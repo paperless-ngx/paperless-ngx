@@ -35,7 +35,7 @@ export enum OwnerFilterType {
 }
 
 @Component({
-  selector: 'app-permissions-filter-dropdown',
+  selector: 'pngx-permissions-filter-dropdown',
   templateUrl: './permissions-filter-dropdown.component.html',
   styleUrls: ['./permissions-filter-dropdown.component.scss'],
 })

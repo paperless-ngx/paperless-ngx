@@ -8,7 +8,6 @@ from pathlib import Path
 from subprocess import CompletedProcess
 from subprocess import run
 from typing import Optional
-from typing import Type
 
 import magic
 from asgiref.sync import async_to_sync
@@ -21,24 +20,29 @@ from django.utils import timezone
 from filelock import FileLock
 from rest_framework.reverse import reverse
 
+from documents.classifier import load_classifier
+from documents.data_models import ConsumableDocument
+from documents.data_models import DocumentMetadataOverrides
+from documents.file_handling import create_source_path_directory
+from documents.file_handling import generate_unique_filename
+from documents.loggers import LoggingMixin
+from documents.matching import document_matches_template
+from documents.models import ConsumptionTemplate
+from documents.models import Correspondent
+from documents.models import Document
+from documents.models import DocumentType
+from documents.models import FileInfo
+from documents.models import StoragePath
+from documents.models import Tag
+from documents.parsers import DocumentParser
+from documents.parsers import ParseError
+from documents.parsers import get_parser_class_for_mime_type
+from documents.parsers import parse_date
+from documents.permissions import set_permissions_for_object
+from documents.signals import document_consumption_finished
+from documents.signals import document_consumption_started
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
-
-from .classifier import load_classifier
-from .file_handling import create_source_path_directory
-from .file_handling import generate_unique_filename
-from .loggers import LoggingMixin
-from .models import Correspondent
-from .models import Document
-from .models import DocumentType
-from .models import FileInfo
-from .models import Tag
-from .parsers import DocumentParser
-from .parsers import ParseError
-from .parsers import get_parser_class_for_mime_type
-from .parsers import parse_date
-from .signals import document_consumption_finished
-from .signals import document_consumption_started
 
 
 class ConsumerError(Exception):
@@ -209,6 +213,7 @@ class Consumer(LoggingMixin):
         script_env = os.environ.copy()
         script_env["DOCUMENT_SOURCE_PATH"] = original_file_path
         script_env["DOCUMENT_WORKING_PATH"] = working_file_path
+        script_env["TASK_ID"] = self.task_id or ""
 
         try:
             completed_proc = run(
@@ -279,6 +284,7 @@ class Consumer(LoggingMixin):
             ",".join(document.tags.all().values_list("name", flat=True)),
         )
         script_env["DOCUMENT_ORIGINAL_FILENAME"] = str(document.original_filename)
+        script_env["TASK_ID"] = self.task_id or ""
 
         try:
             completed_proc = run(
@@ -318,10 +324,15 @@ class Consumer(LoggingMixin):
         override_correspondent_id=None,
         override_document_type_id=None,
         override_tag_ids=None,
+        override_storage_path_id=None,
         task_id=None,
         override_created=None,
         override_asn=None,
         override_owner_id=None,
+        override_view_users=None,
+        override_view_groups=None,
+        override_change_users=None,
+        override_change_groups=None,
     ) -> Document:
         """
         Return the document object if it was successfully created.
@@ -333,10 +344,15 @@ class Consumer(LoggingMixin):
         self.override_correspondent_id = override_correspondent_id
         self.override_document_type_id = override_document_type_id
         self.override_tag_ids = override_tag_ids
+        self.override_storage_path_id = override_storage_path_id
         self.task_id = task_id or str(uuid.uuid4())
         self.override_created = override_created
         self.override_asn = override_asn
         self.override_owner_id = override_owner_id
+        self.override_view_users = override_view_users
+        self.override_view_groups = override_view_groups
+        self.override_change_users = override_change_users
+        self.override_change_groups = override_change_groups
 
         self._send_progress(
             0,
@@ -370,7 +386,7 @@ class Consumer(LoggingMixin):
         self.log.debug(f"Detected mime type: {mime_type}")
 
         # Based on the mime type, get the parser for that type
-        parser_class: Optional[Type[DocumentParser]] = get_parser_class_for_mime_type(
+        parser_class: Optional[type[DocumentParser]] = get_parser_class_for_mime_type(
             mime_type,
         )
         if not parser_class:
@@ -577,6 +593,92 @@ class Consumer(LoggingMixin):
 
         return document
 
+    def get_template_overrides(
+        self,
+        input_doc: ConsumableDocument,
+    ) -> DocumentMetadataOverrides:
+        """
+        Match consumption templates to a document based on source and
+        file name filters, path filters or mail rule filter if specified
+        """
+        overrides = DocumentMetadataOverrides()
+        for template in ConsumptionTemplate.objects.all().order_by("order"):
+            template_overrides = DocumentMetadataOverrides()
+
+            if document_matches_template(input_doc, template):
+                if template.assign_title is not None:
+                    template_overrides.title = template.assign_title
+                if template.assign_tags is not None:
+                    template_overrides.tag_ids = [
+                        tag.pk for tag in template.assign_tags.all()
+                    ]
+                if template.assign_correspondent is not None:
+                    template_overrides.correspondent_id = (
+                        template.assign_correspondent.pk
+                    )
+                if template.assign_document_type is not None:
+                    template_overrides.document_type_id = (
+                        template.assign_document_type.pk
+                    )
+                if template.assign_storage_path is not None:
+                    template_overrides.storage_path_id = template.assign_storage_path.pk
+                if template.assign_owner is not None:
+                    template_overrides.owner_id = template.assign_owner.pk
+                if template.assign_view_users is not None:
+                    template_overrides.view_users = [
+                        user.pk for user in template.assign_view_users.all()
+                    ]
+                if template.assign_view_groups is not None:
+                    template_overrides.view_groups = [
+                        group.pk for group in template.assign_view_groups.all()
+                    ]
+                if template.assign_change_users is not None:
+                    template_overrides.change_users = [
+                        user.pk for user in template.assign_change_users.all()
+                    ]
+                if template.assign_change_groups is not None:
+                    template_overrides.change_groups = [
+                        group.pk for group in template.assign_change_groups.all()
+                    ]
+                overrides.update(template_overrides)
+        return overrides
+
+    def _parse_title_placeholders(self, title: str) -> str:
+        """
+        Consumption template title placeholders can only include items that are
+        assigned as part of this template (since auto-matching hasnt happened yet)
+        """
+        local_added = timezone.localtime(timezone.now())
+
+        correspondent_name = (
+            Correspondent.objects.get(pk=self.override_correspondent_id).name
+            if self.override_correspondent_id is not None
+            else None
+        )
+        doc_type_name = (
+            DocumentType.objects.get(pk=self.override_document_type_id).name
+            if self.override_document_type_id is not None
+            else None
+        )
+        owner_username = (
+            User.objects.get(pk=self.override_owner_id).username
+            if self.override_owner_id is not None
+            else None
+        )
+
+        return title.format(
+            correspondent=correspondent_name,
+            document_type=doc_type_name,
+            added=local_added.isoformat(),
+            added_year=local_added.strftime("%Y"),
+            added_year_short=local_added.strftime("%y"),
+            added_month=local_added.strftime("%m"),
+            added_month_name=local_added.strftime("%B"),
+            added_month_name_short=local_added.strftime("%b"),
+            added_day=local_added.strftime("%d"),
+            owner_username=owner_username,
+        ).strip()
+
     def _store(
         self,
         text: str,
@@ -611,7 +713,11 @@ class Consumer(LoggingMixin):
 
         with open(self.path, "rb") as f:
             document = Document.objects.create(
-                title=(self.override_title or file_info.title)[:127],
+                title=(
+                    self._parse_title_placeholders(self.override_title)
+                    if self.override_title is not None
+                    else file_info.title
+                )[:127],
                 content=text,
                 mime_type=mime_type,
                 checksum=hashlib.md5(f.read()).hexdigest(),
@@ -642,6 +748,11 @@ class Consumer(LoggingMixin):
             for tag_id in self.override_tag_ids:
                 document.tags.add(Tag.objects.get(pk=tag_id))
 
+        if self.override_storage_path_id:
+            document.storage_path = StoragePath.objects.get(
+                pk=self.override_storage_path_id,
+            )
+
         if self.override_asn:
             document.archive_serial_number = self.override_asn
 
@@ -649,6 +760,24 @@ class Consumer(LoggingMixin):
             document.owner = User.objects.get(
                 pk=self.override_owner_id,
             )
+
+        if (
+            self.override_view_users is not None
+            or self.override_view_groups is not None
+            or self.override_change_users is not None
+            or self.override_change_users is not None
+        ):
+            permissions = {
+                "view": {
+                    "users": self.override_view_users or [],
+                    "groups": self.override_view_groups or [],
+                },
+                "change": {
+                    "users": self.override_change_users or [],
+                    "groups": self.override_change_groups or [],
+                },
+            }
+            set_permissions_for_object(permissions=permissions, object=document)
 
     def _write(self, storage_type, source, target):
         with open(source, "rb") as read_file, open(target, "wb") as write_file:

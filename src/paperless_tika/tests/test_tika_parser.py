@@ -1,17 +1,12 @@
 import datetime
 import os
+import zoneinfo
 from pathlib import Path
-from unittest import mock
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
 
 from django.test import TestCase
 from django.test import override_settings
-from httpx import Request
-from httpx import Response
+from httpx import codes
+from httpx._multipart import DataField
 from rest_framework import status
 
 from documents.parsers import ParseError
@@ -99,8 +94,7 @@ class TestTikaParser(HttpxMockMixin, TestCase):
         with self.assertRaises(ParseError):
             self.parser.convert_to_pdf(file, None)
 
-    @mock.patch("paperless_tika.parsers.httpx.post")
-    def test_request_pdf_a_format(self, post: mock.Mock):
+    def test_request_pdf_a_format(self):
         """
         GIVEN:
             - Document needs to be converted to PDF
@@ -112,10 +106,6 @@ class TestTikaParser(HttpxMockMixin, TestCase):
         file = Path(os.path.join(self.parser.tempdir, "input.odt"))
         file.touch()
 
-        response = Response(status_code=status.HTTP_200_OK)
-        response.request = Request("POST", "/somewhere/")
-        post.return_value = response
-
         for setting, expected_key in [
             ("pdfa", "PDF/A-2b"),
             ("pdfa-2", "PDF/A-2b"),
@@ -123,11 +113,20 @@ class TestTikaParser(HttpxMockMixin, TestCase):
             ("pdfa-3", "PDF/A-3b"),
         ]:
             with override_settings(OCR_OUTPUT_TYPE=setting):
+                self.httpx_mock.add_response(
+                    status_code=codes.OK,
+                    content=b"PDF document",
+                    method="POST",
+                )
+
                 self.parser.convert_to_pdf(file, None)
 
-                post.assert_called_once()
-                _, kwargs = post.call_args
+                request = self.httpx_mock.get_request()
+                found = False
+                for field in request.stream.fields:
+                    if isinstance(field, DataField) and field.name == "pdfFormat":
+                        self.assertEqual(field.value, expected_key)
+                        found = True
+                self.assertTrue(found)
 
-                self.assertEqual(kwargs["data"]["pdfFormat"], expected_key)
-
-                post.reset_mock()
+                self.httpx_mock.reset(assert_all_responses_were_requested=False)

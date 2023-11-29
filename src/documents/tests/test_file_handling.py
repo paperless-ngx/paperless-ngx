@@ -820,7 +820,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
 
     @override_settings(FILENAME_FORMAT="{title}")
     def test_archive_deleted2(self):
-        original = os.path.join(settings.ORIGINALS_DIR, "document.png")
+        original = os.path.join(settings.ORIGINALS_DIR, "document.webp")
         original2 = os.path.join(settings.ORIGINALS_DIR, "0000001.pdf")
         archive = os.path.join(settings.ARCHIVE_DIR, "0000001.pdf")
         Path(original).touch()
@@ -828,9 +828,9 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
         Path(archive).touch()
 
         doc1 = Document.objects.create(
-            mime_type="image/png",
+            mime_type="image/webp",
             title="document",
-            filename="document.png",
+            filename="document.webp",
             checksum="A",
             archive_checksum="B",
             archive_filename="0000001.pdf",

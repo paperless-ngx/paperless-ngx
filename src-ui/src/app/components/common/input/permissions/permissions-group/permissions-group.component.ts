@@ -13,7 +13,7 @@ import { AbstractInputComponent } from '../../abstract-input'
       multi: true,
     },
   ],
-  selector: 'app-permissions-group',
+  selector: 'pngx-permissions-group',
   templateUrl: './permissions-group.component.html',
   styleUrls: ['./permissions-group.component.scss'],
 })

@@ -2,14 +2,11 @@ import { HttpClientTestingModule } from '@angular/common/http/testing'
 import {
   ComponentFixture,
   TestBed,
-  discardPeriodicTasks,
   fakeAsync,
   tick,
 } from '@angular/core/testing'
-import { By } from '@angular/platform-browser'
 import { Router } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
-import { NgxFileDropModule } from 'ngx-file-drop'
 import { TourService, TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { Subject } from 'rxjs'
 import { routes } from './app-routing.module'
@@ -21,8 +18,9 @@ import {
 } from './services/consumer-status.service'
 import { PermissionsService } from './services/permissions.service'
 import { ToastService, Toast } from './services/toast.service'
-import { UploadDocumentsService } from './services/upload-documents.service'
 import { SettingsService } from './services/settings.service'
+import { FileDropComponent } from './components/file-drop/file-drop.component'
+import { NgxFileDropModule } from 'ngx-file-drop'
 
 describe('AppComponent', () => {
   let component: AppComponent
@@ -33,11 +31,10 @@ describe('AppComponent', () => {
   let toastService: ToastService
   let router: Router
   let settingsService: SettingsService
-  let uploadDocumentsService: UploadDocumentsService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [AppComponent, ToastsComponent],
+      declarations: [AppComponent, ToastsComponent, FileDropComponent],
       providers: [],
       imports: [
         HttpClientTestingModule,
@@ -53,7 +50,6 @@ describe('AppComponent', () => {
     settingsService = TestBed.inject(SettingsService)
     toastService = TestBed.inject(ToastService)
     router = TestBed.inject(Router)
-    uploadDocumentsService = TestBed.inject(UploadDocumentsService)
     fixture = TestBed.createComponent(AppComponent)
     component = fixture.componentInstance
   })
@@ -72,6 +68,7 @@ describe('AppComponent', () => {
   }))
 
   it('should display toast on document consumed with link if user has access', () => {
+    const navigateSpy = jest.spyOn(router, 'navigate')
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     let toast: Toast
     toastService.getToasts().subscribe((toasts) => (toast = toasts[0]))
@@ -81,9 +78,13 @@ describe('AppComponent', () => {
       .spyOn(consumerStatusService, 'onDocumentConsumptionFinished')
       .mockReturnValue(fileStatusSubject)
     component.ngOnInit()
-    fileStatusSubject.next(new FileStatus())
+    const status = new FileStatus()
+    status.documentId = 1
+    fileStatusSubject.next(status)
     expect(toastSpy).toHaveBeenCalled()
     expect(toast.action).not.toBeUndefined()
+    toast.action()
+    expect(navigateSpy).toHaveBeenCalledWith(['documents', status.documentId])
   })
 
   it('should display toast on document consumed without link if user does not have access', () => {
@@ -138,45 +139,4 @@ describe('AppComponent', () => {
     fileStatusSubject.next(new FileStatus())
     expect(toastSpy).toHaveBeenCalled()
   })
-
-  it('should disable drag-drop if on dashboard', () => {
-    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
-    jest.spyOn(router, 'url', 'get').mockReturnValueOnce('/dashboard')
-    expect(component.dragDropEnabled).toBeFalsy()
-    jest.spyOn(router, 'url', 'get').mockReturnValueOnce('/documents')
-    expect(component.dragDropEnabled).toBeTruthy()
-  })
-
-  it('should enable drag-drop if user has permissions', () => {
-    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
-    expect(component.dragDropEnabled).toBeTruthy()
-  })
-
-  it('should disable drag-drop if user does not have permissions', () => {
-    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(false)
-    expect(component.dragDropEnabled).toBeFalsy()
-  })
-
-  it('should support drag drop', fakeAsync(() => {
-    expect(component.fileIsOver).toBeFalsy()
-    component.fileOver()
-    tick(1)
-    fixture.detectChanges()
-    expect(component.fileIsOver).toBeTruthy()
-    const dropzone = fixture.debugElement.query(
-      By.css('.global-dropzone-overlay')
-    )
-    expect(dropzone).not.toBeNull()
-    component.fileLeave()
-    tick(700)
-    fixture.detectChanges()
-    expect(dropzone.classes['hide']).toBeTruthy()
-    // drop
-    const toastSpy = jest.spyOn(toastService, 'show')
-    const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFiles')
-    component.dropped([])
-    tick(3000)
-    expect(toastSpy).toHaveBeenCalled()
-    expect(uploadSpy).toHaveBeenCalled()
-  }))
 })

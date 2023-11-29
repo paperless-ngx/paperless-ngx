@@ -1,7 +1,7 @@
 import shutil
 import tempfile
+from collections.abc import Iterable
 from random import randint
-from typing import Iterable
 
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User

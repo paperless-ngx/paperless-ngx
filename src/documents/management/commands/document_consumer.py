@@ -8,8 +8,8 @@ from threading import Event
 from time import monotonic
 from time import sleep
 from typing import Final
-from typing import Set
 
+from django import db
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
@@ -32,13 +32,14 @@ except ImportError:  # pragma: nocover
 logger = logging.getLogger("paperless.management.consumer")
 
 
-def _tags_from_path(filepath) -> Set[Tag]:
+def _tags_from_path(filepath) -> list[int]:
     """
     Walk up the directory tree from filepath to CONSUMPTION_DIR
     and get or create Tag IDs for every directory.
 
     Returns set of Tag models
     """
+    db.close_old_connections()
     tag_ids = set()
     path_parts = Path(filepath).relative_to(settings.CONSUMPTION_DIR).parent.parts
     for part in path_parts:
@@ -46,7 +47,7 @@ def _tags_from_path(filepath) -> Set[Tag]:
             Tag.objects.get_or_create(name__iexact=part, defaults={"name": part})[0].pk,
         )
 
-    return tag_ids
+    return list(tag_ids)
 
 
 def _is_ignored(filepath: str) -> bool:
@@ -246,6 +247,8 @@ class Command(BaseCommand):
         if settings.CONSUMER_POLLING == 0 and INotify:
             self.handle_inotify(directory, recursive, options["testing"])
         else:
+            if INotify is None and settings.CONSUMER_POLLING == 0:  # pragma: no cover
+                logger.warn("Using polling as INotify import failed")
             self.handle_polling(directory, recursive, options["testing"])
 
         logger.debug("Consumer exiting.")
@@ -258,8 +261,14 @@ class Command(BaseCommand):
             timeout = self.testing_timeout_s
             logger.debug(f"Configuring timeout to {timeout}s")
 
+        polling_interval = settings.CONSUMER_POLLING
+        if polling_interval == 0:  # pragma: no cover
+            # Only happens if INotify failed to import
+            logger.warn("Using polling of 10s, consider settng this")
+            polling_interval = 10
+
         with ThreadPoolExecutor(max_workers=4) as pool:
-            observer = PollingObserver(timeout=settings.CONSUMER_POLLING)
+            observer = PollingObserver(timeout=polling_interval)
             observer.schedule(Handler(pool), directory, recursive=recursive)
             observer.start()
             try:
@@ -280,7 +289,7 @@ class Command(BaseCommand):
             logger.debug(f"Configuring timeout to {timeout}ms")
 
         inotify = INotify()
-        inotify_flags = flags.CLOSE_WRITE | flags.MOVED_TO
+        inotify_flags = flags.CLOSE_WRITE | flags.MOVED_TO | flags.MODIFY
         if recursive:
             descriptor = inotify.add_watch_recursive(directory, inotify_flags)
         else:
@@ -297,7 +306,10 @@ class Command(BaseCommand):
                 for event in inotify.read(timeout=timeout):
                     path = inotify.get_path(event.wd) if recursive else directory
                     filepath = os.path.join(path, event.name)
-                    notified_files[filepath] = monotonic()
+                    if flags.MODIFY in flags.from_mask(event.mask):
+                        notified_files.pop(filepath, None)
+                    else:
+                        notified_files[filepath] = monotonic()
 
                 # Check the files against the timeout
                 still_waiting = {}

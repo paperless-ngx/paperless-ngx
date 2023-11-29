@@ -1,5 +1,5 @@
 def get_parser(*args, **kwargs):
-    from .parsers import RasterisedDocumentParser
+    from paperless_tesseract.parsers import RasterisedDocumentParser
 
     return RasterisedDocumentParser(*args, **kwargs)
 

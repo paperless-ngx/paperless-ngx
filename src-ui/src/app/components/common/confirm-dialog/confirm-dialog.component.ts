@@ -3,7 +3,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { interval, Subject, take } from 'rxjs'
 
 @Component({
-  selector: 'app-confirm-dialog',
+  selector: 'pngx-confirm-dialog',
   templateUrl: './confirm-dialog.component.html',
   styleUrls: ['./confirm-dialog.component.scss'],
 })

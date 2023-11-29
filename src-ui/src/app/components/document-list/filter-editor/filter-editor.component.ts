@@ -48,6 +48,7 @@ import {
   FILTER_OWNER_DOES_NOT_INCLUDE,
   FILTER_OWNER_ISNULL,
   FILTER_OWNER_ANY,
+  FILTER_CUSTOM_FIELDS,
 } from 'src/app/data/filter-rule-type'
 import {
   FilterableDropdownSelectionModel,
@@ -74,6 +75,7 @@ const TEXT_FILTER_TARGET_TITLE_CONTENT = 'title-content'
 const TEXT_FILTER_TARGET_ASN = 'asn'
 const TEXT_FILTER_TARGET_FULLTEXT_QUERY = 'fulltext-query'
 const TEXT_FILTER_TARGET_FULLTEXT_MORELIKE = 'fulltext-morelike'
+const TEXT_FILTER_TARGET_CUSTOM_FIELDS = 'custom-fields'
 
 const TEXT_FILTER_MODIFIER_EQUALS = 'equals'
 const TEXT_FILTER_MODIFIER_NULL = 'is null'
@@ -103,7 +105,7 @@ const RELATIVE_DATE_QUERYSTRINGS = [
 ]
 
 @Component({
-  selector: 'app-filter-editor',
+  selector: 'pngx-filter-editor',
   templateUrl: './filter-editor.component.html',
   styleUrls: ['./filter-editor.component.scss'],
 })
@@ -204,6 +206,10 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
         name: $localize`Title & content`,
       },
       { id: TEXT_FILTER_TARGET_ASN, name: $localize`ASN` },
+      {
+        id: TEXT_FILTER_TARGET_CUSTOM_FIELDS,
+        name: $localize`Custom fields`,
+      },
       {
         id: TEXT_FILTER_TARGET_FULLTEXT_QUERY,
         name: $localize`Advanced search`,
@@ -320,6 +326,10 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
         case FILTER_ASN:
           this._textFilter = rule.value
           this.textFilterTarget = TEXT_FILTER_TARGET_ASN
+          break
+        case FILTER_CUSTOM_FIELDS:
+          this._textFilter = rule.value
+          this.textFilterTarget = TEXT_FILTER_TARGET_CUSTOM_FIELDS
           break
         case FILTER_FULLTEXT_QUERY:
           let allQueryArgs = rule.value.split(',')
@@ -551,6 +561,15 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           value: this._textFilter,
         })
       }
+    }
+    if (
+      this._textFilter &&
+      this.textFilterTarget == TEXT_FILTER_TARGET_CUSTOM_FIELDS
+    ) {
+      filterRules.push({
+        rule_type: FILTER_CUSTOM_FIELDS,
+        value: this._textFilter,
+      })
     }
     if (
       this._textFilter &&

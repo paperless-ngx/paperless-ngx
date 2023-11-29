@@ -37,7 +37,7 @@ import { FilterEditorComponent } from './filter-editor/filter-editor.component'
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component'
 
 @Component({
-  selector: 'app-document-list',
+  selector: 'pngx-document-list',
   templateUrl: './document-list.component.html',
   styleUrls: ['./document-list.component.scss'],
 })
@@ -185,7 +185,7 @@ export class DocumentListComponent
   }
 
   ngOnDestroy() {
-    // unsubscribes all
+    this.list.cancelPending()
     this.unsubscribeNotifier.next(this)
     this.unsubscribeNotifier.complete()
   }

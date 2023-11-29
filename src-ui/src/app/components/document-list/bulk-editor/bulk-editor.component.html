@@ -21,9 +21,9 @@
       </button>
     </div>
   </div>
-    <div class="d-flex align-items-center gap-2" *appIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
+    <div class="d-flex align-items-center gap-2" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
       <label class="me-2" i18n>Edit:</label>
-      <app-filterable-dropdown title="Tags" icon="tag-fill" i18n-title
+      <pngx-filterable-dropdown title="Tags" icon="tag-fill" i18n-title
         filterPlaceholder="Filter tags" i18n-filterPlaceholder
         [items]="tags"
         [disabled]="!userCanEditAll"
@@ -34,8 +34,8 @@
         [(selectionModel)]="tagSelectionModel"
         [documentCounts]="tagDocumentCounts"
         (apply)="setTags($event)">
-      </app-filterable-dropdown>
-      <app-filterable-dropdown title="Correspondent" icon="person-fill" i18n-title
+      </pngx-filterable-dropdown>
+      <pngx-filterable-dropdown title="Correspondent" icon="person-fill" i18n-title
         filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
         [items]="correspondents"
         [disabled]="!userCanEditAll"
@@ -45,8 +45,8 @@
         [(selectionModel)]="correspondentSelectionModel"
         [documentCounts]="correspondentDocumentCounts"
         (apply)="setCorrespondents($event)">
-      </app-filterable-dropdown>
-      <app-filterable-dropdown title="Document type" icon="file-earmark-fill" i18n-title
+      </pngx-filterable-dropdown>
+      <pngx-filterable-dropdown title="Document type" icon="file-earmark-fill" i18n-title
         filterPlaceholder="Filter document types" i18n-filterPlaceholder
         [items]="documentTypes"
         [disabled]="!userCanEditAll"
@@ -56,8 +56,8 @@
         [(selectionModel)]="documentTypeSelectionModel"
         [documentCounts]="documentTypeDocumentCounts"
         (apply)="setDocumentTypes($event)">
-      </app-filterable-dropdown>
-      <app-filterable-dropdown title="Storage path" icon="folder-fill" i18n-title
+      </pngx-filterable-dropdown>
+      <pngx-filterable-dropdown title="Storage path" icon="folder-fill" i18n-title
         filterPlaceholder="Filter storage paths" i18n-filterPlaceholder
         [items]="storagePaths"
         [disabled]="!userCanEditAll"
@@ -67,7 +67,7 @@
         [(selectionModel)]="storagePathsSelectionModel"
         [documentCounts]="storagePathDocumentCounts"
         (apply)="setStoragePaths($event)">
-      </app-filterable-dropdown>
+      </pngx-filterable-dropdown>
   </div>
   <div class="d-flex align-items-center gap-2 ms-auto">
     <div class="btn-toolbar">
@@ -132,7 +132,7 @@
     </div>
 
     <div class="btn-group btn-group-sm">
-      <button type="button" class="btn btn-sm btn-outline-danger" (click)="applyDelete()" *appIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }" [disabled]="!userOwnsAll">
+      <button type="button" class="btn btn-sm btn-outline-danger" (click)="applyDelete()" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }" [disabled]="!userOwnsAll">
         <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#trash" />
         </svg>&nbsp;<ng-container i18n>Delete</ng-container>

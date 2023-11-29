@@ -1,7 +1,7 @@
 import { FilterRule } from './filter-rule'
-import { ObjectWithId } from './object-with-id'
+import { ObjectWithPermissions } from './object-with-permissions'
 
-export interface PaperlessSavedView extends ObjectWithId {
+export interface PaperlessSavedView extends ObjectWithPermissions {
   name?: string
 
   show_on_dashboard?: boolean

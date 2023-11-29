@@ -1,5 +1,6 @@
 import logging
 import os
+from argparse import RawTextHelpFormatter
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
@@ -8,19 +9,21 @@ logger = logging.getLogger("paperless.management.superuser")
 
 
 class Command(BaseCommand):
-    help = """
-        Creates a Django superuser:
-        User named: admin
-        Email: root@localhost
-        with password based on env variable.
-        No superuser will be created, when:
-        - The username is taken already exists
-        - A superuser already exists
-        - PAPERLESS_ADMIN_PASSWORD is not set
-    """.replace(
-        "    ",
-        "",
+    help = (
+        "Creates a Django superuser:\n"
+        "  User named: admin\n"
+        "  Email: root@localhost\n"
+        "  Password: based on env variable PAPERLESS_ADMIN_PASSWORD\n"
+        "No superuser will be created, when:\n"
+        "  - The username is taken already exists\n"
+        "  - A superuser already exists\n"
+        "  - PAPERLESS_ADMIN_PASSWORD is not set"
     )
+
+    def create_parser(self, *args, **kwargs):
+        parser = super().create_parser(*args, **kwargs)
+        parser.formatter_class = RawTextHelpFormatter
+        return parser
 
     def handle(self, *args, **options):
         username = os.getenv("PAPERLESS_ADMIN_USER", "admin")

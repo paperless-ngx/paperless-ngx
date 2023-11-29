@@ -1,21 +1,28 @@
+# Tool caches
 **/__pycache__
-/src-ui/.vscode
-/src-ui/node_modules
-/src-ui/dist
+**/.ruff_cache/
+**/.mypy_cache/
+# Virtual environment & similar
+.venv/
+./src-ui/node_modules
+./src-ui/dist
+# IDE folders
+.idea/
+.vscode/
+./src-ui/.vscode
+# VCS
 .git
-/export
-/consume
-/media
-/data
-/docs
-.pytest_cache
-/dist
-/scripts
-/resources
+# Test related
+**/.pytest_cache
 **/tests
 **/*.spec.ts
 **/htmlcov
-/src/.pytest_cache
-.idea
-.venv/
-.vscode/
+# Local folders
+./export
+./consume
+./media
+./data
+./docs
+./dist
+./scripts
+./resources

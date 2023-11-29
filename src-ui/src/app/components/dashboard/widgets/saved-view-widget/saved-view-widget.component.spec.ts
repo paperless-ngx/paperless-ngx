@@ -28,6 +28,7 @@ import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
 import { SavedViewWidgetComponent } from './saved-view-widget.component'
 import { By } from '@angular/platform-browser'
 import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
+import { DragDropModule } from '@angular/cdk/drag-drop'
 
 const savedView: PaperlessSavedView = {
   id: 1,
@@ -52,6 +53,7 @@ const documentResults = [
   {
     id: 3,
     title: 'doc3',
+    correspondent: 0,
   },
 ]
 
@@ -89,6 +91,7 @@ describe('SavedViewWidgetComponent', () => {
         HttpClientTestingModule,
         NgbModule,
         RouterTestingModule.withRoutes(routes),
+        DragDropModule,
       ],
     }).compileComponents()
 

@@ -8,8 +8,7 @@ from django.test import override_settings
 from documents.checks import changed_password_check
 from documents.checks import parser_check
 from documents.models import Document
-
-from .factories import DocumentFactory
+from documents.tests.factories import DocumentFactory
 
 
 class TestDocumentChecks(TestCase):

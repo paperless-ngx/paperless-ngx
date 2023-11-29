@@ -30,39 +30,9 @@ describe('NumberComponent', () => {
     input = component.inputField.nativeElement
   })
 
-  // TODO: why doesnt this work?
-  // it('should support use of input field', () => {
-  //   expect(component.value).toBeUndefined()
-  //   input.stepUp()
-  //   console.log(input.value);
-
-  //   input.dispatchEvent(new Event('change'))
-  //   fixture.detectChanges()
-  //   expect(component.value).toEqual('3')
-  // })
-
   it('should support +1 ASN', () => {
-    const listAllSpy = jest.spyOn(documentService, 'listFiltered')
-    listAllSpy
-      .mockReturnValueOnce(
-        of({
-          count: 1,
-          all: [1],
-          results: [
-            {
-              id: 1,
-              archive_serial_number: 1000,
-            },
-          ],
-        })
-      )
-      .mockReturnValueOnce(
-        of({
-          count: 0,
-          all: [],
-          results: [],
-        })
-      )
+    const nextAsnSpy = jest.spyOn(documentService, 'getNextAsn')
+    nextAsnSpy.mockReturnValueOnce(of(1001)).mockReturnValueOnce(of(1))
     expect(component.value).toBeUndefined()
     component.nextAsn()
     expect(component.value).toEqual(1001)
@@ -75,5 +45,19 @@ describe('NumberComponent', () => {
     component.value = 1002
     component.nextAsn()
     expect(component.value).toEqual(1002)
+  })
+
+  it('should support float & monetary values', () => {
+    component.writeValue(11.13)
+    expect(component.value).toEqual(11)
+    component.step = 0.01
+    component.writeValue(11.1)
+    expect(component.value).toEqual('11.10')
+    component.step = 0.1
+    component.writeValue(12.3456)
+    expect(component.value).toEqual(12.3456)
+    // float (step = .1) doesnt force 2 decimals
+    component.writeValue(11.1)
+    expect(component.value).toEqual(11.1)
   })
 })

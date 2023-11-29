@@ -11,17 +11,20 @@ import dateutil.parser
 import pathvalidate
 from celery import states
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from multiselectfield import MultiSelectField
 
+if settings.AUDIT_LOG_ENABLED:
+    from auditlog.registry import auditlog
+
+from documents.data_models import DocumentSource
 from documents.parsers import get_default_file_extension
-
-ALL_STATES = sorted(states.ALL_STATES)
-TASK_STATE_CHOICES = sorted(zip(ALL_STATES, ALL_STATES))
 
 
 class ModelWithOwner(models.Model):
@@ -572,6 +575,9 @@ class UiSettings(models.Model):
 
 
 class PaperlessTask(models.Model):
+    ALL_STATES = sorted(states.ALL_STATES)
+    TASK_STATE_CHOICES = sorted(zip(ALL_STATES, ALL_STATES))
+
     task_id = models.CharField(
         max_length=255,
         unique=True,
@@ -675,3 +681,335 @@ class Note(models.Model):
 
     def __str__(self):
         return self.note
+
+
+class ShareLink(models.Model):
+    class FileVersion(models.TextChoices):
+        ARCHIVE = ("archive", _("Archive"))
+        ORIGINAL = ("original", _("Original"))
+
+    created = models.DateTimeField(
+        _("created"),
+        default=timezone.now,
+        db_index=True,
+        blank=True,
+        editable=False,
+    )
+
+    expiration = models.DateTimeField(
+        _("expiration"),
+        blank=True,
+        null=True,
+        db_index=True,
+    )
+
+    slug = models.SlugField(
+        _("slug"),
+        db_index=True,
+        unique=True,
+        blank=True,
+        editable=False,
+    )
+
+    document = models.ForeignKey(
+        Document,
+        blank=True,
+        related_name="share_links",
+        on_delete=models.CASCADE,
+        verbose_name=_("document"),
+    )
+
+    file_version = models.CharField(
+        max_length=50,
+        choices=FileVersion.choices,
+        default=FileVersion.ARCHIVE,
+    )
+
+    owner = models.ForeignKey(
+        User,
+        blank=True,
+        null=True,
+        related_name="share_links",
+        on_delete=models.SET_NULL,
+        verbose_name=_("owner"),
+    )
+
+    class Meta:
+        ordering = ("created",)
+        verbose_name = _("share link")
+        verbose_name_plural = _("share links")
+
+    def __str__(self):
+        return f"Share Link for {self.document.title}"
+
+
+class ConsumptionTemplate(models.Model):
+    class DocumentSourceChoices(models.IntegerChoices):
+        CONSUME_FOLDER = DocumentSource.ConsumeFolder.value, _("Consume Folder")
+        API_UPLOAD = DocumentSource.ApiUpload.value, _("Api Upload")
+        MAIL_FETCH = DocumentSource.MailFetch.value, _("Mail Fetch")
+
+    name = models.CharField(_("name"), max_length=256, unique=True)
+
+    order = models.IntegerField(_("order"), default=0)
+
+    sources = MultiSelectField(
+        max_length=3,
+        choices=DocumentSourceChoices.choices,
+        default=f"{DocumentSource.ConsumeFolder},{DocumentSource.ApiUpload},{DocumentSource.MailFetch}",
+    )
+
+    filter_path = models.CharField(
+        _("filter path"),
+        max_length=256,
+        null=True,
+        blank=True,
+        help_text=_(
+            "Only consume documents with a path that matches "
+            "this if specified. Wildcards specified as * are "
+            "allowed. Case insensitive.",
+        ),
+    )
+
+    filter_filename = models.CharField(
+        _("filter filename"),
+        max_length=256,
+        null=True,
+        blank=True,
+        help_text=_(
+            "Only consume documents which entirely match this "
+            "filename if specified. Wildcards such as *.pdf or "
+            "*invoice* are allowed. Case insensitive.",
+        ),
+    )
+
+    filter_mailrule = models.ForeignKey(
+        "paperless_mail.MailRule",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("filter documents from this mail rule"),
+    )
+
+    assign_title = models.CharField(
+        _("assign title"),
+        max_length=256,
+        null=True,
+        blank=True,
+        help_text=_(
+            "Assign a document title, can include some placeholders, "
+            "see documentation.",
+        ),
+    )
+
+    assign_tags = models.ManyToManyField(
+        Tag,
+        blank=True,
+        verbose_name=_("assign this tag"),
+    )
+
+    assign_document_type = models.ForeignKey(
+        DocumentType,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("assign this document type"),
+    )
+
+    assign_correspondent = models.ForeignKey(
+        Correspondent,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("assign this correspondent"),
+    )
+
+    assign_storage_path = models.ForeignKey(
+        StoragePath,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("assign this storage path"),
+    )
+
+    assign_owner = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        verbose_name=_("assign this owner"),
+    )
+
+    assign_view_users = models.ManyToManyField(
+        User,
+        blank=True,
+        related_name="+",
+        verbose_name=_("grant view permissions to these users"),
+    )
+
+    assign_view_groups = models.ManyToManyField(
+        Group,
+        blank=True,
+        related_name="+",
+        verbose_name=_("grant view permissions to these groups"),
+    )
+
+    assign_change_users = models.ManyToManyField(
+        User,
+        blank=True,
+        related_name="+",
+        verbose_name=_("grant change permissions to these users"),
+    )
+
+    assign_change_groups = models.ManyToManyField(
+        Group,
+        blank=True,
+        related_name="+",
+        verbose_name=_("grant change permissions to these groups"),
+    )
+
+    class Meta:
+        verbose_name = _("consumption template")
+        verbose_name_plural = _("consumption templates")
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+class CustomField(models.Model):
+    """
+    Defines the name and type of a custom field
+    """
+
+    class FieldDataType(models.TextChoices):
+        STRING = ("string", _("String"))
+        URL = ("url", _("URL"))
+        DATE = ("date", _("Date"))
+        BOOL = ("boolean"), _("Boolean")
+        INT = ("integer", _("Integer"))
+        FLOAT = ("float", _("Float"))
+        MONETARY = ("monetary", _("Monetary"))
+
+    created = models.DateTimeField(
+        _("created"),
+        default=timezone.now,
+        db_index=True,
+        editable=False,
+    )
+
+    name = models.CharField(max_length=128)
+
+    data_type = models.CharField(
+        _("data type"),
+        max_length=50,
+        choices=FieldDataType.choices,
+        editable=False,
+    )
+
+    class Meta:
+        ordering = ("created",)
+        verbose_name = _("custom field")
+        verbose_name_plural = _("custom fields")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name"],
+                name="%(app_label)s_%(class)s_unique_name",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.name} : {self.data_type}"
+
+
+class CustomFieldInstance(models.Model):
+    """
+    A single instance of a field, attached to a CustomField for the name and type
+    and attached to a single Document to be metadata for it
+    """
+
+    created = models.DateTimeField(
+        _("created"),
+        default=timezone.now,
+        db_index=True,
+        editable=False,
+    )
+
+    document = models.ForeignKey(
+        Document,
+        blank=False,
+        null=False,
+        on_delete=models.CASCADE,
+        related_name="custom_fields",
+        editable=False,
+    )
+
+    field = models.ForeignKey(
+        CustomField,
+        blank=False,
+        null=False,
+        on_delete=models.CASCADE,
+        related_name="fields",
+        editable=False,
+    )
+
+    # Actual data storage
+    value_text = models.CharField(max_length=128, null=True)
+
+    value_bool = models.BooleanField(null=True)
+
+    value_url = models.URLField(null=True)
+
+    value_date = models.DateField(null=True)
+
+    value_int = models.IntegerField(null=True)
+
+    value_float = models.FloatField(null=True)
+
+    value_monetary = models.DecimalField(null=True, decimal_places=2, max_digits=12)
+
+    class Meta:
+        ordering = ("created",)
+        verbose_name = _("custom field instance")
+        verbose_name_plural = _("custom field instances")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["document", "field"],
+                name="%(app_label)s_%(class)s_unique_document_field",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return str(self.field.name) + f" : {self.value}"
+
+    @property
+    def value(self):
+        """
+        Based on the data type, access the actual value the instance stores
+        A little shorthand/quick way to get what is actually here
+        """
+        if self.field.data_type == CustomField.FieldDataType.STRING:
+            return self.value_text
+        elif self.field.data_type == CustomField.FieldDataType.URL:
+            return self.value_url
+        elif self.field.data_type == CustomField.FieldDataType.DATE:
+            return self.value_date
+        elif self.field.data_type == CustomField.FieldDataType.BOOL:
+            return self.value_bool
+        elif self.field.data_type == CustomField.FieldDataType.INT:
+            return self.value_int
+        elif self.field.data_type == CustomField.FieldDataType.FLOAT:
+            return self.value_float
+        elif self.field.data_type == CustomField.FieldDataType.MONETARY:
+            return self.value_monetary
+        raise NotImplementedError(self.field.data_type)
+
+
+if settings.AUDIT_LOG_ENABLED:
+    auditlog.register(Document, m2m_fields={"tags"})
+    auditlog.register(Correspondent)
+    auditlog.register(Tag)
+    auditlog.register(DocumentType)
+    auditlog.register(Note)
+    auditlog.register(CustomField)
+    auditlog.register(CustomFieldInstance)

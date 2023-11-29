@@ -1,7 +1,7 @@
 {
   "background_color": "white",
   "description": "A supercharged version of paperless: scan, index and archive all your physical documents",
-  "display": "fullscreen",
+  "display": "standalone",
   "icons": [
     {
       "src": "favicon.ico",

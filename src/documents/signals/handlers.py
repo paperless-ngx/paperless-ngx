@@ -14,6 +14,7 @@ from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.db import DatabaseError
+from django.db import close_old_connections
 from django.db import models
 from django.db.models import Q
 from django.dispatch import receiver
@@ -529,6 +530,8 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
         return
 
     try:
+        close_old_connections()
+
         task_args = body[0]
         input_doc, _ = task_args
 
@@ -560,6 +563,7 @@ def task_prerun_handler(sender=None, task_id=None, task=None, **kwargs):
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-prerun
     """
     try:
+        close_old_connections()
         task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
 
         if task_instance is not None:
@@ -587,6 +591,7 @@ def task_postrun_handler(
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-postrun
     """
     try:
+        close_old_connections()
         task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
 
         if task_instance is not None:
@@ -615,6 +620,7 @@ def task_failure_handler(
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-failure
     """
     try:
+        close_old_connections()
         task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
 
         if task_instance is not None and task_instance.result is None:

@@ -8,7 +8,7 @@ import { UserService } from 'src/app/services/rest/user.service'
 import { PaperlessUser } from 'src/app/data/paperless-user'
 
 @Component({
-  selector: 'app-document-notes',
+  selector: 'pngx-document-notes',
   templateUrl: './document-notes.component.html',
   styleUrls: ['./document-notes.component.scss'],
 })
@@ -63,11 +63,7 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
       },
       error: (e) => {
         this.networkActive = false
-        this.toastService.showError(
-          $localize`Error saving note`,
-          10000,
-          JSON.stringify(e)
-        )
+        this.toastService.showError($localize`Error saving note`, e)
       },
     })
   }
@@ -81,9 +77,7 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
       },
       error: (e) => {
         this.networkActive = false
-        this.toastService.showError(
-          $localize`Error deleting note: ${e.toString()}`
-        )
+        this.toastService.showError($localize`Error deleting note`, e)
       },
     })
   }

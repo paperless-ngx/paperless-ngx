@@ -26,7 +26,7 @@ export enum RelativeDate {
 }
 
 @Component({
-  selector: 'app-date-dropdown',
+  selector: 'pngx-date-dropdown',
   templateUrl: './date-dropdown.component.html',
   styleUrls: ['./date-dropdown.component.scss'],
   providers: [{ provide: NgbDateAdapter, useClass: ISODateAdapter }],
@@ -84,6 +84,9 @@ export class DateDropdownComponent implements OnInit, OnDestroy {
 
   @Output()
   datesSet = new EventEmitter<DateSelection>()
+
+  @Input()
+  disabled: boolean = false
 
   get isActive(): boolean {
     return (

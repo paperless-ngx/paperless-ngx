@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core'
-import { FormControl, FormGroup } from '@angular/forms'
+import { FormArray, FormControl, FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import {
   NgbDateStruct,
@@ -63,6 +63,12 @@ import { EditDialogMode } from '../common/edit-dialog/edit-dialog.component'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { FilterRule } from 'src/app/data/filter-rule'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
+import {
+  PaperlessCustomField,
+  PaperlessCustomFieldDataType,
+} from 'src/app/data/paperless-custom-field'
+import { PaperlessCustomFieldInstance } from 'src/app/data/paperless-custom-field-instance'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -74,7 +80,7 @@ enum DocumentDetailNavIDs {
 }
 
 @Component({
-  selector: 'app-document-detail',
+  selector: 'pngx-document-detail',
   templateUrl: './document-detail.component.html',
   styleUrls: ['./document-detail.component.scss'],
 })
@@ -119,6 +125,7 @@ export class DocumentDetailComponent
     archive_serial_number: new FormControl(),
     tags: new FormControl([]),
     permissions_form: new FormControl(null),
+    custom_fields: new FormArray([]),
   })
 
   previewCurrentPage: number = 1
@@ -133,6 +140,9 @@ export class DocumentDetailComponent
   password: string
 
   ogDate: Date
+
+  customFields: PaperlessCustomField[]
+  public readonly PaperlessCustomFieldDataType = PaperlessCustomFieldDataType
 
   @ViewChild('nav') nav: NgbNav
   @ViewChild('pdfPreview') set pdfPreview(element) {
@@ -165,6 +175,7 @@ export class DocumentDetailComponent
     private storagePathService: StoragePathService,
     private permissionsService: PermissionsService,
     private userService: UserService,
+    private customFieldsService: CustomFieldsService,
     private http: HttpClient
   ) {
     super()
@@ -230,6 +241,8 @@ export class DocumentDetailComponent
       .listAll()
       .pipe(first(), takeUntil(this.unsubscribeNotifier))
       .subscribe((result) => (this.users = result.results))
+
+    this.getCustomFields()
 
     this.route.paramMap
       .pipe(
@@ -323,6 +336,7 @@ export class DocumentDetailComponent
               owner: doc.owner,
               set_permissions: doc.permissions,
             },
+            custom_fields: doc.custom_fields,
           })
 
           this.isDirty$ = dirtyCheck(
@@ -384,6 +398,8 @@ export class DocumentDetailComponent
   updateComponent(doc: PaperlessDocument) {
     this.document = doc
     this.requiresPassword = false
+    // this.customFields = doc.custom_fields.concat([])
+    this.updateFormForCustomFields()
     this.documentsService
       .getMetadata(doc.id)
       .pipe(first())
@@ -395,7 +411,6 @@ export class DocumentDetailComponent
           this.metadata = null
           this.toastService.showError(
             $localize`Error retrieving metadata`,
-            10000,
             error
           )
         },
@@ -417,7 +432,6 @@ export class DocumentDetailComponent
             this.suggestions = null
             this.toastService.showError(
               $localize`Error retrieving suggestions.`,
-              10000,
               error
             )
           },
@@ -432,6 +446,10 @@ export class DocumentDetailComponent
 
     this.documentForm.patchValue(docFormValues, { emitEvent: false })
     if (!this.userCanEdit) this.documentForm.disable()
+  }
+
+  get customFieldFormFields(): FormArray {
+    return this.documentForm.get('custom_fields') as FormArray
   }
 
   createDocumentType(newName: string) {
@@ -511,6 +529,7 @@ export class DocumentDetailComponent
             set_permissions: doc.permissions,
           }
           this.title = doc.title
+          this.updateFormForCustomFields()
           this.documentForm.patchValue(doc)
           this.openDocumentService.setDirty(doc, false)
         },
@@ -534,6 +553,7 @@ export class DocumentDetailComponent
           close && this.close()
           this.networkActive = false
           this.error = null
+          this.openDocumentService.refreshDocument(this.documentId)
         },
         error: (error) => {
           this.networkActive = false
@@ -542,11 +562,7 @@ export class DocumentDetailComponent
             close && this.close()
           } else {
             this.error = error.error
-            this.toastService.showError(
-              $localize`Error saving document` +
-                ': ' +
-                (error.error?.detail ?? error.message ?? JSON.stringify(error))
-            )
+            this.toastService.showError($localize`Error saving document`, error)
           }
         },
       })
@@ -587,11 +603,7 @@ export class DocumentDetailComponent
         error: (error) => {
           this.networkActive = false
           this.error = error.error
-          this.toastService.showError(
-            $localize`Error saving document` +
-              ': ' +
-              (error.error?.detail ?? error.message ?? JSON.stringify(error))
-          )
+          this.toastService.showError($localize`Error saving document`, error)
         },
       })
   }
@@ -640,11 +652,7 @@ export class DocumentDetailComponent
           this.close()
         },
         error: (error) => {
-          this.toastService.showError(
-            $localize`Error deleting document: ${
-              error.error?.detail ?? error.message ?? JSON.stringify(error)
-            }`
-          )
+          this.toastService.showError($localize`Error deleting document`, error)
           modal.componentInstance.buttonsEnabled = true
           this.subscribeModalDelete(modal)
         },
@@ -687,9 +695,8 @@ export class DocumentDetailComponent
               modal.componentInstance.buttonsEnabled = true
             }
             this.toastService.showError(
-              $localize`Error executing operation: ${JSON.stringify(
-                error.error
-              )}`
+              $localize`Error executing operation`,
+              error
             )
           },
         })
@@ -832,5 +839,62 @@ export class DocumentDetailComponent
     })
 
     this.documentListViewService.quickFilter(filterRules)
+  }
+
+  private getCustomFields() {
+    this.customFieldsService
+      .listAll()
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .subscribe((result) => (this.customFields = result.results))
+  }
+
+  public refreshCustomFields() {
+    this.customFieldsService.clearCache()
+    this.getCustomFields()
+  }
+
+  public getCustomFieldFromInstance(
+    instance: PaperlessCustomFieldInstance
+  ): PaperlessCustomField {
+    return this.customFields?.find((f) => f.id === instance.field)
+  }
+
+  public getCustomFieldError(index: number) {
+    const fieldError = this.error?.custom_fields?.[index]
+    return fieldError?.['non_field_errors'] ?? fieldError?.['value']
+  }
+
+  private updateFormForCustomFields(emitEvent: boolean = false) {
+    this.customFieldFormFields.clear({ emitEvent: false })
+    this.document.custom_fields?.forEach((fieldInstance) => {
+      this.customFieldFormFields.push(
+        new FormGroup({
+          field: new FormControl(
+            this.getCustomFieldFromInstance(fieldInstance)?.id
+          ),
+          value: new FormControl(fieldInstance.value),
+        }),
+        { emitEvent }
+      )
+    })
+  }
+
+  public addField(field: PaperlessCustomField) {
+    this.document.custom_fields.push({
+      field: field.id,
+      value: null,
+      document: this.documentId,
+      created: new Date(),
+    })
+    this.updateFormForCustomFields(true)
+  }
+
+  public removeField(fieldInstance: PaperlessCustomFieldInstance) {
+    this.document.custom_fields.splice(
+      this.document.custom_fields.indexOf(fieldInstance),
+      1
+    )
+    this.updateFormForCustomFields(true)
+    this.documentForm.updateValueAndValidity()
   }
 }

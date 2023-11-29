@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core'
 import { PaperlessTag } from 'src/app/data/paperless-tag'
 
 @Component({
-  selector: 'app-tag',
+  selector: 'pngx-tag',
   templateUrl: './tag.component.html',
   styleUrls: ['./tag.component.scss'],
 })

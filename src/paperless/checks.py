@@ -5,9 +5,11 @@ import shutil
 import stat
 
 from django.conf import settings
+from django.core.checks import Critical
 from django.core.checks import Error
 from django.core.checks import Warning
 from django.core.checks import register
+from django.db import connections
 
 exists_message = "{} is set but doesn't exist."
 exists_hint = "Create a directory at {}"
@@ -155,10 +157,8 @@ def settings_values_check(app_configs, **kwargs):
         """
         Validates the user provided timezone is a valid timezone
         """
-        try:
-            import zoneinfo
-        except ImportError:  # pragma: nocover
-            from backports import zoneinfo
+        import zoneinfo
+
         msgs = []
         if settings.TIME_ZONE not in zoneinfo.available_timezones():
             msgs.append(
@@ -197,3 +197,22 @@ def settings_values_check(app_configs, **kwargs):
         + _barcode_scanner_validate()
         + _email_certificate_validate()
     )
+
+
+@register()
+def audit_log_check(app_configs, **kwargs):
+    db_conn = connections["default"]
+    all_tables = db_conn.introspection.table_names()
+    result = []
+
+    if ("auditlog_logentry" in all_tables) and not (settings.AUDIT_LOG_ENABLED):
+        result.append(
+            Critical(
+                (
+                    "auditlog table was found but PAPERLESS_AUDIT_LOG_ENABLED"
+                    " is not active.  This setting cannot be disabled after enabling"
+                ),
+            ),
+        )
+
+    return result

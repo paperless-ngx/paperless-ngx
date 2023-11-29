@@ -1,31 +1,32 @@
 import {
+  HttpTestingController,
+  HttpClientTestingModule,
+} from '@angular/common/http/testing'
+import {
   ComponentFixture,
   TestBed,
-  discardPeriodicTasks,
   fakeAsync,
   tick,
 } from '@angular/core/testing'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
-import {
-  HttpClientTestingModule,
-  HttpTestingController,
-} from '@angular/common/http/testing'
-import { EditDialogMode } from '../edit-dialog.component'
+import { NgSelectModule } from '@ng-select/ng-select'
+import { IMAPSecurity } from 'src/app/data/paperless-mail-account'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { SelectComponent } from '../../input/select/select.component'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { TextComponent } from '../../input/text/text.component'
-import { NgSelectModule } from '@ng-select/ng-select'
-import { PermissionsFormComponent } from '../../input/permissions/permissions-form/permissions-form.component'
-import { MailAccountEditDialogComponent } from './mail-account-edit-dialog.component'
-import { PasswordComponent } from '../../input/password/password.component'
-import { CheckComponent } from '../../input/check/check.component'
-import { IMAPSecurity } from 'src/app/data/paperless-mail-account'
+import { SettingsService } from 'src/app/services/settings.service'
 import { environment } from 'src/environments/environment'
+import { CheckComponent } from '../../input/check/check.component'
+import { PasswordComponent } from '../../input/password/password.component'
+import { PermissionsFormComponent } from '../../input/permissions/permissions-form/permissions-form.component'
+import { SelectComponent } from '../../input/select/select.component'
+import { TextComponent } from '../../input/text/text.component'
+import { EditDialogMode } from '../edit-dialog.component'
+import { MailAccountEditDialogComponent } from './mail-account-edit-dialog.component'
 
 describe('MailAccountEditDialogComponent', () => {
   let component: MailAccountEditDialogComponent
+  let settingsService: SettingsService
   let fixture: ComponentFixture<MailAccountEditDialogComponent>
   let httpController: HttpTestingController
 
@@ -54,6 +55,8 @@ describe('MailAccountEditDialogComponent', () => {
     httpController = TestBed.inject(HttpTestingController)
 
     fixture = TestBed.createComponent(MailAccountEditDialogComponent)
+    settingsService = TestBed.inject(SettingsService)
+    settingsService.currentUser = { id: 99, username: 'user99' }
     component = fixture.componentInstance
 
     fixture.detectChanges()

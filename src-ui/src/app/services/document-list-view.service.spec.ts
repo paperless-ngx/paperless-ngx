@@ -103,6 +103,7 @@ describe('DocumentListViewService', () => {
   })
 
   afterEach(() => {
+    documentListViewService.cancelPending()
     httpTestingController.verify()
     sessionStorage.clear()
   })
@@ -332,6 +333,97 @@ describe('DocumentListViewService', () => {
     })
   })
 
+  it('should not return next doc when documents is null', () => {
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue(null)
+    const complete = jest.fn()
+    documentListViewService.getNext(1).subscribe({
+      next: () => fail('Observable should not emit any value'),
+      complete: complete(),
+    })
+    expect(complete).toHaveBeenCalled()
+  })
+
+  it('should return next doc when exists', () => {
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue(documents)
+    const next = jest.fn()
+    documentListViewService.getNext(3).subscribe({
+      next: (id) => next(id),
+      complete: () => {},
+    })
+    expect(next).toHaveBeenCalledWith(4)
+  })
+
+  it('should increase page on get next doc if needed', () => {
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue(documents)
+    expect(documentListViewService.currentPage).toEqual(1)
+    documentListViewService.currentPageSize = 3
+    jest
+      .spyOn(documentListViewService, 'getLastPage')
+      .mockReturnValue(Math.ceil(documents.length / 3))
+    const reloadSpy = jest.spyOn(documentListViewService, 'reload')
+    documentListViewService
+      .getNext(documents[documents.length - 1].id)
+      .subscribe({
+        next: () => {},
+        complete: () => {},
+      })
+    expect(reloadSpy).toHaveBeenCalled()
+    expect(documentListViewService.currentPage).toEqual(2)
+    const reqs = httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=2&page_size=3&ordering=-created&truncate_content=true`
+    )
+    expect(reqs.length).toBeGreaterThan(0)
+  })
+
+  it('should not return previous doc when documents is null', () => {
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue(null)
+    const complete = jest.fn()
+    documentListViewService.getPrevious(1).subscribe({
+      next: () => fail('Observable should not emit any value'),
+      complete: complete(),
+    })
+    expect(complete).toHaveBeenCalled()
+  })
+
+  it('should return previous doc when exists', () => {
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue(documents)
+    const next = jest.fn()
+    documentListViewService.getPrevious(3).subscribe({
+      next: (id) => next(id),
+      complete: () => {},
+    })
+    expect(next).toHaveBeenCalledWith(2)
+  })
+
+  it('should decrease page on get previous doc if needed', () => {
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue(documents)
+    documentListViewService.currentPage = 2
+    documentListViewService.currentPageSize = 3
+    const reloadSpy = jest.spyOn(documentListViewService, 'reload')
+    documentListViewService.getPrevious(1).subscribe({
+      next: () => {},
+      complete: () => {},
+    })
+    expect(reloadSpy).toHaveBeenCalled()
+    expect(documentListViewService.currentPage).toEqual(1)
+    const reqs = httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=3&ordering=-created&truncate_content=true`
+    )
+    expect(reqs.length).toBeGreaterThan(0)
+  })
+
   it('should update page size from settings', () => {
     settingsService.set(SETTINGS_KEYS.DOCUMENT_LIST_SIZE, 10)
     documentListViewService.updatePageSize()
@@ -424,5 +516,32 @@ describe('DocumentListViewService', () => {
       results: documents.slice(0, 3),
     })
     expect(documentListViewService.selected.size).toEqual(3)
+  })
+
+  it('should cancel on reload the list', () => {
+    const cancelSpy = jest.spyOn(documentListViewService, 'cancelPending')
+    documentListViewService.reload()
+    httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&tags__id__all=9`
+    )
+    expect(cancelSpy).toHaveBeenCalled()
+  })
+
+  it('should reset sort field if changing from search result', () => {
+    const view2 = {
+      id: 22,
+      name: 'Saved View 2',
+      sort_field: 'score',
+      sort_reverse: true,
+      filter_rules: filterRules,
+    }
+
+    documentListViewService.loadSavedView(view2)
+    expect(documentListViewService.sortField).toEqual('score')
+    documentListViewService.filterRules = []
+    expect(documentListViewService.sortField).toEqual('created')
+    httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
+    )
   })
 })

@@ -36,7 +36,7 @@ import { FormControl, FormGroup } from '@angular/forms'
 import { first, Subject, takeUntil } from 'rxjs'
 
 @Component({
-  selector: 'app-bulk-editor',
+  selector: 'pngx-bulk-editor',
   templateUrl: './bulk-editor.component.html',
   styleUrls: ['./bulk-editor.component.scss'],
 })
@@ -182,9 +182,8 @@ export class BulkEditorComponent
             modal.componentInstance.buttonsEnabled = true
           }
           this.toastService.showError(
-            $localize`Error executing bulk operation: ${JSON.stringify(
-              error.error
-            )}`
+            $localize`Error executing bulk operation`,
+            error
           )
         },
       })
@@ -477,8 +476,8 @@ export class BulkEditorComponent
       this.downloadForm.get('downloadFileTypeOriginals').value
         ? 'both'
         : this.downloadForm.get('downloadFileTypeArchive').value
-        ? 'archive'
-        : 'originals'
+          ? 'archive'
+          : 'originals'
     this.documentService
       .bulkDownload(
         Array.from(this.list.selected),

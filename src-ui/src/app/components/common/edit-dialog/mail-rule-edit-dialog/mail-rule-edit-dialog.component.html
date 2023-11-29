@@ -1,4 +1,4 @@
-<form [formGroup]="objectForm" (ngSubmit)="save()">
+<form [formGroup]="objectForm" (ngSubmit)="save()" autocomplete="off">
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
     <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
@@ -6,31 +6,33 @@
   </div>
   <div class="modal-body">
     <div class="row">
-      <div class="col">
-        <app-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></app-input-text>
-        <app-input-select i18n-title title="Account" [items]="accounts" formControlName="account"></app-input-select>
-        <app-input-text i18n-title title="Folder" formControlName="folder" i18n-hint hint="Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server." [error]="error?.folder"></app-input-text>
-        <app-input-number i18n-title title="Maximum age (days)" formControlName="maximum_age" [showAdd]="false" [error]="error?.maximum_age"></app-input-number>
-        <app-input-select i18n-title title="Attachment type" [items]="attachmentTypeOptions" formControlName="attachment_type"></app-input-select>
-        <app-input-select i18n-title title="Consumption scope" [items]="consumptionScopeOptions" formControlName="consumption_scope" i18n-hint hint="See docs for .eml processing requirements"></app-input-select>
-        <app-input-number i18n-title title="Rule order" formControlName="order" [showAdd]="false" [error]="error?.order"></app-input-number>
+      <div class="col-md-4">
+        <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></pngx-input-text>
+        <pngx-input-select i18n-title title="Account" [items]="accounts" formControlName="account"></pngx-input-select>
+        <pngx-input-text i18n-title title="Folder" formControlName="folder" i18n-hint hint="Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server." [error]="error?.folder"></pngx-input-text>
+        <pngx-input-number i18n-title title="Maximum age (days)" formControlName="maximum_age" [showAdd]="false" [error]="error?.maximum_age"></pngx-input-number>
+        <pngx-input-select i18n-title title="Attachment type" [items]="attachmentTypeOptions" formControlName="attachment_type"></pngx-input-select>
+        <pngx-input-select i18n-title title="Consumption scope" [items]="consumptionScopeOptions" formControlName="consumption_scope" i18n-hint hint="See docs for .eml processing requirements"></pngx-input-select>
+        <pngx-input-number i18n-title title="Rule order" formControlName="order" [showAdd]="false" [error]="error?.order"></pngx-input-number>
       </div>
-      <div class="col">
+      <div class="col-md-4">
         <p class="small" i18n>Paperless will only process mails that match <em>all</em> of the filters specified below.</p>
-        <app-input-text i18n-title title="Filter from" formControlName="filter_from" [error]="error?.filter_from"></app-input-text>
-        <app-input-text i18n-title title="Filter to" formControlName="filter_to" [error]="error?.filter_to"></app-input-text>
-        <app-input-text i18n-title title="Filter subject" formControlName="filter_subject" [error]="error?.filter_subject"></app-input-text>
-        <app-input-text i18n-title title="Filter body" formControlName="filter_body" [error]="error?.filter_body"></app-input-text>
-        <app-input-text i18n-title title="Filter attachment filename" formControlName="filter_attachment_filename" i18n-hint hint="Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive." [error]="error?.filter_attachment_filename"></app-input-text>
+        <pngx-input-text i18n-title title="Filter from" formControlName="filter_from" [error]="error?.filter_from"></pngx-input-text>
+        <pngx-input-text i18n-title title="Filter to" formControlName="filter_to" [error]="error?.filter_to"></pngx-input-text>
+        <pngx-input-text i18n-title title="Filter subject" formControlName="filter_subject" [error]="error?.filter_subject"></pngx-input-text>
+        <pngx-input-text i18n-title title="Filter body" formControlName="filter_body" [error]="error?.filter_body"></pngx-input-text>
+        <pngx-input-text i18n-title title="Filter attachment filename" formControlName="filter_attachment_filename" i18n-hint hint="Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive." [error]="error?.filter_attachment_filename"></pngx-input-text>
       </div>
-      <div class="col">
-        <app-input-select i18n-title title="Action" [items]="actionOptions" formControlName="action" i18n-hint hint="Action is only performed when documents are consumed from the mail. Mails without attachments remain entirely untouched."></app-input-select>
-        <app-input-text i18n-title title="Action parameter" *ngIf="showActionParamField" formControlName="action_parameter" [error]="error?.action_parameter"></app-input-text>
-        <app-input-select i18n-title title="Assign title from" [items]="metadataTitleOptions" formControlName="assign_title_from"></app-input-select>
-        <app-input-tags [allowCreate]="false" formControlName="assign_tags"></app-input-tags>
-        <app-input-select i18n-title title="Assign document type" [items]="documentTypes" [allowNull]="true" formControlName="assign_document_type"></app-input-select>
-        <app-input-select i18n-title title="Assign correspondent from" [items]="metadataCorrespondentOptions" formControlName="assign_correspondent_from"></app-input-select>
-        <app-input-select *ngIf="showCorrespondentField" i18n-title title="Assign correspondent" [items]="correspondents" [allowNull]="true" formControlName="assign_correspondent"></app-input-select>
+      <div class="col-md-4">
+        <pngx-input-select i18n-title title="Action" [items]="actionOptions" formControlName="action" i18n-hint hint="Action is only performed when documents are consumed from the mail. Mails without attachments remain entirely untouched."></pngx-input-select>
+        <pngx-input-text i18n-title title="Action parameter" *ngIf="showActionParamField" formControlName="action_parameter" [error]="error?.action_parameter"></pngx-input-text>
+        <p class="small fst-italic mt-5" i18n>Assignments specified here will supersede any consumption templates.</p>
+        <pngx-input-select i18n-title title="Assign title from" [items]="metadataTitleOptions" formControlName="assign_title_from"></pngx-input-select>
+        <pngx-input-tags [allowCreate]="false" formControlName="assign_tags"></pngx-input-tags>
+        <pngx-input-select i18n-title title="Assign document type" [items]="documentTypes" [allowNull]="true" formControlName="assign_document_type"></pngx-input-select>
+        <pngx-input-select i18n-title title="Assign correspondent from" [items]="metadataCorrespondentOptions" formControlName="assign_correspondent_from"></pngx-input-select>
+        <pngx-input-select *ngIf="showCorrespondentField" i18n-title title="Assign correspondent" [items]="correspondents" [allowNull]="true" formControlName="assign_correspondent"></pngx-input-select>
+        <pngx-input-check i18n-title title="Assign owner from rule" formControlName="assign_owner_from_rule"></pngx-input-check>
       </div>
     </div>
   </div>

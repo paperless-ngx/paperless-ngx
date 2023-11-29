@@ -1,14 +1,19 @@
 import shutil
 import tempfile
+import time
+import warnings
 from collections import namedtuple
+from collections.abc import Iterator
 from contextlib import contextmanager
 from os import PathLike
 from pathlib import Path
-from typing import Iterator
-from typing import Tuple
+from typing import Any
+from typing import Callable
 from typing import Union
 from unittest import mock
 
+import httpx
+import pytest
 from django.apps import apps
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
@@ -17,6 +22,7 @@ from django.test import override_settings
 
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
+from documents.parsers import ParseError
 
 
 def setup_directories():
@@ -76,6 +82,67 @@ def paperless_environment():
     finally:
         if dirs:
             remove_dirs(dirs)
+
+
+def util_call_with_backoff(
+    method_or_callable: Callable,
+    args: Union[list, tuple],
+    *,
+    skip_on_50x_err=True,
+) -> tuple[bool, Any]:
+    """
+    For whatever reason, the images started during the test pipeline like to
+    segfault sometimes, crash and otherwise fail randomly, when run with the
+    exact files that usually pass.
+
+    So, this function will retry the given method/function up to 3 times, with larger backoff
+    periods between each attempt, in hopes the issue resolves itself during
+    one attempt to parse.
+
+    This will wait the following:
+        - Attempt 1 - 20s following failure
+        - Attempt 2 - 40s following failure
+        - Attempt 3 - 80s following failure
+
+    """
+    result = None
+    succeeded = False
+    retry_time = 20.0
+    retry_count = 0
+    status_codes = []
+    max_retry_count = 3
+
+    while retry_count < max_retry_count and not succeeded:
+        try:
+            result = method_or_callable(*args)
+
+            succeeded = True
+        except ParseError as e:  # pragma: no cover
+            cause_exec = e.__cause__
+            if cause_exec is not None and isinstance(cause_exec, httpx.HTTPStatusError):
+                status_codes.append(cause_exec.response.status_code)
+                warnings.warn(
+                    f"HTTP Exception for {cause_exec.request.url} - {cause_exec}",
+                )
+            else:
+                warnings.warn(f"Unexpected error: {e}")
+        except Exception as e:  # pragma: no cover
+            warnings.warn(f"Unexpected error: {e}")
+
+        retry_count = retry_count + 1
+
+        time.sleep(retry_time)
+        retry_time = retry_time * 2.0
+
+    if (
+        not succeeded
+        and status_codes
+        and skip_on_50x_err
+        and all(httpx.codes.is_server_error(code) for code in status_codes)
+    ):
+        pytest.skip("Repeated HTTP 50x for service")  # pragma: no cover
+
+    return succeeded, result
 
 
 class DirectoriesMixin:
@@ -150,7 +217,7 @@ class DocumentConsumeDelayMixin:
 
     def get_last_consume_delay_call_args(
         self,
-    ) -> Tuple[ConsumableDocument, DocumentMetadataOverrides]:
+    ) -> tuple[ConsumableDocument, DocumentMetadataOverrides]:
         """
         Returns the most recent arguments to the async task
         """
@@ -164,7 +231,7 @@ class DocumentConsumeDelayMixin:
 
     def get_all_consume_delay_call_args(
         self,
-    ) -> Iterator[Tuple[ConsumableDocument, DocumentMetadataOverrides]]:
+    ) -> Iterator[tuple[ConsumableDocument, DocumentMetadataOverrides]]:
         """
         Iterates over all calls to the async task and returns the arguments
         """
@@ -177,7 +244,7 @@ class DocumentConsumeDelayMixin:
     def get_specific_consume_delay_call_args(
         self,
         index: int,
-    ) -> Iterator[Tuple[ConsumableDocument, DocumentMetadataOverrides]]:
+    ) -> Iterator[tuple[ConsumableDocument, DocumentMetadataOverrides]]:
         """
         Returns the arguments of a specific call to the async task
         """

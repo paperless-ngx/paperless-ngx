@@ -13,13 +13,13 @@ export interface SortEvent {
 }
 
 @Directive({
-  selector: 'th[appSortable]',
+  selector: 'th[pngxSortable]',
 })
 export class SortableDirective {
   constructor() {}
 
   @Input()
-  appSortable: string = ''
+  pngxSortable: string = ''
 
   @Input()
   currentSortReverse: boolean = false
@@ -31,18 +31,20 @@ export class SortableDirective {
 
   @HostBinding('class.asc') get asc() {
     return (
-      this.currentSortField === this.appSortable && !this.currentSortReverse
+      this.currentSortField === this.pngxSortable && !this.currentSortReverse
     )
   }
   @HostBinding('class.des') get des() {
-    return this.currentSortField === this.appSortable && this.currentSortReverse
+    return (
+      this.currentSortField === this.pngxSortable && this.currentSortReverse
+    )
   }
 
   @HostListener('click') rotate() {
-    if (this.currentSortField != this.appSortable) {
-      this.sort.emit({ column: this.appSortable, reverse: false })
+    if (this.currentSortField != this.pngxSortable) {
+      this.sort.emit({ column: this.pngxSortable, reverse: false })
     } else if (
-      this.currentSortField == this.appSortable &&
+      this.currentSortField == this.pngxSortable &&
       !this.currentSortReverse
     ) {
       this.sort.emit({ column: this.currentSortField, reverse: true })
