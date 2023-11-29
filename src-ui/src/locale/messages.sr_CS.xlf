@@ -288,7 +288,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</target>
+        <target state="translated">Dokument <x id="PH" equiv-text="status.filename"/> je dodat u Paperless-ngx.</target>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html">
         <source>Open document</source>
@@ -316,7 +316,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> is being processed by Paperless-ngx.</target>
+        <target state="translated">Dokument <x id="PH" equiv-text="status.filename"/> obrađuje Paperless-ngx.</target>
       </trans-unit>
       <trans-unit id="2501522447884928778" datatype="html">
         <source>Prev</source>
@@ -1084,7 +1084,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">277</context>
         </context-group>
-        <target state="translated">Prikaži upozorenje kada se zatvara sačuvani pogled sa ne sačuvanim izmenama</target>
+        <target state="translated">Prikaži upozorenje kada se zatvara sačuvani pogled sa nesačuvanim izmenama</target>
       </trans-unit>
       <trans-unit id="2123659921722214537" datatype="html">
         <source>Views</source>
@@ -2319,7 +2319,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">67</context>
         </context-group>
-        <target state="translated">Putanja skladišta</target>
+        <target state="translated">Putanje skladišta</target>
       </trans-unit>
       <trans-unit id="3188389494264426470" datatype="html">
         <source>Custom Fields</source>
@@ -2334,6 +2334,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.html</context>
           <context context-type="linenumber">6</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.html</context>
+          <context context-type="linenumber">1</context>
         </context-group>
         <target state="translated">Dodatna polja</target>
       </trans-unit>
@@ -2783,7 +2787,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="translated">Dodali vlasnika</target>
+        <target state="translated">Dodeli vlasnika</target>
       </trans-unit>
       <trans-unit id="1749184201773078639" datatype="html">
         <source>Assign view permissions</source>
@@ -2907,7 +2911,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.ts</context>
           <context context-type="linenumber">83</context>
         </context-group>
-        <target state="translated">Kreiraj novu šablon za obradu</target>
+        <target state="translated">Kreiraj novi šablon za obradu</target>
       </trans-unit>
       <trans-unit id="3745279073747685988" datatype="html">
         <source>Edit consumption template</source>
@@ -4062,6 +4066,14 @@
           <context context-type="linenumber">42</context>
         </context-group>
         <target state="translated">Podeli arhivnu verziju</target>
+      </trans-unit>
+      <trans-unit id="8037476586059399916" datatype="html">
+        <source>Expires</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+        <target state="translated">Ističe</target>
       </trans-unit>
       <trans-unit id="5674286808255988565" datatype="html">
         <source>Create</source>
@@ -5836,6 +5848,14 @@
         </context-group>
         <target state="translated">Pokretanje otpremanja...</target>
       </trans-unit>
+      <trans-unit id="3789574458951567089" datatype="html">
+        <source>Consumption Templates</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+        <target state="translated">Šabloni potrošnje</target>
+      </trans-unit>
       <trans-unit id="7308826808299076537" datatype="html">
         <source>Add Template</source>
         <context-group purpose="location">
@@ -7043,7 +7063,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">239</context>
         </context-group>
-        <target state="needs-translation">Hungarian</target>
+        <target state="translated">Mađarski</target>
       </trans-unit>
       <trans-unit id="2935232983274991580" datatype="html">
         <source>Italian</source>
