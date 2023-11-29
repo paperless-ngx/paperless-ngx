@@ -186,6 +186,11 @@ class RasterisedDocumentParser(DocumentParser):
             "progress_bar": False,
         }
 
+        if "pdfa" in ocrmypdf_args["output_type"]:
+            ocrmypdf_args[
+                "color_conversion_strategy"
+            ] = settings.OCR_COLOR_CONVERSION_STRATEGY
+
         if settings.OCR_MODE == "force" or safe_fallback:
             ocrmypdf_args["force_ocr"] = True
         elif settings.OCR_MODE in ["skip", "skip_noarchive"]:
