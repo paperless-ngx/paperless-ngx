@@ -20,7 +20,7 @@ djangorestframework = "~=3.14"
 djangorestframework-guardian = "*"
 drf-writable-nested = "*"
 bleach = "*"
-celery = "*"
+celery = {extras = ["redis"], version = "*"}
 channels = "~=4.0"
 channels-redis = "*"
 concurrent-log-handler = "*"
