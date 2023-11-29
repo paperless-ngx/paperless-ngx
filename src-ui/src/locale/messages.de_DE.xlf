@@ -3019,7 +3019,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.ts</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="translated">Neues benutzerdefinidertes Feld erstellen</target>
+        <target state="translated">Neues benutzerdefiniertes Feld erstellen</target>
       </trans-unit>
       <trans-unit id="8751213029607178010" datatype="html">
         <source>Edit custom field</source>
