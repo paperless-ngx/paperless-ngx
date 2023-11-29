@@ -103,6 +103,7 @@ jobs:
           CUSTOM_DOMAIN: docs.paperless-ngx.com
           CONFIG_FILE: mkdocs.yml
           EXTRA_PACKAGES: build-base
+          REQUIREMENTS: docs/requirements.txt
 
   tests-backend:
     name: "Backend Tests (Python ${{ matrix.python-version }})"

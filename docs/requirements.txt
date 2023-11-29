@@ -1,0 +1,2 @@
+-i https://pypi.python.org/simple
+mkdocs-glightbox==0.3.4; python_version >= '3.8'
