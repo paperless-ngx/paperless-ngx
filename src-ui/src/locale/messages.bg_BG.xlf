@@ -288,7 +288,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</target>
+        <target state="translated">Документ <x id="PH" equiv-text="status.filename"/> беше добавен към Paperless-ngx.</target>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html">
         <source>Open document</source>
@@ -316,7 +316,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> is being processed by Paperless-ngx.</target>
+        <target state="translated">Документ <x id="PH" equiv-text="status.filename"/> се обработва от Paperless-ngx.</target>
       </trans-unit>
       <trans-unit id="2501522447884928778" datatype="html">
         <source>Prev</source>
@@ -2335,6 +2335,10 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.html</context>
           <context context-type="linenumber">6</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
         <target state="translated">Персонализирани полета</target>
       </trans-unit>
       <trans-unit id="4462691404891390153" datatype="html">
@@ -4062,6 +4066,14 @@
           <context context-type="linenumber">42</context>
         </context-group>
         <target state="translated">Споделяне на архивирана версия</target>
+      </trans-unit>
+      <trans-unit id="8037476586059399916" datatype="html">
+        <source>Expires</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+        <target state="translated">Изтича</target>
       </trans-unit>
       <trans-unit id="5674286808255988565" datatype="html">
         <source>Create</source>
@@ -5836,6 +5848,14 @@
         </context-group>
         <target state="translated">Започва качване...</target>
       </trans-unit>
+      <trans-unit id="3789574458951567089" datatype="html">
+        <source>Consumption Templates</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+        <target state="translated">Шаблони за консумация</target>
+      </trans-unit>
       <trans-unit id="7308826808299076537" datatype="html">
         <source>Add Template</source>
         <context-group purpose="location">
@@ -7043,7 +7063,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">239</context>
         </context-group>
-        <target state="needs-translation">Hungarian</target>
+        <target state="translated">Унгарски</target>
       </trans-unit>
       <trans-unit id="2935232983274991580" datatype="html">
         <source>Italian</source>

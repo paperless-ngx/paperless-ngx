@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-11-13 01:30\n"
+"PO-Revision-Date: 2023-11-16 23:23\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -385,19 +385,19 @@ msgstr "Le chemin de stockage est"
 
 #: documents/models.py:448
 msgid "has correspondent in"
-msgstr ""
+msgstr "a un correspondant dans"
 
 #: documents/models.py:449
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "n'a pas de correspondant dans"
 
 #: documents/models.py:450
 msgid "has document type in"
-msgstr ""
+msgstr "a le type de document dans"
 
 #: documents/models.py:451
 msgid "does not have document type in"
-msgstr ""
+msgstr "n'a pas de type de document dans"
 
 #: documents/models.py:452
 msgid "has storage path in"
@@ -413,11 +413,11 @@ msgstr "le propriétaire est"
 
 #: documents/models.py:455
 msgid "has owner in"
-msgstr ""
+msgstr "a le propriétaire dans"
 
 #: documents/models.py:456
 msgid "does not have owner"
-msgstr ""
+msgstr "n'a pas de propriétaire"
 
 #: documents/models.py:457
 msgid "does not have owner in"
@@ -545,11 +545,11 @@ msgstr "identifiant URL"
 
 #: documents/models.py:739
 msgid "share link"
-msgstr "partager le lien"
+msgstr "lien de partage"
 
 #: documents/models.py:740
 msgid "share links"
-msgstr "partager les liens"
+msgstr "liens de partage"
 
 #: documents/models.py:748
 msgid "Consume Folder"
@@ -557,11 +557,11 @@ msgstr ""
 
 #: documents/models.py:749
 msgid "Api Upload"
-msgstr ""
+msgstr "Téléverser l'Api"
 
 #: documents/models.py:750
 msgid "Mail Fetch"
-msgstr ""
+msgstr "Récupération du courriel"
 
 #: documents/models.py:754 paperless_mail/models.py:95
 msgid "order"
@@ -577,7 +577,7 @@ msgstr ""
 
 #: documents/models.py:775
 msgid "filter filename"
-msgstr ""
+msgstr "filtrer le nom de fichier"
 
 #: documents/models.py:780 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
@@ -589,11 +589,11 @@ msgstr ""
 
 #: documents/models.py:795
 msgid "assign title"
-msgstr ""
+msgstr "attribuer un titre"
 
 #: documents/models.py:800
 msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr ""
+msgstr "Assigner un titre de document, peut inclure certains marqueurs, voir la documentation."
 
 #: documents/models.py:808 paperless_mail/models.py:204
 msgid "assign this tag"
@@ -609,27 +609,27 @@ msgstr "affecter ce correspondant"
 
 #: documents/models.py:832
 msgid "assign this storage path"
-msgstr ""
+msgstr "assigner ce chemin de stockage"
 
 #: documents/models.py:841
 msgid "assign this owner"
-msgstr ""
+msgstr "assigner ce propriétaire"
 
 #: documents/models.py:848
 msgid "grant view permissions to these users"
-msgstr ""
+msgstr "accorder des permissions de vue à ces utilisateurs"
 
 #: documents/models.py:855
 msgid "grant view permissions to these groups"
-msgstr ""
+msgstr "accorder des droits de vue à ces groupes"
 
 #: documents/models.py:862
 msgid "grant change permissions to these users"
-msgstr ""
+msgstr "accorder des droits de modification à ces utilisateurs"
 
 #: documents/models.py:869
 msgid "grant change permissions to these groups"
-msgstr ""
+msgstr "accorder des droits de modification à ces groupes"
 
 #: documents/models.py:873
 msgid "consumption template"
@@ -641,51 +641,51 @@ msgstr ""
 
 #: documents/models.py:886
 msgid "String"
-msgstr ""
+msgstr "Chaîne de caractères"
 
 #: documents/models.py:887
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: documents/models.py:888
 msgid "Date"
-msgstr ""
+msgstr "Date"
 
 #: documents/models.py:889
 msgid "Boolean"
-msgstr ""
+msgstr "Booléen"
 
 #: documents/models.py:890
 msgid "Integer"
-msgstr ""
+msgstr "Nombre entier"
 
 #: documents/models.py:891
 msgid "Float"
-msgstr ""
+msgstr "Nombre décimal"
 
 #: documents/models.py:892
 msgid "Monetary"
-msgstr ""
+msgstr "Monétaire"
 
 #: documents/models.py:904
 msgid "data type"
-msgstr ""
+msgstr "type de données"
 
 #: documents/models.py:912
 msgid "custom field"
-msgstr ""
+msgstr "champ personnalisé"
 
 #: documents/models.py:913
 msgid "custom fields"
-msgstr ""
+msgstr "champs personnalisés"
 
 #: documents/models.py:973
 msgid "custom field instance"
-msgstr ""
+msgstr "instance de champs personnalisés"
 
 #: documents/models.py:974
 msgid "custom field instances"
-msgstr ""
+msgstr "instances de champs personnalisés"
 
 #: documents/serialisers.py:102
 #, python-format
@@ -860,7 +860,7 @@ msgstr "Biélorusse"
 
 #: paperless/settings.py:590
 msgid "Bulgarian"
-msgstr ""
+msgstr "Bulgare"
 
 #: paperless/settings.py:591
 msgid "Catalan"
@@ -900,7 +900,7 @@ msgstr "Français"
 
 #: paperless/settings.py:600
 msgid "Hungarian"
-msgstr ""
+msgstr "Hongrois"
 
 #: paperless/settings.py:601
 msgid "Italian"
@@ -1052,7 +1052,7 @@ msgstr "mot de passe"
 
 #: paperless_mail/models.py:42
 msgid "Is token authentication"
-msgstr ""
+msgstr "Est un jeton d'authentification"
 
 #: paperless_mail/models.py:45
 msgid "character set"
@@ -1116,7 +1116,7 @@ msgstr "Utiliser le nom de la pièce jointe en tant que titre"
 
 #: paperless_mail/models.py:85
 msgid "Do not assign title from rule"
-msgstr ""
+msgstr "Ne pas affecter de titre avec cette règle"
 
 #: paperless_mail/models.py:88
 msgid "Do not assign a correspondent"

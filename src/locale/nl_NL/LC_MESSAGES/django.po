@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-11-13 01:31\n"
+"PO-Revision-Date: 2023-11-28 18:26\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -529,11 +529,11 @@ msgstr "notities"
 
 #: documents/models.py:688
 msgid "Archive"
-msgstr ""
+msgstr "Archief"
 
 #: documents/models.py:689
 msgid "Original"
-msgstr ""
+msgstr "Origineel"
 
 #: documents/models.py:700
 msgid "expiration"
@@ -665,19 +665,19 @@ msgstr ""
 
 #: documents/models.py:892
 msgid "Monetary"
-msgstr ""
+msgstr "Monetair"
 
 #: documents/models.py:904
 msgid "data type"
-msgstr ""
+msgstr "gegevenstype"
 
 #: documents/models.py:912
 msgid "custom field"
-msgstr ""
+msgstr "aangepaste velden"
 
 #: documents/models.py:913
 msgid "custom fields"
-msgstr ""
+msgstr "Aangepaste velden"
 
 #: documents/models.py:973
 msgid "custom field instance"
