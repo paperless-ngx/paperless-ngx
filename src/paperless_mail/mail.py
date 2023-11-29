@@ -8,8 +8,7 @@ import traceback
 from datetime import date
 from datetime import timedelta
 from fnmatch import fnmatch
-from typing import Dict
-from typing import List
+from typing import Optional
 from typing import Union
 
 import magic
@@ -23,6 +22,7 @@ from django.utils.timezone import is_naive
 from django.utils.timezone import make_aware
 from imap_tools import AND
 from imap_tools import NOT
+from imap_tools import MailAttachment
 from imap_tools import MailBox
 from imap_tools import MailboxFolderSelectError
 from imap_tools import MailBoxUnencrypted
@@ -80,7 +80,7 @@ class BaseMailAction:
     read mails when the action is to mark mails as read).
     """
 
-    def get_criteria(self) -> Union[Dict, LogicOperator]:
+    def get_criteria(self) -> Union[dict, LogicOperator]:
         """
         Returns filtering criteria/query for this mail action.
         """
@@ -151,7 +151,7 @@ class TagMailAction(BaseMailAction):
             _, self.color = parameter.split(":")
             self.color = self.color.strip()
 
-            if self.color.lower() not in APPLE_MAIL_TAG_COLORS.keys():
+            if self.color.lower() not in APPLE_MAIL_TAG_COLORS:
                 raise MailError("Not a valid AppleMail tag color.")
 
             self.keyword = None
@@ -232,7 +232,7 @@ def mailbox_login(mailbox: MailBox, account: MailAccount):
 
 @shared_task
 def apply_mail_action(
-    result: List[str],
+    result: list[str],
     rule_id: int,
     message_uid: str,
     message_subject: str,
@@ -319,7 +319,7 @@ def error_callback(
 
 def queue_consumption_tasks(
     *,
-    consume_tasks: List[Signature],
+    consume_tasks: list[Signature],
     rule: MailRule,
     message: MailMessage,
 ):
@@ -424,26 +424,38 @@ class MailAccountHandler(LoggingMixin):
 
     logging_name = "paperless_mail"
 
-    def _correspondent_from_name(self, name):
+    def _correspondent_from_name(self, name: str) -> Optional[Correspondent]:
         try:
             return Correspondent.objects.get_or_create(name=name)[0]
         except DatabaseError as e:
             self.log.error(f"Error while retrieving correspondent {name}: {e}")
             return None
 
-    def _get_title(self, message, att, rule):
+    def _get_title(
+        self,
+        message: MailMessage,
+        att: MailAttachment,
+        rule: MailRule,
+    ) -> Optional[str]:
         if rule.assign_title_from == MailRule.TitleSource.FROM_SUBJECT:
             return message.subject
 
         elif rule.assign_title_from == MailRule.TitleSource.FROM_FILENAME:
             return os.path.splitext(os.path.basename(att.filename))[0]
 
+        elif rule.assign_title_from == MailRule.TitleSource.NONE:
+            return None
+
         else:
             raise NotImplementedError(
                 "Unknown title selector.",
             )  # pragma: nocover
 
-    def _get_correspondent(self, message: MailMessage, rule):
+    def _get_correspondent(
+        self,
+        message: MailMessage,
+        rule: MailRule,
+    ) -> Optional[Correspondent]:
         c_from = rule.assign_correspondent_from
 
         if c_from == MailRule.CorrespondentSource.FROM_NOTHING:
@@ -605,8 +617,7 @@ class MailAccountHandler(LoggingMixin):
             f"{len(message.attachments)} attachment(s)",
         )
 
-        correspondent = self._get_correspondent(message, rule)
-        tag_ids = [tag.id for tag in rule.assign_tags.all()]
+        tag_ids: list[int] = [tag.id for tag in rule.assign_tags.all()]
         doc_type = rule.assign_document_type
 
         if (
@@ -616,7 +627,6 @@ class MailAccountHandler(LoggingMixin):
             processed_elements += self._process_eml(
                 message,
                 rule,
-                correspondent,
                 tag_ids,
                 doc_type,
             )
@@ -628,7 +638,6 @@ class MailAccountHandler(LoggingMixin):
             processed_elements += self._process_attachments(
                 message,
                 rule,
-                correspondent,
                 tag_ids,
                 doc_type,
             )
@@ -639,7 +648,6 @@ class MailAccountHandler(LoggingMixin):
         self,
         message: MailMessage,
         rule: MailRule,
-        correspondent,
         tag_ids,
         doc_type,
     ):
@@ -668,6 +676,8 @@ class MailAccountHandler(LoggingMixin):
                 # as this is system dependent otherwise
                 continue
 
+            correspondent = self._get_correspondent(message, rule)
+
             title = self._get_title(message, att, rule)
 
             # don't trust the content type of the attachment. Could be
@@ -692,6 +702,7 @@ class MailAccountHandler(LoggingMixin):
                 input_doc = ConsumableDocument(
                     source=DocumentSource.MailFetch,
                     original_file=temp_filename,
+                    mailrule_id=rule.pk,
                 )
                 doc_overrides = DocumentMetadataOverrides(
                     title=title,
@@ -699,7 +710,9 @@ class MailAccountHandler(LoggingMixin):
                     correspondent_id=correspondent.id if correspondent else None,
                     document_type_id=doc_type.id if doc_type else None,
                     tag_ids=tag_ids,
-                    owner_id=rule.owner.id if rule.owner else None,
+                    owner_id=rule.owner.id
+                    if (rule.assign_owner_from_rule and rule.owner)
+                    else None,
                 )
 
                 consume_task = consume_file.s(
@@ -746,7 +759,6 @@ class MailAccountHandler(LoggingMixin):
         self,
         message: MailMessage,
         rule: MailRule,
-        correspondent,
         tag_ids,
         doc_type,
     ):
@@ -776,6 +788,8 @@ class MailAccountHandler(LoggingMixin):
                 message.obj._headers = new_headers
 
             f.write(message.obj.as_bytes())
+
+        correspondent = self._get_correspondent(message, rule)
 
         self.log.info(
             f"Rule {rule}: "

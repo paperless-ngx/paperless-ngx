@@ -3,10 +3,10 @@ import logging
 import shutil
 import uuid
 from typing import Optional
-from typing import Type
 
 import tqdm
 from asgiref.sync import async_to_sync
+from celery import Task
 from celery import shared_task
 from channels.layers import get_channel_layer
 from django.conf import settings
@@ -37,6 +37,10 @@ from documents.parsers import DocumentParser
 from documents.parsers import get_parser_class_for_mime_type
 from documents.sanity_checker import SanityCheckFailedException
 
+if settings.AUDIT_LOG_ENABLED:
+    import json
+
+    from auditlog.models import LogEntry
 logger = logging.getLogger("paperless.tasks")
 
 
@@ -91,8 +95,9 @@ def train_classifier():
         logger.warning("Classifier error: " + str(e))
 
 
-@shared_task
+@shared_task(bind=True)
 def consume_file(
+    self: Task,
     input_doc: ConsumableDocument,
     overrides: Optional[DocumentMetadataOverrides] = None,
 ):
@@ -152,6 +157,12 @@ def consume_file(
                 overrides.asn = reader.asn
                 logger.info(f"Found ASN in barcode: {overrides.asn}")
 
+    template_overrides = Consumer().get_template_overrides(
+        input_doc=input_doc,
+    )
+
+    overrides.update(template_overrides)
+
     # continue with consumption if no barcode was found
     document = Consumer().try_consume_file(
         input_doc.original_file,
@@ -160,9 +171,15 @@ def consume_file(
         override_correspondent_id=overrides.correspondent_id,
         override_document_type_id=overrides.document_type_id,
         override_tag_ids=overrides.tag_ids,
+        override_storage_path_id=overrides.storage_path_id,
         override_created=overrides.created,
         override_asn=overrides.asn,
         override_owner_id=overrides.owner_id,
+        override_view_users=overrides.view_users,
+        override_view_groups=overrides.view_groups,
+        override_change_users=overrides.change_users,
+        override_change_groups=overrides.change_groups,
+        task_id=self.request.id,
     )
 
     if document:
@@ -213,7 +230,7 @@ def update_document_archive_file(document_id):
 
     mime_type = document.mime_type
 
-    parser_class: Type[DocumentParser] = get_parser_class_for_mime_type(mime_type)
+    parser_class: type[DocumentParser] = get_parser_class_for_mime_type(mime_type)
 
     if not parser_class:
         logger.error(
@@ -245,11 +262,37 @@ def update_document_archive_file(document_id):
                     document,
                     archive_filename=True,
                 )
+                oldDocument = Document.objects.get(pk=document.pk)
                 Document.objects.filter(pk=document.pk).update(
                     archive_checksum=checksum,
                     content=parser.get_text(),
                     archive_filename=document.archive_filename,
                 )
+                newDocument = Document.objects.get(pk=document.pk)
+                if settings.AUDIT_LOG_ENABLED:
+                    LogEntry.objects.log_create(
+                        instance=oldDocument,
+                        changes=json.dumps(
+                            {
+                                "content": [oldDocument.content, newDocument.content],
+                                "archive_checksum": [
+                                    oldDocument.archive_checksum,
+                                    newDocument.archive_checksum,
+                                ],
+                                "archive_filename": [
+                                    oldDocument.archive_filename,
+                                    newDocument.archive_filename,
+                                ],
+                            },
+                        ),
+                        additional_data=json.dumps(
+                            {
+                                "reason": "Redo OCR called",
+                            },
+                        ),
+                        action=LogEntry.Action.UPDATE,
+                    )
+
                 with FileLock(settings.MEDIA_LOCK):
                     create_source_path_directory(document.archive_path)
                     shutil.move(parser.get_archive_path(), document.archive_path)

@@ -7,7 +7,6 @@ import {
   LOCALE_ID,
   Renderer2,
   RendererFactory2,
-  RendererStyleFlags2,
 } from '@angular/core'
 import { Meta } from '@angular/platform-browser'
 import { CookieService } from 'ngx-cookie-service'
@@ -25,8 +24,8 @@ import {
 } from '../data/paperless-uisettings'
 import { PaperlessUser } from '../data/paperless-user'
 import { PermissionsService } from './permissions.service'
-import { SavedViewService } from './rest/saved-view.service'
 import { ToastService } from './toast.service'
+import { PaperlessSavedView } from '../data/paperless-saved-view'
 
 export interface LanguageOption {
   code: string
@@ -55,6 +54,12 @@ export class SettingsService {
     return this._renderer
   }
 
+  public dashboardIsEmpty: boolean = false
+
+  public globalDropzoneEnabled: boolean = true
+  public globalDropzoneActive: boolean = false
+  public organizingSidebarSavedViews: boolean = false
+
   constructor(
     rendererFactory: RendererFactory2,
     @Inject(DOCUMENT) private document,
@@ -63,7 +68,6 @@ export class SettingsService {
     @Inject(LOCALE_ID) private localeId: string,
     protected http: HttpClient,
     private toastService: ToastService,
-    private savedViewService: SavedViewService,
     private permissionsService: PermissionsService
   ) {
     this._renderer = rendererFactory.createRenderer(null, null)
@@ -106,18 +110,18 @@ export class SettingsService {
     themeColor ??= this.get(SETTINGS_KEYS.THEME_COLOR)
 
     if (darkModeUseSystem) {
-      this._renderer.addClass(this.document.body, 'color-scheme-system')
-      this._renderer.removeClass(this.document.body, 'color-scheme-dark')
+      this._renderer.setAttribute(
+        this.document.documentElement,
+        'data-bs-theme',
+        'auto'
+      )
     } else {
-      this._renderer.removeClass(this.document.body, 'color-scheme-system')
-      darkModeEnabled
-        ? this._renderer.addClass(this.document.body, 'color-scheme-dark')
-        : this._renderer.removeClass(this.document.body, 'color-scheme-dark')
+      this._renderer.setAttribute(
+        this.document.documentElement,
+        'data-bs-theme',
+        darkModeEnabled ? 'dark' : 'light'
+      )
     }
-
-    // remove these in case they were there
-    this._renderer.removeClass(this.document.body, 'primary-dark')
-    this._renderer.removeClass(this.document.body, 'primary-light')
 
     if (themeColor) {
       const hsl = hexToHsl(themeColor)
@@ -130,29 +134,17 @@ export class SettingsService {
         this._renderer.addClass(this.document.body, 'primary-light')
         this._renderer.removeClass(this.document.body, 'primary-dark')
       }
-      this._renderer.setStyle(
-        document.body,
+      document.documentElement.style.setProperty(
         '--pngx-primary',
-        `${+hsl.h * 360},${hsl.s * 100}%`,
-        RendererStyleFlags2.DashCase
+        `${+hsl.h * 360},${hsl.s * 100}%`
       )
-      this._renderer.setStyle(
-        document.body,
+      document.documentElement.style.setProperty(
         '--pngx-primary-lightness',
-        `${hsl.l * 100}%`,
-        RendererStyleFlags2.DashCase
+        `${hsl.l * 100}%`
       )
     } else {
-      this._renderer.removeStyle(
-        document.body,
-        '--pngx-primary',
-        RendererStyleFlags2.DashCase
-      )
-      this._renderer.removeStyle(
-        document.body,
-        '--pngx-primary-lightness',
-        RendererStyleFlags2.DashCase
-      )
+      document.documentElement.style.removeProperty('--pngx-primary')
+      document.documentElement.style.removeProperty('--pngx-primary-lightness')
     }
   }
 
@@ -165,6 +157,12 @@ export class SettingsService {
         dateInputFormat: 'mm/dd/yyyy',
       },
       {
+        code: 'af-za',
+        name: $localize`Afrikaans`,
+        englishName: 'Afrikaans',
+        dateInputFormat: 'yyyy-mm-dd',
+      },
+      {
         code: 'ar-ar',
         name: $localize`Arabic`,
         englishName: 'Arabic',
@@ -174,6 +172,12 @@ export class SettingsService {
         code: 'be-by',
         name: $localize`Belarusian`,
         englishName: 'Belarusian',
+        dateInputFormat: 'dd.mm.yyyy',
+      },
+      {
+        code: 'bg-bg',
+        name: $localize`Bulgarian`,
+        englishName: 'Bulgarian',
         dateInputFormat: 'dd.mm.yyyy',
       },
       {
@@ -201,6 +205,12 @@ export class SettingsService {
         dateInputFormat: 'dd.mm.yyyy',
       },
       {
+        code: 'el-gr',
+        name: $localize`Greek`,
+        englishName: 'Greek',
+        dateInputFormat: 'dd/mm/yyyy',
+      },
+      {
         code: 'en-gb',
         name: $localize`English (GB)`,
         englishName: 'English (GB)',
@@ -225,6 +235,12 @@ export class SettingsService {
         dateInputFormat: 'dd/mm/yyyy',
       },
       {
+        code: 'hu-hu',
+        name: $localize`Hungarian`,
+        englishName: 'Hungarian',
+        dateInputFormat: 'yyyy.mm.dd',
+      },
+      {
         code: 'it-it',
         name: $localize`Italian`,
         englishName: 'Italian',
@@ -241,6 +257,12 @@ export class SettingsService {
         name: $localize`Dutch`,
         englishName: 'Dutch',
         dateInputFormat: 'dd-mm-yyyy',
+      },
+      {
+        code: 'no-no',
+        name: $localize`Norwegian`,
+        englishName: 'Norwegian',
+        dateInputFormat: 'dd.mm.yyyy',
       },
       {
         code: 'pl-pl',
@@ -367,7 +389,7 @@ export class SettingsService {
   }
 
   private getSettingRawValue(key: string): any {
-    let value = null
+    let value = undefined
     // parse key:key:key into nested object
     const keys = key.replace('general-settings:', '').split(':')
     let settingObj = this.settings
@@ -384,12 +406,20 @@ export class SettingsService {
     let setting = SETTINGS.find((s) => s.key == key)
 
     if (!setting) {
-      return null
+      return undefined
     }
 
     let value = this.getSettingRawValue(key)
 
-    if (value != null) {
+    // special case to fallback
+    if (key === SETTINGS_KEYS.DEFAULT_PERMS_OWNER && value === undefined) {
+      return this.currentUser.id
+    }
+
+    if (value !== undefined) {
+      if (value === null) {
+        return null
+      }
       switch (setting.type) {
         case 'boolean':
           return JSON.parse(value)
@@ -419,7 +449,7 @@ export class SettingsService {
 
   private settingIsSet(key: string): boolean {
     let value = this.getSettingRawValue(key)
-    return value != null
+    return value != undefined
   }
 
   storeSettings(): Observable<any> {
@@ -498,11 +528,7 @@ export class SettingsService {
   }
 
   offerTour(): boolean {
-    return (
-      !this.savedViewService.loading &&
-      this.savedViewService.dashboardViews.length == 0 &&
-      !this.get(SETTINGS_KEYS.TOUR_COMPLETE)
-    )
+    return this.dashboardIsEmpty && !this.get(SETTINGS_KEYS.TOUR_COMPLETE)
   }
 
   completeTour() {
@@ -517,5 +543,21 @@ export class SettingsService {
           )
         })
     }
+  }
+
+  updateDashboardViewsSort(
+    dashboardViews: PaperlessSavedView[]
+  ): Observable<any> {
+    this.set(SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER, [
+      ...new Set(dashboardViews.map((v) => v.id)),
+    ])
+    return this.storeSettings()
+  }
+
+  updateSidebarViewsSort(sidebarViews: PaperlessSavedView[]): Observable<any> {
+    this.set(SETTINGS_KEYS.SIDEBAR_VIEWS_SORT_ORDER, [
+      ...new Set(sidebarViews.map((v) => v.id)),
+    ])
+    return this.storeSettings()
   }
 }

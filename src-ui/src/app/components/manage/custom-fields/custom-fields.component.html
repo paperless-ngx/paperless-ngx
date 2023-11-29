@@ -1,0 +1,41 @@
+<pngx-page-header title="Custom Fields" i18n-title>
+    <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editField()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.CustomField }">
+      <svg class="sidebaricon me-1" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
+      </svg>
+      <ng-container i18n>Add Field</ng-container>
+    </button>
+</pngx-page-header>
+
+<ul class="list-group">
+
+    <li class="list-group-item">
+        <div class="row">
+            <div class="col" i18n>Name</div>
+            <div class="col" i18n>Data Type</div>
+            <div class="col" i18n>Actions</div>
+        </div>
+    </li>
+
+    <li *ngFor="let field of fields" class="list-group-item">
+        <div class="row">
+            <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editField(field)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.CustomField)">{{field.name}}</button></div>
+            <div class="col d-flex align-items-center">{{getDataType(field)}}</div>
+            <div class="col">
+                <div class="btn-group">
+                    <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.CustomField }" class="btn btn-sm btn-outline-secondary" type="button" (click)="editField(field)">
+                    <svg class="buttonicon-sm" fill="currentColor">
+                        <use xlink:href="assets/bootstrap-icons.svg#pencil" />
+                      </svg>&nbsp;<ng-container i18n>Edit</ng-container>
+                    </button>
+                    <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.CustomField }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteField(field)">
+                        <svg class="buttonicon-sm" fill="currentColor">
+                            <use xlink:href="assets/bootstrap-icons.svg#trash" />
+                        </svg>&nbsp;<ng-container i18n>Delete</ng-container>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </li>
+    <li *ngIf="fields.length === 0" class="list-group-item" i18n>No fields defined.</li>
+</ul>

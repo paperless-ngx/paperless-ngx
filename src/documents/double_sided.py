@@ -115,12 +115,10 @@ def collate(input_doc: ConsumableDocument) -> str:
             staging.unlink()
 
     else:
-        # In Python 3.9 move supports Path objects directly,
-        # but for now we have to be compatible with 3.8
-        shutil.move(str(pdf_file), str(staging))
+        shutil.move(pdf_file, staging)
         # update access to modification time so we know if the file
         # is outdated when another file gets uploaded
-        os.utime(str(staging), (dt.datetime.now().timestamp(),) * 2)
+        os.utime(staging, (dt.datetime.now().timestamp(),) * 2)
         logger.info(
             "Got scan with odd numbered pages of double-sided scan, moved it to %s",
             staging,

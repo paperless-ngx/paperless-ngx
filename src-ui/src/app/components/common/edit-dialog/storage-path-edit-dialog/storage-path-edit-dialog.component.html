@@ -1,4 +1,4 @@
-<form [formGroup]="objectForm" (ngSubmit)="save()">
+<form [formGroup]="objectForm" (ngSubmit)="save()" autocomplete="off">
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
     <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
@@ -6,14 +6,14 @@
   </div>
   <div class="modal-body">
 
-    <app-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></app-input-text>
-    <app-input-text i18n-title title="Path" formControlName="path" [error]="error?.path" [hint]="pathHint"></app-input-text>
-    <app-input-select i18n-title title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></app-input-select>
-    <app-input-text *ngIf="patternRequired" i18n-title title="Matching pattern" formControlName="match" [error]="error?.match"></app-input-text>
-    <app-input-check *ngIf="patternRequired" i18n-title title="Case insensitive" formControlName="is_insensitive"></app-input-check>
+    <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></pngx-input-text>
+    <pngx-input-text i18n-title title="Path" formControlName="path" [error]="error?.path" [hint]="pathHint"></pngx-input-text>
+    <pngx-input-select i18n-title title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></pngx-input-select>
+    <pngx-input-text *ngIf="patternRequired" i18n-title title="Matching pattern" formControlName="match" [error]="error?.match"></pngx-input-text>
+    <pngx-input-check *ngIf="patternRequired" i18n-title title="Case insensitive" formControlName="is_insensitive"></pngx-input-check>
 
-    <div *appIfOwner="object">
-      <app-permissions-form [users]="users" accordion="true" formControlName="permissions_form"></app-permissions-form>
+    <div *pngxIfOwner="object">
+      <pngx-permissions-form [users]="users" accordion="true" formControlName="permissions_form"></pngx-permissions-form>
     </div>
 
   </div>

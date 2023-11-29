@@ -1,19 +1,21 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
-import { EditDialogMode } from '../edit-dialog.component'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgSelectModule } from '@ng-select/ng-select'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { SelectComponent } from '../../input/select/select.component'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { TextComponent } from '../../input/text/text.component'
-import { NgSelectModule } from '@ng-select/ng-select'
+import { SettingsService } from 'src/app/services/settings.service'
 import { PermissionsFormComponent } from '../../input/permissions/permissions-form/permissions-form.component'
-import { GroupEditDialogComponent } from './group-edit-dialog.component'
+import { SelectComponent } from '../../input/select/select.component'
+import { TextComponent } from '../../input/text/text.component'
 import { PermissionsSelectComponent } from '../../permissions-select/permissions-select.component'
+import { EditDialogMode } from '../edit-dialog.component'
+import { GroupEditDialogComponent } from './group-edit-dialog.component'
 
 describe('GroupEditDialogComponent', () => {
   let component: GroupEditDialogComponent
+  let settingsService: SettingsService
   let fixture: ComponentFixture<GroupEditDialogComponent>
 
   beforeEach(async () => {
@@ -38,6 +40,8 @@ describe('GroupEditDialogComponent', () => {
     }).compileComponents()
 
     fixture = TestBed.createComponent(GroupEditDialogComponent)
+    settingsService = TestBed.inject(SettingsService)
+    settingsService.currentUser = { id: 99, username: 'user99' }
     component = fixture.componentInstance
 
     fixture.detectChanges()

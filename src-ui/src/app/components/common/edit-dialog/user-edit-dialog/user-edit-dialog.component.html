@@ -1,4 +1,4 @@
-<form [formGroup]="objectForm" (ngSubmit)="save()">
+<form [formGroup]="objectForm" (ngSubmit)="save()" autocomplete="off">
     <div class="modal-header">
       <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
       <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
@@ -6,12 +6,12 @@
     </div>
     <div class="modal-body">
       <div class="row">
-        <div class="col">
-          <app-input-text i18n-title title="Username" formControlName="username" [error]="error?.username"></app-input-text>
-          <app-input-text i18n-title title="Email" formControlName="email" [error]="error?.email"></app-input-text>
-          <app-input-password i18n-title title="Password" formControlName="password" [error]="error?.password"></app-input-password>
-          <app-input-text i18n-title title="First name" formControlName="first_name" [error]="error?.first_name"></app-input-text>
-          <app-input-text i18n-title title="Last name" formControlName="last_name" [error]="error?.first_name"></app-input-text>
+        <div class="col-md-4">
+          <pngx-input-text i18n-title title="Username" formControlName="username" [error]="error?.username"></pngx-input-text>
+          <pngx-input-text i18n-title title="Email" formControlName="email" [error]="error?.email"></pngx-input-text>
+          <pngx-input-password i18n-title title="Password" formControlName="password" [error]="error?.password"></pngx-input-password>
+          <pngx-input-text i18n-title title="First name" formControlName="first_name" [error]="error?.first_name"></pngx-input-text>
+          <pngx-input-text i18n-title title="Last name" formControlName="last_name" [error]="error?.first_name"></pngx-input-text>
 
           <div class="mb-2">
             <div class="form-check form-switch form-check-inline">
@@ -24,10 +24,10 @@
             </div>
           </div>
 
-          <app-input-select i18n-title title="Groups" [items]="groups" multiple="true" formControlName="groups"></app-input-select>
+          <pngx-input-select i18n-title title="Groups" [items]="groups" multiple="true" formControlName="groups"></pngx-input-select>
         </div>
         <div class="col">
-          <app-permissions-select i18n-title title="Permissions" formControlName="user_permissions" [error]="error?.user_permissions" [inheritedPermissions]="inheritedPermissions"></app-permissions-select>
+          <pngx-permissions-select i18n-title title="Permissions" formControlName="user_permissions" [error]="error?.user_permissions" [inheritedPermissions]="inheritedPermissions"></pngx-permissions-select>
         </div>
       </div>
     </div>

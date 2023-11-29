@@ -10,6 +10,10 @@ th {
   cursor: pointer;
 }
 
+th.w-40 {
+  width: 40%;
+}
+
 .table-row-selected {
   background-color: var(--pngx-primary-faded);
 }

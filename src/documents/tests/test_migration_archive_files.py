@@ -1,4 +1,5 @@
 import hashlib
+import importlib
 import os
 import shutil
 from pathlib import Path
@@ -14,6 +15,10 @@ from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import TestMigrations
 
 STORAGE_TYPE_GPG = "gpg"
+
+migration_1012_obj = importlib.import_module(
+    "documents.migrations.1012_fix_archive_files",
+)
 
 
 def archive_name_from_filename(filename):
@@ -331,7 +336,7 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
             self.performMigration,
         )
 
-    @mock.patch("documents.migrations.1012_fix_archive_files.parse_wrapper")
+    @mock.patch(f"{__name__}.migration_1012_obj.parse_wrapper")
     def test_parser_error(self, m):
         m.side_effect = ParseError()
         Document = self.apps.get_model("documents", "Document")
@@ -396,7 +401,7 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
         self.assertIsNone(doc1.archive_filename)
         self.assertIsNone(doc2.archive_filename)
 
-    @mock.patch("documents.migrations.1012_fix_archive_files.parse_wrapper")
+    @mock.patch(f"{__name__}.migration_1012_obj.parse_wrapper")
     def test_parser_no_archive(self, m):
         m.side_effect = fake_parse_wrapper
 

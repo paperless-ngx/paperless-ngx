@@ -1,8 +1,18 @@
 // bs options
 $enable-negative-margins: true;
 
-@import "theme";
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px,
+  xxxl: 2400px
+);
+
 @import "node_modules/bootstrap/scss/bootstrap";
+@import "theme";
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import "print";
 
@@ -14,6 +24,12 @@ body {
 
 * {
   transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+@media(min-width: 768px) {
+  .col-slim {
+    padding-left: calc(50px + $grid-gutter-width) !important;
+  }
 }
 
 svg.logo {
@@ -48,6 +64,11 @@ svg.logo {
 
 .nav-link, .list-group-item {
   color: var(--bs-body-color);
+}
+
+.list-group-item .btn-link,
+table .btn-link {
+  font-size: 1em;
 }
 
 .bg-body {
@@ -169,9 +190,16 @@ a, a:hover,
   color: var(--bs-primary);
 }
 
+a.btn-link:hover,
+a.btn-link:active,
+a.btn-link:focus-visible,
 .btn-link:hover,
-.btn-link:active {
-  color: var(--pngx-primary-darken-15) !important;
+.btn-link:active,
+.btn-link:focus-visible {
+  color: var(--pngx-primary-lighten-10) !important;
+  .primary-light & {
+    color: var(--pngx-primary-darken-15) !important;
+  }
 }
 
 .form-control-dark {
@@ -225,6 +253,10 @@ a, a:hover,
     margin-bottom: 0;
     min-height: calc(1.5em + 0.75rem + 5px);
     line-height: 1.5;
+
+    .ng-select-container {
+      border-radius: $border-radius;
+    }
 
     .ng-select-container .ng-value-container .ng-input {
       top: 7px;
@@ -283,11 +315,16 @@ textarea,
   color: var(--bs-body-color);
   background-color: var(--bs-body-bg);
   border-color: var(--bs-border-color);
+  font-size: 0.875rem;
 
   &:focus {
     background-color: var(--pngx-bg-darker);
     color: var(--bs-body-color);
   }
+}
+
+.input-group .btn-outline-secondary {
+  border-color: var(--bs-border-color);
 }
 
 .form-check-input:checked {
@@ -347,6 +384,14 @@ ul.pagination {
 
     &.active:focus, &:active {
       border-bottom: 1px solid transparent;
+    }
+  }
+}
+
+.nav-underline {
+  .nav-link {
+    &.active, &:hover, &:focus {
+      color: var(--bs-primary);
     }
   }
 }
@@ -456,7 +501,7 @@ ul.pagination {
 }
 
 table.table {
-  color: var(--bs-body-color);
+  --bs-table-color: var(--bs-body-color);
   --bs-table-bg: var(--bs-light-rgb);
 
   .des,.asc {
@@ -470,50 +515,6 @@ table.table {
 
 .modal .btn-close {
   color: var(--bs-body-color);
-}
-
-.main-dropzone {
-  height: 100%;
-  width: 100%;
-
-  &.ngx-file-drop__drop-zone--over {
-    background-color: transparent !important;
-  }
-}
-
-.global-dropzone-overlay {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: hsla(var(--pngx-primary), var(--pngx-primary-lightness), .8);
-  z-index: 1055; // $zindex-modal
-  pointer-events: none !important;
-  user-select: none !important;
-  text-align: center;
-  padding-top: 25%;
-
-  h2 {
-    color: var(--pngx-primary-text-contrast)
-  }
-
-  &.show {
-    opacity: 1 !important;
-  }
-
-  &.hide {
-    display: none;
-  }
-}
-
-.ngx-file-drop__drop-zone--over .global-dropzone-overlay {
-  opacity: 0;
-}
-
-.inert {
-  pointer-events: none !important;
-  user-select: none !important;
 }
 
 .alert-primary {
@@ -657,4 +658,32 @@ code {
 
 .me-1px {
   margin-right: 1px !important;
+}
+
+.cdk-drag-placeholder {
+  opacity: .5;
+}
+
+/* Animate items as they're being sorted. */
+.cdk-drop-list-dragging .cdk-drag {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* Animate an item that has been dropped. */
+.cdk-drag-animating {
+  transition: transform 300ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.hidden-button-container {
+  button {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease;
+  }
+  &:hover {
+    button {
+      opacity: 1;
+      pointer-events: initial;
+    }
+  }
 }

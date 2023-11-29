@@ -1,0 +1,105 @@
+<pngx-page-header title="Mail Settings" i18n-title>
+</pngx-page-header>
+
+<ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailAccount }">
+    <h4>
+        <ng-container i18n>Mail accounts</ng-container>
+        <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editMailAccount()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailAccount }">
+        <svg class="sidebaricon me-1" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
+        </svg>
+        <ng-container i18n>Add Account</ng-container>
+        </button>
+    </h4>
+    <ul class="list-group">
+        <li class="list-group-item">
+            <div class="row">
+            <div class="col" i18n>Name</div>
+            <div class="col" i18n>Server</div>
+            <div class="col" i18n>Actions</div>
+            </div>
+        </li>
+
+        <li *ngFor="let account of mailAccounts" class="list-group-item">
+            <div class="row">
+            <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailAccount(account)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailAccount)">{{account.name}}</button></div>
+            <div class="col d-flex align-items-center">{{account.imap_server}}</div>
+            <div class="col">
+                <div class="btn-group">
+                <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" [disabled]="!userCanEdit(account)" class="btn btn-sm btn-outline-secondary" type="button" (click)="editMailAccount(account)">
+                    <svg class="buttonicon-sm" fill="currentColor">
+                        <use xlink:href="assets/bootstrap-icons.svg#pencil" />
+                    </svg>&nbsp;<ng-container i18n>Edit</ng-container>
+                </button>
+                <button *pngxIfOwner="account" class="btn btn-sm btn-outline-secondary" type="button" (click)="editPermissions(account)">
+                    <svg class="buttonicon-sm" fill="currentColor">
+                        <use xlink:href="assets/bootstrap-icons.svg#person-lock" />
+                    </svg>&nbsp;<ng-container i18n>Permissions</ng-container>
+                </button>
+                <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailAccount }" [disabled]="!userIsOwner(account)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailAccount(account)">
+                    <svg class="buttonicon-sm" fill="currentColor">
+                        <use xlink:href="assets/bootstrap-icons.svg#trash" />
+                    </svg>&nbsp;<ng-container i18n>Delete</ng-container>
+                </button>
+                </div>
+            </div>
+            </div>
+        </li>
+        <li *ngIf="mailAccounts.length === 0" class="list-group-item" i18n>No mail accounts defined.</li>
+    </ul>
+
+</ng-container>
+
+<ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailRule }">
+    <h4 class="mt-4">
+        <ng-container i18n>Mail rules</ng-container>
+        <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editMailRule()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailRule }">
+        <svg class="sidebaricon me-1" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
+        </svg>
+        <ng-container i18n>Add Rule</ng-container>
+        </button>
+    </h4>
+    <ul class="list-group">
+        <li class="list-group-item">
+            <div class="row">
+            <div class="col" i18n>Name</div>
+            <div class="col" i18n>Account</div>
+            <div class="col" i18n>Actions</div>
+            </div>
+        </li>
+
+        <li *ngFor="let rule of mailRules" class="list-group-item">
+            <div class="row">
+            <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailRule(rule)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailRule)">{{rule.name}}</button></div>
+            <div class="col d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
+            <div class="col">
+                <div class="btn-group">
+                <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" [disabled]="!userCanEdit(rule)" class="btn btn-sm btn-outline-secondary" type="button" (click)="editMailRule(rule)">
+                    <svg class="buttonicon-sm" fill="currentColor">
+                        <use xlink:href="assets/bootstrap-icons.svg#pencil" />
+                    </svg>&nbsp;<ng-container i18n>Edit</ng-container>
+                </button>
+                <button *pngxIfOwner="rule" class="btn btn-sm btn-outline-secondary" type="button" (click)="editPermissions(rule)">
+                    <svg class="buttonicon-sm" fill="currentColor">
+                        <use xlink:href="assets/bootstrap-icons.svg#person-lock" />
+                    </svg>&nbsp;<ng-container i18n>Permissions</ng-container>
+                </button>
+                <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailRule }" [disabled]="!userIsOwner(rule)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailRule(rule)">
+                    <svg class="buttonicon-sm" fill="currentColor">
+                        <use xlink:href="assets/bootstrap-icons.svg#trash" />
+                    </svg>&nbsp;<ng-container i18n>Delete</ng-container>
+                </button>
+                </div>
+            </div>
+            </div>
+        </li>
+        <li *ngIf="mailRules.length === 0" class="list-group-item" i18n>No mail rules defined.</li>
+    </ul>
+
+</ng-container>
+
+<div *ngIf="!mailAccounts || !mailRules">
+    <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
+    <div class="visually-hidden" i18n>Loading...</div>
+</div>

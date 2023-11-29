@@ -16,19 +16,25 @@ on:
 env:
   # This is the version of pipenv all the steps will use
   # If changing this, change Dockerfile
-  DEFAULT_PIP_ENV_VERSION: "2023.7.23"
-  # This is the default version of Python to use in most steps
-  # If changing this, change Dockerfile
-  DEFAULT_PYTHON_VERSION: "3.9"
+  DEFAULT_PIP_ENV_VERSION: "2023.10.24"
+  # This is the default version of Python to use in most steps which aren't specific
+  DEFAULT_PYTHON_VERSION: "3.10"
 
 jobs:
   pre-commit:
+    # We want to run on external PRs, but not on our own internal PRs as they'll be run
+    # by the push to the branch. Without this if check, checks are duplicated since
+    # internal PRs match both the push and pull_request events.
+    if:
+      github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
+      github.repository
+
     name: Linting Checks
     runs-on: ubuntu-22.04
     steps:
       -
         name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Install python
         uses: actions/setup-python@v4
@@ -46,7 +52,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Set up Python
         id: setup-python
@@ -58,7 +64,7 @@ jobs:
       -
         name: Install pipenv
         run: |
-          pip install --user pipenv==${DEFAULT_PIP_ENV_VERSION}
+          pip install --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }}
       -
         name: Install dependencies
         run: |
@@ -88,7 +94,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Deploy docs
         uses: mhausenblas/mkdocs-deploy-gh-pages@master
@@ -99,18 +105,18 @@ jobs:
           EXTRA_PACKAGES: build-base
 
   tests-backend:
-    name: "Tests (${{ matrix.python-version }})"
+    name: "Backend Tests (Python ${{ matrix.python-version }})"
     runs-on: ubuntu-22.04
     needs:
       - pre-commit
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10']
+        python-version: ['3.9', '3.10', '3.11']
       fail-fast: false
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Start containers
         run: |
@@ -127,7 +133,7 @@ jobs:
       -
         name: Install pipenv
         run: |
-          pip install --user pipenv==${DEFAULT_PIP_ENV_VERSION}
+          pip install --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }}
       -
         name: Install system dependencies
         run: |
@@ -173,47 +179,88 @@ jobs:
           docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml logs
           docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml down
 
-  tests-frontend:
-    name: "Tests Frontend"
+  install-frontend-depedendencies:
+    name: "Install Frontend Dependendencies"
     runs-on: ubuntu-22.04
     needs:
       - pre-commit
-    strategy:
-      matrix:
-        node-version: [16.x]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       -
-        name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        name: Use Node.js 20
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 20.x
           cache: 'npm'
           cache-dependency-path: 'src-ui/package-lock.json'
+      - name: Cache frontend depdendencies
+        id: cache-frontend-deps
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            ~/.cache
+          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/package-lock.json') }}
       -
         name: Install dependencies
+        if: steps.cache-frontend-deps.outputs.cache-hit != 'true'
         run: cd src-ui && npm ci
       -
         name: Install Playwright
+        if: steps.cache-frontend-deps.outputs.cache-hit != 'true'
         run: cd src-ui && npx playwright install --with-deps
+
+  tests-frontend:
+    name: "Frontend Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
+    runs-on: ubuntu-22.04
+    needs:
+      - install-frontend-depedendencies
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20.x]
+        shard-index: [1, 2, 3, 4]
+        shard-count: [4]
+    steps:
+      - uses: actions/checkout@v4
+      -
+        name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+          cache-dependency-path: 'src-ui/package-lock.json'
+      - name: Cache frontend depdendencies
+        id: cache-frontend-deps
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            ~/.cache
+          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/package-lock.json') }}
+      - name: Re-link Angular cli
+        run: cd src-ui && npm link @angular/cli
       -
         name: Linting checks
         run: cd src-ui && npm run lint
       -
         name: Run Jest unit tests
-        run: cd src-ui && npm run test
+        run: cd src-ui && npm run test -- --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
       -
         name: Upload Jest coverage
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: jest-coverage-report
-          path: src-ui/coverage
+          name: jest-coverage-report-${{ matrix.shard-index }}
+          path: |
+            src-ui/coverage/coverage-final.json
+            src-ui/coverage/lcov.info
+            src-ui/coverage/clover.xml
           retention-days: 7
           if-no-files-found: warn
       -
         name: Run Playwright e2e tests
-        run: cd src-ui && npx playwright test
+        run: cd src-ui && npx playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
       -
         name: Upload Playwright test results
         if: always()
@@ -224,20 +271,19 @@ jobs:
           retention-days: 7
 
   tests-coverage-upload:
-    name: "Upload coverage"
+    name: "Upload Coverage"
     runs-on: ubuntu-22.04
     needs:
       - tests-backend
       - tests-frontend
     steps:
       -
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Download frontend coverage
         uses: actions/download-artifact@v3
         with:
-          name: jest-coverage-report
-          path: src-ui/
+          path: src-ui/coverage/
       -
         name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -245,7 +291,9 @@ jobs:
           # not required for public repos, but intermittently fails otherwise
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: frontend
-          directory: src-ui/
+          directory: src-ui/coverage/
+          # dont include backend coverage files here
+          files: '!coverage.xml'
       -
         name: Download backend coverage
         uses: actions/download-artifact@v3
@@ -283,7 +331,7 @@ jobs:
         #  a tag
         # Otherwise forks would require a Docker Hub account and secrets setup
         run: |
-          if [[ ${{ github.repository_owner }} == "paperless-ngx" && ( ${{ github.ref_name }} == "main" || ${{ github.ref_name }} == "dev" || ${{ github.ref_name }} == "beta" || ${{ startsWith(github.ref, 'refs/tags/v') }} == "true" ) ]] ; then
+          if [[ ${{ github.repository_owner }} == "paperless-ngx" && ( ${{ github.ref_name }} == "dev" || ${{ github.ref_name }} == "beta" || ${{ startsWith(github.ref, 'refs/tags/v') }} == "true" ) ]] ; then
             echo "Enabling DockerHub image push"
             echo "enable=true" >> $GITHUB_OUTPUT
           else
@@ -300,7 +348,7 @@ jobs:
       -
         name: Gather Docker metadata
         id: docker-meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: |
             ghcr.io/${{ steps.set-ghcr-repository.outputs.ghcr-repository }}
@@ -315,26 +363,28 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       # If https://github.com/docker/buildx/issues/1044 is resolved,
       # the append input with a native arm64 arch could be used to
       # significantly speed up building
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       -
         name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
       -
-        name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         # Don't attempt to login is not pushing to Docker Hub
         if: steps.push-other-places.outputs.enable == 'true'
         with:
@@ -342,7 +392,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
         name: Login to Quay.io
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         # Don't attempt to login is not pushing to Quay.io
         if: steps.push-other-places.outputs.enable == 'true'
         with:
@@ -351,11 +401,11 @@ jobs:
           password: ${{ secrets.QUAY_ROBOT_TOKEN }}
       -
         name: Build and push
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm/v7,linux/arm64
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker-meta.outputs.tags }}
           labels: ${{ steps.docker-meta.outputs.labels }}
@@ -384,13 +434,14 @@ jobs:
           retention-days: 7
 
   build-release:
+    name: "Build Release"
     needs:
       - build-docker-image
     runs-on: ubuntu-22.04
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Set up Python
         id: setup-python
@@ -402,11 +453,17 @@ jobs:
       -
         name: Install pipenv + tools
         run: |
-          pip install --upgrade --user pipenv==${DEFAULT_PIP_ENV_VERSION} setuptools wheel
+          pip install --upgrade --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }} setuptools wheel
       -
         name: Install Python dependencies
         run: |
           pipenv --python ${{ steps.setup-python.outputs.python-version }} sync --dev
+      -
+        name: Patch whitenoise
+        run: |
+          curl --fail --silent --show-error --location --output 484.patch https://github.com/evansd/whitenoise/pull/484.patch
+          patch -d $(pipenv --venv)/lib/python3.10/site-packages --verbose -p2 < 484.patch
+          rm 484.patch
       -
         name: Install system dependencies
         run: |
@@ -493,6 +550,7 @@ jobs:
           retention-days: 7
 
   publish-release:
+    name: "Publish Release"
     runs-on: ubuntu-22.04
     outputs:
       prerelease: ${{ steps.get_version.outputs.prerelease }}
@@ -542,6 +600,7 @@ jobs:
           asset_content_type: application/x-xz
 
   append-changelog:
+    name: "Append Changelog"
     runs-on: ubuntu-22.04
     needs:
       - publish-release
@@ -549,7 +608,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: main
       -
@@ -562,7 +621,7 @@ jobs:
       -
         name: Install pipenv + tools
         run: |
-          pip install --upgrade --user pipenv==${DEFAULT_PIP_ENV_VERSION} setuptools wheel
+          pip install --upgrade --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }} setuptools wheel
       -
         name: Append Changelog to docs
         id: append-Changelog

@@ -229,6 +229,14 @@ describe(`DocumentService`, () => {
       `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/preview/#search="${searchQuery}"`
     )
   })
+
+  it('should support get next asn', () => {
+    subscription = service.getNextAsn().subscribe((asn) => asn)
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/next_asn/`
+    )
+    expect(req.request.method).toEqual('GET')
+  })
 })
 
 beforeEach(() => {

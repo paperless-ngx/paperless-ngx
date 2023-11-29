@@ -1,4 +1,3 @@
-import { PaperlessGroup } from 'src/app/data/paperless-group'
 import { ObjectWithId } from './object-with-id'
 
 export interface PaperlessUser extends ObjectWithId {

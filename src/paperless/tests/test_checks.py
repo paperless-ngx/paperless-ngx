@@ -1,11 +1,13 @@
 import os
 from pathlib import Path
+from unittest import mock
 
 from django.test import TestCase
 from django.test import override_settings
 
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
+from paperless.checks import audit_log_check
 from paperless.checks import binaries_check
 from paperless.checks import debug_mode_check
 from paperless.checks import paths_check
@@ -231,3 +233,35 @@ class TestEmailCertSettingsChecks(DirectoriesMixin, FileSystemAssertsMixin, Test
         msg = msgs[0]
 
         self.assertIn("Email cert /tmp/not_actually_here.pem is not a file", msg.msg)
+
+
+class TestAuditLogChecks(TestCase):
+    def test_was_enabled_once(self):
+        """
+        GIVEN:
+            - Audit log is not enabled
+        WHEN:
+            - Database tables contain audit log entry
+        THEN:
+            - system check error reported for disabling audit log
+        """
+        introspect_mock = mock.MagicMock()
+        introspect_mock.introspection.table_names.return_value = ["auditlog_logentry"]
+        with override_settings(AUDIT_LOG_ENABLED=False):
+            with mock.patch.dict(
+                "paperless.checks.connections",
+                {"default": introspect_mock},
+            ):
+                msgs = audit_log_check(None)
+
+                self.assertEqual(len(msgs), 1)
+
+                msg = msgs[0]
+
+                self.assertIn(
+                    (
+                        "auditlog table was found but PAPERLESS_AUDIT_LOG_ENABLED"
+                        " is not active."
+                    ),
+                    msg.msg,
+                )

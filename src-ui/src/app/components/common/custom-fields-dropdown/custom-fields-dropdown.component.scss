@@ -1,0 +1,24 @@
+.custom-fields-dropdown {
+    min-width: 350px;
+
+    // correct position on mobile
+    @media (max-width: 575.98px) {
+        &.show {
+            margin-left: -245px !important;
+        }
+    }
+}
+
+::ng-deep .ng-select .ng-select-container .ng-value-container .ng-placeholder,
+::ng-deep .ng-select .ng-option,
+::ng-deep .ng-select .ng-select-container .ng-value-container .ng-value {
+    font-size: 0.875rem;
+}
+
+::ng-deep .paperless-input-select .ng-select {
+    min-height: calc(1em + 0.75rem + 5px);
+}
+
+::ng-deep .paperless-input-select .ng-select .ng-select-container .ng-value-container .ng-input {
+    top: 4px;
+}

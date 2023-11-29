@@ -27,9 +27,12 @@ from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language
+from django.views import View
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
@@ -55,56 +58,67 @@ from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.viewsets import ViewSet
 
 from documents import bulk_edit
+from documents.bulk_download import ArchiveOnlyStrategy
+from documents.bulk_download import OriginalAndArchiveStrategy
+from documents.bulk_download import OriginalsOnlyStrategy
+from documents.classifier import load_classifier
+from documents.data_models import ConsumableDocument
+from documents.data_models import DocumentMetadataOverrides
+from documents.data_models import DocumentSource
+from documents.filters import CorrespondentFilterSet
+from documents.filters import DocumentFilterSet
+from documents.filters import DocumentTypeFilterSet
 from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
+from documents.filters import ShareLinkFilterSet
+from documents.filters import StoragePathFilterSet
+from documents.filters import TagFilterSet
+from documents.matching import match_correspondents
+from documents.matching import match_document_types
+from documents.matching import match_storage_paths
+from documents.matching import match_tags
+from documents.models import ConsumptionTemplate
+from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import Document
+from documents.models import DocumentType
+from documents.models import Note
+from documents.models import PaperlessTask
+from documents.models import SavedView
+from documents.models import ShareLink
+from documents.models import StoragePath
+from documents.models import Tag
+from documents.parsers import get_parser_class_for_mime_type
+from documents.parsers import parse_date_generator
 from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
+from documents.permissions import set_permissions_for_object
+from documents.serialisers import AcknowledgeTasksViewSerializer
+from documents.serialisers import BulkDownloadSerializer
+from documents.serialisers import BulkEditObjectPermissionsSerializer
+from documents.serialisers import BulkEditSerializer
+from documents.serialisers import ConsumptionTemplateSerializer
+from documents.serialisers import CorrespondentSerializer
+from documents.serialisers import CustomFieldSerializer
+from documents.serialisers import DocumentListSerializer
+from documents.serialisers import DocumentSerializer
+from documents.serialisers import DocumentTypeSerializer
+from documents.serialisers import PostDocumentSerializer
+from documents.serialisers import SavedViewSerializer
+from documents.serialisers import ShareLinkSerializer
+from documents.serialisers import StoragePathSerializer
+from documents.serialisers import TagSerializer
+from documents.serialisers import TagSerializerVersion1
+from documents.serialisers import TasksViewSerializer
+from documents.serialisers import UiSettingsViewSerializer
 from documents.tasks import consume_file
 from paperless import version
 from paperless.db import GnuPG
 from paperless.views import StandardPagination
 
-from .bulk_download import ArchiveOnlyStrategy
-from .bulk_download import OriginalAndArchiveStrategy
-from .bulk_download import OriginalsOnlyStrategy
-from .classifier import load_classifier
-from .data_models import ConsumableDocument
-from .data_models import DocumentMetadataOverrides
-from .data_models import DocumentSource
-from .filters import CorrespondentFilterSet
-from .filters import DocumentFilterSet
-from .filters import DocumentTypeFilterSet
-from .filters import StoragePathFilterSet
-from .filters import TagFilterSet
-from .matching import match_correspondents
-from .matching import match_document_types
-from .matching import match_storage_paths
-from .matching import match_tags
-from .models import Correspondent
-from .models import Document
-from .models import DocumentType
-from .models import Note
-from .models import PaperlessTask
-from .models import SavedView
-from .models import StoragePath
-from .models import Tag
-from .parsers import get_parser_class_for_mime_type
-from .parsers import parse_date_generator
-from .serialisers import AcknowledgeTasksViewSerializer
-from .serialisers import BulkDownloadSerializer
-from .serialisers import BulkEditSerializer
-from .serialisers import CorrespondentSerializer
-from .serialisers import DocumentListSerializer
-from .serialisers import DocumentSerializer
-from .serialisers import DocumentTypeSerializer
-from .serialisers import PostDocumentSerializer
-from .serialisers import SavedViewSerializer
-from .serialisers import StoragePathSerializer
-from .serialisers import TagSerializer
-from .serialisers import TagSerializerVersion1
-from .serialisers import TasksViewSerializer
-from .serialisers import UiSettingsViewSerializer
+if settings.AUDIT_LOG_ENABLED:
+    from auditlog.models import LogEntry
 
 logger = logging.getLogger("paperless.api")
 
@@ -144,10 +158,10 @@ class IndexView(TemplateView):
         context["main_js"] = f"frontend/{self.get_frontend_language()}/main.js"
         context[
             "webmanifest"
-        ] = f"frontend/{self.get_frontend_language()}/manifest.webmanifest"  # noqa: E501
+        ] = f"frontend/{self.get_frontend_language()}/manifest.webmanifest"
         context[
             "apple_touch_icon"
-        ] = f"frontend/{self.get_frontend_language()}/apple-touch-icon.png"  # noqa: E501
+        ] = f"frontend/{self.get_frontend_language()}/apple-touch-icon.png"
         return context
 
 
@@ -312,38 +326,12 @@ class DocumentViewSet(
             doc,
         ):
             return HttpResponseForbidden("Insufficient permissions")
-        if not self.original_requested(request) and doc.has_archive_version:
-            file_handle = doc.archive_file
-            filename = doc.get_public_filename(archive=True)
-            mime_type = "application/pdf"
-        else:
-            file_handle = doc.source_file
-            filename = doc.get_public_filename()
-            mime_type = doc.mime_type
-            # Support browser previewing csv files by using text mime type
-            if mime_type in {"application/csv", "text/csv"} and disposition == "inline":
-                mime_type = "text/plain"
-
-        if doc.storage_type == Document.STORAGE_TYPE_GPG:
-            file_handle = GnuPG.decrypted(file_handle)
-
-        response = HttpResponse(file_handle, content_type=mime_type)
-        # Firefox is not able to handle unicode characters in filename field
-        # RFC 5987 addresses this issue
-        # see https://datatracker.ietf.org/doc/html/rfc5987#section-4.2
-        # Chromium cannot handle commas in the filename
-        filename_normalized = normalize("NFKD", filename.replace(",", "_")).encode(
-            "ascii",
-            "ignore",
+        return serve_file(
+            doc=doc,
+            use_archive=not self.original_requested(request)
+            and doc.has_archive_version,
+            disposition=disposition,
         )
-        filename_encoded = quote(filename)
-        content_disposition = (
-            f"{disposition}; "
-            f'filename="{filename_normalized}"; '
-            f"filename*=utf-8''{filename_encoded}"
-        )
-        response["Content-Disposition"] = content_disposition
-        return response
 
     def get_metadata(self, file, mime_type):
         if not os.path.isfile(file):
@@ -511,7 +499,7 @@ class DocumentViewSet(
                 "view_document",
                 doc,
             ):
-                return HttpResponseForbidden("Insufficient permissions to view")
+                return HttpResponseForbidden("Insufficient permissions to view notes")
         except Document.DoesNotExist:
             raise Http404
 
@@ -521,7 +509,7 @@ class DocumentViewSet(
             except Exception as e:
                 logger.warning(f"An error occurred retrieving notes: {e!s}")
                 return Response(
-                    {"error": "Error retreiving notes, check logs for more detail."},
+                    {"error": "Error retrieving notes, check logs for more detail."},
                 )
         elif request.method == "POST":
             try:
@@ -530,7 +518,9 @@ class DocumentViewSet(
                     "change_document",
                     doc,
                 ):
-                    return HttpResponseForbidden("Insufficient permissions to create")
+                    return HttpResponseForbidden(
+                        "Insufficient permissions to create notes",
+                    )
 
                 c = Note.objects.create(
                     document=doc,
@@ -538,6 +528,21 @@ class DocumentViewSet(
                     user=currentUser,
                 )
                 c.save()
+                # If audit log is enabled make an entry in the log
+                # about this note change
+                if settings.AUDIT_LOG_ENABLED:
+                    LogEntry.objects.log_create(
+                        instance=doc,
+                        changes=json.dumps(
+                            {
+                                "Note Added": ["None", c.id],
+                            },
+                        ),
+                        action=LogEntry.Action.UPDATE,
+                    )
+
+                doc.modified = timezone.now()
+                doc.save()
 
                 from documents import index
 
@@ -557,14 +562,28 @@ class DocumentViewSet(
                 "change_document",
                 doc,
             ):
-                return HttpResponseForbidden("Insufficient permissions to delete")
+                return HttpResponseForbidden("Insufficient permissions to delete notes")
 
             note = Note.objects.get(id=int(request.GET.get("id")))
+            if settings.AUDIT_LOG_ENABLED:
+                LogEntry.objects.log_create(
+                    instance=doc,
+                    changes=json.dumps(
+                        {
+                            "Note Deleted": [note.id, "None"],
+                        },
+                    ),
+                    action=LogEntry.Action.UPDATE,
+                )
+
             note.delete()
+
+            doc.modified = timezone.now()
+            doc.save()
 
             from documents import index
 
-            index.add_or_update_document(self.get_object())
+            index.add_or_update_document(doc)
 
             return Response(self.getNotes(doc))
 
@@ -573,6 +592,37 @@ class DocumentViewSet(
                 "error": "error",
             },
         )
+
+    @action(methods=["get"], detail=True)
+    def share_links(self, request, pk=None):
+        currentUser = request.user
+        try:
+            doc = Document.objects.get(pk=pk)
+            if currentUser is not None and not has_perms_owner_aware(
+                currentUser,
+                "change_document",
+                doc,
+            ):
+                return HttpResponseForbidden(
+                    "Insufficient permissions to add share link",
+                )
+        except Document.DoesNotExist:
+            raise Http404
+
+        if request.method == "GET":
+            now = timezone.now()
+            links = [
+                {
+                    "id": c.id,
+                    "created": c.created,
+                    "expiration": c.expiration,
+                    "slug": c.slug,
+                }
+                for c in ShareLink.objects.filter(document=doc)
+                .exclude(expiration__lt=now)
+                .order_by("-created")
+            ]
+            return Response(links)
 
 
 class SearchResultSerializer(DocumentSerializer, PassUserMixin):
@@ -648,6 +698,19 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 )
         else:
             return super().list(request)
+
+    @action(detail=False, methods=["GET"], name="Get Next ASN")
+    def next_asn(self, request, *args, **kwargs):
+        return Response(
+            (
+                Document.objects.filter(archive_serial_number__gte=0)
+                .order_by("archive_serial_number")
+                .last()
+                .archive_serial_number
+                or 0
+            )
+            + 1,
+        )
 
 
 class LogViewSet(ViewSet):
@@ -895,6 +958,39 @@ class StatisticsView(APIView):
             if user is None
             else get_objects_for_user_owner_aware(user, "documents.view_tag", Tag)
         )
+        correspondent_count = (
+            Correspondent.objects.count()
+            if user is None
+            else len(
+                get_objects_for_user_owner_aware(
+                    user,
+                    "documents.view_correspondent",
+                    Correspondent,
+                ),
+            )
+        )
+        document_type_count = (
+            DocumentType.objects.count()
+            if user is None
+            else len(
+                get_objects_for_user_owner_aware(
+                    user,
+                    "documents.view_documenttype",
+                    DocumentType,
+                ),
+            )
+        )
+        storage_path_count = (
+            StoragePath.objects.count()
+            if user is None
+            else len(
+                get_objects_for_user_owner_aware(
+                    user,
+                    "documents.view_storagepath",
+                    StoragePath,
+                ),
+            )
+        )
 
         documents_total = documents.count()
 
@@ -911,7 +1007,7 @@ class StatisticsView(APIView):
             .annotate(mime_type_count=Count("mime_type"))
             .order_by("-mime_type_count")
             if documents_total > 0
-            else 0
+            else []
         )
 
         character_count = (
@@ -929,6 +1025,10 @@ class StatisticsView(APIView):
                 "inbox_tag": inbox_tag.first().pk if inbox_tag.exists() else None,
                 "document_file_type_counts": document_file_type_counts,
                 "character_count": character_count,
+                "tag_count": len(tags),
+                "correspondent_count": correspondent_count,
+                "document_type_count": document_type_count,
+                "storage_path_count": storage_path_count,
             },
         )
 
@@ -975,47 +1075,6 @@ class BulkDownloadView(GenericAPIView):
             )
 
             return response
-
-
-class RemoteVersionView(GenericAPIView):
-    def get(self, request, format=None):
-        remote_version = "0.0.0"
-        is_greater_than_current = False
-        current_version = packaging_version.parse(version.__full_version_str__)
-        try:
-            req = urllib.request.Request(
-                "https://api.github.com/repos/paperless-ngx/"
-                "paperless-ngx/releases/latest",
-            )
-            # Ensure a JSON response
-            req.add_header("Accept", "application/json")
-
-            with urllib.request.urlopen(req) as response:
-                remote = response.read().decode("utf-8")
-            try:
-                remote_json = json.loads(remote)
-                remote_version = remote_json["tag_name"]
-                # Basically PEP 616 but that only went in 3.9
-                if remote_version.startswith("ngx-"):
-                    remote_version = remote_version[len("ngx-") :]
-            except ValueError:
-                logger.debug("An error occurred parsing remote version json")
-        except urllib.error.URLError:
-            logger.debug("An error occurred checking for available updates")
-
-        is_greater_than_current = (
-            packaging_version.parse(
-                remote_version,
-            )
-            > current_version
-        )
-
-        return Response(
-            {
-                "version": remote_version,
-                "update_available": is_greater_than_current,
-            },
-        )
 
 
 class StoragePathViewSet(ModelViewSet, PassUserMixin):
@@ -1092,6 +1151,47 @@ class UiSettingsView(GenericAPIView):
         )
 
 
+class RemoteVersionView(GenericAPIView):
+    def get(self, request, format=None):
+        remote_version = "0.0.0"
+        is_greater_than_current = False
+        current_version = packaging_version.parse(version.__full_version_str__)
+        try:
+            req = urllib.request.Request(
+                "https://api.github.com/repos/paperlessngx/"
+                "paperlessngx/releases/latest",
+            )
+            # Ensure a JSON response
+            req.add_header("Accept", "application/json")
+
+            with urllib.request.urlopen(req) as response:
+                remote = response.read().decode("utf8")
+            try:
+                remote_json = json.loads(remote)
+                remote_version = remote_json["tag_name"]
+                # Basically PEP 616 but that only went in 3.9
+                if remote_version.startswith("ngx-"):
+                    remote_version = remote_version[len("ngx-") :]
+            except ValueError:
+                logger.debug("An error occurred parsing remote version json")
+        except urllib.error.URLError:
+            logger.debug("An error occurred checking for available updates")
+
+        is_greater_than_current = (
+            packaging_version.parse(
+                remote_version,
+            )
+            > current_version
+        )
+
+        return Response(
+            {
+                "version": remote_version,
+                "update_available": is_greater_than_current,
+            },
+        )
+
+
 class TasksViewSet(ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = TasksViewSerializer
@@ -1127,3 +1227,135 @@ class AcknowledgeTasksView(GenericAPIView):
             return Response({"result": result})
         except Exception:
             return HttpResponseBadRequest()
+
+
+class ShareLinkViewSet(ModelViewSet, PassUserMixin):
+    model = ShareLink
+
+    queryset = ShareLink.objects.all()
+
+    serializer_class = ShareLinkSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
+    filterset_class = ShareLinkFilterSet
+    ordering_fields = ("created", "expiration", "document")
+
+
+class SharedLinkView(View):
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request, slug):
+        share_link = ShareLink.objects.filter(slug=slug).first()
+        if share_link is None:
+            return HttpResponseRedirect("/accounts/login/?sharelink_notfound=1")
+        if share_link.expiration is not None and share_link.expiration < timezone.now():
+            return HttpResponseRedirect("/accounts/login/?sharelink_expired=1")
+        return serve_file(
+            doc=share_link.document,
+            use_archive=share_link.file_version == "archive",
+            disposition="inline",
+        )
+
+
+def serve_file(doc: Document, use_archive: bool, disposition: str):
+    if use_archive:
+        file_handle = doc.archive_file
+        filename = doc.get_public_filename(archive=True)
+        mime_type = "application/pdf"
+    else:
+        file_handle = doc.source_file
+        filename = doc.get_public_filename()
+        mime_type = doc.mime_type
+        # Support browser previewing csv files by using text mime type
+        if mime_type in {"application/csv", "text/csv"} and disposition == "inline":
+            mime_type = "text/plain"
+
+    if doc.storage_type == Document.STORAGE_TYPE_GPG:
+        file_handle = GnuPG.decrypted(file_handle)
+
+    response = HttpResponse(file_handle, content_type=mime_type)
+    # Firefox is not able to handle unicode characters in filename field
+    # RFC 5987 addresses this issue
+    # see https://datatracker.ietf.org/doc/html/rfc5987#section-4.2
+    # Chromium cannot handle commas in the filename
+    filename_normalized = normalize("NFKD", filename.replace(",", "_")).encode(
+        "ascii",
+        "ignore",
+    )
+    filename_encoded = quote(filename)
+    content_disposition = (
+        f"{disposition}; "
+        f'filename="{filename_normalized}"; '
+        f"filename*=utf-8''{filename_encoded}"
+    )
+    response["Content-Disposition"] = content_disposition
+    return response
+
+
+class BulkEditObjectPermissionsView(GenericAPIView, PassUserMixin):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = BulkEditObjectPermissionsSerializer
+    parser_classes = (parsers.JSONParser,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = self.request.user
+        object_type = serializer.validated_data.get("object_type")
+        object_ids = serializer.validated_data.get("objects")
+        object_class = serializer.get_object_class(object_type)
+        permissions = serializer.validated_data.get("permissions")
+        owner = serializer.validated_data.get("owner")
+
+        if not user.is_superuser:
+            objs = object_class.objects.filter(pk__in=object_ids)
+            has_perms = all((obj.owner == user or obj.owner is None) for obj in objs)
+
+            if not has_perms:
+                return HttpResponseForbidden("Insufficient permissions")
+
+        try:
+            qs = object_class.objects.filter(id__in=object_ids)
+
+            if "owner" in serializer.validated_data:
+                qs.update(owner=owner)
+
+            if "permissions" in serializer.validated_data:
+                for obj in qs:
+                    set_permissions_for_object(permissions, obj)
+
+            return Response({"result": "OK"})
+        except Exception as e:
+            logger.warning(f"An error occurred performing bulk permissions edit: {e!s}")
+            return HttpResponseBadRequest(
+                "Error performing bulk permissions edit, check logs for more detail.",
+            )
+
+
+class ConsumptionTemplateViewSet(ModelViewSet):
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+
+    serializer_class = ConsumptionTemplateSerializer
+    pagination_class = StandardPagination
+
+    model = ConsumptionTemplate
+
+    queryset = ConsumptionTemplate.objects.all().order_by("name")
+
+
+class CustomFieldViewSet(ModelViewSet):
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+
+    serializer_class = CustomFieldSerializer
+    pagination_class = StandardPagination
+
+    model = CustomField
+
+    queryset = CustomField.objects.all().order_by("-created")

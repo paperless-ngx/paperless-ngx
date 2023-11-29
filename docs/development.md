@@ -61,7 +61,7 @@ first-time setup.
       Every command is executed directly from the root folder of the project unless specified otherwise.
 
 1.  Install prerequisites + pipenv as mentioned in
-    [Bare metal route](/setup#bare_metal).
+    [Bare metal route](setup.md#bare_metal).
 
 2.  Copy `paperless.conf.example` to `paperless.conf` and enable debug
     mode within the file via `PAPERLESS_DEBUG=true`.

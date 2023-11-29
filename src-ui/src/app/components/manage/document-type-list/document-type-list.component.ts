@@ -13,7 +13,7 @@ import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/docume
 import { ManagementListComponent } from '../management-list/management-list.component'
 
 @Component({
-  selector: 'app-document-type-list',
+  selector: 'pngx-document-type-list',
   templateUrl: './../management-list/management-list.component.html',
   styleUrls: ['./../management-list/management-list.component.scss'],
 })

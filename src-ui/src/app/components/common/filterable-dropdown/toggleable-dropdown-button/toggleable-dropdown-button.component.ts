@@ -9,7 +9,7 @@ export enum ToggleableItemState {
 }
 
 @Component({
-  selector: 'app-toggleable-dropdown-button',
+  selector: 'pngx-toggleable-dropdown-button',
   templateUrl: './toggleable-dropdown-button.component.html',
   styleUrls: ['./toggleable-dropdown-button.component.scss'],
 })

@@ -20,6 +20,28 @@
         margin-left: 4%;
         float: left;
     }
+
+    .grid-flipped-left {
+        width: 66%;
+        float: left;
+    }
+
+    .grid-flipped-right {
+        width: 29%;
+        margin-left: 4%;
+        float: left;
+    }
+
+    .grid-half-left {
+        width: 48%;
+        float: left;
+    }
+
+    .grid-half-right {
+        width: 48%;
+        margin-left: 4%;
+        float: left;
+    }
 }
 
 .grid-left > p {
@@ -29,6 +51,12 @@
 
 .grid-right p {
     margin: 0;
+}
+
+.clear {
+    clear: both;
+    margin-bottom: 20px;
+    display: block;
 }
 
 .index-callout {

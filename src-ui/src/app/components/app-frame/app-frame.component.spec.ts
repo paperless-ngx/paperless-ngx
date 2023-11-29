@@ -19,7 +19,7 @@ import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import { RemoteVersionService } from 'src/app/services/rest/remote-version.service'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { of } from 'rxjs'
+import { of, throwError } from 'rxjs'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
@@ -30,7 +30,47 @@ import { DocumentListViewService } from 'src/app/services/document-list-view.ser
 import { FILTER_FULLTEXT_QUERY } from 'src/app/data/filter-rule-type'
 import { routes } from 'src/app/app-routing.module'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
+import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop'
+import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
 
+const saved_views = [
+  {
+    name: 'Saved View 0',
+    id: 0,
+    show_on_dashboard: true,
+    show_in_sidebar: true,
+    sort_field: 'name',
+    sort_reverse: true,
+    filter_rules: [],
+  },
+  {
+    name: 'Saved View 1',
+    id: 1,
+    show_on_dashboard: false,
+    show_in_sidebar: false,
+    sort_field: 'name',
+    sort_reverse: true,
+    filter_rules: [],
+  },
+  {
+    name: 'Saved View 2',
+    id: 2,
+    show_on_dashboard: true,
+    show_in_sidebar: true,
+    sort_field: 'name',
+    sort_reverse: true,
+    filter_rules: [],
+  },
+  {
+    name: 'Saved View 3',
+    id: 3,
+    show_on_dashboard: true,
+    show_in_sidebar: true,
+    sort_field: 'name',
+    sort_reverse: true,
+    filter_rules: [],
+  },
+]
 const document = { id: 2, title: 'Hello world' }
 
 describe('AppFrameComponent', () => {
@@ -57,10 +97,23 @@ describe('AppFrameComponent', () => {
         NgbModule,
         FormsModule,
         ReactiveFormsModule,
+        DragDropModule,
       ],
       providers: [
         SettingsService,
-        SavedViewService,
+        {
+          provide: SavedViewService,
+          useValue: {
+            initialize: () => {},
+            listAll: () =>
+              of({
+                all: [saved_views.map((v) => v.id)],
+                count: saved_views.length,
+                results: saved_views,
+              }),
+            sidebarViews: saved_views.filter((v) => v.show_in_sidebar),
+          },
+        },
         PermissionsService,
         RemoteVersionService,
         IfPermissionsDirective,
@@ -268,5 +321,46 @@ describe('AppFrameComponent', () => {
         value: str.trim(),
       },
     ])
+  })
+
+  it('should disable global dropzone on start drag + drop, re-enable after', () => {
+    expect(settingsService.globalDropzoneEnabled).toBeTruthy()
+    component.onDragStart(null)
+    expect(settingsService.globalDropzoneEnabled).toBeFalsy()
+    component.onDragEnd(null)
+    expect(settingsService.globalDropzoneEnabled).toBeTruthy()
+  })
+
+  it('should update saved view sorting on drag + drop, show info', () => {
+    const settingsSpy = jest.spyOn(settingsService, 'updateSidebarViewsSort')
+    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    jest.spyOn(settingsService, 'storeSettings').mockReturnValue(of(true))
+    component.onDrop({ previousIndex: 0, currentIndex: 1 } as CdkDragDrop<
+      PaperlessSavedView[]
+    >)
+    expect(settingsSpy).toHaveBeenCalledWith([
+      saved_views[2],
+      saved_views[0],
+      saved_views[3],
+    ])
+    expect(toastSpy).toHaveBeenCalled()
+  })
+
+  it('should update saved view sorting on drag + drop, show error', () => {
+    jest.spyOn(settingsService, 'get').mockImplementation((key) => {
+      if (key === SETTINGS_KEYS.SIDEBAR_VIEWS_SORT_ORDER) return []
+    })
+    fixture.destroy()
+    fixture = TestBed.createComponent(AppFrameComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+    const toastSpy = jest.spyOn(toastService, 'showError')
+    jest
+      .spyOn(settingsService, 'storeSettings')
+      .mockReturnValue(throwError(() => new Error('unable to save')))
+    component.onDrop({ previousIndex: 0, currentIndex: 2 } as CdkDragDrop<
+      PaperlessSavedView[]
+    >)
+    expect(toastSpy).toHaveBeenCalled()
   })
 })

@@ -10,7 +10,7 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
 
   constructor(
     protected http: HttpClient,
-    private resourceName: string
+    protected resourceName: string
   ) {}
 
   protected getResourceUrl(id: number = null, action: string = null): string {

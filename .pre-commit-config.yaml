@@ -5,7 +5,7 @@
 repos:
   # General hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
       - id: check-docstring-first
       - id: check-json
@@ -27,7 +27,7 @@ repos:
       - id: check-case-conflict
       - id: detect-private-key
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: 'v3.0.0'
+    rev: 'v3.1.0'
     hooks:
       - id: prettier
         types_or:
@@ -36,17 +36,17 @@ repos:
           - markdown
         exclude: "(^Pipfile\\.lock$)"
   # Python hooks
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.0.280'
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: 'v0.1.5'
     hooks:
       - id: ruff
-  - repo: https://github.com/psf/black
-    rev: 23.7.0
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 23.11.0
     hooks:
       - id: black
   # Dockerfile hooks
   - repo: https://github.com/AleksaC/hadolint-py
-    rev: v2.12.0.2
+    rev: v2.12.0.3
     hooks:
       - id: hadolint
   # Shell script hooks
@@ -57,6 +57,6 @@ repos:
         args:
           - "--tab"
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: "v0.9.0.5"
+    rev: "v0.9.0.6"
     hooks:
       - id: shellcheck

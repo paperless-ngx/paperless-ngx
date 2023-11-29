@@ -24,7 +24,7 @@ import { NgSelectComponent } from '@ng-select/ng-select'
       multi: true,
     },
   ],
-  selector: 'app-input-tags',
+  selector: 'pngx-input-tags',
   templateUrl: './tags.component.html',
   styleUrls: ['./tags.component.scss'],
 })
@@ -60,6 +60,9 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   }
 
   @Input()
+  title = $localize`Tags`
+
+  @Input()
   disabled = false
 
   @Input()
@@ -73,6 +76,9 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
   @Input()
   showFilter: boolean = false
+
+  @Input()
+  horizontal: boolean = false
 
   @Output()
   filterDocuments = new EventEmitter<PaperlessTag[]>()

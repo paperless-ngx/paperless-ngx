@@ -41,7 +41,16 @@ export const SETTINGS_KEYS = {
     'general-settings:update-checking:backend-setting',
   SAVED_VIEWS_WARN_ON_UNSAVED_CHANGE:
     'general-settings:saved-views:warn-on-unsaved-change',
+  DASHBOARD_VIEWS_SORT_ORDER:
+    'general-settings:saved-views:dashboard-views-sort-order',
+  SIDEBAR_VIEWS_SORT_ORDER:
+    'general-settings:saved-views:sidebar-views-sort-order',
   TOUR_COMPLETE: 'general-settings:tour-complete',
+  DEFAULT_PERMS_OWNER: 'general-settings:permissions:default-owner',
+  DEFAULT_PERMS_VIEW_USERS: 'general-settings:permissions:default-view-users',
+  DEFAULT_PERMS_VIEW_GROUPS: 'general-settings:permissions:default-view-groups',
+  DEFAULT_PERMS_EDIT_USERS: 'general-settings:permissions:default-edit-users',
+  DEFAULT_PERMS_EDIT_GROUPS: 'general-settings:permissions:default-edit-groups',
 }
 
 export const SETTINGS: PaperlessUiSetting[] = [
@@ -149,5 +158,40 @@ export const SETTINGS: PaperlessUiSetting[] = [
     key: SETTINGS_KEYS.TOUR_COMPLETE,
     type: 'boolean',
     default: false,
+  },
+  {
+    key: SETTINGS_KEYS.DEFAULT_PERMS_OWNER,
+    type: 'number',
+    default: undefined,
+  },
+  {
+    key: SETTINGS_KEYS.DEFAULT_PERMS_VIEW_USERS,
+    type: 'array',
+    default: [],
+  },
+  {
+    key: SETTINGS_KEYS.DEFAULT_PERMS_VIEW_GROUPS,
+    type: 'array',
+    default: [],
+  },
+  {
+    key: SETTINGS_KEYS.DEFAULT_PERMS_EDIT_USERS,
+    type: 'array',
+    default: [],
+  },
+  {
+    key: SETTINGS_KEYS.DEFAULT_PERMS_EDIT_GROUPS,
+    type: 'array',
+    default: [],
+  },
+  {
+    key: SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER,
+    type: 'array',
+    default: [],
+  },
+  {
+    key: SETTINGS_KEYS.SIDEBAR_VIEWS_SORT_ORDER,
+    type: 'array',
+    default: [],
   },
 ]

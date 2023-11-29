@@ -1,0 +1,14 @@
+<div [class.pe-none]="fileIsOver">
+    <ng-content select="[content]"></ng-content>
+</div>
+
+<div class="global-dropzone-overlay position-fixed top-0 start-0 bottom-0 end-0 text-center pe-none fade" [class.show]="fileIsOver" [class.hide]="hidden">
+    <h2 class="pe-none position-absolute top-50 start-50 translate-middle" i18n>Drop files to begin upload</h2>
+</div>
+
+<ngx-file-drop
+    dropZoneClassName="visually-hidden"
+    contentClassName="visually-hidden"
+    (onFileDrop)="dropped($event)"
+    #ngxFileDrop>
+</ngx-file-drop>

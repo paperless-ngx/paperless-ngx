@@ -8,10 +8,10 @@ import { By } from '@angular/platform-browser'
     <table class="table">
       <thead>
         <th></th>
-        <th class="d-none d-lg-table-cell" appSortable="archive_serial_number">
+        <th class="d-none d-lg-table-cell" pngxSortable="archive_serial_number">
           ASN
         </th>
-        <th class="d-none d-md-table-cell" appSortable="correspondent__name">
+        <th class="d-none d-md-table-cell" pngxSortable="correspondent__name">
           Correspondent
         </th>
       </thead>

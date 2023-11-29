@@ -32,9 +32,16 @@ import {
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
+import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
+import {
+  CdkDragStart,
+  CdkDragEnd,
+  CdkDragDrop,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop'
 
 @Component({
-  selector: 'app-app-frame',
+  selector: 'pngx-app-frame',
   templateUrl: './app-frame.component.html',
   styleUrls: ['./app-frame.component.scss'],
 })
@@ -42,6 +49,15 @@ export class AppFrameComponent
   extends ComponentWithPermissions
   implements OnInit, ComponentCanDeactivate
 {
+  versionString = `${environment.appTitle} ${environment.version}`
+  appRemoteVersion: AppRemoteVersion
+
+  isMenuCollapsed: boolean = true
+
+  slimSidebarAnimating: boolean = false
+
+  searchField = new FormControl('')
+
   constructor(
     public router: Router,
     private activatedRoute: ActivatedRoute,
@@ -63,7 +79,7 @@ export class AppFrameComponent
         PermissionType.SavedView
       )
     ) {
-      savedViewService.initialize()
+      this.savedViewService.initialize()
     }
   }
 
@@ -73,13 +89,6 @@ export class AppFrameComponent
     }
     this.tasksService.reload()
   }
-
-  versionString = `${environment.appTitle} ${environment.version}`
-  appRemoteVersion: AppRemoteVersion
-
-  isMenuCollapsed: boolean = true
-
-  slimSidebarAnimating: boolean = false
 
   toggleSlimSidebar(): void {
     this.slimSidebarAnimating = true
@@ -120,8 +129,6 @@ export class AppFrameComponent
   canDeactivate(): Observable<boolean> | boolean {
     return !this.openDocumentsService.hasDirty()
   }
-
-  searchField = new FormControl('')
 
   get searchFieldEmpty(): boolean {
     return this.searchField.value.trim().length == 0
@@ -216,6 +223,28 @@ export class AppFrameComponent
           }
         }
       })
+  }
+
+  onDragStart(event: CdkDragStart) {
+    this.settingsService.globalDropzoneEnabled = false
+  }
+
+  onDragEnd(event: CdkDragEnd) {
+    this.settingsService.globalDropzoneEnabled = true
+  }
+
+  onDrop(event: CdkDragDrop<PaperlessSavedView[]>) {
+    const sidebarViews = this.savedViewService.sidebarViews.concat([])
+    moveItemInArray(sidebarViews, event.previousIndex, event.currentIndex)
+
+    this.settingsService.updateSidebarViewsSort(sidebarViews).subscribe({
+      next: () => {
+        this.toastService.showInfo($localize`Sidebar views updated`)
+      },
+      error: (e) => {
+        this.toastService.showError($localize`Error updating sidebar views`, e)
+      },
+    })
   }
 
   private checkForUpdates() {
