@@ -65,15 +65,8 @@
               "src/assets",
               "src/manifest.webmanifest",
               {
+                "glob": "**/*",
                 "input": "node_modules/ngx-extended-pdf-viewer/assets/",
-                "glob": "**/locale/en-US/?*.properties",
-                "ignore": ["**/additional-locale/*"],
-                "output": "/assets/"
-              },
-              {
-                "input": "node_modules/ngx-extended-pdf-viewer/assets/",
-                "glob": "**/*.min.js",
-                "ignore": ["*-es5\\.*"],
                 "output": "/assets/"
               }
             ],
