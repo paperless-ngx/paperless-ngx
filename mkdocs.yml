@@ -67,4 +67,5 @@ extra:
     - icon: material/chat
       link: https://matrix.to/#/#paperless:matrix.org
 plugins:
+  - search
   - glightbox
