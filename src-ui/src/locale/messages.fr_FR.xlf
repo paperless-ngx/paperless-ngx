@@ -2797,13 +2797,13 @@
         </context-group>
         <target state="translated">Affecter des autorisations de vue</target>
       </trans-unit>
-      <trans-unit id="1744964187586405039" datatype="html">
+      <trans-unit id="1744964187586405039" datatype="html" approved="yes">
         <source>Assign edit permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="translated">Assigner des autorisations d'édition</target>
+        <target state="final">Assigner des autorisations d'édition</target>
       </trans-unit>
       <trans-unit id="1519954996184640001" datatype="html" approved="yes">
         <source>Error</source>
@@ -4159,13 +4159,13 @@
         </context-group>
         <target state="translated">État</target>
       </trans-unit>
-      <trans-unit id="6732151329960766506" datatype="html">
+      <trans-unit id="6732151329960766506" datatype="html" approved="yes">
         <source>Copy Raw Error</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/toasts/toasts.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="translated">Erreur lors de la copie brute</target>
+        <target state="final">Copier l'erreur brute</target>
       </trans-unit>
       <trans-unit id="1865646076514070962" datatype="html" approved="yes">
         <source>Hello <x id="PH" equiv-text="this.settingsService.displayName"/>, welcome to Paperless-ngx</source>
@@ -6216,13 +6216,13 @@
         </context-group>
         <target state="final">Erreur lors de la supression de la règle de messagerie.</target>
       </trans-unit>
-      <trans-unit id="3061362835271417984" datatype="html">
+      <trans-unit id="3061362835271417984" datatype="html" approved="yes">
         <source>Permissions updated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">212</context>
         </context-group>
-        <target state="translated">Droits d'accès mis à jour</target>
+        <target state="final">Droits d'accès mis à jour</target>
       </trans-unit>
       <trans-unit id="4639647950943944112" datatype="html">
         <source>Error updating permissions</source>
