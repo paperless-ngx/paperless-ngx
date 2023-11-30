@@ -157,6 +157,7 @@ export class DocumentDetailComponent
   previewCurrentPage: number = 1
   previewNumPages: number = 1
   previewZoomSetting: ZoomSetting = ZoomSetting.Width
+  previewLoading: boolean = true
 
   printLoadingModal: NgbModalRef
 
@@ -450,6 +451,8 @@ export class DocumentDetailComponent
       .subscribe({
         next: (result) => {
           this.metadata = result
+          if (this.getContentType() !== 'application/pdf')
+            this.previewLoading = false
         },
         error: (error) => {
           this.metadata = null
@@ -769,6 +772,10 @@ export class DocumentDetailComponent
       .subscribe((prevDocId: number) => {
         this.router.navigate(['documents', prevDocId])
       })
+  }
+
+  onPdfLoadingStarts() {
+    this.previewLoading = false
   }
 
   onPagesLoaded(event: PagesLoadedEvent) {
