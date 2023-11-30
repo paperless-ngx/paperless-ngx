@@ -5649,6 +5649,11 @@ class TestApiConsumptionTemplates(DirectoriesMixin, APITestCase):
         self.t2 = Tag.objects.create(name="t2")
         self.t3 = Tag.objects.create(name="t3")
         self.sp = StoragePath.objects.create(path="/test/")
+        self.cf1 = CustomField.objects.create(name="Custom Field 1", data_type="string")
+        self.cf2 = CustomField.objects.create(
+            name="Custom Field 2",
+            data_type="integer",
+        )
 
         self.ct = ConsumptionTemplate.objects.create(
             name="Template 1",
@@ -5669,6 +5674,8 @@ class TestApiConsumptionTemplates(DirectoriesMixin, APITestCase):
         self.ct.assign_view_groups.add(self.group1.pk)
         self.ct.assign_change_users.add(self.user3.pk)
         self.ct.assign_change_groups.add(self.group1.pk)
+        self.ct.assign_custom_fields.add(self.cf1.pk)
+        self.ct.assign_custom_fields.add(self.cf2.pk)
         self.ct.save()
 
     def test_api_get_consumption_template(self):

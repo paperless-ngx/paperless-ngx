@@ -283,6 +283,7 @@ Consumption templates can assign:
 - Tags, correspondent, document types
 - Document owner
 - View and / or edit permissions to users or groups
+- Custom fields. Note that no value for the field will be set
 
 ### Consumption template permissions
 
