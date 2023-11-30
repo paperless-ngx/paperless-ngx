@@ -754,7 +754,7 @@ class ConsumptionTemplate(models.Model):
     order = models.IntegerField(_("order"), default=0)
 
     sources = MultiSelectField(
-        max_length=3,
+        max_length=5,
         choices=DocumentSourceChoices.choices,
         default=f"{DocumentSource.ConsumeFolder},{DocumentSource.ApiUpload},{DocumentSource.MailFetch}",
     )

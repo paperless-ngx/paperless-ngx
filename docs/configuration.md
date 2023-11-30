@@ -704,6 +704,20 @@ but could result in missing text content.
         this value if you are certain your documents are not malicious and
         you need the text which was not OCRed
 
+#### [`PAPERLESS_OCR_COLOR_CONVERSION_STRATEGY=<RGB>`](#PAPERLESS_OCR_COLOR_CONVERSION_STRATEGY) {#PAPERLESS_OCR_COLOR_CONVERSION_STRATEGY}
+
+: Controls the Ghostscript color conversion strategy when creating the archive file. This setting
+will only be utilized if the output is a version of PDF/A.
+
+    Valid options are CMYK, Gray, LeaveColorUnchanged, RGB or UseDeviceIndependentColor.
+
+    You can find more on the settings [here](https://ghostscript.readthedocs.io/en/latest/VectorDevices.html#color-conversion-and-management) in the Ghostscript documentation.
+
+    !!! warning
+
+        Utilizing some of the options may result in errors when creating archive
+        files from PDFs.
+
 #### [`PAPERLESS_OCR_USER_ARGS=<json>`](#PAPERLESS_OCR_USER_ARGS) {#PAPERLESS_OCR_USER_ARGS}
 
 : OCRmyPDF offers many more options. Use this parameter to specify any
