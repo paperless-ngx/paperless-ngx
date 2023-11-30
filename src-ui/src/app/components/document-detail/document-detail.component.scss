@@ -20,10 +20,6 @@
     top: 0 !important;
     background-color: gray !important;
   }
-
-  ::ng-deep #printServiceDialog {
-    display: none !important;
-  }
 }
 
 ::ng-deep .ng-select-taggable {
