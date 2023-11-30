@@ -120,7 +120,8 @@ class ProfileView(GenericAPIView):
     serializer_class = ProfileSerializer
 
     def get(self, request, *args, **kwargs):
-        user = self.request.user if hasattr(self.request, "user") else None
+        user = self.request.user
+
         serializer = self.get_serializer(data=request.data)
         return Response(serializer.to_representation(user))
 
@@ -150,7 +151,7 @@ class GenerateAuthTokenView(GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        user = self.request.user if hasattr(self.request, "user") else None
+        user = self.request.user
 
         existing_token = Token.objects.filter(user=user).first()
         if existing_token is not None:
