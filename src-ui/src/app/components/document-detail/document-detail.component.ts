@@ -798,7 +798,7 @@ export class DocumentDetailComponent
     return Object.values(ZoomSetting)
   }
 
-  getZoomSettingTitle(setting: ZoomSetting): string {
+  getZoomSettingTitle(setting: ZoomSetting = null): string {
     switch (setting) {
       case ZoomSetting.Auto:
         return $localize`Auto`
