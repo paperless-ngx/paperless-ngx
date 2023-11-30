@@ -1,10 +1,4 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  ViewChild,
-  ChangeDetectorRef,
-} from '@angular/core'
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core'
 import { FormArray, FormControl, FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import {
@@ -27,6 +21,7 @@ import { DocumentService } from 'src/app/services/rest/document.service'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
 import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
+import { PDFDocumentProxy } from 'ng2-pdf-viewer'
 import { ToastService } from 'src/app/services/toast.service'
 import { TextComponent } from '../common/input/text/text.component'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -74,9 +69,6 @@ import {
 } from 'src/app/data/paperless-custom-field'
 import { PaperlessCustomFieldInstance } from 'src/app/data/paperless-custom-field-instance'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { InvalidPDFException } from 'ngx-extended-pdf-viewer/lib/events/invalid-pdf-exception'
-import { PagesLoadedEvent } from 'ngx-extended-pdf-viewer/lib/events/pages-loaded-event'
-import { pdfDefaultOptions } from 'ngx-extended-pdf-viewer'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -144,7 +136,8 @@ export class DocumentDetailComponent
   unsubscribeNotifier: Subject<any> = new Subject()
   docChangeNotifier: Subject<any> = new Subject()
 
-  showPasswordField: boolean = false
+  requiresPassword: boolean = false
+  password: string
 
   ogDate: Date
 
@@ -167,8 +160,6 @@ export class DocumentDetailComponent
   DocumentDetailNavIDs = DocumentDetailNavIDs
   activeNavID: number
 
-  setPasswordCallback: (password: string) => void
-
   constructor(
     private documentsService: DocumentService,
     private route: ActivatedRoute,
@@ -185,23 +176,9 @@ export class DocumentDetailComponent
     private permissionsService: PermissionsService,
     private userService: UserService,
     private customFieldsService: CustomFieldsService,
-    private http: HttpClient,
-    private ref: ChangeDetectorRef
+    private http: HttpClient
   ) {
     super()
-    pdfDefaultOptions.passwordPrompt = {
-      // ngx-extended-pdf-viewer PasswordPrompt
-      open: () => {
-        this.showPasswordField = true
-        ref.detectChanges() // manually trigger change detection
-      },
-      setUpdateCallback: (
-        updateCallback: (password: string) => void,
-        reason: 1 | 2
-      ) => {
-        this.setPasswordCallback = updateCallback
-      },
-    }
   }
 
   titleKeyUp(event) {
@@ -420,6 +397,7 @@ export class DocumentDetailComponent
 
   updateComponent(doc: PaperlessDocument) {
     this.document = doc
+    this.requiresPassword = false
     // this.customFields = doc.custom_fields.concat([])
     this.updateFormForCustomFields()
     this.documentsService
@@ -749,21 +727,20 @@ export class DocumentDetailComponent
       })
   }
 
-  onPagesLoaded(event: PagesLoadedEvent) {
-    this.previewNumPages = event.pagesCount
+  pdfPreviewLoaded(pdf: PDFDocumentProxy) {
+    this.previewNumPages = pdf.numPages
+    if (this.password) this.requiresPassword = false
   }
 
-  onPdfLoadingFailed(event: InvalidPDFException) {
-    this.toastService.showError($localize`Error loading PDF`, {
-      error: event.message,
-    })
-    this.ref.detectChanges() // manually trigger change detection
+  onError(event) {
+    if (event.name == 'PasswordException') {
+      this.requiresPassword = true
+    }
   }
 
   onPasswordKeyUp(event: KeyboardEvent) {
     if ('Enter' == event.key) {
-      this.showPasswordField = false
-      this.setPasswordCallback((event.target as HTMLInputElement).value)
+      this.password = (event.target as HTMLInputElement).value
     }
   }
 

@@ -653,14 +653,14 @@ describe('DocumentDetailComponent', () => {
   it('should support password-protected PDFs with a password field', () => {
     initNormally()
     component.onError({ name: 'PasswordException' }) // normally dispatched by pdf viewer
-    expect(component.showPasswordField).toBeTruthy()
+    expect(component.requiresPassword).toBeTruthy()
     fixture.detectChanges()
     expect(
       fixture.debugElement.query(By.css('input[type=password]'))
     ).not.toBeUndefined()
     component.password = 'foo'
     component.pdfPreviewLoaded({ numPages: 1000 } as any)
-    expect(component.showPasswordField).toBeFalsy()
+    expect(component.requiresPassword).toBeFalsy()
   })
 
   it('should support Enter key in password field', () => {
