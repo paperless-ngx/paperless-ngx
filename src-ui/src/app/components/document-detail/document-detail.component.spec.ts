@@ -19,7 +19,6 @@ import {
   NgbDateStruct,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { PdfViewerComponent } from 'ng2-pdf-viewer'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import {
@@ -70,6 +69,7 @@ import { ShareLinksDropdownComponent } from '../common/share-links-dropdown/shar
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { PaperlessCustomFieldDataType } from 'src/app/data/paperless-custom-field'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { PdfViewerComponent } from '../common/pdf-viewer/pdf-viewer.component'
 
 const doc: PaperlessDocument = {
   id: 3,
@@ -160,10 +160,10 @@ describe('DocumentDetailComponent', () => {
         PermissionsFormComponent,
         SafeHtmlPipe,
         ConfirmDialogComponent,
-        PdfViewerComponent,
         SafeUrlPipe,
         ShareLinksDropdownComponent,
         CustomFieldsDropdownComponent,
+        PdfViewerComponent,
       ],
       providers: [
         DocumentTitlePipe,
@@ -682,6 +682,21 @@ describe('DocumentDetailComponent', () => {
     expect(component.previewNumPages).toEqual(1000)
   })
 
+  it('should support zoom controls', () => {
+    initNormally()
+    component.onZoomSelect({ target: { value: '1' } } as any) // from select
+    expect(component.previewZoomSetting).toEqual('1')
+    component.increaseZoom()
+    expect(component.previewZoomSetting).toEqual('1.5')
+    component.increaseZoom()
+    expect(component.previewZoomSetting).toEqual('2')
+    component.decreaseZoom()
+    expect(component.previewZoomSetting).toEqual('1.5')
+    component.onZoomSelect({ target: { value: '1' } } as any) // from select
+    component.decreaseZoom()
+    expect(component.previewZoomSetting).toEqual('.75')
+  })
+
   it('should support updating notes dynamically', () => {
     const notes = [
       {
@@ -805,7 +820,7 @@ describe('DocumentDetailComponent', () => {
     jest.spyOn(settingsService, 'get').mockReturnValue(false)
     expect(component.useNativePdfViewer).toBeFalsy()
     fixture.detectChanges()
-    expect(fixture.debugElement.query(By.css('pdf-viewer'))).not.toBeNull()
+    expect(fixture.debugElement.query(By.css('pngx-pdf-viewer'))).not.toBeNull()
   })
 
   it('should display native pdf viewer if enabled', () => {
