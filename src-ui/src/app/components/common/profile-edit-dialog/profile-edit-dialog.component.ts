@@ -112,6 +112,8 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
   }
 
   onPasswordChange(): void {
+    console.log(this.currentPassword, this.newPassword)
+
     this.showPasswordConfirm = this.currentPassword !== this.newPassword
 
     if (this.showPasswordConfirm) {

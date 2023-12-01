@@ -22,14 +22,22 @@ export class PasswordComponent extends AbstractInputComponent<string> {
 
   public toggleVisibility(): void {
     this.textVisible = !this.textVisible
-    if (this.textVisible && this.value?.replace(/\*/g, '').length === 0) {
+  }
+
+  public onFocus() {
+    if (this.value?.replace(/\*/g, '').length === 0) {
       this.writeValue('')
-    } else if (!this.textVisible && this.value?.length === 0) {
-      this.writeValue('*********')
     }
   }
 
-  constructor() {
-    super()
+  public onFocusOut() {
+    if (this.value?.length === 0) {
+      this.writeValue('**********')
+      this.onChange(this.value)
+    }
+  }
+
+  get disableRevealToggle(): boolean {
+    return this.value?.replace(/\*/g, '').length === 0
   }
 }

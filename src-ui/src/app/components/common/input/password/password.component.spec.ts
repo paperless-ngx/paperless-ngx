@@ -36,19 +36,24 @@ describe('PasswordComponent', () => {
   })
 
   it('should support toggling field visibility', () => {
-    expect(component.inputField.nativeElement.type).toEqual('password')
+    expect(input.type).toEqual('password')
     component.showReveal = true
     fixture.detectChanges()
     fixture.debugElement.query(By.css('button')).triggerEventHandler('click')
     fixture.detectChanges()
-    expect(component.inputField.nativeElement.type).toEqual('text')
+    expect(input.type).toEqual('text')
   })
 
-  it('should empty field if password is obfuscated', () => {
+  it('should empty field if password is obfuscated on focus', () => {
     component.value = '*********'
-    component.toggleVisibility()
+    component.onFocus()
     expect(component.value).toEqual('')
-    component.toggleVisibility()
-    expect(component.value).toEqual('*********')
+    component.onFocusOut()
+    expect(component.value).toEqual('**********')
+  })
+
+  it('should disable toggle button if no real password', () => {
+    component.value = '*********'
+    expect(component.disableRevealToggle).toBeTruthy()
   })
 })
