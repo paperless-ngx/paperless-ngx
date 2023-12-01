@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-11-13 01:30\n"
+"PO-Revision-Date: 2023-12-01 12:53\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -43,7 +43,7 @@ msgstr "Pontos egyezés"
 
 #: documents/models.py:57
 msgid "Regular expression"
-msgstr "Szabályos kifejezés"
+msgstr "Reguláris kifejezés"
 
 #: documents/models.py:58
 msgid "Fuzzy word"
@@ -64,7 +64,7 @@ msgstr "egyezés"
 
 #: documents/models.py:67
 msgid "matching algorithm"
-msgstr "megfelelő algoritmus"
+msgstr "egyeztető algoritmus"
 
 #: documents/models.py:72
 msgid "is insensitive"
@@ -72,11 +72,11 @@ msgstr "érzéketlen"
 
 #: documents/models.py:95 documents/models.py:147
 msgid "correspondent"
-msgstr "levelező"
+msgstr "kapcsolattartó"
 
 #: documents/models.py:96
 msgid "correspondents"
-msgstr "levelezők"
+msgstr "kapcsolattartók"
 
 #: documents/models.py:100
 msgid "color"
