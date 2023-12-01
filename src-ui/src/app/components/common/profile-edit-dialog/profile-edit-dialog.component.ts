@@ -112,8 +112,6 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
   }
 
   onPasswordChange(): void {
-    console.log(this.currentPassword, this.newPassword)
-
     this.showPasswordConfirm = this.currentPassword !== this.newPassword
 
     if (this.showPasswordConfirm) {
@@ -131,6 +129,7 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
   }
 
   save(): void {
+    const passwordChanged = this.currentPassword !== this.newPassword
     const profile = Object.assign({}, this.form.value)
     this.networkActive = true
     this.profileService
@@ -138,7 +137,16 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: () => {
+          console.log('next', passwordChanged)
           this.toastService.showInfo($localize`Profile updated successfully`)
+          if (passwordChanged) {
+            this.toastService.showInfo(
+              $localize`Password has been changed, you will be logged out momentarily.`
+            )
+            setTimeout(() => {
+              window.location.href = `${window.location.origin}/accounts/logout/?next=/accounts/login/`
+            }, 2500)
+          }
           this.activeModal.close()
         },
         error: (error) => {

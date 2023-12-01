@@ -11,14 +11,15 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
   NgbAccordionModule,
   NgbActiveModal,
+  NgbModal,
   NgbModalModule,
+  NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap'
 import { HttpClientModule } from '@angular/common/http'
 import { TextComponent } from '../input/text/text.component'
 import { PasswordComponent } from '../input/password/password.component'
 import { of, throwError } from 'rxjs'
 import { ToastService } from 'src/app/services/toast.service'
-import { By } from '@angular/platform-browser'
 import { Clipboard } from '@angular/cdk/clipboard'
 
 const profile = {
@@ -35,6 +36,7 @@ describe('ProfileEditDialogComponent', () => {
   let profileService: ProfileService
   let toastService: ToastService
   let clipboard: Clipboard
+  let modalService: NgbModal
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -55,6 +57,7 @@ describe('ProfileEditDialogComponent', () => {
     profileService = TestBed.inject(ProfileService)
     toastService = TestBed.inject(ToastService)
     clipboard = TestBed.inject(Clipboard)
+    modalService = TestBed.inject(NgbModal)
     fixture = TestBed.createComponent(ProfileEditDialogComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
@@ -159,6 +162,28 @@ describe('ProfileEditDialogComponent', () => {
     )
     expect(component.saveDisabled).toBeFalsy()
   })
+
+  it('should logout on save if password changed', fakeAsync(() => {
+    const getSpy = jest.spyOn(profileService, 'get')
+    getSpy.mockReturnValue(of(profile))
+    component.ngOnInit()
+    component['newPassword'] = 'new*pass'
+    component.form.get('password').patchValue('new*pass')
+    component.form.get('password_confirm').patchValue('new*pass')
+
+    const updateSpy = jest.spyOn(profileService, 'update')
+    updateSpy.mockReturnValue(of(null))
+    Object.defineProperty(window, 'location', {
+      value: {
+        href: 'http://localhost/',
+      },
+      writable: true, // possibility to override
+    })
+    component.save()
+    expect(updateSpy).toHaveBeenCalled()
+    tick(2600)
+    expect(window.location.href).toContain('logout')
+  }))
 
   it('should support auth token copy', fakeAsync(() => {
     const getSpy = jest.spyOn(profileService, 'get')
