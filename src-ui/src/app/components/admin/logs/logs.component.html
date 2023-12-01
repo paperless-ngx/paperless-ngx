@@ -1,14 +1,19 @@
 <pngx-page-header title="Logs" i18n-title>
-
+  <div class="form-check form-switch" (click)="toggleAutoRefresh()">
+    <input class="form-check-input" type="checkbox" role="switch" id="autoRefreshSwitch" [attr.checked]="autoRefreshInterval">
+    <label class="form-check-label" for="autoRefreshSwitch" i18n>Auto refresh</label>
+  </div>
 </pngx-page-header>
 
 <ul ngbNav #nav="ngbNav" [(activeId)]="activeLog" (activeIdChange)="reloadLogs()" class="nav-tabs">
   <li *ngFor="let logFile of logFiles" [ngbNavItem]="logFile">
-    <a ngbNavLink>{{logFile}}.log</a>
+    <a ngbNavLink>
+      {{logFile}}.log
+    </a>
   </li>
-  <div *ngIf="isLoading && !logFiles.length" class="pb-2">
+  <div *ngIf="isLoading || !logFiles.length" class="ps-2 d-flex align-items-center">
     <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-    <ng-container i18n>Loading...</ng-container>
+    <ng-container *ngIf="!logFiles.length" i18n>Loading...</ng-container>
   </div>
 </ul>
 

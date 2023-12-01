@@ -23,6 +23,8 @@ export class TasksComponent
   public pageSize: number = 25
   public page: number = 1
 
+  public autoRefreshInterval: any
+
   get dismissButtonText(): string {
     return this.selectedTasks.size > 0
       ? $localize`Dismiss selected`
@@ -39,6 +41,7 @@ export class TasksComponent
 
   ngOnInit() {
     this.tasksService.reload()
+    this.toggleAutoRefresh()
   }
 
   ngOnDestroy() {
@@ -133,6 +136,17 @@ export class TasksComponent
         return $localize`completed`
       case 'failed':
         return $localize`failed`
+    }
+  }
+
+  toggleAutoRefresh(): void {
+    if (this.autoRefreshInterval) {
+      clearInterval(this.autoRefreshInterval)
+      this.autoRefreshInterval = null
+    } else {
+      this.autoRefreshInterval = setInterval(() => {
+        this.tasksService.reload()
+      }, 5000)
     }
   }
 }
