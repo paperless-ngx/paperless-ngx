@@ -1,4 +1,9 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing'
 import { LogService } from 'src/app/services/rest/log.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LogsComponent } from './logs.component'
@@ -26,6 +31,7 @@ describe('LogsComponent', () => {
   let fixture: ComponentFixture<LogsComponent>
   let logService: LogService
   let logSpy
+  let reloadSpy
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -42,7 +48,9 @@ describe('LogsComponent', () => {
     })
     fixture = TestBed.createComponent(LogsComponent)
     component = fixture.componentInstance
+    reloadSpy = jest.spyOn(component, 'reloadLogs')
     window.HTMLElement.prototype.scroll = function () {} // mock scroll
+    jest.useFakeTimers()
     fixture.detectChanges()
   })
 
@@ -67,5 +75,15 @@ describe('LogsComponent', () => {
     )
     component.reloadLogs()
     expect(component.logs).toHaveLength(0)
+  })
+
+  it('should auto refresh, allow toggle', () => {
+    jest.advanceTimersByTime(6000)
+    expect(reloadSpy).toHaveBeenCalledTimes(2)
+
+    component.toggleAutoRefresh()
+    expect(component.autoRefreshInterval).toBeNull()
+    jest.advanceTimersByTime(6000)
+    expect(reloadSpy).toHaveBeenCalledTimes(2)
   })
 })
