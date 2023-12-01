@@ -9,7 +9,7 @@
       </button>
     </div>
     <div class="position-relative" [class.col-md-9]="horizontal">
-      <input #inputField type="text" class="form-control" [class.is-invalid]="error" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [disabled]="disabled">
+      <input #inputField type="text" class="form-control" [class.is-invalid]="error" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [disabled]="disabled" [autocomplete]="autocomplete">
       <small *ngIf="hint" class="form-text text-muted" [innerHTML]="hint | safeHtml"></small>
       <div class="invalid-feedback position-absolute top-100">
         {{error}}

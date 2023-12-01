@@ -1,4 +1,4 @@
-import { Component, forwardRef } from '@angular/core'
+import { Component, Input, forwardRef } from '@angular/core'
 import { NG_VALUE_ACCESSOR } from '@angular/forms'
 import { AbstractInputComponent } from '../abstract-input'
 
@@ -15,6 +15,9 @@ import { AbstractInputComponent } from '../abstract-input'
   styleUrls: ['./text.component.scss'],
 })
 export class TextComponent extends AbstractInputComponent<string> {
+  @Input()
+  autocomplete: string
+
   constructor() {
     super()
   }

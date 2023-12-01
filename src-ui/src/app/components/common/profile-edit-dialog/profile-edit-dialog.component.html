@@ -10,17 +10,17 @@
           <div ngbAccordionItem="first" [collapsed]="!showEmailConfirm" class="border-0 bg-transparent">
             <div ngbAccordionCollapse>
               <div ngbAccordionBody class="p-0 pb-3">
-                <pngx-input-text i18n-title title="Confirm Email" formControlName="email_confirm" (keyup)="onEmailConfirmKeyUp($event)" [error]="error?.email_confirm"></pngx-input-text>
+                <pngx-input-text i18n-title title="Confirm Email" formControlName="email_confirm" (keyup)="onEmailConfirmKeyUp($event)" autocomplete="email" [error]="error?.email_confirm"></pngx-input-text>
               </div>
             </div>
           </div>
         </div>
-        <pngx-input-password i18n-title title="Password" formControlName="password" (keyup)="onPasswordKeyUp($event)" [showReveal]="true" [error]="error?.password"></pngx-input-password>
+        <pngx-input-password i18n-title title="Password" formControlName="password" (keyup)="onPasswordKeyUp($event)" [showReveal]="true" autocomplete="current-password" [error]="error?.password"></pngx-input-password>
         <div ngbAccordion>
           <div ngbAccordionItem="first" [collapsed]="!showPasswordConfirm" class="border-0 bg-transparent">
             <div ngbAccordionCollapse>
               <div ngbAccordionBody class="p-0 pb-3">
-                <pngx-input-password i18n-title title="Confirm Password" formControlName="password_confirm" (keyup)="onPasswordConfirmKeyUp($event)" [error]="error?.password_confirm"></pngx-input-password>
+                <pngx-input-password i18n-title title="Confirm Password" formControlName="password_confirm" (keyup)="onPasswordConfirmKeyUp($event)" autocomplete="new-password" [error]="error?.password_confirm"></pngx-input-password>
               </div>
             </div>
           </div>
