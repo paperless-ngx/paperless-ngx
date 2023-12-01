@@ -34,7 +34,7 @@ Options available to docker installations:
     Paperless uses 4 volumes:
 
     -   `paperless_media`: This is where your documents are stored.
-    -   `paperless_data`: This is where auxillary data is stored. This
+    -   `paperless_data`: This is where auxiliary data is stored. This
         folder also contains the SQLite database, if you use it.
     -   `paperless_pgdata`: Exists only if you use PostgreSQL and
         contains the database.
@@ -408,7 +408,7 @@ that don't match a document anymore get removed as well.
 ### Managing the Automatic matching algorithm
 
 The _Auto_ matching algorithm requires a trained neural network to work.
-This network needs to be updated whenever somethings in your data
+This network needs to be updated whenever something in your data
 changes. The docker image takes care of that automatically with the task
 scheduler. You can manually renew the classifier by invoking the
 following management command:
@@ -597,7 +597,7 @@ This tool does a fuzzy match over document content, looking for
 those which look close according to a given ratio.
 
 At this time, other metadata (such as correspondent or type) is not
-take into account by the detection.
+taken into account by the detection.
 
 ```
 document_fuzzy_match [--ratio] [--processes N]
