@@ -87,7 +87,7 @@ follow the [Docker Compose instructions](https://docs.paperless-ngx.com/setup/#i
 space compared to a bare metal installation, docker comes with close to
 zero overhead, even on Raspberry Pi.
 
-If you decide to got with the bare metal route, be aware that some of
+If you decide to go with the bare metal route, be aware that some of
 the python requirements do not have precompiled packages for ARM /
 ARM64. Installation of these will require additional development
 libraries and compilation will take a long time.
