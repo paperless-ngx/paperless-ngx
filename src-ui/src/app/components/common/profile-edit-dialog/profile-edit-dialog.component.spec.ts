@@ -13,7 +13,6 @@ import {
   NgbActiveModal,
   NgbModal,
   NgbModalModule,
-  NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap'
 import { HttpClientModule } from '@angular/common/http'
 import { TextComponent } from '../input/text/text.component'
@@ -36,7 +35,6 @@ describe('ProfileEditDialogComponent', () => {
   let profileService: ProfileService
   let toastService: ToastService
   let clipboard: Clipboard
-  let modalService: NgbModal
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -57,7 +55,6 @@ describe('ProfileEditDialogComponent', () => {
     profileService = TestBed.inject(ProfileService)
     toastService = TestBed.inject(ToastService)
     clipboard = TestBed.inject(Clipboard)
-    modalService = TestBed.inject(NgbModal)
     fixture = TestBed.createComponent(ProfileEditDialogComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
@@ -138,7 +135,10 @@ describe('ProfileEditDialogComponent', () => {
     getSpy.mockReturnValue(of(profile))
     component.ngOnInit()
     component.form.get('password').patchValue('new*pass')
-    component.onPasswordKeyUp({ target: { value: 'new*pass' } } as any)
+    component.onPasswordKeyUp({
+      target: { value: 'new*pass', tagName: 'input' },
+    } as any)
+    component.onPasswordKeyUp({ target: { tagName: 'button' } } as any) // coverage
     fixture.detectChanges()
     expect(component.form.get('password_confirm').enabled).toBeTruthy()
     expect(fixture.debugElement.nativeElement.textContent).toContain(

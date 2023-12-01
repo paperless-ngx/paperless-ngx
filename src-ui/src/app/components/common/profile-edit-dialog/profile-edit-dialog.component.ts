@@ -102,6 +102,7 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
   }
 
   onPasswordKeyUp(event: KeyboardEvent): void {
+    if ((event.target as HTMLElement).tagName !== 'input') return // toggle button can trigger this handler
     this.newPassword = (event.target as HTMLInputElement)?.value
     this.onPasswordChange()
   }
@@ -162,7 +163,6 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
   generateAuthToken(): void {
     this.profileService.generateAuthToken().subscribe({
       next: (token: string) => {
-        console.log(token)
         this.form.patchValue({ auth_token: token })
       },
       error: (error) => {
