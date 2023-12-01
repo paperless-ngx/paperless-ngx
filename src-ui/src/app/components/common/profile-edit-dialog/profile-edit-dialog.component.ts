@@ -137,14 +137,13 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: () => {
-          console.log('next', passwordChanged)
           this.toastService.showInfo($localize`Profile updated successfully`)
           if (passwordChanged) {
             this.toastService.showInfo(
               $localize`Password has been changed, you will be logged out momentarily.`
             )
             setTimeout(() => {
-              window.location.href = `${window.location.origin}/accounts/logout/?next=/accounts/login/`
+              window.location.href = `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
             }, 2500)
           }
           this.activeModal.close()
