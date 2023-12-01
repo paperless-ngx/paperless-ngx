@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-12-01 12:53\n"
+"PO-Revision-Date: 2023-12-01 13:52\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -553,7 +553,7 @@ msgstr "linkek megosztása"
 
 #: documents/models.py:748
 msgid "Consume Folder"
-msgstr "Fogyasztás mappa"
+msgstr "Feldolgozási mappa"
 
 #: documents/models.py:749
 msgid "Api Upload"
@@ -597,7 +597,7 @@ msgstr "A dokumentum címének hozzárendelése, tartalmazhat néhány helykitö
 
 #: documents/models.py:808 paperless_mail/models.py:204
 msgid "assign this tag"
-msgstr "hozzárendelni ezt a címkét"
+msgstr "rendelje hozzá ezt a jelölőt"
 
 #: documents/models.py:816 paperless_mail/models.py:212
 msgid "assign this document type"
@@ -605,7 +605,7 @@ msgstr "rendelje hozzá ezt a dokumentumtípust"
 
 #: documents/models.py:824 paperless_mail/models.py:226
 msgid "assign this correspondent"
-msgstr "bízza meg ezt a levelezőt"
+msgstr "rendelje hozzá ezt a kapcsolattartót"
 
 #: documents/models.py:832
 msgid "assign this storage path"
@@ -613,7 +613,7 @@ msgstr "rendelje hozzá ezt a tárolási útvonalat"
 
 #: documents/models.py:841
 msgid "assign this owner"
-msgstr "kijelölni ezt a tulajdonost"
+msgstr "rendelje hozzá ezt a tulajdonost"
 
 #: documents/models.py:848
 msgid "grant view permissions to these users"
@@ -1188,7 +1188,7 @@ msgstr "feldolgozási kör"
 
 #: paperless_mail/models.py:177
 msgid "action"
-msgstr "akció"
+msgstr "művelet"
 
 #: paperless_mail/models.py:183
 msgid "action parameter"
@@ -1204,7 +1204,7 @@ msgstr "cím hozzárendelése a"
 
 #: paperless_mail/models.py:216
 msgid "assign correspondent from"
-msgstr "megbízott levelezőt a"
+msgstr "rendelje hozzá a kapcsolattartót a"
 
 #: paperless_mail/models.py:230
 msgid "Assign the rule owner to documents"
@@ -1220,7 +1220,7 @@ msgstr "tárgy"
 
 #: paperless_mail/models.py:272
 msgid "received"
-msgstr "kapott"
+msgstr "fogadott"
 
 #: paperless_mail/models.py:279
 msgid "processed"
@@ -1228,5 +1228,5 @@ msgstr "feldolgozott"
 
 #: paperless_mail/models.py:285
 msgid "status"
-msgstr "státusz"
+msgstr "állapot"
 
