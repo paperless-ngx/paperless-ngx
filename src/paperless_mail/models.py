@@ -139,13 +139,25 @@ class MailRule(document_models.ModelWithOwner):
         blank=True,
     )
 
-    filter_attachment_filename = models.CharField(
-        _("filter attachment filename"),
+    filter_attachment_filename_include = models.CharField(
+        _("filter attachment filename inclusive"),
         max_length=256,
         null=True,
         blank=True,
         help_text=_(
             "Only consume documents which entirely match this "
+            "filename if specified. Wildcards such as *.pdf or "
+            "*invoice* are allowed. Case insensitive.",
+        ),
+    )
+
+    filter_attachment_filename_exclude = models.CharField(
+        _("filter attachment filename exclusive"),
+        max_length=256,
+        null=True,
+        blank=True,
+        help_text=_(
+            "Do not consume documents which entirely match this "
             "filename if specified. Wildcards such as *.pdf or "
             "*invoice* are allowed. Case insensitive.",
         ),
