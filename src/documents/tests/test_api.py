@@ -5769,7 +5769,7 @@ class TestApiConsumptionTemplates(DirectoriesMixin, APITestCase):
             filter_to="someone@somewhere.com",
             filter_subject="subject",
             filter_body="body",
-            filter_attachment_filename="file.pdf",
+            filter_attachment_filename_include="file.pdf",
             maximum_age=30,
             action=MailRule.MailAction.MARK_READ,
             assign_title_from=MailRule.TitleSource.FROM_SUBJECT,
