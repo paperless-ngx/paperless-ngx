@@ -17,10 +17,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
     - name: Checkout
       uses: actions/checkout@v4
-
+    - name: Remove .env
+      run: |
+        rm -f \
+          .env
     - name: crowdin action
       uses: crowdin/github-action@v1
       with:
