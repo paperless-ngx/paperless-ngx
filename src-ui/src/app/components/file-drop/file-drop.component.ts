@@ -38,8 +38,9 @@ export class FileDropComponent {
 
   @ViewChild('ngxFileDrop') ngxFileDrop: NgxFileDropComponent
 
-  @HostListener('dragover', ['$event ']) onDragOver(event: DragEvent) {
-    if (!this.dragDropEnabled) return
+  @HostListener('dragover', ['$event']) onDragOver(event: DragEvent) {
+    if (!this.dragDropEnabled || !event.dataTransfer?.types?.includes('Files'))
+      return
     event.preventDefault()
     event.stopImmediatePropagation()
     this.settings.globalDropzoneActive = true
