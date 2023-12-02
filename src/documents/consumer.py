@@ -795,9 +795,10 @@ class Consumer(LoggingMixin):
         if self.override_custom_field_ids:
             for field_id in self.override_custom_field_ids:
                 field = CustomField.objects.get(pk=field_id)
-                document.custom_fields.add(
-                    CustomFieldInstance.objects.create(field=field, document=document),
-                )
+                CustomFieldInstance.objects.create(
+                    field=field,
+                    document=document,
+                )  # adds to document
 
     def _write(self, storage_type, source, target):
         with open(source, "rb") as read_file, open(target, "wb") as write_file:
