@@ -105,6 +105,7 @@ import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
 import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { CustomFieldsDropdownComponent } from './components/common/custom-fields-dropdown/custom-fields-dropdown.component'
+import { ProfileEditDialogComponent } from './components/common/profile-edit-dialog/profile-edit-dialog.component'
 
 import localeAf from '@angular/common/locales/af'
 import localeAr from '@angular/common/locales/ar'
@@ -256,6 +257,7 @@ function initializeApp(settings: SettingsService) {
     CustomFieldsComponent,
     CustomFieldEditDialogComponent,
     CustomFieldsDropdownComponent,
+    ProfileEditDialogComponent,
   ],
   imports: [
     BrowserModule,

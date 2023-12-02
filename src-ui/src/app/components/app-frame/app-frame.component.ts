@@ -39,6 +39,8 @@ import {
   CdkDragDrop,
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 
 @Component({
   selector: 'pngx-app-frame',
@@ -69,6 +71,7 @@ export class AppFrameComponent
     public settingsService: SettingsService,
     public tasksService: TasksService,
     private readonly toastService: ToastService,
+    private modalService: NgbModal,
     permissionsService: PermissionsService
   ) {
     super()
@@ -119,6 +122,13 @@ export class AppFrameComponent
 
   closeMenu() {
     this.isMenuCollapsed = true
+  }
+
+  editProfile() {
+    this.modalService.open(ProfileEditDialogComponent, {
+      backdrop: 'static',
+    })
+    this.closeMenu()
   }
 
   get openDocuments(): PaperlessDocument[] {
