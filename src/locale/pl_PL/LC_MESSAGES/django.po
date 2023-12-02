@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-11-13 01:31\n"
+"PO-Revision-Date: 2023-12-01 11:18\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -521,7 +521,7 @@ msgstr "użytkownik"
 
 #: documents/models.py:679
 msgid "note"
-msgstr ""
+msgstr "notatka"
 
 #: documents/models.py:680
 msgid "notes"
@@ -529,11 +529,11 @@ msgstr "notatki"
 
 #: documents/models.py:688
 msgid "Archive"
-msgstr ""
+msgstr "Archiwum"
 
 #: documents/models.py:689
 msgid "Original"
-msgstr ""
+msgstr "Oryginał"
 
 #: documents/models.py:700
 msgid "expiration"
@@ -657,7 +657,7 @@ msgstr ""
 
 #: documents/models.py:890
 msgid "Integer"
-msgstr ""
+msgstr "Liczba całkowita"
 
 #: documents/models.py:891
 msgid "Float"
@@ -669,7 +669,7 @@ msgstr ""
 
 #: documents/models.py:904
 msgid "data type"
-msgstr ""
+msgstr "typ danych"
 
 #: documents/models.py:912
 msgid "custom field"
@@ -763,7 +763,7 @@ msgstr "Zaloguj się"
 
 #: documents/templates/registration/login.html:70
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Nie pamiętasz hasła?"
 
 #: documents/templates/registration/password_reset_complete.html:14
 msgid "Paperless-ngx reset password complete"
@@ -792,7 +792,7 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_confirm.html:49
 msgid "New Password"
-msgstr ""
+msgstr "Nowe hasło"
 
 #: documents/templates/registration/password_reset_confirm.html:50
 msgid "Confirm Password"
@@ -800,11 +800,11 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_confirm.html:61
 msgid "Change my password"
-msgstr ""
+msgstr "Zmień hasło"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
-msgstr ""
+msgstr "poproś o reset hasła"
 
 #: documents/templates/registration/password_reset_done.html:14
 msgid "Paperless-ngx reset password sent"
