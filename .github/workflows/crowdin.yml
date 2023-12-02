@@ -3,7 +3,7 @@ name: Crowdin Action
 on:
   workflow_dispatch:
   schedule:
-    - cron: '2 */1 * * *'
+    - cron: '2 */12 * * *'
   push:
     paths: [
       'src/locale/**',
@@ -19,10 +19,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-    - name: Remove .env
-      run: |
-        rm -f \
-          .env
     - name: crowdin action
       uses: crowdin/github-action@v1
       with:
