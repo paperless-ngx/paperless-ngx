@@ -279,7 +279,7 @@ Consumption templates allow you to filter by:
 
 Consumption templates can assign:
 
-- Title, see [title placeholders](usage.md#title_placeholders) below
+- Title, see [title placeholders](usage.md#title-placeholders) below
 - Tags, correspondent, document types
 - Document owner
 - View and / or edit permissions to users or groups
