@@ -519,7 +519,11 @@ class Consumer(LoggingMixin):
                     document.filename = generate_unique_filename(document)
                     create_source_path_directory(document.source_path)
 
-                    self._write(document.storage_type, self.path, document.source_path)
+                    self._write(
+                        document.storage_type,
+                        self.original_path,
+                        document.source_path,
+                    )
 
                     self._write(
                         document.storage_type,
@@ -711,21 +715,20 @@ class Consumer(LoggingMixin):
 
         storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
-        with open(self.path, "rb") as f:
-            document = Document.objects.create(
-                title=(
-                    self._parse_title_placeholders(self.override_title)
-                    if self.override_title is not None
-                    else file_info.title
-                )[:127],
-                content=text,
-                mime_type=mime_type,
-                checksum=hashlib.md5(f.read()).hexdigest(),
-                created=create_date,
-                modified=create_date,
-                storage_type=storage_type,
-                original_filename=self.filename,
-            )
+        document = Document.objects.create(
+            title=(
+                self._parse_title_placeholders(self.override_title)
+                if self.override_title is not None
+                else file_info.title
+            )[:127],
+            content=text,
+            mime_type=mime_type,
+            checksum=hashlib.md5(self.original_path.read_bytes()).hexdigest(),
+            created=create_date,
+            modified=create_date,
+            storage_type=storage_type,
+            original_filename=self.filename,
+        )
 
         self.apply_overrides(document)
 
