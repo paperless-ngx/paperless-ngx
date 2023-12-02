@@ -35,7 +35,9 @@ from documents.views import UiSettingsView
 from documents.views import UnifiedSearchViewSet
 from paperless.consumers import StatusConsumer
 from paperless.views import FaviconView
+from paperless.views import GenerateAuthTokenView
 from paperless.views import GroupViewSet
+from paperless.views import ProfileView
 from paperless.views import UserViewSet
 from paperless_mail.views import MailAccountTestView
 from paperless_mail.views import MailAccountViewSet
@@ -118,6 +120,12 @@ urlpatterns = [
                     "^bulk_edit_object_perms/",
                     BulkEditObjectPermissionsView.as_view(),
                     name="bulk_edit_object_permissions",
+                ),
+                path("profile/generate_auth_token/", GenerateAuthTokenView.as_view()),
+                re_path(
+                    "^profile/",
+                    ProfileView.as_view(),
+                    name="profile_view",
                 ),
                 *api_router.urls,
             ],
