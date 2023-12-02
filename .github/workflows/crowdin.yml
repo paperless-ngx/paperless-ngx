@@ -1,6 +1,9 @@
 name: Crowdin Action
 
 on:
+  workflow_dispatch:
+  schedule:
+    - cron: '2 */1 * * *'
   push:
     paths: [
       'src/locale/**',
@@ -10,6 +13,7 @@ on:
 
 jobs:
   synchronize-with-crowdin:
+    name: Crowdin Sync
     runs-on: ubuntu-latest
 
     steps:
