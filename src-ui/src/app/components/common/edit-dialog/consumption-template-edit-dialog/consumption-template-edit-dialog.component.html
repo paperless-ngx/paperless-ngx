@@ -35,6 +35,7 @@
               <pngx-input-select i18n-title title="Assign document type" [items]="documentTypes" [allowNull]="true" formControlName="assign_document_type"></pngx-input-select>
               <pngx-input-select i18n-title title="Assign correspondent" [items]="correspondents" [allowNull]="true" formControlName="assign_correspondent"></pngx-input-select>
               <pngx-input-select i18n-title title="Assign storage path" [items]="storagePaths" [allowNull]="true" formControlName="assign_storage_path"></pngx-input-select>
+              <pngx-input-select i18n-title title="Assign custom fields" multiple="true" [items]="customFields" [allowNull]="true" formControlName="assign_custom_fields"></pngx-input-select>
           </div>
           <div class="col">
             <pngx-input-select i18n-title title="Assign owner" [items]="users" bindLabel="username" formControlName="assign_owner" [allowNull]="true"></pngx-input-select>
