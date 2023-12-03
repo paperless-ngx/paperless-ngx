@@ -263,6 +263,7 @@ describe('DocumentDetailComponent', () => {
     toastService = TestBed.inject(ToastService)
     documentListViewService = TestBed.inject(DocumentListViewService)
     settingsService = TestBed.inject(SettingsService)
+    settingsService.currentUser = { id: 1 }
     customFieldsService = TestBed.inject(CustomFieldsService)
     fixture = TestBed.createComponent(DocumentDetailComponent)
     component = fixture.componentInstance

@@ -58,8 +58,8 @@ export abstract class EditDialogComponent<
   objectForm: FormGroup = this.getForm()
 
   ngOnInit(): void {
-    if (this.object != null) {
-      if (this.object['permissions']) {
+    if (this.object != null && this.dialogMode !== EditDialogMode.CREATE) {
+      if ((this.object as ObjectWithPermissions).permissions) {
         this.object['set_permissions'] = this.object['permissions']
       }
 
@@ -69,6 +69,8 @@ export abstract class EditDialogComponent<
       }
       this.objectForm.patchValue(this.object)
     } else {
+      // e.g. if name was set
+      this.objectForm.patchValue(this.object)
       // defaults from settings
       this.objectForm.patchValue({
         permissions_form: {
