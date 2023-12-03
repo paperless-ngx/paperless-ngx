@@ -18,6 +18,8 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { EditDialogComponent } from '../edit-dialog.component'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { PaperlessMailRule } from 'src/app/data/paperless-mail-rule'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { PaperlessCustomField } from 'src/app/data/paperless-custom-field'
 
 export const DOCUMENT_SOURCE_OPTIONS = [
   {
@@ -45,6 +47,7 @@ export class ConsumptionTemplateEditDialogComponent extends EditDialogComponent<
   documentTypes: PaperlessDocumentType[]
   storagePaths: PaperlessStoragePath[]
   mailRules: PaperlessMailRule[]
+  customFields: PaperlessCustomField[]
 
   constructor(
     service: ConsumptionTemplateService,
@@ -54,7 +57,8 @@ export class ConsumptionTemplateEditDialogComponent extends EditDialogComponent<
     storagePathService: StoragePathService,
     mailRuleService: MailRuleService,
     userService: UserService,
-    settingsService: SettingsService
+    settingsService: SettingsService,
+    customFieldsService: CustomFieldsService
   ) {
     super(service, activeModal, userService, settingsService)
 
@@ -77,6 +81,11 @@ export class ConsumptionTemplateEditDialogComponent extends EditDialogComponent<
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.mailRules = result.results))
+
+    customFieldsService
+      .listAll()
+      .pipe(first())
+      .subscribe((result) => (this.customFields = result.results))
   }
 
   getCreateTitle() {
@@ -106,6 +115,7 @@ export class ConsumptionTemplateEditDialogComponent extends EditDialogComponent<
       assign_view_groups: new FormControl([]),
       assign_change_users: new FormControl([]),
       assign_change_groups: new FormControl([]),
+      assign_custom_fields: new FormControl([]),
     })
   }
 

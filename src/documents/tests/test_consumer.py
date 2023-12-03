@@ -22,6 +22,7 @@ from documents.consumer import Consumer
 from documents.consumer import ConsumerError
 from documents.consumer import ConsumerFilePhase
 from documents.models import Correspondent
+from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import FileInfo
@@ -456,6 +457,29 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIn(t1, document.tags.all())
         self.assertNotIn(t2, document.tags.all())
         self.assertIn(t3, document.tags.all())
+        self._assert_first_last_send_progress()
+
+    def testOverrideCustomFields(self):
+        cf1 = CustomField.objects.create(name="Custom Field 1", data_type="string")
+        cf2 = CustomField.objects.create(
+            name="Custom Field 2",
+            data_type="integer",
+        )
+        cf3 = CustomField.objects.create(
+            name="Custom Field 3",
+            data_type="url",
+        )
+        document = self.consumer.try_consume_file(
+            self.get_test_file(),
+            override_custom_field_ids=[cf1.id, cf3.id],
+        )
+
+        fields_used = [
+            field_instance.field for field_instance in document.custom_fields.all()
+        ]
+        self.assertIn(cf1, fields_used)
+        self.assertNotIn(cf2, fields_used)
+        self.assertIn(cf3, fields_used)
         self._assert_first_last_send_progress()
 
     def testOverrideAsn(self):

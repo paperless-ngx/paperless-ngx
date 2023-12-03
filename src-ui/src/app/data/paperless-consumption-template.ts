@@ -38,4 +38,6 @@ export interface PaperlessConsumptionTemplate extends ObjectWithId {
   assign_change_users?: number[] // [PaperlessUser.id]
 
   assign_change_groups?: number[] // [PaperlessGroup.id]
+
+  assign_custom_fields?: number[] // [PaperlessCustomField.id]
 }

@@ -11,6 +11,7 @@ from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentSource
 from documents.models import ConsumptionTemplate
 from documents.models import Correspondent
+from documents.models import CustomField
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
@@ -32,6 +33,11 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         self.t2 = Tag.objects.create(name="t2")
         self.t3 = Tag.objects.create(name="t3")
         self.sp = StoragePath.objects.create(path="/test/")
+        self.cf1 = CustomField.objects.create(name="Custom Field 1", data_type="string")
+        self.cf2 = CustomField.objects.create(
+            name="Custom Field 2",
+            data_type="integer",
+        )
 
         self.user2 = User.objects.create(username="user2")
         self.user3 = User.objects.create(username="user3")
@@ -95,6 +101,8 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         ct.assign_view_groups.add(self.group1.pk)
         ct.assign_change_users.add(self.user3.pk)
         ct.assign_change_groups.add(self.group1.pk)
+        ct.assign_custom_fields.add(self.cf1.pk)
+        ct.assign_custom_fields.add(self.cf2.pk)
         ct.save()
 
         self.assertEqual(ct.__str__(), "Template 1")
@@ -127,6 +135,10 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
                 self.assertEqual(
                     overrides["override_title"],
                     "Doc from {correspondent}",
+                )
+                self.assertEqual(
+                    overrides["override_custom_field_ids"],
+                    [self.cf1.pk, self.cf2.pk],
                 )
 
         info = cm.output[0]

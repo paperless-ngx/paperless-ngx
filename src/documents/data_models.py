@@ -28,6 +28,7 @@ class DocumentMetadataOverrides:
     view_groups: Optional[list[int]] = None
     change_users: Optional[list[int]] = None
     change_groups: Optional[list[int]] = None
+    custom_field_ids: Optional[list[int]] = None
 
     def update(self, other: "DocumentMetadataOverrides") -> "DocumentMetadataOverrides":
         """
@@ -74,6 +75,12 @@ class DocumentMetadataOverrides:
             self.change_groups = other.change_groups
         elif other.change_groups is not None:
             self.change_groups.extend(other.change_groups)
+
+        if self.custom_field_ids is None:
+            self.custom_field_ids = other.custom_field_ids
+        elif other.custom_field_ids is not None:
+            self.custom_field_ids.extend(other.custom_field_ids)
+
         return self
 
 
