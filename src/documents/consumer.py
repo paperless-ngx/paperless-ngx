@@ -29,6 +29,8 @@ from documents.loggers import LoggingMixin
 from documents.matching import document_matches_template
 from documents.models import ConsumptionTemplate
 from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import FileInfo
@@ -124,6 +126,7 @@ class Consumer(LoggingMixin):
         self.override_asn = None
         self.task_id = None
         self.override_owner_id = None
+        self.override_custom_field_ids = None
 
         self.channel_layer = get_channel_layer()
 
@@ -333,6 +336,7 @@ class Consumer(LoggingMixin):
         override_view_groups=None,
         override_change_users=None,
         override_change_groups=None,
+        override_custom_field_ids=None,
     ) -> Document:
         """
         Return the document object if it was successfully created.
@@ -353,6 +357,7 @@ class Consumer(LoggingMixin):
         self.override_view_groups = override_view_groups
         self.override_change_users = override_change_users
         self.override_change_groups = override_change_groups
+        self.override_custom_field_ids = override_custom_field_ids
 
         self._send_progress(
             0,
@@ -644,6 +649,11 @@ class Consumer(LoggingMixin):
                     template_overrides.change_groups = [
                         group.pk for group in template.assign_change_groups.all()
                     ]
+                if template.assign_custom_fields is not None:
+                    template_overrides.custom_field_ids = [
+                        field.pk for field in template.assign_custom_fields.all()
+                    ]
+
                 overrides.update(template_overrides)
         return overrides
 
@@ -781,6 +791,14 @@ class Consumer(LoggingMixin):
                 },
             }
             set_permissions_for_object(permissions=permissions, object=document)
+
+        if self.override_custom_field_ids:
+            for field_id in self.override_custom_field_ids:
+                field = CustomField.objects.get(pk=field_id)
+                CustomFieldInstance.objects.create(
+                    field=field,
+                    document=document,
+                )  # adds to document
 
     def _write(self, storage_type, source, target):
         with open(source, "rb") as read_file, open(target, "wb") as write_file:

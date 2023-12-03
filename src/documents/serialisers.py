@@ -429,7 +429,7 @@ class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
 
 class CustomFieldInstanceSerializer(serializers.ModelSerializer):
     field = serializers.PrimaryKeyRelatedField(queryset=CustomField.objects.all())
-    value = ReadWriteSerializerMethodField()
+    value = ReadWriteSerializerMethodField(allow_null=True)
 
     def create(self, validated_data):
         type_to_data_store_name_map = {
@@ -1166,6 +1166,7 @@ class ConsumptionTemplateSerializer(serializers.ModelSerializer):
             "assign_view_groups",
             "assign_change_users",
             "assign_change_groups",
+            "assign_custom_fields",
         ]
 
     def validate(self, attrs):
