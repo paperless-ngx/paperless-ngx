@@ -1171,10 +1171,19 @@ class ConsumptionTemplateSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if ("filter_mailrule") in attrs and attrs["filter_mailrule"] is not None:
             attrs["sources"] = {DocumentSource.MailFetch.value}
+
+        # Empty strings treated as None to avoid unexpected behavior
+        if ("assign_title") in attrs and len(attrs["assign_title"]) == 0:
+            attrs["assign_title"] = None
+        if "filter_filename" in attrs and len(attrs["filter_filename"]) == 0:
+            attrs["filter_filename"] = None
+        if "filter_path" in attrs and len(attrs["filter_path"]) == 0:
+            attrs["filter_path"] = None
+
         if (
-            ("filter_mailrule" not in attrs)
-            and ("filter_filename" not in attrs or len(attrs["filter_filename"]) == 0)
-            and ("filter_path" not in attrs or len(attrs["filter_path"]) == 0)
+            "filter_mailrule" not in attrs
+            and ("filter_filename" not in attrs or attrs["filter_filename"] is None)
+            and ("filter_path" not in attrs or attrs["filter_path"] is None)
         ):
             raise serializers.ValidationError(
                 "File name, path or mail rule filter are required",
