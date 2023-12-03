@@ -131,6 +131,7 @@ describe('EditDialogComponent', () => {
   })
 
   it('should interpolate object permissions', () => {
+    component.getMatchingAlgorithms() // coverage
     component.object = tag
     component.dialogMode = EditDialogMode.EDIT
     component.ngOnInit()
