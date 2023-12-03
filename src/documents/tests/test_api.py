@@ -5740,7 +5740,55 @@ class TestApiConsumptionTemplates(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(StoragePath.objects.count(), 1)
+        self.assertEqual(ConsumptionTemplate.objects.count(), 1)
+
+    def test_api_create_consumption_template_empty_fields(self):
+        """
+        GIVEN:
+            - API request to create a consumption template
+            - Path or filename filter or assign title are empty string
+        WHEN:
+            - API is called
+        THEN:
+            - Template is created but filter or title assignment is not set if ""
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Template 2",
+                    "order": 1,
+                    "sources": [DocumentSource.ApiUpload],
+                    "filter_filename": "*test*",
+                    "filter_path": "",
+                    "assign_title": "",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        ct = ConsumptionTemplate.objects.get(name="Template 2")
+        self.assertEqual(ct.filter_filename, "*test*")
+        self.assertIsNone(ct.filter_path)
+        self.assertIsNone(ct.assign_title)
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Template 3",
+                    "order": 1,
+                    "sources": [DocumentSource.ApiUpload],
+                    "filter_filename": "",
+                    "filter_path": "*/test/*",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        ct2 = ConsumptionTemplate.objects.get(name="Template 3")
+        self.assertEqual(ct2.filter_path, "*/test/*")
+        self.assertIsNone(ct2.filter_filename)
 
     def test_api_create_consumption_template_with_mailrule(self):
         """
