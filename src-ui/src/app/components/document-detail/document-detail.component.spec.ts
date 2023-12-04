@@ -695,6 +695,20 @@ describe('DocumentDetailComponent', () => {
     component.onZoomSelect({ target: { value: '1' } } as any) // from select
     component.decreaseZoom()
     expect(component.previewZoomSetting).toEqual('.75')
+
+    component.onZoomSelect({ target: { value: 'page-fit' } } as any) // from select
+    expect(component.previewZoomScale).toEqual('page-fit')
+    expect(component.previewZoomSetting).toEqual('1')
+    component.increaseZoom()
+    expect(component.previewZoomSetting).toEqual('1.5')
+    expect(component.previewZoomScale).toEqual('page-width')
+
+    component.onZoomSelect({ target: { value: 'page-fit' } } as any) // from select
+    expect(component.previewZoomScale).toEqual('page-fit')
+    expect(component.previewZoomSetting).toEqual('1')
+    component.decreaseZoom()
+    expect(component.previewZoomSetting).toEqual('.5')
+    expect(component.previewZoomScale).toEqual('page-width')
   })
 
   it('should support updating notes dynamically', () => {

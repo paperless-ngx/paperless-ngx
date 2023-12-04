@@ -80,6 +80,8 @@ enum DocumentDetailNavIDs {
 }
 
 enum ZoomSetting {
+  PageFit = 'page-fit',
+  PageWidth = 'page-width',
   Quarter = '.25',
   Half = '.5',
   ThreeQuarters = '.75',
@@ -141,6 +143,7 @@ export class DocumentDetailComponent
   previewCurrentPage: number = 1
   previewNumPages: number = 1
   previewZoomSetting: ZoomSetting = ZoomSetting.One
+  previewZoomScale: ZoomSetting = ZoomSetting.PageWidth
 
   store: BehaviorSubject<any>
   isDirty$: Observable<boolean>
@@ -756,22 +759,37 @@ export class DocumentDetailComponent
   }
 
   onZoomSelect(event: Event) {
-    this.previewZoomSetting = (event.target as HTMLSelectElement)
-      ?.value as ZoomSetting
+    const setting = (event.target as HTMLSelectElement)?.value as ZoomSetting
+    if (ZoomSetting.PageFit === setting) {
+      this.previewZoomSetting = ZoomSetting.One
+      this.previewZoomScale = setting
+    } else {
+      this.previewZoomScale = ZoomSetting.PageWidth
+      this.previewZoomSetting = setting
+    }
   }
 
   get zoomSettings() {
-    return Object.values(ZoomSetting)
+    return Object.values(ZoomSetting).filter(
+      (setting) => setting !== ZoomSetting.PageWidth
+    )
   }
 
   getZoomSettingTitle(setting: ZoomSetting): string {
-    return `${parseFloat(setting) * 100}%`
+    switch (setting) {
+      case ZoomSetting.PageFit:
+        return $localize`Page Fit`
+      default:
+        return `${parseFloat(setting) * 100}%`
+    }
   }
 
   increaseZoom(): void {
     let currentIndex = Object.values(ZoomSetting).indexOf(
       this.previewZoomSetting
     )
+    if (this.previewZoomScale === ZoomSetting.PageFit) currentIndex = 5
+    this.previewZoomScale = ZoomSetting.PageWidth
     this.previewZoomSetting =
       Object.values(ZoomSetting)[
         Math.min(Object.values(ZoomSetting).length - 1, currentIndex + 1)
@@ -782,8 +800,10 @@ export class DocumentDetailComponent
     let currentIndex = Object.values(ZoomSetting).indexOf(
       this.previewZoomSetting
     )
+    if (this.previewZoomScale === ZoomSetting.PageFit) currentIndex = 4
+    this.previewZoomScale = ZoomSetting.PageWidth
     this.previewZoomSetting =
-      Object.values(ZoomSetting)[Math.max(0, currentIndex - 1)]
+      Object.values(ZoomSetting)[Math.max(2, currentIndex - 1)]
   }
 
   get showPermissions(): boolean {
