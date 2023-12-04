@@ -1,0 +1,46 @@
+<div class="mb-3 paperless-input-select" [class.disabled]="disabled">
+    <div class="row">
+      <div class="d-flex align-items-center position-relative hidden-button-container" [class.col-md-3]="horizontal">
+        <label *ngIf="title" class="form-label" [class.mb-md-0]="horizontal" [for]="inputId">{{title}}</label>
+        <button type="button" *ngIf="removable" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
+          <svg class="sidebaricon" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#x"/>
+          </svg>&nbsp;<ng-container i18n>Remove</ng-container>
+        </button>
+      </div>
+      <div [class.col-md-9]="horizontal">
+        <div>
+          <ng-select name="inputId" [(ngModel)]="selectedDocuments"
+            [disabled]="disabled"
+            [items]="foundDocuments$ | async"
+            placeholder="Search for documents"
+            [notFoundText]="notFoundText"
+            [multiple]="true"
+            bindLabel="title"
+            bindValue="id"
+            [compareWith]="compareDocuments"
+            [trackByFn]="trackByFn"
+            [minTermLength]="2"
+            [loading]="loading"
+            [typeahead]="documentsInput$"
+            (change)="onChange(selectedDocuments)">
+                <ng-template ng-label-tmp let-document="item">
+                    <svg class="sidebaricon" fill="currentColor" xmlns="http://www.w3.org/2000/svg" (click)="unselect(document)">
+                        <use xlink:href="assets/bootstrap-icons.svg#x"/>
+                    </svg>
+                    <a routerLink="/documents/{{document.id}}" class="badge bg-light text-primary">
+                        <svg class="sidebaricon-sm me-1" fill="currentColor">
+                            <use xlink:href="assets/bootstrap-icons.svg#file-text"/>
+                        </svg><span>{{document.title}}</span>
+                    </a>
+                </ng-template>
+                <ng-template ng-loadingspinner-tmp>
+                    <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
+                    <div class="visually-hidden" i18n>Loading...</div>
+                </ng-template>
+          </ng-select>
+        </div>
+        <small *ngIf="hint" class="form-text text-muted">{{hint}}</small>
+      </div>
+    </div>
+  </div>

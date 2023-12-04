@@ -15,6 +15,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
+from django.core.validators import int_list_validator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -756,6 +757,7 @@ class CustomField(models.Model):
         INT = ("integer", _("Integer"))
         FLOAT = ("float", _("Float"))
         MONETARY = ("monetary", _("Monetary"))
+        DOCUMENTLINK = ("documentlink", _("Document Link"))
 
     created = models.DateTimeField(
         _("created"),
@@ -834,6 +836,12 @@ class CustomFieldInstance(models.Model):
 
     value_monetary = models.DecimalField(null=True, decimal_places=2, max_digits=12)
 
+    value_document_ids = models.CharField(
+        validators=[int_list_validator],
+        max_length=128,
+        null=True,
+    )
+
     class Meta:
         ordering = ("created",)
         verbose_name = _("custom field instance")
@@ -868,6 +876,8 @@ class CustomFieldInstance(models.Model):
             return self.value_float
         elif self.field.data_type == CustomField.FieldDataType.MONETARY:
             return self.value_monetary
+        elif self.field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
+            return self.value_document_ids
         raise NotImplementedError(self.field.data_type)
 
 

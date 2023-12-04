@@ -1,4 +1,4 @@
-<div class="mb-3 paperless-input-select paperless-input-tags" [class.disabled]="disabled" [class.pb-3]="suggestions">
+<div class="mb-3 paperless-input-select paperless-input-tags" [class.disabled]="disabled" [class.pb-3]="getSuggestions().length > 0">
   <div class="row">
     <div class="d-flex align-items-center" [class.col-md-3]="horizontal">
       <label class="form-label" [class.mb-md-0]="horizontal" for="tags" i18n>{{title}}</label>

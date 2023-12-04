@@ -343,6 +343,7 @@ The following custom field types are supported:
 - `Integer`: integer number e.g. 12
 - `Number`: float number e.g. 12.3456
 - `Monetary`: float number with exactly two decimals, e.g. 12.30
+- `Document Link`: reference(s) to other document(s), displayed as links
 
 ## Share Links
 

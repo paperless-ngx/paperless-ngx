@@ -1,4 +1,5 @@
 import datetime
+import json
 import math
 import re
 import zoneinfo
@@ -440,6 +441,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
             CustomField.FieldDataType.INT: "value_int",
             CustomField.FieldDataType.FLOAT: "value_float",
             CustomField.FieldDataType.MONETARY: "value_monetary",
+            CustomField.FieldDataType.DOCUMENTLINK: "value_document_ids",
         }
         # An instance is attached to a document
         document: Document = validated_data["document"]
@@ -458,7 +460,11 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         return instance
 
     def get_value(self, obj: CustomFieldInstance):
-        return obj.value
+        return (
+            obj.value
+            if (obj.field.data_type != CustomField.FieldDataType.DOCUMENTLINK)
+            else json.loads(obj.value)
+        )
 
     def validate(self, data):
         """
