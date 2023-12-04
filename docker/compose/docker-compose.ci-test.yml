@@ -17,6 +17,8 @@ services:
       - "gotenberg"
       - "--chromium-disable-javascript=true"
       - "--chromium-allow-list=file:///tmp/.*"
+      - "--log-level=warn"
+      - "--log-format=text"
   tika:
     image: ghcr.io/paperless-ngx/tika:latest
     hostname: tika
