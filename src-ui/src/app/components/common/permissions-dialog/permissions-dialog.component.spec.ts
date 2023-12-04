@@ -80,7 +80,16 @@ describe('PermissionsDialogComponent', () => {
   it('should return permissions', () => {
     expect(component.permissions).toEqual({
       owner: null,
-      set_permissions: null,
+      set_permissions: {
+        view: {
+          users: [],
+          groups: [],
+        },
+        change: {
+          users: [],
+          groups: [],
+        },
+      },
     })
     component.form.get('permissions_form').setValue(set_permissions)
     expect(component.permissions).toEqual(set_permissions)
