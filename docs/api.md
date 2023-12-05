@@ -53,7 +53,7 @@ fields:
 - `set_permissions`: Allows setting document permissions. Optional,
   write-only. See [below](#permissions).
 - `custom_fields`: Array of custom fields & values, specified as
-  { field: CUSTOM_FIELD_ID, value: VALUE }
+  `{ field: CUSTOM_FIELD_ID, value: VALUE }`
 
 ## Downloading documents
 
