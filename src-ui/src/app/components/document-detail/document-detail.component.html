@@ -1,9 +1,20 @@
 <pngx-page-header [(title)]="title">
-    <div class="input-group input-group-sm me-5 d-none d-md-flex" *ngIf="getContentType() === 'application/pdf' && !useNativePdfViewer">
-      <div class="input-group-text" i18n>Page</div>
-      <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages" [(ngModel)]="previewCurrentPage" />
-      <div class="input-group-text" i18n>of {{previewNumPages}}</div>
-    </div>
+    <ng-container *ngIf="getContentType() === 'application/pdf' && !useNativePdfViewer">
+        <div class="input-group input-group-sm me-2 d-none d-md-flex">
+            <div class="input-group-text" i18n>Page</div>
+            <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages" [(ngModel)]="previewCurrentPage" />
+            <div class="input-group-text" i18n>of {{previewNumPages}}</div>
+        </div>
+        <div class="input-group input-group-sm me-5 d-none d-md-flex">
+            <button class="btn btn-outline-secondary" (click)="decreaseZoom()" i18n>-</button>
+            <select class="form-select" (change)="onZoomSelect($event)">
+                <option *ngFor="let setting of zoomSettings" [value]="setting" [selected]="previewZoomSetting === setting">
+                    {{ getZoomSettingTitle(setting) }}
+                </option>
+            </select>
+            <button class="btn btn-outline-secondary" (click)="increaseZoom()" i18n>+</button>
+        </div>
+    </ng-container>
 
     <button type="button" class="btn btn-sm btn-outline-danger me-4" (click)="delete()" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }">
         <svg class="buttonicon" fill="currentColor">
@@ -189,24 +200,7 @@
                 <li [ngbNavItem]="DocumentDetailNavIDs.Preview" class="d-md-none">
                     <a ngbNavLink i18n>Preview</a>
                     <ng-template ngbNavContent *ngIf="!pdfPreview.offsetParent">
-                        <div class="position-relative">
-                            <ng-container *ngIf="getContentType() === 'application/pdf'">
-                                <div class="preview-sticky pdf-viewer-container" *ngIf="!useNativePdfViewer ; else nativePdfViewer">
-                                    <pdf-viewer [src]="{ url: previewUrl, password: password }" [original-size]="false" [show-borders]="true" [show-all]="true" [(page)]="previewCurrentPage" [render-text-mode]="2" (error)="onError($event)" (after-load-complete)="pdfPreviewLoaded($event)"></pdf-viewer>
-                                </div>
-                                <ng-template #nativePdfViewer>
-                                    <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>
-                                </ng-template>
-                            </ng-container>
-                            <ng-container *ngIf="getContentType() === 'text/plain'">
-                                <object [data]="previewUrl | safeUrl" type="text/plain" class="preview-sticky bg-light overflow-auto" width="100%"></object>
-                            </ng-container>
-                            <div *ngIf="requiresPassword" class="password-prompt">
-                                <form>
-                                    <input autocomplete="" class="form-control" i18n-placeholder placeholder="Enter Password" type="password" (keyup)="onPasswordKeyUp($event)" />
-                                </form>
-                            </div>
-                        </div>
+                        <ng-container *ngTemplateOutlet="previewContent"></ng-container>
                     </ng-template>
                 </li>
 
@@ -233,14 +227,7 @@
     </div>
 
     <div class="col-md-6 col-xl-8 mb-3 d-none d-md-block position-relative" #pdfPreview>
-        <ng-container *ngIf="getContentType() === 'application/pdf'">
-            <div class="preview-sticky pdf-viewer-container" *ngIf="!useNativePdfViewer ; else nativePdfViewer">
-                <pdf-viewer [src]="{ url: previewUrl, password: password }" [original-size]="false" [show-borders]="true" [show-all]="true" [(page)]="previewCurrentPage" [render-text-mode]="2" (error)="onError($event)" (after-load-complete)="pdfPreviewLoaded($event)"></pdf-viewer>
-            </div>
-            <ng-template #nativePdfViewer>
-                <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>
-            </ng-template>
-        </ng-container>
+        <ng-container *ngTemplateOutlet="previewContent"></ng-container>
         <ng-container *ngIf="renderAsPlainText">
             <div [innerText]="previewText" class="preview-sticky bg-light p-3 overflow-auto" width="100%"></div>
         </ng-container>
@@ -252,3 +239,39 @@
     </div>
 
 </div>
+
+ <ng-template #previewContent>
+     <div *ngIf="!metadata" class="w-100 h-100 d-flex align-items-center justify-content-center">
+         <div>
+             <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+             <ng-container i18n>Loading...</ng-container>
+         </div>
+     </div>
+     <ng-container *ngIf="getContentType() === 'application/pdf'">
+         <div class="preview-sticky pdf-viewer-container" *ngIf="!useNativePdfViewer ; else nativePdfViewer">
+            <pngx-pdf-viewer
+                [src]="{ url: previewUrl, password: password }"
+                [original-size]="false"
+                [show-borders]="true"
+                [show-all]="true"
+                [(page)]="previewCurrentPage"
+                [zoom-scale]="previewZoomScale"
+                [zoom]="previewZoomSetting"
+                [render-text-mode]="2"
+                (error)="onError($event)"
+                (after-load-complete)="pdfPreviewLoaded($event)">
+            </pngx-pdf-viewer>
+         </div>
+         <ng-template #nativePdfViewer>
+             <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>
+         </ng-template>
+     </ng-container>
+     <ng-container *ngIf="renderAsPlainText">
+         <div [innerText]="previewText" class="preview-sticky bg-light p-3 overflow-auto" width="100%"></div>
+     </ng-container>
+     <div *ngIf="showPasswordField" class="password-prompt">
+         <form>
+             <input autocomplete="" autofocus="true" class="form-control" i18n-placeholder placeholder="Enter Password" type="password" (keyup)="onPasswordKeyUp($event)" />
+         </form>
+     </div>
+ </ng-template>
