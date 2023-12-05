@@ -21,7 +21,8 @@
         <pngx-input-text i18n-title title="Filter to" formControlName="filter_to" [error]="error?.filter_to"></pngx-input-text>
         <pngx-input-text i18n-title title="Filter subject" formControlName="filter_subject" [error]="error?.filter_subject"></pngx-input-text>
         <pngx-input-text i18n-title title="Filter body" formControlName="filter_body" [error]="error?.filter_body"></pngx-input-text>
-        <pngx-input-text i18n-title title="Filter attachment filename" formControlName="filter_attachment_filename" i18n-hint hint="Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive." [error]="error?.filter_attachment_filename"></pngx-input-text>
+        <pngx-input-text i18n-title title="Filter attachment filename includes" formControlName="filter_attachment_filename_include" i18n-hint hint="Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive." [error]="error?.filter_attachment_filename_include"></pngx-input-text>
+        <pngx-input-text i18n-title title="Filter attachment filename excluding" formControlName="filter_attachment_filename_exclude" i18n-hint hint="Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive." [error]="error?.filter_attachment_filename_exclude"></pngx-input-text>
       </div>
       <div class="col-md-4">
         <pngx-input-select i18n-title title="Action" [items]="actionOptions" formControlName="action" i18n-hint hint="Action is only performed when documents are consumed from the mail. Mails without attachments remain entirely untouched."></pngx-input-select>

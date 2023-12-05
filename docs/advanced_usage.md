@@ -510,7 +510,7 @@ existing tables) with:
 
 ## Barcodes {#barcodes}
 
-Paperless is able to utilize barcodes for automatically preforming some tasks.
+Paperless is able to utilize barcodes for automatically performing some tasks.
 
 At this time, the library utilized for detection of barcodes supports the following types:
 
@@ -566,7 +566,7 @@ collating two separate scans into one document, reordering the pages as necessar
 
 Suppose you have a double-sided document with 6 pages (3 sheets of paper). First,
 put the stack into your ADF as normal, ensuring that page 1 is scanned first. Your ADF
-will now scan pages 1, 3, and 5. Then you (or your the scanner, if it supports it) upload
+will now scan pages 1, 3, and 5. Then you (or your scanner, if it supports it) upload
 the scan into the correct sub-directory of the consume folder (`double-sided` by default;
 keep in mind that Paperless will _not_ automatically create the directory for you.)
 Paperless will then process the scan and move it into an internal staging area.

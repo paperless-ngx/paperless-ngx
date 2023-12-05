@@ -84,7 +84,9 @@ describe('FileDropComponent', () => {
   it('should support drag drop, initiate upload', fakeAsync(() => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     expect(component.fileIsOver).toBeFalsy()
-    component.onDragOver(new Event('dragover') as DragEvent)
+    const overEvent = new Event('dragover') as DragEvent
+    ;(overEvent as any).dataTransfer = { types: ['Files'] }
+    component.onDragOver(overEvent)
     tick(1)
     fixture.detectChanges()
     expect(component.fileIsOver).toBeTruthy()
@@ -151,7 +153,9 @@ describe('FileDropComponent', () => {
     const leaveSpy = jest.spyOn(component, 'onDragLeave')
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     settingsService.globalDropzoneEnabled = true
-    component.onDragOver(new Event('dragover') as DragEvent)
+    const overEvent = new Event('dragover') as DragEvent
+    ;(overEvent as any).dataTransfer = { types: ['Files'] }
+    component.onDragOver(overEvent)
     tick(1)
     expect(component.hidden).toBeFalsy()
     expect(component.fileIsOver).toBeTruthy()
@@ -165,7 +169,9 @@ describe('FileDropComponent', () => {
     const leaveSpy = jest.spyOn(component, 'onDragLeave')
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     settingsService.globalDropzoneEnabled = true
-    component.onDragOver(new Event('dragover') as DragEvent)
+    const overEvent = new Event('dragover') as DragEvent
+    ;(overEvent as any).dataTransfer = { types: ['Files'] }
+    component.onDragOver(overEvent)
     tick(1)
     expect(component.hidden).toBeFalsy()
     expect(component.fileIsOver).toBeTruthy()

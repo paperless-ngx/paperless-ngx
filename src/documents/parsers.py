@@ -105,7 +105,7 @@ def get_supported_file_extensions() -> set[str]:
     return extensions
 
 
-def get_parser_class_for_mime_type(mime_type: str) -> Optional["DocumentParser"]:
+def get_parser_class_for_mime_type(mime_type: str) -> Optional[type["DocumentParser"]]:
     """
     Returns the best parser (by weight) for the given mimetype or
     None if no parser exists

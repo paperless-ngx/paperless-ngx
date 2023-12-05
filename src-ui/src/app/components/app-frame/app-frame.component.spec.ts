@@ -9,7 +9,7 @@ import {
   fakeAsync,
   tick,
 } from '@angular/core/testing'
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgbModal, NgbModalModule, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { BrowserModule } from '@angular/platform-browser'
 import { RouterTestingModule } from '@angular/router/testing'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -32,6 +32,7 @@ import { routes } from 'src/app/app-routing.module'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
+import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 
 const saved_views = [
   {
@@ -86,6 +87,7 @@ describe('AppFrameComponent', () => {
   let documentListViewService: DocumentListViewService
   let router: Router
   let savedViewSpy
+  let modalService: NgbModal
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -98,6 +100,7 @@ describe('AppFrameComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         DragDropModule,
+        NgbModalModule,
       ],
       providers: [
         SettingsService,
@@ -120,6 +123,7 @@ describe('AppFrameComponent', () => {
         ToastService,
         OpenDocumentsService,
         SearchService,
+        NgbModal,
         {
           provide: ActivatedRoute,
           useValue: {
@@ -148,6 +152,7 @@ describe('AppFrameComponent', () => {
     openDocumentsService = TestBed.inject(OpenDocumentsService)
     searchService = TestBed.inject(SearchService)
     documentListViewService = TestBed.inject(DocumentListViewService)
+    modalService = TestBed.inject(NgbModal)
     router = TestBed.inject(Router)
 
     jest
@@ -362,5 +367,13 @@ describe('AppFrameComponent', () => {
       PaperlessSavedView[]
     >)
     expect(toastSpy).toHaveBeenCalled()
+  })
+
+  it('should support edit profile', () => {
+    const modalSpy = jest.spyOn(modalService, 'open')
+    component.editProfile()
+    expect(modalSpy).toHaveBeenCalledWith(ProfileEditDialogComponent, {
+      backdrop: 'static',
+    })
   })
 })

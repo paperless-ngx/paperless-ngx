@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-11-13 01:31\n"
+"PO-Revision-Date: 2023-11-29 08:50\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -409,7 +409,7 @@ msgstr ""
 
 #: documents/models.py:454
 msgid "owner is"
-msgstr ""
+msgstr "владелец"
 
 #: documents/models.py:455
 msgid "has owner in"
@@ -417,7 +417,7 @@ msgstr ""
 
 #: documents/models.py:456
 msgid "does not have owner"
-msgstr ""
+msgstr "не имеет владельца"
 
 #: documents/models.py:457
 msgid "does not have owner in"
@@ -521,7 +521,7 @@ msgstr "пользователь"
 
 #: documents/models.py:679
 msgid "note"
-msgstr ""
+msgstr "заметка"
 
 #: documents/models.py:680
 msgid "notes"
@@ -529,15 +529,15 @@ msgstr "заметки"
 
 #: documents/models.py:688
 msgid "Archive"
-msgstr ""
+msgstr "Архив"
 
 #: documents/models.py:689
 msgid "Original"
-msgstr ""
+msgstr "Оригинал"
 
 #: documents/models.py:700
 msgid "expiration"
-msgstr ""
+msgstr "Срок действия"
 
 #: documents/models.py:707
 msgid "slug"
@@ -645,7 +645,7 @@ msgstr ""
 
 #: documents/models.py:887
 msgid "URL"
-msgstr ""
+msgstr "Ссылка"
 
 #: documents/models.py:888
 msgid "Date"
@@ -661,7 +661,7 @@ msgstr ""
 
 #: documents/models.py:891
 msgid "Float"
-msgstr ""
+msgstr "С плавающей точкой"
 
 #: documents/models.py:892
 msgid "Monetary"
@@ -669,15 +669,15 @@ msgstr ""
 
 #: documents/models.py:904
 msgid "data type"
-msgstr ""
+msgstr "Тип данных"
 
 #: documents/models.py:912
 msgid "custom field"
-msgstr ""
+msgstr "Пользовательское поле"
 
 #: documents/models.py:913
 msgid "custom fields"
-msgstr ""
+msgstr "Пользовательские поля"
 
 #: documents/models.py:973
 msgid "custom field instance"

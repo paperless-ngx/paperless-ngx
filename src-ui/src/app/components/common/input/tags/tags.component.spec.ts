@@ -32,11 +32,9 @@ import { CheckComponent } from '../check/check.component'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { TextComponent } from '../text/text.component'
 import { ColorComponent } from '../color/color.component'
-import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsFormComponent } from '../permissions/permissions-form/permissions-form.component'
 import { SelectComponent } from '../select/select.component'
-import { ColorSliderModule } from 'ngx-color/slider'
-import { By } from '@angular/platform-browser'
+import { SettingsService } from 'src/app/services/settings.service'
 
 const tags: PaperlessTag[] = [
   {
@@ -63,8 +61,8 @@ const tags: PaperlessTag[] = [
 describe('TagsComponent', () => {
   let component: TagsComponent
   let fixture: ComponentFixture<TagsComponent>
-  let input: HTMLInputElement
   let modalService: NgbModal
+  let settingsService: SettingsService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -110,6 +108,7 @@ describe('TagsComponent', () => {
     }).compileComponents()
 
     modalService = TestBed.inject(NgbModal)
+    settingsService = TestBed.inject(SettingsService)
     fixture = TestBed.createComponent(TagsComponent)
     fixture.debugElement.injector.get(NG_VALUE_ACCESSOR)
     component = fixture.componentInstance
@@ -139,6 +138,7 @@ describe('TagsComponent', () => {
   })
 
   it('should support create new using last search term and open a modal', () => {
+    settingsService.currentUser = { id: 1 }
     let activeInstances: NgbModalRef[]
     modalService.activeInstances.subscribe((v) => (activeInstances = v))
     component.select.searchTerm = 'foobar'
