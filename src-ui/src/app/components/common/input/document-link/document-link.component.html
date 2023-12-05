@@ -28,7 +28,7 @@
                     <svg class="sidebaricon" fill="currentColor" xmlns="http://www.w3.org/2000/svg" (click)="unselect(document)">
                       <use xlink:href="assets/bootstrap-icons.svg#x"/>
                     </svg>
-                    <a routerLink="/documents/{{document.id}}" class="badge bg-light text-primary">
+                    <a routerLink="/documents/{{document.id}}" class="badge bg-light text-primary" (mousedown)="$event.stopImmediatePropagation();">
                       <svg class="sidebaricon-sm me-1" fill="currentColor">
                         <use xlink:href="assets/bootstrap-icons.svg#file-text"/>
                       </svg><span>{{document.title}}</span>
