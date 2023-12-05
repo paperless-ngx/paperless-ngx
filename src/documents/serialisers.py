@@ -1,5 +1,4 @@
 import datetime
-import json
 import math
 import re
 import zoneinfo
@@ -460,11 +459,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         return instance
 
     def get_value(self, obj: CustomFieldInstance):
-        return (
-            obj.value
-            if (obj.field.data_type != CustomField.FieldDataType.DOCUMENTLINK)
-            else json.loads(obj.value)
-        )
+        return obj.value
 
     def validate(self, data):
         """

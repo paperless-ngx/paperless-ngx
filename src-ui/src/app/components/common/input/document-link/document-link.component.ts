@@ -52,15 +52,20 @@ export class DocumentLinkComponent
   }
 
   writeValue(documentIDs: number[]): void {
-    this.loading = true
-    this.documentsService
-      .getCachedMany(documentIDs)
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((documents) => {
-        this.loading = false
-        this.selectedDocuments = documents
-        super.writeValue(documentIDs)
-      })
+    if (!documentIDs || documentIDs.length === 0) {
+      this.selectedDocuments = []
+      super.writeValue([])
+    } else {
+      this.loading = true
+      this.documentsService
+        .getCachedMany(documentIDs)
+        .pipe(takeUntil(this.unsubscribeNotifier))
+        .subscribe((documents) => {
+          this.loading = false
+          this.selectedDocuments = documents
+          super.writeValue(documentIDs)
+        })
+    }
   }
 
   private loadDocs() {

@@ -79,6 +79,21 @@ describe('DocumentLinkComponent', () => {
     component.documentsInput$.next('foo')
   })
 
+  it('should load values correctly', () => {
+    jest.spyOn(documentService, 'getCachedMany').mockImplementation((ids) => {
+      return of(documents.filter((d) => ids.includes(d.id)))
+    })
+    component.writeValue([12, 23])
+    expect(component.value).toEqual([12, 23])
+    expect(component.selectedDocuments).toEqual([documents[1], documents[2]])
+    component.writeValue(null)
+    expect(component.value).toEqual([])
+    expect(component.selectedDocuments).toEqual([])
+    component.writeValue([])
+    expect(component.value).toEqual([])
+    expect(component.selectedDocuments).toEqual([])
+  })
+
   it('should support unselect', () => {
     const getSpy = jest.spyOn(documentService, 'getCachedMany')
     getSpy.mockImplementation((ids) => {

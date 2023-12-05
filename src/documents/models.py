@@ -15,7 +15,6 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
-from django.core.validators import int_list_validator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -836,11 +835,7 @@ class CustomFieldInstance(models.Model):
 
     value_monetary = models.DecimalField(null=True, decimal_places=2, max_digits=12)
 
-    value_document_ids = models.CharField(
-        validators=[int_list_validator],
-        max_length=128,
-        null=True,
-    )
+    value_document_ids = models.JSONField(null=True)
 
     class Meta:
         ordering = ("created",)
