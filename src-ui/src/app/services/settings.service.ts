@@ -143,6 +143,8 @@ export class SettingsService {
         `${hsl.l * 100}%`
       )
     } else {
+      this._renderer.removeClass(this.document.body, 'primary-dark')
+      this._renderer.removeClass(this.document.body, 'primary-light')
       document.documentElement.style.removeProperty('--pngx-primary')
       document.documentElement.style.removeProperty('--pngx-primary-lightness')
     }
