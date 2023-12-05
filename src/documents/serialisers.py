@@ -1175,11 +1175,23 @@ class ConsumptionTemplateSerializer(serializers.ModelSerializer):
             attrs["sources"] = {DocumentSource.MailFetch.value}
 
         # Empty strings treated as None to avoid unexpected behavior
-        if ("assign_title") in attrs and len(attrs["assign_title"]) == 0:
+        if (
+            "assign_title" in attrs
+            and attrs["assign_title"] is not None
+            and len(attrs["assign_title"]) == 0
+        ):
             attrs["assign_title"] = None
-        if "filter_filename" in attrs and len(attrs["filter_filename"]) == 0:
+        if (
+            "filter_filename" in attrs
+            and attrs["filter_filename"] is not None
+            and len(attrs["filter_filename"]) == 0
+        ):
             attrs["filter_filename"] = None
-        if "filter_path" in attrs and len(attrs["filter_path"]) == 0:
+        if (
+            "filter_path" in attrs
+            and attrs["filter_path"] is not None
+            and len(attrs["filter_path"]) == 0
+        ):
             attrs["filter_path"] = None
 
         if (
