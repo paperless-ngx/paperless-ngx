@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-11-16 23:23\n"
+"PO-Revision-Date: 2023-12-04 00:24\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -421,7 +421,7 @@ msgstr "n'a pas de propriétaire"
 
 #: documents/models.py:457
 msgid "does not have owner in"
-msgstr ""
+msgstr "n'a pas de propriétaire"
 
 #: documents/models.py:467
 msgid "rule type"
@@ -553,7 +553,7 @@ msgstr "liens de partage"
 
 #: documents/models.py:748
 msgid "Consume Folder"
-msgstr ""
+msgstr "Dossier d'Importation"
 
 #: documents/models.py:749
 msgid "Api Upload"
@@ -569,11 +569,11 @@ msgstr "ordre"
 
 #: documents/models.py:763
 msgid "filter path"
-msgstr ""
+msgstr "filtrer le chemin"
 
 #: documents/models.py:768
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr ""
+msgstr "N'importer que les documents dont le chemin correspond à celui-ci s'il est spécifié. Les caractères spécifiés par * sont autorisés. Insensible à la casse."
 
 #: documents/models.py:775
 msgid "filter filename"
@@ -585,7 +585,7 @@ msgstr "Ne traiter que les documents correspondant intégralement à ce nom de f
 
 #: documents/models.py:791
 msgid "filter documents from this mail rule"
-msgstr ""
+msgstr "filtrer les documents à partir de cette règle de messagerie"
 
 #: documents/models.py:795
 msgid "assign title"
@@ -633,11 +633,11 @@ msgstr "accorder des droits de modification à ces groupes"
 
 #: documents/models.py:873
 msgid "consumption template"
-msgstr ""
+msgstr "modèle d'importation"
 
 #: documents/models.py:874
 msgid "consumption templates"
-msgstr ""
+msgstr "modèles d'importation"
 
 #: documents/models.py:886
 msgid "String"
@@ -804,7 +804,7 @@ msgstr "Changer mon mot de passe"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
-msgstr "demande de réinitialisation de mot de passe"
+msgstr "redemander la réinitialisation du mot de passe"
 
 #: documents/templates/registration/password_reset_done.html:14
 msgid "Paperless-ngx reset password sent"
@@ -1208,7 +1208,7 @@ msgstr "affecter le correspondant depuis"
 
 #: paperless_mail/models.py:230
 msgid "Assign the rule owner to documents"
-msgstr ""
+msgstr "Affecter le propriétaire de la règle aux documents"
 
 #: paperless_mail/models.py:256
 msgid "uid"

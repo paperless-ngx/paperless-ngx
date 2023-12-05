@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-11-13 01:30\n"
+"PO-Revision-Date: 2023-12-04 00:24\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -249,7 +249,7 @@ msgstr "livello"
 
 #: documents/models.py:389
 msgid "log"
-msgstr "logs"
+msgstr "registro"
 
 #: documents/models.py:390
 msgid "logs"
@@ -393,35 +393,35 @@ msgstr "non ha corrispondente in"
 
 #: documents/models.py:450
 msgid "has document type in"
-msgstr ""
+msgstr "ha tipo di documento in"
 
 #: documents/models.py:451
 msgid "does not have document type in"
-msgstr ""
+msgstr "non ha tipo di documento in"
 
 #: documents/models.py:452
 msgid "has storage path in"
-msgstr ""
+msgstr "ha percorso di archiviazione in"
 
 #: documents/models.py:453
 msgid "does not have storage path in"
-msgstr ""
+msgstr "non ha percorso di archiviazione in"
 
 #: documents/models.py:454
 msgid "owner is"
-msgstr ""
+msgstr "proprietario è"
 
 #: documents/models.py:455
 msgid "has owner in"
-msgstr ""
+msgstr "ha proprietario in"
 
 #: documents/models.py:456
 msgid "does not have owner"
-msgstr ""
+msgstr "non ha proprietario"
 
 #: documents/models.py:457
 msgid "does not have owner in"
-msgstr ""
+msgstr "non ha proprietario in"
 
 #: documents/models.py:467
 msgid "rule type"
@@ -513,7 +513,7 @@ msgstr "I dati restituiti dall'attività"
 
 #: documents/models.py:650
 msgid "Note for the document"
-msgstr ""
+msgstr "Nota per il documento"
 
 #: documents/models.py:674
 msgid "user"
@@ -521,7 +521,7 @@ msgstr "utente"
 
 #: documents/models.py:679
 msgid "note"
-msgstr ""
+msgstr "nota"
 
 #: documents/models.py:680
 msgid "notes"
@@ -529,15 +529,15 @@ msgstr "note"
 
 #: documents/models.py:688
 msgid "Archive"
-msgstr ""
+msgstr "Archivio"
 
 #: documents/models.py:689
 msgid "Original"
-msgstr ""
+msgstr "Originale"
 
 #: documents/models.py:700
 msgid "expiration"
-msgstr ""
+msgstr "scadenza"
 
 #: documents/models.py:707
 msgid "slug"
@@ -545,23 +545,23 @@ msgstr ""
 
 #: documents/models.py:739
 msgid "share link"
-msgstr ""
+msgstr "condividi link"
 
 #: documents/models.py:740
 msgid "share links"
-msgstr ""
+msgstr "condividi links"
 
 #: documents/models.py:748
 msgid "Consume Folder"
-msgstr ""
+msgstr "Cartella di elaborazione"
 
 #: documents/models.py:749
 msgid "Api Upload"
-msgstr ""
+msgstr "Upload Api"
 
 #: documents/models.py:750
 msgid "Mail Fetch"
-msgstr ""
+msgstr "Recupero Posta"
 
 #: documents/models.py:754 paperless_mail/models.py:95
 msgid "order"
@@ -569,15 +569,15 @@ msgstr "priorità"
 
 #: documents/models.py:763
 msgid "filter path"
-msgstr ""
+msgstr "filtro percorso"
 
 #: documents/models.py:768
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr ""
+msgstr "Elabora solo i documenti con un percorso che corrisponde a questo, se specificato. I caratteri wildcard come * sono permessi. Ignora differenze tra maiuscole e minuscole."
 
 #: documents/models.py:775
 msgid "filter filename"
-msgstr ""
+msgstr "filtra nome file"
 
 #: documents/models.py:780 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
@@ -585,15 +585,15 @@ msgstr "Elabora i documenti che corrispondono a questo nome. Puoi usare wildcard
 
 #: documents/models.py:791
 msgid "filter documents from this mail rule"
-msgstr ""
+msgstr "filtra i documenti da questa regola di posta"
 
 #: documents/models.py:795
 msgid "assign title"
-msgstr ""
+msgstr "assegna titolo"
 
 #: documents/models.py:800
 msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr ""
+msgstr "Assegna un titolo al documento, può includere alcuni segnaposti, vedi documentazione."
 
 #: documents/models.py:808 paperless_mail/models.py:204
 msgid "assign this tag"
@@ -609,83 +609,83 @@ msgstr "assegna questo corrispondente"
 
 #: documents/models.py:832
 msgid "assign this storage path"
-msgstr ""
+msgstr "assegna questo percorso di archiviazione"
 
 #: documents/models.py:841
 msgid "assign this owner"
-msgstr ""
+msgstr "assegna questo proprietario"
 
 #: documents/models.py:848
 msgid "grant view permissions to these users"
-msgstr ""
+msgstr "concedi i permessi di visualizzazione a questi utenti"
 
 #: documents/models.py:855
 msgid "grant view permissions to these groups"
-msgstr ""
+msgstr "concedi i permessi di visualizzazione a questi gruppi"
 
 #: documents/models.py:862
 msgid "grant change permissions to these users"
-msgstr ""
+msgstr "concedi permessi di modifica a questi utenti"
 
 #: documents/models.py:869
 msgid "grant change permissions to these groups"
-msgstr ""
+msgstr "concedi permessi di modifica a questi gruppi"
 
 #: documents/models.py:873
 msgid "consumption template"
-msgstr ""
+msgstr "modello di elaborazione"
 
 #: documents/models.py:874
 msgid "consumption templates"
-msgstr ""
+msgstr "modelli di elaborazione"
 
 #: documents/models.py:886
 msgid "String"
-msgstr ""
+msgstr "Stringa"
 
 #: documents/models.py:887
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: documents/models.py:888
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 #: documents/models.py:889
 msgid "Boolean"
-msgstr ""
+msgstr "Booleano"
 
 #: documents/models.py:890
 msgid "Integer"
-msgstr ""
+msgstr "Numero Intero"
 
 #: documents/models.py:891
 msgid "Float"
-msgstr ""
+msgstr "Numero a virgola mobile"
 
 #: documents/models.py:892
 msgid "Monetary"
-msgstr ""
+msgstr "Monetaria"
 
 #: documents/models.py:904
 msgid "data type"
-msgstr ""
+msgstr "tipo di dato"
 
 #: documents/models.py:912
 msgid "custom field"
-msgstr ""
+msgstr "campo personalizzato"
 
 #: documents/models.py:913
 msgid "custom fields"
-msgstr ""
+msgstr "campi personalizzati"
 
 #: documents/models.py:973
 msgid "custom field instance"
-msgstr ""
+msgstr "istanza campo personalizzato"
 
 #: documents/models.py:974
 msgid "custom field instances"
-msgstr ""
+msgstr "istanze campo personalizzato"
 
 #: documents/serialisers.py:102
 #, python-format
@@ -703,7 +703,7 @@ msgstr "Il tipo di file %(type)s non è supportato"
 
 #: documents/serialisers.py:938
 msgid "Invalid variable detected."
-msgstr "Variabile non valida."
+msgstr "Variabile non valida rilevata."
 
 #: documents/templates/index.html:79
 msgid "Paperless-ngx is loading..."
@@ -743,11 +743,11 @@ msgstr "Il nome utente e la password non sono corretti. Riprovare."
 
 #: documents/templates/registration/login.html:48
 msgid "Share link was not found."
-msgstr ""
+msgstr "Link di condivisione non trovato."
 
 #: documents/templates/registration/login.html:52
 msgid "Share link has expired."
-msgstr ""
+msgstr "Il link di condivisione è scaduto."
 
 #: documents/templates/registration/login.html:55
 msgid "Username"
@@ -763,48 +763,48 @@ msgstr "Accedi"
 
 #: documents/templates/registration/login.html:70
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Hai dimenticato la password?"
 
 #: documents/templates/registration/password_reset_complete.html:14
 msgid "Paperless-ngx reset password complete"
-msgstr ""
+msgstr "Ripristino password Paperless-ngx completato"
 
 #: documents/templates/registration/password_reset_complete.html:40
 msgid "Password reset complete."
-msgstr ""
+msgstr "Ripristino della password completato."
 
 #: documents/templates/registration/password_reset_complete.html:42
 #, python-format
 msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
-msgstr ""
+msgstr "La tua nuova password è stata impostata. Ora puoi effettuare il <a href=\"%(login_url)s\">login </a>"
 
 #: documents/templates/registration/password_reset_confirm.html:14
 msgid "Paperless-ngx reset password confirmation"
-msgstr ""
+msgstr "Conferma ripristino password di Paperless-ngx"
 
 #: documents/templates/registration/password_reset_confirm.html:42
 msgid "Set a new password."
-msgstr ""
+msgstr "Imposta una nuova password."
 
 #: documents/templates/registration/password_reset_confirm.html:46
 msgid "Passwords did not match or too weak. Try again."
-msgstr ""
+msgstr "Le password non corrispondevano o erano troppo deboli. Riprova."
 
 #: documents/templates/registration/password_reset_confirm.html:49
 msgid "New Password"
-msgstr ""
+msgstr "Nuova Password"
 
 #: documents/templates/registration/password_reset_confirm.html:50
 msgid "Confirm Password"
-msgstr ""
+msgstr "Conferma Password"
 
 #: documents/templates/registration/password_reset_confirm.html:61
 msgid "Change my password"
-msgstr ""
+msgstr "Modifica la mia password"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
-msgstr ""
+msgstr "richiedi un nuovo ripristino della password"
 
 #: documents/templates/registration/password_reset_done.html:14
 msgid "Paperless-ngx reset password sent"
@@ -812,11 +812,11 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_done.html:40
 msgid "Check your inbox."
-msgstr ""
+msgstr "Controlla la tua casella di posta."
 
 #: documents/templates/registration/password_reset_done.html:41
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
-msgstr ""
+msgstr "Ti abbiamo inviato per email le istruzioni per impostare la tua password. Dovresti ricevere l'email a breve!"
 
 #: documents/templates/registration/password_reset_form.html:14
 msgid "Paperless-ngx reset password request"
@@ -860,7 +860,7 @@ msgstr "Bielorusso"
 
 #: paperless/settings.py:590
 msgid "Bulgarian"
-msgstr ""
+msgstr "Bulgaro"
 
 #: paperless/settings.py:591
 msgid "Catalan"
@@ -900,7 +900,7 @@ msgstr "Francese"
 
 #: paperless/settings.py:600
 msgid "Hungarian"
-msgstr ""
+msgstr "Ungherese"
 
 #: paperless/settings.py:601
 msgid "Italian"
@@ -1208,7 +1208,7 @@ msgstr "assegna corrispondente da"
 
 #: paperless_mail/models.py:230
 msgid "Assign the rule owner to documents"
-msgstr ""
+msgstr "Assegna il proprietario della regola ai documenti"
 
 #: paperless_mail/models.py:256
 msgid "uid"

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-11-29 08:50\n"
+"PO-Revision-Date: 2023-12-04 12:09\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -545,7 +545,7 @@ msgstr ""
 
 #: documents/models.py:739
 msgid "share link"
-msgstr ""
+msgstr "Поделиться ссылкой"
 
 #: documents/models.py:740
 msgid "share links"
@@ -557,11 +557,11 @@ msgstr ""
 
 #: documents/models.py:749
 msgid "Api Upload"
-msgstr ""
+msgstr "Загрузка API"
 
 #: documents/models.py:750
 msgid "Mail Fetch"
-msgstr ""
+msgstr "Получить почту"
 
 #: documents/models.py:754 paperless_mail/models.py:95
 msgid "order"
@@ -641,7 +641,7 @@ msgstr ""
 
 #: documents/models.py:886
 msgid "String"
-msgstr ""
+msgstr "Строка"
 
 #: documents/models.py:887
 msgid "URL"
@@ -649,15 +649,15 @@ msgstr "Ссылка"
 
 #: documents/models.py:888
 msgid "Date"
-msgstr ""
+msgstr "Дата"
 
 #: documents/models.py:889
 msgid "Boolean"
-msgstr ""
+msgstr "Логическое значение"
 
 #: documents/models.py:890
 msgid "Integer"
-msgstr ""
+msgstr "Целое число"
 
 #: documents/models.py:891
 msgid "Float"
@@ -743,11 +743,11 @@ msgstr "Неправильные имя пользователя или паро
 
 #: documents/templates/registration/login.html:48
 msgid "Share link was not found."
-msgstr ""
+msgstr "Эта ссылка не найдена."
 
 #: documents/templates/registration/login.html:52
 msgid "Share link has expired."
-msgstr ""
+msgstr "Срок действия ссылки истёк."
 
 #: documents/templates/registration/login.html:55
 msgid "Username"
@@ -763,7 +763,7 @@ msgstr "Вход"
 
 #: documents/templates/registration/login.html:70
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Забыли пароль?"
 
 #: documents/templates/registration/password_reset_complete.html:14
 msgid "Paperless-ngx reset password complete"
@@ -771,7 +771,7 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_complete.html:40
 msgid "Password reset complete."
-msgstr ""
+msgstr "Изменение пароля прошло успешно."
 
 #: documents/templates/registration/password_reset_complete.html:42
 #, python-format
@@ -784,7 +784,7 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_confirm.html:42
 msgid "Set a new password."
-msgstr ""
+msgstr "Придумайте новый пароль"
 
 #: documents/templates/registration/password_reset_confirm.html:46
 msgid "Passwords did not match or too weak. Try again."
@@ -792,27 +792,27 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_confirm.html:49
 msgid "New Password"
-msgstr ""
+msgstr "Новый пароль"
 
 #: documents/templates/registration/password_reset_confirm.html:50
 msgid "Confirm Password"
-msgstr ""
+msgstr "Подтверждение пароля"
 
 #: documents/templates/registration/password_reset_confirm.html:61
 msgid "Change my password"
-msgstr ""
+msgstr "Сменить пароль"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
-msgstr ""
+msgstr "запросить новый пароль"
 
 #: documents/templates/registration/password_reset_done.html:14
 msgid "Paperless-ngx reset password sent"
-msgstr ""
+msgstr "Пароль сброса Paperless-ngx отправлен"
 
 #: documents/templates/registration/password_reset_done.html:40
 msgid "Check your inbox."
-msgstr ""
+msgstr "Проверье ваш почтовый ящик."
 
 #: documents/templates/registration/password_reset_done.html:41
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
@@ -824,11 +824,11 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_form.html:41
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
-msgstr ""
+msgstr "Введите ваш адрес электронной почты ниже, и мы отправим вам инструкции по установке нового пароля."
 
 #: documents/templates/registration/password_reset_form.html:44
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "Произошла ошибка. Пожалуйста, попробуйте снова."
 
 #: documents/templates/registration/password_reset_form.html:47
 msgid "Email"
@@ -836,7 +836,7 @@ msgstr "Электронная почта"
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
-msgstr ""
+msgstr "Отправить мне инструкции!"
 
 #: paperless/apps.py:10
 msgid "Paperless"
@@ -852,7 +852,7 @@ msgstr "Арабский"
 
 #: paperless/settings.py:588
 msgid "Afrikaans"
-msgstr ""
+msgstr "Африкаанс"
 
 #: paperless/settings.py:589
 msgid "Belarusian"
@@ -860,7 +860,7 @@ msgstr "Белорусский"
 
 #: paperless/settings.py:590
 msgid "Bulgarian"
-msgstr ""
+msgstr "Болгарский"
 
 #: paperless/settings.py:591
 msgid "Catalan"
@@ -880,7 +880,7 @@ msgstr "Немецкий"
 
 #: paperless/settings.py:595
 msgid "Greek"
-msgstr ""
+msgstr "Греческий"
 
 #: paperless/settings.py:596
 msgid "English (GB)"
@@ -900,7 +900,7 @@ msgstr "Французский"
 
 #: paperless/settings.py:600
 msgid "Hungarian"
-msgstr ""
+msgstr "Венгерский"
 
 #: paperless/settings.py:601
 msgid "Italian"
@@ -912,7 +912,7 @@ msgstr "Люксембургский"
 
 #: paperless/settings.py:603
 msgid "Norwegian"
-msgstr ""
+msgstr "Норвежский"
 
 #: paperless/settings.py:604
 msgid "Dutch"
@@ -940,7 +940,7 @@ msgstr "Русский"
 
 #: paperless/settings.py:610
 msgid "Slovak"
-msgstr ""
+msgstr "Словацкий"
 
 #: paperless/settings.py:611
 msgid "Slovenian"
@@ -960,7 +960,7 @@ msgstr "Турецкий"
 
 #: paperless/settings.py:615
 msgid "Ukrainian"
-msgstr ""
+msgstr "Украинский"
 
 #: paperless/settings.py:616
 msgid "Chinese Simplified"
@@ -1052,7 +1052,7 @@ msgstr "пароль"
 
 #: paperless_mail/models.py:42
 msgid "Is token authentication"
-msgstr ""
+msgstr "Аутентификация по токену"
 
 #: paperless_mail/models.py:45
 msgid "character set"
