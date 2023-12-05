@@ -756,6 +756,7 @@ class CustomField(models.Model):
         INT = ("integer", _("Integer"))
         FLOAT = ("float", _("Float"))
         MONETARY = ("monetary", _("Monetary"))
+        DOCUMENTLINK = ("documentlink", _("Document Link"))
 
     created = models.DateTimeField(
         _("created"),
@@ -834,6 +835,8 @@ class CustomFieldInstance(models.Model):
 
     value_monetary = models.DecimalField(null=True, decimal_places=2, max_digits=12)
 
+    value_document_ids = models.JSONField(null=True)
+
     class Meta:
         ordering = ("created",)
         verbose_name = _("custom field instance")
@@ -868,6 +871,8 @@ class CustomFieldInstance(models.Model):
             return self.value_float
         elif self.field.data_type == CustomField.FieldDataType.MONETARY:
             return self.value_monetary
+        elif self.field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
+            return self.value_document_ids
         raise NotImplementedError(self.field.data_type)
 
 

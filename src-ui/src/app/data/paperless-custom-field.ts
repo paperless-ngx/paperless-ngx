@@ -8,6 +8,7 @@ export enum PaperlessCustomFieldDataType {
   Integer = 'integer',
   Float = 'float',
   Monetary = 'monetary',
+  DocumentLink = 'documentlink',
 }
 
 export const DATA_TYPE_LABELS = [
@@ -38,6 +39,10 @@ export const DATA_TYPE_LABELS = [
   {
     id: PaperlessCustomFieldDataType.Url,
     name: $localize`Url`,
+  },
+  {
+    id: PaperlessCustomFieldDataType.DocumentLink,
+    name: $localize`Document Link`,
   },
 ]
 
