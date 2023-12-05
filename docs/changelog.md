@@ -2,6 +2,10 @@
 
 ## paperless-ngx 2.0.1
 
+### Please Note
+
+Exports generated in Paperless-ngx v2.0.0–2.0.1 will **not** contain consumption templates or custom fields, we recommend users upgrade to at least v2.1.
+
 ### Bug Fixes
 
 - Fix: Increase field the length for consumption template source [@stumpylog](https://github.com/stumpylog) ([#4719](https://github.com/paperless-ngx/paperless-ngx/pull/4719))
@@ -21,6 +25,10 @@
 </details>
 
 ## paperless-ngx 2.0.0
+
+### Please Note
+
+Exports generated in Paperless-ngx v2.0.0–2.0.1 will **not** contain consumption templates or custom fields, we recommend users upgrade to at least v2.1.
 
 ### Breaking Changes
 

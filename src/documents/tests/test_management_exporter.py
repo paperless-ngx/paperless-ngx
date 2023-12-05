@@ -21,7 +21,10 @@ from guardian.models import UserObjectPermission
 from guardian.shortcuts import assign_perm
 
 from documents.management.commands import document_exporter
+from documents.models import ConsumptionTemplate
 from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
@@ -89,6 +92,15 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.dt1 = DocumentType.objects.create(name="dt")
         self.c1 = Correspondent.objects.create(name="c")
         self.sp1 = StoragePath.objects.create(path="{created_year}-{title}")
+        self.cf1 = CustomField.objects.create(
+            name="Custom Field 1",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        self.cfi1 = CustomFieldInstance.objects.create(
+            field=self.cf1,
+            value_text="cf instance 1",
+            document=self.d1,
+        )
 
         self.d1.tags.add(self.t1)
         self.d1.correspondent = self.c1
@@ -96,6 +108,9 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.d1.save()
         self.d4.storage_path = self.sp1
         self.d4.save()
+
+        self.ct1 = ConsumptionTemplate.objects.create(name="CT 1", filter_path="*")
+
         super().setUp()
 
     def _get_document_from_manifest(self, manifest, id):
@@ -153,7 +168,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         manifest = self._do_export(use_filename_format=use_filename_format)
 
-        self.assertEqual(len(manifest), 169)
+        self.assertEqual(len(manifest), 172)
 
         # dont include consumer or AnonymousUser users
         self.assertEqual(
