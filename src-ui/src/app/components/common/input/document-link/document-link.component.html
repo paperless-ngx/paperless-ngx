@@ -16,7 +16,6 @@
             placeholder="Search for documents"
             [notFoundText]="notFoundText"
             [multiple]="true"
-            bindLabel="title"
             bindValue="id"
             [compareWith]="compareDocuments"
             [trackByFn]="trackByFn"
@@ -25,18 +24,21 @@
             [typeahead]="documentsInput$"
             (change)="onChange(selectedDocuments)">
                 <ng-template ng-label-tmp let-document="item">
-                    <svg class="sidebaricon" fill="currentColor" xmlns="http://www.w3.org/2000/svg" (click)="unselect(document)">
-                        <use xlink:href="assets/bootstrap-icons.svg#x"/>
-                    </svg>
-                    <a routerLink="/documents/{{document.id}}" class="badge bg-light text-primary">
-                        <svg class="sidebaricon-sm me-1" fill="currentColor">
-                            <use xlink:href="assets/bootstrap-icons.svg#file-text"/>
-                        </svg><span>{{document.title}}</span>
-                    </a>
+                  <svg class="sidebaricon" fill="currentColor" xmlns="http://www.w3.org/2000/svg" (click)="unselect(document)">
+                    <use xlink:href="assets/bootstrap-icons.svg#x"/>
+                  </svg>
+                  <a routerLink="/documents/{{document.id}}" class="badge bg-light text-primary">
+                    <svg class="sidebaricon-sm me-1" fill="currentColor">
+                      <use xlink:href="assets/bootstrap-icons.svg#file-text"/>
+                    </svg><span>{{document.title}}</span>
+                  </a>
                 </ng-template>
                 <ng-template ng-loadingspinner-tmp>
-                    <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
-                    <div class="visually-hidden" i18n>Loading...</div>
+                  <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
+                  <div class="visually-hidden" i18n>Loading...</div>
+                </ng-template>
+                <ng-template ng-option-tmp let-document="item" let-index="index" let-search="searchTerm">
+                  <div>{{document.title}} <small class="text-muted">({{document.created | customDate:'shortDate'}})</small></div>
                 </ng-template>
           </ng-select>
         </div>
