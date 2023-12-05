@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-12-02 02:06\n"
+"POT-Creation-Date: 2023-12-05 08:26-0800\n"
+"PO-Revision-Date: 2023-12-05 16:27\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -53,7 +53,7 @@ msgstr "Fuzzy szó"
 msgid "Automatic"
 msgstr "Automatikus"
 
-#: documents/models.py:62 documents/models.py:402 documents/models.py:752
+#: documents/models.py:62 documents/models.py:402 documents/models.py:895
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
 msgid "name"
 msgstr "név"
@@ -159,7 +159,7 @@ msgid "The checksum of the archived document."
 msgstr "Az archivált dokumentum ellenőrző összege."
 
 #: documents/models.py:205 documents/models.py:385 documents/models.py:654
-#: documents/models.py:692 documents/models.py:895 documents/models.py:932
+#: documents/models.py:692 documents/models.py:762 documents/models.py:799
 msgid "created"
 msgstr "létrehozott"
 
@@ -227,7 +227,7 @@ msgstr "információ"
 msgid "warning"
 msgstr "figyelmeztetés"
 
-#: documents/models.py:371 paperless_mail/models.py:293
+#: documents/models.py:371 paperless_mail/models.py:305
 msgid "error"
 msgstr "hiba"
 
@@ -551,141 +551,149 @@ msgstr "megosztási link"
 msgid "share links"
 msgstr "linkek megosztása"
 
-#: documents/models.py:748
-msgid "Consume Folder"
-msgstr "Feldolgozási mappa"
-
-#: documents/models.py:749
-msgid "Api Upload"
-msgstr "Api feltöltés"
-
-#: documents/models.py:750
-msgid "Mail Fetch"
-msgstr "Mail Fetch"
-
-#: documents/models.py:754 paperless_mail/models.py:95
-msgid "order"
-msgstr "megrendelés"
-
-#: documents/models.py:763
-msgid "filter path"
-msgstr "szűrési útvonal"
-
-#: documents/models.py:768
-msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr "Csak olyan dokumentumokat dolgoz fel, amelyeknek az elérési útvonala megegyezik ezzel, ha ez meg van adva. A *-gal megadott helyettesítő karakterek engedélyezettek. Nagy- és kisbetűket nem érzékeny."
-
-#: documents/models.py:775
-msgid "filter filename"
-msgstr "szűrő fájlnév"
-
-#: documents/models.py:780 paperless_mail/models.py:148
-msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr "Csak olyan dokumentumokat dolgoz fel, amelyek teljes mértékben megfelelnek ennek a fájlnévnek, ha meg van adva. Az olyan helyettesítő karakterek, mint *.pdf vagy *számla* engedélyezettek. Nagy- és kisbetűket nem érzékeny."
-
-#: documents/models.py:791
-msgid "filter documents from this mail rule"
-msgstr "dokumentumok szűrése ebből a levélszabályból"
-
-#: documents/models.py:795
-msgid "assign title"
-msgstr "cím hozzárendelése"
-
-#: documents/models.py:800
-msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr "A dokumentum címének hozzárendelése, tartalmazhat néhány helykitöltőt, lásd a dokumentációt."
-
-#: documents/models.py:808 paperless_mail/models.py:204
-msgid "assign this tag"
-msgstr "rendelje hozzá ezt a jelölőt"
-
-#: documents/models.py:816 paperless_mail/models.py:212
-msgid "assign this document type"
-msgstr "rendelje hozzá ezt a dokumentumtípust"
-
-#: documents/models.py:824 paperless_mail/models.py:226
-msgid "assign this correspondent"
-msgstr "rendelje hozzá ezt a kapcsolattartót"
-
-#: documents/models.py:832
-msgid "assign this storage path"
-msgstr "rendelje hozzá ezt a tárolási útvonalat"
-
-#: documents/models.py:841
-msgid "assign this owner"
-msgstr "rendelje hozzá ezt a tulajdonost"
-
-#: documents/models.py:848
-msgid "grant view permissions to these users"
-msgstr "adjon megtekintési engedélyeket ezeknek a felhasználóknak"
-
-#: documents/models.py:855
-msgid "grant view permissions to these groups"
-msgstr "nézeti engedélyeket adjon ezeknek a csoportoknak"
-
-#: documents/models.py:862
-msgid "grant change permissions to these users"
-msgstr "adjon módosítási engedélyeket ezeknek a felhasználóknak"
-
-#: documents/models.py:869
-msgid "grant change permissions to these groups"
-msgstr "adjon módosítási jogosultságokat ezeknek a csoportoknak"
-
-#: documents/models.py:873
-msgid "consumption template"
-msgstr "fogyasztói sablon"
-
-#: documents/models.py:874
-msgid "consumption templates"
-msgstr "fogyasztási sablonok"
-
-#: documents/models.py:886
+#: documents/models.py:752
 msgid "String"
 msgstr "Karaktersor"
 
-#: documents/models.py:887
+#: documents/models.py:753
 msgid "URL"
 msgstr "URL"
 
-#: documents/models.py:888
+#: documents/models.py:754
 msgid "Date"
 msgstr "Dátum"
 
-#: documents/models.py:889
+#: documents/models.py:755
 msgid "Boolean"
 msgstr "Boolean"
 
-#: documents/models.py:890
+#: documents/models.py:756
 msgid "Integer"
 msgstr "Egész szám"
 
-#: documents/models.py:891
+#: documents/models.py:757
 msgid "Float"
 msgstr "Valós szám"
 
-#: documents/models.py:892
+#: documents/models.py:758
 msgid "Monetary"
 msgstr "Monetáris"
 
-#: documents/models.py:904
+#: documents/models.py:759
+msgid "Document Link"
+msgstr ""
+
+#: documents/models.py:771
 msgid "data type"
 msgstr "adattípus"
 
-#: documents/models.py:912
+#: documents/models.py:779
 msgid "custom field"
 msgstr "egyéni mező"
 
-#: documents/models.py:913
+#: documents/models.py:780
 msgid "custom fields"
 msgstr "egyéni mezők"
 
-#: documents/models.py:973
+#: documents/models.py:842
 msgid "custom field instance"
 msgstr "egyéni mező példány"
 
-#: documents/models.py:974
+#: documents/models.py:843
 msgid "custom field instances"
 msgstr "egyéni mező példányok"
+
+#: documents/models.py:891
+msgid "Consume Folder"
+msgstr "Feldolgozási mappa"
+
+#: documents/models.py:892
+msgid "Api Upload"
+msgstr "Api feltöltés"
+
+#: documents/models.py:893
+msgid "Mail Fetch"
+msgstr "Mail Fetch"
+
+#: documents/models.py:897 paperless_mail/models.py:95
+msgid "order"
+msgstr "megrendelés"
+
+#: documents/models.py:906
+msgid "filter path"
+msgstr "szűrési útvonal"
+
+#: documents/models.py:911
+msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
+msgstr "Csak olyan dokumentumokat dolgoz fel, amelyeknek az elérési útvonala megegyezik ezzel, ha ez meg van adva. A *-gal megadott helyettesítő karakterek engedélyezettek. Nagy- és kisbetűket nem érzékeny."
+
+#: documents/models.py:918
+msgid "filter filename"
+msgstr "szűrő fájlnév"
+
+#: documents/models.py:923 paperless_mail/models.py:148
+msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr "Csak olyan dokumentumokat dolgoz fel, amelyek teljes mértékben megfelelnek ennek a fájlnévnek, ha meg van adva. Az olyan helyettesítő karakterek, mint *.pdf vagy *számla* engedélyezettek. Nagy- és kisbetűket nem érzékeny."
+
+#: documents/models.py:934
+msgid "filter documents from this mail rule"
+msgstr "dokumentumok szűrése ebből a levélszabályból"
+
+#: documents/models.py:938
+msgid "assign title"
+msgstr "cím hozzárendelése"
+
+#: documents/models.py:943
+msgid "Assign a document title, can include some placeholders, see documentation."
+msgstr "A dokumentum címének hozzárendelése, tartalmazhat néhány helykitöltőt, lásd a dokumentációt."
+
+#: documents/models.py:951 paperless_mail/models.py:216
+msgid "assign this tag"
+msgstr "rendelje hozzá ezt a jelölőt"
+
+#: documents/models.py:959 paperless_mail/models.py:224
+msgid "assign this document type"
+msgstr "rendelje hozzá ezt a dokumentumtípust"
+
+#: documents/models.py:967 paperless_mail/models.py:238
+msgid "assign this correspondent"
+msgstr "rendelje hozzá ezt a kapcsolattartót"
+
+#: documents/models.py:975
+msgid "assign this storage path"
+msgstr "rendelje hozzá ezt a tárolási útvonalat"
+
+#: documents/models.py:984
+msgid "assign this owner"
+msgstr "rendelje hozzá ezt a tulajdonost"
+
+#: documents/models.py:991
+msgid "grant view permissions to these users"
+msgstr "adjon megtekintési engedélyeket ezeknek a felhasználóknak"
+
+#: documents/models.py:998
+msgid "grant view permissions to these groups"
+msgstr "nézeti engedélyeket adjon ezeknek a csoportoknak"
+
+#: documents/models.py:1005
+msgid "grant change permissions to these users"
+msgstr "adjon módosítási engedélyeket ezeknek a felhasználóknak"
+
+#: documents/models.py:1012
+msgid "grant change permissions to these groups"
+msgstr "adjon módosítási jogosultságokat ezeknek a csoportoknak"
+
+#: documents/models.py:1019
+msgid "assign these custom fields"
+msgstr ""
+
+#: documents/models.py:1023
+msgid "consumption template"
+msgstr "fogyasztói sablon"
+
+#: documents/models.py:1024
+msgid "consumption templates"
+msgstr "fogyasztási sablonok"
 
 #: documents/serialisers.py:102
 #, python-format
@@ -696,12 +704,12 @@ msgstr "Érvénytelen reguláris kifejezés: %(error)s"
 msgid "Invalid color."
 msgstr "Érvénytelen szín."
 
-#: documents/serialisers.py:841
+#: documents/serialisers.py:842
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Fájltípus %(type)s nem támogatott"
 
-#: documents/serialisers.py:938
+#: documents/serialisers.py:939
 msgid "Invalid variable detected."
 msgstr "Érvénytelen változót észleltek."
 
@@ -966,7 +974,7 @@ msgstr "Ukrán"
 msgid "Chinese Simplified"
 msgstr "Kínai egyszerűsített"
 
-#: paperless/urls.py:186
+#: paperless/urls.py:194
 msgid "Paperless-ngx administration"
 msgstr "Paperless-ngx adminisztráció"
 
@@ -986,19 +994,19 @@ msgstr "Szűrő"
 msgid "Paperless will only process mails that match ALL of the filters given below."
 msgstr "A Paperless csak azokat a leveleket dolgozza fel, amelyek az alábbiakban megadott MINDEN szűrőnek megfelelnek."
 
-#: paperless_mail/admin.py:79
+#: paperless_mail/admin.py:80
 msgid "Actions"
 msgstr "Tevékenységek"
 
-#: paperless_mail/admin.py:82
+#: paperless_mail/admin.py:83
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
 msgstr "A levélre alkalmazott művelet. Ez a művelet csak akkor kerül végrehajtásra, ha a levéltest vagy a mellékletek a levélből kerültek felhasználásra."
 
-#: paperless_mail/admin.py:90
+#: paperless_mail/admin.py:91
 msgid "Metadata"
 msgstr "Metaadatok"
 
-#: paperless_mail/admin.py:93
+#: paperless_mail/admin.py:94
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
 msgstr "Automatikusan hozzárendelhet metaadatokat a szabály által feldolgozott dokumentumokhoz. Ha itt nem rendel hozzá címkéket, típusokat vagy levelezőket, a papírmentes rendszer akkor is feldolgozza az Ön által meghatározott összes egyező szabályt."
 
@@ -1138,7 +1146,7 @@ msgstr "Használja az alább kiválasztott levelezőt"
 msgid "account"
 msgstr "fiók"
 
-#: paperless_mail/models.py:105 paperless_mail/models.py:248
+#: paperless_mail/models.py:105 paperless_mail/models.py:260
 msgid "folder"
 msgstr "mappa"
 
@@ -1163,70 +1171,78 @@ msgid "filter body"
 msgstr "szűrő tartalomra"
 
 #: paperless_mail/models.py:143
-msgid "filter attachment filename"
-msgstr "szűrő melléklet fájlnévre"
+msgid "filter attachment filename inclusive"
+msgstr ""
 
 #: paperless_mail/models.py:155
+msgid "filter attachment filename exclusive"
+msgstr ""
+
+#: paperless_mail/models.py:160
+msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr ""
+
+#: paperless_mail/models.py:167
 msgid "maximum age"
 msgstr "maximális életkor"
 
-#: paperless_mail/models.py:157
+#: paperless_mail/models.py:169
 msgid "Specified in days."
 msgstr "Napokban megadva."
 
-#: paperless_mail/models.py:161
+#: paperless_mail/models.py:173
 msgid "attachment type"
 msgstr "csatolás típusa"
 
-#: paperless_mail/models.py:165
+#: paperless_mail/models.py:177
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
 msgstr "Az inline csatolmányok beágyazott képeket is tartalmaznak, ezért ezt az opciót célszerű egy fájlnévszűrővel kombinálni."
 
-#: paperless_mail/models.py:171
+#: paperless_mail/models.py:183
 msgid "consumption scope"
 msgstr "feldolgozási kör"
 
-#: paperless_mail/models.py:177
+#: paperless_mail/models.py:189
 msgid "action"
 msgstr "művelet"
 
-#: paperless_mail/models.py:183
+#: paperless_mail/models.py:195
 msgid "action parameter"
 msgstr "művelet paraméter"
 
-#: paperless_mail/models.py:188
+#: paperless_mail/models.py:200
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
 msgstr "A fent kiválasztott művelet további paramétere, azaz a mappába áthelyezés művelet célmappája. Az almappákat pontokkal kell elválasztani."
 
-#: paperless_mail/models.py:196
+#: paperless_mail/models.py:208
 msgid "assign title from"
 msgstr "cím hozzárendelése a"
 
-#: paperless_mail/models.py:216
+#: paperless_mail/models.py:228
 msgid "assign correspondent from"
 msgstr "rendelje hozzá a kapcsolattartót a"
 
-#: paperless_mail/models.py:230
+#: paperless_mail/models.py:242
 msgid "Assign the rule owner to documents"
 msgstr "A szabály tulajdonosának hozzárendelése a dokumentumokhoz"
 
-#: paperless_mail/models.py:256
+#: paperless_mail/models.py:268
 msgid "uid"
 msgstr "uid"
 
-#: paperless_mail/models.py:264
+#: paperless_mail/models.py:276
 msgid "subject"
 msgstr "tárgy"
 
-#: paperless_mail/models.py:272
+#: paperless_mail/models.py:284
 msgid "received"
 msgstr "fogadott"
 
-#: paperless_mail/models.py:279
+#: paperless_mail/models.py:291
 msgid "processed"
 msgstr "feldolgozott"
 
-#: paperless_mail/models.py:285
+#: paperless_mail/models.py:297
 msgid "status"
 msgstr "állapot"
 
