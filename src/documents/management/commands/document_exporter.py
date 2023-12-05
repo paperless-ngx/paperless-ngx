@@ -23,7 +23,10 @@ from guardian.models import UserObjectPermission
 
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_filename
+from documents.models import ConsumptionTemplate
 from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
@@ -291,6 +294,19 @@ class Command(BaseCommand):
             manifest += json.loads(
                 serializers.serialize("json", GroupObjectPermission.objects.all()),
             )
+
+            manifest += json.loads(
+                serializers.serialize("json", ConsumptionTemplate.objects.all()),
+            )
+
+            manifest += json.loads(
+                serializers.serialize("json", CustomField.objects.all()),
+            )
+
+            if not self.split_manifest:
+                manifest += json.loads(
+                    serializers.serialize("json", CustomFieldInstance.objects.all()),
+                )
 
         # 3. Export files from each document
         for index, document_dict in tqdm.tqdm(
