@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-11-13 01:31\n"
+"PO-Revision-Date: 2023-12-05 12:09\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -23,23 +23,23 @@ msgstr "文件"
 
 #: documents/models.py:36 documents/models.py:734
 msgid "owner"
-msgstr ""
+msgstr "擁有者"
 
 #: documents/models.py:53
 msgid "None"
-msgstr ""
+msgstr "無"
 
 #: documents/models.py:54
 msgid "Any word"
-msgstr ""
+msgstr "任何字"
 
 #: documents/models.py:55
 msgid "All words"
-msgstr ""
+msgstr "所有字詞"
 
 #: documents/models.py:56
 msgid "Exact match"
-msgstr ""
+msgstr "完全符合"
 
 #: documents/models.py:57
 msgid "Regular expression"
@@ -51,20 +51,20 @@ msgstr ""
 
 #: documents/models.py:59
 msgid "Automatic"
-msgstr ""
+msgstr "自動"
 
 #: documents/models.py:62 documents/models.py:402 documents/models.py:752
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
 msgid "name"
-msgstr ""
+msgstr "名稱"
 
 #: documents/models.py:64
 msgid "match"
-msgstr ""
+msgstr "比對"
 
 #: documents/models.py:67
 msgid "matching algorithm"
-msgstr ""
+msgstr "比對演算法"
 
 #: documents/models.py:72
 msgid "is insensitive"
@@ -80,7 +80,7 @@ msgstr ""
 
 #: documents/models.py:100
 msgid "color"
-msgstr ""
+msgstr "顏色"
 
 #: documents/models.py:103
 msgid "is inbox tag"
@@ -128,64 +128,64 @@ msgstr ""
 
 #: documents/models.py:159
 msgid "title"
-msgstr ""
+msgstr "標題"
 
 #: documents/models.py:171 documents/models.py:648
 msgid "content"
-msgstr ""
+msgstr "內容"
 
 #: documents/models.py:174
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr ""
+msgstr "文件的原始純文字數據。這個欄位主要用於搜尋"
 
 #: documents/models.py:179
 msgid "mime type"
-msgstr ""
+msgstr "mime 類型"
 
 #: documents/models.py:189
 msgid "checksum"
-msgstr ""
+msgstr "檢查碼"
 
 #: documents/models.py:193
 msgid "The checksum of the original document."
-msgstr ""
+msgstr "原始文件的校驗檢查碼"
 
 #: documents/models.py:197
 msgid "archive checksum"
-msgstr ""
+msgstr "存檔校驗檢查碼"
 
 #: documents/models.py:202
 msgid "The checksum of the archived document."
-msgstr ""
+msgstr "歸檔文件的校驗檢查碼"
 
 #: documents/models.py:205 documents/models.py:385 documents/models.py:654
 #: documents/models.py:692 documents/models.py:895 documents/models.py:932
 msgid "created"
-msgstr ""
+msgstr "已建立"
 
 #: documents/models.py:208
 msgid "modified"
-msgstr ""
+msgstr "已修改"
 
 #: documents/models.py:215
 msgid "storage type"
-msgstr ""
+msgstr "儲存空間類型"
 
 #: documents/models.py:223
 msgid "added"
-msgstr ""
+msgstr "已新增"
 
 #: documents/models.py:230
 msgid "filename"
-msgstr ""
+msgstr "檔案名稱"
 
 #: documents/models.py:236
 msgid "Current filename in storage"
-msgstr ""
+msgstr "儲存中的現行檔案名稱"
 
 #: documents/models.py:240
 msgid "archive filename"
-msgstr ""
+msgstr "存檔檔案名稱"
 
 #: documents/models.py:246
 msgid "Current archive filename in storage"
