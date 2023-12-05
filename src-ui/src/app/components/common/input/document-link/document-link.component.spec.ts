@@ -1,6 +1,10 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import {
+  FormsModule,
+  NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
+} from '@angular/forms'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of, throwError } from 'rxjs'
 import { DocumentService } from 'src/app/services/rest/document.service'
@@ -39,6 +43,7 @@ describe('DocumentLinkComponent', () => {
     })
     documentService = TestBed.inject(DocumentService)
     fixture = TestBed.createComponent(DocumentLinkComponent)
+    fixture.debugElement.injector.get(NG_VALUE_ACCESSOR)
     component = fixture.componentInstance
     fixture.detectChanges()
   })
