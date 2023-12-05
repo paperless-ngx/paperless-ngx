@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-12-02 02:06\n"
+"POT-Creation-Date: 2023-12-05 08:26-0800\n"
+"PO-Revision-Date: 2023-12-05 16:27\n"
 "Last-Translator: \n"
 "Language-Team: Belarusian\n"
 "Language: be_BY\n"
@@ -53,7 +53,7 @@ msgstr "Невыразнае слова"
 msgid "Automatic"
 msgstr "Аўтаматычна"
 
-#: documents/models.py:62 documents/models.py:402 documents/models.py:752
+#: documents/models.py:62 documents/models.py:402 documents/models.py:895
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
 msgid "name"
 msgstr "назва"
@@ -159,7 +159,7 @@ msgid "The checksum of the archived document."
 msgstr "Кантрольная сума архіўнага дакумента."
 
 #: documents/models.py:205 documents/models.py:385 documents/models.py:654
-#: documents/models.py:692 documents/models.py:895 documents/models.py:932
+#: documents/models.py:692 documents/models.py:762 documents/models.py:799
 msgid "created"
 msgstr "створаны"
 
@@ -227,7 +227,7 @@ msgstr "інфармацыя"
 msgid "warning"
 msgstr "папярэджанне"
 
-#: documents/models.py:371 paperless_mail/models.py:293
+#: documents/models.py:371 paperless_mail/models.py:305
 msgid "error"
 msgstr "памылка"
 
@@ -551,140 +551,148 @@ msgstr ""
 msgid "share links"
 msgstr ""
 
-#: documents/models.py:748
-msgid "Consume Folder"
-msgstr ""
-
-#: documents/models.py:749
-msgid "Api Upload"
-msgstr ""
-
-#: documents/models.py:750
-msgid "Mail Fetch"
-msgstr ""
-
-#: documents/models.py:754 paperless_mail/models.py:95
-msgid "order"
-msgstr "парадак"
-
-#: documents/models.py:763
-msgid "filter path"
-msgstr ""
-
-#: documents/models.py:768
-msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr ""
-
-#: documents/models.py:775
-msgid "filter filename"
-msgstr ""
-
-#: documents/models.py:780 paperless_mail/models.py:148
-msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr "Апрацоўваць толькі дакументы, якія цалкам супадаюць з імем файла (калі яно пазначана). Маскі, напрыклад *.pdf ці *рахунак*, дазволеныя. Без уліку рэгістра."
-
-#: documents/models.py:791
-msgid "filter documents from this mail rule"
-msgstr ""
-
-#: documents/models.py:795
-msgid "assign title"
-msgstr ""
-
-#: documents/models.py:800
-msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr ""
-
-#: documents/models.py:808 paperless_mail/models.py:204
-msgid "assign this tag"
-msgstr "прызначыць гэты тэг"
-
-#: documents/models.py:816 paperless_mail/models.py:212
-msgid "assign this document type"
-msgstr "прызначыць гэты тып дакумента"
-
-#: documents/models.py:824 paperless_mail/models.py:226
-msgid "assign this correspondent"
-msgstr "прызначыць гэтага карэспандэнта"
-
-#: documents/models.py:832
-msgid "assign this storage path"
-msgstr ""
-
-#: documents/models.py:841
-msgid "assign this owner"
-msgstr ""
-
-#: documents/models.py:848
-msgid "grant view permissions to these users"
-msgstr ""
-
-#: documents/models.py:855
-msgid "grant view permissions to these groups"
-msgstr ""
-
-#: documents/models.py:862
-msgid "grant change permissions to these users"
-msgstr ""
-
-#: documents/models.py:869
-msgid "grant change permissions to these groups"
-msgstr ""
-
-#: documents/models.py:873
-msgid "consumption template"
-msgstr ""
-
-#: documents/models.py:874
-msgid "consumption templates"
-msgstr ""
-
-#: documents/models.py:886
+#: documents/models.py:752
 msgid "String"
 msgstr ""
 
-#: documents/models.py:887
+#: documents/models.py:753
 msgid "URL"
 msgstr ""
 
-#: documents/models.py:888
+#: documents/models.py:754
 msgid "Date"
 msgstr ""
 
-#: documents/models.py:889
+#: documents/models.py:755
 msgid "Boolean"
 msgstr ""
 
-#: documents/models.py:890
+#: documents/models.py:756
 msgid "Integer"
 msgstr ""
 
-#: documents/models.py:891
+#: documents/models.py:757
 msgid "Float"
 msgstr ""
 
-#: documents/models.py:892
+#: documents/models.py:758
 msgid "Monetary"
 msgstr ""
 
-#: documents/models.py:904
+#: documents/models.py:759
+msgid "Document Link"
+msgstr ""
+
+#: documents/models.py:771
 msgid "data type"
 msgstr ""
 
-#: documents/models.py:912
+#: documents/models.py:779
 msgid "custom field"
 msgstr ""
 
-#: documents/models.py:913
+#: documents/models.py:780
 msgid "custom fields"
 msgstr ""
 
-#: documents/models.py:973
+#: documents/models.py:842
 msgid "custom field instance"
 msgstr ""
 
-#: documents/models.py:974
+#: documents/models.py:843
 msgid "custom field instances"
+msgstr ""
+
+#: documents/models.py:891
+msgid "Consume Folder"
+msgstr ""
+
+#: documents/models.py:892
+msgid "Api Upload"
+msgstr ""
+
+#: documents/models.py:893
+msgid "Mail Fetch"
+msgstr ""
+
+#: documents/models.py:897 paperless_mail/models.py:95
+msgid "order"
+msgstr "парадак"
+
+#: documents/models.py:906
+msgid "filter path"
+msgstr ""
+
+#: documents/models.py:911
+msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
+msgstr ""
+
+#: documents/models.py:918
+msgid "filter filename"
+msgstr ""
+
+#: documents/models.py:923 paperless_mail/models.py:148
+msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr "Апрацоўваць толькі дакументы, якія цалкам супадаюць з імем файла (калі яно пазначана). Маскі, напрыклад *.pdf ці *рахунак*, дазволеныя. Без уліку рэгістра."
+
+#: documents/models.py:934
+msgid "filter documents from this mail rule"
+msgstr ""
+
+#: documents/models.py:938
+msgid "assign title"
+msgstr ""
+
+#: documents/models.py:943
+msgid "Assign a document title, can include some placeholders, see documentation."
+msgstr ""
+
+#: documents/models.py:951 paperless_mail/models.py:216
+msgid "assign this tag"
+msgstr "прызначыць гэты тэг"
+
+#: documents/models.py:959 paperless_mail/models.py:224
+msgid "assign this document type"
+msgstr "прызначыць гэты тып дакумента"
+
+#: documents/models.py:967 paperless_mail/models.py:238
+msgid "assign this correspondent"
+msgstr "прызначыць гэтага карэспандэнта"
+
+#: documents/models.py:975
+msgid "assign this storage path"
+msgstr ""
+
+#: documents/models.py:984
+msgid "assign this owner"
+msgstr ""
+
+#: documents/models.py:991
+msgid "grant view permissions to these users"
+msgstr ""
+
+#: documents/models.py:998
+msgid "grant view permissions to these groups"
+msgstr ""
+
+#: documents/models.py:1005
+msgid "grant change permissions to these users"
+msgstr ""
+
+#: documents/models.py:1012
+msgid "grant change permissions to these groups"
+msgstr ""
+
+#: documents/models.py:1019
+msgid "assign these custom fields"
+msgstr ""
+
+#: documents/models.py:1023
+msgid "consumption template"
+msgstr ""
+
+#: documents/models.py:1024
+msgid "consumption templates"
 msgstr ""
 
 #: documents/serialisers.py:102
@@ -696,12 +704,12 @@ msgstr "Няправільны рэгулярны выраз: %(error)s"
 msgid "Invalid color."
 msgstr "Няправільны колер."
 
-#: documents/serialisers.py:841
+#: documents/serialisers.py:842
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Тып файла %(type)s не падтрымліваецца"
 
-#: documents/serialisers.py:938
+#: documents/serialisers.py:939
 msgid "Invalid variable detected."
 msgstr "Выяўлена няправільная зменная."
 
@@ -966,7 +974,7 @@ msgstr ""
 msgid "Chinese Simplified"
 msgstr "Кітайская спрошчаная"
 
-#: paperless/urls.py:186
+#: paperless/urls.py:194
 msgid "Paperless-ngx administration"
 msgstr "Адміністраванне Paperless-ngx"
 
@@ -986,19 +994,19 @@ msgstr "Фільтр"
 msgid "Paperless will only process mails that match ALL of the filters given below."
 msgstr "Paperless-ngx будзе апрацоўваць толькі лісты, якія адпавядаюць УСІМ фільтрам, прыведзеным ніжэй."
 
-#: paperless_mail/admin.py:79
+#: paperless_mail/admin.py:80
 msgid "Actions"
 msgstr "Дзеянні"
 
-#: paperless_mail/admin.py:82
+#: paperless_mail/admin.py:83
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
 msgstr ""
 
-#: paperless_mail/admin.py:90
+#: paperless_mail/admin.py:91
 msgid "Metadata"
 msgstr "Метаданыя"
 
-#: paperless_mail/admin.py:93
+#: paperless_mail/admin.py:94
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
 msgstr "Аўтаматычна прызначаць метададзеныя дакументам, атрыманым з гэтага правіла. Калі вы не прызначаеце тут тэгі, тыпы ці карэспандэнты, Paperless-ngx усё роўна будуць апрацоўваць усе адпаведныя правілы, якія вы вызначылі."
 
@@ -1138,7 +1146,7 @@ msgstr "Выкарыстоўваць карэспандэнта, абранаг�
 msgid "account"
 msgstr "ўліковы запіс"
 
-#: paperless_mail/models.py:105 paperless_mail/models.py:248
+#: paperless_mail/models.py:105 paperless_mail/models.py:260
 msgid "folder"
 msgstr "каталог"
 
@@ -1163,70 +1171,78 @@ msgid "filter body"
 msgstr "фільтр па тэксце паведамлення"
 
 #: paperless_mail/models.py:143
-msgid "filter attachment filename"
-msgstr "фільтр па імені ўкладання"
+msgid "filter attachment filename inclusive"
+msgstr ""
 
 #: paperless_mail/models.py:155
+msgid "filter attachment filename exclusive"
+msgstr ""
+
+#: paperless_mail/models.py:160
+msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr ""
+
+#: paperless_mail/models.py:167
 msgid "maximum age"
 msgstr "максімальны ўзрост"
 
-#: paperless_mail/models.py:157
+#: paperless_mail/models.py:169
 msgid "Specified in days."
 msgstr "Указваецца ў днях."
 
-#: paperless_mail/models.py:161
+#: paperless_mail/models.py:173
 msgid "attachment type"
 msgstr "тып укладання"
 
-#: paperless_mail/models.py:165
+#: paperless_mail/models.py:177
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
 msgstr "Убудаваныя ўкладанні ўключаюць убудаваныя выявы, таму лепш камбінаваць гэты варыянт з фільтрам імёнаў файла."
 
-#: paperless_mail/models.py:171
+#: paperless_mail/models.py:183
 msgid "consumption scope"
 msgstr ""
 
-#: paperless_mail/models.py:177
+#: paperless_mail/models.py:189
 msgid "action"
 msgstr "дзеянне"
 
-#: paperless_mail/models.py:183
+#: paperless_mail/models.py:195
 msgid "action parameter"
 msgstr "параметр дзеяння"
 
-#: paperless_mail/models.py:188
+#: paperless_mail/models.py:200
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
 msgstr "Дадатковы параметр для дзеяння, абранага вышэй, гэта значыць, мэтавая папка дзеяння перамяшчэння ў папку. Падпапкі павінны быць падзеленыя кропкамі."
 
-#: paperless_mail/models.py:196
+#: paperless_mail/models.py:208
 msgid "assign title from"
 msgstr "прызначыць загаловак з"
 
-#: paperless_mail/models.py:216
+#: paperless_mail/models.py:228
 msgid "assign correspondent from"
 msgstr "прызначыць карэспандэнта з"
 
-#: paperless_mail/models.py:230
+#: paperless_mail/models.py:242
 msgid "Assign the rule owner to documents"
 msgstr ""
 
-#: paperless_mail/models.py:256
+#: paperless_mail/models.py:268
 msgid "uid"
 msgstr ""
 
-#: paperless_mail/models.py:264
+#: paperless_mail/models.py:276
 msgid "subject"
 msgstr ""
 
-#: paperless_mail/models.py:272
+#: paperless_mail/models.py:284
 msgid "received"
 msgstr ""
 
-#: paperless_mail/models.py:279
+#: paperless_mail/models.py:291
 msgid "processed"
 msgstr ""
 
-#: paperless_mail/models.py:285
+#: paperless_mail/models.py:297
 msgid "status"
 msgstr ""
 
