@@ -49,7 +49,9 @@ export interface PaperlessMailRule extends ObjectWithPermissions {
 
   filter_body: string
 
-  filter_attachment_filename: string
+  filter_attachment_filename_include: string
+
+  filter_attachment_filename_exclude: string
 
   maximum_age: number
 

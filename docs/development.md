@@ -9,7 +9,7 @@ following way:
 - `main` always represents the latest release and will only see
   changes when a new release is made.
 - `dev` contains the code that will be in the next release.
-- `feature-X` contain bigger changes that will be in some release, but
+- `feature-X` contains bigger changes that will be in some release, but
   not necessarily the next one.
 
 When making functional changes to Paperless-ngx, _always_ make your changes

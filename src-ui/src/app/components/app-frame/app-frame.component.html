@@ -39,6 +39,11 @@
           <p class="small mb-0 px-3 text-muted" i18n>Logged in as {{this.settingsService.displayName}}</p>
           <div class="dropdown-divider"></div>
         </div>
+        <button ngbDropdownItem class="nav-link" (click)="editProfile()">
+          <svg class="sidebaricon me-2" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#person"/>
+          </svg><ng-container i18n>My Profile</ng-container>
+        </button>
         <a ngbDropdownItem class="nav-link" routerLink="settings" (click)="closeMenu()" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.UISettings }">
           <svg class="sidebaricon me-2" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#gear"/>

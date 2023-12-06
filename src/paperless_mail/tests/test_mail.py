@@ -526,6 +526,16 @@ class TestMail(
         )
 
     def test_filename_filter(self):
+        """
+        GIVEN:
+            - Email with multiple similar named attachments
+            - Rule with inclusive and exclusive filters
+        WHEN:
+            - Mail action filtering is checked
+        THEN:
+            - Mail action should not be performed for files excluded
+            - Mail action should be performed for files included
+        """
         message = self.create_message(
             attachments=[
                 _AttachmentDef(filename="f1.pdf"),
@@ -537,15 +547,67 @@ class TestMail(
             ],
         )
 
+        @dataclasses.dataclass(frozen=True)
+        class FilterTestCase:
+            name: str
+            include_pattern: Optional[str]
+            exclude_pattern: Optional[str]
+            expected_matches: list[str]
+
         tests = [
-            ("*.pdf", ["f1.pdf", "f2.pdf", "f3.pdf", "file.PDf", "f1.Pdf"]),
-            ("f1.pdf", ["f1.pdf", "f1.Pdf"]),
-            ("*", ["f1.pdf", "f2.pdf", "f3.pdf", "f2.png", "file.PDf", "f1.Pdf"]),
-            ("*.png", ["f2.png"]),
+            FilterTestCase(
+                "PDF Wildcard",
+                include_pattern="*.pdf",
+                exclude_pattern=None,
+                expected_matches=["f1.pdf", "f2.pdf", "f3.pdf", "file.PDf", "f1.Pdf"],
+            ),
+            FilterTestCase(
+                "F1 PDF Only",
+                include_pattern="f1.pdf",
+                exclude_pattern=None,
+                expected_matches=["f1.pdf", "f1.Pdf"],
+            ),
+            FilterTestCase(
+                "All Files",
+                include_pattern="*",
+                exclude_pattern=None,
+                expected_matches=[
+                    "f1.pdf",
+                    "f2.pdf",
+                    "f3.pdf",
+                    "f2.png",
+                    "file.PDf",
+                    "f1.Pdf",
+                ],
+            ),
+            FilterTestCase(
+                "PNG Only",
+                include_pattern="*.png",
+                exclude_pattern=None,
+                expected_matches=["f2.png"],
+            ),
+            FilterTestCase(
+                "PDF Files without f1",
+                include_pattern="*.pdf",
+                exclude_pattern="f1*",
+                expected_matches=["f2.pdf", "f3.pdf", "file.PDf"],
+            ),
+            FilterTestCase(
+                "All Files, no PNG",
+                include_pattern="*",
+                exclude_pattern="*.png",
+                expected_matches=[
+                    "f1.pdf",
+                    "f2.pdf",
+                    "f3.pdf",
+                    "file.PDf",
+                    "f1.Pdf",
+                ],
+            ),
         ]
 
-        for pattern, matches in tests:
-            with self.subTest(msg=pattern):
+        for test_case in tests:
+            with self.subTest(msg=test_case.name):
                 self._queue_consumption_tasks_mock.reset_mock()
                 account = MailAccount(name=str(uuid.uuid4()))
                 account.save()
@@ -553,14 +615,15 @@ class TestMail(
                     name=str(uuid.uuid4()),
                     assign_title_from=MailRule.TitleSource.FROM_FILENAME,
                     account=account,
-                    filter_attachment_filename=pattern,
+                    filter_attachment_filename_include=test_case.include_pattern,
+                    filter_attachment_filename_exclude=test_case.exclude_pattern,
                 )
                 rule.save()
 
                 self.mail_account_handler._handle_message(message, rule)
                 self.assert_queue_consumption_tasks_call_args(
                     [
-                        [{"override_filename": m} for m in matches],
+                        [{"override_filename": m} for m in test_case.expected_matches],
                     ],
                 )
 
@@ -593,7 +656,7 @@ class TestMail(
             name=str(uuid.uuid4()),
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
-            filter_attachment_filename="*.pdf",
+            filter_attachment_filename_include="*.pdf",
             attachment_type=MailRule.AttachmentProcessing.EVERYTHING,
             action=MailRule.MailAction.DELETE,
         )

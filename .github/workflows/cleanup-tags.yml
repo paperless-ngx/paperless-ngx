@@ -19,9 +19,13 @@ concurrency:
 
 jobs:
   cleanup-images:
-    name: Cleanup Image Tags for paperless-ngx
+    name: Cleanup Image Tags for ${{ matrix.primary-name }}
     if: github.repository_owner == 'paperless-ngx'
     runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        primary-name: ["paperless-ngx", "paperless-ngx/builder/cache/app"]
     env:
       # Requires a personal access token with the OAuth scope delete:packages
       TOKEN: ${{ secrets.GHA_CONTAINER_DELETE_TOKEN }}
@@ -29,12 +33,12 @@ jobs:
       -
         name: Clean temporary images
         if: "${{ env.TOKEN != '' }}"
-        uses: stumpylog/image-cleaner-action/ephemeral@v0.3.0
+        uses: stumpylog/image-cleaner-action/ephemeral@v0.4.0
         with:
           token: "${{ env.TOKEN }}"
           owner: "${{ github.repository_owner }}"
           is_org: "true"
-          package_name: "paperless-ngx"
+          package_name: "${{ matrix.primary-name }}"
           scheme: "branch"
           repo_name: "paperless-ngx"
           match_regex: "feature-"
@@ -49,18 +53,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - primary-name: "paperless-ngx"
-          - primary-name: "paperless-ngx/builder/cache/app"
-          # TODO: Remove the above and replace with the below
-          # - primary-name: "builder/qpdf"
-          # - primary-name: "builder/cache/qpdf"
-          # - primary-name: "builder/pikepdf"
-          # - primary-name: "builder/cache/pikepdf"
-          # - primary-name: "builder/jbig2enc"
-          # - primary-name: "builder/cache/jbig2enc"
-          # - primary-name: "builder/psycopg2"
-          # - primary-name: "builder/cache/psycopg2"
+        primary-name: ["paperless-ngx", "paperless-ngx/builder/cache/app"]
     env:
       # Requires a personal access token with the OAuth scope delete:packages
       TOKEN: ${{ secrets.GHA_CONTAINER_DELETE_TOKEN }}
@@ -68,7 +61,7 @@ jobs:
       -
         name: Clean untagged images
         if: "${{ env.TOKEN != '' }}"
-        uses: stumpylog/image-cleaner-action/untagged@v0.3.0
+        uses: stumpylog/image-cleaner-action/untagged@v0.4.0
         with:
           token: "${{ env.TOKEN }}"
           owner: "${{ github.repository_owner }}"

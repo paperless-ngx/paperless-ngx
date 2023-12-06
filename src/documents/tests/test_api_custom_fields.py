@@ -34,7 +34,9 @@ class TestCustomField(DirectoriesMixin, APITestCase):
             ("date", "Invoiced Date"),
             ("integer", "Invoice #"),
             ("boolean", "Is Active"),
-            ("float", "Total Paid"),
+            ("float", "Average Value"),
+            ("monetary", "Total Paid"),
+            ("documentlink", "Related Documents"),
         ]:
             resp = self.client.post(
                 self.ENDPOINT,
@@ -96,6 +98,10 @@ class TestCustomField(DirectoriesMixin, APITestCase):
             name="Test Custom Field Monetary",
             data_type=CustomField.FieldDataType.MONETARY,
         )
+        custom_field_documentlink = CustomField.objects.create(
+            name="Test Custom Field Doc Link",
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        )
 
         date_value = date.today()
 
@@ -131,6 +137,10 @@ class TestCustomField(DirectoriesMixin, APITestCase):
                         "field": custom_field_monetary.id,
                         "value": 11.10,
                     },
+                    {
+                        "field": custom_field_documentlink.id,
+                        "value": [1, 2, 3],
+                    },
                 ],
             },
             format="json",
@@ -150,11 +160,12 @@ class TestCustomField(DirectoriesMixin, APITestCase):
                 {"field": custom_field_url.id, "value": "https://example.com"},
                 {"field": custom_field_float.id, "value": 12.3456},
                 {"field": custom_field_monetary.id, "value": 11.10},
+                {"field": custom_field_documentlink.id, "value": [1, 2, 3]},
             ],
         )
 
         doc.refresh_from_db()
-        self.assertEqual(len(doc.custom_fields.all()), 7)
+        self.assertEqual(len(doc.custom_fields.all()), 8)
 
     def test_change_custom_field_instance_value(self):
         """

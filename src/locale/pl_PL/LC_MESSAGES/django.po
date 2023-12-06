@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-11-13 01:31\n"
+"POT-Creation-Date: 2023-12-05 08:26-0800\n"
+"PO-Revision-Date: 2023-12-05 16:27\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -53,7 +53,7 @@ msgstr "Dopasowanie rozmyte"
 msgid "Automatic"
 msgstr "Automatyczny"
 
-#: documents/models.py:62 documents/models.py:402 documents/models.py:752
+#: documents/models.py:62 documents/models.py:402 documents/models.py:895
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
 msgid "name"
 msgstr "nazwa"
@@ -159,7 +159,7 @@ msgid "The checksum of the archived document."
 msgstr "Suma kontrolna zarchiwizowanego dokumentu."
 
 #: documents/models.py:205 documents/models.py:385 documents/models.py:654
-#: documents/models.py:692 documents/models.py:895 documents/models.py:932
+#: documents/models.py:692 documents/models.py:762 documents/models.py:799
 msgid "created"
 msgstr "utworzono"
 
@@ -227,7 +227,7 @@ msgstr "informacja"
 msgid "warning"
 msgstr "ostrzeżenie"
 
-#: documents/models.py:371 paperless_mail/models.py:293
+#: documents/models.py:371 paperless_mail/models.py:305
 msgid "error"
 msgstr "błąd"
 
@@ -521,7 +521,7 @@ msgstr "użytkownik"
 
 #: documents/models.py:679
 msgid "note"
-msgstr ""
+msgstr "notatka"
 
 #: documents/models.py:680
 msgid "notes"
@@ -529,11 +529,11 @@ msgstr "notatki"
 
 #: documents/models.py:688
 msgid "Archive"
-msgstr ""
+msgstr "Archiwum"
 
 #: documents/models.py:689
 msgid "Original"
-msgstr ""
+msgstr "Oryginał"
 
 #: documents/models.py:700
 msgid "expiration"
@@ -551,140 +551,148 @@ msgstr ""
 msgid "share links"
 msgstr ""
 
-#: documents/models.py:748
-msgid "Consume Folder"
-msgstr ""
-
-#: documents/models.py:749
-msgid "Api Upload"
-msgstr ""
-
-#: documents/models.py:750
-msgid "Mail Fetch"
-msgstr ""
-
-#: documents/models.py:754 paperless_mail/models.py:95
-msgid "order"
-msgstr "kolejność"
-
-#: documents/models.py:763
-msgid "filter path"
-msgstr ""
-
-#: documents/models.py:768
-msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr ""
-
-#: documents/models.py:775
-msgid "filter filename"
-msgstr ""
-
-#: documents/models.py:780 paperless_mail/models.py:148
-msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr "Przetwarzaj tylko dokumenty, które całkowicie pasują do tej nazwy pliku, jeśli jest podana. Wzorce dopasowania jak *.pdf lub *faktura* są dozwolone. Wielkość liter nie jest rozróżniana."
-
-#: documents/models.py:791
-msgid "filter documents from this mail rule"
-msgstr ""
-
-#: documents/models.py:795
-msgid "assign title"
-msgstr ""
-
-#: documents/models.py:800
-msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr ""
-
-#: documents/models.py:808 paperless_mail/models.py:204
-msgid "assign this tag"
-msgstr "przypisz ten tag"
-
-#: documents/models.py:816 paperless_mail/models.py:212
-msgid "assign this document type"
-msgstr "przypisz ten typ dokumentu"
-
-#: documents/models.py:824 paperless_mail/models.py:226
-msgid "assign this correspondent"
-msgstr "przypisz tego korespondenta"
-
-#: documents/models.py:832
-msgid "assign this storage path"
-msgstr ""
-
-#: documents/models.py:841
-msgid "assign this owner"
-msgstr ""
-
-#: documents/models.py:848
-msgid "grant view permissions to these users"
-msgstr ""
-
-#: documents/models.py:855
-msgid "grant view permissions to these groups"
-msgstr ""
-
-#: documents/models.py:862
-msgid "grant change permissions to these users"
-msgstr ""
-
-#: documents/models.py:869
-msgid "grant change permissions to these groups"
-msgstr ""
-
-#: documents/models.py:873
-msgid "consumption template"
-msgstr ""
-
-#: documents/models.py:874
-msgid "consumption templates"
-msgstr ""
-
-#: documents/models.py:886
+#: documents/models.py:752
 msgid "String"
 msgstr ""
 
-#: documents/models.py:887
+#: documents/models.py:753
 msgid "URL"
 msgstr ""
 
-#: documents/models.py:888
+#: documents/models.py:754
 msgid "Date"
 msgstr ""
 
-#: documents/models.py:889
+#: documents/models.py:755
 msgid "Boolean"
 msgstr ""
 
-#: documents/models.py:890
+#: documents/models.py:756
 msgid "Integer"
-msgstr ""
+msgstr "Liczba całkowita"
 
-#: documents/models.py:891
+#: documents/models.py:757
 msgid "Float"
 msgstr ""
 
-#: documents/models.py:892
+#: documents/models.py:758
 msgid "Monetary"
 msgstr ""
 
-#: documents/models.py:904
-msgid "data type"
+#: documents/models.py:759
+msgid "Document Link"
 msgstr ""
 
-#: documents/models.py:912
+#: documents/models.py:771
+msgid "data type"
+msgstr "typ danych"
+
+#: documents/models.py:779
 msgid "custom field"
 msgstr ""
 
-#: documents/models.py:913
+#: documents/models.py:780
 msgid "custom fields"
 msgstr ""
 
-#: documents/models.py:973
+#: documents/models.py:842
 msgid "custom field instance"
 msgstr ""
 
-#: documents/models.py:974
+#: documents/models.py:843
 msgid "custom field instances"
+msgstr ""
+
+#: documents/models.py:891
+msgid "Consume Folder"
+msgstr ""
+
+#: documents/models.py:892
+msgid "Api Upload"
+msgstr ""
+
+#: documents/models.py:893
+msgid "Mail Fetch"
+msgstr ""
+
+#: documents/models.py:897 paperless_mail/models.py:95
+msgid "order"
+msgstr "kolejność"
+
+#: documents/models.py:906
+msgid "filter path"
+msgstr ""
+
+#: documents/models.py:911
+msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
+msgstr ""
+
+#: documents/models.py:918
+msgid "filter filename"
+msgstr ""
+
+#: documents/models.py:923 paperless_mail/models.py:148
+msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr "Przetwarzaj tylko dokumenty, które całkowicie pasują do tej nazwy pliku, jeśli jest podana. Wzorce dopasowania jak *.pdf lub *faktura* są dozwolone. Wielkość liter nie jest rozróżniana."
+
+#: documents/models.py:934
+msgid "filter documents from this mail rule"
+msgstr ""
+
+#: documents/models.py:938
+msgid "assign title"
+msgstr ""
+
+#: documents/models.py:943
+msgid "Assign a document title, can include some placeholders, see documentation."
+msgstr ""
+
+#: documents/models.py:951 paperless_mail/models.py:216
+msgid "assign this tag"
+msgstr "przypisz ten tag"
+
+#: documents/models.py:959 paperless_mail/models.py:224
+msgid "assign this document type"
+msgstr "przypisz ten typ dokumentu"
+
+#: documents/models.py:967 paperless_mail/models.py:238
+msgid "assign this correspondent"
+msgstr "przypisz tego korespondenta"
+
+#: documents/models.py:975
+msgid "assign this storage path"
+msgstr ""
+
+#: documents/models.py:984
+msgid "assign this owner"
+msgstr ""
+
+#: documents/models.py:991
+msgid "grant view permissions to these users"
+msgstr ""
+
+#: documents/models.py:998
+msgid "grant view permissions to these groups"
+msgstr ""
+
+#: documents/models.py:1005
+msgid "grant change permissions to these users"
+msgstr ""
+
+#: documents/models.py:1012
+msgid "grant change permissions to these groups"
+msgstr ""
+
+#: documents/models.py:1019
+msgid "assign these custom fields"
+msgstr ""
+
+#: documents/models.py:1023
+msgid "consumption template"
+msgstr ""
+
+#: documents/models.py:1024
+msgid "consumption templates"
 msgstr ""
 
 #: documents/serialisers.py:102
@@ -696,12 +704,12 @@ msgstr "Nieprawidłowe wyrażenie regularne: %(error)s"
 msgid "Invalid color."
 msgstr "Nieprawidłowy kolor."
 
-#: documents/serialisers.py:841
+#: documents/serialisers.py:842
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Typ pliku %(type)s nie jest obsługiwany"
 
-#: documents/serialisers.py:938
+#: documents/serialisers.py:939
 msgid "Invalid variable detected."
 msgstr "Wykryto nieprawidłową zmienną."
 
@@ -763,7 +771,7 @@ msgstr "Zaloguj się"
 
 #: documents/templates/registration/login.html:70
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Nie pamiętasz hasła?"
 
 #: documents/templates/registration/password_reset_complete.html:14
 msgid "Paperless-ngx reset password complete"
@@ -792,7 +800,7 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_confirm.html:49
 msgid "New Password"
-msgstr ""
+msgstr "Nowe hasło"
 
 #: documents/templates/registration/password_reset_confirm.html:50
 msgid "Confirm Password"
@@ -800,11 +808,11 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_confirm.html:61
 msgid "Change my password"
-msgstr ""
+msgstr "Zmień hasło"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
-msgstr ""
+msgstr "poproś o reset hasła"
 
 #: documents/templates/registration/password_reset_done.html:14
 msgid "Paperless-ngx reset password sent"
@@ -966,7 +974,7 @@ msgstr "Ukraiński"
 msgid "Chinese Simplified"
 msgstr "Chiński uproszczony"
 
-#: paperless/urls.py:186
+#: paperless/urls.py:194
 msgid "Paperless-ngx administration"
 msgstr "Administracja Paperless-ngx"
 
@@ -986,19 +994,19 @@ msgstr "Filtry"
 msgid "Paperless will only process mails that match ALL of the filters given below."
 msgstr "Paperless przetworzy tylko wiadomości pasujące do WSZYSTKICH filtrów podanych poniżej."
 
-#: paperless_mail/admin.py:79
+#: paperless_mail/admin.py:80
 msgid "Actions"
 msgstr "Akcje"
 
-#: paperless_mail/admin.py:82
+#: paperless_mail/admin.py:83
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
 msgstr "Akcja zastosowana do wiadomości. Ta akcja jest wykonywana tylko wtedy, gdy przetworzono treść lub załączniki wiadomości."
 
-#: paperless_mail/admin.py:90
+#: paperless_mail/admin.py:91
 msgid "Metadata"
 msgstr "Metadane"
 
-#: paperless_mail/admin.py:93
+#: paperless_mail/admin.py:94
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
 msgstr "Przypisz metadane do dokumentów zużywanych z tej reguły automatycznie. Jeśli nie przypisujesz tutaj tagów, typów lub korespondentów, Paperless będzie nadal przetwarzał wszystkie zdefiniowane przez Ciebie reguły."
 
@@ -1138,7 +1146,7 @@ msgstr "Użyj korespondenta wybranego poniżej"
 msgid "account"
 msgstr "konto"
 
-#: paperless_mail/models.py:105 paperless_mail/models.py:248
+#: paperless_mail/models.py:105 paperless_mail/models.py:260
 msgid "folder"
 msgstr "katalog"
 
@@ -1163,70 +1171,78 @@ msgid "filter body"
 msgstr "filtruj po treści"
 
 #: paperless_mail/models.py:143
-msgid "filter attachment filename"
-msgstr "filtruj po nazwie pliku załącznika"
+msgid "filter attachment filename inclusive"
+msgstr ""
 
 #: paperless_mail/models.py:155
+msgid "filter attachment filename exclusive"
+msgstr ""
+
+#: paperless_mail/models.py:160
+msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr ""
+
+#: paperless_mail/models.py:167
 msgid "maximum age"
 msgstr "nie starsze niż"
 
-#: paperless_mail/models.py:157
+#: paperless_mail/models.py:169
 msgid "Specified in days."
 msgstr "dni."
 
-#: paperless_mail/models.py:161
+#: paperless_mail/models.py:173
 msgid "attachment type"
 msgstr "typ załącznika"
 
-#: paperless_mail/models.py:165
+#: paperless_mail/models.py:177
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
 msgstr "Załączniki typu \"inline\" zawierają osadzone obrazy, więc najlepiej połączyć tę opcję z filtrem nazwy pliku."
 
-#: paperless_mail/models.py:171
+#: paperless_mail/models.py:183
 msgid "consumption scope"
 msgstr "zakres konsumpcji"
 
-#: paperless_mail/models.py:177
+#: paperless_mail/models.py:189
 msgid "action"
 msgstr "akcja"
 
-#: paperless_mail/models.py:183
+#: paperless_mail/models.py:195
 msgid "action parameter"
 msgstr "parametr akcji"
 
-#: paperless_mail/models.py:188
+#: paperless_mail/models.py:200
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
 msgstr "Dodatkowy parametr dla akcji wybranej powyżej, tj. docelowy folder akcji \"Przenieś do określonego folderu\". Podfoldery muszą być oddzielone kropkami."
 
-#: paperless_mail/models.py:196
+#: paperless_mail/models.py:208
 msgid "assign title from"
 msgstr "przypisz tytuł"
 
-#: paperless_mail/models.py:216
+#: paperless_mail/models.py:228
 msgid "assign correspondent from"
 msgstr "przypisz korespondenta z"
 
-#: paperless_mail/models.py:230
+#: paperless_mail/models.py:242
 msgid "Assign the rule owner to documents"
 msgstr ""
 
-#: paperless_mail/models.py:256
+#: paperless_mail/models.py:268
 msgid "uid"
 msgstr "uid"
 
-#: paperless_mail/models.py:264
+#: paperless_mail/models.py:276
 msgid "subject"
 msgstr "temat"
 
-#: paperless_mail/models.py:272
+#: paperless_mail/models.py:284
 msgid "received"
 msgstr "otrzymano"
 
-#: paperless_mail/models.py:279
+#: paperless_mail/models.py:291
 msgid "processed"
 msgstr "przetworzono"
 
-#: paperless_mail/models.py:285
+#: paperless_mail/models.py:297
 msgid "status"
 msgstr "status"
 

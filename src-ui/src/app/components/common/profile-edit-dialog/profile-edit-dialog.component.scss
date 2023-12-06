@@ -1,0 +1,9 @@
+::ng-deep {
+    .accordion-body .mb-3 {
+        margin: 0 !important; // hack-ish, for animation
+    }
+}
+
+.copied-badge {
+    right: 8em;
+}

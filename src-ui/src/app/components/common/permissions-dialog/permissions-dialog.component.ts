@@ -52,8 +52,17 @@ export class PermissionsDialogComponent {
   get permissions() {
     return {
       owner: this.form.get('permissions_form').value?.owner ?? null,
-      set_permissions:
-        this.form.get('permissions_form').value?.set_permissions ?? null,
+      set_permissions: this.form.get('permissions_form').value
+        ?.set_permissions ?? {
+        view: {
+          users: [],
+          groups: [],
+        },
+        change: {
+          users: [],
+          groups: [],
+        },
+      },
     }
   }
 

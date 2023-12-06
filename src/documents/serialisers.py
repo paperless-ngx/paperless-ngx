@@ -429,7 +429,7 @@ class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
 
 class CustomFieldInstanceSerializer(serializers.ModelSerializer):
     field = serializers.PrimaryKeyRelatedField(queryset=CustomField.objects.all())
-    value = ReadWriteSerializerMethodField()
+    value = ReadWriteSerializerMethodField(allow_null=True)
 
     def create(self, validated_data):
         type_to_data_store_name_map = {
@@ -440,6 +440,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
             CustomField.FieldDataType.INT: "value_int",
             CustomField.FieldDataType.FLOAT: "value_float",
             CustomField.FieldDataType.MONETARY: "value_monetary",
+            CustomField.FieldDataType.DOCUMENTLINK: "value_document_ids",
         }
         # An instance is attached to a document
         document: Document = validated_data["document"]
@@ -1166,15 +1167,37 @@ class ConsumptionTemplateSerializer(serializers.ModelSerializer):
             "assign_view_groups",
             "assign_change_users",
             "assign_change_groups",
+            "assign_custom_fields",
         ]
 
     def validate(self, attrs):
         if ("filter_mailrule") in attrs and attrs["filter_mailrule"] is not None:
             attrs["sources"] = {DocumentSource.MailFetch.value}
+
+        # Empty strings treated as None to avoid unexpected behavior
         if (
-            ("filter_mailrule" not in attrs)
-            and ("filter_filename" not in attrs or len(attrs["filter_filename"]) == 0)
-            and ("filter_path" not in attrs or len(attrs["filter_path"]) == 0)
+            "assign_title" in attrs
+            and attrs["assign_title"] is not None
+            and len(attrs["assign_title"]) == 0
+        ):
+            attrs["assign_title"] = None
+        if (
+            "filter_filename" in attrs
+            and attrs["filter_filename"] is not None
+            and len(attrs["filter_filename"]) == 0
+        ):
+            attrs["filter_filename"] = None
+        if (
+            "filter_path" in attrs
+            and attrs["filter_path"] is not None
+            and len(attrs["filter_path"]) == 0
+        ):
+            attrs["filter_path"] = None
+
+        if (
+            "filter_mailrule" not in attrs
+            and ("filter_filename" not in attrs or attrs["filter_filename"] is None)
+            and ("filter_path" not in attrs or attrs["filter_path"] is None)
         ):
             raise serializers.ValidationError(
                 "File name, path or mail rule filter are required",

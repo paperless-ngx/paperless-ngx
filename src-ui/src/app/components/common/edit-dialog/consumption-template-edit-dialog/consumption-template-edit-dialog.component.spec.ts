@@ -20,6 +20,7 @@ import { TagsComponent } from '../../input/tags/tags.component'
 import { TextComponent } from '../../input/text/text.component'
 import { EditDialogMode } from '../edit-dialog.component'
 import { ConsumptionTemplateEditDialogComponent } from './consumption-template-edit-dialog.component'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 
 describe('ConsumptionTemplateEditDialogComponent', () => {
   let component: ConsumptionTemplateEditDialogComponent
@@ -86,6 +87,15 @@ describe('ConsumptionTemplateEditDialogComponent', () => {
         },
         {
           provide: MailRuleService,
+          useValue: {
+            listAll: () =>
+              of({
+                results: [],
+              }),
+          },
+        },
+        {
+          provide: CustomFieldsService,
           useValue: {
             listAll: () =>
               of({
