@@ -112,6 +112,7 @@ describe('TasksComponent', () => {
   let modalService: NgbModal
   let router: Router
   let httpTestingController: HttpTestingController
+  let reloadSpy
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -141,11 +142,13 @@ describe('TasksComponent', () => {
     }).compileComponents()
 
     tasksService = TestBed.inject(TasksService)
+    reloadSpy = jest.spyOn(tasksService, 'reload')
     httpTestingController = TestBed.inject(HttpTestingController)
     modalService = TestBed.inject(NgbModal)
     router = TestBed.inject(Router)
     fixture = TestBed.createComponent(TasksComponent)
     component = fixture.componentInstance
+    jest.useFakeTimers()
     fixture.detectChanges()
     httpTestingController
       .expectOne(`${environment.apiBaseUrl}tasks/`)
@@ -164,7 +167,7 @@ describe('TasksComponent', () => {
       `Failed${currentTasksLength}`
     )
     expect(
-      fixture.debugElement.queryAll(By.css('input[type="checkbox"]'))
+      fixture.debugElement.queryAll(By.css('table input[type="checkbox"]'))
     ).toHaveLength(currentTasksLength + 1)
 
     currentTasksLength = tasks.filter(
@@ -245,7 +248,7 @@ describe('TasksComponent', () => {
 
   it('should support toggle all tasks', () => {
     const toggleCheck = fixture.debugElement.query(
-      By.css('input[type=checkbox]')
+      By.css('table input[type=checkbox]')
     )
     toggleCheck.nativeElement.dispatchEvent(new MouseEvent('click'))
     fixture.detectChanges()
@@ -268,5 +271,16 @@ describe('TasksComponent', () => {
       'documents',
       tasks[3].related_document,
     ])
+  })
+
+  it('should auto refresh, allow toggle', () => {
+    expect(reloadSpy).toHaveBeenCalledTimes(1)
+    jest.advanceTimersByTime(5000)
+    expect(reloadSpy).toHaveBeenCalledTimes(2)
+
+    component.toggleAutoRefresh()
+    expect(component.autoRefreshInterval).toBeNull()
+    jest.advanceTimersByTime(6000)
+    expect(reloadSpy).toHaveBeenCalledTimes(2)
   })
 })

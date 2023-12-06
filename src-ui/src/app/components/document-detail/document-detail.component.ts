@@ -21,7 +21,6 @@ import { DocumentService } from 'src/app/services/rest/document.service'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
 import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
-import { PDFDocumentProxy } from 'ng2-pdf-viewer'
 import { ToastService } from 'src/app/services/toast.service'
 import { TextComponent } from '../common/input/text/text.component'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -69,6 +68,7 @@ import {
 } from 'src/app/data/paperless-custom-field'
 import { PaperlessCustomFieldInstance } from 'src/app/data/paperless-custom-field-instance'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { PDFDocumentProxy } from '../common/pdf-viewer/typings'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -77,6 +77,18 @@ enum DocumentDetailNavIDs {
   Preview = 4,
   Notes = 5,
   Permissions = 6,
+}
+
+enum ZoomSetting {
+  PageFit = 'page-fit',
+  PageWidth = 'page-width',
+  Quarter = '.25',
+  Half = '.5',
+  ThreeQuarters = '.75',
+  One = '1',
+  OneAndHalf = '1.5',
+  Two = '2',
+  Three = '3',
 }
 
 @Component({
@@ -130,6 +142,8 @@ export class DocumentDetailComponent
 
   previewCurrentPage: number = 1
   previewNumPages: number = 1
+  previewZoomSetting: ZoomSetting = ZoomSetting.One
+  previewZoomScale: ZoomSetting = ZoomSetting.PageWidth
 
   store: BehaviorSubject<any>
   isDirty$: Observable<boolean>
@@ -742,6 +756,54 @@ export class DocumentDetailComponent
     if ('Enter' == event.key) {
       this.password = (event.target as HTMLInputElement).value
     }
+  }
+
+  onZoomSelect(event: Event) {
+    const setting = (event.target as HTMLSelectElement)?.value as ZoomSetting
+    if (ZoomSetting.PageFit === setting) {
+      this.previewZoomSetting = ZoomSetting.One
+      this.previewZoomScale = setting
+    } else {
+      this.previewZoomScale = ZoomSetting.PageWidth
+      this.previewZoomSetting = setting
+    }
+  }
+
+  get zoomSettings() {
+    return Object.values(ZoomSetting).filter(
+      (setting) => setting !== ZoomSetting.PageWidth
+    )
+  }
+
+  getZoomSettingTitle(setting: ZoomSetting): string {
+    switch (setting) {
+      case ZoomSetting.PageFit:
+        return $localize`Page Fit`
+      default:
+        return `${parseFloat(setting) * 100}%`
+    }
+  }
+
+  increaseZoom(): void {
+    let currentIndex = Object.values(ZoomSetting).indexOf(
+      this.previewZoomSetting
+    )
+    if (this.previewZoomScale === ZoomSetting.PageFit) currentIndex = 5
+    this.previewZoomScale = ZoomSetting.PageWidth
+    this.previewZoomSetting =
+      Object.values(ZoomSetting)[
+        Math.min(Object.values(ZoomSetting).length - 1, currentIndex + 1)
+      ]
+  }
+
+  decreaseZoom(): void {
+    let currentIndex = Object.values(ZoomSetting).indexOf(
+      this.previewZoomSetting
+    )
+    if (this.previewZoomScale === ZoomSetting.PageFit) currentIndex = 4
+    this.previewZoomScale = ZoomSetting.PageWidth
+    this.previewZoomSetting =
+      Object.values(ZoomSetting)[Math.max(2, currentIndex - 1)]
   }
 
   get showPermissions(): boolean {
