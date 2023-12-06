@@ -2,7 +2,8 @@ const base_url = new URL(document.baseURI)
 
 export const environment = {
   production: true,
-  apiBaseUrl: document.baseURI + 'api/',
+  baseUrl: base_url,
+  apiBaseUrl: `${base_url}api/`,
   apiVersion: '3',
   appTitle: 'Paperless-ngx',
   version: '2.1.0-dev',

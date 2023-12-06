@@ -80,10 +80,7 @@ export class ShareLinksDropdownComponent implements OnInit {
   }
 
   getShareUrl(link: PaperlessShareLink): string {
-    const apiURL = new URL(environment.apiBaseUrl)
-    return `${apiURL.origin}${apiURL.pathname.replace(/\/api\/$/, '/share/')}${
-      link.slug
-    }`
+    return `${environment.baseUrl}share/${link.slug}`
   }
 
   getDaysRemaining(link: PaperlessShareLink): string {

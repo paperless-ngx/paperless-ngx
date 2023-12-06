@@ -194,20 +194,19 @@ describe('ShareLinksDropdownComponent', () => {
   })
 
   it('should correctly generate share URLs', () => {
-    environment.apiBaseUrl = 'http://example.com/api/'
+    environment.baseUrl = 'http://example.com/'
     expect(component.getShareUrl({ slug: '123abc123' } as any)).toEqual(
       'http://example.com/share/123abc123'
     )
-    environment.apiBaseUrl = 'http://example.domainwithapiinit.com/api/'
+    environment.baseUrl = 'http://example.domainwithapiinit.com/'
     expect(component.getShareUrl({ slug: '123abc123' } as any)).toEqual(
       'http://example.domainwithapiinit.com/share/123abc123'
     )
-    environment.apiBaseUrl = 'http://example.domainwithapiinit.com:1234/api/'
+    environment.baseUrl = 'http://example.domainwithapiinit.com:1234/'
     expect(component.getShareUrl({ slug: '123abc123' } as any)).toEqual(
       'http://example.domainwithapiinit.com:1234/share/123abc123'
     )
-    environment.apiBaseUrl =
-      'http://example.domainwithapiinit.com:1234/subpath/api/'
+    environment.baseUrl = 'http://example.domainwithapiinit.com:1234/subpath/'
     expect(component.getShareUrl({ slug: '123abc123' } as any)).toEqual(
       'http://example.domainwithapiinit.com:1234/subpath/share/123abc123'
     )

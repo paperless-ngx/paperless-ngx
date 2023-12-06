@@ -33,6 +33,7 @@ import type {
   ZoomScale,
 } from './typings'
 import { PDFSinglePageViewer } from 'pdfjs-dist/web/pdf_viewer'
+import { environment } from 'src/environments/environment'
 
 PDFJS['verbosity'] = PDFJS.VerbosityLevel.ERRORS
 
@@ -231,7 +232,8 @@ export class PdfViewerComponent
     private element: ElementRef<HTMLElement>,
     private ngZone: NgZone
   ) {
-    PDFJS.GlobalWorkerOptions['workerSrc'] = '/assets/js/pdf.worker.min.js'
+    PDFJS.GlobalWorkerOptions['workerSrc'] =
+      `${environment.baseUrl}assets/js/pdf.worker.min.js`
   }
 
   ngAfterViewChecked(): void {
