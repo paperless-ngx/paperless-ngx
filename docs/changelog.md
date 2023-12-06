@@ -10,7 +10,6 @@
 - Enhancement: support automatically assigning custom fields via consumption templates [@shamoon](https://github.com/shamoon) ([#4727](https://github.com/paperless-ngx/paperless-ngx/pull/4727))
 - Feature: update user profile [@shamoon](https://github.com/shamoon) ([#4678](https://github.com/paperless-ngx/paperless-ngx/pull/4678))
 - Enhancement: Allow excluding mail attachments by name [@stumpylog](https://github.com/stumpylog) ([#4691](https://github.com/paperless-ngx/paperless-ngx/pull/4691))
-- Fix: only show global drag-drop when files included [@shamoon](https://github.com/shamoon) ([#4767](https://github.com/paperless-ngx/paperless-ngx/pull/4767))
 - Enhancement: auto-refresh logs \& tasks [@shamoon](https://github.com/shamoon) ([#4680](https://github.com/paperless-ngx/paperless-ngx/pull/4680))
 
 ### Bug Fixes
