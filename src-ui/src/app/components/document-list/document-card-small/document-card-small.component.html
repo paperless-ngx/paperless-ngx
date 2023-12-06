@@ -77,6 +77,12 @@
           </svg>
           <small>{{document.owner | username}}</small>
         </div>
+        <div *ngIf="document.is_shared" class="ps-0 p-1">
+          <svg class="metadata-icon me-2 text-muted" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#people-fill"/>
+          </svg>
+          <small i18n>Shared</small>
+        </div>
       </div>
       <div class="d-flex justify-content-between align-items-center">
         <div class="btn-group w-100">

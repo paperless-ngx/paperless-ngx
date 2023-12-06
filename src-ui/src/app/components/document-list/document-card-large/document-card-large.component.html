@@ -112,6 +112,12 @@
               </svg>
               <small>{{document.owner | username}}</small>
             </div>
+            <div *ngIf="document.is_shared" class="list-group-item bg-light text-dark p-1 border-0">
+              <svg class="metadata-icon me-2 text-muted" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#people-fill"/>
+              </svg>
+              <small i18n>Shared</small>
+            </div>
             <div *ngIf="document.__search_hit__?.score" class="list-group-item bg-light text-dark border-0 d-flex p-0 ps-4 search-score">
               <small class="text-muted" i18n>Score:</small>
               <ngb-progressbar [type]="searchScoreClass" [value]="document.__search_hit__.score" class="search-score-bar mx-2 mt-1" [max]="1"></ngb-progressbar>

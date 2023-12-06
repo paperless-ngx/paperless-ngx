@@ -8,6 +8,7 @@ from celery import states
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.core.validators import URLValidator
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
@@ -15,6 +16,8 @@ from django.utils.translation import gettext as _
 from drf_writable_nested.serializers import NestedUpdateMixin
 from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import get_users_with_perms
+from guardian.utils import get_group_obj_perms_model
+from guardian.utils import get_user_obj_perms_model
 from rest_framework import fields
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
@@ -160,6 +163,7 @@ class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
         try:
             if full_perms:
                 self.fields.pop("user_can_change")
+                self.fields.pop("is_shared")
             else:
                 self.fields.pop("permissions")
         except KeyError:
@@ -205,8 +209,26 @@ class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
             )
         )
 
+    def get_is_shared(self, obj: Document):
+        ctype = ContentType.objects.get_for_model(obj)
+        UserObjectPermission = get_user_obj_perms_model()
+        GroupObjectPermission = get_group_obj_perms_model()
+        return obj.owner == self.user and (
+            UserObjectPermission.objects.filter(
+                content_type=ctype,
+                object_pk=obj.pk,
+            ).count()
+            > 0
+            or GroupObjectPermission.objects.filter(
+                content_type=ctype,
+                object_pk=obj.pk,
+            ).count()
+            > 0
+        )
+
     permissions = SerializerMethodField(read_only=True)
     user_can_change = SerializerMethodField(read_only=True)
+    is_shared = SerializerMethodField(read_only=True)
 
     set_permissions = serializers.DictField(
         label="Set permissions",
@@ -556,6 +578,7 @@ class DocumentSerializer(
             "owner",
             "permissions",
             "user_can_change",
+            "is_shared",
             "set_permissions",
             "notes",
             "custom_fields",
