@@ -1345,6 +1345,10 @@ password. All of these options come from their similarly-named [Django settings]
 
 : Defaults to ''.
 
+#### [`PAPERLESS_EMAIL_FROM=<str>`](#PAPERLESS_EMAIL_FROM) {#PAPERLESS_EMAIL_FROM}
+
+: Defaults to PAPERLESS_EMAIL_HOST_USER if not set.
+
 #### [`PAPERLESS_EMAIL_HOST_PASSWORD=<str>`](#PAPERLESS_EMAIL_HOST_PASSWORD) {#PAPERLESS_EMAIL_HOST_PASSWORD}
 
 : Defaults to ''.
