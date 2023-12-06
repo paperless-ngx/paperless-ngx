@@ -65,7 +65,7 @@
               "src/assets",
               "src/manifest.webmanifest",
               {
-                "glob": "pdf.worker.min.js",
+                "glob": "{pdf.worker.min.js,pdf.min.js}",
                 "input": "node_modules/pdfjs-dist/build/",
                 "output": "/assets/js/"
               }
@@ -75,7 +75,8 @@
             ],
             "scripts": [],
             "allowedCommonJsDependencies": [
-              "ng2-pdf-viewer"
+              "pdfjs-dist",
+              "pdfjs-dist/web/pdf_viewer"
             ],
             "vendorChunk": true,
             "extractLicenses": false,
@@ -109,7 +110,7 @@
                 {
                   "type": "anyComponentStyle",
                   "maximumWarning": "6kb",
-                  "maximumError": "10kb"
+                  "maximumError": "30kb"
                 }
               ]
             },

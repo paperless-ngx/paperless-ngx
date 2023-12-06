@@ -24,13 +24,13 @@ describe('LogoComponent', () => {
   })
 
   it('should support setting height', () => {
-    expect(fixture.debugElement.query(By.css('svg')).attributes.height).toEqual(
-      '6em'
+    expect(fixture.debugElement.query(By.css('svg')).attributes.style).toEqual(
+      'height:6em'
     )
     component.height = '10em'
     fixture.detectChanges()
-    expect(fixture.debugElement.query(By.css('svg')).attributes.height).toEqual(
-      '10em'
+    expect(fixture.debugElement.query(By.css('svg')).attributes.style).toEqual(
+      'height:10em'
     )
   })
 })

@@ -1,7 +1,8 @@
 {
   "root": true,
   "ignorePatterns": [
-    "projects/**/*"
+    "projects/**/*",
+    "/src/app/components/common/pdf-viewer/**"
   ],
   "overrides": [
     {

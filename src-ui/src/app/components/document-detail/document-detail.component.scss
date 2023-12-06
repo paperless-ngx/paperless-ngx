@@ -7,19 +7,14 @@
 .pdf-viewer-container {
   background-color: gray;
 
-  pdf-viewer {
+  pngx-pdf-viewer {
     width: 100%;
     height: 100%;
   }
 }
 
-::ng-deep .ng2-pdf-viewer-container .page {
-  --page-margin: 1px 0 10px;
-  width: 100% !important;
-}
-
-::ng-deep .ng2-pdf-viewer-container .page:last-child {
-  --page-margin: 1px 0 20px;
+::ng-deep .pngx-pdf-viewer-container .page {
+  --page-margin: 10px auto;
 }
 
 ::ng-deep .ng-select-taggable {
@@ -40,4 +35,12 @@
 
 textarea.rtl {
   direction: rtl;
+}
+
+.form-select {
+  padding-right: 2.5em;
+}
+
+.input-group .btn-outline-secondary {
+  border-color: var(--bs-border-color);
 }

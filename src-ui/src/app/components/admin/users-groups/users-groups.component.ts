@@ -89,7 +89,7 @@ export class UsersAndGroupsComponent
             $localize`Password has been changed, you will be logged out momentarily.`
           )
           setTimeout(() => {
-            window.location.href = `${window.location.origin}/accounts/logout/?next=/accounts/login/`
+            window.location.href = `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
           }, 2500)
         } else {
           this.toastService.showInfo(

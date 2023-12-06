@@ -1,5 +1,5 @@
 <pngx-page-header title="File Tasks" i18n-title>
-  <div class="btn-toolbar col col-md-auto">
+  <div class="btn-toolbar col col-md-auto align-items-center">
     <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()" [hidden]="selectedTasks.size === 0">
       <svg class="sidebaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#x"/>
@@ -10,15 +10,10 @@
         <use xlink:href="assets/bootstrap-icons.svg#check2-all"/>
       </svg>&nbsp;<ng-container i18n>{{dismissButtonText}}</ng-container>
     </button>
-    <button class="btn btn-sm btn-outline-primary" (click)="tasksService.reload()">
-      <svg *ngIf="!tasksService.loading" class="sidebaricon" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#arrow-clockwise"/>
-      </svg>
-      <ng-container *ngIf="tasksService.loading">
-        <div class="spinner-border spinner-border-sm fw-normal" role="status"></div>
-        <div class="visually-hidden" i18n>Loading...</div>
-      </ng-container>&nbsp;<ng-container i18n>Refresh</ng-container>
-    </button>
+    <div class="form-check form-switch mb-0" (click)="toggleAutoRefresh()">
+      <input class="form-check-input" type="checkbox" role="switch" id="autoRefreshSwitch" [attr.checked]="autoRefreshInterval">
+      <label class="form-check-label" for="autoRefreshSwitch" i18n>Auto refresh</label>
+    </div>
   </div>
 </pngx-page-header>
 

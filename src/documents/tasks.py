@@ -179,6 +179,7 @@ def consume_file(
         override_view_groups=overrides.view_groups,
         override_change_users=overrides.change_users,
         override_change_groups=overrides.change_groups,
+        override_custom_field_ids=overrides.custom_field_ids,
         task_id=self.request.id,
     )
 
