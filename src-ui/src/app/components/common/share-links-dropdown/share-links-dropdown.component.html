@@ -38,7 +38,7 @@
         <li class="list-group-item pt-3 pb-2">
           <div class="input-group input-group-sm w-100">
             <div class="form-check form-switch ms-auto">
-              <input class="form-check-input" type="checkbox" role="switch" id="versionSwitch" [(ngModel)]="archiveVersion">
+              <input class="form-check-input" type="checkbox" role="switch" id="versionSwitch" [disabled]="!hasArchiveVersion" [(ngModel)]="useArchiveVersion">
               <label class="form-check-label small" for="versionSwitch" i18n>Share archive version</label>
             </div>
           </div>

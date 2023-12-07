@@ -50,6 +50,8 @@ export interface PaperlessDocument extends ObjectWithPermissions {
 
   original_file_name?: string
 
+  archived_file_name?: string
+
   download_url?: string
 
   thumbnail_url?: string
