@@ -769,43 +769,52 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertEqual(params["sidecar"], "sidecar.txt")
 
         with override_settings(OCR_CLEAN="none"):
+            parser = RasterisedDocumentParser(None)
             params = parser.construct_ocrmypdf_parameters("", "", "", "")
             self.assertNotIn("clean", params)
             self.assertNotIn("clean_final", params)
 
         with override_settings(OCR_CLEAN="clean"):
+            parser = RasterisedDocumentParser(None)
             params = parser.construct_ocrmypdf_parameters("", "", "", "")
             self.assertTrue(params["clean"])
             self.assertNotIn("clean_final", params)
 
         with override_settings(OCR_CLEAN="clean-final", OCR_MODE="skip"):
+            parser = RasterisedDocumentParser(None)
             params = parser.construct_ocrmypdf_parameters("", "", "", "")
             self.assertTrue(params["clean_final"])
             self.assertNotIn("clean", params)
 
         with override_settings(OCR_CLEAN="clean-final", OCR_MODE="redo"):
+            parser = RasterisedDocumentParser(None)
             params = parser.construct_ocrmypdf_parameters("", "", "", "")
             self.assertTrue(params["clean"])
             self.assertNotIn("clean_final", params)
 
         with override_settings(OCR_DESKEW=True, OCR_MODE="skip"):
+            parser = RasterisedDocumentParser(None)
             params = parser.construct_ocrmypdf_parameters("", "", "", "")
             self.assertTrue(params["deskew"])
 
         with override_settings(OCR_DESKEW=True, OCR_MODE="redo"):
+            parser = RasterisedDocumentParser(None)
             params = parser.construct_ocrmypdf_parameters("", "", "", "")
             self.assertNotIn("deskew", params)
 
         with override_settings(OCR_DESKEW=False, OCR_MODE="skip"):
+            parser = RasterisedDocumentParser(None)
             params = parser.construct_ocrmypdf_parameters("", "", "", "")
             self.assertNotIn("deskew", params)
 
         with override_settings(OCR_MAX_IMAGE_PIXELS=1_000_001.0):
+            parser = RasterisedDocumentParser(None)
             params = parser.construct_ocrmypdf_parameters("", "", "", "")
             self.assertIn("max_image_mpixels", params)
             self.assertAlmostEqual(params["max_image_mpixels"], 1, places=4)
 
         with override_settings(OCR_MAX_IMAGE_PIXELS=-1_000_001.0):
+            parser = RasterisedDocumentParser(None)
             params = parser.construct_ocrmypdf_parameters("", "", "", "")
             self.assertNotIn("max_image_mpixels", params)
 
