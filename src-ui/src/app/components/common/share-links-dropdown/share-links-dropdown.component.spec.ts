@@ -89,7 +89,7 @@ describe('ShareLinksDropdownComponent', () => {
       .mockReturnValueOnce(throwError(() => new Error('Unable to get links')))
     component.documentId = 99
 
-    component.refresh()
+    component.ngOnInit()
     fixture.detectChanges()
     expect(toastSpy).toHaveBeenCalled()
   })
@@ -104,6 +104,7 @@ describe('ShareLinksDropdownComponent', () => {
     expiration.setDate(expiration.getDate() + 7)
 
     const copySpy = jest.spyOn(clipboard, 'copy')
+    copySpy.mockReturnValue(true)
     const refreshSpy = jest.spyOn(component, 'refresh')
 
     component.createLink()
@@ -118,8 +119,10 @@ describe('ShareLinksDropdownComponent', () => {
     fixture.detectChanges()
     tick(3000)
 
-    expect(copySpy).toHaveBeenCalled()
     expect(refreshSpy).toHaveBeenCalled()
+    expect(copySpy).toHaveBeenCalled()
+    expect(component.copied).toEqual(1)
+    tick(100) // copy timeout
   }))
 
   it('should show error on link creation if needed', () => {

@@ -98,11 +98,13 @@ export class ShareLinksDropdownComponent implements OnInit {
   }
 
   copy(link: PaperlessShareLink) {
-    this.clipboard.copy(this.getShareUrl(link))
-    this.copied = link.id
-    setTimeout(() => {
-      this.copied = null
-    }, 3000)
+    const success = this.clipboard.copy(this.getShareUrl(link))
+    if (success) {
+      this.copied = link.id
+      setTimeout(() => {
+        this.copied = null
+      }, 3000)
+    }
   }
 
   canShare(link: PaperlessShareLink): boolean {
@@ -144,7 +146,9 @@ export class ShareLinksDropdownComponent implements OnInit {
       .subscribe({
         next: (result) => {
           this.loading = false
-          this.copy(result)
+          setTimeout(() => {
+            this.copy(result)
+          }, 10)
           this.refresh()
         },
         error: (e) => {
