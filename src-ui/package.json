@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "@angular-builders/jest": "16.0.1",
-    "@angular-devkit/build-angular": "~16.2.9",
+    "@angular-devkit/build-angular": "~17.0.6",
     "@angular-eslint/builder": "16.2.0",
     "@angular-eslint/eslint-plugin": "16.2.0",
     "@angular-eslint/eslint-plugin-template": "16.2.0",
