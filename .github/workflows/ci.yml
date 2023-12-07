@@ -45,7 +45,7 @@ jobs:
         uses: pre-commit/action@v3.0.0
 
   documentation:
-    name: "Build Documentation"
+    name: "Build & Deploy Documentation"
     runs-on: ubuntu-22.04
     needs:
       - pre-commit
@@ -78,32 +78,20 @@ jobs:
         run: |
           pipenv --python ${{ steps.setup-python.outputs.python-version }} run mkdocs build --config-file ./mkdocs.yml
       -
+        name: Deploy documentation
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          echo "docs.paperless-ngx.com" > "${{ github.workspace }}/docs/CNAME"
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} run mkdocs gh-deploy --force --no-history
+      -
         name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: documentation
           path: site/
           retention-days: 7
-
-  documentation-deploy:
-    name: "Deploy Documentation"
-    runs-on: ubuntu-22.04
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs:
-      - documentation
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v4
-      -
-        name: Deploy docs
-        uses: mhausenblas/mkdocs-deploy-gh-pages@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CUSTOM_DOMAIN: docs.paperless-ngx.com
-          CONFIG_FILE: mkdocs.yml
-          EXTRA_PACKAGES: build-base
-          REQUIREMENTS: docs/requirements.txt
 
   tests-backend:
     name: "Backend Tests (Python ${{ matrix.python-version }})"
@@ -121,8 +109,8 @@ jobs:
       -
         name: Start containers
         run: |
-          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml pull --quiet
-          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml up --detach
+          docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml pull --quiet
+          docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml up --detach
       -
         name: Set up Python
         id: setup-python
@@ -177,8 +165,8 @@ jobs:
         name: Stop containers
         if: always()
         run: |
-          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml logs
-          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml down
+          docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml logs
+          docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml down
 
   install-frontend-depedendencies:
     name: "Install Frontend Dependendencies"
@@ -438,6 +426,7 @@ jobs:
     name: "Build Release"
     needs:
       - build-docker-image
+      - documentation
     runs-on: ubuntu-22.04
     steps:
       -
