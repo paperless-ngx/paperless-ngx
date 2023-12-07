@@ -231,7 +231,7 @@ export class PdfViewerComponent
     private element: ElementRef<HTMLElement>,
     private ngZone: NgZone
   ) {
-    PDFJS.GlobalWorkerOptions['workerSrc'] = '/assets/js/pdf.worker.min.js'
+    PDFJS.GlobalWorkerOptions['workerSrc'] = 'assets/js/pdf.worker.min.js'
   }
 
   ngAfterViewChecked(): void {

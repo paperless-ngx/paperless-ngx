@@ -33,8 +33,6 @@ export class AppComponent implements OnInit, OnDestroy {
     private renderer: Renderer2,
     private permissionsService: PermissionsService
   ) {
-    let anyWindow = window as any
-    anyWindow.pdfWorkerSrc = 'assets/js/pdf.worker.min.js'
     this.settings.updateAppearanceSettings()
   }
 
