@@ -38,6 +38,9 @@ export class ShareLinksDropdownComponent implements OnInit {
   @Input()
   disabled: boolean = false
 
+  @Input()
+  hasArchiveVersion: boolean = true
+
   shareLinks: PaperlessShareLink[]
 
   loading: boolean = false
@@ -46,7 +49,7 @@ export class ShareLinksDropdownComponent implements OnInit {
 
   expirationDays: number = 7
 
-  archiveVersion: boolean = true
+  useArchiveVersion: boolean = true
 
   constructor(
     private shareLinkService: ShareLinkService,
@@ -56,6 +59,7 @@ export class ShareLinksDropdownComponent implements OnInit {
 
   ngOnInit(): void {
     if (this._documentId !== undefined) this.refresh()
+    this.useArchiveVersion = this.hasArchiveVersion
   }
 
   refresh() {
@@ -132,7 +136,7 @@ export class ShareLinksDropdownComponent implements OnInit {
     this.shareLinkService
       .createLinkForDocument(
         this._documentId,
-        this.archiveVersion
+        this.useArchiveVersion
           ? PaperlessFileVersion.Archive
           : PaperlessFileVersion.Original,
         expiration
