@@ -63,7 +63,7 @@
         </a>
       </ng-container>
       <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }">
-        <a *ngIf="statistics?.storage_path_count > 0" class="list-group-item d-flex justify-content-between align-items-center" routerLink="/documenttypes/">
+        <a *ngIf="statistics?.storage_path_count > 0" class="list-group-item d-flex justify-content-between align-items-center" routerLink="/storagepaths/">
           <ng-container i18n>Storage Paths</ng-container>:
           <span class="badge bg-secondary text-light rounded-pill">{{statistics?.storage_path_count | number}}</span>
         </a>
