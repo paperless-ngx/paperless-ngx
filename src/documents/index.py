@@ -145,10 +145,10 @@ def update_document(writer: AsyncWriter, doc: Document):
         type=doc.document_type.name if doc.document_type else None,
         type_id=doc.document_type.id if doc.document_type else None,
         has_type=doc.document_type is not None,
-        created=doc.created,
-        added=doc.added,
+        created=timezone.localtime(doc.created),
+        added=timezone.localtime(doc.added),
         asn=asn,
-        modified=doc.modified,
+        modified=timezone.localtime(doc.modified),
         path=doc.storage_path.name if doc.storage_path else None,
         path_id=doc.storage_path.id if doc.storage_path else None,
         has_path=doc.storage_path is not None,
@@ -371,7 +371,7 @@ class DelayedFullTextQuery(DelayedQuery):
             ],
             self.searcher.ixreader.schema,
         )
-        qp.add_plugin(DateParserPlugin(basedate=timezone.now()))
+        qp.add_plugin(DateParserPlugin(basedate=timezone.localtime()))
         q = qp.parse(q_str)
 
         corrected = self.searcher.correct_query(q, q_str)
