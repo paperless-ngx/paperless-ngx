@@ -1,5 +1,35 @@
 # Changelog
 
+## paperless-ngx 2.1.1
+
+### Features
+
+- Fix: respect baseURI for pdfjs worker URL [@shamoon](https://github.com/shamoon) ([#4865](https://github.com/paperless-ngx/paperless-ngx/pull/4865))
+
+### Bug Fixes
+
+- Fix: disable toggle for share link creation without archive version, fix auto-copy in Safari [@shamoon](https://github.com/shamoon) ([#4885](https://github.com/paperless-ngx/paperless-ngx/pull/4885))
+- Fix: storage paths link incorrect in dashboard widget [@shamoon](https://github.com/shamoon) ([#4878](https://github.com/paperless-ngx/paperless-ngx/pull/4878))
+- Fix: respect baseURI for pdfjs worker URL [@shamoon](https://github.com/shamoon) ([#4865](https://github.com/paperless-ngx/paperless-ngx/pull/4865))
+- Fix: Allow users to configure the From email for password reset [@stumpylog](https://github.com/stumpylog) ([#4867](https://github.com/paperless-ngx/paperless-ngx/pull/4867))
+- Fix: dont show move icon for file tasks badge [@shamoon](https://github.com/shamoon) ([#4860](https://github.com/paperless-ngx/paperless-ngx/pull/4860))
+
+### Maintenance
+
+- Chore: Simplifies how the documentation site is deployed [@stumpylog](https://github.com/stumpylog) ([#4858](https://github.com/paperless-ngx/paperless-ngx/pull/4858))
+
+### All App Changes
+
+<details>
+<summary>5 changes</summary>
+
+- Fix: disable toggle for share link creation without archive version, fix auto-copy in Safari [@shamoon](https://github.com/shamoon) ([#4885](https://github.com/paperless-ngx/paperless-ngx/pull/4885))
+- Fix: storage paths link incorrect in dashboard widget [@shamoon](https://github.com/shamoon) ([#4878](https://github.com/paperless-ngx/paperless-ngx/pull/4878))
+- Fix: respect baseURI for pdfjs worker URL [@shamoon](https://github.com/shamoon) ([#4865](https://github.com/paperless-ngx/paperless-ngx/pull/4865))
+- Fix: Allow users to configure the From email for password reset [@stumpylog](https://github.com/stumpylog) ([#4867](https://github.com/paperless-ngx/paperless-ngx/pull/4867))
+- Fix: dont show move icon for file tasks badge [@shamoon](https://github.com/shamoon) ([#4860](https://github.com/paperless-ngx/paperless-ngx/pull/4860))
+</details>
+
 ## paperless-ngx 2.1.0
 
 ### Features
