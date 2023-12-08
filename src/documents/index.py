@@ -25,9 +25,11 @@ from whoosh.index import open_dir
 from whoosh.qparser import MultifieldParser
 from whoosh.qparser import QueryParser
 from whoosh.qparser.dateparse import DateParserPlugin
+from whoosh.qparser.dateparse import English
 from whoosh.scoring import TF_IDF
 from whoosh.searching import ResultsPage
 from whoosh.searching import Searcher
+from whoosh.util.times import timespan
 from whoosh.writing import AsyncWriter
 
 # from documents.models import CustomMetadata
@@ -145,10 +147,10 @@ def update_document(writer: AsyncWriter, doc: Document):
         type=doc.document_type.name if doc.document_type else None,
         type_id=doc.document_type.id if doc.document_type else None,
         has_type=doc.document_type is not None,
-        created=timezone.localtime(doc.created),
-        added=timezone.localtime(doc.added),
+        created=doc.created,
+        added=doc.added,
         asn=asn,
-        modified=timezone.localtime(doc.modified),
+        modified=doc.modified,
         path=doc.storage_path.name if doc.storage_path else None,
         path_id=doc.storage_path.id if doc.storage_path else None,
         has_path=doc.storage_path is not None,
@@ -356,6 +358,22 @@ class DelayedQuery:
         return page
 
 
+class LocalDateParser(English):
+    def reverse_timezone_offset(self, d):
+        return (d.replace(tzinfo=timezone.get_current_timezone())).astimezone(
+            timezone.utc,
+        )
+
+    def date_from(self, *args, **kwargs):
+        d = super().date_from(*args, **kwargs)
+        if isinstance(d, timespan):
+            d.start = self.reverse_timezone_offset(d.start)
+            d.end = self.reverse_timezone_offset(d.end)
+        else:
+            d = self.reverse_timezone_offset(d)
+        return d
+
+
 class DelayedFullTextQuery(DelayedQuery):
     def _get_query(self):
         q_str = self.query_params["query"]
@@ -371,7 +389,12 @@ class DelayedFullTextQuery(DelayedQuery):
             ],
             self.searcher.ixreader.schema,
         )
-        qp.add_plugin(DateParserPlugin(basedate=timezone.localtime()))
+        qp.add_plugin(
+            DateParserPlugin(
+                basedate=timezone.now(),
+                dateparser=LocalDateParser(),
+            ),
+        )
         q = qp.parse(q_str)
 
         corrected = self.searcher.correct_query(q, q_str)
