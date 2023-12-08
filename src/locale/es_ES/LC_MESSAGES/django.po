@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-05 08:26-0800\n"
-"PO-Revision-Date: 2023-12-05 16:27\n"
+"PO-Revision-Date: 2023-12-07 00:23\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -553,47 +553,47 @@ msgstr "compartir enlaces"
 
 #: documents/models.py:752
 msgid "String"
-msgstr ""
+msgstr "Cadena de texto"
 
 #: documents/models.py:753
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: documents/models.py:754
 msgid "Date"
-msgstr ""
+msgstr "Fecha"
 
 #: documents/models.py:755
 msgid "Boolean"
-msgstr ""
+msgstr "Booleano"
 
 #: documents/models.py:756
 msgid "Integer"
-msgstr ""
+msgstr "Número entero"
 
 #: documents/models.py:757
 msgid "Float"
-msgstr ""
+msgstr "Número flotante"
 
 #: documents/models.py:758
 msgid "Monetary"
-msgstr ""
+msgstr "Monetario"
 
 #: documents/models.py:759
 msgid "Document Link"
-msgstr ""
+msgstr "Enlace al documento"
 
 #: documents/models.py:771
 msgid "data type"
-msgstr ""
+msgstr "tipo de dato"
 
 #: documents/models.py:779
 msgid "custom field"
-msgstr ""
+msgstr "campo personalizado"
 
 #: documents/models.py:780
 msgid "custom fields"
-msgstr ""
+msgstr "campos personalizados"
 
 #: documents/models.py:842
 msgid "custom field instance"
@@ -689,7 +689,7 @@ msgstr ""
 
 #: documents/models.py:1023
 msgid "consumption template"
-msgstr ""
+msgstr "plantilla de consumo"
 
 #: documents/models.py:1024
 msgid "consumption templates"
@@ -820,7 +820,7 @@ msgstr "Contraseña de restablecimiento de Paperless-ngx enviada"
 
 #: documents/templates/registration/password_reset_done.html:40
 msgid "Check your inbox."
-msgstr ""
+msgstr "Revise su bandeja de entrada."
 
 #: documents/templates/registration/password_reset_done.html:41
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
@@ -860,7 +860,7 @@ msgstr "Árabe"
 
 #: paperless/settings.py:588
 msgid "Afrikaans"
-msgstr ""
+msgstr "Africano"
 
 #: paperless/settings.py:589
 msgid "Belarusian"
@@ -868,7 +868,7 @@ msgstr "Bielorruso"
 
 #: paperless/settings.py:590
 msgid "Bulgarian"
-msgstr ""
+msgstr "Búlgaro"
 
 #: paperless/settings.py:591
 msgid "Catalan"
@@ -888,7 +888,7 @@ msgstr "Alemán"
 
 #: paperless/settings.py:595
 msgid "Greek"
-msgstr ""
+msgstr "Griego"
 
 #: paperless/settings.py:596
 msgid "English (GB)"
@@ -908,7 +908,7 @@ msgstr "Francés"
 
 #: paperless/settings.py:600
 msgid "Hungarian"
-msgstr ""
+msgstr "Húngaro"
 
 #: paperless/settings.py:601
 msgid "Italian"
@@ -920,7 +920,7 @@ msgstr "Luxemburgués"
 
 #: paperless/settings.py:603
 msgid "Norwegian"
-msgstr ""
+msgstr "Noruego"
 
 #: paperless/settings.py:604
 msgid "Dutch"
@@ -948,7 +948,7 @@ msgstr "Ruso"
 
 #: paperless/settings.py:610
 msgid "Slovak"
-msgstr ""
+msgstr "Eslovaco"
 
 #: paperless/settings.py:611
 msgid "Slovenian"
@@ -968,7 +968,7 @@ msgstr "Turco"
 
 #: paperless/settings.py:615
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ucraniano"
 
 #: paperless/settings.py:616
 msgid "Chinese Simplified"

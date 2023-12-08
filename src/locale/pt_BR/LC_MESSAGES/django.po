@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-05 08:26-0800\n"
-"PO-Revision-Date: 2023-12-05 16:27\n"
+"PO-Revision-Date: 2023-12-06 12:09\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -409,19 +409,19 @@ msgstr ""
 
 #: documents/models.py:454
 msgid "owner is"
-msgstr ""
+msgstr "o proprietário é"
 
 #: documents/models.py:455
 msgid "has owner in"
-msgstr ""
+msgstr "tem proprietário em"
 
 #: documents/models.py:456
 msgid "does not have owner"
-msgstr ""
+msgstr "não tem proprietário"
 
 #: documents/models.py:457
 msgid "does not have owner in"
-msgstr ""
+msgstr "não tem proprietário em"
 
 #: documents/models.py:467
 msgid "rule type"
@@ -545,11 +545,11 @@ msgstr ""
 
 #: documents/models.py:739
 msgid "share link"
-msgstr ""
+msgstr "compartilhar link"
 
 #: documents/models.py:740
 msgid "share links"
-msgstr ""
+msgstr "compartilhar link"
 
 #: documents/models.py:752
 msgid "String"
@@ -565,11 +565,11 @@ msgstr ""
 
 #: documents/models.py:755
 msgid "Boolean"
-msgstr ""
+msgstr "Booleano"
 
 #: documents/models.py:756
 msgid "Integer"
-msgstr ""
+msgstr "Número inteiro"
 
 #: documents/models.py:757
 msgid "Float"
@@ -577,7 +577,7 @@ msgstr ""
 
 #: documents/models.py:758
 msgid "Monetary"
-msgstr ""
+msgstr "Unidade monetária"
 
 #: documents/models.py:759
 msgid "Document Link"
@@ -593,7 +593,7 @@ msgstr ""
 
 #: documents/models.py:780
 msgid "custom fields"
-msgstr ""
+msgstr "campos personalizados"
 
 #: documents/models.py:842
 msgid "custom field instance"
@@ -605,15 +605,15 @@ msgstr ""
 
 #: documents/models.py:891
 msgid "Consume Folder"
-msgstr ""
+msgstr "Pasta de Consumo"
 
 #: documents/models.py:892
 msgid "Api Upload"
-msgstr ""
+msgstr "Envio por API"
 
 #: documents/models.py:893
 msgid "Mail Fetch"
-msgstr ""
+msgstr "Busca em e-mail"
 
 #: documents/models.py:897 paperless_mail/models.py:95
 msgid "order"
@@ -621,7 +621,7 @@ msgstr "ordem"
 
 #: documents/models.py:906
 msgid "filter path"
-msgstr ""
+msgstr "filtro de caminho"
 
 #: documents/models.py:911
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
@@ -642,11 +642,11 @@ msgstr ""
 
 #: documents/models.py:938
 msgid "assign title"
-msgstr ""
+msgstr "atribuir título"
 
 #: documents/models.py:943
 msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr ""
+msgstr "Atribuir um título de documento, pode incluir alguns espaços reservados, consulta a documentação."
 
 #: documents/models.py:951 paperless_mail/models.py:216
 msgid "assign this tag"
@@ -662,11 +662,11 @@ msgstr "atribuir este correspondente"
 
 #: documents/models.py:975
 msgid "assign this storage path"
-msgstr ""
+msgstr "atribuir este caminho de armazenamento"
 
 #: documents/models.py:984
 msgid "assign this owner"
-msgstr ""
+msgstr "atribuir este proprietário"
 
 #: documents/models.py:991
 msgid "grant view permissions to these users"
@@ -686,15 +686,15 @@ msgstr ""
 
 #: documents/models.py:1019
 msgid "assign these custom fields"
-msgstr ""
+msgstr "atribuir estes campos personalizados"
 
 #: documents/models.py:1023
 msgid "consumption template"
-msgstr ""
+msgstr "modelo de consumo"
 
 #: documents/models.py:1024
 msgid "consumption templates"
-msgstr ""
+msgstr "modelos de consumo"
 
 #: documents/serialisers.py:102
 #, python-format
@@ -752,11 +752,11 @@ msgstr "Seu usuário e senha estão incorretos. Por favor, tente novamente."
 
 #: documents/templates/registration/login.html:48
 msgid "Share link was not found."
-msgstr ""
+msgstr "Link de compartilhamento não encontrado."
 
 #: documents/templates/registration/login.html:52
 msgid "Share link has expired."
-msgstr ""
+msgstr "O link de compartilhamento expirou."
 
 #: documents/templates/registration/login.html:55
 msgid "Username"
@@ -772,7 +772,7 @@ msgstr "Entrar"
 
 #: documents/templates/registration/login.html:70
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Esqueceu sua senha?"
 
 #: documents/templates/registration/password_reset_complete.html:14
 msgid "Paperless-ngx reset password complete"
