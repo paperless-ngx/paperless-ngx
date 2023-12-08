@@ -2,10 +2,6 @@
 
 ## paperless-ngx 2.1.1
 
-### Features
-
-- Fix: respect baseURI for pdfjs worker URL [@shamoon](https://github.com/shamoon) ([#4865](https://github.com/paperless-ngx/paperless-ngx/pull/4865))
-
 ### Bug Fixes
 
 - Fix: disable toggle for share link creation without archive version, fix auto-copy in Safari [@shamoon](https://github.com/shamoon) ([#4885](https://github.com/paperless-ngx/paperless-ngx/pull/4885))
