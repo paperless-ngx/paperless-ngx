@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-05 08:26-0800\n"
-"PO-Revision-Date: 2023-12-05 16:27\n"
+"PO-Revision-Date: 2023-12-07 00:23\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -581,7 +581,7 @@ msgstr "Währung"
 
 #: documents/models.py:759
 msgid "Document Link"
-msgstr ""
+msgstr "Dokumentenverknüpfung"
 
 #: documents/models.py:771
 msgid "data type"
@@ -685,7 +685,7 @@ msgstr "Diesen Gruppen Bearbeitungsberechtigungen erteilen"
 
 #: documents/models.py:1019
 msgid "assign these custom fields"
-msgstr ""
+msgstr "Diese benutzerdefinierten Felder zuweisen"
 
 #: documents/models.py:1023
 msgid "consumption template"
@@ -1172,15 +1172,15 @@ msgstr "Nachrichteninhalt filtern"
 
 #: paperless_mail/models.py:143
 msgid "filter attachment filename inclusive"
-msgstr ""
+msgstr "Filter: Anhang-Dateiname (inklusiv)"
 
 #: paperless_mail/models.py:155
 msgid "filter attachment filename exclusive"
-msgstr ""
+msgstr "Filter: Anhang-Dateiname (exklusiv)"
 
 #: paperless_mail/models.py:160
 msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "Dokumente, die vollständig mit diesem Dateinamen (falls angegeben) übereinstimmen, nicht verarbeiten. Platzhalter wie *.pdf oder *rechnung* sind erlaubt. Groß- und Kleinschreibung wird nicht beachtet."
 
 #: paperless_mail/models.py:167
 msgid "maximum age"
