@@ -282,11 +282,11 @@
         <source>Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">81</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">92</context>
+          <context context-type="linenumber">90</context>
         </context-group>
         <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</target>
       </trans-unit>
@@ -294,7 +294,7 @@
         <source>Open document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">83</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
@@ -306,7 +306,7 @@
         <source>Could not add <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">107</context>
+          <context context-type="linenumber">105</context>
         </context-group>
         <target state="translated">Kon nie <x id="PH" equiv-text="status.filename"/> toevoeg nie: <x id="PH_1" equiv-text="status.message"/></target>
       </trans-unit>
@@ -314,7 +314,7 @@
         <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by Paperless-ngx.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">122</context>
+          <context context-type="linenumber">120</context>
         </context-group>
         <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> is being processed by Paperless-ngx.</target>
       </trans-unit>
@@ -322,7 +322,7 @@
         <source>Prev</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">128</context>
+          <context context-type="linenumber">126</context>
         </context-group>
         <target state="translated">Vorige</target>
       </trans-unit>
@@ -330,7 +330,7 @@
         <source>Next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">129</context>
+          <context context-type="linenumber">127</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -342,7 +342,7 @@
         <source>End</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">130</context>
+          <context context-type="linenumber">128</context>
         </context-group>
         <target state="translated">Einde</target>
       </trans-unit>
@@ -350,7 +350,7 @@
         <source>The dashboard can be used to show saved views, such as an &apos;Inbox&apos;. Those settings are found under Settings &gt; Saved Views once you have created some.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">136</context>
+          <context context-type="linenumber">134</context>
         </context-group>
         <target state="translated">Die paneelbord kan gebruik word om bewaarde aansigte, soos ’n ‘inmandjie’, te bekyk. Daardie instellings word, sodra u een geskep het, gevind onder Instellings &gt; Bewaarde aansigte.</target>
       </trans-unit>
@@ -358,7 +358,7 @@
         <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">143</context>
+          <context context-type="linenumber">141</context>
         </context-group>
         <target state="translated">Sleep-en-los dokumente hier om te begin oplaai, of plaas dit in die verbruik-vouer. U kan ook dokumente enige plek sleep-en-los op alle ander blaaie van die webtoep. Sodra u dit doen, sal Paperless-ngx sy masjienleeralgoritmes begin oplei.</target>
       </trans-unit>
@@ -366,7 +366,7 @@
         <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">148</context>
+          <context context-type="linenumber">146</context>
         </context-group>
         <target state="translated">Die dokumentlyste toon al u dokumente en laat filtrering en massawysiging toe. Daar is drie verskillende aansigstyle: lys, klein kaarte en groot kaarte. ’n Lys van dokumente wat tans oop is vir wysiging word in die systaaf getoon.</target>
       </trans-unit>
@@ -374,7 +374,7 @@
         <source>The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">155</context>
+          <context context-type="linenumber">153</context>
         </context-group>
         <target state="translated">Die filtreernutsmiddels laat u dokumente vinnig vind met verskeie soektogte, datums, etikette, ens.</target>
       </trans-unit>
@@ -382,7 +382,7 @@
         <source>Any combination of filters can be saved as a &apos;view&apos; which can then be displayed on the dashboard and / or sidebar.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">161</context>
+          <context context-type="linenumber">159</context>
         </context-group>
         <target state="translated">Enige kombinasie van filters kan as ’n ‘aansig’ bewaar word, wat dan op die paneelbord en/of systaaf vertoon kan word.</target>
       </trans-unit>
@@ -390,7 +390,7 @@
         <source>Tags, correspondents, document types and storage paths can all be managed using these pages. They can also be created from the document edit view.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">166</context>
+          <context context-type="linenumber">164</context>
         </context-group>
         <target state="translated">Etikette, korrespondente, dokumenttipes en bergpaaie kan alles deur hierdie blaaie bestuur word. Dit kan ook vanuit die dokumentwysigaansig geskep word.</target>
       </trans-unit>
@@ -398,7 +398,7 @@
         <source>Manage e-mail accounts and rules for automatically importing documents.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">174</context>
+          <context context-type="linenumber">172</context>
         </context-group>
         <target state="needs-translation">Manage e-mail accounts and rules for automatically importing documents.</target>
       </trans-unit>
@@ -406,7 +406,7 @@
         <source>Consumption templates give you finer control over the document ingestion process.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">182</context>
+          <context context-type="linenumber">180</context>
         </context-group>
         <target state="needs-translation">Consumption templates give you finer control over the document ingestion process.</target>
       </trans-unit>
@@ -414,7 +414,7 @@
         <source>File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">190</context>
+          <context context-type="linenumber">188</context>
         </context-group>
         <target state="translated">Lêertake toon dokumente wat verbruik is, wag om verbruik te word, of misluk het tydens die proses.</target>
       </trans-unit>
@@ -422,7 +422,7 @@
         <source>Check out the settings for various tweaks to the web app and toggle settings for saved views.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">198</context>
+          <context context-type="linenumber">196</context>
         </context-group>
         <target state="needs-translation">Check out the settings for various tweaks to the web app and toggle settings for saved views.</target>
       </trans-unit>
@@ -430,7 +430,7 @@
         <source>Thank you! 🙏</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">206</context>
+          <context context-type="linenumber">204</context>
         </context-group>
         <target state="translated">Dankie! 🙏</target>
       </trans-unit>
@@ -438,7 +438,7 @@
         <source>There are &lt;em&gt;tons&lt;/em&gt; more features and info we didn&apos;t cover here, but this should get you started. Check out the documentation or visit the project on GitHub to learn more or to report issues.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">208</context>
+          <context context-type="linenumber">206</context>
         </context-group>
         <target state="translated">Daar is nog &lt;em&gt;baie&lt;/em&gt; meer funksies en inligting wat ons nie hier behandel het nie, maar u sal hiermee kan begin. Bekyk die dokumentasie of besoek die projek op GitHub vir meer inligting of om probleme te rapporteer.</target>
       </trans-unit>
@@ -446,7 +446,7 @@
         <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">210</context>
+          <context context-type="linenumber">208</context>
         </context-group>
         <target state="translated">Ten slotte, namens elke bydraer aan hierdie gemeenskapsondersteunde projek, dankie dat u Paperless-ngx gebruik!</target>
       </trans-unit>
@@ -4281,7 +4281,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
-          <context context-type="linenumber">93</context>
+          <context context-type="linenumber">97</context>
         </context-group>
         <target state="needs-translation">1 day</target>
       </trans-unit>
@@ -4313,7 +4313,7 @@
         <source>Error retrieving links</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">78</context>
         </context-group>
         <target state="needs-translation">Error retrieving links</target>
       </trans-unit>
@@ -4321,7 +4321,7 @@
         <source><x id="PH" equiv-text="days"/> days</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
-          <context context-type="linenumber">93</context>
+          <context context-type="linenumber">97</context>
         </context-group>
         <target state="needs-translation"><x id="PH" equiv-text="days"/> days</target>
       </trans-unit>
@@ -4329,7 +4329,7 @@
         <source>Error deleting link</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
-          <context context-type="linenumber">120</context>
+          <context context-type="linenumber">126</context>
         </context-group>
         <target state="needs-translation">Error deleting link</target>
       </trans-unit>
@@ -4337,7 +4337,7 @@
         <source>Error creating link</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
-          <context context-type="linenumber">148</context>
+          <context context-type="linenumber">156</context>
         </context-group>
         <target state="needs-translation">Error creating link</target>
       </trans-unit>

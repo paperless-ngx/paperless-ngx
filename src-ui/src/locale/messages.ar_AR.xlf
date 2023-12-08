@@ -282,11 +282,11 @@
         <source>Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">81</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">92</context>
+          <context context-type="linenumber">90</context>
         </context-group>
         <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</target>
       </trans-unit>
@@ -294,7 +294,7 @@
         <source>Open document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">83</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
@@ -306,7 +306,7 @@
         <source>Could not add <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">107</context>
+          <context context-type="linenumber">105</context>
         </context-group>
         <target state="translated">تعذّر إضافة <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></target>
       </trans-unit>
@@ -314,7 +314,7 @@
         <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by Paperless-ngx.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">122</context>
+          <context context-type="linenumber">120</context>
         </context-group>
         <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> is being processed by Paperless-ngx.</target>
       </trans-unit>
@@ -322,7 +322,7 @@
         <source>Prev</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">128</context>
+          <context context-type="linenumber">126</context>
         </context-group>
         <target state="translated">السابق</target>
       </trans-unit>
@@ -330,7 +330,7 @@
         <source>Next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">129</context>
+          <context context-type="linenumber">127</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -342,7 +342,7 @@
         <source>End</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">130</context>
+          <context context-type="linenumber">128</context>
         </context-group>
         <target state="translated">النهاية</target>
       </trans-unit>
@@ -350,7 +350,7 @@
         <source>The dashboard can be used to show saved views, such as an &apos;Inbox&apos;. Those settings are found under Settings &gt; Saved Views once you have created some.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">136</context>
+          <context context-type="linenumber">134</context>
         </context-group>
         <target state="translated">يمكن استخدام لوحة التحكم لعرض العروض المحفوظة، مثل 'علبة الوارد'. بواسطة الإعدادات يمكنك تفعيلها &gt; المشاهدات المحفوظة بمجرد إنشاء بعضها.</target>
       </trans-unit>
@@ -358,7 +358,7 @@
         <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">143</context>
+          <context context-type="linenumber">141</context>
         </context-group>
         <target state="translated">سحب وإسقاط المستندات هنا للبدء في تحميلها أو وضعها في المجلد المستهلك. يمكنك أيضًا سحب وإسقاط المستندات في أي مكان على جميع الصفحات الأخرى من تطبيق الويب. بمجرد ذلك، سيبدأ هذا التطبيق في تدريب خوارزميات تعلم الآلات.</target>
       </trans-unit>
@@ -366,7 +366,7 @@
         <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">148</context>
+          <context context-type="linenumber">146</context>
         </context-group>
         <target state="translated">تظهر قائمة المستندات جميع مستنداتك وتسمح بالتصفية والتحرير بالجملة. وهناك ثلاث أنماط مختلفة للعرض: القائمة والبطاقات الصغيرة والبطاقات الكبيرة، وفي الشريط الجانبي قائمة بالمستندات المفتوحة حاليا للتحرير.</target>
       </trans-unit>
@@ -374,7 +374,7 @@
         <source>The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">155</context>
+          <context context-type="linenumber">153</context>
         </context-group>
         <target state="translated">أدوات التصفية تسمح لك بالعثور بسرعة على المستندات باستخدام مختلف عمليات البحث والتواريخ والعلامات وما إلى ذلك.</target>
       </trans-unit>
@@ -382,7 +382,7 @@
         <source>Any combination of filters can be saved as a &apos;view&apos; which can then be displayed on the dashboard and / or sidebar.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">161</context>
+          <context context-type="linenumber">159</context>
         </context-group>
         <target state="translated">يمكن حفظ أي مزيج من التصفيات مثل "عرض" يمكنك عرضه بعد ذلك على لوحة التحكم / أو الشريط الجانبي.</target>
       </trans-unit>
@@ -390,7 +390,7 @@
         <source>Tags, correspondents, document types and storage paths can all be managed using these pages. They can also be created from the document edit view.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">166</context>
+          <context context-type="linenumber">164</context>
         </context-group>
         <target state="translated">يمكن إدارة جميع العلامات والمراسلين وأنواع الوثائق ومسارات التخزين باستخدام هذه الصفحات. ويمكن أيضا إنشاؤها من تعديل عرض المستند.</target>
       </trans-unit>
@@ -398,7 +398,7 @@
         <source>Manage e-mail accounts and rules for automatically importing documents.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">174</context>
+          <context context-type="linenumber">172</context>
         </context-group>
         <target state="translated">إدارة حسابات البريد الإلكتروني وقواعد الاستيراد التلقائي للمستندات.</target>
       </trans-unit>
@@ -406,7 +406,7 @@
         <source>Consumption templates give you finer control over the document ingestion process.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">182</context>
+          <context context-type="linenumber">180</context>
         </context-group>
         <target state="translated">قوالب الاستهلاك تعطيك التحكم بدقة في عملية استخراج المستندات.</target>
       </trans-unit>
@@ -414,7 +414,7 @@
         <source>File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">190</context>
+          <context context-type="linenumber">188</context>
         </context-group>
         <target state="translated">ملف المهام يظهر لك المستندات المستهلكة، أو تنتظر أن تكون، أو يكون أخفق في أثناء العملية.</target>
       </trans-unit>
@@ -422,7 +422,7 @@
         <source>Check out the settings for various tweaks to the web app and toggle settings for saved views.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">198</context>
+          <context context-type="linenumber">196</context>
         </context-group>
         <target state="translated">تحقق من إعدادات التعديلات المختلفة على تطبيق الويب و تبديل الإعدادات لطرق العرض المحفوظة.</target>
       </trans-unit>
@@ -430,7 +430,7 @@
         <source>Thank you! 🙏</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">206</context>
+          <context context-type="linenumber">204</context>
         </context-group>
         <target state="translated">شكراً لك! 🙏</target>
       </trans-unit>
@@ -438,7 +438,7 @@
         <source>There are &lt;em&gt;tons&lt;/em&gt; more features and info we didn&apos;t cover here, but this should get you started. Check out the documentation or visit the project on GitHub to learn more or to report issues.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">208</context>
+          <context context-type="linenumber">206</context>
         </context-group>
         <target state="translated">هناك &lt;em&gt;أطنان&lt;/em&gt; المزيد من الميزات والمعلومات التي لم نغطيها هنا، ولكن يجب يكون هذا كافيا لك للبداية. يرجى مراجعة المستندات أو زيارة المشروع على GitHub لمعرفة المزيد أو للإبلاغ عن المشكلات.</target>
       </trans-unit>
@@ -446,7 +446,7 @@
         <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">210</context>
+          <context context-type="linenumber">208</context>
         </context-group>
         <target state="translated">أخيرا، بالنيابة عن كل مساهم في هذا المشروع المدعوم من المجتمع، شكرا لك على استخدام Paperless-ngx!</target>
       </trans-unit>
@@ -4279,7 +4279,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
-          <context context-type="linenumber">93</context>
+          <context context-type="linenumber">97</context>
         </context-group>
         <target state="translated">يوم 1</target>
       </trans-unit>
@@ -4311,7 +4311,7 @@
         <source>Error retrieving links</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">78</context>
         </context-group>
         <target state="translated">خطأ في استرجاع الروابط</target>
       </trans-unit>
@@ -4319,7 +4319,7 @@
         <source><x id="PH" equiv-text="days"/> days</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
-          <context context-type="linenumber">93</context>
+          <context context-type="linenumber">97</context>
         </context-group>
         <target state="translated"><x id="PH" equiv-text="days"/> أيام</target>
       </trans-unit>
@@ -4327,7 +4327,7 @@
         <source>Error deleting link</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
-          <context context-type="linenumber">120</context>
+          <context context-type="linenumber">126</context>
         </context-group>
         <target state="translated">خطأ في حذف الرابط</target>
       </trans-unit>
@@ -4335,7 +4335,7 @@
         <source>Error creating link</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
-          <context context-type="linenumber">148</context>
+          <context context-type="linenumber">156</context>
         </context-group>
         <target state="translated">خطأ في إنشاء الرابط</target>
       </trans-unit>
