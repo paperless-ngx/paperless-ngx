@@ -458,6 +458,23 @@ class TestCustomField(DirectoriesMixin, APITestCase):
         self.assertEqual(doc3.custom_fields.first().value, [1])
         self.assertEqual(doc4.custom_fields.first().value, [1])
 
+        # Add links appends if necessary
+        resp = self.client.patch(
+            f"/api/documents/{doc3.id}/",
+            data={
+                "custom_fields": [
+                    {
+                        "field": custom_field_doclink.id,
+                        "value": [1, 4],
+                    },
+                ],
+            },
+            format="json",
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(doc4.custom_fields.first().value, [1, 3])
+
         # Remove one of the links, removed on other doc
         resp = self.client.patch(
             f"/api/documents/{doc1.id}/",
@@ -474,8 +491,8 @@ class TestCustomField(DirectoriesMixin, APITestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(doc2.custom_fields.first().value, [1])
-        self.assertEqual(doc3.custom_fields.first().value, [1])
-        self.assertEqual(doc4.custom_fields.first().value, [])
+        self.assertEqual(doc3.custom_fields.first().value, [1, 4])
+        self.assertEqual(doc4.custom_fields.first().value, [3])
 
         # Removes the field entirely
         resp = self.client.patch(
@@ -488,5 +505,5 @@ class TestCustomField(DirectoriesMixin, APITestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(doc2.custom_fields.first().value, [])
-        self.assertEqual(doc3.custom_fields.first().value, [])
-        self.assertEqual(doc4.custom_fields.first().value, [])
+        self.assertEqual(doc3.custom_fields.first().value, [4])
+        self.assertEqual(doc4.custom_fields.first().value, [3])
