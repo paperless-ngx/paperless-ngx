@@ -476,3 +476,17 @@ class TestCustomField(DirectoriesMixin, APITestCase):
         self.assertEqual(doc2.custom_fields.first().value, [1])
         self.assertEqual(doc3.custom_fields.first().value, [1])
         self.assertEqual(doc4.custom_fields.first().value, [])
+
+        # Removes the field entirely
+        resp = self.client.patch(
+            f"/api/documents/{doc1.id}/",
+            data={
+                "custom_fields": [],
+            },
+            format="json",
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(doc2.custom_fields.first().value, [])
+        self.assertEqual(doc3.custom_fields.first().value, [])
+        self.assertEqual(doc4.custom_fields.first().value, [])
