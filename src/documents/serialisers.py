@@ -163,7 +163,7 @@ class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
         try:
             if full_perms:
                 self.fields.pop("user_can_change")
-                self.fields.pop("is_shared")
+                self.fields.pop("is_shared_by_requester")
             else:
                 self.fields.pop("permissions")
         except KeyError:
@@ -209,7 +209,7 @@ class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
             )
         )
 
-    def get_is_shared(self, obj: Document):
+    def get_is_shared_by_requester(self, obj: Document):
         ctype = ContentType.objects.get_for_model(obj)
         UserObjectPermission = get_user_obj_perms_model()
         GroupObjectPermission = get_group_obj_perms_model()
@@ -228,7 +228,7 @@ class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
 
     permissions = SerializerMethodField(read_only=True)
     user_can_change = SerializerMethodField(read_only=True)
-    is_shared = SerializerMethodField(read_only=True)
+    is_shared_by_requester = SerializerMethodField(read_only=True)
 
     set_permissions = serializers.DictField(
         label="Set permissions",
@@ -578,7 +578,7 @@ class DocumentSerializer(
             "owner",
             "permissions",
             "user_can_change",
-            "is_shared",
+            "is_shared_by_requester",
             "set_permissions",
             "notes",
             "custom_fields",

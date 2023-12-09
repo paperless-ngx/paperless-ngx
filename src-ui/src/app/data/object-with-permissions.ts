@@ -18,5 +18,5 @@ export interface ObjectWithPermissions extends ObjectWithId {
 
   user_can_change?: boolean
 
-  is_shared?: boolean
+  is_shared_by_requester?: boolean
 }

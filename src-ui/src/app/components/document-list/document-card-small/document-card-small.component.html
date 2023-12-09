@@ -77,7 +77,7 @@
           </svg>
           <small>{{document.owner | username}}</small>
         </div>
-        <div *ngIf="document.is_shared" class="ps-0 p-1">
+        <div *ngIf="document.is_shared_by_requester" class="ps-0 p-1">
           <svg class="metadata-icon me-2 text-muted" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#people-fill"/>
           </svg>

@@ -47,6 +47,7 @@ import {
   FILTER_OWNER_DOES_NOT_INCLUDE,
   FILTER_OWNER_ISNULL,
   FILTER_CUSTOM_FIELDS,
+  FILTER_SHARED_BY_USER,
 } from 'src/app/data/filter-rule-type'
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
@@ -826,6 +827,16 @@ describe('FilterEditorComponent', () => {
     expect(component.permissionsSelectionModel.hideUnowned).toBeTruthy()
   }))
 
+  it('should ingest filter rules for shared by me', fakeAsync(() => {
+    component.filterRules = [
+      {
+        rule_type: FILTER_SHARED_BY_USER,
+        value: '2',
+      },
+    ]
+    expect(component.permissionsSelectionModel.userID).toEqual(2)
+  }))
+
   // GET filterRules
 
   it('should convert user input to correct filter rules on text field search title + content', fakeAsync(() => {
@@ -1453,11 +1464,26 @@ describe('FilterEditorComponent', () => {
     ])
   }))
 
-  it('should convert user input to correct filter on permissions select unowned', fakeAsync(() => {
+  it('should convert user input to correct filter on permissions select shared by me', fakeAsync(() => {
     const permissionsDropdown = fixture.debugElement.query(
       By.directive(PermissionsFilterDropdownComponent)
     )
     const unownedButton = permissionsDropdown.queryAll(By.css('button'))[4]
+    unownedButton.triggerEventHandler('click')
+    fixture.detectChanges()
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_SHARED_BY_USER,
+        value: '1',
+      },
+    ])
+  }))
+
+  it('should convert user input to correct filter on permissions select unowned', fakeAsync(() => {
+    const permissionsDropdown = fixture.debugElement.query(
+      By.directive(PermissionsFilterDropdownComponent)
+    )
+    const unownedButton = permissionsDropdown.queryAll(By.css('button'))[5]
     unownedButton.triggerEventHandler('click')
     fixture.detectChanges()
     expect(component.filterRules).toEqual([
