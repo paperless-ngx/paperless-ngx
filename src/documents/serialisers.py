@@ -471,6 +471,10 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         # This key must exist, as it is validated
         data_store_name = type_to_data_store_name_map[custom_field.data_type]
 
+        if custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
+            # prior to update so we can look for any docs that are going to be removed
+            self.reflect_doclinks(document, custom_field, validated_data["value"])
+
         # Actually update or create the instance, providing the value
         # to fill in the correct attribute based on the type
         instance, _ = CustomFieldInstance.objects.update_or_create(
@@ -493,6 +497,61 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         if field.data_type == CustomField.FieldDataType.URL:
             URLValidator()(data["value"])
         return data
+
+    def reflect_doclinks(
+        self,
+        document: Document,
+        field: CustomField,
+        target_doc_ids: list[int],
+    ):
+        """
+        Add or remove 'symmetrical' links to `document` on all `target_doc_ids`
+        """
+        # Check if any documents are going to be removed from the current list of links and remove the symmetrical links
+        current_field_instance = CustomFieldInstance.objects.filter(
+            field=field,
+            document=document,
+        ).first()
+        if current_field_instance is not None:
+            for doc_id in current_field_instance.value:
+                if doc_id not in target_doc_ids:
+                    self.remove_doclink(document, field, doc_id)
+
+        for target_doc_id in target_doc_ids:
+            target_doc_field_instance = CustomFieldInstance.objects.filter(
+                field=field,
+                document_id=target_doc_id,
+            ).first()
+            if target_doc_field_instance is not None:
+                if document.id not in target_doc_field_instance.value:
+                    target_doc_field_instance.value_document_ids.append(document.id)
+                    target_doc_field_instance.save()
+            else:
+                CustomFieldInstance.objects.update_or_create(
+                    document_id=target_doc_id,
+                    field=field,
+                    defaults={"value_document_ids": [document.id]},
+                )
+
+    def remove_doclink(
+        self,
+        document: Document,
+        field: CustomField,
+        target_doc_id: int,
+    ):
+        """
+        Removes a 'symmetrical' link to `document` from the target document's existing custom field instance
+        """
+        target_doc_field_instance = CustomFieldInstance.objects.filter(
+            document_id=target_doc_id,
+            field=field,
+        ).first()
+        if (
+            target_doc_field_instance is not None
+            and document.id in target_doc_field_instance.value
+        ):
+            target_doc_field_instance.value.remove(document.id)
+            target_doc_field_instance.save()
 
     class Meta:
         model = CustomFieldInstance
