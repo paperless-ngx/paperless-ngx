@@ -65,6 +65,7 @@ export class BulkEditorComponent
     downloadFileTypeArchive: new FormControl(true),
     downloadFileTypeOriginals: new FormControl(false),
     downloadUseFormatting: new FormControl(false),
+    downloadAsSingleFile: new FormControl(false),
   })
 
   constructor(
@@ -136,7 +137,11 @@ export class BulkEditorComponent
       .get('downloadFileTypeArchive')
       .valueChanges.pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((newValue) => {
-        if (!newValue) {
+        if (newValue && this.downloadForm.get('downloadAsSingleFile').value) {
+          this.downloadForm
+            .get('downloadFileTypeOriginals')
+            .patchValue(false, { emitEvent: false })
+        } else if (!newValue) {
           this.downloadForm
             .get('downloadFileTypeOriginals')
             .patchValue(true, { emitEvent: false })
@@ -146,10 +151,36 @@ export class BulkEditorComponent
       .get('downloadFileTypeOriginals')
       .valueChanges.pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((newValue) => {
-        if (!newValue) {
+        if (newValue && this.downloadForm.get('downloadAsSingleFile').value) {
+          this.downloadForm
+            .get('downloadFileTypeArchive')
+            .patchValue(false, { emitEvent: false })
+        } else if (!newValue) {
           this.downloadForm
             .get('downloadFileTypeArchive')
             .patchValue(true, { emitEvent: false })
+        }
+      })
+    this.downloadForm
+      .get('downloadAsSingleFile')
+      .valueChanges.pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((newValue) => {
+        if (newValue) {
+          this.downloadForm
+            .get('downloadUseFormatting')
+            .patchValue(false, { emitEvent: false })
+          this.downloadForm.get('downloadUseFormatting').disable()
+
+          if (
+            this.downloadForm.get('downloadFileTypeArchive').value &&
+            this.downloadForm.get('downloadFileTypeOriginals').value
+          ) {
+            this.downloadForm
+              .get('downloadFileTypeArchive')
+              .patchValue(false, { emitEvent: false })
+          }
+        } else {
+          this.downloadForm.get('downloadUseFormatting').enable()
         }
       })
   }
