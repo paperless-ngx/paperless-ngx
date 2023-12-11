@@ -19,7 +19,7 @@ import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import { RemoteVersionService } from 'src/app/services/rest/remote-version.service'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { of, throwError } from 'rxjs'
+import { Observable, of, tap, throwError } from 'rxjs'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
@@ -296,6 +296,21 @@ describe('AppFrameComponent', () => {
     component.searchAutoComplete(of('hello world 1')).subscribe()
     tick(250)
     expect(autocompleteSpy).toHaveBeenCalled()
+  }))
+
+  it('should handle autocomplete backend failure gracefully', fakeAsync(() => {
+    const serviceAutocompleteSpy = jest.spyOn(searchService, 'autocomplete')
+    serviceAutocompleteSpy.mockReturnValue(
+      throwError(() => new Error('autcomplete failed'))
+    )
+    // serviceAutocompleteSpy.mockReturnValue(of([' world']))
+    let result
+    component.searchAutoComplete(of('hello')).subscribe((res) => {
+      result = res
+    })
+    tick(250)
+    expect(serviceAutocompleteSpy).toHaveBeenCalled()
+    expect(result).toEqual([])
   }))
 
   it('should support reset search field', () => {
