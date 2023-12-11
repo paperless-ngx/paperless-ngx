@@ -8,6 +8,7 @@ import traceback
 from datetime import date
 from datetime import timedelta
 from fnmatch import fnmatch
+from pathlib import Path
 from typing import Optional
 from typing import Union
 
@@ -703,12 +704,15 @@ class MailAccountHandler(LoggingMixin):
 
             if is_mime_type_supported(mime_type):
                 os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
-                _, temp_filename = tempfile.mkstemp(
-                    prefix="paperless-mail-",
-                    dir=settings.SCRATCH_DIR,
+
+                temp_dir = Path(
+                    tempfile.mkdtemp(
+                        prefix="paperless-mail-",
+                        dir=settings.SCRATCH_DIR,
+                    ),
                 )
-                with open(temp_filename, "wb") as f:
-                    f.write(att.payload)
+                temp_filename = temp_dir / pathvalidate.sanitize_filename(att.filename)
+                temp_filename.write_bytes(att.payload)
 
                 self.log.info(
                     f"Rule {rule}: "
