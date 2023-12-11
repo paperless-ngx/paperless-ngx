@@ -513,6 +513,7 @@ export class BulkEditorComponent
       .bulkDownload(
         Array.from(this.list.selected),
         downloadFileType,
+        this.downloadForm.get('downloadAsSingleFile').value,
         this.downloadForm.get('downloadUseFormatting').value
       )
       .pipe(first())

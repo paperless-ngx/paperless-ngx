@@ -191,6 +191,7 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
   bulkDownload(
     ids: number[],
     content = 'both',
+    mergeIntoSingleFile: boolean = false,
     useFilenameFormatting: boolean = false
   ) {
     return this.http.post(
@@ -198,6 +199,7 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
       {
         documents: ids,
         content: content,
+        single_file: mergeIntoSingleFile,
         follow_formatting: useFilenameFormatting,
       },
       { responseType: 'blob' }
