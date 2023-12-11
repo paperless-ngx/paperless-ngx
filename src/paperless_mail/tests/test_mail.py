@@ -1271,7 +1271,10 @@ class TestMail(
         self.assertEqual(len(self.bogus_mailbox.fetch("UNSEEN", False)), 0)
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
 
-    def assert_queue_consumption_tasks_call_args(self, expected_call_args: list):
+    def assert_queue_consumption_tasks_call_args(
+        self,
+        expected_call_args: list[list[dict[str, str]]],
+    ):
         """
         Verifies that queue_consumption_tasks has been called with the expected arguments.
 
@@ -1283,7 +1286,7 @@ class TestMail(
 
         """
 
-        # assert number of calls to queue_consumption_tasks mathc
+        # assert number of calls to queue_consumption_tasks match
         self.assertEqual(
             len(self._queue_consumption_tasks_mock.call_args_list),
             len(expected_call_args),
