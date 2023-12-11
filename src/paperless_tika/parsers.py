@@ -1,4 +1,5 @@
 from pathlib import Path
+import os, shutil
 
 import httpx
 from django.conf import settings
@@ -10,6 +11,15 @@ from tika_client import TikaClient
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
+
+
+def dummy_filename(func):
+    def inner(cls, document_path: Path, *args, **kwargs):
+        str_suffixes = ''.join(document_path.suffixes)
+        new_document_path = os.path.join(str(document_path.parent), f'tempname{str_suffixes}')
+        shutil.copyfile(str(document_path), new_document_path)
+        return func(cls, Path(new_document_path), *args, **kwargs)
+    return inner
 
 
 class TikaDocumentParser(DocumentParser):
@@ -48,6 +58,7 @@ class TikaDocumentParser(DocumentParser):
             )
             return []
 
+    @dummy_filename
     def parse(self, document_path: Path, mime_type: str, file_name=None):
         self.log.info(f"Sending {document_path} to Tika server")
 
