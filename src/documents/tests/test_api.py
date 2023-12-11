@@ -1997,64 +1997,6 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
         )
 
 
-class TestApiUiSettings(DirectoriesMixin, APITestCase):
-    ENDPOINT = "/api/ui_settings/"
-
-    def setUp(self):
-        super().setUp()
-        self.test_user = User.objects.create_superuser(username="test")
-        self.test_user.first_name = "Test"
-        self.test_user.last_name = "User"
-        self.test_user.save()
-        self.client.force_authenticate(user=self.test_user)
-
-    def test_api_get_ui_settings(self):
-        response = self.client.get(self.ENDPOINT, format="json")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertDictEqual(
-            response.data["user"],
-            {
-                "id": self.test_user.id,
-                "username": self.test_user.username,
-                "is_superuser": True,
-                "groups": [],
-                "first_name": self.test_user.first_name,
-                "last_name": self.test_user.last_name,
-            },
-        )
-        self.assertDictEqual(
-            response.data["settings"],
-            {
-                "update_checking": {
-                    "backend_setting": "default",
-                },
-            },
-        )
-
-    def test_api_set_ui_settings(self):
-        settings = {
-            "settings": {
-                "dark_mode": {
-                    "enabled": True,
-                },
-            },
-        }
-
-        response = self.client.post(
-            self.ENDPOINT,
-            json.dumps(settings),
-            content_type="application/json",
-        )
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        ui_settings = self.test_user.ui_settings
-        self.assertDictEqual(
-            ui_settings.settings,
-            settings["settings"],
-        )
-
-
 class TestApiRemoteVersion(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/remote_version/"
 
