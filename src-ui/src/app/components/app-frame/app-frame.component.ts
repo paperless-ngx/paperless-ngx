@@ -8,6 +8,7 @@ import {
   map,
   switchMap,
   first,
+  catchError,
 } from 'rxjs/operators'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
@@ -166,7 +167,13 @@ export class AppFrameComponent
         }
       }),
       switchMap((term) =>
-        term.length < 2 ? from([[]]) : this.searchService.autocomplete(term)
+        term.length < 2
+          ? from([[]])
+          : this.searchService.autocomplete(term).pipe(
+              catchError(() => {
+                return from([[]])
+              })
+            )
       )
     )
 
