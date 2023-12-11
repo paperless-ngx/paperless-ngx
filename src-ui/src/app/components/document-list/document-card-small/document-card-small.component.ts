@@ -16,10 +16,7 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
 @Component({
   selector: 'pngx-document-card-small',
   templateUrl: './document-card-small.component.html',
-  styleUrls: [
-    './document-card-small.component.scss',
-    '../popover-preview/popover-preview.scss',
-  ],
+  styleUrls: ['./document-card-small.component.scss'],
 })
 export class DocumentCardSmallComponent extends ComponentWithPermissions {
   constructor(
@@ -78,6 +75,17 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
 
   get privateName() {
     return $localize`Private`
+  }
+
+  get useNativePdfViewer(): boolean {
+    return this.settingsService.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
+  }
+
+  get isPdf(): boolean {
+    return (
+      this.document?.original_file_name?.endsWith('.pdf') ||
+      this.document?.archived_file_name?.endsWith('.pdf')
+    )
   }
 
   getTagsLimited$() {

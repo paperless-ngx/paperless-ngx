@@ -19,6 +19,9 @@ import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { DocumentCardLargeComponent } from './document-card-large.component'
 import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
+import { SettingsService } from 'src/app/services/settings.service'
+import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.component'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 
 const doc = {
   id: 10,
@@ -40,6 +43,7 @@ const doc = {
 describe('DocumentCardLargeComponent', () => {
   let component: DocumentCardLargeComponent
   let fixture: ComponentFixture<DocumentCardLargeComponent>
+  let settingsService: SettingsService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -50,6 +54,7 @@ describe('DocumentCardLargeComponent', () => {
         IfPermissionsDirective,
         SafeUrlPipe,
         IsNumberPipe,
+        PreviewPopupComponent,
       ],
       providers: [DatePipe],
       imports: [
@@ -62,6 +67,7 @@ describe('DocumentCardLargeComponent', () => {
     }).compileComponents()
 
     fixture = TestBed.createComponent(DocumentCardLargeComponent)
+    settingsService = TestBed.inject(SettingsService)
     component = fixture.componentInstance
     component.document = doc
     fixture.detectChanges()
@@ -86,6 +92,23 @@ describe('DocumentCardLargeComponent', () => {
     tick(600)
     expect(component.popover.isOpen()).toBeFalsy()
   }))
+
+  it('should guess if file is pdf by file name', () => {
+    component.document.original_file_name = 'sample.pdf'
+    expect(component.isPdf).toBeTruthy()
+    component.document.archived_file_name = 'sample.pdf'
+    expect(component.isPdf).toBeTruthy()
+    component.document.archived_file_name = undefined
+    component.document.original_file_name = 'sample.txt'
+    expect(component.isPdf).toBeFalsy()
+  })
+
+  it('should return settings for native PDF viewer', () => {
+    settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, false)
+    expect(component.useNativePdfViewer).toBeFalsy()
+    settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, true)
+    expect(component.useNativePdfViewer).toBeTruthy()
+  })
 
   it('should trim content', () => {
     expect(component.contentTrimmed).toHaveLength(503) // includes ...

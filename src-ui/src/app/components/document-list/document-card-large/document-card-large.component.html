@@ -56,7 +56,12 @@
               </svg>&nbsp;<span class="d-none d-md-inline" i18n>View</span>
             </a>
             <ng-template #previewContent>
-              <object [data]="previewUrl | safeUrl" class="preview" width="100%"></object>
+              <pngx-preview-popup
+                [previewURL]="previewUrl"
+                [useNativePdfViewer]="useNativePdfViewer"
+                [previewText]="document.content"
+                [renderAsPlainText]="!isPdf">
+              </pngx-preview-popup>
             </ng-template>
             <a class="btn btn-sm btn-outline-secondary" [href]="getDownloadUrl()">
               <svg class="sidebaricon" fill="currentColor" class="sidebaricon">

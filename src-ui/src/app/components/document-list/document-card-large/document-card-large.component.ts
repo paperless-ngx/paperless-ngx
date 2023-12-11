@@ -15,10 +15,7 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
 @Component({
   selector: 'pngx-document-card-large',
   templateUrl: './document-card-large.component.html',
-  styleUrls: [
-    './document-card-large.component.scss',
-    '../popover-preview/popover-preview.scss',
-  ],
+  styleUrls: ['./document-card-large.component.scss'],
 })
 export class DocumentCardLargeComponent extends ComponentWithPermissions {
   constructor(
@@ -104,6 +101,17 @@ export class DocumentCardLargeComponent extends ComponentWithPermissions {
 
   get previewUrl() {
     return this.documentService.getPreviewUrl(this.document.id)
+  }
+
+  get useNativePdfViewer(): boolean {
+    return this.settingsService.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
+  }
+
+  get isPdf(): boolean {
+    return (
+      this.document?.original_file_name?.endsWith('.pdf') ||
+      this.document?.archived_file_name?.endsWith('.pdf')
+    )
   }
 
   mouseEnterPreview() {

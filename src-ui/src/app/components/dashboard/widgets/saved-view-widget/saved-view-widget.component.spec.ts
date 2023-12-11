@@ -29,6 +29,7 @@ import { SavedViewWidgetComponent } from './saved-view-widget.component'
 import { By } from '@angular/platform-browser'
 import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { DragDropModule } from '@angular/cdk/drag-drop'
+import { PreviewPopupComponent } from 'src/app/components/common/preview-popup/preview-popup.component'
 
 const savedView: PaperlessSavedView = {
   id: 1,
@@ -74,6 +75,7 @@ describe('SavedViewWidgetComponent', () => {
         CustomDatePipe,
         DocumentTitlePipe,
         SafeUrlPipe,
+        PreviewPopupComponent,
       ],
       providers: [
         PermissionsGuard,

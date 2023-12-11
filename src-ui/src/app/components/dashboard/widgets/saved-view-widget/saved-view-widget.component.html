@@ -36,7 +36,12 @@
               </svg>
             </a>
             <ng-template #previewContent>
-              <object [data]="getPreviewUrl(doc) | safeUrl" class="preview" width="100%"></object>
+              <pngx-preview-popup
+                [previewURL]="getPreviewUrl(doc)"
+                [useNativePdfViewer]="useNativePdfViewer"
+                [previewText]="doc.content"
+                [renderAsPlainText]="!isPdf(doc)">
+              </pngx-preview-popup>
             </ng-template>
             <a [href]="getDownloadUrl(doc)" class="btn px-4 btn-dark border-dark-subtle" title="Download" i18n-title (click)="$event.stopPropagation()">
               <svg class="buttonicon-xs" fill="currentColor">

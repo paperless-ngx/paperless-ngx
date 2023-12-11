@@ -22,6 +22,9 @@ import { By } from '@angular/platform-browser'
 import { TagComponent } from '../../common/tag/tag.component'
 import { PaperlessTag } from 'src/app/data/paperless-tag'
 import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
+import { SettingsService } from 'src/app/services/settings.service'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.component'
 
 const doc = {
   id: 10,
@@ -53,6 +56,7 @@ const doc = {
 describe('DocumentCardSmallComponent', () => {
   let component: DocumentCardSmallComponent
   let fixture: ComponentFixture<DocumentCardSmallComponent>
+  let settingsService: SettingsService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -64,6 +68,7 @@ describe('DocumentCardSmallComponent', () => {
         SafeUrlPipe,
         TagComponent,
         IsNumberPipe,
+        PreviewPopupComponent,
       ],
       providers: [DatePipe],
       imports: [
@@ -76,6 +81,7 @@ describe('DocumentCardSmallComponent', () => {
     }).compileComponents()
 
     fixture = TestBed.createComponent(DocumentCardSmallComponent)
+    settingsService = TestBed.inject(SettingsService)
     component = fixture.componentInstance
     component.document = Object.assign({}, doc)
     fixture.detectChanges()
@@ -103,6 +109,23 @@ describe('DocumentCardSmallComponent', () => {
     expect(
       fixture.debugElement.queryAll(By.directive(TagComponent))
     ).toHaveLength(6)
+  })
+
+  it('should guess if file is pdf by file name', () => {
+    component.document.original_file_name = 'sample.pdf'
+    expect(component.isPdf).toBeTruthy()
+    component.document.archived_file_name = 'sample.pdf'
+    expect(component.isPdf).toBeTruthy()
+    component.document.archived_file_name = undefined
+    component.document.original_file_name = 'sample.txt'
+    expect(component.isPdf).toBeFalsy()
+  })
+
+  it('should return settings for native PDF viewer', () => {
+    settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, false)
+    expect(component.useNativePdfViewer).toBeFalsy()
+    settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, true)
+    expect(component.useNativePdfViewer).toBeTruthy()
   })
 
   it('should show preview on mouseover after delay to preload content', fakeAsync(() => {
