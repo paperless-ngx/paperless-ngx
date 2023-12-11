@@ -964,6 +964,62 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             # Assert subset in results
             self.assertDictEqual(result, {**result, **subset})
 
+    @override_settings(
+        TIME_ZONE="Europe/Sofia",
+    )
+    def test_search_added_specific_date_with_timezone_ahead(self):
+        """
+        GIVEN:
+            - Two documents added right now
+            - One document added on a specific date
+            - The timezone is behind UTC time (+2)
+        WHEN:
+            - Query for documents added on a specific date
+        THEN:
+            - The one document is returned
+        """
+        d1 = Document.objects.create(
+            title="invoice",
+            content="the thing i bought at a shop and paid with bank account",
+            checksum="A",
+            pk=1,
+        )
+        d2 = Document.objects.create(
+            title="bank statement 1",
+            content="things i paid for in august",
+            pk=2,
+            checksum="B",
+        )
+        d3 = Document.objects.create(
+            title="bank statement 3",
+            content="things i paid for in september",
+            pk=3,
+            checksum="C",
+            # specific time zone aware date
+            added=timezone.make_aware(datetime.datetime(2023, 12, 1)),
+        )
+        # refresh doc instance to ensure we operate on date objects that Django uses
+        # Django converts dates to UTC
+        d3.refresh_from_db()
+
+        with index.open_index_writer() as writer:
+            index.update_document(writer, d1)
+            index.update_document(writer, d2)
+            index.update_document(writer, d3)
+
+        response = self.client.get("/api/documents/?query=added:20231201")
+        results = response.data["results"]
+
+        # Expect 1 document returned
+        self.assertEqual(len(results), 1)
+
+        for idx, subset in enumerate(
+            [{"id": 3, "title": "bank statement 3"}],
+        ):
+            result = results[idx]
+            # Assert subset in results
+            self.assertDictEqual(result, {**result, **subset})
+
     def test_search_added_in_last_month(self):
         """
         GIVEN:
