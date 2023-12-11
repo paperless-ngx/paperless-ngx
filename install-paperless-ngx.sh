@@ -380,7 +380,7 @@ fi
 docker compose pull
 
 if [ "$DATABASE_BACKEND" == "postgres" ] || [ "$DATABASE_BACKEND" == "mariadb" ] ; then
-	echo "Starting DB first for initilzation"
+	echo "Starting DB first for initialization"
 	docker compose up --detach db
 	# hopefully enough time for even the slower systems
 	sleep 15
