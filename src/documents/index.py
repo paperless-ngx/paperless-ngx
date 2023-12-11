@@ -3,6 +3,7 @@ import math
 import os
 from collections import Counter
 from contextlib import contextmanager
+from typing import Optional
 
 from dateutil.parser import isoparse
 from django.conf import settings
@@ -26,6 +27,7 @@ from whoosh.qparser import MultifieldParser
 from whoosh.qparser import QueryParser
 from whoosh.qparser.dateparse import DateParserPlugin
 from whoosh.qparser.dateparse import English
+from whoosh.qparser.plugins import FieldsPlugin
 from whoosh.scoring import TF_IDF
 from whoosh.searching import ResultsPage
 from whoosh.searching import Searcher
@@ -425,7 +427,12 @@ class DelayedMoreLikeThisQuery(DelayedQuery):
         return q, mask
 
 
-def autocomplete(ix: FileIndex, term: str, limit: int = 10, user: User = None):
+def autocomplete(
+    ix: FileIndex,
+    term: str,
+    limit: int = 10,
+    user: Optional[User] = None,
+):
     """
     Mimics whoosh.reading.IndexReader.most_distinctive_terms with permissions
     and without scoring
@@ -434,6 +441,9 @@ def autocomplete(ix: FileIndex, term: str, limit: int = 10, user: User = None):
 
     with ix.searcher(weighting=TF_IDF()) as s:
         qp = QueryParser("content", schema=ix.schema)
+        # Don't let searches with a query that happen to match a field override the
+        # content field query instead and return bogus, not text data
+        qp.remove_plugin_class(FieldsPlugin)
         q = qp.parse(f"{term.lower()}*")
         user_criterias = get_permissions_criterias(user)
 
@@ -453,7 +463,7 @@ def autocomplete(ix: FileIndex, term: str, limit: int = 10, user: User = None):
     return terms
 
 
-def get_permissions_criterias(user: User = None):
+def get_permissions_criterias(user: Optional[User] = None):
     user_criterias = [query.Term("has_owner", False)]
     if user is not None:
         if user.is_superuser:  # superusers see all docs
