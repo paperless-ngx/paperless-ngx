@@ -517,21 +517,37 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
                 if doc_id not in target_doc_ids:
                     self.remove_doclink(document, field, doc_id)
 
-        for target_doc_id in target_doc_ids:
-            target_doc_field_instance = CustomFieldInstance.objects.filter(
+        # Create an instance if target doc doesnt have this field or append it to an existing one
+        existing_custom_field_instances = {
+            custom_field.document_id: custom_field
+            for custom_field in CustomFieldInstance.objects.filter(
                 field=field,
-                document_id=target_doc_id,
-            ).first()
-            if target_doc_field_instance is not None:
-                if document.id not in target_doc_field_instance.value:
-                    target_doc_field_instance.value_document_ids.append(document.id)
-                    target_doc_field_instance.save()
-            else:
-                CustomFieldInstance.objects.update_or_create(
-                    document_id=target_doc_id,
-                    field=field,
-                    defaults={"value_document_ids": [document.id]},
+                document_id__in=target_doc_ids,
+            )
+        }
+        custom_field_instances_to_create = []
+        custom_field_instances_to_update = []
+        for target_doc_id in target_doc_ids:
+            target_doc_field_instance = existing_custom_field_instances.get(
+                target_doc_id,
+            )
+            if target_doc_field_instance is None:
+                custom_field_instances_to_create.append(
+                    CustomFieldInstance(
+                        document_id=target_doc_id,
+                        field=field,
+                        value_document_ids=[document.id],
+                    ),
                 )
+            elif document.id not in target_doc_field_instance.value:
+                target_doc_field_instance.value_document_ids.append(document.id)
+                custom_field_instances_to_update.append(target_doc_field_instance)
+
+        CustomFieldInstance.objects.bulk_create(custom_field_instances_to_create)
+        CustomFieldInstance.objects.bulk_update(
+            custom_field_instances_to_update,
+            ["value_document_ids"],
+        )
 
     def remove_doclink(
         self,
