@@ -334,7 +334,9 @@ class DocumentParser(LoggingMixin):
             self.progress_callback(current_progress, max_progress)
 
     def get_settings(self):
-        # return None
+        """
+        A parser must implement this
+        """
         raise NotImplementedError
 
     def read_file_handle_unicode_errors(self, filepath: Path) -> str:

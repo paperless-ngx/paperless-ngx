@@ -168,7 +168,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         manifest = self._do_export(use_filename_format=use_filename_format)
 
-        self.assertEqual(len(manifest), 172)
+        self.assertEqual(len(manifest), 177)
 
         # dont include consumer or AnonymousUser users
         self.assertEqual(
@@ -694,8 +694,8 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             os.path.join(self.dirs.media_dir, "documents"),
         )
 
-        self.assertEqual(ContentType.objects.count(), 31)
-        self.assertEqual(Permission.objects.count(), 124)
+        self.assertEqual(ContentType.objects.count(), 32)
+        self.assertEqual(Permission.objects.count(), 128)
 
         manifest = self._do_export()
 
@@ -719,5 +719,5 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             with self.assertRaises(IntegrityError):
                 call_command("document_importer", "--no-progress-bar", self.target)
 
-            self.assertEqual(ContentType.objects.count(), 31)
-            self.assertEqual(Permission.objects.count(), 125)
+            self.assertEqual(ContentType.objects.count(), 32)
+            self.assertEqual(Permission.objects.count(), 128)

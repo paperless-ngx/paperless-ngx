@@ -37,11 +37,21 @@ class OcrSettings(models.Model):
         GRAY = ("Gray", _("Gray"))
         CMYK = ("CMYK", _("CMYK"))
 
-    pages = models.PositiveIntegerField(null=True, blank=True)
+    pages = models.PositiveIntegerField(
+        verbose_name=_("Do OCR from page 1 to this value"),
+        null=True,
+        blank=True,
+    )
 
-    language = models.CharField(null=True, blank=True, max_length=32)
+    language = models.CharField(
+        verbose_name=_("Do OCR using these languages"),
+        null=True,
+        blank=True,
+        max_length=32,
+    )
 
     output_type = models.CharField(
+        verbose_name=_("Sets the output PDF type"),
         null=True,
         blank=True,
         max_length=8,
@@ -49,6 +59,7 @@ class OcrSettings(models.Model):
     )
 
     mode = models.CharField(
+        verbose_name=_("Sets the OCR mode"),
         null=True,
         blank=True,
         max_length=8,
@@ -56,43 +67,58 @@ class OcrSettings(models.Model):
     )
 
     skip_archive_file = models.CharField(
+        verbose_name=_("Controls the generation of an archive file"),
         null=True,
         blank=True,
         max_length=16,
         choices=ArchiveFileChoices.choices,
     )
 
-    image_dpi = models.PositiveIntegerField(null=True)
+    image_dpi = models.PositiveIntegerField(
+        verbose_name=_("Sets image DPI fallback value"),
+        null=True,
+    )
 
+    # Can't call it clean, that's a model method
     unpaper_clean = models.CharField(
+        verbose_name=_("Controls the unpaper cleaning"),
         null=True,
         blank=True,
         max_length=16,
         choices=CleanChoices.choices,
     )
 
-    deskew = models.BooleanField(null=True)
+    deskew = models.BooleanField(verbose_name=_("Enables deskew"), null=True)
 
-    rotate_pages = models.BooleanField(null=True)
+    rotate_pages = models.BooleanField(
+        verbose_name=_("Enables page rotation"),
+        null=True,
+    )
 
     rotate_pages_threshold = models.FloatField(
+        verbose_name=_("Sets the threshold for rotation of pages"),
         null=True,
         validators=[MinValueValidator(0.0)],
     )
 
     max_image_pixels = models.FloatField(
+        verbose_name=_("Sets the maximum image for decompression"),
         null=True,
         validators=[MinValueValidator(1_000_000.0)],
     )
 
     color_conversion_strategy = models.CharField(
+        verbose_name=_("Sets the Ghostscript color conversion strategy"),
         blank=True,
         null=True,
         max_length=32,
         choices=ColorConvertChoices.choices,
     )
 
-    user_args = models.JSONField(null=True)
+    user_args = models.JSONField(
+        verbose_name=_("Adds additional user arguments for OCRMyPDF"),
+        null=True,
+    )
 
     class Meta:
         verbose_name = _("ocr settings")
@@ -105,7 +131,7 @@ class OcrSettings(models.Model):
             # if you'll not check for self.pk
             # then error will also be raised in the update of exists model
             raise ValidationError(
-                "There is can be only one JuicerBaseSettings instance",
+                "There is can be only one OcrSettings instance",
             )
         return super().save(*args, **kwargs)
 

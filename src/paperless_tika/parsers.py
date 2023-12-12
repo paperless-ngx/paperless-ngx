@@ -111,3 +111,9 @@ class TikaDocumentParser(DocumentParser):
                 raise ParseError(
                     f"Error while converting document to PDF: {err}",
                 ) from err
+
+    def get_settings(self):
+        """
+        This parser does not implement additional settings yet
+        """
+        return None
