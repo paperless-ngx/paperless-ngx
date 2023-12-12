@@ -1347,7 +1347,7 @@ class ConsumptionTemplateViewSet(ModelViewSet):
 
     model = ConsumptionTemplate
 
-    queryset = ConsumptionTemplate.objects.all().order_by("name")
+    queryset = ConsumptionTemplate.objects.all().order_by("order")
 
 
 class CustomFieldViewSet(ModelViewSet):
