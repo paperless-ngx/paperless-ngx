@@ -17,7 +17,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let doc of documents" (mouseleave)="mouseLeaveCard()">
+      <tr *ngFor="let doc of documents" (mouseleave)="maybeClosePopover()">
         <td class="py-2 py-md-3"><a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.created_date | customDate}}</a></td>
         <td class="py-2 py-md-3">
           <a routerLink="/documents/{{doc.id}}" title="Edit" i18n-title class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.title | documentTitle}}</a>
@@ -30,13 +30,13 @@
           <div class="btn-group position-absolute top-50 end-0 translate-middle-y">
             <a [href]="getPreviewUrl(doc)" title="View Preview" i18n-title target="_blank" class="btn px-4 btn-dark border-dark-subtle"
             [ngbPopover]="previewContent" [popoverTitle]="doc.title | documentTitle"
-            autoClose="true" popoverClass="shadow popover-preview" container="body" (mouseenter)="mouseEnterPreview(doc)" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">
+            autoClose="true" popoverClass="shadow popover-preview" container="body" (mouseenter)="mouseEnterPreviewButton(doc)" (mouseleave)="mouseLeavePreviewButton()" #popover="ngbPopover">
               <svg class="buttonicon-xs" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#eye"/>
               </svg>
             </a>
             <ng-template #previewContent>
-              <pngx-preview-popup [document]="doc"></pngx-preview-popup>
+              <pngx-preview-popup [document]="doc" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()"></pngx-preview-popup>
             </ng-template>
             <a [href]="getDownloadUrl(doc)" class="btn px-4 btn-dark border-dark-subtle" title="Download" i18n-title (click)="$event.stopPropagation()">
               <svg class="buttonicon-xs" fill="currentColor">

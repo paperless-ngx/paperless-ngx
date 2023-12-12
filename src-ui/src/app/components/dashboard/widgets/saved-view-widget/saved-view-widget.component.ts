@@ -118,8 +118,11 @@ export class SavedViewWidgetComponent
     return this.documentService.getDownloadUrl(document.id)
   }
 
-  mouseEnterPreview(doc: PaperlessDocument) {
-    this.popover = this.popovers.get(this.documents.indexOf(doc))
+  mouseEnterPreviewButton(doc: PaperlessDocument) {
+    const newPopover = this.popovers.get(this.documents.indexOf(doc))
+    if (this.popover !== newPopover && this.popover?.isOpen())
+      this.popover.close()
+    this.popover = newPopover
     this.mouseOnPreview = true
     if (!this.popover.isOpen()) {
       // we're going to open but hide to pre-load content during hover delay
@@ -136,14 +139,24 @@ export class SavedViewWidgetComponent
     }
   }
 
-  mouseLeavePreview() {
-    this.mouseOnPreview = false
+  mouseEnterPreview() {
+    this.mouseOnPreview = true
   }
 
-  mouseLeaveCard() {
-    console.log('leave card')
+  mouseLeavePreview() {
+    this.mouseOnPreview = false
+    this.maybeClosePopover()
+  }
 
-    this.popover?.close()
+  mouseLeavePreviewButton() {
+    this.mouseOnPreview = false
+    this.maybeClosePopover()
+  }
+
+  maybeClosePopover() {
+    setTimeout(() => {
+      if (!this.mouseOnPreview) this.popover?.close()
+    }, 300)
   }
 
   getCorrespondentQueryParams(correspondentId: number): Params {
