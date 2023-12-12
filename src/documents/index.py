@@ -388,6 +388,7 @@ class DelayedFullTextQuery(DelayedQuery):
                 "type",
                 "notes",
                 "custom_fields",
+                "original_filename",
             ],
             self.searcher.ixreader.schema,
         )
