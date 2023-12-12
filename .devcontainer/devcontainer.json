@@ -1,0 +1,12 @@
+{
+    "name": "Paperless Development",
+    "dockerComposeFile": "docker-compose.devcontainer.sqlite-tika.yml",
+    "service": "paperless-development",
+    "workspaceFolder": "/usr/src/paperless/paperless",
+    "postCreateCommand": "/bin/bash -c pre-commit install && pipenv install --dev",
+    "extensions": [
+      "mhutchie.git-graph",
+      "ms-python.python"
+    ],
+    "remoteUser": "paperless"
+  }

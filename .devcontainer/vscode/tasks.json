@@ -1,0 +1,81 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+	{
+		"label": "Document Consumer",
+		"type": "shell",
+		"command": "pipenv run python manage.py document_consumer",
+		"group": "build",
+		"presentation": {
+			"echo": true,
+			"reveal": "always",
+			"focus": false,
+			"panel": "shared",
+			"showReuseMessage": false,
+			"clear": true,
+			"revealProblems": "onProblem"
+		},
+		"options": {
+			"cwd": "${workspaceFolder}/src"
+		}
+
+		},
+	  {
+		"label": "Maintenance: Migrate",
+		"type": "shell",
+		"command": "pipenv run python manage.py migrate",
+		"group": "none",
+		"presentation": {
+			"echo": true,
+			"reveal": "always",
+			"focus": true,
+			"panel": "shared",
+			"showReuseMessage": false,
+			"clear": true,
+			"revealProblems": "onProblem"
+		},
+		"options": {
+			"cwd": "${workspaceFolder}/src"
+		}
+	  },
+	  {
+		"label": "Maintenance: createsuperuser",
+		"type": "shell",
+		"command": "pipenv run python manage.py createsuperuser",
+		"group": "none",
+		"presentation": {
+			"echo": true,
+			"reveal": "always",
+			"focus": true,
+			"panel": "shared",
+			"showReuseMessage": false,
+			"clear": true,
+			"revealProblems": "onProblem"
+		},
+		"options": {
+			"cwd": "${workspaceFolder}/src"
+		}
+	  },
+	  {
+		"label": "Celery Worker",
+		"type": "shell",
+		"command": "pipenv run celery --app paperless worker -l DEBUG",
+		"group": {
+		  "kind": "build",
+		  "isDefault": true
+		},
+		"presentation": {
+			"echo": true,
+			"reveal": "always",
+			"focus": true,
+			"panel": "shared",
+			"showReuseMessage": false,
+			"clear": true,
+			"revealProblems": "onProblem"
+		},
+		"options": {
+			"cwd": "${workspaceFolder}/src"
+		}
+	  }
+	]
+  }

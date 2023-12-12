@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "paperless backend",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/manage.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["runserver"],
+            "django": true
+        }
+    ]
+}
