@@ -157,3 +157,55 @@ class TestFuzzyMatchCommand(TestCase):
         self.assertRegex(lines[0], self.MSG_REGEX)
         self.assertRegex(lines[1], self.MSG_REGEX)
         self.assertRegex(lines[2], self.MSG_REGEX)
+
+    def test_document_deletion(self):
+        """
+        GIVEN:
+            - 3 documents exist
+            - Document 1 to document 3 has a similarity over 85.0
+        WHEN:
+            - Command is called with the --delete option
+        THEN:
+            - User is warned about the deletion flag
+            - Document 3 is deleted
+            - Documents 1 and 2 remain
+        """
+        # Content similarity is 86.667
+        Document.objects.create(
+            checksum="BEEFCAFE",
+            title="A",
+            content="first document scanned by bob",
+            mime_type="application/pdf",
+            filename="test.pdf",
+        )
+        Document.objects.create(
+            checksum="DEADBEAF",
+            title="A",
+            content="second document scanned by alice",
+            mime_type="application/pdf",
+            filename="other_test.pdf",
+        )
+        Document.objects.create(
+            checksum="CATTLE",
+            title="A",
+            content="first document scanned by pete",
+            mime_type="application/pdf",
+            filename="final_test.pdf",
+        )
+
+        self.assertEqual(Document.objects.count(), 3)
+
+        stdout, _ = self.call_command("--delete")
+        print(stdout)
+        lines = [x.strip() for x in stdout.split("\n") if len(x.strip())]
+        self.assertEqual(len(lines), 3)
+        self.assertEqual(
+            lines[0],
+            "The command is configured to delete documents.  Use with caution",
+        )
+        self.assertRegex(lines[1], self.MSG_REGEX)
+        self.assertEqual(lines[2], "Deleting 1 documents based on ratio matches")
+
+        self.assertEqual(Document.objects.count(), 2)
+        self.assertIsNotNone(Document.objects.get(pk=1))
+        self.assertIsNotNone(Document.objects.get(pk=2))
