@@ -408,10 +408,17 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
             checksum="3",
             owner=user2,
         )
+        doc4 = Document.objects.create(
+            title="Test4",
+            content="content 4",
+            checksum="4",
+            owner=user1,
+        )
 
         assign_perm("view_document", user1, doc2)
         assign_perm("view_document", user1, doc3)
         assign_perm("change_document", user1, doc3)
+        assign_perm("view_document", user2, doc4)
 
         self.client.force_authenticate(user1)
 
@@ -427,8 +434,16 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         self.assertNotIn("permissions", resp_data["results"][0])
         self.assertIn("user_can_change", resp_data["results"][0])
         self.assertEqual(resp_data["results"][0]["user_can_change"], True)  # doc1
+        self.assertEqual(
+            resp_data["results"][0]["is_shared_by_requester"],
+            False,
+        )  # doc1
         self.assertEqual(resp_data["results"][1]["user_can_change"], False)  # doc2
         self.assertEqual(resp_data["results"][2]["user_can_change"], True)  # doc3
+        self.assertEqual(
+            resp_data["results"][3]["is_shared_by_requester"],
+            True,
+        )  # doc4
 
         response = self.client.get(
             "/api/documents/?full_perms=true",
@@ -441,6 +456,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
 
         self.assertIn("permissions", resp_data["results"][0])
         self.assertNotIn("user_can_change", resp_data["results"][0])
+        self.assertNotIn("is_shared_by_requester", resp_data["results"][0])
 
 
 class TestApiUser(DirectoriesMixin, APITestCase):
