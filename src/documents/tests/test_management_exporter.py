@@ -262,7 +262,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             self.assertEqual(Document.objects.get(id=self.d4.id).title, "wow_dec")
             self.assertEqual(GroupObjectPermission.objects.count(), 1)
             self.assertEqual(UserObjectPermission.objects.count(), 1)
-            self.assertEqual(Permission.objects.count(), 124)
+            self.assertEqual(Permission.objects.count(), 128)
             messages = check_sanity()
             # everything is alright after the test
             self.assertEqual(len(messages), 0)
@@ -702,7 +702,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         with paperless_environment():
             self.assertEqual(
                 len(list(filter(lambda e: e["model"] == "auth.permission", manifest))),
-                124,
+                128,
             )
             # add 1 more to db to show objects are not re-created by import
             Permission.objects.create(
@@ -710,7 +710,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                 codename="test_perm",
                 content_type_id=1,
             )
-            self.assertEqual(Permission.objects.count(), 125)
+            self.assertEqual(Permission.objects.count(), 129)
 
             # will cause an import error
             self.user.delete()
@@ -720,4 +720,4 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                 call_command("document_importer", "--no-progress-bar", self.target)
 
             self.assertEqual(ContentType.objects.count(), 32)
-            self.assertEqual(Permission.objects.count(), 128)
+            self.assertEqual(Permission.objects.count(), 129)
