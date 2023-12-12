@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "b395058a24154f74cb1f2d685d51de3f1028ecb48389fac9971209e258a15543"
+            "sha256": "d7ef8db734997cda7c11971f2ddb66bf1918f4232b0956a9bf604c41763ce461"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -566,12 +566,12 @@
         },
         "gotenberg-client": {
             "hashes": [
-                "sha256:3026726d1a47f41e9d43f18c95e530ff64f506e2ec436f116a088da27c7430da",
-                "sha256:c2555f7401faa48213a7cbe29c5e4a68316a003a6953753bc58d1e2b19873771"
+                "sha256:69e9dd5264b75ed0ba1f9eebebdc750b13d190710fd82ca0670d161c249155c9",
+                "sha256:dd0f49d3d4e01399949f39ac5024a5512566c8ded6ee457a336a5f77ce4c1a25"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==0.4.0"
+            "version": "==0.4.1"
         },
         "gunicorn": {
             "hashes": [
