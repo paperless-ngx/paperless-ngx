@@ -135,9 +135,9 @@ class Migration(migrations.Migration):
                     models.FloatField(
                         null=True,
                         validators=[
-                            django.core.validators.MinValueValidator(1000000.0),
+                            django.core.validators.MinValueValidator(1_000_000.0),
                         ],
-                        verbose_name="Sets the maximum image for decompression",
+                        verbose_name="Sets the maximum image size for decompression",
                     ),
                 ),
                 (

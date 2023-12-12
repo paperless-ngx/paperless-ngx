@@ -102,7 +102,7 @@ class OcrSettings(models.Model):
     )
 
     max_image_pixels = models.FloatField(
-        verbose_name=_("Sets the maximum image for decompression"),
+        verbose_name=_("Sets the maximum image size for decompression"),
         null=True,
         validators=[MinValueValidator(1_000_000.0)],
     )

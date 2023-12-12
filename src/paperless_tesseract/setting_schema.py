@@ -33,33 +33,30 @@ def get_ocr_settings() -> OcrSetting:
     assert db_settings is not None
 
     user_args = None
-    if db_settings is not None and db_settings.user_args:
+    if db_settings.user_args:
         user_args = db_settings.user_args
     elif settings.OCR_USER_ARGS is not None:
-        user_args = json.loads(settings.OCR_USER_ARGS)
+        try:
+            user_args = json.loads(settings.OCR_USER_ARGS)
+        except json.JSONDecodeError:
+            user_args = {}
 
     return OcrSetting(
         pages=db_settings.pages or settings.OCR_PAGES,
-        language=db_settings.language
-        if db_settings is not None and db_settings.language is not None
-        else settings.OCR_LANGUAGE,
+        language=db_settings.language or settings.OCR_LANGUAGE,
         output_type=db_settings.output_type or settings.OCR_OUTPUT_TYPE,
         mode=db_settings.mode or settings.OCR_MODE,
         skip_archive_file=(
             db_settings.skip_archive_file or settings.OCR_SKIP_ARCHIVE_FILE
         ),
-        image_dpi=db_settings.image_dpi
-        if db_settings is not None
-        else settings.OCR_IMAGE_DPI,
+        image_dpi=db_settings.image_dpi or settings.OCR_IMAGE_DPI,
         clean=db_settings.unpaper_clean or settings.OCR_CLEAN,
         deskew=db_settings.deskew or settings.OCR_DESKEW,
         rotate=db_settings.rotate_pages or settings.OCR_ROTATE_PAGES,
         rotate_threshold=(
             db_settings.rotate_pages_threshold or settings.OCR_ROTATE_PAGES_THRESHOLD
         ),
-        max_image_pixel=db_settings.max_image_pixels
-        if db_settings is not None
-        else settings.OCR_MAX_IMAGE_PIXELS,
+        max_image_pixel=db_settings.max_image_pixels or settings.OCR_MAX_IMAGE_PIXELS,
         color_conversion_strategy=(
             db_settings.color_conversion_strategy
             or settings.OCR_COLOR_CONVERSION_STRATEGY
