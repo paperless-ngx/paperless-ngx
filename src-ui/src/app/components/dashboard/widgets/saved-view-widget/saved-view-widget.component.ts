@@ -22,8 +22,6 @@ import { DocumentListViewService } from 'src/app/services/document-list-view.ser
 import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
-import { SettingsService } from 'src/app/services/settings.service'
-import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 
 @Component({
   selector: 'pngx-saved-view-widget',
@@ -42,8 +40,7 @@ export class SavedViewWidgetComponent
     private list: DocumentListViewService,
     private consumerStatusService: ConsumerStatusService,
     public openDocumentsService: OpenDocumentsService,
-    public documentListViewService: DocumentListViewService,
-    private settingsService: SettingsService
+    public documentListViewService: DocumentListViewService
   ) {
     super()
   }
@@ -113,23 +110,12 @@ export class SavedViewWidgetComponent
     ])
   }
 
-  get useNativePdfViewer(): boolean {
-    return this.settingsService.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
-  }
-
   getPreviewUrl(document: PaperlessDocument): string {
     return this.documentService.getPreviewUrl(document.id)
   }
 
   getDownloadUrl(document: PaperlessDocument): string {
     return this.documentService.getDownloadUrl(document.id)
-  }
-
-  isPdf(document: PaperlessDocument) {
-    return (
-      document.original_file_name?.endsWith('.pdf') ||
-      document.archived_file_name?.endsWith('.pdf')
-    )
   }
 
   mouseEnterPreview(doc: PaperlessDocument) {
@@ -155,6 +141,8 @@ export class SavedViewWidgetComponent
   }
 
   mouseLeaveCard() {
+    console.log('leave card')
+
     this.popover?.close()
   }
 

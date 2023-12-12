@@ -77,17 +77,6 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
     return $localize`Private`
   }
 
-  get useNativePdfViewer(): boolean {
-    return this.settingsService.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
-  }
-
-  get isPdf(): boolean {
-    return (
-      this.document?.original_file_name?.endsWith('.pdf') ||
-      this.document?.archived_file_name?.endsWith('.pdf')
-    )
-  }
-
   getTagsLimited$() {
     const limit = this.document.notes.length > 0 ? 6 : 7
     return this.document.tags$.pipe(

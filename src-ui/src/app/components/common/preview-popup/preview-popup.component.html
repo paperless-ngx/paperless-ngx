@@ -3,25 +3,20 @@
         <p class="fst-italic position-absolute top-50 start-50 translate-middle" i18n>Error loading preview</p>
     </div>
     <ng-template #noError>
-        <ng-container *ngIf="renderAsPlainText; else renderAsObject">
-            <div class="preview-sticky bg-light p-3 overflow-auto" width="100%">{{previewText}}</div>
-        </ng-container>
-        <ng-template #renderAsObject>
-            <object *ngIf="useNativePdfViewer; else pngxViewer" [data]="previewURL | safeUrl" width="100%"></object>
-            <ng-template #pngxViewer>
-                <div *ngIf="requiresPassword" class="w-100 h-100 position-relative">
-                    <svg width="2em" height="2em" fill="currentColor" class="position-absolute top-50 start-50 translate-middle">
-                      <use xlink:href="assets/bootstrap-icons.svg#file-earmark-lock"/>
-                    </svg>
-                </div>
-                <pngx-pdf-viewer *ngIf="!requiresPassword"
-                    [src]="previewURL"
-                    [original-size]="false"
-                    [show-borders]="true"
-                    [show-all]="false"
-                    (error)="onError($event)">
-                </pngx-pdf-viewer>
-            </ng-template>
+        <object *ngIf="renderAsObject; else pngxViewer" [data]="previewURL | safeUrl" width="100%" class="bg-light" [class.p-2]="!isPdf"></object>
+        <ng-template #pngxViewer>
+            <div *ngIf="requiresPassword" class="w-100 h-100 position-relative">
+                <svg width="2em" height="2em" fill="currentColor" class="position-absolute top-50 start-50 translate-middle">
+                  <use xlink:href="assets/bootstrap-icons.svg#file-earmark-lock"/>
+                </svg>
+            </div>
+            <pngx-pdf-viewer *ngIf="!requiresPassword"
+                [src]="previewURL"
+                [original-size]="false"
+                [show-borders]="true"
+                [show-all]="true"
+                (error)="onError($event)">
+            </pngx-pdf-viewer>
         </ng-template>
     </ng-template>
 </div>

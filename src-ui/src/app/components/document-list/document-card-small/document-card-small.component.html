@@ -94,12 +94,7 @@
             </svg>
           </a>
           <ng-template #previewContent>
-            <pngx-preview-popup
-              [previewURL]="previewUrl"
-              [useNativePdfViewer]="useNativePdfViewer"
-              [previewText]="document.content"
-              [renderAsPlainText]="!isPdf">
-            </pngx-preview-popup>
+            <pngx-preview-popup [document]="document"></pngx-preview-popup>
           </ng-template>
           <a [href]="getDownloadUrl()" class="btn btn-sm btn-outline-secondary" title="Download" i18n-title (click)="$event.stopPropagation()">
             <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-download" fill="currentColor" xmlns="http://www.w3.org/2000/svg">

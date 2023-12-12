@@ -103,17 +103,6 @@ export class DocumentCardLargeComponent extends ComponentWithPermissions {
     return this.documentService.getPreviewUrl(this.document.id)
   }
 
-  get useNativePdfViewer(): boolean {
-    return this.settingsService.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
-  }
-
-  get isPdf(): boolean {
-    return (
-      this.document?.original_file_name?.endsWith('.pdf') ||
-      this.document?.archived_file_name?.endsWith('.pdf')
-    )
-  }
-
   mouseEnterPreview() {
     this.mouseOnPreview = true
     if (!this.popover.isOpen()) {
