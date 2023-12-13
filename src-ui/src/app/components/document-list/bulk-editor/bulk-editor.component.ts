@@ -518,7 +518,12 @@ export class BulkEditorComponent
       )
       .pipe(first())
       .subscribe((result: any) => {
-        saveAs(result, 'documents.zip')
+        saveAs(
+          result,
+          this.downloadForm.get('downloadAsSingleFile').value
+            ? 'documents.pdf'
+            : 'documents.zip'
+        )
         this.awaitingDownload = false
       })
   }
