@@ -166,6 +166,19 @@ def run_convert(
         raise ParseError(f"Convert failed at {args}")
 
 
+def merge_pdfs(input_files, output_file):
+    cmd = [settings.GS_BINARY]
+    cmd += ["-sDEVICE=pdfwrite"]
+    cmd += ["-dBATCH"]
+    cmd += ["-dNOPAUSE"]
+    cmd += ["-q"]
+    cmd += [f"-sOutputFile={output_file}"]
+    cmd += input_files
+
+    if not subprocess.Popen(cmd).wait() == 0:
+        raise ParseError(f"Merge failed at {cmd}")
+
+
 def get_default_thumbnail() -> Path:
     """
     Returns the path to a generic thumbnail
