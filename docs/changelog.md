@@ -2,10 +2,6 @@
 
 ## paperless-ngx 2.1.2
 
-### Features
-
-- Fix: allow text copy in pngx pdf viewer [@shamoon](https://github.com/shamoon) ([#4938](https://github.com/paperless-ngx/paperless-ngx/pull/4938))
-
 ### Bug Fixes
 
 - Fix: sort consumption templates by order by default [@shamoon](https://github.com/shamoon) ([#4956](https://github.com/paperless-ngx/paperless-ngx/pull/4956))
