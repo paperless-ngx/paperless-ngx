@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-05 08:26-0800\n"
-"PO-Revision-Date: 2023-12-05 16:27\n"
+"PO-Revision-Date: 2023-12-10 00:26\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -385,23 +385,23 @@ msgstr "local de armazenamento é"
 
 #: documents/models.py:448
 msgid "has correspondent in"
-msgstr ""
+msgstr "tem correspondente em"
 
 #: documents/models.py:449
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "não tem correspondente em"
 
 #: documents/models.py:450
 msgid "has document type in"
-msgstr ""
+msgstr "tem categoria de documento em"
 
 #: documents/models.py:451
 msgid "does not have document type in"
-msgstr ""
+msgstr "não tem categoria de documento em"
 
 #: documents/models.py:452
 msgid "has storage path in"
-msgstr ""
+msgstr "tem caminho de armazenamento em"
 
 #: documents/models.py:453
 msgid "does not have storage path in"

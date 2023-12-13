@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-05 08:26-0800\n"
-"PO-Revision-Date: 2023-12-05 16:27\n"
+"PO-Revision-Date: 2023-12-08 12:09\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -581,7 +581,7 @@ msgstr "Monetari"
 
 #: documents/models.py:759
 msgid "Document Link"
-msgstr ""
+msgstr "Enllaç Document"
 
 #: documents/models.py:771
 msgid "data type"
@@ -685,7 +685,7 @@ msgstr "dóna permissos d'edició a aquests grups"
 
 #: documents/models.py:1019
 msgid "assign these custom fields"
-msgstr ""
+msgstr "assigna aquests camps personalitzats"
 
 #: documents/models.py:1023
 msgid "consumption template"
@@ -1172,15 +1172,15 @@ msgstr "filtra cos"
 
 #: paperless_mail/models.py:143
 msgid "filter attachment filename inclusive"
-msgstr ""
+msgstr "filtra nom del fitxer adjunt incloent"
 
 #: paperless_mail/models.py:155
 msgid "filter attachment filename exclusive"
-msgstr ""
+msgstr "filtra nom del fitxer adjunt excloent"
 
 #: paperless_mail/models.py:160
 msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "No consumeixis documents que coincideixin aquest nom d'arxiu especificat. Comodins com *.pdf o *factura* permessos. Cas insensitiu."
 
 #: paperless_mail/models.py:167
 msgid "maximum age"
