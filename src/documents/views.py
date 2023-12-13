@@ -59,6 +59,7 @@ from rest_framework.viewsets import ViewSet
 
 from documents import bulk_edit
 from documents.bulk_download import ArchiveOnlyStrategy
+from documents.bulk_download import MergedPdfFile
 from documents.bulk_download import OriginalAndArchiveStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
 from documents.classifier import load_classifier
@@ -1076,6 +1077,7 @@ class BulkDownloadView(GenericAPIView):
         compression = serializer.validated_data.get("compression")
         content = serializer.validated_data.get("content")
         follow_filename_format = serializer.validated_data.get("follow_formatting")
+        single_file = serializer.validated_data.get("single_file")
 
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
         temp = tempfile.NamedTemporaryFile(
@@ -1091,18 +1093,21 @@ class BulkDownloadView(GenericAPIView):
         else:
             strategy_class = ArchiveOnlyStrategy
 
-        with zipfile.ZipFile(temp.name, "w", compression) as zipf:
-            strategy = strategy_class(zipf, follow_filename_format)
+        def _get_bulk_document_writer():
+            if single_file:
+                return MergedPdfFile(temp.name)
+            else:
+                return zipfile.ZipFile(temp.name, "w", compression)
+
+        with _get_bulk_document_writer() as writer:
+            strategy = strategy_class(writer, follow_filename_format)
             for id in ids:
                 doc = Document.objects.get(id=id)
                 strategy.add_document(doc)
 
         with open(temp.name, "rb") as f:
             response = HttpResponse(f, content_type="application/zip")
-            response["Content-Disposition"] = '{}; filename="{}"'.format(
-                "attachment",
-                "documents.zip",
-            )
+            response["Content-Disposition"] = "attachment"
 
             return response
 
