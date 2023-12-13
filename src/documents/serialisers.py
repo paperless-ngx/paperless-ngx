@@ -874,6 +874,10 @@ class BulkDownloadSerializer(DocumentListSerializer):
         default="none",
     )
 
+    single_file = serializers.BooleanField(
+        default=False,
+    )
+
     follow_formatting = serializers.BooleanField(
         default=False,
     )
