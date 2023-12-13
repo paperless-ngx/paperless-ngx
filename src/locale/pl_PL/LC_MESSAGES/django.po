@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-05 08:26-0800\n"
-"PO-Revision-Date: 2023-12-05 16:27\n"
+"PO-Revision-Date: 2023-12-11 00:25\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -665,7 +665,7 @@ msgstr ""
 
 #: documents/models.py:984
 msgid "assign this owner"
-msgstr ""
+msgstr "przypisz tego właściciela"
 
 #: documents/models.py:991
 msgid "grant view permissions to these users"
@@ -751,11 +751,11 @@ msgstr "Twoja nazwa użytkownika i hasło nie są zgodne. Spróbuj ponownie."
 
 #: documents/templates/registration/login.html:48
 msgid "Share link was not found."
-msgstr ""
+msgstr "Link nie został odnaleziony."
 
 #: documents/templates/registration/login.html:52
 msgid "Share link has expired."
-msgstr ""
+msgstr "Link utracił ważność."
 
 #: documents/templates/registration/login.html:55
 msgid "Username"
@@ -779,7 +779,7 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_complete.html:40
 msgid "Password reset complete."
-msgstr ""
+msgstr "Resetowanie hasła zakończone."
 
 #: documents/templates/registration/password_reset_complete.html:42
 #, python-format

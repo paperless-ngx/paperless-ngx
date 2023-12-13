@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-05 08:26-0800\n"
-"PO-Revision-Date: 2023-12-06 12:09\n"
+"PO-Revision-Date: 2023-12-10 00:26\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -385,27 +385,27 @@ msgstr "caminho de armazenamento é"
 
 #: documents/models.py:448
 msgid "has correspondent in"
-msgstr ""
+msgstr "tem correspondente em"
 
 #: documents/models.py:449
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "não tem correspondente em"
 
 #: documents/models.py:450
 msgid "has document type in"
-msgstr ""
+msgstr "possui categoria de documento em"
 
 #: documents/models.py:451
 msgid "does not have document type in"
-msgstr ""
+msgstr "não possui categoria de documento em"
 
 #: documents/models.py:452
 msgid "has storage path in"
-msgstr ""
+msgstr "possui caminho de armazenamento em"
 
 #: documents/models.py:453
 msgid "does not have storage path in"
-msgstr ""
+msgstr "não possui caminho de armazenamento em"
 
 #: documents/models.py:454
 msgid "owner is"
@@ -513,7 +513,7 @@ msgstr "Os dados retornados pela tarefa"
 
 #: documents/models.py:650
 msgid "Note for the document"
-msgstr ""
+msgstr "Nota para o documento"
 
 #: documents/models.py:674
 msgid "user"
@@ -521,7 +521,7 @@ msgstr "usuário"
 
 #: documents/models.py:679
 msgid "note"
-msgstr ""
+msgstr "nota"
 
 #: documents/models.py:680
 msgid "notes"
@@ -529,15 +529,15 @@ msgstr "notas"
 
 #: documents/models.py:688
 msgid "Archive"
-msgstr ""
+msgstr "Arquivo"
 
 #: documents/models.py:689
 msgid "Original"
-msgstr ""
+msgstr "Original"
 
 #: documents/models.py:700
 msgid "expiration"
-msgstr ""
+msgstr "validade"
 
 #: documents/models.py:707
 msgid "slug"
@@ -553,15 +553,15 @@ msgstr "compartilhar link"
 
 #: documents/models.py:752
 msgid "String"
-msgstr ""
+msgstr "Texto"
 
 #: documents/models.py:753
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: documents/models.py:754
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 #: documents/models.py:755
 msgid "Boolean"
@@ -573,7 +573,7 @@ msgstr "Número inteiro"
 
 #: documents/models.py:757
 msgid "Float"
-msgstr ""
+msgstr "Ponto flutuante"
 
 #: documents/models.py:758
 msgid "Monetary"
@@ -581,15 +581,15 @@ msgstr "Unidade monetária"
 
 #: documents/models.py:759
 msgid "Document Link"
-msgstr ""
+msgstr "Link do documento"
 
 #: documents/models.py:771
 msgid "data type"
-msgstr ""
+msgstr "tipo de dados"
 
 #: documents/models.py:779
 msgid "custom field"
-msgstr ""
+msgstr "campo personalizado"
 
 #: documents/models.py:780
 msgid "custom fields"
@@ -597,11 +597,11 @@ msgstr "campos personalizados"
 
 #: documents/models.py:842
 msgid "custom field instance"
-msgstr ""
+msgstr "instância de campo personalizado"
 
 #: documents/models.py:843
 msgid "custom field instances"
-msgstr ""
+msgstr "instâncias de campo personalizadas"
 
 #: documents/models.py:891
 msgid "Consume Folder"

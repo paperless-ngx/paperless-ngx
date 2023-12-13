@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-05 08:26-0800\n"
-"PO-Revision-Date: 2023-12-05 16:27\n"
+"PO-Revision-Date: 2023-12-09 00:23\n"
 "Last-Translator: \n"
 "Language-Team: Hebrew\n"
 "Language: he_IL\n"
@@ -533,7 +533,7 @@ msgstr ""
 
 #: documents/models.py:689
 msgid "Original"
-msgstr ""
+msgstr "מקור"
 
 #: documents/models.py:700
 msgid "expiration"
@@ -545,11 +545,11 @@ msgstr ""
 
 #: documents/models.py:739
 msgid "share link"
-msgstr ""
+msgstr "שתף קישור"
 
 #: documents/models.py:740
 msgid "share links"
-msgstr ""
+msgstr "שתף קישורים"
 
 #: documents/models.py:752
 msgid "String"
@@ -557,11 +557,11 @@ msgstr ""
 
 #: documents/models.py:753
 msgid "URL"
-msgstr ""
+msgstr "כתובת URL"
 
 #: documents/models.py:754
 msgid "Date"
-msgstr ""
+msgstr "תאריך"
 
 #: documents/models.py:755
 msgid "Boolean"
@@ -589,11 +589,11 @@ msgstr ""
 
 #: documents/models.py:779
 msgid "custom field"
-msgstr ""
+msgstr "שדה מותאם אישית"
 
 #: documents/models.py:780
 msgid "custom fields"
-msgstr ""
+msgstr "שדות מותאמים אישית"
 
 #: documents/models.py:842
 msgid "custom field instance"
@@ -771,7 +771,7 @@ msgstr "התחבר"
 
 #: documents/templates/registration/login.html:70
 msgid "Forgot your password?"
-msgstr ""
+msgstr "שכחת את הסיסמה?"
 
 #: documents/templates/registration/password_reset_complete.html:14
 msgid "Paperless-ngx reset password complete"
@@ -779,7 +779,7 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_complete.html:40
 msgid "Password reset complete."
-msgstr ""
+msgstr "איפוס סיסמה הושלם."
 
 #: documents/templates/registration/password_reset_complete.html:42
 #, python-format
@@ -820,11 +820,11 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_done.html:40
 msgid "Check your inbox."
-msgstr ""
+msgstr "בדוק את תיבת הדואר שלך."
 
 #: documents/templates/registration/password_reset_done.html:41
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
-msgstr ""
+msgstr "נשלח מייל עם הוראות להגדרת הסיסמה שלך. אתה צריך לקבל מייל בקרוב!"
 
 #: documents/templates/registration/password_reset_form.html:14
 msgid "Paperless-ngx reset password request"
@@ -836,7 +836,7 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_form.html:44
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "אירעה שגיאה. נא לנסות שוב."
 
 #: documents/templates/registration/password_reset_form.html:47
 msgid "Email"
@@ -844,7 +844,7 @@ msgstr "דוא\"ל"
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
-msgstr ""
+msgstr "שלח לי את ההוראות!"
 
 #: paperless/apps.py:10
 msgid "Paperless"
@@ -868,7 +868,7 @@ msgstr "בלרוסית"
 
 #: paperless/settings.py:590
 msgid "Bulgarian"
-msgstr ""
+msgstr "בולגרית"
 
 #: paperless/settings.py:591
 msgid "Catalan"
@@ -908,7 +908,7 @@ msgstr "צרפתית"
 
 #: paperless/settings.py:600
 msgid "Hungarian"
-msgstr ""
+msgstr "הונגרית"
 
 #: paperless/settings.py:601
 msgid "Italian"
