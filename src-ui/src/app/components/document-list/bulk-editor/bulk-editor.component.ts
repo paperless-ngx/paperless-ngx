@@ -511,7 +511,7 @@ export class BulkEditorComponent
           : 'originals'
     this.documentService
       .bulkDownload(
-        Array.from(this.list.selected),
+        this.list.getSelectedInOrder(),
         downloadFileType,
         this.downloadForm.get('downloadAsSingleFile').value,
         this.downloadForm.get('downloadUseFormatting').value

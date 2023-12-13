@@ -358,6 +358,12 @@ export class DocumentListViewService {
     return this.activeListViewState.selected
   }
 
+  getSelectedInOrder(): number[] {
+    return this.activeListViewState.documents
+      .filter((item) => this.activeListViewState.selected.has(item.id))
+      .map((item) => item.id)
+  }
+
   setSort(field: string, reverse: boolean) {
     this.activeListViewState.sortField = field
     this.activeListViewState.sortReverse = reverse
