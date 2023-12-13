@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-05 08:26-0800\n"
-"PO-Revision-Date: 2023-12-05 16:27\n"
+"PO-Revision-Date: 2023-12-12 00:24\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -581,7 +581,7 @@ msgstr "Monétaire"
 
 #: documents/models.py:759
 msgid "Document Link"
-msgstr ""
+msgstr "Lien du Document"
 
 #: documents/models.py:771
 msgid "data type"
