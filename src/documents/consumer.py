@@ -691,6 +691,7 @@ class Consumer(LoggingMixin):
             added_month_name_short=local_added.strftime("%b"),
             added_day=local_added.strftime("%d"),
             owner_username=owner_username,
+            original_filename=self.filename,
         ).strip()
 
     def _store(
