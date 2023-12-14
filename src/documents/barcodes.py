@@ -324,7 +324,7 @@ class BarcodeReader:
             logger.warning("No pages to split on!")
             return False
 
-        tmp_dir = Path(tempfile.mkdtemp()).resolve()
+        tmp_dir = Path(tempfile.mkdtemp(prefix="paperless-barcode-split-")).resolve()
 
         from documents import tasks
 
@@ -342,5 +342,5 @@ class BarcodeReader:
                 # All the same metadata
                 overrides,
             )
-
+        logger.info("Barcode splitting complete!")
         return True
