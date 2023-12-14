@@ -52,9 +52,11 @@
         </label>
       </div>
       <div>
-        <button *ngFor="let f of getSortFields()" ngbDropdownItem (click)="setSortField(f.field)"
-          [class.active]="list.sortField === f.field">{{f.name}}
-        </button>
+        @for (f of getSortFields(); track f) {
+          <button ngbDropdownItem (click)="setSortField(f.field)"
+            [class.active]="list.sortField === f.field">{{f.name}}
+          </button>
+        }
       </div>
     </div>
   </div>
@@ -62,18 +64,26 @@
   <div class="btn-group ms-2 flex-fill" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }" ngbDropdown role="group">
     <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" tourAnchor="tour.documents-views" ngbDropdownToggle>
       <ng-container i18n>Views</ng-container>
-      <div *ngIf="savedViewIsModified" class="position-absolute top-0 start-100 p-2 translate-middle badge bg-secondary border border-light rounded-circle">
-        <span class="visually-hidden">selected</span>
-      </div>
+      @if (savedViewIsModified) {
+        <div class="position-absolute top-0 start-100 p-2 translate-middle badge bg-secondary border border-light rounded-circle">
+          <span class="visually-hidden">selected</span>
+        </div>
+      }
     </button>
     <div class="dropdown-menu shadow dropdown-menu-right" ngbDropdownMenu>
-      <ng-container *ngIf="!list.activeSavedViewId">
-        <button ngbDropdownItem *ngFor="let view of savedViewService.allViews" (click)="loadViewConfig(view.id)">{{view.name}}</button>
-        <div class="dropdown-divider" *ngIf="savedViewService.allViews.length > 0"></div>
-      </ng-container>
+      @if (!list.activeSavedViewId) {
+        @for (view of savedViewService.allViews; track view) {
+          <button ngbDropdownItem (click)="loadViewConfig(view.id)">{{view.name}}</button>
+        }
+        @if (savedViewService.allViews.length > 0) {
+          <div class="dropdown-divider"></div>
+        }
+      }
 
       <div *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.SavedView }">
-        <button ngbDropdownItem (click)="saveViewConfig()" *ngIf="list.activeSavedViewId" [disabled]="!savedViewIsModified" i18n>Save "{{list.activeSavedViewTitle}}"</button>
+        @if (list.activeSavedViewId) {
+          <button ngbDropdownItem (click)="saveViewConfig()" [disabled]="!savedViewIsModified" i18n>Save "{{list.activeSavedViewTitle}}"</button>
+        }
       </div>
       <button ngbDropdownItem (click)="saveViewConfigAs()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.SavedView }" i18n>Save as...</button>
     </div>
@@ -90,165 +100,191 @@
 <ng-template #pagination>
   <div class="d-flex flex-wrap gap-3 justify-content-between align-items-center mb-3">
     <div class="d-flex align-items-center">
-      <ng-container *ngIf="list.isReloading">
+      @if (list.isReloading) {
         <div class="spinner-border spinner-border-sm me-2" role="status"></div>
         <ng-container i18n>Loading...</ng-container>
-      </ng-container>
-      <span i18n *ngIf="list.selected.size > 0">{list.collectionSize, plural, =1 {Selected {{list.selected.size}} of one document} other {Selected {{list.selected.size}} of {{list.collectionSize || 0}} documents}}</span>
-      <ng-container *ngIf="!list.isReloading">
-        <span i18n *ngIf="list.selected.size === 0">{list.collectionSize, plural, =1 {One document} other {{{list.collectionSize || 0}} documents}}</span>&nbsp;<span i18n *ngIf="isFiltered">(filtered)</span>
-      </ng-container>
-      <button *ngIf="!list.isReloading && isFiltered" class="btn btn-link py-0" (click)="resetFilters()">
-        <svg fill="currentColor" class="buttonicon-sm">
-          <use xlink:href="assets/bootstrap-icons.svg#x"/>
-        </svg><small i18n>Reset filters</small>
-      </button>
+      }
+      @if (list.selected.size > 0) {
+        <span i18n>{list.collectionSize, plural, =1 {Selected {{list.selected.size}} of one document} other {Selected {{list.selected.size}} of {{list.collectionSize || 0}} documents}}</span>
+      }
+      @if (!list.isReloading) {
+        @if (list.selected.size === 0) {
+          <span i18n>{list.collectionSize, plural, =1 {One document} other {{{list.collectionSize || 0}} documents}}</span>
+          }&nbsp;@if (isFiltered) {
+          <span i18n>(filtered)</span>
+        }
+      }
+      @if (!list.isReloading && isFiltered) {
+        <button class="btn btn-link py-0" (click)="resetFilters()">
+          <svg fill="currentColor" class="buttonicon-sm">
+            <use xlink:href="assets/bootstrap-icons.svg#x"/>
+            </svg><small i18n>Reset filters</small>
+          </button>
+        }
+      </div>
+      @if (list.collectionSize) {
+        <ngb-pagination [pageSize]="list.currentPageSize" [collectionSize]="list.collectionSize" [(page)]="list.currentPage" [maxSize]="5"
+        [rotate]="true" aria-label="Default pagination" size="sm"></ngb-pagination>
+      }
     </div>
-    <ngb-pagination *ngIf="list.collectionSize" [pageSize]="list.currentPageSize" [collectionSize]="list.collectionSize" [(page)]="list.currentPage" [maxSize]="5"
-    [rotate]="true" aria-label="Default pagination" size="sm"></ngb-pagination>
-  </div>
-</ng-template>
+  </ng-template>
 
-<div tourAnchor="tour.documents">
-  <ng-container *ngTemplateOutlet="pagination"></ng-container>
-</div>
-
-<ng-container *ngIf="list.error ; else documentListNoError">
-  <div class="alert alert-danger" role="alert"><ng-container i18n>Error while loading documents</ng-container>: {{list.error}}</div>
-</ng-container>
-
-<ng-template #documentListNoError>
-  <div *ngIf="displayMode === 'largeCards'">
-    <pngx-document-card-large [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" (dblClickDocument)="openDocumentDetail(d)" *ngFor="let d of list.documents; trackBy: trackByDocumentId" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)" (clickStoragePath)="clickStoragePath($event)" (clickMoreLike)="clickMoreLike(d.id)">
-    </pngx-document-card-large>
-  </div>
-
-  <table class="table table-sm align-middle border shadow-sm" *ngIf="displayMode === 'details'">
-    <thead>
-      <th></th>
-      <th class="d-none d-lg-table-cell"
-        pngxSortable="archive_serial_number"
-        title="Sort by ASN" i18n-title
-        [currentSortField]="list.sortField"
-        [currentSortReverse]="list.sortReverse"
-        (sort)="onSort($event)"
-        i18n>ASN</th>
-      <th class="d-none d-md-table-cell"
-        pngxSortable="correspondent__name"
-        title="Sort by correspondent" i18n-title
-        [currentSortField]="list.sortField"
-        [currentSortReverse]="list.sortReverse"
-        (sort)="onSort($event)"
-        i18n>Correspondent</th>
-      <th
-        pngxSortable="title"
-        title="Sort by title" i18n-title
-        class="w-40"
-        [currentSortField]="list.sortField"
-        [currentSortReverse]="list.sortReverse"
-        (sort)="onSort($event)"
-        i18n>Title</th>
-      <th class="d-none d-xl-table-cell"
-        pngxSortable="owner"
-        title="Sort by owner" i18n-title
-        [currentSortField]="list.sortField"
-        [currentSortReverse]="list.sortReverse"
-        (sort)="onSort($event)"
-        i18n>Owner</th>
-      <th *ngIf="notesEnabled" class="d-none d-xl-table-cell"
-        pngxSortable="num_notes"
-        title="Sort by notes" i18n-title
-        [currentSortField]="list.sortField"
-        [currentSortReverse]="list.sortReverse"
-        (sort)="onSort($event)"
-        i18n>Notes</th>
-      <th class="d-none d-xl-table-cell"
-        pngxSortable="document_type__name"
-        title="Sort by document type" i18n-title
-        [currentSortField]="list.sortField"
-        [currentSortReverse]="list.sortReverse"
-        (sort)="onSort($event)"
-        i18n>Document type</th>
-      <th class="d-none d-xl-table-cell"
-        pngxSortable="storage_path__name"
-        title="Sort by storage path" i18n-title
-        [currentSortField]="list.sortField"
-        [currentSortReverse]="list.sortReverse"
-        (sort)="onSort($event)"
-        i18n>Storage path</th>
-      <th
-        pngxSortable="created"
-        title="Sort by created date" i18n-title
-        [currentSortField]="list.sortField"
-        [currentSortReverse]="list.sortReverse"
-        (sort)="onSort($event)"
-        i18n>Created</th>
-      <th class="d-none d-xl-table-cell"
-        pngxSortable="added"
-        title="Sort by added date" i18n-title
-        [currentSortField]="list.sortField"
-        [currentSortReverse]="list.sortReverse"
-        (sort)="onSort($event)"
-        i18n>Added</th>
-    </thead>
-    <tbody>
-      <tr *ngFor="let d of list.documents; trackBy: trackByDocumentId" (click)="toggleSelected(d, $event); $event.stopPropagation();" (dblclick)="openDocumentDetail(d)" [ngClass]="list.isSelected(d) ? 'table-row-selected' : ''">
-        <td>
-          <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="docCheck{{d.id}}" [checked]="list.isSelected(d)" (click)="toggleSelected(d, $event); $event.stopPropagation();">
-            <label class="form-check-label" for="docCheck{{d.id}}"></label>
-          </div>
-        </td>
-        <td class="d-none d-lg-table-cell">
-          {{d.archive_serial_number}}
-        </td>
-        <td class="d-none d-md-table-cell">
-          <ng-container *ngIf="d.correspondent">
-            <a (click)="clickCorrespondent(d.correspondent);$event.stopPropagation()" title="Filter by correspondent" i18n-title>{{(d.correspondent$ | async)?.name}}</a>
-          </ng-container>
-        </td>
-        <td>
-          <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
-          <pngx-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ms-1" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(t.id);$event.stopPropagation()"></pngx-tag>
-        </td>
-        <td>
-          {{d.owner | username}}
-        </td>
-        <td *ngIf="notesEnabled" class="d-none d-xl-table-cell">
-          <a *ngIf="d.notes.length" routerLink="/documents/{{d.id}}/notes" class="btn btn-sm p-0">
-            <span class="badge rounded-pill bg-light border text-primary">
-            <svg class="metadata-icon ms-1 me-1" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#chat-left-text"/>
-            </svg>
-            {{d.notes.length}}</span>
-          </a>
-        </td>
-        <td class="d-none d-xl-table-cell">
-          <ng-container *ngIf="d.document_type">
-            <a (click)="clickDocumentType(d.document_type);$event.stopPropagation()" title="Filter by document type" i18n-title>{{(d.document_type$ | async)?.name}}</a>
-          </ng-container>
-        </td>
-        <td class="d-none d-xl-table-cell">
-          <ng-container *ngIf="d.storage_path">
-            <a (click)="clickStoragePath(d.storage_path);$event.stopPropagation()" title="Filter by storage path" i18n-title>{{(d.storage_path$ | async)?.name}}</a>
-          </ng-container>
-        </td>
-        <td>
-          {{d.created_date | customDate}}
-        </td>
-        <td class="d-none d-xl-table-cell">
-          {{d.added | customDate}}
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <div class="row row-cols-paperless-cards" *ngIf="displayMode === 'smallCards'">
-    <pngx-document-card-small class="p-0" [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" (dblClickDocument)="openDocumentDetail(d)" [document]="d" *ngFor="let d of list.documents; trackBy: trackByDocumentId" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickStoragePath)="clickStoragePath($event)" (clickDocumentType)="clickDocumentType($event)"></pngx-document-card-small>
-  </div>
-  <div *ngIf="list.documents?.length > 15" class="mt-3">
+  <div tourAnchor="tour.documents">
     <ng-container *ngTemplateOutlet="pagination"></ng-container>
   </div>
 
-
-</ng-template>
+  @if (list.error ) {
+    <div class="alert alert-danger" role="alert"><ng-container i18n>Error while loading documents</ng-container>: {{list.error}}</div>
+  } @else {
+    @if (displayMode === 'largeCards') {
+      <div>
+        @for (d of list.documents; track trackByDocumentId($index, d)) {
+          <pngx-document-card-large [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" (dblClickDocument)="openDocumentDetail(d)" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)" (clickStoragePath)="clickStoragePath($event)" (clickMoreLike)="clickMoreLike(d.id)">
+          </pngx-document-card-large>
+        }
+      </div>
+    }
+    @if (displayMode === 'details') {
+      <table class="table table-sm align-middle border shadow-sm">
+        <thead>
+          <th></th>
+          <th class="d-none d-lg-table-cell"
+            pngxSortable="archive_serial_number"
+            title="Sort by ASN" i18n-title
+            [currentSortField]="list.sortField"
+            [currentSortReverse]="list.sortReverse"
+            (sort)="onSort($event)"
+          i18n>ASN</th>
+          <th class="d-none d-md-table-cell"
+            pngxSortable="correspondent__name"
+            title="Sort by correspondent" i18n-title
+            [currentSortField]="list.sortField"
+            [currentSortReverse]="list.sortReverse"
+            (sort)="onSort($event)"
+          i18n>Correspondent</th>
+          <th
+            pngxSortable="title"
+            title="Sort by title" i18n-title
+            class="w-40"
+            [currentSortField]="list.sortField"
+            [currentSortReverse]="list.sortReverse"
+            (sort)="onSort($event)"
+          i18n>Title</th>
+          <th class="d-none d-xl-table-cell"
+            pngxSortable="owner"
+            title="Sort by owner" i18n-title
+            [currentSortField]="list.sortField"
+            [currentSortReverse]="list.sortReverse"
+            (sort)="onSort($event)"
+          i18n>Owner</th>
+          @if (notesEnabled) {
+            <th class="d-none d-xl-table-cell"
+              pngxSortable="num_notes"
+              title="Sort by notes" i18n-title
+              [currentSortField]="list.sortField"
+              [currentSortReverse]="list.sortReverse"
+              (sort)="onSort($event)"
+            i18n>Notes</th>
+          }
+          <th class="d-none d-xl-table-cell"
+            pngxSortable="document_type__name"
+            title="Sort by document type" i18n-title
+            [currentSortField]="list.sortField"
+            [currentSortReverse]="list.sortReverse"
+            (sort)="onSort($event)"
+          i18n>Document type</th>
+          <th class="d-none d-xl-table-cell"
+            pngxSortable="storage_path__name"
+            title="Sort by storage path" i18n-title
+            [currentSortField]="list.sortField"
+            [currentSortReverse]="list.sortReverse"
+            (sort)="onSort($event)"
+          i18n>Storage path</th>
+          <th
+            pngxSortable="created"
+            title="Sort by created date" i18n-title
+            [currentSortField]="list.sortField"
+            [currentSortReverse]="list.sortReverse"
+            (sort)="onSort($event)"
+          i18n>Created</th>
+          <th class="d-none d-xl-table-cell"
+            pngxSortable="added"
+            title="Sort by added date" i18n-title
+            [currentSortField]="list.sortField"
+            [currentSortReverse]="list.sortReverse"
+            (sort)="onSort($event)"
+          i18n>Added</th>
+        </thead>
+        <tbody>
+          @for (d of list.documents; track trackByDocumentId($index, d)) {
+            <tr (click)="toggleSelected(d, $event); $event.stopPropagation();" (dblclick)="openDocumentDetail(d)" [ngClass]="list.isSelected(d) ? 'table-row-selected' : ''">
+              <td>
+                <div class="form-check">
+                  <input type="checkbox" class="form-check-input" id="docCheck{{d.id}}" [checked]="list.isSelected(d)" (click)="toggleSelected(d, $event); $event.stopPropagation();">
+                  <label class="form-check-label" for="docCheck{{d.id}}"></label>
+                </div>
+              </td>
+              <td class="d-none d-lg-table-cell">
+                {{d.archive_serial_number}}
+              </td>
+              <td class="d-none d-md-table-cell">
+                @if (d.correspondent) {
+                  <a (click)="clickCorrespondent(d.correspondent);$event.stopPropagation()" title="Filter by correspondent" i18n-title>{{(d.correspondent$ | async)?.name}}</a>
+                }
+              </td>
+              <td>
+                <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
+                @for (t of d.tags$ | async; track t) {
+                  <pngx-tag [tag]="t" class="ms-1" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(t.id);$event.stopPropagation()"></pngx-tag>
+                }
+              </td>
+              <td>
+                {{d.owner | username}}
+              </td>
+              @if (notesEnabled) {
+                <td class="d-none d-xl-table-cell">
+                  @if (d.notes.length) {
+                    <a routerLink="/documents/{{d.id}}/notes" class="btn btn-sm p-0">
+                      <span class="badge rounded-pill bg-light border text-primary">
+                        <svg class="metadata-icon ms-1 me-1" fill="currentColor">
+                          <use xlink:href="assets/bootstrap-icons.svg#chat-left-text"/>
+                        </svg>
+                      {{d.notes.length}}</span>
+                    </a>
+                  }
+                </td>
+              }
+              <td class="d-none d-xl-table-cell">
+                @if (d.document_type) {
+                  <a (click)="clickDocumentType(d.document_type);$event.stopPropagation()" title="Filter by document type" i18n-title>{{(d.document_type$ | async)?.name}}</a>
+                }
+              </td>
+              <td class="d-none d-xl-table-cell">
+                @if (d.storage_path) {
+                  <a (click)="clickStoragePath(d.storage_path);$event.stopPropagation()" title="Filter by storage path" i18n-title>{{(d.storage_path$ | async)?.name}}</a>
+                }
+              </td>
+              <td>
+                {{d.created_date | customDate}}
+              </td>
+              <td class="d-none d-xl-table-cell">
+                {{d.added | customDate}}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+    @if (displayMode === 'smallCards') {
+      <div class="row row-cols-paperless-cards">
+        @for (d of list.documents; track trackByDocumentId($index, d)) {
+          <pngx-document-card-small class="p-0" [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" (dblClickDocument)="openDocumentDetail(d)" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickStoragePath)="clickStoragePath($event)" (clickDocumentType)="clickDocumentType($event)"></pngx-document-card-small>
+        }
+      </div>
+    }
+    @if (list.documents?.length > 15) {
+      <div class="mt-3">
+        <ng-container *ngTemplateOutlet="pagination"></ng-container>
+      </div>
+    }
+  }

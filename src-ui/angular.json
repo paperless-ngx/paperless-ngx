@@ -125,18 +125,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "paperless-ui:build:en-US"
+            "buildTarget": "paperless-ui:build:en-US"
           },
           "configurations": {
             "production": {
-              "browserTarget": "paperless-ui:build:production"
+              "buildTarget": "paperless-ui:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "paperless-ui:build"
+            "buildTarget": "paperless-ui:build"
           }
         },
         "test": {

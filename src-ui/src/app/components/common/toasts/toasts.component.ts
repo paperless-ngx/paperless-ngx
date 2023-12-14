@@ -10,7 +10,7 @@ import { Clipboard } from '@angular/cdk/clipboard'
 })
 export class ToastsComponent implements OnInit, OnDestroy {
   constructor(
-    private toastService: ToastService,
+    public toastService: ToastService,
     private clipboard: Clipboard
   ) {}
 
