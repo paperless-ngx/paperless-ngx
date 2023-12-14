@@ -176,3 +176,10 @@ class TikaSettings(AbstractSingletonModel):
         null=True,
         blank=True,
     )
+
+
+class ConsumerSettings(AbstractSingletonModel):
+    delete_duplicates = models.BooleanField(
+        verbose_name=_("Delete duplicate consumer files"),
+        null=True,
+    )
