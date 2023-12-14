@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -6,13 +5,43 @@ from django.utils.translation import gettext_lazy as _
 DEFAULT_SINGLETON_INSTANCE_ID = 1
 
 
-class OcrSettings(models.Model):
+class AbstractSingletonModel(models.Model):
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        """
+        Always save as the first and only model
+        """
+        self.pk = DEFAULT_SINGLETON_INSTANCE_ID
+        super().save(*args, **kwargs)
+
+
+class CommonSettings(AbstractSingletonModel):
+    """
+    Settings which are common across more than 1 parser
+    """
+
     class OutputTypeChoices(models.TextChoices):
         PDF = ("pdf", _("pdf"))
         PDF_A = ("pdfa", _("pdfa"))
         PDF_A1 = ("pdfa-1", _("pdfa-1"))
         PDF_A2 = ("pdfa-2", _("pdfa-2"))
         PDF_A3 = ("pdfa-3", _("pdfa-3"))
+
+    output_type = models.CharField(
+        verbose_name=_("Sets the output PDF type"),
+        null=True,
+        blank=True,
+        max_length=8,
+        choices=OutputTypeChoices.choices,
+    )
+
+
+class OcrSettings(AbstractSingletonModel):
+    """
+    Settings for the Tesseract based OCR parser
+    """
 
     class ModeChoices(models.TextChoices):
         SKIP = ("skip", _("skip"))
@@ -48,14 +77,6 @@ class OcrSettings(models.Model):
         null=True,
         blank=True,
         max_length=32,
-    )
-
-    output_type = models.CharField(
-        verbose_name=_("Sets the output PDF type"),
-        null=True,
-        blank=True,
-        max_length=8,
-        choices=OutputTypeChoices.choices,
     )
 
     mode = models.CharField(
@@ -124,17 +145,34 @@ class OcrSettings(models.Model):
         verbose_name = _("ocr settings")
 
     def __str__(self) -> str:
-        return ""
+        return "OcrSettings"
 
-    def save(self, *args, **kwargs):
-        if not self.pk and OcrSettings.objects.exists():
-            # if you'll not check for self.pk
-            # then error will also be raised in the update of exists model
-            raise ValidationError(
-                "There is can be only one OcrSettings instance",
-            )
-        return super().save(*args, **kwargs)
 
-    @classmethod
-    def object(cls):
-        return cls._default_manager.all().first()  # Since only one item
+class TextSettings(AbstractSingletonModel):
+    """
+    Settings for the text parser
+    """
+
+    thumbnail_font_name = models.CharField(
+        verbose_name=_("Sets the output PDF type"),
+        null=True,
+        blank=True,
+        max_length=64,
+    )
+
+
+class TikaSettings(AbstractSingletonModel):
+    """
+    Settings for the Tika parser
+    """
+
+    tika_url = models.URLField(
+        verbose_name=_("Tika URL"),
+        null=True,
+        blank=True,
+    )
+    gotenberg_url = models.URLField(
+        verbose_name=_("Gotenberg URL"),
+        null=True,
+        blank=True,
+    )
