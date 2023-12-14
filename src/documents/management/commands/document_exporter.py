@@ -238,18 +238,6 @@ class Command(BaseCommand):
                 serializers.serialize("json", StoragePath.objects.all()),
             )
 
-            notes = json.loads(
-                serializers.serialize("json", Note.objects.all()),
-            )
-            if not self.split_manifest:
-                manifest += notes
-
-            documents = Document.objects.order_by("id")
-            document_map = {d.pk: d for d in documents}
-            document_manifest = json.loads(serializers.serialize("json", documents))
-            if not self.split_manifest:
-                manifest += document_manifest
-
             manifest += json.loads(
                 serializers.serialize("json", MailAccount.objects.all()),
             )
@@ -303,10 +291,24 @@ class Command(BaseCommand):
                 serializers.serialize("json", CustomField.objects.all()),
             )
 
+            # These are treated specially and included in the per-document manifest
+            # if that setting is enabled.  Otherwise, they are just exported to the bulk
+            # manifest
+            documents = Document.objects.order_by("id")
+            document_map: dict[int, Document] = {d.pk: d for d in documents}
+            document_manifest = json.loads(serializers.serialize("json", documents))
+
+            notes = json.loads(
+                serializers.serialize("json", Note.objects.all()),
+            )
+
+            custom_field_instances = json.loads(
+                serializers.serialize("json", CustomFieldInstance.objects.all()),
+            )
             if not self.split_manifest:
-                manifest += json.loads(
-                    serializers.serialize("json", CustomFieldInstance.objects.all()),
-                )
+                manifest += document_manifest
+                manifest += notes
+                manifest += custom_field_instances
 
         # 3. Export files from each document
         for index, document_dict in tqdm.tqdm(
@@ -410,6 +412,12 @@ class Command(BaseCommand):
                     filter(
                         lambda d: d["fields"]["document"] == document_dict["pk"],
                         notes,
+                    ),
+                )
+                content += list(
+                    filter(
+                        lambda d: d["fields"]["document"] == document_dict["pk"],
+                        custom_field_instances,
                     ),
                 )
                 manifest_name.write_text(
