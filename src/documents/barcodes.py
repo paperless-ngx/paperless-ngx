@@ -14,6 +14,8 @@ from pikepdf import Pdf
 from PIL import Image
 
 from documents.converters import convert_from_tiff_to_pdf
+from documents.data_models import ConsumableDocument
+from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
@@ -53,6 +55,7 @@ class BarcodeReader:
         self.mime: Final[str] = mime_type
         self.pdf_file: Path = self.file
         self.barcodes: list[Barcode] = []
+        self._tiff_conversion_done = False
         self.temp_dir: Optional[tempfile.TemporaryDirectory] = None
 
         if settings.CONSUMER_BARCODE_TIFF_SUPPORT:
@@ -150,12 +153,14 @@ class BarcodeReader:
 
     def convert_from_tiff_to_pdf(self):
         """
-        May convert a TIFF image into a PDF, if the input is a TIFF
+        May convert a TIFF image into a PDF, if the input is a TIFF and
+        the TIFF has not been made into a PDF
         """
         # Nothing to do, pdf_file is already assigned correctly
-        if self.mime != "image/tiff":
+        if self.mime != "image/tiff" or self._tiff_conversion_done:
             return
 
+        self._tiff_conversion_done = True
         self.pdf_file = convert_from_tiff_to_pdf(self.file, Path(self.temp_dir.name))
 
     def detect(self) -> None:
@@ -166,6 +171,9 @@ class BarcodeReader:
         # Bail if barcodes already exist
         if self.barcodes:
             return
+
+        # No op if not a TIFF
+        self.convert_from_tiff_to_pdf()
 
         # Choose the library for reading
         if settings.CONSUMER_BARCODE_SCANNER == "PYZBAR":
@@ -240,7 +248,7 @@ class BarcodeReader:
         """
 
         document_paths = []
-        fname = self.file.with_suffix("").name
+        fname = self.file.stem
         with Pdf.open(self.pdf_file) as input_pdf:
             # Start with an empty document
             current_document: list[Page] = []
@@ -290,7 +298,7 @@ class BarcodeReader:
     def separate(
         self,
         source: DocumentSource,
-        override_name: Optional[str] = None,
+        overrides: DocumentMetadataOverrides,
     ) -> bool:
         """
         Separates the document, based on barcodes and configuration, creating new
@@ -316,27 +324,23 @@ class BarcodeReader:
             logger.warning("No pages to split on!")
             return False
 
-        # Create the split documents
-        doc_paths = self.separate_pages(separator_pages)
+        tmp_dir = Path(tempfile.mkdtemp()).resolve()
 
-        # Save the new documents to correct folder
-        if source != DocumentSource.ConsumeFolder:
-            # The given file is somewhere in SCRATCH_DIR,
-            # and new documents must be moved to the CONSUMPTION_DIR
-            # for the consumer to notice them
-            save_to_dir = settings.CONSUMPTION_DIR
-        else:
-            # The given file is somewhere in CONSUMPTION_DIR,
-            # and may be some levels down for recursive tagging
-            # so use the file's parent to preserve any metadata
-            save_to_dir = self.file.parent
+        from documents import tasks
 
-        for idx, document_path in enumerate(doc_paths):
-            if override_name is not None:
-                newname = f"{idx}_{override_name}"
-                dest = save_to_dir / newname
-            else:
-                dest = save_to_dir
-            logger.info(f"Saving {document_path} to {dest}")
-            copy_file_with_basic_stats(document_path, dest)
+        # Create the split document tasks
+        for new_document in self.separate_pages(separator_pages):
+            copy_file_with_basic_stats(new_document, tmp_dir / new_document.name)
+
+            tasks.consume_file.delay(
+                ConsumableDocument(
+                    # Same source, for templates
+                    source=source,
+                    # Can't use same folder or the consume might grab it again
+                    original_file=(tmp_dir / new_document.name).resolve(),
+                ),
+                # All the same metadata
+                overrides,
+            )
+
         return True
