@@ -254,7 +254,7 @@ class RasterisedDocumentParser(DocumentParser):
                     f"Image DPI of {ocrmypdf_args['image_dpi']} is low, OCR may fail",
                 )
 
-        if settings.OCR_USER_ARGS and not safe_fallback:
+        if settings.OCR_USER_ARGS:
             try:
                 user_args = json.loads(settings.OCR_USER_ARGS)
                 ocrmypdf_args = {**ocrmypdf_args, **user_args}
