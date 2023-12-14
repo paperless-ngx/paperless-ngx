@@ -18,7 +18,9 @@ from rest_framework.viewsets import ModelViewSet
 from documents.permissions import PaperlessObjectPermissions
 from paperless.filters import GroupFilterSet
 from paperless.filters import UserFilterSet
+from paperless.models import CommonSettings
 from paperless.models import OcrSettings
+from paperless.serialisers import CommonSettingsSerializer
 from paperless.serialisers import GroupSerializer
 from paperless.serialisers import OcrSettingsSerializer
 from paperless.serialisers import ProfileSerializer
@@ -162,6 +164,15 @@ class GenerateAuthTokenView(GenericAPIView):
         return Response(
             token.key,
         )
+
+
+class CommonSettingsViewSet(ModelViewSet):
+    model = CommonSettings
+
+    queryset = CommonSettings.objects
+
+    serializer_class = CommonSettingsSerializer
+    permission_classes = (IsAuthenticated,)
 
 
 class OcrSettingsViewSet(ModelViewSet):

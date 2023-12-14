@@ -41,6 +41,8 @@ from documents.settings import EXPORTER_THUMBNAIL_NAME
 from documents.utils import copy_file_with_basic_stats
 from paperless import version
 from paperless.db import GnuPG
+from paperless.models import CommonSettings
+from paperless.models import OcrSettings
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
@@ -289,6 +291,14 @@ class Command(BaseCommand):
 
             manifest += json.loads(
                 serializers.serialize("json", CustomField.objects.all()),
+            )
+
+            manifest += json.loads(
+                serializers.serialize("json", CommonSettings.objects.all()),
+            )
+
+            manifest += json.loads(
+                serializers.serialize("json", OcrSettings.objects.all()),
             )
 
             # These are treated specially and included in the per-document manifest

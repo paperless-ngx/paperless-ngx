@@ -34,9 +34,11 @@ from documents.views import TasksViewSet
 from documents.views import UiSettingsView
 from documents.views import UnifiedSearchViewSet
 from paperless.consumers import StatusConsumer
+from paperless.views import CommonSettingsViewSet
 from paperless.views import FaviconView
 from paperless.views import GenerateAuthTokenView
 from paperless.views import GroupViewSet
+from paperless.views import OcrSettingsViewSet
 from paperless.views import ProfileView
 from paperless.views import UserViewSet
 from paperless_mail.views import MailAccountTestView
@@ -59,6 +61,8 @@ api_router.register(r"mail_rules", MailRuleViewSet)
 api_router.register(r"share_links", ShareLinkViewSet)
 api_router.register(r"consumption_templates", ConsumptionTemplateViewSet)
 api_router.register(r"custom_fields", CustomFieldViewSet)
+api_router.register(r"common_settings", CommonSettingsViewSet)
+api_router.register(r"ocr_settings", OcrSettingsViewSet)
 
 
 urlpatterns = [

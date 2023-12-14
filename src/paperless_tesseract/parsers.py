@@ -3,6 +3,7 @@ import re
 import subprocess
 import tempfile
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Optional
 
 from django.conf import settings
@@ -11,7 +12,7 @@ from PIL import Image
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
-from paperless_tesseract.models import OcrSettings as OcrSettingModel
+from paperless.models import OcrSettings as OcrSettingModel
 from paperless_tesseract.setting_schema import OcrSetting
 from paperless_tesseract.setting_schema import get_ocr_settings
 
@@ -71,7 +72,7 @@ class RasterisedDocumentParser(DocumentParser):
             self.logging_group,
         )
 
-    def is_image(self, mime_type):
+    def is_image(self, mime_type) -> bool:
         return mime_type in [
             "image/png",
             "image/jpeg",
@@ -81,7 +82,7 @@ class RasterisedDocumentParser(DocumentParser):
             "image/webp",
         ]
 
-    def has_alpha(self, image):
+    def has_alpha(self, image) -> bool:
         with Image.open(image) as im:
             return im.mode in ("RGBA", "LA")
 
@@ -96,7 +97,7 @@ class RasterisedDocumentParser(DocumentParser):
             ],
         )
 
-    def get_dpi(self, image):
+    def get_dpi(self, image) -> Optional[int]:
         try:
             with Image.open(image) as im:
                 x, y = im.info["dpi"]
@@ -105,7 +106,7 @@ class RasterisedDocumentParser(DocumentParser):
             self.log.warning(f"Error while getting DPI from image {image}: {e}")
             return None
 
-    def calculate_a4_dpi(self, image):
+    def calculate_a4_dpi(self, image) -> Optional[int]:
         try:
             with Image.open(image) as im:
                 width, height = im.size
@@ -118,7 +119,11 @@ class RasterisedDocumentParser(DocumentParser):
             self.log.warning(f"Error while calculating DPI for image {image}: {e}")
             return None
 
-    def extract_text(self, sidecar_file: Optional[Path], pdf_file: Path):
+    def extract_text(
+        self,
+        sidecar_file: Optional[Path],
+        pdf_file: Path,
+    ) -> Optional[str]:
         # When re-doing OCR, the sidecar contains ONLY the new text, not
         # the whole text, so do not utilize it in that case
         if (
@@ -179,7 +184,8 @@ class RasterisedDocumentParser(DocumentParser):
         sidecar_file,
         safe_fallback=False,
     ):
-        assert isinstance(self.parser_settings, OcrSetting)
+        if TYPE_CHECKING:
+            assert isinstance(self.parser_settings, OcrSetting)
         ocrmypdf_args = {
             "input_file": input_file,
             "output_file": output_file,

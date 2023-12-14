@@ -2,7 +2,6 @@ import os
 import shutil
 import tempfile
 import uuid
-from contextlib import AbstractContextManager
 from pathlib import Path
 from unittest import mock
 
@@ -16,28 +15,6 @@ from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from paperless_tesseract.parsers import RasterisedDocumentParser
 from paperless_tesseract.parsers import post_process_text
-
-image_to_string_calls = []
-
-
-def fake_convert(input_file, output_file, **kwargs):
-    with open(input_file) as f:
-        lines = f.readlines()
-
-    for i, line in enumerate(lines):
-        with open(output_file % i, "w") as f2:
-            f2.write(line.strip())
-
-
-class FakeImageFile(AbstractContextManager):
-    def __init__(self, fname):
-        self.fname = fname
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        pass
-
-    def __enter__(self):
-        return os.path.basename(self.fname)
 
 
 class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):

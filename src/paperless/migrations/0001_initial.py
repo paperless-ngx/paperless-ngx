@@ -9,7 +9,7 @@ def _create_singleton(apps, schema_editor):
     """
     Creates the first and only instance of the settings models
     """
-    for model_name in ["CommonSettings", "OcrSettings", "TextSettings", "TikaSettings"]:
+    for model_name in ["CommonSettings", "OcrSettings"]:
         settings_model = apps.get_model("paperless", model_name)
         settings_model.objects.create()
 
@@ -187,61 +187,6 @@ class Migration(migrations.Migration):
             ],
             options={
                 "verbose_name": "ocr settings",
-            },
-        ),
-        migrations.CreateModel(
-            name="TextSettings",
-            fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                (
-                    "thumbnail_font_name",
-                    models.CharField(
-                        blank=True,
-                        max_length=64,
-                        null=True,
-                        verbose_name="Sets the output PDF type",
-                    ),
-                ),
-            ],
-            options={
-                "abstract": False,
-            },
-        ),
-        migrations.CreateModel(
-            name="TikaSettings",
-            fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                (
-                    "tika_url",
-                    models.URLField(blank=True, null=True, verbose_name="Tika URL"),
-                ),
-                (
-                    "gotenberg_url",
-                    models.URLField(
-                        blank=True,
-                        null=True,
-                        verbose_name="Gotenberg URL",
-                    ),
-                ),
-            ],
-            options={
-                "abstract": False,
             },
         ),
         migrations.RunPython(_create_singleton, migrations.RunPython.noop),

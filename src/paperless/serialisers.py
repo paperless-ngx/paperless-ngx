@@ -3,6 +3,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
+from paperless.models import CommonSettings
 from paperless.models import OcrSettings
 
 
@@ -115,6 +116,12 @@ class ProfileSerializer(serializers.ModelSerializer):
             "last_name",
             "auth_token",
         )
+
+
+class CommonSettingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommonSettings
+        fields = ["all"]
 
 
 class OcrSettingsSerializer(serializers.ModelSerializer):
