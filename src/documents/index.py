@@ -3,6 +3,7 @@ import math
 import os
 from collections import Counter
 from contextlib import contextmanager
+from datetime import datetime
 from typing import Optional
 
 from dateutil.parser import isoparse
@@ -371,7 +372,7 @@ class LocalDateParser(English):
         if isinstance(d, timespan):
             d.start = self.reverse_timezone_offset(d.start)
             d.end = self.reverse_timezone_offset(d.end)
-        else:
+        elif isinstance(d, datetime):
             d = self.reverse_timezone_offset(d)
         return d
 
