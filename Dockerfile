@@ -12,7 +12,7 @@ COPY ./src-ui /src/src-ui
 WORKDIR /src/src-ui
 RUN set -eux \
   && npm update npm -g \
-  && npm ci --omit=optional
+  && npm ci
 RUN set -eux \
   && ./node_modules/.bin/ng build --configuration production
 

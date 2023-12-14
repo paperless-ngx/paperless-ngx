@@ -3,13 +3,20 @@
   <ng-container [ngTemplateOutlet]="permissionsForm"></ng-container>
 </ng-container>
 <ng-container *ngIf="accordion">
-  <ngb-accordion #acc="ngbAccordion" activeIds="">
-    <ngb-panel i18n-title title="Edit Permissions">
-      <ng-template ngbPanelContent>
-        <ng-container [ngTemplateOutlet]="permissionsForm"></ng-container>
-      </ng-template>
-    </ngb-panel>
-  </ngb-accordion>
+  <div ngbAccordion activeIds="">
+    <div ngbAccordionItem>
+      <h2 ngbAccordionHeader>
+        <button ngbAccordionButton i18n>Edit Permissions</button>
+      </h2>
+      <div ngbAccordionCollapse>
+        <div ngbAccordionBody>
+          <ng-template>
+            <ng-container [ngTemplateOutlet]="permissionsForm"></ng-container>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
 </ng-container>
 
 <ng-template #permissionsForm>
