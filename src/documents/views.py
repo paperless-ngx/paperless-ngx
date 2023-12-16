@@ -1106,8 +1106,12 @@ class BulkDownloadView(GenericAPIView):
                 strategy.add_document(doc)
 
         with open(temp.name, "rb") as f:
-            response = HttpResponse(f, content_type="application/zip")
-            response["Content-Disposition"] = "attachment"
+            file_extension = "pdf" if single_file else "zip"
+
+            response = HttpResponse(f, content_type=f"application/{file_extension}")
+            response[
+                "Content-Disposition"
+            ] = f'attachment; filename="documents.{file_extension}"'
 
             return response
 
