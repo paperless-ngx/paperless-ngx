@@ -96,14 +96,7 @@
                     </button>
                 </div>
 
-                <div class="btn-group ms-auto">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="discard()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Discard</button>
-                    <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-                        <button *ngIf="hasNext()" type="button" class="btn btn-sm btn-outline-primary" (click)="saveEditNext()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save &amp; next</button>
-                        <button *ngIf="!hasNext()" type="button" class="btn btn-sm btn-outline-primary" (click)="save(true)" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save &amp; close</button>
-                        <button type="submit" class="btn btn-sm btn-primary" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save</button>
-                    </ng-container>
-                </div>
+                <ng-container *ngTemplateOutlet="saveButtons"></ng-container>
             </div>
 
             <ul ngbNav #nav="ngbNav" class="nav-underline flex-nowrap flex-md-wrap overflow-auto" (navChange)="onNavChange($event)" [(activeId)]="activeNavID">
@@ -134,6 +127,10 @@
                                     <pngx-input-document-link *ngSwitchCase="PaperlessCustomFieldDataType.DocumentLink" formControlName="value" [title]="getCustomFieldFromInstance(fieldInstance)?.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true" [error]="getCustomFieldError(i)"></pngx-input-document-link>
                                 </div>
                             </ng-container>
+                        </div>
+
+                        <div class="d-flex border-top pt-3">
+                            <ng-container *ngTemplateOutlet="saveButtons"></ng-container>
                         </div>
                     </ng-template>
                 </li>
@@ -240,6 +237,17 @@
     </div>
 
 </div>
+
+<ng-template #saveButtons>
+    <div class="btn-group ms-auto">
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="discard()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Discard</button>
+        <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
+            <button *ngIf="hasNext()" type="button" class="btn btn-sm btn-outline-primary" (click)="saveEditNext()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save &amp; next</button>
+            <button *ngIf="!hasNext()" type="button" class="btn btn-sm btn-outline-primary" (click)="save(true)" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save &amp; close</button>
+            <button type="submit" class="btn btn-sm btn-primary" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save</button>
+        </ng-container>
+    </div>
+</ng-template>
 
  <ng-template #previewContent>
      <div *ngIf="!metadata" class="w-100 h-100 d-flex align-items-center justify-content-center">
