@@ -4,6 +4,7 @@ import json
 import os
 import shutil
 import zipfile
+from unittest import mock
 
 from django.contrib.auth.models import User
 from django.test import override_settings
@@ -335,3 +336,93 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
                     f.read(),
                     zipf.read("originals/statement/Title 2 - Doc 3.jpg"),
                 )
+
+    @mock.patch("documents.parsers.merge_pdfs")
+    def test_download_single_file_from_originals(self, merge_pdfs_mock):
+        """
+        GIVEN:
+            - Defined list of documents
+        WHEN:
+            - Bulk download request for original documents as single file
+        THEN:
+            - Call to merge_pdfs with paths to original documents in specified order
+            - MIME type of content set to PDF
+        """
+
+        document_a = Document.objects.create(
+            title="Some DocA",
+            filename="some_docA.pdf",
+            checksum="AAa",
+        )
+        document_b = Document.objects.create(
+            title="Some DocB",
+            filename="some_docB.pdf",
+            checksum="BBb",
+        )
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "documents": [document_b.id, document_a.id],
+                    "content": "originals",
+                    "single_file": True,
+                    "follow_formatting": False,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response["Content-Type"], "application/pdf")
+
+        merge_pdfs_mock.assert_called_with(
+            [document_b.source_path, document_a.source_path],
+            mock.ANY,
+        )
+
+    @mock.patch("documents.parsers.merge_pdfs")
+    def test_download_single_file_from_archives(self, merge_pdfs_mock):
+        """
+        GIVEN:
+            - Defined list of documents
+        WHEN:
+            - Bulk download request for original documents as single file
+        THEN:
+            - Call to merge_pdfs with paths to archived documents in specified order
+            - MIME type of content set to PDF
+        """
+
+        document_a = Document.objects.create(
+            title="Some DocA",
+            archive_filename="archive_some_docA.pdf",
+            checksum="AAa",
+            archive_checksum="Arch_AAa",
+        )
+        document_b = Document.objects.create(
+            title="Some DocB",
+            archive_filename="archive_some_docB.pdf",
+            checksum="BBb",
+            archive_checksum="Arch_BBb",
+        )
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "documents": [document_b.id, document_a.id],
+                    "content": "archive",
+                    "single_file": True,
+                    "follow_formatting": False,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response["Content-Type"], "application/pdf")
+
+        merge_pdfs_mock.assert_called_with(
+            [document_b.archive_path, document_a.archive_path],
+            mock.ANY,
+        )
