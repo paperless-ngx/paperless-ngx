@@ -455,6 +455,31 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             # Assert subset in results
             self.assertDictEqual(result, {**result, **subset})
 
+    def test_search_added_invalid_date(self):
+        """
+        GIVEN:
+            - One document added right now
+        WHEN:
+            - Query with invalid added date
+        THEN:
+            - No documents returned
+        """
+        d1 = Document.objects.create(
+            title="invoice",
+            content="the thing i bought at a shop and paid with bank account",
+            checksum="A",
+            pk=1,
+        )
+
+        with index.open_index_writer() as writer:
+            index.update_document(writer, d1)
+
+        response = self.client.get("/api/documents/?query=added:invalid-date")
+        results = response.data["results"]
+
+        # Expect 0 document returned
+        self.assertEqual(len(results), 0)
+
     @mock.patch("documents.index.autocomplete")
     def test_search_autocomplete_limits(self, m):
         """

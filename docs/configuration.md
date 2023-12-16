@@ -733,7 +733,7 @@ they use underscores instead of dashes.
         Paperless has been tested to work with the OCR options provided
         above. There are many options that are incompatible with each other,
         so specifying invalid options may prevent paperless from consuming
-        any documents.
+        any documents.  Use with caution!
 
     Specify arguments as a JSON dictionary. Keep note of lower case
     booleans and double quoted parameter names and strings. Examples:
