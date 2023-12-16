@@ -337,7 +337,7 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
                     zipf.read("originals/statement/Title 2 - Doc 3.jpg"),
                 )
 
-    @mock.patch("documents.parsers.merge_pdfs")
+    @mock.patch("documents.bulk_download.merge_pdfs")
     def test_download_single_file_from_originals(self, merge_pdfs_mock):
         """
         GIVEN:
@@ -381,7 +381,7 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
             mock.ANY,
         )
 
-    @mock.patch("documents.parsers.merge_pdfs")
+    @mock.patch("documents.bulk_download.merge_pdfs")
     def test_download_single_file_from_archives(self, merge_pdfs_mock):
         """
         GIVEN:
