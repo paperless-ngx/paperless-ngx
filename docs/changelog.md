@@ -1,5 +1,28 @@
 # Changelog
 
+## paperless-ngx 2.1.3
+
+### Bug Fixes
+
+- Fix: Document metadata is lost during barcode splitting [@stumpylog](https://github.com/stumpylog) ([#4982](https://github.com/paperless-ngx/paperless-ngx/pull/4982))
+- Fix: Export of custom field instances during a split manifest export [@stumpylog](https://github.com/stumpylog) ([#4984](https://github.com/paperless-ngx/paperless-ngx/pull/4984))
+- Fix: Apply user arguments even in the case of the forcing OCR [@stumpylog](https://github.com/stumpylog) ([#4981](https://github.com/paperless-ngx/paperless-ngx/pull/4981))
+- Fix: support show errors for select dropdowns [@shamoon](https://github.com/shamoon) ([#4979](https://github.com/paperless-ngx/paperless-ngx/pull/4979))
+- Fix: Don't attempt to parse none objects during date searching [@bogdal](https://github.com/bogdal) ([#4977](https://github.com/paperless-ngx/paperless-ngx/pull/4977))
+
+### All App Changes
+
+<details>
+<summary>6 changes</summary>
+
+- Refactor: Boost performance by reducing db queries [@bogdal](https://github.com/bogdal) ([#4990](https://github.com/paperless-ngx/paperless-ngx/pull/4990))
+- Fix: Document metadata is lost during barcode splitting [@stumpylog](https://github.com/stumpylog) ([#4982](https://github.com/paperless-ngx/paperless-ngx/pull/4982))
+- Fix: Export of custom field instances during a split manifest export [@stumpylog](https://github.com/stumpylog) ([#4984](https://github.com/paperless-ngx/paperless-ngx/pull/4984))
+- Fix: Apply user arguments even in the case of the forcing OCR [@stumpylog](https://github.com/stumpylog) ([#4981](https://github.com/paperless-ngx/paperless-ngx/pull/4981))
+- Fix: support show errors for select dropdowns [@shamoon](https://github.com/shamoon) ([#4979](https://github.com/paperless-ngx/paperless-ngx/pull/4979))
+- Fix: Don't attempt to parse none objects during date searching [@bogdal](https://github.com/bogdal) ([#4977](https://github.com/paperless-ngx/paperless-ngx/pull/4977))
+</details>
+
 ## paperless-ngx 2.1.2
 
 ### Bug Fixes
