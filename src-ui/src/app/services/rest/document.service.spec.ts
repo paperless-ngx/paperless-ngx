@@ -137,10 +137,11 @@ describe(`DocumentService`, () => {
 
   it('should call appropriate api endpoint for bulk download', () => {
     const ids = [1, 2, 3]
-    const content = 'both'
+    const content = 'originals'
+    const mergeIntoSingleFile = false
     const useFilenameFormatting = false
     subscription = service
-      .bulkDownload(ids, content, useFilenameFormatting)
+      .bulkDownload(ids, content, mergeIntoSingleFile, useFilenameFormatting)
       .subscribe()
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}${endpoint}/bulk_download/`
@@ -149,6 +150,7 @@ describe(`DocumentService`, () => {
     expect(req.request.body).toEqual({
       documents: ids,
       content,
+      single_file: mergeIntoSingleFile,
       follow_formatting: useFilenameFormatting,
     })
   })

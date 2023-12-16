@@ -802,30 +802,37 @@ describe('BulkEditorComponent', () => {
       .spyOn(documentListViewService, 'documents', 'get')
       .mockReturnValue([{ id: 3 }, { id: 4 }])
     jest
-      .spyOn(documentListViewService, 'selected', 'get')
-      .mockReturnValue(new Set([3, 4]))
+      .spyOn(documentListViewService, 'getSelectedInOrder')
+      .mockReturnValue(new Array(3, 4))
     jest
       .spyOn(permissionsService, 'currentUserHasObjectPermissions')
       .mockReturnValue(true)
+    component.downloadForm.get('downloadAsSingleFile').patchValue(false)
     component.downloadForm.get('downloadFileTypeArchive').patchValue(true)
     fixture.detectChanges()
     let downloadSpy = jest.spyOn(documentService, 'bulkDownload')
     //archive
     component.downloadSelected()
-    expect(downloadSpy).toHaveBeenCalledWith([3, 4], 'archive', false)
+    expect(downloadSpy).toHaveBeenCalledWith([3, 4], 'archive', false, false)
     //originals
     component.downloadForm.get('downloadFileTypeArchive').patchValue(false)
     component.downloadForm.get('downloadFileTypeOriginals').patchValue(true)
     component.downloadSelected()
-    expect(downloadSpy).toHaveBeenCalledWith([3, 4], 'originals', false)
+    expect(downloadSpy).toHaveBeenCalledWith([3, 4], 'originals', false, false)
     //both
     component.downloadForm.get('downloadFileTypeArchive').patchValue(true)
     component.downloadSelected()
-    expect(downloadSpy).toHaveBeenCalledWith([3, 4], 'both', false)
+    expect(downloadSpy).toHaveBeenCalledWith([3, 4], 'both', false, false)
     //formatting
     component.downloadForm.get('downloadUseFormatting').patchValue(true)
     component.downloadSelected()
-    expect(downloadSpy).toHaveBeenCalledWith([3, 4], 'both', true)
+    expect(downloadSpy).toHaveBeenCalledWith([3, 4], 'both', false, true)
+    //merging
+    component.downloadForm.get('downloadFileTypeOriginals').patchValue(true)
+    component.downloadForm.get('downloadFileTypeArchive').patchValue(false)
+    component.downloadForm.get('downloadAsSingleFile').patchValue(true)
+    component.downloadSelected()
+    expect(downloadSpy).toHaveBeenCalledWith([3, 4], 'originals', true, false)
 
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/bulk_download/`
