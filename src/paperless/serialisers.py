@@ -121,10 +121,10 @@ class ProfileSerializer(serializers.ModelSerializer):
 class CommonSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommonSettings
-        fields = ["all"]
+        fields = "__all__"
 
 
 class OcrSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = OcrSettings
-        fields = ["all"]
+        fields = "__all__"
