@@ -128,3 +128,8 @@ class OcrSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = OcrSettings
         fields = "__all__"
+
+
+class ConfigSerializer(serializers.Serializer):
+    common_settings = CommonSettingsSerializer()
+    ocr_settings = OcrSettingsSerializer()
