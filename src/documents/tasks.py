@@ -140,7 +140,7 @@ def consume_file(
         with BarcodeReader(input_doc.original_file, input_doc.mime_type) as reader:
             if settings.CONSUMER_ENABLE_BARCODES and reader.separate(
                 input_doc.source,
-                overrides.filename,
+                overrides,
             ):
                 # notify the sender, otherwise the progress bar
                 # in the UI stays stuck

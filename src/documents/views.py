@@ -182,10 +182,14 @@ class PassUserMixin(CreateModelMixin):
 class CorrespondentViewSet(ModelViewSet, PassUserMixin):
     model = Correspondent
 
-    queryset = Correspondent.objects.annotate(
-        document_count=Count("documents"),
-        last_correspondence=Max("documents__created"),
-    ).order_by(Lower("name"))
+    queryset = (
+        Correspondent.objects.annotate(
+            document_count=Count("documents"),
+            last_correspondence=Max("documents__created"),
+        )
+        .select_related("owner")
+        .order_by(Lower("name"))
+    )
 
     serializer_class = CorrespondentSerializer
     pagination_class = StandardPagination
@@ -208,8 +212,12 @@ class CorrespondentViewSet(ModelViewSet, PassUserMixin):
 class TagViewSet(ModelViewSet, PassUserMixin):
     model = Tag
 
-    queryset = Tag.objects.annotate(document_count=Count("documents")).order_by(
-        Lower("name"),
+    queryset = (
+        Tag.objects.annotate(document_count=Count("documents"))
+        .select_related("owner")
+        .order_by(
+            Lower("name"),
+        )
     )
 
     def get_serializer_class(self, *args, **kwargs):
@@ -232,9 +240,13 @@ class TagViewSet(ModelViewSet, PassUserMixin):
 class DocumentTypeViewSet(ModelViewSet, PassUserMixin):
     model = DocumentType
 
-    queryset = DocumentType.objects.annotate(
-        document_count=Count("documents"),
-    ).order_by(Lower("name"))
+    queryset = (
+        DocumentType.objects.annotate(
+            document_count=Count("documents"),
+        )
+        .select_related("owner")
+        .order_by(Lower("name"))
+    )
 
     serializer_class = DocumentTypeSerializer
     pagination_class = StandardPagination
@@ -283,7 +295,12 @@ class DocumentViewSet(
     )
 
     def get_queryset(self):
-        return Document.objects.distinct().annotate(num_notes=Count("notes"))
+        return (
+            Document.objects.distinct()
+            .annotate(num_notes=Count("notes"))
+            .select_related("correspondent", "storage_path", "document_type", "owner")
+            .prefetch_related("tags", "custom_fields", "notes")
+        )
 
     def get_serializer(self, *args, **kwargs):
         fields_param = self.request.query_params.get("fields", None)
@@ -627,9 +644,18 @@ class DocumentViewSet(
 
 class SearchResultSerializer(DocumentSerializer, PassUserMixin):
     def to_representation(self, instance):
-        doc = Document.objects.get(id=instance["id"])
+        doc = (
+            Document.objects.select_related(
+                "correspondent",
+                "storage_path",
+                "document_type",
+                "owner",
+            )
+            .prefetch_related("tags", "custom_fields", "notes")
+            .get(id=instance["id"])
+        )
         notes = ",".join(
-            [str(c.note) for c in Note.objects.filter(document=instance["id"])],
+            [str(c.note) for c in doc.notes.all()],
         )
         r = super().to_representation(doc)
         r["__search_hit__"] = {
@@ -752,7 +778,11 @@ class SavedViewViewSet(ModelViewSet, PassUserMixin):
 
     def get_queryset(self):
         user = self.request.user
-        return SavedView.objects.filter(owner=user)
+        return (
+            SavedView.objects.filter(owner=user)
+            .select_related("owner")
+            .prefetch_related("filter_rules")
+        )
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -1080,8 +1110,12 @@ class BulkDownloadView(GenericAPIView):
 class StoragePathViewSet(ModelViewSet, PassUserMixin):
     model = StoragePath
 
-    queryset = StoragePath.objects.annotate(document_count=Count("documents")).order_by(
-        Lower("name"),
+    queryset = (
+        StoragePath.objects.annotate(document_count=Count("documents"))
+        .select_related("owner")
+        .order_by(
+            Lower("name"),
+        )
     )
 
     serializer_class = StoragePathSerializer
@@ -1347,7 +1381,18 @@ class ConsumptionTemplateViewSet(ModelViewSet):
 
     model = ConsumptionTemplate
 
-    queryset = ConsumptionTemplate.objects.all().order_by("order")
+    queryset = (
+        ConsumptionTemplate.objects.prefetch_related(
+            "assign_tags",
+            "assign_view_users",
+            "assign_view_groups",
+            "assign_change_users",
+            "assign_change_groups",
+            "assign_custom_fields",
+        )
+        .all()
+        .order_by("order")
+    )
 
 
 class CustomFieldViewSet(ModelViewSet):
