@@ -83,7 +83,7 @@ class OcrSettings(AbstractSingletonModel):
         verbose_name=_("Sets the OCR mode"),
         null=True,
         blank=True,
-        max_length=8,
+        max_length=16,
         choices=ModeChoices.choices,
     )
 

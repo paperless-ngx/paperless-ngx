@@ -92,7 +92,7 @@ class Migration(migrations.Migration):
                             ("redo", "redo"),
                             ("force", "force"),
                         ],
-                        max_length=8,
+                        max_length=16,
                         null=True,
                         verbose_name="Sets the OCR mode",
                     ),
