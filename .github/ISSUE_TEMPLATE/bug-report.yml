@@ -102,3 +102,14 @@ body:
     attributes:
       label: Other
       description: Any other relevant details.
+  - type: checkboxes
+    id: required-checks
+    attributes:
+      label: Please confirm the following
+      options:
+        - label: I believe this issue is a bug that affects all users of Paperless-ngx, not something specific to my installation.
+          required: true
+        - label: I have already searched for relevant existing issues and discussions before opening this report.
+          required: true
+        - label: I have updated the title field above with a concise description.
+          required: true
