@@ -130,7 +130,8 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
   }
 
   save(): void {
-    const passwordChanged = this.currentPassword !== this.newPassword
+    const passwordChanged =
+      this.newPassword && this.currentPassword !== this.newPassword
     const profile = Object.assign({}, this.form.value)
     this.networkActive = true
     this.profileService
