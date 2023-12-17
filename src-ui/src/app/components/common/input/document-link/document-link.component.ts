@@ -58,11 +58,11 @@ export class DocumentLinkComponent
     } else {
       this.loading = true
       this.documentsService
-        .getCachedMany(documentIDs)
+        .getFew(documentIDs, { fields: 'id,title' })
         .pipe(takeUntil(this.unsubscribeNotifier))
-        .subscribe((documents) => {
+        .subscribe((documentResults) => {
           this.loading = false
-          this.selectedDocuments = documents
+          this.selectedDocuments = documentResults.results
           super.writeValue(documentIDs)
         })
     }

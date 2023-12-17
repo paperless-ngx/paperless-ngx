@@ -48,10 +48,15 @@ describe('DocumentLinkComponent', () => {
     fixture.detectChanges()
   })
 
-  it('should retrieve selected documents from APIs', () => {
-    const getSpy = jest.spyOn(documentService, 'getCachedMany')
+  it('should retrieve selected documents from API', () => {
+    const getSpy = jest.spyOn(documentService, 'getFew')
     getSpy.mockImplementation((ids) => {
-      return of(documents.filter((d) => ids.includes(d.id)))
+      const docs = documents.filter((d) => ids.includes(d.id))
+      return of({
+        count: docs.length,
+        all: docs.map((d) => d.id),
+        results: docs,
+      })
     })
     component.writeValue([1])
     expect(getSpy).toHaveBeenCalled()
@@ -85,8 +90,14 @@ describe('DocumentLinkComponent', () => {
   })
 
   it('should load values correctly', () => {
-    jest.spyOn(documentService, 'getCachedMany').mockImplementation((ids) => {
-      return of(documents.filter((d) => ids.includes(d.id)))
+    const getSpy = jest.spyOn(documentService, 'getFew')
+    getSpy.mockImplementation((ids) => {
+      const docs = documents.filter((d) => ids.includes(d.id))
+      return of({
+        count: docs.length,
+        all: docs.map((d) => d.id),
+        results: docs,
+      })
     })
     component.writeValue([12, 23])
     expect(component.value).toEqual([12, 23])
@@ -100,9 +111,14 @@ describe('DocumentLinkComponent', () => {
   })
 
   it('should support unselect', () => {
-    const getSpy = jest.spyOn(documentService, 'getCachedMany')
+    const getSpy = jest.spyOn(documentService, 'getFew')
     getSpy.mockImplementation((ids) => {
-      return of(documents.filter((d) => ids.includes(d.id)))
+      const docs = documents.filter((d) => ids.includes(d.id))
+      return of({
+        count: docs.length,
+        all: docs.map((d) => d.id),
+        results: docs,
+      })
     })
     component.writeValue([12, 23])
     component.unselect({ id: 23 })

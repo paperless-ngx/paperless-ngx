@@ -96,6 +96,21 @@ export const commonAbstractPaperlessServiceTests = (endpoint, ServiceClass) => {
       expect(req.request.method).toEqual('PATCH')
       req.flush([])
     })
+
+    test('should call appropriate api endpoint for get a few objects', () => {
+      subscription = service.getFew([1, 2, 3]).subscribe()
+      const req = httpTestingController.expectOne(
+        `${environment.apiBaseUrl}${endpoint}/?id__in=1,2,3`
+      )
+      expect(req.request.method).toEqual('GET')
+      req.flush([])
+      subscription = service.getFew([4, 5, 6], { foo: 'bar' }).subscribe()
+      const req2 = httpTestingController.expectOne(
+        `${environment.apiBaseUrl}${endpoint}/?id__in=4,5,6&foo=bar`
+      )
+      expect(req2.request.method).toEqual('GET')
+      req2.flush([])
+    })
   })
 
   beforeEach(() => {
