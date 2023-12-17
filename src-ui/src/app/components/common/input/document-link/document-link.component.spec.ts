@@ -21,6 +21,10 @@ const documents = [
     title: 'Document 12 bar',
   },
   {
+    id: 16,
+    title: 'Document 16 bar',
+  },
+  {
     id: 23,
     title: 'Document 23 bar',
   },
@@ -101,7 +105,7 @@ describe('DocumentLinkComponent', () => {
     })
     component.writeValue([12, 23])
     expect(component.value).toEqual([12, 23])
-    expect(component.selectedDocuments).toEqual([documents[1], documents[2]])
+    expect(component.selectedDocuments).toEqual([documents[1], documents[3]])
     component.writeValue(null)
     expect(component.value).toEqual([])
     expect(component.selectedDocuments).toEqual([])
@@ -130,5 +134,27 @@ describe('DocumentLinkComponent', () => {
     expect(component.compareDocuments(documents[0], { id: 1 })).toBeTruthy()
     expect(component.compareDocuments(documents[0], { id: 2 })).toBeFalsy()
     expect(component.trackByFn(documents[1])).toEqual(12)
+  })
+
+  it('should not include the current document or already selected documents in results', () => {
+    let foundDocs
+    component.foundDocuments$.subscribe((found) => (foundDocs = found))
+    component.parentDocumentID = 23
+    component.selectedDocuments = [documents[2]]
+    const listSpy = jest.spyOn(documentService, 'listFiltered')
+    listSpy.mockImplementation(
+      (page, pageSize, sortField, sortReverse, filterRules, extraParams) => {
+        const docs = documents.filter((d) =>
+          d.title.includes(filterRules[0].value)
+        )
+        return of({
+          count: docs.length,
+          results: docs,
+          all: docs.map((d) => d.id),
+        })
+      }
+    )
+    component.documentsInput$.next('bar')
+    expect(foundDocs).toEqual([documents[1]])
   })
 })
