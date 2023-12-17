@@ -98,6 +98,10 @@ steps described in [Docker setup](#docker_hub) automatically.
     Don't change the part after the colon or paperless wont find your
     documents.
 
+    !!! note
+
+        When running with SELinux, this may need be taken into account e.g. by adding :Z for consume and export.
+
     You may also need to change the default port that the webserver will
     use from the default (8000):
 
@@ -136,6 +140,10 @@ steps described in [Docker setup](#docker_hub) automatically.
     >   image: ghcr.io/paperless-ngx/paperless-ngx:latest
     >   user: <user_id>
     > ```
+
+    !!! note
+
+        This is not required for podman and will break things. Similarly `USERMAP_UID` and `USERMAP_GID` should be unset or set to 0.
 
 5.  Modify `docker-compose.env`, following the comments in the file. The
     most important change is to set `USERMAP_UID` and `USERMAP_GID` to
