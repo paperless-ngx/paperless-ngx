@@ -107,6 +107,7 @@ import { CustomFieldsDropdownComponent } from './components/common/custom-fields
 import { ProfileEditDialogComponent } from './components/common/profile-edit-dialog/profile-edit-dialog.component'
 import { PdfViewerComponent } from './components/common/pdf-viewer/pdf-viewer.component'
 import { DocumentLinkComponent } from './components/common/input/document-link/document-link.component'
+import { PreviewPopupComponent } from './components/common/preview-popup/preview-popup.component'
 
 import localeAf from '@angular/common/locales/af'
 import localeAr from '@angular/common/locales/ar'
@@ -261,6 +262,7 @@ function initializeApp(settings: SettingsService) {
     ProfileEditDialogComponent,
     PdfViewerComponent,
     DocumentLinkComponent,
+    PreviewPopupComponent,
   ],
   imports: [
     BrowserModule,
