@@ -11,7 +11,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
   NgbAccordionModule,
   NgbActiveModal,
-  NgbModal,
   NgbModalModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { HttpClientModule } from '@angular/common/http'

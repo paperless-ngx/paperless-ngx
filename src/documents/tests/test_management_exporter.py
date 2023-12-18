@@ -646,10 +646,13 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         with paperless_environment():
             self.assertEqual(Document.objects.count(), 4)
+            self.assertEqual(CustomFieldInstance.objects.count(), 1)
             Document.objects.all().delete()
+            CustomFieldInstance.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
             call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)
+            self.assertEqual(CustomFieldInstance.objects.count(), 1)
 
     def test_folder_prefix(self):
         """

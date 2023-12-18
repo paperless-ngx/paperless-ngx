@@ -43,6 +43,9 @@ export class DocumentLinkComponent
   @Input()
   notFoundText: string = $localize`No documents found`
 
+  @Input()
+  parentDocumentID: number
+
   constructor(private documentsService: DocumentService) {
     super()
   }
@@ -58,11 +61,11 @@ export class DocumentLinkComponent
     } else {
       this.loading = true
       this.documentsService
-        .getCachedMany(documentIDs)
+        .getFew(documentIDs, { fields: 'id,title' })
         .pipe(takeUntil(this.unsubscribeNotifier))
-        .subscribe((documents) => {
+        .subscribe((documentResults) => {
           this.loading = false
-          this.selectedDocuments = documents
+          this.selectedDocuments = documentResults.results
           super.writeValue(documentIDs)
         })
     }
@@ -86,7 +89,13 @@ export class DocumentLinkComponent
               { truncate_content: true }
             )
             .pipe(
-              map((results) => results.results),
+              map((results) =>
+                results.results.filter(
+                  (d) =>
+                    d.id !== this.parentDocumentID &&
+                    !this.selectedDocuments.find((sd) => sd.id === d.id)
+                )
+              ),
               catchError(() => of([])), // empty on error
               tap(() => (this.loading = false))
             )
