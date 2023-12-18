@@ -405,6 +405,14 @@ assigned. `-f` works differently for tags: By default, only additional
 tags get added to documents, no tags will be removed. With `-f`, tags
 that don't match a document anymore get removed as well.
 
+!!! note
+
+    The retagger does not immediately assign or remove tags, correspondents
+    and document types in documents which are currently opened for editing.
+    If a document which is currently being edited gets examined by the
+    retagger, the changes will instead get reflected as suggestions below
+    the edit fields.
+
 ### Managing the Automatic matching algorithm
 
 The _Auto_ matching algorithm requires a trained neural network to work.
