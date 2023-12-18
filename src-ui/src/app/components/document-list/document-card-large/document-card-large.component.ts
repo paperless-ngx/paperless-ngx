@@ -15,10 +15,7 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
 @Component({
   selector: 'pngx-document-card-large',
   templateUrl: './document-card-large.component.html',
-  styleUrls: [
-    './document-card-large.component.scss',
-    '../popover-preview/popover-preview.scss',
-  ],
+  styleUrls: ['./document-card-large.component.scss'],
 })
 export class DocumentCardLargeComponent extends ComponentWithPermissions {
   constructor(
