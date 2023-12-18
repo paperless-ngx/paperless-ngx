@@ -81,6 +81,16 @@ describe('DateComponent', () => {
     expect(eventSpy).toHaveBeenCalled()
   })
 
+  it('should show allow system keyboard events', () => {
+    let event: KeyboardEvent = new KeyboardEvent('keypress', {
+      key: '9',
+      altKey: true,
+    })
+    let preventDefaultSpy = jest.spyOn(event, 'preventDefault')
+    input.dispatchEvent(event)
+    expect(preventDefaultSpy).not.toHaveBeenCalled()
+  })
+
   it('should support paste', () => {
     expect(component.value).toBeUndefined()
     const date = '5/4/20'
@@ -99,5 +109,25 @@ describe('DateComponent', () => {
     event['clipboardData'] = clipboardData
     input.dispatchEvent(event)
     expect(component.value).toEqual({ day: 4, month: 5, year: 2020 })
+    // coverage
+    window['clipboardData'] = {
+      getData: (type) => '',
+    }
+    component.onPaste(new Event('foo') as any)
+  })
+
+  it('should set filter button title', () => {
+    component.title = 'foo'
+    expect(component.filterButtonTitle).toEqual(
+      'Filter documents with this foo'
+    )
+  })
+
+  it('should emit date on filter', () => {
+    let dateReceived
+    component.value = '12/16/2023'
+    component.filterDocuments.subscribe((date) => (dateReceived = date))
+    component.onFilterDocuments()
+    expect(dateReceived).toEqual([{ day: 16, month: 12, year: 2023 }])
   })
 })
