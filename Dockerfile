@@ -52,8 +52,8 @@ ARG TARGETARCH
 
 # Can be workflow provided, defaults set for manual building
 ARG JBIG2ENC_VERSION=0.29
-ARG QPDF_VERSION=11.6.3
-ARG GS_VERSION=10.02.0
+ARG QPDF_VERSION=11.6.4
+ARG GS_VERSION=10.02.1
 
 #
 # Begin installation and configuration
@@ -123,13 +123,13 @@ RUN set -eux \
       && echo "Installing Ghostscript ${GS_VERSION}" \
         && curl --fail --silent --show-error --location \
           --output libgs10_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
-          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
+          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
         && curl --fail --silent --show-error --location \
           --output ghostscript_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
-          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/ghostscript_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
+          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
         && curl --fail --silent --show-error --location \
           --output libgs10-common_${GS_VERSION}.dfsg-2_all.deb \
-          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10-common_${GS_VERSION}.dfsg-2_all.deb \
+          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
         && dpkg --install ./libgs10-common_${GS_VERSION}.dfsg-2_all.deb \
         && dpkg --install ./libgs10_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
         && dpkg --install ./ghostscript_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
