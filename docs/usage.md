@@ -311,6 +311,8 @@ applied. You can use the following placeholders:
 - `{added_month_name}`: added month name
 - `{added_month_name_short}`: added month short name
 - `{added_day}`: added day
+- `{added_time}`: added time in HH:MM format
+- `{original_filename}`: original file name without extension
 
 ## Custom Fields {#custom-fields}
 
