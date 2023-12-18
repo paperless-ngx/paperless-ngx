@@ -691,7 +691,7 @@ class Consumer(LoggingMixin):
             added_month_name_short=local_added.strftime("%b"),
             added_day=local_added.strftime("%d"),
             owner_username=owner_username,
-            original_filename=Path(self.filename).with_suffix("").name,
+            original_filename=Path(self.filename).stem,
             added_time=local_added.strftime("%H:%M"),
         ).strip()
 
