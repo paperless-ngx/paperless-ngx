@@ -1726,4 +1726,13 @@ describe('FilterEditorComponent', () => {
     )
     expect(component.textFilter).toEqual('')
   })
+
+  it('should adjust text filter targets if more like search', () => {
+    const TEXT_FILTER_TARGET_FULLTEXT_MORELIKE = 'fulltext-morelike' // private const
+    component.textFilterTarget = TEXT_FILTER_TARGET_FULLTEXT_MORELIKE
+    expect(component.textFilterTargets).toContainEqual({
+      id: TEXT_FILTER_TARGET_FULLTEXT_MORELIKE,
+      name: $localize`More like`,
+    })
+  })
 })

@@ -105,6 +105,51 @@ const RELATIVE_DATE_QUERYSTRINGS = [
   },
 ]
 
+const DEFAULT_TEXT_FILTER_TARGET_OPTIONS = [
+  { id: TEXT_FILTER_TARGET_TITLE, name: $localize`Title` },
+  {
+    id: TEXT_FILTER_TARGET_TITLE_CONTENT,
+    name: $localize`Title & content`,
+  },
+  { id: TEXT_FILTER_TARGET_ASN, name: $localize`ASN` },
+  {
+    id: TEXT_FILTER_TARGET_CUSTOM_FIELDS,
+    name: $localize`Custom fields`,
+  },
+  {
+    id: TEXT_FILTER_TARGET_FULLTEXT_QUERY,
+    name: $localize`Advanced search`,
+  },
+]
+
+const TEXT_FILTER_TARGET_MORELIKE_OPTION = {
+  id: TEXT_FILTER_TARGET_FULLTEXT_MORELIKE,
+  name: $localize`More like`,
+}
+
+const DEFAULT_TEXT_FILTER_MODIFIER_OPTIONS = [
+  {
+    id: TEXT_FILTER_MODIFIER_EQUALS,
+    label: $localize`equals`,
+  },
+  {
+    id: TEXT_FILTER_MODIFIER_NULL,
+    label: $localize`is empty`,
+  },
+  {
+    id: TEXT_FILTER_MODIFIER_NOTNULL,
+    label: $localize`is not empty`,
+  },
+  {
+    id: TEXT_FILTER_MODIFIER_GT,
+    label: $localize`greater than`,
+  },
+  {
+    id: TEXT_FILTER_MODIFIER_LT,
+    label: $localize`less than`,
+  },
+]
+
 @Component({
   selector: 'pngx-filter-editor',
   templateUrl: './filter-editor.component.html',
@@ -200,29 +245,12 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   _moreLikeDoc: PaperlessDocument
 
   get textFilterTargets() {
-    let targets = [
-      { id: TEXT_FILTER_TARGET_TITLE, name: $localize`Title` },
-      {
-        id: TEXT_FILTER_TARGET_TITLE_CONTENT,
-        name: $localize`Title & content`,
-      },
-      { id: TEXT_FILTER_TARGET_ASN, name: $localize`ASN` },
-      {
-        id: TEXT_FILTER_TARGET_CUSTOM_FIELDS,
-        name: $localize`Custom fields`,
-      },
-      {
-        id: TEXT_FILTER_TARGET_FULLTEXT_QUERY,
-        name: $localize`Advanced search`,
-      },
-    ]
     if (this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_MORELIKE) {
-      targets.push({
-        id: TEXT_FILTER_TARGET_FULLTEXT_MORELIKE,
-        name: $localize`More like`,
-      })
+      return DEFAULT_TEXT_FILTER_TARGET_OPTIONS.concat([
+        TEXT_FILTER_TARGET_MORELIKE_OPTION,
+      ])
     }
-    return targets
+    return DEFAULT_TEXT_FILTER_TARGET_OPTIONS
   }
 
   textFilterTarget = TEXT_FILTER_TARGET_TITLE_CONTENT
@@ -235,28 +263,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   public textFilterModifier: string
 
   get textFilterModifiers() {
-    return [
-      {
-        id: TEXT_FILTER_MODIFIER_EQUALS,
-        label: $localize`equals`,
-      },
-      {
-        id: TEXT_FILTER_MODIFIER_NULL,
-        label: $localize`is empty`,
-      },
-      {
-        id: TEXT_FILTER_MODIFIER_NOTNULL,
-        label: $localize`is not empty`,
-      },
-      {
-        id: TEXT_FILTER_MODIFIER_GT,
-        label: $localize`greater than`,
-      },
-      {
-        id: TEXT_FILTER_MODIFIER_LT,
-        label: $localize`less than`,
-      },
-    ]
+    return DEFAULT_TEXT_FILTER_MODIFIER_OPTIONS
   }
 
   get textFilterModifierIsNull(): boolean {

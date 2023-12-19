@@ -48,6 +48,12 @@ enum SettingsNavIDs {
   SavedViews = 4,
 }
 
+const systemLanguage = { code: '', name: $localize`Use system language` }
+const systemDateFormat = {
+  code: '',
+  name: $localize`Use date format of display language`,
+}
+
 @Component({
   selector: 'pngx-settings',
   templateUrl: './settings.component.html',
@@ -512,15 +518,11 @@ export class SettingsComponent
   }
 
   get displayLanguageOptions(): LanguageOption[] {
-    return [{ code: '', name: $localize`Use system language` }].concat(
-      this.settings.getLanguageOptions()
-    )
+    return [systemLanguage].concat(this.settings.getLanguageOptions())
   }
 
   get dateLocaleOptions(): LanguageOption[] {
-    return [
-      { code: '', name: $localize`Use date format of display language` },
-    ].concat(this.settings.getDateLocaleOptions())
+    return [systemDateFormat].concat(this.settings.getDateLocaleOptions())
   }
 
   get today() {

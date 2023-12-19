@@ -3,140 +3,144 @@
     <button class="btn btn-sm btn-outline-secondary" (click)="list.selectNone()">
       <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#slash-circle" />
-      </svg>&nbsp;<ng-container i18n>Cancel</ng-container>
-    </button>
-  </div>
-  <div class="d-flex align-items-center gap-2" role="group" aria-label="Select">
-    <label class="me-2" i18n>Select:</label>
-    <div class="btn-group">
-      <button class="btn btn-sm btn-outline-primary" (click)="list.selectPage()">
-        <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
-          <use xlink:href="assets/bootstrap-icons.svg#file-earmark-check" />
-        </svg>&nbsp;<ng-container i18n>Page</ng-container>
-      </button>
-      <button class="btn btn-sm btn-outline-primary" (click)="list.selectAll()">
-        <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
-          <use xlink:href="assets/bootstrap-icons.svg#check-all" />
-        </svg>&nbsp;<ng-container i18n>All</ng-container>
+        </svg>&nbsp;<ng-container i18n>Cancel</ng-container>
       </button>
     </div>
-  </div>
-    <div class="d-flex align-items-center gap-2" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-      <label class="me-2" i18n>Edit:</label>
-      <pngx-filterable-dropdown title="Tags" icon="tag-fill" i18n-title
-        filterPlaceholder="Filter tags" i18n-filterPlaceholder
-        [items]="tags"
-        [disabled]="!userCanEditAll"
-        [editing]="true"
-        [manyToOne]="true"
-        [applyOnClose]="applyOnClose"
-        (opened)="openTagsDropdown()"
-        [(selectionModel)]="tagSelectionModel"
-        [documentCounts]="tagDocumentCounts"
-        (apply)="setTags($event)">
-      </pngx-filterable-dropdown>
-      <pngx-filterable-dropdown title="Correspondent" icon="person-fill" i18n-title
-        filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
-        [items]="correspondents"
-        [disabled]="!userCanEditAll"
-        [editing]="true"
-        [applyOnClose]="applyOnClose"
-        (opened)="openCorrespondentDropdown()"
-        [(selectionModel)]="correspondentSelectionModel"
-        [documentCounts]="correspondentDocumentCounts"
-        (apply)="setCorrespondents($event)">
-      </pngx-filterable-dropdown>
-      <pngx-filterable-dropdown title="Document type" icon="file-earmark-fill" i18n-title
-        filterPlaceholder="Filter document types" i18n-filterPlaceholder
-        [items]="documentTypes"
-        [disabled]="!userCanEditAll"
-        [editing]="true"
-        [applyOnClose]="applyOnClose"
-        (opened)="openDocumentTypeDropdown()"
-        [(selectionModel)]="documentTypeSelectionModel"
-        [documentCounts]="documentTypeDocumentCounts"
-        (apply)="setDocumentTypes($event)">
-      </pngx-filterable-dropdown>
-      <pngx-filterable-dropdown title="Storage path" icon="folder-fill" i18n-title
-        filterPlaceholder="Filter storage paths" i18n-filterPlaceholder
-        [items]="storagePaths"
-        [disabled]="!userCanEditAll"
-        [editing]="true"
-        [applyOnClose]="applyOnClose"
-        (opened)="openStoragePathDropdown()"
-        [(selectionModel)]="storagePathsSelectionModel"
-        [documentCounts]="storagePathDocumentCounts"
-        (apply)="setStoragePaths($event)">
-      </pngx-filterable-dropdown>
-  </div>
-  <div class="d-flex align-items-center gap-2 ms-auto">
-    <div class="btn-toolbar">
-
-      <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="setPermissions()" [disabled]="!userOwnsAll || !userCanEditAll">
-        <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
-          <use xlink:href="assets/bootstrap-icons.svg#person-fill-lock" />
-        </svg><div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Permissions</ng-container></div>
-      </button>
-
-      <div ngbDropdown>
-        <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
-          <svg class="toolbaricon" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#three-dots" />
-          </svg>
-          <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
-        </button>
-        <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
-          <button ngbDropdownItem (click)="redoOcrSelected()" [disabled]="!userCanEditAll" i18n>Redo OCR</button>
+    <div class="d-flex align-items-center gap-2" role="group" aria-label="Select">
+      <label class="me-2" i18n>Select:</label>
+      <div class="btn-group">
+        <button class="btn btn-sm btn-outline-primary" (click)="list.selectPage()">
+          <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#file-earmark-check" />
+            </svg>&nbsp;<ng-container i18n>Page</ng-container>
+          </button>
+          <button class="btn btn-sm btn-outline-primary" (click)="list.selectAll()">
+            <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
+              <use xlink:href="assets/bootstrap-icons.svg#check-all" />
+              </svg>&nbsp;<ng-container i18n>All</ng-container>
+            </button>
+          </div>
         </div>
-      </div>
-    </div>
-
-    <div class="btn-group btn-group-sm">
-      <button class="btn btn-sm btn-outline-primary" [disabled]="awaitingDownload" (click)="downloadSelected()">
-        <svg *ngIf="!awaitingDownload" class="toolbaricon" fill="currentColor">
-          <use xlink:href="assets/bootstrap-icons.svg#arrow-down" />
-        </svg>
-        <div *ngIf="awaitingDownload" class="spinner-border spinner-border-sm" role="status">
-          <span class="visually-hidden">Preparing download...</span>
+        <div class="d-flex align-items-center gap-2" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
+          <label class="me-2" i18n>Edit:</label>
+          <pngx-filterable-dropdown title="Tags" icon="tag-fill" i18n-title
+            filterPlaceholder="Filter tags" i18n-filterPlaceholder
+            [items]="tags"
+            [disabled]="!userCanEditAll"
+            [editing]="true"
+            [manyToOne]="true"
+            [applyOnClose]="applyOnClose"
+            (opened)="openTagsDropdown()"
+            [(selectionModel)]="tagSelectionModel"
+            [documentCounts]="tagDocumentCounts"
+            (apply)="setTags($event)">
+          </pngx-filterable-dropdown>
+          <pngx-filterable-dropdown title="Correspondent" icon="person-fill" i18n-title
+            filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
+            [items]="correspondents"
+            [disabled]="!userCanEditAll"
+            [editing]="true"
+            [applyOnClose]="applyOnClose"
+            (opened)="openCorrespondentDropdown()"
+            [(selectionModel)]="correspondentSelectionModel"
+            [documentCounts]="correspondentDocumentCounts"
+            (apply)="setCorrespondents($event)">
+          </pngx-filterable-dropdown>
+          <pngx-filterable-dropdown title="Document type" icon="file-earmark-fill" i18n-title
+            filterPlaceholder="Filter document types" i18n-filterPlaceholder
+            [items]="documentTypes"
+            [disabled]="!userCanEditAll"
+            [editing]="true"
+            [applyOnClose]="applyOnClose"
+            (opened)="openDocumentTypeDropdown()"
+            [(selectionModel)]="documentTypeSelectionModel"
+            [documentCounts]="documentTypeDocumentCounts"
+            (apply)="setDocumentTypes($event)">
+          </pngx-filterable-dropdown>
+          <pngx-filterable-dropdown title="Storage path" icon="folder-fill" i18n-title
+            filterPlaceholder="Filter storage paths" i18n-filterPlaceholder
+            [items]="storagePaths"
+            [disabled]="!userCanEditAll"
+            [editing]="true"
+            [applyOnClose]="applyOnClose"
+            (opened)="openStoragePathDropdown()"
+            [(selectionModel)]="storagePathsSelectionModel"
+            [documentCounts]="storagePathDocumentCounts"
+            (apply)="setStoragePaths($event)">
+          </pngx-filterable-dropdown>
         </div>
-        <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Download</ng-container></div>
-      </button>
-      <div ngbDropdown class="me-2 d-flex btn-group" role="group">
-        <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle-split rounded-end" ngbDropdownToggle></button>
-        <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
-					<form [formGroup]="downloadForm" class="px-3 py-1">
-            <p class="mb-1" i18n>Include:</p>
-            <div class="form-group ps-3 mb-2">
-              <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="downloadFileType_archive" formControlName="downloadFileTypeArchive" />
-                <label class="form-check-label" for="downloadFileType_archive" i18n>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+          <div class="btn-toolbar">
+
+            <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="setPermissions()" [disabled]="!userOwnsAll || !userCanEditAll">
+              <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#person-fill-lock" />
+                </svg><div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Permissions</ng-container></div>
+              </button>
+
+              <div ngbDropdown>
+                <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
+                  <svg class="toolbaricon" fill="currentColor">
+                    <use xlink:href="assets/bootstrap-icons.svg#three-dots" />
+                  </svg>
+                  <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
+                </button>
+                <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
+                  <button ngbDropdownItem (click)="redoOcrSelected()" [disabled]="!userCanEditAll" i18n>Redo OCR</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-sm btn-outline-primary" [disabled]="awaitingDownload" (click)="downloadSelected()">
+                @if (!awaitingDownload) {
+                  <svg class="toolbaricon" fill="currentColor">
+                    <use xlink:href="assets/bootstrap-icons.svg#arrow-down" />
+                  </svg>
+                }
+                @if (awaitingDownload) {
+                  <div class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden">Preparing download...</span>
+                  </div>
+                }
+                <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Download</ng-container></div>
+              </button>
+              <div ngbDropdown class="me-2 d-flex btn-group" role="group">
+                <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle-split rounded-end" ngbDropdownToggle></button>
+                <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
+                  <form [formGroup]="downloadForm" class="px-3 py-1">
+                    <p class="mb-1" i18n>Include:</p>
+                    <div class="form-group ps-3 mb-2">
+                      <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="downloadFileType_archive" formControlName="downloadFileTypeArchive" />
+                        <label class="form-check-label" for="downloadFileType_archive" i18n>
                   Archived files
                 </label>
-              </div>
-              <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="downloadFileType_originals" formControlName="downloadFileTypeOriginals" />
-                <label class="form-check-label" for="downloadFileType_originals" i18n>
+                      </div>
+                      <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="downloadFileType_originals" formControlName="downloadFileTypeOriginals" />
+                        <label class="form-check-label" for="downloadFileType_originals" i18n>
                   Original files
                 </label>
-              </div>
-            </div>
-            <div class="form-check">
-              <input type="checkbox" class="form-check-input" id="downloadUseFormatting" formControlName="downloadUseFormatting" />
-              <label class="form-check-label" for="downloadUseFormatting" i18n>
+                      </div>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" id="downloadUseFormatting" formControlName="downloadUseFormatting" />
+                      <label class="form-check-label" for="downloadUseFormatting" i18n>
                 Use formatted filename
               </label>
+                    </div>
+                  </form>
+                </div>
+              </div>
             </div>
-          </form>
-        </div>
-      </div>
-    </div>
 
-    <div class="btn-group btn-group-sm">
-      <button type="button" class="btn btn-sm btn-outline-danger" (click)="applyDelete()" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }" [disabled]="!userOwnsAll">
-        <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
-          <use xlink:href="assets/bootstrap-icons.svg#trash" />
-        </svg>&nbsp;<ng-container i18n>Delete</ng-container>
-      </button>
-    </div>
-  </div>
-</div>
+            <div class="btn-group btn-group-sm">
+              <button type="button" class="btn btn-sm btn-outline-danger" (click)="applyDelete()" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }" [disabled]="!userOwnsAll">
+                <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
+                  <use xlink:href="assets/bootstrap-icons.svg#trash" />
+                  </svg>&nbsp;<ng-container i18n>Delete</ng-container>
+                </button>
+              </div>
+            </div>
+          </div>
