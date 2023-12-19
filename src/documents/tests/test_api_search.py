@@ -968,7 +968,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         u1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
         u2.user_permissions.add(*Permission.objects.filter(codename="view_document"))
 
-        Document.objects.create(checksum="1", content="test 1", owner=u1)
+        d1 = Document.objects.create(checksum="1", content="test 1", owner=u1)
         d2 = Document.objects.create(checksum="2", content="test 2", owner=u2)
         d3 = Document.objects.create(checksum="3", content="test 3", owner=u2)
         Document.objects.create(checksum="4", content="test 4")
@@ -993,9 +993,10 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
 
         assign_perm("view_document", u1, d2)
         assign_perm("view_document", u1, d3)
+        assign_perm("view_document", u2, d1)
 
         with AsyncWriter(index.open_index()) as writer:
-            for doc in [d2, d3]:
+            for doc in [d1, d2, d3]:
                 index.update_document(writer, doc)
 
         self.client.force_authenticate(user=u1)
@@ -1010,6 +1011,8 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         r = self.client.get(f"/api/documents/?query=test&owner__id__in={u1.id}")
         self.assertEqual(r.data["count"], 1)
         r = self.client.get("/api/documents/?query=test&owner__isnull=true")
+        self.assertEqual(r.data["count"], 1)
+        r = self.client.get(f"/api/documents/?query=test&shared_by__id={u1.id}")
         self.assertEqual(r.data["count"], 1)
 
     def test_search_sorting(self):
