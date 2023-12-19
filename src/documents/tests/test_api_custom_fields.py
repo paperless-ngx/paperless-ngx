@@ -400,6 +400,32 @@ class TestCustomField(DirectoriesMixin, APITestCase):
         self.assertEqual(CustomFieldInstance.objects.count(), 0)
         self.assertEqual(len(doc.custom_fields.all()), 0)
 
+    def test_custom_field_not_null(self):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - API request with custom_fields set to null
+        THEN:
+            - HTTP 400 is returned
+        """
+        doc = Document.objects.create(
+            title="WOW",
+            content="the content",
+            checksum="123",
+            mime_type="application/pdf",
+        )
+
+        resp = self.client.patch(
+            f"/api/documents/{doc.id}/",
+            data={
+                "custom_fields": None,
+            },
+            format="json",
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_bidirectional_doclink_fields(self):
         """
         GIVEN:

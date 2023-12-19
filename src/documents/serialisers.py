@@ -591,7 +591,11 @@ class DocumentSerializer(
     archived_file_name = SerializerMethodField()
     created_date = serializers.DateField(required=False)
 
-    custom_fields = CustomFieldInstanceSerializer(many=True, allow_null=True)
+    custom_fields = CustomFieldInstanceSerializer(
+        many=True,
+        allow_null=False,
+        required=False,
+    )
 
     owner = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
