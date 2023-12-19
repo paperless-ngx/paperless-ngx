@@ -119,6 +119,10 @@ class MailRuleAdmin(GuardedModelAdmin):
 
     ordering = ["order"]
 
+    raw_id_fields = ("assign_correspondent",)
+
+    filter_horizontal = ("assign_tags",)
+
 
 class ProcessedMailAdmin(admin.ModelAdmin):
     class Meta:
