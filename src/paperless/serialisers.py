@@ -3,8 +3,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from paperless.models import CommonSettings
-from paperless.models import OcrSettings
+from paperless.models import ApplicationConfiguration
 
 
 class ObfuscatedUserPasswordField(serializers.Field):
@@ -118,13 +117,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         )
 
 
-class CommonSettingsSerializer(serializers.ModelSerializer):
+class ApplicationConfigurationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CommonSettings
-        fields = "__all__"
-
-
-class OcrSettingsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OcrSettings
+        model = ApplicationConfiguration
         fields = "__all__"

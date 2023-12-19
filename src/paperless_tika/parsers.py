@@ -10,6 +10,8 @@ from tika_client import TikaClient
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
+from paperless.config import OutputTypeConfig
+from paperless.models import OutputTypeChoices
 
 
 class TikaDocumentParser(DocumentParser):
@@ -91,11 +93,14 @@ class TikaDocumentParser(DocumentParser):
             timeout=settings.CELERY_TASK_TIME_LIMIT,
         ) as client, client.libre_office.to_pdf() as route:
             # Set the output format of the resulting PDF
-            if settings.OCR_OUTPUT_TYPE in {"pdfa", "pdfa-2"}:
+            if settings.OCR_OUTPUT_TYPE in {
+                OutputTypeChoices.PDF_A,
+                OutputTypeChoices.PDF_A2,
+            }:
                 route.pdf_format(PdfAFormat.A2b)
-            elif settings.OCR_OUTPUT_TYPE == "pdfa-1":
+            elif settings.OCR_OUTPUT_TYPE == OutputTypeChoices.PDF_A1:
                 route.pdf_format(PdfAFormat.A1a)
-            elif settings.OCR_OUTPUT_TYPE == "pdfa-3":
+            elif settings.OCR_OUTPUT_TYPE == OutputTypeChoices.PDF_A3:
                 route.pdf_format(PdfAFormat.A3b)
 
             route.convert(document_path)
@@ -112,8 +117,8 @@ class TikaDocumentParser(DocumentParser):
                     f"Error while converting document to PDF: {err}",
                 ) from err
 
-    def get_settings(self):
+    def get_settings(self) -> OutputTypeConfig:
         """
         This parser does not implement additional settings yet
         """
-        return None
+        return OutputTypeConfig()

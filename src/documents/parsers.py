@@ -320,7 +320,7 @@ class DocumentParser(LoggingMixin):
     def __init__(self, logging_group, progress_callback=None):
         super().__init__()
         self.logging_group = logging_group
-        self.parser_settings = self.get_settings()
+        self.settings = self.get_settings()
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
         self.tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
 

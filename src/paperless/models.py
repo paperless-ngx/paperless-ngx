@@ -17,17 +17,66 @@ class AbstractSingletonModel(models.Model):
         super().save(*args, **kwargs)
 
 
-class CommonSettings(AbstractSingletonModel):
+class OutputTypeChoices(models.TextChoices):
+    """
+    Matches to --output-type
+    """
+
+    PDF = ("pdf", _("pdf"))
+    PDF_A = ("pdfa", _("pdfa"))
+    PDF_A1 = ("pdfa-1", _("pdfa-1"))
+    PDF_A2 = ("pdfa-2", _("pdfa-2"))
+    PDF_A3 = ("pdfa-3", _("pdfa-3"))
+
+
+class ModeChoices(models.TextChoices):
+    """
+    Matches to --skip-text, --redo-ocr, --force-ocr
+    and our own custom setting
+    """
+
+    SKIP = ("skip", _("skip"))
+    REDO = ("redo", _("redo"))
+    FORCE = ("force", _("force"))
+    SKIP_NO_ARCHIVE = ("skip_noarchive", _("skip_noarchive"))
+
+
+class ArchiveFileChoices(models.TextChoices):
+    """
+    Settings to control creation of an archive PDF file
+    """
+
+    NEVER = ("never", _("never"))
+    WITH_TEXT = ("with_text", _("with_text"))
+    ALWAYS = ("always", _("always"))
+
+
+class CleanChoices(models.TextChoices):
+    """
+    Matches to --clean, --clean-final
+    """
+
+    CLEAN = ("clean", _("clean"))
+    FINAL = ("clean-final", _("clean-final"))
+    NONE = ("none", _("none"))
+
+
+class ColorConvertChoices(models.TextChoices):
+    """
+    Refer to the Ghostscript documentation for valid options
+    """
+
+    UNCHANGED = ("LeaveColorUnchanged", _("LeaveColorUnchanged"))
+    RGB = ("RGB", _("RGB"))
+    INDEPENDENT = ("UseDeviceIndependentColor", _("UseDeviceIndependentColor"))
+    GRAY = ("Gray", _("Gray"))
+    CMYK = ("CMYK", _("CMYK"))
+
+
+class ApplicationConfiguration(AbstractSingletonModel):
     """
     Settings which are common across more than 1 parser
     """
-
-    class OutputTypeChoices(models.TextChoices):
-        PDF = ("pdf", _("pdf"))
-        PDF_A = ("pdfa", _("pdfa"))
-        PDF_A1 = ("pdfa-1", _("pdfa-1"))
-        PDF_A2 = ("pdfa-2", _("pdfa-2"))
-        PDF_A3 = ("pdfa-3", _("pdfa-3"))
 
     output_type = models.CharField(
         verbose_name=_("Sets the output PDF type"),
@@ -37,34 +86,9 @@ class CommonSettings(AbstractSingletonModel):
         choices=OutputTypeChoices.choices,
     )
 
-
-class OcrSettings(AbstractSingletonModel):
     """
     Settings for the Tesseract based OCR parser
     """
-
-    class ModeChoices(models.TextChoices):
-        SKIP = ("skip", _("skip"))
-        SKIP_NO_ARCHIVE = ("skip_noarchive", _("skip_noarchive"))
-        REDO = ("redo", _("redo"))
-        FORCE = ("force", _("force"))
-
-    class ArchiveFileChoices(models.TextChoices):
-        NEVER = ("never", _("never"))
-        WITH_TEXT = ("with_text", _("with_text"))
-        ALWAYS = ("always", _("always"))
-
-    class CleanChoices(models.TextChoices):
-        CLEAN = ("clean", _("clean"))
-        FINAL = ("clean-final", _("clean-final"))
-        NONE = ("none", _("none"))
-
-    class ColorConvertChoices(models.TextChoices):
-        UNCHANGED = ("LeaveColorUnchanged", _("LeaveColorUnchanged"))
-        RGB = ("RGB", _("RGB"))
-        INDEPENDENT = ("UseDeviceIndependentColor", _("UseDeviceIndependentColor"))
-        GRAY = ("Gray", _("Gray"))
-        CMYK = ("CMYK", _("CMYK"))
 
     pages = models.PositiveIntegerField(
         verbose_name=_("Do OCR from page 1 to this value"),
@@ -142,7 +166,7 @@ class OcrSettings(AbstractSingletonModel):
     )
 
     class Meta:
-        verbose_name = _("ocr settings")
+        verbose_name = _("paperless application settings")
 
     def __str__(self) -> str:
-        return "OcrSettings"
+        return "ApplicationConfiguration"
