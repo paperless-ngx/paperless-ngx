@@ -21,7 +21,6 @@ from paperless.filters import UserFilterSet
 from paperless.models import CommonSettings
 from paperless.models import OcrSettings
 from paperless.serialisers import CommonSettingsSerializer
-from paperless.serialisers import ConfigSerializer
 from paperless.serialisers import GroupSerializer
 from paperless.serialisers import OcrSettingsSerializer
 from paperless.serialisers import ProfileSerializer
@@ -183,37 +182,3 @@ class OcrSettingsViewSet(ModelViewSet):
 
     serializer_class = OcrSettingsSerializer
     permission_classes = (IsAuthenticated,)
-
-
-class ConfigView(GenericAPIView):
-    """
-    View for overall config settings
-    """
-
-    permission_classes = [IsAuthenticated]
-    serializer_class = ConfigSerializer
-
-    def get(self, request, *args, **kwargs):
-        serializer = self.get_serializer()
-
-        return Response(
-            serializer.to_representation(
-                {
-                    "common_settings": CommonSettings.objects.first(),
-                    "ocr_settings": OcrSettings.objects.first(),
-                },
-            ),
-        )
-
-    def post(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        CommonSettings.objects.filter(pk=1).update(
-            **serializer.validated_data.get("common_settings"),
-        )
-        OcrSettings.objects.filter(pk=1).update(
-            **serializer.validated_data.get("ocr_settings"),
-        )
-
-        return self.get(request)
