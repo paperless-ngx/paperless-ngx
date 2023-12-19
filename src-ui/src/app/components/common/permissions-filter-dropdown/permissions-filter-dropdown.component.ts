@@ -32,6 +32,7 @@ export enum OwnerFilterType {
   NOT_SELF = 2,
   OTHERS = 3,
   UNOWNED = 4,
+  SHARED_BY_ME = 5,
 }
 
 @Component({
@@ -105,6 +106,13 @@ export class PermissionsFilterDropdownComponent extends ComponentWithPermissions
       this.selectionModel.hideUnowned = false
     } else if (this.selectionModel.ownerFilter === OwnerFilterType.NONE) {
       this.selectionModel.userID = null
+      this.selectionModel.includeUsers = []
+      this.selectionModel.excludeUsers = []
+      this.selectionModel.hideUnowned = false
+    } else if (
+      this.selectionModel.ownerFilter === OwnerFilterType.SHARED_BY_ME
+    ) {
+      this.selectionModel.userID = this.settingsService.currentUser.id
       this.selectionModel.includeUsers = []
       this.selectionModel.excludeUsers = []
       this.selectionModel.hideUnowned = false
