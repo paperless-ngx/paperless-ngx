@@ -8,20 +8,21 @@ most of the available filters and ordering fields.
 
 The API provides the following main endpoints:
 
+- `/api/correspondents/`: Full CRUD support.
+- `/api/custom_fields/`: Full CRUD support.
 - `/api/documents/`: Full CRUD support, except POSTing new documents.
   See below.
-- `/api/correspondents/`: Full CRUD support.
 - `/api/document_types/`: Full CRUD support.
+- `/api/groups/`: Full CRUD support.
 - `/api/logs/`: Read-Only.
-- `/api/tags/`: Full CRUD support.
-- `/api/tasks/`: Read-only.
 - `/api/mail_accounts/`: Full CRUD support.
 - `/api/mail_rules/`: Full CRUD support.
-- `/api/users/`: Full CRUD support.
-- `/api/groups/`: Full CRUD support.
-- `/api/share_links/`: Full CRUD support.
-- `/api/custom_fields/`: Full CRUD support.
 - `/api/profile/`: GET, PATCH
+- `/api/share_links/`: Full CRUD support.
+- `/api/storage_paths/`: Full CRUD support.
+- `/api/tags/`: Full CRUD support.
+- `/api/tasks/`: Read-only.
+- `/api/users/`: Full CRUD support.
 
 All of these endpoints except for the logging endpoint allow you to
 fetch (and edit and delete where appropriate) individual objects by
@@ -320,6 +321,133 @@ can edit the object (either because they are the object owner or have permission
 granted). You can pass the parameter `full_perms=true` to API calls to view the
 full permissions of objects in a format that mirrors the `set_permissions`
 parameter above.
+
+## Permission options
+
+- admin.add_logentry
+- admin.change_logentry
+- admin.delete_logentry
+- admin.view_logentry
+- auth.add_group
+- auth.add_permission
+- auth.add_user
+- auth.change_group
+- auth.change_permission
+- auth.change_user
+- auth.delete_group
+- auth.delete_permission
+- auth.delete_user
+- auth.view_group
+- auth.view_permission
+- auth.view_user
+- authtoken.add_token
+- authtoken.add_tokenproxy
+- authtoken.change_token
+- authtoken.change_tokenproxy
+- authtoken.delete_token
+- authtoken.delete_tokenproxy
+- authtoken.view_token
+- authtoken.view_tokenproxy
+- contenttypes.add_contenttype
+- contenttypes.change_contenttype
+- contenttypes.delete_contenttype
+- contenttypes.view_contenttype
+- django_celery_results.add_chordcounter
+- django_celery_results.add_groupresult
+- django_celery_results.add_taskresult
+- django_celery_results.change_chordcounter
+- django_celery_results.change_groupresult
+- django_celery_results.change_taskresult
+- django_celery_results.delete_chordcounter
+- django_celery_results.delete_groupresult
+- django_celery_results.delete_taskresult
+- django_celery_results.view_chordcounter
+- django_celery_results.view_groupresult
+- django_celery_results.view_taskresult
+- documents.add_consumptiontemplate
+- documents.add_correspondent
+- documents.add_customfield
+- documents.add_customfieldinstance
+- documents.add_document
+- documents.add_documenttype
+- documents.add_log
+- documents.add_note
+- documents.add_paperlesstask
+- documents.add_savedview
+- documents.add_savedviewfilterrule
+- documents.add_sharelink
+- documents.add_storagepath
+- documents.add_tag
+- documents.add_uisettings
+- documents.change_consumptiontemplate
+- documents.change_correspondent
+- documents.change_customfield
+- documents.change_customfieldinstance
+- documents.change_document
+- documents.change_documenttype
+- documents.change_log
+- documents.change_note
+- documents.change_paperlesstask
+- documents.change_savedview
+- documents.change_savedviewfilterrule
+- documents.change_sharelink
+- documents.change_storagepath
+- documents.change_tag
+- documents.change_uisettings
+- documents.delete_consumptiontemplate
+- documents.delete_correspondent
+- documents.delete_customfield
+- documents.delete_customfieldinstance
+- documents.delete_document
+- documents.delete_documenttype
+- documents.delete_log
+- documents.delete_note
+- documents.delete_paperlesstask
+- documents.delete_savedview
+- documents.delete_savedviewfilterrule
+- documents.delete_sharelink
+- documents.delete_storagepath
+- documents.delete_tag
+- documents.delete_uisettings
+- documents.view_consumptiontemplate
+- documents.view_correspondent
+- documents.view_customfield
+- documents.view_customfieldinstance
+- documents.view_document
+- documents.view_documenttype
+- documents.view_log
+- documents.view_note
+- documents.view_paperlesstask
+- documents.view_savedview
+- documents.view_savedviewfilterrule
+- documents.view_sharelink
+- documents.view_storagepath
+- documents.view_tag
+- documents.view_uisettings
+- guardian.add_groupobjectpermission
+- guardian.add_userobjectpermission
+- guardian.change_groupobjectpermission
+- guardian.change_userobjectpermission
+- guardian.delete_groupobjectpermission
+- guardian.delete_userobjectpermission
+- guardian.view_groupobjectpermission
+- guardian.view_userobjectpermission
+- paperless_mail.add_mailaccount
+- paperless_mail.add_mailrule
+- paperless_mail.add_processedmail
+- paperless_mail.change_mailaccount
+- paperless_mail.change_mailrule
+- paperless_mail.change_processedmail
+- paperless_mail.delete_mailaccount
+- paperless_mail.delete_mailrule
+- paperless_mail.delete_processedmail
+- paperless_mail.view_mailaccount
+- paperless_mail.view_mailrule
+- paperless_mail.view_processedmail
+- sessions.add_session
+- sessions.change_session
+- sessions.delete_session
+- sessions.view_session
 
 ## API Versioning
 
