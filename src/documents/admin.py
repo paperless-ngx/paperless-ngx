@@ -108,7 +108,7 @@ class SavedViewAdmin(GuardedModelAdmin):
 
     inlines = [RuleInline]
 
-    def get_queryset(self, request):
+    def get_queryset(self, request):  # pragma: no cover
         return super().get_queryset(request).select_related("owner")
 
 
@@ -145,7 +145,7 @@ class NotesAdmin(GuardedModelAdmin):
     raw_id_fields = ("document",)
     search_fields = ("document__title",)
 
-    def get_queryset(self, request):
+    def get_queryset(self, request):  # pragma: no cover
         return (
             super()
             .get_queryset(request)
@@ -159,7 +159,7 @@ class ShareLinksAdmin(GuardedModelAdmin):
     list_display_links = ("created",)
     raw_id_fields = ("document",)
 
-    def get_queryset(self, request):
+    def get_queryset(self, request):  # pragma: no cover
         return super().get_queryset(request).select_related("document__correspondent")
 
 
@@ -177,7 +177,7 @@ class CustomFieldInstancesAdmin(GuardedModelAdmin):
     search_fields = ("document__title",)
     list_filter = ("created", "field")
 
-    def get_queryset(self, request):
+    def get_queryset(self, request):  # pragma: no cover
         return (
             super()
             .get_queryset(request)
