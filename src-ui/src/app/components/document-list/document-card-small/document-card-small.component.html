@@ -11,45 +11,55 @@
       </div>
 
       <div class="tags d-flex flex-column text-end position-absolute me-1 fs-6">
-        <pngx-tag *ngFor="let t of getTagsLimited$() | async" [tag]="t" (click)="clickTag.emit(t.id);$event.stopPropagation()" [clickable]="true" linkTitle="Toggle tag filter" i18n-linkTitle></pngx-tag>
-        <div *ngIf="moreTags">
-          <span class="badge text-dark">+ {{moreTags}}</span>
-        </div>
+        @for (t of getTagsLimited$() | async; track t) {
+          <pngx-tag [tag]="t" (click)="clickTag.emit(t.id);$event.stopPropagation()" [clickable]="true" linkTitle="Toggle tag filter" i18n-linkTitle></pngx-tag>
+        }
+        @if (moreTags) {
+          <div>
+            <span class="badge text-dark">+ {{moreTags}}</span>
+          </div>
+        }
       </div>
     </div>
 
-    <a *ngIf="notesEnabled && document.notes.length" routerLink="/documents/{{document.id}}/notes" class="document-card-notes py-2 px-1">
-      <span class="badge rounded-pill bg-light border text-primary">
-      <svg class="metadata-icon ms-1 me-1" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#chat-left-text"/>
-      </svg>
-      {{document.notes.length}}</span>
-    </a>
+    @if (notesEnabled && document.notes.length) {
+      <a routerLink="/documents/{{document.id}}/notes" class="document-card-notes py-2 px-1">
+        <span class="badge rounded-pill bg-light border text-primary">
+          <svg class="metadata-icon ms-1 me-1" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#chat-left-text"/>
+          </svg>
+        {{document.notes.length}}</span>
+      </a>
+    }
 
     <div class="card-body bg-light p-2">
       <p class="card-text">
-        <ng-container *ngIf="document.correspondent">
+        @if (document.correspondent) {
           <a title="Toggle correspondent filter" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="fw-bold btn-link">{{(document.correspondent$ | async)?.name ?? privateName}}</a>:
-        </ng-container>
+        }
         {{document.title | documentTitle}}
       </p>
     </div>
     <div class="card-footer pt-0 pb-2 px-2">
       <div class="list-group list-group-flush border-0 pt-1 pb-2 card-info">
-        <button *ngIf="document.document_type" type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0" title="Toggle document type filter" i18n-title
-         (click)="clickDocumentType.emit(document.document_type);$event.stopPropagation()">
-          <svg class="metadata-icon me-2 text-muted" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#file-earmark"/>
-          </svg>
-          <small>{{(document.document_type$ | async)?.name ?? privateName}}</small>
-        </button>
-        <button *ngIf="document.storage_path" type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0" title="Toggle storage path filter" i18n-title
-         (click)="clickStoragePath.emit(document.storage_path);$event.stopPropagation()">
-          <svg class="metadata-icon me-2 text-muted" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#folder"/>
-          </svg>
-          <small>{{(document.storage_path$ | async)?.name ?? privateName}}</small>
-        </button>
+        @if (document.document_type) {
+          <button type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0" title="Toggle document type filter" i18n-title
+            (click)="clickDocumentType.emit(document.document_type);$event.stopPropagation()">
+            <svg class="metadata-icon me-2 text-muted" fill="currentColor">
+              <use xlink:href="assets/bootstrap-icons.svg#file-earmark"/>
+            </svg>
+            <small>{{(document.document_type$ | async)?.name ?? privateName}}</small>
+          </button>
+        }
+        @if (document.storage_path) {
+          <button type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0" title="Toggle storage path filter" i18n-title
+            (click)="clickStoragePath.emit(document.storage_path);$event.stopPropagation()">
+            <svg class="metadata-icon me-2 text-muted" fill="currentColor">
+              <use xlink:href="assets/bootstrap-icons.svg#folder"/>
+            </svg>
+            <small>{{(document.storage_path$ | async)?.name ?? privateName}}</small>
+          </button>
+        }
         <div class="list-group-item bg-transparent p-0 border-0 d-flex flex-wrap-reverse justify-content-between">
           <ng-template #dateTooltip>
             <div class="d-flex flex-column text-light">
@@ -65,24 +75,30 @@
             <small>{{document.created_date | customDate:'mediumDate'}}</small>
           </div>
         </div>
-        <div *ngIf="document.archive_serial_number | isNumber" class="ps-0 p-1">
-          <svg class="metadata-icon me-2 text-muted" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#upc-scan"/>
-          </svg>
-          <small>#{{document.archive_serial_number}}</small>
-        </div>
-        <div *ngIf="document.owner && document.owner !== settingsService.currentUser.id" class="ps-0 p-1">
-          <svg class="metadata-icon me-2 text-muted" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#person-fill-lock"/>
-          </svg>
-          <small>{{document.owner | username}}</small>
-        </div>
-        <div *ngIf="document.is_shared_by_requester" class="ps-0 p-1">
-          <svg class="metadata-icon me-2 text-muted" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#people-fill"/>
-          </svg>
-          <small i18n>Shared</small>
-        </div>
+        @if (document.archive_serial_number | isNumber) {
+          <div class="ps-0 p-1">
+            <svg class="metadata-icon me-2 text-muted" fill="currentColor">
+              <use xlink:href="assets/bootstrap-icons.svg#upc-scan"/>
+            </svg>
+            <small>#{{document.archive_serial_number}}</small>
+          </div>
+        }
+        @if (document.owner && document.owner !== settingsService.currentUser.id) {
+          <div class="ps-0 p-1">
+            <svg class="metadata-icon me-2 text-muted" fill="currentColor">
+              <use xlink:href="assets/bootstrap-icons.svg#person-fill-lock"/>
+            </svg>
+            <small>{{document.owner | username}}</small>
+          </div>
+        }
+        @if (document.is_shared_by_requester) {
+          <div class="ps-0 p-1">
+            <svg class="metadata-icon me-2 text-muted" fill="currentColor">
+              <use xlink:href="assets/bootstrap-icons.svg#people-fill"/>
+            </svg>
+            <small i18n>Shared</small>
+          </div>
+        }
       </div>
       <div class="d-flex justify-content-between align-items-center">
         <div class="btn-group w-100">
@@ -92,8 +108,8 @@
             </svg>
           </a>
           <a [href]="previewUrl" target="_blank" class="btn btn-sm btn-outline-secondary"
-          [ngbPopover]="previewContent" [popoverTitle]="document.title | documentTitle"
-          autoClose="true" popoverClass="shadow popover-preview" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">
+            [ngbPopover]="previewContent" [popoverTitle]="document.title | documentTitle"
+            autoClose="true" popoverClass="shadow popover-preview" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
               <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
               <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>

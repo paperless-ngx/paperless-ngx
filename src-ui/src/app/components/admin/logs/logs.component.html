@@ -6,25 +6,35 @@
 </pngx-page-header>
 
 <ul ngbNav #nav="ngbNav" [(activeId)]="activeLog" (activeIdChange)="reloadLogs()" class="nav-tabs">
-  <li *ngFor="let logFile of logFiles" [ngbNavItem]="logFile">
-    <a ngbNavLink>
-      {{logFile}}.log
-    </a>
-  </li>
-  <div *ngIf="isLoading || !logFiles.length" class="ps-2 d-flex align-items-center">
-    <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-    <ng-container *ngIf="!logFiles.length" i18n>Loading...</ng-container>
-  </div>
+  @for (logFile of logFiles; track logFile) {
+    <li [ngbNavItem]="logFile">
+      <a ngbNavLink>
+        {{logFile}}.log
+      </a>
+    </li>
+  }
+  @if (isLoading || !logFiles.length) {
+    <div class="ps-2 d-flex align-items-center">
+      <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+      @if (!logFiles.length) {
+        <ng-container i18n>Loading...</ng-container>
+      }
+    </div>
+  }
 </ul>
 
 <div [ngbNavOutlet]="nav" class="mt-2"></div>
 
 <div class="bg-dark p-3 text-light font-monospace log-container" #logContainer>
-  <div *ngIf="isLoading && logFiles.length">
-    <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-    <ng-container i18n>Loading...</ng-container>
-  </div>
-  <p
-    class="m-0 p-0 log-entry-{{getLogLevel(log)}}"
-    *ngFor="let log of logs">{{log}}</p>
+  @if (isLoading && logFiles.length) {
+    <div>
+      <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+      <ng-container i18n>Loading...</ng-container>
+    </div>
+  }
+  @for (log of logs; track log) {
+    <p
+      class="m-0 p-0 log-entry-{{getLogLevel(log)}}"
+    >{{log}}</p>
+  }
 </div>

@@ -8,32 +8,44 @@
     <div class="fixed-bottom p-2 p-md-4" [ngClass]="slimSidebarEnabled ? 'col-slim' : 'offset-md-3 offset-lg-2'">
       <div class="row d-flex justify-content-end">
         <div class="col col-lg-4 col-xl-3 d-flex px-4 justify-content-between align-items-center">
-          <p class="m-0 small text-muted" *ngIf="getStatus().length > 0">{{getStatusSummary()}}</p>
-          <a *ngIf="getStatusCompleted().length > 0" class="btn-link" (click)="dismissCompleted()" [routerLink]="[]" >
-            <span class="me-1" i18n="This button dismisses all status messages about processed documents on the dashboard (failed and successful)">Dismiss completed</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" fill="currentColor" class="bi bi-check2-all" viewBox="0 0 16 16">
-              <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 1.854 7.146a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0l7-7zm-4.208 7l-.896-.897.707-.707.543.543 6.646-6.647a.5.5 0 0 1 .708.708l-7 7a.5.5 0 0 1-.708 0z"/>
-              <path d="M5.354 7.146l.896.897-.707.707-.897-.896a.5.5 0 1 1 .708-.708z"/>
-            </svg>
-          </a>
+          @if (getStatus().length > 0) {
+            <p class="m-0 small text-muted">{{getStatusSummary()}}</p>
+          }
+          @if (getStatusCompleted().length > 0) {
+            <a class="btn-link" (click)="dismissCompleted()" [routerLink]="[]" >
+              <span class="me-1" i18n="This button dismisses all status messages about processed documents on the dashboard (failed and successful)">Dismiss completed</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" fill="currentColor" class="bi bi-check2-all" viewBox="0 0 16 16">
+                <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 1.854 7.146a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0l7-7zm-4.208 7l-.896-.897.707-.707.543.543 6.646-6.647a.5.5 0 0 1 .708.708l-7 7a.5.5 0 0 1-.708 0z"/>
+                <path d="M5.354 7.146l.896.897-.707.707-.897-.896a.5.5 0 1 1 .708-.708z"/>
+              </svg>
+            </a>
+          }
         </div>
       </div>
-      <div *ngFor="let status of getStatus()">
-        <ng-container [ngTemplateOutlet]="consumerAlert" [ngTemplateOutletContext]="{ $implicit: status }"></ng-container>
-      </div>
-    </div>
-    <div *ngIf="getStatusHidden().length" class="alerts-hidden">
-      <p *ngIf="!alertsExpanded" class="mt-3 mb-0 text-center">
-        <span i18n="This is shown as a summary line when there are more than 5 document in the processing pipeline.">{getStatusHidden().length, plural, =1 {One more document} other {{{getStatusHidden().length}} more documents}}</span>
-        &nbsp;&bull;&nbsp;
-        <a [routerLink]="[]" (click)="alertsExpanded = !alertsExpanded" aria-controls="hiddenAlerts" [attr.aria-expanded]="alertsExpanded" i18n>Show all</a>
-      </p>
-      <div #hiddenAlerts="ngbCollapse" [(ngbCollapse)]="!alertsExpanded">
-        <div *ngFor="let status of getStatusHidden()">
+      @for (status of getStatus(); track status) {
+        <div>
           <ng-container [ngTemplateOutlet]="consumerAlert" [ngTemplateOutletContext]="{ $implicit: status }"></ng-container>
         </div>
-      </div>
+      }
     </div>
+    @if (getStatusHidden().length) {
+      <div class="alerts-hidden">
+        @if (!alertsExpanded) {
+          <p class="mt-3 mb-0 text-center">
+            <span i18n="This is shown as a summary line when there are more than 5 document in the processing pipeline.">{getStatusHidden().length, plural, =1 {One more document} other {{{getStatusHidden().length}} more documents}}</span>
+            &nbsp;&bull;&nbsp;
+            <a [routerLink]="[]" (click)="alertsExpanded = !alertsExpanded" aria-controls="hiddenAlerts" [attr.aria-expanded]="alertsExpanded" i18n>Show all</a>
+          </p>
+        }
+        <div #hiddenAlerts="ngbCollapse" [(ngbCollapse)]="!alertsExpanded">
+          @for (status of getStatusHidden(); track status) {
+            <div>
+              <ng-container [ngTemplateOutlet]="consumerAlert" [ngTemplateOutletContext]="{ $implicit: status }"></ng-container>
+            </div>
+          }
+        </div>
+      </div>
+    }
   </div>
 </pngx-widget-frame>
 
@@ -42,17 +54,23 @@
     <div class="col col-lg-4 col-xl-3">
       <ngb-alert type="secondary" class="mt-2 mb-0" [dismissible]="isFinished(status)" (closed)="dismiss(status)">
         <h6 class="alert-heading">{{status.filename}}</h6>
-        <p class="mb-0 pb-1" *ngIf="!isFinished(status) || (isFinished(status) && !status.documentId)">{{status.message}}</p>
+        @if (!isFinished(status) || (isFinished(status) && !status.documentId)) {
+          <p class="mb-0 pb-1">{{status.message}}</p>
+        }
         <ngb-progressbar [value]="status.getProgress()" [max]="1" [type]="getStatusColor(status)"></ngb-progressbar>
         <div *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
-          <div *ngIf="isFinished(status)">
-            <button *ngIf="status.documentId" class="btn btn-sm btn-outline-primary btn-open" routerLink="/documents/{{status.documentId}}" (click)="dismiss(status)">
-              <small i18n>Open document</small>
-              <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" fill="currentColor" class="bi bi-arrow-right-short" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8z"/>
-              </svg>
-            </button>
-          </div>
+          @if (isFinished(status)) {
+            <div>
+              @if (status.documentId) {
+                <button class="btn btn-sm btn-outline-primary btn-open" routerLink="/documents/{{status.documentId}}" (click)="dismiss(status)">
+                  <small i18n>Open document</small>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" fill="currentColor" class="bi bi-arrow-right-short" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8z"/>
+                  </svg>
+                </button>
+              }
+            </div>
+          }
         </div>
       </ngb-alert>
     </div>
