@@ -10,13 +10,13 @@
         </context-group>
         <target state="final">Fermer</target>
       </trans-unit>
-      <trans-unit id="ngb.timepicker.HH" datatype="html">
+      <trans-unit id="ngb.timepicker.HH" datatype="html" approved="yes">
         <source>HH</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">HH</target>
+        <target state="final">HH</target>
       </trans-unit>
       <trans-unit id="ngb.toast.close-aria" datatype="html" approved="yes">
         <source>Close</source>
@@ -100,13 +100,13 @@
         </context-group>
         <target state="final">Précédent</target>
       </trans-unit>
-      <trans-unit id="ngb.timepicker.MM" datatype="html">
+      <trans-unit id="ngb.timepicker.MM" datatype="html" approved="yes">
         <source>MM</source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">MM</target>
+        <target state="final">MM</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.next" datatype="html" approved="yes">
         <source>»</source>

@@ -1,5 +1,38 @@
 # Changelog
 
+## paperless-ngx 2.1.2
+
+### Bug Fixes
+
+- Fix: sort consumption templates by order by default [@shamoon](https://github.com/shamoon) ([#4956](https://github.com/paperless-ngx/paperless-ngx/pull/4956))
+- Fix: Updates gotenberg-client, including workaround for Gotenberg non-latin handling [@stumpylog](https://github.com/stumpylog) ([#4944](https://github.com/paperless-ngx/paperless-ngx/pull/4944))
+- Fix: allow text copy in pngx pdf viewer [@shamoon](https://github.com/shamoon) ([#4938](https://github.com/paperless-ngx/paperless-ngx/pull/4938))
+- Fix: Don't allow autocomplete searches to fail on schema field matches [@stumpylog](https://github.com/stumpylog) ([#4934](https://github.com/paperless-ngx/paperless-ngx/pull/4934))
+- Fix: Convert search dates to UTC in advanced search [@bogdal](https://github.com/bogdal) ([#4891](https://github.com/paperless-ngx/paperless-ngx/pull/4891))
+- Fix: Use the attachment filename so downstream template matching works [@stumpylog](https://github.com/stumpylog) ([#4931](https://github.com/paperless-ngx/paperless-ngx/pull/4931))
+- Fix: frontend handle autocomplete failure gracefully [@shamoon](https://github.com/shamoon) ([#4903](https://github.com/paperless-ngx/paperless-ngx/pull/4903))
+
+### Dependencies
+
+- Chore(deps-dev): Bump the small-changes group with 2 updates [@dependabot](https://github.com/dependabot) ([#4942](https://github.com/paperless-ngx/paperless-ngx/pull/4942))
+- Chore(deps-dev): Bump the development group with 1 update [@dependabot](https://github.com/dependabot) ([#4939](https://github.com/paperless-ngx/paperless-ngx/pull/4939))
+
+### All App Changes
+
+<details>
+<summary>9 changes</summary>
+
+- Fix: sort consumption templates by order by default [@shamoon](https://github.com/shamoon) ([#4956](https://github.com/paperless-ngx/paperless-ngx/pull/4956))
+- Chore: reorganize api tests [@shamoon](https://github.com/shamoon) ([#4935](https://github.com/paperless-ngx/paperless-ngx/pull/4935))
+- Chore(deps-dev): Bump the small-changes group with 2 updates [@dependabot](https://github.com/dependabot) ([#4942](https://github.com/paperless-ngx/paperless-ngx/pull/4942))
+- Fix: allow text copy in pngx pdf viewer [@shamoon](https://github.com/shamoon) ([#4938](https://github.com/paperless-ngx/paperless-ngx/pull/4938))
+- Chore(deps-dev): Bump the development group with 1 update [@dependabot](https://github.com/dependabot) ([#4939](https://github.com/paperless-ngx/paperless-ngx/pull/4939))
+- Fix: Don't allow autocomplete searches to fail on schema field matches [@stumpylog](https://github.com/stumpylog) ([#4934](https://github.com/paperless-ngx/paperless-ngx/pull/4934))
+- Fix: Convert search dates to UTC in advanced search [@bogdal](https://github.com/bogdal) ([#4891](https://github.com/paperless-ngx/paperless-ngx/pull/4891))
+- Fix: Use the attachment filename so downstream template matching works [@stumpylog](https://github.com/stumpylog) ([#4931](https://github.com/paperless-ngx/paperless-ngx/pull/4931))
+- Fix: frontend handle autocomplete failure gracefully [@shamoon](https://github.com/shamoon) ([#4903](https://github.com/paperless-ngx/paperless-ngx/pull/4903))
+</details>
+
 ## paperless-ngx 2.1.1
 
 ### Bug Fixes

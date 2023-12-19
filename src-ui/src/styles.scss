@@ -555,6 +555,11 @@ table.table {
   }
 }
 
+.popover-hidden .popover {
+    opacity: 0;
+    pointer-events: none;
+}
+
 // Tour
 .tour-active .popover {
   min-width: 360px;

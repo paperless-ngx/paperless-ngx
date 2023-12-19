@@ -16,10 +16,7 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
 @Component({
   selector: 'pngx-document-card-small',
   templateUrl: './document-card-small.component.html',
-  styleUrls: [
-    './document-card-small.component.scss',
-    '../popover-preview/popover-preview.scss',
-  ],
+  styleUrls: ['./document-card-small.component.scss'],
 })
 export class DocumentCardSmallComponent extends ComponentWithPermissions {
   constructor(

@@ -22,6 +22,7 @@ import { By } from '@angular/platform-browser'
 import { TagComponent } from '../../common/tag/tag.component'
 import { PaperlessTag } from 'src/app/data/paperless-tag'
 import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
+import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.component'
 
 const doc = {
   id: 10,
@@ -64,6 +65,7 @@ describe('DocumentCardSmallComponent', () => {
         SafeUrlPipe,
         TagComponent,
         IsNumberPipe,
+        PreviewPopupComponent,
       ],
       providers: [DatePipe],
       imports: [

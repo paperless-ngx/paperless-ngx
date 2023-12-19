@@ -29,6 +29,7 @@ import { SavedViewWidgetComponent } from './saved-view-widget.component'
 import { By } from '@angular/platform-browser'
 import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { DragDropModule } from '@angular/cdk/drag-drop'
+import { PreviewPopupComponent } from 'src/app/components/common/preview-popup/preview-popup.component'
 
 const savedView: PaperlessSavedView = {
   id: 1,
@@ -74,6 +75,7 @@ describe('SavedViewWidgetComponent', () => {
         CustomDatePipe,
         DocumentTitlePipe,
         SafeUrlPipe,
+        PreviewPopupComponent,
       ],
       providers: [
         PermissionsGuard,
@@ -137,15 +139,18 @@ describe('SavedViewWidgetComponent', () => {
     )
     component.ngOnInit()
     fixture.detectChanges()
-    component.mouseEnterPreview(documentResults[0])
+    component.mouseEnterPreviewButton(documentResults[0])
     expect(component.popover.isOpen()).toBeTruthy()
     expect(component.popoverHidden).toBeTruthy()
     tick(600)
     expect(component.popoverHidden).toBeFalsy()
-    component.mouseLeaveCard()
+    component.maybeClosePopover()
 
-    component.mouseEnterPreview(documentResults[1])
+    component.mouseEnterPreviewButton(documentResults[1])
     tick(100)
+    component.mouseLeavePreviewButton()
+    component.mouseEnterPreview()
+    expect(component.popover.isOpen()).toBeTruthy()
     component.mouseLeavePreview()
     tick(600)
     expect(component.popover.isOpen()).toBeFalsy()
