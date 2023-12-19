@@ -49,6 +49,7 @@ import {
   FILTER_OWNER_ISNULL,
   FILTER_OWNER_ANY,
   FILTER_CUSTOM_FIELDS,
+  FILTER_SHARED_BY_USER,
 } from 'src/app/data/filter-rule-type'
 import {
   FilterableDropdownSelectionModel,
@@ -503,6 +504,12 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
               parseInt(rule.value, 10)
             )
           break
+        case FILTER_SHARED_BY_USER:
+          this.permissionsSelectionModel.ownerFilter =
+            OwnerFilterType.SHARED_BY_ME
+          if (rule.value)
+            this.permissionsSelectionModel.userID = parseInt(rule.value, 10)
+          break
         case FILTER_OWNER_ISNULL:
           if (rule.value === 'true' || rule.value === '1') {
             this.permissionsSelectionModel.hideUnowned = false
@@ -800,6 +807,13 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       filterRules.push({
         rule_type: FILTER_OWNER_ANY,
         value: this.permissionsSelectionModel.includeUsers?.join(','),
+      })
+    } else if (
+      this.permissionsSelectionModel.ownerFilter == OwnerFilterType.SHARED_BY_ME
+    ) {
+      filterRules.push({
+        rule_type: FILTER_SHARED_BY_USER,
+        value: this.permissionsSelectionModel.userID.toString(),
       })
     } else if (
       this.permissionsSelectionModel.ownerFilter == OwnerFilterType.UNOWNED

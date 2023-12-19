@@ -38,6 +38,16 @@
                     <small i18n>Shared with me</small>
                 </div>
             </button>
+            <button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="setFilter(OwnerFilterType.SHARED_BY_ME)" [disabled]="disabled">
+                <div class="selected-icon me-1">
+                    <svg *ngIf="selectionModel.ownerFilter === OwnerFilterType.SHARED_BY_ME" fill="currentColor" class="buttonicon-sm">
+                        <use xlink:href="assets/bootstrap-icons.svg#check"/>
+                    </svg>
+                </div>
+                <div class="me-1">
+                    <small i18n>Shared by me</small>
+                </div>
+            </button>
             <button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="setFilter(OwnerFilterType.UNOWNED)" [disabled]="disabled">
                 <div class="selected-icon me-1">
                     <svg *ngIf="selectionModel.ownerFilter === OwnerFilterType.UNOWNED" fill="currentColor" class="buttonicon-sm">

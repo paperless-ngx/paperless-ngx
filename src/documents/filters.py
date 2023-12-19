@@ -1,7 +1,12 @@
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import Count
+from django.db.models import OuterRef
 from django.db.models import Q
 from django_filters.rest_framework import BooleanFilter
 from django_filters.rest_framework import Filter
 from django_filters.rest_framework import FilterSet
+from guardian.utils import get_group_obj_perms_model
+from guardian.utils import get_user_obj_perms_model
 from rest_framework_guardian.filters import ObjectPermissionsFilter
 
 from documents.models import Correspondent
@@ -101,6 +106,39 @@ class TitleContentFilter(Filter):
             return qs
 
 
+class SharedByUser(Filter):
+    def filter(self, qs, value):
+        ctype = ContentType.objects.get_for_model(self.model)
+        UserObjectPermission = get_user_obj_perms_model()
+        GroupObjectPermission = get_group_obj_perms_model()
+        return (
+            qs.filter(
+                owner_id=value,
+            )
+            .annotate(
+                num_shared_users=Count(
+                    UserObjectPermission.objects.filter(
+                        content_type=ctype,
+                        object_pk=OuterRef("pk"),
+                    ).values("user_id"),
+                ),
+            )
+            .annotate(
+                num_shared_groups=Count(
+                    GroupObjectPermission.objects.filter(
+                        content_type=ctype,
+                        object_pk=OuterRef("pk"),
+                    ).values("group_id"),
+                ),
+            )
+            .filter(
+                Q(num_shared_users__gt=0) | Q(num_shared_groups__gt=0),
+            )
+            if value is not None
+            else qs
+        )
+
+
 class CustomFieldsFilter(Filter):
     def filter(self, qs, value):
         if value:
@@ -143,6 +181,8 @@ class DocumentFilterSet(FilterSet):
     owner__id__none = ObjectFilter(field_name="owner", exclude=True)
 
     custom_fields__icontains = CustomFieldsFilter()
+
+    shared_by__id = SharedByUser()
 
     class Meta:
         model = Document
