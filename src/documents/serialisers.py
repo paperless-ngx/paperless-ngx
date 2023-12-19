@@ -549,8 +549,8 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
             ["value_document_ids"],
         )
 
+    @staticmethod
     def remove_doclink(
-        self,
         document: Document,
         field: CustomField,
         target_doc_id: int,
@@ -625,16 +625,16 @@ class DocumentSerializer(
         if "created_date" in validated_data:
             validated_data.pop("created_date")
         if instance.custom_fields.count() > 0 and "custom_fields" in validated_data:
+            incoming_custom_fields = [
+                field["field"] for field in validated_data["custom_fields"]
+            ]
             for custom_field_instance in instance.custom_fields.filter(
                 field__data_type=CustomField.FieldDataType.DOCUMENTLINK,
             ):
-                if custom_field_instance.field not in [
-                    field["field"] for field in validated_data["custom_fields"]
-                ]:
+                if custom_field_instance.field not in incoming_custom_fields:
                     # Doc link field is being removed entirely
                     for doc_id in custom_field_instance.value:
                         CustomFieldInstanceSerializer.remove_doclink(
-                            None,
                             instance,
                             custom_field_instance.field,
                             doc_id,
