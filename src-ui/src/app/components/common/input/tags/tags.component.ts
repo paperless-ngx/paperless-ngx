@@ -9,7 +9,7 @@ import {
 } from '@angular/core'
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { Tag } from 'src/app/data/tag'
 import { TagEditDialogComponent } from '../../edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { EditDialogMode } from '../../edit-dialog/edit-dialog.component'
@@ -81,13 +81,13 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   horizontal: boolean = false
 
   @Output()
-  filterDocuments = new EventEmitter<PaperlessTag[]>()
+  filterDocuments = new EventEmitter<Tag[]>()
 
   @ViewChild('tagSelect') select: NgSelectComponent
 
   value: number[] = []
 
-  tags: PaperlessTag[] = []
+  tags: Tag[] = []
 
   public createTagRef: (name) => void
 

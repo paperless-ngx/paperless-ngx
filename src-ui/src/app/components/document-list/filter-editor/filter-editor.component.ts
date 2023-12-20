@@ -8,9 +8,9 @@ import {
   ViewChild,
   ElementRef,
 } from '@angular/core'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
-import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
-import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
+import { Tag } from 'src/app/data/tag'
+import { Correspondent } from 'src/app/data/correspondent'
+import { DocumentType } from 'src/app/data/document-type'
 import { Subject, Subscription } from 'rxjs'
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
@@ -62,8 +62,8 @@ import {
   SelectionData,
   SelectionDataItem,
 } from 'src/app/services/rest/document.service'
-import { PaperlessDocument } from 'src/app/data/paperless-document'
-import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
+import { Document } from 'src/app/data/document'
+import { StoragePath } from 'src/app/data/storage-path'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { RelativeDate } from '../../common/date-dropdown/date-dropdown.component'
 import {
@@ -230,10 +230,10 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   @ViewChild('textFilterInput')
   textFilterInput: ElementRef
 
-  tags: PaperlessTag[] = []
-  correspondents: PaperlessCorrespondent[] = []
-  documentTypes: PaperlessDocumentType[] = []
-  storagePaths: PaperlessStoragePath[] = []
+  tags: Tag[] = []
+  correspondents: Correspondent[] = []
+  documentTypes: DocumentType[] = []
+  storagePaths: StoragePath[] = []
 
   tagDocumentCounts: SelectionDataItem[]
   correspondentDocumentCounts: SelectionDataItem[]
@@ -242,7 +242,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
 
   _textFilter = ''
   _moreLikeId: number
-  _moreLikeDoc: PaperlessDocument
+  _moreLikeDoc: Document
 
   get textFilterTargets() {
     if (this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_MORELIKE) {

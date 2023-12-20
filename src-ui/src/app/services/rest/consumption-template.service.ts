@@ -1,13 +1,13 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { tap } from 'rxjs'
-import { PaperlessConsumptionTemplate } from 'src/app/data/paperless-consumption-template'
+import { ConsumptionTemplate } from 'src/app/data/consumption-template'
 import { AbstractPaperlessService } from './abstract-paperless-service'
 
 @Injectable({
   providedIn: 'root',
 })
-export class ConsumptionTemplateService extends AbstractPaperlessService<PaperlessConsumptionTemplate> {
+export class ConsumptionTemplateService extends AbstractPaperlessService<ConsumptionTemplate> {
   loading: boolean
 
   constructor(http: HttpClient) {
@@ -22,21 +22,21 @@ export class ConsumptionTemplateService extends AbstractPaperlessService<Paperle
     })
   }
 
-  private templates: PaperlessConsumptionTemplate[] = []
+  private templates: ConsumptionTemplate[] = []
 
-  public get allTemplates(): PaperlessConsumptionTemplate[] {
+  public get allTemplates(): ConsumptionTemplate[] {
     return this.templates
   }
 
-  create(o: PaperlessConsumptionTemplate) {
+  create(o: ConsumptionTemplate) {
     return super.create(o).pipe(tap(() => this.reload()))
   }
 
-  update(o: PaperlessConsumptionTemplate) {
+  update(o: ConsumptionTemplate) {
     return super.update(o).pipe(tap(() => this.reload()))
   }
 
-  delete(o: PaperlessConsumptionTemplate) {
+  delete(o: ConsumptionTemplate) {
     return super.delete(o).pipe(tap(() => this.reload()))
   }
 }

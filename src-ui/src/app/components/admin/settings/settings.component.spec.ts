@@ -13,8 +13,8 @@ import {
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
-import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
-import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { SavedView } from 'src/app/data/saved-view'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
@@ -138,7 +138,7 @@ describe('SettingsComponent', () => {
         of({
           all: savedViews.map((v) => v.id),
           count: savedViews.length,
-          results: (savedViews as PaperlessSavedView[]).concat([]),
+          results: (savedViews as SavedView[]).concat([]),
         })
       )
     }
@@ -226,9 +226,7 @@ describe('SettingsComponent', () => {
     savedViewPatchSpy.mockClear()
 
     // succeed saved views
-    savedViewPatchSpy.mockReturnValueOnce(
-      of(savedViews as PaperlessSavedView[])
-    )
+    savedViewPatchSpy.mockReturnValueOnce(of(savedViews as SavedView[]))
     component.saveSettings()
     expect(toastErrorSpy).not.toHaveBeenCalled()
     expect(savedViewPatchSpy).toHaveBeenCalled()
@@ -335,7 +333,7 @@ describe('SettingsComponent', () => {
     const toastSpy = jest.spyOn(toastService, 'showInfo')
     const deleteSpy = jest.spyOn(savedViewService, 'delete')
     deleteSpy.mockReturnValue(of(true))
-    component.deleteSavedView(savedViews[0] as PaperlessSavedView)
+    component.deleteSavedView(savedViews[0] as SavedView)
     expect(deleteSpy).toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalledWith(
       `Saved view "${savedViews[0].name}" deleted.`

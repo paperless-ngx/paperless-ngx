@@ -1,10 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { FormGroup, FormControl } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import {
-  DATA_TYPE_LABELS,
-  PaperlessCustomField,
-} from 'src/app/data/paperless-custom-field'
+import { DATA_TYPE_LABELS, CustomField } from 'src/app/data/custom-field'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -16,7 +13,7 @@ import { EditDialogComponent, EditDialogMode } from '../edit-dialog.component'
   styleUrls: ['./custom-field-edit-dialog.component.scss'],
 })
 export class CustomFieldEditDialogComponent
-  extends EditDialogComponent<PaperlessCustomField>
+  extends EditDialogComponent<CustomField>
   implements OnInit
 {
   constructor(

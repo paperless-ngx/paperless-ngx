@@ -15,11 +15,11 @@ import { RouterTestingModule } from '@angular/router/testing'
 import { SettingsService } from 'src/app/services/settings.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
-import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { RemoteVersionService } from 'src/app/services/rest/remote-version.service'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { Observable, of, tap, throwError } from 'rxjs'
+import { of, throwError } from 'rxjs'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
@@ -31,7 +31,7 @@ import { FILTER_FULLTEXT_QUERY } from 'src/app/data/filter-rule-type'
 import { routes } from 'src/app/app-routing.module'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop'
-import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
+import { SavedView } from 'src/app/data/saved-view'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 
 const saved_views = [
@@ -356,7 +356,7 @@ describe('AppFrameComponent', () => {
     const toastSpy = jest.spyOn(toastService, 'showInfo')
     jest.spyOn(settingsService, 'storeSettings').mockReturnValue(of(true))
     component.onDrop({ previousIndex: 0, currentIndex: 1 } as CdkDragDrop<
-      PaperlessSavedView[]
+      SavedView[]
     >)
     expect(settingsSpy).toHaveBeenCalledWith([
       saved_views[2],
@@ -379,7 +379,7 @@ describe('AppFrameComponent', () => {
       .spyOn(settingsService, 'storeSettings')
       .mockReturnValue(throwError(() => new Error('unable to save')))
     component.onDrop({ previousIndex: 0, currentIndex: 2 } as CdkDragDrop<
-      PaperlessSavedView[]
+      SavedView[]
     >)
     expect(toastSpy).toHaveBeenCalled()
   })

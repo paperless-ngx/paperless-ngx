@@ -49,11 +49,11 @@ import {
   FILTER_CUSTOM_FIELDS,
   FILTER_SHARED_BY_USER,
 } from 'src/app/data/filter-rule-type'
-import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
-import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
-import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
-import { PaperlessUser } from 'src/app/data/paperless-user'
+import { Correspondent } from 'src/app/data/correspondent'
+import { DocumentType } from 'src/app/data/document-type'
+import { StoragePath } from 'src/app/data/storage-path'
+import { Tag } from 'src/app/data/tag'
+import { User } from 'src/app/data/user'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { FilterPipe } from 'src/app/pipes/filter.pipe'
@@ -78,7 +78,7 @@ import {
 } from '../../common/permissions-filter-dropdown/permissions-filter-dropdown.component'
 import { FilterEditorComponent } from './filter-editor.component'
 
-const tags: PaperlessTag[] = [
+const tags: Tag[] = [
   {
     id: 2,
     name: 'Tag2',
@@ -89,7 +89,7 @@ const tags: PaperlessTag[] = [
   },
 ]
 
-const correspondents: PaperlessCorrespondent[] = [
+const correspondents: Correspondent[] = [
   {
     id: 12,
     name: 'Corresp12',
@@ -100,7 +100,7 @@ const correspondents: PaperlessCorrespondent[] = [
   },
 ]
 
-const document_types: PaperlessDocumentType[] = [
+const document_types: DocumentType[] = [
   {
     id: 22,
     name: 'DocType22',
@@ -111,7 +111,7 @@ const document_types: PaperlessDocumentType[] = [
   },
 ]
 
-const storage_paths: PaperlessStoragePath[] = [
+const storage_paths: StoragePath[] = [
   {
     id: 32,
     name: 'StoragePath32',
@@ -122,7 +122,7 @@ const storage_paths: PaperlessStoragePath[] = [
   },
 ]
 
-const users: PaperlessUser[] = [
+const users: User[] = [
   {
     id: 1,
     username: 'user1',

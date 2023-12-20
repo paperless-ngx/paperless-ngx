@@ -8,10 +8,7 @@ import {
 import { ToastService } from 'src/app/services/toast.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { of } from 'rxjs'
-import {
-  PaperlessCustomField,
-  PaperlessCustomFieldDataType,
-} from 'src/app/data/paperless-custom-field'
+import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { SelectComponent } from '../input/select/select.component'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -24,16 +21,16 @@ import {
 import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { By } from '@angular/platform-browser'
 
-const fields: PaperlessCustomField[] = [
+const fields: CustomField[] = [
   {
     id: 0,
     name: 'Field 1',
-    data_type: PaperlessCustomFieldDataType.Integer,
+    data_type: CustomFieldDataType.Integer,
   },
   {
     id: 1,
     name: 'Field 2',
-    data_type: PaperlessCustomFieldDataType.String,
+    data_type: CustomFieldDataType.String,
   },
 ]
 

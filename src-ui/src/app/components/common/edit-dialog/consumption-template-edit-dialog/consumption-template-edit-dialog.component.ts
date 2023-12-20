@@ -4,11 +4,11 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { first } from 'rxjs'
 import {
   DocumentSource,
-  PaperlessConsumptionTemplate,
-} from 'src/app/data/paperless-consumption-template'
-import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
-import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
-import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
+  ConsumptionTemplate,
+} from 'src/app/data/consumption-template'
+import { Correspondent } from 'src/app/data/correspondent'
+import { DocumentType } from 'src/app/data/document-type'
+import { StoragePath } from 'src/app/data/storage-path'
 import { ConsumptionTemplateService } from 'src/app/services/rest/consumption-template.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
@@ -17,9 +17,9 @@ import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { EditDialogComponent } from '../edit-dialog.component'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
-import { PaperlessMailRule } from 'src/app/data/paperless-mail-rule'
+import { MailRule } from 'src/app/data/mail-rule'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { PaperlessCustomField } from 'src/app/data/paperless-custom-field'
+import { CustomField } from 'src/app/data/custom-field'
 
 export const DOCUMENT_SOURCE_OPTIONS = [
   {
@@ -41,13 +41,13 @@ export const DOCUMENT_SOURCE_OPTIONS = [
   templateUrl: './consumption-template-edit-dialog.component.html',
   styleUrls: ['./consumption-template-edit-dialog.component.scss'],
 })
-export class ConsumptionTemplateEditDialogComponent extends EditDialogComponent<PaperlessConsumptionTemplate> {
-  templates: PaperlessConsumptionTemplate[]
-  correspondents: PaperlessCorrespondent[]
-  documentTypes: PaperlessDocumentType[]
-  storagePaths: PaperlessStoragePath[]
-  mailRules: PaperlessMailRule[]
-  customFields: PaperlessCustomField[]
+export class ConsumptionTemplateEditDialogComponent extends EditDialogComponent<ConsumptionTemplate> {
+  templates: ConsumptionTemplate[]
+  correspondents: Correspondent[]
+  documentTypes: DocumentType[]
+  storagePaths: StoragePath[]
+  mailRules: MailRule[]
+  customFields: CustomField[]
 
   constructor(
     service: ConsumptionTemplateService,
