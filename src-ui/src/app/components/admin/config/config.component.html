@@ -1,0 +1,116 @@
+<pngx-page-header title="Configuration" i18n-title></pngx-page-header>
+
+  <form [formGroup]="configForm" (ngSubmit)="saveConfig()" class="pb-4">
+
+          <h4 i18n>OCR Settings</h4>
+
+          <div class="row mb-3">
+            <div class="col-md-3 col-form-label pt-0">
+              <span i18n>Output Type</span>
+            </div>
+            <div class="col">
+                <pngx-input-select [items]="ConfigChoices.output_type" formControlName="output_type" [allowNull]="true"></pngx-input-select>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-3 col-form-label pt-0">
+              <span i18n>Pages</span>
+            </div>
+            <div class="col">
+              <pngx-input-number formControlName="pages" [showAdd]="false"></pngx-input-number>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-3 col-form-label pt-0">
+              <span i18n>Mode</span>
+            </div>
+            <div class="col">
+                <pngx-input-select [items]="ConfigChoices.mode" formControlName="mode" [allowNull]="true"></pngx-input-select>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-3 col-form-label pt-0">
+              <span i18n>Skip Archive File</span>
+            </div>
+            <div class="col">
+                <pngx-input-select [items]="ConfigChoices.skip_archive_file" formControlName="skip_archive_file" [allowNull]="true"></pngx-input-select>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-3 col-form-label pt-0">
+              <span i18n>Image DPI</span>
+            </div>
+            <div class="col">
+                <pngx-input-number formControlName="image_dpi" [showAdd]="false"></pngx-input-number>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-3 col-form-label pt-0">
+              <span i18n>Clean</span>
+            </div>
+            <div class="col">
+                <pngx-input-select [items]="ConfigChoices.unpaper_clean" formControlName="unpaper_clean" [allowNull]="true"></pngx-input-select>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-3 col-form-label pt-0">
+              <span i18n>Deskew</span>
+            </div>
+            <div class="col">
+                <pngx-input-check formControlName="deskew"></pngx-input-check>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-3 col-form-label pt-0">
+              <span i18n>Rotate Pages</span>
+            </div>
+            <div class="col">
+                <pngx-input-check formControlName="rotate_pages"></pngx-input-check>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-3 col-form-label pt-0">
+              <span i18n>Rotate Pages Threshold</span>
+            </div>
+            <div class="col">
+                <pngx-input-number formControlName="rotate_pages_threshold" [showAdd]="false"></pngx-input-number>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-3 col-form-label pt-0">
+              <span i18n>Max Image Pixels</span>
+            </div>
+            <div class="col">
+                <pngx-input-number formControlName="max_image_pixels" [showAdd]="false"></pngx-input-number>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-3 col-form-label pt-0">
+              <span i18n>Color Conversion Strategy</span>
+            </div>
+            <div class="col">
+                <pngx-input-select [items]="ConfigChoices.color_conversion_strategy" formControlName="color_conversion_strategy" [allowNull]="true"></pngx-input-select>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-3 col-form-label pt-0">
+              <span i18n>OCR Arguments</span>
+            </div>
+            <div class="col">
+              <pngx-input-text formControlName="user_args"></pngx-input-text>
+            </div>
+          </div>
+
+      <button type="submit" class="btn btn-primary mb-2" [disabled]="loading ||(isDirty$ | async) === false" i18n>Save</button>
+    </form>
