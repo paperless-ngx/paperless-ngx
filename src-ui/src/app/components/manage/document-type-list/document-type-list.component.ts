@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { FILTER_HAS_DOCUMENT_TYPE_ANY } from 'src/app/data/filter-rule-type'
-import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
+import { DocumentType } from 'src/app/data/document-type'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
   PermissionsService,
@@ -17,7 +17,7 @@ import { ManagementListComponent } from '../management-list/management-list.comp
   templateUrl: './../management-list/management-list.component.html',
   styleUrls: ['./../management-list/management-list.component.scss'],
 })
-export class DocumentTypeListComponent extends ManagementListComponent<PaperlessDocumentType> {
+export class DocumentTypeListComponent extends ManagementListComponent<DocumentType> {
   constructor(
     documentTypeService: DocumentTypeService,
     modalService: NgbModal,
@@ -40,7 +40,7 @@ export class DocumentTypeListComponent extends ManagementListComponent<Paperless
     )
   }
 
-  getDeleteMessage(object: PaperlessDocumentType) {
+  getDeleteMessage(object: DocumentType) {
     return $localize`Do you really want to delete the document type "${object.name}"?`
   }
 }

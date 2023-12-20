@@ -34,7 +34,7 @@ import {
 import { Subject, of, throwError } from 'rxjs'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router'
-import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
+import { SavedView } from 'src/app/data/saved-view'
 import {
   FILTER_FULLTEXT_MORELIKE,
   FILTER_FULLTEXT_QUERY,
@@ -47,7 +47,7 @@ import { DocumentCardSmallComponent } from './document-card-small/document-card-
 import { DocumentCardLargeComponent } from './document-card-large/document-card-large.component'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { UsernamePipe } from 'src/app/pipes/username.pipe'
-import { PaperlessDocument } from 'src/app/data/paperless-document'
+import { Document } from 'src/app/data/document'
 import {
   DOCUMENT_SORT_FIELDS,
   DOCUMENT_SORT_FIELDS_FULLTEXT,
@@ -61,10 +61,10 @@ import { CheckComponent } from '../common/input/check/check.component'
 import { HttpErrorResponse } from '@angular/common/http'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { SettingsService } from 'src/app/services/settings.service'
-import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
 
-const docs: PaperlessDocument[] = [
+const docs: Document[] = [
   {
     id: 1,
     title: 'Doc1',
@@ -222,7 +222,7 @@ describe('DocumentListComponent', () => {
   })
 
   it('should load saved view from URL', () => {
-    const view: PaperlessSavedView = {
+    const view: SavedView = {
       id: 10,
       sort_field: 'added',
       sort_reverse: true,
@@ -264,7 +264,7 @@ describe('DocumentListComponent', () => {
   })
 
   it('should load saved view from query params', () => {
-    const view: PaperlessSavedView = {
+    const view: SavedView = {
       id: 10,
       sort_field: 'added',
       sort_reverse: true,
@@ -412,7 +412,7 @@ describe('DocumentListComponent', () => {
   })
 
   it('should support saving an edited view', () => {
-    const view: PaperlessSavedView = {
+    const view: SavedView = {
       id: 10,
       name: 'Saved View 10',
       sort_field: 'added',
@@ -448,7 +448,7 @@ describe('DocumentListComponent', () => {
   })
 
   it('should support edited view saving as', () => {
-    const view: PaperlessSavedView = {
+    const view: SavedView = {
       id: 10,
       name: 'Saved View 10',
       sort_field: 'added',
@@ -494,7 +494,7 @@ describe('DocumentListComponent', () => {
   })
 
   it('should handle error on edited view saving as', () => {
-    const view: PaperlessSavedView = {
+    const view: SavedView = {
       id: 10,
       name: 'Saved View 10',
       sort_field: 'added',

@@ -12,7 +12,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { of, Subject } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type'
-import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
+import { SavedView } from 'src/app/data/saved-view'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
@@ -31,7 +31,7 @@ import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { PreviewPopupComponent } from 'src/app/components/common/preview-popup/preview-popup.component'
 
-const savedView: PaperlessSavedView = {
+const savedView: SavedView = {
   id: 1,
   name: 'Saved View 1',
   sort_field: 'added',

@@ -7,11 +7,11 @@ import {
   NgbNav,
   NgbNavChangeEvent,
 } from '@ng-bootstrap/ng-bootstrap'
-import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
-import { PaperlessDocument } from 'src/app/data/paperless-document'
-import { PaperlessDocumentMetadata } from 'src/app/data/paperless-document-metadata'
-import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { Correspondent } from 'src/app/data/correspondent'
+import { Document } from 'src/app/data/document'
+import { DocumentMetadata } from 'src/app/data/document-metadata'
+import { DocumentType } from 'src/app/data/document-type'
+import { Tag } from 'src/app/data/tag'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
@@ -34,7 +34,7 @@ import {
   debounceTime,
   distinctUntilChanged,
 } from 'rxjs/operators'
-import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions'
+import { DocumentSuggestions } from 'src/app/data/document-suggestions'
 import {
   FILTER_CORRESPONDENT,
   FILTER_CREATED_AFTER,
@@ -45,28 +45,25 @@ import {
   FILTER_STORAGE_PATH,
 } from 'src/app/data/filter-rule-type'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
-import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
+import { StoragePath } from 'src/app/data/storage-path'
 import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
-import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import {
   PermissionAction,
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
-import { PaperlessUser } from 'src/app/data/paperless-user'
+import { User } from 'src/app/data/user'
 import { UserService } from 'src/app/services/rest/user.service'
-import { PaperlessDocumentNote } from 'src/app/data/paperless-document-note'
+import { DocumentNote } from 'src/app/data/document-note'
 import { HttpClient } from '@angular/common/http'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { EditDialogMode } from '../common/edit-dialog/edit-dialog.component'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { FilterRule } from 'src/app/data/filter-rule'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
-import {
-  PaperlessCustomField,
-  PaperlessCustomFieldDataType,
-} from 'src/app/data/paperless-custom-field'
-import { PaperlessCustomFieldInstance } from 'src/app/data/paperless-custom-field-instance'
+import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
+import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { PDFDocumentProxy } from '../common/pdf-viewer/typings'
 
@@ -111,10 +108,10 @@ export class DocumentDetailComponent
   networkActive = false
 
   documentId: number
-  document: PaperlessDocument
-  metadata: PaperlessDocumentMetadata
-  suggestions: PaperlessDocumentSuggestions
-  users: PaperlessUser[]
+  document: Document
+  metadata: DocumentMetadata
+  suggestions: DocumentSuggestions
+  users: User[]
 
   title: string
   titleSubject: Subject<string> = new Subject()
@@ -123,9 +120,9 @@ export class DocumentDetailComponent
   downloadUrl: string
   downloadOriginalUrl: string
 
-  correspondents: PaperlessCorrespondent[]
-  documentTypes: PaperlessDocumentType[]
-  storagePaths: PaperlessStoragePath[]
+  correspondents: Correspondent[]
+  documentTypes: DocumentType[]
+  storagePaths: StoragePath[]
 
   documentForm: FormGroup = new FormGroup({
     title: new FormControl(''),
@@ -155,8 +152,8 @@ export class DocumentDetailComponent
 
   ogDate: Date
 
-  customFields: PaperlessCustomField[]
-  public readonly PaperlessCustomFieldDataType = PaperlessCustomFieldDataType
+  customFields: CustomField[]
+  public readonly PaperlessCustomFieldDataType = CustomFieldDataType
 
   @ViewChild('nav') nav: NgbNav
   @ViewChild('pdfPreview') set pdfPreview(element) {
@@ -409,7 +406,7 @@ export class DocumentDetailComponent
       ])
   }
 
-  updateComponent(doc: PaperlessDocument) {
+  updateComponent(doc: Document) {
     this.document = doc
     this.requiresPassword = false
     // this.customFields = doc.custom_fields.concat([])
@@ -825,13 +822,13 @@ export class DocumentDetailComponent
     )
   }
 
-  notesUpdated(notes: PaperlessDocumentNote[]) {
+  notesUpdated(notes: DocumentNote[]) {
     this.document.notes = notes
     this.openDocumentService.refreshDocument(this.documentId)
   }
 
   get userIsOwner(): boolean {
-    let doc: PaperlessDocument = Object.assign({}, this.document)
+    let doc: Document = Object.assign({}, this.document)
     // dont disable while editing
     if (this.document && this.store?.value.permissions_form?.owner) {
       doc.owner = this.store?.value.permissions_form?.owner
@@ -840,7 +837,7 @@ export class DocumentDetailComponent
   }
 
   get userCanEdit(): boolean {
-    let doc: PaperlessDocument = Object.assign({}, this.document)
+    let doc: Document = Object.assign({}, this.document)
     // dont disable while editing
     if (this.document && this.store?.value.permissions_form?.owner) {
       doc.owner = this.store?.value.permissions_form?.owner
@@ -877,25 +874,25 @@ export class DocumentDetailComponent
         // Correspondent
         return {
           rule_type: FILTER_CORRESPONDENT,
-          value: (i as PaperlessCorrespondent).id.toString(),
+          value: (i as Correspondent).id.toString(),
         }
       } else if (i.hasOwnProperty('path')) {
         // Storage Path
         return {
           rule_type: FILTER_STORAGE_PATH,
-          value: (i as PaperlessStoragePath).id.toString(),
+          value: (i as StoragePath).id.toString(),
         }
       } else if (i.hasOwnProperty('is_inbox_tag')) {
         // Tag
         return {
           rule_type: FILTER_HAS_TAGS_ALL,
-          value: (i as PaperlessTag).id.toString(),
+          value: (i as Tag).id.toString(),
         }
       } else {
         // Document Type, has no specific props
         return {
           rule_type: FILTER_DOCUMENT_TYPE,
-          value: (i as PaperlessDocumentType).id.toString(),
+          value: (i as DocumentType).id.toString(),
         }
       }
     })
@@ -916,8 +913,8 @@ export class DocumentDetailComponent
   }
 
   public getCustomFieldFromInstance(
-    instance: PaperlessCustomFieldInstance
-  ): PaperlessCustomField {
+    instance: CustomFieldInstance
+  ): CustomField {
     return this.customFields?.find((f) => f.id === instance.field)
   }
 
@@ -941,7 +938,7 @@ export class DocumentDetailComponent
     })
   }
 
-  public addField(field: PaperlessCustomField) {
+  public addField(field: CustomField) {
     this.document.custom_fields.push({
       field: field.id,
       value: null,
@@ -951,7 +948,7 @@ export class DocumentDetailComponent
     this.updateFormForCustomFields(true)
   }
 
-  public removeField(fieldInstance: PaperlessCustomFieldInstance) {
+  public removeField(fieldInstance: CustomFieldInstance) {
     this.document.custom_fields.splice(
       this.document.custom_fields.indexOf(fieldInstance),
       1

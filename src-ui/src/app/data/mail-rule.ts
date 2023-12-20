@@ -32,7 +32,7 @@ export enum MailMetadataCorrespondentOption {
   FromCustom = 4,
 }
 
-export interface PaperlessMailRule extends ObjectWithPermissions {
+export interface MailRule extends ObjectWithPermissions {
   name: string
 
   account: number // PaperlessMailAccount.id

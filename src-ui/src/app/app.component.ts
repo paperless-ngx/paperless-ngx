@@ -1,5 +1,5 @@
 import { SettingsService } from './services/settings.service'
-import { SETTINGS_KEYS } from './data/paperless-uisettings'
+import { SETTINGS_KEYS } from './data/ui-settings'
 import { Component, OnDestroy, OnInit, Renderer2 } from '@angular/core'
 import { Router } from '@angular/router'
 import { Subscription, first } from 'rxjs'

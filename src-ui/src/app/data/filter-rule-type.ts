@@ -45,6 +45,7 @@ export const FILTER_OWNER = 32
 export const FILTER_OWNER_ANY = 33
 export const FILTER_OWNER_ISNULL = 34
 export const FILTER_OWNER_DOES_NOT_INCLUDE = 35
+export const FILTER_SHARED_BY_USER = 37
 
 export const FILTER_CUSTOM_FIELDS = 36
 
@@ -270,6 +271,12 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
     id: FILTER_OWNER_DOES_NOT_INCLUDE,
     filtervar: 'owner__id__none',
+    datatype: 'number',
+    multi: true,
+  },
+  {
+    id: FILTER_SHARED_BY_USER,
+    filtervar: 'shared_by__id',
     datatype: 'number',
     multi: true,
   },

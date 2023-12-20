@@ -1,43 +1,58 @@
-<ngb-toast
-  *ngFor="let toast of toasts"
-  [autohide]="true" [delay]="toast.delay"
-  [class]="toast.classname"
-  [class.mb-2]="true"
-  (shown)="onShow(toast)"
-  (hidden)="toastService.closeToast(toast)">
-  <ngb-progressbar class="position-absolute h-100 w-100 top-90 start-0 bottom-0 end-0 pe-none" type="dark" [max]="toast.delay" [value]="toast.delayRemaining"></ngb-progressbar>
-  <span class="visually-hidden">{{ toast.delayRemaining / 1000 | number: '1.0-0' }} seconds</span>
-  <div class="d-flex align-items-top">
-    <svg class="sidebaricon-sm mt-1 me-2 flex-shrink-0" fill="currentColor">
-      <use *ngIf="!toast.error" xlink:href="assets/bootstrap-icons.svg#info-circle"/>
-      <use *ngIf="toast.error" xlink:href="assets/bootstrap-icons.svg#exclamation-triangle"/>
-    </svg>
-    <div>
-      <p class="mb-0">{{toast.content}}</p>
-      <details *ngIf="toast.error">
-        <div class="mt-2">
-          <dl class="row mb-0" *ngIf="isDetailedError(toast.error)">
-            <dt class="col-sm-3 fw-normal text-end">URL</dt>
-            <dd class="col-sm-9">{{ toast.error.url }}</dd>
-            <dt class="col-sm-3 fw-normal text-end" i18n>Status</dt>
-            <dd class="col-sm-9">{{ toast.error.status }} <em>{{ toast.error.statusText }}</em></dd>
-            <dt class="col-sm-3 fw-normal text-end" i18n>Error</dt>
-            <dd class="col-sm-9">{{ getErrorText(toast.error) }}</dd>
-          </dl>
-          <div class="row">
-            <div class="col offset-sm-3">
-              <button class="btn btn-sm btn-outline-dark" (click)="copyError(toast.error)">
-                <svg class="sidebaricon" fill="currentColor">
-                  <use *ngIf="!copied" xlink:href="assets/bootstrap-icons.svg#clipboard" />
-                  <use *ngIf="copied" xlink:href="assets/bootstrap-icons.svg#clipboard-check" />
-                </svg>&nbsp;<ng-container i18n>Copy Raw Error</ng-container>
-              </button>
-            </div>
-          </div>
+@for (toast of toasts; track toast) {
+  <ngb-toast
+    [autohide]="true" [delay]="toast.delay"
+    [class]="toast.classname"
+    [class.mb-2]="true"
+    (shown)="onShow(toast)"
+    (hidden)="toastService.closeToast(toast)">
+    <ngb-progressbar class="position-absolute h-100 w-100 top-90 start-0 bottom-0 end-0 pe-none" type="dark" [max]="toast.delay" [value]="toast.delayRemaining"></ngb-progressbar>
+    <span class="visually-hidden">{{ toast.delayRemaining / 1000 | number: '1.0-0' }} seconds</span>
+    <div class="d-flex align-items-top">
+      <svg class="sidebaricon-sm mt-1 me-2 flex-shrink-0" fill="currentColor">
+        @if (!toast.error) {
+          <use xlink:href="assets/bootstrap-icons.svg#info-circle"/>
+        }
+        @if (toast.error) {
+          <use xlink:href="assets/bootstrap-icons.svg#exclamation-triangle"/>
+        }
+      </svg>
+      <div>
+        <p class="mb-0">{{toast.content}}</p>
+        @if (toast.error) {
+          <details>
+            <div class="mt-2">
+              @if (isDetailedError(toast.error)) {
+                <dl class="row mb-0">
+                  <dt class="col-sm-3 fw-normal text-end">URL</dt>
+                  <dd class="col-sm-9">{{ toast.error.url }}</dd>
+                  <dt class="col-sm-3 fw-normal text-end" i18n>Status</dt>
+                  <dd class="col-sm-9">{{ toast.error.status }} <em>{{ toast.error.statusText }}</em></dd>
+                  <dt class="col-sm-3 fw-normal text-end" i18n>Error</dt>
+                  <dd class="col-sm-9">{{ getErrorText(toast.error) }}</dd>
+                </dl>
+              }
+              <div class="row">
+                <div class="col offset-sm-3">
+                  <button class="btn btn-sm btn-outline-dark" (click)="copyError(toast.error)">
+                    <svg class="sidebaricon" fill="currentColor">
+                      @if (!copied) {
+                        <use xlink:href="assets/bootstrap-icons.svg#clipboard" />
+                      }
+                      @if (copied) {
+                        <use xlink:href="assets/bootstrap-icons.svg#clipboard-check" />
+                      }
+                      </svg>&nbsp;<ng-container i18n>Copy Raw Error</ng-container>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </details>
+          }
+          @if (toast.action) {
+            <p class="mb-0 mt-2"><button class="btn btn-sm btn-outline-secondary" (click)="toastService.closeToast(toast); toast.action()">{{toast.actionName}}</button></p>
+          }
         </div>
-      </details>
-      <p class="mb-0 mt-2" *ngIf="toast.action"><button class="btn btn-sm btn-outline-secondary" (click)="toastService.closeToast(toast); toast.action()">{{toast.actionName}}</button></p>
-    </div>
-    <button type="button" class="btn-close ms-auto flex-shrink-0" data-bs-dismiss="toast" aria-label="Close" (click)="toastService.closeToast(toast);"></button>
-  </div>
-</ngb-toast>
+        <button type="button" class="btn-close ms-auto flex-shrink-0" data-bs-dismiss="toast" aria-label="Close" (click)="toastService.closeToast(toast);"></button>
+      </div>
+    </ngb-toast>
+  }

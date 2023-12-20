@@ -5,7 +5,7 @@ import { PdfViewerComponent } from '../pdf-viewer/pdf-viewer.component'
 import { By } from '@angular/platform-browser'
 import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { SettingsService } from 'src/app/services/settings.service'
-import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { DocumentService } from 'src/app/services/rest/document.service'
 

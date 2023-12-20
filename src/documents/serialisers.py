@@ -8,6 +8,7 @@ from celery import states
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.core.validators import URLValidator
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
@@ -15,6 +16,8 @@ from django.utils.translation import gettext as _
 from drf_writable_nested.serializers import NestedUpdateMixin
 from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import get_users_with_perms
+from guardian.utils import get_group_obj_perms_model
+from guardian.utils import get_user_obj_perms_model
 from rest_framework import fields
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
@@ -160,6 +163,7 @@ class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
         try:
             if full_perms:
                 self.fields.pop("user_can_change")
+                self.fields.pop("is_shared_by_requester")
             else:
                 self.fields.pop("permissions")
         except KeyError:
@@ -205,8 +209,26 @@ class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
             )
         )
 
+    def get_is_shared_by_requester(self, obj: Document):
+        ctype = ContentType.objects.get_for_model(obj)
+        UserObjectPermission = get_user_obj_perms_model()
+        GroupObjectPermission = get_group_obj_perms_model()
+        return obj.owner == self.user and (
+            UserObjectPermission.objects.filter(
+                content_type=ctype,
+                object_pk=obj.pk,
+            ).count()
+            > 0
+            or GroupObjectPermission.objects.filter(
+                content_type=ctype,
+                object_pk=obj.pk,
+            ).count()
+            > 0
+        )
+
     permissions = SerializerMethodField(read_only=True)
     user_can_change = SerializerMethodField(read_only=True)
+    is_shared_by_requester = SerializerMethodField(read_only=True)
 
     set_permissions = serializers.DictField(
         label="Set permissions",
@@ -449,6 +471,10 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         # This key must exist, as it is validated
         data_store_name = type_to_data_store_name_map[custom_field.data_type]
 
+        if custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
+            # prior to update so we can look for any docs that are going to be removed
+            self.reflect_doclinks(document, custom_field, validated_data["value"])
+
         # Actually update or create the instance, providing the value
         # to fill in the correct attribute based on the type
         instance, _ = CustomFieldInstance.objects.update_or_create(
@@ -472,6 +498,77 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
             URLValidator()(data["value"])
         return data
 
+    def reflect_doclinks(
+        self,
+        document: Document,
+        field: CustomField,
+        target_doc_ids: list[int],
+    ):
+        """
+        Add or remove 'symmetrical' links to `document` on all `target_doc_ids`
+        """
+        # Check if any documents are going to be removed from the current list of links and remove the symmetrical links
+        current_field_instance = CustomFieldInstance.objects.filter(
+            field=field,
+            document=document,
+        ).first()
+        if current_field_instance is not None:
+            for doc_id in current_field_instance.value:
+                if doc_id not in target_doc_ids:
+                    self.remove_doclink(document, field, doc_id)
+
+        # Create an instance if target doc doesnt have this field or append it to an existing one
+        existing_custom_field_instances = {
+            custom_field.document_id: custom_field
+            for custom_field in CustomFieldInstance.objects.filter(
+                field=field,
+                document_id__in=target_doc_ids,
+            )
+        }
+        custom_field_instances_to_create = []
+        custom_field_instances_to_update = []
+        for target_doc_id in target_doc_ids:
+            target_doc_field_instance = existing_custom_field_instances.get(
+                target_doc_id,
+            )
+            if target_doc_field_instance is None:
+                custom_field_instances_to_create.append(
+                    CustomFieldInstance(
+                        document_id=target_doc_id,
+                        field=field,
+                        value_document_ids=[document.id],
+                    ),
+                )
+            elif document.id not in target_doc_field_instance.value:
+                target_doc_field_instance.value_document_ids.append(document.id)
+                custom_field_instances_to_update.append(target_doc_field_instance)
+
+        CustomFieldInstance.objects.bulk_create(custom_field_instances_to_create)
+        CustomFieldInstance.objects.bulk_update(
+            custom_field_instances_to_update,
+            ["value_document_ids"],
+        )
+
+    @staticmethod
+    def remove_doclink(
+        document: Document,
+        field: CustomField,
+        target_doc_id: int,
+    ):
+        """
+        Removes a 'symmetrical' link to `document` from the target document's existing custom field instance
+        """
+        target_doc_field_instance = CustomFieldInstance.objects.filter(
+            document_id=target_doc_id,
+            field=field,
+        ).first()
+        if (
+            target_doc_field_instance is not None
+            and document.id in target_doc_field_instance.value
+        ):
+            target_doc_field_instance.value.remove(document.id)
+            target_doc_field_instance.save()
+
     class Meta:
         model = CustomFieldInstance
         fields = [
@@ -494,7 +591,11 @@ class DocumentSerializer(
     archived_file_name = SerializerMethodField()
     created_date = serializers.DateField(required=False)
 
-    custom_fields = CustomFieldInstanceSerializer(many=True, allow_null=True)
+    custom_fields = CustomFieldInstanceSerializer(
+        many=True,
+        allow_null=False,
+        required=False,
+    )
 
     owner = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
@@ -527,6 +628,21 @@ class DocumentSerializer(
             instance.save()
         if "created_date" in validated_data:
             validated_data.pop("created_date")
+        if instance.custom_fields.count() > 0 and "custom_fields" in validated_data:
+            incoming_custom_fields = [
+                field["field"] for field in validated_data["custom_fields"]
+            ]
+            for custom_field_instance in instance.custom_fields.filter(
+                field__data_type=CustomField.FieldDataType.DOCUMENTLINK,
+            ):
+                if custom_field_instance.field not in incoming_custom_fields:
+                    # Doc link field is being removed entirely
+                    for doc_id in custom_field_instance.value:
+                        CustomFieldInstanceSerializer.remove_doclink(
+                            instance,
+                            custom_field_instance.field,
+                            doc_id,
+                        )
         super().update(instance, validated_data)
         return instance
 
@@ -556,6 +672,7 @@ class DocumentSerializer(
             "owner",
             "permissions",
             "user_can_change",
+            "is_shared_by_requester",
             "set_permissions",
             "notes",
             "custom_fields",

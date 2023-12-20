@@ -13,7 +13,7 @@ import {
   catchError,
 } from 'rxjs'
 import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
-import { PaperlessDocument } from 'src/app/data/paperless-document'
+import { Document } from 'src/app/data/document'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { AbstractInputComponent } from '../abstract-input'
 
@@ -34,9 +34,9 @@ export class DocumentLinkComponent
   implements OnInit, OnDestroy
 {
   documentsInput$ = new Subject<string>()
-  foundDocuments$: Observable<PaperlessDocument[]>
+  foundDocuments$: Observable<Document[]>
   loading = false
-  selectedDocuments: PaperlessDocument[] = []
+  selectedDocuments: Document[] = []
 
   private unsubscribeNotifier: Subject<any> = new Subject()
 
@@ -104,21 +104,18 @@ export class DocumentLinkComponent
     )
   }
 
-  unselect(document: PaperlessDocument): void {
+  unselect(document: Document): void {
     this.selectedDocuments = this.selectedDocuments.filter(
       (d) => d.id !== document.id
     )
     this.onChange(this.selectedDocuments.map((d) => d.id))
   }
 
-  compareDocuments(
-    document: PaperlessDocument,
-    selectedDocument: PaperlessDocument
-  ) {
+  compareDocuments(document: Document, selectedDocument: Document) {
     return document.id === selectedDocument.id
   }
 
-  trackByFn(item: PaperlessDocument) {
+  trackByFn(item: Document) {
     return item.id
   }
 

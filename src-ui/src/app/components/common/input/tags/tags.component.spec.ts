@@ -1,21 +1,16 @@
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import {
   FormsModule,
   ReactiveFormsModule,
   NG_VALUE_ACCESSOR,
 } from '@angular/forms'
 import { TagsComponent } from './tags.component'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { Tag } from 'src/app/data/tag'
 import {
   DEFAULT_MATCHING_ALGORITHM,
   MATCH_ALL,
 } from 'src/app/data/matching-model'
-import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
+import { NgSelectModule } from '@ng-select/ng-select'
 import { RouterTestingModule } from '@angular/router/testing'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { of } from 'rxjs'
@@ -36,7 +31,7 @@ import { PermissionsFormComponent } from '../permissions/permissions-form/permis
 import { SelectComponent } from '../select/select.component'
 import { SettingsService } from 'src/app/services/settings.service'
 
-const tags: PaperlessTag[] = [
+const tags: Tag[] = [
   {
     id: 1,
     name: 'Tag1',

@@ -12,7 +12,7 @@ COPY ./src-ui /src/src-ui
 WORKDIR /src/src-ui
 RUN set -eux \
   && npm update npm -g \
-  && npm ci --omit=optional
+  && npm ci
 RUN set -eux \
   && ./node_modules/.bin/ng build --configuration production
 
@@ -29,7 +29,7 @@ COPY Pipfile* ./
 
 RUN set -eux \
   && echo "Installing pipenv" \
-    && python3 -m pip install --no-cache-dir --upgrade pipenv==2023.10.24 \
+    && python3 -m pip install --no-cache-dir --upgrade pipenv==2023.11.15 \
   && echo "Generating requirement.txt" \
     && pipenv requirements > requirements.txt
 

@@ -28,8 +28,9 @@ class CorrespondentAdmin(GuardedModelAdmin):
 
 class TagAdmin(GuardedModelAdmin):
     list_display = ("name", "color", "match", "matching_algorithm")
-    list_filter = ("color", "matching_algorithm")
+    list_filter = ("matching_algorithm",)
     list_editable = ("color", "match", "matching_algorithm")
+    search_fields = ("color", "name")
 
 
 class DocumentTypeAdmin(GuardedModelAdmin):
@@ -107,6 +108,9 @@ class SavedViewAdmin(GuardedModelAdmin):
 
     inlines = [RuleInline]
 
+    def get_queryset(self, request):  # pragma: no cover
+        return super().get_queryset(request).select_related("owner")
+
 
 class StoragePathInline(admin.TabularInline):
     model = StoragePath
@@ -120,8 +124,8 @@ class StoragePathAdmin(GuardedModelAdmin):
 
 class TaskAdmin(admin.ModelAdmin):
     list_display = ("task_id", "task_file_name", "task_name", "date_done", "status")
-    list_filter = ("status", "date_done", "task_file_name", "task_name")
-    search_fields = ("task_name", "task_id", "status")
+    list_filter = ("status", "date_done", "task_name")
+    search_fields = ("task_name", "task_id", "status", "task_file_name")
     readonly_fields = (
         "task_id",
         "task_file_name",
@@ -138,12 +142,25 @@ class NotesAdmin(GuardedModelAdmin):
     list_display = ("user", "created", "note", "document")
     list_filter = ("created", "user")
     list_display_links = ("created",)
+    raw_id_fields = ("document",)
+    search_fields = ("document__title",)
+
+    def get_queryset(self, request):  # pragma: no cover
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("user", "document__correspondent")
+        )
 
 
 class ShareLinksAdmin(GuardedModelAdmin):
     list_display = ("created", "expiration", "document")
     list_filter = ("created", "expiration", "owner")
     list_display_links = ("created",)
+    raw_id_fields = ("document",)
+
+    def get_queryset(self, request):  # pragma: no cover
+        return super().get_queryset(request).select_related("document__correspondent")
 
 
 class CustomFieldsAdmin(GuardedModelAdmin):
@@ -157,7 +174,15 @@ class CustomFieldInstancesAdmin(GuardedModelAdmin):
     fields = ("field", "document", "created", "value")
     readonly_fields = ("field", "document", "created", "value")
     list_display = ("field", "document", "value", "created")
-    list_filter = ("document", "created")
+    search_fields = ("document__title",)
+    list_filter = ("created", "field")
+
+    def get_queryset(self, request):  # pragma: no cover
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("field", "document__correspondent")
+        )
 
 
 admin.site.register(Correspondent, CorrespondentAdmin)
