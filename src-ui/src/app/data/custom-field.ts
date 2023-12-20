@@ -1,6 +1,6 @@
 import { ObjectWithId } from './object-with-id'
 
-export enum PaperlessCustomFieldDataType {
+export enum CustomFieldDataType {
   String = 'string',
   Url = 'url',
   Date = 'date',
@@ -13,41 +13,41 @@ export enum PaperlessCustomFieldDataType {
 
 export const DATA_TYPE_LABELS = [
   {
-    id: PaperlessCustomFieldDataType.Boolean,
+    id: CustomFieldDataType.Boolean,
     name: $localize`Boolean`,
   },
   {
-    id: PaperlessCustomFieldDataType.Date,
+    id: CustomFieldDataType.Date,
     name: $localize`Date`,
   },
   {
-    id: PaperlessCustomFieldDataType.Integer,
+    id: CustomFieldDataType.Integer,
     name: $localize`Integer`,
   },
   {
-    id: PaperlessCustomFieldDataType.Float,
+    id: CustomFieldDataType.Float,
     name: $localize`Number`,
   },
   {
-    id: PaperlessCustomFieldDataType.Monetary,
+    id: CustomFieldDataType.Monetary,
     name: $localize`Monetary`,
   },
   {
-    id: PaperlessCustomFieldDataType.String,
+    id: CustomFieldDataType.String,
     name: $localize`Text`,
   },
   {
-    id: PaperlessCustomFieldDataType.Url,
+    id: CustomFieldDataType.Url,
     name: $localize`Url`,
   },
   {
-    id: PaperlessCustomFieldDataType.DocumentLink,
+    id: CustomFieldDataType.DocumentLink,
     name: $localize`Document Link`,
   },
 ]
 
-export interface PaperlessCustomField extends ObjectWithId {
-  data_type: PaperlessCustomFieldDataType
+export interface CustomField extends ObjectWithId {
+  data_type: CustomFieldDataType
   name: string
   created?: Date
 }

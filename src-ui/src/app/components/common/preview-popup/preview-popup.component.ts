@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core'
-import { PaperlessDocument } from 'src/app/data/paperless-document'
-import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { Document } from 'src/app/data/document'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
 
@@ -11,7 +11,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 })
 export class PreviewPopupComponent {
   @Input()
-  document: PaperlessDocument
+  document: Document
 
   error = false
 

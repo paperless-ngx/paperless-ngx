@@ -30,11 +30,11 @@ import {
   FILTER_CREATED_AFTER,
   FILTER_CREATED_BEFORE,
 } from 'src/app/data/filter-rule-type'
-import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
-import { PaperlessDocument } from 'src/app/data/paperless-document'
-import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
-import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { Correspondent } from 'src/app/data/correspondent'
+import { Document } from 'src/app/data/document'
+import { DocumentType } from 'src/app/data/document-type'
+import { StoragePath } from 'src/app/data/storage-path'
+import { Tag } from 'src/app/data/tag'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
@@ -67,11 +67,11 @@ import { DocumentNotesComponent } from '../document-notes/document-notes.compone
 import { DocumentDetailComponent } from './document-detail.component'
 import { ShareLinksDropdownComponent } from '../common/share-links-dropdown/share-links-dropdown.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
-import { PaperlessCustomFieldDataType } from 'src/app/data/paperless-custom-field'
+import { CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { PdfViewerComponent } from '../common/pdf-viewer/pdf-viewer.component'
 
-const doc: PaperlessDocument = {
+const doc: Document = {
   id: 3,
   title: 'Doc 3',
   correspondent: 11,
@@ -111,13 +111,13 @@ const customFields = [
   {
     id: 0,
     name: 'Field 1',
-    data_type: PaperlessCustomFieldDataType.String,
+    data_type: CustomFieldDataType.String,
     created: new Date(),
   },
   {
     id: 1,
     name: 'Custom Field 2',
-    data_type: PaperlessCustomFieldDataType.Integer,
+    data_type: CustomFieldDataType.Integer,
     created: new Date(),
   },
 ]
@@ -732,7 +732,7 @@ describe('DocumentDetailComponent', () => {
       id: 22,
       name: 'Correspondent22',
       last_correspondence: new Date().toISOString(),
-    } as PaperlessCorrespondent
+    } as Correspondent
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
     component.filterDocuments([object])
     expect(qfSpy).toHaveBeenCalledWith([
@@ -745,7 +745,7 @@ describe('DocumentDetailComponent', () => {
 
   it('should support quick filtering by doc type', () => {
     initNormally()
-    const object = { id: 22, name: 'DocumentType22' } as PaperlessDocumentType
+    const object = { id: 22, name: 'DocumentType22' } as DocumentType
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
     component.filterDocuments([object])
     expect(qfSpy).toHaveBeenCalledWith([
@@ -762,7 +762,7 @@ describe('DocumentDetailComponent', () => {
       id: 22,
       name: 'StoragePath22',
       path: '/foo/bar/',
-    } as PaperlessStoragePath
+    } as StoragePath
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
     component.filterDocuments([object])
     expect(qfSpy).toHaveBeenCalledWith([
@@ -781,14 +781,14 @@ describe('DocumentDetailComponent', () => {
       is_inbox_tag: true,
       color: '#ff0000',
       text_color: '#000000',
-    } as PaperlessTag
+    } as Tag
     const object2 = {
       id: 23,
       name: 'Tag22',
       is_inbox_tag: true,
       color: '#ff0000',
       text_color: '#000000',
-    } as PaperlessTag
+    } as Tag
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
     component.filterDocuments([object1, object2])
     expect(qfSpy).toHaveBeenCalledWith([

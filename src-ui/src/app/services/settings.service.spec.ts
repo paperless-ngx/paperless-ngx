@@ -10,12 +10,9 @@ import { CookieService } from 'ngx-cookie-service'
 import { Subscription } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import { AppModule } from '../app.module'
-import {
-  PaperlessUiSettings,
-  SETTINGS_KEYS,
-} from '../data/paperless-uisettings'
+import { UiSettings, SETTINGS_KEYS } from '../data/ui-settings'
 import { SettingsService } from './settings.service'
-import { PaperlessSavedView } from '../data/paperless-saved-view'
+import { SavedView } from '../data/saved-view'
 
 describe('SettingsService', () => {
   let httpTestingController: HttpTestingController
@@ -23,7 +20,7 @@ describe('SettingsService', () => {
   let cookieService: CookieService
   let subscription: Subscription
 
-  const ui_settings: PaperlessUiSettings = {
+  const ui_settings: UiSettings = {
     user: {
       username: 'testuser',
       first_name: 'Test',
@@ -285,16 +282,16 @@ describe('SettingsService', () => {
       .flush(ui_settings)
     const setSpy = jest.spyOn(settingsService, 'set')
     settingsService.updateDashboardViewsSort([
-      { id: 1 } as PaperlessSavedView,
-      { id: 4 } as PaperlessSavedView,
+      { id: 1 } as SavedView,
+      { id: 4 } as SavedView,
     ])
     expect(setSpy).toHaveBeenCalledWith(
       SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER,
       [1, 4]
     )
     settingsService.updateSidebarViewsSort([
-      { id: 1 } as PaperlessSavedView,
-      { id: 4 } as PaperlessSavedView,
+      { id: 1 } as SavedView,
+      { id: 4 } as SavedView,
     ])
     expect(setSpy).toHaveBeenCalledWith(
       SETTINGS_KEYS.SIDEBAR_VIEWS_SORT_ORDER,

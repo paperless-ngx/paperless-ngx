@@ -3,7 +3,7 @@ import { FormControl, FormGroup } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
-import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
+import { DocumentType } from 'src/app/data/document-type'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -13,7 +13,7 @@ import { SettingsService } from 'src/app/services/settings.service'
   templateUrl: './document-type-edit-dialog.component.html',
   styleUrls: ['./document-type-edit-dialog.component.scss'],
 })
-export class DocumentTypeEditDialogComponent extends EditDialogComponent<PaperlessDocumentType> {
+export class DocumentTypeEditDialogComponent extends EditDialogComponent<DocumentType> {
   constructor(
     service: DocumentTypeService,
     activeModal: NgbActiveModal,

@@ -6,7 +6,7 @@ export enum IMAPSecurity {
   STARTTLS = 3,
 }
 
-export interface PaperlessMailAccount extends ObjectWithPermissions {
+export interface MailAccount extends ObjectWithPermissions {
   name: string
 
   imap_server: string
