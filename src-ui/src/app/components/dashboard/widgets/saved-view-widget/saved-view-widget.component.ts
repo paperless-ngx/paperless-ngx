@@ -8,11 +8,11 @@ import {
 } from '@angular/core'
 import { Params, Router } from '@angular/router'
 import { Subject, takeUntil } from 'rxjs'
-import { PaperlessDocument } from 'src/app/data/paperless-document'
-import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
+import { Document } from 'src/app/data/document'
+import { SavedView } from 'src/app/data/saved-view'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { Tag } from 'src/app/data/tag'
 import {
   FILTER_CORRESPONDENT,
   FILTER_HAS_TAGS_ALL,
@@ -46,9 +46,9 @@ export class SavedViewWidgetComponent
   }
 
   @Input()
-  savedView: PaperlessSavedView
+  savedView: SavedView
 
-  documents: PaperlessDocument[] = []
+  documents: Document[] = []
 
   unsubscribeNotifier: Subject<any> = new Subject()
 
@@ -101,7 +101,7 @@ export class SavedViewWidgetComponent
     }
   }
 
-  clickTag(tag: PaperlessTag, event: MouseEvent) {
+  clickTag(tag: Tag, event: MouseEvent) {
     event.preventDefault()
     event.stopImmediatePropagation()
 
@@ -110,15 +110,15 @@ export class SavedViewWidgetComponent
     ])
   }
 
-  getPreviewUrl(document: PaperlessDocument): string {
+  getPreviewUrl(document: Document): string {
     return this.documentService.getPreviewUrl(document.id)
   }
 
-  getDownloadUrl(document: PaperlessDocument): string {
+  getDownloadUrl(document: Document): string {
     return this.documentService.getDownloadUrl(document.id)
   }
 
-  mouseEnterPreviewButton(doc: PaperlessDocument) {
+  mouseEnterPreviewButton(doc: Document) {
     const newPopover = this.popovers.get(this.documents.indexOf(doc))
     if (this.popover !== newPopover && this.popover?.isOpen())
       this.popover.close()

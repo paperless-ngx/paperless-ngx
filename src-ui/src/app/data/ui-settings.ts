@@ -1,12 +1,12 @@
-import { PaperlessUser } from './paperless-user'
+import { User } from './user'
 
-export interface PaperlessUiSettings {
-  user: PaperlessUser
+export interface UiSettings {
+  user: User
   settings: Object
   permissions: string[]
 }
 
-export interface PaperlessUiSetting {
+export interface UiSetting {
   key: string
   type: string
   default: any
@@ -53,7 +53,7 @@ export const SETTINGS_KEYS = {
   DEFAULT_PERMS_EDIT_GROUPS: 'general-settings:permissions:default-edit-groups',
 }
 
-export const SETTINGS: PaperlessUiSetting[] = [
+export const SETTINGS: UiSetting[] = [
   {
     key: SETTINGS_KEYS.LANGUAGE,
     type: 'string',

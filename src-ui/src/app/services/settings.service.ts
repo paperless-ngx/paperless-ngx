@@ -17,15 +17,11 @@ import {
   hexToHsl,
 } from 'src/app/utils/color'
 import { environment } from 'src/environments/environment'
-import {
-  PaperlessUiSettings,
-  SETTINGS,
-  SETTINGS_KEYS,
-} from '../data/paperless-uisettings'
-import { PaperlessUser } from '../data/paperless-user'
+import { UiSettings, SETTINGS, SETTINGS_KEYS } from '../data/ui-settings'
+import { User } from '../data/user'
 import { PermissionsService } from './permissions.service'
 import { ToastService } from './toast.service'
-import { PaperlessSavedView } from '../data/paperless-saved-view'
+import { SavedView } from '../data/saved-view'
 
 export interface LanguageOption {
   code: string
@@ -240,7 +236,7 @@ export class SettingsService {
   protected baseUrl: string = environment.apiBaseUrl + 'ui_settings/'
 
   private settings: Object = {}
-  currentUser: PaperlessUser
+  currentUser: User
 
   public settingsSaved: EventEmitter<any> = new EventEmitter()
 
@@ -269,8 +265,8 @@ export class SettingsService {
   }
 
   // this is called by the app initializer in app.module
-  public initializeSettings(): Observable<PaperlessUiSettings> {
-    return this.http.get<PaperlessUiSettings>(this.baseUrl).pipe(
+  public initializeSettings(): Observable<UiSettings> {
+    return this.http.get<UiSettings>(this.baseUrl).pipe(
       first(),
       tap((uisettings) => {
         Object.assign(this.settings, uisettings.settings)
@@ -546,16 +542,14 @@ export class SettingsService {
     }
   }
 
-  updateDashboardViewsSort(
-    dashboardViews: PaperlessSavedView[]
-  ): Observable<any> {
+  updateDashboardViewsSort(dashboardViews: SavedView[]): Observable<any> {
     this.set(SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER, [
       ...new Set(dashboardViews.map((v) => v.id)),
     ])
     return this.storeSettings()
   }
 
-  updateSidebarViewsSort(sidebarViews: PaperlessSavedView[]): Observable<any> {
+  updateSidebarViewsSort(sidebarViews: SavedView[]): Observable<any> {
     this.set(SETTINGS_KEYS.SIDEBAR_VIEWS_SORT_ORDER, [
       ...new Set(sidebarViews.map((v) => v.id)),
     ])

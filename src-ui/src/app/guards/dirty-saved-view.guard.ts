@@ -4,7 +4,7 @@ import { DocumentListComponent } from '../components/document-list/document-list
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ConfirmDialogComponent } from '../components/common/confirm-dialog/confirm-dialog.component'
 import { SettingsService } from '../services/settings.service'
-import { SETTINGS_KEYS } from '../data/paperless-uisettings'
+import { SETTINGS_KEYS } from '../data/ui-settings'
 
 @Injectable()
 export class DirtySavedViewGuard {

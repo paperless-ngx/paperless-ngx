@@ -5,7 +5,7 @@ import {
   NG_VALUE_ACCESSOR,
 } from '@angular/forms'
 import { TagsComponent } from './tags.component'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { Tag } from 'src/app/data/tag'
 import {
   DEFAULT_MATCHING_ALGORITHM,
   MATCH_ALL,
@@ -31,7 +31,7 @@ import { PermissionsFormComponent } from '../permissions/permissions-form/permis
 import { SelectComponent } from '../select/select.component'
 import { SettingsService } from 'src/app/services/settings.service'
 
-const tags: PaperlessTag[] = [
+const tags: Tag[] = [
   {
     id: 1,
     name: 'Tag1',

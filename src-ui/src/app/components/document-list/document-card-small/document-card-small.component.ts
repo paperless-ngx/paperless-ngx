@@ -6,11 +6,11 @@ import {
   ViewChild,
 } from '@angular/core'
 import { map } from 'rxjs/operators'
-import { PaperlessDocument } from 'src/app/data/paperless-document'
+import { Document } from 'src/app/data/document'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
-import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 @Component({
@@ -33,7 +33,7 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
   toggleSelected = new EventEmitter()
 
   @Input()
-  document: PaperlessDocument
+  document: Document
 
   @Output()
   dblClickDocument = new EventEmitter()

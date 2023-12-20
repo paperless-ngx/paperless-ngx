@@ -1,6 +1,6 @@
 import { Component, forwardRef, Input, OnInit } from '@angular/core'
 import { FormControl, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms'
-import { PaperlessUser } from 'src/app/data/paperless-user'
+import { User } from 'src/app/data/user'
 import { AbstractInputComponent } from '../../abstract-input'
 
 export interface PermissionsFormObject {
@@ -34,7 +34,7 @@ export class PermissionsFormComponent
   implements OnInit
 {
   @Input()
-  users: PaperlessUser[]
+  users: User[]
 
   @Input()
   accordion: boolean = false

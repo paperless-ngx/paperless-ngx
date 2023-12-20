@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { first } from 'rxjs'
-import { PaperlessUser } from 'src/app/data/paperless-user'
+import { User } from 'src/app/data/user'
 import {
   PermissionAction,
   PermissionType,
@@ -55,7 +55,7 @@ export class PermissionsFilterDropdownComponent extends ComponentWithPermissions
   @Output()
   ownerFilterSet = new EventEmitter<PermissionsSelectionModel>()
 
-  users: PaperlessUser[]
+  users: User[]
 
   hideUnowned: boolean
 
