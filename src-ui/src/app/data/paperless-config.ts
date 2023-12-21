@@ -37,6 +37,127 @@ export enum ColorConvertConfig {
   CMYK = 'CMYK',
 }
 
+export enum ConfigOptionType {
+  String = 'string',
+  Number = 'number',
+  Select = 'select',
+  Boolean = 'boolean',
+}
+
+export const ConfigCategory = {
+  OCR: $localize`OCR Settings`,
+}
+
+export interface ConfigOption {
+  key: string
+  title: string
+  type: ConfigOptionType
+  choices?: Array<string>
+  config_key?: string
+  category: string
+}
+
+function mapToFlatChoices(enumObj: Object): Array<any> {
+  return Object.keys(enumObj).map((key) => {
+    return {
+      id: enumObj[key],
+      name: enumObj[key],
+    }
+  })
+}
+
+export const PaperlessConfigOptions: ConfigOption[] = [
+  {
+    key: 'output_type',
+    title: $localize`Output Type`,
+    type: ConfigOptionType.Select,
+    choices: mapToFlatChoices(OutputTypeConfig),
+    config_key: 'PAPERLESS_OCR_OUTPUT_TYPE',
+    category: ConfigCategory.OCR,
+  },
+  {
+    key: 'pages',
+    title: $localize`Pages`,
+    type: ConfigOptionType.Number,
+    config_key: 'PAPERLESS_OCR_PAGES',
+    category: ConfigCategory.OCR,
+  },
+  {
+    key: 'mode',
+    title: $localize`Mode`,
+    type: ConfigOptionType.Select,
+    choices: mapToFlatChoices(ModeConfig),
+    config_key: 'PAPERLESS_OCR_MODE',
+    category: ConfigCategory.OCR,
+  },
+  {
+    key: 'skip_archive_file',
+    title: $localize`Skip Archive File`,
+    type: ConfigOptionType.Select,
+    choices: mapToFlatChoices(ArchiveFileConfig),
+    config_key: 'PAPERLESS_OCR_SKIP_ARCHIVE_FILE',
+    category: ConfigCategory.OCR,
+  },
+  {
+    key: 'image_dpi',
+    title: $localize`Image DPI`,
+    type: ConfigOptionType.Number,
+    config_key: 'PAPERLESS_OCR_IMAGE_DPI',
+    category: ConfigCategory.OCR,
+  },
+  {
+    key: 'unpaper_clean',
+    title: $localize`Clean`,
+    type: ConfigOptionType.Select,
+    choices: mapToFlatChoices(CleanConfig),
+    config_key: 'PAPERLESS_OCR_CLEAN',
+    category: ConfigCategory.OCR,
+  },
+  {
+    key: 'deskew',
+    title: $localize`Deskew`,
+    type: ConfigOptionType.Boolean,
+    config_key: 'PAPERLESS_OCR_DESKEW',
+    category: ConfigCategory.OCR,
+  },
+  {
+    key: 'rotate_pages',
+    title: $localize`Rotate Pages`,
+    type: ConfigOptionType.Boolean,
+    config_key: 'PAPERLESS_OCR_ROTATE_PAGES',
+    category: ConfigCategory.OCR,
+  },
+  {
+    key: 'rotate_pages_threshold',
+    title: $localize`Rotate Pages Threshold`,
+    type: ConfigOptionType.Number,
+    config_key: 'PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD',
+    category: ConfigCategory.OCR,
+  },
+  {
+    key: 'max_image_pixels',
+    title: $localize`Max Image Pixels`,
+    type: ConfigOptionType.Number,
+    config_key: 'PAPERLESS_OCR_IMAGE_DPI',
+    category: ConfigCategory.OCR,
+  },
+  {
+    key: 'color_conversion_strategy',
+    title: $localize`Color Conversion Strategy`,
+    type: ConfigOptionType.Select,
+    choices: mapToFlatChoices(ColorConvertConfig),
+    config_key: 'PAPERLESS_OCR_COLOR_CONVERSION_STRATEGY',
+    category: ConfigCategory.OCR,
+  },
+  {
+    key: 'user_args',
+    title: $localize`OCR Arguments`,
+    type: ConfigOptionType.String,
+    config_key: 'PAPERLESS_OCR_USER_ARGS',
+    category: ConfigCategory.OCR,
+  },
+]
+
 export interface PaperlessConfig extends ObjectWithId {
   output_type: OutputTypeConfig
   pages: number

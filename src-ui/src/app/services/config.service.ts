@@ -20,6 +20,8 @@ export class ConfigService {
   }
 
   saveConfig(config: PaperlessConfig): Observable<PaperlessConfig> {
-    return this.http.patch<PaperlessConfig>(this.baseUrl, config).pipe(first())
+    return this.http
+      .patch<PaperlessConfig>(`${this.baseUrl}${config.id}/`, config)
+      .pipe(first())
   }
 }

@@ -5,14 +5,14 @@ import {
   Observable,
   Subject,
   Subscription,
+  first,
   takeUntil,
 } from 'rxjs'
 import {
-  ArchiveFileConfig,
-  CleanConfig,
-  ColorConvertConfig,
-  ModeConfig,
-  OutputTypeConfig,
+  PaperlessConfigOptions,
+  ConfigCategory,
+  ConfigOption,
+  ConfigOptionType,
   PaperlessConfig,
 } from 'src/app/data/paperless-config'
 import { ConfigService } from 'src/app/services/config.service'
@@ -29,32 +29,36 @@ export class ConfigComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy, DirtyComponent
 {
-  public ConfigChoices = {
-    output_type: Object.values(OutputTypeConfig),
-    mode: Object.values(ModeConfig),
-    skip_archive_file: Object.values(ArchiveFileConfig),
-    unpaper_clean: Object.values(CleanConfig),
-    color_conversion_strategy: Object.values(ColorConvertConfig),
-  }
+  public readonly ConfigOptionType = ConfigOptionType
 
   public configForm = new FormGroup({
-    output_type: new FormControl(null),
-    pages: new FormControl(null),
-    language: new FormControl(null),
-    mode: new FormControl(null),
-    skip_archive_file: new FormControl(null),
-    image_dpi: new FormControl(null),
-    unpaper_clean: new FormControl(null),
-    deskew: new FormControl(null),
-    rotate_pages: new FormControl(null),
-    rotate_pages_threshold: new FormControl(null),
-    max_image_pixels: new FormControl(null),
-    color_conversion_strategy: new FormControl(null),
-    user_args: new FormControl(null),
+    id: new FormControl(),
+    output_type: new FormControl(),
+    pages: new FormControl(),
+    language: new FormControl(),
+    mode: new FormControl(),
+    skip_archive_file: new FormControl(),
+    image_dpi: new FormControl(),
+    unpaper_clean: new FormControl(),
+    deskew: new FormControl(),
+    rotate_pages: new FormControl(),
+    rotate_pages_threshold: new FormControl(),
+    max_image_pixels: new FormControl(),
+    color_conversion_strategy: new FormControl(),
+    user_args: new FormControl(),
   })
+
+  get optionCategories(): string[] {
+    return Object.values(ConfigCategory)
+  }
+
+  getCategoryOptions(category: string): ConfigOption[] {
+    return PaperlessConfigOptions.filter((o) => o.category === category)
+  }
 
   public loading: boolean = false
 
+  initialConfig: PaperlessConfig
   store: BehaviorSubject<any>
   storeSub: Subscription
   isDirty$: Observable<boolean>
@@ -69,14 +73,17 @@ export class ConfigComponent
   }
 
   ngOnInit(): void {
+    this.loading = true
     this.configService
       .getConfig()
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (config) => {
+          this.loading = false
           this.initialize(config)
         },
         error: (e) => {
+          this.loading = false
           this.toastService.showError($localize`Error retrieving config`, e)
         },
       })
@@ -88,21 +95,51 @@ export class ConfigComponent
   }
 
   private initialize(config: PaperlessConfig) {
-    this.store = new BehaviorSubject(config)
+    if (!this.store) {
+      this.store = new BehaviorSubject(config)
 
-    this.store
-      .asObservable()
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((state) => {
-        this.configForm.patchValue(state, { emitEvent: false })
-      })
+      this.store
+        .asObservable()
+        .pipe(takeUntil(this.unsubscribeNotifier))
+        .subscribe((state) => {
+          this.configForm.patchValue(state, { emitEvent: false })
+        })
 
-    this.isDirty$ = dirtyCheck(this.configForm, this.store.asObservable())
+      this.isDirty$ = dirtyCheck(this.configForm, this.store.asObservable())
+    }
 
     this.configForm.patchValue(config)
+
+    this.initialConfig = config
+  }
+
+  getDocsUrl(key: string) {
+    return `https://docs.paperless-ngx.com/configuration/#${key}`
   }
 
   public saveConfig() {
-    throw Error('Not Implemented')
+    this.loading = true
+    this.configService
+      .saveConfig(this.configForm.value as PaperlessConfig)
+      .pipe(takeUntil(this.unsubscribeNotifier), first())
+      .subscribe({
+        next: (config) => {
+          this.loading = false
+          this.initialize(config)
+          this.store.next(config)
+          this.toastService.showInfo($localize`Configuration updated`)
+        },
+        error: (e) => {
+          this.loading = false
+          this.toastService.showError(
+            $localize`An error occurred updating configuration`,
+            e
+          )
+        },
+      })
+  }
+
+  public discardChanges() {
+    this.configForm.reset(this.initialConfig)
   }
 }
