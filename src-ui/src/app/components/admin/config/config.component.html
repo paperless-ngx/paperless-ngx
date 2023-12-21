@@ -8,22 +8,34 @@
                 <a ngbNavLink i18n>{{category}}</a>
                 <ng-template ngbNavContent>
                     <div class="p-3">
-                        @for (option of getCategoryOptions(category); track option.key) {
-                            <div class="row mb-3">
-                                <div class="col-md-3 col-form-label pt-0">
-                                    <span i18n>{{option.title}}</span>
-                                    <p>See <a [href]="getDocsUrl(option.config_key)" target="_blank" referrerpolicy="no-referrer">{{option.config_key}}</a></p>
-                                </div>
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
+                            @for (option of getCategoryOptions(category); track option.key) {
                                 <div class="col">
-                                    @switch (option.type) {
-                                        @case (ConfigOptionType.Select) { <pngx-input-select [formControlName]="option.key" [items]="option.choices" [allowNull]="true"></pngx-input-select> }
-                                        @case (ConfigOptionType.Number) { <pngx-input-number [formControlName]="option.key" [showAdd]="false"></pngx-input-number> }
-                                        @case (ConfigOptionType.Boolean) { <pngx-input-check [formControlName]="option.key"></pngx-input-check> }
-                                        @case (ConfigOptionType.String) { <pngx-input-text [formControlName]="option.key"></pngx-input-text> }
-                                    }
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <div class="card-title">
+                                                <h6>
+                                                    {{option.title}}
+                                                    <a class="btn btn-sm btn-link" title="Read the documentation about this setting" i18n-title [href]="getDocsUrl(option.config_key)" target="_blank" referrerpolicy="no-referrer">
+                                                        <svg class="sidebaricon" fill="currentColor">
+                                                            <use xlink:href="assets/bootstrap-icons.svg#info-circle"/>
+                                                        </svg>
+                                                    </a>
+                                                </h6>
+                                            </div>
+                                            <div class="mb-n3">
+                                                @switch (option.type) {
+                                                    @case (ConfigOptionType.Select) { <pngx-input-select [formControlName]="option.key" [items]="option.choices" [allowNull]="true"></pngx-input-select> }
+                                                    @case (ConfigOptionType.Number) { <pngx-input-number [formControlName]="option.key" [showAdd]="false"></pngx-input-number> }
+                                                    @case (ConfigOptionType.Boolean) { <pngx-input-switch [formControlName]="option.key" title="Enable" i18n-title></pngx-input-switch> }
+                                                    @case (ConfigOptionType.String) { <pngx-input-text [formControlName]="option.key"></pngx-input-text> }
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        }
+                            }
+                        </div>
                     </div>
                 </ng-template>
             </li>

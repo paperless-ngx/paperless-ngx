@@ -11,7 +11,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { TextComponent } from '../../common/input/text/text.component'
 import { NumberComponent } from '../../common/input/number/number.component'
-import { CheckComponent } from '../../common/input/check/check.component'
+import { SwitchComponent } from '../../common/input/switch/switch.component'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { SelectComponent } from '../../common/input/select/select.component'
@@ -29,7 +29,7 @@ describe('ConfigComponent', () => {
         TextComponent,
         SelectComponent,
         NumberComponent,
-        CheckComponent,
+        SwitchComponent,
         PageHeaderComponent,
       ],
       imports: [
