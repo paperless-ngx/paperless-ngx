@@ -25,10 +25,10 @@
                                             </div>
                                             <div class="mb-n3">
                                                 @switch (option.type) {
-                                                    @case (ConfigOptionType.Select) { <pngx-input-select [formControlName]="option.key" [items]="option.choices" [allowNull]="true"></pngx-input-select> }
-                                                    @case (ConfigOptionType.Number) { <pngx-input-number [formControlName]="option.key" [showAdd]="false"></pngx-input-number> }
-                                                    @case (ConfigOptionType.Boolean) { <pngx-input-switch [formControlName]="option.key" title="Enable" i18n-title></pngx-input-switch> }
-                                                    @case (ConfigOptionType.String) { <pngx-input-text [formControlName]="option.key"></pngx-input-text> }
+                                                    @case (ConfigOptionType.Select) { <pngx-input-select [formControlName]="option.key" [error]="errors[option.key]" [items]="option.choices" [allowNull]="true"></pngx-input-select> }
+                                                    @case (ConfigOptionType.Number) { <pngx-input-number [formControlName]="option.key" [error]="errors[option.key]" [showAdd]="false"></pngx-input-number> }
+                                                    @case (ConfigOptionType.Boolean) { <pngx-input-switch [formControlName]="option.key" [error]="errors[option.key]" title="Enable" i18n-title></pngx-input-switch> }
+                                                    @case (ConfigOptionType.String) { <pngx-input-text [formControlName]="option.key" [error]="errors[option.key]"></pngx-input-text> }
                                                 }
                                             </div>
                                         </div>
@@ -47,7 +47,7 @@
             <button type="button" (click)="discardChanges()" class="btn btn-secondary" [disabled]="loading || (isDirty$ | async) === false" i18n>Discard</button>
         </div>
         <div class="btn-group">
-            <button type="submit" class="btn btn-primary" [disabled]="loading || (isDirty$ | async) === false" i18n>Save</button>
+            <button type="submit" class="btn btn-primary" [disabled]="loading || !configForm.valid || (isDirty$ | async) === false" i18n>Save</button>
         </div>
     </div>
 </form>

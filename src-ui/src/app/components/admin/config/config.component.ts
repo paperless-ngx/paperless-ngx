@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core'
-import { FormControl, FormGroup } from '@angular/forms'
+import { AbstractControl, FormControl, FormGroup } from '@angular/forms'
 import {
   BehaviorSubject,
   Observable,
@@ -48,6 +48,8 @@ export class ConfigComponent
     user_args: new FormControl(),
   })
 
+  public errors = {}
+
   get optionCategories(): string[] {
     return Object.values(ConfigCategory)
   }
@@ -87,6 +89,28 @@ export class ConfigComponent
           this.toastService.showError($localize`Error retrieving config`, e)
         },
       })
+
+    // validate JSON input for user_args
+    this.configForm
+      .get('user_args')
+      .addValidators((control: AbstractControl) => {
+        if (!control.value || control.value.toString().length === 0) return null
+        try {
+          JSON.parse(control.value)
+        } catch (e) {
+          return [
+            {
+              user_args: e,
+            },
+          ]
+        }
+        return null
+      })
+    this.configForm.get('user_args').statusChanges.subscribe((status) => {
+      this.errors['user_args'] =
+        status === 'INVALID' ? $localize`Invalid JSON` : null
+    })
+    this.configForm.get('user_args').updateValueAndValidity()
   }
 
   ngOnDestroy(): void {

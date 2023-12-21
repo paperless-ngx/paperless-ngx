@@ -93,4 +93,11 @@ describe('ConfigComponent', () => {
       OutputTypeConfig.PDF_A2
     )
   })
+
+  it('should support JSON validation for e.g. user_args', () => {
+    component.configForm.get('user_args').patchValue('{ foo bar }')
+    expect(component.errors).toEqual({ user_args: 'Invalid JSON' })
+    component.configForm.get('user_args').patchValue('{ "foo": "bar" }')
+    expect(component.errors).toEqual({ user_args: null })
+  })
 })
