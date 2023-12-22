@@ -32,8 +32,7 @@ services:
       - redisdata:/data
 
   webserver:
-    build:
-      context: ../..
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
     depends_on:
       - broker
