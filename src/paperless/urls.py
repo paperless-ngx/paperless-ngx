@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.urls import path
 from django.urls import re_path
 from django.utils.translation import gettext_lazy as _
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.generic import RedirectView
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
@@ -178,7 +178,7 @@ urlpatterns = [
     # login, logout
     path("accounts/", include("django.contrib.auth.urls")),
     # Root of the Frontend
-    re_path(r".*", login_required(IndexView.as_view()), name="base"),
+    re_path(r".*", login_required(ensure_csrf_cookie(IndexView.as_view())), name="base"),
 ]
 
 
