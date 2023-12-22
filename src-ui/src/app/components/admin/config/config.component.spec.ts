@@ -87,7 +87,7 @@ describe('ConfigComponent', () => {
 
   it('should support discard changes', () => {
     component.initialConfig = { output_type: OutputTypeConfig.PDF_A2 } as any
-    component.configForm.get('output_type').patchValue(OutputTypeConfig.PDF_A)
+    component.configForm.patchValue({ output_type: OutputTypeConfig.PDF_A })
     component.discardChanges()
     expect(component.configForm.get('output_type').value).toEqual(
       OutputTypeConfig.PDF_A2
@@ -95,9 +95,9 @@ describe('ConfigComponent', () => {
   })
 
   it('should support JSON validation for e.g. user_args', () => {
-    component.configForm.get('user_args').patchValue('{ foo bar }')
+    component.configForm.patchValue({ user_args: '{ foo bar }' })
     expect(component.errors).toEqual({ user_args: 'Invalid JSON' })
-    component.configForm.get('user_args').patchValue('{ "foo": "bar" }')
+    component.configForm.patchValue({ user_args: '{ "foo": "bar" }' })
     expect(component.errors).toEqual({ user_args: null })
   })
 })

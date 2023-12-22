@@ -31,22 +31,8 @@ export class ConfigComponent
 {
   public readonly ConfigOptionType = ConfigOptionType
 
-  public configForm = new FormGroup({
-    id: new FormControl(),
-    output_type: new FormControl(),
-    pages: new FormControl(),
-    language: new FormControl(),
-    mode: new FormControl(),
-    skip_archive_file: new FormControl(),
-    image_dpi: new FormControl(),
-    unpaper_clean: new FormControl(),
-    deskew: new FormControl(),
-    rotate_pages: new FormControl(),
-    rotate_pages_threshold: new FormControl(),
-    max_image_pixels: new FormControl(),
-    color_conversion_strategy: new FormControl(),
-    user_args: new FormControl(),
-  })
+  // generated dynamically
+  public configForm = new FormGroup({})
 
   public errors = {}
 
@@ -72,6 +58,10 @@ export class ConfigComponent
     private toastService: ToastService
   ) {
     super()
+    this.configForm.addControl('id', new FormControl())
+    PaperlessConfigOptions.forEach((option) => {
+      this.configForm.addControl(option.key, new FormControl())
+    })
   }
 
   ngOnInit(): void {
@@ -90,27 +80,32 @@ export class ConfigComponent
         },
       })
 
-    // validate JSON input for user_args
-    this.configForm
-      .get('user_args')
-      .addValidators((control: AbstractControl) => {
-        if (!control.value || control.value.toString().length === 0) return null
-        try {
-          JSON.parse(control.value)
-        } catch (e) {
-          return [
-            {
-              user_args: e,
-            },
-          ]
-        }
-        return null
+    // validate JSON inputs
+    PaperlessConfigOptions.filter(
+      (o) => o.type === ConfigOptionType.JSON
+    ).forEach((option) => {
+      this.configForm
+        .get(option.key)
+        .addValidators((control: AbstractControl) => {
+          if (!control.value || control.value.toString().length === 0)
+            return null
+          try {
+            JSON.parse(control.value)
+          } catch (e) {
+            return [
+              {
+                user_args: e,
+              },
+            ]
+          }
+          return null
+        })
+      this.configForm.get(option.key).statusChanges.subscribe((status) => {
+        this.errors[option.key] =
+          status === 'INVALID' ? $localize`Invalid JSON` : null
       })
-    this.configForm.get('user_args').statusChanges.subscribe((status) => {
-      this.errors['user_args'] =
-        status === 'INVALID' ? $localize`Invalid JSON` : null
+      this.configForm.get(option.key).updateValueAndValidity()
     })
-    this.configForm.get('user_args').updateValueAndValidity()
   }
 
   ngOnDestroy(): void {
@@ -131,7 +126,6 @@ export class ConfigComponent
 
       this.isDirty$ = dirtyCheck(this.configForm, this.store.asObservable())
     }
-
     this.configForm.patchValue(config)
 
     this.initialConfig = config

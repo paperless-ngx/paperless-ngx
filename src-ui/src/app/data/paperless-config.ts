@@ -42,6 +42,7 @@ export enum ConfigOptionType {
   Number = 'number',
   Select = 'select',
   Boolean = 'boolean',
+  JSON = 'json',
 }
 
 export const ConfigCategory = {
@@ -52,12 +53,12 @@ export interface ConfigOption {
   key: string
   title: string
   type: ConfigOptionType
-  choices?: Array<string>
+  choices?: Array<{ id: string; name: string }>
   config_key?: string
   category: string
 }
 
-function mapToFlatChoices(enumObj: Object): Array<any> {
+function mapToItems(enumObj: Object): Array<{ id: string; name: string }> {
   return Object.keys(enumObj).map((key) => {
     return {
       id: enumObj[key],
@@ -71,8 +72,15 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     key: 'output_type',
     title: $localize`Output Type`,
     type: ConfigOptionType.Select,
-    choices: mapToFlatChoices(OutputTypeConfig),
+    choices: mapToItems(OutputTypeConfig),
     config_key: 'PAPERLESS_OCR_OUTPUT_TYPE',
+    category: ConfigCategory.OCR,
+  },
+  {
+    key: 'language',
+    title: $localize`Language`,
+    type: ConfigOptionType.String,
+    config_key: 'PAPERLESS_OCR_LANGUAGE',
     category: ConfigCategory.OCR,
   },
   {
@@ -86,7 +94,7 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     key: 'mode',
     title: $localize`Mode`,
     type: ConfigOptionType.Select,
-    choices: mapToFlatChoices(ModeConfig),
+    choices: mapToItems(ModeConfig),
     config_key: 'PAPERLESS_OCR_MODE',
     category: ConfigCategory.OCR,
   },
@@ -94,7 +102,7 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     key: 'skip_archive_file',
     title: $localize`Skip Archive File`,
     type: ConfigOptionType.Select,
-    choices: mapToFlatChoices(ArchiveFileConfig),
+    choices: mapToItems(ArchiveFileConfig),
     config_key: 'PAPERLESS_OCR_SKIP_ARCHIVE_FILE',
     category: ConfigCategory.OCR,
   },
@@ -109,7 +117,7 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     key: 'unpaper_clean',
     title: $localize`Clean`,
     type: ConfigOptionType.Select,
-    choices: mapToFlatChoices(CleanConfig),
+    choices: mapToItems(CleanConfig),
     config_key: 'PAPERLESS_OCR_CLEAN',
     category: ConfigCategory.OCR,
   },
@@ -145,14 +153,14 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     key: 'color_conversion_strategy',
     title: $localize`Color Conversion Strategy`,
     type: ConfigOptionType.Select,
-    choices: mapToFlatChoices(ColorConvertConfig),
+    choices: mapToItems(ColorConvertConfig),
     config_key: 'PAPERLESS_OCR_COLOR_CONVERSION_STRATEGY',
     category: ConfigCategory.OCR,
   },
   {
     key: 'user_args',
     title: $localize`OCR Arguments`,
-    type: ConfigOptionType.String,
+    type: ConfigOptionType.JSON,
     config_key: 'PAPERLESS_OCR_USER_ARGS',
     category: ConfigCategory.OCR,
   },
