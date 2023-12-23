@@ -46,6 +46,7 @@ export class TasksComponent
 
   ngOnDestroy() {
     this.tasksService.cancelPending()
+    clearInterval(this.autoRefreshInterval)
   }
 
   dismissTask(task: PaperlessTask) {
