@@ -6,19 +6,23 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.data_models import DocumentSource
-from documents.models import ConsumptionTemplate
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import Workflow
+from documents.models import WorkflowAction
+from documents.models import WorkflowTrigger
 from documents.tests.utils import DirectoriesMixin
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
 
-class TestApiConsumptionTemplates(DirectoriesMixin, APITestCase):
-    ENDPOINT = "/api/consumption_templates/"
+class TestApiWorkflows(DirectoriesMixin, APITestCase):
+    ENDPOINT = "/api/workflows/"
+    ENDPOINT_TRIGGERS = "/api/workflow_triggers/"
+    ENDPOINT_ACTIONS = "/api/workflow_actions/"
 
     def setUp(self) -> None:
         super().setUp()
@@ -42,104 +46,158 @@ class TestApiConsumptionTemplates(DirectoriesMixin, APITestCase):
             data_type="integer",
         )
 
-        self.ct = ConsumptionTemplate.objects.create(
-            name="Template 1",
-            order=0,
+        self.trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
             sources=f"{int(DocumentSource.ApiUpload)},{int(DocumentSource.ConsumeFolder)},{int(DocumentSource.MailFetch)}",
             filter_filename="*simple*",
             filter_path="*/samples/*",
+        )
+        self.action = WorkflowAction.objects.create(
             assign_title="Doc from {correspondent}",
             assign_correspondent=self.c,
             assign_document_type=self.dt,
             assign_storage_path=self.sp,
             assign_owner=self.user2,
         )
-        self.ct.assign_tags.add(self.t1)
-        self.ct.assign_tags.add(self.t2)
-        self.ct.assign_tags.add(self.t3)
-        self.ct.assign_view_users.add(self.user3.pk)
-        self.ct.assign_view_groups.add(self.group1.pk)
-        self.ct.assign_change_users.add(self.user3.pk)
-        self.ct.assign_change_groups.add(self.group1.pk)
-        self.ct.assign_custom_fields.add(self.cf1.pk)
-        self.ct.assign_custom_fields.add(self.cf2.pk)
-        self.ct.save()
+        self.action.assign_tags.add(self.t1)
+        self.action.assign_tags.add(self.t2)
+        self.action.assign_tags.add(self.t3)
+        self.action.assign_view_users.add(self.user3.pk)
+        self.action.assign_view_groups.add(self.group1.pk)
+        self.action.assign_change_users.add(self.user3.pk)
+        self.action.assign_change_groups.add(self.group1.pk)
+        self.action.assign_custom_fields.add(self.cf1.pk)
+        self.action.assign_custom_fields.add(self.cf2.pk)
+        self.action.save()
 
-    def test_api_get_consumption_template(self):
+        self.workflow = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        self.workflow.triggers.add(self.trigger)
+        self.workflow.actions.add(self.action)
+        self.workflow.save()
+
+    def test_api_get_workflow(self):
         """
         GIVEN:
-            - API request to get all consumption template
+            - API request to get all workflows
         WHEN:
             - API is called
         THEN:
-            - Existing consumption templates are returned
+            - Existing workflows are returned
         """
         response = self.client.get(self.ENDPOINT, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 1)
 
-        resp_consumption_template = response.data["results"][0]
-        self.assertEqual(resp_consumption_template["id"], self.ct.id)
+        resp_workflow = response.data["results"][0]
+        self.assertEqual(resp_workflow["id"], self.workflow.id)
         self.assertEqual(
-            resp_consumption_template["assign_correspondent"],
-            self.ct.assign_correspondent.pk,
+            resp_workflow["actions"][0]["assign_correspondent"],
+            self.action.assign_correspondent.pk,
         )
 
-    def test_api_create_consumption_template(self):
+    def test_api_create_workflow(self):
         """
         GIVEN:
-            - API request to create a consumption template
+            - API request to create a workflow, trigger and action
         WHEN:
             - API is called
         THEN:
             - Correct HTTP response
-            - New template is created
+            - New workflow, trigger and action are created
         """
+        trigger_response = self.client.post(
+            self.ENDPOINT_TRIGGERS,
+            json.dumps(
+                {
+                    "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                    "sources": [DocumentSource.ApiUpload],
+                    "filter_filename": "*",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(trigger_response.status_code, status.HTTP_201_CREATED)
+
+        action_response = self.client.post(
+            self.ENDPOINT_ACTIONS,
+            json.dumps(
+                {
+                    "assign_title": "Action Title",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(action_response.status_code, status.HTTP_201_CREATED)
+
         response = self.client.post(
             self.ENDPOINT,
             json.dumps(
                 {
-                    "name": "Template 2",
+                    "name": "Workflow 2",
                     "order": 1,
-                    "sources": [DocumentSource.ApiUpload],
-                    "filter_filename": "*test*",
+                    "triggers": [
+                        {
+                            "sources": [DocumentSource.ApiUpload],
+                            "type": trigger_response.data["type"],
+                            "filter_filename": trigger_response.data["filter_filename"],
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "assign_title": action_response.data["assign_title"],
+                        },
+                    ],
                 },
             ),
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(ConsumptionTemplate.objects.count(), 2)
+        self.assertEqual(Workflow.objects.count(), 2)
 
-    def test_api_create_invalid_consumption_template(self):
+    def test_api_create_invalid_workflow_trigger(self):
         """
         GIVEN:
-            - API request to create a consumption template
-            - Neither file name nor path filter are specified
+            - API request to create a workflow trigger
+            - Neither type or file name nor path filter are specified
         WHEN:
             - API is called
         THEN:
             - Correct HTTP 400 response
-            - No template is created
+            - No objects are created
         """
         response = self.client.post(
-            self.ENDPOINT,
+            self.ENDPOINT_TRIGGERS,
             json.dumps(
                 {
-                    "name": "Template 2",
-                    "order": 1,
                     "sources": [DocumentSource.ApiUpload],
                 },
             ),
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(ConsumptionTemplate.objects.count(), 1)
 
-    def test_api_create_consumption_template_empty_fields(self):
+        response = self.client.post(
+            self.ENDPOINT_TRIGGERS,
+            json.dumps(
+                {
+                    "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                    "sources": [DocumentSource.ApiUpload],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.assertEqual(WorkflowTrigger.objects.count(), 1)
+
+    def test_api_create_workflow_trigger_action_empty_fields(self):
         """
         GIVEN:
-            - API request to create a consumption template
+            - API request to create a workflow trigger and action
             - Path or filename filter or assign title are empty string
         WHEN:
             - API is called
@@ -147,31 +205,40 @@ class TestApiConsumptionTemplates(DirectoriesMixin, APITestCase):
             - Template is created but filter or title assignment is not set if ""
         """
         response = self.client.post(
-            self.ENDPOINT,
+            self.ENDPOINT_TRIGGERS,
             json.dumps(
                 {
-                    "name": "Template 2",
-                    "order": 1,
+                    "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
                     "sources": [DocumentSource.ApiUpload],
                     "filter_filename": "*test*",
                     "filter_path": "",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        trigger = WorkflowTrigger.objects.get(id=response.data["id"])
+        self.assertEqual(trigger.filter_filename, "*test*")
+        self.assertIsNone(trigger.filter_path)
+
+        response = self.client.post(
+            self.ENDPOINT_ACTIONS,
+            json.dumps(
+                {
                     "assign_title": "",
                 },
             ),
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        ct = ConsumptionTemplate.objects.get(name="Template 2")
-        self.assertEqual(ct.filter_filename, "*test*")
-        self.assertIsNone(ct.filter_path)
-        self.assertIsNone(ct.assign_title)
+        action = WorkflowAction.objects.get(id=response.data["id"])
+        self.assertIsNone(action.assign_title)
 
         response = self.client.post(
-            self.ENDPOINT,
+            self.ENDPOINT_TRIGGERS,
             json.dumps(
                 {
-                    "name": "Template 3",
-                    "order": 1,
+                    "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
                     "sources": [DocumentSource.ApiUpload],
                     "filter_filename": "",
                     "filter_path": "*/test/*",
@@ -180,18 +247,18 @@ class TestApiConsumptionTemplates(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        ct2 = ConsumptionTemplate.objects.get(name="Template 3")
-        self.assertEqual(ct2.filter_path, "*/test/*")
-        self.assertIsNone(ct2.filter_filename)
+        trigger2 = WorkflowTrigger.objects.get(id=response.data["id"])
+        self.assertEqual(trigger2.filter_path, "*/test/*")
+        self.assertIsNone(trigger2.filter_filename)
 
-    def test_api_create_consumption_template_with_mailrule(self):
+    def test_api_create_workflow_trigger_with_mailrule(self):
         """
         GIVEN:
-            - API request to create a consumption template with a mail rule but no MailFetch source
+            - API request to create a workflow trigger with a mail rule but no MailFetch source
         WHEN:
             - API is called
         THEN:
-            - New template is created with MailFetch as source
+            - New trigger is created with MailFetch as source
         """
         account1 = MailAccount.objects.create(
             name="Email1",
@@ -219,11 +286,10 @@ class TestApiConsumptionTemplates(DirectoriesMixin, APITestCase):
             attachment_type=MailRule.AttachmentProcessing.ATTACHMENTS_ONLY,
         )
         response = self.client.post(
-            self.ENDPOINT,
+            self.ENDPOINT_TRIGGERS,
             json.dumps(
                 {
-                    "name": "Template 2",
-                    "order": 1,
+                    "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
                     "sources": [DocumentSource.ApiUpload],
                     "filter_mailrule": rule1.pk,
                 },
@@ -231,6 +297,6 @@ class TestApiConsumptionTemplates(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(ConsumptionTemplate.objects.count(), 2)
-        ct = ConsumptionTemplate.objects.get(name="Template 2")
-        self.assertEqual(ct.sources, [int(DocumentSource.MailFetch).__str__()])
+        self.assertEqual(WorkflowTrigger.objects.count(), 2)
+        trigger = WorkflowTrigger.objects.get(id=response.data["id"])
+        self.assertEqual(trigger.sources, [int(DocumentSource.MailFetch).__str__()])

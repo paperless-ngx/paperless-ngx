@@ -26,8 +26,7 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.loggers import LoggingMixin
-from documents.matching import document_matches_template
-from documents.models import ConsumptionTemplate
+from documents.matching import document_matches_workflow
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -36,6 +35,8 @@ from documents.models import DocumentType
 from documents.models import FileInfo
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import Workflow
+from documents.models import WorkflowTrigger
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import get_parser_class_for_mime_type
@@ -611,50 +612,57 @@ class Consumer(LoggingMixin):
         file name filters, path filters or mail rule filter if specified
         """
         overrides = DocumentMetadataOverrides()
-        for template in ConsumptionTemplate.objects.all().order_by("order"):
+        for workflow in Workflow.objects.all().order_by("order"):
             template_overrides = DocumentMetadataOverrides()
 
-            if document_matches_template(input_doc, template):
-                if template.assign_title is not None:
-                    template_overrides.title = template.assign_title
-                if template.assign_tags is not None:
-                    template_overrides.tag_ids = [
-                        tag.pk for tag in template.assign_tags.all()
-                    ]
-                if template.assign_correspondent is not None:
-                    template_overrides.correspondent_id = (
-                        template.assign_correspondent.pk
-                    )
-                if template.assign_document_type is not None:
-                    template_overrides.document_type_id = (
-                        template.assign_document_type.pk
-                    )
-                if template.assign_storage_path is not None:
-                    template_overrides.storage_path_id = template.assign_storage_path.pk
-                if template.assign_owner is not None:
-                    template_overrides.owner_id = template.assign_owner.pk
-                if template.assign_view_users is not None:
-                    template_overrides.view_users = [
-                        user.pk for user in template.assign_view_users.all()
-                    ]
-                if template.assign_view_groups is not None:
-                    template_overrides.view_groups = [
-                        group.pk for group in template.assign_view_groups.all()
-                    ]
-                if template.assign_change_users is not None:
-                    template_overrides.change_users = [
-                        user.pk for user in template.assign_change_users.all()
-                    ]
-                if template.assign_change_groups is not None:
-                    template_overrides.change_groups = [
-                        group.pk for group in template.assign_change_groups.all()
-                    ]
-                if template.assign_custom_fields is not None:
-                    template_overrides.custom_field_ids = [
-                        field.pk for field in template.assign_custom_fields.all()
-                    ]
+            if document_matches_workflow(
+                input_doc,
+                workflow,
+                WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            ):
+                for action in workflow.actions.all():
+                    if action.assign_title is not None:
+                        template_overrides.title = action.assign_title
+                    if action.assign_tags is not None:
+                        template_overrides.tag_ids = [
+                            tag.pk for tag in action.assign_tags.all()
+                        ]
+                    if action.assign_correspondent is not None:
+                        template_overrides.correspondent_id = (
+                            action.assign_correspondent.pk
+                        )
+                    if action.assign_document_type is not None:
+                        template_overrides.document_type_id = (
+                            action.assign_document_type.pk
+                        )
+                    if action.assign_storage_path is not None:
+                        template_overrides.storage_path_id = (
+                            action.assign_storage_path.pk
+                        )
+                    if action.assign_owner is not None:
+                        template_overrides.owner_id = action.assign_owner.pk
+                    if action.assign_view_users is not None:
+                        template_overrides.view_users = [
+                            user.pk for user in action.assign_view_users.all()
+                        ]
+                    if action.assign_view_groups is not None:
+                        template_overrides.view_groups = [
+                            group.pk for group in action.assign_view_groups.all()
+                        ]
+                    if action.assign_change_users is not None:
+                        template_overrides.change_users = [
+                            user.pk for user in action.assign_change_users.all()
+                        ]
+                    if action.assign_change_groups is not None:
+                        template_overrides.change_groups = [
+                            group.pk for group in action.assign_change_groups.all()
+                        ]
+                    if action.assign_custom_fields is not None:
+                        template_overrides.custom_field_ids = [
+                            field.pk for field in action.assign_custom_fields.all()
+                        ]
 
-                overrides.update(template_overrides)
+                    overrides.update(template_overrides)
         return overrides
 
     def _parse_title_placeholders(self, title: str) -> str:

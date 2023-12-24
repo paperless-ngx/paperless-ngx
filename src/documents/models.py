@@ -888,15 +888,22 @@ if settings.AUDIT_LOG_ENABLED:
     auditlog.register(CustomFieldInstance)
 
 
-class ConsumptionTemplate(models.Model):
+class WorkflowTrigger(models.Model):
+    class WorkflowTriggerType(models.IntegerChoices):
+        CONSUMPTION = 1, _("Consumption")
+        DOCUMENT_ADDED = 2, _("Document Added")
+        DOCUMENT_UPDATED = 3, _("Document Updated")
+
     class DocumentSourceChoices(models.IntegerChoices):
         CONSUME_FOLDER = DocumentSource.ConsumeFolder.value, _("Consume Folder")
         API_UPLOAD = DocumentSource.ApiUpload.value, _("Api Upload")
         MAIL_FETCH = DocumentSource.MailFetch.value, _("Mail Fetch")
 
-    name = models.CharField(_("name"), max_length=256, unique=True)
-
-    order = models.IntegerField(_("order"), default=0)
+    type = models.PositiveIntegerField(
+        _("Workflow Trigger Type"),
+        choices=WorkflowTriggerType.choices,
+        default=WorkflowTriggerType.CONSUMPTION,
+    )
 
     sources = MultiSelectField(
         max_length=5,
@@ -936,6 +943,15 @@ class ConsumptionTemplate(models.Model):
         verbose_name=_("filter documents from this mail rule"),
     )
 
+    class Meta:
+        verbose_name = _("workflow trigger")
+        verbose_name_plural = _("workflow triggers")
+
+    def __str__(self):
+        return f"WorfklowTrigger: {self.pk}"
+
+
+class WorkflowAction(models.Model):
     assign_title = models.CharField(
         _("assign title"),
         max_length=256,
@@ -1022,8 +1038,31 @@ class ConsumptionTemplate(models.Model):
     )
 
     class Meta:
-        verbose_name = _("consumption template")
-        verbose_name_plural = _("consumption templates")
+        verbose_name = _("workflow action")
+        verbose_name_plural = _("workflow actions")
 
     def __str__(self):
-        return f"{self.name}"
+        return f"WorkflowAction {self.pk}"
+
+
+class Workflow(models.Model):
+    name = models.CharField(_("name"), max_length=256, unique=True)
+
+    order = models.IntegerField(_("order"), default=0)
+
+    triggers = models.ManyToManyField(
+        WorkflowTrigger,
+        related_name="workflows",
+        blank=False,
+        verbose_name=_("triggers"),
+    )
+
+    actions = models.ManyToManyField(
+        WorkflowAction,
+        related_name="workflows",
+        blank=False,
+        verbose_name=_("actions"),
+    )
+
+    def __str__(self):
+        return f"Workflow: {self.name}"
