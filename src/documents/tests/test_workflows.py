@@ -116,6 +116,8 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         w.save()
 
         self.assertEqual(w.__str__(), "Workflow: Workflow 1")
+        self.assertEqual(trigger.__str__(), "WorkflowTrigger 1")
+        self.assertEqual(action.__str__(), "WorkflowAction 1")
 
         test_file = self.SAMPLE_DIR / "simple.pdf"
 

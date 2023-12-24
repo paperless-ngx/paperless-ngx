@@ -948,7 +948,7 @@ class WorkflowTrigger(models.Model):
         verbose_name_plural = _("workflow triggers")
 
     def __str__(self):
-        return f"WorfklowTrigger: {self.pk}"
+        return f"WorkflowTrigger {self.pk}"
 
 
 class WorkflowAction(models.Model):

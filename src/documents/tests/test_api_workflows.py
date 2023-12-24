@@ -141,6 +141,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                     "order": 1,
                     "triggers": [
                         {
+                            "id": trigger_response.data["id"],
                             "sources": [DocumentSource.ApiUpload],
                             "type": trigger_response.data["type"],
                             "filter_filename": trigger_response.data["filter_filename"],
@@ -148,6 +149,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                     ],
                     "actions": [
                         {
+                            "id": action_response.data["id"],
                             "assign_title": action_response.data["assign_title"],
                         },
                     ],

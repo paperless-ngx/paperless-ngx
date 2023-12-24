@@ -1262,6 +1262,7 @@ class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissions
 
 
 class WorkflowTriggerSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
     sources = fields.MultipleChoiceField(
         choices=WorkflowTrigger.DocumentSourceChoices.choices,
         allow_empty=False,
@@ -1320,6 +1321,7 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
 
 
 class WorkflowActionSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
     assign_correspondent = CorrespondentField(allow_null=True, required=False)
     assign_tags = TagsField(many=True, allow_null=True, required=False)
     assign_document_type = DocumentTypeField(allow_null=True, required=False)
@@ -1370,36 +1372,70 @@ class WorkflowSerializer(serializers.ModelSerializer):
             "actions",
         ]
 
-    def create(self, validated_data: Any) -> Any:
-        if "triggers" in validated_data:
-            # WorkflowTrigger.objects.update_or_create(triggers)
-            triggers = validated_data.pop("triggers")
-
-        if "actions" in validated_data:
-            # WorkflowAction.objects.update_or_create(actions)
-            actions = validated_data.pop("actions")
-
-        instance = super().create(validated_data)
-
+    def update_triggers_and_actions(self, instance: Workflow, triggers, actions):
         set_triggers = []
         set_actions = []
 
         if triggers is not None:
             for trigger in triggers:
-                print(trigger)
-                trigger_instance = WorkflowTrigger.objects.filter(**trigger).first()
-                if trigger_instance is not None:
-                    set_triggers.append(trigger_instance)
+                trigger_instance, _ = WorkflowTrigger.objects.update_or_create(
+                    id=trigger["id"],
+                    defaults=trigger,
+                )
+                set_triggers.append(trigger_instance)
 
         if actions is not None:
             for action in actions:
-                print(action)
-                action_instance = WorkflowAction.objects.filter(**action).first()
-                if action_instance is not None:
-                    set_actions.append(action_instance)
+                assign_tags = action.pop("assign_tags", None)
+                assign_view_users = action.pop("assign_view_users", None)
+                assign_view_groups = action.pop("assign_view_groups", None)
+                assign_change_users = action.pop("assign_change_users", None)
+                assign_change_groups = action.pop("assign_change_groups", None)
+                assign_custom_fields = action.pop("assign_custom_fields", None)
+                action_instance, _ = WorkflowAction.objects.update_or_create(
+                    id=trigger["id"],
+                    defaults=action,
+                )
+                if assign_tags is not None:
+                    action_instance.assign_tags.set(assign_tags)
+                if assign_view_users is not None:
+                    action_instance.assign_view_users.set(assign_view_users)
+                if assign_view_groups is not None:
+                    action_instance.assign_view_groups.set(assign_view_groups)
+                if assign_change_users is not None:
+                    action_instance.assign_change_users.set(assign_change_users)
+                if assign_change_groups is not None:
+                    action_instance.assign_change_groups.set(assign_change_groups)
+                if assign_custom_fields is not None:
+                    action_instance.assign_custom_fields.set(assign_custom_fields)
+                set_actions.append(action_instance)
 
         instance.triggers.set(set_triggers)
         instance.actions.set(set_actions)
         instance.save()
+
+    def create(self, validated_data: Any) -> Workflow:
+        if "triggers" in validated_data:
+            triggers = validated_data.pop("triggers")
+
+        if "actions" in validated_data:
+            actions = validated_data.pop("actions")
+
+        instance = super().create(validated_data)
+
+        self.update_triggers_and_actions(instance, triggers, actions)
+
+        return instance
+
+    def update(self, instance: Any, validated_data: Any) -> Workflow:
+        if "triggers" in validated_data:
+            triggers = validated_data.pop("triggers")
+
+        if "actions" in validated_data:
+            actions = validated_data.pop("actions")
+
+        instance = super().update(instance, validated_data)
+
+        self.update_triggers_and_actions(instance, triggers, actions)
 
         return instance
