@@ -1,61 +1,54 @@
 import { HttpTestingController } from '@angular/common/http/testing'
 import { TestBed } from '@angular/core/testing'
-import { Subscription } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import { commonAbstractPaperlessServiceTests } from './abstract-paperless-service.spec'
-import { ConsumptionTemplateService } from './consumption-template.service'
+import { WorkflowTriggerService } from './workflow-trigger.service'
 import {
   DocumentSource,
-  ConsumptionTemplate,
-} from 'src/app/data/consumption-template'
+  WorkflowTrigger,
+  WorkflowTriggerType,
+} from 'src/app/data/workflow-trigger'
 
 let httpTestingController: HttpTestingController
-let service: ConsumptionTemplateService
-const endpoint = 'consumption_templates'
-const templates: ConsumptionTemplate[] = [
+let service: WorkflowTriggerService
+const endpoint = 'workflow_triggers'
+const triggers: WorkflowTrigger[] = [
   {
-    name: 'Template 1',
     id: 1,
-    order: 1,
+    type: WorkflowTriggerType.Consumption,
     filter_filename: '*test*',
     filter_path: null,
     sources: [DocumentSource.ApiUpload],
-    assign_correspondent: 2,
   },
   {
-    name: 'Template 2',
     id: 2,
-    order: 2,
+    type: WorkflowTriggerType.DocumentAdded,
     filter_filename: null,
     filter_path: '/test/',
     sources: [DocumentSource.ConsumeFolder, DocumentSource.ApiUpload],
-    assign_document_type: 1,
   },
 ]
 
 // run common tests
-commonAbstractPaperlessServiceTests(
-  'consumption_templates',
-  ConsumptionTemplateService
-)
+commonAbstractPaperlessServiceTests(endpoint, WorkflowTriggerService)
 
-describe(`Additional service tests for ConsumptionTemplateService`, () => {
+describe(`Additional service tests for WorkflowTriggerService`, () => {
   it('should reload', () => {
     service.reload()
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
     )
     req.flush({
-      results: templates,
+      results: triggers,
     })
-    expect(service.allTemplates).toEqual(templates)
+    expect(service.allWorkflows).toEqual(triggers)
   })
 
   beforeEach(() => {
     // Dont need to setup again
 
     httpTestingController = TestBed.inject(HttpTestingController)
-    service = TestBed.inject(ConsumptionTemplateService)
+    service = TestBed.inject(WorkflowTriggerService)
   })
 
   afterEach(() => {

@@ -176,9 +176,9 @@ export class AppComponent implements OnInit, OnDestroy {
           },
         },
         {
-          anchorId: 'tour.consumption-templates',
-          content: $localize`Consumption templates give you finer control over the document ingestion process.`,
-          route: '/templates',
+          anchorId: 'tour.workflows',
+          content: $localize`Workflows give you finer control over the document ingestion process.`,
+          route: '/workflows',
           backdropConfig: {
             offset: 0,
           },

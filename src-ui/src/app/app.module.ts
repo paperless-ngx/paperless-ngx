@@ -95,8 +95,8 @@ import { UsernamePipe } from './pipes/username.pipe'
 import { LogoComponent } from './components/common/logo/logo.component'
 import { IsNumberPipe } from './pipes/is-number.pipe'
 import { ShareLinksDropdownComponent } from './components/common/share-links-dropdown/share-links-dropdown.component'
-import { ConsumptionTemplatesComponent } from './components/manage/consumption-templates/consumption-templates.component'
-import { ConsumptionTemplateEditDialogComponent } from './components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component'
+import { WorkflowsComponent } from './components/manage/workflows/workflows.component'
+import { WorkflowEditDialogComponent } from './components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
 import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 import { DragDropModule } from '@angular/cdk/drag-drop'
@@ -251,8 +251,8 @@ function initializeApp(settings: SettingsService) {
     LogoComponent,
     IsNumberPipe,
     ShareLinksDropdownComponent,
-    ConsumptionTemplatesComponent,
-    ConsumptionTemplateEditDialogComponent,
+    WorkflowsComponent,
+    WorkflowEditDialogComponent,
     MailComponent,
     UsersAndGroupsComponent,
     FileDropComponent,

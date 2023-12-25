@@ -19,18 +19,18 @@ import { SelectComponent } from '../../input/select/select.component'
 import { TagsComponent } from '../../input/tags/tags.component'
 import { TextComponent } from '../../input/text/text.component'
 import { EditDialogMode } from '../edit-dialog.component'
-import { ConsumptionTemplateEditDialogComponent } from './consumption-template-edit-dialog.component'
+import { WorkflowEditDialogComponent } from './workflow-edit-dialog.component'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 
 describe('ConsumptionTemplateEditDialogComponent', () => {
-  let component: ConsumptionTemplateEditDialogComponent
+  let component: WorkflowEditDialogComponent
   let settingsService: SettingsService
-  let fixture: ComponentFixture<ConsumptionTemplateEditDialogComponent>
+  let fixture: ComponentFixture<WorkflowEditDialogComponent>
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [
-        ConsumptionTemplateEditDialogComponent,
+        WorkflowEditDialogComponent,
         IfPermissionsDirective,
         IfOwnerDirective,
         SelectComponent,
@@ -113,7 +113,7 @@ describe('ConsumptionTemplateEditDialogComponent', () => {
       ],
     }).compileComponents()
 
-    fixture = TestBed.createComponent(ConsumptionTemplateEditDialogComponent)
+    fixture = TestBed.createComponent(WorkflowEditDialogComponent)
     settingsService = TestBed.inject(SettingsService)
     settingsService.currentUser = { id: 99, username: 'user99' }
     component = fixture.componentInstance

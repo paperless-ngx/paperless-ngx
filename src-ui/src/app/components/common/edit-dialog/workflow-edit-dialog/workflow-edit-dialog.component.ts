@@ -1,0 +1,191 @@
+import { Component, OnInit } from '@angular/core'
+import { FormGroup, FormControl, FormArray } from '@angular/forms'
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { first } from 'rxjs'
+import { Workflow } from 'src/app/data/workflow'
+import { Correspondent } from 'src/app/data/correspondent'
+import { DocumentType } from 'src/app/data/document-type'
+import { StoragePath } from 'src/app/data/storage-path'
+import { WorkflowService } from 'src/app/services/rest/workflow.service'
+import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
+import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { UserService } from 'src/app/services/rest/user.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import { EditDialogComponent } from '../edit-dialog.component'
+import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
+import { MailRule } from 'src/app/data/mail-rule'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { CustomField } from 'src/app/data/custom-field'
+import {
+  DocumentSource,
+  WorkflowTriggerType,
+} from 'src/app/data/workflow-trigger'
+
+export const DOCUMENT_SOURCE_OPTIONS = [
+  {
+    id: DocumentSource.ConsumeFolder,
+    name: $localize`Consume Folder`,
+  },
+  {
+    id: DocumentSource.ApiUpload,
+    name: $localize`API Upload`,
+  },
+  {
+    id: DocumentSource.MailFetch,
+    name: $localize`Mail Fetch`,
+  },
+]
+
+export const WORKFLOW_TYPE_OPTIONS = [
+  {
+    id: WorkflowTriggerType.Consumption,
+    name: $localize`Consumption`,
+  },
+  {
+    id: WorkflowTriggerType.DocumentAdded,
+    name: $localize`Document Added`,
+  },
+  {
+    id: WorkflowTriggerType.DocumentUpdated,
+    name: $localize`Document Updated`,
+  },
+]
+
+@Component({
+  selector: 'pngx-workflow-edit-dialog',
+  templateUrl: './workflow-edit-dialog.component.html',
+  styleUrls: ['./workflow-edit-dialog.component.scss'],
+})
+export class WorkflowEditDialogComponent
+  extends EditDialogComponent<Workflow>
+  implements OnInit
+{
+  templates: Workflow[]
+  correspondents: Correspondent[]
+  documentTypes: DocumentType[]
+  storagePaths: StoragePath[]
+  mailRules: MailRule[]
+  customFields: CustomField[]
+
+  expandedItem: number = null
+
+  constructor(
+    service: WorkflowService,
+    activeModal: NgbActiveModal,
+    correspondentService: CorrespondentService,
+    documentTypeService: DocumentTypeService,
+    storagePathService: StoragePathService,
+    mailRuleService: MailRuleService,
+    userService: UserService,
+    settingsService: SettingsService,
+    customFieldsService: CustomFieldsService
+  ) {
+    super(service, activeModal, userService, settingsService)
+
+    correspondentService
+      .listAll()
+      .pipe(first())
+      .subscribe((result) => (this.correspondents = result.results))
+
+    documentTypeService
+      .listAll()
+      .pipe(first())
+      .subscribe((result) => (this.documentTypes = result.results))
+
+    storagePathService
+      .listAll()
+      .pipe(first())
+      .subscribe((result) => (this.storagePaths = result.results))
+
+    mailRuleService
+      .listAll()
+      .pipe(first())
+      .subscribe((result) => (this.mailRules = result.results))
+
+    customFieldsService
+      .listAll()
+      .pipe(first())
+      .subscribe((result) => (this.customFields = result.results))
+  }
+
+  getCreateTitle() {
+    return $localize`Create new workflow`
+  }
+
+  getEditTitle() {
+    return $localize`Edit workflow`
+  }
+
+  getForm(): FormGroup {
+    return new FormGroup({
+      name: new FormControl(null),
+      order: new FormControl(null),
+      triggers: new FormArray([]),
+      actions: new FormArray([]),
+    })
+  }
+
+  ngOnInit(): void {
+    super.ngOnInit()
+    this.updateTriggerActionFields()
+  }
+
+  get triggerFields(): FormArray {
+    return this.objectForm.get('triggers') as FormArray
+  }
+
+  get actionFields(): FormArray {
+    return this.objectForm.get('actions') as FormArray
+  }
+
+  private updateTriggerActionFields(emitEvent: boolean = false) {
+    this.triggerFields.clear({ emitEvent: false })
+    this.object?.triggers.forEach((trigger) => {
+      this.triggerFields.push(
+        new FormGroup({
+          id: new FormControl(trigger.id),
+          type: new FormControl(trigger.type),
+          sources: new FormControl(trigger.sources),
+          filter_filename: new FormControl(trigger.filter_filename),
+          filter_path: new FormControl(trigger.filter_path),
+          filter_mailrule: new FormControl(trigger.filter_mailrule),
+        }),
+        { emitEvent }
+      )
+    })
+
+    this.actionFields.clear({ emitEvent: false })
+    this.object?.actions.forEach((action) => {
+      this.actionFields.push(
+        new FormGroup({
+          id: new FormControl(action.id),
+          assign_title: new FormControl(action.assign_title),
+          assign_tags: new FormControl(action.assign_tags),
+          assign_owner: new FormControl(action.assign_owner),
+          assign_document_type: new FormControl(action.assign_document_type),
+          assign_correspondent: new FormControl(action.assign_correspondent),
+          assign_storage_path: new FormControl(action.assign_storage_path),
+          assign_view_users: new FormControl(action.assign_view_users),
+          assign_view_groups: new FormControl(action.assign_view_groups),
+          assign_change_users: new FormControl(action.assign_change_users),
+          assign_change_groups: new FormControl(action.assign_change_groups),
+          assign_custom_fields: new FormControl(action.assign_custom_fields),
+        }),
+        { emitEvent }
+      )
+    })
+  }
+
+  get sourceOptions() {
+    return DOCUMENT_SOURCE_OPTIONS
+  }
+
+  get typeOptions() {
+    return WORKFLOW_TYPE_OPTIONS
+  }
+
+  getTypeOptionName(type: WorkflowTriggerType): string {
+    return this.typeOptions.find((t) => t.id === type).name ?? ''
+  }
+}
