@@ -666,10 +666,6 @@ class Consumer(LoggingMixin):
         return overrides
 
     def _parse_title_placeholders(self, title: str) -> str:
-        """
-        Consumption template title placeholders can only include items that are
-        assigned as part of this template (since auto-matching hasnt happened yet)
-        """
         local_added = timezone.localtime(timezone.now())
 
         correspondent_name = (
@@ -688,20 +684,14 @@ class Consumer(LoggingMixin):
             else None
         )
 
-        return title.format(
-            correspondent=correspondent_name,
-            document_type=doc_type_name,
-            added=local_added.isoformat(),
-            added_year=local_added.strftime("%Y"),
-            added_year_short=local_added.strftime("%y"),
-            added_month=local_added.strftime("%m"),
-            added_month_name=local_added.strftime("%B"),
-            added_month_name_short=local_added.strftime("%b"),
-            added_day=local_added.strftime("%d"),
-            owner_username=owner_username,
-            original_filename=Path(self.filename).stem,
-            added_time=local_added.strftime("%H:%M"),
-        ).strip()
+        return parse_doc_title_w_placeholders(
+            title,
+            correspondent_name,
+            doc_type_name,
+            owner_username,
+            local_added,
+            self.filename,
+        )
 
     def _store(
         self,
@@ -854,3 +844,47 @@ class Consumer(LoggingMixin):
             self.log.warning("Script stderr:")
             for line in stderr_str:
                 self.log.warning(line)
+
+
+def parse_doc_title_w_placeholders(
+    title: str,
+    correspondent_name: str,
+    doc_type_name: str,
+    owner_username: str,
+    local_added: datetime.datetime,
+    original_filename: str,
+    created: Optional[datetime.datetime] = None,
+) -> str:
+    """
+    Title placeholders for Workflows using Consumption triggers can only include
+    items that are assigned as part of this template (since auto-matching hasnt
+    happened yet)
+    """
+    formatting = {
+        "correspondent": correspondent_name,
+        "document_type": doc_type_name,
+        "added": local_added.isoformat(),
+        "added_year": local_added.strftime("%Y"),
+        "added_year_short": local_added.strftime("%y"),
+        "added_month": local_added.strftime("%m"),
+        "added_month_name": local_added.strftime("%B"),
+        "added_month_name_short": local_added.strftime("%b"),
+        "added_day": local_added.strftime("%d"),
+        "added_time": local_added.strftime("%H:%M"),
+        "owner_username": owner_username,
+        "original_filename": Path(original_filename).stem,
+    }
+    if created is not None:
+        formatting.update(
+            {
+                "created": created.isoformat(),
+                "created_year": created.strftime("%Y"),
+                "created_year_short": created.strftime("%y"),
+                "created_month": created.strftime("%m"),
+                "created_month_name": created.strftime("%B"),
+                "created_month_name_short": created.strftime("%b"),
+                "created_day": created.strftime("%d"),
+                "created_time": created.strftime("%H:%M"),
+            },
+        )
+    return title.format(**formatting).strip()

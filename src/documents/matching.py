@@ -239,7 +239,7 @@ def _split_match(matching_model):
 
 
 def document_matches_workflow(
-    document: ConsumableDocument,
+    document: ConsumableDocument | Document,
     workflow: Workflow,
     trigger_type: WorkflowTrigger.WorkflowTriggerType,
 ) -> bool:
@@ -258,52 +258,74 @@ def document_matches_workflow(
         trigger_matched = False
     else:
         for trigger in triggers:
-            # Document source vs template source
-            if document.source not in [int(x) for x in list(trigger.sources)]:
-                log_match_failure(
-                    f"Document source {document.source.name} not in"
-                    f" {[DocumentSource(int(x)).name for x in trigger.sources]}",
-                )
-                trigger_matched = False
+            if trigger_type is WorkflowTrigger.WorkflowTriggerType.CONSUMPTION:
+                # document is type ConsumableDocument
 
-            # Document mail rule vs template mail rule
-            if (
-                document.mailrule_id is not None
-                and trigger.filter_mailrule is not None
-                and document.mailrule_id != trigger.filter_mailrule.pk
-            ):
-                log_match_failure(
-                    f"Document mail rule {document.mailrule_id}"
-                    f" != {trigger.filter_mailrule.pk}",
-                )
-                trigger_matched = False
+                # Document source vs template source
+                if document.source not in [int(x) for x in list(trigger.sources)]:
+                    log_match_failure(
+                        f"Document source {document.source.name} not in"
+                        f" {[DocumentSource(int(x)).name for x in trigger.sources]}",
+                    )
+                    trigger_matched = False
 
-            # Document filename vs template filename
-            if (
-                trigger.filter_filename is not None
-                and len(trigger.filter_filename) > 0
-                and not fnmatch(
-                    document.original_file.name.lower(),
-                    trigger.filter_filename.lower(),
-                )
-            ):
-                log_match_failure(
-                    f"Document filename {document.original_file.name} does not match"
-                    f" {trigger.filter_filename.lower()}",
-                )
-                trigger_matched = False
+                # Document mail rule vs template mail rule
+                if (
+                    document.mailrule_id is not None
+                    and trigger.filter_mailrule is not None
+                    and document.mailrule_id != trigger.filter_mailrule.pk
+                ):
+                    log_match_failure(
+                        f"Document mail rule {document.mailrule_id}"
+                        f" != {trigger.filter_mailrule.pk}",
+                    )
+                    trigger_matched = False
 
-            # Document path vs template path
-            if (
-                trigger.filter_path is not None
-                and len(trigger.filter_path) > 0
-                and not document.original_file.match(trigger.filter_path)
-            ):
-                log_match_failure(
-                    f"Document path {document.original_file}"
-                    f" does not match {trigger.filter_path}",
-                )
-                trigger_matched = False
+                # Document filename vs template filename
+                if (
+                    trigger.filter_filename is not None
+                    and len(trigger.filter_filename) > 0
+                    and not fnmatch(
+                        document.original_file.name.lower(),
+                        trigger.filter_filename.lower(),
+                    )
+                ):
+                    log_match_failure(
+                        f"Document filename {document.original_file.name} does not match"
+                        f" {trigger.filter_filename.lower()}",
+                    )
+                    trigger_matched = False
+
+                # Document path vs template path
+                if (
+                    trigger.filter_path is not None
+                    and len(trigger.filter_path) > 0
+                    and not document.original_file.match(trigger.filter_path)
+                ):
+                    log_match_failure(
+                        f"Document path {document.original_file}"
+                        f" does not match {trigger.filter_path}",
+                    )
+                    trigger_matched = False
+
+            elif trigger_type is WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED:
+                # document is type Document
+
+                # Document filename vs template filename
+                if (
+                    trigger.filter_filename is not None
+                    and len(trigger.filter_filename) > 0
+                    and document.original_filename is not None
+                    and not fnmatch(
+                        document.original_filename.lower(),
+                        trigger.filter_filename.lower(),
+                    )
+                ):
+                    log_match_failure(
+                        f"Document filename {document.original_filename} does not match"
+                        f" {trigger.filter_filename.lower()}",
+                    )
+                    trigger_matched = False
 
             if trigger_matched:
                 logger.info(f"Document matched {trigger} from {workflow}")
