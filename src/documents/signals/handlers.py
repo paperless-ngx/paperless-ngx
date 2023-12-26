@@ -519,14 +519,22 @@ def add_to_index(sender, document, **kwargs):
     index.add_or_update_document(document)
 
 
-def run_workflows(sender, document: Document, logging_group=None, **kwargs):
+def run_workflow_added(sender, document: Document, logging_group=None, **kwargs):
+    run_workflow(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED, document)
+
+
+def run_workflow_updated(sender, document: Document, logging_group=None, **kwargs):
+    run_workflow(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, document)
+
+
+def run_workflow(trigger_type: WorkflowTrigger.WorkflowTriggerType, document: Document):
     for workflow in Workflow.objects.filter(
-        triggers__type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        triggers__type=trigger_type,
     ).order_by("order"):
         if matching.document_matches_workflow(
             document,
             workflow,
-            WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            trigger_type,
         ):
             for action in workflow.actions.all():
                 if action.assign_tags.all().count() > 0:

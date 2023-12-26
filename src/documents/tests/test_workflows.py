@@ -1,12 +1,12 @@
 from datetime import timedelta
 from pathlib import Path
-from unittest import TestCase
 from unittest import mock
 
 import pytest
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.utils import timezone
+from rest_framework.test import APITestCase
 
 from documents import tasks
 from documents.data_models import ConsumableDocument
@@ -28,7 +28,7 @@ from paperless_mail.models import MailRule
 
 
 @pytest.mark.django_db
-class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
+class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
     SAMPLE_DIR = Path(__file__).parent / "samples"
 
     def setUp(self) -> None:
@@ -626,7 +626,6 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def test_document_added_workflow(self):
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
-            sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
             filter_filename="*sample*",
         )
         action = WorkflowAction.objects.create(
@@ -671,3 +670,35 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         self.assertEqual(doc.correspondent, self.c2)
         self.assertEqual(doc.title, f"Doc created in {created.year}")
+
+    def test_document_updated_workflow(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+            filter_has_document_type=self.dt,
+        )
+        action = WorkflowAction.objects.create()
+        action.assign_custom_fields.add(self.cf1)
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        superuser = User.objects.create_superuser("superuser")
+        self.client.force_authenticate(user=superuser)
+
+        self.client.patch(
+            f"/api/documents/{doc.id}/",
+            {"document_type": self.dt.id},
+            format="json",
+        )
+
+        self.assertEqual(doc.custom_fields.all().count(), 1)

@@ -404,7 +404,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "filter_has_correspondent",
+                    "filter_has_document_type",
                     models.ForeignKey(
                         blank=True,
                         null=True,
@@ -414,7 +414,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "filter_has_document_type",
+                    "filter_has_correspondent",
                     models.ForeignKey(
                         blank=True,
                         null=True,

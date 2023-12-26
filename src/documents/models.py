@@ -949,7 +949,7 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("has these tag(s)"),
     )
 
-    filter_has_correspondent = models.ForeignKey(
+    filter_has_document_type = models.ForeignKey(
         DocumentType,
         null=True,
         blank=True,
@@ -957,7 +957,7 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("has this document type"),
     )
 
-    filter_has_document_type = models.ForeignKey(
+    filter_has_correspondent = models.ForeignKey(
         Correspondent,
         null=True,
         blank=True,
