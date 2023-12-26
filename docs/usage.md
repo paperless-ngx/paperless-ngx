@@ -347,7 +347,7 @@ The following custom field types are supported:
 - `Monetary`: float number with exactly two decimals, e.g. 12.30
 - `Document Link`: reference(s) to other document(s) displayed as links, automatically creates a symmetrical link in reverse
 
-## Share Links
+## Share Links {#share-links}
 
 Paperless-ngx added the abiltiy to create shareable links to files in version 2.0. You can find the button for this on the document detail screen.
 
