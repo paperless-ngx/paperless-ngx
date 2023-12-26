@@ -311,6 +311,40 @@ def document_matches_workflow(
             elif trigger_type is WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED:
                 # document is type Document
 
+                # Document has_tags vs document tags
+                if (
+                    trigger.filter_has_tags.all().count() > 0
+                    and document.tags.filter(
+                        id__in=trigger.filter_has_tags.all().values_list("id"),
+                    ).count()
+                    == 0
+                ):
+                    log_match_failure(
+                        f"Document tags {document.tags} do not include"
+                        f" {trigger.filter_has_tags}",
+                    )
+                    trigger_matched = False
+
+                # Document has_correspondent vs document correpondent
+                if (
+                    trigger.filter_has_correspondent is not None
+                    and document.correspondent != trigger.filter_has_correspondent
+                ):
+                    log_match_failure(
+                        f"Document correspondent {document.correspondent} does not match {trigger.filter_has_correspondent}",
+                    )
+                    trigger_matched = False
+
+                # Document has_correspondent vs document correpondent
+                if (
+                    trigger.filter_has_document_type is not None
+                    and document.document_type != trigger.filter_has_document_type
+                ):
+                    log_match_failure(
+                        f"Document doc type {document.document_type} does not match {trigger.filter_has_document_type}",
+                    )
+                    trigger_matched = False
+
                 # Document filename vs template filename
                 if (
                     trigger.filter_filename is not None

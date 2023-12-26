@@ -150,6 +150,13 @@ export class WorkflowEditDialogComponent
           filter_filename: new FormControl(trigger.filter_filename),
           filter_path: new FormControl(trigger.filter_path),
           filter_mailrule: new FormControl(trigger.filter_mailrule),
+          filter_has_tags: new FormControl(trigger.filter_has_tags),
+          filter_has_correspondent: new FormControl(
+            trigger.filter_has_correspondent
+          ),
+          filter_has_document_type: new FormControl(
+            trigger.filter_has_document_type
+          ),
         }),
         { emitEvent }
       )

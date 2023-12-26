@@ -943,6 +943,28 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("filter documents from this mail rule"),
     )
 
+    filter_has_tags = models.ManyToManyField(
+        Tag,
+        blank=True,
+        verbose_name=_("has these tag(s)"),
+    )
+
+    filter_has_correspondent = models.ForeignKey(
+        DocumentType,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("has this document type"),
+    )
+
+    filter_has_document_type = models.ForeignKey(
+        Correspondent,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("has this correspondent"),
+    )
+
     class Meta:
         verbose_name = _("workflow trigger")
         verbose_name_plural = _("workflow triggers")

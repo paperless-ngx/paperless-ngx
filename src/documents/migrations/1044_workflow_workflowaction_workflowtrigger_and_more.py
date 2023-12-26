@@ -395,6 +395,34 @@ class Migration(migrations.Migration):
                         verbose_name="filter documents from this mail rule",
                     ),
                 ),
+                (
+                    "filter_has_tags",
+                    models.ManyToManyField(
+                        blank=True,
+                        to="documents.tag",
+                        verbose_name="has these tag(s)",
+                    ),
+                ),
+                (
+                    "filter_has_correspondent",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="documents.documenttype",
+                        verbose_name="has this document type",
+                    ),
+                ),
+                (
+                    "filter_has_document_type",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="documents.correspondent",
+                        verbose_name="has this correspondent",
+                    ),
+                ),
             ],
             options={
                 "verbose_name": "workflow trigger",
