@@ -92,9 +92,9 @@
                   <ng-container i18n>Add Action</ng-container>
                 </button>
               </div>
-              <div ngbAccordion [closeOthers]="true">
+              <div ngbAccordion [closeOthers]="true" cdkDropList (cdkDropListDropped)="onActionDrop($event)">
                 @for (action of object.actions; track action; let i = $index){
-                  <div ngbAccordionItem [formGroup]="actionFields.controls[i]">
+                  <div ngbAccordionItem cdkDrag [formGroup]="actionFields.controls[i]">
                     <div ngbAccordionHeader>
                       <button ngbAccordionButton><ng-container i18n>Action</ng-container> {{i + 1}}
 

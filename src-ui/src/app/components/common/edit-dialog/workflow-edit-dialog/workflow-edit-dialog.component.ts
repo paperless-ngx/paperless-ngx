@@ -21,6 +21,8 @@ import {
   DocumentSource,
   WorkflowTriggerType,
 } from 'src/app/data/workflow-trigger'
+import { WorkflowAction } from 'src/app/data/workflow-action'
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop'
 
 export const DOCUMENT_SOURCE_OPTIONS = [
   {
@@ -237,6 +239,17 @@ export class WorkflowEditDialogComponent
 
   removeAction(index: number) {
     this.object.actions.splice(index, 1)
+    this.updateTriggerActionFields()
+  }
+
+  onActionDrop(event: CdkDragDrop<WorkflowAction[]>) {
+    moveItemInArray(
+      this.object.actions,
+      event.previousIndex,
+      event.currentIndex
+    )
+    // removing id will effectively re-create the actions in this order
+    this.object.actions.forEach((a) => (a.id = null))
     this.updateTriggerActionFields()
   }
 }
