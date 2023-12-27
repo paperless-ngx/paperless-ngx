@@ -603,13 +603,12 @@ class Consumer(LoggingMixin):
 
         return document
 
-    def get_template_overrides(
+    def get_workflow_overrides(
         self,
         input_doc: ConsumableDocument,
     ) -> DocumentMetadataOverrides:
         """
-        Match consumption templates to a document based on source and
-        file name filters, path filters or mail rule filter if specified
+        Get overrides from matching workflows
         """
         overrides = DocumentMetadataOverrides()
         for workflow in Workflow.objects.filter(enabled=True).order_by("order"):

@@ -158,7 +158,7 @@ def consume_file(
                 overrides.asn = reader.asn
                 logger.info(f"Found ASN in barcode: {overrides.asn}")
 
-    template_overrides = Consumer().get_template_overrides(
+    template_overrides = Consumer().get_workflow_overrides(
         input_doc=input_doc,
     )
 

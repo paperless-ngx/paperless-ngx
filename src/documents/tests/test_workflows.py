@@ -244,7 +244,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         WHEN:
             - File that matches is consumed
         THEN:
-            - Template overrides are applied with subsequent templates only overwriting empty values
+            - Template overrides are applied with subsequent templates overwriting previous values
             or merging if multiple
         """
         trigger1 = WorkflowTrigger.objects.create(
@@ -306,9 +306,9 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
                 m.assert_called_once()
                 _, overrides = m.call_args
                 # template 1
-                self.assertEqual(overrides["override_correspondent_id"], self.c.pk)
                 self.assertEqual(overrides["override_document_type_id"], self.dt.pk)
                 # template 2
+                self.assertEqual(overrides["override_correspondent_id"], self.c2.pk)
                 self.assertEqual(overrides["override_storage_path_id"], self.sp.pk)
                 # template 1 & 2
                 self.assertEqual(

@@ -274,10 +274,9 @@ to workflow trigger 'types':
 - Updated: fires when a document is updated. Similar to 'added' events, can include filtering by tags, doc type, or
   correspondent
 
-In general, workflows are applied sequentially (by sort order) but the behavior of consequtive workflows depends on the type.
-"Consumption" workflows will never override an assignment from a preceding workflow. "Added" and "Updated" workflow triggers
-will overwrite these values (since these are immediately assigned to the document). Titles are always overwritten by
-subsequent workflows. Assignments that accept multiple items e.g. tags, custom fields and permissions will be merged.
+In general, workflow (and any actions they contain) are applied sequentially by sort order. Subsequent workflow actions will
+override assignments from a preceeding workflow except for assignments that accept multiple items e.g. tags, custom fields and
+permissions will be merged.
 
 Workflows allow you to filter by:
 
