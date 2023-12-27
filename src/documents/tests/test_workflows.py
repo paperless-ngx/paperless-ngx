@@ -11,6 +11,7 @@ from rest_framework.test import APITestCase
 from documents import tasks
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentSource
+from documents.matching import document_matches_workflow
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import Document
@@ -570,6 +571,76 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         expected_str = f"Document source {DocumentSource.ApiUpload.name} not in ['{DocumentSource.ConsumeFolder.name}', '{DocumentSource.MailFetch.name}']"
         self.assertIn(expected_str, cm.output[1])
 
+    def test_document_added_no_match_trigger_type(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        action.save()
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        doc.save()
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_matches_workflow(
+                doc,
+                w,
+                WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = f"No matching triggers with type {WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED} found"
+            self.assertIn(expected_str, cm.output[1])
+
+    def test_document_added_no_match_trigger_type(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        action.save()
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        doc.save()
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_matches_workflow(
+                doc,
+                w,
+                WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = f"No matching triggers with type {WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED} found"
+            self.assertIn(expected_str, cm.output[1])
+
     @mock.patch("documents.consumer.Consumer.try_consume_file")
     def test_workflow_repeat_custom_fields(self, m):
         """
@@ -671,6 +742,109 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         self.assertEqual(doc.correspondent, self.c2)
         self.assertEqual(doc.title, f"Doc created in {created.year}")
 
+    def test_document_added_no_match_tags(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        trigger.filter_has_tags.set([self.t1, self.t2])
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        action.save()
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        doc.tags.set([self.t3])
+        doc.save()
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = f"Document tags {doc.tags.all()} do not include {trigger.filter_has_tags.all()}"
+            self.assertIn(expected_str, cm.output[1])
+
+    def test_document_added_no_match_doctype(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_has_document_type=self.dt,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        action.save()
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            original_filename="sample.pdf",
+        )
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = f"Document doc type {doc.document_type} does not match {trigger.filter_has_document_type}"
+            self.assertIn(expected_str, cm.output[1])
+
+    def test_document_added_no_match_correspondent(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_has_correspondent=self.c,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        action.save()
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c2,
+            original_filename="sample.pdf",
+        )
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = f"Document correspondent {doc.correspondent} does not match {trigger.filter_has_correspondent}"
+            self.assertIn(expected_str, cm.output[1])
+
     def test_document_updated_workflow(self):
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
@@ -702,3 +876,49 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         )
 
         self.assertEqual(doc.custom_fields.all().count(), 1)
+
+    def test_workflow_enabled_disabled(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_filename="*sample*",
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Title assign correspondent",
+            assign_correspondent=self.c2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+            enabled=False,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        action2 = WorkflowAction.objects.create(
+            assign_title="Title assign owner",
+            assign_owner=self.user2,
+        )
+        w2 = Workflow.objects.create(
+            name="Workflow 2",
+            order=0,
+            enabled=True,
+        )
+        w2.triggers.add(trigger)
+        w2.actions.add(action2)
+        w2.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        document_consumption_finished.send(
+            sender=self.__class__,
+            document=doc,
+        )
+
+        self.assertEqual(doc.correspondent, self.c)
+        self.assertEqual(doc.title, "Title assign owner")
+        self.assertEqual(doc.owner, self.user2)

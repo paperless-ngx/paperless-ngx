@@ -556,9 +556,13 @@ def run_workflow(trigger_type: WorkflowTrigger.WorkflowTriggerType, document: Do
                 if action.assign_title is not None:
                     document.title = parse_doc_title_w_placeholders(
                         action.assign_title,
-                        document.correspondent.name,
-                        document.document_type.name,
-                        document.owner.username,
+                        document.correspondent.name
+                        if document.correspondent is not None
+                        else "",
+                        document.document_type.name
+                        if document.document_type is not None
+                        else "",
+                        document.owner.username if document.owner is not None else "",
                         document.added,
                         document.original_filename,
                         document.created,

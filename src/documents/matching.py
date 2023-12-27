@@ -255,6 +255,9 @@ def document_matches_workflow(
     triggers = workflow.triggers.filter(type=trigger_type)
     if len(triggers) == 0:
         trigger_matched = False
+        log_match_failure(
+            f"No matching triggers with type {trigger_type} found",
+        )
     else:
         for trigger in triggers:
             if trigger_type is WorkflowTrigger.WorkflowTriggerType.CONSUMPTION:
@@ -307,7 +310,10 @@ def document_matches_workflow(
                     )
                     trigger_matched = False
 
-            elif trigger_type is WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED:
+            elif (
+                trigger_type is WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED
+                or trigger_type is WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED
+            ):
                 # document is type Document
 
                 # Document has_tags vs document tags
@@ -319,8 +325,8 @@ def document_matches_workflow(
                     == 0
                 ):
                     log_match_failure(
-                        f"Document tags {document.tags} do not include"
-                        f" {trigger.filter_has_tags}",
+                        f"Document tags {document.tags.all()} do not include"
+                        f" {trigger.filter_has_tags.all()}",
                     )
                     trigger_matched = False
 
