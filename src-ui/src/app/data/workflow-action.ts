@@ -1,6 +1,11 @@
 import { ObjectWithId } from './object-with-id'
 
+export enum WorkflowActionType {
+  Assignment = 1,
+}
 export interface WorkflowAction extends ObjectWithId {
+  type: WorkflowActionType
+
   assign_title?: string
 
   assign_tags?: number[] // Tag.id

@@ -974,6 +974,15 @@ class WorkflowTrigger(models.Model):
 
 
 class WorkflowAction(models.Model):
+    class WorkflowActionType(models.IntegerChoices):
+        ASSIGNMENT = 1, _("Assignment")
+
+    type = models.PositiveIntegerField(
+        _("Workflow Action Type"),
+        choices=WorkflowActionType.choices,
+        default=WorkflowActionType.ASSIGNMENT,
+    )
+
     assign_title = models.CharField(
         _("assign title"),
         max_length=256,

@@ -224,6 +224,14 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
+                    "type",
+                    models.PositiveIntegerField(
+                        choices=[(1, "Assignment")],
+                        default=1,
+                        verbose_name="Workflow Action Type",
+                    ),
+                ),
+                (
                     "assign_title",
                     models.CharField(
                         blank=True,

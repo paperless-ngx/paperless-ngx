@@ -21,7 +21,10 @@ import {
   DocumentSource,
   WorkflowTriggerType,
 } from 'src/app/data/workflow-trigger'
-import { WorkflowAction } from 'src/app/data/workflow-action'
+import {
+  WorkflowAction,
+  WorkflowActionType,
+} from 'src/app/data/workflow-action'
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop'
 
 export const DOCUMENT_SOURCE_OPTIONS = [
@@ -54,6 +57,13 @@ export const WORKFLOW_TYPE_OPTIONS = [
   },
 ]
 
+export const WORKFLOW_ACTION_OPTIONS = [
+  {
+    id: WorkflowActionType.Assignment,
+    name: $localize`Assignment`,
+  },
+]
+
 @Component({
   selector: 'pngx-workflow-edit-dialog',
   templateUrl: './workflow-edit-dialog.component.html',
@@ -63,6 +73,8 @@ export class WorkflowEditDialogComponent
   extends EditDialogComponent<Workflow>
   implements OnInit
 {
+  public WorkflowTriggerType = WorkflowTriggerType
+
   templates: Workflow[]
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
@@ -170,6 +182,7 @@ export class WorkflowEditDialogComponent
       this.actionFields.push(
         new FormGroup({
           id: new FormControl(action.id),
+          type: new FormControl(action.type),
           assign_title: new FormControl(action.assign_title),
           assign_tags: new FormControl(action.assign_tags),
           assign_owner: new FormControl(action.assign_owner),
@@ -191,12 +204,12 @@ export class WorkflowEditDialogComponent
     return DOCUMENT_SOURCE_OPTIONS
   }
 
-  get typeOptions() {
+  get triggerTypeOptions() {
     return WORKFLOW_TYPE_OPTIONS
   }
 
-  getTypeOptionName(type: WorkflowTriggerType): string {
-    return this.typeOptions.find((t) => t.id === type)?.name ?? ''
+  getTriggerTypeOptionName(type: WorkflowTriggerType): string {
+    return this.triggerTypeOptions.find((t) => t.id === type)?.name ?? ''
   }
 
   addTrigger() {
@@ -214,8 +227,17 @@ export class WorkflowEditDialogComponent
     this.updateTriggerActionFields()
   }
 
+  get actionTypeOptions() {
+    return WORKFLOW_ACTION_OPTIONS
+  }
+
+  getActionTypeOptionName(type: WorkflowActionType): string {
+    return this.actionTypeOptions.find((t) => t.id === type)?.name ?? ''
+  }
+
   addAction() {
     this.object.actions.push({
+      type: WorkflowActionType.Assignment,
       assign_title: null,
       assign_tags: [],
       assign_document_type: null,

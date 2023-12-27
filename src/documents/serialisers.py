@@ -1334,6 +1334,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
         model = WorkflowAction
         fields = [
             "id",
+            "type",
             "assign_title",
             "assign_tags",
             "assign_correspondent",

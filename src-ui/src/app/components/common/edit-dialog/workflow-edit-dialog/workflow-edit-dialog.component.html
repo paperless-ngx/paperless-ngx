@@ -35,9 +35,9 @@
               </div>
               <div ngbAccordion [closeOthers]="true">
                 @for (trigger of object.triggers; track trigger; let i = $index){
-                  <div ngbAccordionItem [formGroup]="triggerFields.controls[i]">
+                  <div ngbAccordionItem>
                     <div ngbAccordionHeader>
-                      <button ngbAccordionButton>{{i + 1}}. {{getTypeOptionName(triggerFields.controls[i].value.type)}}
+                      <button ngbAccordionButton>{{i + 1}}. {{getTriggerTypeOptionName(triggerFields.controls[i].value.type)}}
 
                         <button type="button" class="btn btn-link text-danger ms-3" (click)="removeTrigger(i)">
                           <svg class="sidebaricon me-1" fill="currentColor">
@@ -49,24 +49,7 @@
                     </div>
                     <div ngbAccordionCollapse>
                       <div ngbAccordionBody>
-
-                        <input type="hidden" formControlName="id" />
-                        <pngx-input-select i18n-title title="Trigger type" [horizontal]="true" [items]="typeOptions" formControlName="type" [error]="error?.type"></pngx-input-select>
-                        <p class="small" i18n>Trigger for documents that match <em>all</em> filters specified below.</p>
-                        <div class="row">
-                          <div class="col-md-6">
-                            <pngx-input-select i18n-title title="Filter sources" [items]="sourceOptions" [multiple]="true" formControlName="sources" [error]="error?.sources"></pngx-input-select>
-                            <pngx-input-text i18n-title title="Filter filename" formControlName="filter_filename" i18n-hint hint="Apply to documents that match this filename. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive." [error]="error?.filter_filename"></pngx-input-text>
-                            <pngx-input-text i18n-title title="Filter path" formControlName="filter_path" i18n-hint hint="Apply to documents that match this path. Wildcards specified as * are allowed. Case insensitive.</a>" [error]="error?.filter_path"></pngx-input-text>
-                            <pngx-input-select i18n-title title="Filter mail rule" [items]="mailRules" [allowNull]="true" formControlName="filter_mailrule" i18n-hint hint="Apply to documents consumed via this mail rule." [error]="error?.filter_mailrule"></pngx-input-select>
-                          </div>
-                          <div class="col-md-6">
-                            <pngx-input-tags [allowCreate]="false" i18n-title title="Has tags" formControlName="filter_has_tags"></pngx-input-tags>
-                            <pngx-input-select i18n-title title="Has correspondent" [items]="correspondents" [allowNull]="true" formControlName="filter_has_correspondent"></pngx-input-select>
-                            <pngx-input-select i18n-title title="Has document type" [items]="documentTypes" [allowNull]="true" formControlName="filter_has_document_type"></pngx-input-select>
-                          </div>
-                        </div>
-
+                        <ng-template [ngTemplateOutlet]="triggerForm" [ngTemplateOutletContext]="{ formGroup: triggerFields.controls[i], trigger: trigger }"></ng-template>
                       </div>
                     </div>
                   </div>
@@ -108,7 +91,7 @@
                     </div>
                     <div ngbAccordionCollapse>
                       <div ngbAccordionBody>
-
+                        <pngx-input-select i18n-title title="Action type" [horizontal]="true" [items]="actionTypeOptions" formControlName="type"></pngx-input-select>
                         <input type="hidden" formControlName="id" />
                         <div class="row">
                           <div class="col">
@@ -184,3 +167,28 @@
     <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
   </div>
 </form>
+
+<ng-template #triggerForm let-formGroup="formGroup" let-trigger="trigger">
+  <div [formGroup]="formGroup">
+    <input type="hidden" formControlName="id" />
+    <pngx-input-select i18n-title title="Trigger type" [horizontal]="true" [items]="triggerTypeOptions" formControlName="type"></pngx-input-select>
+    <p class="small" i18n>Trigger for documents that match <em>all</em> filters specified below.</p>
+    <div class="row">
+      <div class="col">
+        <pngx-input-text i18n-title title="Filter filename" formControlName="filter_filename" i18n-hint hint="Apply to documents that match this filename. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive." [error]="error?.filter_filename"></pngx-input-text>
+        @if (formGroup.get('type').value === WorkflowTriggerType.Consumption) {
+          <pngx-input-select i18n-title title="Filter sources" [items]="sourceOptions" [multiple]="true" formControlName="sources" [error]="error?.sources"></pngx-input-select>
+          <pngx-input-text i18n-title title="Filter path" formControlName="filter_path" i18n-hint hint="Apply to documents that match this path. Wildcards specified as * are allowed. Case insensitive.</a>" [error]="error?.filter_path"></pngx-input-text>
+          <pngx-input-select i18n-title title="Filter mail rule" [items]="mailRules" [allowNull]="true" formControlName="filter_mailrule" i18n-hint hint="Apply to documents consumed via this mail rule." [error]="error?.filter_mailrule"></pngx-input-select>
+        }
+      </div>
+      @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated) {
+        <div class="col-md-6">
+          <pngx-input-tags [allowCreate]="false" i18n-title title="Has tags" formControlName="filter_has_tags"></pngx-input-tags>
+          <pngx-input-select i18n-title title="Has correspondent" [items]="correspondents" [allowNull]="true" formControlName="filter_has_correspondent"></pngx-input-select>
+          <pngx-input-select i18n-title title="Has document type" [items]="documentTypes" [allowNull]="true" formControlName="filter_has_document_type"></pngx-input-select>
+        </div>
+      }
+    </div>
+  </div>
+</ng-template>

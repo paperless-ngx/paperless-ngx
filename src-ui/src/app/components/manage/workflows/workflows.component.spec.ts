@@ -22,6 +22,7 @@ import {
   DocumentSource,
   WorkflowTriggerType,
 } from 'src/app/data/workflow-trigger'
+import { WorkflowActionType } from 'src/app/data/workflow-action'
 
 const workflows: Workflow[] = [
   {
@@ -40,6 +41,7 @@ const workflows: Workflow[] = [
     actions: [
       {
         id: 1,
+        type: WorkflowActionType.Assignment,
         assign_title: 'foo',
       },
     ],
@@ -59,6 +61,7 @@ const workflows: Workflow[] = [
     actions: [
       {
         id: 2,
+        type: WorkflowActionType.Assignment,
         assign_title: 'bar',
       },
     ],

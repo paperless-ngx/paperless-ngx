@@ -22,6 +22,7 @@ import { SwitchComponent } from '../../input/switch/switch.component'
 import { EditDialogMode } from '../edit-dialog.component'
 import {
   DOCUMENT_SOURCE_OPTIONS,
+  WORKFLOW_ACTION_OPTIONS,
   WORKFLOW_TYPE_OPTIONS,
   WorkflowEditDialogComponent,
 } from './workflow-edit-dialog.component'
@@ -32,7 +33,10 @@ import {
   DocumentSource,
 } from 'src/app/data/workflow-trigger'
 import { CdkDragDrop } from '@angular/cdk/drag-drop'
-import { WorkflowAction } from 'src/app/data/workflow-action'
+import {
+  WorkflowAction,
+  WorkflowActionType,
+} from 'src/app/data/workflow-action'
 
 const workflow: Workflow = {
   name: 'Workflow 1',
@@ -50,10 +54,12 @@ const workflow: Workflow = {
   actions: [
     {
       id: 1,
+      type: WorkflowActionType.Assignment,
       assign_title: 'foo',
     },
     {
       id: 4,
+      type: WorkflowActionType.Assignment,
       assign_owner: 2,
     },
   ],
@@ -174,11 +180,17 @@ describe('ConsumptionTemplateEditDialogComponent', () => {
   it('should return source options, type options, type name', () => {
     // coverage
     expect(component.sourceOptions).toEqual(DOCUMENT_SOURCE_OPTIONS)
-    expect(component.typeOptions).toEqual(WORKFLOW_TYPE_OPTIONS)
+    expect(component.triggerTypeOptions).toEqual(WORKFLOW_TYPE_OPTIONS)
     expect(
-      component.getTypeOptionName(WorkflowTriggerType.DocumentAdded)
+      component.getTriggerTypeOptionName(WorkflowTriggerType.DocumentAdded)
     ).toEqual('Document Added')
-    expect(component.getTypeOptionName(null)).toEqual('')
+    expect(component.getTriggerTypeOptionName(null)).toEqual('')
+    expect(component.sourceOptions).toEqual(DOCUMENT_SOURCE_OPTIONS)
+    expect(component.actionTypeOptions).toEqual(WORKFLOW_ACTION_OPTIONS)
+    expect(
+      component.getActionTypeOptionName(WorkflowActionType.Assignment)
+    ).toEqual('Assignment')
+    expect(component.getActionTypeOptionName(null)).toEqual('')
   })
 
   it('should support add and remove triggers and actions', () => {
