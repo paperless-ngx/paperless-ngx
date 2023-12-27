@@ -196,7 +196,7 @@ export class WorkflowEditDialogComponent
   }
 
   getTypeOptionName(type: WorkflowTriggerType): string {
-    return this.typeOptions.find((t) => t.id === type).name ?? ''
+    return this.typeOptions.find((t) => t.id === type)?.name ?? ''
   }
 
   addTrigger() {
