@@ -17,6 +17,7 @@ const workflows: Workflow[] = [
     name: 'Workflow 1',
     id: 1,
     order: 1,
+    enabled: true,
     triggers: [
       {
         id: 1,
@@ -36,6 +37,7 @@ const workflows: Workflow[] = [
     name: 'Workflow 2',
     id: 2,
     order: 2,
+    enabled: true,
     triggers: [
       {
         id: 2,

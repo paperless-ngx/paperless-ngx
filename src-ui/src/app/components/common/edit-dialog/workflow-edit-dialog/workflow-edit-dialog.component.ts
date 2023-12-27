@@ -121,6 +121,7 @@ export class WorkflowEditDialogComponent
     return new FormGroup({
       name: new FormControl(null),
       order: new FormControl(null),
+      enabled: new FormControl(true),
       triggers: new FormArray([]),
       actions: new FormArray([]),
     })

@@ -612,7 +612,7 @@ class Consumer(LoggingMixin):
         file name filters, path filters or mail rule filter if specified
         """
         overrides = DocumentMetadataOverrides()
-        for workflow in Workflow.objects.all().order_by("order"):
+        for workflow in Workflow.objects.filter(enabled=True).order_by("order"):
             template_overrides = DocumentMetadataOverrides()
 
             if document_matches_workflow(

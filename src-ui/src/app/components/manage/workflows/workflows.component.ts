@@ -8,7 +8,6 @@ import { ToastService } from 'src/app/services/toast.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import {
   WorkflowEditDialogComponent,
-  DOCUMENT_SOURCE_OPTIONS,
   WORKFLOW_TYPE_OPTIONS,
 } from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'

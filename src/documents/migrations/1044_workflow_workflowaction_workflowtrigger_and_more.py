@@ -205,6 +205,10 @@ class Migration(migrations.Migration):
                     models.CharField(max_length=256, unique=True, verbose_name="name"),
                 ),
                 ("order", models.IntegerField(default=0, verbose_name="order")),
+                (
+                    "enabled",
+                    models.BooleanField(default=True, verbose_name="enabled"),
+                ),
             ],
         ),
         migrations.CreateModel(

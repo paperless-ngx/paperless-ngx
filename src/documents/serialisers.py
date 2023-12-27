@@ -1371,6 +1371,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "order",
+            "enabled",
             "triggers",
             "actions",
         ]

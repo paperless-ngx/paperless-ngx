@@ -529,6 +529,7 @@ def run_workflow_updated(sender, document: Document, logging_group=None, **kwarg
 
 def run_workflow(trigger_type: WorkflowTrigger.WorkflowTriggerType, document: Document):
     for workflow in Workflow.objects.filter(
+        enabled=True,
         triggers__type=trigger_type,
     ).order_by("order"):
         if matching.document_matches_workflow(

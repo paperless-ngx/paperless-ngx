@@ -1086,5 +1086,7 @@ class Workflow(models.Model):
         verbose_name=_("actions"),
     )
 
+    enabled = models.BooleanField(_("enabled"), default=True)
+
     def __str__(self):
         return f"Workflow: {self.name}"

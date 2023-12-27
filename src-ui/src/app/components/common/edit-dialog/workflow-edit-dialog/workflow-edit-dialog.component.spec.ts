@@ -18,6 +18,7 @@ import { PermissionsUserComponent } from '../../input/permissions/permissions-us
 import { SelectComponent } from '../../input/select/select.component'
 import { TagsComponent } from '../../input/tags/tags.component'
 import { TextComponent } from '../../input/text/text.component'
+import { SwitchComponent } from '../../input/switch/switch.component'
 import { EditDialogMode } from '../edit-dialog.component'
 import { WorkflowEditDialogComponent } from './workflow-edit-dialog.component'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
@@ -36,6 +37,7 @@ describe('ConsumptionTemplateEditDialogComponent', () => {
         SelectComponent,
         TextComponent,
         NumberComponent,
+        SwitchComponent,
         TagsComponent,
         PermissionsUserComponent,
         PermissionsGroupComponent,

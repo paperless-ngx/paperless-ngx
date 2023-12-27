@@ -7,6 +7,8 @@ export interface Workflow extends ObjectWithId {
 
   order: number
 
+  enabled: boolean
+
   triggers: WorkflowTrigger[]
 
   actions: WorkflowAction[]
