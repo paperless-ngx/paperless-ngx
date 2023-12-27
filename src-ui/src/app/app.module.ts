@@ -108,6 +108,7 @@ import { ProfileEditDialogComponent } from './components/common/profile-edit-dia
 import { PdfViewerComponent } from './components/common/pdf-viewer/pdf-viewer.component'
 import { DocumentLinkComponent } from './components/common/input/document-link/document-link.component'
 import { PreviewPopupComponent } from './components/common/preview-popup/preview-popup.component'
+import { SwitchComponent } from './components/common/input/switch/switch.component'
 
 import localeAf from '@angular/common/locales/af'
 import localeAr from '@angular/common/locales/ar'
@@ -263,6 +264,7 @@ function initializeApp(settings: SettingsService) {
     PdfViewerComponent,
     DocumentLinkComponent,
     PreviewPopupComponent,
+    SwitchComponent,
   ],
   imports: [
     BrowserModule,
