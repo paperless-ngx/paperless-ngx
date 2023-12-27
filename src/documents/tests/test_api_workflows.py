@@ -36,10 +36,12 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.c = Correspondent.objects.create(name="Correspondent Name")
         self.c2 = Correspondent.objects.create(name="Correspondent Name 2")
         self.dt = DocumentType.objects.create(name="DocType Name")
+        self.dt2 = DocumentType.objects.create(name="DocType Name 2")
         self.t1 = Tag.objects.create(name="t1")
         self.t2 = Tag.objects.create(name="t2")
         self.t3 = Tag.objects.create(name="t3")
-        self.sp = StoragePath.objects.create(path="/test/")
+        self.sp = StoragePath.objects.create(name="Storage Path 1", path="/test/")
+        self.sp2 = StoragePath.objects.create(name="Storage Path 2", path="/test2/")
         self.cf1 = CustomField.objects.create(name="Custom Field 1", data_type="string")
         self.cf2 = CustomField.objects.create(
             name="Custom Field 2",
@@ -102,7 +104,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
     def test_api_create_workflow(self):
         """
         GIVEN:
-            - API request to create a workflow, trigger and action
+            - API request to create a workflow, trigger and action separately
         WHEN:
             - API is called
         THEN:
@@ -151,6 +153,56 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                         {
                             "id": action_response.data["id"],
                             "assign_title": action_response.data["assign_title"],
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Workflow.objects.count(), 2)
+
+    def test_api_create_workflow_nested(self):
+        """
+        GIVEN:
+            - API request to create a workflow with nested trigger and action
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP response
+            - New workflow, trigger and action are created
+        """
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow 2",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "sources": [DocumentSource.ApiUpload],
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "filter_filename": "*",
+                            "filter_path": "*/samples/*",
+                            "filter_has_tags": [self.t1.id],
+                            "filter_has_document_type": self.dt.id,
+                            "filter_has_correspondent": self.c.id,
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "assign_title": "Action Title",
+                            "assign_tags": [self.t2.id],
+                            "assign_document_type": self.dt2.id,
+                            "assign_correspondent": self.c2.id,
+                            "assign_storage_path": self.sp2.id,
+                            "assign_owner": self.user2.id,
+                            "assign_view_users": [self.user2.id],
+                            "assign_view_groups": [self.group1.id],
+                            "assign_change_users": [self.user2.id],
+                            "assign_change_groups": [self.group1.id],
+                            "assign_custom_fields": [self.cf2.id],
                         },
                     ],
                 },
@@ -302,3 +354,82 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(WorkflowTrigger.objects.count(), 2)
         trigger = WorkflowTrigger.objects.get(id=response.data["id"])
         self.assertEqual(trigger.sources, [int(DocumentSource.MailFetch).__str__()])
+
+    def test_api_update_workflow_nested_triggers_actions(self):
+        """
+        GIVEN:
+            - Existing workflow with trigger and action
+        WHEN:
+            - API request to update an existing workflow with nested triggers actions
+        THEN:
+            - Triggers and actions are updated
+        """
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{self.workflow.id}/",
+            json.dumps(
+                {
+                    "name": "Workflow Updated",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+                            "filter_has_tags": [self.t1.id],
+                            "filter_has_correspondent": self.c.id,
+                            "filter_has_document_type": self.dt.id,
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "assign_title": "Action New Title",
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        workflow = Workflow.objects.get(id=response.data["id"])
+        self.assertEqual(workflow.name, "Workflow Updated")
+        self.assertEqual(workflow.triggers.first().filter_has_tags.first(), self.t1)
+        self.assertEqual(workflow.actions.first().assign_title, "Action New Title")
+
+    def test_api_auto_remove_orphaned_triggers_actions(self):
+        """
+        GIVEN:
+            - Existing trigger and action
+        WHEN:
+            - API request is made which creates new trigger / actions
+        THEN:
+            - "Orphaned" triggers and actions are removed
+        """
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{self.workflow.id}/",
+            json.dumps(
+                {
+                    "name": "Workflow Updated",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+                            "filter_has_tags": [self.t1.id],
+                            "filter_has_correspondent": self.c.id,
+                            "filter_has_document_type": self.dt.id,
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "assign_title": "Action New Title",
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        workflow = Workflow.objects.get(id=response.data["id"])
+        self.assertEqual(WorkflowTrigger.objects.all().count(), 1)
+        self.assertNotEqual(workflow.triggers.first().id, self.trigger.id)
+        self.assertEqual(WorkflowAction.objects.all().count(), 1)
+        self.assertNotEqual(workflow.actions.first().id, self.action.id)

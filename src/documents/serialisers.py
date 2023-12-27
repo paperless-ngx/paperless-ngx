@@ -1384,7 +1384,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
             for trigger in triggers:
                 filter_has_tags = trigger.pop("filter_has_tags", None)
                 trigger_instance, _ = WorkflowTrigger.objects.update_or_create(
-                    id=trigger["id"],
+                    id=trigger["id"] if "id" in trigger else None,
                     defaults=trigger,
                 )
                 if filter_has_tags is not None:
@@ -1400,7 +1400,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
                 assign_change_groups = action.pop("assign_change_groups", None)
                 assign_custom_fields = action.pop("assign_custom_fields", None)
                 action_instance, _ = WorkflowAction.objects.update_or_create(
-                    id=action["id"],
+                    id=action["id"] if "id" in action else None,
                     defaults=action,
                 )
                 if assign_tags is not None:
