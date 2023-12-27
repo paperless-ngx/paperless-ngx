@@ -21,13 +21,29 @@
         <div ngbAccordionCollapse>
           <div ngbAccordionBody>
             <ng-template>
-              <p class="small" i18n>Trigger Workflow On:</p>
+              <div class="d-flex">
+                <p class="p-2" i18n>Trigger Workflow On:</p>
+                <button type="button" class="btn btn-sm btn-outline-primary ms-auto mb-3" (click)="addTrigger()">
+                  <svg class="sidebaricon me-1" fill="currentColor">
+                    <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
+                  </svg>
+                  <ng-container i18n>Add Trigger</ng-container>
+                </button>
+              </div>
               <div ngbAccordion [closeOthers]="true">
                 @for (trigger of object.triggers; track trigger; let i = $index){
                   <div ngbAccordionItem [formGroup]="triggerFields.controls[i]">
-                    <h2 ngbAccordionHeader>
-                      <button ngbAccordionButton>{{getTypeOptionName(triggerFields.controls[i].value.type)}} ({{i + 1}})</button>
-                    </h2>
+                    <div ngbAccordionHeader>
+                      <button ngbAccordionButton>{{i + 1}}. {{getTypeOptionName(triggerFields.controls[i].value.type)}}
+
+                        <button type="button" class="btn btn-link text-danger ms-3" (click)="removeTrigger(i)">
+                          <svg class="sidebaricon me-1" fill="currentColor">
+                            <use xlink:href="assets/bootstrap-icons.svg#trash" />
+                          </svg>
+                          <ng-container i18n>Delete</ng-container>
+                        </button>
+                      </button>
+                    </div>
                     <div ngbAccordionCollapse>
                       <div ngbAccordionBody>
 
@@ -64,13 +80,29 @@
         <div ngbAccordionCollapse>
           <div ngbAccordionBody>
             <ng-template>
-              <p class="small" i18n>Apply Actions:</p>
+              <div class="d-flex">
+                <p class="p-2" i18n>Apply Actions:</p>
+                <button type="button" class="btn btn-sm btn-outline-primary ms-auto mb-3" (click)="addAction()">
+                  <svg class="sidebaricon me-1" fill="currentColor">
+                    <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
+                  </svg>
+                  <ng-container i18n>Add Action</ng-container>
+                </button>
+              </div>
               <div ngbAccordion [closeOthers]="true">
                 @for (action of object.actions; track action; let i = $index){
                   <div ngbAccordionItem [formGroup]="actionFields.controls[i]">
-                    <h2 ngbAccordionHeader>
-                      <button ngbAccordionButton>{{i + 1}}</button>
-                    </h2>
+                    <div ngbAccordionHeader>
+                      <button ngbAccordionButton><ng-container i18n>Action</ng-container> {{i + 1}}
+
+                        <button type="button" class="btn btn-link text-danger ms-3" (click)="removeAction(i)">
+                          <svg class="sidebaricon me-1" fill="currentColor">
+                            <use xlink:href="assets/bootstrap-icons.svg#trash" />
+                          </svg>
+                          <ng-container i18n>Delete</ng-container>
+                        </button>
+                      </button>
+                    </div>
                     <div ngbAccordionCollapse>
                       <div ngbAccordionBody>
 

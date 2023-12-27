@@ -195,4 +195,47 @@ export class WorkflowEditDialogComponent
   getTypeOptionName(type: WorkflowTriggerType): string {
     return this.typeOptions.find((t) => t.id === type).name ?? ''
   }
+
+  addTrigger() {
+    this.object.triggers.push({
+      type: WorkflowTriggerType.Consumption,
+      sources: [],
+      filter_filename: null,
+      filter_path: null,
+      filter_mailrule: null,
+      filter_has_tags: [],
+      filter_has_correspondent: null,
+      filter_has_document_type: null,
+    })
+
+    this.updateTriggerActionFields()
+  }
+
+  addAction() {
+    this.object.actions.push({
+      assign_title: null,
+      assign_tags: [],
+      assign_document_type: null,
+      assign_correspondent: null,
+      assign_storage_path: null,
+      assign_owner: null,
+      assign_view_users: [],
+      assign_view_groups: [],
+      assign_change_users: [],
+      assign_change_groups: [],
+      assign_custom_fields: [],
+    })
+
+    this.updateTriggerActionFields()
+  }
+
+  removeTrigger(index: number) {
+    this.object.triggers.splice(index, 1)
+    this.updateTriggerActionFields()
+  }
+
+  removeAction(index: number) {
+    this.object.actions.splice(index, 1)
+    this.updateTriggerActionFields()
+  }
 }

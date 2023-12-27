@@ -1262,10 +1262,10 @@ class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissions
 
 
 class WorkflowTriggerSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(required=False)
+    id = serializers.IntegerField(required=False, allow_null=True)
     sources = fields.MultipleChoiceField(
         choices=WorkflowTrigger.DocumentSourceChoices.choices,
-        allow_empty=False,
+        allow_empty=True,
         default={
             DocumentSource.ConsumeFolder,
             DocumentSource.ApiUpload,
@@ -1324,7 +1324,7 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
 
 
 class WorkflowActionSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(required=False)
+    id = serializers.IntegerField(required=False, allow_null=True)
     assign_correspondent = CorrespondentField(allow_null=True, required=False)
     assign_tags = TagsField(many=True, allow_null=True, required=False)
     assign_document_type = DocumentTypeField(allow_null=True, required=False)
@@ -1381,10 +1381,13 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
         if triggers is not None:
             for trigger in triggers:
+                filter_has_tags = trigger.pop("filter_has_tags", None)
                 trigger_instance, _ = WorkflowTrigger.objects.update_or_create(
                     id=trigger["id"],
                     defaults=trigger,
                 )
+                if filter_has_tags is not None:
+                    trigger_instance.filter_has_tags.set(filter_has_tags)
                 set_triggers.append(trigger_instance)
 
         if actions is not None:
@@ -1396,7 +1399,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
                 assign_change_groups = action.pop("assign_change_groups", None)
                 assign_custom_fields = action.pop("assign_custom_fields", None)
                 action_instance, _ = WorkflowAction.objects.update_or_create(
-                    id=trigger["id"],
+                    id=action["id"],
                     defaults=action,
                 )
                 if assign_tags is not None:
@@ -1416,6 +1419,19 @@ class WorkflowSerializer(serializers.ModelSerializer):
         instance.triggers.set(set_triggers)
         instance.actions.set(set_actions)
         instance.save()
+
+    def prune_triggers_and_actions(self):
+        """
+        ManyToMany fields dont support e.g. on_delete so we need to discard unattached
+        triggers and actionas manually
+        """
+        for trigger in WorkflowTrigger.objects.all():
+            if trigger.workflows.all().count() == 0:
+                trigger.delete()
+
+        for action in WorkflowAction.objects.all():
+            if action.workflows.all().count() == 0:
+                action.delete()
 
     def create(self, validated_data: Any) -> Workflow:
         if "triggers" in validated_data:
@@ -1440,5 +1456,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
         instance = super().update(instance, validated_data)
 
         self.update_triggers_and_actions(instance, triggers, actions)
+
+        self.prune_triggers_and_actions()
 
         return instance
