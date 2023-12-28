@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-05 08:26-0800\n"
-"PO-Revision-Date: 2023-12-05 16:27\n"
+"POT-Creation-Date: 2023-12-09 10:53-0800\n"
+"PO-Revision-Date: 2023-12-19 20:45\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumenter"
 
-#: documents/models.py:36 documents/models.py:734
+#: documents/models.py:36 documents/models.py:736
 msgid "owner"
 msgstr "eier"
 
@@ -53,7 +53,7 @@ msgstr "Fuzzy word"
 msgid "Automatic"
 msgstr "Automatisk"
 
-#: documents/models.py:62 documents/models.py:402 documents/models.py:895
+#: documents/models.py:62 documents/models.py:402 documents/models.py:897
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
 msgid "name"
 msgstr "navn"
@@ -130,7 +130,7 @@ msgstr "Kryptert med GNU Personvernvakt"
 msgid "title"
 msgstr "tittel"
 
-#: documents/models.py:171 documents/models.py:648
+#: documents/models.py:171 documents/models.py:650
 msgid "content"
 msgstr "innhold"
 
@@ -158,8 +158,8 @@ msgstr "arkiv sjekksum"
 msgid "The checksum of the archived document."
 msgstr "Sjekksummen av det arkiverte dokumentet."
 
-#: documents/models.py:205 documents/models.py:385 documents/models.py:654
-#: documents/models.py:692 documents/models.py:762 documents/models.py:799
+#: documents/models.py:205 documents/models.py:385 documents/models.py:656
+#: documents/models.py:694 documents/models.py:764 documents/models.py:801
 msgid "created"
 msgstr "opprettet"
 
@@ -207,7 +207,7 @@ msgstr "arkiver serienummer"
 msgid "The position of this document in your physical document archive."
 msgstr "Dokumentets posisjon i ditt fysiske dokumentarkiv."
 
-#: documents/models.py:279 documents/models.py:665 documents/models.py:719
+#: documents/models.py:279 documents/models.py:667 documents/models.py:721
 msgid "document"
 msgstr "dokument"
 
@@ -255,7 +255,7 @@ msgstr "Logg"
 msgid "logs"
 msgstr "logger"
 
-#: documents/models.py:399 documents/models.py:464
+#: documents/models.py:399 documents/models.py:466
 msgid "saved view"
 msgstr "lagret visning"
 
@@ -423,293 +423,301 @@ msgstr "har ikke eier"
 msgid "does not have owner in"
 msgstr "har ikke eier i"
 
-#: documents/models.py:467
+#: documents/models.py:458
+msgid "has custom field value"
+msgstr ""
+
+#: documents/models.py:459
+msgid "is shared by me"
+msgstr ""
+
+#: documents/models.py:469
 msgid "rule type"
 msgstr "Type regel"
 
-#: documents/models.py:469
+#: documents/models.py:471
 msgid "value"
 msgstr "verdi"
 
-#: documents/models.py:472
+#: documents/models.py:474
 msgid "filter rule"
 msgstr "filtrer regel"
 
-#: documents/models.py:473
+#: documents/models.py:475
 msgid "filter rules"
 msgstr "filtrer regler"
 
-#: documents/models.py:584
+#: documents/models.py:586
 msgid "Task ID"
 msgstr "Oppgave ID"
 
-#: documents/models.py:585
+#: documents/models.py:587
 msgid "Celery ID for the Task that was run"
 msgstr "Celery ID for oppgaven som ble kjørt"
 
-#: documents/models.py:590
+#: documents/models.py:592
 msgid "Acknowledged"
 msgstr "Bekreftet"
 
-#: documents/models.py:591
+#: documents/models.py:593
 msgid "If the task is acknowledged via the frontend or API"
 msgstr "Hvis oppgaven bekreftes via frontend eller API"
 
-#: documents/models.py:597
+#: documents/models.py:599
 msgid "Task Filename"
 msgstr "Filnavn for oppgave"
 
-#: documents/models.py:598
+#: documents/models.py:600
 msgid "Name of the file which the Task was run for"
 msgstr "Navn på filen som oppgaven ble kjørt for"
 
-#: documents/models.py:604
+#: documents/models.py:606
 msgid "Task Name"
 msgstr "Oppgavenavn"
 
-#: documents/models.py:605
+#: documents/models.py:607
 msgid "Name of the Task which was run"
 msgstr "Navn på Oppgaven som ble kjørt"
 
-#: documents/models.py:612
+#: documents/models.py:614
 msgid "Task State"
 msgstr "Oppgave tilstand"
 
-#: documents/models.py:613
+#: documents/models.py:615
 msgid "Current state of the task being run"
 msgstr "Status for oppgaven som kjører"
 
-#: documents/models.py:618
+#: documents/models.py:620
 msgid "Created DateTime"
 msgstr "Opprettet DatoTid"
 
-#: documents/models.py:619
+#: documents/models.py:621
 msgid "Datetime field when the task result was created in UTC"
 msgstr "Tidsstempel for når oppgaven ble opprettet i UTC"
 
-#: documents/models.py:624
+#: documents/models.py:626
 msgid "Started DateTime"
 msgstr "Startet DatoTid"
 
-#: documents/models.py:625
+#: documents/models.py:627
 msgid "Datetime field when the task was started in UTC"
 msgstr "Tidsstempel for når oppgaven ble startet i UTC"
 
-#: documents/models.py:630
+#: documents/models.py:632
 msgid "Completed DateTime"
 msgstr "Fullført tidsstempel"
 
-#: documents/models.py:631
+#: documents/models.py:633
 msgid "Datetime field when the task was completed in UTC"
 msgstr "Tidsstempel for når oppgaven ble fullført i UTC"
 
-#: documents/models.py:636
+#: documents/models.py:638
 msgid "Result Data"
 msgstr "Resultat data"
 
-#: documents/models.py:638
+#: documents/models.py:640
 msgid "The data returned by the task"
 msgstr "Dataene returnert av oppgaven"
 
-#: documents/models.py:650
+#: documents/models.py:652
 msgid "Note for the document"
 msgstr "Merknad til dokumentet"
 
-#: documents/models.py:674
+#: documents/models.py:676
 msgid "user"
 msgstr "bruker"
 
-#: documents/models.py:679
+#: documents/models.py:681
 msgid "note"
 msgstr "merknad"
 
-#: documents/models.py:680
+#: documents/models.py:682
 msgid "notes"
 msgstr "merknader"
 
-#: documents/models.py:688
+#: documents/models.py:690
 msgid "Archive"
 msgstr "Arkiv"
 
-#: documents/models.py:689
+#: documents/models.py:691
 msgid "Original"
 msgstr "Original"
 
-#: documents/models.py:700
+#: documents/models.py:702
 msgid "expiration"
 msgstr "utløp"
 
-#: documents/models.py:707
+#: documents/models.py:709
 msgid "slug"
 msgstr ""
 
-#: documents/models.py:739
+#: documents/models.py:741
 msgid "share link"
 msgstr "del kobling"
 
-#: documents/models.py:740
+#: documents/models.py:742
 msgid "share links"
 msgstr ""
 
-#: documents/models.py:752
+#: documents/models.py:754
 msgid "String"
 msgstr ""
 
-#: documents/models.py:753
+#: documents/models.py:755
 msgid "URL"
 msgstr ""
 
-#: documents/models.py:754
+#: documents/models.py:756
 msgid "Date"
 msgstr ""
 
-#: documents/models.py:755
+#: documents/models.py:757
 msgid "Boolean"
 msgstr ""
 
-#: documents/models.py:756
+#: documents/models.py:758
 msgid "Integer"
 msgstr ""
 
-#: documents/models.py:757
+#: documents/models.py:759
 msgid "Float"
 msgstr ""
 
-#: documents/models.py:758
+#: documents/models.py:760
 msgid "Monetary"
 msgstr ""
 
-#: documents/models.py:759
+#: documents/models.py:761
 msgid "Document Link"
 msgstr ""
 
-#: documents/models.py:771
+#: documents/models.py:773
 msgid "data type"
 msgstr ""
 
-#: documents/models.py:779
+#: documents/models.py:781
 msgid "custom field"
 msgstr ""
 
-#: documents/models.py:780
+#: documents/models.py:782
 msgid "custom fields"
 msgstr ""
 
-#: documents/models.py:842
+#: documents/models.py:844
 msgid "custom field instance"
 msgstr ""
 
-#: documents/models.py:843
+#: documents/models.py:845
 msgid "custom field instances"
 msgstr ""
 
-#: documents/models.py:891
+#: documents/models.py:893
 msgid "Consume Folder"
 msgstr ""
 
-#: documents/models.py:892
+#: documents/models.py:894
 msgid "Api Upload"
 msgstr "API-opplasting"
 
-#: documents/models.py:893
+#: documents/models.py:895
 msgid "Mail Fetch"
 msgstr "Epost-henting"
 
-#: documents/models.py:897 paperless_mail/models.py:95
+#: documents/models.py:899 paperless_mail/models.py:95
 msgid "order"
 msgstr "ordre"
 
-#: documents/models.py:906
+#: documents/models.py:908
 msgid "filter path"
 msgstr "filtrer sti"
 
-#: documents/models.py:911
+#: documents/models.py:913
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
 msgstr "Bare last inn dokumenter med en sti som samsvarer med dette hvis angitt. Jokertegn angitt som * er tillatt. Saker er usensitive."
 
-#: documents/models.py:918
+#: documents/models.py:920
 msgid "filter filename"
 msgstr "filtrer filnavn"
 
-#: documents/models.py:923 paperless_mail/models.py:148
+#: documents/models.py:925 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "Bare bruke dokumenter som samsvarer med dette filnavnet hvis angitt. Jokertegn som *.pdf eller *faktura* er tillatt. Saksfortegnet."
 
-#: documents/models.py:934
+#: documents/models.py:936
 msgid "filter documents from this mail rule"
 msgstr "filtrere dokumenter fra denne epostregelen"
 
-#: documents/models.py:938
+#: documents/models.py:940
 msgid "assign title"
 msgstr "tildel tittel"
 
-#: documents/models.py:943
+#: documents/models.py:945
 msgid "Assign a document title, can include some placeholders, see documentation."
 msgstr "Tilordne en dokumenttittel, kan inkludere noen plassholdere, se dokumentasjon."
 
-#: documents/models.py:951 paperless_mail/models.py:216
+#: documents/models.py:953 paperless_mail/models.py:216
 msgid "assign this tag"
 msgstr "tilordne denne taggen"
 
-#: documents/models.py:959 paperless_mail/models.py:224
+#: documents/models.py:961 paperless_mail/models.py:224
 msgid "assign this document type"
 msgstr "tilordne denne dokumenttypen"
 
-#: documents/models.py:967 paperless_mail/models.py:238
+#: documents/models.py:969 paperless_mail/models.py:238
 msgid "assign this correspondent"
 msgstr "Tildel denne korrespondenten"
 
-#: documents/models.py:975
+#: documents/models.py:977
 msgid "assign this storage path"
 msgstr "tilordne denne lagringsstien"
 
-#: documents/models.py:984
+#: documents/models.py:986
 msgid "assign this owner"
 msgstr "tilordne denne eieren"
 
-#: documents/models.py:991
+#: documents/models.py:993
 msgid "grant view permissions to these users"
 msgstr "gir lesetilgang til disse brukerne"
 
-#: documents/models.py:998
+#: documents/models.py:1000
 msgid "grant view permissions to these groups"
 msgstr "gi lesetilgang til disse brukerne"
 
-#: documents/models.py:1005
+#: documents/models.py:1007
 msgid "grant change permissions to these users"
 msgstr "gir skrivetilgang til disse brukerne"
 
-#: documents/models.py:1012
+#: documents/models.py:1014
 msgid "grant change permissions to these groups"
 msgstr "gi skrivetilgang til disse gruppene"
 
-#: documents/models.py:1019
+#: documents/models.py:1021
 msgid "assign these custom fields"
 msgstr ""
 
-#: documents/models.py:1023
+#: documents/models.py:1025
 msgid "consumption template"
 msgstr "forbruksmal"
 
-#: documents/models.py:1024
+#: documents/models.py:1026
 msgid "consumption templates"
 msgstr "forbruksmaler"
 
-#: documents/serialisers.py:102
+#: documents/serialisers.py:105
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Ugyldig regulært uttrykk: %(error)s"
 
-#: documents/serialisers.py:377
+#: documents/serialisers.py:399
 msgid "Invalid color."
 msgstr "Ugyldig farge."
 
-#: documents/serialisers.py:842
+#: documents/serialisers.py:865
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Filtype %(type)s støttes ikke"
 
-#: documents/serialisers.py:939
+#: documents/serialisers.py:962
 msgid "Invalid variable detected."
 msgstr "Ugyldig variabel oppdaget."
 

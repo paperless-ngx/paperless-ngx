@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-05 08:26-0800\n"
-"PO-Revision-Date: 2023-12-09 00:23\n"
+"POT-Creation-Date: 2023-12-09 10:53-0800\n"
+"PO-Revision-Date: 2023-12-25 12:09\n"
 "Last-Translator: \n"
 "Language-Team: Hebrew\n"
 "Language: he_IL\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid "Documents"
 msgstr "מסמכים"
 
-#: documents/models.py:36 documents/models.py:734
+#: documents/models.py:36 documents/models.py:736
 msgid "owner"
 msgstr "בעלים"
 
@@ -53,7 +53,7 @@ msgstr "מילה מעורפלת"
 msgid "Automatic"
 msgstr "אוטומטי"
 
-#: documents/models.py:62 documents/models.py:402 documents/models.py:895
+#: documents/models.py:62 documents/models.py:402 documents/models.py:897
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
 msgid "name"
 msgstr "שם"
@@ -130,7 +130,7 @@ msgstr "הוצפן באמצעות GNU Privacy Guard"
 msgid "title"
 msgstr "כותרת"
 
-#: documents/models.py:171 documents/models.py:648
+#: documents/models.py:171 documents/models.py:650
 msgid "content"
 msgstr "תוכן"
 
@@ -158,8 +158,8 @@ msgstr "מחרוזת בדיקה לארכיון"
 msgid "The checksum of the archived document."
 msgstr "מחרוזת הבדיקה למסמך בארכיון."
 
-#: documents/models.py:205 documents/models.py:385 documents/models.py:654
-#: documents/models.py:692 documents/models.py:762 documents/models.py:799
+#: documents/models.py:205 documents/models.py:385 documents/models.py:656
+#: documents/models.py:694 documents/models.py:764 documents/models.py:801
 msgid "created"
 msgstr "נוצר"
 
@@ -207,7 +207,7 @@ msgstr "מספר סידורי בארכיון"
 msgid "The position of this document in your physical document archive."
 msgstr "מיקומו של מסמך זה בארכיון המסמכים הפיזי שלך."
 
-#: documents/models.py:279 documents/models.py:665 documents/models.py:719
+#: documents/models.py:279 documents/models.py:667 documents/models.py:721
 msgid "document"
 msgstr "מסמך"
 
@@ -255,7 +255,7 @@ msgstr "יומן רישום"
 msgid "logs"
 msgstr "יומני רישום"
 
-#: documents/models.py:399 documents/models.py:464
+#: documents/models.py:399 documents/models.py:466
 msgid "saved view"
 msgstr "תצוגה שמורה"
 
@@ -385,27 +385,27 @@ msgstr "מיקום האיחסון"
 
 #: documents/models.py:448
 msgid "has correspondent in"
-msgstr ""
+msgstr "קיים מכותב ב"
 
 #: documents/models.py:449
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "ללא מכותב"
 
 #: documents/models.py:450
 msgid "has document type in"
-msgstr ""
+msgstr "סוג מסמך הוא"
 
 #: documents/models.py:451
 msgid "does not have document type in"
-msgstr ""
+msgstr "ללא סיווג סוג מסמך"
 
 #: documents/models.py:452
 msgid "has storage path in"
-msgstr ""
+msgstr "נתיב האחסון"
 
 #: documents/models.py:453
 msgid "does not have storage path in"
-msgstr ""
+msgstr "ללא נתיב אחסון"
 
 #: documents/models.py:454
 msgid "owner is"
@@ -423,293 +423,301 @@ msgstr "אין בעלים"
 msgid "does not have owner in"
 msgstr "אין בעלים תחת"
 
-#: documents/models.py:467
+#: documents/models.py:458
+msgid "has custom field value"
+msgstr "עם שדה מותאם אישית"
+
+#: documents/models.py:459
+msgid "is shared by me"
+msgstr "משותף"
+
+#: documents/models.py:469
 msgid "rule type"
 msgstr "סוג כלל"
 
-#: documents/models.py:469
+#: documents/models.py:471
 msgid "value"
 msgstr "ערך"
 
-#: documents/models.py:472
+#: documents/models.py:474
 msgid "filter rule"
 msgstr "חוק סינון"
 
-#: documents/models.py:473
+#: documents/models.py:475
 msgid "filter rules"
 msgstr "חוקי סינון"
 
-#: documents/models.py:584
+#: documents/models.py:586
 msgid "Task ID"
 msgstr "מספר משימה"
 
-#: documents/models.py:585
+#: documents/models.py:587
 msgid "Celery ID for the Task that was run"
 msgstr "מזהה סלרי עבור המשימה שהופעלה"
 
-#: documents/models.py:590
+#: documents/models.py:592
 msgid "Acknowledged"
 msgstr "מודע"
 
-#: documents/models.py:591
+#: documents/models.py:593
 msgid "If the task is acknowledged via the frontend or API"
 msgstr "אם המשימה מאושרת דרך ה-frontend או ה-API"
 
-#: documents/models.py:597
+#: documents/models.py:599
 msgid "Task Filename"
 msgstr "שם קובץ משימה"
 
-#: documents/models.py:598
+#: documents/models.py:600
 msgid "Name of the file which the Task was run for"
 msgstr "שם הקובץ שעבורו בוצעה המשימה"
 
-#: documents/models.py:604
+#: documents/models.py:606
 msgid "Task Name"
 msgstr "שם המשימה"
 
-#: documents/models.py:605
+#: documents/models.py:607
 msgid "Name of the Task which was run"
 msgstr "שם המשימה שתורץ"
 
-#: documents/models.py:612
+#: documents/models.py:614
 msgid "Task State"
 msgstr "מצב המשימה"
 
-#: documents/models.py:613
+#: documents/models.py:615
 msgid "Current state of the task being run"
 msgstr "מצב הנוכחי של המשימה אשר רצה"
 
-#: documents/models.py:618
+#: documents/models.py:620
 msgid "Created DateTime"
 msgstr "יצירת תאריך שעה"
 
-#: documents/models.py:619
+#: documents/models.py:621
 msgid "Datetime field when the task result was created in UTC"
 msgstr "שדה תאריך שעה כאשר תוצאת המשימה נוצרה ב-UTC"
 
-#: documents/models.py:624
+#: documents/models.py:626
 msgid "Started DateTime"
 msgstr "תאריך שעה התחילה"
 
-#: documents/models.py:625
+#: documents/models.py:627
 msgid "Datetime field when the task was started in UTC"
 msgstr "שדה תאריך שעה כאשר תוצאת המשימה נוצרה ב-UTC"
 
-#: documents/models.py:630
+#: documents/models.py:632
 msgid "Completed DateTime"
 msgstr "תאריך שעה הושלמה"
 
-#: documents/models.py:631
+#: documents/models.py:633
 msgid "Datetime field when the task was completed in UTC"
 msgstr "שדה תאריך שעה כאשר תוצאת המשימה נוצרה ב-UTC"
 
-#: documents/models.py:636
+#: documents/models.py:638
 msgid "Result Data"
 msgstr "תוצאת מידע"
 
-#: documents/models.py:638
+#: documents/models.py:640
 msgid "The data returned by the task"
 msgstr "המידע מאוחזר ע\"י המשימה"
 
-#: documents/models.py:650
+#: documents/models.py:652
 msgid "Note for the document"
 msgstr "הערה להמסמך"
 
-#: documents/models.py:674
+#: documents/models.py:676
 msgid "user"
 msgstr "משתמש"
 
-#: documents/models.py:679
+#: documents/models.py:681
 msgid "note"
-msgstr ""
+msgstr "הערה"
 
-#: documents/models.py:680
+#: documents/models.py:682
 msgid "notes"
-msgstr ""
+msgstr "הערות"
 
-#: documents/models.py:688
+#: documents/models.py:690
 msgid "Archive"
-msgstr ""
+msgstr "ארכיון"
 
-#: documents/models.py:689
+#: documents/models.py:691
 msgid "Original"
 msgstr "מקור"
 
-#: documents/models.py:700
+#: documents/models.py:702
 msgid "expiration"
-msgstr ""
+msgstr "תפוגה"
 
-#: documents/models.py:707
+#: documents/models.py:709
 msgid "slug"
-msgstr ""
+msgstr "טוקן"
 
-#: documents/models.py:739
+#: documents/models.py:741
 msgid "share link"
 msgstr "שתף קישור"
 
-#: documents/models.py:740
+#: documents/models.py:742
 msgid "share links"
 msgstr "שתף קישורים"
 
-#: documents/models.py:752
+#: documents/models.py:754
 msgid "String"
-msgstr ""
+msgstr "מחרוזת"
 
-#: documents/models.py:753
+#: documents/models.py:755
 msgid "URL"
 msgstr "כתובת URL"
 
-#: documents/models.py:754
+#: documents/models.py:756
 msgid "Date"
 msgstr "תאריך"
 
-#: documents/models.py:755
-msgid "Boolean"
-msgstr ""
-
-#: documents/models.py:756
-msgid "Integer"
-msgstr ""
-
 #: documents/models.py:757
-msgid "Float"
-msgstr ""
+msgid "Boolean"
+msgstr "בוליאני"
 
 #: documents/models.py:758
-msgid "Monetary"
-msgstr ""
+msgid "Integer"
+msgstr "מספר שלם"
 
 #: documents/models.py:759
+msgid "Float"
+msgstr "צף"
+
+#: documents/models.py:760
+msgid "Monetary"
+msgstr "כספי"
+
+#: documents/models.py:761
 msgid "Document Link"
-msgstr ""
+msgstr "קישור למסמך"
 
-#: documents/models.py:771
+#: documents/models.py:773
 msgid "data type"
-msgstr ""
+msgstr "סוג מידע:"
 
-#: documents/models.py:779
+#: documents/models.py:781
 msgid "custom field"
 msgstr "שדה מותאם אישית"
 
-#: documents/models.py:780
+#: documents/models.py:782
 msgid "custom fields"
 msgstr "שדות מותאמים אישית"
 
-#: documents/models.py:842
+#: documents/models.py:844
 msgid "custom field instance"
-msgstr ""
+msgstr "שדה מותאם אישית"
 
-#: documents/models.py:843
+#: documents/models.py:845
 msgid "custom field instances"
-msgstr ""
-
-#: documents/models.py:891
-msgid "Consume Folder"
-msgstr ""
-
-#: documents/models.py:892
-msgid "Api Upload"
-msgstr ""
+msgstr "שדות מותאמים אישית"
 
 #: documents/models.py:893
-msgid "Mail Fetch"
-msgstr ""
+msgid "Consume Folder"
+msgstr "עיבוד תיקיה"
 
-#: documents/models.py:897 paperless_mail/models.py:95
+#: documents/models.py:894
+msgid "Api Upload"
+msgstr "העלאה באמצעות API"
+
+#: documents/models.py:895
+msgid "Mail Fetch"
+msgstr "הורד מייל"
+
+#: documents/models.py:899 paperless_mail/models.py:95
 msgid "order"
 msgstr "סדר"
 
-#: documents/models.py:906
+#: documents/models.py:908
 msgid "filter path"
-msgstr ""
+msgstr "נתיב מסנן"
 
-#: documents/models.py:911
+#: documents/models.py:913
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr ""
+msgstr "עבד רק קבצים המצוים בנתיב זה אם מוגדר. "
 
-#: documents/models.py:918
+#: documents/models.py:920
 msgid "filter filename"
-msgstr ""
+msgstr "סנן לפי שם קובץ"
 
-#: documents/models.py:923 paperless_mail/models.py:148
+#: documents/models.py:925 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "קבל רק מסמכים שתואמים לחלוטין את שם הקובץ הזה אם צוין. תווים כלליים כגון pdf.* או *חשבונית* מותרים. חסר רגישות תווים גדולים/קטנים (אנגלית)."
 
-#: documents/models.py:934
+#: documents/models.py:936
 msgid "filter documents from this mail rule"
-msgstr ""
+msgstr "סנן מסמכים לפי כלל המייל הזה"
 
-#: documents/models.py:938
+#: documents/models.py:940
 msgid "assign title"
-msgstr ""
+msgstr "הקצה כותרת"
 
-#: documents/models.py:943
+#: documents/models.py:945
 msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr ""
+msgstr "הקצה כותרת למסמך, תוכל להשתמש במראה מקומות. בדוק כיצד במדריך למשתמש"
 
-#: documents/models.py:951 paperless_mail/models.py:216
+#: documents/models.py:953 paperless_mail/models.py:216
 msgid "assign this tag"
 msgstr "שייך תגית זו"
 
-#: documents/models.py:959 paperless_mail/models.py:224
+#: documents/models.py:961 paperless_mail/models.py:224
 msgid "assign this document type"
 msgstr "שייך סוג מסמך זה"
 
-#: documents/models.py:967 paperless_mail/models.py:238
+#: documents/models.py:969 paperless_mail/models.py:238
 msgid "assign this correspondent"
 msgstr "שייך מכותב זה"
 
-#: documents/models.py:975
+#: documents/models.py:977
 msgid "assign this storage path"
-msgstr ""
+msgstr "הקצה נתיב אחסון זה"
 
-#: documents/models.py:984
+#: documents/models.py:986
 msgid "assign this owner"
-msgstr ""
+msgstr "הקצה בעלים זה"
 
-#: documents/models.py:991
+#: documents/models.py:993
 msgid "grant view permissions to these users"
-msgstr ""
+msgstr "אפשר זכויות צפיה בקובץ למשתמשים אלו"
 
-#: documents/models.py:998
+#: documents/models.py:1000
 msgid "grant view permissions to these groups"
-msgstr ""
+msgstr "אפשר זכויות צפיה בקובץ לקבוצות אלו"
 
-#: documents/models.py:1005
+#: documents/models.py:1007
 msgid "grant change permissions to these users"
-msgstr ""
+msgstr "אפשר זכויות שינוי הגדרות צפיה בקובץ למשתמשים אלו"
 
-#: documents/models.py:1012
+#: documents/models.py:1014
 msgid "grant change permissions to these groups"
-msgstr ""
+msgstr "אפשר זכויות שינוי הגדרות צפיה בקובץ לקבוצות אלו"
 
-#: documents/models.py:1019
+#: documents/models.py:1021
 msgid "assign these custom fields"
-msgstr ""
+msgstr "הקצה שדות מותאמים אישית אלו "
 
-#: documents/models.py:1023
+#: documents/models.py:1025
 msgid "consumption template"
-msgstr ""
+msgstr "תבנית עיבוד"
 
-#: documents/models.py:1024
+#: documents/models.py:1026
 msgid "consumption templates"
-msgstr ""
+msgstr "תבניות עיבוד"
 
-#: documents/serialisers.py:102
+#: documents/serialisers.py:105
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "ביטוי רגולרי בלתי חוקי: %(error)s"
 
-#: documents/serialisers.py:377
+#: documents/serialisers.py:399
 msgid "Invalid color."
 msgstr "צבע לא חוקי."
 
-#: documents/serialisers.py:842
+#: documents/serialisers.py:865
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "סוג קובץ %(type)s לא נתמך"
 
-#: documents/serialisers.py:939
+#: documents/serialisers.py:962
 msgid "Invalid variable detected."
 msgstr "משתנה לא חוקי זוהה."
 
@@ -751,11 +759,11 @@ msgstr "שם המשתמש או הסיסמה שגויים. אנא נסה שנית
 
 #: documents/templates/registration/login.html:48
 msgid "Share link was not found."
-msgstr ""
+msgstr "קישור לשיתוף הקובץ לא נמצא"
 
 #: documents/templates/registration/login.html:52
 msgid "Share link has expired."
-msgstr ""
+msgstr "לינק לקישור הקובץ פג תוקף"
 
 #: documents/templates/registration/login.html:55
 msgid "Username"
@@ -775,7 +783,7 @@ msgstr "שכחת את הסיסמה?"
 
 #: documents/templates/registration/password_reset_complete.html:14
 msgid "Paperless-ngx reset password complete"
-msgstr ""
+msgstr "תהליך איפוס הסיסמה הסתיים"
 
 #: documents/templates/registration/password_reset_complete.html:40
 msgid "Password reset complete."
@@ -784,39 +792,39 @@ msgstr "איפוס סיסמה הושלם."
 #: documents/templates/registration/password_reset_complete.html:42
 #, python-format
 msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
-msgstr ""
+msgstr "הסיסמה שלך הוגדרה בהצלחה במערכת. אתה יכול עתה להתחבר <a href=\"%(login_url)s\">התחבר</a>"
 
 #: documents/templates/registration/password_reset_confirm.html:14
 msgid "Paperless-ngx reset password confirmation"
-msgstr ""
+msgstr "אשור תהליך איפוס הסיסמה"
 
 #: documents/templates/registration/password_reset_confirm.html:42
 msgid "Set a new password."
-msgstr ""
+msgstr "הגדר סיסמה חדשה"
 
 #: documents/templates/registration/password_reset_confirm.html:46
 msgid "Passwords did not match or too weak. Try again."
-msgstr ""
+msgstr "סיסמא חלשה מדי. נסה שוב."
 
 #: documents/templates/registration/password_reset_confirm.html:49
 msgid "New Password"
-msgstr ""
+msgstr "סיסמא חדשה"
 
 #: documents/templates/registration/password_reset_confirm.html:50
 msgid "Confirm Password"
-msgstr ""
+msgstr "אשר סיסמה"
 
 #: documents/templates/registration/password_reset_confirm.html:61
 msgid "Change my password"
-msgstr ""
+msgstr "שנה את הסיסמא שלי"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
-msgstr ""
+msgstr "בקש סיסמת איפוס חדשה"
 
 #: documents/templates/registration/password_reset_done.html:14
 msgid "Paperless-ngx reset password sent"
-msgstr ""
+msgstr "סיסמא לאיפוס נשלחה"
 
 #: documents/templates/registration/password_reset_done.html:40
 msgid "Check your inbox."
@@ -828,11 +836,11 @@ msgstr "נשלח מייל עם הוראות להגדרת הסיסמה שלך. א
 
 #: documents/templates/registration/password_reset_form.html:14
 msgid "Paperless-ngx reset password request"
-msgstr ""
+msgstr "בקשה לאיפוס סיסמה"
 
 #: documents/templates/registration/password_reset_form.html:41
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
-msgstr ""
+msgstr "הכנס את כתובת המייל ואנחנו נשלח לתיבה שלך הנחיות להגדרה מחדש"
 
 #: documents/templates/registration/password_reset_form.html:44
 msgid "An error occurred. Please try again."
@@ -1060,7 +1068,7 @@ msgstr "סיסמה"
 
 #: paperless_mail/models.py:42
 msgid "Is token authentication"
-msgstr ""
+msgstr "אימות טוקן"
 
 #: paperless_mail/models.py:45
 msgid "character set"
@@ -1124,7 +1132,7 @@ msgstr "השתמש בשם הקובץ המצורף ככותרת"
 
 #: paperless_mail/models.py:85
 msgid "Do not assign title from rule"
-msgstr ""
+msgstr "אל תקצה כותרת מהכלל שהוגדר במערכת"
 
 #: paperless_mail/models.py:88
 msgid "Do not assign a correspondent"
@@ -1172,15 +1180,15 @@ msgstr "סנן 'גוף'"
 
 #: paperless_mail/models.py:143
 msgid "filter attachment filename inclusive"
-msgstr ""
+msgstr "סנן לפי 'שם קובץ מצורף'"
 
 #: paperless_mail/models.py:155
 msgid "filter attachment filename exclusive"
-msgstr ""
+msgstr "סנן ללא 'שם קובץ מצורף'"
 
 #: paperless_mail/models.py:160
 msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "קבל רק מסמכים שתואמים לחלוטין את שם הקובץ הזה אם צוין. תווים כלליים כגון pdf.* או *חשבונית* מותרים. חסר רגישות תווים גדולים/קטנים (אנגלית)."
 
 #: paperless_mail/models.py:167
 msgid "maximum age"
@@ -1224,7 +1232,7 @@ msgstr "שייך מכותב מ-"
 
 #: paperless_mail/models.py:242
 msgid "Assign the rule owner to documents"
-msgstr ""
+msgstr "הקצה בעלות קבצים מתוך הכלל שהוגדר במערכת"
 
 #: paperless_mail/models.py:268
 msgid "uid"
