@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-05 08:26-0800\n"
-"PO-Revision-Date: 2023-12-06 00:24\n"
+"POT-Creation-Date: 2023-12-09 10:53-0800\n"
+"PO-Revision-Date: 2023-12-19 20:45\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumentumok"
 
-#: documents/models.py:36 documents/models.py:734
+#: documents/models.py:36 documents/models.py:736
 msgid "owner"
 msgstr "tulajdonos"
 
@@ -53,7 +53,7 @@ msgstr "Fuzzy szó"
 msgid "Automatic"
 msgstr "Automatikus"
 
-#: documents/models.py:62 documents/models.py:402 documents/models.py:895
+#: documents/models.py:62 documents/models.py:402 documents/models.py:897
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
 msgid "name"
 msgstr "név"
@@ -130,7 +130,7 @@ msgstr "GNU Privacy Guarddal titkosítva"
 msgid "title"
 msgstr "cím"
 
-#: documents/models.py:171 documents/models.py:648
+#: documents/models.py:171 documents/models.py:650
 msgid "content"
 msgstr "tartalom"
 
@@ -158,8 +158,8 @@ msgstr "archiválási ellenőrző összeg"
 msgid "The checksum of the archived document."
 msgstr "Az archivált dokumentum ellenőrző összege."
 
-#: documents/models.py:205 documents/models.py:385 documents/models.py:654
-#: documents/models.py:692 documents/models.py:762 documents/models.py:799
+#: documents/models.py:205 documents/models.py:385 documents/models.py:656
+#: documents/models.py:694 documents/models.py:764 documents/models.py:801
 msgid "created"
 msgstr "létrehozott"
 
@@ -207,7 +207,7 @@ msgstr "archiválási sorozatszám"
 msgid "The position of this document in your physical document archive."
 msgstr "A dokumentum helye a fizikai dokumentumarchívumban."
 
-#: documents/models.py:279 documents/models.py:665 documents/models.py:719
+#: documents/models.py:279 documents/models.py:667 documents/models.py:721
 msgid "document"
 msgstr "dokumentum"
 
@@ -255,7 +255,7 @@ msgstr "napló"
 msgid "logs"
 msgstr "naplók"
 
-#: documents/models.py:399 documents/models.py:464
+#: documents/models.py:399 documents/models.py:466
 msgid "saved view"
 msgstr "elmentett nézet"
 
@@ -423,293 +423,301 @@ msgstr "nincs tulajdonosa"
 msgid "does not have owner in"
 msgstr "nem rendelkezik tulajdonossal a"
 
-#: documents/models.py:467
+#: documents/models.py:458
+msgid "has custom field value"
+msgstr ""
+
+#: documents/models.py:459
+msgid "is shared by me"
+msgstr ""
+
+#: documents/models.py:469
 msgid "rule type"
 msgstr "szabálytípus"
 
-#: documents/models.py:469
+#: documents/models.py:471
 msgid "value"
 msgstr "érték"
 
-#: documents/models.py:472
+#: documents/models.py:474
 msgid "filter rule"
 msgstr "szűrőszabály"
 
-#: documents/models.py:473
+#: documents/models.py:475
 msgid "filter rules"
 msgstr "szűrési szabályok"
 
-#: documents/models.py:584
+#: documents/models.py:586
 msgid "Task ID"
 msgstr "Feladat azonosítója"
 
-#: documents/models.py:585
+#: documents/models.py:587
 msgid "Celery ID for the Task that was run"
 msgstr "A futtatott feladat Celery azonosítója"
 
-#: documents/models.py:590
+#: documents/models.py:592
 msgid "Acknowledged"
 msgstr "Visszaigazolva"
 
-#: documents/models.py:591
+#: documents/models.py:593
 msgid "If the task is acknowledged via the frontend or API"
 msgstr "Ha a feladatot a frontenden vagy az API-n keresztül nyugtázzák"
 
-#: documents/models.py:597
+#: documents/models.py:599
 msgid "Task Filename"
 msgstr "Feladat fájlnév"
 
-#: documents/models.py:598
+#: documents/models.py:600
 msgid "Name of the file which the Task was run for"
 msgstr "A fájl neve, amelyre a feladatot futtatták"
 
-#: documents/models.py:604
+#: documents/models.py:606
 msgid "Task Name"
 msgstr "Feladat neve"
 
-#: documents/models.py:605
+#: documents/models.py:607
 msgid "Name of the Task which was run"
 msgstr "A futtatott feladat neve"
 
-#: documents/models.py:612
+#: documents/models.py:614
 msgid "Task State"
 msgstr "Feladat Állapot"
 
-#: documents/models.py:613
+#: documents/models.py:615
 msgid "Current state of the task being run"
 msgstr "A futó feladat aktuális állapota"
 
-#: documents/models.py:618
+#: documents/models.py:620
 msgid "Created DateTime"
 msgstr "Létrehozás dátum idő"
 
-#: documents/models.py:619
+#: documents/models.py:621
 msgid "Datetime field when the task result was created in UTC"
 msgstr "A feladat eredményének létrehozásakor UTC-ben megadott dátum-mező"
 
-#: documents/models.py:624
+#: documents/models.py:626
 msgid "Started DateTime"
 msgstr "Elkezdve Dátum idő"
 
-#: documents/models.py:625
+#: documents/models.py:627
 msgid "Datetime field when the task was started in UTC"
 msgstr "A feladat indításának időpontja UTC-ben"
 
-#: documents/models.py:630
+#: documents/models.py:632
 msgid "Completed DateTime"
 msgstr "Befejeződött Dátum idő"
 
-#: documents/models.py:631
+#: documents/models.py:633
 msgid "Datetime field when the task was completed in UTC"
 msgstr "A feladat befejezésének időpontja UTC-ben"
 
-#: documents/models.py:636
+#: documents/models.py:638
 msgid "Result Data"
 msgstr "Eredmény adatok"
 
-#: documents/models.py:638
+#: documents/models.py:640
 msgid "The data returned by the task"
 msgstr "A feladat által visszaküldött adatok"
 
-#: documents/models.py:650
+#: documents/models.py:652
 msgid "Note for the document"
 msgstr "Megjegyzés a dokumentumhoz"
 
-#: documents/models.py:674
+#: documents/models.py:676
 msgid "user"
 msgstr "felhasználó"
 
-#: documents/models.py:679
+#: documents/models.py:681
 msgid "note"
 msgstr "megjegyzés"
 
-#: documents/models.py:680
+#: documents/models.py:682
 msgid "notes"
 msgstr "jegyzetek"
 
-#: documents/models.py:688
+#: documents/models.py:690
 msgid "Archive"
 msgstr "Archívum"
 
-#: documents/models.py:689
+#: documents/models.py:691
 msgid "Original"
 msgstr "Eredeti"
 
-#: documents/models.py:700
+#: documents/models.py:702
 msgid "expiration"
 msgstr "lejárat"
 
-#: documents/models.py:707
+#: documents/models.py:709
 msgid "slug"
 msgstr "slug"
 
-#: documents/models.py:739
+#: documents/models.py:741
 msgid "share link"
 msgstr "megosztási link"
 
-#: documents/models.py:740
+#: documents/models.py:742
 msgid "share links"
 msgstr "linkek megosztása"
 
-#: documents/models.py:752
+#: documents/models.py:754
 msgid "String"
 msgstr "Karaktersor"
 
-#: documents/models.py:753
+#: documents/models.py:755
 msgid "URL"
 msgstr "URL"
 
-#: documents/models.py:754
+#: documents/models.py:756
 msgid "Date"
 msgstr "Dátum"
 
-#: documents/models.py:755
+#: documents/models.py:757
 msgid "Boolean"
 msgstr "Boolean"
 
-#: documents/models.py:756
+#: documents/models.py:758
 msgid "Integer"
 msgstr "Egész szám"
 
-#: documents/models.py:757
+#: documents/models.py:759
 msgid "Float"
 msgstr "Valós szám"
 
-#: documents/models.py:758
+#: documents/models.py:760
 msgid "Monetary"
 msgstr "Monetáris"
 
-#: documents/models.py:759
+#: documents/models.py:761
 msgid "Document Link"
 msgstr "Dokumentum link"
 
-#: documents/models.py:771
+#: documents/models.py:773
 msgid "data type"
 msgstr "adattípus"
 
-#: documents/models.py:779
+#: documents/models.py:781
 msgid "custom field"
 msgstr "egyéni mező"
 
-#: documents/models.py:780
+#: documents/models.py:782
 msgid "custom fields"
 msgstr "egyéni mezők"
 
-#: documents/models.py:842
+#: documents/models.py:844
 msgid "custom field instance"
 msgstr "egyéni mező példány"
 
-#: documents/models.py:843
+#: documents/models.py:845
 msgid "custom field instances"
 msgstr "egyéni mező példányok"
 
-#: documents/models.py:891
+#: documents/models.py:893
 msgid "Consume Folder"
 msgstr "Feldolgozási mappa"
 
-#: documents/models.py:892
+#: documents/models.py:894
 msgid "Api Upload"
 msgstr "Api feltöltés"
 
-#: documents/models.py:893
+#: documents/models.py:895
 msgid "Mail Fetch"
 msgstr "Mail lehívás"
 
-#: documents/models.py:897 paperless_mail/models.py:95
+#: documents/models.py:899 paperless_mail/models.py:95
 msgid "order"
 msgstr "megrendelés"
 
-#: documents/models.py:906
+#: documents/models.py:908
 msgid "filter path"
 msgstr "szűrési útvonal"
 
-#: documents/models.py:911
+#: documents/models.py:913
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
 msgstr "Csak olyan dokumentumokat dolgoz fel, amelyeknek az elérési útvonala megegyezik ezzel, ha ez meg van adva. A *-gal megadott helyettesítő karakterek engedélyezettek. Nagy- és kisbetűkre nem érzékeny."
 
-#: documents/models.py:918
+#: documents/models.py:920
 msgid "filter filename"
 msgstr "szűrő fájlnév"
 
-#: documents/models.py:923 paperless_mail/models.py:148
+#: documents/models.py:925 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "Csak olyan dokumentumokat dolgoz fel, amelyek teljes mértékben megfelelnek ennek a fájlnévnek, ha meg van adva. Az olyan helyettesítő karakterek, mint *.pdf vagy *számla* engedélyezettek. Nagy- és kisbetűkre nem érzékeny."
 
-#: documents/models.py:934
+#: documents/models.py:936
 msgid "filter documents from this mail rule"
 msgstr "dokumentumok szűrése ebből a levélszabályból"
 
-#: documents/models.py:938
+#: documents/models.py:940
 msgid "assign title"
 msgstr "cím hozzárendelése"
 
-#: documents/models.py:943
+#: documents/models.py:945
 msgid "Assign a document title, can include some placeholders, see documentation."
 msgstr "A dokumentum címének hozzárendelése, tartalmazhat néhány helykitöltőt, lásd a dokumentációt."
 
-#: documents/models.py:951 paperless_mail/models.py:216
+#: documents/models.py:953 paperless_mail/models.py:216
 msgid "assign this tag"
 msgstr "rendelje hozzá ezt a jelölőt"
 
-#: documents/models.py:959 paperless_mail/models.py:224
+#: documents/models.py:961 paperless_mail/models.py:224
 msgid "assign this document type"
 msgstr "rendelje hozzá ezt a dokumentumtípust"
 
-#: documents/models.py:967 paperless_mail/models.py:238
+#: documents/models.py:969 paperless_mail/models.py:238
 msgid "assign this correspondent"
 msgstr "rendelje hozzá ezt a kapcsolattartót"
 
-#: documents/models.py:975
+#: documents/models.py:977
 msgid "assign this storage path"
 msgstr "rendelje hozzá ezt a tárolási útvonalat"
 
-#: documents/models.py:984
+#: documents/models.py:986
 msgid "assign this owner"
 msgstr "rendelje hozzá ezt a tulajdonost"
 
-#: documents/models.py:991
+#: documents/models.py:993
 msgid "grant view permissions to these users"
 msgstr "adjon megtekintési engedélyeket ezeknek a felhasználóknak"
 
-#: documents/models.py:998
+#: documents/models.py:1000
 msgid "grant view permissions to these groups"
 msgstr "nézeti engedélyeket adjon ezeknek a csoportoknak"
 
-#: documents/models.py:1005
+#: documents/models.py:1007
 msgid "grant change permissions to these users"
 msgstr "adjon módosítási engedélyeket ezeknek a felhasználóknak"
 
-#: documents/models.py:1012
+#: documents/models.py:1014
 msgid "grant change permissions to these groups"
 msgstr "adjon módosítási jogosultságokat ezeknek a csoportoknak"
 
-#: documents/models.py:1019
+#: documents/models.py:1021
 msgid "assign these custom fields"
 msgstr "rendelje hozzá ezeket az egyedi mezőket"
 
-#: documents/models.py:1023
+#: documents/models.py:1025
 msgid "consumption template"
 msgstr "feldolgozási sablon"
 
-#: documents/models.py:1024
+#: documents/models.py:1026
 msgid "consumption templates"
 msgstr "feldolgozási sablonok"
 
-#: documents/serialisers.py:102
+#: documents/serialisers.py:105
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Érvénytelen reguláris kifejezés: %(error)s"
 
-#: documents/serialisers.py:377
+#: documents/serialisers.py:399
 msgid "Invalid color."
 msgstr "Érvénytelen szín."
 
-#: documents/serialisers.py:842
+#: documents/serialisers.py:865
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Fájltípus %(type)s nem támogatott"
 
-#: documents/serialisers.py:939
+#: documents/serialisers.py:962
 msgid "Invalid variable detected."
 msgstr "Érvénytelen változót észleltek."
 
