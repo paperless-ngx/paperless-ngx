@@ -1534,7 +1534,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">117</context>
         </context-group>
         <target state="translated">Ocorreu um erro ao salvar as configurações.</target>
       </trans-unit>
@@ -1812,7 +1812,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
-          <context context-type="linenumber">68</context>
+          <context context-type="linenumber">78</context>
         </context-group>
         <target state="translated">Usuários</target>
       </trans-unit>
@@ -1880,7 +1880,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">89</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.html</context>
@@ -2461,7 +2461,7 @@
         <source>Sidebar views updated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">252</context>
+          <context context-type="linenumber">259</context>
         </context-group>
         <target state="needs-translation">Sidebar views updated</target>
       </trans-unit>
@@ -2469,7 +2469,7 @@
         <source>Error updating sidebar views</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">255</context>
+          <context context-type="linenumber">262</context>
         </context-group>
         <target state="needs-translation">Error updating sidebar views</target>
       </trans-unit>
@@ -2477,7 +2477,7 @@
         <source>An error occurred while saving update checking settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">276</context>
+          <context context-type="linenumber">283</context>
         </context-group>
         <target state="translated">Ocorreu um erro ao salvar as verificações de atualizações.</target>
       </trans-unit>
@@ -3964,7 +3964,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.ts</context>
-          <context context-type="linenumber">80</context>
+          <context context-type="linenumber">77</context>
         </context-group>
         <target state="translated">Privado</target>
       </trans-unit>
@@ -4040,11 +4040,19 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         </context-group>
         <target state="translated">Compartilhados comigo</target>
       </trans-unit>
+      <trans-unit id="175385209536581523" datatype="html">
+        <source>Shared by me</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+        <target state="needs-translation">Shared by me</target>
+      </trans-unit>
       <trans-unit id="5151074932731293042" datatype="html">
         <source>Unowned</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
-          <context context-type="linenumber">48</context>
+          <context context-type="linenumber">58</context>
         </context-group>
         <target state="translated">Sem proprietário</target>
       </trans-unit>
@@ -4052,7 +4060,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Hide unowned</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
-          <context context-type="linenumber">77</context>
+          <context context-type="linenumber">87</context>
         </context-group>
         <target state="translated">Ocultar sem proprietários</target>
       </trans-unit>
@@ -4079,6 +4087,14 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
           <context context-type="linenumber">61</context>
         </context-group>
         <target state="needs-translation">Inherited from group</target>
+      </trans-unit>
+      <trans-unit id="6418218602775540217" datatype="html">
+        <source>Error loading preview</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/preview-popup/preview-popup.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <target state="needs-translation">Error loading preview</target>
       </trans-unit>
       <trans-unit id="2984628903434675339" datatype="html">
         <source>Edit Profile</source>
@@ -4416,7 +4432,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">203</context>
+          <context context-type="linenumber">204</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
@@ -4480,7 +4496,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">99</context>
+          <context context-type="linenumber">105</context>
         </context-group>
         <target state="final">Baixar</target>
       </trans-unit>
@@ -5521,11 +5537,27 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         </context-group>
         <target state="translated">Modificado: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate }}"/></target>
       </trans-unit>
+      <trans-unit id="5739581984228459958" datatype="html">
+        <source>Shared</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
+          <context context-type="linenumber">119</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
+          <context context-type="linenumber">84</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pipes/username.pipe.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+        <target state="translated">Compartilhado</target>
+      </trans-unit>
       <trans-unit id="2332107018974972998" datatype="html" approved="yes">
         <source>Score:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">122</context>
         </context-group>
         <target state="final">Nota:</target>
       </trans-unit>
@@ -5669,7 +5701,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">208</context>
+          <context context-type="linenumber">209</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
@@ -5797,7 +5829,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Correspondent: <x id="PH" equiv-text="this.correspondents.find(               (c) =&gt; c.id == +rule.value             )?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">120,122</context>
+          <context context-type="linenumber">121,123</context>
         </context-group>
         <target state="needs-review-translation" state-qualifier="leveraged-tm">Correspondente: <x id="PH" equiv-text="this.correspondents.find(               (c) =&gt; c.id == +rule.value             )?.name"/></target>
       </trans-unit>
@@ -5805,7 +5837,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Without correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">124</context>
+          <context context-type="linenumber">125</context>
         </context-group>
         <target state="final">Sem correspondente</target>
       </trans-unit>
@@ -5813,7 +5845,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Document type: <x id="PH" equiv-text="this.documentTypes.find(               (dt) =&gt; dt.id == +rule.value             )?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">130,132</context>
+          <context context-type="linenumber">131,133</context>
         </context-group>
         <target state="translated">Tipo de documento: <x id="PH" equiv-text="this.documentTypes.find(               (dt) =&gt; dt.id == +rule.value             )?.name"/></target>
       </trans-unit>
@@ -5821,7 +5853,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Without document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">134</context>
+          <context context-type="linenumber">135</context>
         </context-group>
         <target state="final">Sem tipo de documento</target>
       </trans-unit>
@@ -5829,7 +5861,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Storage path: <x id="PH" equiv-text="this.storagePaths.find(               (sp) =&gt; sp.id == +rule.value             )?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">140,142</context>
+          <context context-type="linenumber">141,143</context>
         </context-group>
         <target state="translated">Caminho de armazenamento: <x id="PH" equiv-text="this.storagePaths.find(               (sp) =&gt; sp.id == +rule.value             )?.name"/></target>
       </trans-unit>
@@ -5837,7 +5869,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Without storage path</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">144</context>
+          <context context-type="linenumber">145</context>
         </context-group>
         <target state="needs-translation">Without storage path</target>
       </trans-unit>
@@ -5845,7 +5877,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Tag: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)             ?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">148,149</context>
+          <context context-type="linenumber">149,150</context>
         </context-group>
         <target state="needs-review-translation" state-qualifier="leveraged-tm">Etiqueta: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)             ?.name"/></target>
       </trans-unit>
@@ -5853,7 +5885,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Without any tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">153</context>
+          <context context-type="linenumber">154</context>
         </context-group>
         <target state="final">Sem etiquetas</target>
       </trans-unit>
@@ -5861,7 +5893,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Title: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">157</context>
+          <context context-type="linenumber">158</context>
         </context-group>
         <target state="final">Título: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
@@ -5869,7 +5901,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>ASN: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">160</context>
+          <context context-type="linenumber">161</context>
         </context-group>
         <target state="translated">NSA: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
@@ -5877,7 +5909,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Owner: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">163</context>
+          <context context-type="linenumber">164</context>
         </context-group>
         <target state="translated">Proprietário: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
@@ -5885,7 +5917,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Owner not in: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">166</context>
+          <context context-type="linenumber">167</context>
         </context-group>
         <target state="needs-translation">Owner not in: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
@@ -5893,7 +5925,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Without an owner</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">169</context>
+          <context context-type="linenumber">170</context>
         </context-group>
         <target state="translated">Sem um proprietário</target>
       </trans-unit>
@@ -5901,7 +5933,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Title &amp; content</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">206</context>
+          <context context-type="linenumber">207</context>
         </context-group>
         <target state="final">Título &amp; conteúdo</target>
       </trans-unit>
@@ -5909,7 +5941,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Custom fields</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">211</context>
+          <context context-type="linenumber">212</context>
         </context-group>
         <target state="translated">Campos personalizados</target>
       </trans-unit>
@@ -5917,7 +5949,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Advanced search</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">215</context>
+          <context context-type="linenumber">216</context>
         </context-group>
         <target state="final">Pesquisa avançada</target>
       </trans-unit>
@@ -5925,7 +5957,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>More like</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">221</context>
+          <context context-type="linenumber">222</context>
         </context-group>
         <target state="translated">Mais parecido</target>
       </trans-unit>
@@ -5933,7 +5965,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>equals</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">240</context>
+          <context context-type="linenumber">241</context>
         </context-group>
         <target state="translated">igual a</target>
       </trans-unit>
@@ -5941,7 +5973,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>is empty</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">244</context>
+          <context context-type="linenumber">245</context>
         </context-group>
         <target state="translated">está vazio</target>
       </trans-unit>
@@ -5949,7 +5981,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>is not empty</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">248</context>
+          <context context-type="linenumber">249</context>
         </context-group>
         <target state="translated">não está vazio</target>
       </trans-unit>
@@ -5957,7 +5989,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>greater than</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">252</context>
+          <context context-type="linenumber">253</context>
         </context-group>
         <target state="translated">maior que</target>
       </trans-unit>
@@ -5965,7 +5997,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>less than</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">256</context>
+          <context context-type="linenumber">257</context>
         </context-group>
         <target state="translated">menor que</target>
       </trans-unit>
@@ -6968,14 +7000,6 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
           <context context-type="linenumber">11</context>
         </context-group>
         <target state="final">(sem título)</target>
-      </trans-unit>
-      <trans-unit id="5739581984228459958" datatype="html">
-        <source>Shared</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/pipes/username.pipe.ts</context>
-          <context context-type="linenumber">33</context>
-        </context-group>
-        <target state="translated">Compartilhado</target>
       </trans-unit>
       <trans-unit id="2807800733729323332" datatype="html" approved="yes">
         <source>Yes</source>

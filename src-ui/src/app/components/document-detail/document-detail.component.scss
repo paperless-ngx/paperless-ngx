@@ -44,3 +44,17 @@ textarea.rtl {
 .input-group .btn-outline-secondary {
   border-color: var(--bs-border-color);
 }
+
+.btn-group .btn.order-0 {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: var(--bs-border-radius-sm);
+  border-bottom-left-radius: var(--bs-border-radius-sm);
+}
+
+.btn-group .btn.order-3 {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: var(--bs-border-radius-sm);
+  border-bottom-right-radius: var(--bs-border-radius-sm);
+}

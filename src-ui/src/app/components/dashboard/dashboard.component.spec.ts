@@ -18,9 +18,9 @@ import { TourNgBootstrapModule, TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { LogoComponent } from '../common/logo/logo.component'
 import { of, throwError } from 'rxjs'
 import { ToastService } from 'src/app/services/toast.service'
-import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop'
-import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
+import { SavedView } from 'src/app/data/saved-view'
 
 const saved_views = [
   {
@@ -167,7 +167,7 @@ describe('DashboardComponent', () => {
     const toastSpy = jest.spyOn(toastService, 'showInfo')
     jest.spyOn(settingsService, 'storeSettings').mockReturnValue(of(true))
     component.onDrop({ previousIndex: 0, currentIndex: 1 } as CdkDragDrop<
-      PaperlessSavedView[]
+      SavedView[]
     >)
     expect(settingsSpy).toHaveBeenCalledWith([
       saved_views[2],
@@ -190,7 +190,7 @@ describe('DashboardComponent', () => {
       .spyOn(settingsService, 'storeSettings')
       .mockReturnValue(throwError(() => new Error('unable to save')))
     component.onDrop({ previousIndex: 0, currentIndex: 2 } as CdkDragDrop<
-      PaperlessSavedView[]
+      SavedView[]
     >)
     expect(toastSpy).toHaveBeenCalled()
   })

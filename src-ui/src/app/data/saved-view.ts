@@ -1,7 +1,7 @@
 import { FilterRule } from './filter-rule'
 import { ObjectWithPermissions } from './object-with-permissions'
 
-export interface PaperlessSavedView extends ObjectWithPermissions {
+export interface SavedView extends ObjectWithPermissions {
   name?: string
 
   show_on_dashboard?: boolean

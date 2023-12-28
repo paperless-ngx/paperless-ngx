@@ -11,7 +11,7 @@ import {
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { IMAPSecurity } from 'src/app/data/paperless-mail-account'
+import { IMAPSecurity } from 'src/app/data/mail-account'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SettingsService } from 'src/app/services/settings.service'

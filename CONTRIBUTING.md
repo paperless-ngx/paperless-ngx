@@ -94,7 +94,7 @@ The following files need to be changed:
 
 - src-ui/angular.json (under the _projects/paperless-ui/i18n/locales_ JSON key)
 - src/paperless/settings.py (in the _LANGUAGES_ array)
-- src-ui/src/app/services/settings.service.ts (inside the _getLanguageOptions_ method)
+- src-ui/src/app/services/settings.service.ts (inside the _LANGUAGE_OPTIONS_ array)
 - src-ui/src/app/app.module.ts (import locale from _angular/common/locales_ and call _registerLocaleData_)
 
 Please add the language in the correct order, alphabetically by locale.

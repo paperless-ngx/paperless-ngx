@@ -122,7 +122,7 @@ export class SelectComponent extends AbstractInputComponent<number> {
     }
   }
 
-  addItem(name: string) {
+  addItem(name: string = null) {
     if (name) this.createNew.next(name)
     else this.createNew.next(this._lastSearchTerm)
     this.clearLastSearchTerm()

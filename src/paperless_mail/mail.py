@@ -703,6 +703,12 @@ class MailAccountHandler(LoggingMixin):
             mime_type = magic.from_buffer(att.payload, mime=True)
 
             if is_mime_type_supported(mime_type):
+                self.log.info(
+                    f"Rule {rule}: "
+                    f"Consuming attachment {att.filename} from mail "
+                    f"{message.subject} from {message.from_}",
+                )
+
                 os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
 
                 temp_dir = Path(
@@ -711,14 +717,15 @@ class MailAccountHandler(LoggingMixin):
                         dir=settings.SCRATCH_DIR,
                     ),
                 )
-                temp_filename = temp_dir / pathvalidate.sanitize_filename(att.filename)
-                temp_filename.write_bytes(att.payload)
 
-                self.log.info(
-                    f"Rule {rule}: "
-                    f"Consuming attachment {att.filename} from mail "
-                    f"{message.subject} from {message.from_}",
-                )
+                attachment_name = pathvalidate.sanitize_filename(att.filename)
+                if attachment_name:
+                    temp_filename = temp_dir / attachment_name
+                else:  # pragma: no cover
+                    # Some cases may have no name (generally inline)
+                    temp_filename = temp_dir / "no-name-attachment"
+
+                temp_filename.write_bytes(att.payload)
 
                 input_doc = ConsumableDocument(
                     source=DocumentSource.MailFetch,

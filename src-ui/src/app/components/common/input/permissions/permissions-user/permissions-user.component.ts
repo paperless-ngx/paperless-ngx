@@ -1,7 +1,7 @@
 import { Component, forwardRef, Input, OnInit } from '@angular/core'
 import { NG_VALUE_ACCESSOR } from '@angular/forms'
 import { first } from 'rxjs/operators'
-import { PaperlessUser } from 'src/app/data/paperless-user'
+import { User } from 'src/app/data/user'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { AbstractInputComponent } from '../../abstract-input'
@@ -18,10 +18,8 @@ import { AbstractInputComponent } from '../../abstract-input'
   templateUrl: './permissions-user.component.html',
   styleUrls: ['./permissions-user.component.scss'],
 })
-export class PermissionsUserComponent extends AbstractInputComponent<
-  PaperlessUser[]
-> {
-  users: PaperlessUser[]
+export class PermissionsUserComponent extends AbstractInputComponent<User[]> {
+  users: User[]
 
   constructor(userService: UserService, settings: SettingsService) {
     super()

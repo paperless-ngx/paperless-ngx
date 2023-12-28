@@ -1,5 +1,5 @@
 import { MatchingModel } from './matching-model'
 
-export interface PaperlessCorrespondent extends MatchingModel {
+export interface Correspondent extends MatchingModel {
   last_correspondence?: string // Date
 }

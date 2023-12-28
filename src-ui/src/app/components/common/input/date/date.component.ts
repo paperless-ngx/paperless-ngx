@@ -90,7 +90,11 @@ export class DateComponent
   }
 
   onKeyPress(event: KeyboardEvent) {
-    if ('Enter' !== event.key && !/[0-9,\.\/-]+/.test(event.key)) {
+    if (
+      'Enter' !== event.key &&
+      !(event.altKey || event.metaKey || event.ctrlKey) &&
+      !/[0-9,\.\/-]+/.test(event.key)
+    ) {
       event.preventDefault()
     }
   }

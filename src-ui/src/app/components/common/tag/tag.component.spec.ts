@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { TagComponent } from './tag.component'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { Tag } from 'src/app/data/tag'
 import { By } from '@angular/platform-browser'
 
-const tag: PaperlessTag = {
+const tag: Tag = {
   id: 1,
   color: '#ff0000',
   name: 'Tag1',
