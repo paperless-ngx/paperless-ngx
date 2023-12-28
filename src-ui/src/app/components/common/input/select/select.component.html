@@ -35,7 +35,7 @@
             (clear)="clearLastSearchTerm()"
             (blur)="onBlur()">
             <ng-template ng-option-tmp let-item="item">
-                <span [title]="item.name">{{item.name}}</span>
+                <span [title]="item[bindLabel]">{{item[bindLabel]}}</span>
             </ng-template>
           </ng-select>
           @if (allowCreateNew) {
