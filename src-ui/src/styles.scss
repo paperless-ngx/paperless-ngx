@@ -19,6 +19,7 @@ $grid-breakpoints: (
 // Paperless-ngx styles
 body {
   font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
   height: 100vh;
 }
 
