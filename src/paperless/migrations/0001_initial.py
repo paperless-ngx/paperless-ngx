@@ -50,8 +50,10 @@ class Migration(migrations.Migration):
                 (
                     "pages",
                     models.PositiveIntegerField(
-                        blank=True,
                         null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(1),
+                        ],
                         verbose_name="Do OCR from page 1 to this value",
                     ),
                 ),
@@ -97,6 +99,9 @@ class Migration(migrations.Migration):
                     "image_dpi",
                     models.PositiveIntegerField(
                         null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(1),
+                        ],
                         verbose_name="Sets image DPI fallback value",
                     ),
                 ),

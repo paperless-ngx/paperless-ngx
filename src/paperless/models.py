@@ -93,7 +93,7 @@ class ApplicationConfiguration(AbstractSingletonModel):
     pages = models.PositiveIntegerField(
         verbose_name=_("Do OCR from page 1 to this value"),
         null=True,
-        blank=True,
+        validators=[MinValueValidator(1)],
     )
 
     language = models.CharField(
@@ -122,6 +122,7 @@ class ApplicationConfiguration(AbstractSingletonModel):
     image_dpi = models.PositiveIntegerField(
         verbose_name=_("Sets image DPI fallback value"),
         null=True,
+        validators=[MinValueValidator(1)],
     )
 
     # Can't call it clean, that's a model method
