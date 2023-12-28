@@ -55,31 +55,37 @@ class DocumentMetadataOverrides:
             self.tag_ids = other.tag_ids
         elif other.tag_ids is not None:
             self.tag_ids.extend(other.tag_ids)
+            self.tag_ids = list(set(self.tag_ids))
 
         if self.view_users is None:
             self.view_users = other.view_users
         elif other.view_users is not None:
             self.view_users.extend(other.view_users)
+            self.view_users = list(set(self.view_users))
 
         if self.view_groups is None:
             self.view_groups = other.view_groups
         elif other.view_groups is not None:
             self.view_groups.extend(other.view_groups)
+            self.view_groups = list(set(self.view_groups))
 
         if self.change_users is None:
             self.change_users = other.change_users
         elif other.change_users is not None:
             self.change_users.extend(other.change_users)
+            self.change_users = list(set(self.change_users))
 
         if self.change_groups is None:
             self.change_groups = other.change_groups
         elif other.change_groups is not None:
             self.change_groups.extend(other.change_groups)
+            self.change_groups = list(set(self.change_groups))
 
         if self.custom_field_ids is None:
             self.custom_field_ids = other.custom_field_ids
         elif other.custom_field_ids is not None:
             self.custom_field_ids.extend(other.custom_field_ids)
+            self.custom_field_ids = list(set(self.custom_field_ids))
 
         return self
 
