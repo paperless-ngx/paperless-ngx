@@ -80,6 +80,7 @@ class DocumentMetadataOverrides:
             self.custom_field_ids = other.custom_field_ids
         elif other.custom_field_ids is not None:
             self.custom_field_ids.extend(other.custom_field_ids)
+            self.custom_field_ids = list(set(self.custom_field_ids))
 
         return self
 
