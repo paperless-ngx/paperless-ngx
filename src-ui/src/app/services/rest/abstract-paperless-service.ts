@@ -91,6 +91,19 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
     )
   }
 
+  getFew(ids: number[], extraParams?): Observable<Results<T>> {
+    let httpParams = new HttpParams()
+    httpParams = httpParams.set('id__in', ids.join(','))
+    for (let extraParamKey in extraParams) {
+      if (extraParams[extraParamKey] != null) {
+        httpParams = httpParams.set(extraParamKey, extraParams[extraParamKey])
+      }
+    }
+    return this.http.get<Results<T>>(this.getResourceUrl(), {
+      params: httpParams,
+    })
+  }
+
   clearCache() {
     this._listAll = null
   }

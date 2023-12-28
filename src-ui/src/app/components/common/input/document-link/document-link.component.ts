@@ -13,7 +13,7 @@ import {
   catchError,
 } from 'rxjs'
 import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
-import { PaperlessDocument } from 'src/app/data/paperless-document'
+import { Document } from 'src/app/data/document'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { AbstractInputComponent } from '../abstract-input'
 
@@ -34,14 +34,17 @@ export class DocumentLinkComponent
   implements OnInit, OnDestroy
 {
   documentsInput$ = new Subject<string>()
-  foundDocuments$: Observable<PaperlessDocument[]>
+  foundDocuments$: Observable<Document[]>
   loading = false
-  selectedDocuments: PaperlessDocument[] = []
+  selectedDocuments: Document[] = []
 
   private unsubscribeNotifier: Subject<any> = new Subject()
 
   @Input()
   notFoundText: string = $localize`No documents found`
+
+  @Input()
+  parentDocumentID: number
 
   constructor(private documentsService: DocumentService) {
     super()
@@ -58,11 +61,11 @@ export class DocumentLinkComponent
     } else {
       this.loading = true
       this.documentsService
-        .getCachedMany(documentIDs)
+        .getFew(documentIDs, { fields: 'id,title' })
         .pipe(takeUntil(this.unsubscribeNotifier))
-        .subscribe((documents) => {
+        .subscribe((documentResults) => {
           this.loading = false
-          this.selectedDocuments = documents
+          this.selectedDocuments = documentResults.results
           super.writeValue(documentIDs)
         })
     }
@@ -86,7 +89,13 @@ export class DocumentLinkComponent
               { truncate_content: true }
             )
             .pipe(
-              map((results) => results.results),
+              map((results) =>
+                results.results.filter(
+                  (d) =>
+                    d.id !== this.parentDocumentID &&
+                    !this.selectedDocuments.find((sd) => sd.id === d.id)
+                )
+              ),
               catchError(() => of([])), // empty on error
               tap(() => (this.loading = false))
             )
@@ -95,21 +104,18 @@ export class DocumentLinkComponent
     )
   }
 
-  unselect(document: PaperlessDocument): void {
+  unselect(document: Document): void {
     this.selectedDocuments = this.selectedDocuments.filter(
       (d) => d.id !== document.id
     )
     this.onChange(this.selectedDocuments.map((d) => d.id))
   }
 
-  compareDocuments(
-    document: PaperlessDocument,
-    selectedDocument: PaperlessDocument
-  ) {
+  compareDocuments(document: Document, selectedDocument: Document) {
     return document.id === selectedDocument.id
   }
 
-  trackByFn(item: PaperlessDocument) {
+  trackByFn(item: Document) {
     return item.id
   }
 

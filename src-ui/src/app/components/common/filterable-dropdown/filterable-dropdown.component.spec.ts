@@ -13,7 +13,7 @@ import {
 } from './filterable-dropdown.component'
 import { FilterPipe } from 'src/app/pipes/filter.pipe'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { Tag } from 'src/app/data/tag'
 import {
   DEFAULT_MATCHING_ALGORITHM,
   MATCH_ALL,
@@ -26,7 +26,7 @@ import { TagComponent } from '../tag/tag.component'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
 
-const items: PaperlessTag[] = [
+const items: Tag[] = [
   {
     id: 1,
     name: 'Tag1',

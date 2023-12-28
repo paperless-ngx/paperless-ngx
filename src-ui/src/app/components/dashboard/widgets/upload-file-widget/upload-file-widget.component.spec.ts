@@ -27,6 +27,24 @@ import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
 import { UploadFileWidgetComponent } from './upload-file-widget.component'
 import { DragDropModule } from '@angular/cdk/drag-drop'
 
+const FAILED_STATUSES = [new FileStatus()]
+const WORKING_STATUSES = [new FileStatus(), new FileStatus()]
+const STARTED_STATUSES = [new FileStatus(), new FileStatus(), new FileStatus()]
+const SUCCESS_STATUSES = [
+  new FileStatus(),
+  new FileStatus(),
+  new FileStatus(),
+  new FileStatus(),
+]
+const DEFAULT_STATUSES = [
+  new FileStatus(),
+  new FileStatus(),
+  new FileStatus(),
+  new FileStatus(),
+  new FileStatus(),
+  new FileStatus(),
+]
+
 describe('UploadFileWidgetComponent', () => {
   let component: UploadFileWidgetComponent
   let fixture: ComponentFixture<UploadFileWidgetComponent>
@@ -150,41 +168,22 @@ function mockConsumerStatuses(consumerStatusService) {
     .mockImplementation((phase) => {
       switch (phase) {
         case FileStatusPhase.FAILED:
-          return [new FileStatus()]
+          return FAILED_STATUSES
         case FileStatusPhase.WORKING:
-          return [new FileStatus(), new FileStatus()]
+          return WORKING_STATUSES
         case FileStatusPhase.STARTED:
-          return [new FileStatus(), new FileStatus(), new FileStatus()]
+          return STARTED_STATUSES
         case FileStatusPhase.SUCCESS:
-          return [
-            new FileStatus(),
-            new FileStatus(),
-            new FileStatus(),
-            new FileStatus(),
-          ]
+          return SUCCESS_STATUSES
         case FileStatusPhase.UPLOADING:
           return [partialUpload1, partialUpload2]
         default:
-          return [
-            new FileStatus(),
-            new FileStatus(),
-            new FileStatus(),
-            new FileStatus(),
-            new FileStatus(),
-            new FileStatus(),
-          ]
+          return DEFAULT_STATUSES
       }
     })
   jest
     .spyOn(consumerStatusService, 'getConsumerStatusNotCompleted')
     .mockImplementation(() => {
-      return [
-        new FileStatus(),
-        new FileStatus(),
-        new FileStatus(),
-        new FileStatus(),
-        new FileStatus(),
-        new FileStatus(),
-      ]
+      return DEFAULT_STATUSES
     })
 }

@@ -1,6 +1,10 @@
-::ng-deep .ng-select-container .ng-value-container .ng-value {
-    background-color: transparent !important;
-    border-color: transparent;
+::ng-deep .ng-select-container .ng-value-container {
+    overflow: hidden;
+
+    .ng-value {
+        background-color: transparent !important;
+        border-color: transparent;
+    }
 }
 
 .sidebaricon {
@@ -9,6 +13,4 @@
 
 .badge {
     font-size: .75rem;
-    // --bs-primary: var(--pngx-bg-alt);
-    // color: var(--pngx-primary-text-contrast);
 }

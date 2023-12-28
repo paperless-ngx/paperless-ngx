@@ -1,4 +1,4 @@
-export interface PaperlessDocumentSuggestions {
+export interface DocumentSuggestions {
   tags?: number[]
 
   correspondents?: number[]

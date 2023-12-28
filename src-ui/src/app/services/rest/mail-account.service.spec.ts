@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing'
 import { environment } from 'src/environments/environment'
 import { commonAbstractPaperlessServiceTests } from './abstract-paperless-service.spec'
 import { MailAccountService } from './mail-account.service'
-import { IMAPSecurity } from 'src/app/data/paperless-mail-account'
+import { IMAPSecurity } from 'src/app/data/mail-account'
 
 let httpTestingController: HttpTestingController
 let service: MailAccountService

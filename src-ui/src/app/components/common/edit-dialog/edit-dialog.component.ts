@@ -9,12 +9,12 @@ import {
 } from 'src/app/data/matching-model'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
-import { PaperlessUser } from 'src/app/data/paperless-user'
+import { User } from 'src/app/data/user'
 import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { PermissionsFormObject } from '../input/permissions/permissions-form/permissions-form.component'
 import { SettingsService } from 'src/app/services/settings.service'
-import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 
 export enum EditDialogMode {
   CREATE = 0,
@@ -33,7 +33,7 @@ export abstract class EditDialogComponent<
     private settingsService: SettingsService
   ) {}
 
-  users: PaperlessUser[]
+  users: User[]
 
   @Input()
   dialogMode: EditDialogMode = EditDialogMode.CREATE

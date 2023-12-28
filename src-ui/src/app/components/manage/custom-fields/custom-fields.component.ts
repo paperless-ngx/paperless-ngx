@@ -1,10 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Subject, takeUntil } from 'rxjs'
-import {
-  DATA_TYPE_LABELS,
-  PaperlessCustomField,
-} from 'src/app/data/paperless-custom-field'
+import { DATA_TYPE_LABELS, CustomField } from 'src/app/data/custom-field'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -22,7 +19,7 @@ export class CustomFieldsComponent
   extends ComponentWithPermissions
   implements OnInit
 {
-  public fields: PaperlessCustomField[] = []
+  public fields: CustomField[] = []
 
   private unsubscribeNotifier: Subject<any> = new Subject()
   constructor(
@@ -47,7 +44,7 @@ export class CustomFieldsComponent
       })
   }
 
-  editField(field: PaperlessCustomField) {
+  editField(field: CustomField) {
     const modal = this.modalService.open(CustomFieldEditDialogComponent)
     modal.componentInstance.dialogMode = field
       ? EditDialogMode.EDIT
@@ -67,7 +64,7 @@ export class CustomFieldsComponent
       })
   }
 
-  deleteField(field: PaperlessCustomField) {
+  deleteField(field: CustomField) {
     const modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
     })
@@ -92,7 +89,7 @@ export class CustomFieldsComponent
     })
   }
 
-  getDataType(field: PaperlessCustomField): string {
+  getDataType(field: CustomField): string {
     return DATA_TYPE_LABELS.find((l) => l.id === field.data_type).name
   }
 }

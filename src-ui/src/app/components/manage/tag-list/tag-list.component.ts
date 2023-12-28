@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { Tag } from 'src/app/data/tag'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
   PermissionsService,
@@ -17,7 +17,7 @@ import { ManagementListComponent } from '../management-list/management-list.comp
   templateUrl: './../management-list/management-list.component.html',
   styleUrls: ['./../management-list/management-list.component.scss'],
 })
-export class TagListComponent extends ManagementListComponent<PaperlessTag> {
+export class TagListComponent extends ManagementListComponent<Tag> {
   constructor(
     tagService: TagService,
     modalService: NgbModal,
@@ -41,7 +41,7 @@ export class TagListComponent extends ManagementListComponent<PaperlessTag> {
           key: 'color',
           name: $localize`Color`,
           rendersHtml: true,
-          valueFn: (t: PaperlessTag) => {
+          valueFn: (t: Tag) => {
             return `<span class="badge" style="color: ${t.text_color}; background-color: ${t.color}">${t.color}</span>`
           },
         },
@@ -49,7 +49,7 @@ export class TagListComponent extends ManagementListComponent<PaperlessTag> {
     )
   }
 
-  getDeleteMessage(object: PaperlessTag) {
+  getDeleteMessage(object: Tag) {
     return $localize`Do you really want to delete the tag "${object.name}"?`
   }
 }

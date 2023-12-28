@@ -2,10 +2,7 @@ import { Component, ViewChild } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { NgbActiveModal, NgbAlert } from '@ng-bootstrap/ng-bootstrap'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
-import {
-  IMAPSecurity,
-  PaperlessMailAccount,
-} from 'src/app/data/paperless-mail-account'
+import { IMAPSecurity, MailAccount } from 'src/app/data/mail-account'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -21,7 +18,7 @@ const IMAP_SECURITY_OPTIONS = [
   templateUrl: './mail-account-edit-dialog.component.html',
   styleUrls: ['./mail-account-edit-dialog.component.scss'],
 })
-export class MailAccountEditDialogComponent extends EditDialogComponent<PaperlessMailAccount> {
+export class MailAccountEditDialogComponent extends EditDialogComponent<MailAccount> {
   testActive: boolean = false
   testResult: string
   alertTimeout

@@ -7,7 +7,7 @@ import { of } from 'rxjs'
 import {
   MailMetadataCorrespondentOption,
   MailAction,
-} from 'src/app/data/paperless-mail-rule'
+} from 'src/app/data/mail-rule'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'

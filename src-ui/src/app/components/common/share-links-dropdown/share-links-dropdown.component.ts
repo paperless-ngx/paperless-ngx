@@ -1,9 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core'
 import { first } from 'rxjs'
-import {
-  PaperlessShareLink,
-  PaperlessFileVersion,
-} from 'src/app/data/paperless-share-link'
+import { ShareLink, FileVersion } from 'src/app/data/share-link'
 import { ShareLinkService } from 'src/app/services/rest/share-link.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
@@ -41,7 +38,7 @@ export class ShareLinksDropdownComponent implements OnInit {
   @Input()
   hasArchiveVersion: boolean = true
 
-  shareLinks: PaperlessShareLink[]
+  shareLinks: ShareLink[]
 
   loading: boolean = false
 
@@ -83,21 +80,21 @@ export class ShareLinksDropdownComponent implements OnInit {
       })
   }
 
-  getShareUrl(link: PaperlessShareLink): string {
+  getShareUrl(link: ShareLink): string {
     const apiURL = new URL(environment.apiBaseUrl)
     return `${apiURL.origin}${apiURL.pathname.replace(/\/api\/$/, '/share/')}${
       link.slug
     }`
   }
 
-  getDaysRemaining(link: PaperlessShareLink): string {
+  getDaysRemaining(link: ShareLink): string {
     const days: number = Math.round(
       (Date.parse(link.expiration) - Date.now()) / (1000 * 60 * 60 * 24)
     )
     return days === 1 ? $localize`1 day` : $localize`${days} days`
   }
 
-  copy(link: PaperlessShareLink) {
+  copy(link: ShareLink) {
     const success = this.clipboard.copy(this.getShareUrl(link))
     if (success) {
       this.copied = link.id
@@ -107,17 +104,17 @@ export class ShareLinksDropdownComponent implements OnInit {
     }
   }
 
-  canShare(link: PaperlessShareLink): boolean {
+  canShare(link: ShareLink): boolean {
     return (
       navigator?.canShare && navigator.canShare({ url: this.getShareUrl(link) })
     )
   }
 
-  share(link: PaperlessShareLink) {
+  share(link: ShareLink) {
     navigator.share({ url: this.getShareUrl(link) })
   }
 
-  delete(link: PaperlessShareLink) {
+  delete(link: ShareLink) {
     this.shareLinkService.delete(link).subscribe({
       next: () => {
         this.refresh()
@@ -138,9 +135,7 @@ export class ShareLinksDropdownComponent implements OnInit {
     this.shareLinkService
       .createLinkForDocument(
         this._documentId,
-        this.useArchiveVersion
-          ? PaperlessFileVersion.Archive
-          : PaperlessFileVersion.Original,
+        this.useArchiveVersion ? FileVersion.Archive : FileVersion.Original,
         expiration
       )
       .subscribe({

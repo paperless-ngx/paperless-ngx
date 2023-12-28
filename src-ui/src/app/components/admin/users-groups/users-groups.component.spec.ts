@@ -41,8 +41,8 @@ import { TextComponent } from '../../common/input/text/text.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { SettingsComponent } from '../settings/settings.component'
 import { UsersAndGroupsComponent } from './users-groups.component'
-import { PaperlessUser } from 'src/app/data/paperless-user'
-import { PaperlessGroup } from 'src/app/data/paperless-group'
+import { User } from 'src/app/data/user'
+import { Group } from 'src/app/data/group'
 
 const users = [
   { id: 1, username: 'user1', is_superuser: false },
@@ -119,7 +119,7 @@ describe('UsersAndGroupsComponent', () => {
         of({
           all: users.map((a) => a.id),
           count: users.length,
-          results: (users as PaperlessUser[]).concat([]),
+          results: (users as User[]).concat([]),
         })
       )
     }
@@ -128,7 +128,7 @@ describe('UsersAndGroupsComponent', () => {
         of({
           all: groups.map((r) => r.id),
           count: groups.length,
-          results: (groups as PaperlessGroup[]).concat([]),
+          results: (groups as Group[]).concat([]),
         })
       )
     }

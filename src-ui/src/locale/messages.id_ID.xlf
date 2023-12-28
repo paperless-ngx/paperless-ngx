@@ -288,7 +288,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</target>
+        <target state="translated">Dokumen <x id="PH" equiv-text="status.filename"/> telah ditambahkan ke Paperless-ngx.</target>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html">
         <source>Open document</source>
@@ -316,7 +316,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">120</context>
         </context-group>
-        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> is being processed by Paperless-ngx.</target>
+        <target state="translated">Dokumen <x id="PH" equiv-text="status.filename"/> sedang diproses oleh Paperless-ngx.</target>
       </trans-unit>
       <trans-unit id="2501522447884928778" datatype="html">
         <source>Prev</source>
@@ -360,7 +360,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">141</context>
         </context-group>
-        <target state="needs-translation">Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</target>
+        <target state="translated">Seret dan lepas dokumen di sini untuk mulai mengunggah atau tempatkan pada folder konsumsi. Anda juga dapat seret dan lepas dokumen di mana pun pada halaman lainnya. Setelah itu, Paperless-ngx akan mulai melatih algoritma pembelajaran mesinnya.</target>
       </trans-unit>
       <trans-unit id="7495498057594070122" datatype="html">
         <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
@@ -368,7 +368,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">146</context>
         </context-group>
-        <target state="needs-translation">The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</target>
+        <target state="translated">Daftar dokumen menunjukkan semua dokumen Anda dan memungkinkan penyaringan serta pengeditan masal. Ada tiga gaya tampilan berbeda: daftar, kartu kecil, dan kartu besar. Daftar dokumen yang sedang diedit ada di bilah samping.</target>
       </trans-unit>
       <trans-unit id="1334220418719920556" datatype="html">
         <source>The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.</source>
@@ -376,7 +376,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">153</context>
         </context-group>
-        <target state="needs-translation">The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.</target>
+        <target state="translated">Alat pemfilteran memungkinkan Anda untuk menemukan dokumen dengan cepat menggunakan berbagai pencarian, tanggal, label, dll.</target>
       </trans-unit>
       <trans-unit id="5427326625898532358" datatype="html">
         <source>Any combination of filters can be saved as a &apos;view&apos; which can then be displayed on the dashboard and / or sidebar.</source>
@@ -384,7 +384,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">159</context>
         </context-group>
-        <target state="needs-translation">Any combination of filters can be saved as a 'view' which can then be displayed on the dashboard and / or sidebar.</target>
+        <target state="translated">Kombinasi filter apapun dapat disimpan sebagai 'tampilan' yang dapat ditampilkan pada dasbor dan / atau bilah samping.</target>
       </trans-unit>
       <trans-unit id="2804886236408698479" datatype="html">
         <source>Tags, correspondents, document types and storage paths can all be managed using these pages. They can also be created from the document edit view.</source>
@@ -392,7 +392,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">164</context>
         </context-group>
-        <target state="needs-translation">Tags, correspondents, document types and storage paths can all be managed using these pages. They can also be created from the document edit view.</target>
+        <target state="translated">Label, koresponden, tipe dokumen, dan lokasi penyimpanan dapat dikelola menggunakan halaman ini. Ini semua juga dapat dibuat via tampilan edit dokumen.</target>
       </trans-unit>
       <trans-unit id="7851939076947092983" datatype="html">
         <source>Manage e-mail accounts and rules for automatically importing documents.</source>
@@ -400,7 +400,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">172</context>
         </context-group>
-        <target state="needs-translation">Manage e-mail accounts and rules for automatically importing documents.</target>
+        <target state="translated">Kelola akun surel dan aturan untuk pengimporan otomatis dokumen.</target>
       </trans-unit>
       <trans-unit id="1347174817382304718" datatype="html">
         <source>Consumption templates give you finer control over the document ingestion process.</source>
@@ -620,7 +620,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">You need to reload the page after applying a new language.</target>
+        <target state="translated">Anda perlu memuat ulang halaman setelah mengganti bahasa.</target>
       </trans-unit>
       <trans-unit id="3766032098416558788" datatype="html">
         <source>Date display</source>
@@ -628,7 +628,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Date display</target>
+        <target state="translated">Tampilan tanggal</target>
       </trans-unit>
       <trans-unit id="3733378544613473393" datatype="html">
         <source>Date format</source>
@@ -684,7 +684,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="translated">Gunakan penampil PDF disediakan browser</target>
+        <target state="translated">Gunakan penampil PDF yang disediakan peramban</target>
       </trans-unit>
       <trans-unit id="9003921625412907981" datatype="html">
         <source>This is usually faster for displaying large PDF documents, but it might not work on some browsers.</source>
@@ -692,7 +692,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="needs-translation">This is usually faster for displaying large PDF documents, but it might not work on some browsers.</target>
+        <target state="translated">Ini biasanya lebih cepat untuk menampilkan dokumen PDF berukuran besar, tapi mungkin tidak berfungsi pada beberapa peramban.</target>
       </trans-unit>
       <trans-unit id="3982403428275430291" datatype="html">
         <source>Sidebar</source>
@@ -700,7 +700,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="needs-translation">Sidebar</target>
+        <target state="translated">Bilah samping</target>
       </trans-unit>
       <trans-unit id="4608457133854405683" datatype="html">
         <source>Use &apos;slim&apos; sidebar (icons only)</source>
@@ -708,7 +708,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="needs-translation">Use 'slim' sidebar (icons only)</target>
+        <target state="translated">Gunakan bilah samping 'ramping' (hanya ikon)</target>
       </trans-unit>
       <trans-unit id="1356890996281769972" datatype="html">
         <source>Dark mode</source>
@@ -740,7 +740,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">115</context>
         </context-group>
-        <target state="needs-translation">Invert thumbnails in dark mode</target>
+        <target state="translated">Balikkan warna keluku dalam mode gelap</target>
       </trans-unit>
       <trans-unit id="7983234071833154796" datatype="html">
         <source>Theme Color</source>
@@ -756,7 +756,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">130</context>
         </context-group>
-        <target state="needs-translation">Reset</target>
+        <target state="translated">Reset</target>
       </trans-unit>
       <trans-unit id="8901931207592071833" datatype="html">
         <source>Update checking</source>
@@ -788,7 +788,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">146</context>
         </context-group>
-        <target state="needs-translation">Enable update checking</target>
+        <target state="translated">Aktifkan pemeriksa pembaruan</target>
       </trans-unit>
       <trans-unit id="8508424367627989968" datatype="html">
         <source>Bulk editing</source>
@@ -796,7 +796,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">150</context>
         </context-group>
-        <target state="needs-translation">Bulk editing</target>
+        <target state="translated">Pengeditan massal</target>
       </trans-unit>
       <trans-unit id="8158899674926420054" datatype="html">
         <source>Show confirmation dialogs</source>
@@ -804,7 +804,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">154</context>
         </context-group>
-        <target state="needs-translation">Show confirmation dialogs</target>
+        <target state="translated">Tampilkan dialog konfirmasi</target>
       </trans-unit>
       <trans-unit id="6906812245033969309" datatype="html">
         <source>Deleting documents will always ask for confirmation.</source>
@@ -812,7 +812,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">154</context>
         </context-group>
-        <target state="needs-translation">Deleting documents will always ask for confirmation.</target>
+        <target state="translated">Menghapus dokumen akan selalu meminta konfirmasi.</target>
       </trans-unit>
       <trans-unit id="290238406234356122" datatype="html">
         <source>Apply on close</source>
@@ -820,7 +820,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">155</context>
         </context-group>
-        <target state="needs-translation">Apply on close</target>
+        <target state="translated">Terapkan setelah ditutup</target>
       </trans-unit>
       <trans-unit id="8104421162933956065" datatype="html">
         <source>Notes</source>
@@ -844,7 +844,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">163</context>
         </context-group>
-        <target state="needs-translation">Enable notes</target>
+        <target state="translated">Aktifkan catatan</target>
       </trans-unit>
       <trans-unit id="7314814725704332646" datatype="html">
         <source>Permissions</source>
@@ -908,7 +908,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">174</context>
         </context-group>
-        <target state="needs-translation">Default Permissions</target>
+        <target state="translated">Izin bawaan</target>
       </trans-unit>
       <trans-unit id="8222269449891326545" datatype="html">
         <source> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI </source>
@@ -916,7 +916,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">178,180</context>
         </context-group>
-        <target state="needs-translation"> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI </target>
+        <target state="translated"> Pengaturan diterapkan untuk akun pengguna ini untuk objek (Label, Aturan Surat, dll.) yang dibuat via UI web </target>
       </trans-unit>
       <trans-unit id="4292903881380648974" datatype="html">
         <source>Default Owner</source>
@@ -924,7 +924,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">185</context>
         </context-group>
-        <target state="needs-translation">Default Owner</target>
+        <target state="translated">Pemilik Bawaan</target>
       </trans-unit>
       <trans-unit id="734147282056744882" datatype="html">
         <source>Objects without an owner can be viewed and edited by all users</source>
@@ -936,7 +936,7 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Objects without an owner can be viewed and edited by all users</target>
+        <target state="translated">Objek tanpa pemilik dapat dilihat dan diedit oleh semua pengguna</target>
       </trans-unit>
       <trans-unit id="1835394624061684099" datatype="html">
         <source>Default View Permissions</source>
@@ -944,7 +944,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">194</context>
         </context-group>
-        <target state="needs-translation">Default View Permissions</target>
+        <target state="translated">Izin Tampilan Bawaan</target>
       </trans-unit>
       <trans-unit id="2191775412581217688" datatype="html">
         <source>Users:</source>
@@ -1008,7 +1008,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">221</context>
         </context-group>
-        <target state="needs-translation">Default Edit Permissions</target>
+        <target state="translated">Izin Pengeditan Bawaan</target>
       </trans-unit>
       <trans-unit id="3728984448750213892" datatype="html">
         <source>Edit permissions also grant viewing permissions</source>
@@ -1112,7 +1112,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="needs-translation">Views</target>
+        <target state="translated">Tampilan</target>
       </trans-unit>
       <trans-unit id="8953033926734869941" datatype="html">
         <source>Name</source>
@@ -1534,7 +1534,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">117</context>
         </context-group>
         <target state="translated">Terjadi kesalahan saat menyimpan setelan.</target>
       </trans-unit>
@@ -1812,7 +1812,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
-          <context context-type="linenumber">68</context>
+          <context context-type="linenumber">78</context>
         </context-group>
         <target state="translated">Pengguna</target>
       </trans-unit>
@@ -1880,7 +1880,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">89</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/consumption-templates/consumption-templates.component.html</context>
@@ -2122,7 +2122,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">174</context>
         </context-group>
-        <target state="needs-translation">Deleted group</target>
+        <target state="translated">Grup yang dihapus</target>
       </trans-unit>
       <trans-unit id="8850738980935204840" datatype="html">
         <source>Error deleting group.</source>
@@ -2130,7 +2130,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">180</context>
         </context-group>
-        <target state="needs-translation">Error deleting group.</target>
+        <target state="translated">Kesalahan saat menghapus grup.</target>
       </trans-unit>
       <trans-unit id="2173456130768795374" datatype="html">
         <source>Paperless-ngx</source>
@@ -2311,7 +2311,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Tags</target>
+        <target state="translated">Label</target>
       </trans-unit>
       <trans-unit id="4369111787961525769" datatype="html">
         <source>Document Types</source>
@@ -2327,7 +2327,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="needs-translation">Document Types</target>
+        <target state="translated">Tipe Dokumen</target>
       </trans-unit>
       <trans-unit id="5421255270838137624" datatype="html">
         <source>Storage Paths</source>
@@ -2343,7 +2343,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">67</context>
         </context-group>
-        <target state="needs-translation">Storage Paths</target>
+        <target state="translated">Lokasi Penyimpanan</target>
       </trans-unit>
       <trans-unit id="3188389494264426470" datatype="html">
         <source>Custom Fields</source>
@@ -2391,7 +2391,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">198</context>
         </context-group>
-        <target state="needs-translation">Mail</target>
+        <target state="translated">Surat</target>
       </trans-unit>
       <trans-unit id="7844706011418789951" datatype="html">
         <source>Administration</source>
@@ -2399,7 +2399,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">204</context>
         </context-group>
-        <target state="needs-translation">Administration</target>
+        <target state="translated">Administrasi</target>
       </trans-unit>
       <trans-unit id="5537285341303594392" datatype="html">
         <source>File Tasks<x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span *ngIf=&quot;tasksService.failedFileTasks.length &gt; 0&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
@@ -2461,15 +2461,15 @@
         <source>Sidebar views updated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">252</context>
+          <context context-type="linenumber">259</context>
         </context-group>
-        <target state="needs-translation">Sidebar views updated</target>
+        <target state="translated">Tampilan bilah samping telah diperbarui</target>
       </trans-unit>
       <trans-unit id="3547923076537026828" datatype="html">
         <source>Error updating sidebar views</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">255</context>
+          <context context-type="linenumber">262</context>
         </context-group>
         <target state="needs-translation">Error updating sidebar views</target>
       </trans-unit>
@@ -2477,7 +2477,7 @@
         <source>An error occurred while saving update checking settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">276</context>
+          <context context-type="linenumber">283</context>
         </context-group>
         <target state="translated">Terjadi kesalahan saat menyimpan setelan pemeriksaan pembaruan.</target>
       </trans-unit>
@@ -2675,7 +2675,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Filters</target>
+        <target state="translated">Filter</target>
       </trans-unit>
       <trans-unit id="9090904435418488635" datatype="html">
         <source>Process documents that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> filters specified below.</source>
@@ -2691,7 +2691,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Filter sources</target>
+        <target state="translated">Filter sumber</target>
       </trans-unit>
       <trans-unit id="7467799586957602479" datatype="html">
         <source>Filter filename</source>
@@ -2699,7 +2699,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Filter filename</target>
+        <target state="translated">Filter nama berkas</target>
       </trans-unit>
       <trans-unit id="3694878959415278689" datatype="html">
         <source>Apply to documents that match this filename. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</source>
@@ -2715,7 +2715,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">Filter path</target>
+        <target state="translated">Filter lokasi</target>
       </trans-unit>
       <trans-unit id="2900550647231873115" datatype="html">
         <source>Apply to documents that match this path. Wildcards specified as * are allowed. Case insensitive.&lt;/a&gt;</source>
@@ -2731,7 +2731,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Filter mail rule</target>
+        <target state="translated">Filter aturan surat</target>
       </trans-unit>
       <trans-unit id="8663702115863339485" datatype="html">
         <source>Apply to documents consumed via this mail rule.</source>
@@ -2755,7 +2755,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Assign title</target>
+        <target state="translated">Tetapkan judul</target>
       </trans-unit>
       <trans-unit id="7071676931416298160" datatype="html">
         <source>Can include some placeholders, see &lt;a target=&apos;_blank&apos; href=&apos;https://docs.paperless-ngx.com/usage/#consumption-templates&apos;&gt;documentation&lt;/a&gt;.</source>
@@ -2771,7 +2771,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Assign tags</target>
+        <target state="translated">Tetapkan label</target>
       </trans-unit>
       <trans-unit id="6695990587380209737" datatype="html">
         <source>Assign document type</source>
@@ -2783,7 +2783,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Assign document type</target>
+        <target state="translated">Tetapkan jenis dokumen</target>
       </trans-unit>
       <trans-unit id="4875491778188965469" datatype="html">
         <source>Assign correspondent</source>
@@ -2795,7 +2795,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Assign correspondent</target>
+        <target state="translated">Tetapkan koresponden</target>
       </trans-unit>
       <trans-unit id="7198346314713788799" datatype="html">
         <source>Assign storage path</source>
@@ -2803,7 +2803,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Assign storage path</target>
+        <target state="translated">Tetapkan lokasi penyimpanan</target>
       </trans-unit>
       <trans-unit id="475685412372379925" datatype="html">
         <source>Assign custom fields</source>
@@ -2819,7 +2819,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Assign owner</target>
+        <target state="translated">Tetapkan pemilik</target>
       </trans-unit>
       <trans-unit id="1749184201773078639" datatype="html">
         <source>Assign view permissions</source>
@@ -2827,7 +2827,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Assign view permissions</target>
+        <target state="translated">Tetapkan izin tampilan</target>
       </trans-unit>
       <trans-unit id="1744964187586405039" datatype="html">
         <source>Assign edit permissions</source>
@@ -2835,7 +2835,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component.html</context>
           <context context-type="linenumber">62</context>
         </context-group>
-        <target state="needs-translation">Assign edit permissions</target>
+        <target state="translated">Tetapkan izin edit</target>
       </trans-unit>
       <trans-unit id="1519954996184640001" datatype="html">
         <source>Error</source>
@@ -2851,7 +2851,7 @@
           <context context-type="sourcefile">src/app/components/common/toasts/toasts.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="translated">Kesalahan</target>
+        <target state="translated">Galat</target>
       </trans-unit>
       <trans-unit id="2159130950882492111" datatype="html">
         <source>Cancel</source>
@@ -3023,7 +3023,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component.ts</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Create new correspondent</target>
+        <target state="translated">Buat koresponden baru</target>
       </trans-unit>
       <trans-unit id="2059822531169388684" datatype="html">
         <source>Edit correspondent</source>
@@ -3323,7 +3323,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="translated">Saring dari</target>
+        <target state="translated">Filter dari</target>
       </trans-unit>
       <trans-unit id="8977094263269822022" datatype="html">
         <source>Filter to</source>
@@ -3331,7 +3331,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="translated">Saring ke</target>
+        <target state="translated">Filter ke</target>
       </trans-unit>
       <trans-unit id="8497813481090627874" datatype="html">
         <source>Filter subject</source>
@@ -3339,7 +3339,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="translated">Saring subjek</target>
+        <target state="translated">Filter subjek</target>
       </trans-unit>
       <trans-unit id="7314357616097563149" datatype="html">
         <source>Filter body</source>
@@ -3347,7 +3347,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="translated">Saring badan</target>
+        <target state="translated">Filter badan</target>
       </trans-unit>
       <trans-unit id="4603548543464136402" datatype="html">
         <source>Filter attachment filename includes</source>
@@ -3355,7 +3355,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Filter attachment filename includes</target>
+        <target state="translated">Filter nama berkas lampiran termasuk</target>
       </trans-unit>
       <trans-unit id="4245210767172267486" datatype="html">
         <source>Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</source>
@@ -3371,7 +3371,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Filter attachment filename excluding</target>
+        <target state="translated">Filter nama berkas lampiran tidak termasuk</target>
       </trans-unit>
       <trans-unit id="6774472763442688477" datatype="html">
         <source>Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</source>
@@ -3619,7 +3619,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Create new storage path</target>
+        <target state="translated">Buat lokasi penyimpanan baru</target>
       </trans-unit>
       <trans-unit id="3754859110054016570" datatype="html">
         <source>Edit storage path</source>
@@ -3647,7 +3647,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Inbox tag</target>
+        <target state="translated">Label kotak masuk</target>
       </trans-unit>
       <trans-unit id="8566220514470905459" datatype="html">
         <source>Inbox tags are automatically assigned to all consumed documents.</source>
@@ -3663,7 +3663,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">Create new tag</target>
+        <target state="translated">Buat label baru</target>
       </trans-unit>
       <trans-unit id="5872175735754226507" datatype="html">
         <source>Edit tag</source>
@@ -3671,7 +3671,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.ts</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Edit tag</target>
+        <target state="translated">Edit label</target>
       </trans-unit>
       <trans-unit id="4768749765465246664" datatype="html">
         <source>Email</source>
@@ -3963,7 +3963,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.ts</context>
-          <context context-type="linenumber">80</context>
+          <context context-type="linenumber">77</context>
         </context-group>
         <target state="translated">Privat</target>
       </trans-unit>
@@ -3981,7 +3981,7 @@
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Add tag</target>
+        <target state="translated">Tambah label</target>
       </trans-unit>
       <trans-unit id="2561408369057364131" datatype="html">
         <source>Filter documents with these Tags</source>
@@ -3989,7 +3989,7 @@
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="needs-translation">Filter documents with these Tags</target>
+        <target state="translated">Filter dokumen dengan label berikut</target>
       </trans-unit>
       <trans-unit id="1388712764439031120" datatype="html">
         <source>Open link</source>
@@ -3997,7 +3997,7 @@
           <context context-type="sourcefile">src/app/components/common/input/url/url.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Open link</target>
+        <target state="translated">Buka tautan</target>
       </trans-unit>
       <trans-unit id="7062872617520618723" datatype="html">
         <source>Set permissions</source>
@@ -4039,21 +4039,29 @@
         </context-group>
         <target state="translated">Dibagikan dengan saya</target>
       </trans-unit>
-      <trans-unit id="5151074932731293042" datatype="html">
-        <source>Unowned</source>
+      <trans-unit id="175385209536581523" datatype="html">
+        <source>Shared by me</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
           <context context-type="linenumber">48</context>
         </context-group>
-        <target state="needs-translation">Unowned</target>
+        <target state="translated">Dibagikan oleh saya</target>
+      </trans-unit>
+      <trans-unit id="5151074932731293042" datatype="html">
+        <source>Unowned</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+        <target state="translated">Tidak dimiliki</target>
       </trans-unit>
       <trans-unit id="8999708063434507268" datatype="html">
         <source>Hide unowned</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
-          <context context-type="linenumber">77</context>
+          <context context-type="linenumber">87</context>
         </context-group>
-        <target state="needs-translation">Hide unowned</target>
+        <target state="translated">Sembunyikan yang tidak dimiliki</target>
       </trans-unit>
       <trans-unit id="8650499415827640724" datatype="html">
         <source>Type</source>
@@ -4079,6 +4087,14 @@
         </context-group>
         <target state="needs-translation">Inherited from group</target>
       </trans-unit>
+      <trans-unit id="6418218602775540217" datatype="html">
+        <source>Error loading preview</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/preview-popup/preview-popup.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <target state="translated">Kesalahan saat memuat pratinjau</target>
+      </trans-unit>
       <trans-unit id="2984628903434675339" datatype="html">
         <source>Edit Profile</source>
         <context-group purpose="location">
@@ -4093,7 +4109,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Confirm Email</target>
+        <target state="translated">Konfirmasi Surel</target>
       </trans-unit>
       <trans-unit id="3241357959735682038" datatype="html">
         <source>Confirm Password</source>
@@ -4101,7 +4117,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Confirm Password</target>
+        <target state="translated">Konfirmasi Kata Sandi</target>
       </trans-unit>
       <trans-unit id="7554924397178347823" datatype="html">
         <source>API Auth Token</source>
@@ -4145,7 +4161,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Copied!</target>
+        <target state="translated">Disalin!</target>
       </trans-unit>
       <trans-unit id="4369881772624105142" datatype="html">
         <source>Warning: changing the token cannot be undone</source>
@@ -4161,7 +4177,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="needs-translation">Emails must match</target>
+        <target state="translated">Surel harus cocok</target>
       </trans-unit>
       <trans-unit id="5281933990298241826" datatype="html">
         <source>Passwords must match</source>
@@ -4169,7 +4185,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="needs-translation">Passwords must match</target>
+        <target state="translated">Kata sandi harus cocok</target>
       </trans-unit>
       <trans-unit id="4219429959475101385" datatype="html">
         <source>Profile updated successfully</source>
@@ -4415,7 +4431,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">203</context>
+          <context context-type="linenumber">204</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
@@ -4479,7 +4495,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">99</context>
+          <context context-type="linenumber">105</context>
         </context-group>
         <target state="translated">Unduh</target>
       </trans-unit>
@@ -4700,7 +4716,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">-</target>
+        <target state="translated">-</target>
       </trans-unit>
       <trans-unit id="8479257185772414452" datatype="html">
         <source>+</source>
@@ -4708,7 +4724,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">+</target>
+        <target state="translated">+</target>
       </trans-unit>
       <trans-unit id="8659635229098859487" datatype="html">
         <source>Download original</source>
@@ -5032,7 +5048,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">575</context>
         </context-group>
-        <target state="needs-translation">Document saved successfully.</target>
+        <target state="translated">Dokumen berhasil disimpan.</target>
       </trans-unit>
       <trans-unit id="448882439049417053" datatype="html">
         <source>Error saving document</source>
@@ -5148,7 +5164,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Edit:</target>
+        <target state="translated">Edit:</target>
       </trans-unit>
       <trans-unit id="7001227209911602786" datatype="html">
         <source>Filter tags</source>
@@ -5160,7 +5176,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Filter tags</target>
+        <target state="translated">Filter label</target>
       </trans-unit>
       <trans-unit id="184185893993764098" datatype="html">
         <source>Filter correspondents</source>
@@ -5172,7 +5188,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="translated">Saring koresponden</target>
+        <target state="translated">Filter koresponden</target>
       </trans-unit>
       <trans-unit id="2947613869920454977" datatype="html">
         <source>Filter document types</source>
@@ -5184,7 +5200,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="translated">Saring jenis dokumen</target>
+        <target state="translated">Filter jenis dokumen</target>
       </trans-unit>
       <trans-unit id="8816999377397522522" datatype="html">
         <source>Filter storage paths</source>
@@ -5196,7 +5212,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="translated">Saring lokasi penyimpanan</target>
+        <target state="translated">Filter lokasi penyimpanan</target>
       </trans-unit>
       <trans-unit id="1015374532025907183" datatype="html">
         <source>Include:</source>
@@ -5220,7 +5236,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">118,120</context>
         </context-group>
-        <target state="needs-translation"> Original files </target>
+        <target state="translated"> Berkas asli </target>
       </trans-unit>
       <trans-unit id="3608345051493493574" datatype="html">
         <source> Use formatted filename </source>
@@ -5430,7 +5446,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">207</context>
         </context-group>
-        <target state="needs-translation">Filter by correspondent</target>
+        <target state="translated">Filter berdasarkan koresponden</target>
       </trans-unit>
       <trans-unit id="2784168796433474565" datatype="html">
         <source>Filter by tag</source>
@@ -5442,7 +5458,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">212</context>
         </context-group>
-        <target state="needs-translation">Filter by tag</target>
+        <target state="translated">Filter berdasarkan label</target>
       </trans-unit>
       <trans-unit id="106713086593101376" datatype="html">
         <source>View notes</source>
@@ -5470,7 +5486,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">228</context>
         </context-group>
-        <target state="needs-translation">Filter by document type</target>
+        <target state="translated">Filter berdasarkan jenis dokumen</target>
       </trans-unit>
       <trans-unit id="157572966557284263" datatype="html">
         <source>Filter by storage path</source>
@@ -5482,7 +5498,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">233</context>
         </context-group>
-        <target state="needs-translation">Filter by storage path</target>
+        <target state="translated">Filter berdasarkan lokasi penyimpanan</target>
       </trans-unit>
       <trans-unit id="3727324658595204357" datatype="html">
         <source>Created: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate }}"/></source>
@@ -5520,11 +5536,27 @@
         </context-group>
         <target state="needs-translation">Modified: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate }}"/></target>
       </trans-unit>
+      <trans-unit id="5739581984228459958" datatype="html">
+        <source>Shared</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
+          <context context-type="linenumber">119</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
+          <context context-type="linenumber">84</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pipes/username.pipe.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+        <target state="needs-translation">Shared</target>
+      </trans-unit>
       <trans-unit id="2332107018974972998" datatype="html">
         <source>Score:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">122</context>
         </context-group>
         <target state="needs-translation">Score:</target>
       </trans-unit>
@@ -5630,7 +5662,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="needs-translation">(filtered)</target>
+        <target state="translated">(difilter)</target>
       </trans-unit>
       <trans-unit id="6849725902312323996" datatype="html">
         <source>Reset filters</source>
@@ -5642,7 +5674,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">84</context>
         </context-group>
-        <target state="needs-translation">Reset filters</target>
+        <target state="translated">Reset filter</target>
       </trans-unit>
       <trans-unit id="1559883523769732271" datatype="html">
         <source>Error while loading documents</source>
@@ -5668,7 +5700,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">208</context>
+          <context context-type="linenumber">209</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
@@ -5796,7 +5828,7 @@
         <source>Correspondent: <x id="PH" equiv-text="this.correspondents.find(               (c) =&gt; c.id == +rule.value             )?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">120,122</context>
+          <context context-type="linenumber">121,123</context>
         </context-group>
         <target state="needs-translation">Correspondent: <x id="PH" equiv-text="this.correspondents.find(               (c) =&gt; c.id == +rule.value             )?.name"/></target>
       </trans-unit>
@@ -5804,7 +5836,7 @@
         <source>Without correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">124</context>
+          <context context-type="linenumber">125</context>
         </context-group>
         <target state="translated">Tanpa koresponden</target>
       </trans-unit>
@@ -5812,7 +5844,7 @@
         <source>Document type: <x id="PH" equiv-text="this.documentTypes.find(               (dt) =&gt; dt.id == +rule.value             )?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">130,132</context>
+          <context context-type="linenumber">131,133</context>
         </context-group>
         <target state="needs-translation">Document type: <x id="PH" equiv-text="this.documentTypes.find(               (dt) =&gt; dt.id == +rule.value             )?.name"/></target>
       </trans-unit>
@@ -5820,15 +5852,15 @@
         <source>Without document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">134</context>
+          <context context-type="linenumber">135</context>
         </context-group>
-        <target state="needs-translation">Without document type</target>
+        <target state="translated">Tanpa tipe dokumen</target>
       </trans-unit>
       <trans-unit id="232202047340644471" datatype="html">
         <source>Storage path: <x id="PH" equiv-text="this.storagePaths.find(               (sp) =&gt; sp.id == +rule.value             )?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">140,142</context>
+          <context context-type="linenumber">141,143</context>
         </context-group>
         <target state="needs-translation">Storage path: <x id="PH" equiv-text="this.storagePaths.find(               (sp) =&gt; sp.id == +rule.value             )?.name"/></target>
       </trans-unit>
@@ -5836,15 +5868,15 @@
         <source>Without storage path</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">144</context>
+          <context context-type="linenumber">145</context>
         </context-group>
-        <target state="needs-translation">Without storage path</target>
+        <target state="translated">Tanpa lokasi penyimpanan</target>
       </trans-unit>
       <trans-unit id="8180755793012580465" datatype="html">
         <source>Tag: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)             ?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">148,149</context>
+          <context context-type="linenumber">149,150</context>
         </context-group>
         <target state="needs-translation">Tag: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)             ?.name"/></target>
       </trans-unit>
@@ -5852,15 +5884,15 @@
         <source>Without any tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">153</context>
+          <context context-type="linenumber">154</context>
         </context-group>
-        <target state="needs-translation">Without any tag</target>
+        <target state="translated">Tanpa label apapun</target>
       </trans-unit>
       <trans-unit id="6523384805359286307" datatype="html">
         <source>Title: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">157</context>
+          <context context-type="linenumber">158</context>
         </context-group>
         <target state="needs-translation">Title: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
@@ -5868,7 +5900,7 @@
         <source>ASN: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">160</context>
+          <context context-type="linenumber">161</context>
         </context-group>
         <target state="needs-translation">ASN: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
@@ -5876,7 +5908,7 @@
         <source>Owner: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">163</context>
+          <context context-type="linenumber">164</context>
         </context-group>
         <target state="needs-translation">Owner: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
@@ -5884,7 +5916,7 @@
         <source>Owner not in: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">166</context>
+          <context context-type="linenumber">167</context>
         </context-group>
         <target state="needs-translation">Owner not in: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
@@ -5892,15 +5924,15 @@
         <source>Without an owner</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">169</context>
+          <context context-type="linenumber">170</context>
         </context-group>
-        <target state="needs-translation">Without an owner</target>
+        <target state="translated">Tanpa pemilik</target>
       </trans-unit>
       <trans-unit id="3100631071441658964" datatype="html">
         <source>Title &amp; content</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">206</context>
+          <context context-type="linenumber">207</context>
         </context-group>
         <target state="needs-translation">Title &amp; content</target>
       </trans-unit>
@@ -5908,7 +5940,7 @@
         <source>Custom fields</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">211</context>
+          <context context-type="linenumber">212</context>
         </context-group>
         <target state="needs-translation">Custom fields</target>
       </trans-unit>
@@ -5916,15 +5948,15 @@
         <source>Advanced search</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">215</context>
+          <context context-type="linenumber">216</context>
         </context-group>
-        <target state="needs-translation">Advanced search</target>
+        <target state="translated">Pencarian lanjutan</target>
       </trans-unit>
       <trans-unit id="2649431021108393503" datatype="html">
         <source>More like</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">221</context>
+          <context context-type="linenumber">222</context>
         </context-group>
         <target state="needs-translation">More like</target>
       </trans-unit>
@@ -5932,7 +5964,7 @@
         <source>equals</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">240</context>
+          <context context-type="linenumber">241</context>
         </context-group>
         <target state="needs-translation">equals</target>
       </trans-unit>
@@ -5940,33 +5972,33 @@
         <source>is empty</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">244</context>
+          <context context-type="linenumber">245</context>
         </context-group>
-        <target state="needs-translation">is empty</target>
+        <target state="translated">kosong</target>
       </trans-unit>
       <trans-unit id="6166785695326182482" datatype="html">
         <source>is not empty</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">248</context>
+          <context context-type="linenumber">249</context>
         </context-group>
-        <target state="needs-translation">is not empty</target>
+        <target state="translated">tidak kosong</target>
       </trans-unit>
       <trans-unit id="4686622206659266699" datatype="html">
         <source>greater than</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">252</context>
+          <context context-type="linenumber">253</context>
         </context-group>
-        <target state="needs-translation">greater than</target>
+        <target state="translated">lebih besar dari</target>
       </trans-unit>
       <trans-unit id="8014012170270529279" datatype="html">
         <source>less than</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">256</context>
+          <context context-type="linenumber">257</context>
         </context-group>
-        <target state="needs-translation">less than</target>
+        <target state="translated">kurang dari</target>
       </trans-unit>
       <trans-unit id="7210076240260527720" datatype="html">
         <source>Save current view</source>
@@ -6486,7 +6518,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Filter by:</target>
+        <target state="translated">Filter berdasarkan:</target>
       </trans-unit>
       <trans-unit id="1383365546483928780" datatype="html">
         <source>Matching</source>
@@ -6546,7 +6578,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">78</context>
         </context-group>
-        <target state="needs-translation">Filter Documents</target>
+        <target state="translated">Filter Dokumen</target>
       </trans-unit>
       <trans-unit id="8095412801504464756" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {One <x id="INTERPOLATION"/>} other {<x id="INTERPOLATION_1"/> total <x id="INTERPOLATION_2"/>}}</source>
@@ -6630,7 +6662,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">203</context>
         </context-group>
-        <target state="needs-translation">Associated documents will not be deleted.</target>
+        <target state="translated">Dokumen terkait tidak akan dihapus.</target>
       </trans-unit>
       <trans-unit id="6639207128255974941" datatype="html">
         <source>Error while deleting element</source>
@@ -6967,14 +6999,6 @@
           <context context-type="linenumber">11</context>
         </context-group>
         <target state="needs-translation">(no title)</target>
-      </trans-unit>
-      <trans-unit id="5739581984228459958" datatype="html">
-        <source>Shared</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/pipes/username.pipe.ts</context>
-          <context context-type="linenumber">33</context>
-        </context-group>
-        <target state="needs-translation">Shared</target>
       </trans-unit>
       <trans-unit id="2807800733729323332" datatype="html">
         <source>Yes</source>

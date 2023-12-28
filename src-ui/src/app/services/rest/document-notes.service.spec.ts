@@ -3,9 +3,6 @@ import { Subscription } from 'rxjs'
 import { TestBed } from '@angular/core/testing'
 import { environment } from 'src/environments/environment'
 import { commonAbstractPaperlessServiceTests } from './abstract-paperless-service.spec'
-import { MailFilterAttachmentType } from 'src/app/data/paperless-mail-rule'
-import { MailMetadataTitleOption } from 'src/app/data/paperless-mail-rule'
-import { MailAction } from 'src/app/data/paperless-mail-rule'
 import { DocumentNotesService } from './document-notes.service'
 
 let httpTestingController: HttpTestingController

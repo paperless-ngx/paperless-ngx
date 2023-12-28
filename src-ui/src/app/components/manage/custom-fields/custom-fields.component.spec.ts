@@ -1,10 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { CustomFieldsComponent } from './custom-fields.component'
-import {
-  PaperlessCustomField,
-  PaperlessCustomFieldDataType,
-} from 'src/app/data/paperless-custom-field'
+import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -23,16 +20,16 @@ import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dial
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 
-const fields: PaperlessCustomField[] = [
+const fields: CustomField[] = [
   {
     id: 0,
     name: 'Field 1',
-    data_type: PaperlessCustomFieldDataType.String,
+    data_type: CustomFieldDataType.String,
   },
   {
     id: 1,
     name: 'Field 2',
-    data_type: PaperlessCustomFieldDataType.Integer,
+    data_type: CustomFieldDataType.Integer,
   },
 ]
 
