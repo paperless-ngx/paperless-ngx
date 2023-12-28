@@ -54,6 +54,7 @@ export class LogsComponent implements OnInit, AfterViewChecked, OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribeNotifier.next(true)
     this.unsubscribeNotifier.complete()
+    clearInterval(this.autoRefreshInterval)
   }
 
   reloadLogs() {

@@ -34,6 +34,9 @@
             (focus)="clearLastSearchTerm()"
             (clear)="clearLastSearchTerm()"
             (blur)="onBlur()">
+            <ng-template ng-option-tmp let-item="item">
+                <span [title]="item.name">{{item.name}}</span>
+            </ng-template>
           </ng-select>
           @if (allowCreateNew) {
             <button class="btn btn-outline-secondary" type="button" (click)="addItem()" [disabled]="disabled">
