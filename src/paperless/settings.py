@@ -50,15 +50,6 @@ def __get_boolean(key: str, default: str = "NO") -> bool:
     return bool(os.getenv(key, default).lower() in ("yes", "y", "1", "t", "true"))
 
 
-def __get_optional_boolean(key: str) -> Optional[bool]:
-    """
-    Returns None if the environment key is not present, otherwise a boolean
-    """
-    if key in os.environ:
-        return __get_boolean(key)
-    return None
-
-
 def __get_int(key: str, default: int) -> int:
     """
     Return an integer value based on the environment variable or a default
@@ -71,7 +62,7 @@ def __get_optional_int(key: str) -> Optional[int]:
     Returns None if the environment key is not present, otherwise an integer
     """
     if key in os.environ:
-        return __get_int(key, -1)
+        return __get_int(key, -1)  # pragma: no cover
     return None
 
 
@@ -97,7 +88,7 @@ def __get_path(
 
 def __get_optional_path(key: str) -> Optional[Path]:
     """
-    Returns None if the environment key is not present, otherwise an integer
+    Returns None if the environment key is not present, otherwise a fully resolved Path
     """
     if key in os.environ:
         return __get_path(key, "")

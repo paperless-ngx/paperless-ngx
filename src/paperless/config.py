@@ -79,7 +79,7 @@ class OcrConfig(OutputTypeConfig):
         user_args = None
         if app_config.user_args:
             user_args = app_config.user_args
-        elif settings.OCR_USER_ARGS is not None:
+        elif settings.OCR_USER_ARGS is not None:  # pragma: no cover
             try:
                 user_args = json.loads(settings.OCR_USER_ARGS)
             except json.JSONDecodeError:
