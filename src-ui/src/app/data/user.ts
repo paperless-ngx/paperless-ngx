@@ -1,6 +1,6 @@
 import { ObjectWithId } from './object-with-id'
 
-export interface PaperlessUser extends ObjectWithId {
+export interface User extends ObjectWithId {
   username?: string
   first_name?: string
   last_name?: string
@@ -8,7 +8,7 @@ export interface PaperlessUser extends ObjectWithId {
   is_staff?: boolean
   is_active?: boolean
   is_superuser?: boolean
-  groups?: number[] // PaperlessGroup[]
+  groups?: number[] // Group[]
   user_permissions?: string[]
   inherited_permissions?: string[]
 }

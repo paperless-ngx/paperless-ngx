@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common'
 import { Inject, LOCALE_ID, Pipe, PipeTransform } from '@angular/core'
-import { SETTINGS_KEYS } from '../data/paperless-uisettings'
+import { SETTINGS_KEYS } from '../data/ui-settings'
 import { SettingsService } from '../services/settings.service'
 
 const FORMAT_TO_ISO_FORMAT = {

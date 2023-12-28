@@ -21,10 +21,10 @@ import {
   takeUntil,
   tap,
 } from 'rxjs'
-import { PaperlessGroup } from 'src/app/data/paperless-group'
-import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
-import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
-import { PaperlessUser } from 'src/app/data/paperless-user'
+import { Group } from 'src/app/data/group'
+import { SavedView } from 'src/app/data/saved-view'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { User } from 'src/app/data/user'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
   PermissionsService,
@@ -46,6 +46,12 @@ enum SettingsNavIDs {
   Permissions = 2,
   Notifications = 3,
   SavedViews = 4,
+}
+
+const systemLanguage = { code: '', name: $localize`Use system language` }
+const systemDateFormat = {
+  code: '',
+  name: $localize`Use date format of display language`,
 }
 
 @Component({
@@ -92,7 +98,7 @@ export class SettingsComponent
     savedViews: this.savedViewGroup,
   })
 
-  savedViews: PaperlessSavedView[]
+  savedViews: SavedView[]
 
   store: BehaviorSubject<any>
   storeSub: Subscription
@@ -101,8 +107,8 @@ export class SettingsComponent
   unsubscribeNotifier: Subject<any> = new Subject()
   savePending: boolean = false
 
-  users: PaperlessUser[]
-  groups: PaperlessGroup[]
+  users: User[]
+  groups: Group[]
 
   get computedDateLocale(): string {
     return (
@@ -362,7 +368,7 @@ export class SettingsComponent
     this.settings.organizingSidebarSavedViews = false
   }
 
-  deleteSavedView(savedView: PaperlessSavedView) {
+  deleteSavedView(savedView: SavedView) {
     this.savedViewService.delete(savedView).subscribe(() => {
       this.savedViewGroup.removeControl(savedView.id.toString())
       this.savedViews.splice(this.savedViews.indexOf(savedView), 1)
@@ -512,15 +518,11 @@ export class SettingsComponent
   }
 
   get displayLanguageOptions(): LanguageOption[] {
-    return [{ code: '', name: $localize`Use system language` }].concat(
-      this.settings.getLanguageOptions()
-    )
+    return [systemLanguage].concat(this.settings.getLanguageOptions())
   }
 
   get dateLocaleOptions(): LanguageOption[] {
-    return [
-      { code: '', name: $localize`Use date format of display language` },
-    ].concat(this.settings.getDateLocaleOptions())
+    return [systemDateFormat].concat(this.settings.getDateLocaleOptions())
   }
 
   get today() {
@@ -529,7 +531,7 @@ export class SettingsComponent
 
   saveSettings() {
     // only patch views that have actually changed
-    const changed: PaperlessSavedView[] = []
+    const changed: SavedView[] = []
     Object.values(this.savedViewGroup.controls)
       .filter((g: FormGroup) => !g.pristine)
       .forEach((group: FormGroup) => {

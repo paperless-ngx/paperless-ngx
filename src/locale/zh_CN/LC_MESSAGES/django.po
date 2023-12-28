@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-05 08:26-0800\n"
-"PO-Revision-Date: 2023-12-05 16:27\n"
+"POT-Creation-Date: 2023-12-09 10:53-0800\n"
+"PO-Revision-Date: 2023-12-27 12:08\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid "Documents"
 msgstr "文档"
 
-#: documents/models.py:36 documents/models.py:734
+#: documents/models.py:36 documents/models.py:736
 msgid "owner"
 msgstr "所有者"
 
@@ -53,7 +53,7 @@ msgstr "模糊单词"
 msgid "Automatic"
 msgstr "自动"
 
-#: documents/models.py:62 documents/models.py:402 documents/models.py:895
+#: documents/models.py:62 documents/models.py:402 documents/models.py:897
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
 msgid "name"
 msgstr "名称"
@@ -130,7 +130,7 @@ msgstr "使用 GNU 隐私防护（GPG）加密"
 msgid "title"
 msgstr "标题"
 
-#: documents/models.py:171 documents/models.py:648
+#: documents/models.py:171 documents/models.py:650
 msgid "content"
 msgstr "内容"
 
@@ -158,8 +158,8 @@ msgstr "存档校验和"
 msgid "The checksum of the archived document."
 msgstr "已归档文档的校验和。"
 
-#: documents/models.py:205 documents/models.py:385 documents/models.py:654
-#: documents/models.py:692 documents/models.py:762 documents/models.py:799
+#: documents/models.py:205 documents/models.py:385 documents/models.py:656
+#: documents/models.py:694 documents/models.py:764 documents/models.py:801
 msgid "created"
 msgstr "已创建"
 
@@ -207,7 +207,7 @@ msgstr "归档序列号"
 msgid "The position of this document in your physical document archive."
 msgstr "此文档在您的物理文档归档中的位置。"
 
-#: documents/models.py:279 documents/models.py:665 documents/models.py:719
+#: documents/models.py:279 documents/models.py:667 documents/models.py:721
 msgid "document"
 msgstr "文档"
 
@@ -255,7 +255,7 @@ msgstr "日志"
 msgid "logs"
 msgstr "日志"
 
-#: documents/models.py:399 documents/models.py:464
+#: documents/models.py:399 documents/models.py:466
 msgid "saved view"
 msgstr "保存的视图"
 
@@ -423,293 +423,301 @@ msgstr "没有所有者"
 msgid "does not have owner in"
 msgstr "没有所有者"
 
-#: documents/models.py:467
+#: documents/models.py:458
+msgid "has custom field value"
+msgstr ""
+
+#: documents/models.py:459
+msgid "is shared by me"
+msgstr "由我共享"
+
+#: documents/models.py:469
 msgid "rule type"
 msgstr "规则类型"
 
-#: documents/models.py:469
+#: documents/models.py:471
 msgid "value"
 msgstr "值"
 
-#: documents/models.py:472
+#: documents/models.py:474
 msgid "filter rule"
 msgstr "过滤规则"
 
-#: documents/models.py:473
+#: documents/models.py:475
 msgid "filter rules"
 msgstr "过滤规则"
 
-#: documents/models.py:584
+#: documents/models.py:586
 msgid "Task ID"
 msgstr "任务ID"
 
-#: documents/models.py:585
+#: documents/models.py:587
 msgid "Celery ID for the Task that was run"
 msgstr "正在运行的任务的 Celery ID"
 
-#: documents/models.py:590
+#: documents/models.py:592
 msgid "Acknowledged"
 msgstr "已确认"
 
-#: documents/models.py:591
+#: documents/models.py:593
 msgid "If the task is acknowledged via the frontend or API"
 msgstr "如果任务通过前端或 API 确认"
 
-#: documents/models.py:597
+#: documents/models.py:599
 msgid "Task Filename"
 msgstr "任务文件名"
 
-#: documents/models.py:598
+#: documents/models.py:600
 msgid "Name of the file which the Task was run for"
 msgstr "正在运行的任务文件名称"
 
-#: documents/models.py:604
+#: documents/models.py:606
 msgid "Task Name"
 msgstr "任务名称"
 
-#: documents/models.py:605
+#: documents/models.py:607
 msgid "Name of the Task which was run"
 msgstr "运行中的任务名称"
 
-#: documents/models.py:612
+#: documents/models.py:614
 msgid "Task State"
 msgstr "任务状态"
 
-#: documents/models.py:613
+#: documents/models.py:615
 msgid "Current state of the task being run"
 msgstr "当前任务运行状态"
 
-#: documents/models.py:618
+#: documents/models.py:620
 msgid "Created DateTime"
 msgstr "创建日期"
 
-#: documents/models.py:619
+#: documents/models.py:621
 msgid "Datetime field when the task result was created in UTC"
 msgstr "任务结果创建时间（UTC）"
 
-#: documents/models.py:624
+#: documents/models.py:626
 msgid "Started DateTime"
 msgstr "开始时间"
 
-#: documents/models.py:625
+#: documents/models.py:627
 msgid "Datetime field when the task was started in UTC"
 msgstr "任务开始时间（UTC）"
 
-#: documents/models.py:630
+#: documents/models.py:632
 msgid "Completed DateTime"
 msgstr "完成时间"
 
-#: documents/models.py:631
+#: documents/models.py:633
 msgid "Datetime field when the task was completed in UTC"
 msgstr "任务完成时间（UTC）"
 
-#: documents/models.py:636
+#: documents/models.py:638
 msgid "Result Data"
 msgstr "结果数据"
 
-#: documents/models.py:638
+#: documents/models.py:640
 msgid "The data returned by the task"
 msgstr "任务返回的数据"
 
-#: documents/models.py:650
+#: documents/models.py:652
 msgid "Note for the document"
 msgstr "文档备注"
 
-#: documents/models.py:674
+#: documents/models.py:676
 msgid "user"
 msgstr "用户"
 
-#: documents/models.py:679
+#: documents/models.py:681
 msgid "note"
 msgstr "备注"
 
-#: documents/models.py:680
+#: documents/models.py:682
 msgid "notes"
 msgstr "备注"
 
-#: documents/models.py:688
+#: documents/models.py:690
 msgid "Archive"
 msgstr "归档"
 
-#: documents/models.py:689
+#: documents/models.py:691
 msgid "Original"
 msgstr "原版"
 
-#: documents/models.py:700
+#: documents/models.py:702
 msgid "expiration"
 msgstr "过期时间"
 
-#: documents/models.py:707
+#: documents/models.py:709
 msgid "slug"
 msgstr "缩写"
 
-#: documents/models.py:739
+#: documents/models.py:741
 msgid "share link"
 msgstr "分享链接"
 
-#: documents/models.py:740
+#: documents/models.py:742
 msgid "share links"
 msgstr "分享链接"
 
-#: documents/models.py:752
-msgid "String"
-msgstr ""
-
-#: documents/models.py:753
-msgid "URL"
-msgstr ""
-
 #: documents/models.py:754
-msgid "Date"
-msgstr ""
+msgid "String"
+msgstr "字符串"
 
 #: documents/models.py:755
-msgid "Boolean"
-msgstr ""
+msgid "URL"
+msgstr "URL链接"
 
 #: documents/models.py:756
-msgid "Integer"
-msgstr ""
+msgid "Date"
+msgstr "日期"
 
 #: documents/models.py:757
-msgid "Float"
-msgstr ""
+msgid "Boolean"
+msgstr "布尔型"
 
 #: documents/models.py:758
+msgid "Integer"
+msgstr "整数"
+
+#: documents/models.py:759
+msgid "Float"
+msgstr "浮点数"
+
+#: documents/models.py:760
 msgid "Monetary"
 msgstr ""
 
-#: documents/models.py:759
+#: documents/models.py:761
 msgid "Document Link"
-msgstr ""
+msgstr "文档链接"
 
-#: documents/models.py:771
+#: documents/models.py:773
 msgid "data type"
-msgstr ""
+msgstr "数据类型"
 
-#: documents/models.py:779
+#: documents/models.py:781
 msgid "custom field"
-msgstr ""
+msgstr "自定义字段"
 
-#: documents/models.py:780
+#: documents/models.py:782
 msgid "custom fields"
-msgstr ""
+msgstr "自定义字段"
 
-#: documents/models.py:842
+#: documents/models.py:844
 msgid "custom field instance"
-msgstr ""
+msgstr "自定义字段实例"
 
-#: documents/models.py:843
+#: documents/models.py:845
 msgid "custom field instances"
-msgstr ""
+msgstr "自定义字段实例"
 
-#: documents/models.py:891
+#: documents/models.py:893
 msgid "Consume Folder"
 msgstr "消费文件夹"
 
-#: documents/models.py:892
+#: documents/models.py:894
 msgid "Api Upload"
 msgstr "Api上传"
 
-#: documents/models.py:893
+#: documents/models.py:895
 msgid "Mail Fetch"
 msgstr "邮件获取"
 
-#: documents/models.py:897 paperless_mail/models.py:95
+#: documents/models.py:899 paperless_mail/models.py:95
 msgid "order"
 msgstr "排序"
 
-#: documents/models.py:906
+#: documents/models.py:908
 msgid "filter path"
 msgstr "过滤路径"
 
-#: documents/models.py:911
+#: documents/models.py:913
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
 msgstr "只消耗匹配了指定路径的文档。路径指定中允许使用*作为通配符，大小写不敏感。"
 
-#: documents/models.py:918
+#: documents/models.py:920
 msgid "filter filename"
 msgstr "过滤文件名"
 
-#: documents/models.py:923 paperless_mail/models.py:148
+#: documents/models.py:925 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "如果指定了文件名，只处理完全匹配此文件名的文档。允许使用通配符，如 *.pdf 或 *发票*。不区分大小写。"
 
-#: documents/models.py:934
+#: documents/models.py:936
 msgid "filter documents from this mail rule"
 msgstr "从邮件规则中过滤文档"
 
-#: documents/models.py:938
+#: documents/models.py:940
 msgid "assign title"
 msgstr "指定标题"
 
-#: documents/models.py:943
+#: documents/models.py:945
 msgid "Assign a document title, can include some placeholders, see documentation."
 msgstr "指定一个文档标题，可以包含一些占位符，参见文档。"
 
-#: documents/models.py:951 paperless_mail/models.py:216
+#: documents/models.py:953 paperless_mail/models.py:216
 msgid "assign this tag"
 msgstr "分配此标签"
 
-#: documents/models.py:959 paperless_mail/models.py:224
+#: documents/models.py:961 paperless_mail/models.py:224
 msgid "assign this document type"
 msgstr "分配此文档类型"
 
-#: documents/models.py:967 paperless_mail/models.py:238
+#: documents/models.py:969 paperless_mail/models.py:238
 msgid "assign this correspondent"
 msgstr "分配此联系人"
 
-#: documents/models.py:975
+#: documents/models.py:977
 msgid "assign this storage path"
 msgstr "指定存储路径"
 
-#: documents/models.py:984
+#: documents/models.py:986
 msgid "assign this owner"
 msgstr "指定所有者"
 
-#: documents/models.py:991
+#: documents/models.py:993
 msgid "grant view permissions to these users"
 msgstr "为这些用户授予观看权限"
 
-#: documents/models.py:998
+#: documents/models.py:1000
 msgid "grant view permissions to these groups"
 msgstr "为这些用户组授予观看权限"
 
-#: documents/models.py:1005
+#: documents/models.py:1007
 msgid "grant change permissions to these users"
 msgstr "为这些用户授予修改权限"
 
-#: documents/models.py:1012
+#: documents/models.py:1014
 msgid "grant change permissions to these groups"
 msgstr "为这些用户组授予修改权限"
 
-#: documents/models.py:1019
+#: documents/models.py:1021
 msgid "assign these custom fields"
-msgstr ""
+msgstr "分配这些自定义字段"
 
-#: documents/models.py:1023
+#: documents/models.py:1025
 msgid "consumption template"
 msgstr "消费模板"
 
-#: documents/models.py:1024
+#: documents/models.py:1026
 msgid "consumption templates"
 msgstr "消费模板"
 
-#: documents/serialisers.py:102
+#: documents/serialisers.py:105
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "无效的正则表达式：%(error)s"
 
-#: documents/serialisers.py:377
+#: documents/serialisers.py:399
 msgid "Invalid color."
 msgstr "无效的颜色"
 
-#: documents/serialisers.py:842
+#: documents/serialisers.py:865
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "不支持文件类型 %(type)s"
 
-#: documents/serialisers.py:939
+#: documents/serialisers.py:962
 msgid "Invalid variable detected."
 msgstr "检测到无效变量。"
 
@@ -868,7 +876,7 @@ msgstr "白俄罗斯语"
 
 #: paperless/settings.py:590
 msgid "Bulgarian"
-msgstr ""
+msgstr "保加利亚语"
 
 #: paperless/settings.py:591
 msgid "Catalan"
@@ -908,7 +916,7 @@ msgstr "法语"
 
 #: paperless/settings.py:600
 msgid "Hungarian"
-msgstr ""
+msgstr "匈牙利语"
 
 #: paperless/settings.py:601
 msgid "Italian"
@@ -1180,7 +1188,7 @@ msgstr ""
 
 #: paperless_mail/models.py:160
 msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "如果指定了文件名，不要处理完全匹配此文件名的文档。允许使用通配符，如 *.pdf 或 *发票*。不区分大小写。"
 
 #: paperless_mail/models.py:167
 msgid "maximum age"

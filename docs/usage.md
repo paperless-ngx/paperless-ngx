@@ -311,6 +311,8 @@ applied. You can use the following placeholders:
 - `{added_month_name}`: added month name
 - `{added_month_name_short}`: added month short name
 - `{added_day}`: added day
+- `{added_time}`: added time in HH:MM format
+- `{original_filename}`: original file name without extension
 
 ## Custom Fields {#custom-fields}
 
@@ -343,7 +345,7 @@ The following custom field types are supported:
 - `Integer`: integer number e.g. 12
 - `Number`: float number e.g. 12.3456
 - `Monetary`: float number with exactly two decimals, e.g. 12.30
-- `Document Link`: reference(s) to other document(s), displayed as links
+- `Document Link`: reference(s) to other document(s) displayed as links, automatically creates a symmetrical link in reverse
 
 ## Share Links
 

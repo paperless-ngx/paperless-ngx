@@ -5,7 +5,7 @@ import { UserService } from 'src/app/services/rest/user.service'
 import { of, throwError } from 'rxjs'
 import { DocumentNotesService } from 'src/app/services/rest/document-notes.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { PaperlessDocumentNote } from 'src/app/data/paperless-document-note'
+import { DocumentNote } from 'src/app/data/document-note'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
@@ -14,7 +14,7 @@ import { By } from '@angular/platform-browser'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 
-const notes: PaperlessDocumentNote[] = [
+const notes: DocumentNote[] = [
   {
     id: 23,
     note: 'Note 23',

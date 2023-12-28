@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { Tag } from 'src/app/data/tag'
 
 @Component({
   selector: 'pngx-tag',
@@ -10,7 +10,7 @@ export class TagComponent {
   constructor() {}
 
   @Input()
-  tag: PaperlessTag
+  tag: Tag
 
   @Input()
   linkTitle: string = ''

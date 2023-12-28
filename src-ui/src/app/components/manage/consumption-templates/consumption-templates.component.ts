@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { ConsumptionTemplateService } from 'src/app/services/rest/consumption-template.service'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { Subject, takeUntil } from 'rxjs'
-import { PaperlessConsumptionTemplate } from 'src/app/data/paperless-consumption-template'
+import { ConsumptionTemplate } from 'src/app/data/consumption-template'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ToastService } from 'src/app/services/toast.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
@@ -22,7 +22,7 @@ export class ConsumptionTemplatesComponent
   extends ComponentWithPermissions
   implements OnInit
 {
-  public templates: PaperlessConsumptionTemplate[] = []
+  public templates: ConsumptionTemplate[] = []
 
   private unsubscribeNotifier: Subject<any> = new Subject()
 
@@ -48,13 +48,13 @@ export class ConsumptionTemplatesComponent
       })
   }
 
-  getSourceList(template: PaperlessConsumptionTemplate): string {
+  getSourceList(template: ConsumptionTemplate): string {
     return template.sources
       .map((id) => DOCUMENT_SOURCE_OPTIONS.find((s) => s.id === id).name)
       .join(', ')
   }
 
-  editTemplate(rule: PaperlessConsumptionTemplate) {
+  editTemplate(rule: ConsumptionTemplate) {
     const modal = this.modalService.open(
       ConsumptionTemplateEditDialogComponent,
       {
@@ -82,7 +82,7 @@ export class ConsumptionTemplatesComponent
       })
   }
 
-  deleteTemplate(rule: PaperlessConsumptionTemplate) {
+  deleteTemplate(rule: ConsumptionTemplate) {
     const modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
     })

@@ -1,11 +1,11 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core'
 import { DocumentNotesService } from 'src/app/services/rest/document-notes.service'
-import { PaperlessDocumentNote } from 'src/app/data/paperless-document-note'
+import { DocumentNote } from 'src/app/data/document-note'
 import { FormControl, FormGroup } from '@angular/forms'
 import { ToastService } from 'src/app/services/toast.service'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { UserService } from 'src/app/services/rest/user.service'
-import { PaperlessUser } from 'src/app/data/paperless-user'
+import { User } from 'src/app/data/user'
 
 @Component({
   selector: 'pngx-document-notes',
@@ -24,14 +24,14 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
   documentId: number
 
   @Input()
-  notes: PaperlessDocumentNote[] = []
+  notes: DocumentNote[] = []
 
   @Input()
   addDisabled: boolean = false
 
   @Output()
-  updated: EventEmitter<PaperlessDocumentNote[]> = new EventEmitter()
-  users: PaperlessUser[]
+  updated: EventEmitter<DocumentNote[]> = new EventEmitter()
+  users: User[]
 
   constructor(
     private notesService: DocumentNotesService,
@@ -82,7 +82,7 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
     })
   }
 
-  displayName(note: PaperlessDocumentNote): string {
+  displayName(note: DocumentNote): string {
     if (!note.user) return ''
     const user = this.users?.find((u) => u.id === note.user)
     if (!user) return ''

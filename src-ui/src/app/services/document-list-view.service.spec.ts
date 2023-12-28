@@ -12,13 +12,13 @@ import {
   FILTER_HAS_TAGS_ALL,
   FILTER_HAS_TAGS_ANY,
 } from '../data/filter-rule-type'
-import { PaperlessSavedView } from '../data/paperless-saved-view'
+import { SavedView } from '../data/saved-view'
 import { FilterRule } from '../data/filter-rule'
 import { RouterTestingModule } from '@angular/router/testing'
 import { routes } from 'src/app/app-routing.module'
 import { PermissionsGuard } from '../guards/permissions.guard'
 import { SettingsService } from './settings.service'
-import { SETTINGS_KEYS } from '../data/paperless-uisettings'
+import { SETTINGS_KEYS } from '../data/ui-settings'
 
 const documents = [
   {
@@ -69,7 +69,7 @@ const filterRules: FilterRule[] = [
   },
 ]
 
-const view: PaperlessSavedView = {
+const view: SavedView = {
   id: 3,
   name: 'Saved View',
   sort_field: 'added',

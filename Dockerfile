@@ -12,7 +12,7 @@ COPY ./src-ui /src/src-ui
 WORKDIR /src/src-ui
 RUN set -eux \
   && npm update npm -g \
-  && npm ci --omit=optional
+  && npm ci
 RUN set -eux \
   && ./node_modules/.bin/ng build --configuration production
 
@@ -29,7 +29,7 @@ COPY Pipfile* ./
 
 RUN set -eux \
   && echo "Installing pipenv" \
-    && python3 -m pip install --no-cache-dir --upgrade pipenv==2023.10.24 \
+    && python3 -m pip install --no-cache-dir --upgrade pipenv==2023.11.15 \
   && echo "Generating requirement.txt" \
     && pipenv requirements > requirements.txt
 
@@ -38,6 +38,8 @@ RUN set -eux \
 # Comments:
 #  - Don't leave anything extra in here
 FROM docker.io/python:3.11-slim-bookworm as main-app
+
+ENV PYTHONWARNINGS="ignore:::django.http.response:517"
 
 LABEL org.opencontainers.image.authors="paperless-ngx team <hello@paperless-ngx.com>"
 LABEL org.opencontainers.image.documentation="https://docs.paperless-ngx.com/"
@@ -52,8 +54,8 @@ ARG TARGETARCH
 
 # Can be workflow provided, defaults set for manual building
 ARG JBIG2ENC_VERSION=0.29
-ARG QPDF_VERSION=11.6.3
-ARG GS_VERSION=10.02.0
+ARG QPDF_VERSION=11.6.4
+ARG GS_VERSION=10.02.1
 
 #
 # Begin installation and configuration
@@ -123,13 +125,13 @@ RUN set -eux \
       && echo "Installing Ghostscript ${GS_VERSION}" \
         && curl --fail --silent --show-error --location \
           --output libgs10_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
-          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
+          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
         && curl --fail --silent --show-error --location \
           --output ghostscript_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
-          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/ghostscript_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
+          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
         && curl --fail --silent --show-error --location \
           --output libgs10-common_${GS_VERSION}.dfsg-2_all.deb \
-          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10-common_${GS_VERSION}.dfsg-2_all.deb \
+          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
         && dpkg --install ./libgs10-common_${GS_VERSION}.dfsg-2_all.deb \
         && dpkg --install ./libgs10_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
         && dpkg --install ./ghostscript_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
