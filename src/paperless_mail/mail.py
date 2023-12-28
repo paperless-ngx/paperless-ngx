@@ -92,7 +92,7 @@ class BaseMailAction:
         M: MailBox,
         message_uid: str,
         parameter: str,
-    ):  # pragma: nocover
+    ):  # pragma: no cover
         """
         Perform mail action on the given mail uid in the mailbox.
         """
@@ -171,7 +171,7 @@ class TagMailAction(BaseMailAction):
                 return AND(NOT(gmail_label=self.keyword), no_keyword=self.keyword)
             else:
                 return {"no_keyword": self.keyword}
-        else:  # pragma: nocover
+        else:  # pragma: no cover
             raise ValueError("This should never happen.")
 
     def post_consume(self, M: MailBox, message_uid: str, parameter: str):
@@ -361,7 +361,7 @@ def get_rule_action(rule: MailRule, supports_gmail_labels: bool) -> BaseMailActi
     elif rule.action == MailRule.MailAction.TAG:
         return TagMailAction(rule.action_parameter, supports_gmail_labels)
     else:
-        raise NotImplementedError("Unknown action.")  # pragma: nocover
+        raise NotImplementedError("Unknown action.")  # pragma: no cover
 
 
 def make_criterias(rule: MailRule, supports_gmail_labels: bool):
@@ -397,7 +397,7 @@ def get_mailbox(server, port, security) -> MailBox:
     Returns the correct MailBox instance for the given configuration.
     """
     ssl_context = ssl.create_default_context()
-    if settings.EMAIL_CERTIFICATE_FILE is not None:  # pragma: nocover
+    if settings.EMAIL_CERTIFICATE_FILE is not None:  # pragma: no cover
         ssl_context.load_verify_locations(cafile=settings.EMAIL_CERTIFICATE_FILE)
 
     if security == MailAccount.ImapSecurity.NONE:
@@ -407,7 +407,7 @@ def get_mailbox(server, port, security) -> MailBox:
     elif security == MailAccount.ImapSecurity.SSL:
         mailbox = MailBox(server, port, ssl_context=ssl_context)
     else:
-        raise NotImplementedError("Unknown IMAP security")  # pragma: nocover
+        raise NotImplementedError("Unknown IMAP security")  # pragma: no cover
     return mailbox
 
 
@@ -450,7 +450,7 @@ class MailAccountHandler(LoggingMixin):
         else:
             raise NotImplementedError(
                 "Unknown title selector.",
-            )  # pragma: nocover
+            )  # pragma: no cover
 
     def _get_correspondent(
         self,
@@ -478,7 +478,7 @@ class MailAccountHandler(LoggingMixin):
         else:
             raise NotImplementedError(
                 "Unknown correspondent selector",
-            )  # pragma: nocover
+            )  # pragma: no cover
 
     def handle_mail_account(self, account: MailAccount):
         """

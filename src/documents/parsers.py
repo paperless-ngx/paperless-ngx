@@ -333,7 +333,7 @@ class DocumentParser(LoggingMixin):
         if self.progress_callback:
             self.progress_callback(current_progress, max_progress)
 
-    def get_settings(self):
+    def get_settings(self):  # pragma: no cover
         """
         A parser must implement this
         """

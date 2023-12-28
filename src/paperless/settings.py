@@ -51,6 +51,9 @@ def __get_boolean(key: str, default: str = "NO") -> bool:
 
 
 def __get_optional_boolean(key: str) -> Optional[bool]:
+    """
+    Returns None if the environment key is not present, otherwise a boolean
+    """
     if key in os.environ:
         return __get_boolean(key)
     return None
@@ -64,6 +67,9 @@ def __get_int(key: str, default: int) -> int:
 
 
 def __get_optional_int(key: str) -> Optional[int]:
+    """
+    Returns None if the environment key is not present, otherwise an integer
+    """
     if key in os.environ:
         return __get_int(key, -1)
     return None
@@ -76,26 +82,26 @@ def __get_float(key: str, default: float) -> float:
     return float(os.getenv(key, default))
 
 
-def __get_optional_float(key: str) -> Optional[float]:
-    if key in os.environ:
-        return __get_float(key, -1)
-    return None
-
-
 def __get_path(
     key: str,
-    default: Optional[Union[PathLike, str]] = None,
-) -> Optional[Path]:
+    default: Union[PathLike, str],
+) -> Path:
     """
     Return a normalized, absolute path based on the environment variable or a default,
-    if provided.  If not set and no default, returns None
+    if provided
     """
     if key in os.environ:
         return Path(os.environ[key]).resolve()
-    elif default is not None:
-        return Path(default).resolve()
-    else:
-        return None
+    return Path(default).resolve()
+
+
+def __get_optional_path(key: str) -> Optional[Path]:
+    """
+    Returns None if the environment key is not present, otherwise an integer
+    """
+    if key in os.environ:
+        return __get_path(key, "")
+    return None
 
 
 def __get_list(
@@ -345,7 +351,7 @@ MIDDLEWARE = [
 ]
 
 # Optional to enable compression
-if __get_boolean("PAPERLESS_ENABLE_COMPRESSION", "yes"):  # pragma: nocover
+if __get_boolean("PAPERLESS_ENABLE_COMPRESSION", "yes"):  # pragma: no cover
     MIDDLEWARE.insert(0, "compression_middleware.middleware.CompressionMiddleware")
 
 ROOT_URLCONF = "paperless.urls"
@@ -513,7 +519,7 @@ CSRF_COOKIE_NAME = f"{COOKIE_PREFIX}csrftoken"
 SESSION_COOKIE_NAME = f"{COOKIE_PREFIX}sessionid"
 LANGUAGE_COOKIE_NAME = f"{COOKIE_PREFIX}django_language"
 
-EMAIL_CERTIFICATE_FILE = __get_path("PAPERLESS_EMAIL_CERTIFICATE_LOCATION")
+EMAIL_CERTIFICATE_FILE = __get_optional_path("PAPERLESS_EMAIL_CERTIFICATE_LOCATION")
 
 
 ###############################################################################

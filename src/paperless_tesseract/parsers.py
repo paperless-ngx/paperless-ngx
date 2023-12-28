@@ -213,7 +213,7 @@ class RasterisedDocumentParser(DocumentParser):
             ocrmypdf_args["skip_text"] = True
         elif self.settings.mode == ModeChoices.REDO:
             ocrmypdf_args["redo_ocr"] = True
-        else:
+        else:  # pragma: no cover
             raise ParseError(f"Invalid ocr mode: {self.settings.mode}")
 
         if self.settings.clean == CleanChoices.CLEAN:

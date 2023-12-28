@@ -65,7 +65,7 @@ class TikaDocumentParser(DocumentParser):
                             document_path.read_bytes(),
                             mime_type,
                         )
-                    else:  # pragma: nocover
+                    else:  # pragma: no cover
                         raise
         except Exception as err:
             raise ParseError(

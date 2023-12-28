@@ -73,7 +73,7 @@ class StandardPagination(PageNumberPagination):
 
 
 class FaviconView(View):
-    def get(self, request, *args, **kwargs):  # pragma: nocover
+    def get(self, request, *args, **kwargs):  # pragma: no cover
         favicon = os.path.join(
             os.path.dirname(__file__),
             "static",

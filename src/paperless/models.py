@@ -169,5 +169,5 @@ class ApplicationConfiguration(AbstractSingletonModel):
     class Meta:
         verbose_name = _("paperless application settings")
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:  # pragma: no cover
         return "ApplicationConfiguration"

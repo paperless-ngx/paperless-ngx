@@ -26,7 +26,7 @@ from documents.tasks import consume_file
 try:
     from inotifyrecursive import INotify
     from inotifyrecursive import flags
-except ImportError:  # pragma: nocover
+except ImportError:  # pragma: no cover
     INotify = flags = None
 
 logger = logging.getLogger("paperless.management.consumer")
