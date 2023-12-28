@@ -512,10 +512,16 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
             field=field,
             document=document,
         ).first()
-        if current_field_instance is not None:
+        if (
+            current_field_instance is not None
+            and current_field_instance.value is not None
+        ):
             for doc_id in current_field_instance.value:
                 if doc_id not in target_doc_ids:
                     self.remove_doclink(document, field, doc_id)
+
+        if target_doc_ids is None:
+            target_doc_ids = []
 
         # Create an instance if target doc doesnt have this field or append it to an existing one
         existing_custom_field_instances = {
