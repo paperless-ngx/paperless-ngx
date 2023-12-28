@@ -65,7 +65,13 @@ export class WorkflowsComponent
     modal.componentInstance.dialogMode = workflow
       ? EditDialogMode.EDIT
       : EditDialogMode.CREATE
-    modal.componentInstance.object = workflow
+    if (workflow) {
+      // quick "deep" clone so original doesnt get modified
+      const clone = Object.assign({}, workflow)
+      clone.actions = [...workflow.actions]
+      clone.triggers = [...workflow.triggers]
+      modal.componentInstance.object = clone
+    }
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((newWorkflow) => {
