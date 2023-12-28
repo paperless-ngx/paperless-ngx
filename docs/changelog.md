@@ -9,7 +9,7 @@
 - Enhancement: symmetric document links [@shamoon](https://github.com/shamoon) ([#4907](https://github.com/paperless-ngx/paperless-ngx/pull/4907))
 - Enhancement: shared icon \& shared by me filter [@shamoon](https://github.com/shamoon) ([#4859](https://github.com/paperless-ngx/paperless-ngx/pull/4859))
 - Enhancement: Improved popup preview, respect embedded viewer, error handling [@shamoon](https://github.com/shamoon) ([#4947](https://github.com/paperless-ngx/paperless-ngx/pull/4947))
-- Feature: Allow deletion of documents via the fuzzy matching command [@stumpylog](https://github.com/stumpylog) ([#4957](https://github.com/paperless-ngx/paperless-ngx/pull/4957))
+- Enhancement: Allow deletion of documents via the fuzzy matching command [@stumpylog](https://github.com/stumpylog) ([#4957](https://github.com/paperless-ngx/paperless-ngx/pull/4957))
 - Enhancement: document link field fixes [@shamoon](https://github.com/shamoon) ([#5020](https://github.com/paperless-ngx/paperless-ngx/pull/5020))
 - Enhancement: above and below doc detail save buttons [@shamoon](https://github.com/shamoon) ([#5008](https://github.com/paperless-ngx/paperless-ngx/pull/5008))
 
@@ -24,13 +24,11 @@
 - Fix: dont allow null property via API [@shamoon](https://github.com/shamoon) ([#5063](https://github.com/paperless-ngx/paperless-ngx/pull/5063))
 - Fix: Updates Ghostscript to 10.02.1 for more bug fixes to it [@stumpylog](https://github.com/stumpylog) ([#5040](https://github.com/paperless-ngx/paperless-ngx/pull/5040))
 - Fix: allow system keyboard shortcuts in date fields [@shamoon](https://github.com/shamoon) ([#5009](https://github.com/paperless-ngx/paperless-ngx/pull/5009))
-- Enhancement: document link field fixes [@shamoon](https://github.com/shamoon) ([#5020](https://github.com/paperless-ngx/paperless-ngx/pull/5020))
 - Fix password change detection on profile edit [@shamoon](https://github.com/shamoon) ([#5028](https://github.com/paperless-ngx/paperless-ngx/pull/5028))
 
 ### Documentation
 
 - Documentation: organize API endpoints [@dgsponer](https://github.com/dgsponer) ([#5077](https://github.com/paperless-ngx/paperless-ngx/pull/5077))
-- Enhancement: symmetric document links [@shamoon](https://github.com/shamoon) ([#4907](https://github.com/paperless-ngx/paperless-ngx/pull/4907))
 
 ### Maintenance
 
