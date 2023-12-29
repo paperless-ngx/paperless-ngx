@@ -57,6 +57,15 @@ def __get_int(key: str, default: int) -> int:
     return int(os.getenv(key, default))
 
 
+def __get_optional_int(key: str) -> Optional[int]:
+    """
+    Returns None if the environment key is not present, otherwise an integer
+    """
+    if key in os.environ:
+        return __get_int(key, -1)  # pragma: no cover
+    return None
+
+
 def __get_float(key: str, default: float) -> float:
     """
     Return an integer value based on the environment variable or a default
@@ -66,18 +75,24 @@ def __get_float(key: str, default: float) -> float:
 
 def __get_path(
     key: str,
-    default: Optional[Union[PathLike, str]] = None,
-) -> Optional[Path]:
+    default: Union[PathLike, str],
+) -> Path:
     """
     Return a normalized, absolute path based on the environment variable or a default,
-    if provided.  If not set and no default, returns None
+    if provided
     """
     if key in os.environ:
         return Path(os.environ[key]).resolve()
-    elif default is not None:
-        return Path(default).resolve()
-    else:
-        return None
+    return Path(default).resolve()
+
+
+def __get_optional_path(key: str) -> Optional[Path]:
+    """
+    Returns None if the environment key is not present, otherwise a fully resolved Path
+    """
+    if key in os.environ:
+        return __get_path(key, "")
+    return None
 
 
 def __get_list(
@@ -327,7 +342,7 @@ MIDDLEWARE = [
 ]
 
 # Optional to enable compression
-if __get_boolean("PAPERLESS_ENABLE_COMPRESSION", "yes"):  # pragma: nocover
+if __get_boolean("PAPERLESS_ENABLE_COMPRESSION", "yes"):  # pragma: no cover
     MIDDLEWARE.insert(0, "compression_middleware.middleware.CompressionMiddleware")
 
 ROOT_URLCONF = "paperless.urls"
@@ -495,7 +510,7 @@ CSRF_COOKIE_NAME = f"{COOKIE_PREFIX}csrftoken"
 SESSION_COOKIE_NAME = f"{COOKIE_PREFIX}sessionid"
 LANGUAGE_COOKIE_NAME = f"{COOKIE_PREFIX}django_language"
 
-EMAIL_CERTIFICATE_FILE = __get_path("PAPERLESS_EMAIL_CERTIFICATE_LOCATION")
+EMAIL_CERTIFICATE_FILE = __get_optional_path("PAPERLESS_EMAIL_CERTIFICATE_LOCATION")
 
 
 ###############################################################################
@@ -796,11 +811,10 @@ CONSUMER_BARCODE_STRING: Final[str] = os.getenv(
     "PATCHT",
 )
 
-consumer_barcode_scanner_tmp: Final[str] = os.getenv(
+CONSUMER_BARCODE_SCANNER: Final[str] = os.getenv(
     "PAPERLESS_CONSUMER_BARCODE_SCANNER",
     "PYZBAR",
-)
-CONSUMER_BARCODE_SCANNER = consumer_barcode_scanner_tmp.upper()
+).upper()
 
 CONSUMER_ENABLE_ASN_BARCODE: Final[bool] = __get_boolean(
     "PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE",
@@ -811,15 +825,12 @@ CONSUMER_ASN_BARCODE_PREFIX: Final[str] = os.getenv(
     "ASN",
 )
 
-
-CONSUMER_BARCODE_UPSCALE: Final[float] = float(
-    os.getenv("PAPERLESS_CONSUMER_BARCODE_UPSCALE", 0.0),
+CONSUMER_BARCODE_UPSCALE: Final[float] = __get_float(
+    "PAPERLESS_CONSUMER_BARCODE_UPSCALE",
+    0.0,
 )
 
-
-CONSUMER_BARCODE_DPI: Final[str] = int(
-    os.getenv("PAPERLESS_CONSUMER_BARCODE_DPI", 300),
-)
+CONSUMER_BARCODE_DPI: Final[int] = __get_int("PAPERLESS_CONSUMER_BARCODE_DPI", 300)
 
 CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED: Final[bool] = __get_boolean(
     "PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED",
@@ -834,7 +845,7 @@ CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT: Final[bool] = __get_boolean(
     "PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT",
 )
 
-OCR_PAGES = int(os.getenv("PAPERLESS_OCR_PAGES", 0))
+OCR_PAGES = __get_optional_int("PAPERLESS_OCR_PAGES")
 
 # The default language that tesseract will attempt to use when parsing
 # documents.  It should be a 3-letter language code consistent with ISO 639.
@@ -848,28 +859,29 @@ OCR_MODE = os.getenv("PAPERLESS_OCR_MODE", "skip")
 
 OCR_SKIP_ARCHIVE_FILE = os.getenv("PAPERLESS_OCR_SKIP_ARCHIVE_FILE", "never")
 
-OCR_IMAGE_DPI = os.getenv("PAPERLESS_OCR_IMAGE_DPI")
+OCR_IMAGE_DPI = __get_optional_int("PAPERLESS_OCR_IMAGE_DPI")
 
 OCR_CLEAN = os.getenv("PAPERLESS_OCR_CLEAN", "clean")
 
-OCR_DESKEW = __get_boolean("PAPERLESS_OCR_DESKEW", "true")
+OCR_DESKEW: Final[bool] = __get_boolean("PAPERLESS_OCR_DESKEW", "true")
 
-OCR_ROTATE_PAGES = __get_boolean("PAPERLESS_OCR_ROTATE_PAGES", "true")
+OCR_ROTATE_PAGES: Final[bool] = __get_boolean("PAPERLESS_OCR_ROTATE_PAGES", "true")
 
-OCR_ROTATE_PAGES_THRESHOLD = float(
-    os.getenv("PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD", 12.0),
+OCR_ROTATE_PAGES_THRESHOLD: Final[float] = __get_float(
+    "PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD",
+    12.0,
 )
 
-OCR_MAX_IMAGE_PIXELS: Optional[int] = None
-if os.environ.get("PAPERLESS_OCR_MAX_IMAGE_PIXELS") is not None:
-    OCR_MAX_IMAGE_PIXELS: int = int(os.environ.get("PAPERLESS_OCR_MAX_IMAGE_PIXELS"))
+OCR_MAX_IMAGE_PIXELS: Final[Optional[int]] = __get_optional_int(
+    "PAPERLESS_OCR_MAX_IMAGE_PIXELS",
+)
 
 OCR_COLOR_CONVERSION_STRATEGY = os.getenv(
     "PAPERLESS_OCR_COLOR_CONVERSION_STRATEGY",
     "RGB",
 )
 
-OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS", "{}")
+OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS")
 
 # GNUPG needs a home directory for some reason
 GNUPG_HOME = os.getenv("HOME", "/tmp")
