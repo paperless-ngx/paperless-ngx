@@ -620,6 +620,9 @@ class Consumer(LoggingMixin):
                 WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
             ):
                 for action in workflow.actions.all():
+                    self.log.info(
+                        f"Applying overrides in {action} from {workflow}",
+                    )
                     if action.assign_title is not None:
                         template_overrides.title = action.assign_title
                     if action.assign_tags is not None:

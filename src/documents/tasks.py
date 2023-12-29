@@ -219,6 +219,7 @@ def bulk_update_documents(document_ids):
         document_updated.send(
             sender=None,
             document=doc,
+            logging_group=uuid.uuid4(),
         )
         post_save.send(Document, instance=doc, created=False)
 

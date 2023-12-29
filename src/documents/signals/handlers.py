@@ -520,14 +520,26 @@ def add_to_index(sender, document, **kwargs):
 
 
 def run_workflow_added(sender, document: Document, logging_group=None, **kwargs):
-    run_workflow(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED, document)
+    run_workflow(
+        WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        document,
+        logging_group,
+    )
 
 
 def run_workflow_updated(sender, document: Document, logging_group=None, **kwargs):
-    run_workflow(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, document)
+    run_workflow(
+        WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        document,
+        logging_group,
+    )
 
 
-def run_workflow(trigger_type: WorkflowTrigger.WorkflowTriggerType, document: Document):
+def run_workflow(
+    trigger_type: WorkflowTrigger.WorkflowTriggerType,
+    document: Document,
+    logging_group=None,
+):
     for workflow in Workflow.objects.filter(
         enabled=True,
         triggers__type=trigger_type,
@@ -538,6 +550,10 @@ def run_workflow(trigger_type: WorkflowTrigger.WorkflowTriggerType, document: Do
             trigger_type,
         ):
             for action in workflow.actions.all():
+                logger.info(
+                    f"Applying {action} from {workflow}",
+                    extra={"group": logging_group},
+                )
                 if action.assign_tags.all().count() > 0:
                     document.tags.add(*action.assign_tags.all())
 
