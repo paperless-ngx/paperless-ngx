@@ -2,6 +2,7 @@ import datetime
 import math
 import re
 import zoneinfo
+from decimal import Decimal
 
 import magic
 from celery import states
@@ -9,7 +10,9 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.core.validators import URLValidator
+from django.core.validators import DecimalValidator
+from django.core.validators import MaxLengthValidator
+from django.core.validators import integer_validator
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
@@ -41,6 +44,7 @@ from documents.models import UiSettings
 from documents.parsers import is_mime_type_supported
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import set_permissions_for_object
+from documents.validators import uri_validator
 
 
 # https://www.django-rest-framework.org/api-guide/serializers/#example
@@ -489,17 +493,29 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """
-        For some reason, URLField validation is not run against the value
-        automatically.  Force it to run against the value
+        Probably because we're kind of doing it odd, validation from the model
+        doesn't run against the field "value", so we have to re-create it here.
+
+        Don't like it, but it is better than returning an HTTP 500 when the database
+        hates the value
         """
         data = super().validate(data)
         field: CustomField = data["field"]
-        if (
-            field.data_type == CustomField.FieldDataType.URL
-            and data["value"] is not None
-            and len(data["value"]) > 0
-        ):
-            URLValidator()(data["value"])
+        if "value" in data and data["value"] is not None:
+            if (
+                field.data_type == CustomField.FieldDataType.URL
+                and len(data["value"]) > 0
+            ):
+                uri_validator(data["value"])
+            elif field.data_type == CustomField.FieldDataType.INT:
+                integer_validator(data["value"])
+            elif field.data_type == CustomField.FieldDataType.MONETARY:
+                DecimalValidator(max_digits=12, decimal_places=2)(
+                    Decimal(str(data["value"])),
+                )
+            elif field.data_type == CustomField.FieldDataType.STRING:
+                MaxLengthValidator(limit_value=128)(data["value"])
+
         return data
 
     def reflect_doclinks(
