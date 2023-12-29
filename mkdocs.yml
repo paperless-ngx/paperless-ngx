@@ -45,7 +45,8 @@ markdown_extensions:
   - pymdownx.snippets
   - footnotes
 strict: true
-nav:
+nav:3.9.18
+81.9.3.0
     - index.md
     - setup.md
     - 'Basic Usage': usage.md
