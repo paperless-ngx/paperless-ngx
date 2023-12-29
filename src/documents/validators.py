@@ -19,7 +19,7 @@ def uri_validator(value) -> None:
             )
         elif not parts.netloc and not parts.path:
             raise ValidationError(
-                _(f"Unable to parse URI {value}, missing net loction or path"),
+                _(f"Unable to parse URI {value}, missing net location or path"),
                 params={"value": value},
             )
     except Exception as e:
