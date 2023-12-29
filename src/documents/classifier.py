@@ -52,7 +52,7 @@ def load_classifier() -> Optional["DocumentClassifier"]:
     except OSError:
         logger.exception("IO error while loading document classification model")
         classifier = None
-    except Exception:  # pragma: nocover
+    except Exception:  # pragma: no cover
         logger.exception("Unknown error while loading document classification model")
         classifier = None
 
@@ -318,7 +318,7 @@ class DocumentClassifier:
 
         return True
 
-    def preprocess_content(self, content: str) -> str:  # pragma: nocover
+    def preprocess_content(self, content: str) -> str:  # pragma: no cover
         """
         Process to contents of a document, distilling it down into
         words which are meaningful to the content

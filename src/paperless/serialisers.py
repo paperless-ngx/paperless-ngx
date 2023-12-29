@@ -3,6 +3,8 @@ from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
+from paperless.models import ApplicationConfiguration
+
 
 class ObfuscatedUserPasswordField(serializers.Field):
     """
@@ -113,3 +115,9 @@ class ProfileSerializer(serializers.ModelSerializer):
             "last_name",
             "auth_token",
         )
+
+
+class ApplicationConfigurationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ApplicationConfiguration
+        fields = "__all__"

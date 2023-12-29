@@ -420,7 +420,7 @@ class Consumer(LoggingMixin):
 
         document_parser: DocumentParser = parser_class(
             self.logging_group,
-            progress_callback,
+            progress_callback=progress_callback,
         )
 
         self.log.debug(f"Parser: {type(document_parser).__name__}")

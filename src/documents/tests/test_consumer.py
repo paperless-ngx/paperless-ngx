@@ -172,7 +172,15 @@ class TestFieldPermutations(TestCase):
             self.assertEqual(info.title, "anotherall")
 
 
-class DummyParser(DocumentParser):
+class _BaseTestParser(DocumentParser):
+    def get_settings(self):
+        """
+        This parser does not implement additional settings yet
+        """
+        return None
+
+
+class DummyParser(_BaseTestParser):
     def __init__(self, logging_group, scratch_dir, archive_path):
         super().__init__(logging_group, None)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".webp", dir=scratch_dir)
@@ -185,7 +193,7 @@ class DummyParser(DocumentParser):
         self.text = "The Text"
 
 
-class CopyParser(DocumentParser):
+class CopyParser(_BaseTestParser):
     def get_thumbnail(self, document_path, mime_type, file_name=None):
         return self.fake_thumb
 
@@ -199,7 +207,7 @@ class CopyParser(DocumentParser):
         shutil.copy(document_path, self.archive_path)
 
 
-class FaultyParser(DocumentParser):
+class FaultyParser(_BaseTestParser):
     def __init__(self, logging_group, scratch_dir):
         super().__init__(logging_group)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".webp", dir=scratch_dir)
@@ -211,7 +219,7 @@ class FaultyParser(DocumentParser):
         raise ParseError("Does not compute.")
 
 
-class FaultyGenericExceptionParser(DocumentParser):
+class FaultyGenericExceptionParser(_BaseTestParser):
     def __init__(self, logging_group, scratch_dir):
         super().__init__(logging_group)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".webp", dir=scratch_dir)
