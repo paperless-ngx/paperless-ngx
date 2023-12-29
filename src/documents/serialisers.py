@@ -494,7 +494,11 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         """
         data = super().validate(data)
         field: CustomField = data["field"]
-        if field.data_type == CustomField.FieldDataType.URL:
+        if (
+            field.data_type == CustomField.FieldDataType.URL
+            and data["value"] is not None
+            and len(data["value"]) > 0
+        ):
             URLValidator()(data["value"])
         return data
 
