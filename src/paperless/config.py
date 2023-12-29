@@ -33,7 +33,7 @@ class OutputTypeConfig:
 @dataclasses.dataclass
 class OcrConfig(OutputTypeConfig):
     """
-    Specific settings for the Tesseract based parser.  Options generall
+    Specific settings for the Tesseract based parser.  Options generally
     correspond almost directly to the OCRMyPDF options
     """
 

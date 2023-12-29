@@ -119,6 +119,6 @@ class TikaDocumentParser(DocumentParser):
 
     def get_settings(self) -> OutputTypeConfig:
         """
-        This parser does not implement additional settings yet
+        This parser only uses the PDF output type configuration currently
         """
         return OutputTypeConfig()

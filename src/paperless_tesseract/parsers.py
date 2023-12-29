@@ -35,6 +35,9 @@ class RasterisedDocumentParser(DocumentParser):
     logging_name = "paperless.parsing.tesseract"
 
     def get_settings(self) -> OcrConfig:
+        """
+        This parser uses the OCR configuration settings to parse documents
+        """
         return OcrConfig()
 
     def extract_metadata(self, document_path, mime_type):
