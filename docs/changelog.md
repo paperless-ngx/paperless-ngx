@@ -1,5 +1,23 @@
 # Changelog
 
+## paperless-ngx 2.2.1
+
+### Bug Fixes
+
+- Fix: saving doc links with no value [@shamoon](https://github.com/shamoon) ([#5144](https://github.com/paperless-ngx/paperless-ngx/pull/5144))
+- Fix: allow multiple consumption templates to assign the same custom field [@shamoon](https://github.com/shamoon) ([#5142](https://github.com/paperless-ngx/paperless-ngx/pull/5142))
+- Fix: some dropdowns broken in 2.2.0 [@shamoon](https://github.com/shamoon) ([#5134](https://github.com/paperless-ngx/paperless-ngx/pull/5134))
+
+### All App Changes
+
+<details>
+<summary>3 changes</summary>
+
+- Fix: saving doc links with no value [@shamoon](https://github.com/shamoon) ([#5144](https://github.com/paperless-ngx/paperless-ngx/pull/5144))
+- Fix: allow multiple consumption templates to assign the same custom field [@shamoon](https://github.com/shamoon) ([#5142](https://github.com/paperless-ngx/paperless-ngx/pull/5142))
+- Fix: some dropdowns broken in 2.2.0 [@shamoon](https://github.com/shamoon) ([#5134](https://github.com/paperless-ngx/paperless-ngx/pull/5134))
+</details>
+
 ## paperless-ngx 2.2.0
 
 ### Features
