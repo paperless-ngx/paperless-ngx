@@ -41,6 +41,7 @@ from documents.models import UiSettings
 from documents.parsers import is_mime_type_supported
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import set_permissions_for_object
+from documents.utils import ALL_URL_SCHEMES
 
 
 # https://www.django-rest-framework.org/api-guide/serializers/#example
@@ -499,7 +500,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
             and data["value"] is not None
             and len(data["value"]) > 0
         ):
-            URLValidator()(data["value"])
+            URLValidator(schemes=ALL_URL_SCHEMES)(data["value"])
         return data
 
     def reflect_doclinks(
