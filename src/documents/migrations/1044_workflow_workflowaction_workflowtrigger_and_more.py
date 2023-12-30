@@ -54,7 +54,7 @@ def remove_workflow_permissions(apps, schema_editor):
         group.permissions.remove(*workflow_permissions)
 
 
-def migrate_consumption_templates(apps, schema_editor):  # pragma: no cover
+def migrate_consumption_templates(apps, schema_editor):
     """
     Migrate consumption templates to workflows. At this point ConsumptionTemplate still exists
     but objects are not returned as their true model so we have to manually do that
@@ -142,7 +142,7 @@ def migrate_consumption_templates(apps, schema_editor):  # pragma: no cover
             workflow.save()
 
 
-def unmigrate_consumption_templates(apps, schema_editor):  # pragma: no cover
+def unmigrate_consumption_templates(apps, schema_editor):
     model_name = "ConsumptionTemplate"
     app_name = "documents"
 
@@ -152,7 +152,7 @@ def unmigrate_consumption_templates(apps, schema_editor):  # pragma: no cover
         template = ConsumptionTemplate.objects.create(
             name=workflow.name,
             order=workflow.order,
-            sources=workflow.sources,
+            sources=workflow.triggers.first().sources,
             filter_path=workflow.triggers.first().filter_path,
             filter_filename=workflow.triggers.first().filter_filename,
             filter_mailrule=workflow.triggers.first().filter_mailrule,
