@@ -261,22 +261,57 @@ In order to enable the password reset feature you will need to setup an SMTP bac
 
     v2.3 added "Workflows" and existing "Consumption Templates" were converted automatically to the new more powerful format.
 
-Workflows were introduced in v2.3 and allow for finer control over what metadata (tags, doc
-types) and permissions (owner, privileges) are assigned to documents. Workflows can have multiple 'triggers'
-and 'actions'. Triggers are events (with optional filtering rules) that will cause the workflow to be run
-and actions are the set of sequential actions to apply. Currently, there are three events that correspond
-to workflow trigger 'types':
+Workflows allow hooking into the Paperless-ngx document pipeline, for example to alter what metadata (tags, doc types) and
+permissions (owner, privileges) are assigned to documents. Workflows can have multiple 'triggers' and 'actions'. Triggers
+are events (with optional filtering rules) that will cause the workflow to be run and actions are the set of sequential
+actions to apply.
 
-- Consumption: fires _before_ a document is consumed, so events can filter by e.g. source (mail, consumption
-  folder or API) and file path
-- Added: fires _after_ a document is added. At this time path and source information is no longer available but the document
-  has had document type, tags, etc. assigned so these can now be used for filtering.
-- Updated: fires when a document is updated. Similar to 'added' events, can include filtering by tags, doc type, or
-  correspondent
+In general, workflows and any actions they contain are applied sequentially by sort order. For "assignment" actions, subsequent
+workflow actions will override previous assignments, except for assignments that accept multiple items e.g. tags, custom
+fields and permissions, which will be merged.
 
-In general, workflow (and any actions they contain) are applied sequentially by sort order. Subsequent workflow actions will
-override assignments from a preceeding workflow except for assignments that accept multiple items e.g. tags, custom fields and
-permissions will be merged.
+### Workflow Triggers
+
+Currently, there are three events that correspond to workflow trigger 'types':
+
+1. Consumption: _before_ a document is consumed, so events can include filters by source (mail, consumption
+   folder or API), file path, file name, mail rule
+2. Added: _after_ a document is added. At this time, file path and source information is no longer available,
+   but the document has had document type, tags, etc. assigned so these can now be used for filtering.
+3. Updated: when a document is updated. Similar to 'added' events, triggers can include filtering by tags, doc
+   type, or correspondent.
+
+The following flow diagram illustrates the three trigger types:
+
+```mermaid
+flowchart TD
+    consumption{"Matching
+    'Consumption'
+    trigger(s)"}
+
+    added{"Matching
+    'Added'
+    trigger(s)"}
+
+    updated{"Matching
+    'Updated'
+    trigger(s)"}
+
+    A[New Document] --> consumption
+    consumption --> |Yes| C[Workflow Actions Run]
+    consumption --> |No| D
+    C --> D[Document Added]
+    D -- Paperless-ngx 'matching' of tags, etc. --> added
+    added --> |Yes| F[Workflow Actions Run]
+    added --> |No| G
+    F --> G[Document Finalized]
+    H[Existing Document Changed] --> updated
+    updated --> |Yes| J[Workflow Actions Run]
+    updated --> |No| K
+    J --> K[Document Saved]
+```
+
+#### Filters {#workflow-trigger-filters}
 
 Workflows allow you to filter by:
 
@@ -289,7 +324,9 @@ Workflows allow you to filter by:
 - Document type (`Added` and `Updated` triggers only). Filter documents with this doc type
 - Correspondent (`Added` and `Updated` triggers only). Filter documents with this correspondent
 
-Workflows can assign:
+### Workflow Actions
+
+There is currently one type of workflow action, "Assignment", which can assign:
 
 - Title, see [title placeholders](usage.md#title-placeholders) below
 - Tags, correspondent, document types
@@ -297,17 +334,7 @@ Workflows can assign:
 - View and / or edit permissions to users or groups
 - Custom fields. Note that no value for the field will be set
 
-### Workflow permissions
-
-All users who have application permissions for editing workflows can see the same set
-of workflows. In other words, workflows themselves intentionally do not have an owner or permissions.
-
-Given their potentially far-reaching capabilities, you may want to restrict access to workflows.
-
-Upon migration, existing installs will grant access to workflows to users who can add
-documents (and superusers who can always access all parts of the app).
-
-### Title placeholders
+#### Title placeholders
 
 Workflow titles can include placeholders but the available options differ depending on the type of
 workflow trigger. This is because at the time of consumption (when the title is to be set), no automatic tags etc. have been
@@ -336,6 +363,16 @@ The following placeholders are only available for "added" or "updated" triggers
 - `{created_month_name_short}`: created month short name
 - `{created_day}`: created day
 - `{created_time}`: created time in HH:MM format
+
+### Workflow permissions
+
+All users who have application permissions for editing workflows can see the same set
+of workflows. In other words, workflows themselves intentionally do not have an owner or permissions.
+
+Given their potentially far-reaching capabilities, you may want to restrict access to workflows.
+
+Upon migration, existing installs will grant access to workflows to users who can add
+documents (and superusers who can always access all parts of the app).
 
 ## Custom Fields {#custom-fields}
 
