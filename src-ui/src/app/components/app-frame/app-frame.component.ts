@@ -12,6 +12,7 @@ import {
 } from 'rxjs/operators'
 import { Document } from 'src/app/data/document'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
+import { MessagesService } from 'src/app/services/messages.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SearchService } from 'src/app/services/rest/search.service'
 import { environment } from 'src/environments/environment'
@@ -73,7 +74,8 @@ export class AppFrameComponent
     public tasksService: TasksService,
     private readonly toastService: ToastService,
     private modalService: NgbModal,
-    permissionsService: PermissionsService
+    permissionsService: PermissionsService,
+    private messagesService: MessagesService
   ) {
     super()
 
@@ -92,6 +94,25 @@ export class AppFrameComponent
       this.checkForUpdates()
     }
     this.tasksService.reload()
+
+    this.messagesService
+      .get()
+      .pipe(first())
+      .subscribe((msgs) => {
+        for (const m of msgs) {
+          switch (m.level) {
+            case 'error':
+            case 'warning':
+              this.toastService.showError(m.message)
+              break
+            case 'success':
+            case 'info':
+            case 'debug':
+              this.toastService.showInfo(m.message)
+              break
+          }
+        }
+      })
   }
 
   toggleSlimSidebar(): void {

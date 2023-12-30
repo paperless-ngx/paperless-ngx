@@ -21,6 +21,7 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { of, throwError } from 'rxjs'
 import { ToastService } from 'src/app/services/toast.service'
+import { MessagesService } from 'src/app/services/messages.service'
 import { environment } from 'src/environments/environment'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -83,6 +84,7 @@ describe('AppFrameComponent', () => {
   let permissionsService: PermissionsService
   let remoteVersionService: RemoteVersionService
   let toastService: ToastService
+  let messagesService: MessagesService
   let openDocumentsService: OpenDocumentsService
   let searchService: SearchService
   let documentListViewService: DocumentListViewService
@@ -123,6 +125,7 @@ describe('AppFrameComponent', () => {
         RemoteVersionService,
         IfPermissionsDirective,
         ToastService,
+        MessagesService,
         OpenDocumentsService,
         SearchService,
         NgbModal,
@@ -151,6 +154,7 @@ describe('AppFrameComponent', () => {
     permissionsService = TestBed.inject(PermissionsService)
     remoteVersionService = TestBed.inject(RemoteVersionService)
     toastService = TestBed.inject(ToastService)
+    messagesService = TestBed.inject(MessagesService)
     openDocumentsService = TestBed.inject(OpenDocumentsService)
     searchService = TestBed.inject(SearchService)
     documentListViewService = TestBed.inject(DocumentListViewService)
@@ -392,5 +396,20 @@ describe('AppFrameComponent', () => {
     expect(modalSpy).toHaveBeenCalledWith(ProfileEditDialogComponent, {
       backdrop: 'static',
     })
+  })
+
+  it('should show toasts for django messages', () => {
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    jest.spyOn(messagesService, 'get').mockReturnValue(
+      of([
+        { level: 'error', message: 'Test error', tags: '' },
+        { level: 'info', message: 'Test info', tags: '' },
+      ])
+    )
+    component.ngOnInit()
+    httpTestingController.expectOne(`${environment.apiBaseUrl}messages/`)
+    expect(toastErrorSpy).toHaveBeenCalled()
+    expect(toastInfoSpy).toHaveBeenCalled()
   })
 })
