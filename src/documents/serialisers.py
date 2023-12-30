@@ -1286,6 +1286,7 @@ class ConsumptionTemplateSerializer(serializers.ModelSerializer):
             "filter_mailrule",
             "assign_title",
             "assign_tags",
+            "skip_inbox",
             "assign_correspondent",
             "assign_document_type",
             "assign_storage_path",

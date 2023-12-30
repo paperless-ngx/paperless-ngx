@@ -36,7 +36,16 @@ from documents.permissions import get_objects_for_user_owner_aware
 logger = logging.getLogger("paperless.handlers")
 
 
-def add_inbox_tags(sender, document: Document, logging_group=None, **kwargs):
+def add_inbox_tags(
+    sender,
+    document: Document,
+    logging_group=None,
+    skip_inbox=False,
+    **kwargs,
+):
+    if skip_inbox:
+        return
+
     if document.owner is not None:
         tags = get_objects_for_user_owner_aware(
             document.owner,

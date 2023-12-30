@@ -20,6 +20,7 @@ class DocumentMetadataOverrides:
     correspondent_id: Optional[int] = None
     document_type_id: Optional[int] = None
     tag_ids: Optional[list[int]] = None
+    skip_inbox: bool = False
     storage_path_id: Optional[int] = None
     created: Optional[datetime.datetime] = None
     asn: Optional[int] = None
@@ -56,6 +57,8 @@ class DocumentMetadataOverrides:
         elif other.tag_ids is not None:
             self.tag_ids.extend(other.tag_ids)
             self.tag_ids = list(set(self.tag_ids))
+
+        self.skip_inbox = self.skip_inbox or other.skip_inbox
 
         if self.view_users is None:
             self.view_users = other.view_users

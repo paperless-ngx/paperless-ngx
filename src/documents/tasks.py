@@ -171,6 +171,7 @@ def consume_file(
         override_correspondent_id=overrides.correspondent_id,
         override_document_type_id=overrides.document_type_id,
         override_tag_ids=overrides.tag_ids,
+        override_skip_inbox=overrides.skip_inbox,
         override_storage_path_id=overrides.storage_path_id,
         override_created=overrides.created,
         override_asn=overrides.asn,

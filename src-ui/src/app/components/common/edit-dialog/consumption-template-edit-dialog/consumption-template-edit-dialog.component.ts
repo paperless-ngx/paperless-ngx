@@ -107,6 +107,7 @@ export class ConsumptionTemplateEditDialogComponent extends EditDialogComponent<
       sources: new FormControl([]),
       assign_title: new FormControl(null),
       assign_tags: new FormControl([]),
+      skip_inbox: new FormControl(false),
       assign_owner: new FormControl(null),
       assign_document_type: new FormControl(null),
       assign_correspondent: new FormControl(null),

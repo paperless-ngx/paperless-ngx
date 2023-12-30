@@ -327,6 +327,7 @@ class Consumer(LoggingMixin):
         override_correspondent_id=None,
         override_document_type_id=None,
         override_tag_ids=None,
+        override_skip_inbox=False,
         override_storage_path_id=None,
         task_id=None,
         override_created=None,
@@ -348,6 +349,7 @@ class Consumer(LoggingMixin):
         self.override_correspondent_id = override_correspondent_id
         self.override_document_type_id = override_document_type_id
         self.override_tag_ids = override_tag_ids
+        self.override_skip_inbox = override_skip_inbox
         self.override_storage_path_id = override_storage_path_id
         self.task_id = task_id or str(uuid.uuid4())
         self.override_created = override_created
@@ -516,6 +518,7 @@ class Consumer(LoggingMixin):
                     document=document,
                     logging_group=self.logging_group,
                     classifier=classifier,
+                    skip_inbox=self.override_skip_inbox,
                 )
 
                 # After everything is in the database, copy the files into
@@ -621,6 +624,8 @@ class Consumer(LoggingMixin):
                     template_overrides.tag_ids = [
                         tag.pk for tag in template.assign_tags.all()
                     ]
+                if template.skip_inbox:
+                    template_overrides.skip_inbox = True
                 if template.assign_correspondent is not None:
                     template_overrides.correspondent_id = (
                         template.assign_correspondent.pk

@@ -32,6 +32,7 @@
           <div class="col">
             <pngx-input-text i18n-title title="Assign title" formControlName="assign_title" i18n-hint hint="Can include some placeholders, see <a target='_blank' href='https://docs.paperless-ngx.com/usage/#consumption-templates'>documentation</a>." [error]="error?.assign_title"></pngx-input-text>
             <pngx-input-tags [allowCreate]="false" i18n-title title="Assign tags" formControlName="assign_tags"></pngx-input-tags>
+            <pngx-input-check i18n-title title="Skip assigning inbox tag(s)" formControlName="skip_inbox"></pngx-input-check>
             <pngx-input-select i18n-title title="Assign document type" [items]="documentTypes" [allowNull]="true" formControlName="assign_document_type"></pngx-input-select>
             <pngx-input-select i18n-title title="Assign correspondent" [items]="correspondents" [allowNull]="true" formControlName="assign_correspondent"></pngx-input-select>
             <pngx-input-select i18n-title title="Assign storage path" [items]="storagePaths" [allowNull]="true" formControlName="assign_storage_path"></pngx-input-select>

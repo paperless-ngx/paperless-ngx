@@ -953,6 +953,11 @@ class ConsumptionTemplate(models.Model):
         verbose_name=_("assign this tag"),
     )
 
+    skip_inbox = models.BooleanField(
+        _("Skip assigning inbox tag(s)"),
+        default=False,
+    )
+
     assign_document_type = models.ForeignKey(
         DocumentType,
         null=True,

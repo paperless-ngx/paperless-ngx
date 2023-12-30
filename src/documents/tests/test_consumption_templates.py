@@ -227,6 +227,7 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
             order=0,
             sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
             filter_path="*/samples/*",
+            skip_inbox=True,
             assign_title="Doc from {correspondent}",
             assign_correspondent=self.c,
             assign_document_type=self.dt,
@@ -240,6 +241,7 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
             order=0,
             sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
             filter_filename="*simple*",
+            skip_inbox=False,
             assign_title="Doc from {correspondent}",
             assign_correspondent=self.c2,
             assign_storage_path=self.sp,
@@ -275,6 +277,7 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
                     overrides["override_view_users"],
                     [self.user2.pk, self.user3.pk],
                 )
+                self.assertTrue(overrides["override_skip_inbox"])
 
         expected_str = f"Document matched template {ct1}"
         self.assertIn(expected_str, cm.output[0])
