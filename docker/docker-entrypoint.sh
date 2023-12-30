@@ -86,7 +86,7 @@ initialize() {
 		"${CONSUME_DIR}"; do
 		if [[ ! -d "${dir}" ]]; then
 			echo "Creating directory ${dir}"
-			mkdir "${dir}"
+			mkdir -p "${dir}"
 		fi
 	done
 
