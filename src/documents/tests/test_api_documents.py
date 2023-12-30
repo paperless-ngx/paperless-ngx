@@ -594,7 +594,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(len(results), 0)
 
-    def test_document_owner_filters(self):
+    def test_document_permissions_filters(self):
         """
         GIVEN:
             - Documents with owners, with and without granted permissions
@@ -684,6 +684,18 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertCountEqual(
             [results[0]["id"], results[1]["id"], results[2]["id"]],
             [u1_doc1.id, u1_doc2.id, u2_doc2.id],
+        )
+
+        assign_perm("view_document", u2, u1_doc1)
+
+        # Will show only documents shared by user
+        response = self.client.get(f"/api/documents/?shared_by__id={u1.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertCountEqual(
+            [results[0]["id"]],
+            [u1_doc1.id],
         )
 
     def test_pagination_all(self):

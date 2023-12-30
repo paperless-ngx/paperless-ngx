@@ -6,13 +6,13 @@ import { commonAbstractPaperlessServiceTests } from './abstract-paperless-servic
 import { ConsumptionTemplateService } from './consumption-template.service'
 import {
   DocumentSource,
-  PaperlessConsumptionTemplate,
-} from 'src/app/data/paperless-consumption-template'
+  ConsumptionTemplate,
+} from 'src/app/data/consumption-template'
 
 let httpTestingController: HttpTestingController
 let service: ConsumptionTemplateService
 const endpoint = 'consumption_templates'
-const templates: PaperlessConsumptionTemplate[] = [
+const templates: ConsumptionTemplate[] = [
   {
     name: 'Template 1',
     id: 1,

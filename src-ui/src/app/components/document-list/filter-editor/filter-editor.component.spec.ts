@@ -47,12 +47,13 @@ import {
   FILTER_OWNER_DOES_NOT_INCLUDE,
   FILTER_OWNER_ISNULL,
   FILTER_CUSTOM_FIELDS,
+  FILTER_SHARED_BY_USER,
 } from 'src/app/data/filter-rule-type'
-import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
-import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
-import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
-import { PaperlessUser } from 'src/app/data/paperless-user'
+import { Correspondent } from 'src/app/data/correspondent'
+import { DocumentType } from 'src/app/data/document-type'
+import { StoragePath } from 'src/app/data/storage-path'
+import { Tag } from 'src/app/data/tag'
+import { User } from 'src/app/data/user'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { FilterPipe } from 'src/app/pipes/filter.pipe'
@@ -77,7 +78,7 @@ import {
 } from '../../common/permissions-filter-dropdown/permissions-filter-dropdown.component'
 import { FilterEditorComponent } from './filter-editor.component'
 
-const tags: PaperlessTag[] = [
+const tags: Tag[] = [
   {
     id: 2,
     name: 'Tag2',
@@ -88,7 +89,7 @@ const tags: PaperlessTag[] = [
   },
 ]
 
-const correspondents: PaperlessCorrespondent[] = [
+const correspondents: Correspondent[] = [
   {
     id: 12,
     name: 'Corresp12',
@@ -99,7 +100,7 @@ const correspondents: PaperlessCorrespondent[] = [
   },
 ]
 
-const document_types: PaperlessDocumentType[] = [
+const document_types: DocumentType[] = [
   {
     id: 22,
     name: 'DocType22',
@@ -110,7 +111,7 @@ const document_types: PaperlessDocumentType[] = [
   },
 ]
 
-const storage_paths: PaperlessStoragePath[] = [
+const storage_paths: StoragePath[] = [
   {
     id: 32,
     name: 'StoragePath32',
@@ -121,7 +122,7 @@ const storage_paths: PaperlessStoragePath[] = [
   },
 ]
 
-const users: PaperlessUser[] = [
+const users: User[] = [
   {
     id: 1,
     username: 'user1',
@@ -826,6 +827,16 @@ describe('FilterEditorComponent', () => {
     expect(component.permissionsSelectionModel.hideUnowned).toBeTruthy()
   }))
 
+  it('should ingest filter rules for shared by me', fakeAsync(() => {
+    component.filterRules = [
+      {
+        rule_type: FILTER_SHARED_BY_USER,
+        value: '2',
+      },
+    ]
+    expect(component.permissionsSelectionModel.userID).toEqual(2)
+  }))
+
   // GET filterRules
 
   it('should convert user input to correct filter rules on text field search title + content', fakeAsync(() => {
@@ -1453,11 +1464,26 @@ describe('FilterEditorComponent', () => {
     ])
   }))
 
-  it('should convert user input to correct filter on permissions select unowned', fakeAsync(() => {
+  it('should convert user input to correct filter on permissions select shared by me', fakeAsync(() => {
     const permissionsDropdown = fixture.debugElement.query(
       By.directive(PermissionsFilterDropdownComponent)
     )
     const unownedButton = permissionsDropdown.queryAll(By.css('button'))[4]
+    unownedButton.triggerEventHandler('click')
+    fixture.detectChanges()
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_SHARED_BY_USER,
+        value: '1',
+      },
+    ])
+  }))
+
+  it('should convert user input to correct filter on permissions select unowned', fakeAsync(() => {
+    const permissionsDropdown = fixture.debugElement.query(
+      By.directive(PermissionsFilterDropdownComponent)
+    )
+    const unownedButton = permissionsDropdown.queryAll(By.css('button'))[5]
     unownedButton.triggerEventHandler('click')
     fixture.detectChanges()
     expect(component.filterRules).toEqual([
@@ -1699,5 +1725,14 @@ describe('FilterEditorComponent', () => {
       new KeyboardEvent('keyup', { key: 'Escape' })
     )
     expect(component.textFilter).toEqual('')
+  })
+
+  it('should adjust text filter targets if more like search', () => {
+    const TEXT_FILTER_TARGET_FULLTEXT_MORELIKE = 'fulltext-morelike' // private const
+    component.textFilterTarget = TEXT_FILTER_TARGET_FULLTEXT_MORELIKE
+    expect(component.textFilterTargets).toContainEqual({
+      id: TEXT_FILTER_TARGET_FULLTEXT_MORELIKE,
+      name: $localize`More like`,
+    })
   })
 })

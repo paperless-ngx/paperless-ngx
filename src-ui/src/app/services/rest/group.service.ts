@@ -1,14 +1,14 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Observable, switchMap } from 'rxjs'
-import { PaperlessGroup } from 'src/app/data/paperless-group'
+import { Group } from 'src/app/data/group'
 import { PermissionsService } from '../permissions.service'
 import { AbstractNameFilterService } from './abstract-name-filter-service'
 
 @Injectable({
   providedIn: 'root',
 })
-export class GroupService extends AbstractNameFilterService<PaperlessGroup> {
+export class GroupService extends AbstractNameFilterService<Group> {
   constructor(
     http: HttpClient,
     private permissionService: PermissionsService
@@ -16,7 +16,7 @@ export class GroupService extends AbstractNameFilterService<PaperlessGroup> {
     super(http, 'groups')
   }
 
-  update(o: PaperlessGroup): Observable<PaperlessGroup> {
+  update(o: Group): Observable<Group> {
     return this.getCached(o.id).pipe(
       switchMap((initialGroup) => {
         initialGroup.permissions?.forEach((perm) => {

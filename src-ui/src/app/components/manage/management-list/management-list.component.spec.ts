@@ -15,7 +15,7 @@ import {
   NgbPaginationModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { of, throwError } from 'rxjs'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { Tag } from 'src/app/data/tag'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
@@ -37,7 +37,7 @@ import { MATCH_NONE } from 'src/app/data/matching-model'
 import { MATCH_LITERAL } from 'src/app/data/matching-model'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 
-const tags: PaperlessTag[] = [
+const tags: Tag[] = [
   {
     id: 1,
     name: 'Tag1 Foo',
@@ -57,8 +57,8 @@ const tags: PaperlessTag[] = [
 ]
 
 describe('ManagementListComponent', () => {
-  let component: ManagementListComponent<PaperlessTag>
-  let fixture: ComponentFixture<ManagementListComponent<PaperlessTag>>
+  let component: ManagementListComponent<Tag>
+  let fixture: ComponentFixture<ManagementListComponent<Tag>>
   let tagService: TagService
   let modalService: NgbModal
   let toastService: ToastService
@@ -151,8 +151,7 @@ describe('ManagementListComponent', () => {
     createButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
-    const editDialog =
-      modal.componentInstance as EditDialogComponent<PaperlessTag>
+    const editDialog = modal.componentInstance as EditDialogComponent<Tag>
 
     // fail first
     editDialog.failed.emit({ error: 'error creating item' })
@@ -176,8 +175,7 @@ describe('ManagementListComponent', () => {
     editButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
-    const editDialog =
-      modal.componentInstance as EditDialogComponent<PaperlessTag>
+    const editDialog = modal.componentInstance as EditDialogComponent<Tag>
     expect(editDialog.object).toEqual(tags[0])
 
     // fail first

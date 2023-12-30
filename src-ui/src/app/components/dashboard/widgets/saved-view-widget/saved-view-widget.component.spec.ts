@@ -12,7 +12,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { of, Subject } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type'
-import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
+import { SavedView } from 'src/app/data/saved-view'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
@@ -29,8 +29,9 @@ import { SavedViewWidgetComponent } from './saved-view-widget.component'
 import { By } from '@angular/platform-browser'
 import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { DragDropModule } from '@angular/cdk/drag-drop'
+import { PreviewPopupComponent } from 'src/app/components/common/preview-popup/preview-popup.component'
 
-const savedView: PaperlessSavedView = {
+const savedView: SavedView = {
   id: 1,
   name: 'Saved View 1',
   sort_field: 'added',
@@ -74,6 +75,7 @@ describe('SavedViewWidgetComponent', () => {
         CustomDatePipe,
         DocumentTitlePipe,
         SafeUrlPipe,
+        PreviewPopupComponent,
       ],
       providers: [
         PermissionsGuard,
@@ -137,15 +139,18 @@ describe('SavedViewWidgetComponent', () => {
     )
     component.ngOnInit()
     fixture.detectChanges()
-    component.mouseEnterPreview(documentResults[0])
+    component.mouseEnterPreviewButton(documentResults[0])
     expect(component.popover.isOpen()).toBeTruthy()
     expect(component.popoverHidden).toBeTruthy()
     tick(600)
     expect(component.popoverHidden).toBeFalsy()
-    component.mouseLeaveCard()
+    component.maybeClosePopover()
 
-    component.mouseEnterPreview(documentResults[1])
+    component.mouseEnterPreviewButton(documentResults[1])
     tick(100)
+    component.mouseLeavePreviewButton()
+    component.mouseEnterPreview()
+    expect(component.popover.isOpen()).toBeTruthy()
     component.mouseLeavePreview()
     tick(600)
     expect(component.popover.isOpen()).toBeFalsy()

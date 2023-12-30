@@ -486,3 +486,54 @@ class TestConsumptionTemplates(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         self.assertIn(expected_str, cm.output[0])
         expected_str = f"Document source {DocumentSource.ApiUpload.name} not in ['{DocumentSource.ConsumeFolder.name}', '{DocumentSource.MailFetch.name}']"
         self.assertIn(expected_str, cm.output[1])
+
+    @mock.patch("documents.consumer.Consumer.try_consume_file")
+    def test_consumption_template_repeat_custom_fields(self, m):
+        """
+        GIVEN:
+            - Existing consumption templates which assign the same custom field
+        WHEN:
+            - File that matches is consumed
+        THEN:
+            - Custom field is added the first time successfully
+        """
+        ct = ConsumptionTemplate.objects.create(
+            name="Template 1",
+            order=0,
+            sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
+            filter_filename="*simple*",
+        )
+        ct.assign_custom_fields.add(self.cf1.pk)
+        ct.save()
+
+        ct2 = ConsumptionTemplate.objects.create(
+            name="Template 2",
+            order=1,
+            sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
+            filter_filename="*simple*",
+        )
+        ct2.assign_custom_fields.add(self.cf1.pk)
+        ct2.save()
+
+        test_file = self.SAMPLE_DIR / "simple.pdf"
+
+        with mock.patch("documents.tasks.async_to_sync"):
+            with self.assertLogs("paperless.matching", level="INFO") as cm:
+                tasks.consume_file(
+                    ConsumableDocument(
+                        source=DocumentSource.ConsumeFolder,
+                        original_file=test_file,
+                    ),
+                    None,
+                )
+                m.assert_called_once()
+                _, overrides = m.call_args
+                self.assertEqual(
+                    overrides["override_custom_field_ids"],
+                    [self.cf1.pk],
+                )
+
+        expected_str = f"Document matched template {ct}"
+        self.assertIn(expected_str, cm.output[0])
+        expected_str = f"Document matched template {ct2}"
+        self.assertIn(expected_str, cm.output[1])

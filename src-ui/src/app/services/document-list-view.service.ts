@@ -7,9 +7,9 @@ import {
   cloneFilterRules,
   isFullTextFilterRule,
 } from '../utils/filter-rules'
-import { PaperlessDocument } from '../data/paperless-document'
-import { PaperlessSavedView } from '../data/paperless-saved-view'
-import { SETTINGS_KEYS } from '../data/paperless-uisettings'
+import { Document } from '../data/document'
+import { SavedView } from '../data/saved-view'
+import { SETTINGS_KEYS } from '../data/ui-settings'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
 import { paramsFromViewState, paramsToViewState } from '../utils/query-params'
 import {
@@ -31,7 +31,7 @@ export interface ListViewState {
   /**
    * Current paginated list of documents displayed.
    */
-  documents?: PaperlessDocument[]
+  documents?: Document[]
 
   currentPage: number
 
@@ -149,7 +149,7 @@ export class DocumentListViewService {
     this.unsubscribeNotifier.next(true)
   }
 
-  activateSavedView(view: PaperlessSavedView) {
+  activateSavedView(view: SavedView) {
     this.rangeSelectionAnchorIndex = this.lastRangeSelectionToIndex = null
     if (view) {
       this._activeSavedViewId = view.id
@@ -159,16 +159,13 @@ export class DocumentListViewService {
     }
   }
 
-  activateSavedViewWithQueryParams(
-    view: PaperlessSavedView,
-    queryParams: ParamMap
-  ) {
+  activateSavedViewWithQueryParams(view: SavedView, queryParams: ParamMap) {
     const viewState = paramsToViewState(queryParams)
     this.activateSavedView(view)
     this.currentPage = viewState.currentPage
   }
 
-  loadSavedView(view: PaperlessSavedView, closeCurrentView: boolean = false) {
+  loadSavedView(view: SavedView, closeCurrentView: boolean = false) {
     if (closeCurrentView) {
       this._activeSavedViewId = null
     }
@@ -350,7 +347,7 @@ export class DocumentListViewService {
     this.saveDocumentListView()
   }
 
-  get documents(): PaperlessDocument[] {
+  get documents(): Document[] {
     return this.activeListViewState.documents
   }
 
@@ -494,18 +491,18 @@ export class DocumentListViewService {
     })
   }
 
-  isSelected(d: PaperlessDocument) {
+  isSelected(d: Document) {
     return this.selected.has(d.id)
   }
 
-  toggleSelected(d: PaperlessDocument): void {
+  toggleSelected(d: Document): void {
     if (this.selected.has(d.id)) this.selected.delete(d.id)
     else this.selected.add(d.id)
     this.rangeSelectionAnchorIndex = this.documentIndexInCurrentView(d.id)
     this.lastRangeSelectionToIndex = null
   }
 
-  selectRangeTo(d: PaperlessDocument) {
+  selectRangeTo(d: Document) {
     if (this.rangeSelectionAnchorIndex !== null) {
       const documentToIndex = this.documentIndexInCurrentView(d.id)
       const fromIndex = Math.min(

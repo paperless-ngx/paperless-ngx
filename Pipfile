@@ -4,16 +4,16 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-dateparser = "~=1.1"
+dateparser = "~=1.2"
 # WARNING: django does not use semver.
 #          Only patch versions are guaranteed to not introduce breaking changes.
-django = "~=4.2.7"
+django = "~=4.2.8"
 django-auditlog = "*"
 django-celery-results = "*"
 django-compression-middleware = "*"
 django-cors-headers = "*"
 django-extensions = "*"
-django-filter = "~=23.3"
+django-filter = "~=23.5"
 django-guardian = "*"
 django-multiselectfield = "*"
 djangorestframework = "~=3.14"
@@ -33,7 +33,7 @@ inotifyrecursive = "~=0.3"
 langdetect = "*"
 mysqlclient = "*"
 nltk = "*"
-ocrmypdf = "~=15.0"
+ocrmypdf = "~=15.4"
 pathvalidate = "*"
 pdf2image = "*"
 psycopg2 = "*"
@@ -57,7 +57,7 @@ zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
 
 [dev-packages]
 # Linting
-black = "*"
+black = "==23.11.0"
 pre-commit = "*"
 ruff = "*"
 # Testing

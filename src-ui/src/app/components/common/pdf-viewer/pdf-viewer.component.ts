@@ -36,15 +36,6 @@ import { PDFSinglePageViewer } from 'pdfjs-dist/web/pdf_viewer'
 
 PDFJS['verbosity'] = PDFJS.VerbosityLevel.ERRORS
 
-// Yea this is a straight hack
-declare global {
-  interface WeakKeyTypes {
-    symbol: Object
-  }
-
-  type WeakKey = WeakKeyTypes[keyof WeakKeyTypes]
-}
-
 export enum RenderTextMode {
   DISABLED,
   ENABLED,

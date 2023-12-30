@@ -2,36 +2,44 @@
   <div class="row">
     <div class="d-flex align-items-center position-relative hidden-button-container" [class.col-md-3]="horizontal">
       <label class="form-label" [class.mb-md-0]="horizontal" [for]="inputId">{{title}}</label>
-      <button type="button" *ngIf="removable" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
-        <svg class="sidebaricon" fill="currentColor">
-          <use xlink:href="assets/bootstrap-icons.svg#x"/>
-        </svg>&nbsp;<ng-container i18n>Remove</ng-container>
-      </button>
-    </div>
-    <div class="position-relative" [class.col-md-9]="horizontal">
-      <div class="input-group" [class.is-invalid]="error">
-        <input #inputField class="form-control" [class.is-invalid]="error" [placeholder]="placeholder" [id]="inputId" maxlength="10"
-              (dateSelect)="onChange(value)" (change)="onChange(value)" (keypress)="onKeyPress($event)" (paste)="onPaste($event)"
-              name="dp" [(ngModel)]="value" ngbDatepicker #datePicker="ngbDatepicker" #datePickerContent="ngModel" [disabled]="disabled">
-        <button class="btn btn-outline-secondary calendar" (click)="datePicker.toggle()" type="button" [disabled]="disabled">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="buttonicon">
-            <use _ngcontent-ng-c3750736003="" xlink:href="assets/bootstrap-icons.svg#calendar"></use>
-          </svg>
-        </button>
-        <button *ngIf="showFilter" class="btn btn-outline-secondary" type="button" (click)="onFilterDocuments()" [disabled]="this.value === null" title="{{ fitlerButtonTitle }}">
-          <svg class="buttonicon" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#filter" />
-          </svg>
-        </button>
+      @if (removable) {
+        <button type="button" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
+          <svg class="sidebaricon" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#x"/>
+            </svg>&nbsp;<ng-container i18n>Remove</ng-container>
+          </button>
+        }
       </div>
-      <div class="invalid-feedback position-absolute top-100" i18n>Invalid date.</div>
-      <small *ngIf="hint" class="form-text text-muted">{{hint}}</small>
-      <small *ngIf="getSuggestions().length > 0">
-        <span i18n>Suggestions:</span>&nbsp;
-        <ng-container *ngFor="let s of getSuggestions()">
-          <a (click)="onSuggestionClick(s)" [routerLink]="[]">{{s}}</a>&nbsp;
-        </ng-container>
-      </small>
+      <div class="position-relative" [class.col-md-9]="horizontal">
+        <div class="input-group" [class.is-invalid]="error">
+          <input #inputField class="form-control" [class.is-invalid]="error" [placeholder]="placeholder" [id]="inputId" maxlength="10"
+            (dateSelect)="onChange(value)" (change)="onChange(value)" (keypress)="onKeyPress($event)" (paste)="onPaste($event)"
+            name="dp" [(ngModel)]="value" ngbDatepicker #datePicker="ngbDatepicker" #datePickerContent="ngModel" [disabled]="disabled">
+          <button class="btn btn-outline-secondary calendar" (click)="datePicker.toggle()" type="button" [disabled]="disabled">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="buttonicon">
+              <use _ngcontent-ng-c3750736003="" xlink:href="assets/bootstrap-icons.svg#calendar"></use>
+            </svg>
+          </button>
+          @if (showFilter) {
+            <button class="btn btn-outline-secondary" type="button" (click)="onFilterDocuments()" [disabled]="this.value === null" title="{{ filterButtonTitle }}">
+              <svg class="buttonicon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#filter" />
+              </svg>
+            </button>
+          }
+        </div>
+        <div class="invalid-feedback position-absolute top-100" i18n>Invalid date.</div>
+        @if (hint) {
+          <small class="form-text text-muted">{{hint}}</small>
+        }
+        @if (getSuggestions().length > 0) {
+          <small>
+            <span i18n>Suggestions:</span>&nbsp;
+            @for (s of getSuggestions(); track s) {
+              <a (click)="onSuggestionClick(s)" [routerLink]="[]">{{s}}</a>&nbsp;
+            }
+          </small>
+        }
+      </div>
     </div>
   </div>
-</div>

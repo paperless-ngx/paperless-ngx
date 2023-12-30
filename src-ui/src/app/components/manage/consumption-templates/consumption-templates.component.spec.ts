@@ -11,8 +11,8 @@ import {
 import { of, throwError } from 'rxjs'
 import {
   DocumentSource,
-  PaperlessConsumptionTemplate,
-} from 'src/app/data/paperless-consumption-template'
+  ConsumptionTemplate,
+} from 'src/app/data/consumption-template'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { ConsumptionTemplateService } from 'src/app/services/rest/consumption-template.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -22,7 +22,7 @@ import { ConsumptionTemplatesComponent } from './consumption-templates.component
 import { ConsumptionTemplateEditDialogComponent } from '../../common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component'
 import { PermissionsService } from 'src/app/services/permissions.service'
 
-const templates: PaperlessConsumptionTemplate[] = [
+const templates: ConsumptionTemplate[] = [
   {
     id: 0,
     name: 'Template 1',

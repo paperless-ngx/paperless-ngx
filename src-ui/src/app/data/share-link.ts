@@ -1,18 +1,18 @@
 import { ObjectWithPermissions } from './object-with-permissions'
 
-export enum PaperlessFileVersion {
+export enum FileVersion {
   Archive = 'archive',
   Original = 'original',
 }
 
-export interface PaperlessShareLink extends ObjectWithPermissions {
+export interface ShareLink extends ObjectWithPermissions {
   created: string // Date
 
   expiration?: string // Date
 
   slug: string
 
-  document: number // PaperlessDocument
+  document: number // Document
 
   file_version: string
 }

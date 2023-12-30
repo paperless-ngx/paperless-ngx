@@ -145,6 +145,15 @@ describe('PermissionsFilterDropdownComponent', () => {
       userID: null,
     })
 
+    component.setFilter(OwnerFilterType.SHARED_BY_ME)
+    expect(ownerFilterSetResult).toEqual({
+      excludeUsers: [],
+      hideUnowned: false,
+      includeUsers: [],
+      ownerFilter: OwnerFilterType.SHARED_BY_ME,
+      userID: currentUserID,
+    })
+
     component.setFilter(OwnerFilterType.UNOWNED)
     expect(ownerFilterSetResult).toEqual({
       excludeUsers: [],

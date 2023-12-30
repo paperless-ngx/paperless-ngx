@@ -53,6 +53,12 @@ class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
             type=float,
             help="Ratio to consider documents a match",
         )
+        parser.add_argument(
+            "--delete",
+            default=False,
+            action="store_true",
+            help="If set, one document of matches above the ratio WILL BE DELETED",
+        )
         self.add_argument_progress_bar_mixin(parser)
         self.add_argument_processes_mixin(parser)
 
@@ -62,6 +68,13 @@ class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
 
         self.handle_processes_mixin(**options)
         self.handle_progress_bar_mixin(**options)
+
+        if options["delete"]:
+            self.stdout.write(
+                self.style.WARNING(
+                    "The command is configured to delete documents.  Use with caution",
+                ),
+            )
 
         opt_ratio = options["ratio"]
         checked_pairs: set[tuple[int, int]] = set()
@@ -81,15 +94,12 @@ class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
                     continue
                 # Skip matching which have already been matched together
                 # doc 1 to doc 2 is the same as doc 2 to doc 1
-                if (first_doc.pk, second_doc.pk) in checked_pairs or (
-                    second_doc.pk,
-                    first_doc.pk,
-                ) in checked_pairs:
+                doc_1_to_doc_2 = (first_doc.pk, second_doc.pk)
+                doc_2_to_doc_1 = doc_1_to_doc_2[::-1]
+                if doc_1_to_doc_2 in checked_pairs or doc_2_to_doc_1 in checked_pairs:
                     continue
-                checked_pairs.update(
-                    [(first_doc.pk, second_doc.pk), (second_doc.pk, first_doc.pk)],
-                )
-
+                checked_pairs.update([doc_1_to_doc_2, doc_2_to_doc_1])
+                # Actually something useful to work on now
                 work_pkgs.append(_WorkPackage(first_doc, second_doc))
 
         # Don't spin up a pool of 1 process
@@ -109,6 +119,7 @@ class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
 
         # Check results
         messages = []
+        maybe_delete_ids = []
         for result in sorted(results):
             if result.ratio >= opt_ratio:
                 messages.append(
@@ -117,6 +128,7 @@ class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
                         f" to {result.doc_two_pk} (confidence {result.ratio:.3f})",
                     ),
                 )
+                maybe_delete_ids.append(result.doc_two_pk)
 
         if len(messages) == 0:
             messages.append(
@@ -125,3 +137,10 @@ class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
         self.stdout.writelines(
             messages,
         )
+        if options["delete"]:
+            self.stdout.write(
+                self.style.NOTICE(
+                    f"Deleting {len(maybe_delete_ids)} documents based on ratio matches",
+                ),
+            )
+            Document.objects.filter(pk__in=maybe_delete_ids).delete()

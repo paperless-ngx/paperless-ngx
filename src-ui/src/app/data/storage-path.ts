@@ -1,5 +1,5 @@
 import { MatchingModel } from './matching-model'
 
-export interface PaperlessStoragePath extends MatchingModel {
+export interface StoragePath extends MatchingModel {
   path?: string
 }
