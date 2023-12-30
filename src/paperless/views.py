@@ -56,11 +56,7 @@ class StandardPagination(PageNumberPagination):
                     except Exception:
                         pass
         else:
-            for obj in self.page.paginator.object_list:
-                if hasattr(obj, "id"):
-                    ids.append(obj.id)
-                elif hasattr(obj, "fields"):
-                    ids.append(obj.fields()["id"])
+            ids = self.page.paginator.object_list.values_list("pk", flat=True)
         return ids
 
     def get_paginated_response_schema(self, schema):
