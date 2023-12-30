@@ -1,8 +1,10 @@
 import logging
 import re
 from fnmatch import fnmatch
+from typing import Union
 
 from documents.classifier import DocumentClassifier
+from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentSource
 from documents.models import Correspondent
 from documents.models import Document
@@ -238,7 +240,7 @@ def _split_match(matching_model):
 
 
 def document_matches_workflow(
-    document,  # ConsumableDocument | Document
+    document: Union[ConsumableDocument, Document],
     workflow: Workflow,
     trigger_type: WorkflowTrigger.WorkflowTriggerType,
 ) -> bool:

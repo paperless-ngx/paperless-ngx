@@ -3,7 +3,6 @@ import math
 import re
 import zoneinfo
 from decimal import Decimal
-from typing import Any
 
 import magic
 from celery import states
@@ -1451,7 +1450,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
             if action.workflows.all().count() == 0:
                 action.delete()
 
-    def create(self, validated_data: Any) -> Workflow:
+    def create(self, validated_data) -> Workflow:
         if "triggers" in validated_data:
             triggers = validated_data.pop("triggers")
 
@@ -1464,7 +1463,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
         return instance
 
-    def update(self, instance: Any, validated_data: Any) -> Workflow:
+    def update(self, instance: Workflow, validated_data) -> Workflow:
         if "triggers" in validated_data:
             triggers = validated_data.pop("triggers")
 
