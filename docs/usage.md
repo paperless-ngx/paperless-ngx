@@ -274,12 +274,13 @@ fields and permissions, which will be merged.
 
 Currently, there are three events that correspond to workflow trigger 'types':
 
-1. Consumption: _before_ a document is consumed, so events can include filters by source (mail, consumption
+1. **Consumption**: _before_ a document is consumed, so events can include filters by source (mail, consumption
    folder or API), file path, file name, mail rule
-2. Added: _after_ a document is added. At this time, file path and source information is no longer available,
-   but the document has had document type, tags, etc. assigned so these can now be used for filtering.
-3. Updated: when a document is updated. Similar to 'added' events, triggers can include filtering by tags, doc
-   type, or correspondent.
+2. **Added**: _after_ a document is added. At this time, file path and source information is no longer available,
+   but the document content has been extracted and metadata such as document type, tags, etc. have been set, so these can now
+   be used for filtering.
+3. **Updated**: when a document is updated. Similar to 'added' events, triggers can include filtering by content matching, tags,
+   doc type, or correspondent.
 
 The following flow diagram illustrates the three trigger types:
 
