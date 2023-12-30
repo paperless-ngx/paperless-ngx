@@ -27,7 +27,7 @@
                                                 @switch (option.type) {
                                                     @case (ConfigOptionType.Select) { <pngx-input-select [formControlName]="option.key" [error]="errors[option.key]" [items]="option.choices" [allowNull]="true"></pngx-input-select> }
                                                     @case (ConfigOptionType.Number) { <pngx-input-number [formControlName]="option.key" [error]="errors[option.key]" [showAdd]="false"></pngx-input-number> }
-                                                    @case (ConfigOptionType.Boolean) { <pngx-input-switch [formControlName]="option.key" [error]="errors[option.key]" title="Enable" i18n-title></pngx-input-switch> }
+                                                    @case (ConfigOptionType.Boolean) { <pngx-input-switch [formControlName]="option.key" [error]="errors[option.key]" [horizontal]="true" title="Enable" i18n-title></pngx-input-switch> }
                                                     @case (ConfigOptionType.String) { <pngx-input-text [formControlName]="option.key" [error]="errors[option.key]"></pngx-input-text> }
                                                     @case (ConfigOptionType.JSON) { <pngx-input-text [formControlName]="option.key" [error]="errors[option.key]"></pngx-input-text> }
                                                 }
