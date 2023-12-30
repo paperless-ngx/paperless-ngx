@@ -37,6 +37,7 @@ from documents.views import WorkflowActionViewSet
 from documents.views import WorkflowTriggerViewSet
 from documents.views import WorkflowViewSet
 from paperless.consumers import StatusConsumer
+from paperless.views import ApplicationConfigurationViewSet
 from paperless.views import FaviconView
 from paperless.views import GenerateAuthTokenView
 from paperless.views import GroupViewSet
@@ -64,6 +65,7 @@ api_router.register(r"workflow_triggers", WorkflowTriggerViewSet)
 api_router.register(r"workflow_actions", WorkflowActionViewSet)
 api_router.register(r"workflows", WorkflowViewSet)
 api_router.register(r"custom_fields", CustomFieldViewSet)
+api_router.register(r"config", ApplicationConfigurationViewSet)
 
 
 urlpatterns = [

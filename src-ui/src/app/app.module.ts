@@ -109,6 +109,7 @@ import { PdfViewerComponent } from './components/common/pdf-viewer/pdf-viewer.co
 import { DocumentLinkComponent } from './components/common/input/document-link/document-link.component'
 import { PreviewPopupComponent } from './components/common/preview-popup/preview-popup.component'
 import { SwitchComponent } from './components/common/input/switch/switch.component'
+import { ConfigComponent } from './components/admin/config/config.component'
 
 import localeAf from '@angular/common/locales/af'
 import localeAr from '@angular/common/locales/ar'
@@ -265,6 +266,7 @@ function initializeApp(settings: SettingsService) {
     DocumentLinkComponent,
     PreviewPopupComponent,
     SwitchComponent,
+    ConfigComponent,
   ],
   imports: [
     BrowserModule,

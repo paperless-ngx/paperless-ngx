@@ -3,6 +3,11 @@
 Paperless provides a wide range of customizations. Depending on how you
 run paperless, these settings have to be defined in different places.
 
+Certain configuration options may be set via the UI. This currently includes
+common [OCR](#ocr) related settings. If set, these will take preference over the
+settings via environment variables. If not set, the environment setting or applicable
+default will be utilized instead.
+
 - If you run paperless on docker, `paperless.conf` is not used.
   Rather, configure paperless by copying necessary options to
   `docker-compose.env`.

@@ -1,9 +1,9 @@
-import json
 import os
 import re
 import subprocess
 import tempfile
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Optional
 
 from django.conf import settings
@@ -12,6 +12,10 @@ from PIL import Image
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
+from paperless.config import OcrConfig
+from paperless.models import ArchiveFileChoices
+from paperless.models import CleanChoices
+from paperless.models import ModeChoices
 
 
 class NoTextFoundException(Exception):
@@ -29,6 +33,12 @@ class RasterisedDocumentParser(DocumentParser):
     """
 
     logging_name = "paperless.parsing.tesseract"
+
+    def get_settings(self) -> OcrConfig:
+        """
+        This parser uses the OCR configuration settings to parse documents
+        """
+        return OcrConfig()
 
     def extract_metadata(self, document_path, mime_type):
         result = []
@@ -66,7 +76,7 @@ class RasterisedDocumentParser(DocumentParser):
             self.logging_group,
         )
 
-    def is_image(self, mime_type):
+    def is_image(self, mime_type) -> bool:
         return mime_type in [
             "image/png",
             "image/jpeg",
@@ -76,7 +86,7 @@ class RasterisedDocumentParser(DocumentParser):
             "image/webp",
         ]
 
-    def has_alpha(self, image):
+    def has_alpha(self, image) -> bool:
         with Image.open(image) as im:
             return im.mode in ("RGBA", "LA")
 
@@ -91,7 +101,7 @@ class RasterisedDocumentParser(DocumentParser):
             ],
         )
 
-    def get_dpi(self, image):
+    def get_dpi(self, image) -> Optional[int]:
         try:
             with Image.open(image) as im:
                 x, y = im.info["dpi"]
@@ -100,7 +110,7 @@ class RasterisedDocumentParser(DocumentParser):
             self.log.warning(f"Error while getting DPI from image {image}: {e}")
             return None
 
-    def calculate_a4_dpi(self, image):
+    def calculate_a4_dpi(self, image) -> Optional[int]:
         try:
             with Image.open(image) as im:
                 width, height = im.size
@@ -113,13 +123,17 @@ class RasterisedDocumentParser(DocumentParser):
             self.log.warning(f"Error while calculating DPI for image {image}: {e}")
             return None
 
-    def extract_text(self, sidecar_file: Optional[Path], pdf_file: Path):
+    def extract_text(
+        self,
+        sidecar_file: Optional[Path],
+        pdf_file: Path,
+    ) -> Optional[str]:
         # When re-doing OCR, the sidecar contains ONLY the new text, not
         # the whole text, so do not utilize it in that case
         if (
             sidecar_file is not None
             and os.path.isfile(sidecar_file)
-            and settings.OCR_MODE != "redo"
+            and self.settings.mode != "redo"
         ):
             text = self.read_file_handle_unicode_errors(sidecar_file)
 
@@ -174,6 +188,8 @@ class RasterisedDocumentParser(DocumentParser):
         sidecar_file,
         safe_fallback=False,
     ):
+        if TYPE_CHECKING:
+            assert isinstance(self.settings, OcrConfig)
         ocrmypdf_args = {
             "input_file": input_file,
             "output_file": output_file,
@@ -181,46 +197,47 @@ class RasterisedDocumentParser(DocumentParser):
             # processes via the task library.
             "use_threads": True,
             "jobs": settings.THREADS_PER_WORKER,
-            "language": settings.OCR_LANGUAGE,
-            "output_type": settings.OCR_OUTPUT_TYPE,
+            "language": self.settings.language,
+            "output_type": self.settings.output_type,
             "progress_bar": False,
         }
 
         if "pdfa" in ocrmypdf_args["output_type"]:
             ocrmypdf_args[
                 "color_conversion_strategy"
-            ] = settings.OCR_COLOR_CONVERSION_STRATEGY
+            ] = self.settings.color_conversion_strategy
 
-        if settings.OCR_MODE == "force" or safe_fallback:
+        if self.settings.mode == ModeChoices.FORCE or safe_fallback:
             ocrmypdf_args["force_ocr"] = True
-        elif settings.OCR_MODE in ["skip", "skip_noarchive"]:
+        elif self.settings.mode in {
+            ModeChoices.SKIP,
+            ModeChoices.SKIP_NO_ARCHIVE,
+        }:
             ocrmypdf_args["skip_text"] = True
-        elif settings.OCR_MODE == "redo":
+        elif self.settings.mode == ModeChoices.REDO:
             ocrmypdf_args["redo_ocr"] = True
-        else:
-            raise ParseError(f"Invalid ocr mode: {settings.OCR_MODE}")
+        else:  # pragma: no cover
+            raise ParseError(f"Invalid ocr mode: {self.settings.mode}")
 
-        if settings.OCR_CLEAN == "clean":
+        if self.settings.clean == CleanChoices.CLEAN:
             ocrmypdf_args["clean"] = True
-        elif settings.OCR_CLEAN == "clean-final":
-            if settings.OCR_MODE == "redo":
+        elif self.settings.clean == CleanChoices.FINAL:
+            if self.settings.mode == ModeChoices.REDO:
                 ocrmypdf_args["clean"] = True
             else:
                 # --clean-final is not compatible with --redo-ocr
                 ocrmypdf_args["clean_final"] = True
 
-        if settings.OCR_DESKEW and settings.OCR_MODE != "redo":
+        if self.settings.deskew and self.settings.mode != ModeChoices.REDO:
             # --deskew is not compatible with --redo-ocr
             ocrmypdf_args["deskew"] = True
 
-        if settings.OCR_ROTATE_PAGES:
+        if self.settings.rotate:
             ocrmypdf_args["rotate_pages"] = True
-            ocrmypdf_args[
-                "rotate_pages_threshold"
-            ] = settings.OCR_ROTATE_PAGES_THRESHOLD
+            ocrmypdf_args["rotate_pages_threshold"] = self.settings.rotate_threshold
 
-        if settings.OCR_PAGES > 0:
-            ocrmypdf_args["pages"] = f"1-{settings.OCR_PAGES}"
+        if self.settings.pages is not None:
+            ocrmypdf_args["pages"] = f"1-{self.settings.pages}"
         else:
             # sidecar is incompatible with pages
             ocrmypdf_args["sidecar"] = sidecar_file
@@ -239,8 +256,8 @@ class RasterisedDocumentParser(DocumentParser):
             if dpi:
                 self.log.debug(f"Detected DPI for image {input_file}: {dpi}")
                 ocrmypdf_args["image_dpi"] = dpi
-            elif settings.OCR_IMAGE_DPI:
-                ocrmypdf_args["image_dpi"] = settings.OCR_IMAGE_DPI
+            elif self.settings.image_dpi is not None:
+                ocrmypdf_args["image_dpi"] = self.settings.image_dpi
             elif a4_dpi:
                 ocrmypdf_args["image_dpi"] = a4_dpi
             else:
@@ -254,19 +271,18 @@ class RasterisedDocumentParser(DocumentParser):
                     f"Image DPI of {ocrmypdf_args['image_dpi']} is low, OCR may fail",
                 )
 
-        if settings.OCR_USER_ARGS:
+        if self.settings.user_args is not None:
             try:
-                user_args = json.loads(settings.OCR_USER_ARGS)
-                ocrmypdf_args = {**ocrmypdf_args, **user_args}
+                ocrmypdf_args = {**ocrmypdf_args, **self.settings.user_args}
             except Exception as e:
                 self.log.warning(
                     f"There is an issue with PAPERLESS_OCR_USER_ARGS, so "
                     f"they will not be used. Error: {e}",
                 )
 
-        if settings.OCR_MAX_IMAGE_PIXELS is not None:
+        if self.settings.max_image_pixel is not None:
             # Convert pixels to mega-pixels and provide to ocrmypdf
-            max_pixels_mpixels = settings.OCR_MAX_IMAGE_PIXELS / 1_000_000.0
+            max_pixels_mpixels = self.settings.max_image_pixel / 1_000_000.0
             if max_pixels_mpixels > 0:
                 self.log.debug(
                     f"Calculated {max_pixels_mpixels} megapixels for OCR",
@@ -298,8 +314,12 @@ class RasterisedDocumentParser(DocumentParser):
         # If the original has text, and the user doesn't want an archive,
         # we're done here
         skip_archive_for_text = (
-            settings.OCR_MODE == "skip_noarchive"
-            or settings.OCR_SKIP_ARCHIVE_FILE in ["with_text", "always"]
+            self.settings.mode == ModeChoices.SKIP_NO_ARCHIVE
+            or self.settings.skip_archive_file
+            in {
+                ArchiveFileChoices.WITH_TEXT,
+                ArchiveFileChoices.ALWAYS,
+            }
         )
         if skip_archive_for_text and original_has_text:
             self.log.debug("Document has text, skipping OCRmyPDF entirely.")
@@ -329,7 +349,7 @@ class RasterisedDocumentParser(DocumentParser):
             self.log.debug(f"Calling OCRmyPDF with args: {args}")
             ocrmypdf.ocr(**args)
 
-            if settings.OCR_SKIP_ARCHIVE_FILE != "always":
+            if self.settings.skip_archive_file != ArchiveFileChoices.ALWAYS:
                 self.archive_path = archive_path
 
             self.text = self.extract_text(sidecar_file, archive_path)

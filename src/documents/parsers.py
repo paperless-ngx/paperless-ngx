@@ -125,8 +125,10 @@ def get_parser_class_for_mime_type(mime_type: str) -> Optional[type["DocumentPar
     if not options:
         return None
 
+    best_parser = sorted(options, key=lambda _: _["weight"], reverse=True)[0]
+
     # Return the parser with the highest weight.
-    return sorted(options, key=lambda _: _["weight"], reverse=True)[0]["parser"]
+    return best_parser["parser"]
 
 
 def run_convert(
@@ -318,6 +320,7 @@ class DocumentParser(LoggingMixin):
     def __init__(self, logging_group, progress_callback=None):
         super().__init__()
         self.logging_group = logging_group
+        self.settings = self.get_settings()
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
         self.tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
 
@@ -329,6 +332,12 @@ class DocumentParser(LoggingMixin):
     def progress(self, current_progress, max_progress):
         if self.progress_callback:
             self.progress_callback(current_progress, max_progress)
+
+    def get_settings(self):  # pragma: no cover
+        """
+        A parser must implement this
+        """
+        raise NotImplementedError
 
     def read_file_handle_unicode_errors(self, filepath: Path) -> str:
         """

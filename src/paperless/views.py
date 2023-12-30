@@ -18,6 +18,8 @@ from rest_framework.viewsets import ModelViewSet
 from documents.permissions import PaperlessObjectPermissions
 from paperless.filters import GroupFilterSet
 from paperless.filters import UserFilterSet
+from paperless.models import ApplicationConfiguration
+from paperless.serialisers import ApplicationConfigurationSerializer
 from paperless.serialisers import GroupSerializer
 from paperless.serialisers import ProfileSerializer
 from paperless.serialisers import UserSerializer
@@ -71,7 +73,7 @@ class StandardPagination(PageNumberPagination):
 
 
 class FaviconView(View):
-    def get(self, request, *args, **kwargs):  # pragma: nocover
+    def get(self, request, *args, **kwargs):  # pragma: no cover
         favicon = os.path.join(
             os.path.dirname(__file__),
             "static",
@@ -160,3 +162,12 @@ class GenerateAuthTokenView(GenericAPIView):
         return Response(
             token.key,
         )
+
+
+class ApplicationConfigurationViewSet(ModelViewSet):
+    model = ApplicationConfiguration
+
+    queryset = ApplicationConfiguration.objects
+
+    serializer_class = ApplicationConfigurationSerializer
+    permission_classes = (IsAuthenticated,)

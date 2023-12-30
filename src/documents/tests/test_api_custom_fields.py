@@ -333,19 +333,17 @@ class TestCustomField(DirectoriesMixin, APITestCase):
             },
             format="json",
         )
-        from pprint import pprint
 
-        pprint(resp.json())
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(CustomFieldInstance.objects.count(), 0)
         self.assertEqual(len(doc.custom_fields.all()), 0)
 
-    def test_custom_field_value_validation(self):
+    def test_custom_field_value_url_validation(self):
         """
         GIVEN:
             - Document & custom field exist
         WHEN:
-            - API request to set a field value
+            - API request to set a field value to something which is or is not a link
         THEN:
             - HTTP 400 is returned
             - No field instance is created or attached to the document
@@ -360,31 +358,62 @@ class TestCustomField(DirectoriesMixin, APITestCase):
             name="Test Custom Field URL",
             data_type=CustomField.FieldDataType.URL,
         )
-        custom_field_int = CustomField.objects.create(
-            name="Test Custom Field INT",
-            data_type=CustomField.FieldDataType.INT,
-        )
 
+        for value in ["not a url", "file:"]:
+            with self.subTest(f"Test value {value}"):
+                resp = self.client.patch(
+                    f"/api/documents/{doc.id}/",
+                    data={
+                        "custom_fields": [
+                            {
+                                "field": custom_field_url.id,
+                                "value": value,
+                            },
+                        ],
+                    },
+                    format="json",
+                )
+
+                self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+                self.assertEqual(CustomFieldInstance.objects.count(), 0)
+                self.assertEqual(len(doc.custom_fields.all()), 0)
         resp = self.client.patch(
             f"/api/documents/{doc.id}/",
             data={
                 "custom_fields": [
                     {
                         "field": custom_field_url.id,
-                        "value": "not a url",
+                        "value": "tel:+1-816-555-1212",
                     },
                 ],
             },
             format="json",
         )
 
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(CustomFieldInstance.objects.count(), 0)
-        self.assertEqual(len(doc.custom_fields.all()), 0)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-        self.assertRaises(
-            Exception,
-            self.client.patch,
+    def test_custom_field_value_integer_validation(self):
+        """
+        GIVEN:
+            - Document & custom field exist
+        WHEN:
+            - API request to set a field value to something not an integer
+        THEN:
+            - HTTP 400 is returned
+            - No field instance is created or attached to the document
+        """
+        doc = Document.objects.create(
+            title="WOW",
+            content="the content",
+            checksum="123",
+            mime_type="application/pdf",
+        )
+        custom_field_int = CustomField.objects.create(
+            name="Test Custom Field INT",
+            data_type=CustomField.FieldDataType.INT,
+        )
+
+        resp = self.client.patch(
             f"/api/documents/{doc.id}/",
             data={
                 "custom_fields": [
@@ -397,6 +426,81 @@ class TestCustomField(DirectoriesMixin, APITestCase):
             format="json",
         )
 
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(CustomFieldInstance.objects.count(), 0)
+        self.assertEqual(len(doc.custom_fields.all()), 0)
+
+    def test_custom_field_value_monetary_validation(self):
+        """
+        GIVEN:
+            - Document & custom field exist
+        WHEN:
+            - API request to set a field value to something not a valid monetary decimal
+        THEN:
+            - HTTP 400 is returned
+            - No field instance is created or attached to the document
+        """
+        doc = Document.objects.create(
+            title="WOW",
+            content="the content",
+            checksum="123",
+            mime_type="application/pdf",
+        )
+        custom_field_money = CustomField.objects.create(
+            name="Test Custom Field MONETARY",
+            data_type=CustomField.FieldDataType.MONETARY,
+        )
+
+        resp = self.client.patch(
+            f"/api/documents/{doc.id}/",
+            data={
+                "custom_fields": [
+                    {
+                        "field": custom_field_money.id,
+                        # Too many places past decimal
+                        "value": 12.123,
+                    },
+                ],
+            },
+            format="json",
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(CustomFieldInstance.objects.count(), 0)
+        self.assertEqual(len(doc.custom_fields.all()), 0)
+
+    def test_custom_field_value_short_text_validation(self):
+        """
+        GIVEN:
+            - Document & custom field exist
+        WHEN:
+            - API request to set a field value to a too long string
+        THEN:
+            - HTTP 400 is returned
+            - No field instance is created or attached to the document
+        """
+        doc = Document.objects.create(
+            title="WOW",
+            content="the content",
+            checksum="123",
+            mime_type="application/pdf",
+        )
+        custom_field_string = CustomField.objects.create(
+            name="Test Custom Field STRING",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+
+        resp = self.client.patch(
+            f"/api/documents/{doc.id}/",
+            data={
+                "custom_fields": [
+                    {"field": custom_field_string.id, "value": "a" * 129},
+                ],
+            },
+            format="json",
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(CustomFieldInstance.objects.count(), 0)
         self.assertEqual(len(doc.custom_fields.all()), 0)
 

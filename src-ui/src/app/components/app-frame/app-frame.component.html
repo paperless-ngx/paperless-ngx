@@ -271,6 +271,15 @@
               </svg><span>&nbsp;<ng-container i18n>Settings</ng-container></span>
             </a>
           </li>
+          <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Admin }">
+            <a class="nav-link" routerLink="config" routerLinkActive="active" (click)="closeMenu()"
+              ngbPopover="Configuration" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
+              container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#sliders2-vertical" />
+              </svg><span>&nbsp;<ng-container i18n>Configuration</ng-container></span>
+            </a>
+          </li>
           <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.User }">
             <a class="nav-link" routerLink="usersgroups" routerLinkActive="active" (click)="closeMenu()"
               ngbPopover="Users & Groups" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
