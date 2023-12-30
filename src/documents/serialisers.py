@@ -527,6 +527,10 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         """
         Add or remove 'symmetrical' links to `document` on all `target_doc_ids`
         """
+
+        if target_doc_ids is None:
+            target_doc_ids = []
+
         # Check if any documents are going to be removed from the current list of links and remove the symmetrical links
         current_field_instance = CustomFieldInstance.objects.filter(
             field=field,
@@ -539,9 +543,6 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
             for doc_id in current_field_instance.value:
                 if doc_id not in target_doc_ids:
                     self.remove_doclink(document, field, doc_id)
-
-        if target_doc_ids is None:
-            target_doc_ids = []
 
         # Create an instance if target doc doesnt have this field or append it to an existing one
         existing_custom_field_instances = {
