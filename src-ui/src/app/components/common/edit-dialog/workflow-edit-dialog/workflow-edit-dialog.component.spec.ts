@@ -37,6 +37,7 @@ import {
   WorkflowAction,
   WorkflowActionType,
 } from 'src/app/data/workflow-action'
+import { MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/matching-model'
 
 const workflow: Workflow = {
   name: 'Workflow 1',
@@ -215,5 +216,11 @@ describe('ConsumptionTemplateEditDialogComponent', () => {
     expect(component.object.actions).toEqual([action2, action1])
     expect(action1.id).toBeNull()
     expect(action2.id).toBeNull()
+  })
+
+  it('should not include auto matching in algorithms', () => {
+    expect(component.getMatchingAlgorithms()).not.toContain(
+      MATCHING_ALGORITHMS.find((a) => a.id === MATCH_AUTO)
+    )
   })
 })

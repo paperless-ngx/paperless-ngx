@@ -21,9 +21,13 @@ logger = logging.getLogger("paperless.matching")
 
 def log_reason(matching_model: MatchingModel, document: Document, reason: str):
     class_name = type(matching_model).__name__
+    name = (
+        matching_model.name
+        if hasattr(matching_model, "name")
+        else matching_model.__str__()
+    )
     logger.debug(
-        f"{class_name} {matching_model.name} matched on document "
-        f"{document} because {reason}",
+        f"{class_name} {name} matched on document {document} because {reason}",
     )
 
 
@@ -317,6 +321,15 @@ def document_matches_workflow(
                 or trigger_type is WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED
             ):
                 # document is type Document
+
+                if (
+                    trigger.matching_algorithm > MatchingModel.MATCH_NONE
+                    and not matches(trigger, document)
+                ):
+                    log_match_failure(
+                        f"Document content matching settings for algorithm '{trigger.matching_algorithm}' did not match",
+                    )
+                    trigger_matched = False
 
                 # Document has_tags vs document tags
                 if (

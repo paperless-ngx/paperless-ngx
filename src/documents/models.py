@@ -889,6 +889,15 @@ if settings.AUDIT_LOG_ENABLED:
 
 
 class WorkflowTrigger(models.Model):
+    class WorkflowTriggerMatching(models.IntegerChoices):
+        # No auto matching
+        NONE = MatchingModel.MATCH_NONE, _("None")
+        ANY = MatchingModel.MATCH_ANY, _("Any word")
+        ALL = MatchingModel.MATCH_ALL, _("All words")
+        LITERAL = MatchingModel.MATCH_LITERAL, _("Exact match")
+        REGEX = MatchingModel.MATCH_REGEX, _("Regular expression")
+        FUZZY = MatchingModel.MATCH_FUZZY, _("Fuzzy word")
+
     class WorkflowTriggerType(models.IntegerChoices):
         CONSUMPTION = 1, _("Consumption")
         DOCUMENT_ADDED = 2, _("Document Added")
@@ -942,6 +951,16 @@ class WorkflowTrigger(models.Model):
         on_delete=models.SET_NULL,
         verbose_name=_("filter documents from this mail rule"),
     )
+
+    match = models.CharField(_("match"), max_length=256, blank=True)
+
+    matching_algorithm = models.PositiveIntegerField(
+        _("matching algorithm"),
+        choices=WorkflowTriggerMatching.choices,
+        default=WorkflowTriggerMatching.NONE,
+    )
+
+    is_insensitive = models.BooleanField(_("is insensitive"), default=True)
 
     filter_has_tags = models.ManyToManyField(
         Tag,

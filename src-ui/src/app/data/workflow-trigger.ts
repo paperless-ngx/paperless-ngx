@@ -23,6 +23,12 @@ export interface WorkflowTrigger extends ObjectWithId {
 
   filter_mailrule?: number // MailRule.id
 
+  match?: string
+
+  matching_algorithm?: number
+
+  is_insensitive?: boolean
+
   filter_has_tags?: number[] // Tag.id[]
 
   filter_has_correspondent?: number // Correspondent.id

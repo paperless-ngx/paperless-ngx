@@ -408,6 +408,29 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
+                    "matching_algorithm",
+                    models.PositiveIntegerField(
+                        choices=[
+                            (0, "None"),
+                            (1, "Any word"),
+                            (2, "All words"),
+                            (3, "Exact match"),
+                            (4, "Regular expression"),
+                            (5, "Fuzzy word"),
+                        ],
+                        default=0,
+                        verbose_name="matching algorithm",
+                    ),
+                ),
+                (
+                    "match",
+                    models.CharField(blank=True, max_length=256, verbose_name="match"),
+                ),
+                (
+                    "is_insensitive",
+                    models.BooleanField(default=True, verbose_name="is insensitive"),
+                ),
+                (
                     "filter_has_tags",
                     models.ManyToManyField(
                         blank=True,

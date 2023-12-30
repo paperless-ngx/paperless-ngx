@@ -26,6 +26,11 @@ import {
   WorkflowActionType,
 } from 'src/app/data/workflow-action'
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop'
+import {
+  MATCHING_ALGORITHMS,
+  MATCH_AUTO,
+  MATCH_NONE,
+} from 'src/app/data/matching-model'
 
 export const DOCUMENT_SOURCE_OPTIONS = [
   {
@@ -63,6 +68,10 @@ export const WORKFLOW_ACTION_OPTIONS = [
     name: $localize`Assignment`,
   },
 ]
+
+const TRIGGER_MATCHING_ALGORITHMS = MATCHING_ALGORITHMS.filter(
+  (a) => a.id !== MATCH_AUTO
+)
 
 @Component({
   selector: 'pngx-workflow-edit-dialog',
@@ -141,6 +150,11 @@ export class WorkflowEditDialogComponent
     })
   }
 
+  getMatchingAlgorithms() {
+    // No auto matching
+    return TRIGGER_MATCHING_ALGORITHMS
+  }
+
   ngOnInit(): void {
     super.ngOnInit()
     this.updateTriggerActionFields()
@@ -165,6 +179,9 @@ export class WorkflowEditDialogComponent
           filter_filename: new FormControl(trigger.filter_filename),
           filter_path: new FormControl(trigger.filter_path),
           filter_mailrule: new FormControl(trigger.filter_mailrule),
+          matching_algorithm: new FormControl(MATCH_NONE),
+          match: new FormControl(''),
+          is_insensitive: new FormControl(true),
           filter_has_tags: new FormControl(trigger.filter_has_tags),
           filter_has_correspondent: new FormControl(
             trigger.filter_has_correspondent

@@ -320,7 +320,8 @@ Workflows allow you to filter by:
 - File path, including wildcards. Note that enabling `PAPERLESS_CONSUMER_RECURSIVE` would allow, for
   example, automatically assigning documents to different owners based on the upload directory.
 - Mail rule. Choosing this option will force 'mail fetch' to be the workflow source.
-- Tags (`Added` and `Updated` triggers only). Will filter for documents with any of the specified tags
+- Content matching (`Added` and `Updated` triggers only). Filter document content using the matching settings.
+- Tags (`Added` and `Updated` triggers only). Filter for documents with any of the specified tags
 - Document type (`Added` and `Updated` triggers only). Filter documents with this doc type
 - Correspondent (`Added` and `Updated` triggers only). Filter documents with this correspondent
 

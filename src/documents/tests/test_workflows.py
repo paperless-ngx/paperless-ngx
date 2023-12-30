@@ -16,6 +16,7 @@ from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import MatchingModel
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import Workflow
@@ -742,6 +743,81 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
             expected_str = f"Document filename {doc.original_filename} does not match"
             self.assertIn(expected_str, cm.output[1])
 
+    def test_document_added_match_content_matching(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            matching_algorithm=MatchingModel.MATCH_LITERAL,
+            match="foo",
+            is_insensitive=True,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc content matching worked",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+            content="Hello world foo bar",
+        )
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"WorkflowTrigger {trigger} matched on document"
+            expected_str2 = 'because it contains this string: "foo"'
+            self.assertIn(expected_str, cm.output[0])
+            self.assertIn(expected_str2, cm.output[0])
+            expected_str = f"Document matched {trigger} from {w}"
+            self.assertIn(expected_str, cm.output[1])
+
+    def test_document_added_no_match_content_matching(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            matching_algorithm=MatchingModel.MATCH_LITERAL,
+            match="foo",
+            is_insensitive=True,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc content matching worked",
+            assign_owner=self.user2,
+        )
+        action.save()
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+            content="Hello world bar",
+        )
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = f"Document content matching settings for algorithm '{trigger.matching_algorithm}' did not match"
+            self.assertIn(expected_str, cm.output[1])
+
     def test_document_added_no_match_tags(self):
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
@@ -751,7 +827,6 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
             assign_title="Doc assign owner",
             assign_owner=self.user2,
         )
-        action.save()
         w = Workflow.objects.create(
             name="Workflow 1",
             order=0,
