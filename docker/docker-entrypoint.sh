@@ -86,13 +86,13 @@ initialize() {
 		"${CONSUME_DIR}"; do
 		if [[ ! -d "${dir}" ]]; then
 			echo "Creating directory ${dir}"
-			mkdir "${dir}"
+			mkdir --parents "${dir}"
 		fi
 	done
 
 	local -r tmp_dir="/tmp/paperless"
 	echo "Creating directory ${tmp_dir}"
-	mkdir -p "${tmp_dir}"
+	mkdir --parents "${tmp_dir}"
 
 	set +e
 	echo "Adjusting permissions of paperless files. This may take a while."
