@@ -285,6 +285,8 @@ Consumption templates can assign:
 - View and / or edit permissions to users or groups
 - Custom fields. Note that no value for the field will be set
 
+If the "skip assigning inbox tag(s)" option is selected, any matching documents will not have inbox tag(s) assigned to them.
+
 ### Consumption template permissions
 
 All users who have application permissions for editing consumption templates can see the same set
