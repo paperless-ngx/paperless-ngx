@@ -303,6 +303,10 @@ INSTALLED_APPS = [
     "django_filters",
     "django_celery_results",
     "guardian",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.openid_connect",
     *env_apps,
 ]
 
@@ -339,6 +343,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 # Optional to enable compression
@@ -410,7 +415,37 @@ CHANNEL_LAYERS = {
 AUTHENTICATION_BACKENDS = [
     "guardian.backends.ObjectPermissionBackend",
     "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
+
+SOCIALACCOUNT_PROVIDERS = {
+    # "openid_connect": {
+    #    "APPS": [
+    #        {
+    #            "provider_id": "keycloak",
+    #            "name": "Keycloak",
+    #            "client_id": "paperless",
+    #            "secret": "<CLIENT_SECRET>",
+    #            "settings": {
+    #                "server_url": "https://<KEYCLOAK_SERVER>/realms/<REALM>/.well-known/openid-configuration",
+    #            },
+    #        },
+    #    ],
+    # },
+}
+
+ACCOUNT_LOGOUT_ON_GET = True
+
+ACCOUNT_ADAPTER = "paperless.adapter.CustomAccountAdapter"
+ACCOUNT_ALLOW_SIGNUPS = __get_boolean("PAPERLESS_ACCOUNT_ALLOW_SIGNUPS")
+
+SOCIALACCOUNT_ADAPTER = "paperless.adapter.CustomSocialAccountAdapter"
+SOCIALACCOUNT_ALLOW_SIGNUPS = __get_boolean(
+    "PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS",
+    "yes",
+)
+SOCIALACCOUNT_AUTO_SIGNUP = __get_boolean("PAPERLESS_SOCIAL_AUTO_SIGNUP")
+
 
 AUTO_LOGIN_USERNAME = os.getenv("PAPERLESS_AUTO_LOGIN_USERNAME")
 

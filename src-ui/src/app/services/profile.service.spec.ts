@@ -51,4 +51,20 @@ describe('ProfileService', () => {
     )
     expect(req.request.method).toEqual('POST')
   })
+
+  it('supports disconnecting a social account', () => {
+    service.disconnectSocialAccount(1).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}profile/disconnect_social_account/`
+    )
+    expect(req.request.method).toEqual('POST')
+  })
+
+  it('calls get social account provider endpoint', () => {
+    service.getSocialAccountProviders().subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}profile/social_account_providers/`
+    )
+    expect(req.request.method).toEqual('GET')
+  })
 })

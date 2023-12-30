@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { ProfileService } from 'src/app/services/profile.service'
+import { SocialAccount, SocialAccountProvider } from 'src/app/data/user-profile'
 import { ToastService } from 'src/app/services/toast.service'
 import { Subject, takeUntil } from 'rxjs'
 import { Clipboard } from '@angular/cdk/clipboard'
@@ -38,6 +39,9 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
 
   public copied: boolean = false
 
+  public socialAccounts: SocialAccount[] = []
+  public socialAccountProviders: SocialAccountProvider[] = []
+
   constructor(
     private profileService: ProfileService,
     public activeModal: NgbActiveModal,
@@ -63,6 +67,14 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
           this.newPassword = newPassword
           this.onPasswordChange()
         })
+        this.socialAccounts = profile.social_accounts
+      })
+
+    this.profileService
+      .getSocialAccountProviders()
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((providers) => {
+        this.socialAccountProviders = providers
       })
   }
 
@@ -181,5 +193,19 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.copied = false
     }, 3000)
+  }
+
+  disconnectSocialAccount(id: number): void {
+    this.profileService.disconnectSocialAccount(id).subscribe({
+      next: (id: number) => {
+        this.socialAccounts = this.socialAccounts.filter((a) => a.id != id)
+      },
+      error: (error) => {
+        this.toastService.showError(
+          $localize`Error disconnecting social account`,
+          error
+        )
+      },
+    })
   }
 }

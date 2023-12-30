@@ -49,6 +49,36 @@
         </div>
         <div class="form-text text-muted text-end fst-italic" i18n>Warning: changing the token cannot be undone</div>
       </div>
+      @if (socialAccounts?.length > 0) {
+      <div class="mb-3">
+        <p i18n>Connected social accounts</p>
+        <div class="position-relative">
+          <ul>
+            @for (account of socialAccounts; track account.id) {
+            <li>{{account.name}}<button type="button" class="btn btn-outline-secondary btn-sm ms-2 align-baseline" (click)="disconnectSocialAccount(account.id)" i18n-title title="Disconnect {{ account.name }} social account">
+              <svg class="buttonicon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#trash" />
+              </svg>
+              </button></li>
+            }
+          </ul>
+          <div class="form-text text-muted text-end fst-italic" i18n>Warning: changing the social accounts cannot be undone</div>
+        </div>
+      </div>
+          }
+          @if (socialAccountProviders?.length > 0) {
+      <div class="mb-3">
+        <p i18n>Available social account providers</p>
+        <div class="position-relative">
+          <ul>
+            @for (provider of socialAccountProviders; track provider.name) {
+            <li><a href="{{ provider.login_url }}">{{provider.name}}</a></li>
+            }
+          </ul>
+          <div class="form-text text-muted text-end fst-italic" i18n>Warning: changing the social account providers cannot be undone</div>
+        </div>
+      </div>
+      }
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>

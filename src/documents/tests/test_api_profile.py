@@ -1,3 +1,5 @@
+from allauth.socialaccount.models import SocialAccount
+from allauth.socialaccount.models import SocialApp
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -16,6 +18,15 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
             username="temp_admin",
             first_name="firstname",
             last_name="surname",
+        )
+        SocialApp.objects.create(
+            name="Keycloak",
+            provider="openid_connect",
+            provider_id="keycloak-test",
+        )
+        self.user.socialaccount_set.add(
+            SocialAccount(uid="123456789", provider="keycloak-test"),
+            bulk=False,
         )
         self.client.force_authenticate(user=self.user)
 
@@ -103,3 +114,42 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
 
         response = self.client.post(f"{self.ENDPOINT}generate_auth_token/")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_social_account_providers(self):
+        """
+        GIVEN:
+            - Configured user
+        WHEN:
+            - API call is made to get social account providers
+        THEN:
+            - Social account providers are returned
+        """
+
+        response = self.client.get(f"{self.ENDPOINT}social_account_providers")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_disconnect_social_account(self):
+        """
+        GIVEN:
+            - Configured user
+        WHEN:
+            - API call is made to disconnect a social account
+        THEN:
+            - Social account is deleted from the user
+        """
+
+        social_account_id = self.user.socialaccount_set.all()[0].pk
+
+        response = self.client.post(
+            f"{self.ENDPOINT}disconnect_social_account/",
+            {"id": social_account_id},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, str(social_account_id))
+
+        self.assertEqual(
+            len(self.user.socialaccount_set.filter(pk=social_account_id)),
+            0,
+        )
