@@ -403,13 +403,16 @@ describe('AppFrameComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     jest.spyOn(messagesService, 'get').mockReturnValue(
       of([
+        { level: 'warning', message: 'Test warning', tags: '' },
         { level: 'error', message: 'Test error', tags: '' },
+        { level: 'success', message: 'Test success', tags: '' },
         { level: 'info', message: 'Test info', tags: '' },
+        { level: 'debug', message: 'Test debug', tags: '' },
       ])
     )
     component.ngOnInit()
     httpTestingController.expectOne(`${environment.apiBaseUrl}messages/`)
-    expect(toastErrorSpy).toHaveBeenCalled()
-    expect(toastInfoSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalledTimes(2)
+    expect(toastInfoSpy).toHaveBeenCalledTimes(3)
   })
 })

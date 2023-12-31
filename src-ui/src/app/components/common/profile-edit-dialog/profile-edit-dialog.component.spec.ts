@@ -267,28 +267,26 @@ describe('ProfileEditDialogComponent', () => {
     expect(getProvidersSpy).toHaveBeenCalled()
   })
 
-  it('should remove disconnected social account from component', async () => {
+  it('should remove disconnected social account from component, show error if needed', async () => {
     const disconnectSpy = jest.spyOn(profileService, 'disconnectSocialAccount')
-    disconnectSpy.mockReturnValue(of(socialAccount.id))
-
-    let resolve
-    const p = new Promise((r) => (resolve = r))
-
     const getSpy = jest.spyOn(profileService, 'get')
-    getSpy.mockImplementation(() => {
-      resolve()
-      return of(profile)
-    })
-
+    getSpy.mockImplementation(() => of(profile))
     component.ngOnInit()
 
-    await p
+    const errorSpy = jest.spyOn(toastService, 'showError')
 
-    expect(getSpy).toHaveBeenCalled()
     expect(component.socialAccounts).toContainEqual(socialAccount)
 
+    // fail first
+    disconnectSpy.mockReturnValueOnce(
+      throwError(() => new Error('unable to disconnect'))
+    )
     component.disconnectSocialAccount(socialAccount.id)
+    expect(errorSpy).toHaveBeenCalled()
 
+    // succeed
+    disconnectSpy.mockReturnValue(of(socialAccount.id))
+    component.disconnectSocialAccount(socialAccount.id)
     expect(disconnectSpy).toHaveBeenCalled()
     expect(component.socialAccounts).not.toContainEqual(socialAccount)
   })
