@@ -566,6 +566,9 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
                         value_document_ids=[document.id],
                     ),
                 )
+            elif target_doc_field_instance.value is None:
+                target_doc_field_instance.value_document_ids = [document.id]
+                custom_field_instances_to_update.append(target_doc_field_instance)
             elif document.id not in target_doc_field_instance.value:
                 target_doc_field_instance.value_document_ids.append(document.id)
                 custom_field_instances_to_update.append(target_doc_field_instance)
