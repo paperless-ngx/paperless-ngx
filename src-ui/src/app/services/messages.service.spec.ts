@@ -25,7 +25,7 @@ describe('MessagesService', () => {
     httpTestingController.verify()
   })
 
-  it('calls get profile endpoint', () => {
+  it('calls messages endpoint', () => {
     service.get().subscribe()
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}messages/`
