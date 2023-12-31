@@ -997,3 +997,23 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         self.assertEqual(doc.correspondent, self.c)
         self.assertEqual(doc.title, "Title assign owner")
         self.assertEqual(doc.owner, self.user2)
+
+    def test_new_trigger_type_raises_exception(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=4,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="test",
+        )
+        self.assertRaises(Exception, document_matches_workflow, doc, w, 4)
