@@ -398,14 +398,14 @@ def document_matches_workflow(
         logger.debug(f"No matching triggers with type {trigger_type} found")
     else:
         for trigger in workflow.triggers.filter(type=trigger_type):
-            if trigger_type is WorkflowTrigger.WorkflowTriggerType.CONSUMPTION:
+            if trigger_type == WorkflowTrigger.WorkflowTriggerType.CONSUMPTION:
                 trigger_matched, reason = consumable_document_matches_workflow(
                     document,
                     trigger,
                 )
             elif (
-                trigger_type is WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED
-                or trigger_type is WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED
+                trigger_type == WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED
+                or trigger_type == WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED
             ):
                 trigger_matched, reason = existing_document_matches_workflow(
                     document,
