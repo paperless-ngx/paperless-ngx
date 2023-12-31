@@ -72,7 +72,7 @@ steps described in [Docker setup](#docker_hub) automatically.
 
         If you want to use the included `docker-compose.*.yml` file, you
         need to have at least Docker version **17.09.0** and Docker Compose
-        version **v2**. To check do: `docker compose -v` or `docker -v`
+        version **v2**. To check do: `docker compose version` or `docker -v`
 
         See the [Docker installation guide](https://docs.docker.com/engine/install/) on how to install the current
         version of Docker for your operating system or Linux distribution of
