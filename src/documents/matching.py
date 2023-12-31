@@ -19,12 +19,14 @@ from documents.permissions import get_objects_for_user_owner_aware
 logger = logging.getLogger("paperless.matching")
 
 
-def log_reason(matching_model: MatchingModel, document: Document, reason: str):
+def log_reason(
+    matching_model: Union[MatchingModel, WorkflowTrigger],
+    document: Document,
+    reason: str,
+):
     class_name = type(matching_model).__name__
     name = (
-        matching_model.name
-        if hasattr(matching_model, "name")
-        else matching_model.__str__()
+        matching_model.name if hasattr(matching_model, "name") else str(matching_model)
     )
     logger.debug(
         f"{class_name} {name} matched on document {document} because {reason}",
@@ -258,13 +260,13 @@ def document_matches_workflow(
         logger.debug(reason)
 
     trigger_matched = True
-    triggers = workflow.triggers.filter(type=trigger_type)
-    if len(triggers) == 0:
+    if workflow.triggers.filter(type=trigger_type).count() == 0:
         trigger_matched = False
         log_match_failure(
             f"No matching triggers with type {trigger_type} found",
         )
     else:
+        triggers = workflow.triggers.filter(type=trigger_type)
         for trigger in triggers:
             if trigger_type is WorkflowTrigger.WorkflowTriggerType.CONSUMPTION:
                 # document is type ConsumableDocument
@@ -380,6 +382,10 @@ def document_matches_workflow(
                         f" {trigger.filter_filename.lower()}",
                     )
                     trigger_matched = False
+
+            else:
+                # New trigger types need to be checked above
+                raise Exception(f"Trigger type {trigger_type} not yet supported")
 
             if trigger_matched:
                 logger.info(f"Document matched {trigger} from {workflow}")

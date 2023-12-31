@@ -858,9 +858,9 @@ def parse_doc_title_w_placeholders(
     created: Optional[datetime.datetime] = None,
 ) -> str:
     """
-    Title placeholders for Workflows using Consumption triggers can only include
-    items that are assigned as part of this template (since auto-matching hasnt
-    happened yet)
+    Available title placeholders for Workflows depend on what has already been assigned,
+    e.g. for pre-consumption triggers created will not have been parsed yet, but it will
+    for added / updated triggers
     """
     formatting = {
         "correspondent": correspondent_name,
