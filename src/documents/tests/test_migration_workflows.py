@@ -5,6 +5,9 @@ from documents.tests.utils import TestMigrations
 class TestMigrateWorkflow(TestMigrations):
     migrate_from = "1043_alter_savedviewfilterrule_rule_type"
     migrate_to = "1044_workflow_workflowaction_workflowtrigger_and_more"
+    dependencies = (
+        ("paperless_mail", "0023_remove_mailrule_filter_attachment_filename_and_more"),
+    )
 
     def setUpBeforeMigration(self, apps):
         User = apps.get_model("auth", "User")
@@ -29,14 +32,20 @@ class TestMigrateWorkflow(TestMigrations):
             name="Custom Field 1",
             data_type="string",
         )
+        ma = apps.get_model("paperless_mail", "MailAccount").objects.create(
+            name="MailAccount 1",
+        )
+        mr = apps.get_model("paperless_mail", "MailRule").objects.create(
+            name="MailRule 1",
+            order=0,
+            account=ma,
+        )
 
         user2 = User.objects.create(username="user2")
         user3 = User.objects.create(username="user3")
         group2 = Group.objects.create(name="group2")
 
-        model_name = "ConsumptionTemplate"
-        app_name = "documents"
-        ConsumptionTemplate = apps.get_model(app_label=app_name, model_name=model_name)
+        ConsumptionTemplate = apps.get_model("documents", "ConsumptionTemplate")
 
         ct = ConsumptionTemplate.objects.create(
             name="Template 1",
@@ -44,6 +53,7 @@ class TestMigrateWorkflow(TestMigrations):
             sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
             filter_filename="*simple*",
             filter_path="*/samples/*",
+            filter_mailrule=mr,
             assign_title="Doc from {correspondent}",
             assign_correspondent=c,
             assign_document_type=dt,
