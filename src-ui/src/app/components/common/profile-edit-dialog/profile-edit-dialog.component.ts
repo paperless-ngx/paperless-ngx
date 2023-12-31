@@ -196,16 +196,19 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
   }
 
   disconnectSocialAccount(id: number): void {
-    this.profileService.disconnectSocialAccount(id).subscribe({
-      next: (id: number) => {
-        this.socialAccounts = this.socialAccounts.filter((a) => a.id != id)
-      },
-      error: (error) => {
-        this.toastService.showError(
-          $localize`Error disconnecting social account`,
-          error
-        )
-      },
-    })
+    this.profileService
+      .disconnectSocialAccount(id)
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (id: number) => {
+          this.socialAccounts = this.socialAccounts.filter((a) => a.id != id)
+        },
+        error: (error) => {
+          this.toastService.showError(
+            $localize`Error disconnecting social account`,
+            error
+          )
+        },
+      })
   }
 }
