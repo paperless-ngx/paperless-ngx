@@ -530,7 +530,7 @@ class TestCustomField(DirectoriesMixin, APITestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_bidirectional_doclink_fields(self):
+    def test_symmetric_doclink_fields(self):
         """
         GIVEN:
             - Existing document
@@ -637,3 +637,28 @@ class TestCustomField(DirectoriesMixin, APITestCase):
         self.assertEqual(doc2.custom_fields.first().value, [])
         self.assertEqual(doc3.custom_fields.first().value, [4])
         self.assertEqual(doc4.custom_fields.first().value, [3])
+
+        # If field exists on target doc but value is None
+        doc5 = Document.objects.create(
+            title="WOW5",
+            content="the content4",
+            checksum="5",
+            mime_type="application/pdf",
+        )
+        CustomFieldInstance.objects.create(document=doc5, field=custom_field_doclink)
+
+        resp = self.client.patch(
+            f"/api/documents/{doc1.id}/",
+            data={
+                "custom_fields": [
+                    {
+                        "field": custom_field_doclink.id,
+                        "value": [doc5.id],
+                    },
+                ],
+            },
+            format="json",
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(doc5.custom_fields.first().value, [1])
