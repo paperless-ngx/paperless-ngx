@@ -2,11 +2,13 @@ import os
 from collections import OrderedDict
 
 from allauth.socialaccount.adapter import get_adapter
+from allauth.socialaccount.models import SocialAccount
 from django.contrib import messages
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.db.models.functions import Lower
 from django.http import HttpResponse
+from django.http import HttpResponseBadRequest
 from django.views.generic import View
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.authtoken.models import Token
@@ -183,11 +185,13 @@ class DisconnectSocialAccountView(GenericAPIView):
     def post(self, request, *args, **kwargs):
         user = self.request.user
 
-        user.socialaccount_set.get(pk=request.data["id"]).delete()
-
-        return Response(
-            request.data["id"],
-        )
+        try:
+            account = user.socialaccount_set.get(pk=request.data["id"])
+            account_id = account.id
+            account.delete()
+            return Response(account_id)
+        except SocialAccount.DoesNotExist:
+            return HttpResponseBadRequest("Social account not found")
 
 
 class SocialAccountProvidersView(APIView):

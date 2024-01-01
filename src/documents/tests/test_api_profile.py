@@ -136,9 +136,18 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
         WHEN:
             - API call is made to disconnect a social account
         THEN:
-            - Social account is deleted from the user
+            - Social account is deleted from the user or request fails
         """
 
+        # Test with invalid id
+        response = self.client.post(
+            f"{self.ENDPOINT}disconnect_social_account/",
+            {"id": -1},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Test with valid id
         social_account_id = self.user.socialaccount_set.all()[0].pk
 
         response = self.client.post(
@@ -147,7 +156,7 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, str(social_account_id))
+        self.assertEqual(response.data, social_account_id)
 
         self.assertEqual(
             len(self.user.socialaccount_set.filter(pk=social_account_id)),
