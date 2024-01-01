@@ -179,6 +179,21 @@ def unmigrate_consumption_templates(apps, schema_editor):
         template.save()
 
 
+def delete_consumption_template_content_type(apps, schema_editor):
+    with transaction.atomic():
+        apps.get_model("contenttypes", "ContentType").objects.filter(
+            app_label="documents",
+            model="consumptiontemplate",
+        ).delete()
+
+
+def undelete_consumption_template_content_type(apps, schema_editor):
+    apps.get_model("contenttypes", "ContentType").objects.create(
+        app_label="documents",
+        model="consumptiontemplate",
+    )
+
+
 class Migration(migrations.Migration):
     dependencies = [
         ("paperless_mail", "0023_remove_mailrule_filter_attachment_filename_and_more"),
@@ -491,4 +506,8 @@ class Migration(migrations.Migration):
             unmigrate_consumption_templates,
         ),
         migrations.DeleteModel("ConsumptionTemplate"),
+        migrations.RunPython(
+            delete_consumption_template_content_type,
+            undelete_consumption_template_content_type,
+        ),
     ]
