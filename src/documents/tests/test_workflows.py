@@ -2,7 +2,6 @@ from datetime import timedelta
 from pathlib import Path
 from unittest import mock
 
-import pytest
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -29,7 +28,6 @@ from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
 
-@pytest.mark.django_db
 class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
     SAMPLE_DIR = Path(__file__).parent / "samples"
 
