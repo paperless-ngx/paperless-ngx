@@ -50,7 +50,7 @@ export const DOCUMENT_SOURCE_OPTIONS = [
 export const WORKFLOW_TYPE_OPTIONS = [
   {
     id: WorkflowTriggerType.Consumption,
-    name: $localize`Consumption`,
+    name: $localize`Consumption Started`,
   },
   {
     id: WorkflowTriggerType.DocumentAdded,

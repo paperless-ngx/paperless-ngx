@@ -357,7 +357,7 @@ class Migration(migrations.Migration):
                     "type",
                     models.PositiveIntegerField(
                         choices=[
-                            (1, "Consumption"),
+                            (1, "Consumption Started"),
                             (2, "Document Added"),
                             (3, "Document Updated"),
                         ],

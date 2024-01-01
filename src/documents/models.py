@@ -899,7 +899,7 @@ class WorkflowTrigger(models.Model):
         FUZZY = MatchingModel.MATCH_FUZZY, _("Fuzzy word")
 
     class WorkflowTriggerType(models.IntegerChoices):
-        CONSUMPTION = 1, _("Consumption")
+        CONSUMPTION = 1, _("Consumption Started")
         DOCUMENT_ADDED = 2, _("Document Added")
         DOCUMENT_UPDATED = 3, _("Document Updated")
 
