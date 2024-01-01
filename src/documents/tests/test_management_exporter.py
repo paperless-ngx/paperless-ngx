@@ -179,7 +179,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         manifest = self._do_export(use_filename_format=use_filename_format)
 
-        self.assertEqual(len(manifest), 195)
+        self.assertEqual(len(manifest), 190)
 
         # dont include consumer or AnonymousUser users
         self.assertEqual(
@@ -273,7 +273,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             self.assertEqual(Document.objects.get(id=self.d4.id).title, "wow_dec")
             self.assertEqual(GroupObjectPermission.objects.count(), 1)
             self.assertEqual(UserObjectPermission.objects.count(), 1)
-            self.assertEqual(Permission.objects.count(), 140)
+            self.assertEqual(Permission.objects.count(), 136)
             messages = check_sanity()
             # everything is alright after the test
             self.assertEqual(len(messages), 0)
@@ -705,15 +705,15 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             os.path.join(self.dirs.media_dir, "documents"),
         )
 
-        self.assertEqual(ContentType.objects.count(), 35)
-        self.assertEqual(Permission.objects.count(), 140)
+        self.assertEqual(ContentType.objects.count(), 34)
+        self.assertEqual(Permission.objects.count(), 136)
 
         manifest = self._do_export()
 
         with paperless_environment():
             self.assertEqual(
                 len(list(filter(lambda e: e["model"] == "auth.permission", manifest))),
-                140,
+                136,
             )
             # add 1 more to db to show objects are not re-created by import
             Permission.objects.create(
@@ -721,7 +721,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                 codename="test_perm",
                 content_type_id=1,
             )
-            self.assertEqual(Permission.objects.count(), 141)
+            self.assertEqual(Permission.objects.count(), 137)
 
             # will cause an import error
             self.user.delete()
@@ -730,5 +730,5 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             with self.assertRaises(IntegrityError):
                 call_command("document_importer", "--no-progress-bar", self.target)
 
-            self.assertEqual(ContentType.objects.count(), 35)
-            self.assertEqual(Permission.objects.count(), 141)
+            self.assertEqual(ContentType.objects.count(), 34)
+            self.assertEqual(Permission.objects.count(), 137)
