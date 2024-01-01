@@ -38,8 +38,10 @@
                   <div ngbAccordionItem>
                     <div ngbAccordionHeader>
                       <button ngbAccordionButton>{{i + 1}}. {{getTriggerTypeOptionName(triggerFields.controls[i].value.type)}}
-
-                        <button type="button" class="btn btn-link text-danger ms-3" (click)="removeTrigger(i)">
+                        @if(trigger.id > -1) {
+                          <span class="badge bg-dark text-light ms-2">ID: {{trigger.id}}</span>
+                        }
+                        <button type="button" class="btn btn-link text-danger ms-2" (click)="removeTrigger(i)">
                           <svg class="sidebaricon me-1" fill="currentColor">
                             <use xlink:href="assets/bootstrap-icons.svg#trash" />
                           </svg>
@@ -80,8 +82,10 @@
                   <div ngbAccordionItem cdkDrag [formGroup]="actionFields.controls[i]">
                     <div ngbAccordionHeader>
                       <button ngbAccordionButton><ng-container i18n>Action</ng-container> {{i + 1}}
-
-                        <button type="button" class="btn btn-link text-danger ms-3" (click)="removeAction(i)">
+                        @if(action.id > -1) {
+                          <span class="badge bg-dark text-light ms-2">ID: {{action.id}}</span>
+                        }
+                        <button type="button" class="btn btn-link text-danger ms-2" (click)="removeAction(i)">
                           <svg class="sidebaricon me-1" fill="currentColor">
                             <use xlink:href="assets/bootstrap-icons.svg#trash" />
                           </svg>
