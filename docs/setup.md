@@ -120,6 +120,10 @@ steps described in [Docker setup](#docker_hub) automatically.
 
     **Rootless**
 
+    !!! warning
+
+        It is currently not possible to run the container rootless if additional languages are specified via `PAPERLESS_OCR_LANGUAGES`.
+
     If you want to run Paperless as a rootless container, you will need
     to do the following in your `docker-compose.yml`:
 

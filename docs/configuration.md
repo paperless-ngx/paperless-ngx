@@ -1310,6 +1310,10 @@ specified as "chi-tra".
 
     Defaults to none, which does not install any additional languages.
 
+    !!! warning
+
+         This option must not be used in rootless containers.
+
 #### [`PAPERLESS_ENABLE_FLOWER=<defined>`](#PAPERLESS_ENABLE_FLOWER) {#PAPERLESS_ENABLE_FLOWER}
 
 : If this environment variable is defined, the Celery monitoring tool
