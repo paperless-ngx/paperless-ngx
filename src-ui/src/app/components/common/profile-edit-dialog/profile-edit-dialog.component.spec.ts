@@ -267,7 +267,7 @@ describe('ProfileEditDialogComponent', () => {
     expect(getProvidersSpy).toHaveBeenCalled()
   })
 
-  it('should remove disconnected social account from component, show error if needed', async () => {
+  it('should remove disconnected social account from component, show error if needed', () => {
     const disconnectSpy = jest.spyOn(profileService, 'disconnectSocialAccount')
     const getSpy = jest.spyOn(profileService, 'get')
     getSpy.mockImplementation(() => of(profile))
