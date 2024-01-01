@@ -230,6 +230,9 @@ export class WorkflowEditDialogComponent
   }
 
   addTrigger() {
+    if (!this.object) {
+      this.object = Object.assign({}, this.objectForm.value)
+    }
     this.object.triggers.push({
       type: WorkflowTriggerType.Consumption,
       sources: [],
@@ -253,6 +256,9 @@ export class WorkflowEditDialogComponent
   }
 
   addAction() {
+    if (!this.object) {
+      this.object = Object.assign({}, this.objectForm.value)
+    }
     this.object.actions.push({
       type: WorkflowActionType.Assignment,
       assign_title: null,

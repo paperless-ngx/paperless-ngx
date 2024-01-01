@@ -166,13 +166,22 @@ describe('ConsumptionTemplateEditDialogComponent', () => {
     fixture.detectChanges()
   })
 
-  it('should support create and edit modes', () => {
+  it('should support create and edit modes, support adding triggers and actions on new workflow', () => {
     component.dialogMode = EditDialogMode.CREATE
     const createTitleSpy = jest.spyOn(component, 'getCreateTitle')
     const editTitleSpy = jest.spyOn(component, 'getEditTitle')
     fixture.detectChanges()
     expect(createTitleSpy).toHaveBeenCalled()
     expect(editTitleSpy).not.toHaveBeenCalled()
+    expect(component.object).toBeUndefined()
+    component.addAction()
+    expect(component.object).not.toBeUndefined()
+    expect(component.object.actions).toHaveLength(1)
+    component.object = undefined
+    component.addTrigger()
+    expect(component.object).not.toBeUndefined()
+    expect(component.object.triggers).toHaveLength(1)
+
     component.dialogMode = EditDialogMode.EDIT
     fixture.detectChanges()
     expect(editTitleSpy).toHaveBeenCalled()

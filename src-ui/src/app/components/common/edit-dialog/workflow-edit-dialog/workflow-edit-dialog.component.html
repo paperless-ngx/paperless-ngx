@@ -34,7 +34,7 @@
                 </button>
               </div>
               <div ngbAccordion [closeOthers]="true">
-                @for (trigger of object.triggers; track trigger; let i = $index){
+                @for (trigger of object?.triggers; track trigger; let i = $index){
                   <div ngbAccordionItem>
                     <div ngbAccordionHeader>
                       <button ngbAccordionButton>{{i + 1}}. {{getTriggerTypeOptionName(triggerFields.controls[i].value.type)}}
@@ -76,7 +76,7 @@
                 </button>
               </div>
               <div ngbAccordion [closeOthers]="true" cdkDropList (cdkDropListDropped)="onActionDrop($event)">
-                @for (action of object.actions; track action; let i = $index){
+                @for (action of object?.actions; track action; let i = $index){
                   <div ngbAccordionItem cdkDrag [formGroup]="actionFields.controls[i]">
                     <div ngbAccordionHeader>
                       <button ngbAccordionButton><ng-container i18n>Action</ng-container> {{i + 1}}
