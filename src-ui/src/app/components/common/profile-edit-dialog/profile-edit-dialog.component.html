@@ -70,7 +70,7 @@
           <p i18n>Connect new social account</p>
           <div class="list-group">
             @for (provider of socialAccountProviders; track provider.name) {
-              <a class="list-group-item list-group-item-action text-primary d-flex align-items-center" href="{{ provider.login_url }}" target="_blank" rel="noopener noreferrer">
+              <a class="list-group-item list-group-item-action text-primary d-flex align-items-center" href="{{ provider.login_url }}" rel="noopener noreferrer">
                 {{provider.name}}<svg class="buttonicon-sm ms-2" style="margin-bottom: 1px;" fill="currentColor">
                   <use xlink:href="assets/bootstrap-icons.svg#box-arrow-up-right" />
                 </svg>
