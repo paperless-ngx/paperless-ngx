@@ -23,7 +23,6 @@ from guardian.models import UserObjectPermission
 
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_filename
-from documents.models import ConsumptionTemplate
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -35,6 +34,9 @@ from documents.models import SavedViewFilterRule
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import UiSettings
+from documents.models import Workflow
+from documents.models import WorkflowAction
+from documents.models import WorkflowTrigger
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
@@ -285,7 +287,15 @@ class Command(BaseCommand):
             )
 
             manifest += json.loads(
-                serializers.serialize("json", ConsumptionTemplate.objects.all()),
+                serializers.serialize("json", WorkflowTrigger.objects.all()),
+            )
+
+            manifest += json.loads(
+                serializers.serialize("json", WorkflowAction.objects.all()),
+            )
+
+            manifest += json.loads(
+                serializers.serialize("json", Workflow.objects.all()),
             )
 
             manifest += json.loads(

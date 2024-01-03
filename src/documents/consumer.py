@@ -26,8 +26,7 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.loggers import LoggingMixin
-from documents.matching import document_matches_template
-from documents.models import ConsumptionTemplate
+from documents.matching import document_matches_workflow
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -36,6 +35,8 @@ from documents.models import DocumentType
 from documents.models import FileInfo
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import Workflow
+from documents.models import WorkflowTrigger
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import get_parser_class_for_mime_type
@@ -602,66 +603,71 @@ class Consumer(LoggingMixin):
 
         return document
 
-    def get_template_overrides(
+    def get_workflow_overrides(
         self,
         input_doc: ConsumableDocument,
     ) -> DocumentMetadataOverrides:
         """
-        Match consumption templates to a document based on source and
-        file name filters, path filters or mail rule filter if specified
+        Get overrides from matching workflows
         """
         overrides = DocumentMetadataOverrides()
-        for template in ConsumptionTemplate.objects.all().order_by("order"):
+        for workflow in Workflow.objects.filter(enabled=True).order_by("order"):
             template_overrides = DocumentMetadataOverrides()
 
-            if document_matches_template(input_doc, template):
-                if template.assign_title is not None:
-                    template_overrides.title = template.assign_title
-                if template.assign_tags is not None:
-                    template_overrides.tag_ids = [
-                        tag.pk for tag in template.assign_tags.all()
-                    ]
-                if template.assign_correspondent is not None:
-                    template_overrides.correspondent_id = (
-                        template.assign_correspondent.pk
+            if document_matches_workflow(
+                input_doc,
+                workflow,
+                WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            ):
+                for action in workflow.actions.all():
+                    self.log.info(
+                        f"Applying overrides in {action} from {workflow}",
                     )
-                if template.assign_document_type is not None:
-                    template_overrides.document_type_id = (
-                        template.assign_document_type.pk
-                    )
-                if template.assign_storage_path is not None:
-                    template_overrides.storage_path_id = template.assign_storage_path.pk
-                if template.assign_owner is not None:
-                    template_overrides.owner_id = template.assign_owner.pk
-                if template.assign_view_users is not None:
-                    template_overrides.view_users = [
-                        user.pk for user in template.assign_view_users.all()
-                    ]
-                if template.assign_view_groups is not None:
-                    template_overrides.view_groups = [
-                        group.pk for group in template.assign_view_groups.all()
-                    ]
-                if template.assign_change_users is not None:
-                    template_overrides.change_users = [
-                        user.pk for user in template.assign_change_users.all()
-                    ]
-                if template.assign_change_groups is not None:
-                    template_overrides.change_groups = [
-                        group.pk for group in template.assign_change_groups.all()
-                    ]
-                if template.assign_custom_fields is not None:
-                    template_overrides.custom_field_ids = [
-                        field.pk for field in template.assign_custom_fields.all()
-                    ]
+                    if action.assign_title is not None:
+                        template_overrides.title = action.assign_title
+                    if action.assign_tags is not None:
+                        template_overrides.tag_ids = [
+                            tag.pk for tag in action.assign_tags.all()
+                        ]
+                    if action.assign_correspondent is not None:
+                        template_overrides.correspondent_id = (
+                            action.assign_correspondent.pk
+                        )
+                    if action.assign_document_type is not None:
+                        template_overrides.document_type_id = (
+                            action.assign_document_type.pk
+                        )
+                    if action.assign_storage_path is not None:
+                        template_overrides.storage_path_id = (
+                            action.assign_storage_path.pk
+                        )
+                    if action.assign_owner is not None:
+                        template_overrides.owner_id = action.assign_owner.pk
+                    if action.assign_view_users is not None:
+                        template_overrides.view_users = [
+                            user.pk for user in action.assign_view_users.all()
+                        ]
+                    if action.assign_view_groups is not None:
+                        template_overrides.view_groups = [
+                            group.pk for group in action.assign_view_groups.all()
+                        ]
+                    if action.assign_change_users is not None:
+                        template_overrides.change_users = [
+                            user.pk for user in action.assign_change_users.all()
+                        ]
+                    if action.assign_change_groups is not None:
+                        template_overrides.change_groups = [
+                            group.pk for group in action.assign_change_groups.all()
+                        ]
+                    if action.assign_custom_fields is not None:
+                        template_overrides.custom_field_ids = [
+                            field.pk for field in action.assign_custom_fields.all()
+                        ]
 
-                overrides.update(template_overrides)
+                    overrides.update(template_overrides)
         return overrides
 
     def _parse_title_placeholders(self, title: str) -> str:
-        """
-        Consumption template title placeholders can only include items that are
-        assigned as part of this template (since auto-matching hasnt happened yet)
-        """
         local_added = timezone.localtime(timezone.now())
 
         correspondent_name = (
@@ -680,20 +686,14 @@ class Consumer(LoggingMixin):
             else None
         )
 
-        return title.format(
-            correspondent=correspondent_name,
-            document_type=doc_type_name,
-            added=local_added.isoformat(),
-            added_year=local_added.strftime("%Y"),
-            added_year_short=local_added.strftime("%y"),
-            added_month=local_added.strftime("%m"),
-            added_month_name=local_added.strftime("%B"),
-            added_month_name_short=local_added.strftime("%b"),
-            added_day=local_added.strftime("%d"),
-            owner_username=owner_username,
-            original_filename=Path(self.filename).stem,
-            added_time=local_added.strftime("%H:%M"),
-        ).strip()
+        return parse_doc_title_w_placeholders(
+            title,
+            correspondent_name,
+            doc_type_name,
+            owner_username,
+            local_added,
+            self.filename,
+        )
 
     def _store(
         self,
@@ -846,3 +846,47 @@ class Consumer(LoggingMixin):
             self.log.warning("Script stderr:")
             for line in stderr_str:
                 self.log.warning(line)
+
+
+def parse_doc_title_w_placeholders(
+    title: str,
+    correspondent_name: str,
+    doc_type_name: str,
+    owner_username: str,
+    local_added: datetime.datetime,
+    original_filename: str,
+    created: Optional[datetime.datetime] = None,
+) -> str:
+    """
+    Available title placeholders for Workflows depend on what has already been assigned,
+    e.g. for pre-consumption triggers created will not have been parsed yet, but it will
+    for added / updated triggers
+    """
+    formatting = {
+        "correspondent": correspondent_name,
+        "document_type": doc_type_name,
+        "added": local_added.isoformat(),
+        "added_year": local_added.strftime("%Y"),
+        "added_year_short": local_added.strftime("%y"),
+        "added_month": local_added.strftime("%m"),
+        "added_month_name": local_added.strftime("%B"),
+        "added_month_name_short": local_added.strftime("%b"),
+        "added_day": local_added.strftime("%d"),
+        "added_time": local_added.strftime("%H:%M"),
+        "owner_username": owner_username,
+        "original_filename": Path(original_filename).stem,
+    }
+    if created is not None:
+        formatting.update(
+            {
+                "created": created.isoformat(),
+                "created_year": created.strftime("%Y"),
+                "created_year_short": created.strftime("%y"),
+                "created_month": created.strftime("%m"),
+                "created_month_name": created.strftime("%B"),
+                "created_month_name_short": created.strftime("%b"),
+                "created_day": created.strftime("%d"),
+                "created_time": created.strftime("%H:%M"),
+            },
+        )
+    return title.format(**formatting).strip()

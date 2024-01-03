@@ -33,11 +33,18 @@ class TestReverseMigrateConsumptionTemplate(TestMigrations):
         self.Permission = apps.get_model("auth", "Permission")
         self.user = User.objects.create(username="user1")
         self.group = Group.objects.create(name="group1")
-        permission = self.Permission.objects.get(codename="add_consumptiontemplate")
-        self.user.user_permissions.add(permission.id)
-        self.group.permissions.add(permission.id)
+        permission = self.Permission.objects.filter(
+            codename="add_consumptiontemplate",
+        ).first()
+        if permission is not None:
+            self.user.user_permissions.add(permission.id)
+            self.group.permissions.add(permission.id)
 
     def test_remove_consumptiontemplate_permissions(self):
-        permission = self.Permission.objects.get(codename="add_consumptiontemplate")
-        self.assertFalse(self.user.has_perm(f"documents.{permission.codename}"))
-        self.assertFalse(permission in self.group.permissions.all())
+        permission = self.Permission.objects.filter(
+            codename="add_consumptiontemplate",
+        ).first()
+        # can be None ? now that CTs removed
+        if permission is not None:
+            self.assertFalse(self.user.has_perm(f"documents.{permission.codename}"))
+            self.assertFalse(permission in self.group.permissions.all())

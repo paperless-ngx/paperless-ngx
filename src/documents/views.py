@@ -76,7 +76,6 @@ from documents.matching import match_correspondents
 from documents.matching import match_document_types
 from documents.matching import match_storage_paths
 from documents.matching import match_tags
-from documents.models import ConsumptionTemplate
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import Document
@@ -87,6 +86,9 @@ from documents.models import SavedView
 from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import Workflow
+from documents.models import WorkflowAction
+from documents.models import WorkflowTrigger
 from documents.parsers import get_parser_class_for_mime_type
 from documents.parsers import parse_date_generator
 from documents.permissions import PaperlessAdminPermissions
@@ -98,7 +100,6 @@ from documents.serialisers import AcknowledgeTasksViewSerializer
 from documents.serialisers import BulkDownloadSerializer
 from documents.serialisers import BulkEditObjectPermissionsSerializer
 from documents.serialisers import BulkEditSerializer
-from documents.serialisers import ConsumptionTemplateSerializer
 from documents.serialisers import CorrespondentSerializer
 from documents.serialisers import CustomFieldSerializer
 from documents.serialisers import DocumentListSerializer
@@ -112,6 +113,10 @@ from documents.serialisers import TagSerializer
 from documents.serialisers import TagSerializerVersion1
 from documents.serialisers import TasksViewSerializer
 from documents.serialisers import UiSettingsViewSerializer
+from documents.serialisers import WorkflowActionSerializer
+from documents.serialisers import WorkflowSerializer
+from documents.serialisers import WorkflowTriggerSerializer
+from documents.signals import document_updated
 from documents.tasks import consume_file
 from paperless import version
 from paperless.db import GnuPG
@@ -320,6 +325,12 @@ class DocumentViewSet(
         from documents import index
 
         index.add_or_update_document(self.get_object())
+
+        document_updated.send(
+            sender=self.__class__,
+            document=self.get_object(),
+        )
+
         return response
 
     def destroy(self, request, *args, **kwargs):
@@ -1375,25 +1386,50 @@ class BulkEditObjectPermissionsView(GenericAPIView, PassUserMixin):
             )
 
 
-class ConsumptionTemplateViewSet(ModelViewSet):
+class WorkflowTriggerViewSet(ModelViewSet):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
 
-    serializer_class = ConsumptionTemplateSerializer
+    serializer_class = WorkflowTriggerSerializer
     pagination_class = StandardPagination
 
-    model = ConsumptionTemplate
+    model = WorkflowTrigger
+
+    queryset = WorkflowTrigger.objects.all()
+
+
+class WorkflowActionViewSet(ModelViewSet):
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+
+    serializer_class = WorkflowActionSerializer
+    pagination_class = StandardPagination
+
+    model = WorkflowAction
+
+    queryset = WorkflowAction.objects.all().prefetch_related(
+        "assign_tags",
+        "assign_view_users",
+        "assign_view_groups",
+        "assign_change_users",
+        "assign_change_groups",
+        "assign_custom_fields",
+    )
+
+
+class WorkflowViewSet(ModelViewSet):
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+
+    serializer_class = WorkflowSerializer
+    pagination_class = StandardPagination
+
+    model = Workflow
 
     queryset = (
-        ConsumptionTemplate.objects.prefetch_related(
-            "assign_tags",
-            "assign_view_users",
-            "assign_view_groups",
-            "assign_change_users",
-            "assign_change_groups",
-            "assign_custom_fields",
-        )
-        .all()
+        Workflow.objects.all()
         .order_by("order")
+        .prefetch_related(
+            "triggers",
+            "actions",
+        )
     )
 
 

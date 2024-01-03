@@ -21,7 +21,7 @@ import {
   PermissionAction,
   PermissionType,
 } from './services/permissions.service'
-import { ConsumptionTemplatesComponent } from './components/manage/consumption-templates/consumption-templates.component'
+import { WorkflowsComponent } from './components/manage/workflows/workflows.component'
 import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
@@ -214,13 +214,13 @@ export const routes: Routes = [
         },
       },
       {
-        path: 'templates',
-        component: ConsumptionTemplatesComponent,
+        path: 'workflows',
+        component: WorkflowsComponent,
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
             action: PermissionAction.View,
-            type: PermissionType.ConsumptionTemplate,
+            type: PermissionType.Workflow,
           },
         },
       },

@@ -27,7 +27,6 @@ from rest_framework.fields import SerializerMethodField
 
 from documents import bulk_edit
 from documents.data_models import DocumentSource
-from documents.models import ConsumptionTemplate
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -41,6 +40,9 @@ from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import UiSettings
+from documents.models import Workflow
+from documents.models import WorkflowAction
+from documents.models import WorkflowTrigger
 from documents.parsers import is_mime_type_supported
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import set_permissions_for_object
@@ -1292,43 +1294,38 @@ class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissions
         return attrs
 
 
-class ConsumptionTemplateSerializer(serializers.ModelSerializer):
-    order = serializers.IntegerField(required=False)
+class WorkflowTriggerSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False, allow_null=True)
     sources = fields.MultipleChoiceField(
-        choices=ConsumptionTemplate.DocumentSourceChoices.choices,
-        allow_empty=False,
+        choices=WorkflowTrigger.DocumentSourceChoices.choices,
+        allow_empty=True,
         default={
             DocumentSource.ConsumeFolder,
             DocumentSource.ApiUpload,
             DocumentSource.MailFetch,
         },
     )
-    assign_correspondent = CorrespondentField(allow_null=True, required=False)
-    assign_tags = TagsField(many=True, allow_null=True, required=False)
-    assign_document_type = DocumentTypeField(allow_null=True, required=False)
-    assign_storage_path = StoragePathField(allow_null=True, required=False)
+
+    type = serializers.ChoiceField(
+        choices=WorkflowTrigger.WorkflowTriggerType.choices,
+        label="Trigger Type",
+    )
 
     class Meta:
-        model = ConsumptionTemplate
+        model = WorkflowTrigger
         fields = [
             "id",
-            "name",
-            "order",
             "sources",
+            "type",
             "filter_path",
             "filter_filename",
             "filter_mailrule",
-            "assign_title",
-            "assign_tags",
-            "assign_correspondent",
-            "assign_document_type",
-            "assign_storage_path",
-            "assign_owner",
-            "assign_view_users",
-            "assign_view_groups",
-            "assign_change_users",
-            "assign_change_groups",
-            "assign_custom_fields",
+            "matching_algorithm",
+            "match",
+            "is_insensitive",
+            "filter_has_tags",
+            "filter_has_correspondent",
+            "filter_has_document_type",
         ]
 
     def validate(self, attrs):
@@ -1336,12 +1333,6 @@ class ConsumptionTemplateSerializer(serializers.ModelSerializer):
             attrs["sources"] = {DocumentSource.MailFetch.value}
 
         # Empty strings treated as None to avoid unexpected behavior
-        if (
-            "assign_title" in attrs
-            and attrs["assign_title"] is not None
-            and len(attrs["assign_title"]) == 0
-        ):
-            attrs["assign_title"] = None
         if (
             "filter_filename" in attrs
             and attrs["filter_filename"] is not None
@@ -1356,7 +1347,8 @@ class ConsumptionTemplateSerializer(serializers.ModelSerializer):
             attrs["filter_path"] = None
 
         if (
-            "filter_mailrule" not in attrs
+            attrs["type"] == WorkflowTrigger.WorkflowTriggerType.CONSUMPTION
+            and "filter_mailrule" not in attrs
             and ("filter_filename" not in attrs or attrs["filter_filename"] is None)
             and ("filter_path" not in attrs or attrs["filter_path"] is None)
         ):
@@ -1365,3 +1357,144 @@ class ConsumptionTemplateSerializer(serializers.ModelSerializer):
             )
 
         return attrs
+
+
+class WorkflowActionSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False, allow_null=True)
+    assign_correspondent = CorrespondentField(allow_null=True, required=False)
+    assign_tags = TagsField(many=True, allow_null=True, required=False)
+    assign_document_type = DocumentTypeField(allow_null=True, required=False)
+    assign_storage_path = StoragePathField(allow_null=True, required=False)
+
+    class Meta:
+        model = WorkflowAction
+        fields = [
+            "id",
+            "type",
+            "assign_title",
+            "assign_tags",
+            "assign_correspondent",
+            "assign_document_type",
+            "assign_storage_path",
+            "assign_owner",
+            "assign_view_users",
+            "assign_view_groups",
+            "assign_change_users",
+            "assign_change_groups",
+            "assign_custom_fields",
+        ]
+
+    def validate(self, attrs):
+        # Empty strings treated as None to avoid unexpected behavior
+        if (
+            "assign_title" in attrs
+            and attrs["assign_title"] is not None
+            and len(attrs["assign_title"]) == 0
+        ):
+            attrs["assign_title"] = None
+
+        return attrs
+
+
+class WorkflowSerializer(serializers.ModelSerializer):
+    order = serializers.IntegerField(required=False)
+
+    triggers = WorkflowTriggerSerializer(many=True)
+    actions = WorkflowActionSerializer(many=True)
+
+    class Meta:
+        model = Workflow
+        fields = [
+            "id",
+            "name",
+            "order",
+            "enabled",
+            "triggers",
+            "actions",
+        ]
+
+    def update_triggers_and_actions(self, instance: Workflow, triggers, actions):
+        set_triggers = []
+        set_actions = []
+
+        if triggers is not None:
+            for trigger in triggers:
+                filter_has_tags = trigger.pop("filter_has_tags", None)
+                trigger_instance, _ = WorkflowTrigger.objects.update_or_create(
+                    id=trigger["id"] if "id" in trigger else None,
+                    defaults=trigger,
+                )
+                if filter_has_tags is not None:
+                    trigger_instance.filter_has_tags.set(filter_has_tags)
+                set_triggers.append(trigger_instance)
+
+        if actions is not None:
+            for action in actions:
+                assign_tags = action.pop("assign_tags", None)
+                assign_view_users = action.pop("assign_view_users", None)
+                assign_view_groups = action.pop("assign_view_groups", None)
+                assign_change_users = action.pop("assign_change_users", None)
+                assign_change_groups = action.pop("assign_change_groups", None)
+                assign_custom_fields = action.pop("assign_custom_fields", None)
+                action_instance, _ = WorkflowAction.objects.update_or_create(
+                    id=action["id"] if "id" in action else None,
+                    defaults=action,
+                )
+                if assign_tags is not None:
+                    action_instance.assign_tags.set(assign_tags)
+                if assign_view_users is not None:
+                    action_instance.assign_view_users.set(assign_view_users)
+                if assign_view_groups is not None:
+                    action_instance.assign_view_groups.set(assign_view_groups)
+                if assign_change_users is not None:
+                    action_instance.assign_change_users.set(assign_change_users)
+                if assign_change_groups is not None:
+                    action_instance.assign_change_groups.set(assign_change_groups)
+                if assign_custom_fields is not None:
+                    action_instance.assign_custom_fields.set(assign_custom_fields)
+                set_actions.append(action_instance)
+
+        instance.triggers.set(set_triggers)
+        instance.actions.set(set_actions)
+        instance.save()
+
+    def prune_triggers_and_actions(self):
+        """
+        ManyToMany fields dont support e.g. on_delete so we need to discard unattached
+        triggers and actionas manually
+        """
+        for trigger in WorkflowTrigger.objects.all():
+            if trigger.workflows.all().count() == 0:
+                trigger.delete()
+
+        for action in WorkflowAction.objects.all():
+            if action.workflows.all().count() == 0:
+                action.delete()
+
+    def create(self, validated_data) -> Workflow:
+        if "triggers" in validated_data:
+            triggers = validated_data.pop("triggers")
+
+        if "actions" in validated_data:
+            actions = validated_data.pop("actions")
+
+        instance = super().create(validated_data)
+
+        self.update_triggers_and_actions(instance, triggers, actions)
+
+        return instance
+
+    def update(self, instance: Workflow, validated_data) -> Workflow:
+        if "triggers" in validated_data:
+            triggers = validated_data.pop("triggers")
+
+        if "actions" in validated_data:
+            actions = validated_data.pop("actions")
+
+        instance = super().update(instance, validated_data)
+
+        self.update_triggers_and_actions(instance, triggers, actions)
+
+        self.prune_triggers_and_actions()
+
+        return instance

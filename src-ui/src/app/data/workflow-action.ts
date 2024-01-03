@@ -1,23 +1,10 @@
 import { ObjectWithId } from './object-with-id'
 
-export enum DocumentSource {
-  ConsumeFolder = 1,
-  ApiUpload = 2,
-  MailFetch = 3,
+export enum WorkflowActionType {
+  Assignment = 1,
 }
-
-export interface ConsumptionTemplate extends ObjectWithId {
-  name: string
-
-  order: number
-
-  sources: DocumentSource[]
-
-  filter_filename: string
-
-  filter_path?: string
-
-  filter_mailrule?: number // MailRule.id
+export interface WorkflowAction extends ObjectWithId {
+  type: WorkflowActionType
 
   assign_title?: string
 
