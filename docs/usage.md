@@ -238,7 +238,7 @@ do not have an owner set.
 
 ### Default permissions
 
-Default permissions for documents can be set using consumption templates.
+Default permissions for documents can be set using workflows.
 
 For objects created via the web UI (tags, doc types, etc.) the default is to set the current user
 as owner and no extra permissions, but you explicitly set these under Settings > Permissions.
@@ -255,29 +255,80 @@ permissions can be granted to limit access to certain parts of the UI (and corre
 In order to enable the password reset feature you will need to setup an SMTP backend, see
 [`PAPERLESS_EMAIL_HOST`](configuration.md#PAPERLESS_EMAIL_HOST)
 
-## Consumption templates
+## Workflows
 
-Consumption templates were introduced in v2.0 and allow for finer control over what metadata (tags, doc
-types) and permissions (owner, privileges) are assigned to documents during consumption. In general,
-templates are applied sequentially (by sort order) but subsequent templates will never override an
-assignment from a preceding template. The same is true for mail rules, e.g. if you set the correspondent
-in a mail rule any subsequent consumption templates that are applied _will not_ overwrite this. The
-exception to this is assignments that can be multiple e.g. tags and permissions, which will be merged.
+!!! note
 
-Consumption templates allow you to filter by:
+    v2.3 added "Workflows" and existing "Consumption Templates" were converted automatically to the new more powerful format.
+
+Workflows allow hooking into the Paperless-ngx document pipeline, for example to alter what metadata (tags, doc types) and
+permissions (owner, privileges) are assigned to documents. Workflows can have multiple 'triggers' and 'actions'. Triggers
+are events (with optional filtering rules) that will cause the workflow to be run and actions are the set of sequential
+actions to apply.
+
+In general, workflows and any actions they contain are applied sequentially by sort order. For "assignment" actions, subsequent
+workflow actions will override previous assignments, except for assignments that accept multiple items e.g. tags, custom
+fields and permissions, which will be merged.
+
+### Workflow Triggers
+
+Currently, there are three events that correspond to workflow trigger 'types':
+
+1. **Consumption Started**: _before_ a document is consumed, so events can include filters by source (mail, consumption
+   folder or API), file path, file name, mail rule
+2. **Document Added**: _after_ a document is added. At this time, file path and source information is no longer available,
+   but the document content has been extracted and metadata such as document type, tags, etc. have been set, so these can now
+   be used for filtering.
+3. **Document Updated**: when a document is updated. Similar to 'added' events, triggers can include filtering by content matching,
+   tags, doc type, or correspondent.
+
+The following flow diagram illustrates the three trigger types:
+
+```mermaid
+flowchart TD
+    consumption{"Matching
+    'Consumption'
+    trigger(s)"}
+
+    added{"Matching
+    'Added'
+    trigger(s)"}
+
+    updated{"Matching
+    'Updated'
+    trigger(s)"}
+
+    A[New Document] --> consumption
+    consumption --> |Yes| C[Workflow Actions Run]
+    consumption --> |No| D
+    C --> D[Document Added]
+    D -- Paperless-ngx 'matching' of tags, etc. --> added
+    added --> |Yes| F[Workflow Actions Run]
+    added --> |No| G
+    F --> G[Document Finalized]
+    H[Existing Document Changed] --> updated
+    updated --> |Yes| J[Workflow Actions Run]
+    updated --> |No| K
+    J --> K[Document Saved]
+```
+
+#### Filters {#workflow-trigger-filters}
+
+Workflows allow you to filter by:
 
 - Source, e.g. documents uploaded via consume folder, API (& the web UI) and mail fetch
 - File name, including wildcards e.g. \*.pdf will apply to all pdfs
 - File path, including wildcards. Note that enabling `PAPERLESS_CONSUMER_RECURSIVE` would allow, for
   example, automatically assigning documents to different owners based on the upload directory.
-- Mail rule. Choosing this option will force 'mail fetch' to be the template source.
+- Mail rule. Choosing this option will force 'mail fetch' to be the workflow source.
+- Content matching (`Added` and `Updated` triggers only). Filter document content using the matching settings.
+- Tags (`Added` and `Updated` triggers only). Filter for documents with any of the specified tags
+- Document type (`Added` and `Updated` triggers only). Filter documents with this doc type
+- Correspondent (`Added` and `Updated` triggers only). Filter documents with this correspondent
 
-!!! note
+### Workflow Actions
 
-    You must include a file name filter, a path filter or a mail rule filter. Use * for either to apply
-    to all files.
-
-Consumption templates can assign:
+There is currently one type of workflow action, "Assignment", which can assign:
 
 - Title, see [title placeholders](usage.md#title-placeholders) below
 - Tags, correspondent, document types
@@ -285,21 +336,11 @@ Consumption templates can assign:
 - View and / or edit permissions to users or groups
 - Custom fields. Note that no value for the field will be set
 
-### Consumption template permissions
+#### Title placeholders
 
-All users who have application permissions for editing consumption templates can see the same set
-of templates. In other words, templates themselves intentionally do not have an owner or permissions.
-
-Given their potentially far-reaching capabilities, you may want to restrict access to templates.
-
-Upon migration, existing installs will grant access to consumption templates to users who can add
-documents (and superusers who can always access all parts of the app).
-
-### Title placeholders
-
-Consumption template titles can include placeholders, _only for items that are assigned within the template_.
-This is because at the time of consumption (when the title is to be set), no automatic tags etc. have been
-applied. You can use the following placeholders:
+Workflow titles can include placeholders but the available options differ depending on the type of
+workflow trigger. This is because at the time of consumption (when the title is to be set), no automatic tags etc. have been
+applied. You can use the following placeholders with any trigger type:
 
 - `{correspondent}`: assigned correspondent name
 - `{document_type}`: assigned document type name
@@ -313,6 +354,27 @@ applied. You can use the following placeholders:
 - `{added_day}`: added day
 - `{added_time}`: added time in HH:MM format
 - `{original_filename}`: original file name without extension
+
+The following placeholders are only available for "added" or "updated" triggers
+
+- `{created}`: created datetime
+- `{created_year}`: created year
+- `{created_year_short}`: created year
+- `{created_month}`: created month
+- `{created_month_name}`: created month name
+- `{created_month_name_short}`: created month short name
+- `{created_day}`: created day
+- `{created_time}`: created time in HH:MM format
+
+### Workflow permissions
+
+All users who have application permissions for editing workflows can see the same set
+of workflows. In other words, workflows themselves intentionally do not have an owner or permissions.
+
+Given their potentially far-reaching capabilities, you may want to restrict access to workflows.
+
+Upon migration, existing installs will grant access to workflows to users who can add
+documents (and superusers who can always access all parts of the app).
 
 ## Custom Fields {#custom-fields}
 

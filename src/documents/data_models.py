@@ -33,21 +33,20 @@ class DocumentMetadataOverrides:
     def update(self, other: "DocumentMetadataOverrides") -> "DocumentMetadataOverrides":
         """
         Merges two DocumentMetadataOverrides objects such that object B's overrides
-        are only applied if the property is empty in object A or merged if multiple
-        are accepted.
+        are applied to object A or merged if multiple are accepted.
 
         The update is an in-place modification of self
         """
         # only if empty
-        if self.title is None:
+        if other.title is not None:
             self.title = other.title
-        if self.correspondent_id is None:
+        if other.correspondent_id is not None:
             self.correspondent_id = other.correspondent_id
-        if self.document_type_id is None:
+        if other.document_type_id is not None:
             self.document_type_id = other.document_type_id
-        if self.storage_path_id is None:
+        if other.storage_path_id is not None:
             self.storage_path_id = other.storage_path_id
-        if self.owner_id is None:
+        if other.owner_id is not None:
             self.owner_id = other.owner_id
 
         # merge
