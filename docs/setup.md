@@ -28,7 +28,8 @@ steps described in [Docker setup](#docker_hub) automatically.
 1.  Make sure that Docker and Docker Compose are installed.
 
     !!! tip
-    See the Docker installation instructions at https://docs.docker.com/engine/install/
+
+        See the Docker installation instructions at https://docs.docker.com/engine/install/
 
 2.  Download and run the installation script:
 
