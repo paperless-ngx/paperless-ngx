@@ -819,7 +819,13 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         ) as f:
             response = self.client.post(
                 "/api/documents/post_document/",
-                {"document": f, "title": "", "correspondent": "", "document_type": ""},
+                {
+                    "document": f,
+                    "title": "",
+                    "correspondent": "",
+                    "document_type": "",
+                    "storage_path": "",
+                },
             )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -833,6 +839,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.title)
         self.assertIsNone(overrides.correspondent_id)
         self.assertIsNone(overrides.document_type_id)
+        self.assertIsNone(overrides.storage_path_id)
         self.assertIsNone(overrides.tag_ids)
 
     def test_upload_invalid_form(self):
