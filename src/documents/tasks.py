@@ -36,6 +36,7 @@ from documents.models import Tag
 from documents.parsers import DocumentParser
 from documents.parsers import get_parser_class_for_mime_type
 from documents.sanity_checker import SanityCheckFailedException
+from documents.signals import document_updated
 
 if settings.AUDIT_LOG_ENABLED:
     import json
@@ -157,7 +158,7 @@ def consume_file(
                 overrides.asn = reader.asn
                 logger.info(f"Found ASN in barcode: {overrides.asn}")
 
-    template_overrides = Consumer().get_template_overrides(
+    template_overrides = Consumer().get_workflow_overrides(
         input_doc=input_doc,
     )
 
@@ -215,6 +216,11 @@ def bulk_update_documents(document_ids):
     ix = index.open_index()
 
     for doc in documents:
+        document_updated.send(
+            sender=None,
+            document=doc,
+            logging_group=uuid.uuid4(),
+        )
         post_save.send(Document, instance=doc, created=False)
 
     with AsyncWriter(ix) as writer:

@@ -1,27 +1,35 @@
 import logging
 import re
 from fnmatch import fnmatch
+from typing import Union
 
 from documents.classifier import DocumentClassifier
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentSource
-from documents.models import ConsumptionTemplate
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import Workflow
+from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
 
 logger = logging.getLogger("paperless.matching")
 
 
-def log_reason(matching_model: MatchingModel, document: Document, reason: str):
+def log_reason(
+    matching_model: Union[MatchingModel, WorkflowTrigger],
+    document: Document,
+    reason: str,
+):
     class_name = type(matching_model).__name__
+    name = (
+        matching_model.name if hasattr(matching_model, "name") else str(matching_model)
+    )
     logger.debug(
-        f"{class_name} {matching_model.name} matched on document "
-        f"{document} because {reason}",
+        f"{class_name} {name} matched on document {document} because {reason}",
     )
 
 
@@ -237,65 +245,182 @@ def _split_match(matching_model):
     ]
 
 
-def document_matches_template(
+def consumable_document_matches_workflow(
     document: ConsumableDocument,
-    template: ConsumptionTemplate,
-) -> bool:
+    trigger: WorkflowTrigger,
+) -> tuple[bool, str]:
     """
-    Returns True if the incoming document matches all filters and
-    settings from the template, False otherwise
+    Returns True if the ConsumableDocument matches all filters from the workflow trigger,
+    False otherwise. Includes a reason if doesn't match
     """
 
-    def log_match_failure(reason: str):
-        logger.info(f"Document did not match template {template.name}")
-        logger.debug(reason)
+    trigger_matched = True
+    reason = ""
 
-    # Document source vs template source
-    if document.source not in [int(x) for x in list(template.sources)]:
-        log_match_failure(
+    # Document source vs trigger source
+    if document.source not in [int(x) for x in list(trigger.sources)]:
+        reason = (
             f"Document source {document.source.name} not in"
-            f" {[DocumentSource(int(x)).name for x in template.sources]}",
+            f" {[DocumentSource(int(x)).name for x in trigger.sources]}",
         )
-        return False
+        trigger_matched = False
 
-    # Document mail rule vs template mail rule
+    # Document mail rule vs trigger mail rule
     if (
         document.mailrule_id is not None
-        and template.filter_mailrule is not None
-        and document.mailrule_id != template.filter_mailrule.pk
+        and trigger.filter_mailrule is not None
+        and document.mailrule_id != trigger.filter_mailrule.pk
     ):
-        log_match_failure(
+        reason = (
             f"Document mail rule {document.mailrule_id}"
-            f" != {template.filter_mailrule.pk}",
+            f" != {trigger.filter_mailrule.pk}",
         )
-        return False
+        trigger_matched = False
 
-    # Document filename vs template filename
+    # Document filename vs trigger filename
     if (
-        template.filter_filename is not None
-        and len(template.filter_filename) > 0
+        trigger.filter_filename is not None
+        and len(trigger.filter_filename) > 0
         and not fnmatch(
             document.original_file.name.lower(),
-            template.filter_filename.lower(),
+            trigger.filter_filename.lower(),
         )
     ):
-        log_match_failure(
+        reason = (
             f"Document filename {document.original_file.name} does not match"
-            f" {template.filter_filename.lower()}",
+            f" {trigger.filter_filename.lower()}",
         )
-        return False
+        trigger_matched = False
 
-    # Document path vs template path
+    # Document path vs trigger path
     if (
-        template.filter_path is not None
-        and len(template.filter_path) > 0
-        and not document.original_file.match(template.filter_path)
+        trigger.filter_path is not None
+        and len(trigger.filter_path) > 0
+        and not document.original_file.match(trigger.filter_path)
     ):
-        log_match_failure(
+        reason = (
             f"Document path {document.original_file}"
-            f" does not match {template.filter_path}",
+            f" does not match {trigger.filter_path}",
         )
-        return False
+        trigger_matched = False
 
-    logger.info(f"Document matched template {template.name}")
-    return True
+    return (trigger_matched, reason)
+
+
+def existing_document_matches_workflow(
+    document: Document,
+    trigger: WorkflowTrigger,
+) -> tuple[bool, str]:
+    """
+    Returns True if the Document matches all filters from the workflow trigger,
+    False otherwise. Includes a reason if doesn't match
+    """
+
+    trigger_matched = True
+    reason = ""
+
+    if trigger.matching_algorithm > MatchingModel.MATCH_NONE and not matches(
+        trigger,
+        document,
+    ):
+        reason = (
+            f"Document content matching settings for algorithm '{trigger.matching_algorithm}' did not match",
+        )
+        trigger_matched = False
+
+    # Document tags vs trigger has_tags
+    if (
+        trigger.filter_has_tags.all().count() > 0
+        and document.tags.filter(
+            id__in=trigger.filter_has_tags.all().values_list("id"),
+        ).count()
+        == 0
+    ):
+        reason = (
+            f"Document tags {document.tags.all()} do not include"
+            f" {trigger.filter_has_tags.all()}",
+        )
+        trigger_matched = False
+
+    # Document correpondent vs trigger has_correspondent
+    if (
+        trigger.filter_has_correspondent is not None
+        and document.correspondent != trigger.filter_has_correspondent
+    ):
+        reason = (
+            f"Document correspondent {document.correspondent} does not match {trigger.filter_has_correspondent}",
+        )
+        trigger_matched = False
+
+    # Document document_type vs trigger has_document_type
+    if (
+        trigger.filter_has_document_type is not None
+        and document.document_type != trigger.filter_has_document_type
+    ):
+        reason = (
+            f"Document doc type {document.document_type} does not match {trigger.filter_has_document_type}",
+        )
+        trigger_matched = False
+
+    # Document original_filename vs trigger filename
+    if (
+        trigger.filter_filename is not None
+        and len(trigger.filter_filename) > 0
+        and document.original_filename is not None
+        and not fnmatch(
+            document.original_filename.lower(),
+            trigger.filter_filename.lower(),
+        )
+    ):
+        reason = (
+            f"Document filename {document.original_filename} does not match"
+            f" {trigger.filter_filename.lower()}",
+        )
+        trigger_matched = False
+
+    return (trigger_matched, reason)
+
+
+def document_matches_workflow(
+    document: Union[ConsumableDocument, Document],
+    workflow: Workflow,
+    trigger_type: WorkflowTrigger.WorkflowTriggerType,
+) -> bool:
+    """
+    Returns True if the ConsumableDocument or Document matches all filters and
+    settings from the workflow trigger, False otherwise
+    """
+
+    trigger_matched = True
+    if workflow.triggers.filter(type=trigger_type).count() == 0:
+        trigger_matched = False
+        logger.info(f"Document did not match {workflow}")
+        logger.debug(f"No matching triggers with type {trigger_type} found")
+    else:
+        for trigger in workflow.triggers.filter(type=trigger_type):
+            if trigger_type == WorkflowTrigger.WorkflowTriggerType.CONSUMPTION:
+                trigger_matched, reason = consumable_document_matches_workflow(
+                    document,
+                    trigger,
+                )
+            elif (
+                trigger_type == WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED
+                or trigger_type == WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED
+            ):
+                trigger_matched, reason = existing_document_matches_workflow(
+                    document,
+                    trigger,
+                )
+            else:
+                # New trigger types need to be explicitly checked above
+                raise Exception(f"Trigger type {trigger_type} not yet supported")
+
+            if trigger_matched:
+                logger.info(f"Document matched {trigger} from {workflow}")
+                # matched, bail early
+                return True
+            else:
+                logger.info(f"Document did not match {workflow}")
+                logger.debug(reason)
+
+    return trigger_matched

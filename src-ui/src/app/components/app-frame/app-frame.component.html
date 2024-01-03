@@ -235,14 +235,14 @@
             </a>
           </li>
           <li class="nav-item"
-            *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.ConsumptionTemplate }"
-            tourAnchor="tour.consumption-templates">
-            <a class="nav-link" routerLink="templates" routerLinkActive="active" (click)="closeMenu()"
-              ngbPopover="Consumption templates" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
+            *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Workflow }"
+            tourAnchor="tour.workflows">
+            <a class="nav-link" routerLink="workflows" routerLinkActive="active" (click)="closeMenu()"
+              ngbPopover="Workflows" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
               container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <svg class="sidebaricon" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#file-earmark-ruled" />
-              </svg><span>&nbsp;<ng-container i18n>Templates</ng-container></span>
+                <use xlink:href="assets/bootstrap-icons.svg#boxes" />
+              </svg><span>&nbsp;<ng-container i18n>Workflows</ng-container></span>
             </a>
           </li>
           <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailAccount }"

@@ -888,15 +888,31 @@ if settings.AUDIT_LOG_ENABLED:
     auditlog.register(CustomFieldInstance)
 
 
-class ConsumptionTemplate(models.Model):
+class WorkflowTrigger(models.Model):
+    class WorkflowTriggerMatching(models.IntegerChoices):
+        # No auto matching
+        NONE = MatchingModel.MATCH_NONE, _("None")
+        ANY = MatchingModel.MATCH_ANY, _("Any word")
+        ALL = MatchingModel.MATCH_ALL, _("All words")
+        LITERAL = MatchingModel.MATCH_LITERAL, _("Exact match")
+        REGEX = MatchingModel.MATCH_REGEX, _("Regular expression")
+        FUZZY = MatchingModel.MATCH_FUZZY, _("Fuzzy word")
+
+    class WorkflowTriggerType(models.IntegerChoices):
+        CONSUMPTION = 1, _("Consumption Started")
+        DOCUMENT_ADDED = 2, _("Document Added")
+        DOCUMENT_UPDATED = 3, _("Document Updated")
+
     class DocumentSourceChoices(models.IntegerChoices):
         CONSUME_FOLDER = DocumentSource.ConsumeFolder.value, _("Consume Folder")
         API_UPLOAD = DocumentSource.ApiUpload.value, _("Api Upload")
         MAIL_FETCH = DocumentSource.MailFetch.value, _("Mail Fetch")
 
-    name = models.CharField(_("name"), max_length=256, unique=True)
-
-    order = models.IntegerField(_("order"), default=0)
+    type = models.PositiveIntegerField(
+        _("Workflow Trigger Type"),
+        choices=WorkflowTriggerType.choices,
+        default=WorkflowTriggerType.CONSUMPTION,
+    )
 
     sources = MultiSelectField(
         max_length=5,
@@ -934,6 +950,56 @@ class ConsumptionTemplate(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
         verbose_name=_("filter documents from this mail rule"),
+    )
+
+    match = models.CharField(_("match"), max_length=256, blank=True)
+
+    matching_algorithm = models.PositiveIntegerField(
+        _("matching algorithm"),
+        choices=WorkflowTriggerMatching.choices,
+        default=WorkflowTriggerMatching.NONE,
+    )
+
+    is_insensitive = models.BooleanField(_("is insensitive"), default=True)
+
+    filter_has_tags = models.ManyToManyField(
+        Tag,
+        blank=True,
+        verbose_name=_("has these tag(s)"),
+    )
+
+    filter_has_document_type = models.ForeignKey(
+        DocumentType,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("has this document type"),
+    )
+
+    filter_has_correspondent = models.ForeignKey(
+        Correspondent,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("has this correspondent"),
+    )
+
+    class Meta:
+        verbose_name = _("workflow trigger")
+        verbose_name_plural = _("workflow triggers")
+
+    def __str__(self):
+        return f"WorkflowTrigger {self.pk}"
+
+
+class WorkflowAction(models.Model):
+    class WorkflowActionType(models.IntegerChoices):
+        ASSIGNMENT = 1, _("Assignment")
+
+    type = models.PositiveIntegerField(
+        _("Workflow Action Type"),
+        choices=WorkflowActionType.choices,
+        default=WorkflowActionType.ASSIGNMENT,
     )
 
     assign_title = models.CharField(
@@ -1022,8 +1088,33 @@ class ConsumptionTemplate(models.Model):
     )
 
     class Meta:
-        verbose_name = _("consumption template")
-        verbose_name_plural = _("consumption templates")
+        verbose_name = _("workflow action")
+        verbose_name_plural = _("workflow actions")
 
     def __str__(self):
-        return f"{self.name}"
+        return f"WorkflowAction {self.pk}"
+
+
+class Workflow(models.Model):
+    name = models.CharField(_("name"), max_length=256, unique=True)
+
+    order = models.IntegerField(_("order"), default=0)
+
+    triggers = models.ManyToManyField(
+        WorkflowTrigger,
+        related_name="workflows",
+        blank=False,
+        verbose_name=_("triggers"),
+    )
+
+    actions = models.ManyToManyField(
+        WorkflowAction,
+        related_name="workflows",
+        blank=False,
+        verbose_name=_("actions"),
+    )
+
+    enabled = models.BooleanField(_("enabled"), default=True)
+
+    def __str__(self):
+        return f"Workflow: {self.name}"

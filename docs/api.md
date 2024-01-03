@@ -8,7 +8,6 @@ most of the available filters and ordering fields.
 
 The API provides the following main endpoints:
 
-- `/api/consumption_templates/`: Full CRUD support.
 - `/api/correspondents/`: Full CRUD support.
 - `/api/custom_fields/`: Full CRUD support.
 - `/api/documents/`: Full CRUD support, except POSTing new documents.
@@ -24,6 +23,7 @@ The API provides the following main endpoints:
 - `/api/tags/`: Full CRUD support.
 - `/api/tasks/`: Read-only.
 - `/api/users/`: Full CRUD support.
+- `/api/workflows/`: Full CRUD support.
 
 All of these endpoints except for the logging endpoint allow you to
 fetch (and edit and delete where appropriate) individual objects by
