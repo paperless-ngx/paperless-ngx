@@ -39,7 +39,7 @@
                     <div ngbAccordionHeader>
                       <button ngbAccordionButton>{{i + 1}}. {{getTriggerTypeOptionName(triggerFields.controls[i].value.type)}}
                         @if(trigger.id > -1) {
-                          <span class="badge bg-dark text-light ms-2">ID: {{trigger.id}}</span>
+                          <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{trigger.id}}</span>
                         }
                         <button type="button" class="btn btn-link text-danger ms-2" (click)="removeTrigger(i)">
                           <svg class="sidebaricon me-1" fill="currentColor">
@@ -83,7 +83,7 @@
                     <div ngbAccordionHeader>
                       <button ngbAccordionButton>{{i + 1}}. {{getActionTypeOptionName(actionFields.controls[i].value.type)}}
                         @if(action.id > -1) {
-                          <span class="badge bg-dark text-light ms-2">ID: {{action.id}}</span>
+                          <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{action.id}}</span>
                         }
                         <button type="button" class="btn btn-link text-danger ms-2" (click)="removeAction(i)">
                           <svg class="sidebaricon me-1" fill="currentColor">
