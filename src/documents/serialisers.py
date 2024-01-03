@@ -964,6 +964,14 @@ class PostDocumentSerializer(serializers.Serializer):
         required=False,
     )
 
+    storage_path = serializers.PrimaryKeyRelatedField(
+        queryset=StoragePath.objects.all(),
+        label="Storage path",
+        allow_null=True,
+        write_only=True,
+        required=False,
+    )
+
     tags = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=Tag.objects.all(),
@@ -1000,6 +1008,12 @@ class PostDocumentSerializer(serializers.Serializer):
     def validate_document_type(self, document_type):
         if document_type:
             return document_type.id
+        else:
+            return None
+
+    def validate_storage_path(self, storage_path):
+        if storage_path:
+            return storage_path.id
         else:
             return None
 
