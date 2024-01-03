@@ -839,6 +839,7 @@ class PostDocumentView(GenericAPIView):
         doc_name, doc_data = serializer.validated_data.get("document")
         correspondent_id = serializer.validated_data.get("correspondent")
         document_type_id = serializer.validated_data.get("document_type")
+        storage_path_id = serializer.validated_data.get("storage_path")
         tag_ids = serializer.validated_data.get("tags")
         title = serializer.validated_data.get("title")
         created = serializer.validated_data.get("created")
@@ -865,6 +866,7 @@ class PostDocumentView(GenericAPIView):
             title=title,
             correspondent_id=correspondent_id,
             document_type_id=document_type_id,
+            storage_path_id=storage_path_id,
             tag_ids=tag_ids,
             created=created,
             asn=archive_serial_number,

@@ -274,6 +274,7 @@ The endpoint supports the following optional form fields:
 - `correspondent`: Specify the ID of a correspondent that the consumer
   should use for the document.
 - `document_type`: Similar to correspondent.
+- `storage_path`: Similar to correspondent.
 - `tags`: Similar to correspondent. Specify this multiple times to
   have multiple tags added to the document.
 - `archive_serial_number`: An optional archive serial number to set.
