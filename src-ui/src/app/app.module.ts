@@ -95,8 +95,8 @@ import { UsernamePipe } from './pipes/username.pipe'
 import { LogoComponent } from './components/common/logo/logo.component'
 import { IsNumberPipe } from './pipes/is-number.pipe'
 import { ShareLinksDropdownComponent } from './components/common/share-links-dropdown/share-links-dropdown.component'
-import { ConsumptionTemplatesComponent } from './components/manage/consumption-templates/consumption-templates.component'
-import { ConsumptionTemplateEditDialogComponent } from './components/common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component'
+import { WorkflowsComponent } from './components/manage/workflows/workflows.component'
+import { WorkflowEditDialogComponent } from './components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
 import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 import { DragDropModule } from '@angular/cdk/drag-drop'
@@ -108,8 +108,8 @@ import { ProfileEditDialogComponent } from './components/common/profile-edit-dia
 import { PdfViewerComponent } from './components/common/pdf-viewer/pdf-viewer.component'
 import { DocumentLinkComponent } from './components/common/input/document-link/document-link.component'
 import { PreviewPopupComponent } from './components/common/preview-popup/preview-popup.component'
-import { ConfigComponent } from './components/admin/config/config.component'
 import { SwitchComponent } from './components/common/input/switch/switch.component'
+import { ConfigComponent } from './components/admin/config/config.component'
 
 import localeAf from '@angular/common/locales/af'
 import localeAr from '@angular/common/locales/ar'
@@ -253,8 +253,8 @@ function initializeApp(settings: SettingsService) {
     LogoComponent,
     IsNumberPipe,
     ShareLinksDropdownComponent,
-    ConsumptionTemplatesComponent,
-    ConsumptionTemplateEditDialogComponent,
+    WorkflowsComponent,
+    WorkflowEditDialogComponent,
     MailComponent,
     UsersAndGroupsComponent,
     FileDropComponent,
@@ -265,8 +265,8 @@ function initializeApp(settings: SettingsService) {
     PdfViewerComponent,
     DocumentLinkComponent,
     PreviewPopupComponent,
-    ConfigComponent,
     SwitchComponent,
+    ConfigComponent,
   ],
   imports: [
     BrowserModule,
