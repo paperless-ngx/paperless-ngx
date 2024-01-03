@@ -81,7 +81,7 @@
                 @for (action of object?.actions; track action; let i = $index){
                   <div ngbAccordionItem cdkDrag [formGroup]="actionFields.controls[i]">
                     <div ngbAccordionHeader>
-                      <button ngbAccordionButton><ng-container i18n>Action</ng-container> {{i + 1}}
+                      <button ngbAccordionButton>{{i + 1}}. {{getActionTypeOptionName(actionFields.controls[i].value.type)}}
                         @if(action.id > -1) {
                           <span class="badge bg-dark text-light ms-2">ID: {{action.id}}</span>
                         }
