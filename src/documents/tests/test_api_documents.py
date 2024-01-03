@@ -819,7 +819,13 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         ) as f:
             response = self.client.post(
                 "/api/documents/post_document/",
-                {"document": f, "title": "", "correspondent": "", "document_type": ""},
+                {
+                    "document": f,
+                    "title": "",
+                    "correspondent": "",
+                    "document_type": "",
+                    "storage_path": "",
+                },
             )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -833,6 +839,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.title)
         self.assertIsNone(overrides.correspondent_id)
         self.assertIsNone(overrides.document_type_id)
+        self.assertIsNone(overrides.storage_path_id)
         self.assertIsNone(overrides.tag_ids)
 
     def test_upload_invalid_form(self):
@@ -970,6 +977,48 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "document_type": 34578},
+            )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.consume_file_mock.assert_not_called()
+
+    def test_upload_with_storage_path(self):
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
+
+        sp = StoragePath.objects.create(name="invoices")
+        with open(
+            os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
+            "rb",
+        ) as f:
+            response = self.client.post(
+                "/api/documents/post_document/",
+                {"document": f, "storage_path": sp.id},
+            )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.consume_file_mock.assert_called_once()
+
+        _, overrides = self.get_last_consume_delay_call_args()
+
+        self.assertEqual(overrides.storage_path_id, sp.id)
+        self.assertIsNone(overrides.correspondent_id)
+        self.assertIsNone(overrides.title)
+        self.assertIsNone(overrides.tag_ids)
+
+    def test_upload_with_invalid_storage_path(self):
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
+
+        with open(
+            os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
+            "rb",
+        ) as f:
+            response = self.client.post(
+                "/api/documents/post_document/",
+                {"document": f, "storage_path": 34578},
             )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
