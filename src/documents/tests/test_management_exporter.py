@@ -502,12 +502,14 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         GIVEN:
             - Request to export documents to zipfile
             - There is one existing file in the target
+            - There is one existing directory in the target
         WHEN:
             - Documents are exported
             - deletion of existing files is requested
         THEN:
             - Zipfile is created
             - Zipfile contains exported files
+            - The existing file and directory in target are removed
         """
         shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
         shutil.copytree(
