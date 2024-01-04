@@ -42,7 +42,7 @@ from documents.tests.utils import paperless_environment
 
 class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def setUp(self) -> None:
-        self.target = tempfile.mkdtemp()
+        self.target = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.target)
 
         self.user = User.objects.create(username="temp_admin")
@@ -493,6 +493,54 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         with ZipFile(expected_file) as zip:
             # Extras are from the directories, which also appear in the listing
             self.assertEqual(len(zip.namelist()), 14)
+            self.assertIn("manifest.json", zip.namelist())
+            self.assertIn("version.json", zip.namelist())
+
+    @override_settings(PASSPHRASE="test")
+    def test_export_zipped_with_delete(self):
+        """
+        GIVEN:
+            - Request to export documents to zipfile
+            - There is one existing file in the target
+            - There is one existing directory in the target
+        WHEN:
+            - Documents are exported
+            - deletion of existing files is requested
+        THEN:
+            - Zipfile is created
+            - Zipfile contains exported files
+            - The existing file and directory in target are removed
+        """
+        shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
+        shutil.copytree(
+            os.path.join(os.path.dirname(__file__), "samples", "documents"),
+            os.path.join(self.dirs.media_dir, "documents"),
+        )
+
+        # Create stuff in target directory
+        existing_file = self.target / "test.txt"
+        existing_file.touch()
+        existing_dir = self.target / "somedir"
+        existing_dir.mkdir(parents=True)
+
+        self.assertIsFile(existing_file)
+        self.assertIsDir(existing_dir)
+
+        args = ["document_exporter", self.target, "--zip", "--delete"]
+
+        call_command(*args)
+
+        expected_file = os.path.join(
+            self.target,
+            f"export-{timezone.localdate().isoformat()}.zip",
+        )
+
+        self.assertIsFile(expected_file)
+        self.assertIsNotFile(existing_file)
+        self.assertIsNotDir(existing_dir)
+
+        with ZipFile(expected_file) as zip:
+            self.assertEqual(len(zip.namelist()), 11)
             self.assertIn("manifest.json", zip.namelist())
             self.assertIn("version.json", zip.namelist())
 
