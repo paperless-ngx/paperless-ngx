@@ -24,7 +24,7 @@ import { ToastService } from 'src/app/services/toast.service'
 import {
   DjangoMessageLevel,
   DjangoMessagesService,
-} from 'src/app/services/messages.service'
+} from 'src/app/services/django-messages.service'
 import { environment } from 'src/environments/environment'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { ActivatedRoute, Router } from '@angular/router'
