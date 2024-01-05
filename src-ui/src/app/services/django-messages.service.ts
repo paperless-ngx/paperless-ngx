@@ -17,11 +17,11 @@ export interface DjangoMessage {
 @Injectable({
   providedIn: 'root',
 })
-export class MessagesService {
+export class DjangoMessagesService {
   constructor() {}
 
   get(): DjangoMessage[] {
-    // These are embedded in the HTML as raw JS, kept as a service for convenience
+    // These are embedded in the HTML as raw JS, the service is for convenience
     return window['DJANGO_MESSAGES'] ?? []
   }
 }

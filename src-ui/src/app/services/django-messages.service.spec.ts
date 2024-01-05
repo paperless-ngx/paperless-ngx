@@ -1,26 +1,27 @@
 import { TestBed } from '@angular/core/testing'
 
-import { DjangoMessageLevel, MessagesService } from './messages.service'
-
-import { environment } from 'src/environments/environment'
+import {
+  DjangoMessageLevel,
+  DjangoMessagesService,
+} from './django-messages.service'
 
 const messages = [
   { level: DjangoMessageLevel.ERROR, message: 'Error Message' },
   { level: DjangoMessageLevel.INFO, message: 'Info Message' },
 ]
 
-describe('MessagesService', () => {
-  let service: MessagesService
+describe('DjangoMessagesService', () => {
+  let service: DjangoMessagesService
 
   beforeEach(() => {
     window['DJANGO_MESSAGES'] = messages
     TestBed.configureTestingModule({
-      providers: [MessagesService],
+      providers: [DjangoMessagesService],
     })
-    service = TestBed.inject(MessagesService)
+    service = TestBed.inject(DjangoMessagesService)
   })
 
-  it('calls retrieves global django messages if present', () => {
+  it('should retrieve global django messages if present', () => {
     expect(service.get()).toEqual(messages)
 
     window['DJANGO_MESSAGES'] = undefined

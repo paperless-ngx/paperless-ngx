@@ -14,8 +14,8 @@ import { Document } from 'src/app/data/document'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import {
   DjangoMessageLevel,
-  MessagesService,
-} from 'src/app/services/messages.service'
+  DjangoMessagesService,
+} from 'src/app/services/django-messages.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SearchService } from 'src/app/services/rest/search.service'
 import { environment } from 'src/environments/environment'
@@ -77,8 +77,8 @@ export class AppFrameComponent
     public tasksService: TasksService,
     private readonly toastService: ToastService,
     private modalService: NgbModal,
-    permissionsService: PermissionsService,
-    private messagesService: MessagesService
+    public permissionsService: PermissionsService,
+    private djangoMessagesService: DjangoMessagesService
   ) {
     super()
 
@@ -98,7 +98,7 @@ export class AppFrameComponent
     }
     this.tasksService.reload()
 
-    this.messagesService.get().forEach((message) => {
+    this.djangoMessagesService.get().forEach((message) => {
       switch (message.level) {
         case DjangoMessageLevel.ERROR:
         case DjangoMessageLevel.WARNING:

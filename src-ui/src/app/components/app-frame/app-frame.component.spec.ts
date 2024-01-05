@@ -23,7 +23,7 @@ import { of, throwError } from 'rxjs'
 import { ToastService } from 'src/app/services/toast.service'
 import {
   DjangoMessageLevel,
-  MessagesService,
+  DjangoMessagesService,
 } from 'src/app/services/messages.service'
 import { environment } from 'src/environments/environment'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
@@ -87,7 +87,7 @@ describe('AppFrameComponent', () => {
   let permissionsService: PermissionsService
   let remoteVersionService: RemoteVersionService
   let toastService: ToastService
-  let messagesService: MessagesService
+  let messagesService: DjangoMessagesService
   let openDocumentsService: OpenDocumentsService
   let searchService: SearchService
   let documentListViewService: DocumentListViewService
@@ -128,7 +128,7 @@ describe('AppFrameComponent', () => {
         RemoteVersionService,
         IfPermissionsDirective,
         ToastService,
-        MessagesService,
+        DjangoMessagesService,
         OpenDocumentsService,
         SearchService,
         NgbModal,
@@ -157,7 +157,7 @@ describe('AppFrameComponent', () => {
     permissionsService = TestBed.inject(PermissionsService)
     remoteVersionService = TestBed.inject(RemoteVersionService)
     toastService = TestBed.inject(ToastService)
-    messagesService = TestBed.inject(MessagesService)
+    messagesService = TestBed.inject(DjangoMessagesService)
     openDocumentsService = TestBed.inject(OpenDocumentsService)
     searchService = TestBed.inject(SearchService)
     documentListViewService = TestBed.inject(DocumentListViewService)
