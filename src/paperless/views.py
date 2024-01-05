@@ -3,7 +3,6 @@ from collections import OrderedDict
 
 from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.models import SocialAccount
-from django.contrib import messages
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.db.models.functions import Lower
@@ -227,18 +226,3 @@ class SocialAccountProvidersView(APIView):
             ]
 
         return Response(sorted(resp, key=lambda p: p["name"]))
-
-
-class MessagesView(APIView):
-    """
-    Expose django messages. This clears the messages in django
-    """
-
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, *args, **kwargs):
-        data = [
-            {"level": m.level_tag, "message": m.message, "tags": m.extra_tags}
-            for m in messages.get_messages(request)
-        ]
-        return Response(data)

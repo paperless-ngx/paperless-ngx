@@ -21,7 +21,10 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { of, throwError } from 'rxjs'
 import { ToastService } from 'src/app/services/toast.service'
-import { MessagesService } from 'src/app/services/messages.service'
+import {
+  DjangoMessageLevel,
+  MessagesService,
+} from 'src/app/services/messages.service'
 import { environment } from 'src/environments/environment'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -401,17 +404,14 @@ describe('AppFrameComponent', () => {
   it('should show toasts for django messages', () => {
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
-    jest.spyOn(messagesService, 'get').mockReturnValue(
-      of([
-        { level: 'warning', message: 'Test warning', tags: '' },
-        { level: 'error', message: 'Test error', tags: '' },
-        { level: 'success', message: 'Test success', tags: '' },
-        { level: 'info', message: 'Test info', tags: '' },
-        { level: 'debug', message: 'Test debug', tags: '' },
-      ])
-    )
+    jest.spyOn(messagesService, 'get').mockReturnValue([
+      { level: DjangoMessageLevel.WARNING, message: 'Test warning' },
+      { level: DjangoMessageLevel.ERROR, message: 'Test error' },
+      { level: DjangoMessageLevel.SUCCESS, message: 'Test success' },
+      { level: DjangoMessageLevel.INFO, message: 'Test info' },
+      { level: DjangoMessageLevel.DEBUG, message: 'Test debug' },
+    ])
     component.ngOnInit()
-    httpTestingController.expectOne(`${environment.apiBaseUrl}messages/`)
     expect(toastErrorSpy).toHaveBeenCalledTimes(2)
     expect(toastInfoSpy).toHaveBeenCalledTimes(3)
   })

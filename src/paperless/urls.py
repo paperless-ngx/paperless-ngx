@@ -45,7 +45,6 @@ from paperless.views import DisconnectSocialAccountView
 from paperless.views import FaviconView
 from paperless.views import GenerateAuthTokenView
 from paperless.views import GroupViewSet
-from paperless.views import MessagesView
 from paperless.views import ProfileView
 from paperless.views import SocialAccountProvidersView
 from paperless.views import UserViewSet
@@ -148,7 +147,6 @@ urlpatterns = [
                     ProfileView.as_view(),
                     name="profile_view",
                 ),
-                path("messages/", MessagesView.as_view()),
                 *api_router.urls,
             ],
         ),

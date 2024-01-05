@@ -1,35 +1,29 @@
 import { TestBed } from '@angular/core/testing'
 
-import { MessagesService } from './messages.service'
+import { DjangoMessageLevel, MessagesService } from './messages.service'
 
-import {
-  HttpClientTestingModule,
-  HttpTestingController,
-} from '@angular/common/http/testing'
 import { environment } from 'src/environments/environment'
 
+const messages = [
+  { level: DjangoMessageLevel.ERROR, message: 'Error Message' },
+  { level: DjangoMessageLevel.INFO, message: 'Info Message' },
+]
+
 describe('MessagesService', () => {
-  let httpTestingController: HttpTestingController
   let service: MessagesService
 
   beforeEach(() => {
+    window['DJANGO_MESSAGES'] = messages
     TestBed.configureTestingModule({
       providers: [MessagesService],
-      imports: [HttpClientTestingModule],
     })
-    httpTestingController = TestBed.inject(HttpTestingController)
     service = TestBed.inject(MessagesService)
   })
 
-  afterEach(() => {
-    httpTestingController.verify()
-  })
+  it('calls retrieves global django messages if present', () => {
+    expect(service.get()).toEqual(messages)
 
-  it('calls messages endpoint', () => {
-    service.get().subscribe()
-    const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}messages/`
-    )
-    expect(req.request.method).toEqual('GET')
+    window['DJANGO_MESSAGES'] = undefined
+    expect(service.get()).toEqual([])
   })
 })

@@ -1,25 +1,27 @@
-import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { Observable } from 'rxjs'
-import { environment } from 'src/environments/environment'
+
+// see https://docs.djangoproject.com/en/5.0/ref/contrib/messages/#message-tags
+export enum DjangoMessageLevel {
+  DEBUG = 'debug',
+  INFO = 'info',
+  SUCCESS = 'success',
+  WARNING = 'warning',
+  ERROR = 'error',
+}
 
 export interface DjangoMessage {
-  level: string
+  level: DjangoMessageLevel
   message: string
-  tags: string
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class MessagesService {
-  private endpoint = 'messages'
+  constructor() {}
 
-  constructor(private http: HttpClient) {}
-
-  get(): Observable<DjangoMessage[]> {
-    return this.http.get<DjangoMessage[]>(
-      `${environment.apiBaseUrl}${this.endpoint}/`
-    )
+  get(): DjangoMessage[] {
+    // These are embedded in the HTML as raw JS, kept as a service for convenience
+    return window['DJANGO_MESSAGES'] ?? []
   }
 }
