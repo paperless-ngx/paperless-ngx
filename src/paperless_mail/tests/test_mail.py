@@ -118,7 +118,7 @@ class BogusMailBox(AbstractContextManager):
         if username != self.USERNAME or access_token != self.ACCESS_TOKEN:
             raise MailboxLoginError("BAD", "OK")
 
-    def fetch(self, criteria, mark_seen, charset=""):
+    def fetch(self, criteria, mark_seen, charset="", bulk=True):
         msg = self.messages
 
         criteria = str(criteria).strip("()").split(" ")
