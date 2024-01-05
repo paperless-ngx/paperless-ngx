@@ -12,6 +12,7 @@ from guardian.utils import get_user_obj_perms_model
 from rest_framework_guardian.filters import ObjectPermissionsFilter
 
 from documents.models import Correspondent
+from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Log
@@ -139,6 +140,15 @@ class SharedByUser(Filter):
             if value is not None
             else qs
         )
+
+
+class CustomFieldFilterSet(FilterSet):
+    class Meta:
+        model = CustomField
+        fields = {
+            "id": ID_KWARGS,
+            "name": CHAR_KWARGS,
+        }
 
 
 class CustomFieldsFilter(Filter):
