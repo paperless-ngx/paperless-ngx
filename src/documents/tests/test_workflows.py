@@ -325,6 +325,53 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         self.assertIn(expected_str, cm.output[1])
 
     @mock.patch("documents.consumer.Consumer.try_consume_file")
+    def test_workflow_fnmatch_path(self, m):
+        """
+        GIVEN:
+            - Existing workflow
+        WHEN:
+            - File that matches using fnmatch on path is consumed
+        THEN:
+            - Template overrides are applied
+            - Note: Test was added when path matching changed from pathlib.match to fnmatch
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
+            filter_path="*sample*",
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc fnmatch title",
+        )
+        action.save()
+
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        test_file = self.SAMPLE_DIR / "simple.pdf"
+
+        with mock.patch("documents.tasks.async_to_sync"):
+            with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+                tasks.consume_file(
+                    ConsumableDocument(
+                        source=DocumentSource.ConsumeFolder,
+                        original_file=test_file,
+                    ),
+                    None,
+                )
+                m.assert_called_once()
+                _, overrides = m.call_args
+                self.assertEqual(overrides["override_title"], "Doc fnmatch title")
+
+        expected_str = f"Document matched {trigger} from {w}"
+        self.assertIn(expected_str, cm.output[0])
+
+    @mock.patch("documents.consumer.Consumer.try_consume_file")
     def test_workflow_no_match_filename(self, m):
         """
         GIVEN:

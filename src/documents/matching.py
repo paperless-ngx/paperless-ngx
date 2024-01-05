@@ -296,7 +296,10 @@ def consumable_document_matches_workflow(
     if (
         trigger.filter_path is not None
         and len(trigger.filter_path) > 0
-        and not document.original_file.match(trigger.filter_path)
+        and not fnmatch(
+            document.original_file,
+            trigger.filter_path,
+        )
     ):
         reason = (
             f"Document path {document.original_file}"
