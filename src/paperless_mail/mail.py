@@ -569,6 +569,7 @@ class MailAccountHandler(LoggingMixin):
                 criteria=criterias,
                 mark_seen=False,
                 charset=rule.account.character_set,
+                bulk=True,
             )
         except Exception as err:
             raise MailError(
