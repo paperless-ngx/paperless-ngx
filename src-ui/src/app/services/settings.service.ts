@@ -237,6 +237,7 @@ export class SettingsService {
 
   private settings: Object = {}
   currentUser: User
+  applicationName: string
 
   public settingsSaved: EventEmitter<any> = new EventEmitter()
 
@@ -274,6 +275,7 @@ export class SettingsService {
         // to update lang cookie
         if (this.settings['language']?.length)
           this.setLanguage(this.settings['language'])
+        this.applicationName = this.settings['general-settings:application-name']
         this.currentUser = uisettings.user
         this.permissionsService.initialize(
           uisettings.permissions,

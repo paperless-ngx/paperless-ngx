@@ -136,6 +136,10 @@ export class AppFrameComponent
     return this.openDocumentsService.getOpenDocuments()
   }
 
+  get applicationName(): string {
+    return this.settingsService.get(SETTINGS_KEYS.APPLICATION_NAME)
+  }
+
   @HostListener('window:beforeunload')
   canDeactivate(): Observable<boolean> | boolean {
     return !this.openDocumentsService.hasDirty()

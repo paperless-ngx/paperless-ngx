@@ -69,6 +69,7 @@ export class SettingsComponent
   savedViewGroup = new FormGroup({})
 
   settingsForm = new FormGroup({
+    applicationName: new FormControl(null),
     bulkEditConfirmationDialogs: new FormControl(null),
     bulkEditApplyOnClose: new FormControl(null),
     documentListItemPerPage: new FormControl(null),
@@ -217,6 +218,9 @@ export class SettingsComponent
 
   private getCurrentSettings() {
     return {
+      applicationName: this.settings.get(
+        SETTINGS_KEYS.APPLICATION_NAME
+      ),
       bulkEditConfirmationDialogs: this.settings.get(
         SETTINGS_KEYS.BULK_EDIT_CONFIRMATION_DIALOGS
       ),
@@ -392,6 +396,10 @@ export class SettingsComponent
         this.store?.getValue()['updateCheckingEnabled'] &&
         this.settingsForm.value.updateCheckingEnabled) // update checking was turned on
 
+    this.settings.set(
+      SETTINGS_KEYS.APPLICATION_NAME,
+      this.settingsForm.value.applicationName
+    )
     this.settings.set(
       SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE,
       this.settingsForm.value.bulkEditApplyOnClose

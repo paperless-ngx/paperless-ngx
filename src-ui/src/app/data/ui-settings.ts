@@ -14,6 +14,7 @@ export interface UiSetting {
 
 export const SETTINGS_KEYS = {
   LANGUAGE: 'language',
+  APPLICATION_NAME: 'general-settings:application-name',
   // maintain old general-settings: for backwards compatibility
   BULK_EDIT_CONFIRMATION_DIALOGS:
     'general-settings:bulk-edit:confirmation-dialogs',
@@ -58,6 +59,11 @@ export const SETTINGS: UiSetting[] = [
     key: SETTINGS_KEYS.LANGUAGE,
     type: 'string',
     default: '',
+  },
+  {
+    key: SETTINGS_KEYS.APPLICATION_NAME,
+    type: 'string',
+    default: 'Paperless-ngx',
   },
   {
     key: SETTINGS_KEYS.BULK_EDIT_CONFIRMATION_DIALOGS,
