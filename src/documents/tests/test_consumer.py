@@ -928,7 +928,7 @@ class PreConsumeTestCase(TestCase):
     @override_settings(PRE_CONSUME_SCRIPT=None)
     def test_no_pre_consume_script(self, m):
         c = Consumer()
-        c.path = "path-to-file"
+        c.working_copy = "path-to-file"
         c.run_pre_consume_script()
         m.assert_not_called()
 
@@ -938,7 +938,7 @@ class PreConsumeTestCase(TestCase):
     def test_pre_consume_script_not_found(self, m, m2):
         c = Consumer()
         c.filename = "somefile.pdf"
-        c.path = "path-to-file"
+        c.working_copy = "path-to-file"
         self.assertRaises(ConsumerError, c.run_pre_consume_script)
 
     @mock.patch("documents.consumer.run")
@@ -947,7 +947,7 @@ class PreConsumeTestCase(TestCase):
             with override_settings(PRE_CONSUME_SCRIPT=script.name):
                 c = Consumer()
                 c.original_path = "path-to-file"
-                c.path = "/tmp/somewhere/path-to-file"
+                c.working_copy = "/tmp/somewhere/path-to-file"
                 c.task_id = str(uuid.uuid4())
                 c.run_pre_consume_script()
 
@@ -963,7 +963,7 @@ class PreConsumeTestCase(TestCase):
 
                 subset = {
                     "DOCUMENT_SOURCE_PATH": c.original_path,
-                    "DOCUMENT_WORKING_PATH": c.path,
+                    "DOCUMENT_WORKING_PATH": c.working_copy,
                     "TASK_ID": c.task_id,
                 }
                 self.assertDictEqual(environment, {**environment, **subset})
@@ -991,7 +991,7 @@ class PreConsumeTestCase(TestCase):
             with override_settings(PRE_CONSUME_SCRIPT=script.name):
                 with self.assertLogs("paperless.consumer", level="INFO") as cm:
                     c = Consumer()
-                    c.path = "path-to-file"
+                    c.working_copy = "path-to-file"
 
                     c.run_pre_consume_script()
                     self.assertIn(
@@ -1024,7 +1024,7 @@ class PreConsumeTestCase(TestCase):
 
             with override_settings(PRE_CONSUME_SCRIPT=script.name):
                 c = Consumer()
-                c.path = "path-to-file"
+                c.working_copy = "path-to-file"
                 self.assertRaises(
                     ConsumerError,
                     c.run_pre_consume_script,
