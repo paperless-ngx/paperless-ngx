@@ -24,14 +24,19 @@ from filelock import FileLock
 
 from documents import matching
 from documents.classifier import DocumentClassifier
+from documents.consumer import parse_doc_title_w_placeholders
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_unique_filename
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import MatchingModel
 from documents.models import PaperlessTask
 from documents.models import Tag
+from documents.models import Workflow
+from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
+from documents.permissions import set_permissions_for_object
 
 logger = logging.getLogger("paperless.handlers")
 
@@ -512,6 +517,105 @@ def add_to_index(sender, document, **kwargs):
     from documents import index
 
     index.add_or_update_document(document)
+
+
+def run_workflow_added(sender, document: Document, logging_group=None, **kwargs):
+    run_workflow(
+        WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        document,
+        logging_group,
+    )
+
+
+def run_workflow_updated(sender, document: Document, logging_group=None, **kwargs):
+    run_workflow(
+        WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        document,
+        logging_group,
+    )
+
+
+def run_workflow(
+    trigger_type: WorkflowTrigger.WorkflowTriggerType,
+    document: Document,
+    logging_group=None,
+):
+    for workflow in Workflow.objects.filter(
+        enabled=True,
+        triggers__type=trigger_type,
+    ).order_by("order"):
+        if matching.document_matches_workflow(
+            document,
+            workflow,
+            trigger_type,
+        ):
+            for action in workflow.actions.all():
+                logger.info(
+                    f"Applying {action} from {workflow}",
+                    extra={"group": logging_group},
+                )
+                if action.assign_tags.all().count() > 0:
+                    document.tags.add(*action.assign_tags.all())
+
+                if action.assign_correspondent is not None:
+                    document.correspondent = action.assign_correspondent
+
+                if action.assign_document_type is not None:
+                    document.document_type = action.assign_document_type
+
+                if action.assign_storage_path is not None:
+                    document.storage_path = action.assign_storage_path
+
+                if action.assign_owner is not None:
+                    document.owner = action.assign_owner
+
+                if action.assign_title is not None:
+                    document.title = parse_doc_title_w_placeholders(
+                        action.assign_title,
+                        document.correspondent.name
+                        if document.correspondent is not None
+                        else "",
+                        document.document_type.name
+                        if document.document_type is not None
+                        else "",
+                        document.owner.username if document.owner is not None else "",
+                        document.added,
+                        document.original_filename,
+                        document.created,
+                    )
+
+                if (
+                    action.assign_view_users is not None
+                    or action.assign_view_groups is not None
+                    or action.assign_change_users is not None
+                    or action.assign_change_groups is not None
+                ):
+                    permissions = {
+                        "view": {
+                            "users": action.assign_view_users.all().values_list("id")
+                            or [],
+                            "groups": action.assign_view_groups.all().values_list("id")
+                            or [],
+                        },
+                        "change": {
+                            "users": action.assign_change_users.all().values_list("id")
+                            or [],
+                            "groups": action.assign_change_groups.all().values_list(
+                                "id",
+                            )
+                            or [],
+                        },
+                    }
+                    set_permissions_for_object(permissions=permissions, object=document)
+
+                if action.assign_custom_fields is not None:
+                    for field in action.assign_custom_fields.all():
+                        CustomFieldInstance.objects.create(
+                            field=field,
+                            document=document,
+                        )  # adds to document
+
+            document.save()
 
 
 @before_task_publish.connect

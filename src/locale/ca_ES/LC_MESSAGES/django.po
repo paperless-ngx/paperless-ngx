@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-09 10:53-0800\n"
-"PO-Revision-Date: 2023-12-20 12:08\n"
+"POT-Creation-Date: 2024-01-05 21:26-0800\n"
+"PO-Revision-Date: 2024-01-06 05:27\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -25,27 +25,27 @@ msgstr "documents"
 msgid "owner"
 msgstr "propietari"
 
-#: documents/models.py:53
+#: documents/models.py:53 documents/models.py:894
 msgid "None"
 msgstr "Cap"
 
-#: documents/models.py:54
+#: documents/models.py:54 documents/models.py:895
 msgid "Any word"
 msgstr "Qualsevol paraula"
 
-#: documents/models.py:55
+#: documents/models.py:55 documents/models.py:896
 msgid "All words"
 msgstr "Totes paraules"
 
-#: documents/models.py:56
+#: documents/models.py:56 documents/models.py:897
 msgid "Exact match"
 msgstr "Coincidència exacte"
 
-#: documents/models.py:57
+#: documents/models.py:57 documents/models.py:898
 msgid "Regular expression"
 msgstr "Expressió Regular"
 
-#: documents/models.py:58
+#: documents/models.py:58 documents/models.py:899
 msgid "Fuzzy word"
 msgstr "Paraula difusa"
 
@@ -53,20 +53,20 @@ msgstr "Paraula difusa"
 msgid "Automatic"
 msgstr "Automàtic"
 
-#: documents/models.py:62 documents/models.py:402 documents/models.py:897
+#: documents/models.py:62 documents/models.py:402 documents/models.py:1099
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
 msgid "name"
 msgstr "nom"
 
-#: documents/models.py:64
+#: documents/models.py:64 documents/models.py:955
 msgid "match"
 msgstr "coincidència"
 
-#: documents/models.py:67
+#: documents/models.py:67 documents/models.py:958
 msgid "matching algorithm"
 msgstr "algoritme coincident"
 
-#: documents/models.py:72
+#: documents/models.py:72 documents/models.py:963
 msgid "is insensitive"
 msgstr "no distingeix entre majúscules i minúscules"
 
@@ -611,113 +611,169 @@ msgstr "instància de camp personalitzat"
 msgid "custom field instances"
 msgstr "instàncies de camps personalitzats"
 
-#: documents/models.py:893
+#: documents/models.py:902
+msgid "Consumption Started"
+msgstr "Començada Consumpció"
+
+#: documents/models.py:903
+msgid "Document Added"
+msgstr "Document Afegit"
+
+#: documents/models.py:904
+msgid "Document Updated"
+msgstr "Document Actualitzat"
+
+#: documents/models.py:907
 msgid "Consume Folder"
 msgstr "Directori 'Condumir'"
 
-#: documents/models.py:894
+#: documents/models.py:908
 msgid "Api Upload"
 msgstr "Api Pujada"
 
-#: documents/models.py:895
+#: documents/models.py:909
 msgid "Mail Fetch"
 msgstr "Recollida Correu"
 
-#: documents/models.py:899 paperless_mail/models.py:95
-msgid "order"
-msgstr "ordena"
+#: documents/models.py:912
+msgid "Workflow Trigger Type"
+msgstr "Tipus d'activador de Workflow"
 
-#: documents/models.py:908
+#: documents/models.py:924
 msgid "filter path"
 msgstr "filtra camins"
 
-#: documents/models.py:913
+#: documents/models.py:929
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
 msgstr "Consumeix documents amb la ruta que coincideixi si està especificada. Wilcards especificats amb * estan permessos, no sensitiu."
 
-#: documents/models.py:920
+#: documents/models.py:936
 msgid "filter filename"
 msgstr "filtra nom arxiu"
 
-#: documents/models.py:925 paperless_mail/models.py:148
+#: documents/models.py:941 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "Consumiu només documents que coincideixin completament amb aquest nom de fitxer si s'especifica. Es permeten els comodins com ara *.pdf o *factura*. Cas insensitiu."
 
-#: documents/models.py:936
+#: documents/models.py:952
 msgid "filter documents from this mail rule"
 msgstr "filtra documents d'aquesta regla de correu"
 
-#: documents/models.py:940
+#: documents/models.py:968
+msgid "has these tag(s)"
+msgstr "té aquestes etiquete(s)"
+
+#: documents/models.py:976
+msgid "has this document type"
+msgstr "té aquest tipus de document"
+
+#: documents/models.py:984
+msgid "has this correspondent"
+msgstr "té aquest corresponsal"
+
+#: documents/models.py:988
+msgid "workflow trigger"
+msgstr ""
+
+#: documents/models.py:989
+msgid "workflow triggers"
+msgstr ""
+
+#: documents/models.py:997
+msgid "Assignment"
+msgstr "Assignació"
+
+#: documents/models.py:1000
+msgid "Workflow Action Type"
+msgstr ""
+
+#: documents/models.py:1006
 msgid "assign title"
 msgstr "assigna títol"
 
-#: documents/models.py:945
+#: documents/models.py:1011
 msgid "Assign a document title, can include some placeholders, see documentation."
 msgstr "Assigna un títol de document, pot incloure alguns marcadors de posició, vegeu la documentació."
 
-#: documents/models.py:953 paperless_mail/models.py:216
+#: documents/models.py:1019 paperless_mail/models.py:216
 msgid "assign this tag"
 msgstr "assigna aquesta etiqueta"
 
-#: documents/models.py:961 paperless_mail/models.py:224
+#: documents/models.py:1027 paperless_mail/models.py:224
 msgid "assign this document type"
 msgstr "assigna aquest tipus de document"
 
-#: documents/models.py:969 paperless_mail/models.py:238
+#: documents/models.py:1035 paperless_mail/models.py:238
 msgid "assign this correspondent"
 msgstr "assigna aquest corresponsal"
 
-#: documents/models.py:977
+#: documents/models.py:1043
 msgid "assign this storage path"
 msgstr "assigna aquesta ruta emmagatzematge"
 
-#: documents/models.py:986
+#: documents/models.py:1052
 msgid "assign this owner"
 msgstr "assigna aquest propietari"
 
-#: documents/models.py:993
+#: documents/models.py:1059
 msgid "grant view permissions to these users"
 msgstr "dona permissos visualització a aquests usuaris"
 
-#: documents/models.py:1000
+#: documents/models.py:1066
 msgid "grant view permissions to these groups"
 msgstr "dóna permissos de visionat a aquests grups"
 
-#: documents/models.py:1007
+#: documents/models.py:1073
 msgid "grant change permissions to these users"
 msgstr "dóna permissos d'edició a aquests usuaris"
 
-#: documents/models.py:1014
+#: documents/models.py:1080
 msgid "grant change permissions to these groups"
 msgstr "dóna permissos d'edició a aquests grups"
 
-#: documents/models.py:1021
+#: documents/models.py:1087
 msgid "assign these custom fields"
 msgstr "assigna aquests camps personalitzats"
 
-#: documents/models.py:1025
-msgid "consumption template"
-msgstr "plantilla consumició"
+#: documents/models.py:1091
+msgid "workflow action"
+msgstr ""
 
-#: documents/models.py:1026
-msgid "consumption templates"
-msgstr "plantilles consumicions"
+#: documents/models.py:1092
+msgid "workflow actions"
+msgstr ""
 
-#: documents/serialisers.py:105
+#: documents/models.py:1101 paperless_mail/models.py:95
+msgid "order"
+msgstr "ordena"
+
+#: documents/models.py:1107
+msgid "triggers"
+msgstr "disparadors"
+
+#: documents/models.py:1114
+msgid "actions"
+msgstr "accions"
+
+#: documents/models.py:1117
+msgid "enabled"
+msgstr "habilitat"
+
+#: documents/serialisers.py:111
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Expressió regular invàlida: %(error)s"
 
-#: documents/serialisers.py:399
+#: documents/serialisers.py:405
 msgid "Invalid color."
 msgstr "Color Invàlid."
 
-#: documents/serialisers.py:865
+#: documents/serialisers.py:999
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Tipus arxiu %(type)s no suportat"
 
-#: documents/serialisers.py:962
+#: documents/serialisers.py:1102
 msgid "Invalid variable detected."
 msgstr "Variable detectada invàlida."
 
@@ -854,135 +910,286 @@ msgstr "Email"
 msgid "Send me instructions!"
 msgstr "Enviar instruccions"
 
+#: documents/validators.py:17
+#, python-brace-format
+msgid "Unable to parse URI {value}, missing scheme"
+msgstr "No es pot analitzar l'URI {value}, falta l'esquema"
+
+#: documents/validators.py:22
+#, python-brace-format
+msgid "Unable to parse URI {value}, missing net location or path"
+msgstr "No es pot analitzar l'URI {value}, falta la ubicació o el camí de la xarxa"
+
+#: documents/validators.py:27
+#, python-brace-format
+msgid "Unable to parse URI {value}"
+msgstr "No es pot analitzar l'URI {value},"
+
 #: paperless/apps.py:10
 msgid "Paperless"
 msgstr "Paperless"
 
-#: paperless/settings.py:586
+#: paperless/models.py:25
+msgid "pdf"
+msgstr "pdf"
+
+#: paperless/models.py:26
+msgid "pdfa"
+msgstr "pdfa"
+
+#: paperless/models.py:27
+msgid "pdfa-1"
+msgstr "pdfa-1"
+
+#: paperless/models.py:28
+msgid "pdfa-2"
+msgstr "pdfa-2"
+
+#: paperless/models.py:29
+msgid "pdfa-3"
+msgstr "pdfa-3"
+
+#: paperless/models.py:38
+msgid "skip"
+msgstr "skip"
+
+#: paperless/models.py:39
+msgid "redo"
+msgstr "redo"
+
+#: paperless/models.py:40
+msgid "force"
+msgstr "forçar"
+
+#: paperless/models.py:41
+msgid "skip_noarchive"
+msgstr ""
+
+#: paperless/models.py:49
+msgid "never"
+msgstr "mai"
+
+#: paperless/models.py:50
+msgid "with_text"
+msgstr ""
+
+#: paperless/models.py:51
+msgid "always"
+msgstr "sempre"
+
+#: paperless/models.py:59
+msgid "clean"
+msgstr "neteja"
+
+#: paperless/models.py:60
+msgid "clean-final"
+msgstr ""
+
+#: paperless/models.py:61
+msgid "none"
+msgstr "cap"
+
+#: paperless/models.py:69
+msgid "LeaveColorUnchanged"
+msgstr ""
+
+#: paperless/models.py:70
+msgid "RGB"
+msgstr "RGB"
+
+#: paperless/models.py:71
+msgid "UseDeviceIndependentColor"
+msgstr ""
+
+#: paperless/models.py:72
+msgid "Gray"
+msgstr "Gris"
+
+#: paperless/models.py:73
+msgid "CMYK"
+msgstr "CMYK"
+
+#: paperless/models.py:82
+msgid "Sets the output PDF type"
+msgstr "Estableix tipus de sortida PDF"
+
+#: paperless/models.py:94
+msgid "Do OCR from page 1 to this value"
+msgstr "OCR des de pàgina 1 fins aquest valor"
+
+#: paperless/models.py:100
+msgid "Do OCR using these languages"
+msgstr "Feu OCR utilitzant aquests idiomes"
+
+#: paperless/models.py:107
+msgid "Sets the OCR mode"
+msgstr "Estableix el mode OCR"
+
+#: paperless/models.py:115
+msgid "Controls the generation of an archive file"
+msgstr ""
+
+#: paperless/models.py:123
+msgid "Sets image DPI fallback value"
+msgstr ""
+
+#: paperless/models.py:130
+msgid "Controls the unpaper cleaning"
+msgstr ""
+
+#: paperless/models.py:137
+msgid "Enables deskew"
+msgstr ""
+
+#: paperless/models.py:140
+msgid "Enables page rotation"
+msgstr "Habilita la rotació de pàgines"
+
+#: paperless/models.py:145
+msgid "Sets the threshold for rotation of pages"
+msgstr "Estableix el llindar de rotació de pàgines"
+
+#: paperless/models.py:151
+msgid "Sets the maximum image size for decompression"
+msgstr "Estableix la mida màxima de la imatge per a la descompressió"
+
+#: paperless/models.py:157
+msgid "Sets the Ghostscript color conversion strategy"
+msgstr ""
+
+#: paperless/models.py:165
+msgid "Adds additional user arguments for OCRMyPDF"
+msgstr ""
+
+#: paperless/models.py:170
+msgid "paperless application settings"
+msgstr "configuració de l'aplicació paperless"
+
+#: paperless/settings.py:601
 msgid "English (US)"
 msgstr "English (US)"
 
-#: paperless/settings.py:587
+#: paperless/settings.py:602
 msgid "Arabic"
 msgstr "Àrab"
 
-#: paperless/settings.py:588
+#: paperless/settings.py:603
 msgid "Afrikaans"
 msgstr "Africà"
 
-#: paperless/settings.py:589
+#: paperless/settings.py:604
 msgid "Belarusian"
 msgstr "Bielorús"
 
-#: paperless/settings.py:590
+#: paperless/settings.py:605
 msgid "Bulgarian"
 msgstr "Búlgar"
 
-#: paperless/settings.py:591
+#: paperless/settings.py:606
 msgid "Catalan"
 msgstr "Català"
 
-#: paperless/settings.py:592
+#: paperless/settings.py:607
 msgid "Czech"
 msgstr "Txec"
 
-#: paperless/settings.py:593
+#: paperless/settings.py:608
 msgid "Danish"
 msgstr "Danès"
 
-#: paperless/settings.py:594
+#: paperless/settings.py:609
 msgid "German"
 msgstr "Alemany"
 
-#: paperless/settings.py:595
+#: paperless/settings.py:610
 msgid "Greek"
 msgstr "Grec"
 
-#: paperless/settings.py:596
+#: paperless/settings.py:611
 msgid "English (GB)"
 msgstr "Anglès (GB)"
 
-#: paperless/settings.py:597
+#: paperless/settings.py:612
 msgid "Spanish"
 msgstr "Espanyol"
 
-#: paperless/settings.py:598
+#: paperless/settings.py:613
 msgid "Finnish"
 msgstr "Finès"
 
-#: paperless/settings.py:599
+#: paperless/settings.py:614
 msgid "French"
 msgstr "Francès"
 
-#: paperless/settings.py:600
+#: paperless/settings.py:615
 msgid "Hungarian"
 msgstr "Hongarès"
 
-#: paperless/settings.py:601
+#: paperless/settings.py:616
 msgid "Italian"
 msgstr "Italià"
 
-#: paperless/settings.py:602
+#: paperless/settings.py:617
 msgid "Luxembourgish"
 msgstr "Luxemburguès"
 
-#: paperless/settings.py:603
+#: paperless/settings.py:618
 msgid "Norwegian"
 msgstr "Noruec"
 
-#: paperless/settings.py:604
+#: paperless/settings.py:619
 msgid "Dutch"
 msgstr "Holandès"
 
-#: paperless/settings.py:605
+#: paperless/settings.py:620
 msgid "Polish"
 msgstr "Polac"
 
-#: paperless/settings.py:606
+#: paperless/settings.py:621
 msgid "Portuguese (Brazil)"
 msgstr "Portuguès (BZ)"
 
-#: paperless/settings.py:607
+#: paperless/settings.py:622
 msgid "Portuguese"
 msgstr "Portuguès"
 
-#: paperless/settings.py:608
+#: paperless/settings.py:623
 msgid "Romanian"
 msgstr "Romanès"
 
-#: paperless/settings.py:609
+#: paperless/settings.py:624
 msgid "Russian"
 msgstr "Rus"
 
-#: paperless/settings.py:610
+#: paperless/settings.py:625
 msgid "Slovak"
 msgstr "Eslovac"
 
-#: paperless/settings.py:611
+#: paperless/settings.py:626
 msgid "Slovenian"
 msgstr "Eslovè"
 
-#: paperless/settings.py:612
+#: paperless/settings.py:627
 msgid "Serbian"
 msgstr "Serbi"
 
-#: paperless/settings.py:613
+#: paperless/settings.py:628
 msgid "Swedish"
 msgstr "Suec"
 
-#: paperless/settings.py:614
+#: paperless/settings.py:629
 msgid "Turkish"
 msgstr "Turc"
 
-#: paperless/settings.py:615
+#: paperless/settings.py:630
 msgid "Ukrainian"
 msgstr "Ucranià"
 
-#: paperless/settings.py:616
+#: paperless/settings.py:631
 msgid "Chinese Simplified"
 msgstr "Xinès Simplificat"
 
-#: paperless/urls.py:194
+#: paperless/urls.py:205
 msgid "Paperless-ngx administration"
 msgstr "Administració Paperless-ngx"
 

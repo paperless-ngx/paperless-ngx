@@ -1,33 +1,33 @@
 import { Component, OnInit } from '@angular/core'
-import { ConsumptionTemplateService } from 'src/app/services/rest/consumption-template.service'
+import { WorkflowService } from 'src/app/services/rest/workflow.service'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { Subject, takeUntil } from 'rxjs'
-import { ConsumptionTemplate } from 'src/app/data/consumption-template'
+import { Workflow } from 'src/app/data/workflow'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ToastService } from 'src/app/services/toast.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import {
-  ConsumptionTemplateEditDialogComponent,
-  DOCUMENT_SOURCE_OPTIONS,
-} from '../../common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component'
+  WorkflowEditDialogComponent,
+  WORKFLOW_TYPE_OPTIONS,
+} from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 
 @Component({
-  selector: 'pngx-consumption-templates',
-  templateUrl: './consumption-templates.component.html',
-  styleUrls: ['./consumption-templates.component.scss'],
+  selector: 'pngx-workflows',
+  templateUrl: './workflows.component.html',
+  styleUrls: ['./workflows.component.scss'],
 })
-export class ConsumptionTemplatesComponent
+export class WorkflowsComponent
   extends ComponentWithPermissions
   implements OnInit
 {
-  public templates: ConsumptionTemplate[] = []
+  public workflows: Workflow[] = []
 
   private unsubscribeNotifier: Subject<any> = new Subject()
 
   constructor(
-    private consumptionTemplateService: ConsumptionTemplateService,
+    private workflowService: WorkflowService,
     public permissionsService: PermissionsService,
     private modalService: NgbModal,
     private toastService: ToastService
@@ -40,68 +40,74 @@ export class ConsumptionTemplatesComponent
   }
 
   reload() {
-    this.consumptionTemplateService
+    this.workflowService
       .listAll()
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((r) => {
-        this.templates = r.results
+        this.workflows = r.results
       })
   }
 
-  getSourceList(template: ConsumptionTemplate): string {
-    return template.sources
-      .map((id) => DOCUMENT_SOURCE_OPTIONS.find((s) => s.id === id).name)
+  getTypesList(template: Workflow): string {
+    return template.triggers
+      .map(
+        (trigger) =>
+          WORKFLOW_TYPE_OPTIONS.find((t) => t.id === trigger.type).name
+      )
       .join(', ')
   }
 
-  editTemplate(rule: ConsumptionTemplate) {
-    const modal = this.modalService.open(
-      ConsumptionTemplateEditDialogComponent,
-      {
-        backdrop: 'static',
-        size: 'xl',
-      }
-    )
-    modal.componentInstance.dialogMode = rule
+  editWorkflow(workflow: Workflow) {
+    const modal = this.modalService.open(WorkflowEditDialogComponent, {
+      backdrop: 'static',
+      size: 'xl',
+    })
+    modal.componentInstance.dialogMode = workflow
       ? EditDialogMode.EDIT
       : EditDialogMode.CREATE
-    modal.componentInstance.object = rule
+    if (workflow) {
+      // quick "deep" clone so original doesnt get modified
+      const clone = Object.assign({}, workflow)
+      clone.actions = [...workflow.actions]
+      clone.triggers = [...workflow.triggers]
+      modal.componentInstance.object = clone
+    }
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((newTemplate) => {
+      .subscribe((newWorkflow) => {
         this.toastService.showInfo(
-          $localize`Saved template "${newTemplate.name}".`
+          $localize`Saved workflow "${newWorkflow.name}".`
         )
-        this.consumptionTemplateService.clearCache()
+        this.workflowService.clearCache()
         this.reload()
       })
     modal.componentInstance.failed
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((e) => {
-        this.toastService.showError($localize`Error saving template.`, e)
+        this.toastService.showError($localize`Error saving workflow.`, e)
       })
   }
 
-  deleteTemplate(rule: ConsumptionTemplate) {
+  deleteWorkflow(workflow: Workflow) {
     const modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.title = $localize`Confirm delete template`
-    modal.componentInstance.messageBold = $localize`This operation will permanently delete this template.`
+    modal.componentInstance.title = $localize`Confirm delete workflow`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete this workflow.`
     modal.componentInstance.message = $localize`This operation cannot be undone.`
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.confirmClicked.subscribe(() => {
       modal.componentInstance.buttonsEnabled = false
-      this.consumptionTemplateService.delete(rule).subscribe({
+      this.workflowService.delete(workflow).subscribe({
         next: () => {
           modal.close()
-          this.toastService.showInfo($localize`Deleted template`)
-          this.consumptionTemplateService.clearCache()
+          this.toastService.showInfo($localize`Deleted workflow`)
+          this.workflowService.clearCache()
           this.reload()
         },
         error: (e) => {
-          this.toastService.showError($localize`Error deleting template.`, e)
+          this.toastService.showError($localize`Error deleting workflow.`, e)
         },
       })
     })

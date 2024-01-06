@@ -34,3 +34,9 @@ class TextDocumentParser(DocumentParser):
 
     def parse(self, document_path, mime_type, file_name=None):
         self.text = self.read_file_handle_unicode_errors(document_path)
+
+    def get_settings(self):
+        """
+        This parser does not implement additional settings yet
+        """
+        return None

@@ -11,6 +11,8 @@ repos:
       - id: check-json
         exclude: "tsconfig.*json"
       - id: check-yaml
+        args:
+          - "--unsafe"
       - id: check-toml
       - id: check-executables-have-shebangs
       - id: end-of-file-fixer

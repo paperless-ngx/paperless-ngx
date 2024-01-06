@@ -18,6 +18,7 @@ physical documents into a searchable online archive so you can keep, well, _less
 ## Features
 
 -   **Organize and index** your scanned documents with tags, correspondents, types, and more.
+-   _Your_ data is stored locally on _your_ server and is never transmitted or shared in any way.
 -   Performs **OCR** on your documents, adding searchable and selectable text, even to documents scanned with only images.
 -   Utilizes the open-source Tesseract engine to recognize more than 100 languages.
 -   Documents are saved as PDF/A format which is designed for long term storage, alongside the unaltered originals.
@@ -41,7 +42,7 @@ physical documents into a searchable online archive so you can keep, well, _less
     -   Configure multiple accounts and rules for each account.
     -   After processing, paperless can perform actions on the messages such as marking as read, deleting and more.
 -   A built-in robust **multi-user permissions** system that supports 'global' permissions as well as per document or object.
--   A powerful templating system that gives you more control over the consumption pipeline.
+-   A powerful workflow system that gives you even more control.
 -   **Optimized** for multi core systems: Paperless-ngx consumes multiple documents in parallel.
 -   The integrated sanity checker makes sure that your document archive is in good health.
 
@@ -156,9 +157,9 @@ Tag, correspondent, document type and storage path editing.
 
 </div>
 <div class="grid-half-right" markdown>
-  Consumption templates provide finer control over the document pipeline.
+  Workflows provide finer control over the document pipeline and trigger actions.
 
-![image](assets/screenshots/consumption_template.png)
+![image](assets/screenshots/workflow.png)
 
 </div>
 <div class="clear"></div>

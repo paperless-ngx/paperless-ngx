@@ -1,42 +1,42 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { tap } from 'rxjs'
-import { ConsumptionTemplate } from 'src/app/data/consumption-template'
+import { Workflow } from 'src/app/data/workflow'
 import { AbstractPaperlessService } from './abstract-paperless-service'
 
 @Injectable({
   providedIn: 'root',
 })
-export class ConsumptionTemplateService extends AbstractPaperlessService<ConsumptionTemplate> {
+export class WorkflowService extends AbstractPaperlessService<Workflow> {
   loading: boolean
 
   constructor(http: HttpClient) {
-    super(http, 'consumption_templates')
+    super(http, 'workflows')
   }
 
   public reload() {
     this.loading = true
     this.listAll().subscribe((r) => {
-      this.templates = r.results
+      this.workflows = r.results
       this.loading = false
     })
   }
 
-  private templates: ConsumptionTemplate[] = []
+  private workflows: Workflow[] = []
 
-  public get allTemplates(): ConsumptionTemplate[] {
-    return this.templates
+  public get allWorkflows(): Workflow[] {
+    return this.workflows
   }
 
-  create(o: ConsumptionTemplate) {
+  create(o: Workflow) {
     return super.create(o).pipe(tap(() => this.reload()))
   }
 
-  update(o: ConsumptionTemplate) {
+  update(o: Workflow) {
     return super.update(o).pipe(tap(() => this.reload()))
   }
 
-  delete(o: ConsumptionTemplate) {
+  delete(o: Workflow) {
     return super.delete(o).pipe(tap(() => this.reload()))
   }
 }

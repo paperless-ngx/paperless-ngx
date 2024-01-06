@@ -9,55 +9,76 @@ import {
   NgbModalModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { of, throwError } from 'rxjs'
-import {
-  DocumentSource,
-  ConsumptionTemplate,
-} from 'src/app/data/consumption-template'
+import { Workflow } from 'src/app/data/workflow'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { ConsumptionTemplateService } from 'src/app/services/rest/consumption-template.service'
+import { WorkflowService } from 'src/app/services/rest/workflow.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
-import { ConsumptionTemplatesComponent } from './consumption-templates.component'
-import { ConsumptionTemplateEditDialogComponent } from '../../common/edit-dialog/consumption-template-edit-dialog/consumption-template-edit-dialog.component'
+import { WorkflowsComponent } from './workflows.component'
+import { WorkflowEditDialogComponent } from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
 import { PermissionsService } from 'src/app/services/permissions.service'
+import {
+  DocumentSource,
+  WorkflowTriggerType,
+} from 'src/app/data/workflow-trigger'
+import { WorkflowActionType } from 'src/app/data/workflow-action'
 
-const templates: ConsumptionTemplate[] = [
+const workflows: Workflow[] = [
   {
-    id: 0,
-    name: 'Template 1',
-    order: 0,
-    sources: [
-      DocumentSource.ConsumeFolder,
-      DocumentSource.ApiUpload,
-      DocumentSource.MailFetch,
+    name: 'Workflow 1',
+    id: 1,
+    order: 1,
+    enabled: true,
+    triggers: [
+      {
+        id: 1,
+        type: WorkflowTriggerType.Consumption,
+        sources: [DocumentSource.ConsumeFolder],
+        filter_filename: '*',
+      },
     ],
-    filter_filename: 'foo',
-    filter_path: 'bar',
-    assign_tags: [1, 2, 3],
+    actions: [
+      {
+        id: 1,
+        type: WorkflowActionType.Assignment,
+        assign_title: 'foo',
+      },
+    ],
   },
   {
-    id: 1,
-    name: 'Template 2',
-    order: 1,
-    sources: [DocumentSource.MailFetch],
-    filter_filename: null,
-    filter_path: 'foo/bar',
-    assign_owner: 1,
+    name: 'Workflow 2',
+    id: 2,
+    order: 2,
+    enabled: true,
+    triggers: [
+      {
+        id: 2,
+        type: WorkflowTriggerType.DocumentAdded,
+        filter_filename: 'foo',
+      },
+    ],
+    actions: [
+      {
+        id: 2,
+        type: WorkflowActionType.Assignment,
+        assign_title: 'bar',
+      },
+    ],
   },
 ]
 
-describe('ConsumptionTemplatesComponent', () => {
-  let component: ConsumptionTemplatesComponent
-  let fixture: ComponentFixture<ConsumptionTemplatesComponent>
-  let consumptionTemplateService: ConsumptionTemplateService
+describe('WorkflowsComponent', () => {
+  let component: WorkflowsComponent
+  let fixture: ComponentFixture<WorkflowsComponent>
+  let workflowService: WorkflowService
   let modalService: NgbModal
   let toastService: ToastService
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [
-        ConsumptionTemplatesComponent,
+        WorkflowsComponent,
         IfPermissionsDirective,
         PageHeaderComponent,
         ConfirmDialogComponent,
@@ -81,18 +102,18 @@ describe('ConsumptionTemplatesComponent', () => {
       ],
     })
 
-    consumptionTemplateService = TestBed.inject(ConsumptionTemplateService)
-    jest.spyOn(consumptionTemplateService, 'listAll').mockReturnValue(
+    workflowService = TestBed.inject(WorkflowService)
+    jest.spyOn(workflowService, 'listAll').mockReturnValue(
       of({
-        count: templates.length,
-        all: templates.map((o) => o.id),
-        results: templates,
+        count: workflows.length,
+        all: workflows.map((o) => o.id),
+        results: workflows,
       })
     )
     modalService = TestBed.inject(NgbModal)
     toastService = TestBed.inject(ToastService)
 
-    fixture = TestBed.createComponent(ConsumptionTemplatesComponent)
+    fixture = TestBed.createComponent(WorkflowsComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
   })
@@ -108,8 +129,7 @@ describe('ConsumptionTemplatesComponent', () => {
     createButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
-    const editDialog =
-      modal.componentInstance as ConsumptionTemplateEditDialogComponent
+    const editDialog = modal.componentInstance as WorkflowEditDialogComponent
 
     // fail first
     editDialog.failed.emit({ error: 'error creating item' })
@@ -117,7 +137,7 @@ describe('ConsumptionTemplatesComponent', () => {
     expect(reloadSpy).not.toHaveBeenCalled()
 
     // succeed
-    editDialog.succeeded.emit(templates[0])
+    editDialog.succeeded.emit(workflows[0])
     expect(toastInfoSpy).toHaveBeenCalled()
     expect(reloadSpy).toHaveBeenCalled()
   })
@@ -133,9 +153,8 @@ describe('ConsumptionTemplatesComponent', () => {
     editButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
-    const editDialog =
-      modal.componentInstance as ConsumptionTemplateEditDialogComponent
-    expect(editDialog.object).toEqual(templates[0])
+    const editDialog = modal.componentInstance as WorkflowEditDialogComponent
+    expect(editDialog.object).toEqual(workflows[0])
 
     // fail first
     editDialog.failed.emit({ error: 'error editing item' })
@@ -143,7 +162,7 @@ describe('ConsumptionTemplatesComponent', () => {
     expect(reloadSpy).not.toHaveBeenCalled()
 
     // succeed
-    editDialog.succeeded.emit(templates[0])
+    editDialog.succeeded.emit(workflows[0])
     expect(toastInfoSpy).toHaveBeenCalled()
     expect(reloadSpy).toHaveBeenCalled()
   })
@@ -152,7 +171,7 @@ describe('ConsumptionTemplatesComponent', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const deleteSpy = jest.spyOn(consumptionTemplateService, 'delete')
+    const deleteSpy = jest.spyOn(workflowService, 'delete')
     const reloadSpy = jest.spyOn(component, 'reload')
 
     const deleteButton = fixture.debugElement.queryAll(By.css('button'))[3]
