@@ -9,17 +9,17 @@
 
 ### Features
 
-- Change: Use fnmatch for more sane workflow path matching [@shamoon](https://github.com/shamoon) ([#5250](https://github.com/paperless-ngx/paperless-ngx/pull/5250))
-- Enhancement: fetch mails in bulk [@falkenbt](https://github.com/falkenbt) ([#5249](https://github.com/paperless-ngx/paperless-ngx/pull/5249))
-- Enhancement: add parameter to post_document API [@bevanjkay](https://github.com/bevanjkay) ([#5217](https://github.com/paperless-ngx/paperless-ngx/pull/5217))
 - Feature: Workflows [@shamoon](https://github.com/shamoon) ([#5121](https://github.com/paperless-ngx/paperless-ngx/pull/5121))
 - Feature: Allow setting backend configuration settings via the UI [@stumpylog](https://github.com/stumpylog) ([#5126](https://github.com/paperless-ngx/paperless-ngx/pull/5126))
+- Enhancement: fetch mails in bulk [@falkenbt](https://github.com/falkenbt) ([#5249](https://github.com/paperless-ngx/paperless-ngx/pull/5249))
+- Enhancement: add parameter to post_document API [@bevanjkay](https://github.com/bevanjkay) ([#5217](https://github.com/paperless-ngx/paperless-ngx/pull/5217))
 
 ### Bug Fixes
 
 - Chore: Replaces deprecated Django alias with standard library [@stumpylog](https://github.com/stumpylog) ([#5262](https://github.com/paperless-ngx/paperless-ngx/pull/5262))
 - Fix: Crash in barcode ASN reading when the file type isn't supported [@stumpylog](https://github.com/stumpylog) ([#5261](https://github.com/paperless-ngx/paperless-ngx/pull/5261))
 - Fix: Allows pre-consume scripts to modify the working path again [@stumpylog](https://github.com/stumpylog) ([#5260](https://github.com/paperless-ngx/paperless-ngx/pull/5260))
+- Change: Use fnmatch for more sane workflow path matching [@shamoon](https://github.com/shamoon) ([#5250](https://github.com/paperless-ngx/paperless-ngx/pull/5250))
 - Fix: zip exports not respecting the --delete option [@stumpylog](https://github.com/stumpylog) ([#5245](https://github.com/paperless-ngx/paperless-ngx/pull/5245))
 - Fix: correctly format tip admonition [@ChrisRBe](https://github.com/ChrisRBe) ([#5229](https://github.com/paperless-ngx/paperless-ngx/pull/5229))
 - Fix: filename format remove none when part of directory [@shamoon](https://github.com/shamoon) ([#5210](https://github.com/paperless-ngx/paperless-ngx/pull/5210))
