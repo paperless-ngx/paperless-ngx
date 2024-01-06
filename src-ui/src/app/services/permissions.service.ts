@@ -25,8 +25,10 @@ export enum PermissionType {
   Group = '%s_group',
   Admin = '%s_logentry',
   ShareLink = '%s_sharelink',
-  ConsumptionTemplate = '%s_consumptiontemplate',
   CustomField = '%s_customfield',
+  Workflow = '%s_workflow',
+  WorkflowTrigger = '%s_workflowtrigger',
+  WorkflowAction = '%s_workflowaction',
 }
 
 @Injectable({

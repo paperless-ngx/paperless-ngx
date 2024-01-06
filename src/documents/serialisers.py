@@ -2,6 +2,7 @@ import datetime
 import math
 import re
 import zoneinfo
+from decimal import Decimal
 
 import magic
 from celery import states
@@ -9,7 +10,9 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.core.validators import URLValidator
+from django.core.validators import DecimalValidator
+from django.core.validators import MaxLengthValidator
+from django.core.validators import integer_validator
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
@@ -24,7 +27,6 @@ from rest_framework.fields import SerializerMethodField
 
 from documents import bulk_edit
 from documents.data_models import DocumentSource
-from documents.models import ConsumptionTemplate
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -38,9 +40,13 @@ from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import UiSettings
+from documents.models import Workflow
+from documents.models import WorkflowAction
+from documents.models import WorkflowTrigger
 from documents.parsers import is_mime_type_supported
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import set_permissions_for_object
+from documents.validators import uri_validator
 
 
 # https://www.django-rest-framework.org/api-guide/serializers/#example
@@ -489,13 +495,29 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """
-        For some reason, URLField validation is not run against the value
-        automatically.  Force it to run against the value
+        Probably because we're kind of doing it odd, validation from the model
+        doesn't run against the field "value", so we have to re-create it here.
+
+        Don't like it, but it is better than returning an HTTP 500 when the database
+        hates the value
         """
         data = super().validate(data)
         field: CustomField = data["field"]
-        if field.data_type == CustomField.FieldDataType.URL:
-            URLValidator()(data["value"])
+        if "value" in data and data["value"] is not None:
+            if (
+                field.data_type == CustomField.FieldDataType.URL
+                and len(data["value"]) > 0
+            ):
+                uri_validator(data["value"])
+            elif field.data_type == CustomField.FieldDataType.INT:
+                integer_validator(data["value"])
+            elif field.data_type == CustomField.FieldDataType.MONETARY:
+                DecimalValidator(max_digits=12, decimal_places=2)(
+                    Decimal(str(data["value"])),
+                )
+            elif field.data_type == CustomField.FieldDataType.STRING:
+                MaxLengthValidator(limit_value=128)(data["value"])
+
         return data
 
     def reflect_doclinks(
@@ -507,6 +529,10 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         """
         Add or remove 'symmetrical' links to `document` on all `target_doc_ids`
         """
+
+        if target_doc_ids is None:
+            target_doc_ids = []
+
         # Check if any documents are going to be removed from the current list of links and remove the symmetrical links
         current_field_instance = CustomFieldInstance.objects.filter(
             field=field,
@@ -519,9 +545,6 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
             for doc_id in current_field_instance.value:
                 if doc_id not in target_doc_ids:
                     self.remove_doclink(document, field, doc_id)
-
-        if target_doc_ids is None:
-            target_doc_ids = []
 
         # Create an instance if target doc doesnt have this field or append it to an existing one
         existing_custom_field_instances = {
@@ -545,6 +568,9 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
                         value_document_ids=[document.id],
                     ),
                 )
+            elif target_doc_field_instance.value is None:
+                target_doc_field_instance.value_document_ids = [document.id]
+                custom_field_instances_to_update.append(target_doc_field_instance)
             elif document.id not in target_doc_field_instance.value:
                 target_doc_field_instance.value_document_ids.append(document.id)
                 custom_field_instances_to_update.append(target_doc_field_instance)
@@ -940,6 +966,14 @@ class PostDocumentSerializer(serializers.Serializer):
         required=False,
     )
 
+    storage_path = serializers.PrimaryKeyRelatedField(
+        queryset=StoragePath.objects.all(),
+        label="Storage path",
+        allow_null=True,
+        write_only=True,
+        required=False,
+    )
+
     tags = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=Tag.objects.all(),
@@ -976,6 +1010,12 @@ class PostDocumentSerializer(serializers.Serializer):
     def validate_document_type(self, document_type):
         if document_type:
             return document_type.id
+        else:
+            return None
+
+    def validate_storage_path(self, storage_path):
+        if storage_path:
+            return storage_path.id
         else:
             return None
 
@@ -1254,43 +1294,38 @@ class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissions
         return attrs
 
 
-class ConsumptionTemplateSerializer(serializers.ModelSerializer):
-    order = serializers.IntegerField(required=False)
+class WorkflowTriggerSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False, allow_null=True)
     sources = fields.MultipleChoiceField(
-        choices=ConsumptionTemplate.DocumentSourceChoices.choices,
-        allow_empty=False,
+        choices=WorkflowTrigger.DocumentSourceChoices.choices,
+        allow_empty=True,
         default={
             DocumentSource.ConsumeFolder,
             DocumentSource.ApiUpload,
             DocumentSource.MailFetch,
         },
     )
-    assign_correspondent = CorrespondentField(allow_null=True, required=False)
-    assign_tags = TagsField(many=True, allow_null=True, required=False)
-    assign_document_type = DocumentTypeField(allow_null=True, required=False)
-    assign_storage_path = StoragePathField(allow_null=True, required=False)
+
+    type = serializers.ChoiceField(
+        choices=WorkflowTrigger.WorkflowTriggerType.choices,
+        label="Trigger Type",
+    )
 
     class Meta:
-        model = ConsumptionTemplate
+        model = WorkflowTrigger
         fields = [
             "id",
-            "name",
-            "order",
             "sources",
+            "type",
             "filter_path",
             "filter_filename",
             "filter_mailrule",
-            "assign_title",
-            "assign_tags",
-            "assign_correspondent",
-            "assign_document_type",
-            "assign_storage_path",
-            "assign_owner",
-            "assign_view_users",
-            "assign_view_groups",
-            "assign_change_users",
-            "assign_change_groups",
-            "assign_custom_fields",
+            "matching_algorithm",
+            "match",
+            "is_insensitive",
+            "filter_has_tags",
+            "filter_has_correspondent",
+            "filter_has_document_type",
         ]
 
     def validate(self, attrs):
@@ -1298,12 +1333,6 @@ class ConsumptionTemplateSerializer(serializers.ModelSerializer):
             attrs["sources"] = {DocumentSource.MailFetch.value}
 
         # Empty strings treated as None to avoid unexpected behavior
-        if (
-            "assign_title" in attrs
-            and attrs["assign_title"] is not None
-            and len(attrs["assign_title"]) == 0
-        ):
-            attrs["assign_title"] = None
         if (
             "filter_filename" in attrs
             and attrs["filter_filename"] is not None
@@ -1318,7 +1347,8 @@ class ConsumptionTemplateSerializer(serializers.ModelSerializer):
             attrs["filter_path"] = None
 
         if (
-            "filter_mailrule" not in attrs
+            attrs["type"] == WorkflowTrigger.WorkflowTriggerType.CONSUMPTION
+            and "filter_mailrule" not in attrs
             and ("filter_filename" not in attrs or attrs["filter_filename"] is None)
             and ("filter_path" not in attrs or attrs["filter_path"] is None)
         ):
@@ -1327,3 +1357,144 @@ class ConsumptionTemplateSerializer(serializers.ModelSerializer):
             )
 
         return attrs
+
+
+class WorkflowActionSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False, allow_null=True)
+    assign_correspondent = CorrespondentField(allow_null=True, required=False)
+    assign_tags = TagsField(many=True, allow_null=True, required=False)
+    assign_document_type = DocumentTypeField(allow_null=True, required=False)
+    assign_storage_path = StoragePathField(allow_null=True, required=False)
+
+    class Meta:
+        model = WorkflowAction
+        fields = [
+            "id",
+            "type",
+            "assign_title",
+            "assign_tags",
+            "assign_correspondent",
+            "assign_document_type",
+            "assign_storage_path",
+            "assign_owner",
+            "assign_view_users",
+            "assign_view_groups",
+            "assign_change_users",
+            "assign_change_groups",
+            "assign_custom_fields",
+        ]
+
+    def validate(self, attrs):
+        # Empty strings treated as None to avoid unexpected behavior
+        if (
+            "assign_title" in attrs
+            and attrs["assign_title"] is not None
+            and len(attrs["assign_title"]) == 0
+        ):
+            attrs["assign_title"] = None
+
+        return attrs
+
+
+class WorkflowSerializer(serializers.ModelSerializer):
+    order = serializers.IntegerField(required=False)
+
+    triggers = WorkflowTriggerSerializer(many=True)
+    actions = WorkflowActionSerializer(many=True)
+
+    class Meta:
+        model = Workflow
+        fields = [
+            "id",
+            "name",
+            "order",
+            "enabled",
+            "triggers",
+            "actions",
+        ]
+
+    def update_triggers_and_actions(self, instance: Workflow, triggers, actions):
+        set_triggers = []
+        set_actions = []
+
+        if triggers is not None:
+            for trigger in triggers:
+                filter_has_tags = trigger.pop("filter_has_tags", None)
+                trigger_instance, _ = WorkflowTrigger.objects.update_or_create(
+                    id=trigger["id"] if "id" in trigger else None,
+                    defaults=trigger,
+                )
+                if filter_has_tags is not None:
+                    trigger_instance.filter_has_tags.set(filter_has_tags)
+                set_triggers.append(trigger_instance)
+
+        if actions is not None:
+            for action in actions:
+                assign_tags = action.pop("assign_tags", None)
+                assign_view_users = action.pop("assign_view_users", None)
+                assign_view_groups = action.pop("assign_view_groups", None)
+                assign_change_users = action.pop("assign_change_users", None)
+                assign_change_groups = action.pop("assign_change_groups", None)
+                assign_custom_fields = action.pop("assign_custom_fields", None)
+                action_instance, _ = WorkflowAction.objects.update_or_create(
+                    id=action["id"] if "id" in action else None,
+                    defaults=action,
+                )
+                if assign_tags is not None:
+                    action_instance.assign_tags.set(assign_tags)
+                if assign_view_users is not None:
+                    action_instance.assign_view_users.set(assign_view_users)
+                if assign_view_groups is not None:
+                    action_instance.assign_view_groups.set(assign_view_groups)
+                if assign_change_users is not None:
+                    action_instance.assign_change_users.set(assign_change_users)
+                if assign_change_groups is not None:
+                    action_instance.assign_change_groups.set(assign_change_groups)
+                if assign_custom_fields is not None:
+                    action_instance.assign_custom_fields.set(assign_custom_fields)
+                set_actions.append(action_instance)
+
+        instance.triggers.set(set_triggers)
+        instance.actions.set(set_actions)
+        instance.save()
+
+    def prune_triggers_and_actions(self):
+        """
+        ManyToMany fields dont support e.g. on_delete so we need to discard unattached
+        triggers and actionas manually
+        """
+        for trigger in WorkflowTrigger.objects.all():
+            if trigger.workflows.all().count() == 0:
+                trigger.delete()
+
+        for action in WorkflowAction.objects.all():
+            if action.workflows.all().count() == 0:
+                action.delete()
+
+    def create(self, validated_data) -> Workflow:
+        if "triggers" in validated_data:
+            triggers = validated_data.pop("triggers")
+
+        if "actions" in validated_data:
+            actions = validated_data.pop("actions")
+
+        instance = super().create(validated_data)
+
+        self.update_triggers_and_actions(instance, triggers, actions)
+
+        return instance
+
+    def update(self, instance: Workflow, validated_data) -> Workflow:
+        if "triggers" in validated_data:
+            triggers = validated_data.pop("triggers")
+
+        if "actions" in validated_data:
+            actions = validated_data.pop("actions")
+
+        instance = super().update(instance, validated_data)
+
+        self.update_triggers_and_actions(instance, triggers, actions)
+
+        self.prune_triggers_and_actions()
+
+        return instance

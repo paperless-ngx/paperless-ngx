@@ -36,6 +36,7 @@ from documents.models import Tag
 from documents.parsers import DocumentParser
 from documents.parsers import get_parser_class_for_mime_type
 from documents.sanity_checker import SanityCheckFailedException
+from documents.signals import document_updated
 
 if settings.AUDIT_LOG_ENABLED:
     import json
@@ -151,13 +152,16 @@ def consume_file(
                 return "File successfully split"
 
             # try reading the ASN from barcode
-            if settings.CONSUMER_ENABLE_ASN_BARCODE and reader.asn is not None:
+            if (
+                settings.CONSUMER_ENABLE_ASN_BARCODE
+                and (located_asn := reader.asn) is not None
+            ):
                 # Note this will take precedence over an API provided ASN
                 # But it's from a physical barcode, so that's good
-                overrides.asn = reader.asn
+                overrides.asn = located_asn
                 logger.info(f"Found ASN in barcode: {overrides.asn}")
 
-    template_overrides = Consumer().get_template_overrides(
+    template_overrides = Consumer().get_workflow_overrides(
         input_doc=input_doc,
     )
 
@@ -215,6 +219,11 @@ def bulk_update_documents(document_ids):
     ix = index.open_index()
 
     for doc in documents:
+        document_updated.send(
+            sender=None,
+            document=doc,
+            logging_group=uuid.uuid4(),
+        )
         post_save.send(Document, instance=doc, created=False)
 
     with AsyncWriter(ix) as writer:
