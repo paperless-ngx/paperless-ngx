@@ -4,11 +4,12 @@ import os
 from collections import Counter
 from contextlib import contextmanager
 from datetime import datetime
+from datetime import timezone
 from typing import Optional
 
 from dateutil.parser import isoparse
 from django.conf import settings
-from django.utils import timezone
+from django.utils import timezone as django_timezone
 from guardian.shortcuts import get_users_with_perms
 from whoosh import classify
 from whoosh import highlight
@@ -370,7 +371,7 @@ class DelayedQuery:
 
 class LocalDateParser(English):
     def reverse_timezone_offset(self, d):
-        return (d.replace(tzinfo=timezone.get_current_timezone())).astimezone(
+        return (d.replace(tzinfo=django_timezone.get_current_timezone())).astimezone(
             timezone.utc,
         )
 
@@ -401,7 +402,7 @@ class DelayedFullTextQuery(DelayedQuery):
         )
         qp.add_plugin(
             DateParserPlugin(
-                basedate=timezone.now(),
+                basedate=django_timezone.now(),
                 dateparser=LocalDateParser(),
             ),
         )
