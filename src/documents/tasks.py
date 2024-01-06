@@ -152,10 +152,13 @@ def consume_file(
                 return "File successfully split"
 
             # try reading the ASN from barcode
-            if settings.CONSUMER_ENABLE_ASN_BARCODE and reader.asn is not None:
+            if (
+                settings.CONSUMER_ENABLE_ASN_BARCODE
+                and (located_asn := reader.asn) is not None
+            ):
                 # Note this will take precedence over an API provided ASN
                 # But it's from a physical barcode, so that's good
-                overrides.asn = reader.asn
+                overrides.asn = located_asn
                 logger.info(f"Found ASN in barcode: {overrides.asn}")
 
     template_overrides = Consumer().get_workflow_overrides(
