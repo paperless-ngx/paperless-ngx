@@ -322,7 +322,9 @@ class DocumentParser(LoggingMixin):
         self.logging_group = logging_group
         self.settings = self.get_settings()
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
-        self.tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
+        self.tempdir = Path(
+            tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR),
+        )
 
         self.archive_path = None
         self.text = None

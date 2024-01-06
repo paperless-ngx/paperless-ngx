@@ -90,16 +90,18 @@ class RasterisedDocumentParser(DocumentParser):
         with Image.open(image) as im:
             return im.mode in ("RGBA", "LA")
 
-    def remove_alpha(self, image_path: str):
+    def remove_alpha(self, image_path: str) -> Path:
+        no_alpha_image = Path(self.tempdir) / "image-no-alpha"
         subprocess.run(
             [
                 settings.CONVERT_BINARY,
                 "-alpha",
                 "off",
                 image_path,
-                image_path,
+                no_alpha_image,
             ],
         )
+        return no_alpha_image
 
     def get_dpi(self, image) -> Optional[int]:
         try:
@@ -251,7 +253,8 @@ class RasterisedDocumentParser(DocumentParser):
                     f"Removing alpha layer from {input_file} "
                     "for compatibility with img2pdf",
                 )
-                self.remove_alpha(input_file)
+                # Replace the input file with the non-alpha
+                ocrmypdf_args["input_file"] = self.remove_alpha(input_file)
 
             if dpi:
                 self.log.debug(f"Detected DPI for image {input_file}: {dpi}")
