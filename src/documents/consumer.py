@@ -1,7 +1,6 @@
 import datetime
 import hashlib
 import os
-import shutil
 import tempfile
 import uuid
 from enum import Enum
@@ -563,7 +562,6 @@ class Consumer(LoggingMixin):
                 self.log.debug(f"Deleting file {self.working_copy}")
                 self.original_path.unlink()
                 self.working_copy.unlink()
-                shutil.rmtree(self.working_copy.parent)
 
                 # https://github.com/jonaswinkler/paperless-ng/discussions/1037
                 shadow_file = os.path.join(
