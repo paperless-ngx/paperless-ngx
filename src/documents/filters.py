@@ -1,7 +1,9 @@
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import CharField
 from django.db.models import Count
 from django.db.models import OuterRef
 from django.db.models import Q
+from django.db.models.functions import Cast
 from django_filters.rest_framework import BooleanFilter
 from django_filters.rest_framework import Filter
 from django_filters.rest_framework import FilterSet
@@ -10,6 +12,7 @@ from guardian.utils import get_user_obj_perms_model
 from rest_framework_guardian.filters import ObjectPermissionsFilter
 
 from documents.models import Correspondent
+from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Log
@@ -119,7 +122,7 @@ class SharedByUser(Filter):
                 num_shared_users=Count(
                     UserObjectPermission.objects.filter(
                         content_type=ctype,
-                        object_pk=OuterRef("pk"),
+                        object_pk=Cast(OuterRef("pk"), CharField()),
                     ).values("user_id"),
                 ),
             )
@@ -127,7 +130,7 @@ class SharedByUser(Filter):
                 num_shared_groups=Count(
                     GroupObjectPermission.objects.filter(
                         content_type=ctype,
-                        object_pk=OuterRef("pk"),
+                        object_pk=Cast(OuterRef("pk"), CharField()),
                     ).values("group_id"),
                 ),
             )
@@ -137,6 +140,15 @@ class SharedByUser(Filter):
             if value is not None
             else qs
         )
+
+
+class CustomFieldFilterSet(FilterSet):
+    class Meta:
+        model = CustomField
+        fields = {
+            "id": ID_KWARGS,
+            "name": CHAR_KWARGS,
+        }
 
 
 class CustomFieldsFilter(Filter):

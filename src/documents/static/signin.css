@@ -37,6 +37,11 @@ body {
   border-bottom-left-radius: 0;
 }
 
+#inputUsername:focus {
+  position: relative;
+  z-index: 100;
+}
+
 #inputPassword,
 #inputPassword2 {
   border-top-left-radius: 0;

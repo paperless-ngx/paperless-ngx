@@ -1,0 +1,5 @@
+.btn.text-danger {
+    &:hover, &:focus {
+        color: rgba(var(--bs-danger-rgb), var(--bs-text-opacity)) !important;
+    }
+}

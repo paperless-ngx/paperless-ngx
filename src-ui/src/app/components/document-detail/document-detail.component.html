@@ -123,28 +123,73 @@
                         <div [formGroup]="customFieldFormFields.controls[i]">
                           @switch (getCustomFieldFromInstance(fieldInstance)?.data_type) {
                             @case (PaperlessCustomFieldDataType.String) {
-                              <pngx-input-text formControlName="value" [title]="getCustomFieldFromInstance(fieldInstance)?.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true" [error]="getCustomFieldError(i)"></pngx-input-text>
+                              <pngx-input-text formControlName="value"
+                              [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+                              [removable]="userIsOwner"
+                              (removed)="removeField(fieldInstance)"
+                              [horizontal]="true"
+                              [error]="getCustomFieldError(i)"></pngx-input-text>
                             }
                             @case (PaperlessCustomFieldDataType.Date) {
-                              <pngx-input-date formControlName="value" [title]="getCustomFieldFromInstance(fieldInstance)?.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true" [error]="getCustomFieldError(i)"></pngx-input-date>
+                              <pngx-input-date formControlName="value"
+                              [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+                              [removable]="userIsOwner"
+                              (removed)="removeField(fieldInstance)"
+                              [horizontal]="true"
+                              [error]="getCustomFieldError(i)"></pngx-input-date>
                             }
                             @case (PaperlessCustomFieldDataType.Integer) {
-                              <pngx-input-number formControlName="value" [title]="getCustomFieldFromInstance(fieldInstance)?.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true" [showAdd]="false" [error]="getCustomFieldError(i)"></pngx-input-number>
+                              <pngx-input-number formControlName="value"
+                              [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+                              [removable]="userIsOwner"
+                              (removed)="removeField(fieldInstance)"
+                              [horizontal]="true"
+                              [showAdd]="false"
+                              [error]="getCustomFieldError(i)"></pngx-input-number>
                             }
                             @case (PaperlessCustomFieldDataType.Float) {
-                              <pngx-input-number formControlName="value" [title]="getCustomFieldFromInstance(fieldInstance)?.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true" [showAdd]="false" [step]=".1" [error]="getCustomFieldError(i)"></pngx-input-number>
+                              <pngx-input-number formControlName="value"
+                              [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+                              [removable]="userIsOwner"
+                              (removed)="removeField(fieldInstance)"
+                              [horizontal]="true"
+                              [showAdd]="false"
+                              [step]=".1"
+                              [error]="getCustomFieldError(i)"></pngx-input-number>
                             }
                             @case (PaperlessCustomFieldDataType.Monetary) {
-                              <pngx-input-number formControlName="value" [title]="getCustomFieldFromInstance(fieldInstance)?.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true" [showAdd]="false" [step]=".01" [error]="getCustomFieldError(i)"></pngx-input-number>
+                              <pngx-input-number formControlName="value"
+                              [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+                              [removable]="userIsOwner"
+                              (removed)="removeField(fieldInstance)"
+                              [horizontal]="true"
+                              [showAdd]="false"
+                              [step]=".01"
+                              [error]="getCustomFieldError(i)"></pngx-input-number>
                             }
                             @case (PaperlessCustomFieldDataType.Boolean) {
-                              <pngx-input-check formControlName="value" [title]="getCustomFieldFromInstance(fieldInstance)?.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true"></pngx-input-check>
+                              <pngx-input-check formControlName="value"
+                              [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+                              [removable]="userIsOwner"
+                              (removed)="removeField(fieldInstance)"
+                              [horizontal]="true"></pngx-input-check>
                             }
                             @case (PaperlessCustomFieldDataType.Url) {
-                              <pngx-input-url formControlName="value" [title]="getCustomFieldFromInstance(fieldInstance)?.name" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true" [error]="getCustomFieldError(i)"></pngx-input-url>
+                              <pngx-input-url formControlName="value"
+                              [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+                              [removable]="userIsOwner"
+                              (removed)="removeField(fieldInstance)"
+                              [horizontal]="true"
+                              [error]="getCustomFieldError(i)"></pngx-input-url>
                             }
                             @case (PaperlessCustomFieldDataType.DocumentLink) {
-                              <pngx-input-document-link formControlName="value" [title]="getCustomFieldFromInstance(fieldInstance)?.name" [parentDocumentID]="documentId" [removable]="true" (removed)="removeField(fieldInstance)" [horizontal]="true" [error]="getCustomFieldError(i)"></pngx-input-document-link>
+                              <pngx-input-document-link formControlName="value"
+                              [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+                              [parentDocumentID]="documentId"
+                              [removable]="userIsOwner"
+                              (removed)="removeField(fieldInstance)"
+                              [horizontal]="true"
+                              [error]="getCustomFieldError(i)"></pngx-input-document-link>
                             }
                           }
                         </div>

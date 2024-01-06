@@ -1007,6 +1007,9 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         self.assertEqual(generate_filename(doc_a), "ThisIsAFolder/4/2020-06-25.pdf")
         self.assertEqual(generate_filename(doc_b), "SomeImportantNone/2020-07-25.pdf")
 
+    @override_settings(
+        FILENAME_FORMAT=None,
+    )
     def test_no_path_fallback(self):
         """
         GIVEN:
@@ -1157,3 +1160,28 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
 
         self.assertEqual(generate_filename(text_doc), "logs.txt")
         self.assertEqual(generate_filename(text_doc, archive_filename=True), "logs.pdf")
+
+    @override_settings(
+        FILENAME_FORMAT="XX{correspondent}/{title}",
+        FILENAME_FORMAT_REMOVE_NONE=True,
+    )
+    def test_remove_none_not_dir(self):
+        """
+        GIVEN:
+            - A document with & filename format that includes correspondent as part of directory name
+            - FILENAME_FORMAT_REMOVE_NONE is True
+        WHEN:
+            - the filename is generated for the document
+        THEN:
+            - the missing correspondent is removed but directory structure retained
+        """
+        document = Document.objects.create(
+            title="doc1",
+            mime_type="application/pdf",
+        )
+        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+        document.save()
+
+        # Ensure that filename is properly generated
+        document.filename = generate_filename(document)
+        self.assertEqual(document.filename, "XX/doc1.pdf")

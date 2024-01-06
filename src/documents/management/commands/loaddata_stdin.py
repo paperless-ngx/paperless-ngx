@@ -5,7 +5,7 @@ from django.core.management.commands.loaddata import Command as LoadDataCommand
 
 # This class is used to migrate data between databases
 # That's difficult to test
-class Command(LoadDataCommand):  # pragma: nocover
+class Command(LoadDataCommand):  # pragma: no cover
     """
     Allow the loading of data from standard in.  Sourced originally from:
     https://gist.github.com/bmispelon/ad5a2c333443b3a1d051 (MIT licensed)

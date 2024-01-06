@@ -9,8 +9,11 @@ class DocumentsConfig(AppConfig):
 
     def ready(self):
         from documents.signals import document_consumption_finished
+        from documents.signals import document_updated
         from documents.signals.handlers import add_inbox_tags
         from documents.signals.handlers import add_to_index
+        from documents.signals.handlers import run_workflow_added
+        from documents.signals.handlers import run_workflow_updated
         from documents.signals.handlers import set_correspondent
         from documents.signals.handlers import set_document_type
         from documents.signals.handlers import set_log_entry
@@ -24,5 +27,7 @@ class DocumentsConfig(AppConfig):
         document_consumption_finished.connect(set_storage_path)
         document_consumption_finished.connect(set_log_entry)
         document_consumption_finished.connect(add_to_index)
+        document_consumption_finished.connect(run_workflow_added)
+        document_updated.connect(run_workflow_updated)
 
         AppConfig.ready(self)

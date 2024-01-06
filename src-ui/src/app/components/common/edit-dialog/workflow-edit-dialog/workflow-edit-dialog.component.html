@@ -1,0 +1,207 @@
+<form [formGroup]="objectForm" (ngSubmit)="save()" autocomplete="off">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
+    <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-6">
+        <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></pngx-input-text>
+      </div>
+      <div class="col-4">
+        <pngx-input-number i18n-title title="Sort order" formControlName="order" [showAdd]="false" [error]="error?.order"></pngx-input-number>
+      </div>
+      <div class="col">
+        <pngx-input-switch i18n-title title="Enabled" formControlName="enabled" [error]="error?.enabled"></pngx-input-switch>
+      </div>
+    </div>
+    <div ngbAccordion>
+      <div ngbAccordionItem>
+        <h2 ngbAccordionHeader>
+          <button ngbAccordionButton i18n>Triggers</button>
+        </h2>
+        <div ngbAccordionCollapse>
+          <div ngbAccordionBody>
+            <ng-template>
+              <div class="d-flex">
+                <p class="p-2" i18n>Trigger Workflow On:</p>
+                <button type="button" class="btn btn-sm btn-outline-primary ms-auto mb-3" (click)="addTrigger()">
+                  <svg class="sidebaricon me-1" fill="currentColor">
+                    <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
+                  </svg>
+                  <ng-container i18n>Add Trigger</ng-container>
+                </button>
+              </div>
+              <div ngbAccordion [closeOthers]="true">
+                @for (trigger of object?.triggers; track trigger; let i = $index){
+                  <div ngbAccordionItem>
+                    <div ngbAccordionHeader>
+                      <button ngbAccordionButton>{{i + 1}}. {{getTriggerTypeOptionName(triggerFields.controls[i].value.type)}}
+                        @if(trigger.id > -1) {
+                          <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{trigger.id}}</span>
+                        }
+                        <button type="button" class="btn btn-link text-danger ms-2" (click)="removeTrigger(i)">
+                          <svg class="sidebaricon me-1" fill="currentColor">
+                            <use xlink:href="assets/bootstrap-icons.svg#trash" />
+                          </svg>
+                          <ng-container i18n>Delete</ng-container>
+                        </button>
+                      </button>
+                    </div>
+                    <div ngbAccordionCollapse>
+                      <div ngbAccordionBody>
+                        <ng-template [ngTemplateOutlet]="triggerForm" [ngTemplateOutletContext]="{ formGroup: triggerFields.controls[i], trigger: trigger }"></ng-template>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      <div ngbAccordionItem>
+        <h2 ngbAccordionHeader>
+          <button class="btn-lg" ngbAccordionButton i18n>Actions</button>
+        </h2>
+        <div ngbAccordionCollapse>
+          <div ngbAccordionBody>
+            <ng-template>
+              <div class="d-flex">
+                <p class="p-2" i18n>Apply Actions:</p>
+                <button type="button" class="btn btn-sm btn-outline-primary ms-auto mb-3" (click)="addAction()">
+                  <svg class="sidebaricon me-1" fill="currentColor">
+                    <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
+                  </svg>
+                  <ng-container i18n>Add Action</ng-container>
+                </button>
+              </div>
+              <div ngbAccordion [closeOthers]="true" cdkDropList (cdkDropListDropped)="onActionDrop($event)">
+                @for (action of object?.actions; track action; let i = $index){
+                  <div ngbAccordionItem cdkDrag [formGroup]="actionFields.controls[i]">
+                    <div ngbAccordionHeader>
+                      <button ngbAccordionButton>{{i + 1}}. {{getActionTypeOptionName(actionFields.controls[i].value.type)}}
+                        @if(action.id > -1) {
+                          <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{action.id}}</span>
+                        }
+                        <button type="button" class="btn btn-link text-danger ms-2" (click)="removeAction(i)">
+                          <svg class="sidebaricon me-1" fill="currentColor">
+                            <use xlink:href="assets/bootstrap-icons.svg#trash" />
+                          </svg>
+                          <ng-container i18n>Delete</ng-container>
+                        </button>
+                      </button>
+                    </div>
+                    <div ngbAccordionCollapse>
+                      <div ngbAccordionBody>
+                        <pngx-input-select i18n-title title="Action type" [horizontal]="true" [items]="actionTypeOptions" formControlName="type"></pngx-input-select>
+                        <input type="hidden" formControlName="id" />
+                        <div class="row">
+                          <div class="col">
+                            <pngx-input-text i18n-title title="Assign title" formControlName="assign_title" i18n-hint hint="Can include some placeholders, see <a target='_blank' href='https://docs.paperless-ngx.com/usage/#workflows'>documentation</a>." [error]="error?.assign_title"></pngx-input-text>
+                            <pngx-input-tags [allowCreate]="false" i18n-title title="Assign tags" formControlName="assign_tags"></pngx-input-tags>
+                            <pngx-input-select i18n-title title="Assign document type" [items]="documentTypes" [allowNull]="true" formControlName="assign_document_type"></pngx-input-select>
+                            <pngx-input-select i18n-title title="Assign correspondent" [items]="correspondents" [allowNull]="true" formControlName="assign_correspondent"></pngx-input-select>
+                            <pngx-input-select i18n-title title="Assign storage path" [items]="storagePaths" [allowNull]="true" formControlName="assign_storage_path"></pngx-input-select>
+                            <pngx-input-select i18n-title title="Assign custom fields" multiple="true" [items]="customFields" [allowNull]="true" formControlName="assign_custom_fields"></pngx-input-select>
+                          </div>
+                          <div class="col">
+                            <pngx-input-select i18n-title title="Assign owner" [items]="users" bindLabel="username" formControlName="assign_owner" [allowNull]="true"></pngx-input-select>
+                            <div>
+                              <label class="form-label" i18n>Assign view permissions</label>
+                              <div class="mb-2">
+                                <div class="row mb-1">
+                                  <div class="col-lg-3">
+                                    <label class="form-label d-block my-2 text-nowrap" i18n>Users:</label>
+                                  </div>
+                                  <div class="col-lg-9">
+                                    <pngx-permissions-user type="view" formControlName="assign_view_users"></pngx-permissions-user>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-lg-3">
+                                    <label class="form-label d-block my-2 text-nowrap" i18n>Groups:</label>
+                                  </div>
+                                  <div class="col-lg-9">
+                                    <pngx-permissions-group type="view" formControlName="assign_view_groups"></pngx-permissions-group>
+                                  </div>
+                                </div>
+                              </div>
+                              <label class="form-label" i18n>Assign edit permissions</label>
+                              <div>
+                                <div class="row mb-1">
+                                  <div class="col-lg-3">
+                                    <label class="form-label d-block my-2 text-nowrap" i18n>Users:</label>
+                                  </div>
+                                  <div class="col-lg-9">
+                                    <pngx-permissions-user type="change" formControlName="assign_change_users"></pngx-permissions-user>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-lg-3">
+                                    <label class="form-label d-block my-2 text-nowrap" i18n>Groups:</label>
+                                  </div>
+                                  <div class="col-lg-9">
+                                    <pngx-permissions-group type="change" formControlName="assign_change_groups"></pngx-permissions-group>
+                                  </div>
+                                </div>
+                                <small class="form-text text-muted text-end d-block" i18n>Edit permissions also grant viewing permissions</small>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    @if (error?.non_field_errors) {
+      <span class="text-danger"><ng-container i18n>Error</ng-container>: {{error.non_field_errors}}</span>
+    }
+    <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>
+    <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
+  </div>
+</form>
+
+<ng-template #triggerForm let-formGroup="formGroup" let-trigger="trigger">
+  <div [formGroup]="formGroup">
+    <input type="hidden" formControlName="id" />
+    <pngx-input-select i18n-title title="Trigger type" [horizontal]="true" [items]="triggerTypeOptions" formControlName="type"></pngx-input-select>
+    <p class="small" i18n>Trigger for documents that match <em>all</em> filters specified below.</p>
+    <div class="row">
+      <div class="col">
+        <pngx-input-text i18n-title title="Filter filename" formControlName="filter_filename" i18n-hint hint="Apply to documents that match this filename. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive." [error]="error?.filter_filename"></pngx-input-text>
+        @if (formGroup.get('type').value === WorkflowTriggerType.Consumption) {
+          <pngx-input-select i18n-title title="Filter sources" [items]="sourceOptions" [multiple]="true" formControlName="sources" [error]="error?.sources"></pngx-input-select>
+          <pngx-input-text i18n-title title="Filter path" formControlName="filter_path" i18n-hint hint="Apply to documents that match this path. Wildcards specified as * are allowed. Case insensitive.</a>" [error]="error?.filter_path"></pngx-input-text>
+          <pngx-input-select i18n-title title="Filter mail rule" [items]="mailRules" [allowNull]="true" formControlName="filter_mailrule" i18n-hint hint="Apply to documents consumed via this mail rule." [error]="error?.filter_mailrule"></pngx-input-select>
+        }
+        @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated) {
+          <pngx-input-select i18n-title title="Content matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></pngx-input-select>
+          @if (patternRequired) {
+            <pngx-input-text i18n-title title="Content matching pattern" formControlName="match" [error]="error?.match"></pngx-input-text>
+          }
+          @if (patternRequired) {
+            <pngx-input-check i18n-title title="Case insensitive" formControlName="is_insensitive"></pngx-input-check>
+          }
+        }
+      </div>
+      @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated) {
+        <div class="col-md-6">
+          <pngx-input-tags [allowCreate]="false" i18n-title title="Has tags" formControlName="filter_has_tags"></pngx-input-tags>
+          <pngx-input-select i18n-title title="Has correspondent" [items]="correspondents" [allowNull]="true" formControlName="filter_has_correspondent"></pngx-input-select>
+          <pngx-input-select i18n-title title="Has document type" [items]="documentTypes" [allowNull]="true" formControlName="filter_has_document_type"></pngx-input-select>
+        </div>
+      }
+    </div>
+  </div>
+</ng-template>
