@@ -238,7 +238,7 @@ class RasterisedDocumentParser(DocumentParser):
             ocrmypdf_args["rotate_pages"] = True
             ocrmypdf_args["rotate_pages_threshold"] = self.settings.rotate_threshold
 
-        if self.settings.pages is not None:
+        if self.settings.pages is not None and self.settings.pages > 0:
             ocrmypdf_args["pages"] = f"1-{self.settings.pages}"
         else:
             # sidecar is incompatible with pages
