@@ -662,3 +662,39 @@ class TestCustomField(DirectoriesMixin, APITestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(doc5.custom_fields.first().value, [1])
+
+    def test_custom_field_filters(self):
+        custom_field_string = CustomField.objects.create(
+            name="Test Custom Field String",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        custom_field_date = CustomField.objects.create(
+            name="Test Custom Field Date",
+            data_type=CustomField.FieldDataType.DATE,
+        )
+        custom_field_int = CustomField.objects.create(
+            name="Test Custom Field Int",
+            data_type=CustomField.FieldDataType.INT,
+        )
+
+        response = self.client.get(
+            f"{self.ENDPOINT}?id={custom_field_string.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+
+        response = self.client.get(
+            f"{self.ENDPOINT}?id__in={custom_field_string.id},{custom_field_date.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 2)
+
+        response = self.client.get(
+            f"{self.ENDPOINT}?name__icontains=Int",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["name"], custom_field_int.name)
