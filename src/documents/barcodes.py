@@ -90,6 +90,9 @@ class BarcodeReader:
         """
         asn = None
 
+        if not self.supported_mime_type:
+            return None
+
         # Ensure the barcodes have been read
         self.detect()
 
@@ -215,7 +218,7 @@ class BarcodeReader:
         # This file is really borked, allow the consumption to continue
         # but it may fail further on
         except Exception as e:  # pragma: no cover
-            logger.warning(
+            logger.exception(
                 f"Exception during barcode scanning: {e}",
             )
 
