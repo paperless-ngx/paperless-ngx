@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-09 10:53-0800\n"
-"PO-Revision-Date: 2023-12-28 12:09\n"
+"POT-Creation-Date: 2024-01-05 21:26-0800\n"
+"PO-Revision-Date: 2024-01-06 05:27\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -25,27 +25,27 @@ msgstr "Dokumenty"
 msgid "owner"
 msgstr "właściciel"
 
-#: documents/models.py:53
+#: documents/models.py:53 documents/models.py:894
 msgid "None"
 msgstr "Brak"
 
-#: documents/models.py:54
+#: documents/models.py:54 documents/models.py:895
 msgid "Any word"
 msgstr "Dowolne słowo"
 
-#: documents/models.py:55
+#: documents/models.py:55 documents/models.py:896
 msgid "All words"
 msgstr "Wszystkie słowa"
 
-#: documents/models.py:56
+#: documents/models.py:56 documents/models.py:897
 msgid "Exact match"
 msgstr "Dokładne dopasowanie"
 
-#: documents/models.py:57
+#: documents/models.py:57 documents/models.py:898
 msgid "Regular expression"
 msgstr "Wyrażenie regularne"
 
-#: documents/models.py:58
+#: documents/models.py:58 documents/models.py:899
 msgid "Fuzzy word"
 msgstr "Dopasowanie rozmyte"
 
@@ -53,20 +53,20 @@ msgstr "Dopasowanie rozmyte"
 msgid "Automatic"
 msgstr "Automatyczny"
 
-#: documents/models.py:62 documents/models.py:402 documents/models.py:897
+#: documents/models.py:62 documents/models.py:402 documents/models.py:1099
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
 msgid "name"
 msgstr "nazwa"
 
-#: documents/models.py:64
+#: documents/models.py:64 documents/models.py:955
 msgid "match"
 msgstr "dopasowanie"
 
-#: documents/models.py:67
+#: documents/models.py:67 documents/models.py:958
 msgid "matching algorithm"
 msgstr "algorytm dopasowania"
 
-#: documents/models.py:72
+#: documents/models.py:72 documents/models.py:963
 msgid "is insensitive"
 msgstr "bez rozróżniania wielkości znaków"
 
@@ -112,11 +112,11 @@ msgstr "ścieżka"
 
 #: documents/models.py:129 documents/models.py:156
 msgid "storage path"
-msgstr "ścieżka przechowywania"
+msgstr "ścieżka zapisu"
 
 #: documents/models.py:130
 msgid "storage paths"
-msgstr "ścieżki przechowywania"
+msgstr "ścieżki zapisu"
 
 #: documents/models.py:137
 msgid "Unencrypted"
@@ -197,7 +197,7 @@ msgstr "oryginalna nazwa pliku"
 
 #: documents/models.py:256
 msgid "The original name of the file when it was uploaded"
-msgstr "Oryginalna nazwa pliku podczas jego przesyłania"
+msgstr "Oryginalna nazwa pliku w momencie jego przesyłania"
 
 #: documents/models.py:263
 msgid "archive serial number"
@@ -253,7 +253,7 @@ msgstr "log"
 
 #: documents/models.py:390
 msgid "logs"
-msgstr "logi"
+msgstr "dziennik"
 
 #: documents/models.py:399 documents/models.py:466
 msgid "saved view"
@@ -381,7 +381,7 @@ msgstr "ASN mniejszy niż"
 
 #: documents/models.py:447
 msgid "storage path is"
-msgstr "ścieżką przechowywania jest"
+msgstr "ścieżką zapisu jest"
 
 #: documents/models.py:448
 msgid "has correspondent in"
@@ -401,11 +401,11 @@ msgstr "nie ma typu dokumentu w"
 
 #: documents/models.py:452
 msgid "has storage path in"
-msgstr "ma ścieżkę składowania w"
+msgstr "ma ścieżkę zapisu w"
 
 #: documents/models.py:453
 msgid "does not have storage path in"
-msgstr "nie ma ścieżki składowania w"
+msgstr "nie ma ścieżki zapisu w"
 
 #: documents/models.py:454
 msgid "owner is"
@@ -425,7 +425,7 @@ msgstr "nie ma właściciela w"
 
 #: documents/models.py:458
 msgid "has custom field value"
-msgstr "ma wartość pola niestandardowego"
+msgstr "ma wartość pola dodatkowego"
 
 #: documents/models.py:459
 msgid "is shared by me"
@@ -597,127 +597,183 @@ msgstr "typ danych"
 
 #: documents/models.py:781
 msgid "custom field"
-msgstr "pole niestandardowe"
+msgstr "pole dodatkowe"
 
 #: documents/models.py:782
 msgid "custom fields"
-msgstr "pola niestandardowe"
+msgstr "pola dodatkowe"
 
 #: documents/models.py:844
 msgid "custom field instance"
-msgstr "przykład pola niestandardowego"
+msgstr "przypisane pole dodatkowe"
 
 #: documents/models.py:845
 msgid "custom field instances"
-msgstr "przykłady pól niestandardowych"
+msgstr "przypisanych pól dodatkowych"
 
-#: documents/models.py:893
+#: documents/models.py:902
+msgid "Consumption Started"
+msgstr "Rozpoczęto pobieranie"
+
+#: documents/models.py:903
+msgid "Document Added"
+msgstr "Dodano dokument"
+
+#: documents/models.py:904
+msgid "Document Updated"
+msgstr "Dokument zaktualizowano"
+
+#: documents/models.py:907
 msgid "Consume Folder"
 msgstr "Folder pobierania"
 
-#: documents/models.py:894
+#: documents/models.py:908
 msgid "Api Upload"
 msgstr "Przesyłanie przez API"
 
-#: documents/models.py:895
+#: documents/models.py:909
 msgid "Mail Fetch"
 msgstr "Pobieranie E-mail"
 
-#: documents/models.py:899 paperless_mail/models.py:95
-msgid "order"
-msgstr "kolejność"
+#: documents/models.py:912
+msgid "Workflow Trigger Type"
+msgstr "Typ wyzwalacza dla procesu"
 
-#: documents/models.py:908
+#: documents/models.py:924
 msgid "filter path"
 msgstr "filtruj ścieżkę"
 
-#: documents/models.py:913
+#: documents/models.py:929
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
 msgstr "Pobiera tylko dokumenty ze ścieżką, która pasuje do wyspecyfikowanej. Symbol * jest dozwolony. Wielkość liter bez znaczenia."
 
-#: documents/models.py:920
+#: documents/models.py:936
 msgid "filter filename"
 msgstr "filtruj po nazwie pliku"
 
-#: documents/models.py:925 paperless_mail/models.py:148
+#: documents/models.py:941 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "Przetwarzaj tylko dokumenty, które całkowicie pasują do tej nazwy pliku, jeśli jest podana. Wzorce dopasowania jak *.pdf lub *faktura* są dozwolone. Wielkość liter nie jest rozróżniana."
 
-#: documents/models.py:936
+#: documents/models.py:952
 msgid "filter documents from this mail rule"
 msgstr "filtruj dokumenty z tej reguły pocztowej"
 
-#: documents/models.py:940
+#: documents/models.py:968
+msgid "has these tag(s)"
+msgstr "posiada wskazane tag(i)"
+
+#: documents/models.py:976
+msgid "has this document type"
+msgstr "posiada wskazany typ dokumentu"
+
+#: documents/models.py:984
+msgid "has this correspondent"
+msgstr "posiada wskazanego nadawcę"
+
+#: documents/models.py:988
+msgid "workflow trigger"
+msgstr "wyzwalacz procesu"
+
+#: documents/models.py:989
+msgid "workflow triggers"
+msgstr "wyzwalacze procesu"
+
+#: documents/models.py:997
+msgid "Assignment"
+msgstr "Przypisanie"
+
+#: documents/models.py:1000
+msgid "Workflow Action Type"
+msgstr "Typ akcji w procesie"
+
+#: documents/models.py:1006
 msgid "assign title"
 msgstr "przypisz tytuł"
 
-#: documents/models.py:945
+#: documents/models.py:1011
 msgid "Assign a document title, can include some placeholders, see documentation."
 msgstr "Przypisz tytuł dokumentu, może zawierać zmienne, szczegóły w dokumentacji."
 
-#: documents/models.py:953 paperless_mail/models.py:216
+#: documents/models.py:1019 paperless_mail/models.py:216
 msgid "assign this tag"
 msgstr "przypisz ten tag"
 
-#: documents/models.py:961 paperless_mail/models.py:224
+#: documents/models.py:1027 paperless_mail/models.py:224
 msgid "assign this document type"
 msgstr "przypisz ten typ dokumentu"
 
-#: documents/models.py:969 paperless_mail/models.py:238
+#: documents/models.py:1035 paperless_mail/models.py:238
 msgid "assign this correspondent"
 msgstr "przypisz tego korespondenta"
 
-#: documents/models.py:977
+#: documents/models.py:1043
 msgid "assign this storage path"
 msgstr "przypisz tą ścieżkę zapisu"
 
-#: documents/models.py:986
+#: documents/models.py:1052
 msgid "assign this owner"
 msgstr "przypisz tego właściciela"
 
-#: documents/models.py:993
+#: documents/models.py:1059
 msgid "grant view permissions to these users"
 msgstr "nadaj tym użytkownikom uprawnienia do przeglądania"
 
-#: documents/models.py:1000
+#: documents/models.py:1066
 msgid "grant view permissions to these groups"
 msgstr "nadaj tym grupom uprawnienia do przeglądania"
 
-#: documents/models.py:1007
+#: documents/models.py:1073
 msgid "grant change permissions to these users"
 msgstr "nadaj tym użytkownikom uprawnienia do zmiany"
 
-#: documents/models.py:1014
+#: documents/models.py:1080
 msgid "grant change permissions to these groups"
 msgstr "nadaj tym grupom uprawnienia do zmiany"
 
-#: documents/models.py:1021
+#: documents/models.py:1087
 msgid "assign these custom fields"
-msgstr "przypisz te pola niestandardowe"
+msgstr "przypisz te pola dodatkowe"
 
-#: documents/models.py:1025
-msgid "consumption template"
-msgstr "szablon pobierania"
+#: documents/models.py:1091
+msgid "workflow action"
+msgstr "akcja procesu"
 
-#: documents/models.py:1026
-msgid "consumption templates"
-msgstr "szablony pobierania"
+#: documents/models.py:1092
+msgid "workflow actions"
+msgstr "akcje procesu"
 
-#: documents/serialisers.py:105
+#: documents/models.py:1101 paperless_mail/models.py:95
+msgid "order"
+msgstr "kolejność"
+
+#: documents/models.py:1107
+msgid "triggers"
+msgstr "wyzwalacze"
+
+#: documents/models.py:1114
+msgid "actions"
+msgstr "akcje"
+
+#: documents/models.py:1117
+msgid "enabled"
+msgstr "włączony"
+
+#: documents/serialisers.py:111
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Nieprawidłowe wyrażenie regularne: %(error)s"
 
-#: documents/serialisers.py:399
+#: documents/serialisers.py:405
 msgid "Invalid color."
 msgstr "Nieprawidłowy kolor."
 
-#: documents/serialisers.py:865
+#: documents/serialisers.py:999
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Typ pliku %(type)s nie jest obsługiwany"
 
-#: documents/serialisers.py:962
+#: documents/serialisers.py:1102
 msgid "Invalid variable detected."
 msgstr "Wykryto nieprawidłową zmienną."
 
@@ -854,135 +910,286 @@ msgstr "Adres e-mail"
 msgid "Send me instructions!"
 msgstr "Wyślij mi instrukcje!"
 
+#: documents/validators.py:17
+#, python-brace-format
+msgid "Unable to parse URI {value}, missing scheme"
+msgstr "Nie można przetworzyć URI {value}, błędna struktura"
+
+#: documents/validators.py:22
+#, python-brace-format
+msgid "Unable to parse URI {value}, missing net location or path"
+msgstr "Nie można przetworzyć URI {value}, błędna lokalizacja sieciowa lub ścieżka"
+
+#: documents/validators.py:27
+#, python-brace-format
+msgid "Unable to parse URI {value}"
+msgstr "Nie można przetworzyć URI {value}"
+
 #: paperless/apps.py:10
 msgid "Paperless"
 msgstr "Paperless"
 
-#: paperless/settings.py:586
+#: paperless/models.py:25
+msgid "pdf"
+msgstr "pdf"
+
+#: paperless/models.py:26
+msgid "pdfa"
+msgstr "pdfa"
+
+#: paperless/models.py:27
+msgid "pdfa-1"
+msgstr "pdfa-1"
+
+#: paperless/models.py:28
+msgid "pdfa-2"
+msgstr "pdfa-2"
+
+#: paperless/models.py:29
+msgid "pdfa-3"
+msgstr "pdfa-3"
+
+#: paperless/models.py:38
+msgid "skip"
+msgstr "skip"
+
+#: paperless/models.py:39
+msgid "redo"
+msgstr "redo"
+
+#: paperless/models.py:40
+msgid "force"
+msgstr "force"
+
+#: paperless/models.py:41
+msgid "skip_noarchive"
+msgstr "skip_noarchive"
+
+#: paperless/models.py:49
+msgid "never"
+msgstr "never"
+
+#: paperless/models.py:50
+msgid "with_text"
+msgstr "with_text"
+
+#: paperless/models.py:51
+msgid "always"
+msgstr "always"
+
+#: paperless/models.py:59
+msgid "clean"
+msgstr "wyczyść"
+
+#: paperless/models.py:60
+msgid "clean-final"
+msgstr "clean-final"
+
+#: paperless/models.py:61
+msgid "none"
+msgstr "brak"
+
+#: paperless/models.py:69
+msgid "LeaveColorUnchanged"
+msgstr "LeaveColorUnchanged"
+
+#: paperless/models.py:70
+msgid "RGB"
+msgstr "RGB"
+
+#: paperless/models.py:71
+msgid "UseDeviceIndependentColor"
+msgstr "UseDeviceIndependentColor"
+
+#: paperless/models.py:72
+msgid "Gray"
+msgstr "Gray"
+
+#: paperless/models.py:73
+msgid "CMYK"
+msgstr "CMYK"
+
+#: paperless/models.py:82
+msgid "Sets the output PDF type"
+msgstr "Określa wyjściowy typ PDF"
+
+#: paperless/models.py:94
+msgid "Do OCR from page 1 to this value"
+msgstr "Wykonaj OCR od strony 1 do strony wskazanej"
+
+#: paperless/models.py:100
+msgid "Do OCR using these languages"
+msgstr "Wykonaj OCR używając wskazanych języków"
+
+#: paperless/models.py:107
+msgid "Sets the OCR mode"
+msgstr "Określa tryb OCR"
+
+#: paperless/models.py:115
+msgid "Controls the generation of an archive file"
+msgstr "Zarządza tworzeniem pliku archiwum"
+
+#: paperless/models.py:123
+msgid "Sets image DPI fallback value"
+msgstr "Określa wartość rezerwową dla DPI obrazu"
+
+#: paperless/models.py:130
+msgid "Controls the unpaper cleaning"
+msgstr "Zarządza procesem oczyszczania skanów"
+
+#: paperless/models.py:137
+msgid "Enables deskew"
+msgstr "Włącza prostowanie"
+
+#: paperless/models.py:140
+msgid "Enables page rotation"
+msgstr "Włącza obracanie strony"
+
+#: paperless/models.py:145
+msgid "Sets the threshold for rotation of pages"
+msgstr "Określa próg dla obracania strony"
+
+#: paperless/models.py:151
+msgid "Sets the maximum image size for decompression"
+msgstr "Ustawia maksymalny rozmiar obrazu dla dekompresji"
+
+#: paperless/models.py:157
+msgid "Sets the Ghostscript color conversion strategy"
+msgstr "Określa strategię konwersji kolorów przez Ghostscript"
+
+#: paperless/models.py:165
+msgid "Adds additional user arguments for OCRMyPDF"
+msgstr "Dodaje dodatkowe argumenty dla OCRMyPDF"
+
+#: paperless/models.py:170
+msgid "paperless application settings"
+msgstr "paperless ustawienia aplikacji"
+
+#: paperless/settings.py:601
 msgid "English (US)"
 msgstr "Angielski (USA)"
 
-#: paperless/settings.py:587
+#: paperless/settings.py:602
 msgid "Arabic"
 msgstr "arabski"
 
-#: paperless/settings.py:588
+#: paperless/settings.py:603
 msgid "Afrikaans"
 msgstr "Afrykanerski"
 
-#: paperless/settings.py:589
+#: paperless/settings.py:604
 msgid "Belarusian"
 msgstr "Białoruski"
 
-#: paperless/settings.py:590
+#: paperless/settings.py:605
 msgid "Bulgarian"
 msgstr "Bułgarski"
 
-#: paperless/settings.py:591
+#: paperless/settings.py:606
 msgid "Catalan"
 msgstr "Kataloński"
 
-#: paperless/settings.py:592
+#: paperless/settings.py:607
 msgid "Czech"
 msgstr "Czeski"
 
-#: paperless/settings.py:593
+#: paperless/settings.py:608
 msgid "Danish"
 msgstr "Duński"
 
-#: paperless/settings.py:594
+#: paperless/settings.py:609
 msgid "German"
 msgstr "Niemiecki"
 
-#: paperless/settings.py:595
+#: paperless/settings.py:610
 msgid "Greek"
 msgstr "Grecki"
 
-#: paperless/settings.py:596
+#: paperless/settings.py:611
 msgid "English (GB)"
 msgstr "Angielski (Wielka Brytania)"
 
-#: paperless/settings.py:597
+#: paperless/settings.py:612
 msgid "Spanish"
 msgstr "Hiszpański"
 
-#: paperless/settings.py:598
+#: paperless/settings.py:613
 msgid "Finnish"
 msgstr "Fiński"
 
-#: paperless/settings.py:599
+#: paperless/settings.py:614
 msgid "French"
 msgstr "Francuski"
 
-#: paperless/settings.py:600
+#: paperless/settings.py:615
 msgid "Hungarian"
 msgstr "Węgierski"
 
-#: paperless/settings.py:601
+#: paperless/settings.py:616
 msgid "Italian"
 msgstr "Włoski"
 
-#: paperless/settings.py:602
+#: paperless/settings.py:617
 msgid "Luxembourgish"
 msgstr "Luksemburski"
 
-#: paperless/settings.py:603
+#: paperless/settings.py:618
 msgid "Norwegian"
 msgstr "Norweski"
 
-#: paperless/settings.py:604
+#: paperless/settings.py:619
 msgid "Dutch"
 msgstr "Holenderski"
 
-#: paperless/settings.py:605
+#: paperless/settings.py:620
 msgid "Polish"
 msgstr "Polski"
 
-#: paperless/settings.py:606
+#: paperless/settings.py:621
 msgid "Portuguese (Brazil)"
 msgstr "Portugalski (Brazylia)"
 
-#: paperless/settings.py:607
+#: paperless/settings.py:622
 msgid "Portuguese"
 msgstr "Portugalski"
 
-#: paperless/settings.py:608
+#: paperless/settings.py:623
 msgid "Romanian"
 msgstr "Rumuński"
 
-#: paperless/settings.py:609
+#: paperless/settings.py:624
 msgid "Russian"
 msgstr "Rosyjski"
 
-#: paperless/settings.py:610
+#: paperless/settings.py:625
 msgid "Slovak"
 msgstr "Słowacki"
 
-#: paperless/settings.py:611
+#: paperless/settings.py:626
 msgid "Slovenian"
 msgstr "Słoweński"
 
-#: paperless/settings.py:612
+#: paperless/settings.py:627
 msgid "Serbian"
 msgstr "Serbski"
 
-#: paperless/settings.py:613
+#: paperless/settings.py:628
 msgid "Swedish"
 msgstr "Szwedzki"
 
-#: paperless/settings.py:614
+#: paperless/settings.py:629
 msgid "Turkish"
 msgstr "Turecki"
 
-#: paperless/settings.py:615
+#: paperless/settings.py:630
 msgid "Ukrainian"
 msgstr "Ukraiński"
 
-#: paperless/settings.py:616
+#: paperless/settings.py:631
 msgid "Chinese Simplified"
 msgstr "Chiński uproszczony"
 
-#: paperless/urls.py:194
+#: paperless/urls.py:205
 msgid "Paperless-ngx administration"
 msgstr "Administracja Paperless-ngx"
 
