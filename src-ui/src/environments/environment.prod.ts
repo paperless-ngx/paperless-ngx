@@ -3,7 +3,7 @@ const base_url = new URL(document.baseURI)
 export const environment = {
   production: true,
   apiBaseUrl: document.baseURI + 'api/',
-  apiVersion: '3',
+  apiVersion: '4',
   appTitle: 'Paperless-ngx',
   version: '2.2.0-dev',
   webSocketHost: window.location.host,
