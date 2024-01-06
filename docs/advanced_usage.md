@@ -136,6 +136,11 @@ script can access the following relevant environment variables set:
     be triggered, leading to failures as two tasks work on the
     same document path
 
+!!! warning
+
+    If your script modifies `DOCUMENT_WORKING_PATH` in a non-deterministic
+    way, this may allow duplicate documents to be stored
+
 A simple but common example for this would be creating a simple script
 like this:
 

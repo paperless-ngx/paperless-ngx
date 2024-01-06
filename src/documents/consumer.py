@@ -135,24 +135,24 @@ class Consumer(LoggingMixin):
         """
         Confirm the input file still exists where it should
         """
-        if not os.path.isfile(self.path):
+        if not os.path.isfile(self.original_path):
             self._fail(
                 ConsumerStatusShortMessage.FILE_NOT_FOUND,
-                f"Cannot consume {self.path}: File not found.",
+                f"Cannot consume {self.original_path}: File not found.",
             )
 
     def pre_check_duplicate(self):
         """
         Using the MD5 of the file, check this exact file doesn't already exist
         """
-        with open(self.path, "rb") as f:
+        with open(self.original_path, "rb") as f:
             checksum = hashlib.md5(f.read()).hexdigest()
         existing_doc = Document.objects.filter(
             Q(checksum=checksum) | Q(archive_checksum=checksum),
         )
         if existing_doc.exists():
             if settings.CONSUMER_DELETE_DUPLICATES:
-                os.unlink(self.path)
+                os.unlink(self.original_path)
             self._fail(
                 ConsumerStatusShortMessage.DOCUMENT_ALREADY_EXISTS,
                 f"Not consuming {self.filename}: It is a duplicate of"
@@ -211,7 +211,7 @@ class Consumer(LoggingMixin):
 
         self.log.info(f"Executing pre-consume script {settings.PRE_CONSUME_SCRIPT}")
 
-        working_file_path = str(self.path)
+        working_file_path = str(self.working_copy)
         original_file_path = str(self.original_path)
 
         script_env = os.environ.copy()
@@ -343,8 +343,8 @@ class Consumer(LoggingMixin):
         Return the document object if it was successfully created.
         """
 
-        self.path = Path(path).resolve()
-        self.filename = override_filename or self.path.name
+        self.original_path = Path(path).resolve()
+        self.filename = override_filename or self.original_path.name
         self.override_title = override_title
         self.override_correspondent_id = override_correspondent_id
         self.override_document_type_id = override_document_type_id
@@ -377,17 +377,16 @@ class Consumer(LoggingMixin):
         self.log.info(f"Consuming {self.filename}")
 
         # For the actual work, copy the file into a tempdir
-        self.original_path = self.path
         tempdir = tempfile.TemporaryDirectory(
             prefix="paperless-ngx",
             dir=settings.SCRATCH_DIR,
         )
-        self.path = Path(tempdir.name) / Path(self.filename)
-        copy_file_with_basic_stats(self.original_path, self.path)
+        self.working_copy = Path(tempdir.name) / Path(self.filename)
+        copy_file_with_basic_stats(self.original_path, self.working_copy)
 
         # Determine the parser class.
 
-        mime_type = magic.from_file(self.path, mime=True)
+        mime_type = magic.from_file(self.working_copy, mime=True)
 
         self.log.debug(f"Detected mime type: {mime_type}")
 
@@ -406,7 +405,7 @@ class Consumer(LoggingMixin):
 
         document_consumption_started.send(
             sender=self.__class__,
-            filename=self.path,
+            filename=self.working_copy,
             logging_group=self.logging_group,
         )
 
@@ -444,7 +443,7 @@ class Consumer(LoggingMixin):
                 ConsumerStatusShortMessage.PARSING_DOCUMENT,
             )
             self.log.debug(f"Parsing {self.filename}...")
-            document_parser.parse(self.path, mime_type, self.filename)
+            document_parser.parse(self.working_copy, mime_type, self.filename)
 
             self.log.debug(f"Generating thumbnail for {self.filename}...")
             self._send_progress(
@@ -454,7 +453,7 @@ class Consumer(LoggingMixin):
                 ConsumerStatusShortMessage.GENERATING_THUMBNAIL,
             )
             thumbnail = document_parser.get_thumbnail(
-                self.path,
+                self.working_copy,
                 mime_type,
                 self.filename,
             )
@@ -527,7 +526,7 @@ class Consumer(LoggingMixin):
 
                     self._write(
                         document.storage_type,
-                        self.original_path,
+                        self.working_copy,
                         document.source_path,
                     )
 
@@ -560,9 +559,9 @@ class Consumer(LoggingMixin):
                 document.save()
 
                 # Delete the file only if it was successfully consumed
-                self.log.debug(f"Deleting file {self.path}")
-                os.unlink(self.path)
+                self.log.debug(f"Deleting file {self.working_copy}")
                 self.original_path.unlink()
+                self.working_copy.unlink()
 
                 # https://github.com/jonaswinkler/paperless-ng/discussions/1037
                 shadow_file = os.path.join(
@@ -735,7 +734,7 @@ class Consumer(LoggingMixin):
             )[:127],
             content=text,
             mime_type=mime_type,
-            checksum=hashlib.md5(self.original_path.read_bytes()).hexdigest(),
+            checksum=hashlib.md5(self.working_copy.read_bytes()).hexdigest(),
             created=create_date,
             modified=create_date,
             storage_type=storage_type,
