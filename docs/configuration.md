@@ -665,11 +665,13 @@ completely.
 
     Specifying 1 here will only use the first page.
 
+    The value must be greater than or equal to 1 to be used.
+
     When combined with `PAPERLESS_OCR_MODE=redo` or
     `PAPERLESS_OCR_MODE=force`, paperless will not modify any text it
     finds on excluded pages and copy it verbatim.
 
-    Defaults to 0, which disables this feature and always uses all
+    Defaults to unset, which disables this feature and always uses all
     pages.
 
 #### [`PAPERLESS_OCR_IMAGE_DPI=<num>`](#PAPERLESS_OCR_IMAGE_DPI) {#PAPERLESS_OCR_IMAGE_DPI}
@@ -683,7 +685,7 @@ fails, it uses this value as a fallback.
 
     Set this to the DPI your scanner produces images at.
 
-    Default is none, which will automatically calculate image DPI so
+    Defaults to unset, which will automatically calculate image DPI so
     that the produced PDF documents are A4 sized.
 
 #### [`PAPERLESS_OCR_MAX_IMAGE_PIXELS=<num>`](#PAPERLESS_OCR_MAX_IMAGE_PIXELS) {#PAPERLESS_OCR_MAX_IMAGE_PIXELS}
