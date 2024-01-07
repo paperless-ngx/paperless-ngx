@@ -6985,7 +6985,7 @@
           <context context-type="sourcefile">src/app/data/custom-field.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="translated">Liczba</target>
+        <target state="translated">Liczba rzeczywista</target>
       </trans-unit>
       <trans-unit id="6430409302408843009" datatype="html">
         <source>Monetary</source>

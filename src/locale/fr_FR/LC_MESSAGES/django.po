@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-05 21:26-0800\n"
-"PO-Revision-Date: 2024-01-06 05:27\n"
+"PO-Revision-Date: 2024-01-07 00:27\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -613,15 +613,15 @@ msgstr "instances de champs personnalisés"
 
 #: documents/models.py:902
 msgid "Consumption Started"
-msgstr ""
+msgstr "La consommation a débuté"
 
 #: documents/models.py:903
 msgid "Document Added"
-msgstr ""
+msgstr "Document ajouté"
 
 #: documents/models.py:904
 msgid "Document Updated"
-msgstr ""
+msgstr "Document mis à jour"
 
 #: documents/models.py:907
 msgid "Consume Folder"
@@ -637,7 +637,7 @@ msgstr "Récupération du courriel"
 
 #: documents/models.py:912
 msgid "Workflow Trigger Type"
-msgstr ""
+msgstr "Type de déclencheur de workflow"
 
 #: documents/models.py:924
 msgid "filter path"
@@ -661,31 +661,31 @@ msgstr "filtrer les documents à partir de cette règle de messagerie"
 
 #: documents/models.py:968
 msgid "has these tag(s)"
-msgstr ""
+msgstr "a cette/ces étiquette(s)"
 
 #: documents/models.py:976
 msgid "has this document type"
-msgstr ""
+msgstr "a ce type de document"
 
 #: documents/models.py:984
 msgid "has this correspondent"
-msgstr ""
+msgstr "a ce correspondant"
 
 #: documents/models.py:988
 msgid "workflow trigger"
-msgstr ""
+msgstr "déclencheur workflow"
 
 #: documents/models.py:989
 msgid "workflow triggers"
-msgstr ""
+msgstr "déclencheurs workflow"
 
 #: documents/models.py:997
 msgid "Assignment"
-msgstr ""
+msgstr "Affectation"
 
 #: documents/models.py:1000
 msgid "Workflow Action Type"
-msgstr ""
+msgstr "Type d'action de workflow"
 
 #: documents/models.py:1006
 msgid "assign title"
@@ -737,11 +737,11 @@ msgstr "assigner ces champs personnalisés"
 
 #: documents/models.py:1091
 msgid "workflow action"
-msgstr ""
+msgstr "action de workflow"
 
 #: documents/models.py:1092
 msgid "workflow actions"
-msgstr ""
+msgstr "actions de workflow"
 
 #: documents/models.py:1101 paperless_mail/models.py:95
 msgid "order"
@@ -963,7 +963,7 @@ msgstr "forcer"
 
 #: paperless/models.py:41
 msgid "skip_noarchive"
-msgstr ""
+msgstr "skip_noarchive"
 
 #: paperless/models.py:49
 msgid "never"
@@ -971,7 +971,7 @@ msgstr "jamais"
 
 #: paperless/models.py:50
 msgid "with_text"
-msgstr ""
+msgstr "with_text"
 
 #: paperless/models.py:51
 msgid "always"
@@ -983,7 +983,7 @@ msgstr "clean"
 
 #: paperless/models.py:60
 msgid "clean-final"
-msgstr ""
+msgstr "clean-final"
 
 #: paperless/models.py:61
 msgid "none"
@@ -991,7 +991,7 @@ msgstr "aucun"
 
 #: paperless/models.py:69
 msgid "LeaveColorUnchanged"
-msgstr ""
+msgstr "Laisser les couleurs inchangées"
 
 #: paperless/models.py:70
 msgid "RGB"
@@ -999,15 +999,15 @@ msgstr "RGB"
 
 #: paperless/models.py:71
 msgid "UseDeviceIndependentColor"
-msgstr ""
+msgstr "Utiliser la couleur indépendante de l'appareil"
 
 #: paperless/models.py:72
 msgid "Gray"
-msgstr ""
+msgstr "Gris"
 
 #: paperless/models.py:73
 msgid "CMYK"
-msgstr ""
+msgstr "CMJN"
 
 #: paperless/models.py:82
 msgid "Sets the output PDF type"
@@ -1015,31 +1015,31 @@ msgstr "Définit le type de PDF de sortie"
 
 #: paperless/models.py:94
 msgid "Do OCR from page 1 to this value"
-msgstr ""
+msgstr "Effectuer la ROC de la page 1 à cette valeur"
 
 #: paperless/models.py:100
 msgid "Do OCR using these languages"
-msgstr ""
+msgstr "Utiliser la ROC en utilisant ces langues"
 
 #: paperless/models.py:107
 msgid "Sets the OCR mode"
-msgstr ""
+msgstr "Définit le mode de la ROC"
 
 #: paperless/models.py:115
 msgid "Controls the generation of an archive file"
-msgstr ""
+msgstr "Contrôle la génération d'un fichier d'archive"
 
 #: paperless/models.py:123
 msgid "Sets image DPI fallback value"
-msgstr ""
+msgstr "Définit la valeur de repli du DPI de l'image"
 
 #: paperless/models.py:130
 msgid "Controls the unpaper cleaning"
-msgstr ""
+msgstr "Contrôle le nettoyage du papier"
 
 #: paperless/models.py:137
 msgid "Enables deskew"
-msgstr ""
+msgstr "Active le réalignement"
 
 #: paperless/models.py:140
 msgid "Enables page rotation"
@@ -1051,19 +1051,19 @@ msgstr "Définit le seuil de rotation des pages"
 
 #: paperless/models.py:151
 msgid "Sets the maximum image size for decompression"
-msgstr ""
+msgstr "Définit la taille maximale de l'image pour la décompression"
 
 #: paperless/models.py:157
 msgid "Sets the Ghostscript color conversion strategy"
-msgstr ""
+msgstr "Définit la stratégie de conversion des couleurs de Ghostscript"
 
 #: paperless/models.py:165
 msgid "Adds additional user arguments for OCRMyPDF"
-msgstr ""
+msgstr "Ajoute des arguments utilisateur supplémentaires pour OCRMyPDF"
 
 #: paperless/models.py:170
 msgid "paperless application settings"
-msgstr ""
+msgstr "paramètres de l'application paperless"
 
 #: paperless/settings.py:601
 msgid "English (US)"

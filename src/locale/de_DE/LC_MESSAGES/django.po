@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-05 21:26-0800\n"
-"PO-Revision-Date: 2024-01-06 05:27\n"
+"PO-Revision-Date: 2024-01-07 00:27\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -613,7 +613,7 @@ msgstr "Benutzerdefinierte Feld-Instanzen"
 
 #: documents/models.py:902
 msgid "Consumption Started"
-msgstr ""
+msgstr "Verarbeitung gestartet"
 
 #: documents/models.py:903
 msgid "Document Added"
@@ -637,7 +637,7 @@ msgstr "E-Mail-Abruf"
 
 #: documents/models.py:912
 msgid "Workflow Trigger Type"
-msgstr ""
+msgstr "Workflow-Auslösertyp"
 
 #: documents/models.py:924
 msgid "filter path"
@@ -661,23 +661,23 @@ msgstr "Dokumente aus dieser E-Mail-Regel filtern"
 
 #: documents/models.py:968
 msgid "has these tag(s)"
-msgstr ""
+msgstr "hat diese(n) Tag(s)"
 
 #: documents/models.py:976
 msgid "has this document type"
-msgstr ""
+msgstr "hat diesen Dokumenttyp"
 
 #: documents/models.py:984
 msgid "has this correspondent"
-msgstr ""
+msgstr "hat diesen Korrespondenten"
 
 #: documents/models.py:988
 msgid "workflow trigger"
-msgstr ""
+msgstr "Arbeitsablauf-Auslöser"
 
 #: documents/models.py:989
 msgid "workflow triggers"
-msgstr ""
+msgstr "Arbeitsablauf-Auslöser"
 
 #: documents/models.py:997
 msgid "Assignment"
@@ -685,7 +685,7 @@ msgstr "Zuordnung"
 
 #: documents/models.py:1000
 msgid "Workflow Action Type"
-msgstr ""
+msgstr "Arbeitsablauf-Aktionstyp"
 
 #: documents/models.py:1006
 msgid "assign title"
@@ -737,11 +737,11 @@ msgstr "Diese benutzerdefinierten Felder zuweisen"
 
 #: documents/models.py:1091
 msgid "workflow action"
-msgstr ""
+msgstr "Workflow-Aktion"
 
 #: documents/models.py:1092
 msgid "workflow actions"
-msgstr ""
+msgstr "Workflow-Aktionen"
 
 #: documents/models.py:1101 paperless_mail/models.py:95
 msgid "order"
@@ -749,11 +749,11 @@ msgstr "Reihenfolge"
 
 #: documents/models.py:1107
 msgid "triggers"
-msgstr ""
+msgstr "Auslöser"
 
 #: documents/models.py:1114
 msgid "actions"
-msgstr ""
+msgstr "Aktionen"
 
 #: documents/models.py:1117
 msgid "enabled"
@@ -913,17 +913,17 @@ msgstr "Anweisungen senden!"
 #: documents/validators.py:17
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "Kann URL {value} nicht parsen, fehlendes Schema"
 
 #: documents/validators.py:22
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
+msgstr "Kann URL {value} nicht parsen, fehlende Netzadresse oder Pfad"
 
 #: documents/validators.py:27
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "Kann URL {value} nicht parsen"
 
 #: paperless/apps.py:10
 msgid "Paperless"
@@ -931,31 +931,31 @@ msgstr "Paperless"
 
 #: paperless/models.py:25
 msgid "pdf"
-msgstr ""
+msgstr "pdf"
 
 #: paperless/models.py:26
 msgid "pdfa"
-msgstr ""
+msgstr "pdfa"
 
 #: paperless/models.py:27
 msgid "pdfa-1"
-msgstr ""
+msgstr "pdfa-1"
 
 #: paperless/models.py:28
 msgid "pdfa-2"
-msgstr ""
+msgstr "pdfa-2"
 
 #: paperless/models.py:29
 msgid "pdfa-3"
-msgstr ""
+msgstr "pdfa-3"
 
 #: paperless/models.py:38
 msgid "skip"
-msgstr ""
+msgstr "überspringen"
 
 #: paperless/models.py:39
 msgid "redo"
-msgstr ""
+msgstr "wiederholen"
 
 #: paperless/models.py:40
 msgid "force"
@@ -963,7 +963,7 @@ msgstr "erzwingen"
 
 #: paperless/models.py:41
 msgid "skip_noarchive"
-msgstr ""
+msgstr "skip_noarchive"
 
 #: paperless/models.py:49
 msgid "never"
@@ -971,7 +971,7 @@ msgstr "nie"
 
 #: paperless/models.py:50
 msgid "with_text"
-msgstr "mit_Text"
+msgstr "with_text"
 
 #: paperless/models.py:51
 msgid "always"
@@ -979,27 +979,27 @@ msgstr "immer"
 
 #: paperless/models.py:59
 msgid "clean"
-msgstr ""
+msgstr "bereinigen"
 
 #: paperless/models.py:60
 msgid "clean-final"
-msgstr ""
+msgstr "clean-final"
 
 #: paperless/models.py:61
 msgid "none"
-msgstr ""
+msgstr "keine"
 
 #: paperless/models.py:69
 msgid "LeaveColorUnchanged"
-msgstr ""
+msgstr "LeaveColorUnchanged"
 
 #: paperless/models.py:70
 msgid "RGB"
-msgstr ""
+msgstr "RGB"
 
 #: paperless/models.py:71
 msgid "UseDeviceIndependentColor"
-msgstr ""
+msgstr "UseDeviceIndependentColor"
 
 #: paperless/models.py:72
 msgid "Gray"
@@ -1011,15 +1011,15 @@ msgstr "CMYK"
 
 #: paperless/models.py:82
 msgid "Sets the output PDF type"
-msgstr "Legt den Ausgabe-PDF-Typ fest"
+msgstr "Legt den PDF-Typ der Ausgabedatei fest"
 
 #: paperless/models.py:94
 msgid "Do OCR from page 1 to this value"
-msgstr ""
+msgstr "OCR von Seite 1 bis zu diesem Wert durchführen"
 
 #: paperless/models.py:100
 msgid "Do OCR using these languages"
-msgstr ""
+msgstr "OCR für diese Sprachen durchführen"
 
 #: paperless/models.py:107
 msgid "Sets the OCR mode"
@@ -1027,43 +1027,43 @@ msgstr "Legt den OCR-Modus fest"
 
 #: paperless/models.py:115
 msgid "Controls the generation of an archive file"
-msgstr ""
+msgstr "Steuert die Erzeugung einer Archivdatei"
 
 #: paperless/models.py:123
 msgid "Sets image DPI fallback value"
-msgstr ""
+msgstr "Setzt den Bild-DPI Fallback-Wert"
 
 #: paperless/models.py:130
 msgid "Controls the unpaper cleaning"
-msgstr ""
+msgstr "Steuert die unpaper-Bereinigung"
 
 #: paperless/models.py:137
 msgid "Enables deskew"
-msgstr ""
+msgstr "Aktiviert die Schräglagenkorrektur"
 
 #: paperless/models.py:140
 msgid "Enables page rotation"
-msgstr ""
+msgstr "Aktiviert Seitenrotation"
 
 #: paperless/models.py:145
 msgid "Sets the threshold for rotation of pages"
-msgstr ""
+msgstr "Legt die Schwelle für die Seitenrotation fest"
 
 #: paperless/models.py:151
 msgid "Sets the maximum image size for decompression"
-msgstr ""
+msgstr "Legt die maximale Bildgröße für die Dekomprimierung fest"
 
 #: paperless/models.py:157
 msgid "Sets the Ghostscript color conversion strategy"
-msgstr ""
+msgstr "Legt die Ghostscript-Farbkonvertierungsstrategie fest"
 
 #: paperless/models.py:165
 msgid "Adds additional user arguments for OCRMyPDF"
-msgstr ""
+msgstr "Fügt zusätzliche Benutzerparameter für OCRMyPDF hinzu"
 
 #: paperless/models.py:170
 msgid "paperless application settings"
-msgstr ""
+msgstr "Paperless-Anwendungseinstellungen"
 
 #: paperless/settings.py:601
 msgid "English (US)"
