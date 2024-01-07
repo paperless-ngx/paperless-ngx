@@ -1,9 +1,13 @@
+import logging
+
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from paperless.models import ApplicationConfiguration
+
+logger = logging.getLogger("paperless.settings")
 
 
 class ObfuscatedUserPasswordField(serializers.Field):
@@ -118,6 +122,8 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class ApplicationConfigurationSerializer(serializers.ModelSerializer):
+    user_args = serializers.JSONField(binary=True)
+
     class Meta:
         model = ApplicationConfiguration
         fields = "__all__"
