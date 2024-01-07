@@ -579,9 +579,9 @@ def run_workflow(
                         if document.document_type is not None
                         else "",
                         document.owner.username if document.owner is not None else "",
-                        document.added,
+                        timezone.localtime(document.added),
                         document.original_filename,
-                        document.created,
+                        timezone.localtime(document.created),
                     )
 
                 if (
