@@ -47,6 +47,7 @@ export enum ConfigOptionType {
 
 export const ConfigCategory = {
   OCR: $localize`OCR Settings`,
+  Frontend: $localize`Frontend Settings`,
 }
 
 export interface ConfigOption {
@@ -164,6 +165,13 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     config_key: 'PAPERLESS_OCR_USER_ARGS',
     category: ConfigCategory.OCR,
   },
+  {
+    key: 'app_title',
+    title: $localize`Application Title`,
+    type: ConfigOptionType.String,
+    config_key: 'PAPERLESS_APP_TITLE',
+    category: ConfigCategory.Frontend,
+  },
 ]
 
 export interface PaperlessConfig extends ObjectWithId {
@@ -180,4 +188,5 @@ export interface PaperlessConfig extends ObjectWithId {
   max_image_pixels: number
   color_conversion_strategy: ColorConvertConfig
   user_args: object
+  app_title: string
 }

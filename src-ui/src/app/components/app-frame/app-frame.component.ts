@@ -102,6 +102,10 @@ export class AppFrameComponent
     }, 200) // slightly longer than css animation for slim sidebar
   }
 
+  get customAppTitle(): string {
+    return this.settingsService.get(SETTINGS_KEYS.APP_TITLE)
+  }
+
   get slimSidebarEnabled(): boolean {
     return this.settingsService.get(SETTINGS_KEYS.SLIM_SIDEBAR)
   }

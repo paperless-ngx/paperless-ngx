@@ -999,6 +999,8 @@ ENABLE_UPDATE_CHECK = os.getenv("PAPERLESS_ENABLE_UPDATE_CHECK", "default")
 if ENABLE_UPDATE_CHECK != "default":
     ENABLE_UPDATE_CHECK = __get_boolean("PAPERLESS_ENABLE_UPDATE_CHECK")
 
+APP_TITLE = os.getenv("PAPERLESS_APP_TITLE", None)
+
 ###############################################################################
 # Machine Learning                                                            #
 ###############################################################################

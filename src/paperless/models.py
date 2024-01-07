@@ -166,6 +166,13 @@ class ApplicationConfiguration(AbstractSingletonModel):
         null=True,
     )
 
+    app_title = models.CharField(
+        verbose_name=_("Application Title"),
+        null=True,
+        blank=True,
+        max_length=48,
+    )
+
     class Meta:
         verbose_name = _("paperless application settings")
 
