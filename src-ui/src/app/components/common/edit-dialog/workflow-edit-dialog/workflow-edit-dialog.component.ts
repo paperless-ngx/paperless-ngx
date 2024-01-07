@@ -179,9 +179,9 @@ export class WorkflowEditDialogComponent
           filter_filename: new FormControl(trigger.filter_filename),
           filter_path: new FormControl(trigger.filter_path),
           filter_mailrule: new FormControl(trigger.filter_mailrule),
-          matching_algorithm: new FormControl(MATCH_NONE),
-          match: new FormControl(''),
-          is_insensitive: new FormControl(true),
+          matching_algorithm: new FormControl(trigger.matching_algorithm),
+          match: new FormControl(trigger.match),
+          is_insensitive: new FormControl(trigger.is_insensitive),
           filter_has_tags: new FormControl(trigger.filter_has_tags),
           filter_has_correspondent: new FormControl(
             trigger.filter_has_correspondent
@@ -242,6 +242,9 @@ export class WorkflowEditDialogComponent
       filter_has_tags: [],
       filter_has_correspondent: null,
       filter_has_document_type: null,
+      matching_algorithm: MATCH_NONE,
+      match: null,
+      is_insensitive: true,
     })
 
     this.updateTriggerActionFields()
