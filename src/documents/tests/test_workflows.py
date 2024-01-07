@@ -13,6 +13,7 @@ from documents.data_models import DocumentSource
 from documents.matching import document_matches_workflow
 from documents.models import Correspondent
 from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
@@ -985,6 +986,47 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
             correspondent=self.c,
             original_filename="sample.pdf",
         )
+
+        superuser = User.objects.create_superuser("superuser")
+        self.client.force_authenticate(user=superuser)
+
+        self.client.patch(
+            f"/api/documents/{doc.id}/",
+            {"document_type": self.dt.id},
+            format="json",
+        )
+
+        self.assertEqual(doc.custom_fields.all().count(), 1)
+
+    def test_document_updated_workflow_existing_custom_field(self):
+        """
+        GIVEN:
+            - Existing workflow with UPDATED trigger and action that adds a custom field
+        WHEN:
+            - Document is updated that already contains the field
+        THEN:
+            - Document update succeeds without trying to re-create the field
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+            filter_has_document_type=self.dt,
+        )
+        action = WorkflowAction.objects.create()
+        action.assign_custom_fields.add(self.cf1)
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        CustomFieldInstance.objects.create(document=doc, field=self.cf1)
 
         superuser = User.objects.create_superuser("superuser")
         self.client.force_authenticate(user=superuser)
