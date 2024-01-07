@@ -999,6 +999,14 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         self.assertEqual(doc.custom_fields.all().count(), 1)
 
     def test_document_updated_workflow_existing_custom_field(self):
+        """
+        GIVEN:
+            - Existing workflow with UPDATED trigger and action that adds a custom field
+        WHEN:
+            - Document is updated that already contains the field
+        THEN:
+            - Document update succeeds without trying to re-create the field
+        """
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
             filter_has_document_type=self.dt,
