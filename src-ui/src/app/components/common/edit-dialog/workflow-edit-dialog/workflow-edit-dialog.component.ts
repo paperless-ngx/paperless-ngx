@@ -258,7 +258,7 @@ export class WorkflowEditDialogComponent
       filter_has_correspondent: null,
       filter_has_document_type: null,
       matching_algorithm: MATCH_NONE,
-      match: null,
+      match: '',
       is_insensitive: true,
     }
     this.object.triggers.push(trigger)
