@@ -54,11 +54,6 @@ services:
       - broker
     ports:
       - "8000:8000"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
     volumes:
       - data:/usr/src/paperless/data
       - media:/usr/src/paperless/media
@@ -72,7 +67,6 @@ services:
       PAPERLESS_DBUSER: paperless # only needed if non-default username
       PAPERLESS_DBPASS: paperless # only needed if non-default password
       PAPERLESS_DBPORT: 3306
-
 
 volumes:
   data:
