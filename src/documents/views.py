@@ -120,7 +120,7 @@ from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_updated
 from documents.tasks import consume_file
 from paperless import version
-from paperless.config import FrontendConfig
+from paperless.config import GeneralConfig
 from paperless.db import GnuPG
 from paperless.views import StandardPagination
 
@@ -1166,12 +1166,11 @@ class UiSettingsView(GenericAPIView):
                 "backend_setting": settings.ENABLE_UPDATE_CHECK,
             }
 
-        frontend_config = FrontendConfig()
+        general_config = GeneralConfig()
 
-        if settings.APP_TITLE is not None:
-            ui_settings["app_title"] = settings.APP_TITLE
-        if frontend_config.app_title is not None and len(frontend_config.app_title) > 0:
-            ui_settings["app_title"] = frontend_config.app_title
+        ui_settings["app_title"] = settings.APP_TITLE
+        if general_config.app_title is not None and len(general_config.app_title) > 0:
+            ui_settings["app_title"] = general_config.app_title
 
         user_resp = {
             "id": user.id,

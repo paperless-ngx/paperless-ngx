@@ -46,8 +46,8 @@ export enum ConfigOptionType {
 }
 
 export const ConfigCategory = {
+  General: $localize`General Settings`,
   OCR: $localize`OCR Settings`,
-  Frontend: $localize`Frontend Settings`,
 }
 
 export interface ConfigOption {
@@ -170,7 +170,7 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     title: $localize`Application Title`,
     type: ConfigOptionType.String,
     config_key: 'PAPERLESS_APP_TITLE',
-    category: ConfigCategory.Frontend,
+    category: ConfigCategory.General,
   },
 ]
 

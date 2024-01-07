@@ -99,9 +99,9 @@ class OcrConfig(OutputTypeConfig):
 
 
 @dataclasses.dataclass
-class FrontendConfig(BaseConfig):
+class GeneralConfig(BaseConfig):
     """
-    Frontend application settings that require global scope
+    General application settings that require global scope
     """
 
     app_title: str = dataclasses.field(init=False)
