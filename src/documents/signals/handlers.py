@@ -610,10 +610,18 @@ def run_workflow(
 
                 if action.assign_custom_fields is not None:
                     for field in action.assign_custom_fields.all():
-                        CustomFieldInstance.objects.create(
-                            field=field,
-                            document=document,
-                        )  # adds to document
+                        if (
+                            CustomFieldInstance.objects.filter(
+                                field=field,
+                                document=document,
+                            ).count()
+                            == 0
+                        ):
+                            # can be triggered on existing docs, so only add the field if it doesnt already exist
+                            CustomFieldInstance.objects.create(
+                                field=field,
+                                document=document,
+                            )
 
             document.save()
 
