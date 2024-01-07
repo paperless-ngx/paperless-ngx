@@ -1,5 +1,21 @@
 # Changelog
 
+## paperless-ngx 2.3.1
+
+### Bug Fixes
+
+- Fix: edit workflow form not displaying trigger settings [@shamoon](https://github.com/shamoon) ([#5276](https://github.com/paperless-ngx/paperless-ngx/pull/5276))
+- Fix: Prevent passing 0 pages to OCRMyPDF [@stumpylog](https://github.com/stumpylog) ([#5275](https://github.com/paperless-ngx/paperless-ngx/pull/5275))
+
+### All App Changes
+
+<details>
+<summary>2 changes</summary>
+
+- Fix: edit workflow form not displaying trigger settings [@shamoon](https://github.com/shamoon) ([#5276](https://github.com/paperless-ngx/paperless-ngx/pull/5276))
+- Fix: Prevent passing 0 pages to OCRMyPDF [@stumpylog](https://github.com/stumpylog) ([#5275](https://github.com/paperless-ngx/paperless-ngx/pull/5275))
+</details>
+
 ## paperless-ngx 2.3.0
 
 ### Notable Changes
