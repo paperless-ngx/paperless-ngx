@@ -32,8 +32,8 @@ repos:
     rev: v2.2.4
     hooks:
       - id: codespell
-        args: ["--ignore-words-list", "criterias,afterAll"]
-        exclude: "^src-ui/src/locale/*|^src-ui/e2e/*"
+        args: ["--write-changes", "--ignore-words-list", "criterias,afterall,valeu,ure"]
+        exclude: "^src-ui/src/locale/|^src-ui/e2e/|^src/paperless_mail/tests/samples/"
         exclude_types:
           - pofile
           - json

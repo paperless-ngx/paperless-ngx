@@ -58,7 +58,7 @@ describe('StoragePathListComponent', () => {
     fixture.detectChanges()
   })
 
-  // Tests are included in management-list.compontent.spec.ts
+  // Tests are included in management-list.component.spec.ts
 
   it('should use correct delete message', () => {
     expect(component.getDeleteMessage({ id: 1, name: 'StoragePath1' })).toEqual(

@@ -149,7 +149,7 @@ different means. These are as follows:
 - **Flag:** Sets the 'important' flag on mails with consumed
   documents. Paperless will not consume flagged mails.
 - **Move to folder:** Moves consumed mails out of the way so that
-  paperless wont consume them again.
+  paperless won't consume them again.
 - **Add custom Tag:** Adds a custom tag to mails with consumed
   documents (the IMAP standard calls these "keywords"). Paperless
   will not consume mails already tagged. Not all mail servers support

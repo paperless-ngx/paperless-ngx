@@ -169,7 +169,7 @@ jobs:
           docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml down
 
   install-frontend-depedendencies:
-    name: "Install Frontend Dependendencies"
+    name: "Install Frontend Dependencies"
     runs-on: ubuntu-22.04
     needs:
       - pre-commit
@@ -182,7 +182,7 @@ jobs:
           node-version: 20.x
           cache: 'npm'
           cache-dependency-path: 'src-ui/package-lock.json'
-      - name: Cache frontend depdendencies
+      - name: Cache frontend dependencies
         id: cache-frontend-deps
         uses: actions/cache@v3
         with:
@@ -219,7 +219,7 @@ jobs:
           node-version: 20.x
           cache: 'npm'
           cache-dependency-path: 'src-ui/package-lock.json'
-      - name: Cache frontend depdendencies
+      - name: Cache frontend dependencies
         id: cache-frontend-deps
         uses: actions/cache@v3
         with:

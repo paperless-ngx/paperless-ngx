@@ -157,7 +157,7 @@ export class DocumentDetailComponent
 
   @ViewChild('nav') nav: NgbNav
   @ViewChild('pdfPreview') set pdfPreview(element) {
-    // this gets called when compontent added or removed from DOM
+    // this gets called when component added or removed from DOM
     if (
       element &&
       element.nativeElement.offsetParent !== null &&
@@ -316,7 +316,7 @@ export class DocumentDetailComponent
             .subscribe({
               next: (titleValue) => {
                 // In the rare case when the field changed just after debounced event was fired.
-                // We dont want to overwrite whats actually in the text field, so just return
+                // We dont want to overwrite what's actually in the text field, so just return
                 if (titleValue !== this.titleInput.value) return
 
                 this.title = titleValue

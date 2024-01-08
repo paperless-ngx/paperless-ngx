@@ -56,7 +56,7 @@ describe('NumberComponent', () => {
     component.step = 0.1
     component.writeValue(12.3456)
     expect(component.value).toEqual(12.3456)
-    // float (step = .1) doesnt force 2 decimals
+    // float (step = .1) doesn't force 2 decimals
     component.writeValue(11.1)
     expect(component.value).toEqual(11.1)
   })
