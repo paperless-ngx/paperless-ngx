@@ -411,7 +411,7 @@ The following custom field types are supported:
 
 ## Share Links
 
-Paperless-ngx added the abiltiy to create shareable links to files in version 2.0. You can find the button for this on the document detail screen.
+Paperless-ngx added the ability to create shareable links to files in version 2.0. You can find the button for this on the document detail screen.
 
 - Share links do not require a user to login and thus link directly to a file.
 - Links are unique and are of the form `{paperless-url}/share/{randomly-generated-slug}`.

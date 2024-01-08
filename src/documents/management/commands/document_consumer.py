@@ -264,7 +264,7 @@ class Command(BaseCommand):
         polling_interval = settings.CONSUMER_POLLING
         if polling_interval == 0:  # pragma: no cover
             # Only happens if INotify failed to import
-            logger.warn("Using polling of 10s, consider settng this")
+            logger.warn("Using polling of 10s, consider setting this")
             polling_interval = 10
 
         with ThreadPoolExecutor(max_workers=4) as pool:

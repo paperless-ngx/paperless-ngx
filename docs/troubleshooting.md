@@ -138,7 +138,7 @@ command:
 You might encounter errors such as:
 
 ```shell-session
-The following error occured while consuming document.pdf: [Errno 13] Permission denied: '/usr/src/paperless/src/../consume/document.pdf'
+The following error occurred while consuming document.pdf: [Errno 13] Permission denied: '/usr/src/paperless/src/../consume/document.pdf'
 ```
 
 This happens when paperless does not have permission to delete files
