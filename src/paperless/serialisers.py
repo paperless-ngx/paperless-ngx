@@ -122,7 +122,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class ApplicationConfigurationSerializer(serializers.ModelSerializer):
-    user_args = serializers.JSONField(binary=True)
+    user_args = serializers.JSONField(binary=True, allow_null=True)
 
     class Meta:
         model = ApplicationConfiguration
