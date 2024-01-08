@@ -22,9 +22,6 @@ class BaseConfig:
             app_config = ApplicationConfiguration.objects.all().first()
         return app_config
 
-    def __post_init__(self) -> None:
-        return self._get_config_instance()
-
 
 @dataclasses.dataclass
 class OutputTypeConfig(BaseConfig):
@@ -35,7 +32,7 @@ class OutputTypeConfig(BaseConfig):
     output_type: str = dataclasses.field(init=False)
 
     def __post_init__(self) -> None:
-        app_config = super.__post_init__()
+        app_config = self._get_config_instance()
 
         self.output_type = app_config.output_type or settings.OCR_OUTPUT_TYPE
 
@@ -107,6 +104,6 @@ class GeneralConfig(BaseConfig):
     app_title: str = dataclasses.field(init=False)
 
     def __post_init__(self) -> None:
-        app_config = super().__post_init__()
+        app_config = self._get_config_instance()
 
         self.app_title = app_config.app_title or None
