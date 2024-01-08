@@ -49,8 +49,29 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                     "rotate_pages_threshold": None,
                     "max_image_pixels": None,
                     "color_conversion_strategy": None,
+                    "app_title": None,
                 },
             ),
+        )
+
+    def test_api_get_ui_settings_with_config(self):
+        """
+        GIVEN:
+            - Existing config with app_title specified
+        WHEN:
+            - API to retrieve uisettings is called
+        THEN:
+            - app_title is included
+        """
+        config = ApplicationConfiguration.objects.first()
+        config.app_title = "Fancy New Title"
+        config.save()
+        response = self.client.get("/api/ui_settings/", format="json")
+        self.assertDictContainsSubset(
+            {
+                "app_title": config.app_title,
+            },
+            response.data["settings"],
         )
 
     def test_api_update_config(self):
