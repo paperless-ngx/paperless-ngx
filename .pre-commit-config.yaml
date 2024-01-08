@@ -28,6 +28,15 @@ repos:
           - svg
       - id: check-case-conflict
       - id: detect-private-key
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.4
+    hooks:
+      - id: codespell
+        args: ["--ignore-words-list", "criterias,afterAll"]
+        exclude: "^src-ui/src/locale/*|^src-ui/e2e/*"
+        exclude_types:
+          - pofile
+          - json
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: 'v3.1.0'
     hooks:
