@@ -1276,7 +1276,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         GIVEN:
             - NUMBER_OF_SUGGESTED_DATES = 0 (disables feature)
         WHEN:
-            - API reuqest for document suggestions
+            - API request for document suggestions
         THEN:
             - Dont check for suggested dates at all
         """
@@ -1526,7 +1526,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         GIVEN:
             - A document with a single note
         WHEN:
-            - API reuqest for document notes is made
+            - API request for document notes is made
         THEN:
             - The associated note is returned
         """

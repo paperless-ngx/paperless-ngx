@@ -207,7 +207,7 @@ def create_archive_version(doc, retry_count=3):
                 return
             else:
                 # This is mostly here for the tika parser in docker
-                # environemnts. The servers for parsing need to come up first,
+                # environments. The servers for parsing need to come up first,
                 # and the docker setup doesn't ensure that tika is running
                 # before attempting migrations.
                 logger.error("Parse error, will try again in 5 seconds...")

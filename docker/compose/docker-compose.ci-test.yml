@@ -1,6 +1,6 @@
 # Docker Compose file for running paperless testing with actual gotenberg
 # and Tika containers for a more end to end test of the Tika related functionality
-# Can be used locally or by the CI to start the nessecary containers with the
+# Can be used locally or by the CI to start the necessary containers with the
 # correct networking for the tests
 
 version: "3.7"

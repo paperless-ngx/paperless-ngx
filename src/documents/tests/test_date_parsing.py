@@ -212,8 +212,8 @@ class TestDate(TestCase):
 
     def test_multiple_dates(self):
         text = """This text has multiple dates.
-                  For example 02.02.2018, 22 July 2022 and Dezember 2021.
-                  But not 24-12-9999 because its in the future..."""
+                  For example 02.02.2018, 22 July 2022 and December 2021.
+                  But not 24-12-9999 because it's in the future..."""
         dates = list(parse_date_generator("", text))
         self.assertEqual(len(dates), 3)
         self.assertEqual(

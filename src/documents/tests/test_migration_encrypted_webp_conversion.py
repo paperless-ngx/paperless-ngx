@@ -165,7 +165,7 @@ class TestMigrateToEncrytpedWebPThumbnails(TestMigrations):
     ):
         """
         GIVEN:
-            - Encrytped document exists with existing encrypted WebP thumbnail path
+            - Encrypted document exists with existing encrypted WebP thumbnail path
         WHEN:
             - Migration is attempted
         THEN:

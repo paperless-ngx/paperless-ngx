@@ -43,7 +43,7 @@ class TestDelayedQuery(TestCase):
         )
 
     def test_get_permission_criteria(self):
-        # tests contains touples of user instances and the expected filter
+        # tests contains tuples of user instances and the expected filter
         tests = (
             (None, [query.Term("has_owner", False)]),
             (User(42, username="foo", is_superuser=True), []),
@@ -113,7 +113,7 @@ class TestDelayedQuery(TestCase):
             )
 
     def test_tags_query_filters(self):
-        # tests contains touples of query_parameter dics and the expected whoosh query
+        # tests contains tuples of query_parameter dics and the expected whoosh query
         param = "tags"
         field, _ = DelayedQuery.param_map[param]
         tests = (
