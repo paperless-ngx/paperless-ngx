@@ -38,11 +38,6 @@ services:
       - broker
     ports:
       - "8000:8000"
-    healthcheck:
-      test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
     volumes:
       - data:/usr/src/paperless/data
       - media:/usr/src/paperless/media
@@ -51,7 +46,6 @@ services:
     env_file: docker-compose.env
     environment:
       PAPERLESS_REDIS: redis://broker:6379
-
 
 volumes:
   data:

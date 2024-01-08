@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-05 21:26-0800\n"
-"PO-Revision-Date: 2024-01-06 05:27\n"
+"PO-Revision-Date: 2024-01-06 12:09\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -673,11 +673,11 @@ msgstr "té aquest corresponsal"
 
 #: documents/models.py:988
 msgid "workflow trigger"
-msgstr ""
+msgstr "disparador de flux"
 
 #: documents/models.py:989
 msgid "workflow triggers"
-msgstr ""
+msgstr "disparadors de fluxos"
 
 #: documents/models.py:997
 msgid "Assignment"
@@ -685,7 +685,7 @@ msgstr "Assignació"
 
 #: documents/models.py:1000
 msgid "Workflow Action Type"
-msgstr ""
+msgstr "Tipus d'acció de disparador"
 
 #: documents/models.py:1006
 msgid "assign title"
@@ -737,11 +737,11 @@ msgstr "assigna aquests camps personalitzats"
 
 #: documents/models.py:1091
 msgid "workflow action"
-msgstr ""
+msgstr "acció disparador"
 
 #: documents/models.py:1092
 msgid "workflow actions"
-msgstr ""
+msgstr "accions disparadors"
 
 #: documents/models.py:1101 paperless_mail/models.py:95
 msgid "order"
@@ -963,7 +963,7 @@ msgstr "forçar"
 
 #: paperless/models.py:41
 msgid "skip_noarchive"
-msgstr ""
+msgstr "skip_noarchive"
 
 #: paperless/models.py:49
 msgid "never"
@@ -971,7 +971,7 @@ msgstr "mai"
 
 #: paperless/models.py:50
 msgid "with_text"
-msgstr ""
+msgstr "with_text"
 
 #: paperless/models.py:51
 msgid "always"
@@ -983,7 +983,7 @@ msgstr "neteja"
 
 #: paperless/models.py:60
 msgid "clean-final"
-msgstr ""
+msgstr "clean-final"
 
 #: paperless/models.py:61
 msgid "none"
@@ -991,7 +991,7 @@ msgstr "cap"
 
 #: paperless/models.py:69
 msgid "LeaveColorUnchanged"
-msgstr ""
+msgstr "DeixarColorSenseCanviar"
 
 #: paperless/models.py:70
 msgid "RGB"
@@ -999,7 +999,7 @@ msgstr "RGB"
 
 #: paperless/models.py:71
 msgid "UseDeviceIndependentColor"
-msgstr ""
+msgstr "EmprarColordispositiuIndependent"
 
 #: paperless/models.py:72
 msgid "Gray"
@@ -1027,7 +1027,7 @@ msgstr "Estableix el mode OCR"
 
 #: paperless/models.py:115
 msgid "Controls the generation of an archive file"
-msgstr ""
+msgstr "Controls de generació d'arxiu arxivat"
 
 #: paperless/models.py:123
 msgid "Sets image DPI fallback value"
@@ -1039,7 +1039,7 @@ msgstr ""
 
 #: paperless/models.py:137
 msgid "Enables deskew"
-msgstr ""
+msgstr "Habilita deskew"
 
 #: paperless/models.py:140
 msgid "Enables page rotation"
