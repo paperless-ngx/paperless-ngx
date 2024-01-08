@@ -270,7 +270,7 @@ class DelayedQuery:
                     query.DateRange(field, start=isoparse(value), end=None),
                 )
             elif query_filter == "icontains":
-                  criterias.append(
+                criterias.append(
                     query.Term(field, value),
                 )
             elif query_filter == "istartswith":
