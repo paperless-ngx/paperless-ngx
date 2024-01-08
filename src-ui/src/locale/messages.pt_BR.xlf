@@ -3833,13 +3833,13 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         </context-group>
         <target state="translated">Filtro de caminho</target>
       </trans-unit>
-      <trans-unit id="2900550647231873115" datatype="html">
-        <source>Apply to documents that match this path. Wildcards specified as * are allowed. Case insensitive.&lt;/a&gt;</source>
+      <trans-unit id="5491897741674893121" datatype="html">
+        <source>Apply to documents that match this path. Wildcards specified as * are allowed. Case-normalized.&lt;/a&gt;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">185</context>
         </context-group>
-        <target state="translated">Aplica-se a documentos que correspondem a esse caminho. Caracteres curinga usando * são permitidos. Sem diferenciação de maiúsculas e minúsculas.&lt;/a&gt;</target>
+        <target state="needs-translation">Apply to documents that match this path. Wildcards specified as * are allowed. Case-normalized.&lt;/a&gt;</target>
       </trans-unit>
       <trans-unit id="7468453896129193641" datatype="html">
         <source>Filter mail rule</source>
@@ -3901,7 +3901,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Consume Folder</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">38</context>
+          <context context-type="linenumber">39</context>
         </context-group>
         <target state="translated">Pasta de Consumo</target>
       </trans-unit>
@@ -3909,7 +3909,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>API Upload</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">42</context>
+          <context context-type="linenumber">43</context>
         </context-group>
         <target state="translated">Envio por API</target>
       </trans-unit>
@@ -3917,7 +3917,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Mail Fetch</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">46</context>
+          <context context-type="linenumber">47</context>
         </context-group>
         <target state="translated">Busca em e-mail</target>
       </trans-unit>
@@ -3925,7 +3925,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Consumption Started</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">53</context>
+          <context context-type="linenumber">54</context>
         </context-group>
         <target state="needs-translation">Consumption Started</target>
       </trans-unit>
@@ -3933,7 +3933,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Document Added</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">57</context>
+          <context context-type="linenumber">58</context>
         </context-group>
         <target state="needs-translation">Document Added</target>
       </trans-unit>
@@ -3941,7 +3941,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Document Updated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">61</context>
+          <context context-type="linenumber">62</context>
         </context-group>
         <target state="needs-translation">Document Updated</target>
       </trans-unit>
@@ -3949,7 +3949,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">68</context>
+          <context context-type="linenumber">69</context>
         </context-group>
         <target state="needs-translation">Assignment</target>
       </trans-unit>
@@ -3957,7 +3957,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Create new workflow</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">136</context>
+          <context context-type="linenumber">137</context>
         </context-group>
         <target state="needs-translation">Create new workflow</target>
       </trans-unit>
@@ -3965,7 +3965,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Edit workflow</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">140</context>
+          <context context-type="linenumber">141</context>
         </context-group>
         <target state="needs-translation">Edit workflow</target>
       </trans-unit>

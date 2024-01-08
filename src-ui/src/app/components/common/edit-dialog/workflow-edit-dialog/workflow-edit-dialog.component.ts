@@ -19,6 +19,7 @@ import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service
 import { CustomField } from 'src/app/data/custom-field'
 import {
   DocumentSource,
+  WorkflowTrigger,
   WorkflowTriggerType,
 } from 'src/app/data/workflow-trigger'
 import {
@@ -157,7 +158,7 @@ export class WorkflowEditDialogComponent
 
   ngOnInit(): void {
     super.ngOnInit()
-    this.updateTriggerActionFields()
+    this.updateAllTriggerActionFields()
   }
 
   get triggerFields(): FormArray {
@@ -168,52 +169,66 @@ export class WorkflowEditDialogComponent
     return this.objectForm.get('actions') as FormArray
   }
 
-  private updateTriggerActionFields(emitEvent: boolean = false) {
+  private createTriggerField(
+    trigger: WorkflowTrigger,
+    emitEvent: boolean = false
+  ) {
+    this.triggerFields.push(
+      new FormGroup({
+        id: new FormControl(trigger.id),
+        type: new FormControl(trigger.type),
+        sources: new FormControl(trigger.sources),
+        filter_filename: new FormControl(trigger.filter_filename),
+        filter_path: new FormControl(trigger.filter_path),
+        filter_mailrule: new FormControl(trigger.filter_mailrule),
+        matching_algorithm: new FormControl(trigger.matching_algorithm),
+        match: new FormControl(trigger.match),
+        is_insensitive: new FormControl(trigger.is_insensitive),
+        filter_has_tags: new FormControl(trigger.filter_has_tags),
+        filter_has_correspondent: new FormControl(
+          trigger.filter_has_correspondent
+        ),
+        filter_has_document_type: new FormControl(
+          trigger.filter_has_document_type
+        ),
+      }),
+      { emitEvent }
+    )
+  }
+
+  private createActionField(
+    action: WorkflowAction,
+    emitEvent: boolean = false
+  ) {
+    this.actionFields.push(
+      new FormGroup({
+        id: new FormControl(action.id),
+        type: new FormControl(action.type),
+        assign_title: new FormControl(action.assign_title),
+        assign_tags: new FormControl(action.assign_tags),
+        assign_owner: new FormControl(action.assign_owner),
+        assign_document_type: new FormControl(action.assign_document_type),
+        assign_correspondent: new FormControl(action.assign_correspondent),
+        assign_storage_path: new FormControl(action.assign_storage_path),
+        assign_view_users: new FormControl(action.assign_view_users),
+        assign_view_groups: new FormControl(action.assign_view_groups),
+        assign_change_users: new FormControl(action.assign_change_users),
+        assign_change_groups: new FormControl(action.assign_change_groups),
+        assign_custom_fields: new FormControl(action.assign_custom_fields),
+      }),
+      { emitEvent }
+    )
+  }
+
+  private updateAllTriggerActionFields(emitEvent: boolean = false) {
     this.triggerFields.clear({ emitEvent: false })
     this.object?.triggers.forEach((trigger) => {
-      this.triggerFields.push(
-        new FormGroup({
-          id: new FormControl(trigger.id),
-          type: new FormControl(trigger.type),
-          sources: new FormControl(trigger.sources),
-          filter_filename: new FormControl(trigger.filter_filename),
-          filter_path: new FormControl(trigger.filter_path),
-          filter_mailrule: new FormControl(trigger.filter_mailrule),
-          matching_algorithm: new FormControl(trigger.matching_algorithm),
-          match: new FormControl(trigger.match),
-          is_insensitive: new FormControl(trigger.is_insensitive),
-          filter_has_tags: new FormControl(trigger.filter_has_tags),
-          filter_has_correspondent: new FormControl(
-            trigger.filter_has_correspondent
-          ),
-          filter_has_document_type: new FormControl(
-            trigger.filter_has_document_type
-          ),
-        }),
-        { emitEvent }
-      )
+      this.createTriggerField(trigger, emitEvent)
     })
 
     this.actionFields.clear({ emitEvent: false })
     this.object?.actions.forEach((action) => {
-      this.actionFields.push(
-        new FormGroup({
-          id: new FormControl(action.id),
-          type: new FormControl(action.type),
-          assign_title: new FormControl(action.assign_title),
-          assign_tags: new FormControl(action.assign_tags),
-          assign_owner: new FormControl(action.assign_owner),
-          assign_document_type: new FormControl(action.assign_document_type),
-          assign_correspondent: new FormControl(action.assign_correspondent),
-          assign_storage_path: new FormControl(action.assign_storage_path),
-          assign_view_users: new FormControl(action.assign_view_users),
-          assign_view_groups: new FormControl(action.assign_view_groups),
-          assign_change_users: new FormControl(action.assign_change_users),
-          assign_change_groups: new FormControl(action.assign_change_groups),
-          assign_custom_fields: new FormControl(action.assign_custom_fields),
-        }),
-        { emitEvent }
-      )
+      this.createActionField(action, emitEvent)
     })
   }
 
@@ -233,7 +248,7 @@ export class WorkflowEditDialogComponent
     if (!this.object) {
       this.object = Object.assign({}, this.objectForm.value)
     }
-    this.object.triggers.push({
+    const trigger: WorkflowTrigger = {
       type: WorkflowTriggerType.Consumption,
       sources: [],
       filter_filename: null,
@@ -243,11 +258,11 @@ export class WorkflowEditDialogComponent
       filter_has_correspondent: null,
       filter_has_document_type: null,
       matching_algorithm: MATCH_NONE,
-      match: null,
+      match: '',
       is_insensitive: true,
-    })
-
-    this.updateTriggerActionFields()
+    }
+    this.object.triggers.push(trigger)
+    this.createTriggerField(trigger)
   }
 
   get actionTypeOptions() {
@@ -262,7 +277,7 @@ export class WorkflowEditDialogComponent
     if (!this.object) {
       this.object = Object.assign({}, this.objectForm.value)
     }
-    this.object.actions.push({
+    const action: WorkflowAction = {
       type: WorkflowActionType.Assignment,
       assign_title: null,
       assign_tags: [],
@@ -275,19 +290,19 @@ export class WorkflowEditDialogComponent
       assign_change_users: [],
       assign_change_groups: [],
       assign_custom_fields: [],
-    })
-
-    this.updateTriggerActionFields()
+    }
+    this.object.actions.push(action)
+    this.createActionField(action)
   }
 
   removeTrigger(index: number) {
-    this.object.triggers.splice(index, 1)
-    this.updateTriggerActionFields()
+    this.object.triggers.splice(index, 1).pop()
+    this.triggerFields.removeAt(index)
   }
 
   removeAction(index: number) {
     this.object.actions.splice(index, 1)
-    this.updateTriggerActionFields()
+    this.actionFields.removeAt(index)
   }
 
   onActionDrop(event: CdkDragDrop<WorkflowAction[]>) {
@@ -296,8 +311,10 @@ export class WorkflowEditDialogComponent
       event.previousIndex,
       event.currentIndex
     )
+    const actionField = this.actionFields.at(event.previousIndex)
+    this.actionFields.removeAt(event.previousIndex)
+    this.actionFields.insert(event.currentIndex, actionField)
     // removing id will effectively re-create the actions in this order
     this.object.actions.forEach((a) => (a.id = null))
-    this.updateTriggerActionFields()
   }
 }

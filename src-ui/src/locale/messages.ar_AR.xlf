@@ -3832,13 +3832,13 @@
         </context-group>
         <target state="translated">مسار التصفية</target>
       </trans-unit>
-      <trans-unit id="2900550647231873115" datatype="html">
-        <source>Apply to documents that match this path. Wildcards specified as * are allowed. Case insensitive.&lt;/a&gt;</source>
+      <trans-unit id="5491897741674893121" datatype="html">
+        <source>Apply to documents that match this path. Wildcards specified as * are allowed. Case-normalized.&lt;/a&gt;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">185</context>
         </context-group>
-        <target state="translated">تطبيق على المستندات التي تتطابق مع هذا المسار. البطاقات البرية المحددة كما * مسموح بها. حالة غير حساسة.&lt;/a&gt;</target>
+        <target state="needs-translation">Apply to documents that match this path. Wildcards specified as * are allowed. Case-normalized.&lt;/a&gt;</target>
       </trans-unit>
       <trans-unit id="7468453896129193641" datatype="html">
         <source>Filter mail rule</source>
@@ -3900,7 +3900,7 @@
         <source>Consume Folder</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">38</context>
+          <context context-type="linenumber">39</context>
         </context-group>
         <target state="translated">‏مِلَفّ الاستهلاك</target>
       </trans-unit>
@@ -3908,7 +3908,7 @@
         <source>API Upload</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">42</context>
+          <context context-type="linenumber">43</context>
         </context-group>
         <target state="translated">تحميل API</target>
       </trans-unit>
@@ -3916,7 +3916,7 @@
         <source>Mail Fetch</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">46</context>
+          <context context-type="linenumber">47</context>
         </context-group>
         <target state="translated">جلب البريد</target>
       </trans-unit>
@@ -3924,7 +3924,7 @@
         <source>Consumption Started</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">53</context>
+          <context context-type="linenumber">54</context>
         </context-group>
         <target state="needs-translation">Consumption Started</target>
       </trans-unit>
@@ -3932,7 +3932,7 @@
         <source>Document Added</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">57</context>
+          <context context-type="linenumber">58</context>
         </context-group>
         <target state="needs-translation">Document Added</target>
       </trans-unit>
@@ -3940,7 +3940,7 @@
         <source>Document Updated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">61</context>
+          <context context-type="linenumber">62</context>
         </context-group>
         <target state="needs-translation">Document Updated</target>
       </trans-unit>
@@ -3948,7 +3948,7 @@
         <source>Assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">68</context>
+          <context context-type="linenumber">69</context>
         </context-group>
         <target state="needs-translation">Assignment</target>
       </trans-unit>
@@ -3956,7 +3956,7 @@
         <source>Create new workflow</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">136</context>
+          <context context-type="linenumber">137</context>
         </context-group>
         <target state="needs-translation">Create new workflow</target>
       </trans-unit>
@@ -3964,7 +3964,7 @@
         <source>Edit workflow</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">140</context>
+          <context context-type="linenumber">141</context>
         </context-group>
         <target state="needs-translation">Edit workflow</target>
       </trans-unit>

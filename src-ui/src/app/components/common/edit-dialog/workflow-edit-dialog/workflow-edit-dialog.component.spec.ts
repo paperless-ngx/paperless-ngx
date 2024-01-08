@@ -66,7 +66,7 @@ const workflow: Workflow = {
   ],
 }
 
-describe('ConsumptionTemplateEditDialogComponent', () => {
+describe('WorkflowEditDialogComponent', () => {
   let component: WorkflowEditDialogComponent
   let settingsService: SettingsService
   let fixture: ComponentFixture<WorkflowEditDialogComponent>
@@ -219,6 +219,7 @@ describe('ConsumptionTemplateEditDialogComponent', () => {
     const action1 = workflow.actions[0]
     const action2 = workflow.actions[1]
     component.object = workflow
+    component.ngOnInit()
     component.onActionDrop({ previousIndex: 0, currentIndex: 1 } as CdkDragDrop<
       WorkflowAction[]
     >)

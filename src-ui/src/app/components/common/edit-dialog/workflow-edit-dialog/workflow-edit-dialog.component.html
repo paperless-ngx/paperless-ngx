@@ -182,7 +182,7 @@
         <pngx-input-text i18n-title title="Filter filename" formControlName="filter_filename" i18n-hint hint="Apply to documents that match this filename. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive." [error]="error?.filter_filename"></pngx-input-text>
         @if (formGroup.get('type').value === WorkflowTriggerType.Consumption) {
           <pngx-input-select i18n-title title="Filter sources" [items]="sourceOptions" [multiple]="true" formControlName="sources" [error]="error?.sources"></pngx-input-select>
-          <pngx-input-text i18n-title title="Filter path" formControlName="filter_path" i18n-hint hint="Apply to documents that match this path. Wildcards specified as * are allowed. Case insensitive.</a>" [error]="error?.filter_path"></pngx-input-text>
+          <pngx-input-text i18n-title title="Filter path" formControlName="filter_path" i18n-hint hint="Apply to documents that match this path. Wildcards specified as * are allowed. Case-normalized.</a>" [error]="error?.filter_path"></pngx-input-text>
           <pngx-input-select i18n-title title="Filter mail rule" [items]="mailRules" [allowNull]="true" formControlName="filter_mailrule" i18n-hint hint="Apply to documents consumed via this mail rule." [error]="error?.filter_mailrule"></pngx-input-select>
         }
         @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated) {
