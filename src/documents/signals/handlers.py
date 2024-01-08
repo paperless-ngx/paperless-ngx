@@ -617,7 +617,7 @@ def run_workflow(
                             ).count()
                             == 0
                         ):
-                            # can be triggered on existing docs, so only add the field if it doesnt already exist
+                            # can be triggered on existing docs, so only add the field if it doesn't already exist
                             CustomFieldInstance.objects.create(
                                 field=field,
                                 document=document,

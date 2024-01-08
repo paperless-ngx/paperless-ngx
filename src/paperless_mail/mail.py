@@ -767,7 +767,7 @@ class MailAccountHandler(LoggingMixin):
                 message=message,
             )
         else:
-            # No files to consume, just mark as processed if it wasnt by .eml processing
+            # No files to consume, just mark as processed if it wasn't by .eml processing
             if not ProcessedMail.objects.filter(
                 rule=rule,
                 uid=message.uid,

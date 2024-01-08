@@ -345,7 +345,7 @@ def existing_document_matches_workflow(
         )
         trigger_matched = False
 
-    # Document correpondent vs trigger has_correspondent
+    # Document correspondent vs trigger has_correspondent
     if (
         trigger.filter_has_correspondent is not None
         and document.correspondent != trigger.filter_has_correspondent
