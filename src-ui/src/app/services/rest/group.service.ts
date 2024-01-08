@@ -23,7 +23,7 @@ export class GroupService extends AbstractNameFilterService<Group> {
           const { typeKey, actionKey } =
             this.permissionService.getPermissionKeys(perm)
           if (!typeKey || !actionKey) {
-            // dont lose permissions the UI doesnt use
+            // dont lose permissions the UI doesn't use
             o.permissions.push(perm)
           }
         })

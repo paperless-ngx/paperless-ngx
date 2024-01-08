@@ -66,7 +66,7 @@ export class WorkflowsComponent
       ? EditDialogMode.EDIT
       : EditDialogMode.CREATE
     if (workflow) {
-      // quick "deep" clone so original doesnt get modified
+      // quick "deep" clone so original doesn't get modified
       const clone = Object.assign({}, workflow)
       clone.actions = [...workflow.actions]
       clone.triggers = [...workflow.triggers]

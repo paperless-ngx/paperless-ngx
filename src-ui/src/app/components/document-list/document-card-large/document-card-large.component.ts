@@ -82,7 +82,7 @@ export class DocumentCardLargeComponent extends ComponentWithPermissions {
       // only show notes with a match
       highlights = (this.document['__search_hit__'].note_highlights as string)
         .split(',')
-        .filter((higlight) => higlight.includes('<span'))
+        .filter((highlight) => highlight.includes('<span'))
     }
     return highlights
   }

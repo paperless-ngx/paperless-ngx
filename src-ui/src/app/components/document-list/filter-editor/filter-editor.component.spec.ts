@@ -355,7 +355,7 @@ describe('FilterEditorComponent', () => {
     expect(component.textFilterTarget).toEqual('fulltext-morelike') // TEXT_FILTER_TARGET_FULLTEXT_MORELIKE
     expect(moreLikeSpy).toHaveBeenCalledWith(1)
     expect(component.textFilter).toEqual('Foo Bar')
-    // we have to do this here because it cant be done by user input
+    // we have to do this here because it can't be done by user input
     expect(component.filterRules).toEqual([
       {
         rule_type: FILTER_FULLTEXT_MORELIKE,
@@ -1264,7 +1264,7 @@ describe('FilterEditorComponent', () => {
 
     dateCreatedAfter.nativeElement.value = '05/14/2023'
     // dateCreatedAfter.triggerEventHandler('change')
-    // TODO: why isnt ngModel triggering this on change?
+    // TODO: why isn't ngModel triggering this on change?
     component.dateCreatedAfter = '2023-05-14'
     fixture.detectChanges()
     tick(400)
@@ -1284,7 +1284,7 @@ describe('FilterEditorComponent', () => {
 
     dateCreatedBefore.nativeElement.value = '05/14/2023'
     // dateCreatedBefore.triggerEventHandler('change')
-    // TODO: why isnt ngModel triggering this on change?
+    // TODO: why isn't ngModel triggering this on change?
     component.dateCreatedBefore = '2023-05-14'
     fixture.detectChanges()
     tick(400)
@@ -1341,7 +1341,7 @@ describe('FilterEditorComponent', () => {
 
     dateAddedAfter.nativeElement.value = '05/14/2023'
     // dateAddedAfter.triggerEventHandler('change')
-    // TODO: why isnt ngModel triggering this on change?
+    // TODO: why isn't ngModel triggering this on change?
     component.dateAddedAfter = '2023-05-14'
     fixture.detectChanges()
     tick(400)
@@ -1361,7 +1361,7 @@ describe('FilterEditorComponent', () => {
 
     dateAddedBefore.nativeElement.value = '05/14/2023'
     // dateAddedBefore.triggerEventHandler('change')
-    // TODO: why isnt ngModel triggering this on change?
+    // TODO: why isn't ngModel triggering this on change?
     component.dateAddedBefore = '2023-05-14'
     fixture.detectChanges()
     tick(400)
@@ -1524,7 +1524,7 @@ describe('FilterEditorComponent', () => {
     )
     ownerToggle.nativeElement.checked = true
     // ownerToggle.triggerEventHandler('change')
-    // TODO: ngModel isnt doing this here
+    // TODO: ngModel isn't doing this here
     component.permissionsSelectionModel.hideUnowned = true
     fixture.detectChanges()
     expect(component.filterRules).toEqual([
