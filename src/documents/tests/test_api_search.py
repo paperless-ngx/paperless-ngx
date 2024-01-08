@@ -55,7 +55,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         with AsyncWriter(index.open_index()) as writer:
             # Note to future self: there is a reason we dont use a model signal handler to update the index: some operations edit many documents at once
             # (retagger, renamer) and we don't want to open a writer for each of these, but rather perform the entire operation with one writer.
-            # That's why we cant open the writer in a model on_save handler or something.
+            # That's why we can't open the writer in a model on_save handler or something.
             index.update_document(writer, d1)
             index.update_document(writer, d2)
             index.update_document(writer, d3)
@@ -903,8 +903,8 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         GIVEN:
             - Documents with owners set & without
         WHEN:
-            - API reuqest for advanced query (search) is made by non-superuser
-            - API reuqest for advanced query (search) is made by superuser
+            - API request for advanced query (search) is made by non-superuser
+            - API request for advanced query (search) is made by superuser
         THEN:
             - Only owned docs are returned for regular users
             - All docs are returned for superuser
@@ -959,7 +959,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         GIVEN:
             - Documents with granted view permissions to others
         WHEN:
-            - API reuqest for advanced query (search) is made by user
+            - API request for advanced query (search) is made by user
         THEN:
             - Only docs with granted view permissions are returned
         """
