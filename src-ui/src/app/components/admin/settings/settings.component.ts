@@ -363,7 +363,7 @@ export class SettingsComponent
   }
 
   ngOnDestroy() {
-    if (this.isDirty) this.settings.updateAppearanceSettings() // in case user changed appearance but didnt save
+    if (this.isDirty) this.settings.updateAppearanceSettings() // in case user changed appearance but didn't save
     this.storeSub && this.storeSub.unsubscribe()
     this.settings.organizingSidebarSavedViews = false
   }

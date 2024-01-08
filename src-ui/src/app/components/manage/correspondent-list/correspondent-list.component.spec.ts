@@ -34,7 +34,7 @@ describe('CorrespondentListComponent', () => {
     correspondentsService = TestBed.inject(CorrespondentService)
   })
 
-  // Tests are included in management-list.compontent.spec.ts
+  // Tests are included in management-list.component.spec.ts
 
   it('should use correct delete message', () => {
     jest.spyOn(correspondentsService, 'listFiltered').mockReturnValue(

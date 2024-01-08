@@ -665,7 +665,7 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
     @mock.patch("documents.signals.handlers.generate_unique_filename")
     def testFilenameHandlingUnstableFormat(self, m):
-        filenames = ["this", "that", "now this", "i cant decide"]
+        filenames = ["this", "that", "now this", "i cannot decide"]
 
         def get_filename():
             f = filenames.pop()

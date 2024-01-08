@@ -208,7 +208,7 @@ export class DocumentListViewService {
       this.activeListViewState.sortField = newState.sortField
       this.activeListViewState.sortReverse = newState.sortReverse
       this.activeListViewState.currentPage = newState.currentPage
-      this.reload(null, paramsEmpty) // update the params if there arent any
+      this.reload(null, paramsEmpty) // update the params if there aren't any
     }
   }
 

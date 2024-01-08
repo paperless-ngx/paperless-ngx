@@ -204,10 +204,10 @@ class DocumentClassifier:
         ) and self.last_auto_type_hash == hasher.digest():
             return False
 
-        # substract 1 since -1 (null) is also part of the classes.
+        # subtract 1 since -1 (null) is also part of the classes.
 
         # union with {-1} accounts for cases where all documents have
-        # correspondents and types assigned, so -1 isnt part of labels_x, which
+        # correspondents and types assigned, so -1 isn't part of labels_x, which
         # it usually is.
         num_correspondents = len(set(labels_correspondent) | {-1}) - 1
         num_document_types = len(set(labels_document_type) | {-1}) - 1
