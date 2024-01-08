@@ -35,6 +35,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
         self.assertDictEqual(
             response.data["settings"],
             {
+                "app_title": None,
                 "update_checking": {
                     "backend_setting": "default",
                 },
