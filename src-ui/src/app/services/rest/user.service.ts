@@ -23,7 +23,7 @@ export class UserService extends AbstractNameFilterService<User> {
           const { typeKey, actionKey } =
             this.permissionService.getPermissionKeys(perm)
           if (!typeKey || !actionKey) {
-            // dont lose permissions the UI doesnt use
+            // dont lose permissions the UI doesn't use
             o.user_permissions.push(perm)
           }
         })

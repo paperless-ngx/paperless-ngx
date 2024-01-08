@@ -223,7 +223,7 @@ class TestMail(
         attachments: Union[int, list[_AttachmentDef]] = 1,
         body: str = "",
         subject: str = "the subject",
-        from_: str = "noone@mail.com",
+        from_: str = "no_one@mail.com",
         to: Optional[list[str]] = None,
         seen: bool = False,
         flagged: bool = False,

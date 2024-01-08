@@ -27,7 +27,7 @@ describe('TextComponent', () => {
 
   it('should support use of input field', () => {
     expect(component.value).toBeUndefined()
-    // TODO: why doesnt this work?
+    // TODO: why doesn't this work?
     // input.value = 'foo'
     // input.dispatchEvent(new Event('change'))
     // fixture.detectChanges()
