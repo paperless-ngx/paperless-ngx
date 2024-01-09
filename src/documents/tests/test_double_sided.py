@@ -17,6 +17,7 @@ from documents.data_models import DocumentSource
 from documents.double_sided import STAGING_FILE_NAME
 from documents.double_sided import TIMEOUT_MINUTES
 from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
 
 
@@ -42,9 +43,10 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         dst = self.dirs.double_sided_dir / dstname
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(src, dst)
-        with mock.patch("documents.tasks.async_to_sync"), mock.patch(
-            "documents.consumer.async_to_sync",
-        ):
+        with mock.patch(
+            "documents.tasks.ProgressManager",
+            DummyProgressManager,
+        ), mock.patch("documents.consumer.async_to_sync"):
             msg = tasks.consume_file(
                 ConsumableDocument(
                     source=DocumentSource.ConsumeFolder,
@@ -211,7 +213,7 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
         msg = self.consume_file("simple.pdf", Path("..") / "simple.pdf")
         self.assertIsNotFile(self.staging_file)
-        self.assertRegex(msg, "Success. New document .* created")
+        self.assertRegex(msg, r"Success. New document id \d+ created")
 
     def test_subdirectory_upload(self):
         """
@@ -250,4 +252,4 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
         msg = self.consume_file("simple.pdf")
         self.assertIsNotFile(self.staging_file)
-        self.assertRegex(msg, "Success. New document .* created")
+        self.assertRegex(msg, r"Success. New document id \d+ created")

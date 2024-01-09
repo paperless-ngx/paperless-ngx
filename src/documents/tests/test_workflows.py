@@ -24,6 +24,7 @@ from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.signals import document_consumption_finished
 from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
@@ -126,7 +127,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
 
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
-        with mock.patch("documents.tasks.async_to_sync"):
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             with self.assertLogs("paperless.matching", level="INFO") as cm:
                 tasks.consume_file(
                     ConsumableDocument(
@@ -203,7 +204,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         w.save()
 
         test_file = self.SAMPLE_DIR / "simple.pdf"
-        with mock.patch("documents.tasks.async_to_sync"):
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             with self.assertLogs("paperless.matching", level="INFO") as cm:
                 tasks.consume_file(
                     ConsumableDocument(
@@ -294,7 +295,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
 
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
-        with mock.patch("documents.tasks.async_to_sync"):
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             with self.assertLogs("paperless.matching", level="INFO") as cm:
                 tasks.consume_file(
                     ConsumableDocument(
@@ -356,7 +357,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
 
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
-        with mock.patch("documents.tasks.async_to_sync"):
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             with self.assertLogs("paperless.matching", level="DEBUG") as cm:
                 tasks.consume_file(
                     ConsumableDocument(
@@ -407,7 +408,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
 
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
-        with mock.patch("documents.tasks.async_to_sync"):
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             with self.assertLogs("paperless.matching", level="DEBUG") as cm:
                 tasks.consume_file(
                     ConsumableDocument(
@@ -468,7 +469,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
 
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
-        with mock.patch("documents.tasks.async_to_sync"):
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             with self.assertLogs("paperless.matching", level="DEBUG") as cm:
                 tasks.consume_file(
                     ConsumableDocument(
@@ -529,7 +530,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
 
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
-        with mock.patch("documents.tasks.async_to_sync"):
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             with self.assertLogs("paperless.matching", level="DEBUG") as cm:
                 tasks.consume_file(
                     ConsumableDocument(
@@ -591,7 +592,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
 
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
-        with mock.patch("documents.tasks.async_to_sync"):
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             with self.assertLogs("paperless.matching", level="DEBUG") as cm:
                 tasks.consume_file(
                     ConsumableDocument(
@@ -686,7 +687,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
 
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
-        with mock.patch("documents.tasks.async_to_sync"):
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             with self.assertLogs("paperless.matching", level="INFO") as cm:
                 tasks.consume_file(
                     ConsumableDocument(

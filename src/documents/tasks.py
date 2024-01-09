@@ -2,30 +2,30 @@ import hashlib
 import logging
 import shutil
 import uuid
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Optional
 
 import tqdm
-from asgiref.sync import async_to_sync
 from celery import Task
 from celery import shared_task
-from channels.layers import get_channel_layer
 from django.conf import settings
 from django.db import transaction
 from django.db.models.signals import post_save
 from filelock import FileLock
-from redis.exceptions import ConnectionError
 from whoosh.writing import AsyncWriter
 
 from documents import index
 from documents import sanity_checker
-from documents.barcodes import BarcodeReader
+from documents.barcodes import BarcodePlugin
 from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
 from documents.consumer import Consumer
 from documents.consumer import ConsumerError
+from documents.consumer import WorkflowTriggerPlugin
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
-from documents.double_sided import collate
+from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.models import Correspondent
@@ -35,6 +35,10 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.parsers import DocumentParser
 from documents.parsers import get_parser_class_for_mime_type
+from documents.plugins.base import ConsumeTaskPlugin
+from documents.plugins.base import ProgressManager
+from documents.plugins.base import StopConsumeTaskError
+from documents.plugins.helpers import ProgressStatusOptions
 from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated
 
@@ -102,70 +106,60 @@ def consume_file(
     input_doc: ConsumableDocument,
     overrides: Optional[DocumentMetadataOverrides] = None,
 ):
-    def send_progress(status="SUCCESS", message="finished"):
-        payload = {
-            "filename": overrides.filename or input_doc.original_file.name,
-            "task_id": None,
-            "current_progress": 100,
-            "max_progress": 100,
-            "status": status,
-            "message": message,
-        }
-        try:
-            async_to_sync(get_channel_layer().group_send)(
-                "status_updates",
-                {"type": "status_update", "data": payload},
-            )
-        except ConnectionError as e:
-            logger.warning(f"ConnectionError on status send: {e!s}")
-
     # Default no overrides
     if overrides is None:
         overrides = DocumentMetadataOverrides()
 
-    # Handle collation of double-sided documents scanned in two parts
-    if settings.CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED and (
-        settings.CONSUMER_COLLATE_DOUBLE_SIDED_SUBDIR_NAME
-        in input_doc.original_file.parts
-    ):
-        try:
-            msg = collate(input_doc)
-            send_progress(message=msg)
-            return msg
-        except ConsumerError as e:
-            send_progress(status="FAILURE", message=e.args[0])
-            raise e
+    plugins: list[type[ConsumeTaskPlugin]] = [
+        CollatePlugin,
+        BarcodePlugin,
+        WorkflowTriggerPlugin,
+    ]
 
-    # read all barcodes in the current document
-    if settings.CONSUMER_ENABLE_BARCODES or settings.CONSUMER_ENABLE_ASN_BARCODE:
-        with BarcodeReader(input_doc.original_file, input_doc.mime_type) as reader:
-            if settings.CONSUMER_ENABLE_BARCODES and reader.separate(
-                input_doc.source,
+    with ProgressManager(
+        overrides.filename or input_doc.original_file.name,
+        self.request.id,
+    ) as status_mgr, TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
+        tmp_dir = Path(tmp_dir)
+        for plugin_class in plugins:
+            plugin_name = plugin_class.NAME
+
+            plugin = plugin_class(
+                input_doc,
                 overrides,
-            ):
-                # notify the sender, otherwise the progress bar
-                # in the UI stays stuck
-                send_progress()
-                # consuming stops here, since the original document with
-                # the barcodes has been split and will be consumed separately
-                input_doc.original_file.unlink()
-                return "File successfully split"
+                status_mgr,
+                tmp_dir,
+                self.request.id,
+            )
 
-            # try reading the ASN from barcode
-            if (
-                settings.CONSUMER_ENABLE_ASN_BARCODE
-                and (located_asn := reader.asn) is not None
-            ):
-                # Note this will take precedence over an API provided ASN
-                # But it's from a physical barcode, so that's good
-                overrides.asn = located_asn
-                logger.info(f"Found ASN in barcode: {overrides.asn}")
+            if not plugin.able_to_run:
+                logger.debug(f"Skipping plugin {plugin_name}")
+                continue
 
-    template_overrides = Consumer().get_workflow_overrides(
-        input_doc=input_doc,
-    )
+            try:
+                logger.debug(f"Executing plugin {plugin_name}")
+                plugin.setup()
 
-    overrides.update(template_overrides)
+                msg = plugin.run()
+
+                if msg is not None:
+                    logger.info(f"{plugin_name} completed with: {msg}")
+                else:
+                    logger.info(f"{plugin_name} completed with no message")
+
+                overrides = plugin.metadata
+
+            except StopConsumeTaskError as e:
+                logger.info(f"{plugin_name} requested task exit: {e.message}")
+                return e.message
+
+            except Exception as e:
+                logger.exception(f"{plugin_name} failed: {e}")
+                status_mgr.send_progress(ProgressStatusOptions.FAILED, f"{e}", 100, 100)
+                raise
+
+            finally:
+                plugin.cleanup()
 
     # continue with consumption if no barcode was found
     document = Consumer().try_consume_file(
