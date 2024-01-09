@@ -730,9 +730,9 @@ class Consumer(LoggingMixin):
         if self.override_title is not None:
             try:
                 title = self._parse_title_placeholders(self.override_title)
-            except Exception:
+            except Exception as e:
                 self.log.error(
-                    f"Error occurred parsing title override '{self.override_title}', falling back to original",
+                    f"Error occurred parsing title override '{self.override_title}', falling back to original. Exception: {e}",
                 )
 
         document = Document.objects.create(

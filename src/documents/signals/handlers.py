@@ -587,7 +587,7 @@ def run_workflow(
                             document.created,
                         )
                     except Exception:
-                        logger.error(
+                        logger.exception(
                             f"Error occurred parsing title assignment '{action.assign_title}', falling back to original",
                             extra={"group": logging_group},
                         )
