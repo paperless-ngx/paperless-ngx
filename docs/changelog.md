@@ -3277,7 +3277,7 @@ primarily.
     [OCRmyPDF](https://github.com/jbarlow83/OCRmyPDF) to perform OCR
     on documents. It still uses tesseract under the hood, but the
     PDF parser of Paperless has changed considerably and will behave
-    different for some douments.
+    different for some documents.
   - OCRmyPDF creates archived PDF/A documents with embedded text
     that can be selected in the front end.
   - Paperless stores archived versions of documents alongside with
