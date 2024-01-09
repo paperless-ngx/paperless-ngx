@@ -1414,9 +1414,9 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
                         created_day="",
                         created_time="",
                     )
-                except ValueError as e:
+                except (ValueError, KeyError) as e:
                     raise serializers.ValidationError(
-                        {"assign_title": f"Invalid f-string detected: {e.args[0]}"},
+                        {"assign_title": f'Invalid f-string detected: "{e.args[0]}"'},
                     )
 
         return attrs
