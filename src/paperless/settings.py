@@ -306,7 +306,6 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-    "allauth.socialaccount.providers.openid_connect",
     *env_apps,
 ]
 
@@ -419,22 +418,6 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-SOCIALACCOUNT_PROVIDERS = {
-    # "openid_connect": {
-    #    "APPS": [
-    #        {
-    #            "provider_id": "keycloak",
-    #            "name": "Keycloak",
-    #            "client_id": "paperless",
-    #            "secret": "<CLIENT_SECRET>",
-    #            "settings": {
-    #                "server_url": "https://<KEYCLOAK_SERVER>/realms/<REALM>/.well-known/openid-configuration",
-    #            },
-    #        },
-    #    ],
-    # },
-}
-
 ACCOUNT_LOGOUT_ON_GET = True
 
 ACCOUNT_ADAPTER = "paperless.adapter.CustomAccountAdapter"
@@ -446,7 +429,9 @@ SOCIALACCOUNT_ALLOW_SIGNUPS = __get_boolean(
     "yes",
 )
 SOCIALACCOUNT_AUTO_SIGNUP = __get_boolean("PAPERLESS_SOCIAL_AUTO_SIGNUP")
-
+SOCIALACCOUNT_PROVIDERS = json.loads(
+    os.getenv("PAPERLESS_SOCIALACCOUNT_PROVIDERS", "{}"),
+)
 
 AUTO_LOGIN_USERNAME = os.getenv("PAPERLESS_AUTO_LOGIN_USERNAME")
 
