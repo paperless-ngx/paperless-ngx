@@ -499,8 +499,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Disable Django's artificial limit on the number of form fields to submit at
 # once. This is a protection against overloading the server, but since this is
-# a self-hosted sort of gig, the benefits of being able to mass-delete a tonne
-# of log entries outweight the benefits of such a safeguard.
+# a self-hosted sort of gig, the benefits of being able to mass-delete a ton
+# of log entries outweigh the benefits of such a safeguard.
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 

@@ -303,7 +303,7 @@ describe('DocumentDetailComponent', () => {
     discardPeriodicTasks()
   }))
 
-  it('should update title before doc change if wasnt updated via debounce', fakeAsync(() => {
+  it('should update title before doc change if was not updated via debounce', fakeAsync(() => {
     initNormally()
     component.titleInput.value = 'Foo Bar'
     component.titleInput.inputField.nativeElement.dispatchEvent(

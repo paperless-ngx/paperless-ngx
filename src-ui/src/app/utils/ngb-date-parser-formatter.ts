@@ -53,7 +53,7 @@ export class LocalizedDateParserFormatter extends NgbDateParserFormatter {
     if (this.separatorRegExp.test(value)) {
       let segments = value.split(this.separatorRegExp)
 
-      // always accept strict yyyy*mm*dd format even if thats not the input format since we can be certain its not yyyy*dd*mm
+      // always accept strict yyyy*mm*dd format even if that's not the input format since we can be certain its not yyyy*dd*mm
       if (
         value.length == 10 &&
         segments.length == 3 &&

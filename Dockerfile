@@ -189,7 +189,7 @@ RUN set -eux \
     && chmod 755 /usr/local/bin/paperless_cmd.sh \
     && mv flower-conditional.sh /usr/local/bin/flower-conditional.sh \
     && chmod 755 /usr/local/bin/flower-conditional.sh \
-  && echo "Installing managment commands" \
+  && echo "Installing management commands" \
     && chmod +x install_management_commands.sh \
     && ./install_management_commands.sh
 

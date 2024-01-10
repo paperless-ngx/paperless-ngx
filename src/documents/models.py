@@ -394,11 +394,6 @@ class Log(models.Model):
 
 
 class SavedView(ModelWithOwner):
-    class Meta:
-        ordering = ("name",)
-        verbose_name = _("saved view")
-        verbose_name_plural = _("saved views")
-
     name = models.CharField(_("name"), max_length=128)
 
     show_on_dashboard = models.BooleanField(
@@ -415,6 +410,14 @@ class SavedView(ModelWithOwner):
         blank=True,
     )
     sort_reverse = models.BooleanField(_("sort reverse"), default=False)
+
+    class Meta:
+        ordering = ("name",)
+        verbose_name = _("saved view")
+        verbose_name_plural = _("saved views")
+
+    def __str__(self):
+        return f"SavedView {self.name}"
 
 
 class SavedViewFilterRule(models.Model):

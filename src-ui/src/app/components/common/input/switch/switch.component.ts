@@ -1,4 +1,4 @@
-import { Component, forwardRef } from '@angular/core'
+import { Component, Input, forwardRef } from '@angular/core'
 import { NG_VALUE_ACCESSOR } from '@angular/forms'
 import { AbstractInputComponent } from '../abstract-input'
 
@@ -15,7 +15,14 @@ import { AbstractInputComponent } from '../abstract-input'
   styleUrls: ['./switch.component.scss'],
 })
 export class SwitchComponent extends AbstractInputComponent<boolean> {
+  @Input()
+  showUnsetNote: boolean = false
+
   constructor() {
     super()
+  }
+
+  get isUnset(): boolean {
+    return this.value === null || this.value === undefined
   }
 }

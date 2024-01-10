@@ -726,12 +726,17 @@ class Consumer(LoggingMixin):
 
         storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
+        title = file_info.title[:127]
+        if self.override_title is not None:
+            try:
+                title = self._parse_title_placeholders(self.override_title)
+            except Exception as e:
+                self.log.error(
+                    f"Error occurred parsing title override '{self.override_title}', falling back to original. Exception: {e}",
+                )
+
         document = Document.objects.create(
-            title=(
-                self._parse_title_placeholders(self.override_title)
-                if self.override_title is not None
-                else file_info.title
-            )[:127],
+            title=title,
             content=text,
             mime_type=mime_type,
             checksum=hashlib.md5(self.working_copy.read_bytes()).hexdigest(),

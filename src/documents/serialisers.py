@@ -546,7 +546,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
                 if doc_id not in target_doc_ids:
                     self.remove_doclink(document, field, doc_id)
 
-        # Create an instance if target doc doesnt have this field or append it to an existing one
+        # Create an instance if target doc doesn't have this field or append it to an existing one
         existing_custom_field_instances = {
             custom_field.document_id: custom_field
             for custom_field in CustomFieldInstance.objects.filter(
@@ -1385,13 +1385,39 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
-        # Empty strings treated as None to avoid unexpected behavior
-        if (
-            "assign_title" in attrs
-            and attrs["assign_title"] is not None
-            and len(attrs["assign_title"]) == 0
-        ):
-            attrs["assign_title"] = None
+        if "assign_title" in attrs and attrs["assign_title"] is not None:
+            if len(attrs["assign_title"]) == 0:
+                # Empty strings treated as None to avoid unexpected behavior
+                attrs["assign_title"] = None
+            else:
+                try:
+                    # test against all placeholders, see consumer.py `parse_doc_title_w_placeholders`
+                    attrs["assign_title"].format(
+                        correspondent="",
+                        document_type="",
+                        added="",
+                        added_year="",
+                        added_year_short="",
+                        added_month="",
+                        added_month_name="",
+                        added_month_name_short="",
+                        added_day="",
+                        added_time="",
+                        owner_username="",
+                        original_filename="",
+                        created="",
+                        created_year="",
+                        created_year_short="",
+                        created_month="",
+                        created_month_name="",
+                        created_month_name_short="",
+                        created_day="",
+                        created_time="",
+                    )
+                except (ValueError, KeyError) as e:
+                    raise serializers.ValidationError(
+                        {"assign_title": f'Invalid f-string detected: "{e.args[0]}"'},
+                    )
 
         return attrs
 
