@@ -76,10 +76,10 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         config = ApplicationConfiguration.objects.first()
         self.assertEqual(config.color_conversion_strategy, ColorConvertChoices.RGB)
 
-    def test_api_update_config_empty_json_field(self):
+    def test_api_update_config_empty_fields(self):
         """
         GIVEN:
-            - API request to update app config with empty string for user_args JSONField
+            - API request to update app config with empty string for user_args JSONField and language field
         WHEN:
             - API is called
         THEN:
@@ -91,6 +91,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
             json.dumps(
                 {
                     "user_args": "",
+                    "language": "",
                 },
             ),
             content_type="application/json",
@@ -98,3 +99,4 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         config = ApplicationConfiguration.objects.first()
         self.assertEqual(config.user_args, None)
+        self.assertEqual(config.language, None)
