@@ -1385,9 +1385,9 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
-        # Empty strings treated as None to avoid unexpected behavior
-        if "assign_title" in attrs:
-            if attrs["assign_title"] is not None and len(attrs["assign_title"]) == 0:
+        if "assign_title" in attrs and attrs["assign_title"] is not None:
+            if len(attrs["assign_title"]) == 0:
+                # Empty strings treated as None to avoid unexpected behavior
                 attrs["assign_title"] = None
             else:
                 try:
