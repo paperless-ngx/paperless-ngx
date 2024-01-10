@@ -570,19 +570,27 @@ def run_workflow(
                     document.owner = action.assign_owner
 
                 if action.assign_title is not None:
-                    document.title = parse_doc_title_w_placeholders(
-                        action.assign_title,
-                        document.correspondent.name
-                        if document.correspondent is not None
-                        else "",
-                        document.document_type.name
-                        if document.document_type is not None
-                        else "",
-                        document.owner.username if document.owner is not None else "",
-                        timezone.localtime(document.added),
-                        document.original_filename,
-                        timezone.localtime(document.created),
-                    )
+                    try:
+                        document.title = parse_doc_title_w_placeholders(
+                            action.assign_title,
+                            document.correspondent.name
+                            if document.correspondent is not None
+                            else "",
+                            document.document_type.name
+                            if document.document_type is not None
+                            else "",
+                            document.owner.username
+                            if document.owner is not None
+                            else "",
+                            document.added,
+                            document.original_filename,
+                            document.created,
+                        )
+                    except Exception:
+                        logger.exception(
+                            f"Error occurred parsing title assignment '{action.assign_title}', falling back to original",
+                            extra={"group": logging_group},
+                        )
 
                 if (
                     action.assign_view_users is not None

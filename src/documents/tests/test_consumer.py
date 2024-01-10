@@ -423,6 +423,16 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertEqual(document.title, "Override Title")
         self._assert_first_last_send_progress()
 
+    def testOverrideTitleInvalidPlaceholders(self):
+        with self.assertLogs("paperless.consumer", level="ERROR") as cm:
+            document = self.consumer.try_consume_file(
+                self.get_test_file(),
+                override_title="Override {correspondent]",
+            )
+            self.assertEqual(document.title, "sample")
+            expected_str = "Error occurred parsing title override 'Override {correspondent]', falling back to original"
+            self.assertIn(expected_str, cm.output[0])
+
     def testOverrideCorrespondent(self):
         c = Correspondent.objects.create(name="test")
 
