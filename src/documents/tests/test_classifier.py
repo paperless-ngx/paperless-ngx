@@ -414,7 +414,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         )
         doc2 = Document.objects.create(
             title="doc2",
-            content="this is a document from noone",
+            content="this is a document from no one",
             checksum="B",
         )
 

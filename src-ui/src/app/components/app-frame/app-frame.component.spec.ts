@@ -248,7 +248,7 @@ describe('AppFrameComponent', () => {
     expect(toastSpy).toHaveBeenCalled()
   })
 
-  it('should support collapsable menu', () => {
+  it('should support collapsible menu', () => {
     const button: HTMLButtonElement = (
       fixture.nativeElement as HTMLDivElement
     ).querySelector('button[data-toggle=collapse]')

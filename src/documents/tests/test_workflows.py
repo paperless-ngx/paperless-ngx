@@ -966,6 +966,50 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
             expected_str = f"Document correspondent {doc.correspondent} does not match {trigger.filter_has_correspondent}"
             self.assertIn(expected_str, cm.output[1])
 
+    def test_document_added_invalid_title_placeholders(self):
+        """
+        GIVEN:
+            - Existing workflow with added trigger type
+            - Assign title field has an error
+        WHEN:
+            - File that matches is added
+        THEN:
+            - Title is not updated, error is output
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_filename="*sample*",
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc {created_year]",
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        now = timezone.localtime(timezone.now())
+        created = now - timedelta(weeks=520)
+        doc = Document.objects.create(
+            original_filename="sample.pdf",
+            title="sample test",
+            content="Hello world bar",
+            created=created,
+        )
+
+        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Error occurred parsing title assignment '{action.assign_title}', falling back to original"
+            self.assertIn(expected_str, cm.output[0])
+
+        self.assertEqual(doc.title, "sample test")
+
     def test_document_updated_workflow(self):
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,

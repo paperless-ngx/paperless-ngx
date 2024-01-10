@@ -224,7 +224,7 @@ def generate_filename(
             if settings.FILENAME_FORMAT_REMOVE_NONE:
                 path = path.replace("/-none-/", "/")  # remove empty directories
                 path = path.replace(" -none-", "")  # remove when spaced, with space
-                path = path.replace("-none-", "")  # remove rest of the occurences
+                path = path.replace("-none-", "")  # remove rest of the occurrences
 
             path = path.replace("-none-", "none")  # backward compatibility
             path = path.strip(os.sep)

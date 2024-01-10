@@ -59,7 +59,7 @@ export class OpenDocumentsService {
   openDocument(doc: Document): Observable<boolean> {
     if (this.openDocuments.find((d) => d.id == doc.id) == null) {
       if (this.openDocuments.length == this.MAX_OPEN_DOCUMENTS) {
-        // at max, ensure changes arent lost
+        // at max, ensure changes aren't lost
         const docToRemove = this.openDocuments[this.MAX_OPEN_DOCUMENTS - 1]
         const closeObservable = this.closeDocument(docToRemove)
         closeObservable.pipe(first()).subscribe((closed) => {

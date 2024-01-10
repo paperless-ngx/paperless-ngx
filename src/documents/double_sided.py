@@ -35,7 +35,7 @@ def collate(input_doc: ConsumableDocument) -> str:
     in reverse order, since the ADF will have scanned the pages from bottom
     to top.
 
-    Returns a status message on succcess, or raises a ConsumerError
+    Returns a status message on success, or raises a ConsumerError
     in case of failure.
     """
 

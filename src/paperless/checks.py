@@ -95,8 +95,8 @@ def debug_mode_check(app_configs, **kwargs):
         return [
             Warning(
                 "DEBUG mode is enabled. Disable Debug mode. This is a serious "
-                "security issue, since it puts security overides in place which "
-                "are meant to be only used during development. This "
+                "security issue, since it puts security overrides in place "
+                "which are meant to be only used during development. This "
                 "also means that paperless will tell anyone various "
                 "debugging information when something goes wrong.",
             ),
