@@ -97,7 +97,7 @@ export abstract class EditDialogComponent<
       })
     }
 
-    // wait to enable close button so it doesnt steal focus from input since its the first clickable element in the DOM
+    // wait to enable close button so it doesn't steal focus from input since its the first clickable element in the DOM
     setTimeout(() => {
       this.closeEnabled = true
     })

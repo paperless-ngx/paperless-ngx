@@ -613,7 +613,7 @@ scan a completely new "odd numbered pages" one. The old staging file will get di
 
 The collation feature can be used together with the [subdirs as tags](configuration.md#consume_config)
 feature (but this is not a requirement). Just create a correctly named double-sided subdir
-in the hierachy and upload your scans there. For example, both `double-sided/foo/bar` as
+in the hierarchy and upload your scans there. For example, both `double-sided/foo/bar` as
 well as `foo/bar/double-sided` will cause the collated document to be treated as if it
 were uploaded into `foo/bar` and receive both `foo` and `bar` tags, but not `double-sided`.
 

@@ -81,7 +81,7 @@ jobs:
             console.log(`Found ${result.repository.discussions.nodes.length} open answered discussions`)
 
             for (const discussion of result.repository.discussions.nodes) {
-              console.log(`Closing dicussion #${discussion.number} (${discussion.id})`)
+              console.log(`Closing discussion #${discussion.number} (${discussion.id})`)
 
               const addCommentMutation = `mutation($discussion:ID!, $body:String!) {
                 addDiscussionComment(input:{discussionId:$discussion, body:$body}) {

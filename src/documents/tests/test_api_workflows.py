@@ -248,6 +248,45 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
 
         self.assertEqual(WorkflowTrigger.objects.count(), 1)
 
+    def test_api_create_invalid_assign_title(self):
+        """
+        GIVEN:
+            - API request to create a workflow
+            - Invalid f-string for assign_title
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP 400 response
+            - No objects are created
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow 1",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "assign_title": "{created_year]",
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(
+            "Invalid f-string detected",
+            response.data["actions"][0]["assign_title"][0],
+        )
+
+        self.assertEqual(Workflow.objects.count(), 1)
+
     def test_api_create_workflow_trigger_action_empty_fields(self):
         """
         GIVEN:

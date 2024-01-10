@@ -58,7 +58,7 @@ describe('DocumentTypeListComponent', () => {
     fixture.detectChanges()
   })
 
-  // Tests are included in management-list.compontent.spec.ts
+  // Tests are included in management-list.component.spec.ts
 
   it('should use correct delete message', () => {
     expect(

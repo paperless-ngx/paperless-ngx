@@ -146,7 +146,7 @@ export class ConsumerStatusService {
     this.statusWebSocket.onmessage = (ev) => {
       let statusMessage: WebsocketConsumerStatusMessage = JSON.parse(ev['data'])
 
-      // fallback if backend didnt restrict message
+      // fallback if backend didn't restrict message
       if (
         statusMessage.owner_id &&
         statusMessage.owner_id !== this.settingsService.currentUser?.id &&

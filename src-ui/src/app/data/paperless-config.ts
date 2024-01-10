@@ -146,7 +146,7 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     key: 'max_image_pixels',
     title: $localize`Max Image Pixels`,
     type: ConfigOptionType.Number,
-    config_key: 'PAPERLESS_OCR_IMAGE_DPI',
+    config_key: 'PAPERLESS_OCR_MAX_IMAGE_PIXELS',
     category: ConfigCategory.OCR,
   },
   {
