@@ -3706,7 +3706,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/switch/switch.component.html</context>
-          <context context-type="linenumber">10</context>
+          <context context-type="linenumber">17</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/text/text.component.html</context>
@@ -3825,6 +3825,13 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.ts</context>
           <context context-type="linenumber">92</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6541407358060244620" datatype="html">
+        <source>Note: value has not yet been set and will not apply until explicitly changed</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/input/switch/switch.component.html</context>
+          <context context-type="linenumber">45</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6560126119609945418" datatype="html">
