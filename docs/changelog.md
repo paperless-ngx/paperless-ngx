@@ -2,21 +2,19 @@
 
 ## paperless-ngx 2.3.3
 
-### Features
+### Enhancements
 
-- Chore: Backend dependencies update [@stumpylog](https://github.com/stumpylog) ([#5336](https://github.com/paperless-ngx/paperless-ngx/pull/5336))
+- Enhancement: Explain behavior of unset app config boolean to user [@shamoon](https://github.com/shamoon) ([#5345](https://github.com/paperless-ngx/paperless-ngx/pull/5345))
+- Enhancement: title assignment placeholder error handling, fallback [@shamoon](https://github.com/shamoon) ([#5282](https://github.com/paperless-ngx/paperless-ngx/pull/5282))
 
 ### Bug Fixes
 
 - Fix: Don't require the JSON user arguments field, interpret empty string as [@stumpylog](https://github.com/stumpylog) ([#5320](https://github.com/paperless-ngx/paperless-ngx/pull/5320))
 
-### Documentation
-
-- Chore: Backend dependencies update [@stumpylog](https://github.com/stumpylog) ([#5336](https://github.com/paperless-ngx/paperless-ngx/pull/5336))
-
 ### Maintenance
 
 - Chore: Backend dependencies update [@stumpylog](https://github.com/stumpylog) ([#5336](https://github.com/paperless-ngx/paperless-ngx/pull/5336))
+- Chore: add pre-commit hook for codespell [@shamoon](https://github.com/shamoon) ([#5324](https://github.com/paperless-ngx/paperless-ngx/pull/5324))
 
 ### All App Changes
 
