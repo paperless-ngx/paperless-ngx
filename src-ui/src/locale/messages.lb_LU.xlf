@@ -441,21 +441,21 @@
         </context-group>
         <target state="needs-translation">Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</target>
       </trans-unit>
-      <trans-unit id="3008420115644088420" datatype="html">
-        <source>Configuration</source>
+      <trans-unit id="9063918187161876141" datatype="html">
+        <source>Application Configuration</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
+        <target state="needs-translation">Application Configuration</target>
+      </trans-unit>
+      <trans-unit id="8833245444477474977" datatype="html">
+        <source>Global Paperless-ngx configuration options</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">276</context>
+          <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
+          <context context-type="linenumber">1</context>
         </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">280</context>
-        </context-group>
-        <target state="needs-translation">Configuration</target>
+        <target state="needs-translation">Global Paperless-ngx configuration options</target>
       </trans-unit>
       <trans-unit id="187187500641108332" datatype="html">
         <source>
@@ -2488,6 +2488,18 @@
         </context-group>
         <target state="needs-translation">Administration</target>
       </trans-unit>
+      <trans-unit id="3008420115644088420" datatype="html">
+        <source>Configuration</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">276</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">280</context>
+        </context-group>
+        <target state="needs-translation">Configuration</target>
+      </trans-unit>
       <trans-unit id="6626289114556551491" datatype="html">
         <source>File Tasks<x id="START_BLOCK_IF" equiv-text="@if (tasksService.failedFileTasks.length &gt; 0) {"/><x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></source>
         <context-group purpose="location">
@@ -4065,7 +4077,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/switch/switch.component.html</context>
-          <context context-type="linenumber">10</context>
+          <context context-type="linenumber">17</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/text/text.component.html</context>
@@ -4197,6 +4209,14 @@
           <context context-type="linenumber">92</context>
         </context-group>
         <target state="needs-translation">No items found</target>
+      </trans-unit>
+      <trans-unit id="6541407358060244620" datatype="html">
+        <source>Note: value has not yet been set and will not apply until explicitly changed</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/input/switch/switch.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+        <target state="needs-translation">Note: value has not yet been set and will not apply until explicitly changed</target>
       </trans-unit>
       <trans-unit id="6560126119609945418" datatype="html" approved="yes">
         <source>Add tag</source>

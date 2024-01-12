@@ -7,7 +7,7 @@ name = "pypi"
 dateparser = "~=1.2"
 # WARNING: django does not use semver.
 #          Only patch versions are guaranteed to not introduce breaking changes.
-django = "~=4.2.8"
+django = "~=4.2.9"
 django-auditlog = "*"
 django-celery-results = "*"
 django-compression-middleware = "*"
@@ -57,7 +57,7 @@ zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
 
 [dev-packages]
 # Linting
-black = "==23.11.0"
+black = "*"
 pre-commit = "*"
 ruff = "*"
 # Testing

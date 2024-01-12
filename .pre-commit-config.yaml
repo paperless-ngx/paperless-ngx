@@ -29,11 +29,10 @@ repos:
       - id: check-case-conflict
       - id: detect-private-key
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.4
+    rev: v2.2.6
     hooks:
       - id: codespell
-        args: ["--write-changes", "--ignore-words-list", "criterias,afterall,valeu,ure"]
-        exclude: "^src-ui/src/locale/|^src-ui/e2e/|^src/paperless_mail/tests/samples/"
+        exclude: "(^src-ui/src/locale/)|(^src-ui/e2e/)|(^src/paperless_mail/tests/samples/)"
         exclude_types:
           - pofile
           - json
@@ -48,11 +47,11 @@ repos:
         exclude: "(^Pipfile\\.lock$)"
   # Python hooks
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.1.5'
+    rev: 'v0.1.11'
     hooks:
       - id: ruff
   - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 23.11.0
+    rev: 23.12.1
     hooks:
       - id: black
   # Dockerfile hooks
