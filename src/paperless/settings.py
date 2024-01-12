@@ -367,6 +367,7 @@ STORAGES = {
     "staticfiles": {
         "BACKEND": _static_backend,
     },
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
 }
 
 _CELERY_REDIS_URL, _CHANNELS_REDIS_URL = _parse_redis_url(
@@ -1000,6 +1001,7 @@ if ENABLE_UPDATE_CHECK != "default":
     ENABLE_UPDATE_CHECK = __get_boolean("PAPERLESS_ENABLE_UPDATE_CHECK")
 
 APP_TITLE = os.getenv("PAPERLESS_APP_TITLE", None)
+APP_LOGO = os.getenv("PAPERLESS_APP_LOGO", None)
 
 ###############################################################################
 # Machine Learning                                                            #

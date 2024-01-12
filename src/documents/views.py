@@ -1171,6 +1171,9 @@ class UiSettingsView(GenericAPIView):
         ui_settings["app_title"] = settings.APP_TITLE
         if general_config.app_title is not None and len(general_config.app_title) > 0:
             ui_settings["app_title"] = general_config.app_title
+        ui_settings["app_logo"] = settings.APP_LOGO
+        if general_config.app_logo is not None and len(general_config.app_logo) > 0:
+            ui_settings["app_logo"] = general_config.app_logo
 
         user_resp = {
             "id": user.id,

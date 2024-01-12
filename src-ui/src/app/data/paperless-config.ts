@@ -43,6 +43,7 @@ export enum ConfigOptionType {
   Select = 'select',
   Boolean = 'boolean',
   JSON = 'json',
+  File = 'file',
 }
 
 export const ConfigCategory = {
@@ -166,6 +167,13 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     category: ConfigCategory.OCR,
   },
   {
+    key: 'app_logo',
+    title: $localize`Application Logo`,
+    type: ConfigOptionType.File,
+    config_key: 'PAPERLESS_APP_LOGO',
+    category: ConfigCategory.General,
+  },
+  {
     key: 'app_title',
     title: $localize`Application Title`,
     type: ConfigOptionType.String,
@@ -188,5 +196,6 @@ export interface PaperlessConfig extends ObjectWithId {
   max_image_pixels: number
   color_conversion_strategy: ColorConvertConfig
   user_args: object
+  app_logo: string
   app_title: string
 }
