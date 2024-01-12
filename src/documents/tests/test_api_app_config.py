@@ -1,4 +1,5 @@
 import json
+import os
 
 from django.contrib.auth.models import User
 from rest_framework import status
@@ -122,3 +123,37 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         config = ApplicationConfiguration.objects.first()
         self.assertEqual(config.user_args, None)
+
+    def test_api_replace_app_logo(self):
+        """
+        GIVEN:
+            - Existing config with app_logo specified
+        WHEN:
+            - API to replace app_logo is called
+        THEN:
+            - old app_logo file is deleted
+        """
+        with open(
+            os.path.join(os.path.dirname(__file__), "samples", "simple.jpg"),
+            "rb",
+        ) as f:
+            self.client.patch(
+                f"{self.ENDPOINT}1/",
+                {
+                    "app_logo": f,
+                },
+            )
+        config = ApplicationConfiguration.objects.first()
+        old_logo = config.app_logo
+        self.assertTrue(os.path.exists(old_logo.path))
+        with open(
+            os.path.join(os.path.dirname(__file__), "samples", "simple.png"),
+            "rb",
+        ) as f:
+            self.client.patch(
+                f"{self.ENDPOINT}1/",
+                {
+                    "app_logo": f,
+                },
+            )
+        self.assertFalse(os.path.exists(old_logo.path))
