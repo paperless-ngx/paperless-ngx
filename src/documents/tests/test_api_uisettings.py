@@ -36,6 +36,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
             response.data["settings"],
             {
                 "app_title": None,
+                "app_logo": None,
                 "update_checking": {
                     "backend_setting": "default",
                 },
