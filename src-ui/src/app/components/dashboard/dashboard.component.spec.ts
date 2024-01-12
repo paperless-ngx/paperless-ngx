@@ -194,14 +194,4 @@ describe('DashboardComponent', () => {
     >)
     expect(toastSpy).toHaveBeenCalled()
   })
-
-  it('should get custom app title', () => {
-    const title = 'FooBar'
-    expect(component.subtitle).toContain('Paperless-ngx')
-    expect(component.subtitle).not.toContain(title)
-    jest.spyOn(settingsService, 'get').mockImplementation((key) => {
-      if (key === SETTINGS_KEYS.APP_TITLE) return title
-    })
-    expect(component.subtitle).toContain(title)
-  })
 })

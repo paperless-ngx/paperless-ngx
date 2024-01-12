@@ -5,13 +5,13 @@ import { ComponentWithPermissions } from '../with-permissions/with-permissions.c
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { SavedView } from 'src/app/data/saved-view'
 import { ToastService } from 'src/app/services/toast.service'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import {
   CdkDragDrop,
   CdkDragEnd,
   CdkDragStart,
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
+import { environment } from 'src/environments/environment'
 
 @Component({
   selector: 'pngx-dashboard',
@@ -34,13 +34,10 @@ export class DashboardComponent extends ComponentWithPermissions {
   }
 
   get subtitle() {
-    const appTitle = this.settingsService.get(SETTINGS_KEYS.APP_TITLE)?.length
-      ? this.settingsService.get(SETTINGS_KEYS.APP_TITLE)
-      : 'Paperless-ngx'
     if (this.settingsService.displayName) {
-      return $localize`Hello ${this.settingsService.displayName}, welcome to ${appTitle}`
+      return $localize`Hello ${this.settingsService.displayName}, welcome to ${environment.appTitle}`
     } else {
-      return $localize`Welcome to ${appTitle}`
+      return $localize`Welcome to ${environment.appTitle}`
     }
   }
 
