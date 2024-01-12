@@ -1335,6 +1335,10 @@ started by the container.
 
 : If set, overrides the default name "Paperless-ngx"
 
+#### [`PAPERLESS_APP_LOGO=<path>`](#PAPERLESS_APP_LOGO) {#PAPERLESS_APP_LOGO}
+
+: Path to an image file in the /media/logo directory, must include 'logo', e.g. `/logo/Atari_logo.svg`
+
 #### [`PAPERLESS_ENABLE_UPDATE_CHECK=<bool>`](#PAPERLESS_ENABLE_UPDATE_CHECK) {#PAPERLESS_ENABLE_UPDATE_CHECK}
 
 !!! note
