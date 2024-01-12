@@ -1,5 +1,55 @@
 # Changelog
 
+## paperless-ngx 2.3.3
+
+### Enhancements
+
+- Enhancement: Explain behavior of unset app config boolean to user [@shamoon](https://github.com/shamoon) ([#5345](https://github.com/paperless-ngx/paperless-ngx/pull/5345))
+- Enhancement: title assignment placeholder error handling, fallback [@shamoon](https://github.com/shamoon) ([#5282](https://github.com/paperless-ngx/paperless-ngx/pull/5282))
+
+### Bug Fixes
+
+- Fix: Don't require the JSON user arguments field, interpret empty string as [@stumpylog](https://github.com/stumpylog) ([#5320](https://github.com/paperless-ngx/paperless-ngx/pull/5320))
+
+### Maintenance
+
+- Chore: Backend dependencies update [@stumpylog](https://github.com/stumpylog) ([#5336](https://github.com/paperless-ngx/paperless-ngx/pull/5336))
+- Chore: add pre-commit hook for codespell [@shamoon](https://github.com/shamoon) ([#5324](https://github.com/paperless-ngx/paperless-ngx/pull/5324))
+
+### All App Changes
+
+<details>
+<summary>5 changes</summary>
+
+- Enhancement: Explain behavior of unset app config boolean to user [@shamoon](https://github.com/shamoon) ([#5345](https://github.com/paperless-ngx/paperless-ngx/pull/5345))
+- Enhancement: title assignment placeholder error handling, fallback [@shamoon](https://github.com/shamoon) ([#5282](https://github.com/paperless-ngx/paperless-ngx/pull/5282))
+- Chore: Backend dependencies update [@stumpylog](https://github.com/stumpylog) ([#5336](https://github.com/paperless-ngx/paperless-ngx/pull/5336))
+- Fix: Don't require the JSON user arguments field, interpret empty string as [@stumpylog](https://github.com/stumpylog) ([#5320](https://github.com/paperless-ngx/paperless-ngx/pull/5320))
+- Chore: add pre-commit hook for codespell [@shamoon](https://github.com/shamoon) ([#5324](https://github.com/paperless-ngx/paperless-ngx/pull/5324))
+</details>
+
+## paperless-ngx 2.3.2
+
+### Bug Fixes
+
+- Fix: triggered workflow assignment of customfield fails if field exists in v2.3.1 [@shamoon](https://github.com/shamoon) ([#5302](https://github.com/paperless-ngx/paperless-ngx/pull/5302))
+- Fix: Decoding of user arguments for OCR [@stumpylog](https://github.com/stumpylog) ([#5307](https://github.com/paperless-ngx/paperless-ngx/pull/5307))
+- Fix: empty workflow trigger match field cannot be saved in v.2.3.1 [@shamoon](https://github.com/shamoon) ([#5301](https://github.com/paperless-ngx/paperless-ngx/pull/5301))
+- Fix: Use local time for added/updated workflow triggers [@stumpylog](https://github.com/stumpylog) ([#5304](https://github.com/paperless-ngx/paperless-ngx/pull/5304))
+- Fix: workflow edit form loses unsaved changes [@shamoon](https://github.com/shamoon) ([#5299](https://github.com/paperless-ngx/paperless-ngx/pull/5299))
+
+### All App Changes
+
+<details>
+<summary>5 changes</summary>
+
+- Fix: triggered workflow assignment of customfield fails if field exists in v2.3.1 [@shamoon](https://github.com/shamoon) ([#5302](https://github.com/paperless-ngx/paperless-ngx/pull/5302))
+- Fix: Decoding of user arguments for OCR [@stumpylog](https://github.com/stumpylog) ([#5307](https://github.com/paperless-ngx/paperless-ngx/pull/5307))
+- Fix: empty workflow trigger match field cannot be saved in v.2.3.1 [@shamoon](https://github.com/shamoon) ([#5301](https://github.com/paperless-ngx/paperless-ngx/pull/5301))
+- Fix: Use local time for added/updated workflow triggers [@stumpylog](https://github.com/stumpylog) ([#5304](https://github.com/paperless-ngx/paperless-ngx/pull/5304))
+- Fix: workflow edit form loses unsaved changes [@shamoon](https://github.com/shamoon) ([#5299](https://github.com/paperless-ngx/paperless-ngx/pull/5299))
+</details>
+
 ## paperless-ngx 2.3.1
 
 ### Bug Fixes
