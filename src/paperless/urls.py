@@ -1,4 +1,4 @@
-import re
+import os
 
 from django.conf import settings
 from django.conf.urls import include
@@ -186,9 +186,9 @@ urlpatterns = [
     ),
     # App logo
     re_path(
-        r"^%s(?P<path>.*)$" % re.escape(settings.MEDIA_URL.lstrip("/")),
+        r"^logo(?P<path>.*)$",
         serve,
-        kwargs={"document_root": settings.MEDIA_ROOT},
+        kwargs={"document_root": os.path.join(settings.MEDIA_ROOT, "logo")},
     ),
     # TODO: with localization, this is even worse! :/
     # login, logout
