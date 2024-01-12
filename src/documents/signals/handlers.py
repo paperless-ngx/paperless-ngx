@@ -582,9 +582,9 @@ def run_workflow(
                             document.owner.username
                             if document.owner is not None
                             else "",
-                            document.added,
+                            timezone.localtime(document.added),
                             document.original_filename,
-                            document.created,
+                            timezone.localtime(document.created),
                         )
                     except Exception:
                         logger.exception(
