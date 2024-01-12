@@ -34,10 +34,13 @@ export class DashboardComponent extends ComponentWithPermissions {
   }
 
   get subtitle() {
+    const appTitle = this.settingsService.get(SETTINGS_KEYS.APP_TITLE)?.length
+      ? this.settingsService.get(SETTINGS_KEYS.APP_TITLE)
+      : 'Paperless-ngx'
     if (this.settingsService.displayName) {
-      return $localize`Hello ${this.settingsService.displayName}, welcome to Paperless-ngx`
+      return $localize`Hello ${this.settingsService.displayName}, welcome to ${appTitle}`
     } else {
-      return $localize`Welcome to Paperless-ngx`
+      return $localize`Welcome to ${appTitle}`
     }
   }
 
