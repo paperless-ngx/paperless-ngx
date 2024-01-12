@@ -24,4 +24,16 @@ export class ConfigService {
       .patch<PaperlessConfig>(`${this.baseUrl}${config.id}/`, config)
       .pipe(first())
   }
+
+  uploadFile(
+    file: File,
+    configID: number,
+    configKey: string
+  ): Observable<PaperlessConfig> {
+    let formData = new FormData()
+    formData.append(configKey, file, file.name)
+    return this.http
+      .patch<PaperlessConfig>(`${this.baseUrl}${configID}/`, formData)
+      .pipe(first())
+  }
 }

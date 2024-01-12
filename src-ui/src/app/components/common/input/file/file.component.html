@@ -1,0 +1,30 @@
+<div class="mb-3" [class.pb-3]="error">
+    <div class="row">
+      <div class="d-flex align-items-center position-relative hidden-button-container" [class.col-md-3]="horizontal">
+        @if (title) {
+          <label class="form-label" [class.mb-md-0]="horizontal" [for]="inputId">{{title}}</label>
+        }
+        @if (removable) {
+          <button type="button" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
+            <svg class="sidebaricon" fill="currentColor">
+              <use xlink:href="assets/bootstrap-icons.svg#x"/>
+              </svg>&nbsp;<ng-container i18n>Remove</ng-container>
+            </button>
+          }
+        </div>
+        <div class="input-group" [class.col-md-9]="horizontal" [class.is-invalid]="error">
+          <input #fileInput type="file" class="form-control" [id]="inputId" (change)="onFile($event)" [disabled]="disabled">
+          <button class="btn btn-outline-secondary py-0" type="button" (click)="onButton()" [disabled]="disabled || !file" i18n>Upload</button>
+        </div>
+        @if (filename) {
+            <small class="form-text text-muted">{{filename}}</small>
+        }
+        <input #inputField type="hidden" class="form-control small" [(ngModel)]="value" [disabled]="true">
+        @if (hint) {
+            <small class="form-text text-muted" [innerHTML]="hint | safeHtml"></small>
+        }
+        <div class="invalid-feedback position-absolute top-100">
+            {{error}}
+        </div>
+      </div>
+    </div>

@@ -39,4 +39,13 @@ describe('ConfigService', () => {
     )
     expect(req.request.method).toEqual('PATCH')
   })
+
+  it('should support upload file with form data', () => {
+    service.uploadFile(new File([], 'test.png'), 1, 'app_logo').subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}config/1/`
+    )
+    expect(req.request.method).toEqual('PATCH')
+    expect(req.request.body).not.toBeNull()
+  })
 })

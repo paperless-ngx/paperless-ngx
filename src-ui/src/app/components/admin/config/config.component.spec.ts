@@ -15,12 +15,15 @@ import { SwitchComponent } from '../../common/input/switch/switch.component'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { SelectComponent } from '../../common/input/select/select.component'
+import { FileComponent } from '../../common/input/file/file.component'
+import { SettingsService } from 'src/app/services/settings.service'
 
 describe('ConfigComponent', () => {
   let component: ConfigComponent
   let fixture: ComponentFixture<ConfigComponent>
   let configService: ConfigService
   let toastService: ToastService
+  let settingService: SettingsService
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -30,6 +33,7 @@ describe('ConfigComponent', () => {
         SelectComponent,
         NumberComponent,
         SwitchComponent,
+        FileComponent,
         PageHeaderComponent,
       ],
       imports: [
@@ -44,6 +48,7 @@ describe('ConfigComponent', () => {
 
     configService = TestBed.inject(ConfigService)
     toastService = TestBed.inject(ToastService)
+    settingService = TestBed.inject(SettingsService)
     fixture = TestBed.createComponent(ConfigComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
@@ -99,5 +104,40 @@ describe('ConfigComponent', () => {
     expect(component.errors).toEqual({ user_args: 'Invalid JSON' })
     component.configForm.patchValue({ user_args: '{ "foo": "bar" }' })
     expect(component.errors).toEqual({ user_args: null })
+  })
+
+  it('should upload file, show error if necessary', () => {
+    const uploadSpy = jest.spyOn(configService, 'uploadFile')
+    const errorSpy = jest.spyOn(toastService, 'showError')
+    uploadSpy.mockReturnValueOnce(
+      throwError(() => new Error('Error uploading file'))
+    )
+    component.uploadFile(new File([], 'test.png'), 'app_logo')
+    expect(uploadSpy).toHaveBeenCalled()
+    expect(errorSpy).toHaveBeenCalled()
+    uploadSpy.mockReturnValueOnce(
+      of({ app_logo: 'https://example.com/logo/test.png' } as any)
+    )
+    component.uploadFile(new File([], 'test.png'), 'app_logo')
+    expect(component.initialConfig).toEqual({
+      app_logo: 'https://example.com/logo/test.png',
+    })
+  })
+
+  it('should refresh ui settings after save or upload', () => {
+    const saveSpy = jest.spyOn(configService, 'saveConfig')
+    const initSpy = jest.spyOn(settingService, 'initializeSettings')
+    saveSpy.mockReturnValueOnce(
+      of({ output_type: OutputTypeConfig.PDF_A } as any)
+    )
+    component.saveConfig()
+    expect(initSpy).toHaveBeenCalled()
+
+    const uploadSpy = jest.spyOn(configService, 'uploadFile')
+    uploadSpy.mockReturnValueOnce(
+      of({ app_logo: 'https://example.com/logo/test.png' } as any)
+    )
+    component.uploadFile(new File([], 'test.png'), 'app_logo')
+    expect(initSpy).toHaveBeenCalled()
   })
 })
