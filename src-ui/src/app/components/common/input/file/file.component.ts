@@ -39,9 +39,15 @@ export class FileComponent extends AbstractInputComponent<string> {
     this.file = (event.target as HTMLInputElement).files[0]
   }
 
-  onButton() {
+  uploadClicked() {
     this.upload.emit(this.file)
+    this.clear()
+  }
+
+  clear() {
     this.file = undefined
     this.fileInput.nativeElement.value = null
+    this.writeValue(null)
+    this.onChange(null)
   }
 }

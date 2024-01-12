@@ -14,10 +14,17 @@
         </div>
         <div class="input-group" [class.col-md-9]="horizontal" [class.is-invalid]="error">
           <input #fileInput type="file" class="form-control" [id]="inputId" (change)="onFile($event)" [disabled]="disabled">
-          <button class="btn btn-outline-secondary py-0" type="button" (click)="onButton()" [disabled]="disabled || !file" i18n>Upload</button>
+          <button class="btn btn-outline-primary py-0" type="button" (click)="uploadClicked()" [disabled]="disabled || !file" i18n>Upload</button>
         </div>
         @if (filename) {
-            <small class="form-text text-muted">{{filename}}</small>
+            <div class="form-text d-flex align-items-center">
+              <span class="text-muted">{{filename}}</span>
+              <button type="button" class="btn btn-link btn-sm ms-2" (click)="clear()">
+                <svg class="sidebaricon" fill="currentColor">
+                  <use xlink:href="assets/bootstrap-icons.svg#x"/>
+                </svg><small class="ms-1" i18n>Remove</small>
+              </button>
+            </div>
         }
         <input #inputField type="hidden" class="form-control small" [(ngModel)]="value" [disabled]="true">
         @if (hint) {

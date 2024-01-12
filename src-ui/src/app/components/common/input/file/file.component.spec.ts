@@ -34,7 +34,7 @@ describe('FileComponent', () => {
     let firedFile
     component.file = new File([], 'test.png')
     component.upload.subscribe((file) => (firedFile = file))
-    component.onButton()
+    component.uploadClicked()
     expect(firedFile.name).toEqual('test.png')
     expect(component.file).toBeUndefined()
   })
