@@ -217,9 +217,16 @@ main {
  */
 
 .navbar-brand {
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
   font-size: 1rem;
+
+  .flex-column {
+    padding: 0.15rem 0;
+  }
+
+  .byline {
+    font-size: 0.5rem;
+    letter-spacing: 0.1rem;
+  }
 }
 
 @media screen and (min-width: 768px) {

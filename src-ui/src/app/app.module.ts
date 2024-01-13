@@ -110,6 +110,7 @@ import { DocumentLinkComponent } from './components/common/input/document-link/d
 import { PreviewPopupComponent } from './components/common/preview-popup/preview-popup.component'
 import { SwitchComponent } from './components/common/input/switch/switch.component'
 import { ConfigComponent } from './components/admin/config/config.component'
+import { FileComponent } from './components/common/input/file/file.component'
 
 import localeAf from '@angular/common/locales/af'
 import localeAr from '@angular/common/locales/ar'
@@ -267,6 +268,7 @@ function initializeApp(settings: SettingsService) {
     PreviewPopupComponent,
     SwitchComponent,
     ConfigComponent,
+    FileComponent,
   ],
   imports: [
     BrowserModule,

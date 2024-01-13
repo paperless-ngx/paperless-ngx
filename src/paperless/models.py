@@ -1,3 +1,4 @@
+from django.core.validators import FileExtensionValidator
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -164,6 +165,23 @@ class ApplicationConfiguration(AbstractSingletonModel):
     user_args = models.JSONField(
         verbose_name=_("Adds additional user arguments for OCRMyPDF"),
         null=True,
+    )
+
+    app_title = models.CharField(
+        verbose_name=_("Application title"),
+        null=True,
+        blank=True,
+        max_length=48,
+    )
+
+    app_logo = models.FileField(
+        verbose_name=_("Application logo"),
+        null=True,
+        blank=True,
+        validators=[
+            FileExtensionValidator(allowed_extensions=["jpg", "png", "gif", "svg"]),
+        ],
+        upload_to="logo/",
     )
 
     class Meta:

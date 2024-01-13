@@ -1,3 +1,5 @@
+import os
+
 from django.conf import settings
 from django.conf.urls import include
 from django.contrib import admin
@@ -8,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import RedirectView
+from django.views.static import serve
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
@@ -180,6 +183,12 @@ urlpatterns = [
         RedirectView.as_view(
             url=settings.STATIC_URL + "frontend/en-US/assets/%(path)s",
         ),
+    ),
+    # App logo
+    re_path(
+        r"^logo(?P<path>.*)$",
+        serve,
+        kwargs={"document_root": os.path.join(settings.MEDIA_ROOT, "logo")},
     ),
     # TODO: with localization, this is even worse! :/
     # login, logout
