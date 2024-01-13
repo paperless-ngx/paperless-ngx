@@ -21,361 +21,361 @@
   <button type="button" class="btn btn-sm btn-outline-danger me-4" (click)="delete()" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }">
     <svg class="buttonicon" fill="currentColor">
       <use xlink:href="assets/bootstrap-icons.svg#trash" />
-      </svg><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
-    </button>
+    </svg><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
+  </button>
 
-    <div class="btn-group me-2">
-      <a [href]="downloadUrl" class="btn btn-sm btn-outline-primary">
-        <svg class="buttonicon me-md-1" fill="currentColor">
+  <div class="btn-group me-2">
+    <a [href]="downloadUrl" class="btn btn-sm btn-outline-primary">
+      <svg class="buttonicon me-md-1" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#download" />
-          </svg><span class="d-none d-lg-inline ps-1" i18n>Download</span>
-        </a>
+      </svg><span class="d-none d-lg-inline ps-1" i18n>Download</span>
+    </a>
 
-        @if (metadata?.has_archive_version) {
-          <div class="btn-group" ngbDropdown role="group">
-            <button class="btn btn-sm btn-outline-primary dropdown-toggle" ngbDropdownToggle></button>
-            <div class="dropdown-menu shadow" ngbDropdownMenu>
-              <a ngbDropdownItem [href]="downloadOriginalUrl" i18n>Download original</a>
-            </div>
-          </div>
-        }
+    @if (metadata?.has_archive_version) {
+      <div class="btn-group" ngbDropdown role="group">
+        <button class="btn btn-sm btn-outline-primary dropdown-toggle" ngbDropdownToggle></button>
+        <div class="dropdown-menu shadow" ngbDropdownMenu>
+          <a ngbDropdownItem [href]="downloadOriginalUrl" i18n>Download original</a>
+        </div>
       </div>
+    }
+  </div>
 
-      <div class="ms-auto" ngbDropdown>
-        <button class="btn btn-sm btn-outline-primary me-2" id="actionsDropdown" ngbDropdownToggle>
-          <svg class="toolbaricon" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#three-dots" />
-          </svg>
-          <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
-        </button>
-        <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
-          <button ngbDropdownItem (click)="redoOcr()" [disabled]="!userCanEdit">
-            <svg class="buttonicon-sm" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#arrow-counterclockwise" />
-              </svg><span class="ps-1" i18n>Redo OCR</span>
-            </button>
+  <div class="ms-auto" ngbDropdown>
+    <button class="btn btn-sm btn-outline-primary me-2" id="actionsDropdown" ngbDropdownToggle>
+      <svg class="toolbaricon" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#three-dots" />
+      </svg>
+      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
+    </button>
+    <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
+      <button ngbDropdownItem (click)="redoOcr()" [disabled]="!userCanEdit">
+        <svg class="buttonicon-sm" fill="currentColor">
+          <use xlink:href="assets/bootstrap-icons.svg#arrow-counterclockwise" />
+        </svg><span class="ps-1" i18n>Redo OCR</span>
+      </button>
 
-            <button ngbDropdownItem (click)="moreLike()">
-              <svg class="buttonicon-sm" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#diagram-3" />
-                </svg><span class="ps-1" i18n>More like this</span>
-              </button>
-            </div>
-          </div>
+      <button ngbDropdownItem (click)="moreLike()">
+        <svg class="buttonicon-sm" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#diagram-3" />
+        </svg><span class="ps-1" i18n>More like this</span>
+      </button>
+    </div>
+  </div>
 
-          <pngx-custom-fields-dropdown
-            *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }"
-            class="me-2"
-            [documentId]="documentId"
-            [disabled]="!userIsOwner"
-            [existingFields]="document?.custom_fields"
-            (created)="refreshCustomFields()"
-            (added)="addField($event)">
-          </pngx-custom-fields-dropdown>
+  <pngx-custom-fields-dropdown
+    *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }"
+    class="me-2"
+    [documentId]="documentId"
+    [disabled]="!userIsOwner"
+    [existingFields]="document?.custom_fields"
+    (created)="refreshCustomFields()"
+    (added)="addField($event)">
+  </pngx-custom-fields-dropdown>
 
-          <pngx-share-links-dropdown [documentId]="documentId" [hasArchiveVersion]="!!document?.archived_file_name" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }"></pngx-share-links-dropdown>
-        </pngx-page-header>
+  <pngx-share-links-dropdown [documentId]="documentId" [hasArchiveVersion]="!!document?.archived_file_name" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }"></pngx-share-links-dropdown>
+</pngx-page-header>
 
-        <div class="row">
-          <div class="col-md-6 col-xl-4 mb-4">
+<div class="row">
+  <div class="col-md-6 col-xl-4 mb-4">
 
-            <form [formGroup]='documentForm' (ngSubmit)="save()">
+    <form [formGroup]='documentForm' (ngSubmit)="save()">
 
-              <div class="btn-toolbar mb-1 pb-3 border-bottom">
-                <div class="btn-group">
-                  <button type="button" class="btn btn-sm btn-outline-secondary" i18n-title title="Close" (click)="close()">
-                    <svg class="buttonicon" fill="currentColor">
-                      <use xlink:href="assets/bootstrap-icons.svg#x" />
-                    </svg>
-                  </button>
-                  <button type="button" class="btn btn-sm btn-outline-secondary" i18n-title title="Previous" (click)="previousDoc()" [disabled]="!hasPrevious()">
-                    <svg class="buttonicon" fill="currentColor">
-                      <use xlink:href="assets/bootstrap-icons.svg#arrow-left" />
-                    </svg>
-                  </button>
-                  <button type="button" class="btn btn-sm btn-outline-secondary"  i18n-title title="Next" (click)="nextDoc()" [disabled]="!hasNext()">
-                    <svg class="buttonicon" fill="currentColor">
-                      <use xlink:href="assets/bootstrap-icons.svg#arrow-right" />
-                    </svg>
-                  </button>
-                </div>
-
-                <ng-container *ngTemplateOutlet="saveButtons"></ng-container>
-              </div>
-
-              <ul ngbNav #nav="ngbNav" class="nav-underline flex-nowrap flex-md-wrap overflow-auto" (navChange)="onNavChange($event)" [(activeId)]="activeNavID">
-                <li [ngbNavItem]="DocumentDetailNavIDs.Details">
-                  <a ngbNavLink i18n>Details</a>
-                  <ng-template ngbNavContent>
-                    <div>
-                      <pngx-input-text #inputTitle i18n-title title="Title" formControlName="title" [horizontal]="true" (keyup)="titleKeyUp($event)" [error]="error?.title"></pngx-input-text>
-                      <pngx-input-number i18n-title title="Archive serial number" [error]="error?.archive_serial_number" [horizontal]="true" formControlName='archive_serial_number'></pngx-input-number>
-                      <pngx-input-date i18n-title title="Date created" formControlName="created_date" [suggestions]="suggestions?.dates" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
-                      [error]="error?.created_date"></pngx-input-date>
-                      <pngx-input-select [items]="correspondents" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
-                      (createNew)="createCorrespondent($event)" [suggestions]="suggestions?.correspondents" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }"></pngx-input-select>
-                      <pngx-input-select [items]="documentTypes" i18n-title title="Document type" formControlName="document_type" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
-                      (createNew)="createDocumentType($event)" [suggestions]="suggestions?.document_types" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }"></pngx-input-select>
-                      <pngx-input-select [items]="storagePaths" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
-                      (createNew)="createStoragePath($event)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }"></pngx-input-select>
-                      <pngx-input-tags formControlName="tags" [suggestions]="suggestions?.tags" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></pngx-input-tags>
-                      @for (fieldInstance of document?.custom_fields; track fieldInstance; let i = $index) {
-                        <div [formGroup]="customFieldFormFields.controls[i]">
-                          @switch (getCustomFieldFromInstance(fieldInstance)?.data_type) {
-                            @case (PaperlessCustomFieldDataType.String) {
-                              <pngx-input-text formControlName="value"
-                              [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                              [removable]="userIsOwner"
-                              (removed)="removeField(fieldInstance)"
-                              [horizontal]="true"
-                              [error]="getCustomFieldError(i)"></pngx-input-text>
-                            }
-                            @case (PaperlessCustomFieldDataType.Date) {
-                              <pngx-input-date formControlName="value"
-                              [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                              [removable]="userIsOwner"
-                              (removed)="removeField(fieldInstance)"
-                              [horizontal]="true"
-                              [error]="getCustomFieldError(i)"></pngx-input-date>
-                            }
-                            @case (PaperlessCustomFieldDataType.Integer) {
-                              <pngx-input-number formControlName="value"
-                              [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                              [removable]="userIsOwner"
-                              (removed)="removeField(fieldInstance)"
-                              [horizontal]="true"
-                              [showAdd]="false"
-                              [error]="getCustomFieldError(i)"></pngx-input-number>
-                            }
-                            @case (PaperlessCustomFieldDataType.Float) {
-                              <pngx-input-number formControlName="value"
-                              [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                              [removable]="userIsOwner"
-                              (removed)="removeField(fieldInstance)"
-                              [horizontal]="true"
-                              [showAdd]="false"
-                              [step]=".1"
-                              [error]="getCustomFieldError(i)"></pngx-input-number>
-                            }
-                            @case (PaperlessCustomFieldDataType.Monetary) {
-                              <pngx-input-number formControlName="value"
-                              [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                              [removable]="userIsOwner"
-                              (removed)="removeField(fieldInstance)"
-                              [horizontal]="true"
-                              [showAdd]="false"
-                              [step]=".01"
-                              [error]="getCustomFieldError(i)"></pngx-input-number>
-                            }
-                            @case (PaperlessCustomFieldDataType.Boolean) {
-                              <pngx-input-check formControlName="value"
-                              [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                              [removable]="userIsOwner"
-                              (removed)="removeField(fieldInstance)"
-                              [horizontal]="true"></pngx-input-check>
-                            }
-                            @case (PaperlessCustomFieldDataType.Url) {
-                              <pngx-input-url formControlName="value"
-                              [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                              [removable]="userIsOwner"
-                              (removed)="removeField(fieldInstance)"
-                              [horizontal]="true"
-                              [error]="getCustomFieldError(i)"></pngx-input-url>
-                            }
-                            @case (PaperlessCustomFieldDataType.DocumentLink) {
-                              <pngx-input-document-link formControlName="value"
-                              [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                              [parentDocumentID]="documentId"
-                              [removable]="userIsOwner"
-                              (removed)="removeField(fieldInstance)"
-                              [horizontal]="true"
-                              [error]="getCustomFieldError(i)"></pngx-input-document-link>
-                            }
-                          }
-                        </div>
-                      }
-                    </div>
-
-                    <div class="d-flex border-top pt-3">
-                      <ng-container *ngTemplateOutlet="saveButtons"></ng-container>
-                    </div>
-                  </ng-template>
-                </li>
-
-                <li [ngbNavItem]="DocumentDetailNavIDs.Content">
-                  <a ngbNavLink i18n>Content</a>
-                  <ng-template ngbNavContent>
-                    <div>
-                      <textarea class="form-control" id="content" rows="20" formControlName='content' [class.rtl]="isRTL"></textarea>
-                    </div>
-                  </ng-template>
-                </li>
-
-                <li [ngbNavItem]="DocumentDetailNavIDs.Metadata">
-                  <a ngbNavLink i18n>Metadata</a>
-                  <ng-template ngbNavContent>
-
-                    @if (document) {
-                      <table class="table table-borderless">
-                        <tbody>
-                          <tr>
-                            <td i18n>Date modified</td>
-                            <td>{{document.modified | customDate}}</td>
-                          </tr>
-                          <tr>
-                            <td i18n>Date added</td>
-                            <td>{{document.added | customDate}}</td>
-                          </tr>
-                          <tr>
-                            <td i18n>Media filename</td>
-                            <td>{{metadata?.media_filename}}</td>
-                          </tr>
-                          <tr>
-                            <td i18n>Original filename</td>
-                            <td>{{metadata?.original_filename}}</td>
-                          </tr>
-                          <tr>
-                            <td i18n>Original MD5 checksum</td>
-                            <td>{{metadata?.original_checksum}}</td>
-                          </tr>
-                          <tr>
-                            <td i18n>Original file size</td>
-                            <td>{{metadata?.original_size | fileSize}}</td>
-                          </tr>
-                          <tr>
-                            <td i18n>Original mime type</td>
-                            <td>{{metadata?.original_mime_type}}</td>
-                          </tr>
-                          @if (metadata?.has_archive_version) {
-                            <tr>
-                              <td i18n>Archive MD5 checksum</td>
-                              <td>{{metadata?.archive_checksum}}</td>
-                            </tr>
-                          }
-                          @if (metadata?.has_archive_version) {
-                            <tr>
-                              <td i18n>Archive file size</td>
-                              <td>{{metadata?.archive_size | fileSize}}</td>
-                            </tr>
-                          }
-                        </tbody>
-                      </table>
-                    }
-
-                    @if (metadata?.original_metadata?.length > 0) {
-                      <pngx-metadata-collapse i18n-title title="Original document metadata" [metadata]="metadata.original_metadata"></pngx-metadata-collapse>
-                    }
-                    @if (metadata?.archive_metadata?.length > 0) {
-                      <pngx-metadata-collapse i18n-title title="Archived document metadata" [metadata]="metadata.archive_metadata"></pngx-metadata-collapse>
-                    }
-
-                  </ng-template>
-                </li>
-
-                <li [ngbNavItem]="DocumentDetailNavIDs.Preview" class="d-md-none">
-                  <a ngbNavLink i18n>Preview</a>
-                  @if (!pdfPreview.offsetParent) {
-                    <ng-template ngbNavContent>
-                      <ng-container *ngTemplateOutlet="previewContent"></ng-container>
-                    </ng-template>
-                  }
-                </li>
-
-                @if (notesEnabled) {
-                  <li [ngbNavItem]="DocumentDetailNavIDs.Notes">
-                    <a class="text-nowrap" ngbNavLink i18n>Notes @if (document?.notes.length) {
-<span class="badge text-bg-secondary ms-1">{{document.notes.length}}</span>
-}</a>
-                    <ng-template ngbNavContent>
-                      <pngx-document-notes [documentId]="documentId" [notes]="document?.notes" [addDisabled]="!userCanEdit" (updated)="notesUpdated($event)"></pngx-document-notes>
-                    </ng-template>
-                  </li>
-                }
-
-                @if (showPermissions) {
-                  <li [ngbNavItem]="DocumentDetailNavIDs.Permissions">
-                    <a ngbNavLink i18n>Permissions</a>
-                    <ng-template ngbNavContent>
-                      <div class="mb-3">
-                        <pngx-permissions-form [users]="users" formControlName="permissions_form"></pngx-permissions-form>
-                      </div>
-                    </ng-template>
-                  </li>
-                }
-              </ul>
-
-              <div [ngbNavOutlet]="nav" class="mt-3"></div>
-
-            </form>
-          </div>
-
-          <div class="col-md-6 col-xl-8 mb-3 d-none d-md-block position-relative" #pdfPreview>
-            <ng-container *ngTemplateOutlet="previewContent"></ng-container>
-            @if (renderAsPlainText) {
-              <div [innerText]="previewText" class="preview-sticky bg-light p-3 overflow-auto" width="100%"></div>
-            }
-            @if (requiresPassword) {
-              <div class="password-prompt">
-                <form>
-                  <input autocomplete="" class="form-control" i18n-placeholder placeholder="Enter Password" type="password" (keyup)="onPasswordKeyUp($event)" />
-                </form>
-              </div>
-            }
-          </div>
-
+      <div class="btn-toolbar mb-1 pb-3 border-bottom">
+        <div class="btn-group">
+          <button type="button" class="btn btn-sm btn-outline-secondary" i18n-title title="Close" (click)="close()">
+            <svg class="buttonicon" fill="currentColor">
+              <use xlink:href="assets/bootstrap-icons.svg#x" />
+            </svg>
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" i18n-title title="Previous" (click)="previousDoc()" [disabled]="!hasPrevious()">
+            <svg class="buttonicon" fill="currentColor">
+              <use xlink:href="assets/bootstrap-icons.svg#arrow-left" />
+            </svg>
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-secondary"  i18n-title title="Next" (click)="nextDoc()" [disabled]="!hasNext()">
+            <svg class="buttonicon" fill="currentColor">
+              <use xlink:href="assets/bootstrap-icons.svg#arrow-right" />
+            </svg>
+          </button>
         </div>
 
-        <ng-template #saveButtons>
-          <div class="btn-group ms-auto">
-            <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-              <button type="submit" class="order-3 btn btn-sm btn-primary" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save</button>
-              @if (hasNext()) {
-                <button type="button" class="order-1 btn btn-sm btn-outline-primary" (click)="saveEditNext()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save &amp; next</button>
-              }
-              @if (!hasNext()) {
-                <button type="button" class="order-2 btn btn-sm btn-outline-primary" (click)="save(true)" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save &amp; close</button>
-              }
-            </ng-container>
-            <button type="button" class="order-0 btn btn-sm btn-outline-secondary" (click)="discard()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Discard</button>
-          </div>
-        </ng-template>
+        <ng-container *ngTemplateOutlet="saveButtons"></ng-container>
+      </div>
 
-        <ng-template #previewContent>
-          @if (!metadata) {
-            <div class="w-100 h-100 d-flex align-items-center justify-content-center">
-              <div>
-                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                <ng-container i18n>Loading...</ng-container>
-              </div>
+      <ul ngbNav #nav="ngbNav" class="nav-underline flex-nowrap flex-md-wrap overflow-auto" (navChange)="onNavChange($event)" [(activeId)]="activeNavID">
+        <li [ngbNavItem]="DocumentDetailNavIDs.Details">
+          <a ngbNavLink i18n>Details</a>
+          <ng-template ngbNavContent>
+            <div>
+              <pngx-input-text #inputTitle i18n-title title="Title" formControlName="title" [horizontal]="true" (keyup)="titleKeyUp($event)" [error]="error?.title"></pngx-input-text>
+              <pngx-input-number i18n-title title="Archive serial number" [error]="error?.archive_serial_number" [horizontal]="true" formControlName='archive_serial_number'></pngx-input-number>
+              <pngx-input-date i18n-title title="Date created" formControlName="created_date" [suggestions]="suggestions?.dates" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
+              [error]="error?.created_date"></pngx-input-date>
+              <pngx-input-select [items]="correspondents" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
+              (createNew)="createCorrespondent($event)" [suggestions]="suggestions?.correspondents" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }"></pngx-input-select>
+              <pngx-input-select [items]="documentTypes" i18n-title title="Document type" formControlName="document_type" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
+              (createNew)="createDocumentType($event)" [suggestions]="suggestions?.document_types" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }"></pngx-input-select>
+              <pngx-input-select [items]="storagePaths" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
+              (createNew)="createStoragePath($event)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }"></pngx-input-select>
+              <pngx-input-tags formControlName="tags" [suggestions]="suggestions?.tags" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></pngx-input-tags>
+              @for (fieldInstance of document?.custom_fields; track fieldInstance; let i = $index) {
+                <div [formGroup]="customFieldFormFields.controls[i]">
+                  @switch (getCustomFieldFromInstance(fieldInstance)?.data_type) {
+                    @case (PaperlessCustomFieldDataType.String) {
+                      <pngx-input-text formControlName="value"
+                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+                      [removable]="userIsOwner"
+                      (removed)="removeField(fieldInstance)"
+                      [horizontal]="true"
+                      [error]="getCustomFieldError(i)"></pngx-input-text>
+                    }
+                    @case (PaperlessCustomFieldDataType.Date) {
+                      <pngx-input-date formControlName="value"
+                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+                      [removable]="userIsOwner"
+                      (removed)="removeField(fieldInstance)"
+                      [horizontal]="true"
+                      [error]="getCustomFieldError(i)"></pngx-input-date>
+                    }
+                    @case (PaperlessCustomFieldDataType.Integer) {
+                      <pngx-input-number formControlName="value"
+                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+                      [removable]="userIsOwner"
+                      (removed)="removeField(fieldInstance)"
+                      [horizontal]="true"
+                      [showAdd]="false"
+                      [error]="getCustomFieldError(i)"></pngx-input-number>
+                    }
+                    @case (PaperlessCustomFieldDataType.Float) {
+                      <pngx-input-number formControlName="value"
+                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+                      [removable]="userIsOwner"
+                      (removed)="removeField(fieldInstance)"
+                      [horizontal]="true"
+                      [showAdd]="false"
+                      [step]=".1"
+                      [error]="getCustomFieldError(i)"></pngx-input-number>
+                    }
+                    @case (PaperlessCustomFieldDataType.Monetary) {
+                      <pngx-input-number formControlName="value"
+                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+                      [removable]="userIsOwner"
+                      (removed)="removeField(fieldInstance)"
+                      [horizontal]="true"
+                      [showAdd]="false"
+                      [step]=".01"
+                      [error]="getCustomFieldError(i)"></pngx-input-number>
+                    }
+                    @case (PaperlessCustomFieldDataType.Boolean) {
+                      <pngx-input-check formControlName="value"
+                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+                      [removable]="userIsOwner"
+                      (removed)="removeField(fieldInstance)"
+                      [horizontal]="true"></pngx-input-check>
+                    }
+                    @case (PaperlessCustomFieldDataType.Url) {
+                      <pngx-input-url formControlName="value"
+                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+                      [removable]="userIsOwner"
+                      (removed)="removeField(fieldInstance)"
+                      [horizontal]="true"
+                      [error]="getCustomFieldError(i)"></pngx-input-url>
+                    }
+                    @case (PaperlessCustomFieldDataType.DocumentLink) {
+                      <pngx-input-document-link formControlName="value"
+                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+                      [parentDocumentID]="documentId"
+                      [removable]="userIsOwner"
+                      (removed)="removeField(fieldInstance)"
+                      [horizontal]="true"
+                      [error]="getCustomFieldError(i)"></pngx-input-document-link>
+                    }
+                  }
+                </div>
+              }
             </div>
-          }
-          @if (getContentType() === 'application/pdf') {
-            @if (!useNativePdfViewer ) {
-              <div class="preview-sticky pdf-viewer-container">
-                <pngx-pdf-viewer
-                  [src]="{ url: previewUrl, password: password }"
-                  [original-size]="false"
-                  [show-borders]="true"
-                  [show-all]="true"
-                  [(page)]="previewCurrentPage"
-                  [zoom-scale]="previewZoomScale"
-                  [zoom]="previewZoomSetting"
-                  (error)="onError($event)"
-                  (after-load-complete)="pdfPreviewLoaded($event)">
-                </pngx-pdf-viewer>
-              </div>
-            } @else {
-              <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>
+
+            <div class="d-flex border-top pt-3">
+              <ng-container *ngTemplateOutlet="saveButtons"></ng-container>
+            </div>
+          </ng-template>
+        </li>
+
+        <li [ngbNavItem]="DocumentDetailNavIDs.Content">
+          <a ngbNavLink i18n>Content</a>
+          <ng-template ngbNavContent>
+            <div>
+              <textarea class="form-control" id="content" rows="20" formControlName='content' [class.rtl]="isRTL"></textarea>
+            </div>
+          </ng-template>
+        </li>
+
+        <li [ngbNavItem]="DocumentDetailNavIDs.Metadata">
+          <a ngbNavLink i18n>Metadata</a>
+          <ng-template ngbNavContent>
+
+            @if (document) {
+              <table class="table table-borderless">
+                <tbody>
+                  <tr>
+                    <td i18n>Date modified</td>
+                    <td>{{document.modified | customDate}}</td>
+                  </tr>
+                  <tr>
+                    <td i18n>Date added</td>
+                    <td>{{document.added | customDate}}</td>
+                  </tr>
+                  <tr>
+                    <td i18n>Media filename</td>
+                    <td>{{metadata?.media_filename}}</td>
+                  </tr>
+                  <tr>
+                    <td i18n>Original filename</td>
+                    <td>{{metadata?.original_filename}}</td>
+                  </tr>
+                  <tr>
+                    <td i18n>Original MD5 checksum</td>
+                    <td>{{metadata?.original_checksum}}</td>
+                  </tr>
+                  <tr>
+                    <td i18n>Original file size</td>
+                    <td>{{metadata?.original_size | fileSize}}</td>
+                  </tr>
+                  <tr>
+                    <td i18n>Original mime type</td>
+                    <td>{{metadata?.original_mime_type}}</td>
+                  </tr>
+                  @if (metadata?.has_archive_version) {
+                    <tr>
+                      <td i18n>Archive MD5 checksum</td>
+                      <td>{{metadata?.archive_checksum}}</td>
+                    </tr>
+                  }
+                  @if (metadata?.has_archive_version) {
+                    <tr>
+                      <td i18n>Archive file size</td>
+                      <td>{{metadata?.archive_size | fileSize}}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
             }
+
+            @if (metadata?.original_metadata?.length > 0) {
+              <pngx-metadata-collapse i18n-title title="Original document metadata" [metadata]="metadata.original_metadata"></pngx-metadata-collapse>
+            }
+            @if (metadata?.archive_metadata?.length > 0) {
+              <pngx-metadata-collapse i18n-title title="Archived document metadata" [metadata]="metadata.archive_metadata"></pngx-metadata-collapse>
+            }
+
+          </ng-template>
+        </li>
+
+        <li [ngbNavItem]="DocumentDetailNavIDs.Preview" class="d-md-none">
+          <a ngbNavLink i18n>Preview</a>
+          @if (!pdfPreview.offsetParent) {
+            <ng-template ngbNavContent>
+              <ng-container *ngTemplateOutlet="previewContent"></ng-container>
+            </ng-template>
           }
-          @if (renderAsPlainText) {
-            <div [innerText]="previewText" class="preview-sticky bg-light p-3 overflow-auto" width="100%"></div>
-          }
-          @if (showPasswordField) {
-            <div class="password-prompt">
-              <form>
-                <input autocomplete="" autofocus="true" class="form-control" i18n-placeholder placeholder="Enter Password" type="password" (keyup)="onPasswordKeyUp($event)" />
-              </form>
-            </div>
-          }
-        </ng-template>
+        </li>
+
+        @if (notesEnabled) {
+          <li [ngbNavItem]="DocumentDetailNavIDs.Notes">
+            <a class="text-nowrap" ngbNavLink i18n>Notes @if (document?.notes.length) {
+              <span class="badge text-bg-secondary ms-1">{{document.notes.length}}</span>
+            }</a>
+            <ng-template ngbNavContent>
+              <pngx-document-notes [documentId]="documentId" [notes]="document?.notes" [addDisabled]="!userCanEdit" (updated)="notesUpdated($event)"></pngx-document-notes>
+            </ng-template>
+          </li>
+        }
+
+        @if (showPermissions) {
+          <li [ngbNavItem]="DocumentDetailNavIDs.Permissions">
+            <a ngbNavLink i18n>Permissions</a>
+            <ng-template ngbNavContent>
+              <div class="mb-3">
+                <pngx-permissions-form [users]="users" formControlName="permissions_form"></pngx-permissions-form>
+              </div>
+            </ng-template>
+          </li>
+        }
+      </ul>
+
+      <div [ngbNavOutlet]="nav" class="mt-3"></div>
+
+    </form>
+  </div>
+
+  <div class="col-md-6 col-xl-8 mb-3 d-none d-md-block position-relative" #pdfPreview>
+    <ng-container *ngTemplateOutlet="previewContent"></ng-container>
+    @if (renderAsPlainText) {
+      <div [innerText]="previewText" class="preview-sticky bg-light p-3 overflow-auto" width="100%"></div>
+    }
+    @if (requiresPassword) {
+      <div class="password-prompt">
+        <form>
+          <input autocomplete="" class="form-control" i18n-placeholder placeholder="Enter Password" type="password" (keyup)="onPasswordKeyUp($event)" />
+        </form>
+      </div>
+    }
+  </div>
+
+</div>
+
+<ng-template #saveButtons>
+  <div class="btn-group ms-auto">
+    <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
+      <button type="submit" class="order-3 btn btn-sm btn-primary" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save</button>
+      @if (hasNext()) {
+        <button type="button" class="order-1 btn btn-sm btn-outline-primary" (click)="saveEditNext()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save &amp; next</button>
+      }
+      @if (!hasNext()) {
+        <button type="button" class="order-2 btn btn-sm btn-outline-primary" (click)="save(true)" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save &amp; close</button>
+      }
+    </ng-container>
+    <button type="button" class="order-0 btn btn-sm btn-outline-secondary" (click)="discard()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Discard</button>
+  </div>
+</ng-template>
+
+<ng-template #previewContent>
+  @if (!metadata) {
+    <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+      <div>
+        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+        <ng-container i18n>Loading...</ng-container>
+      </div>
+    </div>
+  }
+  @if (getContentType() === 'application/pdf') {
+    @if (!useNativePdfViewer ) {
+      <div class="preview-sticky pdf-viewer-container">
+        <pngx-pdf-viewer
+          [src]="{ url: previewUrl, password: password }"
+          [original-size]="false"
+          [show-borders]="true"
+          [show-all]="true"
+          [(page)]="previewCurrentPage"
+          [zoom-scale]="previewZoomScale"
+          [zoom]="previewZoomSetting"
+          (error)="onError($event)"
+          (after-load-complete)="pdfPreviewLoaded($event)">
+        </pngx-pdf-viewer>
+      </div>
+    } @else {
+      <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>
+    }
+  }
+  @if (renderAsPlainText) {
+    <div [innerText]="previewText" class="preview-sticky bg-light p-3 overflow-auto" width="100%"></div>
+  }
+  @if (showPasswordField) {
+    <div class="password-prompt">
+      <form>
+        <input autocomplete="" autofocus="true" class="form-control" i18n-placeholder placeholder="Enter Password" type="password" (keyup)="onPasswordKeyUp($event)" />
+      </form>
+    </div>
+  }
+</ng-template>
