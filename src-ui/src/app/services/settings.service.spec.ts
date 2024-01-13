@@ -301,4 +301,16 @@ describe('SettingsService', () => {
       .expectOne(`${environment.apiBaseUrl}ui_settings/`)
       .flush(ui_settings)
   })
+
+  it('should update environment app title if set', () => {
+    const settings = Object.assign({}, ui_settings)
+    settings.settings['app_title'] = 'FooBar'
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}ui_settings/`
+    )
+    req.flush(settings)
+    expect(environment.appTitle).toEqual('FooBar')
+    // post for migrate
+    httpTestingController.expectOne(`${environment.apiBaseUrl}ui_settings/`)
+  })
 })

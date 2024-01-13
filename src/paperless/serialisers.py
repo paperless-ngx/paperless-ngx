@@ -132,6 +132,11 @@ class ApplicationConfigurationSerializer(serializers.ModelSerializer):
             data["language"] = None
         return super().run_validation(data)
 
+    def update(self, instance, validated_data):
+        if instance.app_logo and "app_logo" in validated_data:
+            instance.app_logo.delete()
+        return super().update(instance, validated_data)
+
     class Meta:
         model = ApplicationConfiguration
         fields = "__all__"

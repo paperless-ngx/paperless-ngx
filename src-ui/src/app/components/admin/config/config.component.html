@@ -30,6 +30,7 @@
                                                     @case (ConfigOptionType.Boolean) { <pngx-input-switch [formControlName]="option.key" [error]="errors[option.key]" [showUnsetNote]="true" [horizontal]="true" title="Enable" i18n-title></pngx-input-switch> }
                                                     @case (ConfigOptionType.String) { <pngx-input-text [formControlName]="option.key" [error]="errors[option.key]"></pngx-input-text> }
                                                     @case (ConfigOptionType.JSON) { <pngx-input-text [formControlName]="option.key" [error]="errors[option.key]"></pngx-input-text> }
+                                                    @case (ConfigOptionType.File) { <pngx-input-file [formControlName]="option.key" (upload)="uploadFile($event, option.key)" [error]="errors[option.key]"></pngx-input-file> }
                                                 }
                                             </div>
                                         </div>
