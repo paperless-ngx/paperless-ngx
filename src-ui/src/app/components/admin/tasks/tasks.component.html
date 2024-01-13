@@ -110,7 +110,12 @@
 
   <div class="pb-3 d-sm-flex justify-content-between align-items-center">
     @if (tasks.length > 0) {
-      <div class="pb-2 pb-sm-0" i18n>{tasks.length, plural, =1 {One {{this.activeTabLocalized}} task} other {{{tasks.length || 0}} total {{this.activeTabLocalized}} tasks}}</div>
+      <div class="pb-2 pb-sm-0">
+        <ng-container i18n>{tasks.length, plural, =1 {One {{this.activeTabLocalized}} task} other {{{tasks.length || 0}} total {{this.activeTabLocalized}} tasks}}</ng-container>
+        @if (selectedTasks.size > 0) {
+          <ng-container i18n>&nbsp;({{selectedTasks.size}} selected)</ng-container>
+        }
+      </div>
     }
     @if (tasks.length > pageSize) {
       <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="tasks.length" maxSize="8" size="sm"></ngb-pagination>
