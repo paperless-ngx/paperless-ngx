@@ -21,7 +21,6 @@ from filelock import FileLock
 from rest_framework.reverse import reverse
 
 from documents.classifier import load_classifier
-from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
@@ -42,10 +41,81 @@ from documents.parsers import ParseError
 from documents.parsers import get_parser_class_for_mime_type
 from documents.parsers import parse_date
 from documents.permissions import set_permissions_for_object
+from documents.plugins.base import AlwaysRunPluginMixin
+from documents.plugins.base import ConsumeTaskPlugin
+from documents.plugins.base import NoCleanupPluginMixin
+from documents.plugins.base import NoSetupPluginMixin
 from documents.signals import document_consumption_finished
 from documents.signals import document_consumption_started
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
+
+
+class WorkflowTriggerPlugin(
+    NoCleanupPluginMixin,
+    NoSetupPluginMixin,
+    AlwaysRunPluginMixin,
+    ConsumeTaskPlugin,
+):
+    NAME: str = "WorkflowTriggerPlugin"
+
+    def run(self) -> Optional[str]:
+        """
+        Get overrides from matching workflows
+        """
+        overrides = DocumentMetadataOverrides()
+        for workflow in Workflow.objects.filter(enabled=True).order_by("order"):
+            template_overrides = DocumentMetadataOverrides()
+
+            if document_matches_workflow(
+                self.input_doc,
+                workflow,
+                WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            ):
+                for action in workflow.actions.all():
+                    if action.assign_title is not None:
+                        template_overrides.title = action.assign_title
+                    if action.assign_tags is not None:
+                        template_overrides.tag_ids = [
+                            tag.pk for tag in action.assign_tags.all()
+                        ]
+                    if action.assign_correspondent is not None:
+                        template_overrides.correspondent_id = (
+                            action.assign_correspondent.pk
+                        )
+                    if action.assign_document_type is not None:
+                        template_overrides.document_type_id = (
+                            action.assign_document_type.pk
+                        )
+                    if action.assign_storage_path is not None:
+                        template_overrides.storage_path_id = (
+                            action.assign_storage_path.pk
+                        )
+                    if action.assign_owner is not None:
+                        template_overrides.owner_id = action.assign_owner.pk
+                    if action.assign_view_users is not None:
+                        template_overrides.view_users = [
+                            user.pk for user in action.assign_view_users.all()
+                        ]
+                    if action.assign_view_groups is not None:
+                        template_overrides.view_groups = [
+                            group.pk for group in action.assign_view_groups.all()
+                        ]
+                    if action.assign_change_users is not None:
+                        template_overrides.change_users = [
+                            user.pk for user in action.assign_change_users.all()
+                        ]
+                    if action.assign_change_groups is not None:
+                        template_overrides.change_groups = [
+                            group.pk for group in action.assign_change_groups.all()
+                        ]
+                    if action.assign_custom_fields is not None:
+                        template_overrides.custom_field_ids = [
+                            field.pk for field in action.assign_custom_fields.all()
+                        ]
+
+                    overrides.update(template_overrides)
+        self.metadata.update(overrides)
 
 
 class ConsumerError(Exception):
@@ -601,70 +671,6 @@ class Consumer(LoggingMixin):
         document.refresh_from_db()
 
         return document
-
-    def get_workflow_overrides(
-        self,
-        input_doc: ConsumableDocument,
-    ) -> DocumentMetadataOverrides:
-        """
-        Get overrides from matching workflows
-        """
-        overrides = DocumentMetadataOverrides()
-        for workflow in Workflow.objects.filter(enabled=True).order_by("order"):
-            template_overrides = DocumentMetadataOverrides()
-
-            if document_matches_workflow(
-                input_doc,
-                workflow,
-                WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
-            ):
-                for action in workflow.actions.all():
-                    self.log.info(
-                        f"Applying overrides in {action} from {workflow}",
-                    )
-                    if action.assign_title is not None:
-                        template_overrides.title = action.assign_title
-                    if action.assign_tags is not None:
-                        template_overrides.tag_ids = [
-                            tag.pk for tag in action.assign_tags.all()
-                        ]
-                    if action.assign_correspondent is not None:
-                        template_overrides.correspondent_id = (
-                            action.assign_correspondent.pk
-                        )
-                    if action.assign_document_type is not None:
-                        template_overrides.document_type_id = (
-                            action.assign_document_type.pk
-                        )
-                    if action.assign_storage_path is not None:
-                        template_overrides.storage_path_id = (
-                            action.assign_storage_path.pk
-                        )
-                    if action.assign_owner is not None:
-                        template_overrides.owner_id = action.assign_owner.pk
-                    if action.assign_view_users is not None:
-                        template_overrides.view_users = [
-                            user.pk for user in action.assign_view_users.all()
-                        ]
-                    if action.assign_view_groups is not None:
-                        template_overrides.view_groups = [
-                            group.pk for group in action.assign_view_groups.all()
-                        ]
-                    if action.assign_change_users is not None:
-                        template_overrides.change_users = [
-                            user.pk for user in action.assign_change_users.all()
-                        ]
-                    if action.assign_change_groups is not None:
-                        template_overrides.change_groups = [
-                            group.pk for group in action.assign_change_groups.all()
-                        ]
-                    if action.assign_custom_fields is not None:
-                        template_overrides.custom_field_ids = [
-                            field.pk for field in action.assign_custom_fields.all()
-                        ]
-
-                    overrides.update(template_overrides)
-        return overrides
 
     def _parse_title_placeholders(self, title: str) -> str:
         local_added = timezone.localtime(timezone.now())

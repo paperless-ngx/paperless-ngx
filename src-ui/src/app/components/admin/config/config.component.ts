@@ -19,6 +19,7 @@ import { ConfigService } from 'src/app/services/config.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { DirtyComponent, dirtyCheck } from '@ngneat/dirty-check-forms'
+import { SettingsService } from 'src/app/services/settings.service'
 
 @Component({
   selector: 'pngx-config',
@@ -55,7 +56,8 @@ export class ConfigComponent
 
   constructor(
     private configService: ConfigService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private settingsService: SettingsService
   ) {
     super()
     this.configForm.addControl('id', new FormControl())
@@ -145,6 +147,7 @@ export class ConfigComponent
           this.loading = false
           this.initialize(config)
           this.store.next(config)
+          this.settingsService.initializeSettings().subscribe()
           this.toastService.showInfo($localize`Configuration updated`)
         },
         error: (e) => {
@@ -159,5 +162,28 @@ export class ConfigComponent
 
   public discardChanges() {
     this.configForm.reset(this.initialConfig)
+  }
+
+  public uploadFile(file: File, key: string) {
+    this.loading = true
+    this.configService
+      .uploadFile(file, this.configForm.value['id'], key)
+      .pipe(takeUntil(this.unsubscribeNotifier), first())
+      .subscribe({
+        next: (config) => {
+          this.loading = false
+          this.initialize(config)
+          this.store.next(config)
+          this.settingsService.initializeSettings().subscribe()
+          this.toastService.showInfo($localize`File successfully updated`)
+        },
+        error: (e) => {
+          this.loading = false
+          this.toastService.showError(
+            $localize`An error occurred uploading file`,
+            e
+          )
+        },
+      })
   }
 }
