@@ -289,7 +289,23 @@ export class DocumentDetailComponent
           const openDocument = this.openDocumentService.getOpenDocument(
             this.documentId
           )
+
           if (openDocument) {
+            if (
+              new Date(doc.modified) > new Date(openDocument.modified) &&
+              !this.modalService.hasOpenModals()
+            ) {
+              let modal = this.modalService.open(ConfirmDialogComponent, {
+                backdrop: 'static',
+              })
+              modal.componentInstance.title = $localize`Document changes detected`
+              modal.componentInstance.messageBold = $localize`The version of this document in your browser session appears older than the existing version.`
+              modal.componentInstance.message = $localize`Saving the document here may overwrite other changes that were made. To restore the existing version, discard your changes or close the document.`
+              modal.componentInstance.cancelBtnCaption = $localize`Ok`
+              modal.componentInstance.cancelBtnClass = 'btn-primary'
+              modal.componentInstance.btnClass = 'visually-hidden'
+            }
+
             if (this.documentForm.dirty) {
               Object.assign(openDocument, this.documentForm.value)
               openDocument['owner'] =

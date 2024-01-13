@@ -79,8 +79,9 @@ const doc: Document = {
   storage_path: 31,
   tags: [41, 42, 43],
   content: 'text content',
-  added: new Date(),
-  created: new Date(),
+  added: new Date('May 4, 2014 03:24:00'),
+  created: new Date('May 4, 2014 03:24:00'),
+  modified: new Date('May 4, 2014 03:24:00'),
   archive_serial_number: null,
   original_file_name: 'file.pdf',
   owner: null,
@@ -933,6 +934,26 @@ describe('DocumentDetailComponent', () => {
       .query(By.directive(CustomFieldsDropdownComponent))
       .triggerEventHandler('created')
     expect(refreshSpy).toHaveBeenCalled()
+  })
+
+  it('should warn when open document does not match doc retrieved from backend on init', () => {
+    const modalSpy = jest.spyOn(modalService, 'open')
+    const openDoc = Object.assign({}, doc)
+    // simulate a document being modified elsewhere and db updated
+    doc.modified = new Date()
+    jest.spyOn(documentService, 'get').mockReturnValueOnce(of(doc))
+    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(openDoc)
+    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+      of({
+        count: customFields.length,
+        all: customFields.map((f) => f.id),
+        results: customFields,
+      })
+    )
+    fixture.detectChanges() // calls ngOnInit
+    expect(modalSpy).toHaveBeenCalledWith(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
   })
 
   function initNormally() {
