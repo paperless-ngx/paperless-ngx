@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NotFoundComponent } from './not-found.component'
 import { By } from '@angular/platform-browser'
 import { LogoComponent } from '../common/logo/logo.component'
+import { HttpClientTestingModule } from '@angular/common/http/testing'
 
 describe('NotFoundComponent', () => {
   let component: NotFoundComponent
@@ -10,6 +11,7 @@ describe('NotFoundComponent', () => {
   beforeEach(async () => {
     TestBed.configureTestingModule({
       declarations: [NotFoundComponent, LogoComponent],
+      imports: [HttpClientTestingModule],
     }).compileComponents()
 
     fixture = TestBed.createComponent(NotFoundComponent)

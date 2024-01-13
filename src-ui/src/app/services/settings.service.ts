@@ -270,6 +270,9 @@ export class SettingsService {
       first(),
       tap((uisettings) => {
         Object.assign(this.settings, uisettings.settings)
+        if (this.get(SETTINGS_KEYS.APP_TITLE)?.length) {
+          environment.appTitle = this.get(SETTINGS_KEYS.APP_TITLE)
+        }
         this.maybeMigrateSettings()
         // to update lang cookie
         if (this.settings['language']?.length)

@@ -8,12 +8,10 @@ from paperless.models import ApplicationConfiguration
 
 
 @dataclasses.dataclass
-class OutputTypeConfig:
+class BaseConfig:
     """
     Almost all parsers care about the chosen PDF output format
     """
-
-    output_type: str = dataclasses.field(init=False)
 
     @staticmethod
     def _get_config_instance() -> ApplicationConfiguration:
@@ -23,6 +21,15 @@ class OutputTypeConfig:
             ApplicationConfiguration.objects.create()
             app_config = ApplicationConfiguration.objects.all().first()
         return app_config
+
+
+@dataclasses.dataclass
+class OutputTypeConfig(BaseConfig):
+    """
+    Almost all parsers care about the chosen PDF output format
+    """
+
+    output_type: str = dataclasses.field(init=False)
 
     def __post_init__(self) -> None:
         app_config = self._get_config_instance()
@@ -86,3 +93,19 @@ class OcrConfig(OutputTypeConfig):
                 user_args = {}
 
         self.user_args = user_args
+
+
+@dataclasses.dataclass
+class GeneralConfig(BaseConfig):
+    """
+    General application settings that require global scope
+    """
+
+    app_title: str = dataclasses.field(init=False)
+    app_logo: str = dataclasses.field(init=False)
+
+    def __post_init__(self) -> None:
+        app_config = self._get_config_instance()
+
+        self.app_title = app_config.app_title or None
+        self.app_logo = app_config.app_logo.url if app_config.app_logo else None

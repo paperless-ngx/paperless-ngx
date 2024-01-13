@@ -39,4 +39,26 @@ describe('ConfigService', () => {
     )
     expect(req.request.method).toEqual('PATCH')
   })
+
+  it('should support upload file with form data', () => {
+    service.uploadFile(new File([], 'test.png'), 1, 'app_logo').subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}config/1/`
+    )
+    expect(req.request.method).toEqual('PATCH')
+    expect(req.request.body).not.toBeNull()
+  })
+
+  it('should not pass string app_logo', () => {
+    service
+      .saveConfig({
+        id: 1,
+        app_logo: '/logo/foobar.png',
+      } as PaperlessConfig)
+      .subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}config/1/`
+    )
+    expect(req.request.body).toEqual({ id: 1 })
+  })
 })
