@@ -465,33 +465,42 @@ export class PdfViewerComponent
 
     this.clear()
 
-    this.setupViewer()
-
-    this.loadingTask = PDFJS.getDocument(this.getDocumentParams())
-
-    this.loadingTask!.onProgress = (progressData: PDFProgressData) => {
-      this.onProgress.emit(progressData)
+    if (this.pdfViewer) {
+      this.pdfViewer._resetView()
+      this.pdfViewer = null
     }
 
-    const src = this.src
+    this.setupViewer()
 
-    from(this.loadingTask!.promise as Promise<PDFDocumentProxy>)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (pdf) => {
-          this._pdf = pdf
-          this.lastLoaded = src
+    try {
+      this.loadingTask = PDFJS.getDocument(this.getDocumentParams())
 
-          this.afterLoadComplete.emit(pdf)
-          this.resetPdfDocument()
+      this.loadingTask!.onProgress = (progressData: PDFProgressData) => {
+        this.onProgress.emit(progressData)
+      }
 
-          this.update()
-        },
-        error: (error) => {
-          this.lastLoaded = null
-          this.onError.emit(error)
-        },
-      })
+      const src = this.src
+
+      from(this.loadingTask!.promise as Promise<PDFDocumentProxy>)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (pdf) => {
+            this._pdf = pdf
+            this.lastLoaded = src
+
+            this.afterLoadComplete.emit(pdf)
+            this.resetPdfDocument()
+
+            this.update()
+          },
+          error: (error) => {
+            this.lastLoaded = null
+            this.onError.emit(error)
+          },
+        })
+    } catch (e) {
+      this.onError.emit(e)
+    }
   }
 
   private update() {
