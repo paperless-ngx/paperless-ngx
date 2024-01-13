@@ -12,8 +12,8 @@
   }
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-outline-secondary" (click)="cancel()" [disabled]="!buttonsEnabled" i18n>
-        <span class="d-inline-block" style="padding-bottom: 1px;" >Cancel</span>
+  <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">
+        <span class="d-inline-block" style="padding-bottom: 1px;">{{cancelBtnCaption}}</span>
       </button>
   <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled">
     <span>
