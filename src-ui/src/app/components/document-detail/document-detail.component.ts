@@ -303,15 +303,12 @@ export class DocumentDetailComponent
               new Date(doc.modified) > new Date(openDocument.modified) &&
               !this.modalService.hasOpenModals()
             ) {
-              let modal = this.modalService.open(ConfirmDialogComponent, {
-                backdrop: 'static',
-              })
+              let modal = this.modalService.open(ConfirmDialogComponent)
               modal.componentInstance.title = $localize`Document changes detected`
               modal.componentInstance.messageBold = $localize`The version of this document in your browser session appears older than the existing version.`
               modal.componentInstance.message = $localize`Saving the document here may overwrite other changes that were made. To restore the existing version, discard your changes or close the document.`
-              modal.componentInstance.cancelBtnCaption = $localize`Ok`
-              modal.componentInstance.cancelBtnClass = 'btn-primary'
-              modal.componentInstance.btnClass = 'visually-hidden'
+              modal.componentInstance.cancelBtnClass = 'visually-hidden'
+              modal.componentInstance.btnCaption = $localize`Ok`
             }
 
             if (this.documentForm.dirty) {
@@ -433,7 +430,6 @@ export class DocumentDetailComponent
   updateComponent(doc: Document) {
     this.document = doc
     this.requiresPassword = false
-    // this.customFields = doc.custom_fields.concat([])
     this.updateFormForCustomFields()
     this.documentsService
       .getMetadata(doc.id)

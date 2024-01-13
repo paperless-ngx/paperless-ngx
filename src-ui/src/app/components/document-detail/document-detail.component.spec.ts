@@ -972,6 +972,9 @@ describe('DocumentDetailComponent', () => {
     const openDoc = Object.assign({}, doc)
     // simulate a document being modified elsewhere and db updated
     doc.modified = new Date()
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
     jest.spyOn(documentService, 'get').mockReturnValueOnce(of(doc))
     jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(openDoc)
     jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
@@ -982,9 +985,7 @@ describe('DocumentDetailComponent', () => {
       })
     )
     fixture.detectChanges() // calls ngOnInit
-    expect(modalSpy).toHaveBeenCalledWith(ConfirmDialogComponent, {
-      backdrop: 'static',
-    })
+    expect(modalSpy).toHaveBeenCalledWith(ConfirmDialogComponent)
   })
 
   function initNormally() {
