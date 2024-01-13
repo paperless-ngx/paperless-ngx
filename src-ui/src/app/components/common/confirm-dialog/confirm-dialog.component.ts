@@ -38,6 +38,12 @@ export class ConfirmDialogComponent {
   alternativeBtnCaption
 
   @Input()
+  cancelBtnClass = 'btn-outline-secondary'
+
+  @Input()
+  cancelBtnCaption = $localize`Cancel`
+
+  @Input()
   buttonsEnabled = true
 
   confirmButtonEnabled = true
