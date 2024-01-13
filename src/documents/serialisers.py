@@ -13,6 +13,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.validators import DecimalValidator
 from django.core.validators import MaxLengthValidator
 from django.core.validators import integer_validator
+from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
@@ -580,6 +581,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
             custom_field_instances_to_update,
             ["value_document_ids"],
         )
+        Document.objects.filter(id__in=target_doc_ids).update(modified=timezone.now())
 
     @staticmethod
     def remove_doclink(
@@ -600,6 +602,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         ):
             target_doc_field_instance.value.remove(document.id)
             target_doc_field_instance.save()
+        Document.objects.filter(id=target_doc_id).update(modified=timezone.now())
 
     class Meta:
         model = CustomFieldInstance
