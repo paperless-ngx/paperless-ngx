@@ -421,7 +421,11 @@ export class DocumentDetailComponent
     this.updateFormForCustomFields()
     this.documentsService
       .getMetadata(doc.id)
-      .pipe(first())
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifier),
+        takeUntil(this.docChangeNotifier)
+      )
       .subscribe({
         next: (result) => {
           this.metadata = result
@@ -442,7 +446,11 @@ export class DocumentDetailComponent
     ) {
       this.documentsService
         .getSuggestions(doc.id)
-        .pipe(first(), takeUntil(this.unsubscribeNotifier))
+        .pipe(
+          first(),
+          takeUntil(this.unsubscribeNotifier),
+          takeUntil(this.docChangeNotifier)
+        )
         .subscribe({
           next: (result) => {
             this.suggestions = result
