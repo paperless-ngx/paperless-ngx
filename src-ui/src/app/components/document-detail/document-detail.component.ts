@@ -33,6 +33,7 @@ import {
   map,
   debounceTime,
   distinctUntilChanged,
+  filter,
 } from 'rxjs/operators'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
 import {
@@ -257,6 +258,13 @@ export class DocumentDetailComponent
 
     this.route.paramMap
       .pipe(
+        filter((paramMap) => {
+          // only init when changing docs & section is set
+          return (
+            +paramMap.get('id') !== this.documentId &&
+            paramMap.get('section')?.length > 0
+          )
+        }),
         takeUntil(this.unsubscribeNotifier),
         switchMap((paramMap) => {
           const documentId = +paramMap.get('id')
