@@ -650,7 +650,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         Path(settings.MODEL_FILE).touch()
         self.assertTrue(os.path.exists(settings.MODEL_FILE))
 
-        load.side_effect = IncompatibleClassifierVersionError()
+        load.side_effect = IncompatibleClassifierVersionError("Dummey Error")
         self.assertIsNone(load_classifier())
         self.assertFalse(os.path.exists(settings.MODEL_FILE))
 
