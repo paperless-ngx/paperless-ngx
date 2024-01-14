@@ -429,8 +429,9 @@ HTTP_REMOTE_USER_HEADER_NAME = os.getenv(
 if ENABLE_HTTP_REMOTE_USER:
     MIDDLEWARE.append("paperless.auth.HttpRemoteUserMiddleware")
     AUTHENTICATION_BACKENDS.insert(0, "django.contrib.auth.backends.RemoteUserBackend")
-    REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].append(
-        "rest_framework.authentication.RemoteUserAuthentication",
+    REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].insert(
+        0,
+        "paperless.auth.PaperlessRemoteUserAuthentication",
     )
 
 # X-Frame options for embedded PDF display:
