@@ -1,11 +1,11 @@
 @if (active) {
   <button class="position-absolute top-0 start-100 translate-middle badge bg-secondary border border-light rounded-pill p-1" title="Clear" i18n-title (click)="onClick($event)">
     @if (!isNumbered && selected) {
-      <i-bs name="check-lg"></i-bs>
+      <i-bs class="check" width="1em" height="1em" name="check-lg"></i-bs>
     }
     @if (isNumbered) {
       <div class="number">{{number}}<span class="visually-hidden">selected</span></div>
     }
-    <i-bs name="x-lg"></i-bs>
+    <i-bs class="x" width=".9em" height="1em" name="x-lg"></i-bs>
   </button>
 }

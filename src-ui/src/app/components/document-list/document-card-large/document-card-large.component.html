@@ -49,21 +49,21 @@
         <div class="d-flex flex-column flex-md-row align-items-md-center">
           <div class="btn-group">
             <a class="btn btn-sm btn-outline-secondary" (click)="clickMoreLike.emit()">
-              <i-bs class="sidebaricon" fill="currentColor" class="sidebaricon" name="diagram-3"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>More like this</span>
+              <i-bs    name="diagram-3"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>More like this</span>
               </a>
               <a routerLink="/documents/{{document.id}}" class="btn btn-sm btn-outline-secondary" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-                <i-bs class="sidebaricon" fill="currentColor" class="sidebaricon" name="pencil"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Edit</span>
+                <i-bs    name="pencil"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Edit</span>
                 </a>
                 <a class="btn btn-sm btn-outline-secondary" target="_blank" [href]="previewUrl"
                   [ngbPopover]="previewContent" [popoverTitle]="document.title | documentTitle"
                   autoClose="true" popoverClass="shadow popover-preview" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">
-                  <i-bs class="sidebaricon" fill="currentColor" class="sidebaricon" name="eye"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>View</span>
+                  <i-bs    name="eye"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>View</span>
                   </a>
                   <ng-template #previewContent>
                     <pngx-preview-popup [document]="document"></pngx-preview-popup>
                   </ng-template>
                   <a class="btn btn-sm btn-outline-secondary" [href]="getDownloadUrl()">
-                    <i-bs class="sidebaricon" fill="currentColor" class="sidebaricon" name="download"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Download</span>
+                    <i-bs    name="download"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Download</span>
                     </a>
                   </div>
 

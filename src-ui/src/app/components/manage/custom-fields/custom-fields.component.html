@@ -1,7 +1,6 @@
 <pngx-page-header title="Custom Fields" i18n-title>
   <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editField()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.CustomField }">
-    <i-bs class="sidebaricon me-1" name="plus-circle"></i-bs>
-    <ng-container i18n>Add Field</ng-container>
+    <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Field</ng-container>
   </button>
 </pngx-page-header>
 
@@ -23,10 +22,10 @@
         <div class="col">
           <div class="btn-group">
             <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.CustomField }" class="btn btn-sm btn-outline-secondary" type="button" (click)="editField(field)">
-              <i-bs class="buttonicon-sm" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
+              <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
               </button>
               <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.CustomField }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteField(field)">
-                <i-bs class="buttonicon-sm" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+                <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
                 </button>
               </div>
             </div>

@@ -19,12 +19,12 @@
   }
 
   <button type="button" class="btn btn-sm btn-outline-danger me-4" (click)="delete()" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }">
-    <i-bs class="buttonicon" name="trash"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
+    <i-bs width="1.2em" height="1.2em" name="trash"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
   </button>
 
   <div class="btn-group me-2">
     <a [href]="downloadUrl" class="btn btn-sm btn-outline-primary">
-      <i-bs class="buttonicon me-md-1" name="download"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Download</span>
+      <i-bs width="1.2em" height="1.2em" name="download"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Download</span>
     </a>
 
     @if (metadata?.has_archive_version) {
@@ -44,11 +44,11 @@
     </button>
     <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
       <button ngbDropdownItem (click)="redoOcr()" [disabled]="!userCanEdit">
-        <i-bs class="buttonicon-sm" name="arrow-counterclockwise"></i-bs><span class="ps-1" i18n>Redo OCR</span>
+        <i-bs width="1em" height="1em" name="arrow-counterclockwise"></i-bs><span class="ps-1" i18n>Redo OCR</span>
       </button>
 
       <button ngbDropdownItem (click)="moreLike()">
-        <i-bs class="buttonicon-sm" name="diagram-3"></i-bs><span class="ps-1" i18n>More like this</span>
+        <i-bs width="1em" height="1em" name="diagram-3"></i-bs><span class="ps-1" i18n>More like this</span>
       </button>
     </div>
   </div>
@@ -74,13 +74,13 @@
       <div class="btn-toolbar mb-1 pb-3 border-bottom">
         <div class="btn-group">
           <button type="button" class="btn btn-sm btn-outline-secondary" i18n-title title="Close" (click)="close()">
-            <i-bs class="buttonicon" name="x"></i-bs>
+            <i-bs width="1.2em" height="1.2em" name="x"></i-bs>
           </button>
           <button type="button" class="btn btn-sm btn-outline-secondary" i18n-title title="Previous" (click)="previousDoc()" [disabled]="!hasPrevious()">
-            <i-bs class="buttonicon" name="arrow-left"></i-bs>
+            <i-bs width="1.2em" height="1.2em" name="arrow-left"></i-bs>
           </button>
           <button type="button" class="btn btn-sm btn-outline-secondary"  i18n-title title="Next" (click)="nextDoc()" [disabled]="!hasNext()">
-            <i-bs class="buttonicon" name="arrow-right"></i-bs>
+            <i-bs width="1.2em" height="1.2em" name="arrow-right"></i-bs>
           </button>
         </div>
 

@@ -34,12 +34,12 @@
         </ng-select>
         @if (allowCreate) {
           <button class="btn btn-outline-secondary" type="button" (click)="createTag()" [disabled]="disabled">
-            <i-bs class="buttonicon" name="plus"></i-bs>
+            <i-bs width="1.2em" height="1.2em" name="plus"></i-bs>
           </button>
         }
         @if (showFilter) {
           <button class="btn btn-outline-secondary" type="button" (click)="onFilterDocuments()" [disabled]="hasPrivate || this.value === null" i18n-title title="Filter documents with these Tags">
-            <i-bs class="buttonicon" name="filter"></i-bs>
+            <i-bs width="1.2em" height="1.2em" name="filter"></i-bs>
           </button>
         }
       </div>

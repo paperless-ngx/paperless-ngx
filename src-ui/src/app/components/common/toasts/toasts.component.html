@@ -9,10 +9,10 @@
     <span class="visually-hidden">{{ toast.delayRemaining / 1000 | number: '1.0-0' }} seconds</span>
     <div class="d-flex align-items-top">
       @if (!toast.error) {
-        <i-bs class="sidebaricon-sm mt-1 me-2 flex-shrink-0" name="info-circle"></i-bs>
+        <i-bs width="0.9em" height="0.9em" name="info-circle"></i-bs>
       }
       @if (toast.error) {
-        <i-bs class="sidebaricon-sm mt-1 me-2 flex-shrink-0" name="exclamation-triangle"></i-bs>
+        <i-bs width="0.9em" height="0.9em" name="exclamation-triangle"></i-bs>
       }
       <div>
         <p class="mb-0">{{toast.content}}</p>
@@ -33,10 +33,10 @@
                 <div class="col offset-sm-3">
                   <button class="btn btn-sm btn-outline-dark" (click)="copyError(toast.error)">
                     @if (!copied) {
-                      <i-bs class="sidebaricon" name="clipboard"></i-bs>
+                      <i-bs  name="clipboard"></i-bs>
                     }
                     @if (copied) {
-                      <i-bs class="sidebaricon" name="clipboard-check"></i-bs>
+                      <i-bs  name="clipboard-check"></i-bs>
                     }
                     >&nbsp;<ng-container i18n>Copy Raw Error</ng-container>
                   </button>

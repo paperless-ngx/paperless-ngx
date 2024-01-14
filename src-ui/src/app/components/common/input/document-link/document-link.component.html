@@ -6,7 +6,7 @@
       }
       @if (removable) {
         <button type="button" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
-          <i-bs class="sidebaricon" name="x"></i-bs>&nbsp;<ng-container i18n>Remove</ng-container>
+          <i-bs  name="x"></i-bs>&nbsp;<ng-container i18n>Remove</ng-container>
           </button>
         }
       </div>
@@ -27,9 +27,9 @@
             (change)="onChange(selectedDocuments)">
             <ng-template ng-label-tmp let-document="item">
               <div class="d-flex align-items-center">
-                <i-bs class="sidebaricon" (click)="unselect(document)" name="x"></i-bs>
+                <i-bs  (click)="unselect(document)" name="x"></i-bs>
                 <a routerLink="/documents/{{document.id}}" class="badge bg-light text-primary" (mousedown)="$event.stopImmediatePropagation();">
-                  <i-bs class="sidebaricon-sm me-1" name="file-text"></i-bs><span>{{document.title}}</span>
+                  <i-bs width="0.9em" height="0.9em" name="file-text"></i-bs><span>{{document.title}}</span>
                   </a>
                 </div>
               </ng-template>

@@ -21,20 +21,20 @@
             }
             <button type="button" class="btn btn-sm btn-outline-primary" (click)="copy(link)">
                 @if (copied !== link.id) {
-                  <i-bs class="buttonicon" name="clipboard-fill"></i-bs>
+                  <i-bs width="1.2em" height="1.2em" name="clipboard-fill"></i-bs>
                 }
                 @if (copied === link.id) {
-                  <i-bs class="buttonicon" name="clipboard-check-fill"></i-bs>
+                  <i-bs width="1.2em" height="1.2em" name="clipboard-check-fill"></i-bs>
                 }
                 <span class="visually-hidden" i18n>Copy</span>
               </button>
               @if (canShare(link)) {
                 <button type="button" class="btn btn-sm btn-outline-primary" (click)="share(link)">
-                  <i-bs class="buttonicon" name="box-arrow-up"></i-bs><span class="visually-hidden" i18n>Share</span>
+                  <i-bs width="1.2em" height="1.2em" name="box-arrow-up"></i-bs><span class="visually-hidden" i18n>Share</span>
                   </button>
                 }
                 <button type="button" class="btn btn-sm btn-outline-danger" (click)="delete(link)">
-                  <i-bs class="buttonicon" name="trash"></i-bs><span class="visually-hidden" i18n>Delete</span>
+                  <i-bs width="1.2em" height="1.2em" name="trash"></i-bs><span class="visually-hidden" i18n>Delete</span>
                   </button>
                 </div>
                 <span class="badge copied-badge bg-primary small fade ms-4 position-absolute top-50 translate-middle-y pe-none z-3" [class.show]="copied === link.id" i18n>Copied!</span>
@@ -59,7 +59,7 @@
                     <div class="spinner-border spinner-border-sm me-2" role="status"></div>
                   }
                   @if (!loading) {
-                    <i-bs class="buttonicon me-1" name="plus"></i-bs>
+                    <i-bs width="1.2em" height="1.2em" name="plus"></i-bs>
                   }
                   <ng-container i18n>Create</ng-container>
                 </button>
