@@ -1,4 +1,8 @@
-<pngx-page-header title="Logs" i18n-title>
+<pngx-page-header
+  title="Logs"
+  i18n-title
+  info="Review the log files for the application and for email checking."
+  i18n-info>
   <div class="form-check form-switch" (click)="toggleAutoRefresh()">
     <input class="form-check-input" type="checkbox" role="switch" id="autoRefreshSwitch" [attr.checked]="autoRefreshInterval">
     <label class="form-check-label" for="autoRefreshSwitch" i18n>Auto refresh</label>
