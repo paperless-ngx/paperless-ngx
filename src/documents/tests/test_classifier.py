@@ -673,4 +673,3 @@ class TestClassifier(DirectoriesMixin, TestCase):
         ):
             classifier = load_classifier()
             self.assertIsNone(classifier)
-        self.assertFalse(True)
