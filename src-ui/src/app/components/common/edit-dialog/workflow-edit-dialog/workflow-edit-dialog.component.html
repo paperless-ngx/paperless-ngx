@@ -27,9 +27,7 @@
               <div class="d-flex">
                 <p class="p-2" i18n>Trigger Workflow On:</p>
                 <button type="button" class="btn btn-sm btn-outline-primary ms-auto mb-3" (click)="addTrigger()">
-                  <svg class="sidebaricon me-1" fill="currentColor">
-                    <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
-                  </svg>
+                  <i-bs class="sidebaricon me-1" name="plus-circle"></i-bs>
                   <ng-container i18n>Add Trigger</ng-container>
                 </button>
               </div>
@@ -42,9 +40,7 @@
                           <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{trigger.id}}</span>
                         }
                         <button type="button" class="btn btn-link text-danger ms-2" (click)="removeTrigger(i)">
-                          <svg class="sidebaricon me-1" fill="currentColor">
-                            <use xlink:href="assets/bootstrap-icons.svg#trash" />
-                          </svg>
+                          <i-bs class="sidebaricon me-1" name="trash"></i-bs>
                           <ng-container i18n>Delete</ng-container>
                         </button>
                       </button>
@@ -71,9 +67,7 @@
               <div class="d-flex">
                 <p class="p-2" i18n>Apply Actions:</p>
                 <button type="button" class="btn btn-sm btn-outline-primary ms-auto mb-3" (click)="addAction()">
-                  <svg class="sidebaricon me-1" fill="currentColor">
-                    <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
-                  </svg>
+                  <i-bs class="sidebaricon me-1" name="plus-circle"></i-bs>
                   <ng-container i18n>Add Action</ng-container>
                 </button>
               </div>
@@ -86,9 +80,7 @@
                           <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{action.id}}</span>
                         }
                         <button type="button" class="btn btn-link text-danger ms-2" (click)="removeAction(i)">
-                          <svg class="sidebaricon me-1" fill="currentColor">
-                            <use xlink:href="assets/bootstrap-icons.svg#trash" />
-                          </svg>
+                          <i-bs class="sidebaricon me-1" name="trash"></i-bs>
                           <ng-container i18n>Delete</ng-container>
                         </button>
                       </button>

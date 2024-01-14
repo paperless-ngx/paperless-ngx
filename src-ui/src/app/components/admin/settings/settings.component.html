@@ -2,9 +2,7 @@
   <button class="btn btn-sm btn-outline-primary" (click)="tourService.start()"><ng-container i18n>Start tour</ng-container></button>
   <a *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Admin }" class="btn btn-sm btn-primary ms-3" href="admin/" target="_blank">
     <ng-container i18n>Open Django Admin</ng-container>
-    <svg class="sidebaricon ms-1" fill="currentColor">
-      <use xlink:href="assets/bootstrap-icons.svg#arrow-up-right"/>
-    </svg>
+    <i-bs class="sidebaricon ms-1" name="arrow-up-right"></i-bs>
   </a>
 </pngx-page-header>
 
@@ -135,9 +133,7 @@
           </div>
           <div class="col-2">
             <button class="btn btn-link btn-sm pt-2 ps-0" [disabled]="!this.settingsForm.get('themeColor').value" (click)="clearThemeColor()">
-              <svg fill="currentColor" class="buttonicon-sm me-1">
-                <use xlink:href="assets/bootstrap-icons.svg#x"/>
-                </svg><ng-container i18n>Reset</ng-container>
+              <i-bs class="buttonicon-sm me-1" name="x"></i-bs><ng-container i18n>Reset</ng-container>
               </button>
             </div>
           </div>

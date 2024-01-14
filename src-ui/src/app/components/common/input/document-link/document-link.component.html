@@ -6,9 +6,7 @@
       }
       @if (removable) {
         <button type="button" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
-          <svg class="sidebaricon" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#x"/>
-            </svg>&nbsp;<ng-container i18n>Remove</ng-container>
+          <i-bs class="sidebaricon" name="x"></i-bs>&nbsp;<ng-container i18n>Remove</ng-container>
           </button>
         }
       </div>
@@ -29,13 +27,9 @@
             (change)="onChange(selectedDocuments)">
             <ng-template ng-label-tmp let-document="item">
               <div class="d-flex align-items-center">
-                <svg class="sidebaricon" fill="currentColor" xmlns="http://www.w3.org/2000/svg" (click)="unselect(document)">
-                  <use xlink:href="assets/bootstrap-icons.svg#x"/>
-                </svg>
+                <i-bs class="sidebaricon" (click)="unselect(document)" name="x"></i-bs>
                 <a routerLink="/documents/{{document.id}}" class="badge bg-light text-primary" (mousedown)="$event.stopImmediatePropagation();">
-                  <svg class="sidebaricon-sm me-1" fill="currentColor">
-                    <use xlink:href="assets/bootstrap-icons.svg#file-text"/>
-                    </svg><span>{{document.title}}</span>
+                  <i-bs class="sidebaricon-sm me-1" name="file-text"></i-bs><span>{{document.title}}</span>
                   </a>
                 </div>
               </ng-template>
