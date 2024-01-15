@@ -1,4 +1,10 @@
-<pngx-page-header title="Workflows" i18n-title>
+<pngx-page-header
+  title="Workflows"
+  i18n-title
+  info="Use workflows to customize the behavior of Paperless-ngx when events 'trigger' a workflow."
+  i18n-info
+  infoLink="usage/#workflows"
+  >
   <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editWorkflow()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Workflow }">
     <svg class="sidebaricon me-1" fill="currentColor">
       <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />

@@ -5,6 +5,22 @@
       @if (subTitle) {
         <span class="h6 mb-0 d-block d-md-inline fw-normal ms-md-3 text-truncate" style="line-height: 1.4">{{subTitle}}</span>
       }
+      @if (info) {
+        <button class="btn btn-sm btn-link text-muted me-auto p-0 p-md-2" title="What's this?" i18n-title type="button" [ngbPopover]="infoPopover" [autoClose]="true">
+          <svg class="sidebaricon" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#question-circle"/>
+          </svg>
+        </button>
+        <ng-template #infoPopover>
+          <p [class.mb-0]="!infoLink" [innerHTML]="info"></p>
+          @if (infoLink) {
+            <a href="https://docs.paperless-ngx.com/{{infoLink}}" target="_blank" referrerpolicy="noopener noreferrer" i18n>Read more</a>
+            <svg class="sidebaricon-sm text-muted ms-1" fill="currentColor">
+              <use xlink:href="assets/bootstrap-icons.svg#box-arrow-up-right"/>
+            </svg>
+          }
+        </ng-template>
+      }
     </h3>
   </div>
   <div class="btn-toolbar col col-md-auto">

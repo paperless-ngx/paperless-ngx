@@ -24,4 +24,10 @@ export class PageHeaderComponent {
 
   @Input()
   subTitle: string = ''
+
+  @Input()
+  info: string
+
+  @Input()
+  infoLink: string
 }
