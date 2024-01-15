@@ -686,8 +686,8 @@
           <context context-type="linenumber">281</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="1658074716498703596" datatype="html">
-        <source>Options to customize appearance, notifications, saved views and more. Settings apply to the current user only.</source>
+      <trans-unit id="4999473193657330663" datatype="html">
+        <source>Options to customize appearance, notifications, saved views and more. Settings apply to the &lt;strong&gt;current user only&lt;/strong&gt;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">4</context>
