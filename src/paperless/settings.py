@@ -927,7 +927,7 @@ for t in json.loads(os.getenv("PAPERLESS_FILENAME_PARSE_TRANSFORMS", "[]")):
     FILENAME_PARSE_TRANSFORMS.append((re.compile(t["pattern"]), t["repl"]))
 
 # Specify the filename format for out files
-FILENAME_FORMAT = os.getenv("PAPERLESS_FILENAME_FORMAT").replace("\"", "")
+FILENAME_FORMAT = os.getenv("PAPERLESS_FILENAME_FORMAT").replace('\"', "")
 
 # If this is enabled, variables in filename format will resolve to
 # empty-string instead of 'none'.
