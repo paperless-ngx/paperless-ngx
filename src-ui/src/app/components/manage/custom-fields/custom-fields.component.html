@@ -1,4 +1,10 @@
-<pngx-page-header title="Custom Fields" i18n-title>
+<pngx-page-header
+  title="Custom Fields"
+  i18n-title
+  info="Customize the data fields that can be attached to documents."
+  i18n-info
+  infoLink="usage/#custom-fields"
+  >
   <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editField()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.CustomField }">
     <svg class="sidebaricon me-1" fill="currentColor">
       <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
