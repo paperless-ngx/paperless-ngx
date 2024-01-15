@@ -1,4 +1,10 @@
-<pngx-page-header title="Application Configuration" subTitle="Global Paperless-ngx configuration options" i18n-title i18n-subTitle></pngx-page-header>
+<pngx-page-header
+    title="Application Configuration"
+    i18n-title
+    info="Global app configuration options which apply to <strong>every</strong> user of this install of Paperless-ngx. Options can also be set using environment variables or the configuration file but the value here will always take precedence."
+    i18n-info
+    infoLink="configuration">
+</pngx-page-header>
 
 <form [formGroup]="configForm" (ngSubmit)="saveConfig()" class="pb-4">
 

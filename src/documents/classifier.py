@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Optional
 
 from django.conf import settings
+from sklearn.exceptions import InconsistentVersionWarning
 
 from documents.models import Document
 from documents.models import MatchingModel
@@ -18,7 +19,9 @@ logger = logging.getLogger("paperless.classifier")
 
 
 class IncompatibleClassifierVersionError(Exception):
-    pass
+    def __init__(self, message: str, *args: object) -> None:
+        self.message = message
+        super().__init__(*args)
 
 
 class ClassifierModelCorruptError(Exception):
@@ -37,8 +40,8 @@ def load_classifier() -> Optional["DocumentClassifier"]:
     try:
         classifier.load()
 
-    except IncompatibleClassifierVersionError:
-        logger.info("Classifier version updated, will re-train")
+    except IncompatibleClassifierVersionError as e:
+        logger.info(f"Classifier version incompatible: {e.message}, will re-train")
         os.unlink(settings.MODEL_FILE)
         classifier = None
     except ClassifierModelCorruptError:
@@ -114,10 +117,12 @@ class DocumentClassifier:
                 "#security-maintainability-limitations"
             )
             for warning in w:
-                if issubclass(warning.category, UserWarning):
-                    w_msg = str(warning.message)
-                    if sk_learn_warning_url in w_msg:
-                        raise IncompatibleClassifierVersionError
+                # The warning is inconsistent, the MLPClassifier is a specific warning, others have not updated yet
+                if issubclass(warning.category, InconsistentVersionWarning) or (
+                    issubclass(warning.category, UserWarning)
+                    and sk_learn_warning_url in str(warning.message)
+                ):
+                    raise IncompatibleClassifierVersionError("sklearn version update")
 
     def save(self):
         target_file: Path = settings.MODEL_FILE
