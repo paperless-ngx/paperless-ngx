@@ -1336,7 +1336,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIn("ETag", response.headers)
         self.assertEqual(
             response.headers["ETag"],
-            f"\"b'thisisachecksum'{settings.NUMBER_OF_SUGGESTED_DATES}\"",
+            f"\"b'thisisachecksum':{settings.NUMBER_OF_SUGGESTED_DATES}\"",
         )
 
         mocked_pickle_load.rest_mock()

@@ -25,7 +25,7 @@ def suggestions_etag(request, pk: int) -> Optional[str]:
             return None
         _ = pickle.load(f)
         last_auto_type_hash: bytes = pickle.load(f)
-        return str(last_auto_type_hash) + str(settings.NUMBER_OF_SUGGESTED_DATES)
+        return f"{last_auto_type_hash}:{settings.NUMBER_OF_SUGGESTED_DATES}"
 
 
 def suggestions_last_modified(request, pk: int) -> Optional[datetime]:
