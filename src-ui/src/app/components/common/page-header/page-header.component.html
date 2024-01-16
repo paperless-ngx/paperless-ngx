@@ -7,17 +7,13 @@
       }
       @if (info) {
         <button class="btn btn-sm btn-link text-muted me-auto p-0 p-md-2" title="What's this?" i18n-title type="button" [ngbPopover]="infoPopover" [autoClose]="true">
-          <svg class="sidebaricon" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#question-circle"/>
-          </svg>
+          <i-bs name="question-circle"></i-bs>
         </button>
         <ng-template #infoPopover>
           <p [class.mb-0]="!infoLink" [innerHTML]="info"></p>
           @if (infoLink) {
             <a href="https://docs.paperless-ngx.com/{{infoLink}}" target="_blank" referrerpolicy="noopener noreferrer" i18n>Read more</a>
-            <svg class="sidebaricon-sm text-muted ms-1" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#box-arrow-up-right"/>
-            </svg>
+            <i-bs class="ms-1" width=".8em" height=".8em" name="box-arrow-up-right"></i-bs>
           }
         </ng-template>
       }
