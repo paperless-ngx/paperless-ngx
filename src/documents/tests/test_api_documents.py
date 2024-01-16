@@ -2051,6 +2051,35 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.content, b"1000")
 
+    def test_next_asn_no_documents_with_asn(self):
+        """
+        GIVEN:
+            - Existing document, but with no ASN assugned
+        WHEN:
+            - API request to get next ASN
+        THEN:
+            - ASN 1 is returned
+        """
+        user1 = User.objects.create_user(username="test1")
+        user1.user_permissions.add(*Permission.objects.all())
+        user1.save()
+
+        doc1 = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document 1",
+            checksum="1",
+        )
+        doc1.save()
+
+        self.client.force_authenticate(user1)
+
+        resp = self.client.get(
+            "/api/documents/next_asn/",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.content, b"1")
+
 
 class TestDocumentApiV2(DirectoriesMixin, APITestCase):
     def setUp(self):

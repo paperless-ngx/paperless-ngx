@@ -757,16 +757,11 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
     @action(detail=False, methods=["GET"], name="Get Next ASN")
     def next_asn(self, request, *args, **kwargs):
-        return Response(
-            (
-                Document.objects.filter(archive_serial_number__gte=0)
-                .order_by("archive_serial_number")
-                .last()
-                .archive_serial_number
-                or 0
-            )
-            + 1,
+        max_asn = Document.objects.aggregate(Max("archive_serial_number")).get(
+            "archive_serial_number__max",
         )
+        max_asn = 0 if max_asn is None else max_asn + 1
+        return Response(max_asn)
 
 
 class LogViewSet(ViewSet):
