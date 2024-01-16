@@ -139,7 +139,7 @@ document. Paperless only reports PDF metadata at this point.
 
 ## Authorization
 
-The REST api provides three different forms of authentication.
+The REST api provides four different forms of authentication.
 
 1.  Basic authentication
 
@@ -176,6 +176,12 @@ The REST api provides three different forms of authentication.
     ```
 
     Tokens can also be managed in the Django admin.
+
+4.  Remote User authentication
+
+    If already setup (see
+    [configuration](configuration.md#PAPERLESS_ENABLE_HTTP_REMOTE_USER)),
+    you can authenticate against the API using Remote User auth.
 
 ## Searching for documents
 
