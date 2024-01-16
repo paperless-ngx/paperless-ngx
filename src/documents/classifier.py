@@ -207,6 +207,7 @@ class DocumentClassifier:
             self.last_doc_change_time is not None
             and self.last_doc_change_time >= latest_doc_change
         ) and self.last_auto_type_hash == hasher.digest():
+            logger.info("No updates since last training")
             return False
 
         # subtract 1 since -1 (null) is also part of the classes.
