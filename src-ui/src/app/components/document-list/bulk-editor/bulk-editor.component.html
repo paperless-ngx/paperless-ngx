@@ -72,7 +72,7 @@
 
               <div ngbDropdown>
                 <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
-                  <i-bs class="toolbaricon" name="three-dots"></i-bs>
+                  <i-bs name="three-dots"></i-bs>
                   <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
                 </button>
                 <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
@@ -84,7 +84,7 @@
             <div class="btn-group btn-group-sm">
               <button class="btn btn-sm btn-outline-primary" [disabled]="awaitingDownload" (click)="downloadSelected()">
                 @if (!awaitingDownload) {
-                  <i-bs class="toolbaricon" name="arrow-down"></i-bs>
+                  <i-bs name="arrow-down"></i-bs>
                 }
                 @if (awaitingDownload) {
                   <div class="spinner-border spinner-border-sm" role="status">

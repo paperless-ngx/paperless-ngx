@@ -1,6 +1,6 @@
 <div class="btn-group w-100" ngbDropdown role="group">
   <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="isActive ? 'btn-primary' : 'btn-outline-primary'" [disabled]="disabled">
-    <i-bs class="toolbaricon" name="person-fill-lock"></i-bs>
+    <i-bs name="person-fill-lock"></i-bs>
     <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
     <pngx-clearable-badge [selected]="isActive" (cleared)="reset()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
   </button>

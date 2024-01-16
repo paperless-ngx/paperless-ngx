@@ -2,7 +2,7 @@
 
   <div ngbDropdown class="me-2 d-flex">
     <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
-      <i-bs class="toolbaricon" name="text-indent-left"></i-bs>
+      <i-bs name="text-indent-left"></i-bs>
       <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Select</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
@@ -14,15 +14,15 @@
   <div class="btn-group flex-fill" role="group">
     <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="details" (ngModelChange)="saveDisplayMode()" id="displayModeDetails" name="displayModeDetails">
     <label for="displayModeDetails" class="btn btn-outline-primary btn-sm">
-      <i-bs class="toolbaricon" name="list-ul"></i-bs>
+      <i-bs name="list-ul"></i-bs>
     </label>
     <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="smallCards" (ngModelChange)="saveDisplayMode()" id="displayModeSmall" name="displayModeSmall">
     <label for="displayModeSmall" class="btn btn-outline-primary btn-sm">
-      <i-bs class="toolbaricon" name="grid"></i-bs>
+      <i-bs name="grid"></i-bs>
     </label>
     <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="largeCards" (ngModelChange)="saveDisplayMode()" id="displayModeLarge" name="displayModeLarge">
     <label for="displayModeLarge" class="btn btn-outline-primary btn-sm">
-      <i-bs class="toolbaricon" name="hdd-stack"></i-bs>
+      <i-bs name="hdd-stack"></i-bs>
     </label>
   </div>
 
@@ -32,11 +32,11 @@
       <div class="w-100 d-flex pb-2 mb-1 border-bottom">
         <input type="radio" class="btn-check" [value]="false" [(ngModel)]="listSortReverse" id="listSortReverseFalse">
         <label class="btn btn-outline-primary btn-sm mx-2 flex-fill" for="listSortReverseFalse">
-          <i-bs class="toolbaricon" name="sort-alpha-down"></i-bs>
+          <i-bs name="sort-alpha-down"></i-bs>
         </label>
         <input type="radio" class="btn-check" [value]="true" [(ngModel)]="listSortReverse" id="listSortReverseTrue">
         <label class="btn btn-outline-primary btn-sm me-2 flex-fill" for="listSortReverseTrue">
-          <i-bs class="toolbaricon" name="sort-alpha-up-alt"></i-bs>
+          <i-bs name="sort-alpha-up-alt"></i-bs>
         </label>
       </div>
       <div>
