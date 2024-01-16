@@ -239,12 +239,12 @@
         },
         "channels-redis": {
             "hashes": [
-                "sha256:3696f5b9fe367ea495d402ba83d7c3c99e8ca0e1354ff8d913535976ed0abf73",
-                "sha256:6bd4f75f4ab4a7db17cee495593ace886d7e914c66f8214a1f247ff6659c073a"
+                "sha256:01c26c4d5d3a203f104bba9e5585c0305a70df390d21792386586068162027fd",
+                "sha256:2c5b944a39bd984b72aa8005a3ae11637bf29b5092adeb91c9aad4ab819a8ac4"
             ],
             "index": "pypi",
-            "markers": "python_version >= '3.7'",
-            "version": "==4.1.0"
+            "markers": "python_version >= '3.8'",
+            "version": "==4.2.0"
         },
         "chardet": {
             "hashes": [
@@ -574,12 +574,12 @@
         },
         "gotenberg-client": {
             "hashes": [
-                "sha256:69e9dd5264b75ed0ba1f9eebebdc750b13d190710fd82ca0670d161c249155c9",
-                "sha256:dd0f49d3d4e01399949f39ac5024a5512566c8ded6ee457a336a5f77ce4c1a25"
+                "sha256:097151c959d9ad9c6292694dac454a07a511489a353086df924f489190084425",
+                "sha256:3d6c0449fd1afb82206bfdc2edacfe1d7d98e9de7207332b696b97a3d4dfba6b"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==0.4.1"
+            "version": "==0.5.0"
         },
         "gunicorn": {
             "hashes": [
