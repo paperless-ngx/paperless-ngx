@@ -1,9 +1,13 @@
-import pickle
 from datetime import datetime
 from typing import Optional
 
 from django.conf import settings
+from django.core.cache import cache
 
+from documents.caching import CACHE_5_MINUTES
+from documents.caching import CLASSIFIER_HASH_KEY
+from documents.caching import CLASSIFIER_MODIFIED_KEY
+from documents.caching import CLASSIFIER_VERSION_KEY
 from documents.classifier import DocumentClassifier
 from documents.models import Document
 
@@ -19,13 +23,18 @@ def suggestions_etag(request, pk: int) -> Optional[str]:
     """
     if not settings.MODEL_FILE.exists():
         return None
-    with open(settings.MODEL_FILE, "rb") as f:
-        schema_version = pickle.load(f)
-        if schema_version != DocumentClassifier.FORMAT_VERSION:
-            return None
-        _ = pickle.load(f)
-        last_auto_type_hash: bytes = pickle.load(f)
-        return f"{last_auto_type_hash}:{settings.NUMBER_OF_SUGGESTED_DATES}"
+    cache_hits = cache.get_many(
+        [CLASSIFIER_VERSION_KEY, CLASSIFIER_HASH_KEY],
+    )
+    if (
+        CLASSIFIER_VERSION_KEY in cache_hits
+        and cache_hits[CLASSIFIER_VERSION_KEY] != DocumentClassifier.FORMAT_VERSION
+    ):
+        return None
+    elif CLASSIFIER_HASH_KEY in cache_hits:
+        cache.touch(CLASSIFIER_HASH_KEY, CACHE_5_MINUTES)
+        return f"{cache_hits[CLASSIFIER_HASH_KEY]}:{settings.NUMBER_OF_SUGGESTED_DATES}"
+    return None
 
 
 def suggestions_last_modified(request, pk: int) -> Optional[datetime]:
@@ -36,12 +45,18 @@ def suggestions_last_modified(request, pk: int) -> Optional[datetime]:
     """
     if not settings.MODEL_FILE.exists():
         return None
-    with open(settings.MODEL_FILE, "rb") as f:
-        schema_version = pickle.load(f)
-        if schema_version != DocumentClassifier.FORMAT_VERSION:
-            return None
-        last_doc_change_time = pickle.load(f)
-        return last_doc_change_time
+    cache_hits = cache.get_many(
+        [CLASSIFIER_VERSION_KEY, CLASSIFIER_MODIFIED_KEY],
+    )
+    if (
+        CLASSIFIER_VERSION_KEY in cache_hits
+        and cache_hits[CLASSIFIER_VERSION_KEY] != DocumentClassifier.FORMAT_VERSION
+    ):
+        return None
+    elif CLASSIFIER_MODIFIED_KEY in cache_hits:
+        cache.touch(CLASSIFIER_MODIFIED_KEY, CACHE_5_MINUTES)
+        return cache_hits[CLASSIFIER_MODIFIED_KEY]
+    return None
 
 
 def metadata_etag(request, pk: int) -> Optional[str]:

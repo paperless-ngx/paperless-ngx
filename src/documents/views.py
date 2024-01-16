@@ -15,6 +15,7 @@ from urllib.parse import quote
 import pathvalidate
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.db.models import Case
 from django.db.models import Count
 from django.db.models import IntegerField
@@ -62,6 +63,9 @@ from documents import bulk_edit
 from documents.bulk_download import ArchiveOnlyStrategy
 from documents.bulk_download import OriginalAndArchiveStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
+from documents.caching import CACHE_5_MINUTES
+from documents.caching import DOC_METADATA_BASE
+from documents.caching import DOC_SUGGESTIONS_BASE
 from documents.classifier import load_classifier
 from documents.conditionals import metadata_etag
 from documents.conditionals import metadata_last_modified
@@ -407,6 +411,14 @@ class DocumentViewSet(
         except Document.DoesNotExist:
             raise Http404
 
+        doc_key = DOC_METADATA_BASE.format(doc.pk)
+
+        cache_hit = cache.get(doc_key)
+
+        if cache_hit is not None:
+            cache.touch(doc_key, CACHE_5_MINUTES)
+            return Response(cache_hit)
+
         meta = {
             "original_checksum": doc.checksum,
             "original_size": self.get_filesize(doc.source_path),
@@ -436,6 +448,8 @@ class DocumentViewSet(
             meta["archive_size"] = None
             meta["archive_metadata"] = None
 
+        cache.set(doc_key, meta, CACHE_5_MINUTES)
+
         return Response(meta)
 
     @action(methods=["get"], detail=True)
@@ -454,6 +468,14 @@ class DocumentViewSet(
         ):
             return HttpResponseForbidden("Insufficient permissions")
 
+        doc_key = DOC_SUGGESTIONS_BASE.format(doc.pk)
+
+        cache_hit = cache.get(doc_key)
+
+        if cache_hit is not None:
+            cache.touch(doc_key, CACHE_5_MINUTES)
+            return Response(cache_hit)
+
         classifier = load_classifier()
 
         dates = []
@@ -463,23 +485,23 @@ class DocumentViewSet(
                 {i for i in itertools.islice(gen, settings.NUMBER_OF_SUGGESTED_DATES)},
             )
 
-        return Response(
-            {
-                "correspondents": [
-                    c.id for c in match_correspondents(doc, classifier, request.user)
-                ],
-                "tags": [t.id for t in match_tags(doc, classifier, request.user)],
-                "document_types": [
-                    dt.id for dt in match_document_types(doc, classifier, request.user)
-                ],
-                "storage_paths": [
-                    dt.id for dt in match_storage_paths(doc, classifier, request.user)
-                ],
-                "dates": [
-                    date.strftime("%Y-%m-%d") for date in dates if date is not None
-                ],
-            },
-        )
+        resp_data = {
+            "correspondents": [
+                c.id for c in match_correspondents(doc, classifier, request.user)
+            ],
+            "tags": [t.id for t in match_tags(doc, classifier, request.user)],
+            "document_types": [
+                dt.id for dt in match_document_types(doc, classifier, request.user)
+            ],
+            "storage_paths": [
+                dt.id for dt in match_storage_paths(doc, classifier, request.user)
+            ],
+            "dates": [date.strftime("%Y-%m-%d") for date in dates if date is not None],
+        }
+
+        cache.set(doc_key, resp_data, CACHE_5_MINUTES)
+
+        return Response(resp_data)
 
     @action(methods=["get"], detail=True)
     @method_decorator(cache_control(public=False, max_age=5 * 60))

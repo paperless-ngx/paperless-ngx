@@ -10,8 +10,13 @@ from pathlib import Path
 from typing import Optional
 
 from django.conf import settings
+from django.core.cache import cache
 from sklearn.exceptions import InconsistentVersionWarning
 
+from documents.caching import CACHE_5_MINUTES
+from documents.caching import CLASSIFIER_HASH_KEY
+from documents.caching import CLASSIFIER_MODIFIED_KEY
+from documents.caching import CLASSIFIER_VERSION_KEY
 from documents.models import Document
 from documents.models import MatchingModel
 
@@ -321,6 +326,10 @@ class DocumentClassifier:
 
         self.last_doc_change_time = latest_doc_change
         self.last_auto_type_hash = hasher.digest()
+
+        cache.set(CLASSIFIER_MODIFIED_KEY, self.last_doc_change_time, CACHE_5_MINUTES)
+        cache.set(CLASSIFIER_HASH_KEY, hasher.hexdigest(), CACHE_5_MINUTES)
+        cache.set(CLASSIFIER_VERSION_KEY, self.FORMAT_VERSION, CACHE_5_MINUTES)
 
         return True
 
