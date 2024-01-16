@@ -255,12 +255,12 @@
             <a class="nav-link" routerLink="tasks" routerLinkActive="active" (click)="closeMenu()"
               ngbPopover="File Tasks" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
               container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+              <i-bs class="me-1" name="list-task"></i-bs><span>&nbsp;<ng-container i18n>File Tasks</ng-container>@if (tasksService.failedFileTasks.length > 0) {
+                <span><span class="badge bg-danger ms-2">{{tasksService.failedFileTasks.length}}</span></span>
+              }</span>
               @if (tasksService.failedFileTasks.length > 0 && slimSidebarEnabled) {
                 <span class="badge bg-danger position-absolute top-0 end-0">{{tasksService.failedFileTasks.length}}</span>
               }
-              <i-bs class="me-1" name="list-task"></i-bs><span>&nbsp;<ng-container i18n>File Tasks</ng-container>@if (tasksService.failedFileTasks.length > 0) {
-                    <span><span class="badge bg-danger ms-2">{{tasksService.failedFileTasks.length}}</span></span>
-              }</span>
             </a>
           </li>
           <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Admin }">
