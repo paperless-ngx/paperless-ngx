@@ -47,3 +47,11 @@ class HttpRemoteUserMiddleware(PersistentRemoteUserMiddleware):
     """
 
     header = settings.HTTP_REMOTE_USER_HEADER_NAME
+
+
+class PaperlessRemoteUserAuthentication(authentication.RemoteUserAuthentication):
+    """
+    REMOTE_USER authentication for DRF which overrides the default header.
+    """
+
+    header = settings.HTTP_REMOTE_USER_HEADER_NAME
