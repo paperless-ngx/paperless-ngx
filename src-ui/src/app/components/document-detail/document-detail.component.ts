@@ -861,8 +861,11 @@ export class DocumentDetailComponent
   get userIsOwner(): boolean {
     let doc: Document = Object.assign({}, this.document)
     // dont disable while editing
-    if (this.document && this.store?.value.permissions_form?.owner) {
-      doc.owner = this.store?.value.permissions_form?.owner
+    if (
+      this.document &&
+      this.store?.value.permissions_form?.hasOwnProperty('owner')
+    ) {
+      doc.owner = this.store.value.permissions_form.owner
     }
     return !this.document || this.permissionsService.currentUserOwnsObject(doc)
   }
@@ -870,8 +873,11 @@ export class DocumentDetailComponent
   get userCanEdit(): boolean {
     let doc: Document = Object.assign({}, this.document)
     // dont disable while editing
-    if (this.document && this.store?.value.permissions_form?.owner) {
-      doc.owner = this.store?.value.permissions_form?.owner
+    if (
+      this.document &&
+      this.store?.value.permissions_form?.hasOwnProperty('owner')
+    ) {
+      doc.owner = this.store.value.permissions_form.owner
     }
     return (
       !this.document ||
