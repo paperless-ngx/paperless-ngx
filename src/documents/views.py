@@ -760,8 +760,9 @@ class UnifiedSearchViewSet(DocumentViewSet):
         max_asn = Document.objects.aggregate(Max("archive_serial_number")).get(
             "archive_serial_number__max",
         )
-        max_asn = 0 if max_asn is None else max_asn + 1
-        return Response(max_asn)
+        if max_asn is None:
+            max_asn = 0
+        return Response(max_asn + 1)
 
 
 class LogViewSet(ViewSet):
