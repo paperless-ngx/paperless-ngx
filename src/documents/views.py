@@ -34,6 +34,7 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import get_language
 from django.views import View
 from django.views.decorators.cache import cache_control
+from django.views.decorators.http import condition
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from langdetect import detect
@@ -62,6 +63,11 @@ from documents.bulk_download import ArchiveOnlyStrategy
 from documents.bulk_download import OriginalAndArchiveStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
 from documents.classifier import load_classifier
+from documents.conditionals import metadata_etag
+from documents.conditionals import metadata_last_modified
+from documents.conditionals import preview_etag
+from documents.conditionals import suggestions_etag
+from documents.conditionals import suggestions_last_modified
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
@@ -386,6 +392,9 @@ class DocumentViewSet(
             return None
 
     @action(methods=["get"], detail=True)
+    @method_decorator(
+        condition(etag_func=metadata_etag, last_modified_func=metadata_last_modified),
+    )
     def metadata(self, request, pk=None):
         try:
             doc = Document.objects.get(pk=pk)
@@ -430,6 +439,12 @@ class DocumentViewSet(
         return Response(meta)
 
     @action(methods=["get"], detail=True)
+    @method_decorator(
+        condition(
+            etag_func=suggestions_etag,
+            last_modified_func=suggestions_last_modified,
+        ),
+    )
     def suggestions(self, request, pk=None):
         doc = get_object_or_404(Document, pk=pk)
         if request.user is not None and not has_perms_owner_aware(
@@ -467,6 +482,8 @@ class DocumentViewSet(
         )
 
     @action(methods=["get"], detail=True)
+    @method_decorator(cache_control(public=False, max_age=5 * 60))
+    @method_decorator(condition(etag_func=preview_etag))
     def preview(self, request, pk=None):
         try:
             response = self.file_response(pk, request, "inline")
