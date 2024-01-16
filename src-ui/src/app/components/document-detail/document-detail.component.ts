@@ -309,6 +309,9 @@ export class DocumentDetailComponent
               modal.componentInstance.message = $localize`Saving the document here may overwrite other changes that were made. To restore the existing version, discard your changes or close the document.`
               modal.componentInstance.cancelBtnClass = 'visually-hidden'
               modal.componentInstance.btnCaption = $localize`Ok`
+              modal.componentInstance.confirmClicked.subscribe(() =>
+                modal.close()
+              )
             }
 
             if (this.documentForm.dirty) {
