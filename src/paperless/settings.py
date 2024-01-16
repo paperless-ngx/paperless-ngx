@@ -420,18 +420,30 @@ if AUTO_LOGIN_USERNAME:
     # regular login in case the provided user does not exist.
     MIDDLEWARE.insert(_index + 1, "paperless.auth.AutoLoginMiddleware")
 
-ENABLE_HTTP_REMOTE_USER = __get_boolean("PAPERLESS_ENABLE_HTTP_REMOTE_USER")
-HTTP_REMOTE_USER_HEADER_NAME = os.getenv(
-    "PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME",
-    "HTTP_REMOTE_USER",
-)
 
-if ENABLE_HTTP_REMOTE_USER:
-    MIDDLEWARE.append("paperless.auth.HttpRemoteUserMiddleware")
-    AUTHENTICATION_BACKENDS.insert(0, "django.contrib.auth.backends.RemoteUserBackend")
-    REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].append(
-        "rest_framework.authentication.RemoteUserAuthentication",
+def _parse_remote_user_settings() -> str:
+    global MIDDLEWARE, AUTHENTICATION_BACKENDS, REST_FRAMEWORK
+    enable = __get_boolean("PAPERLESS_ENABLE_HTTP_REMOTE_USER")
+    if enable:
+        MIDDLEWARE.append("paperless.auth.HttpRemoteUserMiddleware")
+        AUTHENTICATION_BACKENDS.insert(
+            0,
+            "django.contrib.auth.backends.RemoteUserBackend",
+        )
+        REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].insert(
+            0,
+            "paperless.auth.PaperlessRemoteUserAuthentication",
+        )
+
+    header_name = os.getenv(
+        "PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME",
+        "HTTP_REMOTE_USER",
     )
+
+    return header_name
+
+
+HTTP_REMOTE_USER_HEADER_NAME = _parse_remote_user_settings()
 
 # X-Frame options for embedded PDF display:
 X_FRAME_OPTIONS = "ANY" if DEBUG else "SAMEORIGIN"
