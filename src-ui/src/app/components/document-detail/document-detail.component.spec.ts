@@ -968,6 +968,8 @@ describe('DocumentDetailComponent', () => {
   })
 
   it('should warn when open document does not match doc retrieved from backend on init', () => {
+    let openModal: NgbModalRef
+    modalService.activeInstances.subscribe((modals) => (openModal = modals[0]))
     const modalSpy = jest.spyOn(modalService, 'open')
     const openDoc = Object.assign({}, doc)
     // simulate a document being modified elsewhere and db updated
@@ -986,6 +988,10 @@ describe('DocumentDetailComponent', () => {
     )
     fixture.detectChanges() // calls ngOnInit
     expect(modalSpy).toHaveBeenCalledWith(ConfirmDialogComponent)
+    const closeSpy = jest.spyOn(openModal, 'close')
+    const confirmDialog = openModal.componentInstance as ConfirmDialogComponent
+    confirmDialog.confirmClicked.next(confirmDialog)
+    expect(closeSpy).toHaveBeenCalled()
   })
 
   function initNormally() {
