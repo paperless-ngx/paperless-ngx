@@ -1266,6 +1266,86 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             },
         )
 
+    @mock.patch("documents.conditionals.pickle.load")
+    @mock.patch("documents.views.match_storage_paths")
+    @mock.patch("documents.views.match_document_types")
+    @mock.patch("documents.views.match_tags")
+    @mock.patch("documents.views.match_correspondents")
+    @override_settings(NUMBER_OF_SUGGESTED_DATES=10)
+    def test_get_suggestions_cached(
+        self,
+        match_correspondents,
+        match_tags,
+        match_document_types,
+        match_storage_paths,
+        mocked_pickle_load,
+    ):
+        """
+        GIVEN:
+           - Request for suggestions for a document
+        WHEN:
+          - Classifier has not been modified
+        THEN:
+          - Subsequent requests are returned alright
+          - ETag and last modified are called
+        """
+        settings.MODEL_FILE.touch()
+
+        from documents.classifier import DocumentClassifier
+
+        last_modified = timezone.now()
+
+        # ETag first, then modified
+        mock_effect = [
+            DocumentClassifier.FORMAT_VERSION,
+            "dont care",
+            b"thisisachecksum",
+            DocumentClassifier.FORMAT_VERSION,
+            last_modified,
+        ]
+        mocked_pickle_load.side_effect = mock_effect
+
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is an invoice from 12.04.2022!",
+        )
+
+        match_correspondents.return_value = [Correspondent(id=88), Correspondent(id=2)]
+        match_tags.return_value = [Tag(id=56), Tag(id=123)]
+        match_document_types.return_value = [DocumentType(id=23)]
+        match_storage_paths.return_value = [StoragePath(id=99), StoragePath(id=77)]
+
+        response = self.client.get(f"/api/documents/{doc.pk}/suggestions/")
+        self.assertEqual(
+            response.data,
+            {
+                "correspondents": [88, 2],
+                "tags": [56, 123],
+                "document_types": [23],
+                "storage_paths": [99, 77],
+                "dates": ["2022-04-12"],
+            },
+        )
+        mocked_pickle_load.assert_called()
+        self.assertIn("Last-Modified", response.headers)
+        self.assertEqual(
+            response.headers["Last-Modified"],
+            last_modified.strftime("%a, %d %b %Y %H:%M:%S %Z").replace("UTC", "GMT"),
+        )
+        self.assertIn("ETag", response.headers)
+        self.assertEqual(
+            response.headers["ETag"],
+            f"\"b'thisisachecksum':{settings.NUMBER_OF_SUGGESTED_DATES}\"",
+        )
+
+        mocked_pickle_load.rest_mock()
+        mocked_pickle_load.side_effect = mock_effect
+
+        response = self.client.get(f"/api/documents/{doc.pk}/suggestions/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        mocked_pickle_load.assert_called()
+
     @mock.patch("documents.parsers.parse_date_generator")
     @override_settings(NUMBER_OF_SUGGESTED_DATES=0)
     def test_get_suggestions_dates_disabled(
@@ -1970,6 +2050,35 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.content, b"1000")
+
+    def test_next_asn_no_documents_with_asn(self):
+        """
+        GIVEN:
+            - Existing document, but with no ASN assugned
+        WHEN:
+            - API request to get next ASN
+        THEN:
+            - ASN 1 is returned
+        """
+        user1 = User.objects.create_user(username="test1")
+        user1.user_permissions.add(*Permission.objects.all())
+        user1.save()
+
+        doc1 = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document 1",
+            checksum="1",
+        )
+        doc1.save()
+
+        self.client.force_authenticate(user1)
+
+        resp = self.client.get(
+            "/api/documents/next_asn/",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.content, b"1")
 
 
 class TestDocumentApiV2(DirectoriesMixin, APITestCase):
