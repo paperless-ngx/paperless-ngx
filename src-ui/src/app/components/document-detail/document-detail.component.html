@@ -81,8 +81,8 @@
 
     <form [formGroup]='documentForm' (ngSubmit)="save()">
 
-      <div class="btn-toolbar mb-1 pb-3 border-bottom">
-        <div class="btn-group">
+      <div class="btn-toolbar mb-1 border-bottom">
+        <div class="btn-group pb-3">
           <button type="button" class="btn btn-sm btn-outline-secondary" i18n-title title="Close" (click)="close()">
             <svg class="buttonicon" fill="currentColor">
               <use xlink:href="assets/bootstrap-icons.svg#x" />
@@ -326,7 +326,7 @@
 </div>
 
 <ng-template #saveButtons>
-  <div class="btn-group ms-auto">
+  <div class="btn-group pb-3 ms-auto">
     <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
       <button type="submit" class="order-3 btn btn-sm btn-primary" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save</button>
       @if (hasNext()) {
