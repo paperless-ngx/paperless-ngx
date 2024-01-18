@@ -119,6 +119,8 @@ jobs:
             }
 
             const CUTOFF_DAYS = 180;
+            const cutoff = new Date();
+            cutoff.setDate(cutoff.getDate() - CUTOFF_DAYS);
 
             const query = `query(
                 $owner:String!,
@@ -169,9 +171,6 @@ jobs:
             console.log(`Checking ${combinedDiscussions.length} open discussions`);
 
             for (const discussion of combinedDiscussions) {
-              const cutoff = new Date();
-              cutoff.setDate(cutoff.getDate() - CUTOFF_DAYS);
-
               if (new Date(discussion.updatedAt) < cutoff) {
                 console.log(`Closing outdated discussion #${discussion.number} (${discussion.id}), last updated at ${discussion.updatedAt}`);
                 const addCommentMutation = `mutation($discussion:ID!, $body:String!) {
