@@ -20,7 +20,7 @@ body:
         - [The troubleshooting documentation](https://docs.paperless-ngx.com/troubleshooting/).
         - [The installation instructions](https://docs.paperless-ngx.com/setup/#installation).
         - [Existing issues and discussions](https://github.com/paperless-ngx/paperless-ngx/search?q=&type=issues).
-        - Disable any customer container initialization scripts, if using
+        - Disable any custom container initialization scripts, if using
 
         If you encounter issues while installing or configuring Paperless-ngx, please post in the ["Support" section of the discussions](https://github.com/paperless-ngx/paperless-ngx/discussions/new?category=support).
   - type: textarea
