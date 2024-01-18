@@ -6,10 +6,7 @@
   infoLink="usage/#custom-fields"
   >
   <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editField()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.CustomField }">
-    <svg class="sidebaricon me-1" fill="currentColor">
-      <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
-    </svg>
-    <ng-container i18n>Add Field</ng-container>
+    <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Field</ng-container>
   </button>
 </pngx-page-header>
 
@@ -31,14 +28,10 @@
         <div class="col">
           <div class="btn-group">
             <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.CustomField }" class="btn btn-sm btn-outline-secondary" type="button" (click)="editField(field)">
-              <svg class="buttonicon-sm" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#pencil" />
-                </svg>&nbsp;<ng-container i18n>Edit</ng-container>
+              <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
               </button>
               <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.CustomField }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteField(field)">
-                <svg class="buttonicon-sm" fill="currentColor">
-                  <use xlink:href="assets/bootstrap-icons.svg#trash" />
-                  </svg>&nbsp;<ng-container i18n>Delete</ng-container>
+                <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
                 </button>
               </div>
             </div>

@@ -33,19 +33,16 @@
         <div class="input-group">
           <input type="text" class="form-control" formControlName="auth_token" readonly>
           <button type="button" class="btn btn-outline-secondary" (click)="copyAuthToken()" i18n-title title="Copy">
-            <svg class="buttonicon-sm" fill="currentColor">
               @if (!copied) {
-                <use xlink:href="assets/bootstrap-icons.svg#clipboard-fill" />
+                <i-bs width="1em" height="1em" name="clipboard-fill"></i-bs>
               }
               @if (copied) {
-                <use xlink:href="assets/bootstrap-icons.svg#clipboard-check-fill" />
+                <i-bs width="1em" height="1em" name="clipboard-check-fill"></i-bs>
               }
-              </svg><span class="visually-hidden" i18n>Copy</span>
+              <span class="visually-hidden" i18n>Copy</span>
             </button>
             <button type="button" class="btn btn-outline-secondary" (click)="generateAuthToken()" i18n-title title="Regenerate auth token">
-              <svg class="buttonicon" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#arrow-repeat" />
-              </svg>
+              <i-bs width="1.2em" height="1.2em" name="arrow-repeat"></i-bs>
             </button>
           </div>
           <span class="badge copied-badge bg-primary small fade ms-4 position-absolute top-50 translate-middle-y pe-none z-3" [class.show]="copied" i18n>Copied!</span>

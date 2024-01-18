@@ -6,51 +6,45 @@
       }
       @if (removable) {
         <button type="button" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
-          <svg class="sidebaricon" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#x"/>
-            </svg>&nbsp;<ng-container i18n>Remove</ng-container>
-          </button>
-        }
-      </div>
-      <div [class.col-md-9]="horizontal">
-        <div>
-          <ng-select name="inputId" [(ngModel)]="selectedDocuments"
-            [disabled]="disabled"
-            [items]="foundDocuments$ | async"
-            placeholder="Search for documents"
-            [notFoundText]="notFoundText"
-            [multiple]="true"
-            bindValue="id"
-            [compareWith]="compareDocuments"
-            [trackByFn]="trackByFn"
-            [minTermLength]="2"
-            [loading]="loading"
-            [typeahead]="documentsInput$"
-            (change)="onChange(selectedDocuments)">
-            <ng-template ng-label-tmp let-document="item">
-              <div class="d-flex align-items-center">
-                <svg class="sidebaricon" fill="currentColor" xmlns="http://www.w3.org/2000/svg" (click)="unselect(document)">
-                  <use xlink:href="assets/bootstrap-icons.svg#x"/>
-                </svg>
-                <a routerLink="/documents/{{document.id}}" class="badge bg-light text-primary" (mousedown)="$event.stopImmediatePropagation();">
-                  <svg class="sidebaricon-sm me-1" fill="currentColor">
-                    <use xlink:href="assets/bootstrap-icons.svg#file-text"/>
-                    </svg><span>{{document.title}}</span>
-                  </a>
-                </div>
-              </ng-template>
-              <ng-template ng-loadingspinner-tmp>
-                <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
-                <div class="visually-hidden" i18n>Loading...</div>
-              </ng-template>
-              <ng-template ng-option-tmp let-document="item" let-index="index" let-search="searchTerm">
-                <div>{{document.title}} <small class="text-muted">({{document.created | customDate:'shortDate'}})</small></div>
-              </ng-template>
-            </ng-select>
-          </div>
-          @if (hint) {
-            <small class="form-text text-muted">{{hint}}</small>
-          }
-        </div>
-      </div>
+          <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Remove</ng-container>
+        </button>
+      }
     </div>
+    <div [class.col-md-9]="horizontal">
+      <div>
+        <ng-select name="inputId" [(ngModel)]="selectedDocuments"
+          [disabled]="disabled"
+          [items]="foundDocuments$ | async"
+          placeholder="Search for documents"
+          [notFoundText]="notFoundText"
+          [multiple]="true"
+          bindValue="id"
+          [compareWith]="compareDocuments"
+          [trackByFn]="trackByFn"
+          [minTermLength]="2"
+          [loading]="loading"
+          [typeahead]="documentsInput$"
+          (change)="onChange(selectedDocuments)">
+          <ng-template ng-label-tmp let-document="item">
+            <div class="d-flex align-items-center">
+              <i-bs (click)="unselect(document)" name="x"></i-bs>
+              <a routerLink="/documents/{{document.id}}" class="badge bg-light text-primary" (mousedown)="$event.stopImmediatePropagation();">
+                <i-bs width="0.9em" height="0.9em" name="file-text"></i-bs>&nbsp;<span>{{document.title}}</span>
+              </a>
+            </div>
+          </ng-template>
+          <ng-template ng-loadingspinner-tmp>
+            <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
+            <div class="visually-hidden" i18n>Loading...</div>
+          </ng-template>
+          <ng-template ng-option-tmp let-document="item" let-index="index" let-search="searchTerm">
+            <div>{{document.title}} <small class="text-muted">({{document.created | customDate:'shortDate'}})</small></div>
+          </ng-template>
+        </ng-select>
+      </div>
+      @if (hint) {
+        <small class="form-text text-muted">{{hint}}</small>
+      }
+    </div>
+  </div>
+</div>

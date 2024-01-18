@@ -11,10 +11,7 @@
   <h4>
     <ng-container i18n>Mail accounts</ng-container>
     <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editMailAccount()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailAccount }">
-      <svg class="sidebaricon me-1" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
-      </svg>
-      <ng-container i18n>Add Account</ng-container>
+      <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Account</ng-container>
     </button>
   </h4>
   <ul class="list-group">
@@ -34,19 +31,13 @@
           <div class="col">
             <div class="btn-group">
               <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" [disabled]="!userCanEdit(account)" class="btn btn-sm btn-outline-secondary" type="button" (click)="editMailAccount(account)">
-                <svg class="buttonicon-sm" fill="currentColor">
-                  <use xlink:href="assets/bootstrap-icons.svg#pencil" />
-                  </svg>&nbsp;<ng-container i18n>Edit</ng-container>
+                <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
                 </button>
                 <button *pngxIfOwner="account" class="btn btn-sm btn-outline-secondary" type="button" (click)="editPermissions(account)">
-                  <svg class="buttonicon-sm" fill="currentColor">
-                    <use xlink:href="assets/bootstrap-icons.svg#person-lock" />
-                    </svg>&nbsp;<ng-container i18n>Permissions</ng-container>
+                  <i-bs width="1em" height="1em" name="person-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
                   </button>
                   <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailAccount }" [disabled]="!userIsOwner(account)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailAccount(account)">
-                    <svg class="buttonicon-sm" fill="currentColor">
-                      <use xlink:href="assets/bootstrap-icons.svg#trash" />
-                      </svg>&nbsp;<ng-container i18n>Delete</ng-container>
+                    <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
                     </button>
                   </div>
                 </div>
@@ -64,10 +55,7 @@
         <h4 class="mt-4">
           <ng-container i18n>Mail rules</ng-container>
           <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editMailRule()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailRule }">
-            <svg class="sidebaricon me-1" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
-            </svg>
-            <ng-container i18n>Add Rule</ng-container>
+            <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Rule</ng-container>
           </button>
         </h4>
         <ul class="list-group">
@@ -87,19 +75,13 @@
                 <div class="col">
                   <div class="btn-group">
                     <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" [disabled]="!userCanEdit(rule)" class="btn btn-sm btn-outline-secondary" type="button" (click)="editMailRule(rule)">
-                      <svg class="buttonicon-sm" fill="currentColor">
-                        <use xlink:href="assets/bootstrap-icons.svg#pencil" />
-                        </svg>&nbsp;<ng-container i18n>Edit</ng-container>
+                      <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
                       </button>
                       <button *pngxIfOwner="rule" class="btn btn-sm btn-outline-secondary" type="button" (click)="editPermissions(rule)">
-                        <svg class="buttonicon-sm" fill="currentColor">
-                          <use xlink:href="assets/bootstrap-icons.svg#person-lock" />
-                          </svg>&nbsp;<ng-container i18n>Permissions</ng-container>
+                        <i-bs width="1em" height="1em" name="person-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
                         </button>
                         <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailRule }" [disabled]="!userIsOwner(rule)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailRule(rule)">
-                          <svg class="buttonicon-sm" fill="currentColor">
-                            <use xlink:href="assets/bootstrap-icons.svg#trash" />
-                            </svg>&nbsp;<ng-container i18n>Delete</ng-container>
+                          <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
                           </button>
                         </div>
                       </div>

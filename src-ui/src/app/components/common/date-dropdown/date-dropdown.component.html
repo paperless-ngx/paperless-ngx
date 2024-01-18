@@ -9,9 +9,7 @@
         <button class="list-group-item small list-goup list-group-item-action d-flex p-2" role="menuitem" (click)="setRelativeDate(rd.id)">
           <div class="selected-icon">
             @if (relativeDate === rd.id) {
-              <svg fill="currentColor" class="buttonicon-sm">
-                <use xlink:href="assets/bootstrap-icons.svg#check"/>
-              </svg>
+              <i-bs width="1em" height="1em" name="check"></i-bs>
             }
           </div>
           <div class="d-flex justify-content-between w-100 align-items-center ps-2">
@@ -32,9 +30,7 @@
           <div i18n>After</div>
           @if (dateAfter) {
             <a class="btn btn-link p-0 m-0" (click)="clearAfter()">
-              <svg fill="currentColor" class="buttonicon-sm">
-                <use xlink:href="assets/bootstrap-icons.svg#x"/>
-              </svg>
+              <i-bs width="1em" height="1em" name="x"></i-bs>
               <small i18n>Clear</small>
             </a>
           }
@@ -44,9 +40,7 @@
           <input class="form-control" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
             maxlength="10" [(ngModel)]="dateAfter" ngbDatepicker #dateAfterPicker="ngbDatepicker">
           <button class="btn btn-outline-secondary" (click)="dateAfterPicker.toggle()" type="button">
-            <svg fill="currentColor" class="buttonicon-sm">
-              <use xlink:href="assets/bootstrap-icons.svg#calendar"/>
-            </svg>
+            <i-bs width="1em" height="1em" name="calendar"></i-bs>
           </button>
         </div>
 
@@ -57,9 +51,7 @@
           <div i18n>Before</div>
           @if (dateBefore) {
             <a class="btn btn-link p-0 m-0" (click)="clearBefore()">
-              <svg fill="currentColor" class="buttonicon-sm">
-                <use xlink:href="assets/bootstrap-icons.svg#x"/>
-              </svg>
+              <i-bs width="1em" height="1em" name="x"></i-bs>
               <small i18n>Clear</small>
             </a>
           }
@@ -69,9 +61,7 @@
           <input class="form-control" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
             maxlength="10" [(ngModel)]="dateBefore" ngbDatepicker #dateBeforePicker="ngbDatepicker">
           <button class="btn btn-outline-secondary" (click)="dateBeforePicker.toggle()" type="button">
-            <svg fill="currentColor" class="buttonicon-sm">
-              <use xlink:href="assets/bootstrap-icons.svg#calendar"/>
-            </svg>
+            <i-bs width="1em" height="1em" name="calendar"></i-bs>
           </button>
         </div>
 

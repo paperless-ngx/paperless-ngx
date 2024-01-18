@@ -7,9 +7,7 @@
   <button class="btn btn-sm btn-outline-primary" (click)="tourService.start()"><ng-container i18n>Start tour</ng-container></button>
   <a *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Admin }" class="btn btn-sm btn-primary ms-3" href="admin/" target="_blank">
     <ng-container i18n>Open Django Admin</ng-container>
-    <svg class="sidebaricon ms-1" fill="currentColor">
-      <use xlink:href="assets/bootstrap-icons.svg#arrow-up-right"/>
-    </svg>
+    <i-bs name="arrow-up-right"></i-bs>
   </a>
 </pngx-page-header>
 
@@ -140,204 +138,202 @@
           </div>
           <div class="col-2">
             <button class="btn btn-link btn-sm pt-2 ps-0" [disabled]="!this.settingsForm.get('themeColor').value" (click)="clearThemeColor()">
-              <svg fill="currentColor" class="buttonicon-sm me-1">
-                <use xlink:href="assets/bootstrap-icons.svg#x"/>
-                </svg><ng-container i18n>Reset</ng-container>
-              </button>
-            </div>
+              <i-bs width="1em" height="1em" name="x"></i-bs><ng-container i18n>Reset</ng-container>
+            </button>
           </div>
+        </div>
 
-          <h4 class="mt-4" id="update-checking" i18n>Update checking</h4>
+        <h4 class="mt-4" id="update-checking" i18n>Update checking</h4>
 
-          <div class="row mb-3">
-            <div class="offset-md-3 col">
-              <p i18n>
-              Update checking works by pinging the public <a href="https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest" target="_blank" rel="noopener noreferrer">GitHub API</a> for the latest release to determine whether a new version is available.<br/>
-              Actual updating of the app must still be performed manually.
-            </p>
-              <p i18n>
-              <em>No tracking data is collected by the app in any way.</em>
-            </p>
-              <pngx-input-check i18n-title title="Enable update checking" formControlName="updateCheckingEnabled"></pngx-input-check>
-            </div>
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <p i18n>
+            Update checking works by pinging the public <a href="https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest" target="_blank" rel="noopener noreferrer">GitHub API</a> for the latest release to determine whether a new version is available.<br/>
+            Actual updating of the app must still be performed manually.
+          </p>
+            <p i18n>
+            <em>No tracking data is collected by the app in any way.</em>
+          </p>
+            <pngx-input-check i18n-title title="Enable update checking" formControlName="updateCheckingEnabled"></pngx-input-check>
           </div>
+        </div>
 
-          <h4 class="mt-4" i18n>Bulk editing</h4>
+        <h4 class="mt-4" i18n>Bulk editing</h4>
 
-          <div class="row mb-3">
-            <div class="offset-md-3 col">
-              <pngx-input-check i18n-title title="Show confirmation dialogs" formControlName="bulkEditConfirmationDialogs" i18n-hint hint="Deleting documents will always ask for confirmation."></pngx-input-check>
-              <pngx-input-check i18n-title title="Apply on close" formControlName="bulkEditApplyOnClose"></pngx-input-check>
-            </div>
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <pngx-input-check i18n-title title="Show confirmation dialogs" formControlName="bulkEditConfirmationDialogs" i18n-hint hint="Deleting documents will always ask for confirmation."></pngx-input-check>
+            <pngx-input-check i18n-title title="Apply on close" formControlName="bulkEditApplyOnClose"></pngx-input-check>
           </div>
+        </div>
 
-          <h4 class="mt-4" i18n>Notes</h4>
+        <h4 class="mt-4" i18n>Notes</h4>
 
-          <div class="row mb-3">
-            <div class="offset-md-3 col">
-              <pngx-input-check i18n-title title="Enable notes" formControlName="notesEnabled"></pngx-input-check>
-            </div>
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <pngx-input-check i18n-title title="Enable notes" formControlName="notesEnabled"></pngx-input-check>
           </div>
+        </div>
 
-        </ng-template>
-      </li>
+      </ng-template>
+    </li>
 
-      <li [ngbNavItem]="SettingsNavIDs.Permissions">
-        <a ngbNavLink i18n>Permissions</a>
-        <ng-template ngbNavContent>
+    <li [ngbNavItem]="SettingsNavIDs.Permissions">
+      <a ngbNavLink i18n>Permissions</a>
+      <ng-template ngbNavContent>
 
-          <h4 i18n>Default Permissions</h4>
+        <h4 i18n>Default Permissions</h4>
 
-          <div class="row mb-3">
-            <div class="offset-md-3 col">
-              <p i18n>
-              Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI
-            </p>
-            </div>
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <p i18n>
+            Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI
+          </p>
           </div>
-          <div class="row mb-3">
-            <div class="col-md-3 col-form-label pt-0">
-              <span i18n>Default Owner</span>
-            </div>
-            <div class="col-md-5">
-              <pngx-input-select [items]="users" bindLabel="username" formControlName="defaultPermsOwner" [allowNull]="true"></pngx-input-select>
-              <small class="form-text text-muted text-end d-block mt-n2" i18n>Objects without an owner can be viewed and edited by all users</small>
-            </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-3 col-form-label pt-0">
+            <span i18n>Default Owner</span>
           </div>
-          <div class="row mb-3">
-            <div class="col-md-3 col-form-label pt-0">
-              <span i18n>Default View Permissions</span>
-            </div>
-            <div class="col-md-5">
-              <div class="row">
-                <div class="col-3">
-                  <span class="d-block pt-1" i18n>Users:</span>
-                </div>
-                <div class="col">
-                  <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.User }">
-                    <pngx-permissions-user type="view" formControlName="defaultPermsViewUsers"></pngx-permissions-user>
-                  </ng-container>
-                </div>
+          <div class="col-md-5">
+            <pngx-input-select [items]="users" bindLabel="username" formControlName="defaultPermsOwner" [allowNull]="true"></pngx-input-select>
+            <small class="form-text text-muted text-end d-block mt-n2" i18n>Objects without an owner can be viewed and edited by all users</small>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-3 col-form-label pt-0">
+            <span i18n>Default View Permissions</span>
+          </div>
+          <div class="col-md-5">
+            <div class="row">
+              <div class="col-3">
+                <span class="d-block pt-1" i18n>Users:</span>
               </div>
-              <div class="row">
-                <div class="col-3">
-                  <span class="d-block pt-1" i18n>Groups:</span>
-                </div>
-                <div class="col">
-                  <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Group }">
-                    <pngx-permissions-group type="view" formControlName="defaultPermsViewGroups"></pngx-permissions-group>
-                  </ng-container>
-                </div>
+              <div class="col">
+                <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.User }">
+                  <pngx-permissions-user type="view" formControlName="defaultPermsViewUsers"></pngx-permissions-user>
+                </ng-container>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-3">
+                <span class="d-block pt-1" i18n>Groups:</span>
+              </div>
+              <div class="col">
+                <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Group }">
+                  <pngx-permissions-group type="view" formControlName="defaultPermsViewGroups"></pngx-permissions-group>
+                </ng-container>
               </div>
             </div>
           </div>
-          <div class="row mb-3">
-            <div class="col-md-3 col-form-label pt-0">
-              <span i18n>Default Edit Permissions</span>
-            </div>
-            <div class="col-md-5">
-              <div class="row">
-                <div class="col-3">
-                  <span class="d-block pt-1" i18n>Users:</span>
-                </div>
-                <div class="col">
-                  <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.User }">
-                    <pngx-permissions-user type="view" formControlName="defaultPermsEditUsers"></pngx-permissions-user>
-                  </ng-container>
-                </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-3 col-form-label pt-0">
+            <span i18n>Default Edit Permissions</span>
+          </div>
+          <div class="col-md-5">
+            <div class="row">
+              <div class="col-3">
+                <span class="d-block pt-1" i18n>Users:</span>
               </div>
-              <div class="row">
-                <div class="col-3">
-                  <span class="d-block pt-1" i18n>Groups:</span>
-                </div>
-                <div class="col">
-                  <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Group }">
-                    <pngx-permissions-group type="view" formControlName="defaultPermsEditGroups"></pngx-permissions-group>
-                  </ng-container>
-                </div>
-              </div>
-              <div class="row">
-                <small class="form-text text-muted text-end d-block" i18n>Edit permissions also grant viewing permissions</small>
+              <div class="col">
+                <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.User }">
+                  <pngx-permissions-user type="view" formControlName="defaultPermsEditUsers"></pngx-permissions-user>
+                </ng-container>
               </div>
             </div>
-          </div>
-        </ng-template>
-      </li>
-
-      <li [ngbNavItem]="SettingsNavIDs.Notifications">
-        <a ngbNavLink i18n>Notifications</a>
-        <ng-template ngbNavContent>
-
-          <h4 i18n>Document processing</h4>
-
-          <div class="row mb-3">
-            <div class="offset-md-3 col">
-              <pngx-input-check i18n-title title="Show notifications when new documents are detected" formControlName="notificationsConsumerNewDocument"></pngx-input-check>
-              <pngx-input-check i18n-title title="Show notifications when document processing completes successfully" formControlName="notificationsConsumerSuccess"></pngx-input-check>
-              <pngx-input-check i18n-title title="Show notifications when document processing fails" formControlName="notificationsConsumerFailed"></pngx-input-check>
-              <pngx-input-check i18n-title title="Suppress notifications on dashboard" formControlName="notificationsConsumerSuppressOnDashboard" i18n-hint hint="This will suppress all messages about document processing status on the dashboard."></pngx-input-check>
+            <div class="row">
+              <div class="col-3">
+                <span class="d-block pt-1" i18n>Groups:</span>
+              </div>
+              <div class="col">
+                <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Group }">
+                  <pngx-permissions-group type="view" formControlName="defaultPermsEditGroups"></pngx-permissions-group>
+                </ng-container>
+              </div>
+            </div>
+            <div class="row">
+              <small class="form-text text-muted text-end d-block" i18n>Edit permissions also grant viewing permissions</small>
             </div>
           </div>
+        </div>
+      </ng-template>
+    </li>
 
-        </ng-template>
-      </li>
+    <li [ngbNavItem]="SettingsNavIDs.Notifications">
+      <a ngbNavLink i18n>Notifications</a>
+      <ng-template ngbNavContent>
 
-      <li [ngbNavItem]="SettingsNavIDs.SavedViews">
-        <a ngbNavLink i18n>Saved views</a>
-        <ng-template ngbNavContent>
+        <h4 i18n>Document processing</h4>
 
-          <h4 i18n>Settings</h4>
-          <div class="row mb-3">
-            <div class="offset-md-3 col">
-              <pngx-input-check i18n-title title="Show warning when closing saved views with unsaved changes" formControlName="savedViewsWarnOnUnsavedChange"></pngx-input-check>
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <pngx-input-check i18n-title title="Show notifications when new documents are detected" formControlName="notificationsConsumerNewDocument"></pngx-input-check>
+            <pngx-input-check i18n-title title="Show notifications when document processing completes successfully" formControlName="notificationsConsumerSuccess"></pngx-input-check>
+            <pngx-input-check i18n-title title="Show notifications when document processing fails" formControlName="notificationsConsumerFailed"></pngx-input-check>
+            <pngx-input-check i18n-title title="Suppress notifications on dashboard" formControlName="notificationsConsumerSuppressOnDashboard" i18n-hint hint="This will suppress all messages about document processing status on the dashboard."></pngx-input-check>
+          </div>
+        </div>
+
+      </ng-template>
+    </li>
+
+    <li [ngbNavItem]="SettingsNavIDs.SavedViews">
+      <a ngbNavLink i18n>Saved views</a>
+      <ng-template ngbNavContent>
+
+        <h4 i18n>Settings</h4>
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <pngx-input-check i18n-title title="Show warning when closing saved views with unsaved changes" formControlName="savedViewsWarnOnUnsavedChange"></pngx-input-check>
+          </div>
+        </div>
+
+        <h4 i18n>Views</h4>
+        <div formGroupName="savedViews">
+
+          @for (view of savedViews; track view) {
+            <div [formGroupName]="view.id" class="row">
+              <div class="mb-3 col">
+                <label class="form-label" for="name_{{view.id}}" i18n>Name</label>
+                <input type="text" class="form-control" formControlName="name" id="name_{{view.id}}">
+              </div>
+              <div class="mb-2 col">
+                <label class="form-label" for="show_on_dashboard_{{view.id}}" i18n>&nbsp;<span class="visually-hidden">Appears on</span></label>
+                <div class="form-check form-switch">
+                  <input type="checkbox" class="form-check-input" id="show_on_dashboard_{{view.id}}" formControlName="show_on_dashboard">
+                  <label class="form-check-label" for="show_on_dashboard_{{view.id}}" i18n>Show on dashboard</label>
+                </div>
+                <div class="form-check form-switch">
+                  <input type="checkbox" class="form-check-input" id="show_in_sidebar_{{view.id}}" formControlName="show_in_sidebar">
+                  <label class="form-check-label" for="show_in_sidebar_{{view.id}}" i18n>Show in sidebar</label>
+                </div>
+              </div>
+              <div class="mb-2 col-auto">
+                <label class="form-label" for="name_{{view.id}}" i18n>Actions</label>
+                <button type="button" class="btn btn-sm btn-outline-danger form-control" (click)="deleteSavedView(view)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.SavedView }" i18n>Delete</button>
+              </div>
             </div>
-          </div>
+          }
 
-          <h4 i18n>Views</h4>
-          <div formGroupName="savedViews">
+          @if (savedViews && savedViews.length === 0) {
+            <div i18n>No saved views defined.</div>
+          }
 
-            @for (view of savedViews; track view) {
-              <div [formGroupName]="view.id" class="row">
-                <div class="mb-3 col">
-                  <label class="form-label" for="name_{{view.id}}" i18n>Name</label>
-                  <input type="text" class="form-control" formControlName="name" id="name_{{view.id}}">
-                </div>
-                <div class="mb-2 col">
-                  <label class="form-label" for="show_on_dashboard_{{view.id}}" i18n>&nbsp;<span class="visually-hidden">Appears on</span></label>
-                  <div class="form-check form-switch">
-                    <input type="checkbox" class="form-check-input" id="show_on_dashboard_{{view.id}}" formControlName="show_on_dashboard">
-                    <label class="form-check-label" for="show_on_dashboard_{{view.id}}" i18n>Show on dashboard</label>
-                  </div>
-                  <div class="form-check form-switch">
-                    <input type="checkbox" class="form-check-input" id="show_in_sidebar_{{view.id}}" formControlName="show_in_sidebar">
-                    <label class="form-check-label" for="show_in_sidebar_{{view.id}}" i18n>Show in sidebar</label>
-                  </div>
-                </div>
-                <div class="mb-2 col-auto">
-                  <label class="form-label" for="name_{{view.id}}" i18n>Actions</label>
-                  <button type="button" class="btn btn-sm btn-outline-danger form-control" (click)="deleteSavedView(view)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.SavedView }" i18n>Delete</button>
-                </div>
-              </div>
-            }
+          @if (!savedViews) {
+            <div>
+              <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
+              <div class="visually-hidden" i18n>Loading...</div>
+            </div>
+          }
 
-            @if (savedViews && savedViews.length === 0) {
-              <div i18n>No saved views defined.</div>
-            }
+        </div>
 
-            @if (!savedViews) {
-              <div>
-                <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
-                <div class="visually-hidden" i18n>Loading...</div>
-              </div>
-            }
+      </ng-template>
+    </li>
+  </ul>
 
-          </div>
+  <div [ngbNavOutlet]="nav" class="border-start border-end border-bottom p-3 mb-3 shadow-sm"></div>
 
-        </ng-template>
-      </li>
-    </ul>
-
-    <div [ngbNavOutlet]="nav" class="border-start border-end border-bottom p-3 mb-3 shadow-sm"></div>
-
-    <button type="submit" class="btn btn-primary mb-2" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.UISettings }" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
-  </form>
+  <button type="submit" class="btn btn-primary mb-2" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.UISettings }" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
+</form>

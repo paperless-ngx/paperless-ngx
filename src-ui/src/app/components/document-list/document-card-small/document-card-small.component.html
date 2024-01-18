@@ -25,9 +25,7 @@
     @if (notesEnabled && document.notes.length) {
       <a routerLink="/documents/{{document.id}}/notes" class="document-card-notes py-2 px-1">
         <span class="badge rounded-pill bg-light border text-primary">
-          <svg class="metadata-icon ms-1 me-1" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#chat-left-text"/>
-          </svg>
+          <i-bs width="0.9rem" height="0.9rem" class="ms-1 me-1" name="chat-left-text"></i-bs>
         {{document.notes.length}}</span>
       </a>
     }
@@ -45,18 +43,14 @@
         @if (document.document_type) {
           <button type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0" title="Toggle document type filter" i18n-title
             (click)="clickDocumentType.emit(document.document_type);$event.stopPropagation()">
-            <svg class="metadata-icon me-2 text-muted" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#file-earmark"/>
-            </svg>
+            <i-bs width="0.9rem" height="0.9rem" class="me-2 text-muted" name="file-earmark"></i-bs>
             <small>{{(document.document_type$ | async)?.name ?? privateName}}</small>
           </button>
         }
         @if (document.storage_path) {
           <button type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0" title="Toggle storage path filter" i18n-title
             (click)="clickStoragePath.emit(document.storage_path);$event.stopPropagation()">
-            <svg class="metadata-icon me-2 text-muted" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#folder"/>
-            </svg>
+            <i-bs width="0.9rem" height="0.9rem" class="me-2 text-muted" name="folder"></i-bs>
             <small>{{(document.storage_path$ | async)?.name ?? privateName}}</small>
           </button>
         }
@@ -69,33 +63,25 @@
             </div>
           </ng-template>
           <div class="ps-0 p-1" placement="top" [ngbTooltip]="dateTooltip">
-            <svg class="metadata-icon me-2 text-muted" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#calendar-event"/>
-            </svg>
+            <i-bs width="0.9rem" height="0.9rem" class="me-2 text-muted" name="calendar-event"></i-bs>
             <small>{{document.created_date | customDate:'mediumDate'}}</small>
           </div>
         </div>
         @if (document.archive_serial_number | isNumber) {
           <div class="ps-0 p-1">
-            <svg class="metadata-icon me-2 text-muted" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#upc-scan"/>
-            </svg>
+            <i-bs width="0.9rem" height="0.9rem" class="me-2 text-muted" name="upc-scan"></i-bs>
             <small>#{{document.archive_serial_number}}</small>
           </div>
         }
         @if (document.owner && document.owner !== settingsService.currentUser.id) {
           <div class="ps-0 p-1">
-            <svg class="metadata-icon me-2 text-muted" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#person-fill-lock"/>
-            </svg>
+            <i-bs width="0.9rem" height="0.9rem" class="me-2 text-muted" name="person-fill-lock"></i-bs>
             <small>{{document.owner | username}}</small>
           </div>
         }
         @if (document.is_shared_by_requester) {
           <div class="ps-0 p-1">
-            <svg class="metadata-icon me-2 text-muted" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#people-fill"/>
-            </svg>
+            <i-bs width="0.9rem" height="0.9rem" class="me-2 text-muted" name="people-fill"></i-bs>
             <small i18n>Shared</small>
           </div>
         }
@@ -103,26 +89,18 @@
       <div class="d-flex justify-content-between align-items-center">
         <div class="btn-group w-100">
           <a routerLink="/documents/{{document.id}}" class="btn btn-sm btn-outline-secondary" title="Edit" i18n-title *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }" i18n-title>
-            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pencil" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5L13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175l-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-            </svg>
+            <i-bs name="pencil"></i-bs>
           </a>
           <a [href]="previewUrl" target="_blank" class="btn btn-sm btn-outline-secondary"
             [ngbPopover]="previewContent" [popoverTitle]="document.title | documentTitle"
             autoClose="true" popoverClass="shadow popover-preview" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
-              <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
-              <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
-            </svg>
+            <i-bs name="eye"></i-bs>
           </a>
           <ng-template #previewContent>
             <pngx-preview-popup [document]="document"></pngx-preview-popup>
           </ng-template>
           <a [href]="getDownloadUrl()" class="btn btn-sm btn-outline-secondary" title="Download" i18n-title (click)="$event.stopPropagation()">
-            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-download" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-              <path fill-rule="evenodd" d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
-            </svg>
+            <i-bs name="download"></i-bs>
           </a>
         </div>
       </div>

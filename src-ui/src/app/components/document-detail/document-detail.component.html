@@ -19,16 +19,12 @@
   }
 
   <button type="button" class="btn btn-sm btn-outline-danger me-4" (click)="delete()" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }">
-    <svg class="buttonicon" fill="currentColor">
-      <use xlink:href="assets/bootstrap-icons.svg#trash" />
-    </svg><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
+    <i-bs width="1.2em" height="1.2em" name="trash"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
   </button>
 
   <div class="btn-group me-2">
     <a [href]="downloadUrl" class="btn btn-sm btn-outline-primary">
-      <svg class="buttonicon me-md-1" fill="currentColor">
-          <use xlink:href="assets/bootstrap-icons.svg#download" />
-      </svg><span class="d-none d-lg-inline ps-1" i18n>Download</span>
+      <i-bs width="1.2em" height="1.2em" name="download"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Download</span>
     </a>
 
     @if (metadata?.has_archive_version) {
@@ -43,22 +39,16 @@
 
   <div class="ms-auto" ngbDropdown>
     <button class="btn btn-sm btn-outline-primary me-2" id="actionsDropdown" ngbDropdownToggle>
-      <svg class="toolbaricon" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#three-dots" />
-      </svg>
+      <i-bs name="three-dots"></i-bs>
       <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
       <button ngbDropdownItem (click)="redoOcr()" [disabled]="!userCanEdit">
-        <svg class="buttonicon-sm" fill="currentColor">
-          <use xlink:href="assets/bootstrap-icons.svg#arrow-counterclockwise" />
-        </svg><span class="ps-1" i18n>Redo OCR</span>
+        <i-bs width="1em" height="1em" name="arrow-counterclockwise"></i-bs><span class="ps-1" i18n>Redo OCR</span>
       </button>
 
       <button ngbDropdownItem (click)="moreLike()">
-        <svg class="buttonicon-sm" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#diagram-3" />
-        </svg><span class="ps-1" i18n>More like this</span>
+        <i-bs width="1em" height="1em" name="diagram-3"></i-bs><span class="ps-1" i18n>More like this</span>
       </button>
     </div>
   </div>
@@ -84,19 +74,13 @@
       <div class="btn-toolbar mb-1 border-bottom">
         <div class="btn-group pb-3">
           <button type="button" class="btn btn-sm btn-outline-secondary" i18n-title title="Close" (click)="close()">
-            <svg class="buttonicon" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#x" />
-            </svg>
+            <i-bs width="1.2em" height="1.2em" name="x"></i-bs>
           </button>
           <button type="button" class="btn btn-sm btn-outline-secondary" i18n-title title="Previous" (click)="previousDoc()" [disabled]="!hasPrevious()">
-            <svg class="buttonicon" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#arrow-left" />
-            </svg>
+            <i-bs width="1.2em" height="1.2em" name="arrow-left"></i-bs>
           </button>
           <button type="button" class="btn btn-sm btn-outline-secondary"  i18n-title title="Next" (click)="nextDoc()" [disabled]="!hasNext()">
-            <svg class="buttonicon" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#arrow-right" />
-            </svg>
+            <i-bs width="1.2em" height="1.2em" name="arrow-right"></i-bs>
           </button>
         </div>
 
