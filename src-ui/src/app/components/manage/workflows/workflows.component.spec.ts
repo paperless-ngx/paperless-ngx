@@ -7,6 +7,7 @@ import {
   NgbPaginationModule,
   NgbModalRef,
   NgbModalModule,
+  NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { of, throwError } from 'rxjs'
 import { Workflow } from 'src/app/data/workflow'
@@ -99,6 +100,7 @@ describe('WorkflowsComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         NgbModalModule,
+        NgbPopoverModule,
       ],
     })
 

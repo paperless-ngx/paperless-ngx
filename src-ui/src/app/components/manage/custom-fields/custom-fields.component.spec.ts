@@ -11,6 +11,7 @@ import {
   NgbPaginationModule,
   NgbModalModule,
   NgbModalRef,
+  NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { of, throwError } from 'rxjs'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
@@ -64,6 +65,7 @@ describe('CustomFieldsComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         NgbModalModule,
+        NgbPopoverModule,
       ],
     })
 
