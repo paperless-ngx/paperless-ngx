@@ -1,8 +1,6 @@
 <div ngbDropdown #fieldDropdown="ngbDropdown" (openChange)="onOpenClose()">
     <button class="btn btn-sm btn-outline-primary" id="customFieldsDropdown" [disabled]="disabled" ngbDropdownToggle>
-      <svg class="toolbaricon" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#ui-radios" />
-      </svg>
+      <i-bs name="ui-radios"></i-bs>
       <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Custom Fields</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="customFieldsDropdown" class="shadow custom-fields-dropdown">
@@ -20,14 +18,10 @@
                 </pngx-input-select>
                 <div class="btn-toolbar" role="toolbar">
                     <button class="btn btn-sm btn-outline-secondary me-auto" type="button" (click)="createField()" [disabled]="!canCreateFields">
-                        <svg fill="currentColor" class="buttonicon-sm me-1 mb-1">
-                        <use xlink:href="assets/bootstrap-icons.svg#asterisk"/>
-                        </svg><ng-container i18n>Create New Field</ng-container>
+                        <i-bs width="1em" height="1em" name="asterisk"></i-bs>&nbsp;<ng-container i18n>Create New Field</ng-container>
                     </button>
                     <button class="btn btn-sm btn-outline-primary me-1" type="button" (click)="addField(); fieldDropdown.close()" [disabled]="field === undefined">
-                        <svg fill="currentColor" class="buttonicon me-1">
-                          <use xlink:href="assets/bootstrap-icons.svg#plus-circle"/>
-                        </svg><ng-container i18n>Add</ng-container>
+                        <i-bs width="1.2em" height="1.2em" name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add</ng-container>
                     </button>
                 </div>
             </li>

@@ -2,9 +2,7 @@
 
   <div ngbDropdown class="me-2 d-flex">
     <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
-      <svg class="toolbaricon" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#text-indent-left" />
-      </svg>
+      <i-bs name="text-indent-left"></i-bs>
       <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Select</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
@@ -16,21 +14,15 @@
   <div class="btn-group flex-fill" role="group">
     <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="details" (ngModelChange)="saveDisplayMode()" id="displayModeDetails" name="displayModeDetails">
     <label for="displayModeDetails" class="btn btn-outline-primary btn-sm">
-      <svg class="toolbaricon" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#list-ul" />
-      </svg>
+      <i-bs name="list-ul"></i-bs>
     </label>
     <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="smallCards" (ngModelChange)="saveDisplayMode()" id="displayModeSmall" name="displayModeSmall">
     <label for="displayModeSmall" class="btn btn-outline-primary btn-sm">
-      <svg class="toolbaricon" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#grid" />
-      </svg>
+      <i-bs name="grid"></i-bs>
     </label>
     <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="largeCards" (ngModelChange)="saveDisplayMode()" id="displayModeLarge" name="displayModeLarge">
     <label for="displayModeLarge" class="btn btn-outline-primary btn-sm">
-      <svg class="toolbaricon" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#hdd-stack" />
-      </svg>
+      <i-bs name="hdd-stack"></i-bs>
     </label>
   </div>
 
@@ -40,15 +32,11 @@
       <div class="w-100 d-flex pb-2 mb-1 border-bottom">
         <input type="radio" class="btn-check" [value]="false" [(ngModel)]="listSortReverse" id="listSortReverseFalse">
         <label class="btn btn-outline-primary btn-sm mx-2 flex-fill" for="listSortReverseFalse">
-          <svg class="toolbaricon" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-down" />
-          </svg>
+          <i-bs name="sort-alpha-down"></i-bs>
         </label>
         <input type="radio" class="btn-check" [value]="true" [(ngModel)]="listSortReverse" id="listSortReverseTrue">
         <label class="btn btn-outline-primary btn-sm me-2 flex-fill" for="listSortReverseTrue">
-          <svg class="toolbaricon" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-up-alt" />
-          </svg>
+          <i-bs name="sort-alpha-up-alt"></i-bs>
         </label>
       </div>
       <div>
@@ -116,9 +104,7 @@
       }
       @if (!list.isReloading && isFiltered) {
         <button class="btn btn-link py-0" (click)="resetFilters()">
-          <svg fill="currentColor" class="buttonicon-sm">
-            <use xlink:href="assets/bootstrap-icons.svg#x"/>
-            </svg><small i18n>Reset filters</small>
+          <i-bs width="1em" height="1em" name="x"></i-bs><small i18n>Reset filters</small>
           </button>
         }
       </div>
@@ -246,9 +232,7 @@
                   @if (d.notes.length) {
                     <a routerLink="/documents/{{d.id}}/notes" class="btn btn-sm p-0">
                       <span class="badge rounded-pill bg-light border text-primary">
-                        <svg class="metadata-icon ms-1 me-1" fill="currentColor">
-                          <use xlink:href="assets/bootstrap-icons.svg#chat-left-text"/>
-                        </svg>
+                        <i-bs width="0.9rem" height="0.9rem" class="ms-1 me-1" name="chat-left-text"></i-bs>
                       {{d.notes.length}}</span>
                     </a>
                   }

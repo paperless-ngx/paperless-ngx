@@ -6,9 +6,7 @@
         }
         @if (removable) {
           <button type="button" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
-            <svg class="sidebaricon" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#x"/>
-              </svg>&nbsp;<ng-container i18n>Remove</ng-container>
+            <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Remove</ng-container>
             </button>
           }
         </div>
@@ -20,9 +18,7 @@
             <div class="form-text d-flex align-items-center">
               <span class="text-muted">{{filename}}</span>
               <button type="button" class="btn btn-link btn-sm text-danger ms-2" (click)="clear()">
-                <svg class="sidebaricon" fill="currentColor">
-                  <use xlink:href="assets/bootstrap-icons.svg#x"/>
-                </svg><small class="ms-1" i18n>Remove</small>
+                <i-bs name="x"></i-bs><small i18n>Remove</small>
               </button>
             </div>
         }

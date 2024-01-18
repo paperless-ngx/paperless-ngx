@@ -19,9 +19,7 @@
         }
         @if (_textFilter) {
           <button class="btn btn-link btn-sm px-0 position-absolute top-0 end-0 z-10" (click)="resetTextField()">
-            <svg fill="currentColor" class="buttonicon-sm me-1">
-              <use xlink:href="assets/bootstrap-icons.svg#x"/>
-            </svg>
+            <i-bs width="1em" height="1em" name="x"></i-bs>
           </button>
         }
         <input #textFilterInput class="form-control form-control-sm" type="text" [disabled]="textFilterModifierIsNull" [(ngModel)]="textFilter" (keyup)="textFilterKeyup($event)" [readonly]="textFilterTarget === 'fulltext-morelike'">
@@ -87,9 +85,7 @@
       </div>
       <div class="d-flex flex-wrap d-none d-sm-inline-block">
         <button class="btn btn-outline-secondary btn-sm" [disabled]="!rulesModified" (click)="resetSelected()">
-          <svg class="toolbaricon ms-n1" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#x"></use>
-            </svg><ng-container i18n>Reset filters</ng-container>
+          <i-bs class="ms-n1" name="x"></i-bs><ng-container i18n>Reset filters</ng-container>
           </button>
         </div>
       </div>

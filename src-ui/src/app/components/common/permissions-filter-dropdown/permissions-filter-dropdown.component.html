@@ -1,8 +1,6 @@
 <div class="btn-group w-100" ngbDropdown role="group">
   <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="isActive ? 'btn-primary' : 'btn-outline-primary'" [disabled]="disabled">
-    <svg class="toolbaricon" fill="currentColor">
-      <use xlink:href="assets/bootstrap-icons.svg#person-fill-lock" />
-    </svg>
+    <i-bs name="person-fill-lock"></i-bs>
     <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
     <pngx-clearable-badge [selected]="isActive" (cleared)="reset()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
   </button>
@@ -11,9 +9,7 @@
       <button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="setFilter(OwnerFilterType.NONE)" [disabled]="disabled">
         <div class="selected-icon me-1">
           @if (selectionModel.ownerFilter === OwnerFilterType.NONE) {
-            <svg fill="currentColor" class="buttonicon-sm">
-              <use xlink:href="assets/bootstrap-icons.svg#check"/>
-            </svg>
+            <i-bs width="1em" height="1em" name="check"></i-bs>
           }
         </div>
         <div class="me-1">
@@ -23,9 +19,7 @@
       <button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="setFilter(OwnerFilterType.SELF)" [disabled]="disabled">
         <div class="selected-icon me-1">
           @if (selectionModel.ownerFilter === OwnerFilterType.SELF) {
-            <svg fill="currentColor" class="buttonicon-sm">
-              <use xlink:href="assets/bootstrap-icons.svg#check"/>
-            </svg>
+            <i-bs width="1em" height="1em" name="check"></i-bs>
           }
         </div>
         <div class="me-1">
@@ -35,9 +29,7 @@
       <button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="setFilter(OwnerFilterType.NOT_SELF)" [disabled]="disabled">
         <div class="selected-icon me-1">
           @if (selectionModel.ownerFilter === OwnerFilterType.NOT_SELF) {
-            <svg fill="currentColor" class="buttonicon-sm">
-              <use xlink:href="assets/bootstrap-icons.svg#check"/>
-            </svg>
+            <i-bs width="1em" height="1em" name="check"></i-bs>
           }
         </div>
         <div class="me-1">
@@ -47,9 +39,7 @@
       <button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="setFilter(OwnerFilterType.SHARED_BY_ME)" [disabled]="disabled">
         <div class="selected-icon me-1">
           @if (selectionModel.ownerFilter === OwnerFilterType.SHARED_BY_ME) {
-            <svg fill="currentColor" class="buttonicon-sm">
-              <use xlink:href="assets/bootstrap-icons.svg#check"/>
-            </svg>
+            <i-bs width="1em" height="1em" name="check"></i-bs>
           }
         </div>
         <div class="me-1">
@@ -59,9 +49,7 @@
       <button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="setFilter(OwnerFilterType.UNOWNED)" [disabled]="disabled">
         <div class="selected-icon me-1">
           @if (selectionModel.ownerFilter === OwnerFilterType.UNOWNED) {
-            <svg fill="currentColor" class="buttonicon-sm">
-              <use xlink:href="assets/bootstrap-icons.svg#check"/>
-            </svg>
+            <i-bs width="1em" height="1em" name="check"></i-bs>
           }
         </div>
         <div class="me-1">
@@ -71,9 +59,7 @@
       <button *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.User }" class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" [disabled]="disabled">
         <div class="selected-icon me-1">
           @if (selectionModel.ownerFilter === OwnerFilterType.OTHERS) {
-            <svg fill="currentColor" class="buttonicon-sm">
-              <use xlink:href="assets/bootstrap-icons.svg#check"/>
-            </svg>
+            <i-bs width="1em" height="1em" name="check"></i-bs>
           }
         </div>
         <div class="me-1 w-100">

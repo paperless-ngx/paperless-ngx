@@ -4,9 +4,7 @@
       <label class="form-label" [class.mb-md-0]="horizontal" [for]="inputId">{{title}}</label>
       @if (removable) {
         <button type="button" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
-          <svg class="sidebaricon" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#x"/>
-            </svg>&nbsp;<ng-container i18n>Remove</ng-container>
+          <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Remove</ng-container>
           </button>
         }
       </div>
@@ -16,15 +14,11 @@
             (dateSelect)="onChange(value)" (change)="onChange(value)" (keypress)="onKeyPress($event)" (paste)="onPaste($event)"
             name="dp" [(ngModel)]="value" ngbDatepicker #datePicker="ngbDatepicker" #datePickerContent="ngModel" [disabled]="disabled">
           <button class="btn btn-outline-secondary calendar" (click)="datePicker.toggle()" type="button" [disabled]="disabled">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="buttonicon">
-              <use _ngcontent-ng-c3750736003="" xlink:href="assets/bootstrap-icons.svg#calendar"></use>
-            </svg>
+            <i-bs width="1.2em" height="1.2em" name="calendar"></i-bs>
           </button>
           @if (showFilter) {
             <button class="btn btn-outline-secondary" type="button" (click)="onFilterDocuments()" [disabled]="this.value === null" title="{{ filterButtonTitle }}">
-              <svg class="buttonicon" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#filter" />
-              </svg>
+              <i-bs width="1.2em" height="1.2em" name="filter"></i-bs>
             </button>
           }
         </div>

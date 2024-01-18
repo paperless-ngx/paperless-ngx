@@ -1,23 +1,17 @@
 <div class="d-flex flex-wrap gap-4">
   <div class="d-flex align-items-center" role="group" aria-label="Select">
     <button class="btn btn-sm btn-outline-secondary" (click)="list.selectNone()">
-      <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#slash-circle" />
-        </svg>&nbsp;<ng-container i18n>Cancel</ng-container>
+      <i-bs name="slash-circle"></i-bs>&nbsp;<ng-container i18n>Cancel</ng-container>
       </button>
     </div>
     <div class="d-flex align-items-center gap-2" role="group" aria-label="Select">
       <label class="me-2" i18n>Select:</label>
       <div class="btn-group">
         <button class="btn btn-sm btn-outline-primary" (click)="list.selectPage()">
-          <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#file-earmark-check" />
-            </svg>&nbsp;<ng-container i18n>Page</ng-container>
+          <i-bs name="file-earmark-check"></i-bs>&nbsp;<ng-container i18n>Page</ng-container>
           </button>
           <button class="btn btn-sm btn-outline-primary" (click)="list.selectAll()">
-            <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#check-all" />
-              </svg>&nbsp;<ng-container i18n>All</ng-container>
+            <i-bs name="check-all"></i-bs>&nbsp;<ng-container i18n>All</ng-container>
             </button>
           </div>
         </div>
@@ -73,16 +67,12 @@
           <div class="btn-toolbar">
 
             <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="setPermissions()" [disabled]="!userOwnsAll || !userCanEditAll">
-              <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#person-fill-lock" />
-                </svg><div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Permissions</ng-container></div>
+              <i-bs name="person-fill-lock"></i-bs><div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Permissions</ng-container></div>
               </button>
 
               <div ngbDropdown>
                 <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
-                  <svg class="toolbaricon" fill="currentColor">
-                    <use xlink:href="assets/bootstrap-icons.svg#three-dots" />
-                  </svg>
+                  <i-bs name="three-dots"></i-bs>
                   <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
                 </button>
                 <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
@@ -94,9 +84,7 @@
             <div class="btn-group btn-group-sm">
               <button class="btn btn-sm btn-outline-primary" [disabled]="awaitingDownload" (click)="downloadSelected()">
                 @if (!awaitingDownload) {
-                  <svg class="toolbaricon" fill="currentColor">
-                    <use xlink:href="assets/bootstrap-icons.svg#arrow-down" />
-                  </svg>
+                  <i-bs name="arrow-down"></i-bs>
                 }
                 @if (awaitingDownload) {
                   <div class="spinner-border spinner-border-sm" role="status">
@@ -137,9 +125,7 @@
 
             <div class="btn-group btn-group-sm">
               <button type="button" class="btn btn-sm btn-outline-danger" (click)="applyDelete()" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }" [disabled]="!userOwnsAll">
-                <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
-                  <use xlink:href="assets/bootstrap-icons.svg#trash" />
-                  </svg>&nbsp;<ng-container i18n>Delete</ng-container>
+                <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
                 </button>
               </div>
             </div>

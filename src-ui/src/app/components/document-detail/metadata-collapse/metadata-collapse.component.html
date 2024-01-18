@@ -2,14 +2,10 @@
   <button type="button" class="btn btn-outline-secondary btn-sm me-2"
     (click)="expand = !expand">
     @if (!expand) {
-      <svg class="buttonicon" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#caret-down" />
-      </svg>
+      <i-bs width="1.2em" height="1.2em" name="caret-down"></i-bs>
     }
     @if (expand) {
-      <svg class="buttonicon" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#caret-up" />
-      </svg>
+      <i-bs width="1.2em" height="1.2em" name="caret-up"></i-bs>
     }
   </button>
   {{title}}

@@ -1,8 +1,6 @@
 <div class="btn-group w-100" ngbDropdown role="group" (openChange)="dropdownOpenChange($event)" #dropdown="ngbDropdown" (keydown)="listKeyDown($event)">
   <button class="btn btn-sm" id="dropdown_{{name}}" ngbDropdownToggle [ngClass]="!editing && selectionModel.selectionSize() > 0 ? 'btn-primary' : 'btn-outline-primary'" [disabled]="disabled">
-    <svg class="toolbaricon" fill="currentColor">
-      <use attr.xlink:href="assets/bootstrap-icons.svg#{{icon}}" />
-    </svg>
+    <i-bs name="{{icon}}"></i-bs>
     <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
     @if (!editing && selectionModel.totalCount > 0) {
       <pngx-clearable-badge [number]="selectionModel.totalCount" [selected]="selectionModel.selectionSize() > 0" (cleared)="reset()"></pngx-clearable-badge>
@@ -49,9 +47,7 @@
       @if (editing) {
         <button class="list-group-item list-group-item-action bg-light" (click)="applyClicked()" [disabled]="!modelIsDirty || disabled">
           <small class="ms-2" [ngClass]="{'fw-bold': modelIsDirty}" i18n>Apply</small>
-          <svg width="1.5em" height="1em" viewBox="0 0 16 16" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#arrow-right" />
-          </svg>
+          <i-bs width="1.5em" height="1em" name="arrow-right"></i-bs>
         </button>
       }
       @if (!editing && manyToOne) {

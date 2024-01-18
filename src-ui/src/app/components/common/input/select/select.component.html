@@ -6,9 +6,7 @@
       }
       @if (removable) {
         <button type="button" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
-          <svg class="sidebaricon" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#x"/>
-            </svg>&nbsp;<ng-container i18n>Remove</ng-container>
+          <i-bs  name="x"></i-bs>&nbsp;<ng-container i18n>Remove</ng-container>
           </button>
         }
       </div>
@@ -40,16 +38,12 @@
           </ng-select>
           @if (allowCreateNew) {
             <button class="btn btn-outline-secondary" type="button" (click)="addItem()" [disabled]="disabled">
-              <svg class="buttonicon" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#plus" />
-              </svg>
+              <i-bs width="1.2em" height="1.2em" name="plus"></i-bs>
             </button>
           }
           @if (showFilter) {
             <button class="btn btn-outline-secondary" type="button" (click)="onFilterDocuments()" [disabled]="isPrivate || this.value === null" title="{{ filterButtonTitle }}">
-              <svg class="buttonicon" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#filter" />
-              </svg>
+              <i-bs width="1.2em" height="1.2em" name="filter"></i-bs>
             </button>
           }
         </div>

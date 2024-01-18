@@ -5,9 +5,7 @@
         <label class="form-label" [class.mb-md-0]="horizontal" [for]="inputId">{{title}}</label>
         @if (removable) {
           <button type="button" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
-            <svg class="sidebaricon" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#x"/>
-              </svg>&nbsp;<ng-container i18n>Remove</ng-container>
+            <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Remove</ng-container>
             </button>
           }
         </div>
