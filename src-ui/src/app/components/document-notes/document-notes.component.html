@@ -23,9 +23,7 @@
           <div class="d-flex card-footer small bg-light text-primary justify-content-between align-items-center">
             <span>{{displayName(note)}} - {{ note.created | customDate}}</span>
             <button type="button" class="btn btn-link btn-sm p-0 fade" title="Delete note" i18n-title (click)="deleteNote(note.id)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Note }">
-              <svg width="13" height="13" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#trash" />
-              </svg>
+              <i-bs name="trash"></i-bs>
               <span class="visually-hidden" i18n>Delete note</span>
             </button>
           </div>

@@ -1,20 +1,13 @@
 <pngx-page-header title="{{ typeNamePlural | titlecase }}">
   <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()" [hidden]="selectedObjects.size === 0">
-    <svg class="sidebaricon" fill="currentColor">
-      <use xlink:href="assets/bootstrap-icons.svg#x"/>
-      </svg>&nbsp;<ng-container i18n>Clear selection</ng-container>
+    <i-bs  name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
     </button>
     <button type="button" class="btn btn-sm btn-outline-primary me-5" (click)="setPermissions()" [disabled]="!userOwnsAll || selectedObjects.size === 0">
-      <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#person-fill-lock" />
-        </svg>&nbsp;<ng-container i18n>Permissions</ng-container>
-      </button>
-      <button type="button" class="btn btn-sm btn-outline-primary" (click)="openCreateDialog()" *pngxIfPermissions="{ action: PermissionAction.Add, type: permissionType }" i18n>
-    <svg class="sidebaricon me-1" fill="currentColor">
-      <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
-    </svg>
-    Create
-  </button>
+      <i-bs name="person-fill-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-primary" (click)="openCreateDialog()" *pngxIfPermissions="{ action: PermissionAction.Add, type: permissionType }">
+      <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Create</ng-container>
+    </button>
     </pngx-page-header>
 
     <div class="row mb-3">
@@ -80,9 +73,7 @@
                 <div class="btn-group d-block d-sm-none">
                   <div ngbDropdown class="d-inline-block">
                     <button type="button" class="btn btn-link" id="actionsMenuMobile" ngbDropdownToggle>
-                      <svg class="toolbaricon" fill="currentColor">
-                        <use xlink:href="assets/bootstrap-icons.svg#three-dots-vertical" />
-                      </svg>
+                      <i-bs name="three-dots-vertical"></i-bs>
                     </button>
                     <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">
                       <button (click)="filterDocuments(object)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }" ngbDropdownItem i18n>Filter Documents</button>
@@ -93,19 +84,13 @@
                 </div>
                 <div class="btn-group d-none d-sm-block">
                   <button class="btn btn-sm btn-outline-secondary" (click)="filterDocuments(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
-                    <svg class="buttonicon-sm" fill="currentColor">
-                      <use xlink:href="assets/bootstrap-icons.svg#filter" />
-                      </svg>&nbsp;<ng-container i18n>Documents</ng-container>
+                    <i-bs width="1em" height="1em" name="filter"></i-bs>&nbsp;<ng-container i18n>Documents</ng-container>
                     </button>
                     <button class="btn btn-sm btn-outline-secondary" (click)="openEditDialog(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }" [disabled]="!userCanEdit(object)">
-                      <svg class="buttonicon-sm" fill="currentColor">
-                        <use xlink:href="assets/bootstrap-icons.svg#pencil" />
-                        </svg>&nbsp;<ng-container i18n>Edit</ng-container>
+                      <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
                       </button>
                       <button class="btn btn-sm btn-outline-danger" (click)="openDeleteDialog(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }" [disabled]="!userCanDelete(object)">
-                        <svg class="buttonicon-sm" fill="currentColor">
-                          <use xlink:href="assets/bootstrap-icons.svg#trash" />
-                          </svg>&nbsp;<ng-container i18n>Delete</ng-container>
+                        <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
                         </button>
                       </div>
                     </td>

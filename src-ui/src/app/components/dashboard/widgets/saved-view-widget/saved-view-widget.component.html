@@ -39,17 +39,13 @@
                 <a [href]="getPreviewUrl(doc)" title="View Preview" i18n-title target="_blank" class="btn px-4 btn-dark border-dark-subtle"
                   [ngbPopover]="previewContent" [popoverTitle]="doc.title | documentTitle"
                   autoClose="true" popoverClass="shadow popover-preview" container="body" (mouseenter)="mouseEnterPreviewButton(doc)" (mouseleave)="mouseLeavePreviewButton()" #popover="ngbPopover">
-                  <svg class="buttonicon-xs" fill="currentColor">
-                    <use xlink:href="assets/bootstrap-icons.svg#eye"/>
-                  </svg>
+                  <i-bs width="0.8em" height="0.8em" name="eye"></i-bs>
                 </a>
                 <ng-template #previewContent>
                   <pngx-preview-popup [document]="doc" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()"></pngx-preview-popup>
                 </ng-template>
                 <a [href]="getDownloadUrl(doc)" class="btn px-4 btn-dark border-dark-subtle" title="Download" i18n-title (click)="$event.stopPropagation()">
-                  <svg class="buttonicon-xs" fill="currentColor">
-                    <use xlink:href="assets/bootstrap-icons.svg#download"/>
-                  </svg>
+                  <i-bs width="0.8em" height="0.8em" name="download"></i-bs>
                 </a>
               </div>
             </td>

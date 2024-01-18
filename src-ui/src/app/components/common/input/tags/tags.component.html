@@ -18,9 +18,7 @@
 
           <ng-template ng-label-tmp let-item="item">
             <span class="tag-wrap tag-wrap-delete" (mousedown)="removeTag($event, item.id)">
-              <svg width="1.2em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <use xlink:href="assets/bootstrap-icons.svg#x"/>
-              </svg>
+              <i-bs name="x"></i-bs>
               @if (item.id && tags) {
                 <pngx-tag style="background-color: none;" [tag]="getTag(item.id)"></pngx-tag>
               }
@@ -36,16 +34,12 @@
         </ng-select>
         @if (allowCreate) {
           <button class="btn btn-outline-secondary" type="button" (click)="createTag()" [disabled]="disabled">
-            <svg class="buttonicon" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#plus" />
-            </svg>
+            <i-bs width="1.2em" height="1.2em" name="plus"></i-bs>
           </button>
         }
         @if (showFilter) {
           <button class="btn btn-outline-secondary" type="button" (click)="onFilterDocuments()" [disabled]="hasPrivate || this.value === null" i18n-title title="Filter documents with these Tags">
-            <svg class="buttonicon" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#filter" />
-            </svg>
+            <i-bs width="1.2em" height="1.2em" name="filter"></i-bs>
           </button>
         }
       </div>

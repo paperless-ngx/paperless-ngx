@@ -1,19 +1,13 @@
 <button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="toggleItem($event)" [disabled]="disabled">
   <div class="selected-icon me-1">
     @if (isChecked()) {
-      <svg fill="currentColor" class="buttonicon-sm bi-check">
-        <use xlink:href="assets/bootstrap-icons.svg#check"/>
-      </svg>
+      <i-bs width="1em" height="1em" name="check"></i-bs>
     }
     @if (isPartiallyChecked()) {
-      <svg fill="currentColor" class="buttonicon-sm bi-dash">
-        <use xlink:href="assets/bootstrap-icons.svg#dash"/>
-      </svg>
+      <i-bs width="1em" height="1em" name="dash"></i-bs>
     }
     @if (isExcluded()) {
-      <svg fill="currentColor" class="buttonicon-sm bi-x">
-        <use xlink:href="assets/bootstrap-icons.svg#x"/>
-      </svg>
+      <i-bs width="1em" height="1em" name="x"></i-bs>
     }
   </div>
   <div class="me-1">

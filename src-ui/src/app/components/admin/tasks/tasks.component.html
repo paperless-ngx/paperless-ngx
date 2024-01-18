@@ -6,14 +6,10 @@
   >
   <div class="btn-toolbar col col-md-auto align-items-center">
     <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()" [hidden]="selectedTasks.size === 0">
-      <svg class="sidebaricon" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#x"/>
-      </svg>&nbsp;<ng-container i18n>Clear selection</ng-container>
+      <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
     </button>
     <button class="btn btn-sm btn-outline-primary me-4" (click)="dismissTasks()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }" [disabled]="tasksService.total === 0">
-      <svg class="sidebaricon" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#check2-all"/>
-      </svg>&nbsp;<ng-container i18n>{{dismissButtonText}}</ng-container>
+      <i-bs name="check2-all"></i-bs>&nbsp;{{dismissButtonText}}
     </button>
     <div class="form-check form-switch mb-0">
       <input class="form-check-input" type="checkbox" role="switch" id="autoRefreshSwitch" (click)="toggleAutoRefresh()" [attr.checked]="autoRefreshInterval">
@@ -80,24 +76,18 @@
           }
           <td class="d-lg-none">
             <button class="btn btn-link" (click)="expandTask(task); $event.stopPropagation();">
-              <svg fill="currentColor" class="" width="1.2em" height="1.2em" style="vertical-align: text-top;" viewBox="0 0 16 16">
-                <use xlink:href="assets/bootstrap-icons.svg#info-circle" />
-              </svg>
+              <i-bs width="1.2em" height="1.2em" name="info-circle"></i-bs>
             </button>
           </td>
           <td scope="row">
             <div class="btn-group" role="group">
               <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }">
-                <svg class="sidebaricon" fill="currentColor">
-                  <use xlink:href="assets/bootstrap-icons.svg#check"/>
-                  </svg>&nbsp;<ng-container i18n>Dismiss</ng-container>
+                <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Dismiss</ng-container>
               </button>
               <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
                 @if (task.related_document) {
                   <button class="btn btn-sm btn-outline-primary" (click)="dismissAndGo(task); $event.stopPropagation();">
-                    <svg class="sidebaricon" fill="currentColor">
-                      <use xlink:href="assets/bootstrap-icons.svg#file-text"/>
-                    </svg>&nbsp;<ng-container i18n>Open Document</ng-container>
+                    <i-bs name="file-text"></i-bs>&nbsp;<ng-container i18n>Open Document</ng-container>
                   </button>
                 }
               </ng-container>

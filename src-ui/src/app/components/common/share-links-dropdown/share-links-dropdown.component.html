@@ -1,8 +1,6 @@
 <div ngbDropdown>
   <button class="btn btn-sm btn-outline-primary" id="shareLinksDropdown" [disabled]="disabled" ngbDropdownToggle>
-    <svg class="toolbaricon" fill="currentColor">
-      <use xlink:href="assets/bootstrap-icons.svg#link" />
-    </svg>
+    <i-bs name="link"></i-bs>
     <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Share Links</ng-container></div>
   </button>
   <div ngbDropdownMenu aria-labelledby="shareLinksDropdown" class="shadow share-links-dropdown">
@@ -22,26 +20,21 @@
               </span>
             }
             <button type="button" class="btn btn-sm btn-outline-primary" (click)="copy(link)">
-              <svg class="buttonicon" fill="currentColor">
                 @if (copied !== link.id) {
-                  <use xlink:href="assets/bootstrap-icons.svg#clipboard-fill" />
+                  <i-bs width="1.2em" height="1.2em" name="clipboard-fill"></i-bs>
                 }
                 @if (copied === link.id) {
-                  <use xlink:href="assets/bootstrap-icons.svg#clipboard-check-fill" />
+                  <i-bs width="1.2em" height="1.2em" name="clipboard-check-fill"></i-bs>
                 }
-                </svg><span class="visually-hidden" i18n>Copy</span>
+                <span class="visually-hidden" i18n>Copy</span>
               </button>
               @if (canShare(link)) {
                 <button type="button" class="btn btn-sm btn-outline-primary" (click)="share(link)">
-                  <svg class="buttonicon" fill="currentColor">
-                    <use xlink:href="assets/bootstrap-icons.svg#box-arrow-up" />
-                    </svg><span class="visually-hidden" i18n>Share</span>
+                  <i-bs width="1.2em" height="1.2em" name="box-arrow-up"></i-bs><span class="visually-hidden" i18n>Share</span>
                   </button>
                 }
                 <button type="button" class="btn btn-sm btn-outline-danger" (click)="delete(link)">
-                  <svg class="buttonicon" fill="currentColor">
-                    <use xlink:href="assets/bootstrap-icons.svg#trash" />
-                    </svg><span class="visually-hidden" i18n>Delete</span>
+                  <i-bs width="1.2em" height="1.2em" name="trash"></i-bs><span class="visually-hidden" i18n>Delete</span>
                   </button>
                 </div>
                 <span class="badge copied-badge bg-primary small fade ms-4 position-absolute top-50 translate-middle-y pe-none z-3" [class.show]="copied === link.id" i18n>Copied!</span>
@@ -66,9 +59,7 @@
                     <div class="spinner-border spinner-border-sm me-2" role="status"></div>
                   }
                   @if (!loading) {
-                    <svg class="buttonicon me-1" fill="currentColor">
-                      <use xlink:href="assets/bootstrap-icons.svg#plus" />
-                    </svg>
+                    <i-bs name="plus"></i-bs>
                   }
                   <ng-container i18n>Create</ng-container>
                 </button>

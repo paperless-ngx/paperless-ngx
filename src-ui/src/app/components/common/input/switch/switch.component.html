@@ -5,16 +5,12 @@
         <label class="form-label" [for]="inputId" [ngbTooltip]="showUnsetNote && isUnset ? tipContent: null" placement="end">
           {{title}}
           @if (showUnsetNote && isUnset) {
-            <svg class="sidebaricon-sm ms-1" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#exclamation-triangle"/>
-              </svg>
+            <i-bs width="0.9em" height="0.9em" name="exclamation-triangle"></i-bs>
           }
         </label>
         @if (removable) {
           <button type="button" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
-            <svg class="sidebaricon" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#x"/>
-            </svg>&nbsp;<ng-container i18n>Remove</ng-container>
+            <i-bs  name="x"></i-bs>&nbsp;<ng-container i18n>Remove</ng-container>
           </button>
         }
       </div>
@@ -26,9 +22,7 @@
           <label class="form-check-label" [class.text-muted]="showUnsetNote && isUnset" [for]="inputId" [ngbTooltip]="showUnsetNote && isUnset ? tipContent: null" placement="end">
             {{title}}
             @if (showUnsetNote && isUnset) {
-              <svg class="sidebaricon-sm ms-1" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#exclamation-triangle"/>
-              </svg>
+              &nbsp;<i-bs width="0.9em" height="0.9em" name="exclamation-triangle"></i-bs>
             }
           </label>
         }

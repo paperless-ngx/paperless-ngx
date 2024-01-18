@@ -139,10 +139,6 @@ table .btn-link {
   }
 }
 
-.nav-item .sidebaricon {
-  color: var(--bs-secondary);
-}
-
 .btn:focus,
 .btn:active:focus,
 .dropdown-item:focus,
@@ -463,44 +459,6 @@ ul.pagination {
   border-top-left-radius: .25rem;
   border-top-right-radius: .25rem;
   overflow: hidden;
-}
-
-// icons
-.toolbaricon {
-  width: 1.2em;
-  height: 1.2em;
-}
-
-.buttonicon {
-  width: 1.2em;
-  height: 1.2em;
-}
-
-.buttonicon-sm {
-  width: 1em;
-  height: 1em;
-}
-
-.buttonicon-xs {
-  width: 0.8em;
-  height: 0.8em;
-}
-
-.sidebaricon {
-  width: 16px;
-  height: 16px;
-  vertical-align: text-bottom;
-}
-
-.sidebaricon-sm {
-  width: 12px;
-  height: 12px;
-}
-
-.metadata-icon {
-  width: 0.9rem;
-  height: 0.9rem;
-  padding: 0.05rem;
 }
 
 table.table {

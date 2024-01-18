@@ -152,9 +152,9 @@ main {
     font-weight: bold;
   }
 
-  .sidebaricon {
-    margin-right: 4px;
-    color: inherit;
+  i-bs {
+    position: relative;
+    top: -1px;
   }
 }
 
@@ -186,11 +186,11 @@ main {
     width: 1.8rem;
     height: 100%;
 
-    svg {
+    i-bs {
       opacity: 0.5;
     }
 
-    &:hover svg {
+    &:hover i-bs {
       opacity: 1;
     }
   }
@@ -205,7 +205,7 @@ main {
       text-decoration: underline;
     }
 
-    svg {
+    i-bs {
       margin-bottom: 2px;
     }
   }
@@ -248,7 +248,7 @@ main {
 .navbar .dropdown-menu {
   font-size: 0.875rem; // body size
 
-  a svg {
+  a i-bs {
     opacity: 0.6;
   }
 }
@@ -259,7 +259,7 @@ main {
   form {
     position: relative;
 
-    > svg {
+    > i-bs {
       position: absolute;
       left: 0.6rem;
       top: 0.5rem;
@@ -269,7 +269,7 @@ main {
 
 
   &:focus-within {
-    form > svg {
+    form > i-bs {
       display: none;
     }
 
@@ -323,6 +323,6 @@ main {
   cursor: move;
 }
 
-::ng-deep .navItemDrag .position-absolute svg {
+::ng-deep .navItemDrag .position-absolute i-bs {
   display: none;
 }

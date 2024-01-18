@@ -36,9 +36,7 @@
           }
           @for (highlight of searchNoteHighlights; track highlight) {
             <span class="d-block">
-              <svg width="1em" height="1em" fill="currentColor" class="me-2">
-                <use xlink:href="assets/bootstrap-icons.svg#chat-left-text"/>
-              </svg>
+              <i-bs name="chat-left-text"></i-bs>
               <span [innerHtml]="highlight"></span>
             </span>
           }
@@ -51,66 +49,46 @@
         <div class="d-flex flex-column flex-md-row align-items-md-center">
           <div class="btn-group">
             <a class="btn btn-sm btn-outline-secondary" (click)="clickMoreLike.emit()">
-              <svg class="sidebaricon" fill="currentColor" class="sidebaricon">
-                <use xlink:href="assets/bootstrap-icons.svg#diagram-3"/>
-                </svg>&nbsp;<span class="d-none d-md-inline" i18n>More like this</span>
+              <i-bs    name="diagram-3"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>More like this</span>
               </a>
               <a routerLink="/documents/{{document.id}}" class="btn btn-sm btn-outline-secondary" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-                <svg class="sidebaricon" fill="currentColor" class="sidebaricon">
-                  <use xlink:href="assets/bootstrap-icons.svg#pencil"/>
-                  </svg>&nbsp;<span class="d-none d-md-inline" i18n>Edit</span>
+                <i-bs    name="pencil"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Edit</span>
                 </a>
                 <a class="btn btn-sm btn-outline-secondary" target="_blank" [href]="previewUrl"
                   [ngbPopover]="previewContent" [popoverTitle]="document.title | documentTitle"
                   autoClose="true" popoverClass="shadow popover-preview" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">
-                  <svg class="sidebaricon" fill="currentColor" class="sidebaricon">
-                    <use xlink:href="assets/bootstrap-icons.svg#eye"/>
-                    </svg>&nbsp;<span class="d-none d-md-inline" i18n>View</span>
+                  <i-bs    name="eye"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>View</span>
                   </a>
                   <ng-template #previewContent>
                     <pngx-preview-popup [document]="document"></pngx-preview-popup>
                   </ng-template>
                   <a class="btn btn-sm btn-outline-secondary" [href]="getDownloadUrl()">
-                    <svg class="sidebaricon" fill="currentColor" class="sidebaricon">
-                      <use xlink:href="assets/bootstrap-icons.svg#download"/>
-                      </svg>&nbsp;<span class="d-none d-md-inline" i18n>Download</span>
+                    <i-bs    name="download"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Download</span>
                     </a>
                   </div>
 
 
                   <div class="list-group list-group-horizontal border-0 card-info ms-md-auto mt-2 mt-md-0">
                     @if (notesEnabled && document.notes.length) {
-                      <button routerLink="/documents/{{document.id}}/notes" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2" title="View notes" i18n-title>
-                        <svg class="metadata-icon me-2 text-muted" fill="currentColor">
-                          <use xlink:href="assets/bootstrap-icons.svg#chat-left-text"/>
-                        </svg>
-                        <small i18n>{{document.notes.length}} Notes</small>
+                      <button routerLink="/documents/{{document.id}}/notes" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2 d-flex align-items-center" title="View notes" i18n-title>
+                        <i-bs width="09.rem" height="0.9rem" class="me-2 text-muted" name="chat-left-text"></i-bs><small i18n>{{document.notes.length}} Notes</small>
                       </button>
                     }
                     @if (document.document_type) {
-                      <button type="button" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2" title="Filter by document type" i18n-title
+                      <button type="button" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2 d-flex align-items-center" title="Filter by document type" i18n-title
                         (click)="clickDocumentType.emit(document.document_type);$event.stopPropagation()">
-                        <svg class="metadata-icon me-2 text-muted" fill="currentColor">
-                          <use xlink:href="assets/bootstrap-icons.svg#file-earmark"/>
-                        </svg>
-                        <small>{{(document.document_type$ | async)?.name}}</small>
+                        <i-bs width="09.rem" height="0.9rem" class="me-2 text-muted" name="file-earmark"></i-bs><small>{{(document.document_type$ | async)?.name}}</small>
                       </button>
                     }
                     @if (document.storage_path) {
-                      <button type="button" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2" title="Filter by storage path" i18n-title
+                      <button type="button" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2 d-flex align-items-center" title="Filter by storage path" i18n-title
                         (click)="clickStoragePath.emit(document.storage_path);$event.stopPropagation()">
-                        <svg class="metadata-icon me-2 text-muted" fill="currentColor">
-                          <use xlink:href="assets/bootstrap-icons.svg#archive"/>
-                        </svg>
-                        <small>{{(document.storage_path$ | async)?.name}}</small>
+                        <i-bs width="09.rem" height="0.9rem" class="me-2 text-muted" name="archive"></i-bs><small>{{(document.storage_path$ | async)?.name}}</small>
                       </button>
                     }
                     @if (document.archive_serial_number | isNumber) {
-                      <div class="list-group-item me-2 bg-light text-dark p-1 border-0">
-                        <svg class="metadata-icon me-2 text-muted" fill="currentColor">
-                          <use xlink:href="assets/bootstrap-icons.svg#upc-scan"/>
-                        </svg>
-                        <small>#{{document.archive_serial_number}}</small>
+                      <div class="list-group-item me-2 bg-light text-dark p-1 border-0 d-flex align-items-center">
+                        <i-bs width="09.rem" height="0.9rem" class="me-2 text-muted" name="upc-scan"></i-bs><small>#{{document.archive_serial_number}}</small>
                       </div>
                     }
                     <ng-template #dateTooltip>
@@ -120,26 +98,17 @@
                         <span i18n>Modified: {{ document.modified | customDate }}</span>
                       </div>
                     </ng-template>
-                    <div class="list-group-item bg-light text-dark p-1 border-0" [ngbTooltip]="dateTooltip">
-                      <svg class="metadata-icon me-2 text-muted" fill="currentColor">
-                        <use xlink:href="assets/bootstrap-icons.svg#calendar-event"/>
-                      </svg>
-                      <small>{{document.created_date | customDate:'mediumDate'}}</small>
+                    <div class="list-group-item bg-light text-dark p-1 border-0 d-flex align-items-center" [ngbTooltip]="dateTooltip">
+                      <i-bs width="09.rem" height="0.9rem" class="me-2 text-muted" name="calendar-event"></i-bs><small>{{document.created_date | customDate:'mediumDate'}}</small>
                     </div>
                     @if (document.owner && document.owner !== settingsService.currentUser.id) {
-                      <div class="list-group-item bg-light text-dark p-1 border-0">
-                        <svg class="metadata-icon me-2 text-muted" fill="currentColor">
-                          <use xlink:href="assets/bootstrap-icons.svg#person-fill-lock"/>
-                        </svg>
-                        <small>{{document.owner | username}}</small>
+                      <div class="list-group-item bg-light text-dark p-1 border-0 d-flex align-items-center">
+                        <i-bs width="09.rem" height="0.9rem" class="me-2 text-muted" name="person-fill-lock"></i-bs><small>{{document.owner | username}}</small>
                       </div>
                     }
                     @if (document.is_shared_by_requester) {
-                      <div class="list-group-item bg-light text-dark p-1 border-0">
-                        <svg class="metadata-icon me-2 text-muted" fill="currentColor">
-                          <use xlink:href="assets/bootstrap-icons.svg#people-fill"/>
-                        </svg>
-                        <small i18n>Shared</small>
+                      <div class="list-group-item bg-light text-dark p-1 border-0 d-flex align-items-center">
+                        <i-bs width="09.rem" height="0.9rem" class="me-2 text-muted" name="people-fill"></i-bs><small i18n>Shared</small>
                       </div>
                     }
                     @if (document.__search_hit__?.score) {
