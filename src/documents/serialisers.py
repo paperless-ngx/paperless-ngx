@@ -670,7 +670,10 @@ class DocumentSerializer(
             for custom_field_instance in instance.custom_fields.filter(
                 field__data_type=CustomField.FieldDataType.DOCUMENTLINK,
             ):
-                if custom_field_instance.field not in incoming_custom_fields:
+                if (
+                    custom_field_instance.field not in incoming_custom_fields
+                    and custom_field_instance.value is not None
+                ):
                     # Doc link field is being removed entirely
                     for doc_id in custom_field_instance.value:
                         CustomFieldInstanceSerializer.remove_doclink(
