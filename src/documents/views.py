@@ -64,14 +64,18 @@ from documents.bulk_download import ArchiveOnlyStrategy
 from documents.bulk_download import OriginalAndArchiveStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
 from documents.caching import CACHE_5_MINUTES
+from documents.caching import CACHE_50_MINUTES
 from documents.caching import DOC_METADATA_BASE
 from documents.caching import DOC_SUGGESTIONS_BASE
 from documents.classifier import load_classifier
 from documents.conditionals import metadata_etag
 from documents.conditionals import metadata_last_modified
 from documents.conditionals import preview_etag
+from documents.conditionals import preview_last_modified
 from documents.conditionals import suggestions_etag
 from documents.conditionals import suggestions_last_modified
+from documents.conditionals import thumbnail_etag
+from documents.conditionals import thumbnail_last_modified
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
@@ -505,7 +509,9 @@ class DocumentViewSet(
 
     @action(methods=["get"], detail=True)
     @method_decorator(cache_control(public=False, max_age=5 * 60))
-    @method_decorator(condition(etag_func=preview_etag))
+    @method_decorator(
+        condition(etag_func=preview_etag, last_modified_func=preview_last_modified),
+    )
     def preview(self, request, pk=None):
         try:
             response = self.file_response(pk, request, "inline")
@@ -514,7 +520,10 @@ class DocumentViewSet(
             raise Http404
 
     @action(methods=["get"], detail=True)
-    @method_decorator(cache_control(public=False, max_age=315360000))
+    @method_decorator(cache_control(public=False, max_age=CACHE_50_MINUTES))
+    @method_decorator(
+        condition(etag_func=thumbnail_etag, last_modified_func=thumbnail_last_modified),
+    )
     def thumb(self, request, pk=None):
         try:
             doc = Document.objects.get(id=pk)
@@ -528,8 +537,6 @@ class DocumentViewSet(
                 handle = GnuPG.decrypted(doc.thumbnail_file)
             else:
                 handle = doc.thumbnail_file
-            # TODO: Send ETag information and use that to send new thumbnails
-            #  if available
 
             return HttpResponse(handle, content_type="image/webp")
         except (FileNotFoundError, Document.DoesNotExist):
