@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-05 21:26-0800\n"
-"PO-Revision-Date: 2024-01-10 12:09\n"
+"PO-Revision-Date: 2024-01-19 00:24\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -913,17 +913,17 @@ msgstr "Anweisungen senden!"
 #: documents/validators.py:17
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr "Kann URL {value} nicht parsen, fehlendes Schema"
+msgstr "Kann URI {value} nicht parsen, fehlendes Schema"
 
 #: documents/validators.py:22
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr "Kann URL {value} nicht parsen, fehlende Netzadresse oder Pfad"
+msgstr "Kann URI {value} nicht parsen, fehlende Netzadresse oder Pfad"
 
 #: documents/validators.py:27
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr "Kann URL {value} nicht parsen"
+msgstr "Kann URI {value} nicht parsen"
 
 #: paperless/apps.py:10
 msgid "Paperless"
