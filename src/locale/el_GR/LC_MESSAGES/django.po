@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-05 21:26-0800\n"
-"PO-Revision-Date: 2024-01-06 05:27\n"
+"PO-Revision-Date: 2024-01-11 12:09\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -589,7 +589,7 @@ msgstr "Νομισματικό"
 
 #: documents/models.py:761
 msgid "Document Link"
-msgstr ""
+msgstr "Σύνδεσμος Εγγράφου"
 
 #: documents/models.py:773
 msgid "data type"

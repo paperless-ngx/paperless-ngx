@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-05 21:26-0800\n"
-"PO-Revision-Date: 2024-01-06 05:27\n"
+"PO-Revision-Date: 2024-01-12 12:09\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -585,7 +585,7 @@ msgstr "浮点数"
 
 #: documents/models.py:760
 msgid "Monetary"
-msgstr ""
+msgstr "货币"
 
 #: documents/models.py:761
 msgid "Document Link"
@@ -613,15 +613,15 @@ msgstr "自定义字段实例"
 
 #: documents/models.py:902
 msgid "Consumption Started"
-msgstr ""
+msgstr "消费已开始"
 
 #: documents/models.py:903
 msgid "Document Added"
-msgstr ""
+msgstr "文档已添加"
 
 #: documents/models.py:904
 msgid "Document Updated"
-msgstr ""
+msgstr "文档已更新"
 
 #: documents/models.py:907
 msgid "Consume Folder"
@@ -637,7 +637,7 @@ msgstr "邮件获取"
 
 #: documents/models.py:912
 msgid "Workflow Trigger Type"
-msgstr ""
+msgstr "工作流触发器类型"
 
 #: documents/models.py:924
 msgid "filter path"
@@ -661,11 +661,11 @@ msgstr "从邮件规则中过滤文档"
 
 #: documents/models.py:968
 msgid "has these tag(s)"
-msgstr ""
+msgstr "含有这些标签"
 
 #: documents/models.py:976
 msgid "has this document type"
-msgstr ""
+msgstr "具有此文档类型"
 
 #: documents/models.py:984
 msgid "has this correspondent"
@@ -673,19 +673,19 @@ msgstr ""
 
 #: documents/models.py:988
 msgid "workflow trigger"
-msgstr ""
+msgstr "工作流触发器"
 
 #: documents/models.py:989
 msgid "workflow triggers"
-msgstr ""
+msgstr "工作流触发器"
 
 #: documents/models.py:997
 msgid "Assignment"
-msgstr ""
+msgstr "分配任务"
 
 #: documents/models.py:1000
 msgid "Workflow Action Type"
-msgstr ""
+msgstr "工作流动作类型"
 
 #: documents/models.py:1006
 msgid "assign title"
@@ -737,11 +737,11 @@ msgstr "分配这些自定义字段"
 
 #: documents/models.py:1091
 msgid "workflow action"
-msgstr ""
+msgstr "工作流动作"
 
 #: documents/models.py:1092
 msgid "workflow actions"
-msgstr ""
+msgstr "工作流动作"
 
 #: documents/models.py:1101 paperless_mail/models.py:95
 msgid "order"
@@ -749,15 +749,15 @@ msgstr "排序"
 
 #: documents/models.py:1107
 msgid "triggers"
-msgstr ""
+msgstr "触发器"
 
 #: documents/models.py:1114
 msgid "actions"
-msgstr ""
+msgstr "动作"
 
 #: documents/models.py:1117
 msgid "enabled"
-msgstr ""
+msgstr "已启用"
 
 #: documents/serialisers.py:111
 #, python-format
@@ -913,17 +913,17 @@ msgstr "向为发送说明"
 #: documents/validators.py:17
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "无法解析 URI {value}，缺少方案(scheme)"
 
 #: documents/validators.py:22
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
+msgstr "无法解析 URI {value}，缺少网络位置或路径"
 
 #: documents/validators.py:27
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "无法解析 URI {value}"
 
 #: paperless/apps.py:10
 msgid "Paperless"
@@ -931,35 +931,35 @@ msgstr "无纸版"
 
 #: paperless/models.py:25
 msgid "pdf"
-msgstr ""
+msgstr "pdf"
 
 #: paperless/models.py:26
 msgid "pdfa"
-msgstr ""
+msgstr "pdfa"
 
 #: paperless/models.py:27
 msgid "pdfa-1"
-msgstr ""
+msgstr "pdfa-1"
 
 #: paperless/models.py:28
 msgid "pdfa-2"
-msgstr ""
+msgstr "pdfa-2"
 
 #: paperless/models.py:29
 msgid "pdfa-3"
-msgstr ""
+msgstr "pdfa-3"
 
 #: paperless/models.py:38
 msgid "skip"
-msgstr ""
+msgstr "跳过"
 
 #: paperless/models.py:39
 msgid "redo"
-msgstr ""
+msgstr "重做"
 
 #: paperless/models.py:40
 msgid "force"
-msgstr ""
+msgstr "强制"
 
 #: paperless/models.py:41
 msgid "skip_noarchive"
@@ -967,7 +967,7 @@ msgstr ""
 
 #: paperless/models.py:49
 msgid "never"
-msgstr ""
+msgstr "从不"
 
 #: paperless/models.py:50
 msgid "with_text"
@@ -975,11 +975,11 @@ msgstr ""
 
 #: paperless/models.py:51
 msgid "always"
-msgstr ""
+msgstr "总是"
 
 #: paperless/models.py:59
 msgid "clean"
-msgstr ""
+msgstr "清理"
 
 #: paperless/models.py:60
 msgid "clean-final"
@@ -987,7 +987,7 @@ msgstr ""
 
 #: paperless/models.py:61
 msgid "none"
-msgstr ""
+msgstr "无"
 
 #: paperless/models.py:69
 msgid "LeaveColorUnchanged"
@@ -995,7 +995,7 @@ msgstr ""
 
 #: paperless/models.py:70
 msgid "RGB"
-msgstr ""
+msgstr "RGB"
 
 #: paperless/models.py:71
 msgid "UseDeviceIndependentColor"
@@ -1003,67 +1003,67 @@ msgstr ""
 
 #: paperless/models.py:72
 msgid "Gray"
-msgstr ""
+msgstr "灰色"
 
 #: paperless/models.py:73
 msgid "CMYK"
-msgstr ""
+msgstr "CMYK"
 
 #: paperless/models.py:82
 msgid "Sets the output PDF type"
-msgstr ""
+msgstr "设置 PDF 输出类型"
 
 #: paperless/models.py:94
 msgid "Do OCR from page 1 to this value"
-msgstr ""
+msgstr "从第1页执行 OCR 直到此值"
 
 #: paperless/models.py:100
 msgid "Do OCR using these languages"
-msgstr ""
+msgstr "使用这些语言执行 OCR"
 
 #: paperless/models.py:107
 msgid "Sets the OCR mode"
-msgstr ""
+msgstr "设置 OCR 模式"
 
 #: paperless/models.py:115
 msgid "Controls the generation of an archive file"
-msgstr ""
+msgstr "控制归档文件的生成"
 
 #: paperless/models.py:123
 msgid "Sets image DPI fallback value"
-msgstr ""
+msgstr "设置图像 DPI 后备值"
 
 #: paperless/models.py:130
 msgid "Controls the unpaper cleaning"
-msgstr ""
+msgstr "控制无纸清理"
 
 #: paperless/models.py:137
 msgid "Enables deskew"
-msgstr ""
+msgstr "启用deskew"
 
 #: paperless/models.py:140
 msgid "Enables page rotation"
-msgstr ""
+msgstr "启用页面旋转"
 
 #: paperless/models.py:145
 msgid "Sets the threshold for rotation of pages"
-msgstr ""
+msgstr "设置页面旋转的阈值"
 
 #: paperless/models.py:151
 msgid "Sets the maximum image size for decompression"
-msgstr ""
+msgstr "设置解压的最大图像大小"
 
 #: paperless/models.py:157
 msgid "Sets the Ghostscript color conversion strategy"
-msgstr ""
+msgstr "设置 Ghostscript 颜色转换策略"
 
 #: paperless/models.py:165
 msgid "Adds additional user arguments for OCRMyPDF"
-msgstr ""
+msgstr "为 OCRMyPDF 添加额外的用户参数"
 
 #: paperless/models.py:170
 msgid "paperless application settings"
-msgstr ""
+msgstr "无纸应用设置"
 
 #: paperless/settings.py:601
 msgid "English (US)"
@@ -1387,11 +1387,11 @@ msgstr "过滤内容"
 
 #: paperless_mail/models.py:143
 msgid "filter attachment filename inclusive"
-msgstr ""
+msgstr "过滤附件文件名，包含"
 
 #: paperless_mail/models.py:155
 msgid "filter attachment filename exclusive"
-msgstr ""
+msgstr "过滤附件文件名，不包含"
 
 #: paperless_mail/models.py:160
 msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
