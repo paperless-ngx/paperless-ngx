@@ -463,7 +463,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="final">Globale Anwendungskonfigurationsoptionen, welche für &lt;strong&gt;jeden&lt;/strong&gt;Benutzer dieser Paperless-ngx-Installation gelten. Optionen können auch mithilfe von Umgebungsvariablen oder der Konfigurationsdatei gesetzt werden, jedoch haben die Werte hier immer Vorrang.</target>
+        <target state="final">Globale Anwendungskonfigurationsoptionen, welche für &lt;strong&gt;jeden&lt;/strong&gt; Benutzer dieser Paperless-ngx-Installation gelten. Optionen können auch mithilfe von Umgebungsvariablen oder der Konfigurationsdatei gesetzt werden, jedoch haben die Werte hier immer Vorrang.</target>
       </trans-unit>
       <trans-unit id="187187500641108332" datatype="html" approved="yes">
         <source>
