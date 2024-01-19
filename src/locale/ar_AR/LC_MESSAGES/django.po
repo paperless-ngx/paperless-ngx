@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-05 21:26-0800\n"
-"PO-Revision-Date: 2024-01-06 05:27\n"
+"PO-Revision-Date: 2024-01-15 12:09\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -425,7 +425,7 @@ msgstr "ليس لديه مالك في"
 
 #: documents/models.py:458
 msgid "has custom field value"
-msgstr ""
+msgstr "له قيمة حقل مخصص"
 
 #: documents/models.py:459
 msgid "is shared by me"
@@ -573,11 +573,11 @@ msgstr "التاريخ"
 
 #: documents/models.py:757
 msgid "Boolean"
-msgstr ""
+msgstr "قيمة منطقية"
 
 #: documents/models.py:758
 msgid "Integer"
-msgstr ""
+msgstr "عدد صحيح"
 
 #: documents/models.py:759
 msgid "Float"
@@ -1083,7 +1083,7 @@ msgstr "البيلاروسية"
 
 #: paperless/settings.py:605
 msgid "Bulgarian"
-msgstr ""
+msgstr "البلغارية"
 
 #: paperless/settings.py:606
 msgid "Catalan"
@@ -1123,7 +1123,7 @@ msgstr "الفرنسية"
 
 #: paperless/settings.py:615
 msgid "Hungarian"
-msgstr ""
+msgstr "المجرية"
 
 #: paperless/settings.py:616
 msgid "Italian"
