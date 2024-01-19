@@ -37,7 +37,8 @@ export class NumberComponent extends AbstractInputComponent<number> {
   }
 
   writeValue(newValue: any): void {
-    if (this.step === 1) newValue = parseInt(newValue, 10)
+    if (this.step === 1 && newValue?.toString().indexOf('e') === -1)
+      newValue = parseInt(newValue, 10)
     if (this.step === 0.01) newValue = parseFloat(newValue).toFixed(2)
     super.writeValue(newValue)
   }
