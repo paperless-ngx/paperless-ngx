@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-05 21:26-0800\n"
-"PO-Revision-Date: 2024-01-07 00:27\n"
+"PO-Revision-Date: 2024-01-17 12:09\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -753,11 +753,11 @@ msgstr ""
 
 #: documents/models.py:1114
 msgid "actions"
-msgstr ""
+msgstr "azioni"
 
 #: documents/models.py:1117
 msgid "enabled"
-msgstr ""
+msgstr "abilitato"
 
 #: documents/serialisers.py:111
 #, python-format
@@ -979,7 +979,7 @@ msgstr "sempre"
 
 #: paperless/models.py:59
 msgid "clean"
-msgstr ""
+msgstr "pulisci"
 
 #: paperless/models.py:60
 msgid "clean-final"

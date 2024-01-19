@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-05 21:26-0800\n"
-"PO-Revision-Date: 2024-01-07 00:27\n"
+"PO-Revision-Date: 2024-01-18 12:09\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -385,51 +385,51 @@ msgstr "opslagpad is"
 
 #: documents/models.py:448
 msgid "has correspondent in"
-msgstr ""
+msgstr "heeft corrrespondent in"
 
 #: documents/models.py:449
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "heeft geen correspondent in"
 
 #: documents/models.py:450
 msgid "has document type in"
-msgstr ""
+msgstr "heeft documenttype in"
 
 #: documents/models.py:451
 msgid "does not have document type in"
-msgstr ""
+msgstr "heeft geen documentttype in"
 
 #: documents/models.py:452
 msgid "has storage path in"
-msgstr ""
+msgstr "heeft opslagpad in"
 
 #: documents/models.py:453
 msgid "does not have storage path in"
-msgstr ""
+msgstr "heeft geen opslagpad in"
 
 #: documents/models.py:454
 msgid "owner is"
-msgstr ""
+msgstr "eigenaar is"
 
 #: documents/models.py:455
 msgid "has owner in"
-msgstr ""
+msgstr "heeft eigenaar in"
 
 #: documents/models.py:456
 msgid "does not have owner"
-msgstr ""
+msgstr "heeft geen eigenaar"
 
 #: documents/models.py:457
 msgid "does not have owner in"
-msgstr ""
+msgstr "heeft geen eigenaar in"
 
 #: documents/models.py:458
 msgid "has custom field value"
-msgstr ""
+msgstr "heeft waarde van aangepast veld"
 
 #: documents/models.py:459
 msgid "is shared by me"
-msgstr ""
+msgstr "is gedeeld door mij"
 
 #: documents/models.py:469
 msgid "rule type"
@@ -521,7 +521,7 @@ msgstr "Gegevens geretourneerd door de taak"
 
 #: documents/models.py:652
 msgid "Note for the document"
-msgstr ""
+msgstr "Notitie bij het document"
 
 #: documents/models.py:676
 msgid "user"
@@ -529,7 +529,7 @@ msgstr "gebruiker"
 
 #: documents/models.py:681
 msgid "note"
-msgstr ""
+msgstr "notitie"
 
 #: documents/models.py:682
 msgid "notes"
@@ -545,43 +545,43 @@ msgstr "Origineel"
 
 #: documents/models.py:702
 msgid "expiration"
-msgstr ""
+msgstr "vervaldatum"
 
 #: documents/models.py:709
 msgid "slug"
-msgstr ""
+msgstr "slug"
 
 #: documents/models.py:741
 msgid "share link"
-msgstr ""
+msgstr "gedeelde link"
 
 #: documents/models.py:742
 msgid "share links"
-msgstr ""
+msgstr "gedeelde links"
 
 #: documents/models.py:754
 msgid "String"
-msgstr ""
+msgstr "Tekenreeks"
 
 #: documents/models.py:755
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: documents/models.py:756
 msgid "Date"
-msgstr ""
+msgstr "Datum"
 
 #: documents/models.py:757
 msgid "Boolean"
-msgstr ""
+msgstr "Boolean"
 
 #: documents/models.py:758
 msgid "Integer"
-msgstr ""
+msgstr "Geheel getal"
 
 #: documents/models.py:759
 msgid "Float"
-msgstr ""
+msgstr "Zwevendekommagetal"
 
 #: documents/models.py:760
 msgid "Monetary"
@@ -589,7 +589,7 @@ msgstr "Monetair"
 
 #: documents/models.py:761
 msgid "Document Link"
-msgstr ""
+msgstr "Documentkoppeling"
 
 #: documents/models.py:773
 msgid "data type"
@@ -605,51 +605,51 @@ msgstr "Aangepaste velden"
 
 #: documents/models.py:844
 msgid "custom field instance"
-msgstr ""
+msgstr "aangepast veld instantie"
 
 #: documents/models.py:845
 msgid "custom field instances"
-msgstr ""
+msgstr "aangepast veld instanties"
 
 #: documents/models.py:902
 msgid "Consumption Started"
-msgstr ""
+msgstr "Verwerking gestart"
 
 #: documents/models.py:903
 msgid "Document Added"
-msgstr ""
+msgstr "Document toegevoegd"
 
 #: documents/models.py:904
 msgid "Document Updated"
-msgstr ""
+msgstr "Document bijgewerkt"
 
 #: documents/models.py:907
 msgid "Consume Folder"
-msgstr ""
+msgstr "Inname locatie"
 
 #: documents/models.py:908
 msgid "Api Upload"
-msgstr ""
+msgstr "API upload"
 
 #: documents/models.py:909
 msgid "Mail Fetch"
-msgstr ""
+msgstr "E-mails ophalen"
 
 #: documents/models.py:912
 msgid "Workflow Trigger Type"
-msgstr ""
+msgstr "Workflow trigger type"
 
 #: documents/models.py:924
 msgid "filter path"
-msgstr ""
+msgstr "filter op opslaglocatie"
 
 #: documents/models.py:929
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr ""
+msgstr "Alleen documenten verwerken die overeenkomen met dit pad. Wildcards met * zijn toegstaan. Niet hoofdlettergevoelig."
 
 #: documents/models.py:936
 msgid "filter filename"
-msgstr ""
+msgstr "filter op bestandsnaam"
 
 #: documents/models.py:941 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
@@ -657,43 +657,43 @@ msgstr "Alleen documenten verwerken die volledig overeenkomen, indien aangegeven
 
 #: documents/models.py:952
 msgid "filter documents from this mail rule"
-msgstr ""
+msgstr "filter op documenten van deze e-mailregel"
 
 #: documents/models.py:968
 msgid "has these tag(s)"
-msgstr ""
+msgstr "heeft deze label(s)"
 
 #: documents/models.py:976
 msgid "has this document type"
-msgstr ""
+msgstr "heeft dit documenttype"
 
 #: documents/models.py:984
 msgid "has this correspondent"
-msgstr ""
+msgstr "heeft deze correspondent"
 
 #: documents/models.py:988
 msgid "workflow trigger"
-msgstr ""
+msgstr "workflow trigger"
 
 #: documents/models.py:989
 msgid "workflow triggers"
-msgstr ""
+msgstr "workflow triggers"
 
 #: documents/models.py:997
 msgid "Assignment"
-msgstr ""
+msgstr "Toewijzing"
 
 #: documents/models.py:1000
 msgid "Workflow Action Type"
-msgstr ""
+msgstr "Actietype workflow"
 
 #: documents/models.py:1006
 msgid "assign title"
-msgstr ""
+msgstr "titel toewijzen"
 
 #: documents/models.py:1011
 msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr ""
+msgstr "Een documenttitel toewijzen, kan gebruik maken van placeholders, zie documentatie."
 
 #: documents/models.py:1019 paperless_mail/models.py:216
 msgid "assign this tag"
@@ -709,39 +709,39 @@ msgstr "wijs deze correspondent toe"
 
 #: documents/models.py:1043
 msgid "assign this storage path"
-msgstr ""
+msgstr "wijs dit opslagpad toe"
 
 #: documents/models.py:1052
 msgid "assign this owner"
-msgstr ""
+msgstr "wijs deze eigenaar toe"
 
 #: documents/models.py:1059
 msgid "grant view permissions to these users"
-msgstr ""
+msgstr "geef deze gebruikers weergaverechten"
 
 #: documents/models.py:1066
 msgid "grant view permissions to these groups"
-msgstr ""
+msgstr "geef deze groepen weergaverechten"
 
 #: documents/models.py:1073
 msgid "grant change permissions to these users"
-msgstr ""
+msgstr "geef deze gebruikers bewerkingsrechten"
 
 #: documents/models.py:1080
 msgid "grant change permissions to these groups"
-msgstr ""
+msgstr "geef deze groepen bewerkingsrechten"
 
 #: documents/models.py:1087
 msgid "assign these custom fields"
-msgstr ""
+msgstr "deze aangepaste velden toewijzen"
 
 #: documents/models.py:1091
 msgid "workflow action"
-msgstr ""
+msgstr "worflow actie"
 
 #: documents/models.py:1092
 msgid "workflow actions"
-msgstr ""
+msgstr "workflow acties"
 
 #: documents/models.py:1101 paperless_mail/models.py:95
 msgid "order"
@@ -749,15 +749,15 @@ msgstr "volgorde"
 
 #: documents/models.py:1107
 msgid "triggers"
-msgstr ""
+msgstr "triggers"
 
 #: documents/models.py:1114
 msgid "actions"
-msgstr ""
+msgstr "acties"
 
 #: documents/models.py:1117
 msgid "enabled"
-msgstr ""
+msgstr "ingeschakeld"
 
 #: documents/serialisers.py:111
 #, python-format
@@ -815,11 +815,11 @@ msgstr "Je gebruikersnaam en wachtwoord komen niet overeen. Probeer opnieuw."
 
 #: documents/templates/registration/login.html:48
 msgid "Share link was not found."
-msgstr ""
+msgstr "Gedeelde link is niet gevonden."
 
 #: documents/templates/registration/login.html:52
 msgid "Share link has expired."
-msgstr ""
+msgstr "Gedeelde link is verlopen."
 
 #: documents/templates/registration/login.html:55
 msgid "Username"
@@ -835,72 +835,72 @@ msgstr "Aanmelden"
 
 #: documents/templates/registration/login.html:70
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Wachtwoord vergeten?"
 
 #: documents/templates/registration/password_reset_complete.html:14
 msgid "Paperless-ngx reset password complete"
-msgstr ""
+msgstr "Paperless-ngx wachtwoord reset voltooid"
 
 #: documents/templates/registration/password_reset_complete.html:40
 msgid "Password reset complete."
-msgstr ""
+msgstr "Wachtwoord opnieuw instellen voltooid."
 
 #: documents/templates/registration/password_reset_complete.html:42
 #, python-format
 msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
-msgstr ""
+msgstr "Je nieuwe wachtwoord is ingesteld. Je kunt nu <a href=\"%(login_url)s\">inloggen</a>"
 
 #: documents/templates/registration/password_reset_confirm.html:14
 msgid "Paperless-ngx reset password confirmation"
-msgstr ""
+msgstr "Paperless-ngx wachtwoordherstel bevestigen"
 
 #: documents/templates/registration/password_reset_confirm.html:42
 msgid "Set a new password."
-msgstr ""
+msgstr "Stel een nieuw wachtwoord in."
 
 #: documents/templates/registration/password_reset_confirm.html:46
 msgid "Passwords did not match or too weak. Try again."
-msgstr ""
+msgstr "Wachtwoorden kwamen niet overeen of waren te zwak. Probeer het opnieuw."
 
 #: documents/templates/registration/password_reset_confirm.html:49
 msgid "New Password"
-msgstr ""
+msgstr "Nieuw wachtwoord"
 
 #: documents/templates/registration/password_reset_confirm.html:50
 msgid "Confirm Password"
-msgstr ""
+msgstr "Bevestig wachtwoord"
 
 #: documents/templates/registration/password_reset_confirm.html:61
 msgid "Change my password"
-msgstr ""
+msgstr "Verander mijn wachtwoord"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
-msgstr ""
+msgstr "wachtwoordherstel aanvragen"
 
 #: documents/templates/registration/password_reset_done.html:14
 msgid "Paperless-ngx reset password sent"
-msgstr ""
+msgstr "Paperless-ngx wachtwoordherstel verzonden"
 
 #: documents/templates/registration/password_reset_done.html:40
 msgid "Check your inbox."
-msgstr ""
+msgstr "Controleer je inbox."
 
 #: documents/templates/registration/password_reset_done.html:41
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
-msgstr ""
+msgstr "We hebben je per e-mail instructies gestuurd voor het instellen van je wachtwoord. Je zult de e-mail binnenkort moeten ontvangen!"
 
 #: documents/templates/registration/password_reset_form.html:14
 msgid "Paperless-ngx reset password request"
-msgstr ""
+msgstr "Paperless-ngx wachtwoord opnieuw instellen"
 
 #: documents/templates/registration/password_reset_form.html:41
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
-msgstr ""
+msgstr "Vul hieronder je e-mailadres in en ontvang instructies om een nieuw wachtwoord in te stellen."
 
 #: documents/templates/registration/password_reset_form.html:44
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "Er is een fout opgetreden. Probeer het opnieuw."
 
 #: documents/templates/registration/password_reset_form.html:47
 msgid "Email"
@@ -908,22 +908,22 @@ msgstr "E-mailadres"
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
-msgstr ""
+msgstr "Stuur e-mail met instructies!"
 
 #: documents/validators.py:17
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "Kan URI {value} niet parseren, schema ontbreekt"
 
 #: documents/validators.py:22
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
+msgstr "Kan URI {value} niet parseren, locatie of pad ontbreekt"
 
 #: documents/validators.py:27
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "Kan URI {value} niet parseren"
 
 #: paperless/apps.py:10
 msgid "Paperless"
@@ -931,139 +931,139 @@ msgstr "Paperless"
 
 #: paperless/models.py:25
 msgid "pdf"
-msgstr ""
+msgstr "pdf"
 
 #: paperless/models.py:26
 msgid "pdfa"
-msgstr ""
+msgstr "pdfa"
 
 #: paperless/models.py:27
 msgid "pdfa-1"
-msgstr ""
+msgstr "pdfa-1"
 
 #: paperless/models.py:28
 msgid "pdfa-2"
-msgstr ""
+msgstr "pdfa-2"
 
 #: paperless/models.py:29
 msgid "pdfa-3"
-msgstr ""
+msgstr "pdfa-3"
 
 #: paperless/models.py:38
 msgid "skip"
-msgstr ""
+msgstr "overslaan"
 
 #: paperless/models.py:39
 msgid "redo"
-msgstr ""
+msgstr "herstellen"
 
 #: paperless/models.py:40
 msgid "force"
-msgstr ""
+msgstr "forceer"
 
 #: paperless/models.py:41
 msgid "skip_noarchive"
-msgstr ""
+msgstr "overslaan_geenarchief"
 
 #: paperless/models.py:49
 msgid "never"
-msgstr ""
+msgstr "nooit"
 
 #: paperless/models.py:50
 msgid "with_text"
-msgstr ""
+msgstr "met_tekst"
 
 #: paperless/models.py:51
 msgid "always"
-msgstr ""
+msgstr "altijd"
 
 #: paperless/models.py:59
 msgid "clean"
-msgstr ""
+msgstr "opschonen"
 
 #: paperless/models.py:60
 msgid "clean-final"
-msgstr ""
+msgstr "eindresultaat-opschonen"
 
 #: paperless/models.py:61
 msgid "none"
-msgstr ""
+msgstr "geen"
 
 #: paperless/models.py:69
 msgid "LeaveColorUnchanged"
-msgstr ""
+msgstr "LaatKleurOngewijzigd"
 
 #: paperless/models.py:70
 msgid "RGB"
-msgstr ""
+msgstr "RGB"
 
 #: paperless/models.py:71
 msgid "UseDeviceIndependentColor"
-msgstr ""
+msgstr "GebruikApparaatonafhankelijkeKleur"
 
 #: paperless/models.py:72
 msgid "Gray"
-msgstr ""
+msgstr "Grijs"
 
 #: paperless/models.py:73
 msgid "CMYK"
-msgstr ""
+msgstr "CMYK"
 
 #: paperless/models.py:82
 msgid "Sets the output PDF type"
-msgstr ""
+msgstr "Stelt het PDF uitvoertype in"
 
 #: paperless/models.py:94
 msgid "Do OCR from page 1 to this value"
-msgstr ""
+msgstr "Voer OCR uit vanaf pagina 1 tot deze waarde"
 
 #: paperless/models.py:100
 msgid "Do OCR using these languages"
-msgstr ""
+msgstr "Voer OCR uit met deze talen"
 
 #: paperless/models.py:107
 msgid "Sets the OCR mode"
-msgstr ""
+msgstr "Stelt de OCR modus in"
 
 #: paperless/models.py:115
 msgid "Controls the generation of an archive file"
-msgstr ""
+msgstr "Bepaalt of een archiefbestand wordt aangemaakt"
 
 #: paperless/models.py:123
 msgid "Sets image DPI fallback value"
-msgstr ""
+msgstr "Stelt de standaardwaarde voor afbeelding DPI in"
 
 #: paperless/models.py:130
 msgid "Controls the unpaper cleaning"
-msgstr ""
+msgstr "Bepaalt de unpaper opschoonmethode"
 
 #: paperless/models.py:137
 msgid "Enables deskew"
-msgstr ""
+msgstr "Schakelt rechtzetten in"
 
 #: paperless/models.py:140
 msgid "Enables page rotation"
-msgstr ""
+msgstr "Schakelt pagina's draaien in"
 
 #: paperless/models.py:145
 msgid "Sets the threshold for rotation of pages"
-msgstr ""
+msgstr "Stelt de drempelwaarde voor pagina's draaien in"
 
 #: paperless/models.py:151
 msgid "Sets the maximum image size for decompression"
-msgstr ""
+msgstr "Stelt de maximale afbeeldingsgrootte voor decomprimeren in"
 
 #: paperless/models.py:157
 msgid "Sets the Ghostscript color conversion strategy"
-msgstr ""
+msgstr "Stelt de methode voor kleuromzetting van Ghostscript in"
 
 #: paperless/models.py:165
 msgid "Adds additional user arguments for OCRMyPDF"
-msgstr ""
+msgstr "Voegt extra gebruikersargumenten toe voor OCRMyPDF"
 
 #: paperless/models.py:170
 msgid "paperless application settings"
-msgstr ""
+msgstr "paperless applicatie instellingen"
 
 #: paperless/settings.py:601
 msgid "English (US)"
@@ -1075,7 +1075,7 @@ msgstr "Arabisch"
 
 #: paperless/settings.py:603
 msgid "Afrikaans"
-msgstr ""
+msgstr "Afrikaans"
 
 #: paperless/settings.py:604
 msgid "Belarusian"
@@ -1083,7 +1083,7 @@ msgstr "Wit-Russisch"
 
 #: paperless/settings.py:605
 msgid "Bulgarian"
-msgstr ""
+msgstr "Bulgaars"
 
 #: paperless/settings.py:606
 msgid "Catalan"
@@ -1103,7 +1103,7 @@ msgstr "Duits"
 
 #: paperless/settings.py:610
 msgid "Greek"
-msgstr ""
+msgstr "Grieks"
 
 #: paperless/settings.py:611
 msgid "English (GB)"
@@ -1123,7 +1123,7 @@ msgstr "Frans"
 
 #: paperless/settings.py:615
 msgid "Hungarian"
-msgstr ""
+msgstr "Hongaars"
 
 #: paperless/settings.py:616
 msgid "Italian"
@@ -1135,7 +1135,7 @@ msgstr "Luxemburgs"
 
 #: paperless/settings.py:618
 msgid "Norwegian"
-msgstr ""
+msgstr "Noors"
 
 #: paperless/settings.py:619
 msgid "Dutch"
@@ -1275,7 +1275,7 @@ msgstr "wachtwoord"
 
 #: paperless_mail/models.py:42
 msgid "Is token authentication"
-msgstr ""
+msgstr "Gebruikt tokenauthenticatie"
 
 #: paperless_mail/models.py:45
 msgid "character set"
@@ -1339,7 +1339,7 @@ msgstr "Gebruik naam van bijlage als titel"
 
 #: paperless_mail/models.py:85
 msgid "Do not assign title from rule"
-msgstr ""
+msgstr "Titel niet toewijzen vanuit regel"
 
 #: paperless_mail/models.py:88
 msgid "Do not assign a correspondent"
@@ -1387,15 +1387,15 @@ msgstr "filter inhoud"
 
 #: paperless_mail/models.py:143
 msgid "filter attachment filename inclusive"
-msgstr ""
+msgstr "filter bijlagenaam bevat"
 
 #: paperless_mail/models.py:155
 msgid "filter attachment filename exclusive"
-msgstr ""
+msgstr "filter bijlagenaam bevat niet"
 
 #: paperless_mail/models.py:160
 msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "Geen documenten verwerken die overeenkomen met deze bestandsnaam indien ingevuld. Je kunt wildcards gebruiken, zoals *.pdf of *factuur*. Dit is niet hoofdlettergevoelig."
 
 #: paperless_mail/models.py:167
 msgid "maximum age"
@@ -1439,7 +1439,7 @@ msgstr "wijs correspondent toe van"
 
 #: paperless_mail/models.py:242
 msgid "Assign the rule owner to documents"
-msgstr ""
+msgstr "Wijs de eigenaar van de regel toe aan documenten"
 
 #: paperless_mail/models.py:268
 msgid "uid"
