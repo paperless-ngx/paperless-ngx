@@ -19,6 +19,7 @@ import { PasswordComponent } from '../input/password/password.component'
 import { of, throwError } from 'rxjs'
 import { ToastService } from 'src/app/services/toast.service'
 import { Clipboard } from '@angular/cdk/clipboard'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const profile = {
   email: 'foo@bar.com',
@@ -49,6 +50,7 @@ describe('ProfileEditDialogComponent', () => {
         FormsModule,
         NgbModalModule,
         NgbAccordionModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     })
     profileService = TestBed.inject(ProfileService)

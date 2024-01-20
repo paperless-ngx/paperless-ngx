@@ -23,6 +23,7 @@ import { TagComponent } from '../../common/tag/tag.component'
 import { Tag } from 'src/app/data/tag'
 import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
 import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.component'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const doc = {
   id: 10,
@@ -74,6 +75,7 @@ describe('DocumentCardSmallComponent', () => {
         NgbPopoverModule,
         NgbTooltipModule,
         NgbProgressbarModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 

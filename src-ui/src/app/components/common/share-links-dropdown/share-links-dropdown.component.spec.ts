@@ -17,6 +17,7 @@ import { environment } from 'src/environments/environment'
 import { ShareLinksDropdownComponent } from './share-links-dropdown.component'
 import { Clipboard } from '@angular/cdk/clipboard'
 import { By } from '@angular/platform-browser'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 describe('ShareLinksDropdownComponent', () => {
   let component: ShareLinksDropdownComponent
@@ -29,7 +30,12 @@ describe('ShareLinksDropdownComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [ShareLinksDropdownComponent],
-      imports: [HttpClientTestingModule, FormsModule, ReactiveFormsModule],
+      imports: [
+        HttpClientTestingModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+      ],
     })
 
     fixture = TestBed.createComponent(ShareLinksDropdownComponent)
