@@ -37,6 +37,7 @@ import { TextComponent } from '../../common/input/text/text.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { SettingsComponent } from './settings.component'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const savedViews = [
   { id: 1, name: 'view1', show_in_sidebar: true, show_on_dashboard: true },
@@ -92,6 +93,7 @@ describe('SettingsComponent', () => {
         ReactiveFormsModule,
         NgbAlertModule,
         NgSelectModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 

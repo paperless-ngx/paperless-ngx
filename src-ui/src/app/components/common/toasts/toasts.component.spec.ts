@@ -12,6 +12,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { of } from 'rxjs'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { Clipboard } from '@angular/cdk/clipboard'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const toasts = [
   {
@@ -45,7 +46,11 @@ describe('ToastsComponent', () => {
   beforeEach(async () => {
     TestBed.configureTestingModule({
       declarations: [ToastsComponent],
-      imports: [HttpClientTestingModule, NgbModule],
+      imports: [
+        HttpClientTestingModule,
+        NgbModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+      ],
       providers: [
         {
           provide: ToastService,

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { MatchingModel } from 'src/app/data/matching-model'
 
 export enum ToggleableItemState {

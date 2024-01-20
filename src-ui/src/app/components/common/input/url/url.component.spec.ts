@@ -5,6 +5,7 @@ import {
   NG_VALUE_ACCESSOR,
 } from '@angular/forms'
 import { UrlComponent } from './url.component'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 describe('TextComponent', () => {
   let component: UrlComponent
@@ -15,7 +16,11 @@ describe('TextComponent', () => {
     TestBed.configureTestingModule({
       declarations: [UrlComponent],
       providers: [],
-      imports: [FormsModule, ReactiveFormsModule],
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+      ],
     }).compileComponents()
 
     fixture = TestBed.createComponent(UrlComponent)

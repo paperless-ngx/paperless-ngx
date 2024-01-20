@@ -30,6 +30,7 @@ import { ColorComponent } from '../color/color.component'
 import { PermissionsFormComponent } from '../permissions/permissions-form/permissions-form.component'
 import { SelectComponent } from '../select/select.component'
 import { SettingsService } from 'src/app/services/settings.service'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const tags: Tag[] = [
   {
@@ -99,6 +100,7 @@ describe('TagsComponent', () => {
         NgbModalModule,
         NgbAccordionModule,
         NgbPopoverModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 

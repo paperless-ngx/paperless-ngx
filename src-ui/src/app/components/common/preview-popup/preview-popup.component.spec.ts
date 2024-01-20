@@ -8,6 +8,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { DocumentService } from 'src/app/services/rest/document.service'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const doc = {
   id: 10,
@@ -25,7 +26,10 @@ describe('PreviewPopupComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [PreviewPopupComponent, PdfViewerComponent, SafeUrlPipe],
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+      ],
     })
     settingsService = TestBed.inject(SettingsService)
     documentService = TestBed.inject(DocumentService)

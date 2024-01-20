@@ -12,6 +12,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { RouterTestingModule } from '@angular/router/testing'
 import { LocalizedDateParserFormatter } from 'src/app/utils/ngb-date-parser-formatter'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 describe('DateComponent', () => {
   let component: DateComponent
@@ -33,6 +34,7 @@ describe('DateComponent', () => {
         HttpClientTestingModule,
         NgbDatepickerModule,
         RouterTestingModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 

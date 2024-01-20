@@ -63,6 +63,7 @@ import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { SettingsService } from 'src/app/services/settings.service'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const docs: Document[] = [
   {
@@ -146,6 +147,7 @@ describe('DocumentListComponent', () => {
         NgbDatepickerModule,
         NgbPopoverModule,
         NgbTooltipModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 

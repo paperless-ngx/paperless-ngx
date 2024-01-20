@@ -14,6 +14,7 @@ import {
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
 import { SettingsService } from 'src/app/services/settings.service'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const currentUserID = 13
 
@@ -69,6 +70,7 @@ describe('PermissionsFilterDropdownComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         NgbModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 

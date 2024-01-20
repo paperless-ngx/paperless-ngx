@@ -21,6 +21,7 @@ import { ToastService } from 'src/app/services/toast.service'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop'
 import { SavedView } from 'src/app/data/saved-view'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const saved_views = [
   {
@@ -107,6 +108,7 @@ describe('DashboardComponent', () => {
         RouterTestingModule,
         TourNgBootstrapModule,
         DragDropModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 

@@ -70,6 +70,7 @@ import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/
 import { CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { PdfViewerComponent } from '../common/pdf-viewer/pdf-viewer.component'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const doc: Document = {
   id: 3,
@@ -250,6 +251,7 @@ describe('DocumentDetailComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         NgbModalModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 

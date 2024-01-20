@@ -40,6 +40,7 @@ import { ToastService } from 'src/app/services/toast.service'
 import { TagsComponent } from '../../common/input/tags/tags.component'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const mailAccounts = [
   { id: 1, name: 'account1' },
@@ -91,6 +92,7 @@ describe('MailComponent', () => {
         ReactiveFormsModule,
         NgbAlertModule,
         NgSelectModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 

@@ -43,6 +43,7 @@ import { SettingsComponent } from '../settings/settings.component'
 import { UsersAndGroupsComponent } from './users-groups.component'
 import { User } from 'src/app/data/user'
 import { Group } from 'src/app/data/group'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const users = [
   { id: 1, username: 'user1', is_superuser: false },
@@ -92,6 +93,7 @@ describe('UsersAndGroupsComponent', () => {
         ReactiveFormsModule,
         NgbAlertModule,
         NgSelectModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
     fixture = TestBed.createComponent(UsersAndGroupsComponent)
