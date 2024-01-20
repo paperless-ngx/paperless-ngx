@@ -40,6 +40,7 @@ import { PermissionsGroupComponent } from '../../common/input/permissions/permis
 import { PermissionsUserComponent } from '../../common/input/permissions/permissions-user/permissions-user.component'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { GroupService } from 'src/app/services/rest/group.service'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const selectionData: SelectionData = {
   selected_tags: [
@@ -153,6 +154,7 @@ describe('BulkEditorComponent', () => {
         NgbModule,
         NgbModalModule,
         NgSelectModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 

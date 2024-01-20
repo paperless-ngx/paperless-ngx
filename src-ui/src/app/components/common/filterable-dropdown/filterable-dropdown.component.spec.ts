@@ -25,6 +25,7 @@ import {
 import { TagComponent } from '../tag/tag.component'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const items: Tag[] = [
   {
@@ -63,7 +64,12 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
         ClearableBadgeComponent,
       ],
       providers: [FilterPipe],
-      imports: [NgbModule, FormsModule, ReactiveFormsModule],
+      imports: [
+        NgbModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+      ],
     }).compileComponents()
 
     fixture = TestBed.createComponent(FilterableDropdownComponent)
@@ -215,6 +221,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   it('should apply changes and close when apply button clicked', () => {
     component.items = items
+    component.icon = 'tag-fill'
     component.editing = true
     component.selectionModel = selectionModel
     fixture.nativeElement
@@ -236,6 +243,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   it('should apply on close if enabled', () => {
     component.items = items
+    component.icon = 'tag-fill'
     component.editing = true
     component.applyOnClose = true
     component.selectionModel = selectionModel
@@ -253,6 +261,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   it('should focus text filter on open, support filtering, clear on close', fakeAsync(() => {
     component.items = items
+    component.icon = 'tag-fill'
     fixture.nativeElement
       .querySelector('button')
       .dispatchEvent(new MouseEvent('click')) // open
@@ -279,6 +288,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   it('should toggle & close on enter inside filter field if 1 item remains', fakeAsync(() => {
     component.items = items
+    component.icon = 'tag-fill'
     expect(component.selectionModel.getSelectedItems()).toEqual([])
     fixture.nativeElement
       .querySelector('button')
@@ -298,6 +308,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   it('should apply & close on enter inside filter field if 1 item remains if editing', fakeAsync(() => {
     component.items = items
+    component.icon = 'tag-fill'
     component.editing = true
     let applyResult: ChangedItems
     component.apply.subscribe((result) => (applyResult = result))
@@ -319,6 +330,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   it('should support arrow keyboard navigation', fakeAsync(() => {
     component.items = items
+    component.icon = 'tag-fill'
     fixture.nativeElement
       .querySelector('button')
       .dispatchEvent(new MouseEvent('click')) // open
@@ -363,6 +375,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   it('should support arrow keyboard navigation after tab keyboard navigation', fakeAsync(() => {
     component.items = items
+    component.icon = 'tag-fill'
     fixture.nativeElement
       .querySelector('button')
       .dispatchEvent(new MouseEvent('click')) // open
@@ -398,6 +411,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   it('should support arrow keyboard navigation after click', fakeAsync(() => {
     component.items = items
+    component.icon = 'tag-fill'
     fixture.nativeElement
       .querySelector('button')
       .dispatchEvent(new MouseEvent('click')) // open
@@ -422,6 +436,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   it('should toggle logical operator', fakeAsync(() => {
     component.items = items
+    component.icon = 'tag-fill'
     component.manyToOne = true
     selectionModel.set(items[0].id, ToggleableItemState.Selected)
     selectionModel.set(items[1].id, ToggleableItemState.Selected)
@@ -450,6 +465,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   it('should toggle intersection include / exclude', fakeAsync(() => {
     component.items = items
+    component.icon = 'tag-fill'
     selectionModel.set(items[0].id, ToggleableItemState.Selected)
     selectionModel.set(items[1].id, ToggleableItemState.Selected)
     component.selectionModel = selectionModel

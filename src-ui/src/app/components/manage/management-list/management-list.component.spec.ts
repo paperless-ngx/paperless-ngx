@@ -36,6 +36,7 @@ import { MATCH_AUTO } from 'src/app/data/matching-model'
 import { MATCH_NONE } from 'src/app/data/matching-model'
 import { MATCH_LITERAL } from 'src/app/data/matching-model'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const tags: Tag[] = [
   {
@@ -94,6 +95,7 @@ describe('ManagementListComponent', () => {
         ReactiveFormsModule,
         NgbModalModule,
         RouterTestingModule.withRoutes(routes),
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 

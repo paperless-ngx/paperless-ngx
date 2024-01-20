@@ -33,6 +33,7 @@ import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop'
 import { SavedView } from 'src/app/data/saved-view'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const saved_views = [
   {
@@ -101,6 +102,7 @@ describe('AppFrameComponent', () => {
         ReactiveFormsModule,
         DragDropModule,
         NgbModalModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
         SettingsService,

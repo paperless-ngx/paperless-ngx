@@ -11,6 +11,7 @@ import {
   PermissionType,
 } from 'src/app/services/permissions.service'
 import { By } from '@angular/platform-browser'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const permissions = [
   'add_document',
@@ -32,7 +33,12 @@ describe('PermissionsSelectComponent', () => {
     TestBed.configureTestingModule({
       declarations: [PermissionsSelectComponent],
       providers: [],
-      imports: [FormsModule, ReactiveFormsModule, NgbModule],
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgbModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+      ],
     }).compileComponents()
 
     fixture = TestBed.createComponent(PermissionsSelectComponent)

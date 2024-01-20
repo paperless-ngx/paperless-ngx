@@ -10,20 +10,17 @@ import {
   DateSelection,
   RelativeDate,
 } from './date-dropdown.component'
-import {
-  HttpClientTestingModule,
-  HttpTestingController,
-} from '@angular/common/http/testing'
+import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DatePipe } from '@angular/common'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 describe('DateDropdownComponent', () => {
   let component: DateDropdownComponent
-  let httpTestingController: HttpTestingController
   let settingsService: SettingsService
   let settingsSpy
 
@@ -40,10 +37,10 @@ describe('DateDropdownComponent', () => {
         NgbModule,
         FormsModule,
         ReactiveFormsModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 
-    httpTestingController = TestBed.inject(HttpTestingController)
     settingsService = TestBed.inject(SettingsService)
     settingsSpy = jest.spyOn(settingsService, 'getLocalizedDateInputFormat')
 

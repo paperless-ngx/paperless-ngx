@@ -77,6 +77,7 @@ import {
   OwnerFilterType,
 } from '../../common/permissions-filter-dropdown/permissions-filter-dropdown.component'
 import { FilterEditorComponent } from './filter-editor.component'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const tags: Tag[] = [
   {
@@ -191,6 +192,7 @@ describe('FilterEditorComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         NgbDatepickerModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 

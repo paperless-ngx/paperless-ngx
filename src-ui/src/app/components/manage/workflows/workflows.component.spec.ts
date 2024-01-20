@@ -24,6 +24,7 @@ import {
   WorkflowTriggerType,
 } from 'src/app/data/workflow-trigger'
 import { WorkflowActionType } from 'src/app/data/workflow-action'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const workflows: Workflow[] = [
   {
@@ -101,6 +102,7 @@ describe('WorkflowsComponent', () => {
         ReactiveFormsModule,
         NgbModalModule,
         NgbPopoverModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     })
 

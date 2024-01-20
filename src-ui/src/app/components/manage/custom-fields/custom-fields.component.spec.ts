@@ -20,6 +20,7 @@ import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const fields: CustomField[] = [
   {
@@ -66,6 +67,7 @@ describe('CustomFieldsComponent', () => {
         ReactiveFormsModule,
         NgbModalModule,
         NgbPopoverModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     })
 

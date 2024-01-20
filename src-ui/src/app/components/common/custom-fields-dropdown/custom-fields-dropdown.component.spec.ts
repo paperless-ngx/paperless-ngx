@@ -20,6 +20,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { By } from '@angular/platform-browser'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const fields: CustomField[] = [
   {
@@ -40,7 +41,6 @@ describe('CustomFieldsDropdownComponent', () => {
   let customFieldService: CustomFieldsService
   let toastService: ToastService
   let modalService: NgbModal
-  let httpController: HttpTestingController
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -52,10 +52,10 @@ describe('CustomFieldsDropdownComponent', () => {
         ReactiveFormsModule,
         NgbModalModule,
         NgbDropdownModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     })
     customFieldService = TestBed.inject(CustomFieldsService)
-    httpController = TestBed.inject(HttpTestingController)
     toastService = TestBed.inject(ToastService)
     modalService = TestBed.inject(NgbModal)
     jest.spyOn(customFieldService, 'listAll').mockReturnValue(
