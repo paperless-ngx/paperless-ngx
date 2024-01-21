@@ -289,7 +289,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
-          <context context-type="linenumber">63</context>
+          <context context-type="linenumber">73</context>
         </context-group>
         <target state="final">פתח מסמך</target>
       </trans-unit>
@@ -507,7 +507,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">323</context>
+          <context context-type="linenumber">315</context>
         </context-group>
         <target state="translated">בטל</target>
       </trans-unit>
@@ -567,7 +567,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">315</context>
+          <context context-type="linenumber">307</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
@@ -703,7 +703,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">332</context>
+          <context context-type="linenumber">324</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -1055,7 +1055,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">281</context>
+          <context context-type="linenumber">283</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -2147,7 +2147,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">719</context>
+          <context context-type="linenumber">733</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -2187,7 +2187,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">721</context>
+          <context context-type="linenumber">735</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -4749,7 +4749,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
-          <context context-type="linenumber">34</context>
+          <context context-type="linenumber">39</context>
         </context-group>
         <target state="translated">הצג הכל</target>
       </trans-unit>
@@ -4929,7 +4929,7 @@
         <source>Dismiss completed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
-          <context context-type="linenumber">16</context>
+          <context context-type="linenumber">20</context>
         </context-group>
         <note priority="1" from="description">This button dismisses all status messages about processed documents on the dashboard (failed and successful)</note>
         <target state="translated">שחרר את המבוצעים</target>
@@ -4938,7 +4938,7 @@
         <source>{VAR_PLURAL, plural, =1 {One more document} other {<x id="INTERPOLATION"/> more documents}}</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">37</context>
         </context-group>
         <note priority="1" from="description">This is shown as a summary line when there are more than 5 document in the processing pipeline.</note>
         <target state="translated">{VAR_PLURAL, plural, =1 {עוד מסמך אחד} other {<x id="INTERPOLATION"/> עוד מסמכים}}</target>
@@ -5312,27 +5312,15 @@
         <source>Notes <x id="START_BLOCK_IF" equiv-text="@if (document?.notes.length) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="ngth}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">270,273</context>
+          <context context-type="linenumber">272,275</context>
         </context-group>
         <target state="needs-translation">Notes <x id="START_BLOCK_IF" equiv-text="@if (document?.notes.length) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="ngth}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></target>
-      </trans-unit>
-      <trans-unit id="8191371354890763172" datatype="html">
-        <source>Enter Password</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">304</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">361</context>
-        </context-group>
-        <target state="translated">הזן סיסמה</target>
       </trans-unit>
       <trans-unit id="5129524307369213584" datatype="html">
         <source>Save &amp; next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">317</context>
+          <context context-type="linenumber">309</context>
         </context-group>
         <target state="translated">שמור &amp; הבא</target>
       </trans-unit>
@@ -5340,15 +5328,23 @@
         <source>Save &amp; close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">320</context>
+          <context context-type="linenumber">312</context>
         </context-group>
         <target state="translated">שמור &amp; סגור</target>
+      </trans-unit>
+      <trans-unit id="8191371354890763172" datatype="html">
+        <source>Enter Password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">363</context>
+        </context-group>
+        <target state="translated">הזן סיסמה</target>
       </trans-unit>
       <trans-unit id="2218903673684131427" datatype="html">
         <source>An error occurred loading content: <x id="PH" equiv-text="err.message ?? err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">284,286</context>
+          <context context-type="linenumber">298,300</context>
         </context-group>
         <target state="translated">ארעה שגיאה בטעינת התוכן: <x id="PH" equiv-text="err.message ?? err.toString()"/></target>
       </trans-unit>
@@ -5356,7 +5352,7 @@
         <source>Document changes detected</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">307</context>
+          <context context-type="linenumber">321</context>
         </context-group>
         <target state="needs-translation">Document changes detected</target>
       </trans-unit>
@@ -5364,7 +5360,7 @@
         <source>The version of this document in your browser session appears older than the existing version.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">308</context>
+          <context context-type="linenumber">322</context>
         </context-group>
         <target state="needs-translation">The version of this document in your browser session appears older than the existing version.</target>
       </trans-unit>
@@ -5372,7 +5368,7 @@
         <source>Saving the document here may overwrite other changes that were made. To restore the existing version, discard your changes or close the document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">309</context>
+          <context context-type="linenumber">323</context>
         </context-group>
         <target state="needs-translation">Saving the document here may overwrite other changes that were made. To restore the existing version, discard your changes or close the document.</target>
       </trans-unit>
@@ -5380,7 +5376,7 @@
         <source>Ok</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">311</context>
+          <context context-type="linenumber">325</context>
         </context-group>
         <target state="needs-translation">Ok</target>
       </trans-unit>
@@ -5388,7 +5384,7 @@
         <source>Error retrieving metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">451</context>
+          <context context-type="linenumber">465</context>
         </context-group>
         <target state="translated">שגיאה באחזור נתונים</target>
       </trans-unit>
@@ -5396,7 +5392,7 @@
         <source>Error retrieving suggestions.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">476</context>
+          <context context-type="linenumber">490</context>
         </context-group>
         <target state="translated">שגיאה באחזור הצעות.</target>
       </trans-unit>
@@ -5404,11 +5400,11 @@
         <source>Document saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">594</context>
+          <context context-type="linenumber">608</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">603</context>
+          <context context-type="linenumber">617</context>
         </context-group>
         <target state="translated">מסמך נשמר בהצלחה.</target>
       </trans-unit>
@@ -5416,11 +5412,11 @@
         <source>Error saving document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">607</context>
+          <context context-type="linenumber">621</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">648</context>
+          <context context-type="linenumber">662</context>
         </context-group>
         <target state="translated">שגיאה בשמירת מסמך</target>
       </trans-unit>
@@ -5428,7 +5424,7 @@
         <source>Confirm delete</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">674</context>
+          <context context-type="linenumber">688</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
@@ -5440,7 +5436,7 @@
         <source>Do you really want to delete document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">675</context>
+          <context context-type="linenumber">689</context>
         </context-group>
         <target state="translated">בטוח שברצנך למחוק את המסמך <x id="PH" equiv-text="this.document.title"/>?</target>
       </trans-unit>
@@ -5448,7 +5444,7 @@
         <source>The files for this document will be deleted permanently. This operation cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">676</context>
+          <context context-type="linenumber">690</context>
         </context-group>
         <target state="translated">הקבצים עבור מסמך זה יימחקו לצמיתות. לא ניתן לבטל פעולה זו.</target>
       </trans-unit>
@@ -5456,7 +5452,7 @@
         <source>Delete document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">678</context>
+          <context context-type="linenumber">692</context>
         </context-group>
         <target state="translated">מחק מסמך</target>
       </trans-unit>
@@ -5464,7 +5460,7 @@
         <source>Error deleting document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">697</context>
+          <context context-type="linenumber">711</context>
         </context-group>
         <target state="translated">שגיאה במחיקת מסמך</target>
       </trans-unit>
@@ -5472,7 +5468,7 @@
         <source>Redo OCR confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">717</context>
+          <context context-type="linenumber">731</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -5484,7 +5480,7 @@
         <source>This operation will permanently redo OCR for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">718</context>
+          <context context-type="linenumber">732</context>
         </context-group>
         <target state="translated">פעולה זו תבצע סריקת OCR מחודשת של המסמך.</target>
       </trans-unit>
@@ -5492,7 +5488,7 @@
         <source>Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">729</context>
+          <context context-type="linenumber">743</context>
         </context-group>
         <target state="translated">ביצוע OCR מחדש תתחיל ברקע. סגור ופתח מחדש או רענן את המסמך לאחר שהפעולה תושלם לצפייה בתוכן החדש.</target>
       </trans-unit>
@@ -5500,7 +5496,7 @@
         <source>Error executing operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">740</context>
+          <context context-type="linenumber">754</context>
         </context-group>
         <target state="translated">שגיאת הרצה</target>
       </trans-unit>
@@ -5508,7 +5504,7 @@
         <source>Page Fit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">809</context>
+          <context context-type="linenumber">823</context>
         </context-group>
         <target state="translated">התאם תצוגה לרוחב הדף</target>
       </trans-unit>
