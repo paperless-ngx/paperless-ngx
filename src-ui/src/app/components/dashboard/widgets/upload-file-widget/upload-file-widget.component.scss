@@ -35,3 +35,7 @@ form {
 ::ng-deep .ngx-file-drop__drop-zone--over {
   background-color: var(--pngx-primary-faded) !important;
 }
+
+.consumer-status-card {
+  background-color: rgba(var(--bs-body-bg-rgb), .95) !important;
+}
