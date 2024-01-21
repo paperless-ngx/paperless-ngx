@@ -437,6 +437,7 @@ with Prometheus, as it exports metrics. For details on its capabilities,
 refer to the [Flower](https://flower.readthedocs.io/en/latest/index.html)
 documentation.
 
+Flower can be enabled with the setting [PAPERLESS_ENABLE_FLOWER](configuration/#PAPERLESS_ENABLE_FLOWER).
 To configure Flower further, create a `flowerconfig.py` and
 place it into the `src/paperless` directory. For a Docker
 installation, you can use volumes to accomplish this:
@@ -446,7 +447,7 @@ services:
   # ...
   webserver:
     environment:
-      - PAPERLESS_ENABLE_FLOWER # (3)!
+      - PAPERLESS_ENABLE_FLOWER
     ports:
       - 5555:5555 # (2)!
     # ...
@@ -455,8 +456,7 @@ services:
 ```
 
 1. Note the `:ro` tag means the file will be mounted as read only.
-2. Flower runs by default on port 5555, but this can be configured.
-3. Start Flower by the container.
+2. By default, Flower runs on port 5555, but this can be configured.
 
 ## Custom Container Initialization
 
