@@ -434,7 +434,8 @@ to view more detailed information about the health of the celery workers
 used for asynchronous tasks. This includes details on currently running,
 queued and completed tasks, timing and more. Flower can also be used
 with Prometheus, as it exports metrics. For details on its capabilities,
-refer to the Flower documentation.
+refer to the [Flower](https://flower.readthedocs.io/en/latest/index.html)
+documentation.
 
 To configure Flower further, create a `flowerconfig.py` and
 place it into the `src/paperless` directory. For a Docker
@@ -444,6 +445,8 @@ installation, you can use volumes to accomplish this:
 services:
   # ...
   webserver:
+    environment:
+      - PAPERLESS_ENABLE_FLOWER # (3)!
     ports:
       - 5555:5555 # (2)!
     # ...
@@ -452,7 +455,8 @@ services:
 ```
 
 1. Note the `:ro` tag means the file will be mounted as read only.
-2. `flower` runs by default on port 5555, but this can be configured
+2. Flower runs by default on port 5555, but this can be configured.
+3. Start Flower by the container.
 
 ## Custom Container Initialization
 
