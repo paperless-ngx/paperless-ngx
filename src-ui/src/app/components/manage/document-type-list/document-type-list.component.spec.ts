@@ -9,6 +9,7 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { of } from 'rxjs'
 import { DocumentTypeListComponent } from './document-type-list.component'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 describe('DocumentTypeListComponent', () => {
   let component: DocumentTypeListComponent
@@ -29,6 +30,7 @@ describe('DocumentTypeListComponent', () => {
         NgbPaginationModule,
         FormsModule,
         ReactiveFormsModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 

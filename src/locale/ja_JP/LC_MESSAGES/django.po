@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-05 21:26-0800\n"
-"PO-Revision-Date: 2024-01-19 00:24\n"
+"PO-Revision-Date: 2024-01-21 00:26\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -136,7 +136,7 @@ msgstr "コンテンツ"
 
 #: documents/models.py:174
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr ""
+msgstr "ドキュメントの生のテキストのみのデータ。この項目は主に検索に使用されます。"
 
 #: documents/models.py:179
 msgid "mime type"
@@ -205,7 +205,7 @@ msgstr "アーカイブ番号"
 
 #: documents/models.py:273
 msgid "The position of this document in your physical document archive."
-msgstr ""
+msgstr "物理的なドキュメントアーカイブ内での、このドキュメントの位置"
 
 #: documents/models.py:279 documents/models.py:667 documents/models.py:721
 msgid "document"
@@ -217,11 +217,11 @@ msgstr "ドキュメント"
 
 #: documents/models.py:368
 msgid "debug"
-msgstr ""
+msgstr "デバッグ"
 
 #: documents/models.py:369
 msgid "information"
-msgstr ""
+msgstr "情報"
 
 #: documents/models.py:370
 msgid "warning"
@@ -233,7 +233,7 @@ msgstr "エラー"
 
 #: documents/models.py:372
 msgid "critical"
-msgstr ""
+msgstr "深刻"
 
 #: documents/models.py:375
 msgid "group"
@@ -273,99 +273,99 @@ msgstr "サイドバーに表示"
 
 #: documents/models.py:412
 msgid "sort field"
-msgstr ""
+msgstr "項目を並べ替え"
 
 #: documents/models.py:417
 msgid "sort reverse"
-msgstr ""
+msgstr "項目を逆順で並べ替え"
 
 #: documents/models.py:422
 msgid "title contains"
-msgstr ""
+msgstr "タイトルが次のものを含む"
 
 #: documents/models.py:423
 msgid "content contains"
-msgstr ""
+msgstr "コンテンツが次のものを含む"
 
 #: documents/models.py:424
 msgid "ASN is"
-msgstr ""
+msgstr "ASN が"
 
 #: documents/models.py:425
 msgid "correspondent is"
-msgstr ""
+msgstr "担当が"
 
 #: documents/models.py:426
 msgid "document type is"
-msgstr ""
+msgstr "ドキュメントタイプが"
 
 #: documents/models.py:427
 msgid "is in inbox"
-msgstr ""
+msgstr "次のものが受信トレイにある"
 
 #: documents/models.py:428
 msgid "has tag"
-msgstr ""
+msgstr "次のタグがある"
 
 #: documents/models.py:429
 msgid "has any tag"
-msgstr ""
+msgstr "次のいずれかのタグがある"
 
 #: documents/models.py:430
 msgid "created before"
-msgstr ""
+msgstr "次の日付以前に作成"
 
 #: documents/models.py:431
 msgid "created after"
-msgstr ""
+msgstr "次の日付以降に作成"
 
 #: documents/models.py:432
 msgid "created year is"
-msgstr ""
+msgstr "作成年が"
 
 #: documents/models.py:433
 msgid "created month is"
-msgstr ""
+msgstr "作成月が"
 
 #: documents/models.py:434
 msgid "created day is"
-msgstr ""
+msgstr "作成日が"
 
 #: documents/models.py:435
 msgid "added before"
-msgstr ""
+msgstr "次の日付以前に追加"
 
 #: documents/models.py:436
 msgid "added after"
-msgstr ""
+msgstr "次の日付以降に追加"
 
 #: documents/models.py:437
 msgid "modified before"
-msgstr ""
+msgstr "次の日付以前に変更"
 
 #: documents/models.py:438
 msgid "modified after"
-msgstr ""
+msgstr "次の日付以降に変更"
 
 #: documents/models.py:439
 msgid "does not have tag"
-msgstr ""
+msgstr "次のタグがない"
 
 #: documents/models.py:440
 msgid "does not have ASN"
-msgstr ""
+msgstr "次の ASN でない"
 
 #: documents/models.py:441
 msgid "title or content contains"
-msgstr ""
+msgstr "タイトルまたはコンテンツに次のものを含む"
 
 #: documents/models.py:442
 msgid "fulltext query"
-msgstr ""
+msgstr "全文検索"
 
 #: documents/models.py:443
 msgid "more like this"
-msgstr ""
+msgstr "これと類似のもの"
 
 #: documents/models.py:444
 msgid "has tags in"
@@ -441,11 +441,11 @@ msgstr ""
 
 #: documents/models.py:474
 msgid "filter rule"
-msgstr ""
+msgstr "フィルタルール"
 
 #: documents/models.py:475
 msgid "filter rules"
-msgstr ""
+msgstr "フィルタールール"
 
 #: documents/models.py:586
 msgid "Task ID"
@@ -839,20 +839,20 @@ msgstr "パスワードをお忘れですか？"
 
 #: documents/templates/registration/password_reset_complete.html:14
 msgid "Paperless-ngx reset password complete"
-msgstr ""
+msgstr "Paperless-ngx パスワードリセットの完了"
 
 #: documents/templates/registration/password_reset_complete.html:40
 msgid "Password reset complete."
-msgstr ""
+msgstr "パスワードリセットが完了しました"
 
 #: documents/templates/registration/password_reset_complete.html:42
 #, python-format
 msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
-msgstr ""
+msgstr "新しいパスワードがセットされました。<a href=\"%(login_url)s\"> ログイン </a> できます。"
 
 #: documents/templates/registration/password_reset_confirm.html:14
 msgid "Paperless-ngx reset password confirmation"
-msgstr ""
+msgstr "Paperless-ngx パスワードリセットの確認"
 
 #: documents/templates/registration/password_reset_confirm.html:42
 msgid "Set a new password."
@@ -860,19 +860,19 @@ msgstr "新しいパスワードを設定"
 
 #: documents/templates/registration/password_reset_confirm.html:46
 msgid "Passwords did not match or too weak. Try again."
-msgstr ""
+msgstr "パスワードが一致しないか、パスワードが弱すぎます。もう一度お試しください。"
 
 #: documents/templates/registration/password_reset_confirm.html:49
 msgid "New Password"
-msgstr ""
+msgstr "新しいパスワード"
 
 #: documents/templates/registration/password_reset_confirm.html:50
 msgid "Confirm Password"
-msgstr ""
+msgstr "パスワードの確認"
 
 #: documents/templates/registration/password_reset_confirm.html:61
 msgid "Change my password"
-msgstr ""
+msgstr "パスワードの変更"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
@@ -880,7 +880,7 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_done.html:14
 msgid "Paperless-ngx reset password sent"
-msgstr ""
+msgstr "Paperless-ngx パスワードリセットの送信"
 
 #: documents/templates/registration/password_reset_done.html:40
 msgid "Check your inbox."
@@ -892,7 +892,7 @@ msgstr "パスワードの設定手順をメールで送信しました。まも
 
 #: documents/templates/registration/password_reset_form.html:14
 msgid "Paperless-ngx reset password request"
-msgstr ""
+msgstr "Paperless-ngx パスワードリセットの要求"
 
 #: documents/templates/registration/password_reset_form.html:41
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
@@ -1231,15 +1231,15 @@ msgstr ""
 
 #: paperless_mail/models.py:10
 msgid "mail account"
-msgstr ""
+msgstr "メールアカウント"
 
 #: paperless_mail/models.py:11
 msgid "mail accounts"
-msgstr ""
+msgstr "メールアカウント"
 
 #: paperless_mail/models.py:14
 msgid "No encryption"
-msgstr ""
+msgstr "暗号化なし"
 
 #: paperless_mail/models.py:15
 msgid "Use SSL"
@@ -1251,11 +1251,11 @@ msgstr ""
 
 #: paperless_mail/models.py:20
 msgid "IMAP server"
-msgstr ""
+msgstr "IMAP サーバー"
 
 #: paperless_mail/models.py:23
 msgid "IMAP port"
-msgstr ""
+msgstr "IMAP ポート番号"
 
 #: paperless_mail/models.py:27
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
@@ -1263,7 +1263,7 @@ msgstr ""
 
 #: paperless_mail/models.py:33
 msgid "IMAP security"
-msgstr ""
+msgstr "IMAP セキュリティ"
 
 #: paperless_mail/models.py:38
 msgid "username"
@@ -1279,7 +1279,7 @@ msgstr ""
 
 #: paperless_mail/models.py:45
 msgid "character set"
-msgstr ""
+msgstr "文字セット"
 
 #: paperless_mail/models.py:49
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
@@ -1287,11 +1287,11 @@ msgstr ""
 
 #: paperless_mail/models.py:60
 msgid "mail rule"
-msgstr ""
+msgstr "メールルール"
 
 #: paperless_mail/models.py:61
 msgid "mail rules"
-msgstr ""
+msgstr "メールルール"
 
 #: paperless_mail/models.py:64 paperless_mail/models.py:72
 msgid "Only process attachments."
@@ -1359,11 +1359,11 @@ msgstr ""
 
 #: paperless_mail/models.py:101
 msgid "account"
-msgstr ""
+msgstr "アカウント"
 
 #: paperless_mail/models.py:105 paperless_mail/models.py:260
 msgid "folder"
-msgstr ""
+msgstr "フォルダー"
 
 #: paperless_mail/models.py:109
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."

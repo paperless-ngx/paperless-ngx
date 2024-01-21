@@ -17,6 +17,7 @@ import { PageHeaderComponent } from '../../common/page-header/page-header.compon
 import { SelectComponent } from '../../common/input/select/select.component'
 import { FileComponent } from '../../common/input/file/file.component'
 import { SettingsService } from 'src/app/services/settings.service'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 describe('ConfigComponent', () => {
   let component: ConfigComponent
@@ -43,6 +44,7 @@ describe('ConfigComponent', () => {
         NgSelectModule,
         FormsModule,
         ReactiveFormsModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 

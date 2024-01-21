@@ -10,6 +10,7 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { TagListComponent } from './tag-list.component'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 describe('TagListComponent', () => {
   let component: TagListComponent
@@ -31,6 +32,7 @@ describe('TagListComponent', () => {
         NgbPaginationModule,
         FormsModule,
         ReactiveFormsModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 

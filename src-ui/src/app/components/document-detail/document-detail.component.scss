@@ -58,3 +58,9 @@ textarea.rtl {
   border-top-right-radius: var(--bs-border-radius-sm);
   border-bottom-right-radius: var(--bs-border-radius-sm);
 }
+
+.preview-sticky img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}

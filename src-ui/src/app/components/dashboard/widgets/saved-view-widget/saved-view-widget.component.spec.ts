@@ -30,6 +30,7 @@ import { By } from '@angular/platform-browser'
 import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { PreviewPopupComponent } from 'src/app/components/common/preview-popup/preview-popup.component'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const savedView: SavedView = {
   id: 1,
@@ -94,6 +95,7 @@ describe('SavedViewWidgetComponent', () => {
         NgbModule,
         RouterTestingModule.withRoutes(routes),
         DragDropModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 

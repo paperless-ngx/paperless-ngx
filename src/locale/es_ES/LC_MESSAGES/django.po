@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-05 21:26-0800\n"
-"PO-Revision-Date: 2024-01-06 05:27\n"
+"PO-Revision-Date: 2024-01-20 00:23\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -605,11 +605,11 @@ msgstr "campos personalizados"
 
 #: documents/models.py:844
 msgid "custom field instance"
-msgstr ""
+msgstr "instancia de campo personalizado"
 
 #: documents/models.py:845
 msgid "custom field instances"
-msgstr ""
+msgstr "instancias de campos personalizados"
 
 #: documents/models.py:902
 msgid "Consumption Started"
@@ -637,7 +637,7 @@ msgstr "Buscar correo"
 
 #: documents/models.py:912
 msgid "Workflow Trigger Type"
-msgstr ""
+msgstr "Tipo de disparador de flujo de trabajo"
 
 #: documents/models.py:924
 msgid "filter path"
@@ -681,7 +681,7 @@ msgstr ""
 
 #: documents/models.py:997
 msgid "Assignment"
-msgstr ""
+msgstr "Tarea"
 
 #: documents/models.py:1000
 msgid "Workflow Action Type"
@@ -749,15 +749,15 @@ msgstr "orden"
 
 #: documents/models.py:1107
 msgid "triggers"
-msgstr ""
+msgstr "disparador"
 
 #: documents/models.py:1114
 msgid "actions"
-msgstr ""
+msgstr "acciones"
 
 #: documents/models.py:1117
 msgid "enabled"
-msgstr ""
+msgstr "habilitado"
 
 #: documents/serialisers.py:111
 #, python-format
@@ -852,7 +852,7 @@ msgstr "Se ha establecido tu nueva contraseña. Ahora puedes <a href=\"%(login_u
 
 #: documents/templates/registration/password_reset_confirm.html:14
 msgid "Paperless-ngx reset password confirmation"
-msgstr ""
+msgstr "Confirmación de contraseña de restablecimiento de Paperless-ngx"
 
 #: documents/templates/registration/password_reset_confirm.html:42
 msgid "Set a new password."
@@ -931,15 +931,15 @@ msgstr "Paperless"
 
 #: paperless/models.py:25
 msgid "pdf"
-msgstr ""
+msgstr "pdf"
 
 #: paperless/models.py:26
 msgid "pdfa"
-msgstr ""
+msgstr "pdfa"
 
 #: paperless/models.py:27
 msgid "pdfa-1"
-msgstr ""
+msgstr "pdfa-1"
 
 #: paperless/models.py:28
 msgid "pdfa-2"
@@ -971,15 +971,15 @@ msgstr ""
 
 #: paperless/models.py:50
 msgid "with_text"
-msgstr ""
+msgstr "con_texto"
 
 #: paperless/models.py:51
 msgid "always"
-msgstr ""
+msgstr "siempre"
 
 #: paperless/models.py:59
 msgid "clean"
-msgstr ""
+msgstr "borrar"
 
 #: paperless/models.py:60
 msgid "clean-final"
@@ -987,7 +987,7 @@ msgstr ""
 
 #: paperless/models.py:61
 msgid "none"
-msgstr ""
+msgstr "ninguno"
 
 #: paperless/models.py:69
 msgid "LeaveColorUnchanged"
@@ -995,7 +995,7 @@ msgstr ""
 
 #: paperless/models.py:70
 msgid "RGB"
-msgstr ""
+msgstr "RGB"
 
 #: paperless/models.py:71
 msgid "UseDeviceIndependentColor"
@@ -1003,31 +1003,31 @@ msgstr ""
 
 #: paperless/models.py:72
 msgid "Gray"
-msgstr ""
+msgstr "Gris"
 
 #: paperless/models.py:73
 msgid "CMYK"
-msgstr ""
+msgstr "CMYK"
 
 #: paperless/models.py:82
 msgid "Sets the output PDF type"
-msgstr ""
+msgstr "Establece el tipo de salida PDF"
 
 #: paperless/models.py:94
 msgid "Do OCR from page 1 to this value"
-msgstr ""
+msgstr "Hacer OCR de la página 1 a este valor"
 
 #: paperless/models.py:100
 msgid "Do OCR using these languages"
-msgstr ""
+msgstr "Realizar OCR usando estos idiomas"
 
 #: paperless/models.py:107
 msgid "Sets the OCR mode"
-msgstr ""
+msgstr "Establece el modo OCR"
 
 #: paperless/models.py:115
 msgid "Controls the generation of an archive file"
-msgstr ""
+msgstr "Controla la generación de un archivo"
 
 #: paperless/models.py:123
 msgid "Sets image DPI fallback value"

@@ -60,4 +60,9 @@ describe('NumberComponent', () => {
     component.writeValue(11.1)
     expect(component.value).toEqual(11.1)
   })
+
+  it('should support scientific notation', () => {
+    component.writeValue(1.23456789e8)
+    expect(component.value).toEqual(123456789)
+  })
 })

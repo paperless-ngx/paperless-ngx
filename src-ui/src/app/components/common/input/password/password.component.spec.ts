@@ -6,6 +6,7 @@ import {
 } from '@angular/forms'
 import { PasswordComponent } from './password.component'
 import { By } from '@angular/platform-browser'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 describe('PasswordComponent', () => {
   let component: PasswordComponent
@@ -16,7 +17,11 @@ describe('PasswordComponent', () => {
     TestBed.configureTestingModule({
       declarations: [PasswordComponent],
       providers: [],
-      imports: [FormsModule, ReactiveFormsModule],
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+      ],
     }).compileComponents()
 
     fixture = TestBed.createComponent(PasswordComponent)

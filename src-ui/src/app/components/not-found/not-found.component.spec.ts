@@ -3,6 +3,7 @@ import { NotFoundComponent } from './not-found.component'
 import { By } from '@angular/platform-browser'
 import { LogoComponent } from '../common/logo/logo.component'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 describe('NotFoundComponent', () => {
   let component: NotFoundComponent
@@ -11,7 +12,10 @@ describe('NotFoundComponent', () => {
   beforeEach(async () => {
     TestBed.configureTestingModule({
       declarations: [NotFoundComponent, LogoComponent],
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+      ],
     }).compileComponents()
 
     fixture = TestBed.createComponent(NotFoundComponent)

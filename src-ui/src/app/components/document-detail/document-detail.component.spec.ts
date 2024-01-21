@@ -70,6 +70,7 @@ import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/
 import { CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { PdfViewerComponent } from '../common/pdf-viewer/pdf-viewer.component'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const doc: Document = {
   id: 3,
@@ -250,6 +251,7 @@ describe('DocumentDetailComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         NgbModalModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 
@@ -992,6 +994,53 @@ describe('DocumentDetailComponent', () => {
     const confirmDialog = openModal.componentInstance as ConfirmDialogComponent
     confirmDialog.confirmClicked.next(confirmDialog)
     expect(closeSpy).toHaveBeenCalled()
+  })
+
+  it('should change preview element by render type', () => {
+    component.metadata = { has_archive_version: true }
+    initNormally()
+    fixture.detectChanges()
+    expect(component.contentRenderType).toEqual(component.ContentRenderType.PDF)
+    expect(
+      fixture.debugElement.query(By.css('pdf-viewer-container'))
+    ).not.toBeUndefined()
+
+    component.metadata = {
+      has_archive_version: false,
+      original_mime_type: 'text/plain',
+    }
+    fixture.detectChanges()
+    expect(component.contentRenderType).toEqual(
+      component.ContentRenderType.Text
+    )
+    expect(
+      fixture.debugElement.query(By.css('div.preview-sticky'))
+    ).not.toBeUndefined()
+
+    component.metadata = {
+      has_archive_version: false,
+      original_mime_type: 'image/jpg',
+    }
+    fixture.detectChanges()
+    expect(component.contentRenderType).toEqual(
+      component.ContentRenderType.Image
+    )
+    expect(
+      fixture.debugElement.query(By.css('.preview-sticky img'))
+    ).not.toBeUndefined()
+
+    component.metadata = {
+      has_archive_version: false,
+      original_mime_type:
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    }
+    fixture.detectChanges()
+    expect(component.contentRenderType).toEqual(
+      component.ContentRenderType.Other
+    )
+    expect(
+      fixture.debugElement.query(By.css('object.preview-sticky'))
+    ).not.toBeUndefined()
   })
 
   function initNormally() {

@@ -13,6 +13,7 @@ import { DatePipe } from '@angular/common'
 import { By } from '@angular/platform-browser'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const notes: DocumentNote[] = [
   {
@@ -84,7 +85,12 @@ describe('DocumentNotesComponent', () => {
         CustomDatePipe,
         DatePipe,
       ],
-      imports: [HttpClientTestingModule, FormsModule, ReactiveFormsModule],
+      imports: [
+        HttpClientTestingModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+      ],
     }).compileComponents()
 
     notesService = TestBed.inject(DocumentNotesService)

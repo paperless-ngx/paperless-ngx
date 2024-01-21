@@ -77,6 +77,13 @@ enum DocumentDetailNavIDs {
   Permissions = 6,
 }
 
+enum ContentRenderType {
+  PDF = 'pdf',
+  Image = 'image',
+  Text = 'text',
+  Other = 'other',
+}
+
 enum ZoomSetting {
   PageFit = 'page-fit',
   PageWidth = 'page-width',
@@ -154,7 +161,9 @@ export class DocumentDetailComponent
   ogDate: Date
 
   customFields: CustomField[]
-  public readonly PaperlessCustomFieldDataType = CustomFieldDataType
+  public readonly CustomFieldDataType = CustomFieldDataType
+
+  public readonly ContentRenderType = ContentRenderType
 
   @ViewChild('nav') nav: NgbNav
   @ViewChild('pdfPreview') set pdfPreview(element) {
@@ -201,16 +210,21 @@ export class DocumentDetailComponent
     return this.settings.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
   }
 
-  getContentType() {
-    return this.metadata?.has_archive_version
+  get contentRenderType(): ContentRenderType {
+    const contentType = this.metadata?.has_archive_version
       ? 'application/pdf'
       : this.metadata?.original_mime_type
-  }
 
-  get renderAsPlainText(): boolean {
-    return ['text/plain', 'application/csv', 'text/csv'].includes(
-      this.getContentType()
-    )
+    if (contentType === 'application/pdf') {
+      return ContentRenderType.PDF
+    } else if (
+      ['text/plain', 'application/csv', 'text/csv'].includes(contentType)
+    ) {
+      return ContentRenderType.Text
+    } else if (contentType?.indexOf('image/') === 0) {
+      return ContentRenderType.Image
+    }
+    return ContentRenderType.Other
   }
 
   get isRTL() {
