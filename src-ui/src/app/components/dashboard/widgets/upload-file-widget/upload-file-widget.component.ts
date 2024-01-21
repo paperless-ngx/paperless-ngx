@@ -116,6 +116,11 @@ export class UploadFileWidgetComponent extends ComponentWithPermissions {
 
   dismissCompleted() {
     this.alerts.forEach((a) => a.close())
+    if (this.alertsExpanded) {
+      this.getStatusCompleted().forEach((status) =>
+        this.consumerStatusService.dismiss(status)
+      )
+    }
   }
 
   public onFileSelected(event: Event) {
