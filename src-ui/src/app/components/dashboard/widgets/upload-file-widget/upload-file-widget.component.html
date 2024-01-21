@@ -5,69 +5,77 @@
       <button class="btn btn-sm btn-outline-primary mt-3" (click)="fileUpload.click()" i18n>Browse files</button>
       <input type="file" class="visually-hidden" (change)="onFileSelected($event)" multiple #fileUpload>
     </form>
-    <div class="fixed-bottom p-2 p-md-4" [ngClass]="slimSidebarEnabled ? 'col-slim' : 'offset-md-3 offset-lg-2'">
-      <div class="row d-flex justify-content-end">
-        <div class="col col-lg-4 col-xl-3 d-flex px-4 justify-content-between align-items-center">
-          @if (getStatus().length > 0) {
-            <p class="m-0 small text-muted">{{getStatusSummary()}}</p>
-          }
-          @if (getStatusCompleted().length > 0) {
-            <a class="btn-link" (click)="dismissCompleted()" [routerLink]="[]" >
-              <span class="me-1" i18n="This button dismisses all status messages about processed documents on the dashboard (failed and successful)">Dismiss completed</span>
-              <i-bs name="check2-all"></i-bs>
-            </a>
-          }
-        </div>
-      </div>
-      @for (status of getStatus(); track status) {
-        <div>
-          <ng-container [ngTemplateOutlet]="consumerAlert" [ngTemplateOutletContext]="{ $implicit: status }"></ng-container>
-        </div>
-      }
-    </div>
-    @if (getStatusHidden().length) {
-      <div class="alerts-hidden">
-        @if (!alertsExpanded) {
-          <p class="mt-3 mb-0 text-center">
-            <span i18n="This is shown as a summary line when there are more than 5 document in the processing pipeline.">{getStatusHidden().length, plural, =1 {One more document} other {{{getStatusHidden().length}} more documents}}</span>
-            &nbsp;&bull;&nbsp;
-            <a [routerLink]="[]" (click)="alertsExpanded = !alertsExpanded" aria-controls="hiddenAlerts" [attr.aria-expanded]="alertsExpanded" i18n>Show all</a>
-          </p>
-        }
-        <div #hiddenAlerts="ngbCollapse" [(ngbCollapse)]="!alertsExpanded">
-          @for (status of getStatusHidden(); track status) {
-            <div>
-              <ng-container [ngTemplateOutlet]="consumerAlert" [ngTemplateOutletContext]="{ $implicit: status }"></ng-container>
+    @if (getStatus().length > 0) {
+    <div class="fixed-bottom p-2 p-md-4 d-flex justify-content-end" [ngClass]="slimSidebarEnabled ? 'col-slim' : 'offset-md-3 offset-lg-2'">
+      <div class="col col-lg-4 col-xl-3 ps-0 pe-0 ps-lg-3 pe-lg-0">
+        <div class="card shadow-sm consumer-status-card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col d-flex justify-content-between align-items-center">
+                @if (getStatus().length > 0) {
+                  <p class="m-0 small text-muted">{{getStatusSummary()}}</p>
+                }
+                @if (getStatusCompleted().length > 0) {
+                  <a class="btn-link" (click)="dismissCompleted()" [routerLink]="[]" >
+                    <span class="me-1" i18n="This button dismisses all status messages about processed documents on the dashboard (failed and successful)">Dismiss completed</span>
+                    <i-bs name="check2-all"></i-bs>
+                  </a>
+                }
+              </div>
             </div>
-          }
+            <div class="row">
+              <div class="col">
+                @for (status of getStatus(); track status) {
+                  <div>
+                    <ng-container [ngTemplateOutlet]="consumerAlert" [ngTemplateOutletContext]="{ $implicit: status }"></ng-container>
+                  </div>
+                }
+                @if (getStatusHidden().length) {
+                  <div class="alerts-hidden">
+                    @if (!alertsExpanded) {
+                      <p class="mt-3 mb-0 text-center">
+                        <span i18n="This is shown as a summary line when there are more than 5 document in the processing pipeline.">{getStatusHidden().length, plural, =1 {One more document} other {{{getStatusHidden().length}} more documents}}</span>
+                        &nbsp;&bull;&nbsp;
+                        <a [routerLink]="[]" (click)="alertsExpanded = !alertsExpanded" aria-controls="hiddenAlerts" [attr.aria-expanded]="alertsExpanded" i18n>Show all</a>
+                      </p>
+                    }
+                    <div #hiddenAlerts="ngbCollapse" [(ngbCollapse)]="!alertsExpanded">
+                      @for (status of getStatusHidden(); track status) {
+                        <div>
+                          <ng-container [ngTemplateOutlet]="consumerAlert" [ngTemplateOutletContext]="{ $implicit: status }"></ng-container>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    }
+    </div>
+  }
   </div>
 </pngx-widget-frame>
 
 <ng-template #consumerAlert let-status>
-  <div class="row d-flex justify-content-end">
-    <div class="col col-lg-4 col-xl-3">
-      <ngb-alert type="secondary" class="mt-2 mb-0" [dismissible]="isFinished(status)" (closed)="dismiss(status)">
-        <h6 class="alert-heading">{{status.filename}}</h6>
-        @if (!isFinished(status) || (isFinished(status) && !status.documentId)) {
-          <p class="mb-0 pb-1">{{status.message}}</p>
-        }
-        <ngb-progressbar [value]="status.getProgress()" [max]="1" [type]="getStatusColor(status)"></ngb-progressbar>
-        <div *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
-          @if (isFinished(status)) {
-            <div>
-              @if (status.documentId) {
-                <button class="btn btn-sm btn-outline-primary btn-open" routerLink="/documents/{{status.documentId}}" (click)="dismiss(status)">
-                  <small i18n>Open document</small>
-                  <i-bs name="arrow-right-short"></i-bs>
-                </button>
-              }
-            </div>
+  <ngb-alert type="secondary" class="mt-2 mb-0" [dismissible]="isFinished(status)" (closed)="dismiss(status)">
+    <h6 class="alert-heading">{{status.filename}}</h6>
+    @if (!isFinished(status) || (isFinished(status) && !status.documentId)) {
+      <p class="mb-0 pb-1">{{status.message}}</p>
+    }
+    <ngb-progressbar [value]="status.getProgress()" [max]="1" [type]="getStatusColor(status)"></ngb-progressbar>
+    <div *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+      @if (isFinished(status)) {
+        <div>
+          @if (status.documentId) {
+            <button class="btn btn-sm btn-outline-primary btn-open" routerLink="/documents/{{status.documentId}}" (click)="dismiss(status)">
+              <small i18n>Open document</small>
+              <i-bs name="arrow-right-short"></i-bs>
+            </button>
           }
         </div>
-      </ngb-alert>
+      }
     </div>
-  </div>
+  </ngb-alert>
 </ng-template>
