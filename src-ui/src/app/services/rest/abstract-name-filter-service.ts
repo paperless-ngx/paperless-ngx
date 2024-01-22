@@ -26,13 +26,15 @@ export abstract class AbstractNameFilterService<
 
   bulk_update_permissions(
     objects: Array<number>,
-    permissions: { owner: number; set_permissions: PermissionsObject }
+    permissions: { owner: number; set_permissions: PermissionsObject },
+    merge: boolean
   ): Observable<string> {
     return this.http.post<string>(`${this.baseUrl}bulk_edit_object_perms/`, {
       objects,
       object_type: this.resourceName,
       owner: permissions.owner,
       permissions: permissions.set_permissions,
+      merge,
     })
   }
 }

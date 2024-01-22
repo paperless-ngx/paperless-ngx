@@ -279,12 +279,13 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
       backdrop: 'static',
     })
     modal.componentInstance.confirmClicked.subscribe(
-      (permissions: { owner: number; set_permissions: PermissionsObject }) => {
+      ({ permissions, merge }) => {
         modal.componentInstance.buttonsEnabled = false
         this.service
           .bulk_update_permissions(
             Array.from(this.selectedObjects),
-            permissions
+            permissions,
+            merge
           )
           .subscribe({
             next: () => {

@@ -540,9 +540,14 @@ export class BulkEditorComponent
     let modal = this.modalService.open(PermissionsDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.confirmClicked.subscribe((permissions) => {
-      modal.componentInstance.buttonsEnabled = false
-      this.executeBulkOperation(modal, 'set_permissions', permissions)
-    })
+    modal.componentInstance.confirmClicked.subscribe(
+      ({ permissions, merge }) => {
+        modal.componentInstance.buttonsEnabled = false
+        this.executeBulkOperation(modal, 'set_permissions', {
+          ...permissions,
+          merge,
+        })
+      }
+    )
   }
 }

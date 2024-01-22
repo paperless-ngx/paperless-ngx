@@ -264,13 +264,19 @@ describe('ManagementListComponent', () => {
       throwError(() => new Error('error setting permissions'))
     )
     const errorToastSpy = jest.spyOn(toastService, 'showError')
-    modal.componentInstance.confirmClicked.emit()
+    modal.componentInstance.confirmClicked.emit({
+      permissions: {},
+      merge: true,
+    })
     expect(bulkEditPermsSpy).toHaveBeenCalled()
     expect(errorToastSpy).toHaveBeenCalled()
 
     const successToastSpy = jest.spyOn(toastService, 'showInfo')
     bulkEditPermsSpy.mockReturnValueOnce(of('OK'))
-    modal.componentInstance.confirmClicked.emit()
+    modal.componentInstance.confirmClicked.emit({
+      permissions: {},
+      merge: true,
+    })
     expect(bulkEditPermsSpy).toHaveBeenCalled()
     expect(successToastSpy).toHaveBeenCalled()
   })
