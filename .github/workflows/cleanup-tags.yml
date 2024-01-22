@@ -41,7 +41,7 @@ jobs:
           package_name: "${{ matrix.primary-name }}"
           scheme: "branch"
           repo_name: "paperless-ngx"
-          match_regex: "feature-"
+          match_regex: "(feature|fix)"
           do_delete: "true"
 
   cleanup-untagged-images:
