@@ -1385,6 +1385,7 @@ class BulkEditObjectPermissionsView(GenericAPIView, PassUserMixin):
         object_class = serializer.get_object_class(object_type)
         permissions = serializer.validated_data.get("permissions")
         owner = serializer.validated_data.get("owner")
+        merge = serializer.validated_data.get("merge")
 
         if not user.is_superuser:
             objs = object_class.objects.filter(pk__in=object_ids)
@@ -1396,12 +1397,21 @@ class BulkEditObjectPermissionsView(GenericAPIView, PassUserMixin):
         try:
             qs = object_class.objects.filter(id__in=object_ids)
 
-            if "owner" in serializer.validated_data:
-                qs.update(owner=owner)
+            # if merge is true, we dont want to remove the owner
+            if "owner" in serializer.validated_data and (
+                not merge or (merge and owner is not None)
+            ):
+                # if merge is true, we dont want to overwrite the owner
+                qs_owner_update = qs.filter(owner__isnull=True) if merge else qs
+                qs_owner_update.update(owner=owner)
 
             if "permissions" in serializer.validated_data:
                 for obj in qs:
-                    set_permissions_for_object(permissions, obj)
+                    set_permissions_for_object(
+                        permissions=permissions,
+                        object=obj,
+                        merge=merge,
+                    )
 
             return Response({"result": "OK"})
         except Exception as e:
