@@ -27,8 +27,6 @@ export enum PermissionType {
   ShareLink = '%s_sharelink',
   CustomField = '%s_customfield',
   Workflow = '%s_workflow',
-  WorkflowTrigger = '%s_workflowtrigger',
-  WorkflowAction = '%s_workflowaction',
 }
 
 @Injectable({
