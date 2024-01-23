@@ -593,10 +593,22 @@ def run_workflow(
                         )
 
                 if (
-                    action.assign_view_users is not None
-                    or action.assign_view_groups is not None
-                    or action.assign_change_users is not None
-                    or action.assign_change_groups is not None
+                    (
+                        action.assign_view_users is not None
+                        and action.assign_view_users.count() > 0
+                    )
+                    or (
+                        action.assign_view_groups is not None
+                        and action.assign_view_groups.count() > 0
+                    )
+                    or (
+                        action.assign_change_users is not None
+                        and action.assign_change_users.count() > 0
+                    )
+                    or (
+                        action.assign_change_groups is not None
+                        and action.assign_change_groups.count() > 0
+                    )
                 ):
                     permissions = {
                         "view": {
@@ -614,7 +626,11 @@ def run_workflow(
                             or [],
                         },
                     }
-                    set_permissions_for_object(permissions=permissions, object=document)
+                    set_permissions_for_object(
+                        permissions=permissions,
+                        object=document,
+                        merge=True,
+                    )
 
                 if action.assign_custom_fields is not None:
                     for field in action.assign_custom_fields.all():

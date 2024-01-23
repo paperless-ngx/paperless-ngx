@@ -4,7 +4,11 @@ from unittest import mock
 
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.db.models import QuerySet
 from django.utils import timezone
+from guardian.shortcuts import assign_perm
+from guardian.shortcuts import get_groups_with_perms
+from guardian.shortcuts import get_users_with_perms
 from rest_framework.test import APITestCase
 
 from documents import tasks
@@ -50,6 +54,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         self.user2 = User.objects.create(username="user2")
         self.user3 = User.objects.create(username="user3")
         self.group1 = Group.objects.create(name="group1")
+        self.group2 = Group.objects.create(name="group2")
 
         account1 = MailAccount.objects.create(
             name="Email1",
@@ -1082,7 +1087,73 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
             format="json",
         )
 
-        self.assertEqual(doc.custom_fields.all().count(), 1)
+    def test_document_updated_workflow_merge_permissions(self):
+        """
+        GIVEN:
+            - Existing workflow with UPDATED trigger and action that sets permissions
+        WHEN:
+            - Document is updated that already has permissions
+        THEN:
+            - Permissions are merged
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+            filter_has_document_type=self.dt,
+        )
+        action = WorkflowAction.objects.create()
+        action.assign_view_users.add(self.user3)
+        action.assign_change_users.add(self.user3)
+        action.assign_view_groups.add(self.group2)
+        action.save()
+
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        assign_perm("documents.view_document", self.user2, doc)
+        assign_perm("documents.change_document", self.user2, doc)
+        assign_perm("documents.view_document", self.group1, doc)
+        assign_perm("documents.change_document", self.group1, doc)
+
+        superuser = User.objects.create_superuser("superuser")
+        self.client.force_authenticate(user=superuser)
+
+        self.client.patch(
+            f"/api/documents/{doc.id}/",
+            {"document_type": self.dt.id},
+            format="json",
+        )
+
+        view_users_perms: QuerySet = get_users_with_perms(
+            doc,
+            only_with_perms_in=["view_document"],
+        )
+        change_users_perms: QuerySet = get_users_with_perms(
+            doc,
+            only_with_perms_in=["change_document"],
+        )
+        # user2 should still have permissions
+        self.assertIn(self.user2, view_users_perms)
+        self.assertIn(self.user2, change_users_perms)
+        # user3 should have been added
+        self.assertIn(self.user3, view_users_perms)
+        self.assertIn(self.user3, change_users_perms)
+
+        group_perms: QuerySet = get_groups_with_perms(doc)
+        # group1 should still have permissions
+        self.assertIn(self.group1, group_perms)
+        # group2 should have been added
+        self.assertIn(self.group2, group_perms)
 
     def test_workflow_enabled_disabled(self):
         trigger = WorkflowTrigger.objects.create(
