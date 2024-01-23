@@ -310,7 +310,7 @@ jobs:
   build-docker-image:
     name: Build Docker image for ${{ github.ref_name }}
     runs-on: ubuntu-22.04
-    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || contains(github.ref, 'beta.rc') || startsWith(github.ref, 'refs/tags/v'))
+    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || startsWith(github.ref, 'refs/heads/fix-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || contains(github.ref, 'beta.rc') || startsWith(github.ref, 'refs/tags/v'))
     concurrency:
       group: ${{ github.workflow }}-build-docker-image-${{ github.ref_name }}
       cancel-in-progress: true
