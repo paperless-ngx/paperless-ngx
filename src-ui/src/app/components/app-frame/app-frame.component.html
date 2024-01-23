@@ -235,7 +235,7 @@
               <i-bs class="me-1" name="gear"></i-bs><span>&nbsp;<ng-container i18n>Settings</ng-container></span>
             </a>
           </li>
-          <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Admin }">
+          <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.AppConfig }">
             <a class="nav-link" routerLink="config" routerLinkActive="active" (click)="closeMenu()"
               ngbPopover="Configuration" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
               container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
