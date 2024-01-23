@@ -186,8 +186,8 @@ export const routes: Routes = [
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
-            action: PermissionAction.View,
-            type: PermissionType.Admin,
+            action: PermissionAction.Change,
+            type: PermissionType.AppConfig,
           },
         },
       },

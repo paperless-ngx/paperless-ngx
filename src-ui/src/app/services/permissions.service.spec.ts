@@ -268,6 +268,10 @@ describe('PermissionsService', () => {
         'view_customfield',
         'change_customfield',
         'delete_customfield',
+        'add_applicationconfiguration',
+        'change_applicationconfiguration',
+        'delete_applicationconfiguration',
+        'view_applicationconfiguration',
       ],
       {
         username: 'testuser',
