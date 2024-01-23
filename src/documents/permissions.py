@@ -57,15 +57,28 @@ def get_groups_with_only_permission(obj, codename):
     return Group.objects.filter(id__in=group_object_perm_group_ids).distinct()
 
 
-def set_permissions_for_object(permissions, object):
+def set_permissions_for_object(permissions: list[str], object, merge: bool = False):
+    """
+    Set permissions for an object. The permissions are given as a list of strings
+    in the format "action_modelname", e.g. "view_document".
+
+    If merge is True, the permissions are merged with the existing permissions and
+    no users or groups are removed. If False, the permissions are set to exactly
+    the given list of users and groups.
+    """
+
     for action in permissions:
         permission = f"{action}_{object.__class__.__name__.lower()}"
         # users
         users_to_add = User.objects.filter(id__in=permissions[action]["users"])
-        users_to_remove = get_users_with_perms(
-            object,
-            only_with_perms_in=[permission],
-            with_group_users=False,
+        users_to_remove = (
+            get_users_with_perms(
+                object,
+                only_with_perms_in=[permission],
+                with_group_users=False,
+            )
+            if not merge
+            else User.objects.none()
         )
         if len(users_to_add) > 0 and len(users_to_remove) > 0:
             users_to_remove = users_to_remove.exclude(id__in=users_to_add)
@@ -84,9 +97,13 @@ def set_permissions_for_object(permissions, object):
                     )
         # groups
         groups_to_add = Group.objects.filter(id__in=permissions[action]["groups"])
-        groups_to_remove = get_groups_with_only_permission(
-            object,
-            permission,
+        groups_to_remove = (
+            get_groups_with_only_permission(
+                object,
+                permission,
+            )
+            if not merge
+            else Group.objects.none()
         )
         if len(groups_to_add) > 0 and len(groups_to_remove) > 0:
             groups_to_remove = groups_to_remove.exclude(id__in=groups_to_add)
