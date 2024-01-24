@@ -602,7 +602,7 @@ class TestMail(
                 "PDF Files without f1 and f2 and f3",
                 include_pattern="*.pdf",
                 exclude_pattern="f1*,f2*,f3*",
-                expected_matches=[list"file.PDf"],
+                expected_matches=["file.PDf"],
             ),
             FilterTestCase(
                 "All Files, no PNG",
