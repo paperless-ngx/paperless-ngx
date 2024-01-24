@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-05 21:26-0800\n"
-"PO-Revision-Date: 2024-01-19 00:24\n"
+"PO-Revision-Date: 2024-01-22 12:09\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -429,7 +429,7 @@ msgstr "має значення спеціального поля"
 
 #: documents/models.py:459
 msgid "is shared by me"
-msgstr ""
+msgstr "поділився я"
 
 #: documents/models.py:469
 msgid "rule type"
@@ -545,11 +545,11 @@ msgstr "Оригінал"
 
 #: documents/models.py:702
 msgid "expiration"
-msgstr ""
+msgstr "закінчується"
 
 #: documents/models.py:709
 msgid "slug"
-msgstr ""
+msgstr "слаг"
 
 #: documents/models.py:741
 msgid "share link"
@@ -585,7 +585,7 @@ msgstr "З рухомою комою"
 
 #: documents/models.py:760
 msgid "Monetary"
-msgstr ""
+msgstr "Монетарний"
 
 #: documents/models.py:761
 msgid "Document Link"
@@ -605,15 +605,15 @@ msgstr "користувацькі поля"
 
 #: documents/models.py:844
 msgid "custom field instance"
-msgstr ""
+msgstr "спеціальний екземпляр поля"
 
 #: documents/models.py:845
 msgid "custom field instances"
-msgstr ""
+msgstr "спеціальні екземпляри поля"
 
 #: documents/models.py:902
 msgid "Consumption Started"
-msgstr ""
+msgstr "Використання розпочато"
 
 #: documents/models.py:903
 msgid "Document Added"
@@ -625,7 +625,7 @@ msgstr "Документ оновлено"
 
 #: documents/models.py:907
 msgid "Consume Folder"
-msgstr ""
+msgstr "Використати теку"
 
 #: documents/models.py:908
 msgid "Api Upload"
@@ -637,7 +637,7 @@ msgstr "Завантаження пошти"
 
 #: documents/models.py:912
 msgid "Workflow Trigger Type"
-msgstr ""
+msgstr "Тип тригера робочого процесу"
 
 #: documents/models.py:924
 msgid "filter path"
@@ -645,11 +645,11 @@ msgstr "шлях фільтра"
 
 #: documents/models.py:929
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr ""
+msgstr "Використовувати лише документи зі шляхом, який відповідає цьому, якщо вказано. Допускаються символи підставлення, позначені як *. Регістр не враховується."
 
 #: documents/models.py:936
 msgid "filter filename"
-msgstr ""
+msgstr "фільтрувати за назвою файлу"
 
 #: documents/models.py:941 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
@@ -657,35 +657,35 @@ msgstr "Обробляти лише ті документи, які повніс
 
 #: documents/models.py:952
 msgid "filter documents from this mail rule"
-msgstr ""
+msgstr "фільтрувати документи з цього правила пошти"
 
 #: documents/models.py:968
 msgid "has these tag(s)"
-msgstr ""
+msgstr "має цей тег(и)"
 
 #: documents/models.py:976
 msgid "has this document type"
-msgstr ""
+msgstr "має тип документа"
 
 #: documents/models.py:984
 msgid "has this correspondent"
-msgstr ""
+msgstr "має кореспондента"
 
 #: documents/models.py:988
 msgid "workflow trigger"
-msgstr ""
+msgstr "тригер робочого процесу"
 
 #: documents/models.py:989
 msgid "workflow triggers"
-msgstr ""
+msgstr "тригери робочого процесу"
 
 #: documents/models.py:997
 msgid "Assignment"
-msgstr ""
+msgstr "Призначення"
 
 #: documents/models.py:1000
 msgid "Workflow Action Type"
-msgstr ""
+msgstr "Тип дії робочого процесу"
 
 #: documents/models.py:1006
 msgid "assign title"
@@ -693,7 +693,7 @@ msgstr "призначити назву"
 
 #: documents/models.py:1011
 msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr ""
+msgstr "Призначити заголовок документу, може включати деякі місця заповнювачів, див. документацію."
 
 #: documents/models.py:1019 paperless_mail/models.py:216
 msgid "assign this tag"
@@ -709,31 +709,31 @@ msgstr "призначити цього кореспондента"
 
 #: documents/models.py:1043
 msgid "assign this storage path"
-msgstr ""
+msgstr "призначити шлях до сховища"
 
 #: documents/models.py:1052
 msgid "assign this owner"
-msgstr ""
+msgstr "призначити власника"
 
 #: documents/models.py:1059
 msgid "grant view permissions to these users"
-msgstr ""
+msgstr "надати дозволи на перегляд цим користувачам"
 
 #: documents/models.py:1066
 msgid "grant view permissions to these groups"
-msgstr ""
+msgstr "надати дозволи на перегляд цим групам"
 
 #: documents/models.py:1073
 msgid "grant change permissions to these users"
-msgstr ""
+msgstr "надати дозволи на зміну цим користувачам"
 
 #: documents/models.py:1080
 msgid "grant change permissions to these groups"
-msgstr ""
+msgstr "надати дозволи на зміну цим групам"
 
 #: documents/models.py:1087
 msgid "assign these custom fields"
-msgstr ""
+msgstr "призначити користувацькі поля"
 
 #: documents/models.py:1091
 msgid "workflow action"
@@ -749,7 +749,7 @@ msgstr "порядок"
 
 #: documents/models.py:1107
 msgid "triggers"
-msgstr ""
+msgstr "тригери"
 
 #: documents/models.py:1114
 msgid "actions"
@@ -815,7 +815,7 @@ msgstr "Ім'я користувача та пароль не збігаютьс
 
 #: documents/templates/registration/login.html:48
 msgid "Share link was not found."
-msgstr ""
+msgstr "Посилання для спільного доступу не знайдено."
 
 #: documents/templates/registration/login.html:52
 msgid "Share link has expired."
@@ -876,11 +876,11 @@ msgstr "Змінити мій пароль"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
-msgstr ""
+msgstr "запит для створення нового паролю"
 
 #: documents/templates/registration/password_reset_done.html:14
 msgid "Paperless-ngx reset password sent"
-msgstr ""
+msgstr "Запит на скидання пароля Paperless-ngx надіслано"
 
 #: documents/templates/registration/password_reset_done.html:40
 msgid "Check your inbox."
@@ -892,15 +892,15 @@ msgstr "Ми надіслали вам на електронну пошту ін
 
 #: documents/templates/registration/password_reset_form.html:14
 msgid "Paperless-ngx reset password request"
-msgstr ""
+msgstr "Запит на скидання пароля Paperless-ngx"
 
 #: documents/templates/registration/password_reset_form.html:41
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
-msgstr ""
+msgstr "Введіть свою електронну адресу нижче, і ми надішлемо електронною поштою інструкції щодо відновлення."
 
 #: documents/templates/registration/password_reset_form.html:44
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "Сталась помилка. Спробуйте ще раз."
 
 #: documents/templates/registration/password_reset_form.html:47
 msgid "Email"
@@ -908,22 +908,22 @@ msgstr "Ел. пошта"
 
 #: documents/templates/registration/password_reset_form.html:54
 msgid "Send me instructions!"
-msgstr ""
+msgstr "Надіслати мені інструкції!"
 
 #: documents/validators.py:17
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "Не вдалося проаналізувати URI {value}, пропущено схему"
 
 #: documents/validators.py:22
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
+msgstr "Не вдалося проаналізувати URI {value}, відсутнє місце розташування або шлях"
 
 #: documents/validators.py:27
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "Не вдалося проаналізувати URI {value}"
 
 #: paperless/apps.py:10
 msgid "Paperless"
@@ -931,67 +931,67 @@ msgstr "Paperless"
 
 #: paperless/models.py:25
 msgid "pdf"
-msgstr ""
+msgstr "pdf"
 
 #: paperless/models.py:26
 msgid "pdfa"
-msgstr ""
+msgstr "pdfa"
 
 #: paperless/models.py:27
 msgid "pdfa-1"
-msgstr ""
+msgstr "pdfa-1"
 
 #: paperless/models.py:28
 msgid "pdfa-2"
-msgstr ""
+msgstr "pdfa-2"
 
 #: paperless/models.py:29
 msgid "pdfa-3"
-msgstr ""
+msgstr "pdfa-3"
 
 #: paperless/models.py:38
 msgid "skip"
-msgstr ""
+msgstr "пропустити"
 
 #: paperless/models.py:39
 msgid "redo"
-msgstr ""
+msgstr "повторити"
 
 #: paperless/models.py:40
 msgid "force"
-msgstr ""
+msgstr "примусово"
 
 #: paperless/models.py:41
 msgid "skip_noarchive"
-msgstr ""
+msgstr "skip_noarchive"
 
 #: paperless/models.py:49
 msgid "never"
-msgstr ""
+msgstr "ніколи"
 
 #: paperless/models.py:50
 msgid "with_text"
-msgstr ""
+msgstr "за _текстом"
 
 #: paperless/models.py:51
 msgid "always"
-msgstr ""
+msgstr "завжди"
 
 #: paperless/models.py:59
 msgid "clean"
-msgstr ""
+msgstr "очистити"
 
 #: paperless/models.py:60
 msgid "clean-final"
-msgstr ""
+msgstr "фінальне очищення"
 
 #: paperless/models.py:61
 msgid "none"
-msgstr ""
+msgstr "нічого"
 
 #: paperless/models.py:69
 msgid "LeaveColorUnchanged"
-msgstr ""
+msgstr "Не змінювати колір"
 
 #: paperless/models.py:70
 msgid "RGB"
@@ -999,7 +999,7 @@ msgstr "RGB"
 
 #: paperless/models.py:71
 msgid "UseDeviceIndependentColor"
-msgstr ""
+msgstr "Використовувати колір в залежності від пристрою"
 
 #: paperless/models.py:72
 msgid "Gray"
@@ -1011,59 +1011,59 @@ msgstr "CMYK"
 
 #: paperless/models.py:82
 msgid "Sets the output PDF type"
-msgstr ""
+msgstr "Встановити тип виводу PDF"
 
 #: paperless/models.py:94
 msgid "Do OCR from page 1 to this value"
-msgstr ""
+msgstr "Зробити OCR з сторінки 1 до цього значення"
 
 #: paperless/models.py:100
 msgid "Do OCR using these languages"
-msgstr ""
+msgstr "Розпізнавання використовуючи ці мови"
 
 #: paperless/models.py:107
 msgid "Sets the OCR mode"
-msgstr ""
+msgstr "Встановлення режиму OCR"
 
 #: paperless/models.py:115
 msgid "Controls the generation of an archive file"
-msgstr ""
+msgstr "Керування створенням архівного файлу"
 
 #: paperless/models.py:123
 msgid "Sets image DPI fallback value"
-msgstr ""
+msgstr "Встановлення резервного значення роздільної здатності"
 
 #: paperless/models.py:130
 msgid "Controls the unpaper cleaning"
-msgstr ""
+msgstr "Керування очищенням від паперу"
 
 #: paperless/models.py:137
 msgid "Enables deskew"
-msgstr ""
+msgstr "Увімкнути вирівнювання"
 
 #: paperless/models.py:140
 msgid "Enables page rotation"
-msgstr ""
+msgstr "Увімкнути обертання сторінки"
 
 #: paperless/models.py:145
 msgid "Sets the threshold for rotation of pages"
-msgstr ""
+msgstr "Встановити граничне значення обертання сторінок"
 
 #: paperless/models.py:151
 msgid "Sets the maximum image size for decompression"
-msgstr ""
+msgstr "Встановити максимальний розмір зображення для декомпресії"
 
 #: paperless/models.py:157
 msgid "Sets the Ghostscript color conversion strategy"
-msgstr ""
+msgstr "Встановити правила перетворення кольорів Ghostscript"
 
 #: paperless/models.py:165
 msgid "Adds additional user arguments for OCRMyPDF"
-msgstr ""
+msgstr "Додає додаткові аргументи користувачів для OCRMyPDF"
 
 #: paperless/models.py:170
 msgid "paperless application settings"
-msgstr ""
+msgstr "налаштування програми документообігу"
 
 #: paperless/settings.py:601
 msgid "English (US)"
@@ -1275,7 +1275,7 @@ msgstr "пароль"
 
 #: paperless_mail/models.py:42
 msgid "Is token authentication"
-msgstr ""
+msgstr "Токен автентифікації"
 
 #: paperless_mail/models.py:45
 msgid "character set"
@@ -1339,7 +1339,7 @@ msgstr "Використовувати назву файлу як заголов
 
 #: paperless_mail/models.py:85
 msgid "Do not assign title from rule"
-msgstr ""
+msgstr "Не призначати заголовок від цього правила"
 
 #: paperless_mail/models.py:88
 msgid "Do not assign a correspondent"
@@ -1387,15 +1387,15 @@ msgstr "фільтрувати по тексту повідомлення"
 
 #: paperless_mail/models.py:143
 msgid "filter attachment filename inclusive"
-msgstr ""
+msgstr "фільтр враховує вкладену назву файлу"
 
 #: paperless_mail/models.py:155
 msgid "filter attachment filename exclusive"
-msgstr ""
+msgstr "фільтр не враховує вкладену назву файлу"
 
 #: paperless_mail/models.py:160
 msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "Не використовуйте документи, які повністю відповідають цій назві файлу, якщо вона вказана. Допускаються символи підстановки, наприклад *.pdf або *рахунок-фактура*. Регістр не враховується."
 
 #: paperless_mail/models.py:167
 msgid "maximum age"
@@ -1439,7 +1439,7 @@ msgstr "призначити кореспондента з"
 
 #: paperless_mail/models.py:242
 msgid "Assign the rule owner to documents"
-msgstr ""
+msgstr "Призначити власника правила документів"
 
 #: paperless_mail/models.py:268
 msgid "uid"

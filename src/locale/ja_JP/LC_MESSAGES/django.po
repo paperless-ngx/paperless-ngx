@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-05 21:26-0800\n"
-"PO-Revision-Date: 2024-01-21 00:26\n"
+"PO-Revision-Date: 2024-01-21 12:08\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -369,75 +369,75 @@ msgstr "これと類似のもの"
 
 #: documents/models.py:444
 msgid "has tags in"
-msgstr ""
+msgstr "次のタグがある"
 
 #: documents/models.py:445
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN が次の値より大きい"
 
 #: documents/models.py:446
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN が次の値より小さい"
 
 #: documents/models.py:447
 msgid "storage path is"
-msgstr ""
+msgstr "フォルダーが"
 
 #: documents/models.py:448
 msgid "has correspondent in"
-msgstr ""
+msgstr "次のものが担当"
 
 #: documents/models.py:449
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "次のものが担当でない"
 
 #: documents/models.py:450
 msgid "has document type in"
-msgstr ""
+msgstr "次のドキュメントタイプがある"
 
 #: documents/models.py:451
 msgid "does not have document type in"
-msgstr ""
+msgstr "次のドキュメントタイプがない"
 
 #: documents/models.py:452
 msgid "has storage path in"
-msgstr ""
+msgstr "次のフォルダーがある"
 
 #: documents/models.py:453
 msgid "does not have storage path in"
-msgstr ""
+msgstr "次のフォルダーがない"
 
 #: documents/models.py:454
 msgid "owner is"
-msgstr ""
+msgstr "所有者が"
 
 #: documents/models.py:455
 msgid "has owner in"
-msgstr ""
+msgstr "所有者がいる"
 
 #: documents/models.py:456
 msgid "does not have owner"
-msgstr ""
+msgstr "次のものが所有者"
 
 #: documents/models.py:457
 msgid "does not have owner in"
-msgstr ""
+msgstr "次のものが所有者でない"
 
 #: documents/models.py:458
 msgid "has custom field value"
-msgstr ""
+msgstr "次のカスタム項目がある"
 
 #: documents/models.py:459
 msgid "is shared by me"
-msgstr ""
+msgstr "自分が共有した"
 
 #: documents/models.py:469
 msgid "rule type"
-msgstr ""
+msgstr "ルールタイプ"
 
 #: documents/models.py:471
 msgid "value"
-msgstr ""
+msgstr "値"
 
 #: documents/models.py:474
 msgid "filter rule"
@@ -453,75 +453,75 @@ msgstr "タスク ID"
 
 #: documents/models.py:587
 msgid "Celery ID for the Task that was run"
-msgstr ""
+msgstr "実行されたタスクの Celery ID"
 
 #: documents/models.py:592
 msgid "Acknowledged"
-msgstr ""
+msgstr "承認"
 
 #: documents/models.py:593
 msgid "If the task is acknowledged via the frontend or API"
-msgstr ""
+msgstr "フロントエンドまたは API 経由でタスクが承認されている場合"
 
 #: documents/models.py:599
 msgid "Task Filename"
-msgstr ""
+msgstr "タスクのファイル名"
 
 #: documents/models.py:600
 msgid "Name of the file which the Task was run for"
-msgstr ""
+msgstr "タスクを実行したファイル名"
 
 #: documents/models.py:606
 msgid "Task Name"
-msgstr ""
+msgstr "タスク名"
 
 #: documents/models.py:607
 msgid "Name of the Task which was run"
-msgstr ""
+msgstr "実行されたタスク名"
 
 #: documents/models.py:614
 msgid "Task State"
-msgstr ""
+msgstr "タスクの状態"
 
 #: documents/models.py:615
 msgid "Current state of the task being run"
-msgstr ""
+msgstr "実行中のタスクの状態"
 
 #: documents/models.py:620
 msgid "Created DateTime"
-msgstr ""
+msgstr "作成日時"
 
 #: documents/models.py:621
 msgid "Datetime field when the task result was created in UTC"
-msgstr ""
+msgstr "タスクの結果が作成された UTC 日時"
 
 #: documents/models.py:626
 msgid "Started DateTime"
-msgstr ""
+msgstr "開始日時"
 
 #: documents/models.py:627
 msgid "Datetime field when the task was started in UTC"
-msgstr ""
+msgstr "タスクが開始された UTC 日時"
 
 #: documents/models.py:632
 msgid "Completed DateTime"
-msgstr ""
+msgstr "完了日時"
 
 #: documents/models.py:633
 msgid "Datetime field when the task was completed in UTC"
-msgstr ""
+msgstr "タスクが完了した UTC 日時"
 
 #: documents/models.py:638
 msgid "Result Data"
-msgstr ""
+msgstr "結果データ"
 
 #: documents/models.py:640
 msgid "The data returned by the task"
-msgstr ""
+msgstr "タスクが出力したデータ"
 
 #: documents/models.py:652
 msgid "Note for the document"
-msgstr ""
+msgstr "ドキュメントのメモ"
 
 #: documents/models.py:676
 msgid "user"
@@ -541,15 +541,15 @@ msgstr "アーカイブ"
 
 #: documents/models.py:691
 msgid "Original"
-msgstr ""
+msgstr "原本"
 
 #: documents/models.py:702
 msgid "expiration"
-msgstr ""
+msgstr "有効期限"
 
 #: documents/models.py:709
 msgid "slug"
-msgstr ""
+msgstr "スラグ"
 
 #: documents/models.py:741
 msgid "share link"
@@ -605,11 +605,11 @@ msgstr "カスタム項目"
 
 #: documents/models.py:844
 msgid "custom field instance"
-msgstr ""
+msgstr "カスタム項目インスタンス"
 
 #: documents/models.py:845
 msgid "custom field instances"
-msgstr ""
+msgstr "カスタム項目インスタンス"
 
 #: documents/models.py:902
 msgid "Consumption Started"
@@ -637,145 +637,145 @@ msgstr "メールの取得"
 
 #: documents/models.py:912
 msgid "Workflow Trigger Type"
-msgstr ""
+msgstr "ワークフローのトリガータイプ"
 
 #: documents/models.py:924
 msgid "filter path"
-msgstr ""
+msgstr "パスをフィルター"
 
 #: documents/models.py:929
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr ""
+msgstr "指定されたパスを持つドキュメントのみを使用します。ワイルドカード (*) が使用できます。大文字・小文字を区別しません。"
 
 #: documents/models.py:936
 msgid "filter filename"
-msgstr ""
+msgstr "ファイル名をフィルター"
 
 #: documents/models.py:941 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "指定されたファイル名に完全にマッチするドキュメントのみを使用します。 *.pdf や *請求書* などのワイルドカードが使用できます。大文字・小文字を区別しません。"
 
 #: documents/models.py:952
 msgid "filter documents from this mail rule"
-msgstr ""
+msgstr "このメールルールからのドキュメントをフィルター"
 
 #: documents/models.py:968
 msgid "has these tag(s)"
-msgstr ""
+msgstr "タグ"
 
 #: documents/models.py:976
 msgid "has this document type"
-msgstr ""
+msgstr "ドキュメントタイプ"
 
 #: documents/models.py:984
 msgid "has this correspondent"
-msgstr ""
+msgstr "担当"
 
 #: documents/models.py:988
 msgid "workflow trigger"
-msgstr ""
+msgstr "ワークフローのトリガー"
 
 #: documents/models.py:989
 msgid "workflow triggers"
-msgstr ""
+msgstr "ワークフローのトリガー"
 
 #: documents/models.py:997
 msgid "Assignment"
-msgstr ""
+msgstr "割り当て"
 
 #: documents/models.py:1000
 msgid "Workflow Action Type"
-msgstr ""
+msgstr "ワークフローのアクションタイプ"
 
 #: documents/models.py:1006
 msgid "assign title"
-msgstr ""
+msgstr "タイトルの割り当て"
 
 #: documents/models.py:1011
 msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr ""
+msgstr "ドキュメントタイトルを割り当てます。ドキュメントタイトルにはプレースホルダーを含めることができます。マニュアルを参照してください。"
 
 #: documents/models.py:1019 paperless_mail/models.py:216
 msgid "assign this tag"
-msgstr ""
+msgstr "タグの割り当て"
 
 #: documents/models.py:1027 paperless_mail/models.py:224
 msgid "assign this document type"
-msgstr ""
+msgstr "ドキュメントタイプの割り当て"
 
 #: documents/models.py:1035 paperless_mail/models.py:238
 msgid "assign this correspondent"
-msgstr ""
+msgstr "担当の割り当て"
 
 #: documents/models.py:1043
 msgid "assign this storage path"
-msgstr ""
+msgstr "フォルダーの割り当て"
 
 #: documents/models.py:1052
 msgid "assign this owner"
-msgstr ""
+msgstr "所有者の割り当て"
 
 #: documents/models.py:1059
 msgid "grant view permissions to these users"
-msgstr ""
+msgstr "ユーザーへの表示権限の付与"
 
 #: documents/models.py:1066
 msgid "grant view permissions to these groups"
-msgstr ""
+msgstr "グループへの表示権限の付与"
 
 #: documents/models.py:1073
 msgid "grant change permissions to these users"
-msgstr ""
+msgstr "ユーザーへの変更権限の付与"
 
 #: documents/models.py:1080
 msgid "grant change permissions to these groups"
-msgstr ""
+msgstr "グループへの変更権限の付与"
 
 #: documents/models.py:1087
 msgid "assign these custom fields"
-msgstr ""
+msgstr "カスタム項目の割り当て"
 
 #: documents/models.py:1091
 msgid "workflow action"
-msgstr ""
+msgstr "ワークフローのアクション"
 
 #: documents/models.py:1092
 msgid "workflow actions"
-msgstr ""
+msgstr "ワークフローのアクション"
 
 #: documents/models.py:1101 paperless_mail/models.py:95
 msgid "order"
-msgstr ""
+msgstr "順序"
 
 #: documents/models.py:1107
 msgid "triggers"
-msgstr ""
+msgstr "トリガー"
 
 #: documents/models.py:1114
 msgid "actions"
-msgstr ""
+msgstr "アクション"
 
 #: documents/models.py:1117
 msgid "enabled"
-msgstr ""
+msgstr "有効"
 
 #: documents/serialisers.py:111
 #, python-format
 msgid "Invalid regular expression: %(error)s"
-msgstr ""
+msgstr "不正な正規表現: %(error)s"
 
 #: documents/serialisers.py:405
 msgid "Invalid color."
-msgstr ""
+msgstr "無効な色"
 
 #: documents/serialisers.py:999
 #, python-format
 msgid "File type %(type)s not supported"
-msgstr ""
+msgstr "ファイルタイプ %(type)s はサポートされていません"
 
 #: documents/serialisers.py:1102
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "無効な変数を検出しました"
 
 #: documents/templates/index.html:79
 msgid "Paperless-ngx is loading..."
@@ -783,11 +783,11 @@ msgstr "Paperless-ngxを読み込んでいます…"
 
 #: documents/templates/index.html:80
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "まだここに？うーん、何かおかしいのかもしれません。"
 
 #: documents/templates/index.html:80
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "これはドキュメントへのリンクです"
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
@@ -876,7 +876,7 @@ msgstr "パスワードの変更"
 
 #: documents/templates/registration/password_reset_confirm.html:65
 msgid "request a new password reset"
-msgstr ""
+msgstr "パスワードリセットの要求"
 
 #: documents/templates/registration/password_reset_done.html:14
 msgid "Paperless-ngx reset password sent"
@@ -913,21 +913,21 @@ msgstr "手順を送信してください!"
 #: documents/validators.py:17
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "URI {value} を解析できません。スキームがありません。"
 
 #: documents/validators.py:22
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
+msgstr "URI {value} を解析できません。ネットの場所またはパスがありません。"
 
 #: documents/validators.py:27
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "URI {value} を解析できません"
 
 #: paperless/apps.py:10
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/models.py:25
 msgid "pdf"
@@ -951,111 +951,111 @@ msgstr "pdfa-3"
 
 #: paperless/models.py:38
 msgid "skip"
-msgstr ""
+msgstr "skip"
 
 #: paperless/models.py:39
 msgid "redo"
-msgstr ""
+msgstr "redo"
 
 #: paperless/models.py:40
 msgid "force"
-msgstr ""
+msgstr "force"
 
 #: paperless/models.py:41
 msgid "skip_noarchive"
-msgstr ""
+msgstr "skip_noarchive"
 
 #: paperless/models.py:49
 msgid "never"
-msgstr ""
+msgstr "never"
 
 #: paperless/models.py:50
 msgid "with_text"
-msgstr ""
+msgstr "with_text"
 
 #: paperless/models.py:51
 msgid "always"
-msgstr ""
+msgstr "always"
 
 #: paperless/models.py:59
 msgid "clean"
-msgstr ""
+msgstr "clean"
 
 #: paperless/models.py:60
 msgid "clean-final"
-msgstr ""
+msgstr "clean-final"
 
 #: paperless/models.py:61
 msgid "none"
-msgstr ""
+msgstr "none"
 
 #: paperless/models.py:69
 msgid "LeaveColorUnchanged"
-msgstr ""
+msgstr "LeaveColorUnchanged"
 
 #: paperless/models.py:70
 msgid "RGB"
-msgstr ""
+msgstr "RGB"
 
 #: paperless/models.py:71
 msgid "UseDeviceIndependentColor"
-msgstr ""
+msgstr "UseDeviceIndependentColor"
 
 #: paperless/models.py:72
 msgid "Gray"
-msgstr ""
+msgstr "Gray"
 
 #: paperless/models.py:73
 msgid "CMYK"
-msgstr ""
+msgstr "CMYK"
 
 #: paperless/models.py:82
 msgid "Sets the output PDF type"
-msgstr ""
+msgstr "出力 PDF タイプの設定"
 
 #: paperless/models.py:94
 msgid "Do OCR from page 1 to this value"
-msgstr ""
+msgstr "1ページからこのページまで OCR を実行する"
 
 #: paperless/models.py:100
 msgid "Do OCR using these languages"
-msgstr ""
+msgstr "これらの言語で OCR を実行する"
 
 #: paperless/models.py:107
 msgid "Sets the OCR mode"
-msgstr ""
+msgstr "OCR モードの設定"
 
 #: paperless/models.py:115
 msgid "Controls the generation of an archive file"
-msgstr ""
+msgstr "アーカイブファイル生成の制御"
 
 #: paperless/models.py:123
 msgid "Sets image DPI fallback value"
-msgstr ""
+msgstr "画像の DPI フォールバック値の設定"
 
 #: paperless/models.py:130
 msgid "Controls the unpaper cleaning"
-msgstr ""
+msgstr "アンペーパークリーニングの制御"
 
 #: paperless/models.py:137
 msgid "Enables deskew"
-msgstr ""
+msgstr "傾き補正の有効化"
 
 #: paperless/models.py:140
 msgid "Enables page rotation"
-msgstr ""
+msgstr "ページ回転の有効化"
 
 #: paperless/models.py:145
 msgid "Sets the threshold for rotation of pages"
-msgstr ""
+msgstr "ページ回転のしきい値の設定"
 
 #: paperless/models.py:151
 msgid "Sets the maximum image size for decompression"
-msgstr ""
+msgstr "展開する画像の最大サイズの設定"
 
 #: paperless/models.py:157
 msgid "Sets the Ghostscript color conversion strategy"
-msgstr ""
+msgstr "Ghostscript 色変換ストラテジーの設定"
 
 #: paperless/models.py:165
 msgid "Adds additional user arguments for OCRMyPDF"

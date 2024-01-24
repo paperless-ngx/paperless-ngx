@@ -1781,7 +1781,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Info</target>
+        <target state="translated">情報</target>
       </trans-unit>
       <trans-unit id="8958063833276423847" datatype="html">
         <source>click for full output</source>
@@ -1789,7 +1789,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">72</context>
         </context-group>
-        <target state="needs-translation">click for full output</target>
+        <target state="translated">クリックしてすべて表示</target>
       </trans-unit>
       <trans-unit id="1536087519743707362" datatype="html">
         <source>Dismiss</source>
@@ -2813,7 +2813,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">now</target>
+        <target state="translated">現在</target>
       </trans-unit>
       <trans-unit id="6371576811194810854" datatype="html">
         <source>After</source>
@@ -3185,7 +3185,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Maximum age (days)</target>
+        <target state="translated">最大有効期間 (日)</target>
       </trans-unit>
       <trans-unit id="7093509971705471817" datatype="html">
         <source>Attachment type</source>
@@ -4146,7 +4146,7 @@
           <context context-type="sourcefile">src/app/components/common/input/date/date.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="translated">無効な日付です</target>
+        <target state="translated">不正な日付です</target>
       </trans-unit>
       <trans-unit id="524422427194414813" datatype="html">
         <source>Suggestions:</source>
@@ -4259,7 +4259,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.ts</context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="needs-translation">Private</target>
+        <target state="translated">非公開</target>
       </trans-unit>
       <trans-unit id="2504502765849142619" datatype="html">
         <source>No items found</source>
@@ -7360,7 +7360,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">156</context>
         </context-group>
-        <target state="translated">色変換</target>
+        <target state="translated">色変換ストラテジー</target>
       </trans-unit>
       <trans-unit id="4696480417479207939" datatype="html">
         <source>OCR Arguments</source>
@@ -7669,7 +7669,7 @@
           <context context-type="linenumber">33</context>
         </context-group>
         <note priority="1" from="description">Score is a value returned by the full text search engine and specifies how well a result matches the given query</note>
-        <target state="needs-translation">Search score</target>
+        <target state="translated">検索スコア</target>
       </trans-unit>
       <trans-unit id="1206520795340730278" datatype="html">
         <source>English (US)</source>
@@ -7933,7 +7933,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">471</context>
         </context-group>
-        <target state="needs-translation">Successfully completed one-time migratration of settings to the database!</target>
+        <target state="translated">データベースへのワンタイム設定移行が正常に完了しました！</target>
       </trans-unit>
       <trans-unit id="5558341108007064934" datatype="html">
         <source>Unable to migrate settings to the database, please try saving manually.</source>
@@ -7941,7 +7941,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">472</context>
         </context-group>
-        <target state="needs-translation">Unable to migrate settings to the database, please try saving manually.</target>
+        <target state="translated">データベースに設定を移行できません。手動で保存してみてください。</target>
       </trans-unit>
       <trans-unit id="1168781785897678748" datatype="html">
         <source>You can restart the tour from the settings page.</source>
