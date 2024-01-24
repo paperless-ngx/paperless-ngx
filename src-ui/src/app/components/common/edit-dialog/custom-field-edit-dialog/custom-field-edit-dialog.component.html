@@ -5,7 +5,7 @@
     </button>
   </div>
   <div class="modal-body">
-    <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></pngx-input-text>
+    <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
     <pngx-input-select i18n-title title="Data type" [items]="getDataTypes()" formControlName="data_type"></pngx-input-select>
     @if (typeFieldDisabled) {
       <small class="d-block mt-n2" i18n>Data type cannot be changed after a field is created</small>

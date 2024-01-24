@@ -7,7 +7,7 @@
   <div class="modal-body">
     <div class="row">
       <div class="col">
-        <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></pngx-input-text>
+        <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
         <pngx-input-text i18n-title title="IMAP Server" formControlName="imap_server" [error]="error?.imap_server"></pngx-input-text>
         <pngx-input-text i18n-title title="IMAP Port" formControlName="imap_port" [error]="error?.imap_port"></pngx-input-text>
         <pngx-input-select i18n-title title="IMAP Security" [items]="imapSecurityOptions" formControlName="imap_security"></pngx-input-select>
