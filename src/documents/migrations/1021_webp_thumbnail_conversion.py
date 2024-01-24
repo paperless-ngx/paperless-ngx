@@ -27,6 +27,7 @@ def _do_convert(work_package):
             strip=True,
             trim=False,
             auto_orient=True,
+            define="pdf:use-cropbox=true",
             input_file=f"{existing_thumbnail}[0]",
             output_file=str(converted_thumbnail),
         )

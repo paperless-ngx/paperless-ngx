@@ -94,6 +94,8 @@ def move_documents_and_create_thumbnails(apps, schema_editor):
                 "500x5000",
                 "-alpha",
                 "remove",
+                "-define",
+                "pdf:use-cropbox=true",
                 orig_target,
                 os.path.join(thumb_temp, "convert-%04d.png"),
             ),

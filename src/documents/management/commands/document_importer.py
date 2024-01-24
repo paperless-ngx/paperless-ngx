@@ -290,6 +290,7 @@ class Command(BaseCommand):
                             strip=True,
                             trim=False,
                             auto_orient=True,
+                            define="pdf:use-cropbox=true",
                             input_file=f"{thumbnail_path}[0]",
                             output_file=str(document.thumbnail_path),
                         )
