@@ -136,7 +136,9 @@ These rules perform the following:
 
 Paperless will check all emails only once and completely ignore messages
 that do not match your filters. It will also only perform the rule action
-on e-mails that it has consumed documents from.
+on e-mails that it has consumed documents from. The filename attachment
+exclusion pattern could be splitted by commto to allow different exclusion
+patterns.
 
 The actions all ensure that the same mail is not consumed twice by
 different means. These are as follows:
