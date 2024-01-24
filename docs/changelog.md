@@ -25,8 +25,9 @@
 ### All App Changes
 
 <details>
-<summary>6 changes</summary>
+<summary>7 changes</summary>
 
+- Revert "Enhancement: support remote user auth directly against API (DRF)" @shamoon ([#5534](https://github.com/paperless-ngx/paperless-ngx/pull/5534))
 - Fix: Minor frontend things in 2.4.0 [@shamoon](https://github.com/shamoon) ([#5514](https://github.com/paperless-ngx/paperless-ngx/pull/5514))
 - Fix: enforce permissions for app config [@shamoon](https://github.com/shamoon) ([#5516](https://github.com/paperless-ngx/paperless-ngx/pull/5516))
 - Change: merge workflow permissions assignments instead of overwrite [@shamoon](https://github.com/shamoon) ([#5496](https://github.com/paperless-ngx/paperless-ngx/pull/5496))
