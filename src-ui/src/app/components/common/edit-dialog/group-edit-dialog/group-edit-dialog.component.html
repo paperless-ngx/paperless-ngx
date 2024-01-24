@@ -7,7 +7,7 @@
     <div class="modal-body">
       <div class="row">
         <div class="col">
-          <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></pngx-input-text>
+          <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
           <pngx-permissions-select i18n-title title="Permissions" formControlName="permissions" [error]="error?.permissions"></pngx-permissions-select>
         </div>
       </div>

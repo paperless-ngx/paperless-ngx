@@ -5,7 +5,7 @@
     </button>
   </div>
   <div class="modal-body">
-    <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></pngx-input-text>
+    <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
     <pngx-input-check i18n-title title="Show in sidebar" formControlName="showInSideBar"></pngx-input-check>
     <pngx-input-check i18n-title title="Show on dashboard" formControlName="showOnDashboard"></pngx-input-check>
     @if (error?.filter_rules) {

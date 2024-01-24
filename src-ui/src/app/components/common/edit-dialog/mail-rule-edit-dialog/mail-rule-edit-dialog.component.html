@@ -7,7 +7,7 @@
   <div class="modal-body">
     <div class="row">
       <div class="col-md-4">
-        <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></pngx-input-text>
+        <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
         <pngx-input-select i18n-title title="Account" [items]="accounts" formControlName="account"></pngx-input-select>
         <pngx-input-text i18n-title title="Folder" formControlName="folder" i18n-hint hint="Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server." [error]="error?.folder"></pngx-input-text>
         <pngx-input-number i18n-title title="Maximum age (days)" formControlName="maximum_age" [showAdd]="false" [error]="error?.maximum_age"></pngx-input-number>
