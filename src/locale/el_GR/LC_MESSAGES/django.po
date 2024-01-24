@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-05 21:26-0800\n"
-"PO-Revision-Date: 2024-01-11 12:09\n"
+"PO-Revision-Date: 2024-01-22 12:09\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -931,11 +931,11 @@ msgstr "Paperless"
 
 #: paperless/models.py:25
 msgid "pdf"
-msgstr ""
+msgstr "pdf"
 
 #: paperless/models.py:26
 msgid "pdfa"
-msgstr ""
+msgstr "pdfa"
 
 #: paperless/models.py:27
 msgid "pdfa-1"
@@ -995,7 +995,7 @@ msgstr ""
 
 #: paperless/models.py:70
 msgid "RGB"
-msgstr ""
+msgstr "RGB"
 
 #: paperless/models.py:71
 msgid "UseDeviceIndependentColor"
@@ -1007,7 +1007,7 @@ msgstr ""
 
 #: paperless/models.py:73
 msgid "CMYK"
-msgstr ""
+msgstr "CMYK"
 
 #: paperless/models.py:82
 msgid "Sets the output PDF type"
