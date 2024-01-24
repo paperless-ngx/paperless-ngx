@@ -7,7 +7,7 @@
   <div class="modal-body">
     <div class="row">
       <div class="col-md-6">
-        <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></pngx-input-text>
+        <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
       </div>
       <div class="col-4">
         <pngx-input-number i18n-title title="Sort order" formControlName="order" [showAdd]="false" [error]="error?.order"></pngx-input-number>
