@@ -67,7 +67,7 @@ you installed paperless-ngx in the first place. The releases are
 available at the [release
 page](https://github.com/paperless-ngx/paperless-ngx/releases).
 
-First of all, [make a backup](#backup).
+First of all, make sure no active processes (like consumption) are running, then [make a backup](#backup).
 
 After that, ensure that paperless is stopped:
 
