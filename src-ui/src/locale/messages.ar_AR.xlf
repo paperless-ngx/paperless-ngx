@@ -3289,7 +3289,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</target>
+        <target state="translated">لا تستهلك المستندات التي تتطابق تماما مع اسم الملف هذا إذا تم تحديده. البطاقات البرية مثل *.pdf أو *الفاتورة* مسموح بها. الحالة غير حساسة.</target>
       </trans-unit>
       <trans-unit id="9216117865911519658" datatype="html">
         <source>Action</source>
@@ -3749,7 +3749,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">Add Trigger</target>
+        <target state="translated">إضافة مشغل</target>
       </trans-unit>
       <trans-unit id="6882912390704300247" datatype="html">
         <source>Apply Actions:</source>
@@ -3757,7 +3757,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">66</context>
         </context-group>
-        <target state="needs-translation">Apply Actions:</target>
+        <target state="translated">تطبيق الإجراءات:</target>
       </trans-unit>
       <trans-unit id="51883444329775670" datatype="html">
         <source>Add Action</source>
@@ -3765,7 +3765,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">68</context>
         </context-group>
-        <target state="needs-translation">Add Action</target>
+        <target state="translated">إضافة اجراء</target>
       </trans-unit>
       <trans-unit id="6417103744331194518" datatype="html">
         <source>Action type</source>
@@ -3773,7 +3773,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">86</context>
         </context-group>
-        <target state="needs-translation">Action type</target>
+        <target state="translated">نوع الإجراء</target>
       </trans-unit>
       <trans-unit id="6019822389883736115" datatype="html">
         <source>Assign title</source>
@@ -3789,7 +3789,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="needs-translation">Can include some placeholders, see &lt;a target='_blank' href='https://docs.paperless-ngx.com/usage/#workflows'&gt;documentation&lt;/a&gt;.</target>
+        <target state="translated">يمكن أن تتضمن بعض العناصر النائبة، انظر &lt;a target='_blank' href='https://docs.paperless-ngx.com/usage/#workflows'&gt;المستندات&lt;/a&gt;.</target>
       </trans-unit>
       <trans-unit id="6528897010417701530" datatype="html">
         <source>Assign tags</source>
@@ -3813,7 +3813,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">95</context>
         </context-group>
-        <target state="needs-translation">Assign custom fields</target>
+        <target state="translated">تعيين حقول مخصصة</target>
       </trans-unit>
       <trans-unit id="5057200219587080996" datatype="html">
         <source>Assign owner</source>
@@ -3845,7 +3845,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">166</context>
         </context-group>
-        <target state="needs-translation">Trigger type</target>
+        <target state="translated">نوع المشغل</target>
       </trans-unit>
       <trans-unit id="8727727835543352574" datatype="html">
         <source>Trigger for documents that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> filters specified below.</source>
@@ -3853,7 +3853,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">167</context>
         </context-group>
-        <target state="needs-translation">Trigger for documents that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> filters specified below.</target>
+        <target state="translated">المشغل للمستندات التي تطابق <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>جميع الفلاتر<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> المحددة أدناه.</target>
       </trans-unit>
       <trans-unit id="7467799586957602479" datatype="html">
         <source>Filter filename</source>
@@ -4005,7 +4005,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">69</context>
         </context-group>
-        <target state="needs-translation">Assignment</target>
+        <target state="translated">المهام</target>
       </trans-unit>
       <trans-unit id="3138206142174978019" datatype="html">
         <source>Create new workflow</source>
@@ -4013,7 +4013,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">137</context>
         </context-group>
-        <target state="needs-translation">Create new workflow</target>
+        <target state="translated">إنشاء سير عمل جديد</target>
       </trans-unit>
       <trans-unit id="5996779210524133604" datatype="html">
         <source>Edit workflow</source>
@@ -4021,7 +4021,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">141</context>
         </context-group>
-        <target state="needs-translation">Edit workflow</target>
+        <target state="translated">تعديل سير العمل</target>
       </trans-unit>
       <trans-unit id="1616102757855967475" datatype="html">
         <source>All</source>
@@ -4138,7 +4138,7 @@
           <context context-type="sourcefile">src/app/components/common/input/url/url.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="needs-translation">Remove</target>
+        <target state="translated">إزالة</target>
       </trans-unit>
       <trans-unit id="445302259125375799" datatype="html" approved="yes">
         <source>Invalid date.</source>
@@ -4182,7 +4182,7 @@
           <context context-type="sourcefile">src/app/components/common/input/document-link/document-link.component.ts</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">No documents found</target>
+        <target state="translated">لم يتم العثور على مستندات</target>
       </trans-unit>
       <trans-unit id="6932865105766151309" datatype="html">
         <source>Upload</source>
@@ -4190,7 +4190,7 @@
           <context context-type="sourcefile">src/app/components/common/input/file/file.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Upload</target>
+        <target state="translated">رفع</target>
       </trans-unit>
       <trans-unit id="5554528553553249088" datatype="html">
         <source>Show password</source>
@@ -4198,7 +4198,7 @@
           <context context-type="sourcefile">src/app/components/common/input/password/password.component.html</context>
           <context context-type="linenumber">6</context>
         </context-group>
-        <target state="needs-translation">Show password</target>
+        <target state="translated">عرض كلمة المرور</target>
       </trans-unit>
       <trans-unit id="594042705136125260" datatype="html">
         <source>Edit Permissions</source>
@@ -4267,7 +4267,7 @@
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.ts</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="needs-translation">No items found</target>
+        <target state="translated">لم يتم العثور على أي عنصر</target>
       </trans-unit>
       <trans-unit id="6541407358060244620" datatype="html">
         <source>Note: value has not yet been set and will not apply until explicitly changed</source>
@@ -4275,7 +4275,7 @@
           <context context-type="sourcefile">src/app/components/common/input/switch/switch.component.html</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="needs-translation">Note: value has not yet been set and will not apply until explicitly changed</target>
+        <target state="translated">ملاحظة: لم يتم بعد تعيين القيمة ولن تنطبق حتى يتم تغييرها بشكل صريح</target>
       </trans-unit>
       <trans-unit id="6560126119609945418" datatype="html">
         <source>Add tag</source>
@@ -4299,7 +4299,7 @@
           <context context-type="sourcefile">src/app/components/common/input/url/url.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Open link</target>
+        <target state="translated">فتح الرابط</target>
       </trans-unit>
       <trans-unit id="5752465522295465624" datatype="html">
         <source>What&apos;s this?</source>
@@ -4307,7 +4307,7 @@
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">What's this?</target>
+        <target state="translated">ما هذا؟</target>
       </trans-unit>
       <trans-unit id="2827984212740060090" datatype="html">
         <source>Read more</source>
@@ -4315,7 +4315,7 @@
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Read more</target>
+        <target state="translated">اقرأ المزيد</target>
       </trans-unit>
       <trans-unit id="7062872617520618723" datatype="html">
         <source>Set permissions</source>
@@ -4363,7 +4363,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="needs-translation">Shared by me</target>
+        <target state="translated">تم المشاركة من قبلي</target>
       </trans-unit>
       <trans-unit id="5151074932731293042" datatype="html">
         <source>Unowned</source>
@@ -4411,7 +4411,7 @@
           <context context-type="sourcefile">src/app/components/common/preview-popup/preview-popup.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Error loading preview</target>
+        <target state="translated">خطأ في تحميل المعاينة</target>
       </trans-unit>
       <trans-unit id="2984628903434675339" datatype="html">
         <source>Edit Profile</source>
@@ -4419,7 +4419,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">3</context>
         </context-group>
-        <target state="needs-translation">Edit Profile</target>
+        <target state="translated">تعديل الملف الشخصي</target>
       </trans-unit>
       <trans-unit id="8214169742072920158" datatype="html">
         <source>Confirm Email</source>
@@ -4427,7 +4427,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Confirm Email</target>
+        <target state="translated">تأكيد البريد الإلكتروني</target>
       </trans-unit>
       <trans-unit id="3241357959735682038" datatype="html">
         <source>Confirm Password</source>
@@ -4435,7 +4435,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Confirm Password</target>
+        <target state="translated">تأكيد كلمة المرور</target>
       </trans-unit>
       <trans-unit id="7554924397178347823" datatype="html">
         <source>API Auth Token</source>
@@ -4443,7 +4443,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">API Auth Token</target>
+        <target state="translated">API Auth Token</target>
       </trans-unit>
       <trans-unit id="4323470180912194028" datatype="html">
         <source>Copy</source>
@@ -4467,7 +4467,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">Regenerate auth token</target>
+        <target state="translated">تجديد رمز المصادقة</target>
       </trans-unit>
       <trans-unit id="5392341774767336507" datatype="html">
         <source>Copied!</source>
@@ -4487,7 +4487,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="needs-translation">Warning: changing the token cannot be undone</target>
+        <target state="translated">تحذير: لا يمكن التراجع عن تغيير رمز المصادقة</target>
       </trans-unit>
       <trans-unit id="6141884091799403188" datatype="html">
         <source>Emails must match</source>
@@ -4495,7 +4495,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="needs-translation">Emails must match</target>
+        <target state="translated">البريد الإلكتروني يجب أن يتطابق</target>
       </trans-unit>
       <trans-unit id="5281933990298241826" datatype="html">
         <source>Passwords must match</source>
@@ -4503,7 +4503,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="needs-translation">Passwords must match</target>
+        <target state="translated">يجب أن تتطابق كلمة المرور</target>
       </trans-unit>
       <trans-unit id="4219429959475101385" datatype="html">
         <source>Profile updated successfully</source>
@@ -4511,7 +4511,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
           <context context-type="linenumber">142</context>
         </context-group>
-        <target state="needs-translation">Profile updated successfully</target>
+        <target state="translated">تم تعديل الملف الشخصي بنجاح</target>
       </trans-unit>
       <trans-unit id="3417726855410304962" datatype="html">
         <source>Error saving profile</source>
@@ -4519,7 +4519,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
           <context context-type="linenumber">154</context>
         </context-group>
-        <target state="needs-translation">Error saving profile</target>
+        <target state="translated">حدث خطأ أثناء حفظ الملف الشخصي</target>
       </trans-unit>
       <trans-unit id="154249228726292516" datatype="html">
         <source>Error generating auth token</source>
@@ -4527,7 +4527,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
           <context context-type="linenumber">171</context>
         </context-group>
-        <target state="needs-translation">Error generating auth token</target>
+        <target state="translated">خطأ في إنشاء رمز المصادقة</target>
       </trans-unit>
       <trans-unit id="3797570084942068182" datatype="html" approved="yes">
         <source>Select</source>
