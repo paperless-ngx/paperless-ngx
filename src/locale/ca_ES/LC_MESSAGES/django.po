@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-05 21:26-0800\n"
-"PO-Revision-Date: 2024-01-19 12:09\n"
+"PO-Revision-Date: 2024-01-25 12:09\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -1031,11 +1031,11 @@ msgstr "Controls de generació d'arxiu arxivat"
 
 #: paperless/models.py:123
 msgid "Sets image DPI fallback value"
-msgstr ""
+msgstr "Estableix DPI d'imatge per defecte"
 
 #: paperless/models.py:130
 msgid "Controls the unpaper cleaning"
-msgstr ""
+msgstr "Controla la neteja sense paper"
 
 #: paperless/models.py:137
 msgid "Enables deskew"
@@ -1055,11 +1055,11 @@ msgstr "Estableix la mida màxima de la imatge per a la descompressió"
 
 #: paperless/models.py:157
 msgid "Sets the Ghostscript color conversion strategy"
-msgstr ""
+msgstr "Estableix l'estratègia de conversió de color de Ghostscript"
 
 #: paperless/models.py:165
 msgid "Adds additional user arguments for OCRMyPDF"
-msgstr ""
+msgstr "Afegeix arguments d'usuari addicionals per a OCRMyPDF"
 
 #: paperless/models.py:170
 msgid "paperless application settings"
