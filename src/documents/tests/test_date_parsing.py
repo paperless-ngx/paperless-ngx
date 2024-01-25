@@ -201,6 +201,13 @@ class TestDate(TestCase):
             datetime.datetime(2022, 3, 25, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
         )
 
+    def test_date_format_26(self):
+        text = "CHASE 0 September 25, 2019 JPMorgan Chase Bank, NA. P0 Box 182051"
+        self.assertEqual(
+            parse_date("", text),
+            datetime.datetime(2019, 9, 25, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+
     def test_crazy_date_past(self, *args):
         self.assertIsNone(parse_date("", "01-07-0590 00:00:00"))
 
