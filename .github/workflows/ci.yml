@@ -645,7 +645,7 @@ jobs:
           script: |
             const { repo, owner } = context.repo;
             const result = await github.rest.pulls.create({
-              title: '[Documentation] Add ${{ needs.publish-release.outputs.version }} changelog',
+              title: 'Documentation: Add ${{ needs.publish-release.outputs.version }} changelog',
               owner,
               repo,
               head: '${{ needs.publish-release.outputs.version }}-changelog',
