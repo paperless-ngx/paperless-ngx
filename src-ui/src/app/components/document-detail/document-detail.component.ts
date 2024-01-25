@@ -82,6 +82,7 @@ enum ContentRenderType {
   Image = 'image',
   Text = 'text',
   Other = 'other',
+  Unknown = 'unknown',
 }
 
 enum ZoomSetting {
@@ -211,6 +212,7 @@ export class DocumentDetailComponent
   }
 
   get contentRenderType(): ContentRenderType {
+    if (!this.metadata) return ContentRenderType.Unknown
     const contentType = this.metadata?.has_archive_version
       ? 'application/pdf'
       : this.metadata?.original_mime_type

@@ -324,44 +324,45 @@
         <ng-container i18n>Loading...</ng-container>
       </div>
     </div>
-  }
-  @switch (contentRenderType) {
-    @case (ContentRenderType.PDF) {
-      @if (!useNativePdfViewer) {
-        <div class="preview-sticky pdf-viewer-container">
-          <pngx-pdf-viewer
-            [src]="{ url: previewUrl, password: password }"
-            [original-size]="false"
-            [show-borders]="true"
-            [show-all]="true"
-            [(page)]="previewCurrentPage"
-            [zoom-scale]="previewZoomScale"
-            [zoom]="previewZoomSetting"
-            (error)="onError($event)"
-            (after-load-complete)="pdfPreviewLoaded($event)">
-          </pngx-pdf-viewer>
+  } @else {
+    @switch (contentRenderType) {
+      @case (ContentRenderType.PDF) {
+        @if (!useNativePdfViewer) {
+          <div class="preview-sticky pdf-viewer-container">
+            <pngx-pdf-viewer
+              [src]="{ url: previewUrl, password: password }"
+              [original-size]="false"
+              [show-borders]="true"
+              [show-all]="true"
+              [(page)]="previewCurrentPage"
+              [zoom-scale]="previewZoomScale"
+              [zoom]="previewZoomSetting"
+              (error)="onError($event)"
+              (after-load-complete)="pdfPreviewLoaded($event)">
+            </pngx-pdf-viewer>
+          </div>
+        } @else {
+          <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>
+        }
+      }
+      @case (ContentRenderType.Text) {
+        <div class="preview-sticky bg-light p-3 overflow-auto" width="100%">{{previewText}}</div>
+      }
+      @case (ContentRenderType.Image) {
+        <div class="preview-sticky">
+          <img [src]="previewUrl | safeUrl" width="100%" height="100%" alt="{{title}}" />
         </div>
-      } @else {
+      }
+      @case (ContentRenderType.Other) {
         <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>
       }
     }
-    @case (ContentRenderType.Text) {
-      <div class="preview-sticky bg-light p-3 overflow-auto" width="100%">{{previewText}}</div>
-    }
-    @case (ContentRenderType.Image) {
-      <div class="preview-sticky">
-        <img [src]="previewUrl | safeUrl" width="100%" height="100%" alt="{{title}}" />
+    @if (requiresPassword) {
+      <div class="password-prompt">
+        <form>
+          <input autocomplete="" autofocus="true" class="form-control" i18n-placeholder placeholder="Enter Password" type="password" (keyup)="onPasswordKeyUp($event)" />
+        </form>
       </div>
     }
-    @case (ContentRenderType.Other) {
-      <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>
-    }
-  }
-  @if (requiresPassword) {
-    <div class="password-prompt">
-      <form>
-        <input autocomplete="" autofocus="true" class="form-control" i18n-placeholder placeholder="Enter Password" type="password" (keyup)="onPasswordKeyUp($event)" />
-      </form>
-    </div>
   }
 </ng-template>
