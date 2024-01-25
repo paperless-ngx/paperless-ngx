@@ -67,14 +67,14 @@ you installed paperless-ngx in the first place. The releases are
 available at the [release
 page](https://github.com/paperless-ngx/paperless-ngx/releases).
 
-First of all, ensure that paperless is stopped.
+First of all, make sure no active processes (like consumption) are running, then [make a backup](#backup).
+
+After that, ensure that paperless is stopped:
 
 ```shell-session
 $ cd /path/to/paperless
 $ docker compose down
 ```
-
-After that, [make a backup](#backup).
 
 1.  If you pull the image from the docker hub, all you need to do is:
 
