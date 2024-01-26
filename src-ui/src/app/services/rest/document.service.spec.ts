@@ -7,10 +7,13 @@ import { TestBed } from '@angular/core/testing'
 import { environment } from 'src/environments/environment'
 import { DocumentService } from './document.service'
 import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
+import { SettingsService } from '../settings.service'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 
 let httpTestingController: HttpTestingController
 let service: DocumentService
 let subscription: Subscription
+let settingsService: SettingsService
 const endpoint = 'documents'
 const documents = [
   {
@@ -33,6 +36,17 @@ const documents = [
     content: 'some content',
   },
 ]
+
+beforeEach(() => {
+  TestBed.configureTestingModule({
+    providers: [DocumentService],
+    imports: [HttpClientTestingModule],
+  })
+
+  httpTestingController = TestBed.inject(HttpTestingController)
+  service = TestBed.inject(DocumentService)
+  settingsService = TestBed.inject(SettingsService)
+})
 
 describe(`DocumentService`, () => {
   // common tests e.g. commonAbstractPaperlessServiceTests differ slightly
@@ -237,16 +251,21 @@ describe(`DocumentService`, () => {
     )
     expect(req.request.method).toEqual('GET')
   })
-})
 
-beforeEach(() => {
-  TestBed.configureTestingModule({
-    providers: [DocumentService],
-    imports: [HttpClientTestingModule],
+  it('should pass remove_inbox_tags setting to update', () => {
+    subscription = service.update(documents[0]).subscribe()
+    let req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/`
+    )
+    expect(req.request.body.remove_inbox_tags).toEqual(false)
+
+    settingsService.set(SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS, true)
+    subscription = service.update(documents[0]).subscribe()
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/`
+    )
+    expect(req.request.body.remove_inbox_tags).toEqual(true)
   })
-
-  httpTestingController = TestBed.inject(HttpTestingController)
-  service = TestBed.inject(DocumentService)
 })
 
 afterEach(() => {

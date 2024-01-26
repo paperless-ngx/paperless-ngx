@@ -2080,6 +2080,72 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.content, b"1")
 
+    def test_remove_inbox_tags(self):
+        """
+        GIVEN:
+            - Existing document with or without inbox tags
+        WHEN:
+            - API request to update document, with or without `remove_inbox_tags` flag
+        THEN:
+            - Inbox tags are removed as long as they are not being added
+        """
+        tag1 = Tag.objects.create(name="tag1", color="#abcdef")
+        inbox_tag1 = Tag.objects.create(
+            name="inbox1",
+            color="#abcdef",
+            is_inbox_tag=True,
+        )
+        inbox_tag2 = Tag.objects.create(
+            name="inbox2",
+            color="#abcdef",
+            is_inbox_tag=True,
+        )
+
+        doc1 = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document 1",
+            checksum="1",
+        )
+        doc1.tags.add(tag1)
+        doc1.tags.add(inbox_tag1)
+        doc1.tags.add(inbox_tag2)
+        doc1.save()
+
+        # Remove inbox tags defaults to false
+        resp = self.client.patch(
+            f"/api/documents/{doc1.pk}/",
+            {
+                "title": "New title",
+            },
+        )
+        doc1.refresh_from_db()
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(doc1.tags.count(), 3)
+
+        # Remove inbox tags set to true
+        resp = self.client.patch(
+            f"/api/documents/{doc1.pk}/",
+            {
+                "remove_inbox_tags": True,
+            },
+        )
+        doc1.refresh_from_db()
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(doc1.tags.count(), 1)
+
+        # Remove inbox tags set to true but adding a new inbox tag
+        resp = self.client.patch(
+            f"/api/documents/{doc1.pk}/",
+            {
+                "remove_inbox_tags": True,
+                "tags": [inbox_tag1.pk, tag1.pk],
+            },
+        )
+        doc1.refresh_from_db()
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(doc1.tags.count(), 2)
+
 
 class TestDocumentApiV2(DirectoriesMixin, APITestCase):
     def setUp(self):
