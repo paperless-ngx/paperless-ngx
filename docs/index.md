@@ -6,7 +6,6 @@
 physical documents into a searchable online archive so you can keep, well, _less paper_.
 
 [Get started](setup.md){ .md-button .md-button--primary .index-callout }
-[Demo](https://demo.paperless-ngx.com){ .md-button .md-button--secondary target=\_blank }
 
 </div>
 <div class="grid-right" markdown>
