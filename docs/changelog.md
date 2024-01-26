@@ -1,5 +1,21 @@
 # Changelog
 
+## paperless-ngx 2.4.2
+
+### Bug Fixes
+
+- Fix: improve one of the date matching regexes [@shamoon](https://github.com/shamoon) ([#5540](https://github.com/paperless-ngx/paperless-ngx/pull/5540))
+- Fix: tweak doc detail component behavior while awaiting metadata [@shamoon](https://github.com/shamoon) ([#5546](https://github.com/paperless-ngx/paperless-ngx/pull/5546))
+
+### All App Changes
+
+<details>
+<summary>2 changes</summary>
+
+- Fix: improve one of the date matching regexes [@shamoon](https://github.com/shamoon) ([#5540](https://github.com/paperless-ngx/paperless-ngx/pull/5540))
+- Fix: tweak doc detail component behavior while awaiting metadata [@shamoon](https://github.com/shamoon) ([#5546](https://github.com/paperless-ngx/paperless-ngx/pull/5546))
+</details>
+
 ## paperless-ngx 2.4.1
 
 ### Breaking Changes
