@@ -468,7 +468,7 @@ applications.
 
     !!! warning
 
-        See the warning above about securing your installation when using Remote-User header authentication. This setting is separate from
+        See the warning above about securing your installation when using remote user header authentication. This setting is separate from
         `PAPERLESS_ENABLE_HTTP_REMOTE_USER` to avoid introducing a security vulnerability to existing reverse proxy setups. As above,
         ensure that your reverse proxy does not simply pass the `Remote-User` header from the internet to paperless.
 
