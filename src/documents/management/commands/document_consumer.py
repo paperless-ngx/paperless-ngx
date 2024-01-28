@@ -232,6 +232,9 @@ class Command(BaseCommand):
         if not os.path.isdir(directory):
             raise CommandError(f"Consumption directory {directory} does not exist")
 
+        # Consumer will need this
+        settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
+
         if recursive:
             for dirpath, _, filenames in os.walk(directory):
                 for filename in filenames:
