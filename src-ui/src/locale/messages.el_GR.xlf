@@ -497,7 +497,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Enable</target>
+        <target state="translated">Ενεργοποίηση</target>
       </trans-unit>
       <trans-unit id="3823219296477075982" datatype="html">
         <source>Discard</source>
@@ -589,7 +589,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="needs-translation">Invalid JSON</target>
+        <target state="translated">Μη έγκυρο JSON</target>
       </trans-unit>
       <trans-unit id="5103146006962696736" datatype="html">
         <source>Configuration updated</source>
@@ -657,7 +657,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Auto refresh</target>
+        <target state="translated">Αυτόματη ανανέωση</target>
       </trans-unit>
       <trans-unit id="3894950702316166331" datatype="html">
         <source>Loading...</source>
@@ -2469,7 +2469,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">74</context>
         </context-group>
-        <target state="needs-translation">Document Types</target>
+        <target state="translated">Τύποι Εγγράφων</target>
       </trans-unit>
       <trans-unit id="5421255270838137624" datatype="html">
         <source>Storage Paths</source>
@@ -2485,7 +2485,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">82</context>
         </context-group>
-        <target state="needs-translation">Storage Paths</target>
+        <target state="translated">Διαδρομές Αποθήκευσης</target>
       </trans-unit>
       <trans-unit id="3188389494264426470" datatype="html">
         <source>Custom Fields</source>
@@ -2521,7 +2521,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="needs-translation">Workflows</target>
+        <target state="translated">Ροές εργασίας</target>
       </trans-unit>
       <trans-unit id="1292737233370901804" datatype="html">
         <source>Mail</source>
@@ -3981,7 +3981,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">Consumption Started</target>
+        <target state="translated">Η Κατανάλωση Ξεκίνησε</target>
       </trans-unit>
       <trans-unit id="7858311467093621703" datatype="html">
         <source>Document Added</source>
@@ -4307,7 +4307,7 @@
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">What's this?</target>
+        <target state="translated">Τι είναι αυτό;</target>
       </trans-unit>
       <trans-unit id="2827984212740060090" datatype="html">
         <source>Read more</source>
@@ -4419,7 +4419,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">3</context>
         </context-group>
-        <target state="needs-translation">Edit Profile</target>
+        <target state="translated">Επεξεργασία Προφίλ</target>
       </trans-unit>
       <trans-unit id="8214169742072920158" datatype="html">
         <source>Confirm Email</source>
@@ -4427,7 +4427,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Confirm Email</target>
+        <target state="translated">Επιβεβαίωση Email</target>
       </trans-unit>
       <trans-unit id="3241357959735682038" datatype="html">
         <source>Confirm Password</source>
@@ -4435,7 +4435,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Confirm Password</target>
+        <target state="translated">Επιβεβαίωση Κωδικού</target>
       </trans-unit>
       <trans-unit id="7554924397178347823" datatype="html">
         <source>API Auth Token</source>
@@ -4443,7 +4443,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">API Auth Token</target>
+        <target state="translated">API Auth Token</target>
       </trans-unit>
       <trans-unit id="4323470180912194028" datatype="html">
         <source>Copy</source>
@@ -4843,7 +4843,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
           <context context-type="linenumber">57</context>
         </context-group>
-        <target state="needs-translation">No documents</target>
+        <target state="translated">Δεν υπάρχουν έγγραφα</target>
       </trans-unit>
       <trans-unit id="1069523139277190436" datatype="html">
         <source>Statistics</source>
@@ -5054,7 +5054,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">-</target>
+        <target state="translated">-</target>
       </trans-unit>
       <trans-unit id="8479257185772414452" datatype="html">
         <source>+</source>
@@ -5062,7 +5062,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">+</target>
+        <target state="translated">+</target>
       </trans-unit>
       <trans-unit id="8659635229098859487" datatype="html">
         <source>Download original</source>
@@ -5378,7 +5378,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">325</context>
         </context-group>
-        <target state="needs-translation">Ok</target>
+        <target state="translated">Οκ</target>
       </trans-unit>
       <trans-unit id="5758784066858623886" datatype="html">
         <source>Error retrieving metadata</source>
@@ -7096,7 +7096,7 @@
           <context context-type="sourcefile">src/app/data/custom-field.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Boolean</target>
+        <target state="translated">Δυαδικό</target>
       </trans-unit>
       <trans-unit id="3973931101896534797" datatype="html">
         <source>Date</source>
@@ -7104,7 +7104,7 @@
           <context context-type="sourcefile">src/app/data/custom-field.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Date</target>
+        <target state="translated">Ημερομηνία</target>
       </trans-unit>
       <trans-unit id="362956598863566327" datatype="html">
         <source>Integer</source>
@@ -7112,7 +7112,7 @@
           <context context-type="sourcefile">src/app/data/custom-field.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Integer</target>
+        <target state="translated">Ακέραιος</target>
       </trans-unit>
       <trans-unit id="6370642728789544052" datatype="html">
         <source>Number</source>
@@ -7120,7 +7120,7 @@
           <context context-type="sourcefile">src/app/data/custom-field.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">Number</target>
+        <target state="translated">Αριθμός</target>
       </trans-unit>
       <trans-unit id="6430409302408843009" datatype="html">
         <source>Monetary</source>
@@ -7128,7 +7128,7 @@
           <context context-type="sourcefile">src/app/data/custom-field.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Monetary</target>
+        <target state="translated">Νομισματικό</target>
       </trans-unit>
       <trans-unit id="6162693758764653365" datatype="html">
         <source>Text</source>
@@ -7136,7 +7136,7 @@
           <context context-type="sourcefile">src/app/data/custom-field.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Text</target>
+        <target state="translated">Κείμενο</target>
       </trans-unit>
       <trans-unit id="8308045076391224954" datatype="html">
         <source>Url</source>

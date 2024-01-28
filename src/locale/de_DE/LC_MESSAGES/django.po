@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-05 21:26-0800\n"
-"PO-Revision-Date: 2024-01-19 12:09\n"
+"PO-Revision-Date: 2024-01-27 00:22\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -601,7 +601,7 @@ msgstr "Benutzerdefiniertes Feld"
 
 #: documents/models.py:782
 msgid "custom fields"
-msgstr "Benutzerdefinierte Felder"
+msgstr "Benutzerdef. Felder"
 
 #: documents/models.py:844
 msgid "custom field instance"

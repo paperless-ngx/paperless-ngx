@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-05 21:26-0800\n"
-"PO-Revision-Date: 2024-01-25 22:18\n"
+"PO-Revision-Date: 2024-01-27 00:22\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -931,7 +931,7 @@ msgstr "لا ورقي"
 
 #: paperless/models.py:25
 msgid "pdf"
-msgstr ""
+msgstr "pdf"
 
 #: paperless/models.py:26
 msgid "pdfa"
@@ -951,15 +951,15 @@ msgstr ""
 
 #: paperless/models.py:38
 msgid "skip"
-msgstr ""
+msgstr "تخطي"
 
 #: paperless/models.py:39
 msgid "redo"
-msgstr ""
+msgstr "إعادة"
 
 #: paperless/models.py:40
 msgid "force"
-msgstr ""
+msgstr "إجبار"
 
 #: paperless/models.py:41
 msgid "skip_noarchive"
@@ -967,7 +967,7 @@ msgstr ""
 
 #: paperless/models.py:49
 msgid "never"
-msgstr ""
+msgstr "أبداً"
 
 #: paperless/models.py:50
 msgid "with_text"
@@ -975,7 +975,7 @@ msgstr ""
 
 #: paperless/models.py:51
 msgid "always"
-msgstr ""
+msgstr "دائماً"
 
 #: paperless/models.py:59
 msgid "clean"
@@ -987,7 +987,7 @@ msgstr ""
 
 #: paperless/models.py:61
 msgid "none"
-msgstr ""
+msgstr "لا شيء"
 
 #: paperless/models.py:69
 msgid "LeaveColorUnchanged"
@@ -995,7 +995,7 @@ msgstr ""
 
 #: paperless/models.py:70
 msgid "RGB"
-msgstr ""
+msgstr "RGB"
 
 #: paperless/models.py:71
 msgid "UseDeviceIndependentColor"
@@ -1003,15 +1003,15 @@ msgstr ""
 
 #: paperless/models.py:72
 msgid "Gray"
-msgstr ""
+msgstr "رمادي"
 
 #: paperless/models.py:73
 msgid "CMYK"
-msgstr ""
+msgstr "CMYK"
 
 #: paperless/models.py:82
 msgid "Sets the output PDF type"
-msgstr ""
+msgstr "تعيين نوع إخراج PDF"
 
 #: paperless/models.py:94
 msgid "Do OCR from page 1 to this value"
