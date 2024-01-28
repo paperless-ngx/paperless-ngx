@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-05 21:26-0800\n"
-"PO-Revision-Date: 2024-01-22 12:09\n"
+"PO-Revision-Date: 2024-01-27 12:08\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -425,11 +425,11 @@ msgstr "δεν έχει ιδιοκτήτη σε"
 
 #: documents/models.py:458
 msgid "has custom field value"
-msgstr ""
+msgstr "έχει προσαρμοσμένη τιμή πεδίου"
 
 #: documents/models.py:459
 msgid "is shared by me"
-msgstr ""
+msgstr "μοιράζεται από μένα"
 
 #: documents/models.py:469
 msgid "rule type"
@@ -613,7 +613,7 @@ msgstr "στιγμιότυπα προσαρμοσμένων πεδίων"
 
 #: documents/models.py:902
 msgid "Consumption Started"
-msgstr ""
+msgstr "Η Κατανάλωση Ξεκίνησε"
 
 #: documents/models.py:903
 msgid "Document Added"
@@ -753,7 +753,7 @@ msgstr ""
 
 #: documents/models.py:1114
 msgid "actions"
-msgstr ""
+msgstr "ενέργειες"
 
 #: documents/models.py:1117
 msgid "enabled"
@@ -939,15 +939,15 @@ msgstr "pdfa"
 
 #: paperless/models.py:27
 msgid "pdfa-1"
-msgstr ""
+msgstr "pdfa-1"
 
 #: paperless/models.py:28
 msgid "pdfa-2"
-msgstr ""
+msgstr "pdfa-2"
 
 #: paperless/models.py:29
 msgid "pdfa-3"
-msgstr ""
+msgstr "pdfa-3"
 
 #: paperless/models.py:38
 msgid "skip"
@@ -967,7 +967,7 @@ msgstr ""
 
 #: paperless/models.py:49
 msgid "never"
-msgstr ""
+msgstr "ποτέ"
 
 #: paperless/models.py:50
 msgid "with_text"
