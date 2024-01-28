@@ -1,5 +1,19 @@
 # Changelog
 
+## paperless-ngx 2.4.3
+
+### Bug Fixes
+
+- Fix: Ensure the scratch directory exists before consuming via the folder [@stumpylog](https://github.com/stumpylog) ([#5579](https://github.com/paperless-ngx/paperless-ngx/pull/5579))
+
+### Documentation
+
+- Remove demo info, for now [@shamoon](https://github.com/shamoon) ([#5557](https://github.com/paperless-ngx/paperless-ngx/pull/5557))
+
+### All App Changes
+
+- Fix: Ensure the scratch directory exists before consuming via the folder [@stumpylog](https://github.com/stumpylog) ([#5579](https://github.com/paperless-ngx/paperless-ngx/pull/5579))
+
 ## paperless-ngx 2.4.2
 
 ### Bug Fixes
