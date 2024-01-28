@@ -1159,6 +1159,36 @@ combination with PAPERLESS_CONSUMER_BARCODE_UPSCALE bigger than 1.0.
 
     Defaults to "300"
 
+#### [`PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE=<bool>`](#PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE) {#PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE}
+
+: Enables the detection of barcodes in the scanned document and
+assigns or creates tags if a properly formatted barcode is detected.
+
+    The barcode must match one of the (configurable) regular expressions.
+    If the barcode text contains ',' (comma), it is split into multiple
+    barcodes which are individually processed for tagging.
+
+    Matching is case insensitive.
+
+    Defaults to false.
+
+#### [`CONSUMER_TAG_BARCODE_MAPPING=<json dict>`](#CONSUMER_TAG_BARCODE_MAPPING) {#CONSUMER_TAG_BARCODE_MAPPING}
+
+: Defines a dictionary of filter regex and substitute expressions.
+
+    A barcode is only considered for tagging if at least one regex is matching
+    the barcode text. Before looking up or creating a tag, the substitute
+    is applied.
+
+    This allows very versatile matching as well as reformatting and mapping of
+    barcode pattern to tag values.
+
+    Syntax: {"<regex>": "<substitute>" [,...]]}
+
+    Defaults to {"TAG:(.*)": "\\g<1>"} which includes any barcode beginning with
+    TAG: followed by any number of characters. It is substitured by its name
+    without the TAG: text.
+
 ## Audit Trail
 
 #### [`PAPERLESS_AUDIT_LOG_ENABLED=<bool>`](#PAPERLESS_AUDIT_LOG_ENABLED) {#PAPERLESS_AUDIT_LOG_ENABLED}
