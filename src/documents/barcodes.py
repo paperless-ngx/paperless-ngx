@@ -333,8 +333,8 @@ class BarcodePlugin(ConsumeTaskPlugin):
                         )
                         tags.append(tag.pk)
 
-                except ValueError as e:
-                    logger.warning(
+                except Exception as e:
+                    logger.error(
                         f"Failed to find or create TAG '{raw}' because: {e}",
                     )
 

@@ -812,11 +812,13 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         """
         test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-custom-prefix.pdf"
         with self.get_reader(test_file) as reader:
+            reader.metadata.tag_ids = [99]
             reader.run()
             self.assertEqual(reader.pdf_file, test_file)
             tags = reader.metadata.tag_ids
-            self.assertEqual(len(tags), 1)
-            self.assertEqual(Tag.objects.get(name__iexact="00123").pk, tags[0])
+            self.assertEqual(len(tags), 2)
+            self.assertEqual(tags[0], 99)
+            self.assertEqual(Tag.objects.get(name__iexact="00123").pk, tags[1])
 
     @override_settings(
         CONSUMER_ENABLE_TAG_BARCODE=True,
@@ -844,3 +846,21 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
             self.assertEqual(Tag.objects.get(name__iexact="00125").pk, tags[2])
             self.assertEqual(Tag.objects.get(name__iexact="00126").pk, tags[3])
             self.assertEqual(Tag.objects.get(name__iexact="00127").pk, tags[4])
+
+    @override_settings(
+        CONSUMER_ENABLE_TAG_BARCODE=True,
+        CONSUMER_TAG_BARCODE_MAPPING={"CUSTOM-PREFIX-(.*)": "\\g<3>"},
+    )
+    def test_scan_file_for_tag_raises_value_error(self):
+        """
+        GIVEN:
+            - Any error occurs during tag barcode processing
+        THEN:
+            - The processing should be skipped and not break the import
+        """
+        test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-custom-prefix.pdf"
+        with self.get_reader(test_file) as reader:
+            reader.run()
+            # expect error to be caught and logged only
+            tags = reader.metadata.tag_ids
+            self.assertEqual(tags, None)
