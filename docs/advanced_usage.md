@@ -524,23 +524,11 @@ Django uses timezones but MySQL as well as MariaDB do not have any timezone info
 
 This results in not being able to filter by date ranges (i.e. using after/before in the "Created" or "Added" filters).
 
-To fix that, you have to add the timezone information into your database by using one of the following commands depending on whether you are using MySQL or MariaDB.
+To fix that, execute one of the following commands.
 
-Note: In case you are using the official MariaDB docker image, this is already done while initializing the database.
+MySQL: `mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql -p`
 
-To check whether an import of the timezone information is necessary, you can take a look into the `time_zone` table inside the `mysql` database. If this table is empty, you have to import the timezone information using the commands bellow.
-
-MySQL (and older MariaDB installations):
-
-```
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql -p
-```
-
-MariaDB:
-
-```
-mariadb-tzinfo-to-sql /usr/share/zoneinfo | mariadb -u root mysql -p
-```
+MariaDB: `mariadb-tzinfo-to-sql /usr/share/zoneinfo | mariadb -u root mysql -p`
 
 ## Barcodes {#barcodes}
 
