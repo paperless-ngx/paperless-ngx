@@ -8,7 +8,23 @@ CACHE_1_MINUTE: Final[int] = 60
 CACHE_5_MINUTES: Final[int] = 5 * CACHE_1_MINUTE
 CACHE_50_MINUTES: Final[int] = 50 * CACHE_1_MINUTE
 
-DOC_SUGGESTIONS_BASE: Final[str] = "doc_{}_suggest"
-DOC_METADATA_BASE: Final[str] = "doc_{}_metadata"
-DOC_THUMBNAIL_ETAG_BASE: Final[str] = "doc_{}_thumbnail_etag"
-DOC_THUMBNAIL_MODIFIED_BASE: Final[str] = "doc_{}_thumbnail_modified"
+
+def get_suggestion_key(document_id: int) -> str:
+    """
+    Builds the key to store a document's suggestion data in the cache
+    """
+    return f"doc_{document_id}_suggest"
+
+
+def get_metadata_key(document_id: int) -> str:
+    """
+    Builds the key to store a document's metadata data in the cache
+    """
+    return f"doc_{document_id}_metadata"
+
+
+def get_thumbnail_modified_key(document_id: int) -> str:
+    """
+    Builds the key to store a thumbnail's timestamp
+    """
+    return f"doc_{document_id}_thumbnail_modified"

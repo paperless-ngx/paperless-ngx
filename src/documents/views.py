@@ -36,6 +36,7 @@ from django.utils.translation import get_language
 from django.views import View
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import condition
+from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from langdetect import detect
@@ -65,8 +66,8 @@ from documents.bulk_download import OriginalAndArchiveStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
 from documents.caching import CACHE_5_MINUTES
 from documents.caching import CACHE_50_MINUTES
-from documents.caching import DOC_METADATA_BASE
-from documents.caching import DOC_SUGGESTIONS_BASE
+from documents.caching import get_metadata_key
+from documents.caching import get_suggestion_key
 from documents.classifier import load_classifier
 from documents.conditionals import metadata_etag
 from documents.conditionals import metadata_last_modified
@@ -74,7 +75,6 @@ from documents.conditionals import preview_etag
 from documents.conditionals import preview_last_modified
 from documents.conditionals import suggestions_etag
 from documents.conditionals import suggestions_last_modified
-from documents.conditionals import thumbnail_etag
 from documents.conditionals import thumbnail_last_modified
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
@@ -415,7 +415,7 @@ class DocumentViewSet(
         except Document.DoesNotExist:
             raise Http404
 
-        doc_key = DOC_METADATA_BASE.format(doc.pk)
+        doc_key = get_metadata_key(doc.pk)
 
         cache_hit = cache.get(doc_key)
 
@@ -472,7 +472,7 @@ class DocumentViewSet(
         ):
             return HttpResponseForbidden("Insufficient permissions")
 
-        doc_key = DOC_SUGGESTIONS_BASE.format(doc.pk)
+        doc_key = get_suggestion_key(doc.pk)
 
         cache_hit = cache.get(doc_key)
 
@@ -521,9 +521,7 @@ class DocumentViewSet(
 
     @action(methods=["get"], detail=True)
     @method_decorator(cache_control(public=False, max_age=CACHE_50_MINUTES))
-    @method_decorator(
-        condition(etag_func=thumbnail_etag, last_modified_func=thumbnail_last_modified),
-    )
+    @method_decorator(last_modified(thumbnail_last_modified))
     def thumb(self, request, pk=None):
         try:
             doc = Document.objects.get(id=pk)

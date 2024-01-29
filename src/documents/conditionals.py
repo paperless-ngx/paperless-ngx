@@ -1,6 +1,5 @@
 from datetime import datetime
 from datetime import timezone
-from hashlib import sha256
 from typing import Optional
 
 from django.conf import settings
@@ -11,8 +10,7 @@ from documents.caching import CACHE_50_MINUTES
 from documents.caching import CLASSIFIER_HASH_KEY
 from documents.caching import CLASSIFIER_MODIFIED_KEY
 from documents.caching import CLASSIFIER_VERSION_KEY
-from documents.caching import DOC_THUMBNAIL_ETAG_BASE
-from documents.caching import DOC_THUMBNAIL_MODIFIED_BASE
+from documents.caching import get_thumbnail_modified_key
 from documents.classifier import DocumentClassifier
 from documents.models import Document
 
@@ -113,33 +111,16 @@ def preview_etag(request, pk: int) -> Optional[str]:
 
 
 def preview_last_modified(request, pk: int) -> Optional[str]:
-    """ """
+    """
+    Uses the documents modified time to set the Last-Modified header.  Not strictly
+    speaking correct, but close enough and quick
+    """
     try:
         doc = Document.objects.get(pk=pk)
         return doc.modified
     except Document.DoesNotExist:  # pragma: no cover
         return None
     return None
-
-
-def thumbnail_etag(request, pk: int) -> Optional[str]:
-    """
-    Returns the SHA256 of a thumbnail, either from cache or calculated
-    """
-    try:
-        doc = Document.objects.get(pk=pk)
-        if not doc.thumbnail_path.exists():
-            return None
-        doc_key = DOC_THUMBNAIL_ETAG_BASE.format(pk)
-        cache_hit = cache.get(doc_key)
-        if cache_hit is not None:
-            return cache_hit
-        hasher = sha256()
-        hasher.update(doc.thumbnail_path.read_bytes())
-        thumb_checksum = hasher.hexdigest()
-        cache.set(doc_key, thumb_checksum, CACHE_50_MINUTES)
-    except Document.DoesNotExist:  # pragma: no cover
-        return None
 
 
 def thumbnail_last_modified(request, pk: int) -> Optional[int]:
@@ -150,10 +131,14 @@ def thumbnail_last_modified(request, pk: int) -> Optional[int]:
         doc = Document.objects.get(pk=pk)
         if not doc.thumbnail_path.exists():
             return None
-        doc_key = DOC_THUMBNAIL_MODIFIED_BASE.format(pk)
+        doc_key = get_thumbnail_modified_key(pk)
+
         cache_hit = cache.get(doc_key)
         if cache_hit is not None:
+            cache.touch(doc_key, CACHE_50_MINUTES)
             return cache_hit
+
+        # No cache, get the timestamp and cache the datetime
         last_modified = datetime.fromtimestamp(
             doc.thumbnail_path.stat().st_mtime,
             tz=timezone.utc,

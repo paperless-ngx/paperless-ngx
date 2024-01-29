@@ -213,6 +213,15 @@ class DocumentClassifier:
             and self.last_doc_change_time >= latest_doc_change
         ) and self.last_auto_type_hash == hasher.digest():
             logger.info("No updates since last training")
+            # Set the classifier information into the cache
+            # Caching for 50 minutes, so slightly less than the normal retrain time
+            cache.set(
+                CLASSIFIER_MODIFIED_KEY,
+                self.last_doc_change_time,
+                CACHE_50_MINUTES,
+            )
+            cache.set(CLASSIFIER_HASH_KEY, hasher.hexdigest(), CACHE_50_MINUTES)
+            cache.set(CLASSIFIER_VERSION_KEY, self.FORMAT_VERSION, CACHE_50_MINUTES)
             return False
 
         # subtract 1 since -1 (null) is also part of the classes.

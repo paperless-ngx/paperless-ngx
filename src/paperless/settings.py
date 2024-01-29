@@ -767,6 +767,7 @@ CACHES = {
             "django.core.cache.backends.redis.RedisCache",
         ),
         "LOCATION": _CHANNELS_REDIS_URL,
+        "KEY_PREFIX": os.getenv("PAPERLESS_REDIS_PREFIX", ""),
     },
 }
 
