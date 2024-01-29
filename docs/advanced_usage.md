@@ -519,11 +519,11 @@ existing tables) with:
 
 ### Missing timezones
 
-Django uses timezones but MySQL as well as MariaDB do not have any timezone information by default.
+MySQL as well as MariaDB do not have any timezone information by default (though some
+docker images such as the official MariaDB image take care of this for you) which will
+cause unexpected behavior with date-based queries.
 
-This results in not being able to filter by date ranges (i.e. using after/before in the "Created" or "Added" filters).
-
-To fix that, execute one of the following commands.
+To fix this, execute one of the following commands:
 
 MySQL: `mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql -p`
 
