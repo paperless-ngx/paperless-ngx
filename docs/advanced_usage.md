@@ -517,6 +517,18 @@ existing tables) with:
     an older system may fix issues that can arise while setting up Paperless-ngx but
     `utf8mb3` can cause issues with consumption (where `utf8mb4` does not).
 
+### Missing timezones
+
+MySQL as well as MariaDB do not have any timezone information by default (though some
+docker images such as the official MariaDB image take care of this for you) which will
+cause unexpected behavior with date-based queries.
+
+To fix this, execute one of the following commands:
+
+MySQL: `mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql -p`
+
+MariaDB: `mariadb-tzinfo-to-sql /usr/share/zoneinfo | mariadb -u root mysql -p`
+
 ## Barcodes {#barcodes}
 
 Paperless is able to utilize barcodes for automatically performing some tasks.
