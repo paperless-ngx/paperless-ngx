@@ -517,7 +517,6 @@ existing tables) with:
     an older system may fix issues that can arise while setting up Paperless-ngx but
     `utf8mb3` can cause issues with consumption (where `utf8mb4` does not).
 
-
 ### Missing timezones
 
 Django uses timezones but MySQL as well as MariaDB do not have any timezone information by default.
