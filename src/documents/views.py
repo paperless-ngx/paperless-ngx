@@ -415,13 +415,28 @@ class DocumentViewSet(
         except Document.DoesNotExist:
             raise Http404
 
-        doc_key = get_metadata_key(doc.pk)
+        doc_original_key = get_metadata_key(doc.pk, is_archive=False)
+        doc_archive_key = get_metadata_key(doc.pk, is_archive=True)
 
-        cache_hit = cache.get(doc_key)
+        cache_hits = cache.get_many([doc_original_key, doc_archive_key])
 
-        if cache_hit is not None:
-            cache.touch(doc_key, CACHE_5_MINUTES)
-            return Response(cache_hit)
+        # use cached original file metadata if possible, else gather then cache
+        if doc_original_key in cache_hits:
+            cache.touch(doc_original_key, CACHE_5_MINUTES)
+            original_metadata = cache_hits[doc_original_key]
+        else:
+            original_metadata = self.get_metadata(doc.source_path, doc.mime_type)
+            cache.set(doc_original_key, original_metadata, CACHE_5_MINUTES)
+
+        # use cached archive file metadata, if applicable, then cache if it wasn't
+        archive_metadata = None
+        archive_filesize = None
+        if doc.has_archive_version and doc_archive_key in cache_hits:
+            archive_metadata = cache_hits[doc_archive_key]
+        elif doc.has_archive_version:
+            archive_filesize = self.get_filesize(doc.archive_path)
+            archive_metadata = self.get_metadata(doc.archive_path, "application/pdf")
+            cache.set(doc_archive_key, archive_metadata, CACHE_5_MINUTES)
 
         meta = {
             "original_checksum": doc.checksum,
@@ -429,10 +444,12 @@ class DocumentViewSet(
             "original_mime_type": doc.mime_type,
             "media_filename": doc.filename,
             "has_archive_version": doc.has_archive_version,
-            "original_metadata": self.get_metadata(doc.source_path, doc.mime_type),
+            "original_metadata": original_metadata,
             "archive_checksum": doc.archive_checksum,
             "archive_media_filename": doc.archive_filename,
             "original_filename": doc.original_filename,
+            "archive_size": archive_filesize,
+            "archive_metadata": archive_metadata,
         }
 
         lang = "en"
@@ -441,18 +458,6 @@ class DocumentViewSet(
         except Exception:
             pass
         meta["lang"] = lang
-
-        if doc.has_archive_version:
-            meta["archive_size"] = self.get_filesize(doc.archive_path)
-            meta["archive_metadata"] = self.get_metadata(
-                doc.archive_path,
-                "application/pdf",
-            )
-        else:
-            meta["archive_size"] = None
-            meta["archive_metadata"] = None
-
-        cache.set(doc_key, meta, CACHE_5_MINUTES)
 
         return Response(meta)
 

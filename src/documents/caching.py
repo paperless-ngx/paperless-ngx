@@ -16,11 +16,15 @@ def get_suggestion_key(document_id: int) -> str:
     return f"doc_{document_id}_suggest"
 
 
-def get_metadata_key(document_id: int) -> str:
+def get_metadata_key(document_id: int, is_archive: bool) -> str:
     """
     Builds the key to store a document's metadata data in the cache
     """
-    return f"doc_{document_id}_metadata"
+    return (
+        f"doc_{document_id}_archive_metadata"
+        if is_archive
+        else f"doc_{document_id}_original_metadata"
+    )
 
 
 def get_thumbnail_modified_key(document_id: int) -> str:
