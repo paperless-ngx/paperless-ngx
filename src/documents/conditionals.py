@@ -110,7 +110,7 @@ def preview_etag(request, pk: int) -> Optional[str]:
     return None
 
 
-def preview_last_modified(request, pk: int) -> Optional[str]:
+def preview_last_modified(request, pk: int) -> Optional[datetime]:
     """
     Uses the documents modified time to set the Last-Modified header.  Not strictly
     speaking correct, but close enough and quick
@@ -123,7 +123,7 @@ def preview_last_modified(request, pk: int) -> Optional[str]:
     return None
 
 
-def thumbnail_last_modified(request, pk: int) -> Optional[int]:
+def thumbnail_last_modified(request, pk: int) -> Optional[datetime]:
     """
     Returns the filesystem last modified either from cache or from filesystem
     """
