@@ -184,7 +184,7 @@ jobs:
           cache-dependency-path: 'src-ui/package-lock.json'
       - name: Cache frontend dependencies
         id: cache-frontend-deps
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.npm
@@ -221,7 +221,7 @@ jobs:
           cache-dependency-path: 'src-ui/package-lock.json'
       - name: Cache frontend dependencies
         id: cache-frontend-deps
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.npm
