@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-05 21:26-0800\n"
-"PO-Revision-Date: 2024-01-06 05:27\n"
+"PO-Revision-Date: 2024-01-25 00:24\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -565,11 +565,11 @@ msgstr ""
 
 #: documents/models.py:755
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: documents/models.py:756
 msgid "Date"
-msgstr ""
+msgstr "Tarih"
 
 #: documents/models.py:757
 msgid "Boolean"
@@ -717,7 +717,7 @@ msgstr ""
 
 #: documents/models.py:1059
 msgid "grant view permissions to these users"
-msgstr ""
+msgstr "bu kullanıcılara görüntüleme izni ver"
 
 #: documents/models.py:1066
 msgid "grant view permissions to these groups"
@@ -725,11 +725,11 @@ msgstr ""
 
 #: documents/models.py:1073
 msgid "grant change permissions to these users"
-msgstr ""
+msgstr "bu kullanıcılara değişiklik yapma izni ver"
 
 #: documents/models.py:1080
 msgid "grant change permissions to these groups"
-msgstr ""
+msgstr "bu gruplara değişiklik yapma izni ver"
 
 #: documents/models.py:1087
 msgid "assign these custom fields"
@@ -815,11 +815,11 @@ msgstr "Kullanıcı adınız ve parolanız uymuyor. Lütfen tekrar deneyiniz."
 
 #: documents/templates/registration/login.html:48
 msgid "Share link was not found."
-msgstr ""
+msgstr "Paylaşım bağlantısı bulunamadı."
 
 #: documents/templates/registration/login.html:52
 msgid "Share link has expired."
-msgstr ""
+msgstr "Bağlantının kullanım süresi doldu."
 
 #: documents/templates/registration/login.html:55
 msgid "Username"
@@ -835,7 +835,7 @@ msgstr "Oturum aç"
 
 #: documents/templates/registration/login.html:70
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Şifrenizi mi unuttunuz?"
 
 #: documents/templates/registration/password_reset_complete.html:14
 msgid "Paperless-ngx reset password complete"
@@ -843,7 +843,7 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_complete.html:40
 msgid "Password reset complete."
-msgstr ""
+msgstr "Şifre sıfırlama tamamlandı."
 
 #: documents/templates/registration/password_reset_complete.html:42
 #, python-format
@@ -856,7 +856,7 @@ msgstr ""
 
 #: documents/templates/registration/password_reset_confirm.html:42
 msgid "Set a new password."
-msgstr ""
+msgstr "Yeni bir şifre belirleyin."
 
 #: documents/templates/registration/password_reset_confirm.html:46
 msgid "Passwords did not match or too weak. Try again."
@@ -951,7 +951,7 @@ msgstr ""
 
 #: paperless/models.py:38
 msgid "skip"
-msgstr ""
+msgstr "atla"
 
 #: paperless/models.py:39
 msgid "redo"
@@ -967,7 +967,7 @@ msgstr ""
 
 #: paperless/models.py:49
 msgid "never"
-msgstr ""
+msgstr "asla"
 
 #: paperless/models.py:50
 msgid "with_text"
@@ -995,7 +995,7 @@ msgstr ""
 
 #: paperless/models.py:70
 msgid "RGB"
-msgstr ""
+msgstr "RGB"
 
 #: paperless/models.py:71
 msgid "UseDeviceIndependentColor"
@@ -1007,7 +1007,7 @@ msgstr ""
 
 #: paperless/models.py:73
 msgid "CMYK"
-msgstr ""
+msgstr "CMYK"
 
 #: paperless/models.py:82
 msgid "Sets the output PDF type"

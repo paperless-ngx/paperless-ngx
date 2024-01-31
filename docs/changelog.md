@@ -1,5 +1,57 @@
 # Changelog
 
+## paperless-ngx 2.4.2
+
+### Bug Fixes
+
+- Fix: improve one of the date matching regexes [@shamoon](https://github.com/shamoon) ([#5540](https://github.com/paperless-ngx/paperless-ngx/pull/5540))
+- Fix: tweak doc detail component behavior while awaiting metadata [@shamoon](https://github.com/shamoon) ([#5546](https://github.com/paperless-ngx/paperless-ngx/pull/5546))
+
+### All App Changes
+
+<details>
+<summary>2 changes</summary>
+
+- Fix: improve one of the date matching regexes [@shamoon](https://github.com/shamoon) ([#5540](https://github.com/paperless-ngx/paperless-ngx/pull/5540))
+- Fix: tweak doc detail component behavior while awaiting metadata [@shamoon](https://github.com/shamoon) ([#5546](https://github.com/paperless-ngx/paperless-ngx/pull/5546))
+</details>
+
+## paperless-ngx 2.4.1
+
+### Breaking Changes
+
+- Change: merge workflow permissions assignments instead of overwrite [@shamoon](https://github.com/shamoon) ([#5496](https://github.com/paperless-ngx/paperless-ngx/pull/5496))
+
+### Bug Fixes
+
+- Fix: Minor frontend things in 2.4.0 [@shamoon](https://github.com/shamoon) ([#5514](https://github.com/paperless-ngx/paperless-ngx/pull/5514))
+- Fix: install script fails on alpine linux [@shamoon](https://github.com/shamoon) ([#5520](https://github.com/paperless-ngx/paperless-ngx/pull/5520))
+- Fix: enforce permissions for app config [@shamoon](https://github.com/shamoon) ([#5516](https://github.com/paperless-ngx/paperless-ngx/pull/5516))
+- Fix: render images not converted to pdf, refactor doc detail rendering [@shamoon](https://github.com/shamoon) ([#5475](https://github.com/paperless-ngx/paperless-ngx/pull/5475))
+- Fix: Dont parse numbers with exponent as integer [@shamoon](https://github.com/shamoon) ([#5457](https://github.com/paperless-ngx/paperless-ngx/pull/5457))
+
+### Maintenance
+
+- Chore: Build fix- branches [@shamoon](https://github.com/shamoon) ([#5501](https://github.com/paperless-ngx/paperless-ngx/pull/5501))
+
+### Dependencies
+
+- Chore(deps-dev): Bump the development group with 1 update [@dependabot](https://github.com/dependabot) ([#5503](https://github.com/paperless-ngx/paperless-ngx/pull/5503))
+
+### All App Changes
+
+<details>
+<summary>7 changes</summary>
+
+- Revert "Enhancement: support remote user auth directly against API (DRF)" @shamoon ([#5534](https://github.com/paperless-ngx/paperless-ngx/pull/5534))
+- Fix: Minor frontend things in 2.4.0 [@shamoon](https://github.com/shamoon) ([#5514](https://github.com/paperless-ngx/paperless-ngx/pull/5514))
+- Fix: enforce permissions for app config [@shamoon](https://github.com/shamoon) ([#5516](https://github.com/paperless-ngx/paperless-ngx/pull/5516))
+- Change: merge workflow permissions assignments instead of overwrite [@shamoon](https://github.com/shamoon) ([#5496](https://github.com/paperless-ngx/paperless-ngx/pull/5496))
+- Chore(deps-dev): Bump the development group with 1 update [@dependabot](https://github.com/dependabot) ([#5503](https://github.com/paperless-ngx/paperless-ngx/pull/5503))
+- Fix: render images not converted to pdf, refactor doc detail rendering [@shamoon](https://github.com/shamoon) ([#5475](https://github.com/paperless-ngx/paperless-ngx/pull/5475))
+- Fix: Dont parse numbers with exponent as integer [@shamoon](https://github.com/shamoon) ([#5457](https://github.com/paperless-ngx/paperless-ngx/pull/5457))
+</details>
+
 ## paperless-ngx 2.4.0
 
 ### Features
