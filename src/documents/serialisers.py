@@ -869,6 +869,7 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
             "delete",
             "redo_ocr",
             "set_permissions",
+            "rotate",
         ],
         label="Method",
         write_only=True,
@@ -906,6 +907,8 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
             return bulk_edit.redo_ocr
         elif method == "set_permissions":
             return bulk_edit.set_permissions
+        elif method == "rotate":
+            return bulk_edit.rotate
         else:
             raise serializers.ValidationError("Unsupported method.")
 
@@ -984,6 +987,16 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
         if "merge" not in parameters:
             parameters["merge"] = False
 
+    def _validate_parameters_rotate(self, parameters):
+        try:
+            if (
+                "degrees" not in parameters
+                or not float(parameters["degrees"]).is_integer()
+            ):
+                raise serializers.ValidationError("invalid rotation degrees")
+        except ValueError:
+            raise serializers.ValidationError("invalid rotation degrees")
+
     def validate(self, attrs):
         method = attrs["method"]
         parameters = attrs["parameters"]
@@ -1000,6 +1013,8 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
             self._validate_storage_path(parameters)
         elif method == bulk_edit.set_permissions:
             self._validate_parameters_set_permissions(parameters)
+        elif method == bulk_edit.rotate:
+            self._validate_parameters_rotate(parameters)
 
         return attrs
 

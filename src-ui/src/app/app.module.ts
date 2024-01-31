@@ -116,9 +116,11 @@ import { ConfirmButtonComponent } from './components/common/confirm-button/confi
 import { MonetaryComponent } from './components/common/input/monetary/monetary.component'
 import { SystemStatusDialogComponent } from './components/common/system-status-dialog/system-status-dialog.component'
 import { NgxFilesizeModule } from 'ngx-filesize'
+import { RotateConfirmDialogComponent } from './components/common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import {
   airplane,
   archive,
+  arrowClockwise,
   arrowCounterclockwise,
   arrowDown,
   arrowLeft,
@@ -127,6 +129,7 @@ import {
   arrowRightShort,
   arrowUpRight,
   asterisk,
+  bodyText,
   boxArrowUp,
   boxArrowUpRight,
   boxes,
@@ -209,6 +212,7 @@ import {
 const icons = {
   airplane,
   archive,
+  arrowClockwise,
   arrowCounterclockwise,
   arrowDown,
   arrowLeft,
@@ -217,6 +221,7 @@ const icons = {
   arrowRightShort,
   arrowUpRight,
   asterisk,
+  bodyText,
   boxArrowUp,
   boxArrowUpRight,
   boxes,
@@ -458,6 +463,7 @@ function initializeApp(settings: SettingsService) {
     ConfirmButtonComponent,
     MonetaryComponent,
     SystemStatusDialogComponent,
+    RotateConfirmDialogComponent,
   ],
   imports: [
     BrowserModule,

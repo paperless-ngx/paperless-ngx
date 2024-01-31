@@ -39,6 +39,7 @@ import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
 import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 
 @Component({
   selector: 'pngx-bulk-editor',
@@ -640,5 +641,26 @@ export class BulkEditorComponent
         })
       }
     )
+  }
+
+  rotateSelected() {
+    let modal = this.modalService.open(RotateConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    const rotateDialog = modal.componentInstance as RotateConfirmDialogComponent
+    rotateDialog.title = $localize`Rotate confirm`
+    rotateDialog.messageBold = $localize`This operation will permanently rotate ${this.list.selected.size} selected document(s).`
+    rotateDialog.message = $localize`This will alter the original copy.`
+    rotateDialog.btnClass = 'btn-danger'
+    rotateDialog.btnCaption = $localize`Proceed`
+    rotateDialog.documentID = Array.from(this.list.selected)[0]
+    rotateDialog.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        rotateDialog.buttonsEnabled = false
+        this.executeBulkOperation(modal, 'rotate', {
+          degrees: rotateDialog.degrees,
+        })
+      })
   }
 }
