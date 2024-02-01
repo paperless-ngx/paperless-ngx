@@ -22,6 +22,7 @@ import { DocumentListViewService } from 'src/app/services/document-list-view.ser
 import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
+import { PermissionsService } from 'src/app/services/permissions.service'
 
 @Component({
   selector: 'pngx-saved-view-widget',
@@ -40,7 +41,8 @@ export class SavedViewWidgetComponent
     private list: DocumentListViewService,
     private consumerStatusService: ConsumerStatusService,
     public openDocumentsService: OpenDocumentsService,
-    public documentListViewService: DocumentListViewService
+    public documentListViewService: DocumentListViewService,
+    public permissionsService: PermissionsService
   ) {
     super()
   }
