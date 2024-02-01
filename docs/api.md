@@ -191,7 +191,7 @@ results:
 
 - `/api/documents/?query=your%20search%20query`: Search for a document
   using a full text query. For details on the syntax, see [Basic Usage - Searching](usage.md#basic-usage_searching).
-- `/api/documents/?more_like=1234`: Search for documents similar to
+- `/api/documents/?more_like_id=1234`: Search for documents similar to
   the document with id 1234.
 
 Pagination works exactly the same as it does for normal requests on this
