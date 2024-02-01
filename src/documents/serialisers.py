@@ -726,7 +726,7 @@ class DocumentSerializer(
             context.get("request").method == "PATCH"
             or context.get("request").method == "PUT"
         ):
-            kwargs.__setitem__("full_perms", True)
+            kwargs["full_perms"] = True
 
         super().__init__(*args, **kwargs)
 
