@@ -250,25 +250,50 @@ export class DocumentDetailComponent
         Object.assign(this.document, docValues)
       })
 
-    this.correspondentService
-      .listAll()
-      .pipe(first(), takeUntil(this.unsubscribeNotifier))
-      .subscribe((result) => (this.correspondents = result.results))
-
-    this.documentTypeService
-      .listAll()
-      .pipe(first(), takeUntil(this.unsubscribeNotifier))
-      .subscribe((result) => (this.documentTypes = result.results))
-
-    this.storagePathService
-      .listAll()
-      .pipe(first(), takeUntil(this.unsubscribeNotifier))
-      .subscribe((result) => (this.storagePaths = result.results))
-
-    this.userService
-      .listAll()
-      .pipe(first(), takeUntil(this.unsubscribeNotifier))
-      .subscribe((result) => (this.users = result.results))
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Correspondent
+      )
+    ) {
+      this.correspondentService
+        .listAll()
+        .pipe(first(), takeUntil(this.unsubscribeNotifier))
+        .subscribe((result) => (this.correspondents = result.results))
+    }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.DocumentType
+      )
+    ) {
+      this.documentTypeService
+        .listAll()
+        .pipe(first(), takeUntil(this.unsubscribeNotifier))
+        .subscribe((result) => (this.documentTypes = result.results))
+    }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.StoragePath
+      )
+    ) {
+      this.storagePathService
+        .listAll()
+        .pipe(first(), takeUntil(this.unsubscribeNotifier))
+        .subscribe((result) => (this.storagePaths = result.results))
+    }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.User
+      )
+    ) {
+      this.userService
+        .listAll()
+        .pipe(first(), takeUntil(this.unsubscribeNotifier))
+        .subscribe((result) => (this.users = result.results))
+    }
 
     this.getCustomFields()
 

@@ -115,22 +115,50 @@ export class BulkEditorComponent
   }
 
   ngOnInit() {
-    this.tagService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.tags = result.results))
-    this.correspondentService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.correspondents = result.results))
-    this.documentTypeService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.documentTypes = result.results))
-    this.storagePathService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.storagePaths = result.results))
+    if (
+      this.permissionService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Tag
+      )
+    ) {
+      this.tagService
+        .listAll()
+        .pipe(first())
+        .subscribe((result) => (this.tags = result.results))
+    }
+    if (
+      this.permissionService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Correspondent
+      )
+    ) {
+      this.correspondentService
+        .listAll()
+        .pipe(first())
+        .subscribe((result) => (this.correspondents = result.results))
+    }
+    if (
+      this.permissionService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.DocumentType
+      )
+    ) {
+      this.documentTypeService
+        .listAll()
+        .pipe(first())
+        .subscribe((result) => (this.documentTypes = result.results))
+    }
+    if (
+      this.permissionService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.StoragePath
+      )
+    ) {
+      this.storagePathService
+        .listAll()
+        .pipe(first())
+        .subscribe((result) => (this.storagePaths = result.results))
+    }
 
     this.downloadForm
       .get('downloadFileTypeArchive')
