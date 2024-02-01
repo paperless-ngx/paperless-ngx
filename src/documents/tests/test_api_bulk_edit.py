@@ -766,6 +766,58 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         self.assertEqual(len(kwargs["set_permissions"]["view"]["users"]), 2)
 
     @mock.patch("documents.serialisers.bulk_edit.set_permissions")
+    def test_set_permissions_merge(self, m):
+        m.return_value = "OK"
+        user1 = User.objects.create(username="user1")
+        user2 = User.objects.create(username="user2")
+        permissions = {
+            "view": {
+                "users": [user1.id, user2.id],
+                "groups": None,
+            },
+            "change": {
+                "users": [user1.id],
+                "groups": None,
+            },
+        }
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id, self.doc3.id],
+                    "method": "set_permissions",
+                    "parameters": {"set_permissions": permissions},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        m.assert_called()
+        args, kwargs = m.call_args
+        self.assertEqual(kwargs["merge"], False)
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id, self.doc3.id],
+                    "method": "set_permissions",
+                    "parameters": {"set_permissions": permissions, "merge": True},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        m.assert_called()
+        args, kwargs = m.call_args
+        self.assertEqual(kwargs["merge"], True)
+
+    @mock.patch("documents.serialisers.bulk_edit.set_permissions")
     def test_insufficient_permissions_ownership(self, m):
         """
         GIVEN:

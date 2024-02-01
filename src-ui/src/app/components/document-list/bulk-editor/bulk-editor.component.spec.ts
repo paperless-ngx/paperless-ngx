@@ -41,6 +41,7 @@ import { PermissionsUserComponent } from '../../common/input/permissions/permiss
 import { NgSelectModule } from '@ng-select/ng-select'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { SwitchComponent } from '../../common/input/switch/switch.component'
 
 const selectionData: SelectionData = {
   selected_tags: [
@@ -81,6 +82,7 @@ describe('BulkEditorComponent', () => {
         SelectComponent,
         PermissionsGroupComponent,
         PermissionsUserComponent,
+        SwitchComponent,
       ],
       providers: [
         PermissionsService,
@@ -851,7 +853,18 @@ describe('BulkEditorComponent', () => {
     fixture.detectChanges()
     component.setPermissions()
     expect(modal).not.toBeUndefined()
-    modal.componentInstance.confirmClicked.next()
+    const perms = {
+      permissions: {
+        view_users: [],
+        change_users: [],
+        view_groups: [],
+        change_groups: [],
+      },
+    }
+    modal.componentInstance.confirmClicked.emit({
+      permissions: perms,
+      merge: true,
+    })
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/bulk_edit/`
     )
@@ -859,7 +872,10 @@ describe('BulkEditorComponent', () => {
     expect(req.request.body).toEqual({
       documents: [3, 4],
       method: 'set_permissions',
-      parameters: undefined,
+      parameters: {
+        permissions: perms.permissions,
+        merge: true,
+      },
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
