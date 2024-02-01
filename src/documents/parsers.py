@@ -140,6 +140,7 @@ def run_convert(
     type=None,
     depth=None,
     auto_orient=False,
+    use_cropbox=False,
     extra=None,
     logging_group=None,
 ) -> None:
@@ -158,6 +159,7 @@ def run_convert(
     args += ["-type", str(type)] if type else []
     args += ["-depth", str(depth)] if depth else []
     args += ["-auto-orient"] if auto_orient else []
+    args += ["-define", "pdf:use-cropbox=true"] if use_cropbox else []
     args += [input_file, output_file]
 
     logger.debug("Execute: " + " ".join(args), extra={"group": logging_group})
@@ -229,6 +231,7 @@ def make_thumbnail_from_pdf(in_path, temp_dir, logging_group=None) -> str:
             strip=True,
             trim=False,
             auto_orient=True,
+            use_cropbox=True,
             input_file=f"{in_path}[0]",
             output_file=out_path,
             logging_group=logging_group,
