@@ -67,7 +67,7 @@ export class PermissionsFilterDropdownComponent extends ComponentWithPermissions
   }
 
   constructor(
-    permissionsService: PermissionsService,
+    public permissionsService: PermissionsService,
     userService: UserService,
     private settingsService: SettingsService
   ) {

@@ -868,4 +868,22 @@ describe('BulkEditorComponent', () => {
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     ) // listAllFilteredIds
   })
+
+  it('should not attempt to retrieve objects if user does not have permissions', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    expect(component.tags).toBeUndefined()
+    expect(component.correspondents).toBeUndefined()
+    expect(component.documentTypes).toBeUndefined()
+    expect(component.storagePaths).toBeUndefined()
+    httpTestingController.expectNone(`${environment.apiBaseUrl}documents/tags/`)
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/correspondents/`
+    )
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/document_types/`
+    )
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/storage_paths/`
+    )
+  })
 })
