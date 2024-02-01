@@ -41,6 +41,7 @@ import { TagsComponent } from '../../common/input/tags/tags.component'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { SwitchComponent } from '../../common/input/switch/switch.component'
 
 const mailAccounts = [
   { id: 1, name: 'account1' },
@@ -82,6 +83,7 @@ describe('MailComponent', () => {
         PermissionsGroupComponent,
         PermissionsDialogComponent,
         PermissionsFormComponent,
+        SwitchComponent,
       ],
       providers: [CustomDatePipe, DatePipe, PermissionsGuard],
       imports: [
@@ -267,11 +269,11 @@ describe('MailComponent', () => {
     rulePatchSpy.mockReturnValueOnce(
       throwError(() => new Error('error saving perms'))
     )
-    dialog.confirmClicked.emit(perms)
+    dialog.confirmClicked.emit({ permissions: perms, merge: true })
     expect(rulePatchSpy).toHaveBeenCalled()
     expect(toastErrorSpy).toHaveBeenCalled()
     rulePatchSpy.mockReturnValueOnce(of(mailRules[0] as MailRule))
-    dialog.confirmClicked.emit(perms)
+    dialog.confirmClicked.emit({ permissions: perms, merge: true })
     expect(toastInfoSpy).toHaveBeenCalledWith('Permissions updated')
 
     modalService.dismissAll()
@@ -299,8 +301,7 @@ describe('MailComponent', () => {
     expect(modal).not.toBeUndefined()
     let dialog = modal.componentInstance as PermissionsDialogComponent
     expect(dialog.object).toEqual(mailAccounts[0])
-    dialog = modal.componentInstance as PermissionsDialogComponent
-    dialog.confirmClicked.emit(perms)
+    dialog.confirmClicked.emit({ permissions: perms, merge: true })
     expect(accountPatchSpy).toHaveBeenCalled()
   })
 })

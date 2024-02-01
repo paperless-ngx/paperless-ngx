@@ -700,8 +700,8 @@ class TestBulkEditObjectPermissions(APITestCase):
     def setUp(self):
         super().setUp()
 
-        user = User.objects.create_superuser(username="temp_admin")
-        self.client.force_authenticate(user=user)
+        self.temp_admin = User.objects.create_superuser(username="temp_admin")
+        self.client.force_authenticate(user=self.temp_admin)
 
         self.t1 = Tag.objects.create(name="t1")
         self.t2 = Tag.objects.create(name="t2")
@@ -821,6 +821,79 @@ class TestBulkEditObjectPermissions(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(StoragePath.objects.get(pk=self.sp1.id).owner, self.user3)
+
+    def test_bulk_object_set_permissions_merge(self):
+        """
+        GIVEN:
+            - Existing objects
+        WHEN:
+            - bulk_edit_object_perms API endpoint is called with merge=True or merge=False (default)
+        THEN:
+            - Permissions and / or owner are replaced or merged, depending on the merge flag
+        """
+        permissions = {
+            "view": {
+                "users": [self.user1.id, self.user2.id],
+                "groups": [],
+            },
+            "change": {
+                "users": [self.user1.id],
+                "groups": [],
+            },
+        }
+
+        assign_perm("view_tag", self.user3, self.t1)
+        self.t1.owner = self.user3
+        self.t1.save()
+
+        # merge=True
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": [self.t1.id, self.t2.id],
+                    "object_type": "tags",
+                    "owner": self.user1.id,
+                    "permissions": permissions,
+                    "merge": True,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.t1.refresh_from_db()
+        self.t2.refresh_from_db()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # user3 should still be owner of t1 since was set prior
+        self.assertEqual(self.t1.owner, self.user3)
+        # user1 should now be owner of t2 since it didn't have an owner
+        self.assertEqual(self.t2.owner, self.user1)
+
+        # user1 should be added
+        self.assertIn(self.user1, get_users_with_perms(self.t1))
+        # user3 should be preserved
+        self.assertIn(self.user3, get_users_with_perms(self.t1))
+
+        # merge=False (default)
+        response = self.client.post(
+            "/api/bulk_edit_object_perms/",
+            json.dumps(
+                {
+                    "objects": [self.t1.id, self.t2.id],
+                    "object_type": "tags",
+                    "permissions": permissions,
+                    "merge": False,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # user1 should be added
+        self.assertIn(self.user1, get_users_with_perms(self.t1))
+        # user3 should be removed
+        self.assertNotIn(self.user3, get_users_with_perms(self.t1))
 
     def test_bulk_edit_object_permissions_insufficient_perms(self):
         """

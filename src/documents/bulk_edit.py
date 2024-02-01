@@ -129,13 +129,17 @@ def redo_ocr(doc_ids):
     return "OK"
 
 
-def set_permissions(doc_ids, set_permissions, owner=None):
+def set_permissions(doc_ids, set_permissions, owner=None, merge=False):
     qs = Document.objects.filter(id__in=doc_ids)
 
-    qs.update(owner=owner)
+    if merge:
+        # If merging, only set owner for documents that don't have an owner
+        qs.filter(owner__isnull=True).update(owner=owner)
+    else:
+        qs.update(owner=owner)
 
     for doc in qs:
-        set_permissions_for_object(set_permissions, doc)
+        set_permissions_for_object(permissions=set_permissions, object=doc, merge=merge)
 
     affected_docs = [doc.id for doc in qs]
 
