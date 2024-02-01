@@ -916,6 +916,8 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
         )
         if "owner" in parameters and parameters["owner"] is not None:
             self._validate_owner(parameters["owner"])
+        if "merge" not in parameters:
+            parameters["merge"] = False
 
     def validate(self, attrs):
         method = attrs["method"]
@@ -1256,6 +1258,12 @@ class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissions
         allow_empty=False,
         required=False,
         write_only=True,
+    )
+
+    merge = serializers.BooleanField(
+        default=False,
+        write_only=True,
+        required=False,
     )
 
     def get_object_class(self, object_type):

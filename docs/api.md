@@ -330,6 +330,64 @@ granted). You can pass the parameter `full_perms=true` to API calls to view the
 full permissions of objects in a format that mirrors the `set_permissions`
 parameter above.
 
+## Bulk Editing
+
+The API supports various bulk-editing operations which are executed asynchronously.
+
+### Documents
+
+For bulk operations on documents, use the endpoint `/api/bulk_edit/` which accepts
+a json payload of the format:
+
+```json
+{
+  "documents": [LIST_OF_DOCUMENT_IDS],
+  "method": METHOD, // see below
+  "parameters": args // see below
+}
+```
+
+The following methods are supported:
+
+- `set_correspondent`
+  - Requires `parameters`: `{ "correspondent": CORRESPONDENT_ID }`
+- `set_document_type`
+  - Requires `parameters`: `{ "document_type": DOCUMENT_TYPE_ID }`
+- `set_storage_path`
+  - Requires `parameters`: `{ "storage_path": STORAGE_PATH_ID }`
+- `add_tag`
+  - Requires `parameters`: `{ "tag": TAG_ID }`
+- `remove_tag`
+  - Requires `parameters`: `{ "tag": TAG_ID }`
+- `modify_tags`
+  - Requires `parameters`: `{ "add_tags": [LIST_OF_TAG_IDS] }` and / or `{ "remove_tags": [LIST_OF_TAG_IDS] }`
+- `delete`
+  - No `parameters` required
+- `redo_ocr`
+  - No `parameters` required
+- `set_permissions`
+  - Requires `parameters`:
+    - `"permissions": PERMISSIONS_OBJ` (see format [above](#permissions)) and / or
+    - `"owner": OWNER_ID or null`
+    - `"merge": true or false` (defaults to false)
+  - The `merge` flag determines if the supplied permissions will overwrite all existing permissions (including
+    removing them) or be merged with existing permissions.
+
+### Objects
+
+Bulk editing for objects (tags, document types etc.) currently supports only updating permissions, using
+the endpoint: `/api/bulk_edit_object_perms/` which requires a json payload of the format:
+
+```json
+{
+  "objects": [LIST_OF_OBJECT_IDS],
+  "object_type": "tags", "correspondents", "document_types" or "storage_paths"
+  "owner": OWNER_ID // optional
+  "permissions": { "view": { "users": [] ... }, "change": { ... } }, // (see 'set_permissions' format above)
+  "merge": true / false // defaults to false, see above
+}
+```
+
 ## API Versioning
 
 The REST API is versioned since Paperless-ngx 1.3.0.
@@ -386,3 +444,13 @@ Initial API version.
   color to use for a specific tag, which is either black or white
   depending on the brightness of `Tag.color`.
 - Removed field `Tag.colour`.
+
+#### Version 3
+
+- Permissions endpoints have been added.
+- The format of the `/api/ui_settings/` has changed.
+
+#### Version 4
+
+- Consumption templates were refactored to workflows and API endpoints
+  changed as such.
