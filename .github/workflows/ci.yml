@@ -283,7 +283,7 @@ jobs:
           merge-multiple: true
       -
         name: Upload frontend coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           # not required for public repos, but intermittently fails otherwise
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -299,7 +299,7 @@ jobs:
           path: src/
       -
         name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           # not required for public repos, but intermittently fails otherwise
           token: ${{ secrets.CODECOV_TOKEN }}
