@@ -13,6 +13,11 @@ import { TagService } from './tag.service'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
 import { queryParamsFromFilterRules } from '../../utils/query-params'
 import { StoragePathService } from './storage-path.service'
+import {
+  PermissionAction,
+  PermissionType,
+  PermissionsService,
+} from '../permissions.service'
 
 export const DOCUMENT_SORT_FIELDS = [
   { field: 'archive_serial_number', name: $localize`ASN` },
@@ -57,21 +62,40 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     private correspondentService: CorrespondentService,
     private documentTypeService: DocumentTypeService,
     private tagService: TagService,
-    private storagePathService: StoragePathService
+    private storagePathService: StoragePathService,
+    private permissionsService: PermissionsService
   ) {
     super(http, 'documents')
   }
 
   addObservablesToDocument(doc: Document) {
-    if (doc.correspondent) {
+    if (
+      doc.correspondent &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Correspondent
+      )
+    ) {
       doc.correspondent$ = this.correspondentService.getCached(
         doc.correspondent
       )
     }
-    if (doc.document_type) {
+    if (
+      doc.document_type &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.DocumentType
+      )
+    ) {
       doc.document_type$ = this.documentTypeService.getCached(doc.document_type)
     }
-    if (doc.tags) {
+    if (
+      doc.tags &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Tag
+      )
+    ) {
       doc.tags$ = this.tagService
         .getCachedMany(doc.tags)
         .pipe(
@@ -80,7 +104,13 @@ export class DocumentService extends AbstractPaperlessService<Document> {
           )
         )
     }
-    if (doc.storage_path) {
+    if (
+      doc.storage_path &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.StoragePath
+      )
+    ) {
       doc.storage_path$ = this.storagePathService.getCached(doc.storage_path)
     }
     return doc
