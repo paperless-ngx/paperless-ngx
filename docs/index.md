@@ -6,6 +6,14 @@
 physical documents into a searchable online archive so you can keep, well, _less paper_.
 
 [Get started](setup.md){ .md-button .md-button--primary .index-callout }
+[Demo](https://demo.paperless-ngx.com){ .md-button .md-button--secondary target=\_blank }
+
+<div style="display: flex; justify-content: end; margin-top: -1.5rem;">
+  <a href="https://m.do.co/c/8d70b916d462" target="_blank">
+    <img src="https://opensource.nyc3.cdn.digitaloceanspaces.com/attribution/assets/PoweredByDO/DO_Powered_by_Badge_white.svg#only-dark" class="no-lightbox" width="150px">
+    <img src="https://opensource.nyc3.cdn.digitaloceanspaces.com/attribution/assets/PoweredByDO/DO_Powered_by_Badge_black.svg#only-light" class="no-lightbox" width="150px">
+  </a>
+</div>
 
 </div>
 <div class="grid-right" markdown>
