@@ -1303,7 +1303,10 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         classifier_checksum = b"thisisachecksum"
 
-        mocked_load.return_value = mock.Mock(last_auto_type_hash=classifier_checksum)
+        mocked_load.side_effect = [
+            mock.Mock(last_auto_type_hash=classifier_checksum),
+            mock.Mock(last_auto_type_hash=classifier_checksum),
+        ]
 
         last_modified = timezone.now()
         cache.set(CLASSIFIER_MODIFIED_KEY, last_modified, CACHE_50_MINUTES)
@@ -1351,6 +1354,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         response = self.client.get(f"/api/documents/{doc.pk}/suggestions/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(True)
 
     @mock.patch("documents.parsers.parse_date_generator")
     @override_settings(NUMBER_OF_SUGGESTED_DATES=0)

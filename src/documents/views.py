@@ -525,7 +525,7 @@ class DocumentViewSet(
         if classifier is not None:
             cache.set(
                 doc_key,
-                (classifier.last_auto_type_hash.decode(), resp_data),
+                (classifier.last_auto_type_hash, resp_data),
                 CACHE_5_MINUTES,
             )
 
