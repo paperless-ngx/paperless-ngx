@@ -53,6 +53,8 @@ export const SETTINGS_KEYS = {
   DEFAULT_PERMS_VIEW_GROUPS: 'general-settings:permissions:default-view-groups',
   DEFAULT_PERMS_EDIT_USERS: 'general-settings:permissions:default-edit-users',
   DEFAULT_PERMS_EDIT_GROUPS: 'general-settings:permissions:default-edit-groups',
+  DOCUMENT_EDITING_REMOVE_INBOX_TAGS:
+    'general-settings:document-editing:remove-inbox-tags',
 }
 
 export const SETTINGS: UiSetting[] = [
@@ -205,5 +207,10 @@ export const SETTINGS: UiSetting[] = [
     key: SETTINGS_KEYS.APP_TITLE,
     type: 'string',
     default: '',
+  },
+  {
+    key: SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS,
+    type: 'boolean',
+    default: false,
   },
 ]

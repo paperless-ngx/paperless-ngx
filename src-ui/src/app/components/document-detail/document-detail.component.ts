@@ -630,7 +630,9 @@ export class DocumentDetailComponent
       .update(this.document)
       .pipe(first())
       .subscribe({
-        next: () => {
+        next: (docValues) => {
+          // in case data changed while saving eg removing inbox_tags
+          this.documentForm.patchValue(docValues)
           this.store.next(this.documentForm.value)
           this.toastService.showInfo($localize`Document saved successfully.`)
           close && this.close()
