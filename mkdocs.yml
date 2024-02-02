@@ -73,4 +73,6 @@ extra:
       link: https://matrix.to/#/#paperless:matrix.org
 plugins:
   - search
-  - glightbox
+  - glightbox:
+       skip_classes:
+         - no-lightbox
