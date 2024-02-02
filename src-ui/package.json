@@ -48,7 +48,7 @@
     "@angular-eslint/template-parser": "17.2.1",
     "@angular/cli": "~17.1.2",
     "@angular/compiler-cli": "~17.1.2",
-    "@playwright/test": "^1.40.1",
+    "@playwright/test": "^1.41.2",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.16",
     "@typescript-eslint/eslint-plugin": "^6.20.0",
