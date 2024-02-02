@@ -88,6 +88,7 @@ export class SettingsComponent
     defaultPermsViewGroups: new FormControl(null),
     defaultPermsEditUsers: new FormControl(null),
     defaultPermsEditGroups: new FormControl(null),
+    documentEditingRemoveInboxTags: new FormControl(null),
 
     notificationsConsumerNewDocument: new FormControl(null),
     notificationsConsumerSuccess: new FormControl(null),
@@ -270,6 +271,9 @@ export class SettingsComponent
       ),
       defaultPermsEditGroups: this.settings.get(
         SETTINGS_KEYS.DEFAULT_PERMS_EDIT_GROUPS
+      ),
+      documentEditingRemoveInboxTags: this.settings.get(
+        SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS
       ),
       savedViews: {},
     }
@@ -483,6 +487,10 @@ export class SettingsComponent
     this.settings.set(
       SETTINGS_KEYS.DEFAULT_PERMS_EDIT_GROUPS,
       this.settingsForm.value.defaultPermsEditGroups
+    )
+    this.settings.set(
+      SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS,
+      this.settingsForm.value.documentEditingRemoveInboxTags
     )
     this.settings.setLanguage(this.settingsForm.value.displayLanguage)
     this.settings

@@ -63,4 +63,7 @@ export interface Document extends ObjectWithPermissions {
   __search_hit__?: SearchHit
 
   custom_fields?: CustomFieldInstance[]
+
+  // write-only field
+  remove_inbox_tags?: boolean
 }
