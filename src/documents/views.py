@@ -66,6 +66,7 @@ from documents.bulk_download import OriginalAndArchiveStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
 from documents.caching import CACHE_5_MINUTES
 from documents.caching import CACHE_50_MINUTES
+from documents.caching import CLASSIFIER_HASH_KEY
 from documents.caching import get_metadata_key
 from documents.caching import get_suggestion_key
 from documents.classifier import load_classifier
@@ -431,12 +432,17 @@ class DocumentViewSet(
         # use cached archive file metadata, if applicable, then cache if it wasn't
         archive_metadata = None
         archive_filesize = None
-        if doc.has_archive_version and doc_archive_key in cache_hits:
-            archive_metadata = cache_hits[doc_archive_key]
-        elif doc.has_archive_version:
-            archive_filesize = self.get_filesize(doc.archive_path)
-            archive_metadata = self.get_metadata(doc.archive_path, "application/pdf")
-            cache.set(doc_archive_key, archive_metadata, CACHE_5_MINUTES)
+        if doc.has_archive_version:
+            if doc_archive_key in cache_hits:
+                archive_metadata = cache_hits[doc_archive_key]
+                archive_filesize = self.get_filesize(doc.archive_path)
+            else:
+                archive_filesize = self.get_filesize(doc.archive_path)
+                archive_metadata = self.get_metadata(
+                    doc.archive_path,
+                    "application/pdf",
+                )
+                cache.set(doc_archive_key, archive_metadata, CACHE_5_MINUTES)
 
         meta = {
             "original_checksum": doc.checksum,
@@ -479,11 +485,18 @@ class DocumentViewSet(
 
         doc_key = get_suggestion_key(doc.pk)
 
-        cache_hit = cache.get(doc_key)
+        cache_hits = cache.get_many([doc_key, CLASSIFIER_HASH_KEY])
 
-        if cache_hit is not None:
-            cache.touch(doc_key, CACHE_5_MINUTES)
-            return Response(cache_hit)
+        # Check if we can use the cache
+        # Needs to exist, and have the same classifier hash
+        if doc_key in cache_hits:
+            classifier_version, suggestions = cache_hits[doc_key]
+            if (
+                CLASSIFIER_HASH_KEY in cache_hits
+                and classifier_version == cache_hits[CLASSIFIER_HASH_KEY]
+            ):
+                cache.touch(doc_key, CACHE_5_MINUTES)
+                return Response(suggestions)
 
         classifier = load_classifier()
 
@@ -508,7 +521,13 @@ class DocumentViewSet(
             "dates": [date.strftime("%Y-%m-%d") for date in dates if date is not None],
         }
 
-        cache.set(doc_key, resp_data, CACHE_5_MINUTES)
+        # Cache the suggestions and the classifier hash for later
+        if classifier is not None:
+            cache.set(
+                (doc_key, classifier.last_auto_type_hash.decode()),
+                resp_data,
+                CACHE_5_MINUTES,
+            )
 
         return Response(resp_data)
 
