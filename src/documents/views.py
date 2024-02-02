@@ -524,8 +524,8 @@ class DocumentViewSet(
         # Cache the suggestions and the classifier hash for later
         if classifier is not None:
             cache.set(
-                (doc_key, classifier.last_auto_type_hash.decode()),
-                resp_data,
+                doc_key,
+                (classifier.last_auto_type_hash.decode(), resp_data),
                 CACHE_5_MINUTES,
             )
 
