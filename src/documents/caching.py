@@ -62,20 +62,6 @@ def get_suggestion_cache(document_id: int) -> Optional[SuggestionCacheData]:
         # The classifier format is the same
         # The classifier hash is the same
         # Then the suggestions can be used
-        print(CLASSIFIER_VERSION_KEY in cache_hits)
-        if CLASSIFIER_VERSION_KEY in cache_hits:
-            print(
-                cache_hits[CLASSIFIER_VERSION_KEY] == DocumentClassifier.FORMAT_VERSION,
-            )
-            print(
-                cache_hits[CLASSIFIER_VERSION_KEY]
-                == doc_suggestions.classifier_version,
-            )
-        print(CLASSIFIER_HASH_KEY in cache_hits)
-        if CLASSIFIER_HASH_KEY in cache_hits:
-            print(cache_hits[CLASSIFIER_HASH_KEY])
-            print(doc_suggestions.classifier_hash)
-            print(cache_hits[CLASSIFIER_HASH_KEY] == doc_suggestions.classifier_hash)
         if (
             CLASSIFIER_VERSION_KEY in cache_hits
             and cache_hits[CLASSIFIER_VERSION_KEY] == DocumentClassifier.FORMAT_VERSION

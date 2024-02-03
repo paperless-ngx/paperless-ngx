@@ -4,6 +4,7 @@ import shutil
 import tempfile
 import uuid
 import zoneinfo
+from binascii import hexlify
 from datetime import timedelta
 from pathlib import Path
 from unittest import mock
@@ -1168,6 +1169,9 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(meta["original_size"], os.stat(source_file).st_size)
         self.assertEqual(meta["archive_size"], os.stat(archive_file).st_size)
 
+        response = self.client.get(f"/api/documents/{doc.pk}/metadata/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     def test_get_metadata_invalid_doc(self):
         response = self.client.get("/api/documents/34576/metadata/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -1301,23 +1305,24 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         settings.MODEL_FILE.touch()
 
-        classifier_checksum = b"thisisachecksum"
+        classifier_checksum_bytes = b"thisisachecksum"
+        classifier_checksum_hex = hexlify(classifier_checksum_bytes).decode()
 
         # Two loads, so two side effects
         mocked_load.side_effect = [
             mock.Mock(
-                last_auto_type_hash=classifier_checksum,
+                last_auto_type_hash=classifier_checksum_bytes,
                 FORMAT_VERSION=DocumentClassifier.FORMAT_VERSION,
             ),
             mock.Mock(
-                last_auto_type_hash=classifier_checksum,
+                last_auto_type_hash=classifier_checksum_bytes,
                 FORMAT_VERSION=DocumentClassifier.FORMAT_VERSION,
             ),
         ]
 
         last_modified = timezone.now()
         cache.set(CLASSIFIER_MODIFIED_KEY, last_modified, CACHE_50_MINUTES)
-        cache.set(CLASSIFIER_HASH_KEY, classifier_checksum.decode(), CACHE_50_MINUTES)
+        cache.set(CLASSIFIER_HASH_KEY, classifier_checksum_hex, CACHE_50_MINUTES)
         cache.set(
             CLASSIFIER_VERSION_KEY,
             DocumentClassifier.FORMAT_VERSION,
@@ -1356,7 +1361,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIn("ETag", response.headers)
         self.assertEqual(
             response.headers["ETag"],
-            f'"{classifier_checksum.decode()}:{settings.NUMBER_OF_SUGGESTED_DATES}"',
+            f'"{classifier_checksum_hex}:{settings.NUMBER_OF_SUGGESTED_DATES}"',
         )
 
         response = self.client.get(f"/api/documents/{doc.pk}/suggestions/")
