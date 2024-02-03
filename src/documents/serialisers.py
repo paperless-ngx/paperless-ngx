@@ -441,6 +441,17 @@ class CustomFieldSerializer(serializers.ModelSerializer):
             "data_type",
         ]
 
+    def validate(self, attrs):
+        # see https://github.com/encode/django-rest-framework/issues/7173
+        name = attrs["name"] if "name" in attrs else self.instance.name
+        if ("name" in attrs) and self.Meta.model.objects.filter(
+            name=name,
+        ).exists():
+            raise serializers.ValidationError(
+                {"error": "Object violates name unique constraint"},
+            )
+        return super().validate(attrs)
+
 
 class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
     """
