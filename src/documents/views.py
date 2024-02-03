@@ -421,14 +421,15 @@ class DocumentViewSet(
 
         document_cached_metadata = get_metadata_cache(doc.pk)
 
+        archive_metadata = None
+        archive_filesize = None
         if document_cached_metadata is not None:
             original_metadata = document_cached_metadata.original_metadata
             archive_metadata = document_cached_metadata.archive_metadata
             refresh_metadata_cache(doc.pk)
         else:
             original_metadata = self.get_metadata(doc.source_path, doc.mime_type)
-            archive_metadata = None
-            archive_filesize = None
+
             if doc.has_archive_version:
                 archive_filesize = self.get_filesize(doc.archive_path)
                 archive_metadata = self.get_metadata(

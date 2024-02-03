@@ -1,4 +1,5 @@
 import logging
+from binascii import hexlify
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 from typing import Final
@@ -61,6 +62,20 @@ def get_suggestion_cache(document_id: int) -> Optional[SuggestionCacheData]:
         # The classifier format is the same
         # The classifier hash is the same
         # Then the suggestions can be used
+        print(CLASSIFIER_VERSION_KEY in cache_hits)
+        if CLASSIFIER_VERSION_KEY in cache_hits:
+            print(
+                cache_hits[CLASSIFIER_VERSION_KEY] == DocumentClassifier.FORMAT_VERSION,
+            )
+            print(
+                cache_hits[CLASSIFIER_VERSION_KEY]
+                == doc_suggestions.classifier_version,
+            )
+        print(CLASSIFIER_HASH_KEY in cache_hits)
+        if CLASSIFIER_HASH_KEY in cache_hits:
+            print(cache_hits[CLASSIFIER_HASH_KEY])
+            print(doc_suggestions.classifier_hash)
+            print(cache_hits[CLASSIFIER_HASH_KEY] == doc_suggestions.classifier_hash)
         if (
             CLASSIFIER_VERSION_KEY in cache_hits
             and cache_hits[CLASSIFIER_VERSION_KEY] == DocumentClassifier.FORMAT_VERSION
@@ -89,11 +104,12 @@ def set_suggestions_cache(
     """
     if classifier is not None:
         doc_key = get_suggestion_cache_key(document_id)
+        print(classifier.last_auto_type_hash)
         cache.set(
             doc_key,
             SuggestionCacheData(
                 classifier.FORMAT_VERSION,
-                classifier.last_auto_type_hash.hex(),
+                hexlify(classifier.last_auto_type_hash).decode(),
                 suggestions,
             ),
             timeout,

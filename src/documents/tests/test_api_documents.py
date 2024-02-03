@@ -1317,7 +1317,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         last_modified = timezone.now()
         cache.set(CLASSIFIER_MODIFIED_KEY, last_modified, CACHE_50_MINUTES)
-        cache.set(CLASSIFIER_HASH_KEY, classifier_checksum, CACHE_50_MINUTES)
+        cache.set(CLASSIFIER_HASH_KEY, classifier_checksum.decode(), CACHE_50_MINUTES)
         cache.set(
             CLASSIFIER_VERSION_KEY,
             DocumentClassifier.FORMAT_VERSION,
@@ -1356,7 +1356,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIn("ETag", response.headers)
         self.assertEqual(
             response.headers["ETag"],
-            f'"{classifier_checksum}:{settings.NUMBER_OF_SUGGESTED_DATES}"',
+            f'"{classifier_checksum.decode()}:{settings.NUMBER_OF_SUGGESTED_DATES}"',
         )
 
         response = self.client.get(f"/api/documents/{doc.pk}/suggestions/")
