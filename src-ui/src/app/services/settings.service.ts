@@ -132,6 +132,12 @@ const LANGUAGE_OPTIONS = [
     dateInputFormat: 'dd/mm/yyyy',
   },
   {
+    code: 'ja-jp',
+    name: $localize`Japanese`,
+    englishName: 'Japanese',
+    dateInputFormat: 'yyyy/mm/dd',
+  },
+  {
     code: 'lb-lu',
     name: $localize`Luxembourgish`,
     englishName: 'Luxembourgish',
