@@ -17,9 +17,9 @@ logger = logging.getLogger("paperless.caching")
 @dataclass(frozen=True)
 class MetadataCacheData:
     original_checksum: str
-    original_metadata: dict
-    archive_checksum: str | None
-    archive_metadata: dict | None
+    original_metadata: list
+    archive_checksum: Optional[str]
+    archive_metadata: Optional[list]
 
 
 @dataclass(frozen=True)
@@ -126,7 +126,7 @@ def get_metadata_cache(document_id: int) -> Optional[MetadataCacheData]:
     was cached once and the checksums have not changed
     """
     doc_key = get_metadata_cache_key(document_id)
-    doc_metadata: MetadataCacheData | None = cache.get(doc_key)
+    doc_metadata: Optional[MetadataCacheData] = cache.get(doc_key)
     # The metadata exists in the cache
     if doc_metadata is not None:
         try:
@@ -154,8 +154,8 @@ def get_metadata_cache(document_id: int) -> Optional[MetadataCacheData]:
 
 def set_metadata_cache(
     document: Document,
-    original_metadata: dict,
-    archive_metadata: dict | None,
+    original_metadata: list,
+    archive_metadata: Optional[list],
     *,
     timeout=CACHE_50_MINUTES,
 ) -> None:
