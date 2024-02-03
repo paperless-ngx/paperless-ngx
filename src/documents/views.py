@@ -15,7 +15,6 @@ from urllib.parse import quote
 import pathvalidate
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.cache import cache
 from django.db.models import Case
 from django.db.models import Count
 from django.db.models import IntegerField
@@ -64,11 +63,13 @@ from documents import bulk_edit
 from documents.bulk_download import ArchiveOnlyStrategy
 from documents.bulk_download import OriginalAndArchiveStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
-from documents.caching import CACHE_5_MINUTES
 from documents.caching import CACHE_50_MINUTES
-from documents.caching import CLASSIFIER_HASH_KEY
-from documents.caching import get_metadata_key
-from documents.caching import get_suggestion_key
+from documents.caching import get_metadata_cache
+from documents.caching import get_suggestion_cache
+from documents.caching import refresh_metadata_cache
+from documents.caching import refresh_suggestions_cache
+from documents.caching import set_metadata_cache
+from documents.caching import set_suggestions_cache
 from documents.classifier import load_classifier
 from documents.conditionals import metadata_etag
 from documents.conditionals import metadata_last_modified
@@ -389,9 +390,11 @@ class DocumentViewSet(
             try:
                 return parser.extract_metadata(file, mime_type)
             except Exception:
+                logger.exception(f"Issue getting metadata for {file}")
                 # TODO: cover GPG errors, remove later.
                 return []
         else:
+            logger.warning(f"No parser for {mime_type}")
             return []
 
     def get_filesize(self, filename):
@@ -416,33 +419,23 @@ class DocumentViewSet(
         except Document.DoesNotExist:
             raise Http404
 
-        doc_original_key = get_metadata_key(doc.pk, is_archive=False)
-        doc_archive_key = get_metadata_key(doc.pk, is_archive=True)
+        document_cached_metadata = get_metadata_cache(doc.pk)
 
-        cache_hits = cache.get_many([doc_original_key, doc_archive_key])
-
-        # use cached original file metadata if possible, else gather then cache
-        if doc_original_key in cache_hits:
-            cache.touch(doc_original_key, CACHE_5_MINUTES)
-            original_metadata = cache_hits[doc_original_key]
+        if document_cached_metadata is not None:
+            original_metadata = document_cached_metadata.original_metadata
+            archive_metadata = document_cached_metadata.archive_metadata
+            refresh_metadata_cache(doc.pk)
         else:
             original_metadata = self.get_metadata(doc.source_path, doc.mime_type)
-            cache.set(doc_original_key, original_metadata, CACHE_5_MINUTES)
-
-        # use cached archive file metadata, if applicable, then cache if it wasn't
-        archive_metadata = None
-        archive_filesize = None
-        if doc.has_archive_version:
-            if doc_archive_key in cache_hits:
-                archive_metadata = cache_hits[doc_archive_key]
-                archive_filesize = self.get_filesize(doc.archive_path)
-            else:
+            archive_metadata = None
+            archive_filesize = None
+            if doc.has_archive_version:
                 archive_filesize = self.get_filesize(doc.archive_path)
                 archive_metadata = self.get_metadata(
                     doc.archive_path,
                     "application/pdf",
                 )
-                cache.set(doc_archive_key, archive_metadata, CACHE_5_MINUTES)
+            set_metadata_cache(doc, original_metadata, archive_metadata)
 
         meta = {
             "original_checksum": doc.checksum,
@@ -483,20 +476,11 @@ class DocumentViewSet(
         ):
             return HttpResponseForbidden("Insufficient permissions")
 
-        doc_key = get_suggestion_key(doc.pk)
+        document_suggestions = get_suggestion_cache(doc.pk)
 
-        cache_hits = cache.get_many([doc_key, CLASSIFIER_HASH_KEY])
-
-        # Check if we can use the cache
-        # Needs to exist, and have the same classifier hash
-        if doc_key in cache_hits:
-            classifier_version, suggestions = cache_hits[doc_key]
-            if (
-                CLASSIFIER_HASH_KEY in cache_hits
-                and classifier_version == cache_hits[CLASSIFIER_HASH_KEY]
-            ):
-                cache.touch(doc_key, CACHE_5_MINUTES)
-                return Response(suggestions)
+        if document_suggestions is not None:
+            refresh_suggestions_cache(doc.pk)
+            return Response(document_suggestions.suggestions)
 
         classifier = load_classifier()
 
@@ -522,12 +506,7 @@ class DocumentViewSet(
         }
 
         # Cache the suggestions and the classifier hash for later
-        if classifier is not None:
-            cache.set(
-                doc_key,
-                (classifier.last_auto_type_hash, resp_data),
-                CACHE_5_MINUTES,
-            )
+        set_suggestions_cache(doc.pk, resp_data, classifier)
 
         return Response(resp_data)
 

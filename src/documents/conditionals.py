@@ -125,7 +125,8 @@ def preview_last_modified(request, pk: int) -> Optional[datetime]:
 
 def thumbnail_last_modified(request, pk: int) -> Optional[datetime]:
     """
-    Returns the filesystem last modified either from cache or from filesystem
+    Returns the filesystem last modified either from cache or from filesystem.
+    Cache should be (slightly?) faster than filesystem
     """
     try:
         doc = Document.objects.get(pk=pk)

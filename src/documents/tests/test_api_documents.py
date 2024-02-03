@@ -1303,9 +1303,16 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         classifier_checksum = b"thisisachecksum"
 
+        # Two loads, so two side effects
         mocked_load.side_effect = [
-            mock.Mock(last_auto_type_hash=classifier_checksum),
-            mock.Mock(last_auto_type_hash=classifier_checksum),
+            mock.Mock(
+                last_auto_type_hash=classifier_checksum,
+                FORMAT_VERSION=DocumentClassifier.FORMAT_VERSION,
+            ),
+            mock.Mock(
+                last_auto_type_hash=classifier_checksum,
+                FORMAT_VERSION=DocumentClassifier.FORMAT_VERSION,
+            ),
         ]
 
         last_modified = timezone.now()
