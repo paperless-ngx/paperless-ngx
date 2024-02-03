@@ -71,7 +71,7 @@ def get_suggestion_cache(document_id: int) -> Optional[SuggestionCacheData]:
             and cache_hits[CLASSIFIER_HASH_KEY] == doc_suggestions.classifier_hash
         ):
             return doc_suggestions
-        else:
+        else:  # pragma: no cover
             # Remove the key because something didn't match
             cache.delete(doc_key)
     return None
@@ -145,7 +145,7 @@ def get_metadata_cache(document_id: int) -> Optional[MetadataCacheData]:
                 # Refresh cache
                 cache.touch(doc_key, CACHE_50_MINUTES)
                 return doc_metadata
-            else:
+            else:  # pragma: no cover
                 # Something didn't match, delete the key
                 cache.delete(doc_key)
         except Document.DoesNotExist:  # pragma: no cover

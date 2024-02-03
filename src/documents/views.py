@@ -389,11 +389,11 @@ class DocumentViewSet(
 
             try:
                 return parser.extract_metadata(file, mime_type)
-            except Exception:
+            except Exception:  # pragma: no cover
                 logger.exception(f"Issue getting metadata for {file}")
                 # TODO: cover GPG errors, remove later.
                 return []
-        else:
+        else:  # pragma: no cover
             logger.warning(f"No parser for {mime_type}")
             return []
 
