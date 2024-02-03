@@ -630,6 +630,7 @@ LANGUAGES = [
     ("fr-fr", _("French")),
     ("hu-hu", _("Hungarian")),
     ("it-it", _("Italian")),
+    ("ja-jp", _("Japanese")),
     ("lb-lu", _("Luxembourgish")),
     ("no-no", _("Norwegian")),
     ("nl-nl", _("Dutch")),
