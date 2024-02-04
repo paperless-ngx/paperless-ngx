@@ -762,8 +762,12 @@ CELERY_BEAT_SCHEDULE_FILENAME = os.path.join(DATA_DIR, "celerybeat-schedule.db")
 # django setting.
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "BACKEND": os.environ.get(
+            "PAPERLESS_CACHE_BACKEND",
+            "django.core.cache.backends.redis.RedisCache",
+        ),
         "LOCATION": _CHANNELS_REDIS_URL,
+        "KEY_PREFIX": os.getenv("PAPERLESS_REDIS_PREFIX", ""),
     },
 }
 
