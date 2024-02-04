@@ -35,6 +35,7 @@ from django.utils.translation import get_language
 from django.views import View
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import condition
+from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from langdetect import detect
@@ -62,12 +63,21 @@ from documents import bulk_edit
 from documents.bulk_download import ArchiveOnlyStrategy
 from documents.bulk_download import OriginalAndArchiveStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
+from documents.caching import CACHE_50_MINUTES
+from documents.caching import get_metadata_cache
+from documents.caching import get_suggestion_cache
+from documents.caching import refresh_metadata_cache
+from documents.caching import refresh_suggestions_cache
+from documents.caching import set_metadata_cache
+from documents.caching import set_suggestions_cache
 from documents.classifier import load_classifier
 from documents.conditionals import metadata_etag
 from documents.conditionals import metadata_last_modified
 from documents.conditionals import preview_etag
+from documents.conditionals import preview_last_modified
 from documents.conditionals import suggestions_etag
 from documents.conditionals import suggestions_last_modified
+from documents.conditionals import thumbnail_last_modified
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
@@ -379,10 +389,12 @@ class DocumentViewSet(
 
             try:
                 return parser.extract_metadata(file, mime_type)
-            except Exception:
+            except Exception:  # pragma: no cover
+                logger.exception(f"Issue getting metadata for {file}")
                 # TODO: cover GPG errors, remove later.
                 return []
-        else:
+        else:  # pragma: no cover
+            logger.warning(f"No parser for {mime_type}")
             return []
 
     def get_filesize(self, filename):
@@ -407,16 +419,37 @@ class DocumentViewSet(
         except Document.DoesNotExist:
             raise Http404
 
+        document_cached_metadata = get_metadata_cache(doc.pk)
+
+        archive_metadata = None
+        archive_filesize = None
+        if document_cached_metadata is not None:
+            original_metadata = document_cached_metadata.original_metadata
+            archive_metadata = document_cached_metadata.archive_metadata
+            refresh_metadata_cache(doc.pk)
+        else:
+            original_metadata = self.get_metadata(doc.source_path, doc.mime_type)
+
+            if doc.has_archive_version:
+                archive_filesize = self.get_filesize(doc.archive_path)
+                archive_metadata = self.get_metadata(
+                    doc.archive_path,
+                    "application/pdf",
+                )
+            set_metadata_cache(doc, original_metadata, archive_metadata)
+
         meta = {
             "original_checksum": doc.checksum,
             "original_size": self.get_filesize(doc.source_path),
             "original_mime_type": doc.mime_type,
             "media_filename": doc.filename,
             "has_archive_version": doc.has_archive_version,
-            "original_metadata": self.get_metadata(doc.source_path, doc.mime_type),
+            "original_metadata": original_metadata,
             "archive_checksum": doc.archive_checksum,
             "archive_media_filename": doc.archive_filename,
             "original_filename": doc.original_filename,
+            "archive_size": archive_filesize,
+            "archive_metadata": archive_metadata,
         }
 
         lang = "en"
@@ -425,16 +458,6 @@ class DocumentViewSet(
         except Exception:
             pass
         meta["lang"] = lang
-
-        if doc.has_archive_version:
-            meta["archive_size"] = self.get_filesize(doc.archive_path)
-            meta["archive_metadata"] = self.get_metadata(
-                doc.archive_path,
-                "application/pdf",
-            )
-        else:
-            meta["archive_size"] = None
-            meta["archive_metadata"] = None
 
         return Response(meta)
 
@@ -454,6 +477,12 @@ class DocumentViewSet(
         ):
             return HttpResponseForbidden("Insufficient permissions")
 
+        document_suggestions = get_suggestion_cache(doc.pk)
+
+        if document_suggestions is not None:
+            refresh_suggestions_cache(doc.pk)
+            return Response(document_suggestions.suggestions)
+
         classifier = load_classifier()
 
         dates = []
@@ -463,27 +492,30 @@ class DocumentViewSet(
                 {i for i in itertools.islice(gen, settings.NUMBER_OF_SUGGESTED_DATES)},
             )
 
-        return Response(
-            {
-                "correspondents": [
-                    c.id for c in match_correspondents(doc, classifier, request.user)
-                ],
-                "tags": [t.id for t in match_tags(doc, classifier, request.user)],
-                "document_types": [
-                    dt.id for dt in match_document_types(doc, classifier, request.user)
-                ],
-                "storage_paths": [
-                    dt.id for dt in match_storage_paths(doc, classifier, request.user)
-                ],
-                "dates": [
-                    date.strftime("%Y-%m-%d") for date in dates if date is not None
-                ],
-            },
-        )
+        resp_data = {
+            "correspondents": [
+                c.id for c in match_correspondents(doc, classifier, request.user)
+            ],
+            "tags": [t.id for t in match_tags(doc, classifier, request.user)],
+            "document_types": [
+                dt.id for dt in match_document_types(doc, classifier, request.user)
+            ],
+            "storage_paths": [
+                dt.id for dt in match_storage_paths(doc, classifier, request.user)
+            ],
+            "dates": [date.strftime("%Y-%m-%d") for date in dates if date is not None],
+        }
+
+        # Cache the suggestions and the classifier hash for later
+        set_suggestions_cache(doc.pk, resp_data, classifier)
+
+        return Response(resp_data)
 
     @action(methods=["get"], detail=True)
     @method_decorator(cache_control(public=False, max_age=5 * 60))
-    @method_decorator(condition(etag_func=preview_etag))
+    @method_decorator(
+        condition(etag_func=preview_etag, last_modified_func=preview_last_modified),
+    )
     def preview(self, request, pk=None):
         try:
             response = self.file_response(pk, request, "inline")
@@ -492,7 +524,8 @@ class DocumentViewSet(
             raise Http404
 
     @action(methods=["get"], detail=True)
-    @method_decorator(cache_control(public=False, max_age=315360000))
+    @method_decorator(cache_control(public=False, max_age=CACHE_50_MINUTES))
+    @method_decorator(last_modified(thumbnail_last_modified))
     def thumb(self, request, pk=None):
         try:
             doc = Document.objects.get(id=pk)
@@ -506,8 +539,6 @@ class DocumentViewSet(
                 handle = GnuPG.decrypted(doc.thumbnail_file)
             else:
                 handle = doc.thumbnail_file
-            # TODO: Send ETag information and use that to send new thumbnails
-            #  if available
 
             return HttpResponse(handle, content_type="image/webp")
         except (FileNotFoundError, Document.DoesNotExist):
