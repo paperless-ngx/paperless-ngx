@@ -31,7 +31,7 @@ fetching, index optimization and for training the automatic document
 matcher.
 
     -   If your Redis server needs login credentials PAPERLESS_REDIS =
-        `redis://<username>:<password>@<host>:<port>`
+        `redis://<username>:<password>@<host>:<port>\<DBIndex>`
     -   With the requirepass option PAPERLESS_REDIS =
         `redis://:<password>@<host>:<port>`
 
