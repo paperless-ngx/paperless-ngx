@@ -309,10 +309,9 @@ class BarcodePlugin(ConsumeTaskPlugin):
             for raw in tag_texts.split(","):
                 try:
                     tag = None
-
-                    mappings = settings.CONSUMER_TAG_BARCODE_MAPPING.items()
-                    for regex, sub in mappings:
+                    for regex in settings.CONSUMER_TAG_BARCODE_MAPPING:
                         if re.match(regex, raw, flags=re.IGNORECASE):
+                            sub = settings.CONSUMER_TAG_BARCODE_MAPPING[regex]
                             tag = (
                                 re.sub(regex, sub, raw, flags=re.IGNORECASE)
                                 if sub
