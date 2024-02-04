@@ -4,6 +4,7 @@ import shutil
 import tempfile
 import uuid
 import zoneinfo
+from binascii import hexlify
 from datetime import timedelta
 from pathlib import Path
 from unittest import mock
@@ -13,12 +14,17 @@ from dateutil import parser
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.test import override_settings
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from documents.caching import CACHE_50_MINUTES
+from documents.caching import CLASSIFIER_HASH_KEY
+from documents.caching import CLASSIFIER_MODIFIED_KEY
+from documents.caching import CLASSIFIER_VERSION_KEY
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -40,6 +46,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.user = User.objects.create_superuser(username="temp_admin")
         self.client.force_authenticate(user=self.user)
+        cache.clear()
 
     def testDocuments(self):
         response = self.client.get("/api/documents/").data
@@ -1162,6 +1169,9 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(meta["original_size"], os.stat(source_file).st_size)
         self.assertEqual(meta["archive_size"], os.stat(archive_file).st_size)
 
+        response = self.client.get(f"/api/documents/{doc.pk}/metadata/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     def test_get_metadata_invalid_doc(self):
         response = self.client.get("/api/documents/34576/metadata/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -1266,7 +1276,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             },
         )
 
-    @mock.patch("documents.conditionals.pickle.load")
+    @mock.patch("documents.views.load_classifier")
     @mock.patch("documents.views.match_storage_paths")
     @mock.patch("documents.views.match_document_types")
     @mock.patch("documents.views.match_tags")
@@ -1278,7 +1288,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         match_tags,
         match_document_types,
         match_storage_paths,
-        mocked_pickle_load,
+        mocked_load,
     ):
         """
         GIVEN:
@@ -1287,23 +1297,43 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
           - Classifier has not been modified
         THEN:
           - Subsequent requests are returned alright
-          - ETag and last modified are called
+          - ETag and last modified headers are set
         """
-        settings.MODEL_FILE.touch()
 
+        # setup the cache how the classifier does it
         from documents.classifier import DocumentClassifier
 
-        last_modified = timezone.now()
+        settings.MODEL_FILE.touch()
 
-        # ETag first, then modified
-        mock_effect = [
-            DocumentClassifier.FORMAT_VERSION,
-            "dont care",
-            b"thisisachecksum",
-            DocumentClassifier.FORMAT_VERSION,
-            last_modified,
+        classifier_checksum_bytes = b"thisisachecksum"
+        classifier_checksum_hex = hexlify(classifier_checksum_bytes).decode()
+
+        # Two loads, so two side effects
+        mocked_load.side_effect = [
+            mock.Mock(
+                last_auto_type_hash=classifier_checksum_bytes,
+                FORMAT_VERSION=DocumentClassifier.FORMAT_VERSION,
+            ),
+            mock.Mock(
+                last_auto_type_hash=classifier_checksum_bytes,
+                FORMAT_VERSION=DocumentClassifier.FORMAT_VERSION,
+            ),
         ]
-        mocked_pickle_load.side_effect = mock_effect
+
+        last_modified = timezone.now()
+        cache.set(CLASSIFIER_MODIFIED_KEY, last_modified, CACHE_50_MINUTES)
+        cache.set(CLASSIFIER_HASH_KEY, classifier_checksum_hex, CACHE_50_MINUTES)
+        cache.set(
+            CLASSIFIER_VERSION_KEY,
+            DocumentClassifier.FORMAT_VERSION,
+            CACHE_50_MINUTES,
+        )
+
+        # Mock the matching
+        match_correspondents.return_value = [Correspondent(id=88), Correspondent(id=2)]
+        match_tags.return_value = [Tag(id=56), Tag(id=123)]
+        match_document_types.return_value = [DocumentType(id=23)]
+        match_storage_paths.return_value = [StoragePath(id=99), StoragePath(id=77)]
 
         doc = Document.objects.create(
             title="test",
@@ -1311,12 +1341,8 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             content="this is an invoice from 12.04.2022!",
         )
 
-        match_correspondents.return_value = [Correspondent(id=88), Correspondent(id=2)]
-        match_tags.return_value = [Tag(id=56), Tag(id=123)]
-        match_document_types.return_value = [DocumentType(id=23)]
-        match_storage_paths.return_value = [StoragePath(id=99), StoragePath(id=77)]
-
         response = self.client.get(f"/api/documents/{doc.pk}/suggestions/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             response.data,
             {
@@ -1327,7 +1353,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
                 "dates": ["2022-04-12"],
             },
         )
-        mocked_pickle_load.assert_called()
         self.assertIn("Last-Modified", response.headers)
         self.assertEqual(
             response.headers["Last-Modified"],
@@ -1336,15 +1361,11 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIn("ETag", response.headers)
         self.assertEqual(
             response.headers["ETag"],
-            f"\"b'thisisachecksum':{settings.NUMBER_OF_SUGGESTED_DATES}\"",
+            f'"{classifier_checksum_hex}:{settings.NUMBER_OF_SUGGESTED_DATES}"',
         )
-
-        mocked_pickle_load.rest_mock()
-        mocked_pickle_load.side_effect = mock_effect
 
         response = self.client.get(f"/api/documents/{doc.pk}/suggestions/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        mocked_pickle_load.assert_called()
 
     @mock.patch("documents.parsers.parse_date_generator")
     @override_settings(NUMBER_OF_SUGGESTED_DATES=0)

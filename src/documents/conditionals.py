@@ -1,9 +1,16 @@
-import pickle
 from datetime import datetime
+from datetime import timezone
 from typing import Optional
 
 from django.conf import settings
+from django.core.cache import cache
 
+from documents.caching import CACHE_5_MINUTES
+from documents.caching import CACHE_50_MINUTES
+from documents.caching import CLASSIFIER_HASH_KEY
+from documents.caching import CLASSIFIER_MODIFIED_KEY
+from documents.caching import CLASSIFIER_VERSION_KEY
+from documents.caching import get_thumbnail_modified_key
 from documents.classifier import DocumentClassifier
 from documents.models import Document
 
@@ -14,18 +21,25 @@ def suggestions_etag(request, pk: int) -> Optional[str]:
     suggestions if the classifier has not been changed and the suggested dates
     setting is also unchanged
 
-    TODO: It would be nice to not duplicate the partial loading and the loading
-    between here and the actual classifier
     """
+    # If no model file, no etag at all
     if not settings.MODEL_FILE.exists():
         return None
-    with open(settings.MODEL_FILE, "rb") as f:
-        schema_version = pickle.load(f)
-        if schema_version != DocumentClassifier.FORMAT_VERSION:
-            return None
-        _ = pickle.load(f)
-        last_auto_type_hash: bytes = pickle.load(f)
-        return f"{last_auto_type_hash}:{settings.NUMBER_OF_SUGGESTED_DATES}"
+    # Check cache information
+    cache_hits = cache.get_many(
+        [CLASSIFIER_VERSION_KEY, CLASSIFIER_HASH_KEY],
+    )
+    # If the version differs somehow, no etag
+    if (
+        CLASSIFIER_VERSION_KEY in cache_hits
+        and cache_hits[CLASSIFIER_VERSION_KEY] != DocumentClassifier.FORMAT_VERSION
+    ):
+        return None
+    elif CLASSIFIER_HASH_KEY in cache_hits:
+        # Refresh the cache and return the hash digest and the dates setting
+        cache.touch(CLASSIFIER_HASH_KEY, CACHE_5_MINUTES)
+        return f"{cache_hits[CLASSIFIER_HASH_KEY]}:{settings.NUMBER_OF_SUGGESTED_DATES}"
+    return None
 
 
 def suggestions_last_modified(request, pk: int) -> Optional[datetime]:
@@ -34,14 +48,23 @@ def suggestions_last_modified(request, pk: int) -> Optional[datetime]:
     as there is not way to track the suggested date setting modification, but it seems
     unlikely that changes too often
     """
+    # No file, no last modified
     if not settings.MODEL_FILE.exists():
         return None
-    with open(settings.MODEL_FILE, "rb") as f:
-        schema_version = pickle.load(f)
-        if schema_version != DocumentClassifier.FORMAT_VERSION:
-            return None
-        last_doc_change_time = pickle.load(f)
-        return last_doc_change_time
+    cache_hits = cache.get_many(
+        [CLASSIFIER_VERSION_KEY, CLASSIFIER_MODIFIED_KEY],
+    )
+    # If the version differs somehow, no last modified
+    if (
+        CLASSIFIER_VERSION_KEY in cache_hits
+        and cache_hits[CLASSIFIER_VERSION_KEY] != DocumentClassifier.FORMAT_VERSION
+    ):
+        return None
+    elif CLASSIFIER_MODIFIED_KEY in cache_hits:
+        # Refresh the cache and return the last modified
+        cache.touch(CLASSIFIER_MODIFIED_KEY, CACHE_5_MINUTES)
+        return cache_hits[CLASSIFIER_MODIFIED_KEY]
+    return None
 
 
 def metadata_etag(request, pk: int) -> Optional[str]:
@@ -52,7 +75,7 @@ def metadata_etag(request, pk: int) -> Optional[str]:
     try:
         doc = Document.objects.get(pk=pk)
         return doc.checksum
-    except Document.DoesNotExist:
+    except Document.DoesNotExist:  # pragma: no cover
         return None
     return None
 
@@ -66,7 +89,7 @@ def metadata_last_modified(request, pk: int) -> Optional[datetime]:
     try:
         doc = Document.objects.get(pk=pk)
         return doc.modified
-    except Document.DoesNotExist:
+    except Document.DoesNotExist:  # pragma: no cover
         return None
     return None
 
@@ -82,6 +105,46 @@ def preview_etag(request, pk: int) -> Optional[str]:
             and request.query_params["original"] == "true"
         )
         return doc.checksum if use_original else doc.archive_checksum
-    except Document.DoesNotExist:
+    except Document.DoesNotExist:  # pragma: no cover
         return None
     return None
+
+
+def preview_last_modified(request, pk: int) -> Optional[datetime]:
+    """
+    Uses the documents modified time to set the Last-Modified header.  Not strictly
+    speaking correct, but close enough and quick
+    """
+    try:
+        doc = Document.objects.get(pk=pk)
+        return doc.modified
+    except Document.DoesNotExist:  # pragma: no cover
+        return None
+    return None
+
+
+def thumbnail_last_modified(request, pk: int) -> Optional[datetime]:
+    """
+    Returns the filesystem last modified either from cache or from filesystem.
+    Cache should be (slightly?) faster than filesystem
+    """
+    try:
+        doc = Document.objects.get(pk=pk)
+        if not doc.thumbnail_path.exists():
+            return None
+        doc_key = get_thumbnail_modified_key(pk)
+
+        cache_hit = cache.get(doc_key)
+        if cache_hit is not None:
+            cache.touch(doc_key, CACHE_50_MINUTES)
+            return cache_hit
+
+        # No cache, get the timestamp and cache the datetime
+        last_modified = datetime.fromtimestamp(
+            doc.thumbnail_path.stat().st_mtime,
+            tz=timezone.utc,
+        )
+        cache.set(doc_key, last_modified, CACHE_50_MINUTES)
+        return last_modified
+    except Document.DoesNotExist:  # pragma: no cover
+        return None
