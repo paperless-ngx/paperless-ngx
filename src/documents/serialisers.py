@@ -81,7 +81,7 @@ class MatchingModelSerializer(serializers.ModelSerializer):
     slug = SerializerMethodField()
 
     def validate(self, data):
-        # see https://github.com/encode/django-rest-framework/issues/7173
+        # TODO: remove pending https://github.com/encode/django-rest-framework/issues/7173
         name = data["name"] if "name" in data else self.instance.name
         owner = (
             data["owner"]
@@ -441,6 +441,17 @@ class CustomFieldSerializer(serializers.ModelSerializer):
             "data_type",
         ]
 
+    def validate(self, attrs):
+        # TODO: remove pending https://github.com/encode/django-rest-framework/issues/7173
+        name = attrs["name"] if "name" in attrs else self.instance.name
+        if ("name" in attrs) and self.Meta.model.objects.filter(
+            name=name,
+        ).exists():
+            raise serializers.ValidationError(
+                {"error": "Object violates name unique constraint"},
+            )
+        return super().validate(attrs)
+
 
 class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
     """
@@ -638,6 +649,11 @@ class DocumentSerializer(
         allow_null=True,
     )
 
+    remove_inbox_tags = serializers.BooleanField(
+        default=False,
+        write_only=True,
+    )
+
     def get_original_file_name(self, obj):
         return obj.original_filename
 
@@ -681,11 +697,47 @@ class DocumentSerializer(
                             custom_field_instance.field,
                             doc_id,
                         )
+        if (
+            "remove_inbox_tags" in validated_data
+            and validated_data["remove_inbox_tags"]
+        ):
+            tag_ids_being_added = (
+                [
+                    tag.id
+                    for tag in validated_data["tags"]
+                    if tag not in instance.tags.all()
+                ]
+                if "tags" in validated_data
+                else []
+            )
+            inbox_tags_not_being_added = Tag.objects.filter(is_inbox_tag=True).exclude(
+                id__in=tag_ids_being_added,
+            )
+            if "tags" in validated_data:
+                validated_data["tags"] = [
+                    tag
+                    for tag in validated_data["tags"]
+                    if tag not in inbox_tags_not_being_added
+                ]
+            else:
+                validated_data["tags"] = [
+                    tag
+                    for tag in instance.tags.all()
+                    if tag not in inbox_tags_not_being_added
+                ]
         super().update(instance, validated_data)
         return instance
 
     def __init__(self, *args, **kwargs):
         self.truncate_content = kwargs.pop("truncate_content", False)
+
+        # return full permissions if we're doing a PATCH or PUT
+        context = kwargs.get("context")
+        if (
+            context.get("request").method == "PATCH"
+            or context.get("request").method == "PUT"
+        ):
+            kwargs["full_perms"] = True
 
         super().__init__(*args, **kwargs)
 
@@ -714,6 +766,7 @@ class DocumentSerializer(
             "set_permissions",
             "notes",
             "custom_fields",
+            "remove_inbox_tags",
         )
 
 
@@ -916,6 +969,8 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
         )
         if "owner" in parameters and parameters["owner"] is not None:
             self._validate_owner(parameters["owner"])
+        if "merge" not in parameters:
+            parameters["merge"] = False
 
     def validate(self, attrs):
         method = attrs["method"]
@@ -1256,6 +1311,12 @@ class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissions
         allow_empty=False,
         required=False,
         write_only=True,
+    )
+
+    merge = serializers.BooleanField(
+        default=False,
+        write_only=True,
+        required=False,
     )
 
     def get_object_class(self, object_type):

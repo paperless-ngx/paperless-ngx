@@ -11,6 +11,7 @@ import { NgSelectModule } from '@ng-select/ng-select'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { PermissionsUserComponent } from '../input/permissions/permissions-user/permissions-user.component'
 import { PermissionsGroupComponent } from '../input/permissions/permissions-group/permissions-group.component'
+import { SwitchComponent } from '../input/switch/switch.component'
 
 const set_permissions = {
   owner: 10,
@@ -37,6 +38,7 @@ describe('PermissionsDialogComponent', () => {
         PermissionsDialogComponent,
         SafeHtmlPipe,
         SelectComponent,
+        SwitchComponent,
         PermissionsFormComponent,
         PermissionsUserComponent,
         PermissionsGroupComponent,
@@ -111,5 +113,24 @@ describe('PermissionsDialogComponent', () => {
     component.object = obj
     expect(component.title).toEqual(`Edit permissions for ${obj.name}`)
     expect(component.permissions).toEqual(set_permissions)
+  })
+
+  it('should toggle hint based on object existence (if editing) or merge flag', () => {
+    component.form.get('merge').setValue(true)
+    expect(component.hint.includes('Existing')).toBeTruthy()
+    component.form.get('merge').setValue(false)
+    expect(component.hint.includes('will be replaced')).toBeTruthy()
+    component.object = {}
+    expect(component.hint).toBeNull()
+  })
+
+  it('should emit permissions and merge flag on confirm', () => {
+    const confirmSpy = jest.spyOn(component.confirmClicked, 'emit')
+    component.form.get('permissions_form').setValue(set_permissions)
+    component.confirm()
+    expect(confirmSpy).toHaveBeenCalledWith({
+      permissions: set_permissions,
+      merge: true,
+    })
   })
 })

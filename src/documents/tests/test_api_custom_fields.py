@@ -53,6 +53,29 @@ class TestCustomField(DirectoriesMixin, APITestCase):
             self.assertEqual(data["name"], name)
             self.assertEqual(data["data_type"], field_type)
 
+    def test_create_custom_field_nonunique_name(self):
+        """
+        GIVEN:
+            - Custom field exists
+        WHEN:
+            - API request to create custom field with the same name
+        THEN:
+            - HTTP 400 is returned
+        """
+        CustomField.objects.create(
+            name="Test Custom Field",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+
+        resp = self.client.post(
+            self.ENDPOINT,
+            data={
+                "data_type": "string",
+                "name": "Test Custom Field",
+            },
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_create_custom_field_instance(self):
         """
         GIVEN:

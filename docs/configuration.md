@@ -34,6 +34,8 @@ matcher.
         `redis://<username>:<password>@<host>:<port>`
     -   With the requirepass option PAPERLESS_REDIS =
         `redis://:<password>@<host>:<port>`
+    -   To include the redis database index PAPERLESS_REDIS =
+        `redis://<username>:<password>@<host>:<port>/<DBIndex>`
 
     [More information on securing your Redis
     Instance](https://redis.io/docs/getting-started/#securing-redis).
@@ -462,9 +464,21 @@ applications.
 
     Defaults to "false" which disables this feature.
 
+#### [`PAPERLESS_ENABLE_HTTP_REMOTE_USER_API=<bool>`](#PAPERLESS_ENABLE_HTTP_REMOTE_USER_API) {#PAPERLESS_ENABLE_HTTP_REMOTE_USER_API}
+
+: Allows authentication via HTTP_REMOTE_USER directly against the API
+
+    !!! warning
+
+        See the warning above about securing your installation when using remote user header authentication. This setting is separate from
+        `PAPERLESS_ENABLE_HTTP_REMOTE_USER` to avoid introducing a security vulnerability to existing reverse proxy setups. As above,
+        ensure that your reverse proxy does not simply pass the `Remote-User` header from the internet to paperless.
+
+    Defaults to "false" which disables this feature.
+
 #### [`PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME=<str>`](#PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME) {#PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME}
 
-: If "PAPERLESS_ENABLE_HTTP_REMOTE_USER" is enabled, this
+: If "PAPERLESS_ENABLE_HTTP_REMOTE_USER" or `PAPERLESS_ENABLE_HTTP_REMOTE_USER_API` are enabled, this
 property allows to customize the name of the HTTP header from which
 the authenticated username is extracted. Values are in terms of
 [HttpRequest.META](https://docs.djangoproject.com/en/4.1/ref/request-response/#django.http.HttpRequest.META).
@@ -1377,6 +1391,12 @@ specified as "chi-tra".
 started by the container.
 
     You can read more about this in the [advanced documentation](advanced_usage.md#celery-monitoring).
+
+#### [`PAPERLESS_SUPERVISORD_WORKING_DIR=<defined>`](#PAPERLESS_SUPERVISORD_WORKING_DIR) {#PAPERLESS_SUPERVISORD_WORKING_DIR}
+
+: If this environment variable is defined, the `supervisord.log` and `supervisord.pid` file will be created under the specified path in `PAPERLESS_SUPERVISORD_WORKING_DIR`. Setting `PAPERLESS_SUPERVISORD_WORKING_DIR=/tmp` and `PYTHONPYCACHEPREFIX=/tmp/pycache` would allow paperless to work on a read-only filesystem.
+
+    Please take note that the `PAPERLESS_DATA_DIR` and `PAPERLESS_MEDIA_ROOT` paths still have to be writable, just like the `PAPERLESS_SUPERVISORD_WORKING_DIR`. The can be archived by using bind or volume mounts. Only works in the container is run as user *paperless*
 
 ## Frontend Settings
 

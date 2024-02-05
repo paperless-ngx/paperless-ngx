@@ -47,22 +47,25 @@ describe('NumberComponent', () => {
     expect(component.value).toEqual(1002)
   })
 
-  it('should support float & monetary values', () => {
-    component.writeValue(11.13)
-    expect(component.value).toEqual(11)
+  it('should support float, monetary values & scientific notation', () => {
+    const mockFn = jest.fn()
+    component.registerOnChange(mockFn)
+
+    component.step = 1
+    component.onChange(11.13)
+    expect(mockFn).toHaveBeenCalledWith(11)
+
+    component.onChange(1.23456789e8)
+    expect(mockFn).toHaveBeenCalledWith(123456789)
+
+    component.step = 0.01
+    component.onChange(11.1)
+    expect(mockFn).toHaveBeenCalledWith('11.10')
+  })
+
+  it('should display monetary values fixed to 2 decimals', () => {
     component.step = 0.01
     component.writeValue(11.1)
     expect(component.value).toEqual('11.10')
-    component.step = 0.1
-    component.writeValue(12.3456)
-    expect(component.value).toEqual(12.3456)
-    // float (step = .1) doesn't force 2 decimals
-    component.writeValue(11.1)
-    expect(component.value).toEqual(11.1)
-  })
-
-  it('should support scientific notation', () => {
-    component.writeValue(1.23456789e8)
-    expect(component.value).toEqual(123456789)
   })
 })
