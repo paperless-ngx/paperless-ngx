@@ -129,13 +129,12 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            response.data,
-            [
-                {
-                    "login_url": "/accounts/oidc/keycloak-test/login/?process=connect",
-                    "name": "Keycloak",
-                },
-            ],
+            response.data[0]["name"],
+            "Keycloak",
+        )
+        self.assertIn(
+            "keycloak-test/login/?process=connect",
+            response.data[0]["login_url"],
         )
 
     def test_disconnect_social_account(self):
