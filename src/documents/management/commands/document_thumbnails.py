@@ -72,7 +72,7 @@ class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
 
         if self.process_count == 1:
             for doc_id in ids:
-                self._process_document(doc_id)
+                _process_document(doc_id)
         else:  # pragma: no cover
             with multiprocessing.Pool(processes=self.process_count) as pool:
                 list(
