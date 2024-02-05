@@ -978,7 +978,6 @@
                 "sha256:fd814847901df6e8de13ce69b84c31fc9b3fb591224d6762d0b256d510cbf382",
                 "sha256:fdb325b7fba1e2c40b9b1db407f85642e32404131c08480dd652110fc908561b"
             ],
-            "markers": "python_version < '3.10'",
             "version": "==4.9.4"
         },
         "markdown-it-py": {
