@@ -34,6 +34,8 @@ matcher.
         `redis://<username>:<password>@<host>:<port>`
     -   With the requirepass option PAPERLESS_REDIS =
         `redis://:<password>@<host>:<port>`
+    -   To include the redis database index PAPERLESS_REDIS =
+        `redis://<username>:<password>@<host>:<port>/<DBIndex>`
 
     [More information on securing your Redis
     Instance](https://redis.io/docs/getting-started/#securing-redis).
