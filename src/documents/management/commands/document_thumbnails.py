@@ -19,7 +19,7 @@ def _process_document(doc_id):
     if parser_class:
         parser = parser_class(logging_group=None)
     else:
-        print(f"{document} No parser for mime type {document.mime_type}")
+        print(f"{document} No parser for mime type {document.mime_type}")  # noqa: T201
         return
 
     try:
@@ -72,7 +72,7 @@ class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
 
         if self.process_count == 1:
             for doc_id in ids:
-                _process_document(doc_id)
+                self._process_document(doc_id)
         else:  # pragma: no cover
             with multiprocessing.Pool(processes=self.process_count) as pool:
                 list(
