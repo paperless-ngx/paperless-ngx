@@ -125,9 +125,18 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
             - Social account providers are returned
         """
 
-        response = self.client.get(f"{self.ENDPOINT}social_account_providers")
+        response = self.client.get(f"{self.ENDPOINT}social_account_providers/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.data,
+            [
+                {
+                    "login_url": "/accounts/oidc/keycloak-test/login/?process=connect",
+                    "name": "Keycloak",
+                },
+            ],
+        )
 
     def test_disconnect_social_account(self):
         """
