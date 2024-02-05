@@ -25,7 +25,7 @@ extend-select = [
 ]
 # TODO PTH https://docs.astral.sh/ruff/rules/#flake8-use-pathlib-pth
 ignore = ["DJ001", "SIM105", "RUF012"]
-#fix = true
+fix = true
 line-length = 88
 respect-gitignore = true
 src = ["src"]
