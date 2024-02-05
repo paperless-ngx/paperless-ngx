@@ -18,7 +18,6 @@ from django.db import close_old_connections
 from django.db import models
 from django.db.models import Q
 from django.dispatch import receiver
-from django.utils import termcolors
 from django.utils import timezone
 from filelock import FileLock
 
@@ -54,6 +53,26 @@ def add_inbox_tags(sender, document: Document, logging_group=None, **kwargs):
     document.tags.add(*inbox_tags)
 
 
+def _suggestion_printer(
+    stdout,
+    style_func,
+    suggestion_type: str,
+    document: Document,
+    selected: MatchingModel,
+    base_url: Optional[str] = None,
+):
+    """
+    Smaller helper to reduce duplication when just outputting suggestions to the console
+    """
+    doc_str = str(document)
+    if base_url is not None:
+        stdout.write(style_func.SUCCESS(doc_str))
+        stdout.write(style_func.SUCCESS(f"{base_url}/documents/{document.pk}"))
+    else:
+        stdout.write(style_func.SUCCESS(f"{doc_str} [{document.pk}]"))
+    stdout.write(f"Suggest {suggestion_type}: {selected}")
+
+
 def set_correspondent(
     sender,
     document: Document,
@@ -63,7 +82,8 @@ def set_correspondent(
     use_first=True,
     suggest=False,
     base_url=None,
-    color=False,
+    stdout=None,
+    style_func=None,
     **kwargs,
 ):
     if document.correspondent and not replace:
@@ -90,23 +110,14 @@ def set_correspondent(
 
     if selected or replace:
         if suggest:
-            if base_url:
-                print(
-                    termcolors.colorize(str(document), fg="green")
-                    if color
-                    else str(document),
-                )
-                print(f"{base_url}/documents/{document.pk}")
-            else:
-                print(
-                    (
-                        termcolors.colorize(str(document), fg="green")
-                        if color
-                        else str(document)
-                    )
-                    + f" [{document.pk}]",
-                )
-            print(f"Suggest correspondent {selected}")
+            _suggestion_printer(
+                stdout,
+                style_func,
+                "correspondent",
+                document,
+                selected,
+                base_url,
+            )
         else:
             logger.info(
                 f"Assigning correspondent {selected} to {document}",
@@ -126,7 +137,8 @@ def set_document_type(
     use_first=True,
     suggest=False,
     base_url=None,
-    color=False,
+    stdout=None,
+    style_func=None,
     **kwargs,
 ):
     if document.document_type and not replace:
@@ -154,23 +166,14 @@ def set_document_type(
 
     if selected or replace:
         if suggest:
-            if base_url:
-                print(
-                    termcolors.colorize(str(document), fg="green")
-                    if color
-                    else str(document),
-                )
-                print(f"{base_url}/documents/{document.pk}")
-            else:
-                print(
-                    (
-                        termcolors.colorize(str(document), fg="green")
-                        if color
-                        else str(document)
-                    )
-                    + f" [{document.pk}]",
-                )
-            print(f"Suggest document type {selected}")
+            _suggestion_printer(
+                stdout,
+                style_func,
+                "document type",
+                document,
+                selected,
+                base_url,
+            )
         else:
             logger.info(
                 f"Assigning document type {selected} to {document}",
@@ -189,7 +192,8 @@ def set_tags(
     replace=False,
     suggest=False,
     base_url=None,
-    color=False,
+    stdout=None,
+    style_func=None,
     **kwargs,
 ):
     if replace:
@@ -212,26 +216,16 @@ def set_tags(
         ]
         if not relevant_tags and not extra_tags:
             return
+        doc_str = style_func.SUCCESS(str(document))
         if base_url:
-            print(
-                termcolors.colorize(str(document), fg="green")
-                if color
-                else str(document),
-            )
-            print(f"{base_url}/documents/{document.pk}")
+            stdout.write(doc_str)
+            stdout.write(f"{base_url}/documents/{document.pk}")
         else:
-            print(
-                (
-                    termcolors.colorize(str(document), fg="green")
-                    if color
-                    else str(document)
-                )
-                + f" [{document.pk}]",
-            )
+            stdout.write(doc_str + style_func.SUCCESS(f" [{document.pk}]"))
         if relevant_tags:
-            print("Suggest tags: " + ", ".join([t.name for t in relevant_tags]))
+            stdout.write("Suggest tags: " + ", ".join([t.name for t in relevant_tags]))
         if extra_tags:
-            print("Extra tags: " + ", ".join([t.name for t in extra_tags]))
+            stdout.write("Extra tags: " + ", ".join([t.name for t in extra_tags]))
     else:
         if not relevant_tags:
             return
@@ -254,7 +248,8 @@ def set_storage_path(
     use_first=True,
     suggest=False,
     base_url=None,
-    color=False,
+    stdout=None,
+    style_func=None,
     **kwargs,
 ):
     if document.storage_path and not replace:
@@ -285,23 +280,14 @@ def set_storage_path(
 
     if selected or replace:
         if suggest:
-            if base_url:
-                print(
-                    termcolors.colorize(str(document), fg="green")
-                    if color
-                    else str(document),
-                )
-                print(f"{base_url}/documents/{document.pk}")
-            else:
-                print(
-                    (
-                        termcolors.colorize(str(document), fg="green")
-                        if color
-                        else str(document)
-                    )
-                    + f" [{document.pk}]",
-                )
-            print(f"Suggest storage directory {selected}")
+            _suggestion_printer(
+                stdout,
+                style_func,
+                "storage directory",
+                document,
+                selected,
+                base_url,
+            )
         else:
             logger.info(
                 f"Assigning storage path {selected} to {document}",

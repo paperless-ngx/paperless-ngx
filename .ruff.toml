@@ -1,7 +1,29 @@
-# https://beta.ruff.rs/docs/settings/
-# https://beta.ruff.rs/docs/rules/
-extend-select = ["I", "W", "UP", "COM", "DJ", "EXE", "ISC", "ICN", "G201", "INP", "PIE", "RSE", "SIM", "TID", "PLC", "PLE", "RUF"]
-# TODO PTH
+# https://docs.astral.sh/ruff/settings/
+# https://docs.astral.sh/ruff/rules/
+extend-select = [
+  "W",     # https://docs.astral.sh/ruff/rules/#pycodestyle-e-w
+  "I",     # https://docs.astral.sh/ruff/rules/#isort-i
+  "UP",    # https://docs.astral.sh/ruff/rules/#pyupgrade-up
+  "COM",   # https://docs.astral.sh/ruff/rules/#flake8-commas-com
+  "DJ",    # https://docs.astral.sh/ruff/rules/#flake8-django-dj
+  "EXE",   # https://docs.astral.sh/ruff/rules/#flake8-executable-exe
+  "ISC",   # https://docs.astral.sh/ruff/rules/#flake8-implicit-str-concat-isc
+  "ICN",   # https://docs.astral.sh/ruff/rules/#flake8-import-conventions-icn
+  "G201",  # https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
+  "INP",   # https://docs.astral.sh/ruff/rules/#flake8-no-pep420-inp
+  "PIE",   # https://docs.astral.sh/ruff/rules/#flake8-pie-pie
+  "Q",     # https://docs.astral.sh/ruff/rules/#flake8-quotes-q
+  "RSE",   # https://docs.astral.sh/ruff/rules/#flake8-raise-rse
+  "T20",   # https://docs.astral.sh/ruff/rules/#flake8-print-t20
+  "SIM",   # https://docs.astral.sh/ruff/rules/#flake8-simplify-sim
+  "TID",   # https://docs.astral.sh/ruff/rules/#flake8-tidy-imports-tid
+  "TCH",   # https://docs.astral.sh/ruff/rules/#flake8-type-checking-tch
+  "PLC",   # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PLE",   # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "RUF",   # https://docs.astral.sh/ruff/rules/#ruff-specific-rules-ruf
+  "FLY",   # https://docs.astral.sh/ruff/rules/#flynt-fly
+]
+# TODO PTH https://docs.astral.sh/ruff/rules/#flake8-use-pathlib-pth
 ignore = ["DJ001", "SIM105", "RUF012"]
 fix = true
 line-length = 88
@@ -13,9 +35,9 @@ show-fixes = true
 
 [per-file-ignores]
 ".github/scripts/*.py" = ["E501", "INP001", "SIM117"]
-"docker/wait-for-redis.py" = ["INP001"]
+"docker/wait-for-redis.py" = ["INP001", "T201"]
 "*/tests/*.py" = ["E501", "SIM117"]
-"*/migrations/*.py" = ["E501", "SIM"]
+"*/migrations/*.py" = ["E501", "SIM", "T201"]
 "src/paperless_tesseract/tests/test_parser.py" = ["RUF001"]
 "src/documents/models.py" = ["SIM115"]
 
