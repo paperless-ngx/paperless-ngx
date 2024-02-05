@@ -306,6 +306,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    # The openid_connect provider is used in the profile API tests
     "allauth.socialaccount.providers.openid_connect",
     *env_apps,
 ]
