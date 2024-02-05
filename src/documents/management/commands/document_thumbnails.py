@@ -19,7 +19,7 @@ def _process_document(doc_id):
     if parser_class:
         parser = parser_class(logging_group=None)
     else:
-        print(f"{document} No parser for mime type {document.mime_type}")
+        print(f"{document} No parser for mime type {document.mime_type}")  # noqa: T201
         return
 
     try:

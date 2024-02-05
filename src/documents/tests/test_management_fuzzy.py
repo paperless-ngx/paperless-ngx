@@ -196,7 +196,7 @@ class TestFuzzyMatchCommand(TestCase):
         self.assertEqual(Document.objects.count(), 3)
 
         stdout, _ = self.call_command("--delete")
-        print(stdout)
+
         lines = [x.strip() for x in stdout.split("\n") if len(x.strip())]
         self.assertEqual(len(lines), 3)
         self.assertEqual(

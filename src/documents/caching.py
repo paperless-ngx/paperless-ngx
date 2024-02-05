@@ -90,7 +90,6 @@ def set_suggestions_cache(
     """
     if classifier is not None:
         doc_key = get_suggestion_cache_key(document_id)
-        print(classifier.last_auto_type_hash)
         cache.set(
             doc_key,
             SuggestionCacheData(
