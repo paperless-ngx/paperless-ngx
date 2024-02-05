@@ -26,6 +26,15 @@ class MockOpenIDProvider:
         return "openid/login/"
 
 
+# see allauth.socialaccount.providers.openid_connect.provider.OpenIDConnectProviderAccount
+class MockOpenIDConnectProviderAccount:
+    def __init__(self, mock_social_account_dict):
+        self.account = mock_social_account_dict
+
+    def to_str(self):
+        return self.account["name"]
+
+
 # see allauth.socialaccount.providers.openid_connect.provider.OpenIDConnectProvider
 class MockOpenIDConnectProvider:
     id = "openid_connect"
@@ -72,7 +81,6 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
         THEN:
             - Profile is returned
         """
-
         response = self.client.get(self.ENDPOINT)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -80,6 +88,52 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
         self.assertEqual(response.data["email"], self.user.email)
         self.assertEqual(response.data["first_name"], self.user.first_name)
         self.assertEqual(response.data["last_name"], self.user.last_name)
+
+    @mock.patch(
+        "allauth.socialaccount.models.SocialAccount.get_provider_account",
+    )
+    @mock.patch(
+        "allauth.socialaccount.adapter.DefaultSocialAccountAdapter.list_providers",
+    )
+    def test_get_profile_w_social(self, mock_list_providers, mock_get_provider_account):
+        """
+        GIVEN:
+            - Configured user and setup social account
+        WHEN:
+            - API call is made to get profile
+        THEN:
+            - Profile is returned with social accounts
+        """
+        self.setupSocialAccount()
+
+        openid_provider = (
+            MockOpenIDConnectProvider(
+                app=SocialApp.objects.get(provider_id="keycloak-test"),
+            ),
+        )
+        mock_list_providers.return_value = [
+            openid_provider,
+        ]
+        mock_get_provider_account.return_value = MockOpenIDConnectProviderAccount(
+            mock_social_account_dict={
+                "name": openid_provider[0].name,
+            },
+        )
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(
+            response.data["social_accounts"],
+            [
+                {
+                    "id": 1,
+                    "provider": "keycloak-test",
+                    "name": "Keycloak",
+                },
+            ],
+        )
 
     def test_update_profile(self):
         """
@@ -210,6 +264,41 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
             len(response.data),
             2,
         )
+
+    # @mock.patch(
+    #     "allauth.socialaccount.adapter.DefaultSocialAccountAdapter.list_providers",
+    # )
+    # def test_get_social_accounts(
+    #     self,
+    #     mock_list_providers,
+    # ):
+    #     """
+    #     GIVEN:
+    #         - Configured user
+    #     WHEN:
+    #         - API call is made to get social account providers
+    #     THEN:
+    #         - Social account providers are returned
+    #     """
+    #     self.setupSocialAccount()
+
+    #     mock_list_providers.return_value = [
+    #         MockOpenIDConnectProvider(
+    #             app=SocialApp.objects.get(provider_id="keycloak-test"),
+    #         ),
+    #     ]
+
+    #     response = self.client.get(f"{self.ENDPOINT}social_accounts/")
+
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    #     self.assertEqual(
+    #         response.data[0]["name"],
+    #         "Keycloak",
+    #     )
+    #     self.assertIn(
+    #         "keycloak-test/login/?process=connect",
+    #         response.data[0]["login_url"],
+    #     )
 
     def test_disconnect_social_account(self):
         """
