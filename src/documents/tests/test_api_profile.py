@@ -10,6 +10,35 @@ from rest_framework.test import APITestCase
 from documents.tests.utils import DirectoriesMixin
 
 
+# see allauth.socialaccount.providers.openid.provider.OpenIDProvider
+class MockOpenIDProvider:
+    id = "openid"
+    name = "OpenID"
+
+    def get_brands(self):
+        default_servers = [
+            dict(id="yahoo", name="Yahoo", openid_url="http://me.yahoo.com"),
+            dict(id="hyves", name="Hyves", openid_url="http://hyves.nl"),
+        ]
+        return default_servers
+
+    def get_login_url(self, request, **kwargs):
+        return "openid/login/"
+
+
+# see allauth.socialaccount.providers.openid_connect.provider.OpenIDConnectProvider
+class MockOpenIDConnectProvider:
+    id = "openid_connect"
+    name = "OpenID Connect"
+
+    def __init__(self, app=None):
+        self.app = app
+        self.name = app.name
+
+    def get_login_url(self, request, **kwargs):
+        return f"{self.app.provider_id}/login/?process=connect"
+
+
 class TestApiProfile(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/profile/"
 
@@ -21,6 +50,9 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
             first_name="firstname",
             last_name="surname",
         )
+        self.client.force_authenticate(user=self.user)
+
+    def setupSocialAccount(self):
         SocialApp.objects.create(
             name="Keycloak",
             provider="openid_connect",
@@ -30,7 +62,6 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
             SocialAccount(uid="123456789", provider="keycloak-test"),
             bulk=False,
         )
-        self.client.force_authenticate(user=self.user)
 
     def test_get_profile(self):
         """
@@ -117,7 +148,13 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
         response = self.client.post(f"{self.ENDPOINT}generate_auth_token/")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_get_social_account_providers(self):
+    @mock.patch(
+        "allauth.socialaccount.adapter.DefaultSocialAccountAdapter.list_providers",
+    )
+    def test_get_social_account_providers(
+        self,
+        mock_list_providers,
+    ):
         """
         GIVEN:
             - Configured user
@@ -126,6 +163,13 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
         THEN:
             - Social account providers are returned
         """
+        self.setupSocialAccount()
+
+        mock_list_providers.return_value = [
+            MockOpenIDConnectProvider(
+                app=SocialApp.objects.get(provider_id="keycloak-test"),
+            ),
+        ]
 
         response = self.client.get(f"{self.ENDPOINT}social_account_providers/")
 
@@ -155,21 +199,6 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
             - Brands for openid provider are returned
         """
 
-        # see allauth.socialaccount.providers.openid.provider.OpenIDProvider
-        class MockOpenIDProvider:
-            id = "openid"
-            name = "OpenID"
-
-            def get_brands(self):
-                default_servers = [
-                    dict(id="yahoo", name="Yahoo", openid_url="http://me.yahoo.com"),
-                    dict(id="hyves", name="Hyves", openid_url="http://hyves.nl"),
-                ]
-                return default_servers
-
-            def get_login_url(self, request, **kwargs):
-                return "openid/login/"
-
         mock_list_providers.return_value = [
             MockOpenIDProvider(),
         ]
@@ -191,6 +220,7 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
         THEN:
             - Social account is deleted from the user or request fails
         """
+        self.setupSocialAccount()
 
         # Test with invalid id
         response = self.client.post(
