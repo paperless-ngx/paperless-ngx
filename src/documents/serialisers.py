@@ -82,7 +82,10 @@ class MatchingModelSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         # TODO: remove pending https://github.com/encode/django-rest-framework/issues/7173
-        name = data.get("name", self.instance.name)
+        name = data.get(
+            "name",
+            self.instance.name if hasattr(self.instance, "name") else None,
+        )
         owner = (
             data["owner"]
             if "owner" in data
@@ -441,7 +444,10 @@ class CustomFieldSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         # TODO: remove pending https://github.com/encode/django-rest-framework/issues/7173
-        name = attrs.get("name", self.instance.name)
+        name = attrs.get(
+            "name",
+            self.instance.name if hasattr(self.instance, "name") else None,
+        )
         if ("name" in attrs) and self.Meta.model.objects.filter(
             name=name,
         ).exists():
