@@ -55,9 +55,7 @@
           <ul class="list-group">
             @for (account of socialAccounts; track account.id) {
               <li class="list-group-item">{{account.name}} ({{account.provider}})<button type="button" class="btn btn-outline-danger btn-sm ms-2 align-baseline" (click)="disconnectSocialAccount(account.id)" i18n-title title="Disconnect {{ account.name }} social account">
-                <ng-container i18n>Disconnect</ng-container><svg class="buttonicon-sm ms-1" fill="currentColor">
-                  <use xlink:href="assets/bootstrap-icons.svg#trash" />
-                </svg>
+                <ng-container i18n>Disconnect</ng-container>&nbsp;<i-bs name="trash"></i-bs>
                 </button>
               </li>
             }
@@ -71,9 +69,7 @@
           <div class="list-group">
             @for (provider of socialAccountProviders; track provider.name) {
               <a class="list-group-item list-group-item-action text-primary d-flex align-items-center" href="{{ provider.login_url }}" rel="noopener noreferrer">
-                {{provider.name}}<svg class="buttonicon-sm ms-2" style="margin-bottom: 1px;" fill="currentColor">
-                  <use xlink:href="assets/bootstrap-icons.svg#box-arrow-up-right" />
-                </svg>
+                {{provider.name}}&nbsp;<i-bs class="pb-1 ps-1" name="box-arrow-up-right"></i-bs>
               </a>
             }
           </div>
