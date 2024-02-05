@@ -1100,7 +1100,7 @@ def _get_nltk_language_setting(ocr_lang: str) -> Optional[str]:
         "tur": "turkish",
     }
 
-    return iso_code_to_nltk.get(ocr_lang, None)
+    return iso_code_to_nltk.get(ocr_lang)
 
 
 NLTK_ENABLED: Final[bool] = __get_boolean("PAPERLESS_ENABLE_NLTK", "yes")

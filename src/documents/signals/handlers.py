@@ -559,15 +559,21 @@ def run_workflow(
                     try:
                         document.title = parse_doc_title_w_placeholders(
                             action.assign_title,
-                            document.correspondent.name
-                            if document.correspondent is not None
-                            else "",
-                            document.document_type.name
-                            if document.document_type is not None
-                            else "",
-                            document.owner.username
-                            if document.owner is not None
-                            else "",
+                            (
+                                document.correspondent.name
+                                if document.correspondent is not None
+                                else ""
+                            ),
+                            (
+                                document.document_type.name
+                                if document.document_type is not None
+                                else ""
+                            ),
+                            (
+                                document.owner.username
+                                if document.owner is not None
+                                else ""
+                            ),
                             timezone.localtime(document.added),
                             document.original_filename,
                             timezone.localtime(document.created),
