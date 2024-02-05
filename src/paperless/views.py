@@ -209,17 +209,14 @@ class SocialAccountProvidersView(APIView):
             if p.id != "openid"
         ]
 
-        if (
-            openid_provider := next(filter(lambda p: p.id == "openid", providers), None)
-            is not None
-        ):
+        for openid_provider in filter(lambda p: p.id == "openid", providers):
             resp += [
                 {
-                    "name": b.name,
+                    "name": b["name"],
                     "login_url": openid_provider.get_login_url(
                         request,
                         process="connect",
-                        openid=b.openid_url,
+                        openid=b["openid_url"],
                     ),
                 }
                 for b in openid_provider.get_brands()
