@@ -140,6 +140,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "last_name",
             "auth_token",
             "social_accounts",
+            "has_usable_password",
         )
 
 

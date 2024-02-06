@@ -31,6 +31,7 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
   private newPassword: string
   private passwordConfirm: string
   public showPasswordConfirm: boolean = false
+  public hasUsablePassword: boolean = false
 
   private currentEmail: string
   private newEmail: string
@@ -63,6 +64,7 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
           this.onEmailChange()
         })
         this.currentPassword = profile.password
+        this.hasUsablePassword = profile.has_usable_password
         this.form.get('password').valueChanges.subscribe((newPassword) => {
           this.newPassword = newPassword
           this.onPasswordChange()

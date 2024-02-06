@@ -16,4 +16,5 @@ export interface PaperlessUserProfile {
   last_name?: string
   auth_token?: string
   social_accounts?: SocialAccount[]
+  has_usable_password?: boolean
 }

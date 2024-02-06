@@ -12,6 +12,7 @@ import {
   NgbAccordionModule,
   NgbActiveModal,
   NgbModalModule,
+  NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { HttpClientModule } from '@angular/common/http'
 import { TextComponent } from '../input/text/text.component'
@@ -60,6 +61,7 @@ describe('ProfileEditDialogComponent', () => {
         NgbModalModule,
         NgbAccordionModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        NgbPopoverModule,
       ],
     })
     profileService = TestBed.inject(ProfileService)
@@ -158,6 +160,7 @@ describe('ProfileEditDialogComponent', () => {
       'getSocialAccountProviders'
     )
     getProvidersSpy.mockReturnValue(of(socialAccountProviders))
+    component.hasUsablePassword = true
     component.ngOnInit()
     component.form.get('password').patchValue('new*pass')
     component.onPasswordKeyUp({
