@@ -45,10 +45,18 @@
         </div>
       }
       @if (editing) {
-        <button class="list-group-item list-group-item-action bg-light" (click)="applyClicked()" [disabled]="!modelIsDirty || disabled">
-          <small class="ms-2" [ngClass]="{'fw-bold': modelIsDirty}" i18n>Apply</small>
-          <i-bs width="1.5em" height="1em" name="arrow-right"></i-bs>
-        </button>
+        @if ((selectionModel.itemsSorted | filter: filterText).length === 0 && createRef !== undefined) {
+          <button class="list-group-item list-group-item-action bg-light" (click)="createClicked()" [disabled]="disabled">
+            <small class="ms-2"><ng-container i18n>Create</ng-container> "{{filterText}}"</small>
+            <i-bs width="1.5em" height="1em" name="plus"></i-bs>
+          </button>
+        }
+        @if ((selectionModel.itemsSorted | filter: filterText).length > 0) {
+          <button class="list-group-item list-group-item-action bg-light" (click)="applyClicked()" [disabled]="!modelIsDirty || disabled">
+            <small class="ms-2" [ngClass]="{'fw-bold': modelIsDirty}" i18n>Apply</small>
+            <i-bs width="1.5em" height="1em" name="arrow-right"></i-bs>
+          </button>
+        }
       }
       @if (!editing && manyToOne) {
         <div class="list-group-item list-group-item-note pt-1 pb-2">
