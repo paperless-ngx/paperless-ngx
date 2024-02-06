@@ -33,7 +33,12 @@ import {
   PermissionType,
 } from 'src/app/services/permissions.service'
 import { FormControl, FormGroup } from '@angular/forms'
-import { first, Subject, takeUntil } from 'rxjs'
+import { first, map, Subject, switchMap, takeUntil } from 'rxjs'
+import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
+import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
+import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
+import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
+import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 
 @Component({
   selector: 'pngx-bulk-editor',
@@ -477,6 +482,92 @@ export class BulkEditorComponent
         storage_path: storagePath ? storagePath.id : null,
       })
     }
+  }
+
+  createTag(name: string) {
+    let modal = this.modalService.open(TagEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    modal.componentInstance.object = { name }
+    modal.componentInstance.succeeded
+      .pipe(
+        switchMap((newTag) => {
+          return this.tagService
+            .listAll()
+            .pipe(map((tags) => ({ newTag, tags })))
+        })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ newTag, tags }) => {
+        this.tags = tags.results
+        this.tagSelectionModel.toggle(newTag.id)
+      })
+  }
+
+  createCorrespondent(name: string) {
+    let modal = this.modalService.open(CorrespondentEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    modal.componentInstance.object = { name }
+    modal.componentInstance.succeeded
+      .pipe(
+        switchMap((newCorrespondent) => {
+          return this.correspondentService
+            .listAll()
+            .pipe(
+              map((correspondents) => ({ newCorrespondent, correspondents }))
+            )
+        })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ newCorrespondent, correspondents }) => {
+        this.correspondents = correspondents.results
+        this.correspondentSelectionModel.toggle(newCorrespondent.id)
+      })
+  }
+
+  createDocumentType(name: string) {
+    let modal = this.modalService.open(DocumentTypeEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    modal.componentInstance.object = { name }
+    modal.componentInstance.succeeded
+      .pipe(
+        switchMap((newDocumentType) => {
+          return this.documentTypeService
+            .listAll()
+            .pipe(map((documentTypes) => ({ newDocumentType, documentTypes })))
+        })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ newDocumentType, documentTypes }) => {
+        this.documentTypes = documentTypes.results
+        this.documentTypeSelectionModel.toggle(newDocumentType.id)
+      })
+  }
+
+  createStoragePath(name: string) {
+    let modal = this.modalService.open(StoragePathEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    modal.componentInstance.object = { name }
+    modal.componentInstance.succeeded
+      .pipe(
+        switchMap((newStoragePath) => {
+          return this.storagePathService
+            .listAll()
+            .pipe(map((storagePaths) => ({ newStoragePath, storagePaths })))
+        })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ newStoragePath, storagePaths }) => {
+        this.storagePaths = storagePaths.results
+        this.storagePathsSelectionModel.toggle(newStoragePath.id)
+      })
   }
 
   applyDelete() {
