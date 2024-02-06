@@ -500,4 +500,46 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     selectionModel.apply()
     expect(selectionModel.itemsSorted).toEqual([nullItem, items[1], items[0]])
   })
+
+  it('should set support create, keep open model and call createRef method', fakeAsync(() => {
+    component.items = items
+    component.icon = 'tag-fill'
+    component.selectionModel = selectionModel
+    fixture.nativeElement
+      .querySelector('button')
+      .dispatchEvent(new MouseEvent('click')) // open
+    fixture.detectChanges()
+    tick(100)
+
+    component.filterText = 'Test Filter Text'
+    component.createRef = jest.fn()
+    component.createClicked()
+    expect(component.creating).toBeTruthy()
+    expect(component.createRef).toHaveBeenCalledWith('Test Filter Text')
+    const openSpy = jest.spyOn(component.dropdown, 'open')
+    component.dropdownOpenChange(false)
+    expect(openSpy).toHaveBeenCalled() // should keep open
+  }))
+
+  it('should call create on enter inside filter field if 0 items remain while editing', fakeAsync(() => {
+    component.items = items
+    component.icon = 'tag-fill'
+    component.editing = true
+    component.createRef = jest.fn()
+    const createSpy = jest.spyOn(component, 'createClicked')
+    expect(component.selectionModel.getSelectedItems()).toEqual([])
+    fixture.nativeElement
+      .querySelector('button')
+      .dispatchEvent(new MouseEvent('click')) // open
+    fixture.detectChanges()
+    tick(100)
+    component.filterText = 'FooBar'
+    fixture.detectChanges()
+    component.listFilterTextInput.nativeElement.dispatchEvent(
+      new KeyboardEvent('keyup', { key: 'Enter' })
+    )
+    expect(component.selectionModel.getSelectedItems()).toEqual([])
+    tick(300)
+    expect(createSpy).toHaveBeenCalled()
+  }))
 })
