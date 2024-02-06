@@ -1,11 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ProfileService } from 'src/app/services/profile.service'
 import { SocialAccount, SocialAccountProvider } from 'src/app/data/user-profile'
 import { ToastService } from 'src/app/services/toast.service'
 import { Subject, takeUntil } from 'rxjs'
 import { Clipboard } from '@angular/cdk/clipboard'
+import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 
 @Component({
   selector: 'pngx-profile-edit-dialog',
@@ -46,7 +47,8 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
     private profileService: ProfileService,
     public activeModal: NgbActiveModal,
     private toastService: ToastService,
-    private clipboard: Clipboard
+    private clipboard: Clipboard,
+    private modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -196,19 +198,30 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
   }
 
   disconnectSocialAccount(id: number): void {
-    this.profileService
-      .disconnectSocialAccount(id)
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe({
-        next: (id: number) => {
-          this.socialAccounts = this.socialAccounts.filter((a) => a.id != id)
-        },
-        error: (error) => {
-          this.toastService.showError(
-            $localize`Error disconnecting social account`,
-            error
-          )
-        },
-      })
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Confirm disconnecting the social account`
+    modal.componentInstance.messageBold = $localize`The social account will be disconnected and can no longer be used to log in.`
+    modal.componentInstance.message = $localize`This operation cannot be undone but you can connect the account again.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      this.profileService
+        .disconnectSocialAccount(id)
+        .pipe(takeUntil(this.unsubscribeNotifier))
+        .subscribe({
+          next: (id: number) => {
+            this.socialAccounts = this.socialAccounts.filter((a) => a.id != id)
+          },
+          error: (error) => {
+            this.toastService.showError(
+              $localize`Error disconnecting social account`,
+              error
+            )
+          },
+        })
+    })
   }
 }
