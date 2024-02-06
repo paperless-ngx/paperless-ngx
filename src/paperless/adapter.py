@@ -24,3 +24,7 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         """
         url = reverse("base")
         return url
+
+    def populate_user(self, request, sociallogin, data):
+        # TODO: If default global permissions are implemented, should also be here
+        return super().populate_user(request, sociallogin, data)
