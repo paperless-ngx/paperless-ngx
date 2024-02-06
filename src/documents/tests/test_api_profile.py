@@ -265,41 +265,6 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
             2,
         )
 
-    # @mock.patch(
-    #     "allauth.socialaccount.adapter.DefaultSocialAccountAdapter.list_providers",
-    # )
-    # def test_get_social_accounts(
-    #     self,
-    #     mock_list_providers,
-    # ):
-    #     """
-    #     GIVEN:
-    #         - Configured user
-    #     WHEN:
-    #         - API call is made to get social account providers
-    #     THEN:
-    #         - Social account providers are returned
-    #     """
-    #     self.setupSocialAccount()
-
-    #     mock_list_providers.return_value = [
-    #         MockOpenIDConnectProvider(
-    #             app=SocialApp.objects.get(provider_id="keycloak-test"),
-    #         ),
-    #     ]
-
-    #     response = self.client.get(f"{self.ENDPOINT}social_accounts/")
-
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertEqual(
-    #         response.data[0]["name"],
-    #         "Keycloak",
-    #     )
-    #     self.assertIn(
-    #         "keycloak-test/login/?process=connect",
-    #         response.data[0]["login_url"],
-    #     )
-
     def test_disconnect_social_account(self):
         """
         GIVEN:
