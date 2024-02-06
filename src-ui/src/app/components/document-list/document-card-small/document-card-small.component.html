@@ -25,7 +25,7 @@
     @if (notesEnabled && document.notes.length) {
       <a routerLink="/documents/{{document.id}}/notes" class="document-card-notes py-2 px-1">
         <span class="badge rounded-pill bg-light border text-primary">
-          <i-bs width="0.9rem" height="0.9rem" class="ms-1 me-1" name="chat-left-text"></i-bs>
+          <i-bs width="1.2em" height="1.2em" class="ms-1 me-1" name="chat-left-text"></i-bs>
         {{document.notes.length}}</span>
       </a>
     }
@@ -43,14 +43,14 @@
         @if (document.document_type) {
           <button type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0" title="Toggle document type filter" i18n-title
             (click)="clickDocumentType.emit(document.document_type);$event.stopPropagation()">
-            <i-bs width="0.9rem" height="0.9rem" class="me-2 text-muted" name="file-earmark"></i-bs>
+            <i-bs width="1em" height="1em" class="me-2 text-muted" name="file-earmark"></i-bs>
             <small>{{(document.document_type$ | async)?.name ?? privateName}}</small>
           </button>
         }
         @if (document.storage_path) {
           <button type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0" title="Toggle storage path filter" i18n-title
             (click)="clickStoragePath.emit(document.storage_path);$event.stopPropagation()">
-            <i-bs width="0.9rem" height="0.9rem" class="me-2 text-muted" name="folder"></i-bs>
+            <i-bs width="1em" height="1em" class="me-2 text-muted" name="folder"></i-bs>
             <small>{{(document.storage_path$ | async)?.name ?? privateName}}</small>
           </button>
         }
@@ -63,25 +63,25 @@
             </div>
           </ng-template>
           <div class="ps-0 p-1" placement="top" [ngbTooltip]="dateTooltip">
-            <i-bs width="0.9rem" height="0.9rem" class="me-2 text-muted" name="calendar-event"></i-bs>
+            <i-bs width="1em" height="1em" class="me-2 text-muted" name="calendar-event"></i-bs>
             <small>{{document.created_date | customDate:'mediumDate'}}</small>
           </div>
         </div>
         @if (document.archive_serial_number | isNumber) {
           <div class="ps-0 p-1">
-            <i-bs width="0.9rem" height="0.9rem" class="me-2 text-muted" name="upc-scan"></i-bs>
+            <i-bs width="1em" height="1em" class="me-2 text-muted" name="upc-scan"></i-bs>
             <small>#{{document.archive_serial_number}}</small>
           </div>
         }
         @if (document.owner && document.owner !== settingsService.currentUser.id) {
           <div class="ps-0 p-1">
-            <i-bs width="0.9rem" height="0.9rem" class="me-2 text-muted" name="person-fill-lock"></i-bs>
+            <i-bs width="1em" height="1em" class="me-2 text-muted" name="person-fill-lock"></i-bs>
             <small>{{document.owner | username}}</small>
           </div>
         }
         @if (document.is_shared_by_requester) {
           <div class="ps-0 p-1">
-            <i-bs width="0.9rem" height="0.9rem" class="me-2 text-muted" name="people-fill"></i-bs>
+            <i-bs width="1em" height="1em" class="me-2 text-muted" name="people-fill"></i-bs>
             <small i18n>Shared</small>
           </div>
         }
