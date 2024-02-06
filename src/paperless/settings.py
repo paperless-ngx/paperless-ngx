@@ -771,6 +771,11 @@ CACHES = {
     },
 }
 
+if DEBUG and os.getenv("PAPERLESS_CACHE_BACKEND") is None:
+    CACHES["default"][
+        "BACKEND"
+    ] = "django.core.cache.backends.locmem.LocMemCache"  # pragma: no cover
+
 
 def default_threads_per_worker(task_workers) -> int:
     # always leave one core open
