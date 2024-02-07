@@ -44,6 +44,8 @@ import { UsersAndGroupsComponent } from './users-groups.component'
 import { User } from 'src/app/data/user'
 import { Group } from 'src/app/data/group'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { By } from '@angular/platform-browser'
+import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
 
 const users = [
   { id: 1, username: 'user1', is_superuser: false },
@@ -83,6 +85,7 @@ describe('UsersAndGroupsComponent', () => {
         PermissionsUserComponent,
         PermissionsGroupComponent,
         IfOwnerDirective,
+        ConfirmButtonComponent,
       ],
       providers: [CustomDatePipe, DatePipe, PermissionsGuard],
       imports: [
@@ -160,10 +163,9 @@ describe('UsersAndGroupsComponent', () => {
 
   it('should support delete user, show error if needed', () => {
     completeSetup()
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    component.deleteUser(users[0])
-    const deleteDialog = modal.componentInstance as ConfirmDialogComponent
+    const deleteButton = fixture.debugElement.query(
+      By.directive(ConfirmButtonComponent)
+    )
     const deleteSpy = jest.spyOn(userService, 'delete')
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
@@ -171,10 +173,10 @@ describe('UsersAndGroupsComponent', () => {
     deleteSpy.mockReturnValueOnce(
       throwError(() => new Error('error deleting user'))
     )
-    deleteDialog.confirm()
-    expect(toastErrorSpy).toBeCalled()
+    deleteButton.nativeElement.dispatchEvent(new Event('confirm'))
+    expect(toastErrorSpy).toHaveBeenCalled()
     deleteSpy.mockReturnValueOnce(of(true))
-    deleteDialog.confirm()
+    deleteButton.nativeElement.dispatchEvent(new Event('confirm'))
     expect(listAllSpy).toHaveBeenCalled()
     expect(toastInfoSpy).toHaveBeenCalledWith('Deleted user')
   })
@@ -218,10 +220,9 @@ describe('UsersAndGroupsComponent', () => {
 
   it('should support delete group, show error if needed', () => {
     completeSetup()
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    component.deleteGroup(users[0])
-    const deleteDialog = modal.componentInstance as ConfirmDialogComponent
+    const deleteButton = fixture.debugElement.queryAll(
+      By.directive(ConfirmButtonComponent)
+    )[2]
     const deleteSpy = jest.spyOn(groupService, 'delete')
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
@@ -229,10 +230,10 @@ describe('UsersAndGroupsComponent', () => {
     deleteSpy.mockReturnValueOnce(
       throwError(() => new Error('error deleting group'))
     )
-    deleteDialog.confirm()
-    expect(toastErrorSpy).toBeCalled()
+    deleteButton.nativeElement.dispatchEvent(new Event('confirm'))
+    expect(toastErrorSpy).toHaveBeenCalled()
     deleteSpy.mockReturnValueOnce(of(true))
-    deleteDialog.confirm()
+    deleteButton.nativeElement.dispatchEvent(new Event('confirm'))
     expect(listAllSpy).toHaveBeenCalled()
     expect(toastInfoSpy).toHaveBeenCalledWith('Deleted group')
   })
