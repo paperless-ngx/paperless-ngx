@@ -42,6 +42,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { SwitchComponent } from '../../common/input/switch/switch.component'
+import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
+import { By } from '@angular/platform-browser'
 
 const mailAccounts = [
   { id: 1, name: 'account1' },
@@ -84,6 +86,7 @@ describe('MailComponent', () => {
         PermissionsDialogComponent,
         PermissionsFormComponent,
         SwitchComponent,
+        ConfirmButtonComponent,
       ],
       providers: [CustomDatePipe, DatePipe, PermissionsGuard],
       imports: [
@@ -183,10 +186,9 @@ describe('MailComponent', () => {
 
   it('should support delete mail account, show error if needed', () => {
     completeSetup()
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    component.deleteMailAccount(mailAccounts[0] as MailAccount)
-    const deleteDialog = modal.componentInstance as ConfirmDialogComponent
+    const deleteButton = fixture.debugElement.query(
+      By.directive(ConfirmButtonComponent)
+    )
     const deleteSpy = jest.spyOn(mailAccountService, 'delete')
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
@@ -194,10 +196,10 @@ describe('MailComponent', () => {
     deleteSpy.mockReturnValueOnce(
       throwError(() => new Error('error deleting mail account'))
     )
-    deleteDialog.confirm()
+    deleteButton.nativeElement.dispatchEvent(new Event('confirm'))
     expect(toastErrorSpy).toBeCalled()
     deleteSpy.mockReturnValueOnce(of(true))
-    deleteDialog.confirm()
+    deleteButton.nativeElement.dispatchEvent(new Event('confirm'))
     expect(listAllSpy).toHaveBeenCalled()
     expect(toastInfoSpy).toHaveBeenCalledWith('Deleted mail account')
   })
@@ -222,10 +224,9 @@ describe('MailComponent', () => {
 
   it('should support delete mail rule, show error if needed', () => {
     completeSetup()
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    component.deleteMailRule(mailRules[0] as MailRule)
-    const deleteDialog = modal.componentInstance as ConfirmDialogComponent
+    const deleteButton = fixture.debugElement.queryAll(
+      By.directive(ConfirmButtonComponent)
+    )[2]
     const deleteSpy = jest.spyOn(mailRuleService, 'delete')
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
@@ -233,10 +234,10 @@ describe('MailComponent', () => {
     deleteSpy.mockReturnValueOnce(
       throwError(() => new Error('error deleting mail rule'))
     )
-    deleteDialog.confirm()
+    deleteButton.nativeElement.dispatchEvent(new Event('confirm'))
     expect(toastErrorSpy).toBeCalled()
     deleteSpy.mockReturnValueOnce(of(true))
-    deleteDialog.confirm()
+    deleteButton.nativeElement.dispatchEvent(new Event('confirm'))
     expect(listAllSpy).toHaveBeenCalled()
     expect(toastInfoSpy).toHaveBeenCalledWith('Deleted mail rule')
   })
