@@ -398,6 +398,11 @@ export class FilterableDropdownComponent {
   @Input()
   disabled = false
 
+  @Input()
+  createRef: (name) => void
+
+  creating: boolean = false
+
   @Output()
   apply = new EventEmitter<ChangedItems>()
 
@@ -437,6 +442,11 @@ export class FilterableDropdownComponent {
     }
   }
 
+  createClicked() {
+    this.creating = true
+    this.createRef(this.filterText)
+  }
+
   dropdownOpenChange(open: boolean): void {
     if (open) {
       setTimeout(() => {
@@ -448,9 +458,14 @@ export class FilterableDropdownComponent {
       }
       this.opened.next(this)
     } else {
-      this.filterText = ''
-      if (this.applyOnClose && this.selectionModel.isDirty()) {
-        this.apply.emit(this.selectionModel.diff())
+      if (this.creating) {
+        this.dropdown.open()
+        this.creating = false
+      } else {
+        this.filterText = ''
+        if (this.applyOnClose && this.selectionModel.isDirty()) {
+          this.apply.emit(this.selectionModel.diff())
+        }
       }
     }
   }
@@ -466,6 +481,8 @@ export class FilterableDropdownComponent {
           this.dropdown.close()
         }
       }, 200)
+    } else if (filtered.length == 0 && this.createRef) {
+      this.createClicked()
     }
   }
 
