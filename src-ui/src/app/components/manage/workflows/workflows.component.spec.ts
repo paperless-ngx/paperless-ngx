@@ -25,7 +25,6 @@ import {
 } from 'src/app/data/workflow-trigger'
 import { WorkflowActionType } from 'src/app/data/workflow-action'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
 
 const workflows: Workflow[] = [
   {
@@ -85,7 +84,6 @@ describe('WorkflowsComponent', () => {
         IfPermissionsDirective,
         PageHeaderComponent,
         ConfirmDialogComponent,
-        ConfirmButtonComponent,
       ],
       providers: [
         {
@@ -174,23 +172,27 @@ describe('WorkflowsComponent', () => {
   })
 
   it('should support delete, show notification on error / success', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const deleteSpy = jest.spyOn(workflowService, 'delete')
     const reloadSpy = jest.spyOn(component, 'reload')
 
-    const deleteButton = fixture.debugElement.query(
-      By.directive(ConfirmButtonComponent)
-    )
+    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[4]
+    deleteButton.triggerEventHandler('click')
+
+    expect(modal).not.toBeUndefined()
+    const editDialog = modal.componentInstance as ConfirmDialogComponent
 
     // fail first
     deleteSpy.mockReturnValueOnce(throwError(() => new Error('error deleting')))
-    deleteButton.nativeElement.dispatchEvent(new Event('confirm'))
+    editDialog.confirmClicked.emit()
     expect(toastErrorSpy).toHaveBeenCalled()
     expect(reloadSpy).not.toHaveBeenCalled()
 
     // succeed
     deleteSpy.mockReturnValueOnce(of(true))
-    deleteButton.nativeElement.dispatchEvent(new Event('confirm'))
+    editDialog.confirmClicked.emit()
     expect(reloadSpy).toHaveBeenCalled()
   })
 })
