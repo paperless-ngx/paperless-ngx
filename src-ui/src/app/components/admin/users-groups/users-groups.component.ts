@@ -108,16 +108,28 @@ export class UsersAndGroupsComponent
   }
 
   deleteUser(user: User) {
-    this.usersService.delete(user).subscribe({
-      next: () => {
-        this.toastService.showInfo($localize`Deleted user`)
-        this.usersService.listAll().subscribe((r) => {
-          this.users = r.results
-        })
-      },
-      error: (e) => {
-        this.toastService.showError($localize`Error deleting user.`, e)
-      },
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Confirm delete user account`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete this user account.`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      this.usersService.delete(user).subscribe({
+        next: () => {
+          modal.close()
+          this.toastService.showInfo($localize`Deleted user`)
+          this.usersService.listAll().subscribe((r) => {
+            this.users = r.results
+          })
+        },
+        error: (e) => {
+          this.toastService.showError($localize`Error deleting user.`, e)
+        },
+      })
     })
   }
 
@@ -146,16 +158,28 @@ export class UsersAndGroupsComponent
   }
 
   deleteGroup(group: Group) {
-    this.groupsService.delete(group).subscribe({
-      next: () => {
-        this.toastService.showInfo($localize`Deleted group`)
-        this.groupsService.listAll().subscribe((r) => {
-          this.groups = r.results
-        })
-      },
-      error: (e) => {
-        this.toastService.showError($localize`Error deleting group.`, e)
-      },
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Confirm delete user group`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete this user group.`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      this.groupsService.delete(group).subscribe({
+        next: () => {
+          modal.close()
+          this.toastService.showInfo($localize`Deleted group`)
+          this.groupsService.listAll().subscribe((r) => {
+            this.groups = r.results
+          })
+        },
+        error: (e) => {
+          this.toastService.showError($localize`Error deleting group.`, e)
+        },
+      })
     })
   }
 
