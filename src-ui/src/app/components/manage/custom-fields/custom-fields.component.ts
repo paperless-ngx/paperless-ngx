@@ -65,27 +65,15 @@ export class CustomFieldsComponent
   }
 
   deleteField(field: CustomField) {
-    const modal = this.modalService.open(ConfirmDialogComponent, {
-      backdrop: 'static',
-    })
-    modal.componentInstance.title = $localize`Confirm delete field`
-    modal.componentInstance.messageBold = $localize`This operation will permanently delete this field.`
-    modal.componentInstance.message = $localize`This operation cannot be undone.`
-    modal.componentInstance.btnClass = 'btn-danger'
-    modal.componentInstance.btnCaption = $localize`Proceed`
-    modal.componentInstance.confirmClicked.subscribe(() => {
-      modal.componentInstance.buttonsEnabled = false
-      this.customFieldsService.delete(field).subscribe({
-        next: () => {
-          modal.close()
-          this.toastService.showInfo($localize`Deleted field`)
-          this.customFieldsService.clearCache()
-          this.reload()
-        },
-        error: (e) => {
-          this.toastService.showError($localize`Error deleting field.`, e)
-        },
-      })
+    this.customFieldsService.delete(field).subscribe({
+      next: () => {
+        this.toastService.showInfo($localize`Deleted field`)
+        this.customFieldsService.clearCache()
+        this.reload()
+      },
+      error: (e) => {
+        this.toastService.showError($localize`Error deleting field.`, e)
+      },
     })
   }
 
