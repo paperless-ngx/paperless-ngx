@@ -550,13 +550,13 @@ for a list of provider configurations. You will also likely need to include the 
 system. See the corresponding
 [django-allauth documentation](https://docs.allauth.org/en/0.60.0/socialaccount/configuration.html)
 
-    Defaults to 'https'
+    Defaults to False
 
 #### [`PAPERLESS_ACCOUNT_ALLOW_SIGNUPS=<bool>`](#PAPERLESS_ACCOUNT_ALLOW_SIGNUPS) {#PAPERLESS_ACCOUNT_ALLOW_SIGNUPS}
 
 : Allow users to signup for a new Paperless-ngx account using any setup third party authentication systems.
 
-    Defaults to 'https'
+    Defaults to False
 
 #### [`PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL=<string>`](#PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL) {#PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL}
 
