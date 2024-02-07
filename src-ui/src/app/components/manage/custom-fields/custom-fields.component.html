@@ -29,21 +29,16 @@
           <div class="btn-group">
             <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.CustomField }" class="btn btn-sm btn-outline-secondary" type="button" (click)="editField(field)">
               <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
-            </button>
-            <pngx-confirm-button
-              label="Delete"
-              i18n-label
-              (confirm)="deleteField(field)"
-              *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.CustomField }"
-              buttonClasses="btn-sm btn-outline-danger"
-              iconName="trash">
-            </pngx-confirm-button>
+              </button>
+              <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.CustomField }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteField(field)">
+                <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </li>
-  }
-  @if (fields.length === 0) {
-    <li class="list-group-item" i18n>No fields defined.</li>
-  }
-</ul>
+        </li>
+      }
+      @if (fields.length === 0) {
+        <li class="list-group-item" i18n>No fields defined.</li>
+      }
+    </ul>

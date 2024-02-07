@@ -21,7 +21,6 @@ import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dial
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
 
 const fields: CustomField[] = [
   {
@@ -50,7 +49,6 @@ describe('CustomFieldsComponent', () => {
         IfPermissionsDirective,
         PageHeaderComponent,
         ConfirmDialogComponent,
-        ConfirmButtonComponent,
       ],
       providers: [
         {
@@ -139,22 +137,27 @@ describe('CustomFieldsComponent', () => {
   })
 
   it('should support delete, show notification on error / success', () => {
-    const deleteButton = fixture.debugElement.query(
-      By.directive(ConfirmButtonComponent)
-    )
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const deleteSpy = jest.spyOn(customFieldsService, 'delete')
     const reloadSpy = jest.spyOn(component, 'reload')
 
+    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[4]
+    deleteButton.triggerEventHandler('click')
+
+    expect(modal).not.toBeUndefined()
+    const editDialog = modal.componentInstance as ConfirmDialogComponent
+
     // fail first
     deleteSpy.mockReturnValueOnce(throwError(() => new Error('error deleting')))
-    deleteButton.nativeElement.dispatchEvent(new Event('confirm'))
+    editDialog.confirmClicked.emit()
     expect(toastErrorSpy).toHaveBeenCalled()
     expect(reloadSpy).not.toHaveBeenCalled()
 
     // succeed
     deleteSpy.mockReturnValueOnce(of(true))
-    deleteButton.nativeElement.dispatchEvent(new Event('confirm'))
+    editDialog.confirmClicked.emit()
     expect(reloadSpy).toHaveBeenCalled()
   })
 })
