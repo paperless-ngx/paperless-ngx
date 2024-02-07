@@ -656,26 +656,26 @@ applications. See the relevant configuration options for more information:
 ### OpenID Connect and social authentication
 
 Version 2.5.0 of Paperless-ngx added support for integrating other authentication systems via
-the [django-allauth](https://github.com/pennersr/django-allauth) package. Once setup, users
-can either login or (optionally) signup using any third party systems you integrate. See the
+the [django-allauth](https://github.com/pennersr/django-allauth) package. Once set up, users
+can either log in or (optionally) sign up using any third party systems you integrate. See the
 relevant [configuration settings](configuration.md#PAPERLESS_SOCIALACCOUNT_PROVIDERS) and
 [django-allauth docs](https://docs.allauth.org/en/latest/socialaccount/configuration.html)
 for more information.
 
-As an example, to setup login via Github, the following environment variables would need to be
+As an example, to set up login via Github, the following environment variables would need to be
 set:
-
-qweqweqweq
 
 ```conf
 PAPERLESS_APPS="allauth.socialaccount.providers.github"
 PAPERLESS_SOCIALACCOUNT_PROVIDERS='{"github": {"APPS": [{"provider_id": "github","name": "Github","client_id": "<CLIENT_ID>","secret": "<CLIENT_SECRET>"}]}}'
 ```
 
-Or, to use OpenID Connect ("OIDC"):
+Or, to use OpenID Connect ("OIDC"), via Keycloak in this example:
 
 ```conf
 PAPERLESS_APPS="allauth.socialaccount.providers.openid_connect"
 PAPERLESS_SOCIALACCOUNT_PROVIDERS='
 {"openid_connect": {"APPS": [{"provider_id": "keycloak","name": "Keycloak","client_id": "paperless","secret": "<CLIENT_SECRET>","settings": { "server_url": "https://<KEYCLOAK_SERVER>/realms/<REALM>/.well-known/openid-configuration"}}]}}'
 ```
+
+More details about configuration option for various providers can be found in the allauth documentation: https://docs.allauth.org/en/latest/socialaccount/providers/index.html#provider-specifics
