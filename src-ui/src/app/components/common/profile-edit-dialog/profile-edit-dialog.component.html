@@ -63,7 +63,7 @@
                 <button
                   type="button"
                   class="btn btn-outline-danger btn-sm ms-2 align-baseline"
-                  [disabled]="!hasUsablePassword"
+                  [disabled]="!hasUsablePassword && socialAccounts.length === 1"
                   (click)="disconnectSocialAccount(account.id)"
                   i18n-title title="Disconnect {{ account.name }} social account">
                 <ng-container i18n>Disconnect</ng-container>&nbsp;<i-bs name="trash"></i-bs>
