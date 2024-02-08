@@ -21,6 +21,7 @@ import { of, throwError } from 'rxjs'
 import { ToastService } from 'src/app/services/toast.service'
 import { Clipboard } from '@angular/cdk/clipboard'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { ConfirmButtonComponent } from '../confirm-button/confirm-button.component'
 
 const socialAccount = {
   id: 1,
@@ -52,6 +53,7 @@ describe('ProfileEditDialogComponent', () => {
         ProfileEditDialogComponent,
         TextComponent,
         PasswordComponent,
+        ConfirmButtonComponent,
       ],
       providers: [NgbActiveModal],
       imports: [

@@ -1,0 +1,12 @@
+// Taken from bootstrap rules, obv
+::ng-deep .input-group > pngx-confirm-button:not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) > button,
+::ng-deep .btn-group > pngx-confirm-button:not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) > button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  ::ng-deep .input-group:not(.has-validation) > pngx-confirm-button:not(:last-child):not(.dropdown-toggle):not(.dropdown-menu):not(.form-floating) > button,
+  ::ng-deep .btn-group:not(.has-validation) > pngx-confirm-button:not(:last-child):not(.dropdown-toggle):not(.dropdown-menu):not(.form-floating) > button {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
