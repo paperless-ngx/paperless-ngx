@@ -1,5 +1,14 @@
+fix = true
+line-length = 88
+respect-gitignore = true
+src = ["src"]
+target-version = "py39"
+output-format = "grouped"
+show-fixes = true
+
 # https://docs.astral.sh/ruff/settings/
 # https://docs.astral.sh/ruff/rules/
+[lint]
 extend-select = [
   "W",     # https://docs.astral.sh/ruff/rules/#pycodestyle-e-w
   "I",     # https://docs.astral.sh/ruff/rules/#isort-i
@@ -25,15 +34,8 @@ extend-select = [
 ]
 # TODO PTH https://docs.astral.sh/ruff/rules/#flake8-use-pathlib-pth
 ignore = ["DJ001", "SIM105", "RUF012"]
-fix = true
-line-length = 88
-respect-gitignore = true
-src = ["src"]
-target-version = "py39"
-output-format = "grouped"
-show-fixes = true
 
-[per-file-ignores]
+[lint.per-file-ignores]
 ".github/scripts/*.py" = ["E501", "INP001", "SIM117"]
 "docker/wait-for-redis.py" = ["INP001", "T201"]
 "*/tests/*.py" = ["E501", "SIM117"]
@@ -41,5 +43,5 @@ show-fixes = true
 "src/paperless_tesseract/tests/test_parser.py" = ["RUF001"]
 "src/documents/models.py" = ["SIM115"]
 
-[isort]
+[lint.isort]
 force-single-line = true

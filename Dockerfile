@@ -29,7 +29,7 @@ COPY Pipfile* ./
 
 RUN set -eux \
   && echo "Installing pipenv" \
-    && python3 -m pip install --no-cache-dir --upgrade pipenv==2023.11.15 \
+    && python3 -m pip install --no-cache-dir --upgrade pipenv==2023.12.1 \
   && echo "Generating requirement.txt" \
     && pipenv requirements > requirements.txt
 
