@@ -2,6 +2,7 @@
 
 {% load static %}
 {% load i18n %}
+{% load allauth %}
 
 <html lang="en">
   <head>
@@ -11,14 +12,14 @@
     <meta name="author" content="Paperless-ngx project and contributors">
     <meta name="robots" content="noindex,nofollow">
 
-    <title>{% translate "Paperless-ngx reset password request" %}</title>
+    <title>{% translate "Paperless-ngx social account sign in" %}</title>
 
 		<link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'signin.css' %}" rel="stylesheet">
   </head>
 
   <body class="text-center">
-    <form class="form-signin position-absolute top-50 start-50 translate-middle" method="post">
+    <div class="position-absolute top-50 start-50 translate-middle">
 			{% csrf_token %}
       <svg xmlns="http://www.w3.org/2000/svg" width="300" class="logo mb-4" viewBox="0 0 2897.4 896.6">
         <path class="leaf" d="M140,713.7c-3.4-16.4-10.3-49.1-11.2-49.1c-145.7-87.1-128.4-238-80.2-324.2C59,449,251.2,524,139.1,656.8 c-0.9,1.7,5.2,22.4,10.3,41.4c22.4-37.9,56-83.6,54.3-87.9C65.9,273.9,496.9,248.1,586.6,39.4c40.5,201.8-20.7,513.9-367.2,593.2 c-1.7,0.9-62.9,108.6-65.5,109.5c0-1.7-25.9-0.9-22.4-9.5C133.1,727.4,136.6,720.6,140,713.7L140,713.7z M135.7,632.6 c44-50.9-7.8-137.9-38.8-166.4C149.5,556.7,146,609.3,135.7,632.6L135.7,632.6z" transform="translate(0)" style="fill:#17541f"/>
@@ -38,21 +39,8 @@
           <path d="M757.6,293.7c-20-10.8-42.6-16.2-67.8-16.2H600c-8.5,39.2-21.1,76.4-37.6,111.3c-9.9,20.8-21.1,40.6-33.6,59.4v207.2h88.9 V521.5h72c25.2,0,47.8-5.4,67.8-16.2s35.7-25.6,47.1-44.2c11.4-18.7,17.1-39.1,17.1-61.3c0.1-22.7-5.6-43.3-17-61.9 C793.3,319.2,777.6,304.5,757.6,293.7z M716.6,434.3c-9.3,8.9-21.6,13.3-36.7,13.3l-62.2,0.4v-92.5l62.2-0.4 c15.1,0,27.3,4.4,36.7,13.3c9.4,8.9,14,19.9,14,32.9C730.6,414.5,726,425.4,716.6,434.3z" transform="translate(0)"/>
         </g>
       </svg>
-			<p>{% translate "Enter your email address below, and we'll email instructions for setting a new one." %}</p>
-			{% if form.errors %}
-        <div class="alert alert-danger" role="alert">
-          {% translate "An error occurred. Please try again." %}
-        </div>
-      {% endif %}
-			{% translate "Email" as i18n_email %}
-      <h1></h1>
-      <div class="form-floating">
-        <input type="email" name="email" id="inputEmail" placeholder="{{ i18n_email }}" class="form-control" required>
-			  <label for="inputEmail">{{ i18n_email }}</label>
-      </div>
-      <div class="d-grid mt-3">
-        <button class="btn btn-lg btn-primary" type="submit">{% translate "Send me instructions!" %}</button>
-      </div>
-		</form>
+        {% url 'account_login' as login_url %}
+      <p>{% blocktranslate %}An error occurred while attempting to login via your social network account. Back to the <a href="{{ login_url }}">login page</a>{% endblocktranslate %}</p>
+    </div>
 	</body>
 </html>

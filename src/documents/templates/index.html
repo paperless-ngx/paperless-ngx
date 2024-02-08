@@ -80,6 +80,13 @@
 				<p class="warning m-auto mt-3 small fade hide">{% translate "Still here?! Hmm, something might be wrong." %} <a href="https://docs.paperless-ngx.com">{% translate "Here's a link to the docs." %}</a></p>
 			</div>
 		</div>
+		<script type="text/javascript">{# Pass Django messages to Angular frontend #}
+			window.DJANGO_MESSAGES = [
+				{% for message in messages %}
+					{ level: "{{ message.level_tag | escapejs }}", message: "{{ message | escapejs }}" },
+				{% endfor %}
+			]
+		</script>
 	</pngx-root>
 	<script src="{% static runtime_js %}" defer></script>
 	<script src="{% static polyfills_js %}" defer></script>
