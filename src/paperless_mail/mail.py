@@ -739,9 +739,11 @@ class MailAccountHandler(LoggingMixin):
                     correspondent_id=correspondent.id if correspondent else None,
                     document_type_id=doc_type.id if doc_type else None,
                     tag_ids=tag_ids,
-                    owner_id=rule.owner.id
-                    if (rule.assign_owner_from_rule and rule.owner)
-                    else None,
+                    owner_id=(
+                        rule.owner.id
+                        if (rule.assign_owner_from_rule and rule.owner)
+                        else None
+                    ),
                 )
 
                 consume_task = consume_file.s(
