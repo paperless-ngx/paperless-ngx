@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { ProfileService } from 'src/app/services/profile.service'
+import { SocialAccount, SocialAccountProvider } from 'src/app/data/user-profile'
 import { ToastService } from 'src/app/services/toast.service'
 import { Subject, takeUntil } from 'rxjs'
 import { Clipboard } from '@angular/cdk/clipboard'
@@ -30,6 +31,7 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
   private newPassword: string
   private passwordConfirm: string
   public showPasswordConfirm: boolean = false
+  public hasUsablePassword: boolean = false
 
   private currentEmail: string
   private newEmail: string
@@ -37,6 +39,9 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
   public showEmailConfirm: boolean = false
 
   public copied: boolean = false
+
+  public socialAccounts: SocialAccount[] = []
+  public socialAccountProviders: SocialAccountProvider[] = []
 
   constructor(
     private profileService: ProfileService,
@@ -59,10 +64,19 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
           this.onEmailChange()
         })
         this.currentPassword = profile.password
+        this.hasUsablePassword = profile.has_usable_password
         this.form.get('password').valueChanges.subscribe((newPassword) => {
           this.newPassword = newPassword
           this.onPasswordChange()
         })
+        this.socialAccounts = profile.social_accounts
+      })
+
+    this.profileService
+      .getSocialAccountProviders()
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((providers) => {
+        this.socialAccountProviders = providers
       })
   }
 
@@ -181,5 +195,22 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.copied = false
     }, 3000)
+  }
+
+  disconnectSocialAccount(id: number): void {
+    this.profileService
+      .disconnectSocialAccount(id)
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (id: number) => {
+          this.socialAccounts = this.socialAccounts.filter((a) => a.id != id)
+        },
+        error: (error) => {
+          this.toastService.showError(
+            $localize`Error disconnecting social account`,
+            error
+          )
+        },
+      })
   }
 }

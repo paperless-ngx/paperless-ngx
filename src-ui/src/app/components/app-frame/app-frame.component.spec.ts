@@ -21,6 +21,10 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { of, throwError } from 'rxjs'
 import { ToastService } from 'src/app/services/toast.service'
+import {
+  DjangoMessageLevel,
+  DjangoMessagesService,
+} from 'src/app/services/django-messages.service'
 import { environment } from 'src/environments/environment'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -83,6 +87,7 @@ describe('AppFrameComponent', () => {
   let permissionsService: PermissionsService
   let remoteVersionService: RemoteVersionService
   let toastService: ToastService
+  let messagesService: DjangoMessagesService
   let openDocumentsService: OpenDocumentsService
   let searchService: SearchService
   let documentListViewService: DocumentListViewService
@@ -123,6 +128,7 @@ describe('AppFrameComponent', () => {
         RemoteVersionService,
         IfPermissionsDirective,
         ToastService,
+        DjangoMessagesService,
         OpenDocumentsService,
         SearchService,
         NgbModal,
@@ -151,6 +157,7 @@ describe('AppFrameComponent', () => {
     permissionsService = TestBed.inject(PermissionsService)
     remoteVersionService = TestBed.inject(RemoteVersionService)
     toastService = TestBed.inject(ToastService)
+    messagesService = TestBed.inject(DjangoMessagesService)
     openDocumentsService = TestBed.inject(OpenDocumentsService)
     searchService = TestBed.inject(SearchService)
     documentListViewService = TestBed.inject(DocumentListViewService)
@@ -392,5 +399,20 @@ describe('AppFrameComponent', () => {
     expect(modalSpy).toHaveBeenCalledWith(ProfileEditDialogComponent, {
       backdrop: 'static',
     })
+  })
+
+  it('should show toasts for django messages', () => {
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    jest.spyOn(messagesService, 'get').mockReturnValue([
+      { level: DjangoMessageLevel.WARNING, message: 'Test warning' },
+      { level: DjangoMessageLevel.ERROR, message: 'Test error' },
+      { level: DjangoMessageLevel.SUCCESS, message: 'Test success' },
+      { level: DjangoMessageLevel.INFO, message: 'Test info' },
+      { level: DjangoMessageLevel.DEBUG, message: 'Test debug' },
+    ])
+    component.ngOnInit()
+    expect(toastErrorSpy).toHaveBeenCalledTimes(2)
+    expect(toastInfoSpy).toHaveBeenCalledTimes(3)
   })
 })

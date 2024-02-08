@@ -640,3 +640,42 @@ single-sided split marker page, the split document(s) will have an empty page at
 whatever else was on the backside of the split marker page.) You can work around that by having
 a split marker page that has the split barcode on _both_ sides. This way, the extra page will
 get automatically removed.
+
+## SSO and third party authentication with Paperless-ngx
+
+Paperless-ngx has a built-in authentication system from Django but you can easily integrate an
+external authentication solution using one of the following methods:
+
+### Remote User authentication
+
+This is a simple option that uses remote user authentication made available by certain SSO
+applications. See the relevant configuration options for more information:
+[PAPERLESS_ENABLE_HTTP_REMOTE_USER](configuration.md#PAPERLESS_ENABLE_HTTP_REMOTE_USER) and
+[PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME](configuration.md#PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME)
+
+### OpenID Connect and social authentication
+
+Version 2.5.0 of Paperless-ngx added support for integrating other authentication systems via
+the [django-allauth](https://github.com/pennersr/django-allauth) package. Once set up, users
+can either log in or (optionally) sign up using any third party systems you integrate. See the
+relevant [configuration settings](configuration.md#PAPERLESS_SOCIALACCOUNT_PROVIDERS) and
+[django-allauth docs](https://docs.allauth.org/en/latest/socialaccount/configuration.html)
+for more information.
+
+As an example, to set up login via Github, the following environment variables would need to be
+set:
+
+```conf
+PAPERLESS_APPS="allauth.socialaccount.providers.github"
+PAPERLESS_SOCIALACCOUNT_PROVIDERS='{"github": {"APPS": [{"provider_id": "github","name": "Github","client_id": "<CLIENT_ID>","secret": "<CLIENT_SECRET>"}]}}'
+```
+
+Or, to use OpenID Connect ("OIDC"), via Keycloak in this example:
+
+```conf
+PAPERLESS_APPS="allauth.socialaccount.providers.openid_connect"
+PAPERLESS_SOCIALACCOUNT_PROVIDERS='
+{"openid_connect": {"APPS": [{"provider_id": "keycloak","name": "Keycloak","client_id": "paperless","secret": "<CLIENT_SECRET>","settings": { "server_url": "https://<KEYCLOAK_SERVER>/realms/<REALM>/.well-known/openid-configuration"}}]}}'
+```
+
+More details about configuration option for various providers can be found in the allauth documentation: https://docs.allauth.org/en/latest/socialaccount/providers/index.html#provider-specifics

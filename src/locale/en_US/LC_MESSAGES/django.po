@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-02 20:17-0800\n"
+"POT-Creation-Date: 2024-02-07 06:20+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -777,13 +777,134 @@ msgstr ""
 msgid "Invalid color."
 msgstr ""
 
-#: documents/serialisers.py:1049
+#: documents/serialisers.py:1060
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr ""
 
-#: documents/serialisers.py:1152
+#: documents/serialisers.py:1163
 msgid "Invalid variable detected."
+msgstr ""
+
+#: documents/templates/account/login.html:14
+msgid "Paperless-ngx sign in"
+msgstr ""
+
+#: documents/templates/account/login.html:47
+msgid "Please sign in."
+msgstr ""
+
+#: documents/templates/account/login.html:50
+msgid "Your username and password didn't match. Please try again."
+msgstr ""
+
+#: documents/templates/account/login.html:54
+msgid "Share link was not found."
+msgstr ""
+
+#: documents/templates/account/login.html:58
+msgid "Share link has expired."
+msgstr ""
+
+#: documents/templates/account/login.html:61
+#: documents/templates/socialaccount/signup.html:56
+msgid "Username"
+msgstr ""
+
+#: documents/templates/account/login.html:62
+msgid "Password"
+msgstr ""
+
+#: documents/templates/account/login.html:72
+msgid "Sign in"
+msgstr ""
+
+#: documents/templates/account/login.html:76
+msgid "Forgot your password?"
+msgstr ""
+
+#: documents/templates/account/login.html:83
+msgid "or sign in via"
+msgstr ""
+
+#: documents/templates/account/password_reset.html:15
+msgid "Paperless-ngx reset password request"
+msgstr ""
+
+#: documents/templates/account/password_reset.html:43
+msgid ""
+"Enter your email address below, and we'll email instructions for setting a "
+"new one."
+msgstr ""
+
+#: documents/templates/account/password_reset.html:46
+msgid "An error occurred. Please try again."
+msgstr ""
+
+#: documents/templates/account/password_reset.html:49
+#: documents/templates/socialaccount/signup.html:57
+msgid "Email"
+msgstr ""
+
+#: documents/templates/account/password_reset.html:56
+msgid "Send me instructions!"
+msgstr ""
+
+#: documents/templates/account/password_reset_done.html:14
+msgid "Paperless-ngx reset password sent"
+msgstr ""
+
+#: documents/templates/account/password_reset_done.html:40
+msgid "Check your inbox."
+msgstr ""
+
+#: documents/templates/account/password_reset_done.html:41
+msgid ""
+"We've emailed you instructions for setting your password. You should receive "
+"the email shortly!"
+msgstr ""
+
+#: documents/templates/account/password_reset_from_key.html:15
+msgid "Paperless-ngx reset password confirmation"
+msgstr ""
+
+#: documents/templates/account/password_reset_from_key.html:44
+msgid "request a new password reset"
+msgstr ""
+
+#: documents/templates/account/password_reset_from_key.html:46
+msgid "Set a new password."
+msgstr ""
+
+#: documents/templates/account/password_reset_from_key.html:50
+msgid "Passwords did not match or too weak. Try again."
+msgstr ""
+
+#: documents/templates/account/password_reset_from_key.html:53
+msgid "New Password"
+msgstr ""
+
+#: documents/templates/account/password_reset_from_key.html:54
+msgid "Confirm Password"
+msgstr ""
+
+#: documents/templates/account/password_reset_from_key.html:65
+msgid "Change my password"
+msgstr ""
+
+#: documents/templates/account/password_reset_from_key_done.html:14
+msgid "Paperless-ngx reset password complete"
+msgstr ""
+
+#: documents/templates/account/password_reset_from_key_done.html:40
+msgid "Password reset complete."
+msgstr ""
+
+#: documents/templates/account/password_reset_from_key_done.html:42
+#, python-format
+msgid ""
+"Your new password has been set. You can now <a href=\"%(login_url)s\">log "
+"in</a>"
 msgstr ""
 
 #: documents/templates/index.html:79
@@ -798,131 +919,40 @@ msgstr ""
 msgid "Here's a link to the docs."
 msgstr ""
 
-#: documents/templates/registration/logged_out.html:14
-msgid "Paperless-ngx signed out"
+#: documents/templates/socialaccount/authentication_error.html:15
+#: documents/templates/socialaccount/login.html:15
+msgid "Paperless-ngx social account sign in"
 msgstr ""
 
-#: documents/templates/registration/logged_out.html:40
-msgid "You have been successfully logged out. Bye!"
-msgstr ""
-
-#: documents/templates/registration/logged_out.html:41
-msgid "Sign in again"
-msgstr ""
-
-#: documents/templates/registration/login.html:14
-msgid "Paperless-ngx sign in"
-msgstr ""
-
-#: documents/templates/registration/login.html:41
-msgid "Please sign in."
-msgstr ""
-
-#: documents/templates/registration/login.html:44
-msgid "Your username and password didn't match. Please try again."
-msgstr ""
-
-#: documents/templates/registration/login.html:48
-msgid "Share link was not found."
-msgstr ""
-
-#: documents/templates/registration/login.html:52
-msgid "Share link has expired."
-msgstr ""
-
-#: documents/templates/registration/login.html:55
-msgid "Username"
-msgstr ""
-
-#: documents/templates/registration/login.html:56
-msgid "Password"
-msgstr ""
-
-#: documents/templates/registration/login.html:66
-msgid "Sign in"
-msgstr ""
-
-#: documents/templates/registration/login.html:70
-msgid "Forgot your password?"
-msgstr ""
-
-#: documents/templates/registration/password_reset_complete.html:14
-msgid "Paperless-ngx reset password complete"
-msgstr ""
-
-#: documents/templates/registration/password_reset_complete.html:40
-msgid "Password reset complete."
-msgstr ""
-
-#: documents/templates/registration/password_reset_complete.html:42
+#: documents/templates/socialaccount/authentication_error.html:43
 #, python-format
 msgid ""
-"Your new password has been set. You can now <a href=\"%(login_url)s\">log "
-"in</a>"
+"An error occurred while attempting to login via your social network account. "
+"Back to the <a href=\"%(login_url)s\">login page</a>"
 msgstr ""
 
-#: documents/templates/registration/password_reset_confirm.html:14
-msgid "Paperless-ngx reset password confirmation"
+#: documents/templates/socialaccount/login.html:44
+#, python-format
+msgid "You are about to connect a new third-party account from %(provider)s."
 msgstr ""
 
-#: documents/templates/registration/password_reset_confirm.html:42
-msgid "Set a new password."
+#: documents/templates/socialaccount/login.html:47
+msgid "Continue"
 msgstr ""
 
-#: documents/templates/registration/password_reset_confirm.html:46
-msgid "Passwords did not match or too weak. Try again."
+#: documents/templates/socialaccount/signup.html:14
+msgid "Paperless-ngx social account sign up"
 msgstr ""
 
-#: documents/templates/registration/password_reset_confirm.html:49
-msgid "New Password"
-msgstr ""
-
-#: documents/templates/registration/password_reset_confirm.html:50
-msgid "Confirm Password"
-msgstr ""
-
-#: documents/templates/registration/password_reset_confirm.html:61
-msgid "Change my password"
-msgstr ""
-
-#: documents/templates/registration/password_reset_confirm.html:65
-msgid "request a new password reset"
-msgstr ""
-
-#: documents/templates/registration/password_reset_done.html:14
-msgid "Paperless-ngx reset password sent"
-msgstr ""
-
-#: documents/templates/registration/password_reset_done.html:40
-msgid "Check your inbox."
-msgstr ""
-
-#: documents/templates/registration/password_reset_done.html:41
+#: documents/templates/socialaccount/signup.html:53
+#, python-format
 msgid ""
-"We've emailed you instructions for setting your password. You should receive "
-"the email shortly!"
+"You are about to use your %(provider_name)s account to login to\n"
+"%(site_name)s. As a final step, please complete the following form:"
 msgstr ""
 
-#: documents/templates/registration/password_reset_form.html:14
-msgid "Paperless-ngx reset password request"
-msgstr ""
-
-#: documents/templates/registration/password_reset_form.html:41
-msgid ""
-"Enter your email address below, and we'll email instructions for setting a "
-"new one."
-msgstr ""
-
-#: documents/templates/registration/password_reset_form.html:44
-msgid "An error occurred. Please try again."
-msgstr ""
-
-#: documents/templates/registration/password_reset_form.html:47
-msgid "Email"
-msgstr ""
-
-#: documents/templates/registration/password_reset_form.html:54
-msgid "Send me instructions!"
+#: documents/templates/socialaccount/signup.html:72
+msgid "Sign up"
 msgstr ""
 
 #: documents/validators.py:17
@@ -1088,135 +1118,135 @@ msgstr ""
 msgid "paperless application settings"
 msgstr ""
 
-#: paperless/settings.py:617
+#: paperless/settings.py:658
 msgid "English (US)"
 msgstr ""
 
-#: paperless/settings.py:618
+#: paperless/settings.py:659
 msgid "Arabic"
 msgstr ""
 
-#: paperless/settings.py:619
+#: paperless/settings.py:660
 msgid "Afrikaans"
 msgstr ""
 
-#: paperless/settings.py:620
+#: paperless/settings.py:661
 msgid "Belarusian"
 msgstr ""
 
-#: paperless/settings.py:621
+#: paperless/settings.py:662
 msgid "Bulgarian"
 msgstr ""
 
-#: paperless/settings.py:622
+#: paperless/settings.py:663
 msgid "Catalan"
 msgstr ""
 
-#: paperless/settings.py:623
+#: paperless/settings.py:664
 msgid "Czech"
 msgstr ""
 
-#: paperless/settings.py:624
+#: paperless/settings.py:665
 msgid "Danish"
 msgstr ""
 
-#: paperless/settings.py:625
+#: paperless/settings.py:666
 msgid "German"
 msgstr ""
 
-#: paperless/settings.py:626
+#: paperless/settings.py:667
 msgid "Greek"
 msgstr ""
 
-#: paperless/settings.py:627
+#: paperless/settings.py:668
 msgid "English (GB)"
 msgstr ""
 
-#: paperless/settings.py:628
+#: paperless/settings.py:669
 msgid "Spanish"
 msgstr ""
 
-#: paperless/settings.py:629
+#: paperless/settings.py:670
 msgid "Finnish"
 msgstr ""
 
-#: paperless/settings.py:630
+#: paperless/settings.py:671
 msgid "French"
 msgstr ""
 
-#: paperless/settings.py:631
+#: paperless/settings.py:672
 msgid "Hungarian"
 msgstr ""
 
-#: paperless/settings.py:632
+#: paperless/settings.py:673
 msgid "Italian"
 msgstr ""
 
-#: paperless/settings.py:633
+#: paperless/settings.py:674
 msgid "Japanese"
 msgstr ""
 
-#: paperless/settings.py:634
+#: paperless/settings.py:675
 msgid "Luxembourgish"
 msgstr ""
 
-#: paperless/settings.py:635
+#: paperless/settings.py:676
 msgid "Norwegian"
 msgstr ""
 
-#: paperless/settings.py:636
+#: paperless/settings.py:677
 msgid "Dutch"
 msgstr ""
 
-#: paperless/settings.py:637
+#: paperless/settings.py:678
 msgid "Polish"
 msgstr ""
 
-#: paperless/settings.py:638
+#: paperless/settings.py:679
 msgid "Portuguese (Brazil)"
 msgstr ""
 
-#: paperless/settings.py:639
+#: paperless/settings.py:680
 msgid "Portuguese"
 msgstr ""
 
-#: paperless/settings.py:640
+#: paperless/settings.py:681
 msgid "Romanian"
 msgstr ""
 
-#: paperless/settings.py:641
+#: paperless/settings.py:682
 msgid "Russian"
 msgstr ""
 
-#: paperless/settings.py:642
+#: paperless/settings.py:683
 msgid "Slovak"
 msgstr ""
 
-#: paperless/settings.py:643
+#: paperless/settings.py:684
 msgid "Slovenian"
 msgstr ""
 
-#: paperless/settings.py:644
+#: paperless/settings.py:685
 msgid "Serbian"
 msgstr ""
 
-#: paperless/settings.py:645
+#: paperless/settings.py:686
 msgid "Swedish"
 msgstr ""
 
-#: paperless/settings.py:646
+#: paperless/settings.py:687
 msgid "Turkish"
 msgstr ""
 
-#: paperless/settings.py:647
+#: paperless/settings.py:688
 msgid "Ukrainian"
 msgstr ""
 
-#: paperless/settings.py:648
+#: paperless/settings.py:689
 msgid "Chinese Simplified"
 msgstr ""
 
-#: paperless/urls.py:214
+#: paperless/urls.py:224
 msgid "Paperless-ngx administration"
 msgstr ""
 
