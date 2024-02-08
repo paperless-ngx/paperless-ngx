@@ -2,7 +2,10 @@ import { HttpTestingController } from '@angular/common/http/testing'
 import { Subscription } from 'rxjs'
 import { TestBed } from '@angular/core/testing'
 import { environment } from 'src/environments/environment'
-import { AbstractNameFilterService } from './abstract-name-filter-service'
+import {
+  AbstractNameFilterService,
+  BulkEditObjectOperation,
+} from './abstract-name-filter-service'
 import { commonAbstractPaperlessServiceTests } from './abstract-paperless-service.spec'
 
 let httpTestingController: HttpTestingController
@@ -53,8 +56,9 @@ export const commonAbstractNameFilterPaperlessServiceTests = (
         },
       }
       subscription = service
-        .bulk_update_permissions(
+        .bulk_edit_objects(
           [1, 2],
+          BulkEditObjectOperation.SetPermissions,
           {
             owner,
             set_permissions: permissions,
@@ -63,9 +67,33 @@ export const commonAbstractNameFilterPaperlessServiceTests = (
         )
         .subscribe()
       const req = httpTestingController.expectOne(
-        `${environment.apiBaseUrl}bulk_edit_object_perms/`
+        `${environment.apiBaseUrl}bulk_edit_objects/`
       )
       expect(req.request.method).toEqual('POST')
+      expect(req.request.body).toEqual({
+        objects: [1, 2],
+        object_type: endpoint,
+        operation: BulkEditObjectOperation.SetPermissions,
+        permissions,
+        owner,
+        merge: true,
+      })
+      req.flush([])
+    })
+
+    test('should call appropriate api endpoint for bulk delete objects', () => {
+      subscription = service
+        .bulk_edit_objects([1, 2], BulkEditObjectOperation.Delete)
+        .subscribe()
+      const req = httpTestingController.expectOne(
+        `${environment.apiBaseUrl}bulk_edit_objects/`
+      )
+      expect(req.request.method).toEqual('POST')
+      expect(req.request.body).toEqual({
+        objects: [1, 2],
+        object_type: endpoint,
+        operation: BulkEditObjectOperation.Delete,
+      })
       req.flush([])
     })
   })

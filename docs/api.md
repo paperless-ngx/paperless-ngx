@@ -375,14 +375,15 @@ The following methods are supported:
 
 ### Objects
 
-Bulk editing for objects (tags, document types etc.) currently supports only updating permissions, using
-the endpoint: `/api/bulk_edit_object_perms/` which requires a json payload of the format:
+Bulk editing for objects (tags, document types etc.) currently supports set permissions or delete
+operations, using the endpoint: `/api/bulk_edit_objects/`, which requires a json payload of the format:
 
 ```json
 {
   "objects": [LIST_OF_OBJECT_IDS],
-  "object_type": "tags", "correspondents", "document_types" or "storage_paths"
-  "owner": OWNER_ID // optional
+  "object_type": "tags", "correspondents", "document_types" or "storage_paths",
+  "operation": "set_permissions" or "delete",
+  "owner": OWNER_ID, // optional
   "permissions": { "view": { "users": [] ... }, "change": { ... } }, // (see 'set_permissions' format above)
   "merge": true / false // defaults to false, see above
 }
