@@ -112,6 +112,7 @@ import { SwitchComponent } from './components/common/input/switch/switch.compone
 import { ConfigComponent } from './components/admin/config/config.component'
 import { FileComponent } from './components/common/input/file/file.component'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { ConfirmButtonComponent } from './components/common/confirm-button/confirm-button.component'
 import {
   archive,
   arrowCounterclockwise,
@@ -439,6 +440,7 @@ function initializeApp(settings: SettingsService) {
     SwitchComponent,
     ConfigComponent,
     FileComponent,
+    ConfirmButtonComponent,
   ],
   imports: [
     BrowserModule,
