@@ -12,6 +12,10 @@ import {
 } from 'rxjs/operators'
 import { Document } from 'src/app/data/document'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
+import {
+  DjangoMessageLevel,
+  DjangoMessagesService,
+} from 'src/app/services/django-messages.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SearchService } from 'src/app/services/rest/search.service'
 import { environment } from 'src/environments/environment'
@@ -73,7 +77,8 @@ export class AppFrameComponent
     public tasksService: TasksService,
     private readonly toastService: ToastService,
     private modalService: NgbModal,
-    permissionsService: PermissionsService
+    public permissionsService: PermissionsService,
+    private djangoMessagesService: DjangoMessagesService
   ) {
     super()
 
@@ -92,6 +97,20 @@ export class AppFrameComponent
       this.checkForUpdates()
     }
     this.tasksService.reload()
+
+    this.djangoMessagesService.get().forEach((message) => {
+      switch (message.level) {
+        case DjangoMessageLevel.ERROR:
+        case DjangoMessageLevel.WARNING:
+          this.toastService.showError(message.message)
+          break
+        case DjangoMessageLevel.SUCCESS:
+        case DjangoMessageLevel.INFO:
+        case DjangoMessageLevel.DEBUG:
+          this.toastService.showInfo(message.message)
+          break
+      }
+    })
   }
 
   toggleSlimSidebar(): void {

@@ -303,6 +303,9 @@ INSTALLED_APPS = [
     "django_filters",
     "django_celery_results",
     "guardian",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
     *env_apps,
 ]
 
@@ -339,6 +342,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 # Optional to enable compression
@@ -350,6 +354,7 @@ ROOT_URLCONF = "paperless.urls"
 FORCE_SCRIPT_NAME = os.getenv("PAPERLESS_FORCE_SCRIPT_NAME")
 BASE_URL = (FORCE_SCRIPT_NAME or "") + "/"
 LOGIN_URL = BASE_URL + "accounts/login/"
+LOGIN_REDIRECT_URL = "/dashboard"
 LOGOUT_REDIRECT_URL = os.getenv("PAPERLESS_LOGOUT_REDIRECT_URL")
 
 WSGI_APPLICATION = "paperless.wsgi.application"
@@ -410,7 +415,27 @@ CHANNEL_LAYERS = {
 AUTHENTICATION_BACKENDS = [
     "guardian.backends.ObjectPermissionBackend",
     "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
+
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv(
+    "PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL",
+    "https",
+)
+
+ACCOUNT_ADAPTER = "paperless.adapter.CustomAccountAdapter"
+ACCOUNT_ALLOW_SIGNUPS = __get_boolean("PAPERLESS_ACCOUNT_ALLOW_SIGNUPS")
+
+SOCIALACCOUNT_ADAPTER = "paperless.adapter.CustomSocialAccountAdapter"
+SOCIALACCOUNT_ALLOW_SIGNUPS = __get_boolean(
+    "PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS",
+    "yes",
+)
+SOCIALACCOUNT_AUTO_SIGNUP = __get_boolean("PAPERLESS_SOCIAL_AUTO_SIGNUP")
+SOCIALACCOUNT_PROVIDERS = json.loads(
+    os.getenv("PAPERLESS_SOCIALACCOUNT_PROVIDERS", "{}"),
+)
 
 AUTO_LOGIN_USERNAME = os.getenv("PAPERLESS_AUTO_LOGIN_USERNAME")
 

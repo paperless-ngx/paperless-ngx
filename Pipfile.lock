@@ -452,6 +452,14 @@
             "markers": "python_version >= '3.8'",
             "version": "==4.2.9"
         },
+        "django-allauth": {
+            "hashes": [
+                "sha256:ec19efb80b34d2f18bd831eab9b10b6301f58d1cce9f39af35f497b7e5b0a141"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.7'",
+            "version": "==0.59.0"
+        },
         "django-auditlog": {
             "hashes": [
                 "sha256:7bc2c87e4aff62dec9785d1b2359a2b27148f8c286f8a52b9114fc7876c5a9f7",

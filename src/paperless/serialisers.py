@@ -1,5 +1,6 @@
 import logging
 
+from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
@@ -105,10 +106,30 @@ class GroupSerializer(serializers.ModelSerializer):
         )
 
 
+class SocialAccountSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SocialAccount
+        fields = (
+            "id",
+            "provider",
+            "name",
+        )
+
+    def get_name(self, obj):
+        return obj.get_provider_account().to_str()
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(allow_null=False)
     password = ObfuscatedUserPasswordField(required=False, allow_null=False)
     auth_token = serializers.SlugRelatedField(read_only=True, slug_field="key")
+    social_accounts = SocialAccountSerializer(
+        many=True,
+        read_only=True,
+        source="socialaccount_set",
+    )
 
     class Meta:
         model = User
@@ -118,6 +139,8 @@ class ProfileSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "auth_token",
+            "social_accounts",
+            "has_usable_password",
         )
 
 

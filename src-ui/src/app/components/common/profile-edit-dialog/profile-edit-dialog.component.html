@@ -49,6 +49,43 @@
         </div>
         <div class="form-text text-muted text-end fst-italic" i18n>Warning: changing the token cannot be undone</div>
       </div>
+      @if (socialAccounts?.length > 0) {
+        <div class="mb-3">
+          <p i18n>Connected social accounts</p>
+          <ul class="list-group">
+            @for (account of socialAccounts; track account.id) {
+              <li class="list-group-item"
+                ngbPopover="Set a password before disconnecting social account."
+                i18n-ngbPopover
+                [disablePopover]="hasUsablePassword"
+                triggers="mouseenter:mouseleave">
+                {{account.name}} ({{account.provider}})
+                <button
+                  type="button"
+                  class="btn btn-outline-danger btn-sm ms-2 align-baseline"
+                  [disabled]="!hasUsablePassword && socialAccounts.length === 1"
+                  (click)="disconnectSocialAccount(account.id)"
+                  i18n-title title="Disconnect {{ account.name }} social account">
+                <ng-container i18n>Disconnect</ng-container>&nbsp;<i-bs name="trash"></i-bs>
+                </button>
+              </li>
+            }
+          </ul>
+          <div class="form-text text-muted text-end fst-italic" i18n>Warning: disconnecting social accounts cannot be undone</div>
+        </div>
+      }
+      @if (socialAccountProviders?.length > 0) {
+        <div class="mb-3">
+          <p i18n>Connect new social account</p>
+          <div class="list-group">
+            @for (provider of socialAccountProviders; track provider.name) {
+              <a class="list-group-item list-group-item-action text-primary d-flex align-items-center" href="{{ provider.login_url }}" rel="noopener noreferrer">
+                {{provider.name}}&nbsp;<i-bs class="pb-1 ps-1" name="box-arrow-up-right"></i-bs>
+              </a>
+            }
+          </div>
+        </div>
+      }
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>

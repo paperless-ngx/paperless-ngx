@@ -535,6 +535,42 @@ This is for use with self-signed certificates against local IMAP servers.
     Settings this value has security implications for the security of your email.
     Understand what it does and be sure you need to before setting.
 
+#### [`PAPERLESS_SOCIALACCOUNT_PROVIDERS=<json>`](#PAPERLESS_SOCIALACCOUNT_PROVIDERS) {#PAPERLESS_SOCIALACCOUNT_PROVIDERS}
+
+: This variable is used to setup login and signup via social account providers which are compatible with django-allauth.
+See the corresponding [django-allauth documentation](https://docs.allauth.org/en/0.60.0/socialaccount/providers/index.html)
+for a list of provider configurations. You will also likely need to include the relevant Django 'application' inside the
+[PAPERLESS_APPS](#PAPERLESS_APPS) setting.
+
+    Defaults to None, which does not enable any third party authentication systems.
+
+#### [`PAPERLESS_SOCIAL_AUTO_SIGNUP=<bool>`](#PAPERLESS_SOCIAL_AUTO_SIGNUP) {#PAPERLESS_SOCIAL_AUTO_SIGNUP}
+
+: Attempt to signup the user using retrieved email, username etc from the third party authentication
+system. See the corresponding
+[django-allauth documentation](https://docs.allauth.org/en/0.60.0/socialaccount/configuration.html)
+
+    Defaults to False
+
+#### [`PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS=<bool>`](#PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS) {#PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS}
+
+: Allow users to signup for a new Paperless-ngx account using any setup third party authentication systems.
+
+    Defaults to True
+
+#### [`PAPERLESS_ACCOUNT_ALLOW_SIGNUPS=<bool>`](#PAPERLESS_ACCOUNT_ALLOW_SIGNUPS) {#PAPERLESS_ACCOUNT_ALLOW_SIGNUPS}
+
+: Allow users to signup for a new Paperless-ngx account.
+
+    Defaults to False
+
+#### [`PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL=<string>`](#PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL) {#PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL}
+
+: The protocol used when generating URLs, e.g. login callback URLs. See the corresponding
+[django-allauth documentation](https://docs.allauth.org/en/latest/account/configuration.html)
+
+    Defaults to 'https'
+
 ## OCR settings {#ocr}
 
 Paperless uses [OCRmyPDF](https://ocrmypdf.readthedocs.io/en/latest/)
@@ -904,6 +940,14 @@ documents.
     web for "MAGICK_TMPDIR".
 
     Default is none, which disables the temporary directory.
+
+#### [`PAPERLESS_APPS=<string>`](#PAPERLESS_APPS) {#PAPERLESS_APPS}
+
+: A comma-separated list of Django apps to be included in Django's
+[`INSTALLED_APPS`](https://docs.djangoproject.com/en/5.0/ref/applications/). This setting should
+be used with caution!
+
+    Defaults to None, which does not add any additional apps.
 
 ## Document Consumption {#consume_config}
 
