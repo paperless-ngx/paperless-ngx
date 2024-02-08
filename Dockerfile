@@ -39,8 +39,6 @@ RUN set -eux \
 #  - Don't leave anything extra in here
 FROM docker.io/python:3.11-slim-bookworm as main-app
 
-ENV PYTHONWARNINGS="ignore:::django.http.response:517"
-
 LABEL org.opencontainers.image.authors="paperless-ngx team <hello@paperless-ngx.com>"
 LABEL org.opencontainers.image.documentation="https://docs.paperless-ngx.com/"
 LABEL org.opencontainers.image.source="https://github.com/paperless-ngx/paperless-ngx"
@@ -56,6 +54,12 @@ ARG TARGETARCH
 ARG JBIG2ENC_VERSION=0.29
 ARG QPDF_VERSION=11.6.4
 ARG GS_VERSION=10.02.1
+
+# Set Python environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    # Ignore warning from Whitenoise
+    PYTHONWARNINGS="ignore:::django.http.response:517"
 
 #
 # Begin installation and configuration
