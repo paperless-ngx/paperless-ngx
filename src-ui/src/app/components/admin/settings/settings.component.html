@@ -319,7 +319,15 @@
               </div>
               <div class="mb-2 col-auto">
                 <label class="form-label" for="name_{{view.id}}" i18n>Actions</label>
-                <button type="button" class="btn btn-sm btn-outline-danger form-control" (click)="deleteSavedView(view)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.SavedView }" i18n>Delete</button>
+
+                <pngx-confirm-button
+                  label="Delete"
+                  i18n-label
+                  (confirm)="deleteSavedView(view)"
+                  *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.SavedView }"
+                  buttonClasses="btn-sm btn-outline-danger form-control"
+                  iconName="trash">
+                </pngx-confirm-button>
               </div>
             </div>
           }

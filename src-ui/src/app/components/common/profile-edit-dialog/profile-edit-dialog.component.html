@@ -41,9 +41,14 @@
               }
               <span class="visually-hidden" i18n>Copy</span>
             </button>
-            <button type="button" class="btn btn-outline-secondary" (click)="generateAuthToken()" i18n-title title="Regenerate auth token">
-              <i-bs width="1.2em" height="1.2em" name="arrow-repeat"></i-bs>
-            </button>
+            <pngx-confirm-button
+              title="Regenerate auth token"
+              i18n-title
+              buttonClasses=" btn-outline-secondary"
+              iconName="arrow-repeat"
+              [disabled]="!hasUsablePassword"
+              (confirm)="generateAuthToken()">
+            </pngx-confirm-button>
           </div>
           <span class="badge copied-badge bg-primary small fade ms-4 position-absolute top-50 translate-middle-y pe-none z-3" [class.show]="copied" i18n>Copied!</span>
         </div>
@@ -60,14 +65,16 @@
                 [disablePopover]="hasUsablePassword"
                 triggers="mouseenter:mouseleave">
                 {{account.name}} ({{account.provider}})
-                <button
-                  type="button"
-                  class="btn btn-outline-danger btn-sm ms-2 align-baseline"
-                  [disabled]="!hasUsablePassword && socialAccounts.length === 1"
-                  (click)="disconnectSocialAccount(account.id)"
-                  i18n-title title="Disconnect {{ account.name }} social account">
-                <ng-container i18n>Disconnect</ng-container>&nbsp;<i-bs name="trash"></i-bs>
-                </button>
+                <pngx-confirm-button
+                  label="Disconnect"
+                  i18n-label
+                  title="Disconnect {{ account.name }} social account"
+                  i18n-title
+                  buttonClasses="btn-outline-danger btn-sm ms-2 align-baseline"
+                  iconName="trash"
+                  [disabled]="!hasUsablePassword"
+                  (confirm)="disconnectSocialAccount(account.id)">
+                </pngx-confirm-button>
               </li>
             }
           </ul>
