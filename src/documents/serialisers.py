@@ -82,13 +82,14 @@ class MatchingModelSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         # TODO: remove pending https://github.com/encode/django-rest-framework/issues/7173
-        name = data["name"] if "name" in data else self.instance.name
+        name = data.get(
+            "name",
+            self.instance.name if hasattr(self.instance, "name") else None,
+        )
         owner = (
             data["owner"]
             if "owner" in data
-            else self.user
-            if hasattr(self, "user")
-            else None
+            else self.user if hasattr(self, "user") else None
         )
         pk = self.instance.pk if hasattr(self.instance, "pk") else None
         if ("name" in data or "owner" in data) and self.Meta.model.objects.filter(
@@ -261,7 +262,7 @@ class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
         if "set_permissions" in validated_data:
             self._set_permissions(validated_data["set_permissions"], instance)
         if "owner" in validated_data and "name" in self.Meta.fields:
-            name = validated_data["name"] if "name" in validated_data else instance.name
+            name = validated_data.get("name", instance.name)
             not_unique = (
                 self.Meta.model.objects.exclude(pk=instance.pk)
                 .filter(owner=validated_data["owner"], name=name)
@@ -443,7 +444,10 @@ class CustomFieldSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         # TODO: remove pending https://github.com/encode/django-rest-framework/issues/7173
-        name = attrs["name"] if "name" in attrs else self.instance.name
+        name = attrs.get(
+            "name",
+            self.instance.name if hasattr(self.instance, "name") else None,
+        )
         if ("name" in attrs) and self.Meta.model.objects.filter(
             name=name,
         ).exists():
@@ -697,10 +701,7 @@ class DocumentSerializer(
                             custom_field_instance.field,
                             doc_id,
                         )
-        if (
-            "remove_inbox_tags" in validated_data
-            and validated_data["remove_inbox_tags"]
-        ):
+        if validated_data.get("remove_inbox_tags"):
             tag_ids_being_added = (
                 [
                     tag.id
@@ -1352,7 +1353,7 @@ class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissions
     def validate(self, attrs):
         object_type = attrs["object_type"]
         objects = attrs["objects"]
-        permissions = attrs["permissions"] if "permissions" in attrs else None
+        permissions = attrs.get("permissions")
 
         self._validate_objects(objects, object_type)
         if permissions is not None:
@@ -1514,7 +1515,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
             for trigger in triggers:
                 filter_has_tags = trigger.pop("filter_has_tags", None)
                 trigger_instance, _ = WorkflowTrigger.objects.update_or_create(
-                    id=trigger["id"] if "id" in trigger else None,
+                    id=trigger.get("id"),
                     defaults=trigger,
                 )
                 if filter_has_tags is not None:
@@ -1530,7 +1531,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
                 assign_change_groups = action.pop("assign_change_groups", None)
                 assign_custom_fields = action.pop("assign_custom_fields", None)
                 action_instance, _ = WorkflowAction.objects.update_or_create(
-                    id=action["id"] if "id" in action else None,
+                    id=action.get("id"),
                     defaults=action,
                 )
                 if assign_tags is not None:

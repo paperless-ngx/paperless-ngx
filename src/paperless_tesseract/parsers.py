@@ -205,9 +205,9 @@ class RasterisedDocumentParser(DocumentParser):
         }
 
         if "pdfa" in ocrmypdf_args["output_type"]:
-            ocrmypdf_args[
-                "color_conversion_strategy"
-            ] = self.settings.color_conversion_strategy
+            ocrmypdf_args["color_conversion_strategy"] = (
+                self.settings.color_conversion_strategy
+            )
 
         if self.settings.mode == ModeChoices.FORCE or safe_fallback:
             ocrmypdf_args["force_ocr"] = True

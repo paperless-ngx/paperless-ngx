@@ -175,16 +175,16 @@ class IndexView(TemplateView):
         context["full_name"] = self.request.user.get_full_name()
         context["styles_css"] = f"frontend/{self.get_frontend_language()}/styles.css"
         context["runtime_js"] = f"frontend/{self.get_frontend_language()}/runtime.js"
-        context[
-            "polyfills_js"
-        ] = f"frontend/{self.get_frontend_language()}/polyfills.js"
+        context["polyfills_js"] = (
+            f"frontend/{self.get_frontend_language()}/polyfills.js"
+        )
         context["main_js"] = f"frontend/{self.get_frontend_language()}/main.js"
-        context[
-            "webmanifest"
-        ] = f"frontend/{self.get_frontend_language()}/manifest.webmanifest"
-        context[
-            "apple_touch_icon"
-        ] = f"frontend/{self.get_frontend_language()}/apple-touch-icon.png"
+        context["webmanifest"] = (
+            f"frontend/{self.get_frontend_language()}/manifest.webmanifest"
+        )
+        context["apple_touch_icon"] = (
+            f"frontend/{self.get_frontend_language()}/apple-touch-icon.png"
+        )
         return context
 
 
@@ -722,9 +722,9 @@ class SearchResultSerializer(DocumentSerializer, PassUserMixin):
         r["__search_hit__"] = {
             "score": instance.score,
             "highlights": instance.highlights("content", text=doc.content),
-            "note_highlights": instance.highlights("notes", text=notes)
-            if doc
-            else None,
+            "note_highlights": (
+                instance.highlights("notes", text=notes) if doc else None
+            ),
             "rank": instance.rank,
         }
 
