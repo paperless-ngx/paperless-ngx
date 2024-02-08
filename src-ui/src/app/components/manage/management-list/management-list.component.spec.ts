@@ -39,6 +39,7 @@ import { MATCH_LITERAL } from 'src/app/data/matching-model'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
+import { BulkEditObjectOperation } from 'src/app/services/rest/abstract-name-filter-service'
 
 const tags: Tag[] = [
   {
@@ -153,7 +154,7 @@ describe('ManagementListComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
-    const createButton = fixture.debugElement.queryAll(By.css('button'))[2]
+    const createButton = fixture.debugElement.queryAll(By.css('button'))[3]
     createButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
@@ -177,7 +178,7 @@ describe('ManagementListComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
-    const editButton = fixture.debugElement.queryAll(By.css('button'))[6]
+    const editButton = fixture.debugElement.queryAll(By.css('button'))[7]
     editButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
@@ -218,7 +219,7 @@ describe('ManagementListComponent', () => {
 
   it('should support quick filter for objects', () => {
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    const filterButton = fixture.debugElement.queryAll(By.css('button'))[5]
+    const filterButton = fixture.debugElement.queryAll(By.css('button'))[6]
     filterButton.triggerEventHandler('click')
     expect(qfSpy).toHaveBeenCalledWith([
       { rule_type: FILTER_HAS_TAGS_ALL, value: tags[0].id.toString() },
@@ -246,7 +247,7 @@ describe('ManagementListComponent', () => {
   })
 
   it('should support bulk edit permissions', () => {
-    const bulkEditPermsSpy = jest.spyOn(tagService, 'bulk_update_permissions')
+    const bulkEditPermsSpy = jest.spyOn(tagService, 'bulk_edit_objects')
     component.toggleSelected(tags[0])
     component.toggleSelected(tags[1])
     component.toggleSelected(tags[2])
@@ -278,6 +279,37 @@ describe('ManagementListComponent', () => {
       merge: true,
     })
     expect(bulkEditPermsSpy).toHaveBeenCalled()
+    expect(successToastSpy).toHaveBeenCalled()
+  })
+
+  it('should support bulk delete objects', () => {
+    const bulkEditSpy = jest.spyOn(tagService, 'bulk_edit_objects')
+    component.toggleSelected(tags[0])
+    component.toggleSelected(tags[1])
+    const selected = new Set([tags[0].id, tags[1].id])
+    expect(component.selectedObjects).toEqual(selected)
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
+    fixture.detectChanges()
+    component.delete()
+    expect(modal).not.toBeUndefined()
+
+    // fail first
+    bulkEditSpy.mockReturnValueOnce(
+      throwError(() => new Error('error setting permissions'))
+    )
+    const errorToastSpy = jest.spyOn(toastService, 'showError')
+    modal.componentInstance.confirmClicked.emit(null)
+    expect(bulkEditSpy).toHaveBeenCalledWith(
+      Array.from(selected),
+      BulkEditObjectOperation.Delete
+    )
+    expect(errorToastSpy).toHaveBeenCalled()
+
+    const successToastSpy = jest.spyOn(toastService, 'showInfo')
+    bulkEditSpy.mockReturnValueOnce(of('OK'))
+    modal.componentInstance.confirmClicked.emit(null)
+    expect(bulkEditSpy).toHaveBeenCalled()
     expect(successToastSpy).toHaveBeenCalled()
   })
 })
