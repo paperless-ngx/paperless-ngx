@@ -32,72 +32,72 @@
             <div class="btn-group">
               <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" [disabled]="!userCanEdit(account)" class="btn btn-sm btn-outline-secondary" type="button" (click)="editMailAccount(account)">
                 <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
-                </button>
-                <button *pngxIfOwner="account" class="btn btn-sm btn-outline-secondary" type="button" (click)="editPermissions(account)">
-                  <i-bs width="1em" height="1em" name="person-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
-                  </button>
-                  <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailAccount }" [disabled]="!userIsOwner(account)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailAccount(account)">
-                    <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </li>
-          }
-          @if (mailAccounts.length === 0) {
-            <li class="list-group-item" i18n>No mail accounts defined.</li>
-          }
-        </ul>
-
-      </ng-container>
-
-      <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailRule }">
-        <h4 class="mt-4">
-          <ng-container i18n>Mail rules</ng-container>
-          <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editMailRule()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailRule }">
-            <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Rule</ng-container>
-          </button>
-        </h4>
-        <ul class="list-group">
-          <li class="list-group-item">
-            <div class="row">
-              <div class="col" i18n>Name</div>
-              <div class="col" i18n>Account</div>
-              <div class="col" i18n>Actions</div>
+              </button>
+              <button *pngxIfOwner="account" class="btn btn-sm btn-outline-secondary" type="button" (click)="editPermissions(account)">
+                <i-bs width="1em" height="1em" name="person-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
+              </button>
+              <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailAccount }" [disabled]="!userIsOwner(account)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailAccount(account)">
+                <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+              </button>
             </div>
-          </li>
+          </div>
+        </div>
+      </li>
+    }
+    @if (mailAccounts.length === 0) {
+      <li class="list-group-item" i18n>No mail accounts defined.</li>
+    }
+  </ul>
 
-          @for (rule of mailRules; track rule) {
-            <li class="list-group-item">
-              <div class="row">
-                <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailRule(rule)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailRule)">{{rule.name}}</button></div>
-                <div class="col d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
-                <div class="col">
-                  <div class="btn-group">
-                    <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" [disabled]="!userCanEdit(rule)" class="btn btn-sm btn-outline-secondary" type="button" (click)="editMailRule(rule)">
-                      <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
-                      </button>
-                      <button *pngxIfOwner="rule" class="btn btn-sm btn-outline-secondary" type="button" (click)="editPermissions(rule)">
-                        <i-bs width="1em" height="1em" name="person-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
-                        </button>
-                        <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailRule }" [disabled]="!userIsOwner(rule)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailRule(rule)">
-                          <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                }
-                @if (mailRules.length === 0) {
-                  <li class="list-group-item" i18n>No mail rules defined.</li>
-                }
-              </ul>
+</ng-container>
 
-            </ng-container>
+<ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailRule }">
+  <h4 class="mt-4">
+    <ng-container i18n>Mail rules</ng-container>
+    <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editMailRule()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailRule }">
+      <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Rule</ng-container>
+    </button>
+  </h4>
+  <ul class="list-group">
+    <li class="list-group-item">
+      <div class="row">
+        <div class="col" i18n>Name</div>
+        <div class="col" i18n>Account</div>
+        <div class="col" i18n>Actions</div>
+      </div>
+    </li>
 
-            @if (!mailAccounts || !mailRules) {
-              <div>
-                <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
-                <div class="visually-hidden" i18n>Loading...</div>
-              </div>
-            }
+    @for (rule of mailRules; track rule) {
+      <li class="list-group-item">
+        <div class="row">
+          <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailRule(rule)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailRule)">{{rule.name}}</button></div>
+          <div class="col d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
+          <div class="col">
+            <div class="btn-group">
+              <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" [disabled]="!userCanEdit(rule)" class="btn btn-sm btn-outline-secondary" type="button" (click)="editMailRule(rule)">
+                <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
+              </button>
+              <button *pngxIfOwner="rule" class="btn btn-sm btn-outline-secondary" type="button" (click)="editPermissions(rule)">
+                <i-bs width="1em" height="1em" name="person-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
+              </button>
+              <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailRule }" [disabled]="!userIsOwner(rule)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailRule(rule)">
+                <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+              </button>
+            </div>
+          </div>
+        </div>
+      </li>
+    }
+    @if (mailRules.length === 0) {
+      <li class="list-group-item" i18n>No mail rules defined.</li>
+    }
+  </ul>
+
+</ng-container>
+
+@if (!mailAccounts || !mailRules) {
+  <div>
+    <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
+    <div class="visually-hidden" i18n>Loading...</div>
+  </div>
+}

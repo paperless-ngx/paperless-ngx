@@ -535,6 +535,42 @@ This is for use with self-signed certificates against local IMAP servers.
     Settings this value has security implications for the security of your email.
     Understand what it does and be sure you need to before setting.
 
+#### [`PAPERLESS_SOCIALACCOUNT_PROVIDERS=<json>`](#PAPERLESS_SOCIALACCOUNT_PROVIDERS) {#PAPERLESS_SOCIALACCOUNT_PROVIDERS}
+
+: This variable is used to setup login and signup via social account providers which are compatible with django-allauth.
+See the corresponding [django-allauth documentation](https://docs.allauth.org/en/0.60.0/socialaccount/providers/index.html)
+for a list of provider configurations. You will also likely need to include the relevant Django 'application' inside the
+[PAPERLESS_APPS](#PAPERLESS_APPS) setting.
+
+    Defaults to None, which does not enable any third party authentication systems.
+
+#### [`PAPERLESS_SOCIAL_AUTO_SIGNUP=<bool>`](#PAPERLESS_SOCIAL_AUTO_SIGNUP) {#PAPERLESS_SOCIAL_AUTO_SIGNUP}
+
+: Attempt to signup the user using retrieved email, username etc from the third party authentication
+system. See the corresponding
+[django-allauth documentation](https://docs.allauth.org/en/0.60.0/socialaccount/configuration.html)
+
+    Defaults to False
+
+#### [`PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS=<bool>`](#PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS) {#PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS}
+
+: Allow users to signup for a new Paperless-ngx account using any setup third party authentication systems.
+
+    Defaults to True
+
+#### [`PAPERLESS_ACCOUNT_ALLOW_SIGNUPS=<bool>`](#PAPERLESS_ACCOUNT_ALLOW_SIGNUPS) {#PAPERLESS_ACCOUNT_ALLOW_SIGNUPS}
+
+: Allow users to signup for a new Paperless-ngx account.
+
+    Defaults to False
+
+#### [`PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL=<string>`](#PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL) {#PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL}
+
+: The protocol used when generating URLs, e.g. login callback URLs. See the corresponding
+[django-allauth documentation](https://docs.allauth.org/en/latest/account/configuration.html)
+
+    Defaults to 'https'
+
 ## OCR settings {#ocr}
 
 Paperless uses [OCRmyPDF](https://ocrmypdf.readthedocs.io/en/latest/)
@@ -905,6 +941,14 @@ documents.
 
     Default is none, which disables the temporary directory.
 
+#### [`PAPERLESS_APPS=<string>`](#PAPERLESS_APPS) {#PAPERLESS_APPS}
+
+: A comma-separated list of Django apps to be included in Django's
+[`INSTALLED_APPS`](https://docs.djangoproject.com/en/5.0/ref/applications/). This setting should
+be used with caution!
+
+    Defaults to None, which does not add any additional apps.
+
 ## Document Consumption {#consume_config}
 
 #### [`PAPERLESS_CONSUMER_DELETE_DUPLICATES=<bool>`](#PAPERLESS_CONSUMER_DELETE_DUPLICATES) {#PAPERLESS_CONSUMER_DELETE_DUPLICATES}
@@ -1172,6 +1216,55 @@ fails a bigger dpi value i.e. 600 can fix the issue. Try using in
 combination with PAPERLESS_CONSUMER_BARCODE_UPSCALE bigger than 1.0.
 
     Defaults to "300"
+
+#### [`PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE=<bool>`](#PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE) {#PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE}
+
+: Enables the detection of barcodes in the scanned document and
+assigns or creates tags if a properly formatted barcode is detected.
+
+    The barcode must match one of the (configurable) regular expressions.
+    If the barcode text contains ',' (comma), it is split into multiple
+    barcodes which are individually processed for tagging.
+
+    Matching is case insensitive.
+
+    Defaults to false.
+
+#### [`PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING=<json dict>`](#PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING) {#PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING}
+
+: Defines a dictionary of filter regex and substitute expressions.
+
+    Syntax: {"<regex>": "<substitute>" [,...]]}
+
+    A barcode is considered for tagging if the barcode text matches
+    at least one of the provided <regex> pattern.
+
+    If a match is found, the <substitute> rule is applied. This allows very
+    versatile reformatting and mapping of barcode pattern to tag values.
+
+    If a tag is not found it will be created.
+
+    Defaults to:
+
+    {"TAG:(.*)": "\\g<1>"} which defines
+    - a regex TAG:(.*) which includes barcodes beginning with TAG:
+      followed by any text that gets stored into match group #1 and
+    - a substitute \\g<1> that replaces the original barcode text
+      by the content in match group #1.
+    Consequently, the tag is the barcode text without its TAG: prefix.
+
+    More examples:
+
+    {"ASN12.*": "JOHN", "ASN13.*": "SMITH"} for example maps
+    - ASN12nnnn barcodes to the tag JOHN and
+    - ASN13nnnn barcodes to the tag SMITH.
+
+    {"T-J": "JOHN", "T-S": "SMITH", "T-D": "DOE"} directly maps
+    - T-J barcodes to the tag JOHN,
+    - T-S barcodes to the tag SMITH and
+    - T-D barcodes to the tag DOE.
+
+    Please refer to the Python regex documentation for more information.
 
 ## Audit Trail
 

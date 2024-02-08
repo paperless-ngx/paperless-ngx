@@ -796,6 +796,11 @@ CACHES = {
     },
 }
 
+if DEBUG and os.getenv("PAPERLESS_CACHE_BACKEND") is None:
+    CACHES["default"][
+        "BACKEND"
+    ] = "django.core.cache.backends.locmem.LocMemCache"  # pragma: no cover
+
 
 def default_threads_per_worker(task_workers) -> int:
     # always leave one core open
@@ -877,6 +882,19 @@ CONSUMER_BARCODE_UPSCALE: Final[float] = __get_float(
 )
 
 CONSUMER_BARCODE_DPI: Final[int] = __get_int("PAPERLESS_CONSUMER_BARCODE_DPI", 300)
+
+CONSUMER_ENABLE_TAG_BARCODE: Final[bool] = __get_boolean(
+    "PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE",
+)
+
+CONSUMER_TAG_BARCODE_MAPPING = dict(
+    json.loads(
+        os.getenv(
+            "PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING",
+            '{"TAG:(.*)": "\\\\g<1>"}',
+        ),
+    ),
+)
 
 CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED: Final[bool] = __get_boolean(
     "PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED",

@@ -4,10 +4,13 @@ import pickle
 import re
 import warnings
 from collections.abc import Iterator
-from datetime import datetime
 from hashlib import sha256
-from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Optional
+
+if TYPE_CHECKING:
+    from datetime import datetime
+    from pathlib import Path
 
 from django.conf import settings
 from django.core.cache import cache
