@@ -3,6 +3,11 @@ import { AbstractPaperlessService } from './abstract-paperless-service'
 import { PermissionsObject } from 'src/app/data/object-with-permissions'
 import { Observable } from 'rxjs'
 
+export enum BulkEditObjectOperation {
+  SetPermissions = 'set_permissions',
+  Delete = 'delete',
+}
+
 export abstract class AbstractNameFilterService<
   T extends ObjectWithId,
 > extends AbstractPaperlessService<T> {
@@ -24,17 +29,22 @@ export abstract class AbstractNameFilterService<
     return this.list(page, pageSize, sortField, sortReverse, params)
   }
 
-  bulk_update_permissions(
+  bulk_edit_objects(
     objects: Array<number>,
-    permissions: { owner: number; set_permissions: PermissionsObject },
-    merge: boolean
+    operation: BulkEditObjectOperation,
+    permissions: { owner: number; set_permissions: PermissionsObject } = null,
+    merge: boolean = null
   ): Observable<string> {
-    return this.http.post<string>(`${this.baseUrl}bulk_edit_object_perms/`, {
+    const params = {
       objects,
       object_type: this.resourceName,
-      owner: permissions.owner,
-      permissions: permissions.set_permissions,
-      merge,
-    })
+      operation,
+    }
+    if (operation === BulkEditObjectOperation.SetPermissions) {
+      params['owner'] = permissions?.owner
+      params['permissions'] = permissions?.set_permissions
+      params['merge'] = merge
+    }
+    return this.http.post<string>(`${this.baseUrl}bulk_edit_objects/`, params)
   }
 }
