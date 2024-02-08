@@ -1281,7 +1281,7 @@ class ShareLinkSerializer(OwnedObjectSerializer):
         return super().create(validated_data)
 
 
-class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissionsMixin):
+class BulkEditObjectsSerializer(serializers.Serializer, SetPermissionsMixin):
     objects = serializers.ListField(
         required=True,
         allow_empty=False,
@@ -1298,6 +1298,16 @@ class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissions
             "storage_paths",
         ],
         label="Object Type",
+        write_only=True,
+    )
+
+    operation = serializers.ChoiceField(
+        choices=[
+            "set_permissions",
+            "delete",
+        ],
+        label="Operation",
+        required=True,
         write_only=True,
     )
 
@@ -1353,11 +1363,14 @@ class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissions
     def validate(self, attrs):
         object_type = attrs["object_type"]
         objects = attrs["objects"]
-        permissions = attrs.get("permissions")
+        operation = attrs.get("operation")
 
         self._validate_objects(objects, object_type)
-        if permissions is not None:
-            self._validate_permissions(permissions)
+
+        if operation == "set_permissions":
+            permissions = attrs.get("permissions")
+            if permissions is not None:
+                self._validate_permissions(permissions)
 
         return attrs
 

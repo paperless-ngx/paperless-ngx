@@ -16,7 +16,7 @@ from rest_framework.routers import DefaultRouter
 
 from documents.views import AcknowledgeTasksView
 from documents.views import BulkDownloadView
-from documents.views import BulkEditObjectPermissionsView
+from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
 from documents.views import CorrespondentViewSet
 from documents.views import CustomFieldViewSet
@@ -129,9 +129,9 @@ urlpatterns = [
                 ),
                 path("token/", views.obtain_auth_token),
                 re_path(
-                    "^bulk_edit_object_perms/",
-                    BulkEditObjectPermissionsView.as_view(),
-                    name="bulk_edit_object_permissions",
+                    "^bulk_edit_objects/",
+                    BulkEditObjectsView.as_view(),
+                    name="bulk_edit_objects",
                 ),
                 path("profile/generate_auth_token/", GenerateAuthTokenView.as_view()),
                 path(
