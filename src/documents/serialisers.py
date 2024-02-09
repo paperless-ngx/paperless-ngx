@@ -1410,9 +1410,6 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
-        if ("filter_mailrule") in attrs and attrs["filter_mailrule"] is not None:
-            attrs["sources"] = {DocumentSource.MailFetch.value}
-
         # Empty strings treated as None to avoid unexpected behavior
         if (
             "filter_filename" in attrs
