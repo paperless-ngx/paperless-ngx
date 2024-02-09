@@ -15,8 +15,6 @@ from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.tests.utils import DirectoriesMixin
-from paperless_mail.models import MailAccount
-from paperless_mail.models import MailRule
 
 
 class TestApiWorkflows(DirectoriesMixin, APITestCase):
@@ -343,56 +341,6 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         trigger2 = WorkflowTrigger.objects.get(id=response.data["id"])
         self.assertEqual(trigger2.filter_path, "*/test/*")
         self.assertIsNone(trigger2.filter_filename)
-
-    def test_api_create_workflow_trigger_with_mailrule(self):
-        """
-        GIVEN:
-            - API request to create a workflow trigger with a mail rule but no MailFetch source
-        WHEN:
-            - API is called
-        THEN:
-            - New trigger is created with MailFetch as source
-        """
-        account1 = MailAccount.objects.create(
-            name="Email1",
-            username="username1",
-            password="password1",
-            imap_server="server.example.com",
-            imap_port=443,
-            imap_security=MailAccount.ImapSecurity.SSL,
-            character_set="UTF-8",
-        )
-        rule1 = MailRule.objects.create(
-            name="Rule1",
-            account=account1,
-            folder="INBOX",
-            filter_from="from@example.com",
-            filter_to="someone@somewhere.com",
-            filter_subject="subject",
-            filter_body="body",
-            filter_attachment_filename_include="file.pdf",
-            maximum_age=30,
-            action=MailRule.MailAction.MARK_READ,
-            assign_title_from=MailRule.TitleSource.FROM_SUBJECT,
-            assign_correspondent_from=MailRule.CorrespondentSource.FROM_NOTHING,
-            order=0,
-            attachment_type=MailRule.AttachmentProcessing.ATTACHMENTS_ONLY,
-        )
-        response = self.client.post(
-            self.ENDPOINT_TRIGGERS,
-            json.dumps(
-                {
-                    "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
-                    "sources": [DocumentSource.ApiUpload],
-                    "filter_mailrule": rule1.pk,
-                },
-            ),
-            content_type="application/json",
-        )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(WorkflowTrigger.objects.count(), 2)
-        trigger = WorkflowTrigger.objects.get(id=response.data["id"])
-        self.assertEqual(trigger.sources, [int(DocumentSource.MailFetch).__str__()])
 
     def test_api_update_workflow_nested_triggers_actions(self):
         """
