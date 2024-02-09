@@ -55,11 +55,21 @@ class RasterisedDocumentParser(DocumentParser):
                 value = str(value)
                 try:
                     m = namespace_pattern.match(key)
+                    if m is None:  # pragma: no cover
+                        continue
+                    namespace = m.group(1)
+                    key_value = m.group(2)
+                    try:
+                        namespace.encode("utf-8")
+                        key_value.encode("utf-8")
+                    except UnicodeEncodeError as e:  # pragma: no cover
+                        self.log.debug(f"Skipping metadata key {key}: {e}")
+                        continue
                     result.append(
                         {
-                            "namespace": m.group(1),
-                            "prefix": meta.REVERSE_NS[m.group(1)],
-                            "key": m.group(2),
+                            "namespace": namespace,
+                            "prefix": meta.REVERSE_NS[namespace],
+                            "key": key_value,
                             "value": value,
                         },
                     )
