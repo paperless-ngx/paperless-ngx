@@ -63,7 +63,7 @@ class RasterisedDocumentParser(DocumentParser):
                         namespace.encode("utf-8")
                         key_value.encode("utf-8")
                     except UnicodeEncodeError as e:  # pragma: no cover
-                        self.log.debug(f"Skipping header {key}: {e}")
+                        self.log.debug(f"Skipping metadata key {key}: {e}")
                         continue
                     result.append(
                         {
