@@ -55,7 +55,7 @@ class RasterisedDocumentParser(DocumentParser):
                 value = str(value)
                 try:
                     m = namespace_pattern.match(key)
-                    if m is None:
+                    if m is None:  # pragma: no cover
                         continue
                     namespace = m.group(1)
                     key_value = m.group(2)
