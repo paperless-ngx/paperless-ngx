@@ -487,7 +487,7 @@ export class DocumentDetailComponent
           this.metadata = result
         },
         error: (error) => {
-          this.metadata = null
+          this.metadata = {} // allow display to fallback to <object> tag
           this.toastService.showError(
             $localize`Error retrieving metadata`,
             error
