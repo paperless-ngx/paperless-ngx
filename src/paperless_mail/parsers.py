@@ -69,6 +69,11 @@ class MailDocumentParser(DocumentParser):
 
         for key, value in mail.headers.items():
             value = ", ".join(i for i in value)
+            try:
+                value.encode("utf-8")
+            except UnicodeEncodeError as e:  # pragma: no cover
+                self.log.debug(f"Skipping header {key}: {e}")
+                continue
 
             result.append(
                 {
