@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-05 21:26-0800\n"
-"PO-Revision-Date: 2024-01-25 12:09\n"
+"POT-Creation-Date: 2024-02-08 11:56-0800\n"
+"PO-Revision-Date: 2024-02-08 19:57\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -21,31 +21,31 @@ msgstr ""
 msgid "Documents"
 msgstr "documents"
 
-#: documents/models.py:36 documents/models.py:736
+#: documents/models.py:36 documents/models.py:739
 msgid "owner"
 msgstr "propietari"
 
-#: documents/models.py:53 documents/models.py:894
+#: documents/models.py:53 documents/models.py:897
 msgid "None"
 msgstr "Cap"
 
-#: documents/models.py:54 documents/models.py:895
+#: documents/models.py:54 documents/models.py:898
 msgid "Any word"
 msgstr "Qualsevol paraula"
 
-#: documents/models.py:55 documents/models.py:896
+#: documents/models.py:55 documents/models.py:899
 msgid "All words"
 msgstr "Totes paraules"
 
-#: documents/models.py:56 documents/models.py:897
+#: documents/models.py:56 documents/models.py:900
 msgid "Exact match"
 msgstr "Coincidència exacte"
 
-#: documents/models.py:57 documents/models.py:898
+#: documents/models.py:57 documents/models.py:901
 msgid "Regular expression"
 msgstr "Expressió Regular"
 
-#: documents/models.py:58 documents/models.py:899
+#: documents/models.py:58 documents/models.py:902
 msgid "Fuzzy word"
 msgstr "Paraula difusa"
 
@@ -53,20 +53,20 @@ msgstr "Paraula difusa"
 msgid "Automatic"
 msgstr "Automàtic"
 
-#: documents/models.py:62 documents/models.py:402 documents/models.py:1099
+#: documents/models.py:62 documents/models.py:397 documents/models.py:1102
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
 msgid "name"
 msgstr "nom"
 
-#: documents/models.py:64 documents/models.py:955
+#: documents/models.py:64 documents/models.py:958
 msgid "match"
 msgstr "coincidència"
 
-#: documents/models.py:67 documents/models.py:958
+#: documents/models.py:67 documents/models.py:961
 msgid "matching algorithm"
 msgstr "algoritme coincident"
 
-#: documents/models.py:72 documents/models.py:963
+#: documents/models.py:72 documents/models.py:966
 msgid "is insensitive"
 msgstr "no distingeix entre majúscules i minúscules"
 
@@ -130,7 +130,7 @@ msgstr "Xifrat amb GNU Privacy Guard"
 msgid "title"
 msgstr "títol"
 
-#: documents/models.py:171 documents/models.py:650
+#: documents/models.py:171 documents/models.py:653
 msgid "content"
 msgstr "contingut"
 
@@ -158,8 +158,8 @@ msgstr "arxiva checksum"
 msgid "The checksum of the archived document."
 msgstr "El checksum del document arxivat."
 
-#: documents/models.py:205 documents/models.py:385 documents/models.py:656
-#: documents/models.py:694 documents/models.py:764 documents/models.py:801
+#: documents/models.py:205 documents/models.py:385 documents/models.py:659
+#: documents/models.py:697 documents/models.py:767 documents/models.py:804
 msgid "created"
 msgstr "creat"
 
@@ -207,7 +207,7 @@ msgstr "número de sèrie de l'arxiu"
 msgid "The position of this document in your physical document archive."
 msgstr "Posició d'aquest document al vostre arxiu físic de documents."
 
-#: documents/models.py:279 documents/models.py:667 documents/models.py:721
+#: documents/models.py:279 documents/models.py:670 documents/models.py:724
 msgid "document"
 msgstr "document"
 
@@ -255,527 +255,642 @@ msgstr "log"
 msgid "logs"
 msgstr "logs"
 
-#: documents/models.py:399 documents/models.py:466
-msgid "saved view"
-msgstr "vista guardada"
-
 #: documents/models.py:400
-msgid "saved views"
-msgstr "vistes guardades"
-
-#: documents/models.py:405
 msgid "show on dashboard"
 msgstr "mostra al panell"
 
-#: documents/models.py:408
+#: documents/models.py:403
 msgid "show in sidebar"
 msgstr "mostra barra lateral"
 
-#: documents/models.py:412
+#: documents/models.py:407
 msgid "sort field"
 msgstr "camp ordenació"
 
-#: documents/models.py:417
+#: documents/models.py:412
 msgid "sort reverse"
 msgstr "ordenament invers"
 
-#: documents/models.py:422
+#: documents/models.py:416 documents/models.py:469
+msgid "saved view"
+msgstr "vista guardada"
+
+#: documents/models.py:417
+msgid "saved views"
+msgstr "vistes guardades"
+
+#: documents/models.py:425
 msgid "title contains"
 msgstr "títol conté"
 
-#: documents/models.py:423
+#: documents/models.py:426
 msgid "content contains"
 msgstr "contingut conté"
 
-#: documents/models.py:424
+#: documents/models.py:427
 msgid "ASN is"
 msgstr "ASN és"
 
-#: documents/models.py:425
+#: documents/models.py:428
 msgid "correspondent is"
 msgstr "corresponsal és"
 
-#: documents/models.py:426
+#: documents/models.py:429
 msgid "document type is"
 msgstr "tipus document és"
 
-#: documents/models.py:427
+#: documents/models.py:430
 msgid "is in inbox"
 msgstr "està safata entrada"
 
-#: documents/models.py:428
+#: documents/models.py:431
 msgid "has tag"
 msgstr "té etiqueta"
 
-#: documents/models.py:429
+#: documents/models.py:432
 msgid "has any tag"
 msgstr "qualsevol etiqueta"
 
-#: documents/models.py:430
+#: documents/models.py:433
 msgid "created before"
 msgstr "creat abans"
 
-#: documents/models.py:431
+#: documents/models.py:434
 msgid "created after"
 msgstr "creat després"
 
-#: documents/models.py:432
+#: documents/models.py:435
 msgid "created year is"
 msgstr "any creació és"
 
-#: documents/models.py:433
+#: documents/models.py:436
 msgid "created month is"
 msgstr "mes creació és"
 
-#: documents/models.py:434
+#: documents/models.py:437
 msgid "created day is"
 msgstr "dia creació és"
 
-#: documents/models.py:435
+#: documents/models.py:438
 msgid "added before"
 msgstr "afegit abans"
 
-#: documents/models.py:436
+#: documents/models.py:439
 msgid "added after"
 msgstr "afegit després"
 
-#: documents/models.py:437
+#: documents/models.py:440
 msgid "modified before"
 msgstr "modificat abans"
 
-#: documents/models.py:438
+#: documents/models.py:441
 msgid "modified after"
 msgstr "modificat després"
 
-#: documents/models.py:439
+#: documents/models.py:442
 msgid "does not have tag"
 msgstr "no té etiqueta"
 
-#: documents/models.py:440
+#: documents/models.py:443
 msgid "does not have ASN"
 msgstr "no té ASN"
 
-#: documents/models.py:441
+#: documents/models.py:444
 msgid "title or content contains"
 msgstr "títol o contingut conté"
 
-#: documents/models.py:442
+#: documents/models.py:445
 msgid "fulltext query"
 msgstr "consulta de text complet"
 
-#: documents/models.py:443
+#: documents/models.py:446
 msgid "more like this"
 msgstr "més com aquest"
 
-#: documents/models.py:444
+#: documents/models.py:447
 msgid "has tags in"
 msgstr "té etiquetes a"
 
-#: documents/models.py:445
+#: documents/models.py:448
 msgid "ASN greater than"
 msgstr "ASN més gran que"
 
-#: documents/models.py:446
+#: documents/models.py:449
 msgid "ASN less than"
 msgstr "ASN menor que"
 
-#: documents/models.py:447
+#: documents/models.py:450
 msgid "storage path is"
 msgstr "emmagatzematge és"
 
-#: documents/models.py:448
+#: documents/models.py:451
 msgid "has correspondent in"
 msgstr "té corresponsal a"
 
-#: documents/models.py:449
+#: documents/models.py:452
 msgid "does not have correspondent in"
 msgstr "no té corresponsal a"
 
-#: documents/models.py:450
+#: documents/models.py:453
 msgid "has document type in"
 msgstr "té tipus de document a"
 
-#: documents/models.py:451
+#: documents/models.py:454
 msgid "does not have document type in"
 msgstr "no té tipus de document a"
 
-#: documents/models.py:452
+#: documents/models.py:455
 msgid "has storage path in"
 msgstr "té emmagatzematge a"
 
-#: documents/models.py:453
+#: documents/models.py:456
 msgid "does not have storage path in"
 msgstr "no té emmagatzematge a"
 
-#: documents/models.py:454
+#: documents/models.py:457
 msgid "owner is"
 msgstr "propietari és"
 
-#: documents/models.py:455
+#: documents/models.py:458
 msgid "has owner in"
 msgstr "té propietari a"
 
-#: documents/models.py:456
+#: documents/models.py:459
 msgid "does not have owner"
 msgstr "no té propietari"
 
-#: documents/models.py:457
+#: documents/models.py:460
 msgid "does not have owner in"
 msgstr "no té propietari a"
 
-#: documents/models.py:458
+#: documents/models.py:461
 msgid "has custom field value"
 msgstr "té camp personalitzat"
 
-#: documents/models.py:459
+#: documents/models.py:462
 msgid "is shared by me"
 msgstr "compartit per mi"
 
-#: documents/models.py:469
+#: documents/models.py:472
 msgid "rule type"
 msgstr "tipus de regla"
 
-#: documents/models.py:471
+#: documents/models.py:474
 msgid "value"
 msgstr "valor"
 
-#: documents/models.py:474
+#: documents/models.py:477
 msgid "filter rule"
 msgstr "regla de filtre"
 
-#: documents/models.py:475
+#: documents/models.py:478
 msgid "filter rules"
 msgstr "regla de filtres"
 
-#: documents/models.py:586
+#: documents/models.py:589
 msgid "Task ID"
 msgstr "ID Tasca"
 
-#: documents/models.py:587
+#: documents/models.py:590
 msgid "Celery ID for the Task that was run"
 msgstr "Celery ID per la tasca que es va executar"
 
-#: documents/models.py:592
+#: documents/models.py:595
 msgid "Acknowledged"
 msgstr "Reconegut"
 
-#: documents/models.py:593
+#: documents/models.py:596
 msgid "If the task is acknowledged via the frontend or API"
 msgstr "Si la tasca es reconeix mitjançant la interfície o l'API"
 
-#: documents/models.py:599
+#: documents/models.py:602
 msgid "Task Filename"
 msgstr "Nom Arxiu tasca"
 
-#: documents/models.py:600
+#: documents/models.py:603
 msgid "Name of the file which the Task was run for"
 msgstr "Nom del fitxer per al qual s'ha executat la tasca"
 
-#: documents/models.py:606
+#: documents/models.py:609
 msgid "Task Name"
 msgstr "Nom tasca"
 
-#: documents/models.py:607
+#: documents/models.py:610
 msgid "Name of the Task which was run"
 msgstr "Nom de la tasca que s'ha executat"
 
-#: documents/models.py:614
+#: documents/models.py:617
 msgid "Task State"
 msgstr "Estat de tasca"
 
-#: documents/models.py:615
+#: documents/models.py:618
 msgid "Current state of the task being run"
 msgstr "Estat actual de la tasca que s'està executant"
 
-#: documents/models.py:620
+#: documents/models.py:623
 msgid "Created DateTime"
 msgstr "Data Hora Creació"
 
-#: documents/models.py:621
+#: documents/models.py:624
 msgid "Datetime field when the task result was created in UTC"
 msgstr "Camp data i hora en què es va iniciar la tasca UTC"
 
-#: documents/models.py:626
+#: documents/models.py:629
 msgid "Started DateTime"
 msgstr "Data Hora Creació"
 
-#: documents/models.py:627
+#: documents/models.py:630
 msgid "Datetime field when the task was started in UTC"
 msgstr "Camp data i hora en què es va iniciar la tasca UTC"
 
-#: documents/models.py:632
+#: documents/models.py:635
 msgid "Completed DateTime"
 msgstr "Data Hora completada"
 
-#: documents/models.py:633
+#: documents/models.py:636
 msgid "Datetime field when the task was completed in UTC"
 msgstr "Camp data i hora en què es va completar la tasca UTC"
 
-#: documents/models.py:638
+#: documents/models.py:641
 msgid "Result Data"
 msgstr "Dades del resultat"
 
-#: documents/models.py:640
+#: documents/models.py:643
 msgid "The data returned by the task"
 msgstr "Dades retornades per la tasca"
 
-#: documents/models.py:652
+#: documents/models.py:655
 msgid "Note for the document"
 msgstr "Nota pel document"
 
-#: documents/models.py:676
+#: documents/models.py:679
 msgid "user"
 msgstr "usuari"
 
-#: documents/models.py:681
+#: documents/models.py:684
 msgid "note"
 msgstr "nota"
 
-#: documents/models.py:682
+#: documents/models.py:685
 msgid "notes"
 msgstr "notes"
 
-#: documents/models.py:690
+#: documents/models.py:693
 msgid "Archive"
 msgstr "Arxiu"
 
-#: documents/models.py:691
+#: documents/models.py:694
 msgid "Original"
 msgstr "Original"
 
-#: documents/models.py:702
+#: documents/models.py:705
 msgid "expiration"
 msgstr "venciment"
 
-#: documents/models.py:709
+#: documents/models.py:712
 msgid "slug"
 msgstr "fitxa"
 
-#: documents/models.py:741
+#: documents/models.py:744
 msgid "share link"
 msgstr "comparteix enllaç"
 
-#: documents/models.py:742
+#: documents/models.py:745
 msgid "share links"
 msgstr "comparteix enllaços"
 
-#: documents/models.py:754
+#: documents/models.py:757
 msgid "String"
 msgstr "Cadena"
 
-#: documents/models.py:755
+#: documents/models.py:758
 msgid "URL"
 msgstr "URL"
 
-#: documents/models.py:756
+#: documents/models.py:759
 msgid "Date"
 msgstr "Data"
 
-#: documents/models.py:757
+#: documents/models.py:760
 msgid "Boolean"
 msgstr "Booleà"
 
-#: documents/models.py:758
+#: documents/models.py:761
 msgid "Integer"
 msgstr "Enter"
 
-#: documents/models.py:759
+#: documents/models.py:762
 msgid "Float"
 msgstr "Flotant"
 
-#: documents/models.py:760
+#: documents/models.py:763
 msgid "Monetary"
 msgstr "Monetari"
 
-#: documents/models.py:761
+#: documents/models.py:764
 msgid "Document Link"
 msgstr "Enllaç Document"
 
-#: documents/models.py:773
+#: documents/models.py:776
 msgid "data type"
 msgstr "tipus dada"
 
-#: documents/models.py:781
+#: documents/models.py:784
 msgid "custom field"
 msgstr "camp personalitzat"
 
-#: documents/models.py:782
+#: documents/models.py:785
 msgid "custom fields"
 msgstr "camps personalitzats"
 
-#: documents/models.py:844
+#: documents/models.py:847
 msgid "custom field instance"
 msgstr "instància de camp personalitzat"
 
-#: documents/models.py:845
+#: documents/models.py:848
 msgid "custom field instances"
 msgstr "instàncies de camps personalitzats"
 
-#: documents/models.py:902
+#: documents/models.py:905
 msgid "Consumption Started"
 msgstr "Començada Consumpció"
 
-#: documents/models.py:903
+#: documents/models.py:906
 msgid "Document Added"
 msgstr "Document Afegit"
 
-#: documents/models.py:904
+#: documents/models.py:907
 msgid "Document Updated"
 msgstr "Document Actualitzat"
 
-#: documents/models.py:907
+#: documents/models.py:910
 msgid "Consume Folder"
 msgstr "Directori 'Condumir'"
 
-#: documents/models.py:908
+#: documents/models.py:911
 msgid "Api Upload"
 msgstr "Api Pujada"
 
-#: documents/models.py:909
+#: documents/models.py:912
 msgid "Mail Fetch"
 msgstr "Recollida Correu"
 
-#: documents/models.py:912
+#: documents/models.py:915
 msgid "Workflow Trigger Type"
 msgstr "Tipus d'activador de Workflow"
 
-#: documents/models.py:924
+#: documents/models.py:927
 msgid "filter path"
 msgstr "filtra camins"
 
-#: documents/models.py:929
+#: documents/models.py:932
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
 msgstr "Consumeix documents amb la ruta que coincideixi si està especificada. Wilcards especificats amb * estan permessos, no sensitiu."
 
-#: documents/models.py:936
+#: documents/models.py:939
 msgid "filter filename"
 msgstr "filtra nom arxiu"
 
-#: documents/models.py:941 paperless_mail/models.py:148
+#: documents/models.py:944 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "Consumiu només documents que coincideixin completament amb aquest nom de fitxer si s'especifica. Es permeten els comodins com ara *.pdf o *factura*. Cas insensitiu."
 
-#: documents/models.py:952
+#: documents/models.py:955
 msgid "filter documents from this mail rule"
 msgstr "filtra documents d'aquesta regla de correu"
 
-#: documents/models.py:968
+#: documents/models.py:971
 msgid "has these tag(s)"
 msgstr "té aquestes etiquete(s)"
 
-#: documents/models.py:976
+#: documents/models.py:979
 msgid "has this document type"
 msgstr "té aquest tipus de document"
 
-#: documents/models.py:984
+#: documents/models.py:987
 msgid "has this correspondent"
 msgstr "té aquest corresponsal"
 
-#: documents/models.py:988
+#: documents/models.py:991
 msgid "workflow trigger"
 msgstr "disparador de flux"
 
-#: documents/models.py:989
+#: documents/models.py:992
 msgid "workflow triggers"
 msgstr "disparadors de fluxos"
 
-#: documents/models.py:997
+#: documents/models.py:1000
 msgid "Assignment"
 msgstr "Assignació"
 
-#: documents/models.py:1000
+#: documents/models.py:1003
 msgid "Workflow Action Type"
 msgstr "Tipus d'acció de disparador"
 
-#: documents/models.py:1006
+#: documents/models.py:1009
 msgid "assign title"
 msgstr "assigna títol"
 
-#: documents/models.py:1011
+#: documents/models.py:1014
 msgid "Assign a document title, can include some placeholders, see documentation."
 msgstr "Assigna un títol de document, pot incloure alguns marcadors de posició, vegeu la documentació."
 
-#: documents/models.py:1019 paperless_mail/models.py:216
+#: documents/models.py:1022 paperless_mail/models.py:216
 msgid "assign this tag"
 msgstr "assigna aquesta etiqueta"
 
-#: documents/models.py:1027 paperless_mail/models.py:224
+#: documents/models.py:1030 paperless_mail/models.py:224
 msgid "assign this document type"
 msgstr "assigna aquest tipus de document"
 
-#: documents/models.py:1035 paperless_mail/models.py:238
+#: documents/models.py:1038 paperless_mail/models.py:238
 msgid "assign this correspondent"
 msgstr "assigna aquest corresponsal"
 
-#: documents/models.py:1043
+#: documents/models.py:1046
 msgid "assign this storage path"
 msgstr "assigna aquesta ruta emmagatzematge"
 
-#: documents/models.py:1052
+#: documents/models.py:1055
 msgid "assign this owner"
 msgstr "assigna aquest propietari"
 
-#: documents/models.py:1059
+#: documents/models.py:1062
 msgid "grant view permissions to these users"
 msgstr "dona permissos visualització a aquests usuaris"
 
-#: documents/models.py:1066
+#: documents/models.py:1069
 msgid "grant view permissions to these groups"
 msgstr "dóna permissos de visionat a aquests grups"
 
-#: documents/models.py:1073
+#: documents/models.py:1076
 msgid "grant change permissions to these users"
 msgstr "dóna permissos d'edició a aquests usuaris"
 
-#: documents/models.py:1080
+#: documents/models.py:1083
 msgid "grant change permissions to these groups"
 msgstr "dóna permissos d'edició a aquests grups"
 
-#: documents/models.py:1087
+#: documents/models.py:1090
 msgid "assign these custom fields"
 msgstr "assigna aquests camps personalitzats"
 
-#: documents/models.py:1091
+#: documents/models.py:1094
 msgid "workflow action"
 msgstr "acció disparador"
 
-#: documents/models.py:1092
+#: documents/models.py:1095
 msgid "workflow actions"
 msgstr "accions disparadors"
 
-#: documents/models.py:1101 paperless_mail/models.py:95
+#: documents/models.py:1104 paperless_mail/models.py:95
 msgid "order"
 msgstr "ordena"
 
-#: documents/models.py:1107
+#: documents/models.py:1110
 msgid "triggers"
 msgstr "disparadors"
 
-#: documents/models.py:1114
+#: documents/models.py:1117
 msgid "actions"
 msgstr "accions"
 
-#: documents/models.py:1117
+#: documents/models.py:1120
 msgid "enabled"
 msgstr "habilitat"
 
-#: documents/serialisers.py:111
+#: documents/serialisers.py:113
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Expressió regular invàlida: %(error)s"
 
-#: documents/serialisers.py:405
+#: documents/serialisers.py:407
 msgid "Invalid color."
 msgstr "Color Invàlid."
 
-#: documents/serialisers.py:999
+#: documents/serialisers.py:1061
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Tipus arxiu %(type)s no suportat"
 
-#: documents/serialisers.py:1102
+#: documents/serialisers.py:1164
 msgid "Invalid variable detected."
 msgstr "Variable detectada invàlida."
+
+#: documents/templates/account/login.html:14
+msgid "Paperless-ngx sign in"
+msgstr "Paperless-ngx sign in"
+
+#: documents/templates/account/login.html:47
+msgid "Please sign in."
+msgstr "Siusplau valida't."
+
+#: documents/templates/account/login.html:50
+msgid "Your username and password didn't match. Please try again."
+msgstr "Nom usuari / contrasenya no coincideixen. Siusplau torna a provar."
+
+#: documents/templates/account/login.html:54
+msgid "Share link was not found."
+msgstr "No s'ha trobat aquest enllaç."
+
+#: documents/templates/account/login.html:58
+msgid "Share link has expired."
+msgstr "L'enllaç ha caducat."
+
+#: documents/templates/account/login.html:61
+#: documents/templates/socialaccount/signup.html:56
+msgid "Username"
+msgstr "Nom usuari"
+
+#: documents/templates/account/login.html:62
+msgid "Password"
+msgstr "Contrasenya"
+
+#: documents/templates/account/login.html:72
+msgid "Sign in"
+msgstr "Validació"
+
+#: documents/templates/account/login.html:76
+msgid "Forgot your password?"
+msgstr "Contrasenya oblidada?"
+
+#: documents/templates/account/login.html:83
+msgid "or sign in via"
+msgstr ""
+
+#: documents/templates/account/password_reset.html:15
+msgid "Paperless-ngx reset password request"
+msgstr "Sol·licitud de restabliment de la contrasenya"
+
+#: documents/templates/account/password_reset.html:43
+msgid "Enter your email address below, and we'll email instructions for setting a new one."
+msgstr "Introduïu la vostra adreça de correu electrònic a continuació i us enviarem les instruccions per configurar-ne una de nova."
+
+#: documents/templates/account/password_reset.html:46
+msgid "An error occurred. Please try again."
+msgstr "Error. Prova de nou."
+
+#: documents/templates/account/password_reset.html:49
+#: documents/templates/socialaccount/signup.html:57
+msgid "Email"
+msgstr "Email"
+
+#: documents/templates/account/password_reset.html:56
+msgid "Send me instructions!"
+msgstr "Enviar instruccions"
+
+#: documents/templates/account/password_reset_done.html:14
+msgid "Paperless-ngx reset password sent"
+msgstr "S'ha enviat el restabliment de contrasenya"
+
+#: documents/templates/account/password_reset_done.html:40
+msgid "Check your inbox."
+msgstr "Reviseu el correu."
+
+#: documents/templates/account/password_reset_done.html:41
+msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
+msgstr "Enviat per correu electrònic instruccions per configurar la vostra contrasenya. Hauríeu de rebre el correu electrònic en breu!"
+
+#: documents/templates/account/password_reset_from_key.html:15
+msgid "Paperless-ngx reset password confirmation"
+msgstr "Paperless-ngx confirmació de restabliment de contrasenya"
+
+#: documents/templates/account/password_reset_from_key.html:44
+msgid "request a new password reset"
+msgstr "sol·licitar restabliment de contrasenya"
+
+#: documents/templates/account/password_reset_from_key.html:46
+msgid "Set a new password."
+msgstr "Entra una contrasenya nova"
+
+#: documents/templates/account/password_reset_from_key.html:50
+msgid "Passwords did not match or too weak. Try again."
+msgstr "Contrasenyes no coincideixen o son massa febles."
+
+#: documents/templates/account/password_reset_from_key.html:53
+msgid "New Password"
+msgstr "Nova contrasenya"
+
+#: documents/templates/account/password_reset_from_key.html:54
+msgid "Confirm Password"
+msgstr "Confirmar contrasenya"
+
+#: documents/templates/account/password_reset_from_key.html:65
+msgid "Change my password"
+msgstr "Canvia contrasenya"
+
+#: documents/templates/account/password_reset_from_key_done.html:14
+msgid "Paperless-ngx reset password complete"
+msgstr "Contrasenya restablerta"
+
+#: documents/templates/account/password_reset_from_key_done.html:40
+msgid "Password reset complete."
+msgstr "Contrasenya restablerta."
+
+#: documents/templates/account/password_reset_from_key_done.html:42
+#, python-format
+msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
+msgstr "Contrasenya enviada. Pots iniciar <a href=\"%(login_url)s\">sessió</a>"
 
 #: documents/templates/index.html:79
 msgid "Paperless-ngx is loading..."
@@ -789,126 +904,38 @@ msgstr "Encara Aquí?! Hmm, alguna cosa pot estar malament."
 msgid "Here's a link to the docs."
 msgstr "Link als documents."
 
-#: documents/templates/registration/logged_out.html:14
-msgid "Paperless-ngx signed out"
-msgstr "Deslogat de Paperless-ngx"
+#: documents/templates/socialaccount/authentication_error.html:15
+#: documents/templates/socialaccount/login.html:15
+msgid "Paperless-ngx social account sign in"
+msgstr ""
 
-#: documents/templates/registration/logged_out.html:40
-msgid "You have been successfully logged out. Bye!"
-msgstr "Deslogat correctament. Adéu!"
-
-#: documents/templates/registration/logged_out.html:41
-msgid "Sign in again"
-msgstr "Entra de nou"
-
-#: documents/templates/registration/login.html:14
-msgid "Paperless-ngx sign in"
-msgstr "Paperless-ngx sign in"
-
-#: documents/templates/registration/login.html:41
-msgid "Please sign in."
-msgstr "Siusplau valida't."
-
-#: documents/templates/registration/login.html:44
-msgid "Your username and password didn't match. Please try again."
-msgstr "Nom usuari / contrasenya no coincideixen. Siusplau torna a provar."
-
-#: documents/templates/registration/login.html:48
-msgid "Share link was not found."
-msgstr "No s'ha trobat aquest enllaç."
-
-#: documents/templates/registration/login.html:52
-msgid "Share link has expired."
-msgstr "L'enllaç ha caducat."
-
-#: documents/templates/registration/login.html:55
-msgid "Username"
-msgstr "Nom usuari"
-
-#: documents/templates/registration/login.html:56
-msgid "Password"
-msgstr "Contrasenya"
-
-#: documents/templates/registration/login.html:66
-msgid "Sign in"
-msgstr "Validació"
-
-#: documents/templates/registration/login.html:70
-msgid "Forgot your password?"
-msgstr "Contrasenya oblidada?"
-
-#: documents/templates/registration/password_reset_complete.html:14
-msgid "Paperless-ngx reset password complete"
-msgstr "Contrasenya restablerta"
-
-#: documents/templates/registration/password_reset_complete.html:40
-msgid "Password reset complete."
-msgstr "Contrasenya restablerta."
-
-#: documents/templates/registration/password_reset_complete.html:42
+#: documents/templates/socialaccount/authentication_error.html:43
 #, python-format
-msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
-msgstr "Contrasenya enviada. Pots iniciar <a href=\"%(login_url)s\">sessió</a>"
+msgid "An error occurred while attempting to login via your social network account. Back to the <a href=\"%(login_url)s\">login page</a>"
+msgstr ""
 
-#: documents/templates/registration/password_reset_confirm.html:14
-msgid "Paperless-ngx reset password confirmation"
-msgstr "Paperless-ngx confirmació de restabliment de contrasenya"
+#: documents/templates/socialaccount/login.html:44
+#, python-format
+msgid "You are about to connect a new third-party account from %(provider)s."
+msgstr ""
 
-#: documents/templates/registration/password_reset_confirm.html:42
-msgid "Set a new password."
-msgstr "Entra una contrasenya nova"
+#: documents/templates/socialaccount/login.html:47
+msgid "Continue"
+msgstr ""
 
-#: documents/templates/registration/password_reset_confirm.html:46
-msgid "Passwords did not match or too weak. Try again."
-msgstr "Contrasenyes no coincideixen o son massa febles."
+#: documents/templates/socialaccount/signup.html:14
+msgid "Paperless-ngx social account sign up"
+msgstr ""
 
-#: documents/templates/registration/password_reset_confirm.html:49
-msgid "New Password"
-msgstr "Nova contrasenya"
+#: documents/templates/socialaccount/signup.html:53
+#, python-format
+msgid "You are about to use your %(provider_name)s account to login to\n"
+"%(site_name)s. As a final step, please complete the following form:"
+msgstr ""
 
-#: documents/templates/registration/password_reset_confirm.html:50
-msgid "Confirm Password"
-msgstr "Confirmar contrasenya"
-
-#: documents/templates/registration/password_reset_confirm.html:61
-msgid "Change my password"
-msgstr "Canvia contrasenya"
-
-#: documents/templates/registration/password_reset_confirm.html:65
-msgid "request a new password reset"
-msgstr "sol·licitar restabliment de contrasenya"
-
-#: documents/templates/registration/password_reset_done.html:14
-msgid "Paperless-ngx reset password sent"
-msgstr "S'ha enviat el restabliment de contrasenya"
-
-#: documents/templates/registration/password_reset_done.html:40
-msgid "Check your inbox."
-msgstr "Reviseu el correu."
-
-#: documents/templates/registration/password_reset_done.html:41
-msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
-msgstr "Enviat per correu electrònic instruccions per configurar la vostra contrasenya. Hauríeu de rebre el correu electrònic en breu!"
-
-#: documents/templates/registration/password_reset_form.html:14
-msgid "Paperless-ngx reset password request"
-msgstr "Sol·licitud de restabliment de la contrasenya"
-
-#: documents/templates/registration/password_reset_form.html:41
-msgid "Enter your email address below, and we'll email instructions for setting a new one."
-msgstr "Introduïu la vostra adreça de correu electrònic a continuació i us enviarem les instruccions per configurar-ne una de nova."
-
-#: documents/templates/registration/password_reset_form.html:44
-msgid "An error occurred. Please try again."
-msgstr "Error. Prova de nou."
-
-#: documents/templates/registration/password_reset_form.html:47
-msgid "Email"
-msgstr "Email"
-
-#: documents/templates/registration/password_reset_form.html:54
-msgid "Send me instructions!"
-msgstr "Enviar instruccions"
+#: documents/templates/socialaccount/signup.html:72
+msgid "Sign up"
+msgstr ""
 
 #: documents/validators.py:17
 #, python-brace-format
@@ -929,299 +956,311 @@ msgstr "No es pot analitzar l'URI {value},"
 msgid "Paperless"
 msgstr "Paperless"
 
-#: paperless/models.py:25
+#: paperless/models.py:26
 msgid "pdf"
 msgstr "pdf"
 
-#: paperless/models.py:26
+#: paperless/models.py:27
 msgid "pdfa"
 msgstr "pdfa"
 
-#: paperless/models.py:27
+#: paperless/models.py:28
 msgid "pdfa-1"
 msgstr "pdfa-1"
 
-#: paperless/models.py:28
+#: paperless/models.py:29
 msgid "pdfa-2"
 msgstr "pdfa-2"
 
-#: paperless/models.py:29
+#: paperless/models.py:30
 msgid "pdfa-3"
 msgstr "pdfa-3"
 
-#: paperless/models.py:38
+#: paperless/models.py:39
 msgid "skip"
 msgstr "skip"
 
-#: paperless/models.py:39
+#: paperless/models.py:40
 msgid "redo"
 msgstr "redo"
 
-#: paperless/models.py:40
+#: paperless/models.py:41
 msgid "force"
 msgstr "forçar"
 
-#: paperless/models.py:41
+#: paperless/models.py:42
 msgid "skip_noarchive"
 msgstr "skip_noarchive"
 
-#: paperless/models.py:49
+#: paperless/models.py:50
 msgid "never"
 msgstr "mai"
 
-#: paperless/models.py:50
+#: paperless/models.py:51
 msgid "with_text"
 msgstr "with_text"
 
-#: paperless/models.py:51
+#: paperless/models.py:52
 msgid "always"
 msgstr "sempre"
 
-#: paperless/models.py:59
+#: paperless/models.py:60
 msgid "clean"
 msgstr "neteja"
 
-#: paperless/models.py:60
+#: paperless/models.py:61
 msgid "clean-final"
 msgstr "clean-final"
 
-#: paperless/models.py:61
+#: paperless/models.py:62
 msgid "none"
 msgstr "cap"
 
-#: paperless/models.py:69
+#: paperless/models.py:70
 msgid "LeaveColorUnchanged"
 msgstr "DeixarColorSenseCanviar"
 
-#: paperless/models.py:70
+#: paperless/models.py:71
 msgid "RGB"
 msgstr "RGB"
 
-#: paperless/models.py:71
+#: paperless/models.py:72
 msgid "UseDeviceIndependentColor"
 msgstr "EmprarColordispositiuIndependent"
 
-#: paperless/models.py:72
+#: paperless/models.py:73
 msgid "Gray"
 msgstr "Gris"
 
-#: paperless/models.py:73
+#: paperless/models.py:74
 msgid "CMYK"
 msgstr "CMYK"
 
-#: paperless/models.py:82
+#: paperless/models.py:83
 msgid "Sets the output PDF type"
 msgstr "Estableix tipus de sortida PDF"
 
-#: paperless/models.py:94
+#: paperless/models.py:95
 msgid "Do OCR from page 1 to this value"
 msgstr "OCR des de pàgina 1 fins aquest valor"
 
-#: paperless/models.py:100
+#: paperless/models.py:101
 msgid "Do OCR using these languages"
 msgstr "Feu OCR utilitzant aquests idiomes"
 
-#: paperless/models.py:107
+#: paperless/models.py:108
 msgid "Sets the OCR mode"
 msgstr "Estableix el mode OCR"
 
-#: paperless/models.py:115
+#: paperless/models.py:116
 msgid "Controls the generation of an archive file"
 msgstr "Controls de generació d'arxiu arxivat"
 
-#: paperless/models.py:123
+#: paperless/models.py:124
 msgid "Sets image DPI fallback value"
 msgstr "Estableix DPI d'imatge per defecte"
 
-#: paperless/models.py:130
+#: paperless/models.py:131
 msgid "Controls the unpaper cleaning"
 msgstr "Controla la neteja sense paper"
 
-#: paperless/models.py:137
+#: paperless/models.py:138
 msgid "Enables deskew"
 msgstr "Habilita deskew"
 
-#: paperless/models.py:140
+#: paperless/models.py:141
 msgid "Enables page rotation"
 msgstr "Habilita la rotació de pàgines"
 
-#: paperless/models.py:145
+#: paperless/models.py:146
 msgid "Sets the threshold for rotation of pages"
 msgstr "Estableix el llindar de rotació de pàgines"
 
-#: paperless/models.py:151
+#: paperless/models.py:152
 msgid "Sets the maximum image size for decompression"
 msgstr "Estableix la mida màxima de la imatge per a la descompressió"
 
-#: paperless/models.py:157
+#: paperless/models.py:158
 msgid "Sets the Ghostscript color conversion strategy"
 msgstr "Estableix l'estratègia de conversió de color de Ghostscript"
 
-#: paperless/models.py:165
+#: paperless/models.py:166
 msgid "Adds additional user arguments for OCRMyPDF"
 msgstr "Afegeix arguments d'usuari addicionals per a OCRMyPDF"
 
-#: paperless/models.py:170
+#: paperless/models.py:171
+msgid "Application title"
+msgstr "Títol Aplicació"
+
+#: paperless/models.py:178
+msgid "Application logo"
+msgstr "Logo Aplicació"
+
+#: paperless/models.py:188
 msgid "paperless application settings"
 msgstr "configuració de l'aplicació paperless"
 
-#: paperless/settings.py:601
+#: paperless/settings.py:642
 msgid "English (US)"
 msgstr "English (US)"
 
-#: paperless/settings.py:602
+#: paperless/settings.py:643
 msgid "Arabic"
 msgstr "Àrab"
 
-#: paperless/settings.py:603
+#: paperless/settings.py:644
 msgid "Afrikaans"
 msgstr "Africà"
 
-#: paperless/settings.py:604
+#: paperless/settings.py:645
 msgid "Belarusian"
 msgstr "Bielorús"
 
-#: paperless/settings.py:605
+#: paperless/settings.py:646
 msgid "Bulgarian"
 msgstr "Búlgar"
 
-#: paperless/settings.py:606
+#: paperless/settings.py:647
 msgid "Catalan"
 msgstr "Català"
 
-#: paperless/settings.py:607
+#: paperless/settings.py:648
 msgid "Czech"
 msgstr "Txec"
 
-#: paperless/settings.py:608
+#: paperless/settings.py:649
 msgid "Danish"
 msgstr "Danès"
 
-#: paperless/settings.py:609
+#: paperless/settings.py:650
 msgid "German"
 msgstr "Alemany"
 
-#: paperless/settings.py:610
+#: paperless/settings.py:651
 msgid "Greek"
 msgstr "Grec"
 
-#: paperless/settings.py:611
+#: paperless/settings.py:652
 msgid "English (GB)"
 msgstr "Anglès (GB)"
 
-#: paperless/settings.py:612
+#: paperless/settings.py:653
 msgid "Spanish"
 msgstr "Espanyol"
 
-#: paperless/settings.py:613
+#: paperless/settings.py:654
 msgid "Finnish"
 msgstr "Finès"
 
-#: paperless/settings.py:614
+#: paperless/settings.py:655
 msgid "French"
 msgstr "Francès"
 
-#: paperless/settings.py:615
+#: paperless/settings.py:656
 msgid "Hungarian"
 msgstr "Hongarès"
 
-#: paperless/settings.py:616
+#: paperless/settings.py:657
 msgid "Italian"
 msgstr "Italià"
 
-#: paperless/settings.py:617
+#: paperless/settings.py:658
+msgid "Japanese"
+msgstr "Japonès"
+
+#: paperless/settings.py:659
 msgid "Luxembourgish"
 msgstr "Luxemburguès"
 
-#: paperless/settings.py:618
+#: paperless/settings.py:660
 msgid "Norwegian"
 msgstr "Noruec"
 
-#: paperless/settings.py:619
+#: paperless/settings.py:661
 msgid "Dutch"
 msgstr "Holandès"
 
-#: paperless/settings.py:620
+#: paperless/settings.py:662
 msgid "Polish"
 msgstr "Polac"
 
-#: paperless/settings.py:621
+#: paperless/settings.py:663
 msgid "Portuguese (Brazil)"
 msgstr "Portuguès (BZ)"
 
-#: paperless/settings.py:622
+#: paperless/settings.py:664
 msgid "Portuguese"
 msgstr "Portuguès"
 
-#: paperless/settings.py:623
+#: paperless/settings.py:665
 msgid "Romanian"
 msgstr "Romanès"
 
-#: paperless/settings.py:624
+#: paperless/settings.py:666
 msgid "Russian"
 msgstr "Rus"
 
-#: paperless/settings.py:625
+#: paperless/settings.py:667
 msgid "Slovak"
 msgstr "Eslovac"
 
-#: paperless/settings.py:626
+#: paperless/settings.py:668
 msgid "Slovenian"
 msgstr "Eslovè"
 
-#: paperless/settings.py:627
+#: paperless/settings.py:669
 msgid "Serbian"
 msgstr "Serbi"
 
-#: paperless/settings.py:628
+#: paperless/settings.py:670
 msgid "Swedish"
 msgstr "Suec"
 
-#: paperless/settings.py:629
+#: paperless/settings.py:671
 msgid "Turkish"
 msgstr "Turc"
 
-#: paperless/settings.py:630
+#: paperless/settings.py:672
 msgid "Ukrainian"
 msgstr "Ucranià"
 
-#: paperless/settings.py:631
+#: paperless/settings.py:673
 msgid "Chinese Simplified"
 msgstr "Xinès Simplificat"
 
-#: paperless/urls.py:205
+#: paperless/urls.py:224
 msgid "Paperless-ngx administration"
 msgstr "Administració Paperless-ngx"
 
-#: paperless_mail/admin.py:41
+#: paperless_mail/admin.py:39
 msgid "Authentication"
 msgstr "Autentificació"
 
-#: paperless_mail/admin.py:44
+#: paperless_mail/admin.py:42
 msgid "Advanced settings"
 msgstr "Opcions avançades"
 
-#: paperless_mail/admin.py:60
+#: paperless_mail/admin.py:58
 msgid "Filter"
 msgstr "Filtre"
 
-#: paperless_mail/admin.py:63
+#: paperless_mail/admin.py:61
 msgid "Paperless will only process mails that match ALL of the filters given below."
 msgstr "Només es processaran els correus que coincideixin amb TOTS els filtres indicats."
 
-#: paperless_mail/admin.py:80
+#: paperless_mail/admin.py:78
 msgid "Actions"
 msgstr "Accions"
 
-#: paperless_mail/admin.py:83
+#: paperless_mail/admin.py:81
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
 msgstr "Acció aplicada al correu. Aquesta acció només es realitza quan el cos del correu o els fitxers adjunts s'han consumit."
 
-#: paperless_mail/admin.py:91
+#: paperless_mail/admin.py:89
 msgid "Metadata"
 msgstr "Matadades"
 
-#: paperless_mail/admin.py:94
+#: paperless_mail/admin.py:92
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
 msgstr "Assigna metadades als documents consumits d'aquesta regla automàticament. Si no assigneu etiquetes, tipus o corresponsals aquí, es processaran totes les regles de concordança que hàgiu definit."
 
