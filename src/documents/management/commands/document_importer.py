@@ -243,9 +243,9 @@ class Command(BaseCommand):
                     ) from e
 
     def _import_files_from_manifest(self, progress_bar_disable):
-        os.makedirs(settings.ORIGINALS_DIR, exist_ok=True)
-        os.makedirs(settings.THUMBNAIL_DIR, exist_ok=True)
-        os.makedirs(settings.ARCHIVE_DIR, exist_ok=True)
+        settings.ORIGINALS_DIR.mkdir(parents=True, exist_ok=True)
+        settings.THUMBNAIL_DIR.mkdir(parents=True, exist_ok=True)
+        settings.ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
 
         self.stdout.write("Copy files into paperless...")
 
