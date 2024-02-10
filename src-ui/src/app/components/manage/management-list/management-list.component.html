@@ -2,8 +2,11 @@
   <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()" [hidden]="selectedObjects.size === 0">
     <i-bs  name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
     </button>
-    <button type="button" class="btn btn-sm btn-outline-primary me-5" (click)="setPermissions()" [disabled]="!userOwnsAll || selectedObjects.size === 0">
+    <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="setPermissions()" [disabled]="!userOwnsAll || selectedObjects.size === 0">
       <i-bs name="person-fill-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-danger me-5" (click)="delete()" [disabled]="!userOwnsAll || selectedObjects.size === 0">
+      <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
     </button>
     <button type="button" class="btn btn-sm btn-outline-primary" (click)="openCreateDialog()" *pngxIfPermissions="{ action: PermissionAction.Add, type: permissionType }">
       <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Create</ng-container>
@@ -85,33 +88,39 @@
                 <div class="btn-group d-none d-sm-block">
                   <button class="btn btn-sm btn-outline-secondary" (click)="filterDocuments(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
                     <i-bs width="1em" height="1em" name="filter"></i-bs>&nbsp;<ng-container i18n>Documents</ng-container>
-                    </button>
-                    <button class="btn btn-sm btn-outline-secondary" (click)="openEditDialog(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }" [disabled]="!userCanEdit(object)">
-                      <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
-                      </button>
-                      <button class="btn btn-sm btn-outline-danger" (click)="openDeleteDialog(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }" [disabled]="!userCanDelete(object)">
-                        <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-
-          @if (!isLoading) {
-            <div class="d-flex mb-2">
-              @if (collectionSize > 0) {
-                <div>
-                  <ng-container i18n>{collectionSize, plural, =1 {One {{typeName}}} other {{{collectionSize || 0}} total {{typeNamePlural}}}}</ng-container>
-                  @if (selectedObjects.size > 0) {
-                    &nbsp;({{selectedObjects.size}} selected)
-                  }
+                  </button>
+                  <button class="btn btn-sm btn-outline-secondary" (click)="openEditDialog(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }" [disabled]="!userCanEdit(object)">
+                    <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
+                  </button>
+                  <pngx-confirm-button
+                    label="Delete"
+                    i18n-label
+                    (confirm)="deleteObject(object)"
+                    *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }"
+                    [disabled]="!userCanDelete(object)"
+                    buttonClasses=" btn-sm btn-outline-danger"
+                    iconName="trash">
+                  </pngx-confirm-button>
                 </div>
-              }
-              @if (collectionSize > 20) {
-                <ngb-pagination class="ms-auto" [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page" [maxSize]="5" (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
-              }
-            </div>
+              </td>
+            </tr>
           }
+        </tbody>
+      </table>
+    </div>
+
+    @if (!isLoading) {
+      <div class="d-flex mb-2">
+        @if (collectionSize > 0) {
+          <div>
+            <ng-container i18n>{collectionSize, plural, =1 {One {{typeName}}} other {{{collectionSize || 0}} total {{typeNamePlural}}}}</ng-container>
+            @if (selectedObjects.size > 0) {
+              &nbsp;({{selectedObjects.size}} selected)
+            }
+          </div>
+        }
+        @if (collectionSize > 20) {
+          <ngb-pagination class="ms-auto" [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page" [maxSize]="5" (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
+        }
+      </div>
+    }

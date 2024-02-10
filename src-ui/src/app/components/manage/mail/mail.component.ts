@@ -200,22 +200,27 @@ export class MailComponent
     const dialog: PermissionsDialogComponent =
       modal.componentInstance as PermissionsDialogComponent
     dialog.object = object
-    modal.componentInstance.confirmClicked.subscribe((permissions) => {
-      modal.componentInstance.buttonsEnabled = false
-      const service: AbstractPaperlessService<MailRule | MailAccount> =
-        'account' in object ? this.mailRuleService : this.mailAccountService
-      object.owner = permissions['owner']
-      object['set_permissions'] = permissions['set_permissions']
-      service.patch(object).subscribe({
-        next: () => {
-          this.toastService.showInfo($localize`Permissions updated`)
-          modal.close()
-        },
-        error: (e) => {
-          this.toastService.showError($localize`Error updating permissions`, e)
-        },
-      })
-    })
+    modal.componentInstance.confirmClicked.subscribe(
+      ({ permissions, merge }) => {
+        modal.componentInstance.buttonsEnabled = false
+        const service: AbstractPaperlessService<MailRule | MailAccount> =
+          'account' in object ? this.mailRuleService : this.mailAccountService
+        object.owner = permissions['owner']
+        object['set_permissions'] = permissions['set_permissions']
+        service.patch(object).subscribe({
+          next: () => {
+            this.toastService.showInfo($localize`Permissions updated`)
+            modal.close()
+          },
+          error: (e) => {
+            this.toastService.showError(
+              $localize`Error updating permissions`,
+              e
+            )
+          },
+        })
+      }
+    )
   }
 
   userCanEdit(obj: ObjectWithPermissions): boolean {

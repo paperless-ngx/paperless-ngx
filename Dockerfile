@@ -29,7 +29,7 @@ COPY Pipfile* ./
 
 RUN set -eux \
   && echo "Installing pipenv" \
-    && python3 -m pip install --no-cache-dir --upgrade pipenv==2023.11.15 \
+    && python3 -m pip install --no-cache-dir --upgrade pipenv==2023.12.1 \
   && echo "Generating requirement.txt" \
     && pipenv requirements > requirements.txt
 
@@ -38,8 +38,6 @@ RUN set -eux \
 # Comments:
 #  - Don't leave anything extra in here
 FROM docker.io/python:3.11-slim-bookworm as main-app
-
-ENV PYTHONWARNINGS="ignore:::django.http.response:517"
 
 LABEL org.opencontainers.image.authors="paperless-ngx team <hello@paperless-ngx.com>"
 LABEL org.opencontainers.image.documentation="https://docs.paperless-ngx.com/"
@@ -56,6 +54,12 @@ ARG TARGETARCH
 ARG JBIG2ENC_VERSION=0.29
 ARG QPDF_VERSION=11.6.4
 ARG GS_VERSION=10.02.1
+
+# Set Python environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    # Ignore warning from Whitenoise
+    PYTHONWARNINGS="ignore:::django.http.response:517"
 
 #
 # Begin installation and configuration

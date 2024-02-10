@@ -258,7 +258,9 @@ def consumable_document_matches_workflow(
     reason = ""
 
     # Document source vs trigger source
-    if document.source not in [int(x) for x in list(trigger.sources)]:
+    if len(trigger.sources) > 0 and document.source not in [
+        int(x) for x in list(trigger.sources)
+    ]:
         reason = (
             f"Document source {document.source.name} not in"
             f" {[DocumentSource(int(x)).name for x in trigger.sources]}",

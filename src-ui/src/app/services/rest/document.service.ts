@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { Document } from 'src/app/data/document'
 import { DocumentMetadata } from 'src/app/data/document-metadata'
 import { AbstractPaperlessService } from './abstract-paperless-service'
-import { HttpClient, HttpParams } from '@angular/common/http'
+import { HttpClient } from '@angular/common/http'
 import { Observable } from 'rxjs'
 import { Results } from 'src/app/data/results'
 import { FilterRule } from 'src/app/data/filter-rule'
@@ -13,6 +13,13 @@ import { TagService } from './tag.service'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
 import { queryParamsFromFilterRules } from '../../utils/query-params'
 import { StoragePathService } from './storage-path.service'
+import {
+  PermissionAction,
+  PermissionType,
+  PermissionsService,
+} from '../permissions.service'
+import { SettingsService } from '../settings.service'
+import { SETTINGS, SETTINGS_KEYS } from 'src/app/data/ui-settings'
 
 export const DOCUMENT_SORT_FIELDS = [
   { field: 'archive_serial_number', name: $localize`ASN` },
@@ -57,21 +64,41 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     private correspondentService: CorrespondentService,
     private documentTypeService: DocumentTypeService,
     private tagService: TagService,
-    private storagePathService: StoragePathService
+    private storagePathService: StoragePathService,
+    private permissionsService: PermissionsService,
+    private settingsService: SettingsService
   ) {
     super(http, 'documents')
   }
 
   addObservablesToDocument(doc: Document) {
-    if (doc.correspondent) {
+    if (
+      doc.correspondent &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Correspondent
+      )
+    ) {
       doc.correspondent$ = this.correspondentService.getCached(
         doc.correspondent
       )
     }
-    if (doc.document_type) {
+    if (
+      doc.document_type &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.DocumentType
+      )
+    ) {
       doc.document_type$ = this.documentTypeService.getCached(doc.document_type)
     }
-    if (doc.tags) {
+    if (
+      doc.tags &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Tag
+      )
+    ) {
       doc.tags$ = this.tagService
         .getCachedMany(doc.tags)
         .pipe(
@@ -80,7 +107,13 @@ export class DocumentService extends AbstractPaperlessService<Document> {
           )
         )
     }
-    if (doc.storage_path) {
+    if (
+      doc.storage_path &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.StoragePath
+      )
+    ) {
       doc.storage_path$ = this.storagePathService.getCached(doc.storage_path)
     }
     return doc
@@ -150,6 +183,9 @@ export class DocumentService extends AbstractPaperlessService<Document> {
   update(o: Document): Observable<Document> {
     // we want to only set created_date
     o.created = undefined
+    o.remove_inbox_tags = this.settingsService.get(
+      SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS
+    )
     return super.update(o)
   }
 

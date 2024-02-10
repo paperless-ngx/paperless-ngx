@@ -38,6 +38,7 @@ import { PageHeaderComponent } from '../../common/page-header/page-header.compon
 import { SettingsComponent } from './settings.component'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
 
 const savedViews = [
   { id: 1, name: 'view1', show_in_sidebar: true, show_on_dashboard: true },
@@ -83,6 +84,7 @@ describe('SettingsComponent', () => {
         PermissionsUserComponent,
         PermissionsGroupComponent,
         IfOwnerDirective,
+        ConfirmButtonComponent,
       ],
       providers: [CustomDatePipe, DatePipe, PermissionsGuard],
       imports: [
@@ -289,7 +291,7 @@ describe('SettingsComponent', () => {
     expect(toastErrorSpy).toHaveBeenCalled()
     expect(storeSpy).toHaveBeenCalled()
     expect(appearanceSettingsSpy).not.toHaveBeenCalled()
-    expect(setSpy).toHaveBeenCalledTimes(24)
+    expect(setSpy).toHaveBeenCalledTimes(25)
 
     // succeed
     storeSpy.mockReturnValueOnce(of(true))

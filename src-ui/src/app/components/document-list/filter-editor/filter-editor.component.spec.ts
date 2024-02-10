@@ -1,5 +1,8 @@
 import { DatePipe } from '@angular/common'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing'
 import {
   ComponentFixture,
   fakeAsync,
@@ -78,6 +81,11 @@ import {
 } from '../../common/permissions-filter-dropdown/permissions-filter-dropdown.component'
 import { FilterEditorComponent } from './filter-editor.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import {
+  PermissionType,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
+import { environment } from 'src/environments/environment'
 
 const tags: Tag[] = [
   {
@@ -135,6 +143,8 @@ describe('FilterEditorComponent', () => {
   let fixture: ComponentFixture<FilterEditorComponent>
   let documentService: DocumentService
   let settingsService: SettingsService
+  let permissionsService: PermissionsService
+  let httpTestingController: HttpTestingController
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
@@ -199,12 +209,39 @@ describe('FilterEditorComponent', () => {
     documentService = TestBed.inject(DocumentService)
     settingsService = TestBed.inject(SettingsService)
     settingsService.currentUser = users[0]
+    permissionsService = TestBed.inject(PermissionsService)
+    jest
+      .spyOn(permissionsService, 'currentUserCan')
+      .mockImplementation((action, type) => {
+        // a little hack-ish, permissions filter dropdown causes reactive forms issue due to ng-select
+        // trying to apply formControlName
+        return type !== PermissionType.User
+      })
+    httpTestingController = TestBed.inject(HttpTestingController)
     fixture = TestBed.createComponent(FilterEditorComponent)
     component = fixture.componentInstance
     component.filterRules = []
     fixture.detectChanges()
     tick()
   }))
+
+  it('should not attempt to retrieve objects if user does not have permissions', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReset()
+    jest
+      .spyOn(permissionsService, 'currentUserCan')
+      .mockImplementation((action, type) => false)
+    component.ngOnInit()
+    httpTestingController.expectNone(`${environment.apiBaseUrl}documents/tags/`)
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/correspondents/`
+    )
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/document_types/`
+    )
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/storage_paths/`
+    )
+  })
 
   // SET filterRules
 

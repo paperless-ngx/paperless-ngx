@@ -222,3 +222,118 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         args, _ = bulk_update_mock.call_args
 
         self.assertCountEqual([document.pk], args[0])
+
+
+class TestBulkEditObjects(APITestCase):
+    # See test_api_permissions.py for bulk tests on permissions
+    def setUp(self):
+        super().setUp()
+
+        self.temp_admin = User.objects.create_superuser(username="temp_admin")
+        self.client.force_authenticate(user=self.temp_admin)
+
+        self.t1 = Tag.objects.create(name="t1")
+        self.t2 = Tag.objects.create(name="t2")
+        self.c1 = Correspondent.objects.create(name="c1")
+        self.dt1 = DocumentType.objects.create(name="dt1")
+        self.sp1 = StoragePath.objects.create(name="sp1")
+        self.user1 = User.objects.create(username="user1")
+        self.user2 = User.objects.create(username="user2")
+        self.user3 = User.objects.create(username="user3")
+
+    def test_bulk_objects_delete(self):
+        """
+        GIVEN:
+            - Existing objects
+        WHEN:
+            - bulk_edit_objects API endpoint is called with delete operation
+        THEN:
+            - Objects are deleted
+        """
+        response = self.client.post(
+            "/api/bulk_edit_objects/",
+            json.dumps(
+                {
+                    "objects": [self.t1.id, self.t2.id],
+                    "object_type": "tags",
+                    "operation": "delete",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Tag.objects.count(), 0)
+
+        response = self.client.post(
+            "/api/bulk_edit_objects/",
+            json.dumps(
+                {
+                    "objects": [self.c1.id],
+                    "object_type": "correspondents",
+                    "operation": "delete",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Correspondent.objects.count(), 0)
+
+        response = self.client.post(
+            "/api/bulk_edit_objects/",
+            json.dumps(
+                {
+                    "objects": [self.dt1.id],
+                    "object_type": "document_types",
+                    "operation": "delete",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(DocumentType.objects.count(), 0)
+
+        response = self.client.post(
+            "/api/bulk_edit_objects/",
+            json.dumps(
+                {
+                    "objects": [self.sp1.id],
+                    "object_type": "storage_paths",
+                    "operation": "delete",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(StoragePath.objects.count(), 0)
+
+    def test_bulk_edit_object_permissions_insufficient_perms(self):
+        """
+        GIVEN:
+            - Objects owned by user other than logged in user
+        WHEN:
+            - bulk_edit_objects API endpoint is called with delete operation
+        THEN:
+            - User is not able to delete objects
+        """
+        self.t1.owner = User.objects.get(username="temp_admin")
+        self.t1.save()
+        self.client.force_authenticate(user=self.user1)
+
+        response = self.client.post(
+            "/api/bulk_edit_objects/",
+            json.dumps(
+                {
+                    "objects": [self.t1.id, self.t2.id],
+                    "object_type": "tags",
+                    "operation": "delete",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.content, b"Insufficient permissions")

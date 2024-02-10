@@ -233,10 +233,10 @@ class Consumer(LoggingMixin):
         """
         Ensure all required directories exist before attempting to use them
         """
-        os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
-        os.makedirs(settings.THUMBNAIL_DIR, exist_ok=True)
-        os.makedirs(settings.ORIGINALS_DIR, exist_ok=True)
-        os.makedirs(settings.ARCHIVE_DIR, exist_ok=True)
+        settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
+        settings.THUMBNAIL_DIR.mkdir(parents=True, exist_ok=True)
+        settings.ORIGINALS_DIR.mkdir(parents=True, exist_ok=True)
+        settings.ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
 
     def pre_check_asn_value(self):
         """

@@ -1,0 +1,22 @@
+<button
+    type="button"
+    class="btn {{buttonClasses}}"
+    (click)="onClick($event)"
+    [disabled]="disabled"
+    [ngbPopover]="popoverContent"
+    [autoClose]="true"
+    (hidden)="confirming = false"
+    #popover="ngbPopover"
+    popoverClass="popover-slim"
+>
+    @if (iconName) {
+        <i-bs [class.me-1]="label" name="{{iconName}}"></i-bs>
+    }
+    <ng-container>{{label}}</ng-container>
+</button>
+
+<ng-template #popoverContent>
+    <div>
+        {{confirmMessage}}&nbsp;<button class="btn btn-link btn-sm text-danger p-0 m-0 lh-1" type="button" (click)="onConfirm($event)">Yes</button>
+    </div>
+</ng-template>

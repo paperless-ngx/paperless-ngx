@@ -1,15 +1,18 @@
 from datetime import timedelta
 from pathlib import Path
+from typing import TYPE_CHECKING
 from unittest import mock
 
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
-from django.db.models import QuerySet
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
 from rest_framework.test import APITestCase
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
 
 from documents import tasks
 from documents.data_models import ConsumableDocument
