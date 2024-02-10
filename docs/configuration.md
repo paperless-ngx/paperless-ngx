@@ -454,11 +454,12 @@ applications.
 
         This will allow authentication by simply adding a
         `Remote-User: <username>` header to a request. Use with care! You
-        especially *must:   ensure that any such header is not passed from
-        your proxy server to paperless.
+        especially *must* ensure that any such header is not passed from
+        external requests to your reverse-proxy to paperless (that would
+        effectively bypass all authentication).
 
-        If you're exposing paperless to the internet directly, do not use
-        this.
+        If you're exposing paperless to the internet directly (i.e.
+        without a reverse proxy), do not use this.
 
         Also see the warning [in the official documentation](https://docs.djangoproject.com/en/4.1/howto/auth-remote-user/#configuration).
 
@@ -1107,8 +1108,10 @@ system changes with `inotify`.
 
 #### [`PAPERLESS_CONSUMER_POLLING_RETRY_COUNT=<num>`](#PAPERLESS_CONSUMER_POLLING_RETRY_COUNT) {#PAPERLESS_CONSUMER_POLLING_RETRY_COUNT}
 
-: If consumer polling is enabled, sets the number of times paperless
-will check for a file to remain unmodified.
+: If consumer polling is enabled, sets the maximum number of times
+paperless will check for a file to remain unmodified. If a file's
+modification time and size are identical for two consecutive checks, it
+will be consumed.
 
     Defaults to 5.
 

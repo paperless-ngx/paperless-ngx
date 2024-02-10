@@ -904,7 +904,7 @@ class PostDocumentView(GenericAPIView):
 
         t = int(mktime(datetime.now().timetuple()))
 
-        os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
+        settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
 
         temp_file_path = Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR)) / Path(
             pathvalidate.sanitize_filename(doc_name),
@@ -1136,7 +1136,7 @@ class BulkDownloadView(GenericAPIView):
         content = serializer.validated_data.get("content")
         follow_filename_format = serializer.validated_data.get("follow_formatting")
 
-        os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
+        settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
         temp = tempfile.NamedTemporaryFile(
             dir=settings.SCRATCH_DIR,
             suffix="-compressed-archive",
