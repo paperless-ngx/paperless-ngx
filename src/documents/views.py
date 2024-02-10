@@ -2,6 +2,7 @@ import itertools
 import json
 import logging
 import os
+import platform
 import re
 import tempfile
 import urllib
@@ -15,6 +16,9 @@ from urllib.parse import quote
 import pathvalidate
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db import connections
+from django.db.migrations.loader import MigrationLoader
+from django.db.migrations.recorder import MigrationRecorder
 from django.db.models import Case
 from django.db.models import Count
 from django.db.models import IntegerField
@@ -40,6 +44,7 @@ from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from langdetect import detect
 from packaging import version as packaging_version
+from redis import Redis
 from rest_framework import parsers
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
@@ -1539,3 +1544,74 @@ class CustomFieldViewSet(ModelViewSet):
     model = CustomField
 
     queryset = CustomField.objects.all().order_by("-created")
+
+
+class SystemStatusView(GenericAPIView, PassUserMixin):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        if not request.user.has_perm("admin.view_logentry"):
+            return HttpResponseForbidden("Insufficient permissions")
+
+        current_version = version.__full_version_str__
+
+        media_stats = os.statvfs(settings.MEDIA_ROOT)
+
+        db_conn = connections["default"]
+        db_url = db_conn.settings_dict["NAME"]
+        loader = MigrationLoader(connection=db_conn)
+        all_migrations = [f"{app}.{name}" for app, name in loader.graph.nodes]
+        applied_migrations = [
+            f"{m.app}.{m.name}"
+            for m in MigrationRecorder.Migration.objects.all().order_by("id")
+        ]
+        db_error = None
+        try:
+            db_conn.cursor()
+            db_status = "OK"
+        except Exception as e:
+            db_status = "ERROR"
+            db_error = str(e)
+
+        redis_url = settings._CELERY_REDIS_URL
+        redis_error = None
+        with Redis.from_url(url=redis_url) as client:
+            try:
+                client.ping()
+                redis_status = "OK"
+            except Exception as e:
+                redis_status = "ERROR"
+                redis_error = str(e)
+
+        return Response(
+            {
+                "pngx_version": current_version,
+                "server_os": platform.platform(),
+                "install_type": (
+                    "containerized"
+                    if os.environ.get("PNGX_CONTAINERIZED") == "1"
+                    else "bare-metal"
+                ),
+                "storage": {
+                    "total": media_stats.f_frsize * media_stats.f_blocks,
+                    "available": media_stats.f_frsize * media_stats.f_bavail,
+                },
+                "database": {
+                    "type": db_conn.vendor,
+                    "url": db_url,
+                    "status": db_status,
+                    "error": db_error,
+                    "migration_status": {
+                        "latest_migration": applied_migrations[-1],
+                        "unapplied_migrations": [
+                            m for m in all_migrations if m not in applied_migrations
+                        ],
+                    },
+                },
+                "redis": {
+                    "url": redis_url,
+                    "status": redis_status,
+                    "error": redis_error,
+                },
+            },
+        )
