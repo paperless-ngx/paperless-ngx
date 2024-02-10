@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-05 21:26-0800\n"
-"PO-Revision-Date: 2024-01-21 12:08\n"
+"POT-Creation-Date: 2024-02-08 11:56-0800\n"
+"PO-Revision-Date: 2024-02-09 12:08\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -21,31 +21,31 @@ msgstr ""
 msgid "Documents"
 msgstr "ドキュメント"
 
-#: documents/models.py:36 documents/models.py:736
+#: documents/models.py:36 documents/models.py:739
 msgid "owner"
 msgstr "所有者"
 
-#: documents/models.py:53 documents/models.py:894
+#: documents/models.py:53 documents/models.py:897
 msgid "None"
 msgstr "なし"
 
-#: documents/models.py:54 documents/models.py:895
+#: documents/models.py:54 documents/models.py:898
 msgid "Any word"
 msgstr "いずれかの単語"
 
-#: documents/models.py:55 documents/models.py:896
+#: documents/models.py:55 documents/models.py:899
 msgid "All words"
 msgstr "すべての単語"
 
-#: documents/models.py:56 documents/models.py:897
+#: documents/models.py:56 documents/models.py:900
 msgid "Exact match"
 msgstr "完全一致"
 
-#: documents/models.py:57 documents/models.py:898
+#: documents/models.py:57 documents/models.py:901
 msgid "Regular expression"
 msgstr "正規表現"
 
-#: documents/models.py:58 documents/models.py:899
+#: documents/models.py:58 documents/models.py:902
 msgid "Fuzzy word"
 msgstr "あいまいな単語"
 
@@ -53,20 +53,20 @@ msgstr "あいまいな単語"
 msgid "Automatic"
 msgstr "自動"
 
-#: documents/models.py:62 documents/models.py:402 documents/models.py:1099
+#: documents/models.py:62 documents/models.py:397 documents/models.py:1102
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
 msgid "name"
 msgstr "名称"
 
-#: documents/models.py:64 documents/models.py:955
+#: documents/models.py:64 documents/models.py:958
 msgid "match"
 msgstr "マッチ"
 
-#: documents/models.py:67 documents/models.py:958
+#: documents/models.py:67 documents/models.py:961
 msgid "matching algorithm"
 msgstr "マッチングアルゴリズム"
 
-#: documents/models.py:72 documents/models.py:963
+#: documents/models.py:72 documents/models.py:966
 msgid "is insensitive"
 msgstr "大文字・小文字の区別なし"
 
@@ -130,7 +130,7 @@ msgstr "GNU Privacy Guard で暗号化"
 msgid "title"
 msgstr "タイトル"
 
-#: documents/models.py:171 documents/models.py:650
+#: documents/models.py:171 documents/models.py:653
 msgid "content"
 msgstr "コンテンツ"
 
@@ -158,8 +158,8 @@ msgstr "アーカイブのチェックサム"
 msgid "The checksum of the archived document."
 msgstr "アーカイブされたドキュメントのチェックサム"
 
-#: documents/models.py:205 documents/models.py:385 documents/models.py:656
-#: documents/models.py:694 documents/models.py:764 documents/models.py:801
+#: documents/models.py:205 documents/models.py:385 documents/models.py:659
+#: documents/models.py:697 documents/models.py:767 documents/models.py:804
 msgid "created"
 msgstr "作成日"
 
@@ -207,7 +207,7 @@ msgstr "アーカイブ番号"
 msgid "The position of this document in your physical document archive."
 msgstr "物理的なドキュメントアーカイブ内での、このドキュメントの位置"
 
-#: documents/models.py:279 documents/models.py:667 documents/models.py:721
+#: documents/models.py:279 documents/models.py:670 documents/models.py:724
 msgid "document"
 msgstr "ドキュメント"
 
@@ -255,527 +255,642 @@ msgstr "ログ"
 msgid "logs"
 msgstr "ログ"
 
-#: documents/models.py:399 documents/models.py:466
-msgid "saved view"
-msgstr "保存済みビュー"
-
 #: documents/models.py:400
-msgid "saved views"
-msgstr "保存済みビュー"
-
-#: documents/models.py:405
 msgid "show on dashboard"
 msgstr "ダッシュボードに表示"
 
-#: documents/models.py:408
+#: documents/models.py:403
 msgid "show in sidebar"
 msgstr "サイドバーに表示"
 
-#: documents/models.py:412
+#: documents/models.py:407
 msgid "sort field"
 msgstr "項目を並べ替え"
 
-#: documents/models.py:417
+#: documents/models.py:412
 msgid "sort reverse"
 msgstr "項目を逆順で並べ替え"
 
-#: documents/models.py:422
+#: documents/models.py:416 documents/models.py:469
+msgid "saved view"
+msgstr "保存済みビュー"
+
+#: documents/models.py:417
+msgid "saved views"
+msgstr "保存済みビュー"
+
+#: documents/models.py:425
 msgid "title contains"
 msgstr "タイトルが次のものを含む"
 
-#: documents/models.py:423
+#: documents/models.py:426
 msgid "content contains"
 msgstr "コンテンツが次のものを含む"
 
-#: documents/models.py:424
+#: documents/models.py:427
 msgid "ASN is"
 msgstr "ASN が"
 
-#: documents/models.py:425
+#: documents/models.py:428
 msgid "correspondent is"
 msgstr "担当が"
 
-#: documents/models.py:426
+#: documents/models.py:429
 msgid "document type is"
 msgstr "ドキュメントタイプが"
 
-#: documents/models.py:427
+#: documents/models.py:430
 msgid "is in inbox"
 msgstr "次のものが受信トレイにある"
 
-#: documents/models.py:428
+#: documents/models.py:431
 msgid "has tag"
 msgstr "次のタグがある"
 
-#: documents/models.py:429
+#: documents/models.py:432
 msgid "has any tag"
 msgstr "次のいずれかのタグがある"
 
-#: documents/models.py:430
+#: documents/models.py:433
 msgid "created before"
 msgstr "次の日付以前に作成"
 
-#: documents/models.py:431
+#: documents/models.py:434
 msgid "created after"
 msgstr "次の日付以降に作成"
 
-#: documents/models.py:432
+#: documents/models.py:435
 msgid "created year is"
 msgstr "作成年が"
 
-#: documents/models.py:433
+#: documents/models.py:436
 msgid "created month is"
 msgstr "作成月が"
 
-#: documents/models.py:434
+#: documents/models.py:437
 msgid "created day is"
 msgstr "作成日が"
 
-#: documents/models.py:435
+#: documents/models.py:438
 msgid "added before"
 msgstr "次の日付以前に追加"
 
-#: documents/models.py:436
+#: documents/models.py:439
 msgid "added after"
 msgstr "次の日付以降に追加"
 
-#: documents/models.py:437
+#: documents/models.py:440
 msgid "modified before"
 msgstr "次の日付以前に変更"
 
-#: documents/models.py:438
+#: documents/models.py:441
 msgid "modified after"
 msgstr "次の日付以降に変更"
 
-#: documents/models.py:439
+#: documents/models.py:442
 msgid "does not have tag"
 msgstr "次のタグがない"
 
-#: documents/models.py:440
+#: documents/models.py:443
 msgid "does not have ASN"
 msgstr "次の ASN でない"
 
-#: documents/models.py:441
+#: documents/models.py:444
 msgid "title or content contains"
 msgstr "タイトルまたはコンテンツに次のものを含む"
 
-#: documents/models.py:442
+#: documents/models.py:445
 msgid "fulltext query"
 msgstr "全文検索"
 
-#: documents/models.py:443
+#: documents/models.py:446
 msgid "more like this"
 msgstr "これと類似のもの"
 
-#: documents/models.py:444
+#: documents/models.py:447
 msgid "has tags in"
 msgstr "次のタグがある"
 
-#: documents/models.py:445
+#: documents/models.py:448
 msgid "ASN greater than"
 msgstr "ASN が次の値より大きい"
 
-#: documents/models.py:446
+#: documents/models.py:449
 msgid "ASN less than"
 msgstr "ASN が次の値より小さい"
 
-#: documents/models.py:447
+#: documents/models.py:450
 msgid "storage path is"
 msgstr "フォルダーが"
 
-#: documents/models.py:448
+#: documents/models.py:451
 msgid "has correspondent in"
 msgstr "次のものが担当"
 
-#: documents/models.py:449
+#: documents/models.py:452
 msgid "does not have correspondent in"
 msgstr "次のものが担当でない"
 
-#: documents/models.py:450
+#: documents/models.py:453
 msgid "has document type in"
 msgstr "次のドキュメントタイプがある"
 
-#: documents/models.py:451
+#: documents/models.py:454
 msgid "does not have document type in"
 msgstr "次のドキュメントタイプがない"
 
-#: documents/models.py:452
+#: documents/models.py:455
 msgid "has storage path in"
 msgstr "次のフォルダーがある"
 
-#: documents/models.py:453
+#: documents/models.py:456
 msgid "does not have storage path in"
 msgstr "次のフォルダーがない"
 
-#: documents/models.py:454
+#: documents/models.py:457
 msgid "owner is"
 msgstr "所有者が"
 
-#: documents/models.py:455
+#: documents/models.py:458
 msgid "has owner in"
 msgstr "所有者がいる"
 
-#: documents/models.py:456
+#: documents/models.py:459
 msgid "does not have owner"
 msgstr "次のものが所有者"
 
-#: documents/models.py:457
+#: documents/models.py:460
 msgid "does not have owner in"
 msgstr "次のものが所有者でない"
 
-#: documents/models.py:458
+#: documents/models.py:461
 msgid "has custom field value"
 msgstr "次のカスタム項目がある"
 
-#: documents/models.py:459
+#: documents/models.py:462
 msgid "is shared by me"
 msgstr "自分が共有した"
 
-#: documents/models.py:469
+#: documents/models.py:472
 msgid "rule type"
 msgstr "ルールタイプ"
 
-#: documents/models.py:471
+#: documents/models.py:474
 msgid "value"
 msgstr "値"
 
-#: documents/models.py:474
+#: documents/models.py:477
 msgid "filter rule"
 msgstr "フィルタルール"
 
-#: documents/models.py:475
+#: documents/models.py:478
 msgid "filter rules"
 msgstr "フィルタールール"
 
-#: documents/models.py:586
+#: documents/models.py:589
 msgid "Task ID"
 msgstr "タスク ID"
 
-#: documents/models.py:587
+#: documents/models.py:590
 msgid "Celery ID for the Task that was run"
 msgstr "実行されたタスクの Celery ID"
 
-#: documents/models.py:592
+#: documents/models.py:595
 msgid "Acknowledged"
 msgstr "承認"
 
-#: documents/models.py:593
+#: documents/models.py:596
 msgid "If the task is acknowledged via the frontend or API"
 msgstr "フロントエンドまたは API 経由でタスクが承認されている場合"
 
-#: documents/models.py:599
+#: documents/models.py:602
 msgid "Task Filename"
 msgstr "タスクのファイル名"
 
-#: documents/models.py:600
+#: documents/models.py:603
 msgid "Name of the file which the Task was run for"
 msgstr "タスクを実行したファイル名"
 
-#: documents/models.py:606
+#: documents/models.py:609
 msgid "Task Name"
 msgstr "タスク名"
 
-#: documents/models.py:607
+#: documents/models.py:610
 msgid "Name of the Task which was run"
 msgstr "実行されたタスク名"
 
-#: documents/models.py:614
+#: documents/models.py:617
 msgid "Task State"
 msgstr "タスクの状態"
 
-#: documents/models.py:615
+#: documents/models.py:618
 msgid "Current state of the task being run"
 msgstr "実行中のタスクの状態"
 
-#: documents/models.py:620
+#: documents/models.py:623
 msgid "Created DateTime"
 msgstr "作成日時"
 
-#: documents/models.py:621
+#: documents/models.py:624
 msgid "Datetime field when the task result was created in UTC"
 msgstr "タスクの結果が作成された UTC 日時"
 
-#: documents/models.py:626
+#: documents/models.py:629
 msgid "Started DateTime"
 msgstr "開始日時"
 
-#: documents/models.py:627
+#: documents/models.py:630
 msgid "Datetime field when the task was started in UTC"
 msgstr "タスクが開始された UTC 日時"
 
-#: documents/models.py:632
+#: documents/models.py:635
 msgid "Completed DateTime"
 msgstr "完了日時"
 
-#: documents/models.py:633
+#: documents/models.py:636
 msgid "Datetime field when the task was completed in UTC"
 msgstr "タスクが完了した UTC 日時"
 
-#: documents/models.py:638
+#: documents/models.py:641
 msgid "Result Data"
 msgstr "結果データ"
 
-#: documents/models.py:640
+#: documents/models.py:643
 msgid "The data returned by the task"
 msgstr "タスクが出力したデータ"
 
-#: documents/models.py:652
+#: documents/models.py:655
 msgid "Note for the document"
 msgstr "ドキュメントのメモ"
 
-#: documents/models.py:676
+#: documents/models.py:679
 msgid "user"
 msgstr "ユーザー"
 
-#: documents/models.py:681
+#: documents/models.py:684
 msgid "note"
 msgstr "メモ"
 
-#: documents/models.py:682
+#: documents/models.py:685
 msgid "notes"
 msgstr "メモ"
 
-#: documents/models.py:690
+#: documents/models.py:693
 msgid "Archive"
 msgstr "アーカイブ"
 
-#: documents/models.py:691
+#: documents/models.py:694
 msgid "Original"
 msgstr "原本"
 
-#: documents/models.py:702
+#: documents/models.py:705
 msgid "expiration"
 msgstr "有効期限"
 
-#: documents/models.py:709
+#: documents/models.py:712
 msgid "slug"
 msgstr "スラグ"
 
-#: documents/models.py:741
+#: documents/models.py:744
 msgid "share link"
 msgstr "共有リンク"
 
-#: documents/models.py:742
+#: documents/models.py:745
 msgid "share links"
 msgstr "共有リンク"
 
-#: documents/models.py:754
+#: documents/models.py:757
 msgid "String"
 msgstr "文字列"
 
-#: documents/models.py:755
+#: documents/models.py:758
 msgid "URL"
 msgstr "URL"
 
-#: documents/models.py:756
+#: documents/models.py:759
 msgid "Date"
 msgstr "日付"
 
-#: documents/models.py:757
+#: documents/models.py:760
 msgid "Boolean"
 msgstr "ブール値"
 
-#: documents/models.py:758
+#: documents/models.py:761
 msgid "Integer"
 msgstr "整数"
 
-#: documents/models.py:759
+#: documents/models.py:762
 msgid "Float"
 msgstr "浮動小数点数"
 
-#: documents/models.py:760
+#: documents/models.py:763
 msgid "Monetary"
 msgstr "通貨 (ドル)"
 
-#: documents/models.py:761
+#: documents/models.py:764
 msgid "Document Link"
 msgstr "ドキュメントリンク"
 
-#: documents/models.py:773
+#: documents/models.py:776
 msgid "data type"
 msgstr "データの種類"
 
-#: documents/models.py:781
+#: documents/models.py:784
 msgid "custom field"
 msgstr "カスタム項目"
 
-#: documents/models.py:782
+#: documents/models.py:785
 msgid "custom fields"
 msgstr "カスタム項目"
 
-#: documents/models.py:844
+#: documents/models.py:847
 msgid "custom field instance"
 msgstr "カスタム項目インスタンス"
 
-#: documents/models.py:845
+#: documents/models.py:848
 msgid "custom field instances"
 msgstr "カスタム項目インスタンス"
 
-#: documents/models.py:902
+#: documents/models.py:905
 msgid "Consumption Started"
 msgstr "利用開始時"
 
-#: documents/models.py:903
+#: documents/models.py:906
 msgid "Document Added"
 msgstr "ドキュメントの追加時"
 
-#: documents/models.py:904
+#: documents/models.py:907
 msgid "Document Updated"
 msgstr "ドキュメントの更新時"
 
-#: documents/models.py:907
+#: documents/models.py:910
 msgid "Consume Folder"
 msgstr "フォルダーの利用"
 
-#: documents/models.py:908
+#: documents/models.py:911
 msgid "Api Upload"
 msgstr "API アップロード"
 
-#: documents/models.py:909
+#: documents/models.py:912
 msgid "Mail Fetch"
 msgstr "メールの取得"
 
-#: documents/models.py:912
+#: documents/models.py:915
 msgid "Workflow Trigger Type"
 msgstr "ワークフローのトリガータイプ"
 
-#: documents/models.py:924
+#: documents/models.py:927
 msgid "filter path"
 msgstr "パスをフィルター"
 
-#: documents/models.py:929
+#: documents/models.py:932
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
 msgstr "指定されたパスを持つドキュメントのみを使用します。ワイルドカード (*) が使用できます。大文字・小文字を区別しません。"
 
-#: documents/models.py:936
+#: documents/models.py:939
 msgid "filter filename"
 msgstr "ファイル名をフィルター"
 
-#: documents/models.py:941 paperless_mail/models.py:148
+#: documents/models.py:944 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "指定されたファイル名に完全にマッチするドキュメントのみを使用します。 *.pdf や *請求書* などのワイルドカードが使用できます。大文字・小文字を区別しません。"
 
-#: documents/models.py:952
+#: documents/models.py:955
 msgid "filter documents from this mail rule"
 msgstr "このメールルールからのドキュメントをフィルター"
 
-#: documents/models.py:968
+#: documents/models.py:971
 msgid "has these tag(s)"
 msgstr "タグ"
 
-#: documents/models.py:976
+#: documents/models.py:979
 msgid "has this document type"
 msgstr "ドキュメントタイプ"
 
-#: documents/models.py:984
+#: documents/models.py:987
 msgid "has this correspondent"
 msgstr "担当"
 
-#: documents/models.py:988
+#: documents/models.py:991
 msgid "workflow trigger"
 msgstr "ワークフローのトリガー"
 
-#: documents/models.py:989
+#: documents/models.py:992
 msgid "workflow triggers"
 msgstr "ワークフローのトリガー"
 
-#: documents/models.py:997
+#: documents/models.py:1000
 msgid "Assignment"
 msgstr "割り当て"
 
-#: documents/models.py:1000
+#: documents/models.py:1003
 msgid "Workflow Action Type"
 msgstr "ワークフローのアクションタイプ"
 
-#: documents/models.py:1006
+#: documents/models.py:1009
 msgid "assign title"
 msgstr "タイトルの割り当て"
 
-#: documents/models.py:1011
+#: documents/models.py:1014
 msgid "Assign a document title, can include some placeholders, see documentation."
 msgstr "ドキュメントタイトルを割り当てます。ドキュメントタイトルにはプレースホルダーを含めることができます。マニュアルを参照してください。"
 
-#: documents/models.py:1019 paperless_mail/models.py:216
+#: documents/models.py:1022 paperless_mail/models.py:216
 msgid "assign this tag"
 msgstr "タグの割り当て"
 
-#: documents/models.py:1027 paperless_mail/models.py:224
+#: documents/models.py:1030 paperless_mail/models.py:224
 msgid "assign this document type"
 msgstr "ドキュメントタイプの割り当て"
 
-#: documents/models.py:1035 paperless_mail/models.py:238
+#: documents/models.py:1038 paperless_mail/models.py:238
 msgid "assign this correspondent"
 msgstr "担当の割り当て"
 
-#: documents/models.py:1043
+#: documents/models.py:1046
 msgid "assign this storage path"
 msgstr "フォルダーの割り当て"
 
-#: documents/models.py:1052
+#: documents/models.py:1055
 msgid "assign this owner"
 msgstr "所有者の割り当て"
 
-#: documents/models.py:1059
+#: documents/models.py:1062
 msgid "grant view permissions to these users"
 msgstr "ユーザーへの表示権限の付与"
 
-#: documents/models.py:1066
+#: documents/models.py:1069
 msgid "grant view permissions to these groups"
 msgstr "グループへの表示権限の付与"
 
-#: documents/models.py:1073
+#: documents/models.py:1076
 msgid "grant change permissions to these users"
 msgstr "ユーザーへの変更権限の付与"
 
-#: documents/models.py:1080
+#: documents/models.py:1083
 msgid "grant change permissions to these groups"
 msgstr "グループへの変更権限の付与"
 
-#: documents/models.py:1087
+#: documents/models.py:1090
 msgid "assign these custom fields"
 msgstr "カスタム項目の割り当て"
 
-#: documents/models.py:1091
+#: documents/models.py:1094
 msgid "workflow action"
 msgstr "ワークフローのアクション"
 
-#: documents/models.py:1092
+#: documents/models.py:1095
 msgid "workflow actions"
 msgstr "ワークフローのアクション"
 
-#: documents/models.py:1101 paperless_mail/models.py:95
+#: documents/models.py:1104 paperless_mail/models.py:95
 msgid "order"
 msgstr "順序"
 
-#: documents/models.py:1107
+#: documents/models.py:1110
 msgid "triggers"
 msgstr "トリガー"
 
-#: documents/models.py:1114
+#: documents/models.py:1117
 msgid "actions"
 msgstr "アクション"
 
-#: documents/models.py:1117
+#: documents/models.py:1120
 msgid "enabled"
 msgstr "有効"
 
-#: documents/serialisers.py:111
+#: documents/serialisers.py:113
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "不正な正規表現: %(error)s"
 
-#: documents/serialisers.py:405
+#: documents/serialisers.py:407
 msgid "Invalid color."
 msgstr "無効な色"
 
-#: documents/serialisers.py:999
+#: documents/serialisers.py:1061
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "ファイルタイプ %(type)s はサポートされていません"
 
-#: documents/serialisers.py:1102
+#: documents/serialisers.py:1164
 msgid "Invalid variable detected."
 msgstr "無効な変数を検出しました"
+
+#: documents/templates/account/login.html:14
+msgid "Paperless-ngx sign in"
+msgstr "Paperless-ngx ログイン"
+
+#: documents/templates/account/login.html:47
+msgid "Please sign in."
+msgstr "ログインしてください。"
+
+#: documents/templates/account/login.html:50
+msgid "Your username and password didn't match. Please try again."
+msgstr "ユーザー名またはパスワードが一致しません。再試行してください。"
+
+#: documents/templates/account/login.html:54
+msgid "Share link was not found."
+msgstr "共有リンクが見つかりませんでした。"
+
+#: documents/templates/account/login.html:58
+msgid "Share link has expired."
+msgstr "共有リンクの有効期限を過ぎています。"
+
+#: documents/templates/account/login.html:61
+#: documents/templates/socialaccount/signup.html:56
+msgid "Username"
+msgstr "ユーザー名"
+
+#: documents/templates/account/login.html:62
+msgid "Password"
+msgstr "パスワード"
+
+#: documents/templates/account/login.html:72
+msgid "Sign in"
+msgstr "ログイン"
+
+#: documents/templates/account/login.html:76
+msgid "Forgot your password?"
+msgstr "パスワードをお忘れですか？"
+
+#: documents/templates/account/login.html:83
+msgid "or sign in via"
+msgstr "または次の方法でログイン"
+
+#: documents/templates/account/password_reset.html:15
+msgid "Paperless-ngx reset password request"
+msgstr "Paperless-ngx パスワードリセットの要求"
+
+#: documents/templates/account/password_reset.html:43
+msgid "Enter your email address below, and we'll email instructions for setting a new one."
+msgstr "メールアドレスを入力してください。新しいパスワードを設定する手順をメールで送信します。"
+
+#: documents/templates/account/password_reset.html:46
+msgid "An error occurred. Please try again."
+msgstr "エラーが発生しました。再試行してください。"
+
+#: documents/templates/account/password_reset.html:49
+#: documents/templates/socialaccount/signup.html:57
+msgid "Email"
+msgstr "メールアドレス"
+
+#: documents/templates/account/password_reset.html:56
+msgid "Send me instructions!"
+msgstr "手順を送信してください!"
+
+#: documents/templates/account/password_reset_done.html:14
+msgid "Paperless-ngx reset password sent"
+msgstr "Paperless-ngx パスワードリセットの送信"
+
+#: documents/templates/account/password_reset_done.html:40
+msgid "Check your inbox."
+msgstr "受信トレイを確認してください。"
+
+#: documents/templates/account/password_reset_done.html:41
+msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
+msgstr "パスワードの設定手順をメールで送信しました。まもなくメールが届くでしょう。"
+
+#: documents/templates/account/password_reset_from_key.html:15
+msgid "Paperless-ngx reset password confirmation"
+msgstr "Paperless-ngx パスワードリセットの確認"
+
+#: documents/templates/account/password_reset_from_key.html:44
+msgid "request a new password reset"
+msgstr "パスワードリセットの要求"
+
+#: documents/templates/account/password_reset_from_key.html:46
+msgid "Set a new password."
+msgstr "新しいパスワードを設定"
+
+#: documents/templates/account/password_reset_from_key.html:50
+msgid "Passwords did not match or too weak. Try again."
+msgstr "パスワードが一致しないか、パスワードが弱すぎます。もう一度お試しください。"
+
+#: documents/templates/account/password_reset_from_key.html:53
+msgid "New Password"
+msgstr "新しいパスワード"
+
+#: documents/templates/account/password_reset_from_key.html:54
+msgid "Confirm Password"
+msgstr "パスワードの確認"
+
+#: documents/templates/account/password_reset_from_key.html:65
+msgid "Change my password"
+msgstr "パスワードの変更"
+
+#: documents/templates/account/password_reset_from_key_done.html:14
+msgid "Paperless-ngx reset password complete"
+msgstr "Paperless-ngx パスワードリセットの完了"
+
+#: documents/templates/account/password_reset_from_key_done.html:40
+msgid "Password reset complete."
+msgstr "パスワードリセットが完了しました"
+
+#: documents/templates/account/password_reset_from_key_done.html:42
+#, python-format
+msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
+msgstr "新しいパスワードがセットされました。<a href=\"%(login_url)s\"> ログイン </a> できます。"
 
 #: documents/templates/index.html:79
 msgid "Paperless-ngx is loading..."
@@ -789,126 +904,38 @@ msgstr "まだここに？うーん、何かおかしいのかもしれません
 msgid "Here's a link to the docs."
 msgstr "これはドキュメントへのリンクです"
 
-#: documents/templates/registration/logged_out.html:14
-msgid "Paperless-ngx signed out"
-msgstr "Paperless-ngx ログアウト"
+#: documents/templates/socialaccount/authentication_error.html:15
+#: documents/templates/socialaccount/login.html:15
+msgid "Paperless-ngx social account sign in"
+msgstr "Paperless-ngx ソーシャルアカウントログイン"
 
-#: documents/templates/registration/logged_out.html:40
-msgid "You have been successfully logged out. Bye!"
-msgstr "正常にログアウトしました。"
-
-#: documents/templates/registration/logged_out.html:41
-msgid "Sign in again"
-msgstr "再度ログイン"
-
-#: documents/templates/registration/login.html:14
-msgid "Paperless-ngx sign in"
-msgstr "Paperless-ngx ログイン"
-
-#: documents/templates/registration/login.html:41
-msgid "Please sign in."
-msgstr "ログインしてください。"
-
-#: documents/templates/registration/login.html:44
-msgid "Your username and password didn't match. Please try again."
-msgstr "ユーザー名またはパスワードが一致しません。再試行してください。"
-
-#: documents/templates/registration/login.html:48
-msgid "Share link was not found."
-msgstr "共有リンクが見つかりませんでした。"
-
-#: documents/templates/registration/login.html:52
-msgid "Share link has expired."
-msgstr "共有リンクの有効期限を過ぎています。"
-
-#: documents/templates/registration/login.html:55
-msgid "Username"
-msgstr "ユーザー名"
-
-#: documents/templates/registration/login.html:56
-msgid "Password"
-msgstr "パスワード"
-
-#: documents/templates/registration/login.html:66
-msgid "Sign in"
-msgstr "ログイン"
-
-#: documents/templates/registration/login.html:70
-msgid "Forgot your password?"
-msgstr "パスワードをお忘れですか？"
-
-#: documents/templates/registration/password_reset_complete.html:14
-msgid "Paperless-ngx reset password complete"
-msgstr "Paperless-ngx パスワードリセットの完了"
-
-#: documents/templates/registration/password_reset_complete.html:40
-msgid "Password reset complete."
-msgstr "パスワードリセットが完了しました"
-
-#: documents/templates/registration/password_reset_complete.html:42
+#: documents/templates/socialaccount/authentication_error.html:43
 #, python-format
-msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
-msgstr "新しいパスワードがセットされました。<a href=\"%(login_url)s\"> ログイン </a> できます。"
+msgid "An error occurred while attempting to login via your social network account. Back to the <a href=\"%(login_url)s\">login page</a>"
+msgstr "ソーシャルアカウントでログイン中にエラーが発生しました。<a href=\"%(login_url)s\">ログイン画面</a>に戻ります。"
 
-#: documents/templates/registration/password_reset_confirm.html:14
-msgid "Paperless-ngx reset password confirmation"
-msgstr "Paperless-ngx パスワードリセットの確認"
+#: documents/templates/socialaccount/login.html:44
+#, python-format
+msgid "You are about to connect a new third-party account from %(provider)s."
+msgstr "%(provider)s から新規サードパーティアカウントに接続しようとしています。"
 
-#: documents/templates/registration/password_reset_confirm.html:42
-msgid "Set a new password."
-msgstr "新しいパスワードを設定"
+#: documents/templates/socialaccount/login.html:47
+msgid "Continue"
+msgstr "続行"
 
-#: documents/templates/registration/password_reset_confirm.html:46
-msgid "Passwords did not match or too weak. Try again."
-msgstr "パスワードが一致しないか、パスワードが弱すぎます。もう一度お試しください。"
+#: documents/templates/socialaccount/signup.html:14
+msgid "Paperless-ngx social account sign up"
+msgstr "Paperless-ngx ソーシャルアカウント登録"
 
-#: documents/templates/registration/password_reset_confirm.html:49
-msgid "New Password"
-msgstr "新しいパスワード"
+#: documents/templates/socialaccount/signup.html:53
+#, python-format
+msgid "You are about to use your %(provider_name)s account to login to\n"
+"%(site_name)s. As a final step, please complete the following form:"
+msgstr "%(provider_name)s のアカウントで %(site_name)s にログインしようとしています。最後に、次のフォームに記入してください。"
 
-#: documents/templates/registration/password_reset_confirm.html:50
-msgid "Confirm Password"
-msgstr "パスワードの確認"
-
-#: documents/templates/registration/password_reset_confirm.html:61
-msgid "Change my password"
-msgstr "パスワードの変更"
-
-#: documents/templates/registration/password_reset_confirm.html:65
-msgid "request a new password reset"
-msgstr "パスワードリセットの要求"
-
-#: documents/templates/registration/password_reset_done.html:14
-msgid "Paperless-ngx reset password sent"
-msgstr "Paperless-ngx パスワードリセットの送信"
-
-#: documents/templates/registration/password_reset_done.html:40
-msgid "Check your inbox."
-msgstr "受信トレイを確認してください。"
-
-#: documents/templates/registration/password_reset_done.html:41
-msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
-msgstr "パスワードの設定手順をメールで送信しました。まもなくメールが届くでしょう。"
-
-#: documents/templates/registration/password_reset_form.html:14
-msgid "Paperless-ngx reset password request"
-msgstr "Paperless-ngx パスワードリセットの要求"
-
-#: documents/templates/registration/password_reset_form.html:41
-msgid "Enter your email address below, and we'll email instructions for setting a new one."
-msgstr "メールアドレスを入力してください。新しいパスワードを設定する手順をメールで送信します。"
-
-#: documents/templates/registration/password_reset_form.html:44
-msgid "An error occurred. Please try again."
-msgstr "エラーが発生しました。再試行してください。"
-
-#: documents/templates/registration/password_reset_form.html:47
-msgid "Email"
-msgstr "メールアドレス"
-
-#: documents/templates/registration/password_reset_form.html:54
-msgid "Send me instructions!"
-msgstr "手順を送信してください!"
+#: documents/templates/socialaccount/signup.html:72
+msgid "Sign up"
+msgstr "登録"
 
 #: documents/validators.py:17
 #, python-brace-format
@@ -929,305 +956,317 @@ msgstr "URI {value} を解析できません"
 msgid "Paperless"
 msgstr "Paperless"
 
-#: paperless/models.py:25
+#: paperless/models.py:26
 msgid "pdf"
 msgstr "pdf"
 
-#: paperless/models.py:26
+#: paperless/models.py:27
 msgid "pdfa"
 msgstr "pdfa"
 
-#: paperless/models.py:27
+#: paperless/models.py:28
 msgid "pdfa-1"
 msgstr "pdfa-1"
 
-#: paperless/models.py:28
+#: paperless/models.py:29
 msgid "pdfa-2"
 msgstr "pdfa-2"
 
-#: paperless/models.py:29
+#: paperless/models.py:30
 msgid "pdfa-3"
 msgstr "pdfa-3"
 
-#: paperless/models.py:38
+#: paperless/models.py:39
 msgid "skip"
 msgstr "skip"
 
-#: paperless/models.py:39
+#: paperless/models.py:40
 msgid "redo"
 msgstr "redo"
 
-#: paperless/models.py:40
+#: paperless/models.py:41
 msgid "force"
 msgstr "force"
 
-#: paperless/models.py:41
+#: paperless/models.py:42
 msgid "skip_noarchive"
 msgstr "skip_noarchive"
 
-#: paperless/models.py:49
+#: paperless/models.py:50
 msgid "never"
 msgstr "never"
 
-#: paperless/models.py:50
+#: paperless/models.py:51
 msgid "with_text"
 msgstr "with_text"
 
-#: paperless/models.py:51
+#: paperless/models.py:52
 msgid "always"
 msgstr "always"
 
-#: paperless/models.py:59
+#: paperless/models.py:60
 msgid "clean"
 msgstr "clean"
 
-#: paperless/models.py:60
+#: paperless/models.py:61
 msgid "clean-final"
 msgstr "clean-final"
 
-#: paperless/models.py:61
+#: paperless/models.py:62
 msgid "none"
 msgstr "none"
 
-#: paperless/models.py:69
+#: paperless/models.py:70
 msgid "LeaveColorUnchanged"
 msgstr "LeaveColorUnchanged"
 
-#: paperless/models.py:70
+#: paperless/models.py:71
 msgid "RGB"
 msgstr "RGB"
 
-#: paperless/models.py:71
+#: paperless/models.py:72
 msgid "UseDeviceIndependentColor"
 msgstr "UseDeviceIndependentColor"
 
-#: paperless/models.py:72
+#: paperless/models.py:73
 msgid "Gray"
 msgstr "Gray"
 
-#: paperless/models.py:73
+#: paperless/models.py:74
 msgid "CMYK"
 msgstr "CMYK"
 
-#: paperless/models.py:82
+#: paperless/models.py:83
 msgid "Sets the output PDF type"
 msgstr "出力 PDF タイプの設定"
 
-#: paperless/models.py:94
+#: paperless/models.py:95
 msgid "Do OCR from page 1 to this value"
 msgstr "1ページからこのページまで OCR を実行する"
 
-#: paperless/models.py:100
+#: paperless/models.py:101
 msgid "Do OCR using these languages"
 msgstr "これらの言語で OCR を実行する"
 
-#: paperless/models.py:107
+#: paperless/models.py:108
 msgid "Sets the OCR mode"
 msgstr "OCR モードの設定"
 
-#: paperless/models.py:115
+#: paperless/models.py:116
 msgid "Controls the generation of an archive file"
 msgstr "アーカイブファイル生成の制御"
 
-#: paperless/models.py:123
+#: paperless/models.py:124
 msgid "Sets image DPI fallback value"
 msgstr "画像の DPI フォールバック値の設定"
 
-#: paperless/models.py:130
+#: paperless/models.py:131
 msgid "Controls the unpaper cleaning"
 msgstr "アンペーパークリーニングの制御"
 
-#: paperless/models.py:137
+#: paperless/models.py:138
 msgid "Enables deskew"
 msgstr "傾き補正の有効化"
 
-#: paperless/models.py:140
+#: paperless/models.py:141
 msgid "Enables page rotation"
 msgstr "ページ回転の有効化"
 
-#: paperless/models.py:145
+#: paperless/models.py:146
 msgid "Sets the threshold for rotation of pages"
 msgstr "ページ回転のしきい値の設定"
 
-#: paperless/models.py:151
+#: paperless/models.py:152
 msgid "Sets the maximum image size for decompression"
 msgstr "展開する画像の最大サイズの設定"
 
-#: paperless/models.py:157
+#: paperless/models.py:158
 msgid "Sets the Ghostscript color conversion strategy"
 msgstr "Ghostscript 色変換ストラテジーの設定"
 
-#: paperless/models.py:165
+#: paperless/models.py:166
 msgid "Adds additional user arguments for OCRMyPDF"
-msgstr ""
+msgstr "OCRMyPDF への追加のユーザー引数を追加"
 
-#: paperless/models.py:170
+#: paperless/models.py:171
+msgid "Application title"
+msgstr "アプリケーションタイトル"
+
+#: paperless/models.py:178
+msgid "Application logo"
+msgstr "アプリケーションロゴ"
+
+#: paperless/models.py:188
 msgid "paperless application settings"
-msgstr ""
+msgstr "Paperless アプリケーションの設定"
 
-#: paperless/settings.py:601
+#: paperless/settings.py:642
 msgid "English (US)"
 msgstr "英語 (米国)"
 
-#: paperless/settings.py:602
+#: paperless/settings.py:643
 msgid "Arabic"
 msgstr "アラビア語"
 
-#: paperless/settings.py:603
+#: paperless/settings.py:644
 msgid "Afrikaans"
 msgstr "アフリカーンス語"
 
-#: paperless/settings.py:604
+#: paperless/settings.py:645
 msgid "Belarusian"
 msgstr "ベラルーシ語"
 
-#: paperless/settings.py:605
+#: paperless/settings.py:646
 msgid "Bulgarian"
 msgstr "ブルガリア語"
 
-#: paperless/settings.py:606
+#: paperless/settings.py:647
 msgid "Catalan"
 msgstr "カタロニア語"
 
-#: paperless/settings.py:607
+#: paperless/settings.py:648
 msgid "Czech"
 msgstr "チェコ語"
 
-#: paperless/settings.py:608
+#: paperless/settings.py:649
 msgid "Danish"
 msgstr "デンマーク語"
 
-#: paperless/settings.py:609
+#: paperless/settings.py:650
 msgid "German"
 msgstr "ドイツ語"
 
-#: paperless/settings.py:610
+#: paperless/settings.py:651
 msgid "Greek"
 msgstr "ギリシャ語"
 
-#: paperless/settings.py:611
+#: paperless/settings.py:652
 msgid "English (GB)"
 msgstr "英語 (英国)"
 
-#: paperless/settings.py:612
+#: paperless/settings.py:653
 msgid "Spanish"
 msgstr "スペイン語"
 
-#: paperless/settings.py:613
+#: paperless/settings.py:654
 msgid "Finnish"
 msgstr "フィンランド語"
 
-#: paperless/settings.py:614
+#: paperless/settings.py:655
 msgid "French"
 msgstr "フランス語"
 
-#: paperless/settings.py:615
+#: paperless/settings.py:656
 msgid "Hungarian"
 msgstr "ハンガリー語"
 
-#: paperless/settings.py:616
+#: paperless/settings.py:657
 msgid "Italian"
 msgstr "イタリア語"
 
-#: paperless/settings.py:617
+#: paperless/settings.py:658
+msgid "Japanese"
+msgstr "日本語"
+
+#: paperless/settings.py:659
 msgid "Luxembourgish"
 msgstr "ルクセンブルク語"
 
-#: paperless/settings.py:618
+#: paperless/settings.py:660
 msgid "Norwegian"
 msgstr "ノルウェー語"
 
-#: paperless/settings.py:619
+#: paperless/settings.py:661
 msgid "Dutch"
 msgstr "オランダ語"
 
-#: paperless/settings.py:620
+#: paperless/settings.py:662
 msgid "Polish"
 msgstr "ポーランド語"
 
-#: paperless/settings.py:621
+#: paperless/settings.py:663
 msgid "Portuguese (Brazil)"
 msgstr "ポルトガル語 (ブラジル)"
 
-#: paperless/settings.py:622
+#: paperless/settings.py:664
 msgid "Portuguese"
 msgstr "ポルトガル語"
 
-#: paperless/settings.py:623
+#: paperless/settings.py:665
 msgid "Romanian"
 msgstr "ルーマニア語"
 
-#: paperless/settings.py:624
+#: paperless/settings.py:666
 msgid "Russian"
 msgstr "ロシア語"
 
-#: paperless/settings.py:625
+#: paperless/settings.py:667
 msgid "Slovak"
 msgstr "スロバキア語"
 
-#: paperless/settings.py:626
+#: paperless/settings.py:668
 msgid "Slovenian"
 msgstr "スロベニア語"
 
-#: paperless/settings.py:627
+#: paperless/settings.py:669
 msgid "Serbian"
 msgstr "セルビア語"
 
-#: paperless/settings.py:628
+#: paperless/settings.py:670
 msgid "Swedish"
 msgstr "スウェーデン語"
 
-#: paperless/settings.py:629
+#: paperless/settings.py:671
 msgid "Turkish"
 msgstr "トルコ語"
 
-#: paperless/settings.py:630
+#: paperless/settings.py:672
 msgid "Ukrainian"
 msgstr "ウクライナ語"
 
-#: paperless/settings.py:631
+#: paperless/settings.py:673
 msgid "Chinese Simplified"
 msgstr "中国語 (簡体字)"
 
-#: paperless/urls.py:205
+#: paperless/urls.py:224
 msgid "Paperless-ngx administration"
 msgstr "Paperless-ngx の管理"
 
-#: paperless_mail/admin.py:41
+#: paperless_mail/admin.py:39
 msgid "Authentication"
-msgstr ""
+msgstr "認証"
 
-#: paperless_mail/admin.py:44
+#: paperless_mail/admin.py:42
 msgid "Advanced settings"
-msgstr ""
+msgstr "高度な設定"
 
-#: paperless_mail/admin.py:60
+#: paperless_mail/admin.py:58
 msgid "Filter"
-msgstr ""
+msgstr "フィルター"
 
-#: paperless_mail/admin.py:63
+#: paperless_mail/admin.py:61
 msgid "Paperless will only process mails that match ALL of the filters given below."
-msgstr ""
+msgstr "Paperless は以下のフィルタにマッチするメールのみを処理します"
 
-#: paperless_mail/admin.py:80
+#: paperless_mail/admin.py:78
 msgid "Actions"
-msgstr ""
+msgstr "アクション"
 
-#: paperless_mail/admin.py:83
+#: paperless_mail/admin.py:81
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr ""
+msgstr "メールに適用されるアクション。このアクションは、メール本文または添付ファイルがメールから取り込まれた場合にのみ実行されます。"
 
-#: paperless_mail/admin.py:91
+#: paperless_mail/admin.py:89
 msgid "Metadata"
-msgstr ""
+msgstr "メタデータ"
 
-#: paperless_mail/admin.py:94
+#: paperless_mail/admin.py:92
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr ""
+msgstr "このルールから使用されるドキュメントに自動的にメタデータを割り当てます。ここでタグ、タイプ、担当者を割り当てなかった場合でも、Paperless は定義済みのすべてのマッチングルールを処理します。"
 
 #: paperless_mail/apps.py:11
 msgid "Paperless mail"
-msgstr ""
+msgstr "Paperless メール"
 
 #: paperless_mail/models.py:10
 msgid "mail account"
@@ -1243,11 +1282,11 @@ msgstr "暗号化なし"
 
 #: paperless_mail/models.py:15
 msgid "Use SSL"
-msgstr ""
+msgstr "SSL を使用"
 
 #: paperless_mail/models.py:16
 msgid "Use STARTTLS"
-msgstr ""
+msgstr "STARTTLS を使用"
 
 #: paperless_mail/models.py:20
 msgid "IMAP server"
@@ -1259,7 +1298,7 @@ msgstr "IMAP ポート番号"
 
 #: paperless_mail/models.py:27
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
-msgstr ""
+msgstr "通常、暗号化されていない接続や STARTTLS 接続では 143、SSL 接続では 993 です。"
 
 #: paperless_mail/models.py:33
 msgid "IMAP security"
@@ -1275,7 +1314,7 @@ msgstr "パスワード"
 
 #: paperless_mail/models.py:42
 msgid "Is token authentication"
-msgstr ""
+msgstr "トークン認証"
 
 #: paperless_mail/models.py:45
 msgid "character set"
@@ -1283,7 +1322,7 @@ msgstr "文字セット"
 
 #: paperless_mail/models.py:49
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr ""
+msgstr "'UTF-8' や 'US-ASCII' など、メールサーバーとの通信に使用する文字セット"
 
 #: paperless_mail/models.py:60
 msgid "mail rule"
@@ -1295,67 +1334,67 @@ msgstr "メールルール"
 
 #: paperless_mail/models.py:64 paperless_mail/models.py:72
 msgid "Only process attachments."
-msgstr ""
+msgstr "添付ファイルのみを処理."
 
 #: paperless_mail/models.py:65
 msgid "Process full Mail (with embedded attachments in file) as .eml"
-msgstr ""
+msgstr ".eml としてメール全体 (添付ファイルを含む) を処理"
 
 #: paperless_mail/models.py:67
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr ""
+msgstr ".eml としてメール全体 (添付ファイルを含む) を処理 + 添付ファイルを別のドキュメントとして処理"
 
 #: paperless_mail/models.py:73
 msgid "Process all files, including 'inline' attachments."
-msgstr ""
+msgstr "インライン添付ファイルを含むすべてのファイルを処理"
 
 #: paperless_mail/models.py:76
 msgid "Delete"
-msgstr ""
+msgstr "削除"
 
 #: paperless_mail/models.py:77
 msgid "Move to specified folder"
-msgstr ""
+msgstr "指定したフォルダーに移動"
 
 #: paperless_mail/models.py:78
 msgid "Mark as read, don't process read mails"
-msgstr ""
+msgstr "既読としてマーク (既読メールは処理しない)"
 
 #: paperless_mail/models.py:79
 msgid "Flag the mail, don't process flagged mails"
-msgstr ""
+msgstr "メールにフラグ (フラグ付きメールは処理しない)"
 
 #: paperless_mail/models.py:80
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr ""
+msgstr "指定されたタグでメールにタグ付け (タグ付きメールは処理しない)"
 
 #: paperless_mail/models.py:83
 msgid "Use subject as title"
-msgstr ""
+msgstr "件名をタイトルに使用"
 
 #: paperless_mail/models.py:84
 msgid "Use attachment filename as title"
-msgstr ""
+msgstr "添付ファイルのファイル名をタイトルに使用"
 
 #: paperless_mail/models.py:85
 msgid "Do not assign title from rule"
-msgstr ""
+msgstr "このルールからタイトルを割り当てない"
 
 #: paperless_mail/models.py:88
 msgid "Do not assign a correspondent"
-msgstr ""
+msgstr "担当を割り当てない"
 
 #: paperless_mail/models.py:89
 msgid "Use mail address"
-msgstr ""
+msgstr "メールアドレスを使用する"
 
 #: paperless_mail/models.py:90
 msgid "Use name (or mail address if not available)"
-msgstr ""
+msgstr "名前 (不明な場合はメールアドレス) を使用する"
 
 #: paperless_mail/models.py:91
 msgid "Use correspondent selected below"
-msgstr ""
+msgstr "以下で選択する担当を使用"
 
 #: paperless_mail/models.py:101
 msgid "account"
@@ -1367,97 +1406,97 @@ msgstr "フォルダー"
 
 #: paperless_mail/models.py:109
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr ""
+msgstr "サブフォルダーは、区切り文字 (通常はドット ( . ) またはスラッシュ ( / ) で区切る必要がありますが、これはメール サーバーによって異なります。"
 
 #: paperless_mail/models.py:115
 msgid "filter from"
-msgstr ""
+msgstr "送信元のフィルター"
 
 #: paperless_mail/models.py:122
 msgid "filter to"
-msgstr ""
+msgstr "宛先のフィルター"
 
 #: paperless_mail/models.py:129
 msgid "filter subject"
-msgstr ""
+msgstr "件名のフィルター"
 
 #: paperless_mail/models.py:136
 msgid "filter body"
-msgstr ""
+msgstr "本文のフィルター"
 
 #: paperless_mail/models.py:143
 msgid "filter attachment filename inclusive"
-msgstr ""
+msgstr "添付ファイル名のフィルター"
 
 #: paperless_mail/models.py:155
 msgid "filter attachment filename exclusive"
-msgstr ""
+msgstr "除外する添付ファイル名のフィルター"
 
 #: paperless_mail/models.py:160
 msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "このファイル名にマッチするドキュメントは使用しません。 *.pdf や *請求書* などのワイルドカードが使用できます。大文字・小文字を区別しません。"
 
 #: paperless_mail/models.py:167
 msgid "maximum age"
-msgstr ""
+msgstr "有効期限"
 
 #: paperless_mail/models.py:169
 msgid "Specified in days."
-msgstr ""
+msgstr "日数で指定"
 
 #: paperless_mail/models.py:173
 msgid "attachment type"
-msgstr ""
+msgstr "添付ファイルの種類"
 
 #: paperless_mail/models.py:177
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
-msgstr ""
+msgstr "インライン添付ファイルに埋め込み画像が含まれるので、このオプションをファイル名のフィルターと組み合わせるのが最善です。"
 
 #: paperless_mail/models.py:183
 msgid "consumption scope"
-msgstr ""
+msgstr "利用範囲"
 
 #: paperless_mail/models.py:189
 msgid "action"
-msgstr ""
+msgstr "アクション"
 
 #: paperless_mail/models.py:195
 msgid "action parameter"
-msgstr ""
+msgstr "アクションパラメーター"
 
 #: paperless_mail/models.py:200
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr ""
+msgstr "上記で選択したアクションの追加パラメーター、たとえばフォルダーへの移動アクションの移動先フォルダー。サブフォルダーはドットで区切る必要があります。"
 
 #: paperless_mail/models.py:208
 msgid "assign title from"
-msgstr ""
+msgstr "タイトルの割り当て元"
 
 #: paperless_mail/models.py:228
 msgid "assign correspondent from"
-msgstr ""
+msgstr "担当の割り当て元"
 
 #: paperless_mail/models.py:242
 msgid "Assign the rule owner to documents"
-msgstr ""
+msgstr "ルール所有者のドキュメントへの割り当て"
 
 #: paperless_mail/models.py:268
 msgid "uid"
-msgstr ""
+msgstr "UID"
 
 #: paperless_mail/models.py:276
 msgid "subject"
-msgstr ""
+msgstr "件名"
 
 #: paperless_mail/models.py:284
 msgid "received"
-msgstr ""
+msgstr "受信日時"
 
 #: paperless_mail/models.py:291
 msgid "processed"
-msgstr ""
+msgstr "処理日時"
 
 #: paperless_mail/models.py:297
 msgid "status"
-msgstr ""
+msgstr "ステータス"
 
