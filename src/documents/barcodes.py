@@ -14,6 +14,7 @@ from PIL import Image
 
 from documents.converters import convert_from_tiff_to_pdf
 from documents.data_models import ConsumableDocument
+from documents.models import Tag
 from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import StopConsumeTaskError
 from documents.plugins.helpers import ProgressStatusOptions
@@ -65,7 +66,9 @@ class BarcodePlugin(ConsumeTaskPlugin):
             supported_mimes = {"application/pdf"}
 
         return (
-            settings.CONSUMER_ENABLE_ASN_BARCODE or settings.CONSUMER_ENABLE_BARCODES
+            settings.CONSUMER_ENABLE_ASN_BARCODE
+            or settings.CONSUMER_ENABLE_BARCODES
+            or settings.CONSUMER_ENABLE_TAG_BARCODE
         ) and self.input_doc.mime_type in supported_mimes
 
     def setup(self):
@@ -89,6 +92,16 @@ class BarcodePlugin(ConsumeTaskPlugin):
         if located_asn is not None:
             logger.info(f"Found ASN in barcode: {located_asn}")
             self.metadata.asn = located_asn
+
+        # try reading tags from barcodes
+        if settings.CONSUMER_ENABLE_TAG_BARCODE:
+            tags = self.tags
+            if tags is not None and len(tags) > 0:
+                if self.metadata.tag_ids:
+                    self.metadata.tag_ids += tags
+                else:
+                    self.metadata.tag_ids = tags
+                logger.info(f"Found tags in barcode: {tags}")
 
         separator_pages = self.get_separation_pages()
         if not separator_pages:
@@ -278,6 +291,53 @@ class BarcodePlugin(ConsumeTaskPlugin):
                 logger.warning(f"Failed to parse ASN number because: {e}")
 
         return asn
+
+    @property
+    def tags(self) -> Optional[list[int]]:
+        """
+        Search the parsed barcodes for any tags.
+        Returns the detected tag ids (or empty list)
+        """
+        tags = []
+
+        # Ensure the barcodes have been read
+        self.detect()
+
+        for x in self.barcodes:
+            tag_texts = x.value
+
+            for raw in tag_texts.split(","):
+                try:
+                    tag = None
+                    for regex in settings.CONSUMER_TAG_BARCODE_MAPPING:
+                        if re.match(regex, raw, flags=re.IGNORECASE):
+                            sub = settings.CONSUMER_TAG_BARCODE_MAPPING[regex]
+                            tag = (
+                                re.sub(regex, sub, raw, flags=re.IGNORECASE)
+                                if sub
+                                else raw
+                            )
+                            break
+
+                    if tag:
+                        tag = Tag.objects.get_or_create(
+                            name__iexact=tag,
+                            defaults={"name": tag},
+                        )[0]
+
+                        logger.debug(
+                            f"Found Tag Barcode '{raw}', substituted "
+                            f"to '{tag}' and mapped to "
+                            f"tag #{tag.pk}.",
+                        )
+                        tags.append(tag.pk)
+
+                except Exception as e:
+                    logger.error(
+                        f"Failed to find or create TAG '{raw}' because: {e}",
+                    )
+
+        return tags
 
     def get_separation_pages(self) -> dict[int, bool]:
         """

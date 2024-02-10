@@ -41,14 +41,58 @@
               }
               <span class="visually-hidden" i18n>Copy</span>
             </button>
-            <button type="button" class="btn btn-outline-secondary" (click)="generateAuthToken()" i18n-title title="Regenerate auth token">
-              <i-bs width="1.2em" height="1.2em" name="arrow-repeat"></i-bs>
-            </button>
+            <pngx-confirm-button
+              title="Regenerate auth token"
+              i18n-title
+              buttonClasses=" btn-outline-secondary"
+              iconName="arrow-repeat"
+              [disabled]="!hasUsablePassword"
+              (confirm)="generateAuthToken()">
+            </pngx-confirm-button>
           </div>
           <span class="badge copied-badge bg-primary small fade ms-4 position-absolute top-50 translate-middle-y pe-none z-3" [class.show]="copied" i18n>Copied!</span>
         </div>
         <div class="form-text text-muted text-end fst-italic" i18n>Warning: changing the token cannot be undone</div>
       </div>
+      @if (socialAccounts?.length > 0) {
+        <div class="mb-3">
+          <p i18n>Connected social accounts</p>
+          <ul class="list-group">
+            @for (account of socialAccounts; track account.id) {
+              <li class="list-group-item"
+                ngbPopover="Set a password before disconnecting social account."
+                i18n-ngbPopover
+                [disablePopover]="hasUsablePassword"
+                triggers="mouseenter:mouseleave">
+                {{account.name}} ({{account.provider}})
+                <pngx-confirm-button
+                  label="Disconnect"
+                  i18n-label
+                  title="Disconnect {{ account.name }} social account"
+                  i18n-title
+                  buttonClasses="btn-outline-danger btn-sm ms-2 align-baseline"
+                  iconName="trash"
+                  [disabled]="!hasUsablePassword"
+                  (confirm)="disconnectSocialAccount(account.id)">
+                </pngx-confirm-button>
+              </li>
+            }
+          </ul>
+          <div class="form-text text-muted text-end fst-italic" i18n>Warning: disconnecting social accounts cannot be undone</div>
+        </div>
+      }
+      @if (socialAccountProviders?.length > 0) {
+        <div class="mb-3">
+          <p i18n>Connect new social account</p>
+          <div class="list-group">
+            @for (provider of socialAccountProviders; track provider.name) {
+              <a class="list-group-item list-group-item-action text-primary d-flex align-items-center" href="{{ provider.login_url }}" rel="noopener noreferrer">
+                {{provider.name}}&nbsp;<i-bs class="pb-1 ps-1" name="box-arrow-up-right"></i-bs>
+              </a>
+            }
+          </div>
+        </div>
+      }
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>

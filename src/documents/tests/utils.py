@@ -340,7 +340,6 @@ class DummyProgressManager:
     def __init__(self, filename: str, task_id: Optional[str] = None) -> None:
         self.filename = filename
         self.task_id = task_id
-        print("hello world")
         self.payloads = []
 
     def __enter__(self):

@@ -69,8 +69,6 @@ class Command(ProgressBarMixin, BaseCommand):
 
     def handle(self, *args, **options):
         self.handle_progress_bar_mixin(**options)
-        # Detect if we support color
-        color = self.style.ERROR("test") != "test"
 
         if options["inbox_only"]:
             queryset = Document.objects.filter(tags__is_inbox_tag=True)
@@ -96,7 +94,8 @@ class Command(ProgressBarMixin, BaseCommand):
                     use_first=options["use_first"],
                     suggest=options["suggest"],
                     base_url=options["base_url"],
-                    color=color,
+                    stdout=self.stdout,
+                    style_func=self.style,
                 )
 
             if options["document_type"]:
@@ -108,7 +107,8 @@ class Command(ProgressBarMixin, BaseCommand):
                     use_first=options["use_first"],
                     suggest=options["suggest"],
                     base_url=options["base_url"],
-                    color=color,
+                    stdout=self.stdout,
+                    style_func=self.style,
                 )
 
             if options["tags"]:
@@ -119,7 +119,8 @@ class Command(ProgressBarMixin, BaseCommand):
                     replace=options["overwrite"],
                     suggest=options["suggest"],
                     base_url=options["base_url"],
-                    color=color,
+                    stdout=self.stdout,
+                    style_func=self.style,
                 )
             if options["storage_path"]:
                 set_storage_path(
@@ -130,5 +131,6 @@ class Command(ProgressBarMixin, BaseCommand):
                     use_first=options["use_first"],
                     suggest=options["suggest"],
                     base_url=options["base_url"],
-                    color=color,
+                    stdout=self.stdout,
+                    style_func=self.style,
                 )

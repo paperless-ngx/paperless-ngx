@@ -7,7 +7,8 @@ name = "pypi"
 dateparser = "~=1.2"
 # WARNING: django does not use semver.
 #          Only patch versions are guaranteed to not introduce breaking changes.
-django = "~=4.2.9"
+django = "~=4.2.10"
+django-allauth = "*"
 django-auditlog = "*"
 django-celery-results = "*"
 django-compression-middleware = "*"
@@ -45,11 +46,11 @@ python-magic = "*"
 pyzbar = "*"
 rapidfuzz = "*"
 redis = {extras = ["hiredis"], version = "*"}
-scikit-learn = "~=1.3"
+scikit-learn = "~=1.4"
 setproctitle = "*"
 tika-client = "*"
 tqdm = "*"
-uvicorn = {extras = ["standard"], version = "*"}
+uvicorn = {extras = ["standard"], version = "==0.25.0"}
 watchdog = "~=3.0"
 whitenoise = "~=6.6"
 whoosh="~=2.7"

@@ -38,6 +38,7 @@ import {
   WorkflowActionType,
 } from 'src/app/data/workflow-action'
 import { MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/matching-model'
+import { ConfirmButtonComponent } from '../../confirm-button/confirm-button.component'
 
 const workflow: Workflow = {
   name: 'Workflow 1',
@@ -85,6 +86,7 @@ describe('WorkflowEditDialogComponent', () => {
         PermissionsUserComponent,
         PermissionsGroupComponent,
         SafeHtmlPipe,
+        ConfirmButtonComponent,
       ],
       providers: [
         NgbActiveModal,
