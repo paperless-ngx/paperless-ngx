@@ -470,12 +470,12 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
     def test_try_delete_empty_directories(self):
         # Create our working directory
-        tmp = os.path.join(settings.ORIGINALS_DIR, "test_delete_empty")
-        os.makedirs(tmp)
+        tmp: Path = settings.ORIGINALS_DIR / "test_delete_empty"
+        tmp.mkdir(exist_ok=True, parents=True)
 
-        os.makedirs(os.path.join(tmp, "notempty"))
-        Path(os.path.join(tmp, "notempty", "file")).touch()
-        os.makedirs(os.path.join(tmp, "notempty", "empty"))
+        (tmp / "notempty").mkdir(exist_ok=True, parents=True)
+        (tmp / "notempty" / "file").touch()
+        (tmp / "notempty" / "empty").mkdir(exist_ok=True, parents=True)
 
         delete_empty_directories(
             os.path.join(tmp, "notempty", "empty"),
@@ -647,7 +647,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
         existing_archive_file = os.path.join(settings.ARCHIVE_DIR, "none", "my_doc.pdf")
         Path(original).touch()
         Path(archive).touch()
-        os.makedirs(os.path.join(settings.ARCHIVE_DIR, "none"))
+        (settings.ARCHIVE_DIR / "none").mkdir(parents=True, exist_ok=True)
         Path(existing_archive_file).touch()
         doc = Document.objects.create(
             mime_type="application/pdf",
