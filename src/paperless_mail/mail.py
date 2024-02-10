@@ -710,7 +710,7 @@ class MailAccountHandler(LoggingMixin):
                     f"{message.subject} from {message.from_}",
                 )
 
-                os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
+                settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
 
                 temp_dir = Path(
                     tempfile.mkdtemp(
@@ -793,7 +793,7 @@ class MailAccountHandler(LoggingMixin):
         tag_ids,
         doc_type,
     ):
-        os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
+        settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
         _, temp_filename = tempfile.mkstemp(
             prefix="paperless-mail-",
             dir=settings.SCRATCH_DIR,

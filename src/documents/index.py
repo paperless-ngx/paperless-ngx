@@ -88,7 +88,7 @@ def open_index(recreate=False) -> FileIndex:
         logger.exception("Error while opening the index, recreating.")
 
     if not os.path.isdir(settings.INDEX_DIR):
-        os.makedirs(settings.INDEX_DIR, exist_ok=True)
+        settings.INDEX_DIR.mkdir(parents=True, exist_ok=True)
     return create_in(settings.INDEX_DIR, get_schema())
 
 

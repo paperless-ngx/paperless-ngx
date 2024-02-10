@@ -689,7 +689,7 @@ USE_TZ = True
 
 setup_logging_queues()
 
-os.makedirs(LOGGING_DIR, exist_ok=True)
+LOGGING_DIR.mkdir(parents=True, exist_ok=True)
 
 LOGROTATE_MAX_SIZE = os.getenv("PAPERLESS_LOGROTATE_MAX_SIZE", 1024 * 1024)
 LOGROTATE_MAX_BACKUPS = os.getenv("PAPERLESS_LOGROTATE_MAX_BACKUPS", 20)

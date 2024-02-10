@@ -182,7 +182,7 @@ class Command(BaseCommand):
         if self.zip_export:
             self.original_target = self.target
 
-            os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
+            settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
             temp_dir = tempfile.TemporaryDirectory(
                 dir=settings.SCRATCH_DIR,
                 prefix="paperless-export",
