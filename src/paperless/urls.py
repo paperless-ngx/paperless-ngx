@@ -16,7 +16,7 @@ from rest_framework.routers import DefaultRouter
 
 from documents.views import AcknowledgeTasksView
 from documents.views import BulkDownloadView
-from documents.views import BulkEditObjectPermissionsView
+from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
 from documents.views import CorrespondentViewSet
 from documents.views import CustomFieldViewSet
@@ -41,10 +41,12 @@ from documents.views import WorkflowTriggerViewSet
 from documents.views import WorkflowViewSet
 from paperless.consumers import StatusConsumer
 from paperless.views import ApplicationConfigurationViewSet
+from paperless.views import DisconnectSocialAccountView
 from paperless.views import FaviconView
 from paperless.views import GenerateAuthTokenView
 from paperless.views import GroupViewSet
 from paperless.views import ProfileView
+from paperless.views import SocialAccountProvidersView
 from paperless.views import UserViewSet
 from paperless_mail.views import MailAccountTestView
 from paperless_mail.views import MailAccountViewSet
@@ -127,11 +129,19 @@ urlpatterns = [
                 ),
                 path("token/", views.obtain_auth_token),
                 re_path(
-                    "^bulk_edit_object_perms/",
-                    BulkEditObjectPermissionsView.as_view(),
-                    name="bulk_edit_object_permissions",
+                    "^bulk_edit_objects/",
+                    BulkEditObjectsView.as_view(),
+                    name="bulk_edit_objects",
                 ),
                 path("profile/generate_auth_token/", GenerateAuthTokenView.as_view()),
+                path(
+                    "profile/disconnect_social_account/",
+                    DisconnectSocialAccountView.as_view(),
+                ),
+                path(
+                    "profile/social_account_providers/",
+                    SocialAccountProvidersView.as_view(),
+                ),
                 re_path(
                     "^profile/",
                     ProfileView.as_view(),
@@ -192,7 +202,7 @@ urlpatterns = [
     ),
     # TODO: with localization, this is even worse! :/
     # login, logout
-    path("accounts/", include("django.contrib.auth.urls")),
+    path("accounts/", include("allauth.urls")),
     # Root of the Frontend
     re_path(
         r".*",

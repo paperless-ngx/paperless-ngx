@@ -5,12 +5,15 @@
 </div>
 <div class="modal-body">
 
-  @if (!object && message) {
-    <p class="mb-3" [innerHTML]="message | safeHtml"></p>
-  }
-
   <form [formGroup]="form">
-    <pngx-permissions-form [users]="users" formControlName="permissions_form"></pngx-permissions-form>
+    <div class="form-group">
+      <pngx-permissions-form [users]="users" formControlName="permissions_form"></pngx-permissions-form>
+    </div>
+    <div class="form-group mt-4">
+      <div class="offset-lg-3 row">
+        <pngx-input-switch i18n-title title="Merge with existing permissions" [horizontal]="true" [hint]="hint" formControlName="merge"></pngx-input-switch>
+      </div>
+    </div>
   </form>
 
 </div>
@@ -20,5 +23,5 @@
     <span class="visually-hidden" i18n>Loading...</span>
   }
   <button type="button" class="btn btn-outline-primary" (click)="cancelClicked()" [disabled]="!buttonsEnabled" i18n>Cancel</button>
-  <button type="button" class="btn btn-primary" (click)="confirmClicked.emit(permissions)" [disabled]="!buttonsEnabled" i18n>Confirm</button>
+  <button type="button" class="btn btn-primary" (click)="confirm()" [disabled]="!buttonsEnabled" i18n>Confirm</button>
 </div>

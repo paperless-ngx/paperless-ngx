@@ -38,9 +38,13 @@
                         @if(trigger.id > -1) {
                           <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{trigger.id}}</span>
                         }
-                        <button type="button" class="btn btn-link text-danger ms-2" (click)="removeTrigger(i)">
-                          <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
-                        </button>
+                        <pngx-confirm-button
+                          label="Delete"
+                          i18n-label
+                          (confirm)="removeTrigger(i)"
+                          buttonClasses="btn-link text-danger ms-2"
+                          iconName="trash">
+                        </pngx-confirm-button>
                       </button>
                     </div>
                     <div ngbAccordionCollapse>
@@ -76,9 +80,13 @@
                         @if(action.id > -1) {
                           <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{action.id}}</span>
                         }
-                        <button type="button" class="btn btn-link text-danger ms-2" (click)="removeAction(i)">
-                          <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
-                        </button>
+                        <pngx-confirm-button
+                          label="Delete"
+                          i18n-label
+                          (confirm)="removeAction(i)"
+                          buttonClasses="btn-link text-danger ms-2"
+                          iconName="trash">
+                        </pngx-confirm-button>
                       </button>
                     </div>
                     <div ngbAccordionCollapse>

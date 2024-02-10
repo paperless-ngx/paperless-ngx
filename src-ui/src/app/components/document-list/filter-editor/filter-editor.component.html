@@ -18,7 +18,7 @@
           </select>
         }
         @if (_textFilter) {
-          <button class="btn btn-link btn-sm px-0 position-absolute top-0 end-0 z-10" (click)="resetTextField()">
+          <button class="btn btn-link btn-sm px-2 position-absolute top-0 end-0 z-10" (click)="resetTextField()">
             <i-bs width="1em" height="1em" name="x"></i-bs>
           </button>
         }
@@ -29,7 +29,8 @@
   <div class="col-auto">
     <div class="d-flex flex-wrap gap-3">
       <div class="d-flex flex-wrap gap-2">
-        <pngx-filterable-dropdown class="flex-fill" title="Tags" icon="tag-fill" i18n-title
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Tag)) {
+          <pngx-filterable-dropdown class="flex-fill" title="Tags" icon="tag-fill" i18n-title
           filterPlaceholder="Filter tags" i18n-filterPlaceholder
           [items]="tags"
           [manyToOne]="true"
@@ -37,31 +38,38 @@
           (selectionModelChange)="updateRules()"
           (opened)="onTagsDropdownOpen()"
           [documentCounts]="tagDocumentCounts"
-        [allowSelectNone]="true"></pngx-filterable-dropdown>
-        <pngx-filterable-dropdown class="flex-fill" title="Correspondent" icon="person-fill" i18n-title
+          [allowSelectNone]="true"></pngx-filterable-dropdown>
+        }
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
+          <pngx-filterable-dropdown class="flex-fill" title="Correspondent" icon="person-fill" i18n-title
           filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
           [items]="correspondents"
           [(selectionModel)]="correspondentSelectionModel"
           (selectionModelChange)="updateRules()"
           (opened)="onCorrespondentDropdownOpen()"
           [documentCounts]="correspondentDocumentCounts"
-        [allowSelectNone]="true"></pngx-filterable-dropdown>
-        <pngx-filterable-dropdown class="flex-fill" title="Document type" icon="file-earmark-fill" i18n-title
-          filterPlaceholder="Filter document types" i18n-filterPlaceholder
-          [items]="documentTypes"
-          [(selectionModel)]="documentTypeSelectionModel"
-          (selectionModelChange)="updateRules()"
-          (opened)="onDocumentTypeDropdownOpen()"
-          [documentCounts]="documentTypeDocumentCounts"
-        [allowSelectNone]="true"></pngx-filterable-dropdown>
-        <pngx-filterable-dropdown class="flex-fill" title="Storage path" icon="folder-fill" i18n-title
+          [allowSelectNone]="true"></pngx-filterable-dropdown>
+        }
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
+            <pngx-filterable-dropdown class="flex-fill" title="Document type" icon="file-earmark-fill" i18n-title
+            filterPlaceholder="Filter document types" i18n-filterPlaceholder
+            [items]="documentTypes"
+            [(selectionModel)]="documentTypeSelectionModel"
+            (selectionModelChange)="updateRules()"
+            (opened)="onDocumentTypeDropdownOpen()"
+            [documentCounts]="documentTypeDocumentCounts"
+            [allowSelectNone]="true"></pngx-filterable-dropdown>
+        }
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
+          <pngx-filterable-dropdown class="flex-fill" title="Storage path" icon="folder-fill" i18n-title
           filterPlaceholder="Filter storage paths" i18n-filterPlaceholder
           [items]="storagePaths"
           [(selectionModel)]="storagePathSelectionModel"
           (selectionModelChange)="updateRules()"
           (opened)="onStoragePathDropdownOpen()"
           [documentCounts]="storagePathDocumentCounts"
-        [allowSelectNone]="true"></pngx-filterable-dropdown>
+          [allowSelectNone]="true"></pngx-filterable-dropdown>
+        }
       </div>
       <div class="d-flex flex-wrap gap-2">
         <pngx-date-dropdown

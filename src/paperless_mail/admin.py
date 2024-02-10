@@ -9,11 +9,9 @@ from paperless_mail.models import ProcessedMail
 
 
 class MailAccountAdminForm(forms.ModelForm):
-
     """Metadata classes used by Django admin to display the form."""
 
     class Meta:
-
         """Metadata class used by Django admin to display the form."""
 
         model = MailAccount

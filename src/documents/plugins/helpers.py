@@ -5,7 +5,9 @@ from typing import Union
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from channels_redis.pubsub import RedisPubSubChannelLayer
+
+if TYPE_CHECKING:
+    from channels_redis.pubsub import RedisPubSubChannelLayer
 
 
 class ProgressStatusOptions(str, enum.Enum):

@@ -1,5 +1,8 @@
 import { DatePipe } from '@angular/common'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing'
 import {
   ComponentFixture,
   TestBed,
@@ -71,6 +74,7 @@ import { CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { PdfViewerComponent } from '../common/pdf-viewer/pdf-viewer.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { environment } from 'src/environments/environment'
 
 const doc: Document = {
   id: 3,
@@ -136,6 +140,7 @@ describe('DocumentDetailComponent', () => {
   let documentListViewService: DocumentListViewService
   let settingsService: SettingsService
   let customFieldsService: CustomFieldsService
+  let httpTestingController: HttpTestingController
 
   let currentUserCan = true
   let currentUserHasObjectPermissions = true
@@ -266,6 +271,7 @@ describe('DocumentDetailComponent', () => {
     settingsService.currentUser = { id: 1 }
     customFieldsService = TestBed.inject(CustomFieldsService)
     fixture = TestBed.createComponent(DocumentDetailComponent)
+    httpTestingController = TestBed.inject(HttpTestingController)
     component = fixture.componentInstance
   })
 
@@ -348,6 +354,26 @@ describe('DocumentDetailComponent', () => {
     currentUserHasObjectPermissions = false
     initNormally()
     expect(component.documentForm.disabled).toBeTruthy()
+  })
+
+  it('should not attempt to retrieve objects if user does not have permissions', () => {
+    currentUserCan = false
+    initNormally()
+    expect(component.correspondents).toBeUndefined()
+    expect(component.documentTypes).toBeUndefined()
+    expect(component.storagePaths).toBeUndefined()
+    expect(component.users).toBeUndefined()
+    httpTestingController.expectNone(`${environment.apiBaseUrl}documents/tags/`)
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/correspondents/`
+    )
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/document_types/`
+    )
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/storage_paths/`
+    )
+    currentUserCan = true
   })
 
   it('should support creating document type', () => {

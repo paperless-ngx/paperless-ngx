@@ -81,14 +81,15 @@ class MatchingModelSerializer(serializers.ModelSerializer):
     slug = SerializerMethodField()
 
     def validate(self, data):
-        # see https://github.com/encode/django-rest-framework/issues/7173
-        name = data["name"] if "name" in data else self.instance.name
+        # TODO: remove pending https://github.com/encode/django-rest-framework/issues/7173
+        name = data.get(
+            "name",
+            self.instance.name if hasattr(self.instance, "name") else None,
+        )
         owner = (
             data["owner"]
             if "owner" in data
-            else self.user
-            if hasattr(self, "user")
-            else None
+            else self.user if hasattr(self, "user") else None
         )
         pk = self.instance.pk if hasattr(self.instance, "pk") else None
         if ("name" in data or "owner" in data) and self.Meta.model.objects.filter(
@@ -261,7 +262,7 @@ class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
         if "set_permissions" in validated_data:
             self._set_permissions(validated_data["set_permissions"], instance)
         if "owner" in validated_data and "name" in self.Meta.fields:
-            name = validated_data["name"] if "name" in validated_data else instance.name
+            name = validated_data.get("name", instance.name)
             not_unique = (
                 self.Meta.model.objects.exclude(pk=instance.pk)
                 .filter(owner=validated_data["owner"], name=name)
@@ -440,6 +441,20 @@ class CustomFieldSerializer(serializers.ModelSerializer):
             "name",
             "data_type",
         ]
+
+    def validate(self, attrs):
+        # TODO: remove pending https://github.com/encode/django-rest-framework/issues/7173
+        name = attrs.get(
+            "name",
+            self.instance.name if hasattr(self.instance, "name") else None,
+        )
+        if ("name" in attrs) and self.Meta.model.objects.filter(
+            name=name,
+        ).exists():
+            raise serializers.ValidationError(
+                {"error": "Object violates name unique constraint"},
+            )
+        return super().validate(attrs)
 
 
 class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
@@ -638,6 +653,11 @@ class DocumentSerializer(
         allow_null=True,
     )
 
+    remove_inbox_tags = serializers.BooleanField(
+        default=False,
+        write_only=True,
+    )
+
     def get_original_file_name(self, obj):
         return obj.original_filename
 
@@ -681,11 +701,44 @@ class DocumentSerializer(
                             custom_field_instance.field,
                             doc_id,
                         )
+        if validated_data.get("remove_inbox_tags"):
+            tag_ids_being_added = (
+                [
+                    tag.id
+                    for tag in validated_data["tags"]
+                    if tag not in instance.tags.all()
+                ]
+                if "tags" in validated_data
+                else []
+            )
+            inbox_tags_not_being_added = Tag.objects.filter(is_inbox_tag=True).exclude(
+                id__in=tag_ids_being_added,
+            )
+            if "tags" in validated_data:
+                validated_data["tags"] = [
+                    tag
+                    for tag in validated_data["tags"]
+                    if tag not in inbox_tags_not_being_added
+                ]
+            else:
+                validated_data["tags"] = [
+                    tag
+                    for tag in instance.tags.all()
+                    if tag not in inbox_tags_not_being_added
+                ]
         super().update(instance, validated_data)
         return instance
 
     def __init__(self, *args, **kwargs):
         self.truncate_content = kwargs.pop("truncate_content", False)
+
+        # return full permissions if we're doing a PATCH or PUT
+        context = kwargs.get("context")
+        if (
+            context.get("request").method == "PATCH"
+            or context.get("request").method == "PUT"
+        ):
+            kwargs["full_perms"] = True
 
         super().__init__(*args, **kwargs)
 
@@ -714,6 +767,7 @@ class DocumentSerializer(
             "set_permissions",
             "notes",
             "custom_fields",
+            "remove_inbox_tags",
         )
 
 
@@ -916,6 +970,8 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
         )
         if "owner" in parameters and parameters["owner"] is not None:
             self._validate_owner(parameters["owner"])
+        if "merge" not in parameters:
+            parameters["merge"] = False
 
     def validate(self, attrs):
         method = attrs["method"]
@@ -1225,7 +1281,7 @@ class ShareLinkSerializer(OwnedObjectSerializer):
         return super().create(validated_data)
 
 
-class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissionsMixin):
+class BulkEditObjectsSerializer(serializers.Serializer, SetPermissionsMixin):
     objects = serializers.ListField(
         required=True,
         allow_empty=False,
@@ -1245,6 +1301,16 @@ class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissions
         write_only=True,
     )
 
+    operation = serializers.ChoiceField(
+        choices=[
+            "set_permissions",
+            "delete",
+        ],
+        label="Operation",
+        required=True,
+        write_only=True,
+    )
+
     owner = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
         required=False,
@@ -1256,6 +1322,12 @@ class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissions
         allow_empty=False,
         required=False,
         write_only=True,
+    )
+
+    merge = serializers.BooleanField(
+        default=False,
+        write_only=True,
+        required=False,
     )
 
     def get_object_class(self, object_type):
@@ -1291,11 +1363,14 @@ class BulkEditObjectPermissionsSerializer(serializers.Serializer, SetPermissions
     def validate(self, attrs):
         object_type = attrs["object_type"]
         objects = attrs["objects"]
-        permissions = attrs["permissions"] if "permissions" in attrs else None
+        operation = attrs.get("operation")
 
         self._validate_objects(objects, object_type)
-        if permissions is not None:
-            self._validate_permissions(permissions)
+
+        if operation == "set_permissions":
+            permissions = attrs.get("permissions")
+            if permissions is not None:
+                self._validate_permissions(permissions)
 
         return attrs
 
@@ -1335,9 +1410,6 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
-        if ("filter_mailrule") in attrs and attrs["filter_mailrule"] is not None:
-            attrs["sources"] = {DocumentSource.MailFetch.value}
-
         # Empty strings treated as None to avoid unexpected behavior
         if (
             "filter_filename" in attrs
@@ -1453,7 +1525,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
             for trigger in triggers:
                 filter_has_tags = trigger.pop("filter_has_tags", None)
                 trigger_instance, _ = WorkflowTrigger.objects.update_or_create(
-                    id=trigger["id"] if "id" in trigger else None,
+                    id=trigger.get("id"),
                     defaults=trigger,
                 )
                 if filter_has_tags is not None:
@@ -1469,7 +1541,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
                 assign_change_groups = action.pop("assign_change_groups", None)
                 assign_custom_fields = action.pop("assign_custom_fields", None)
                 action_instance, _ = WorkflowAction.objects.update_or_create(
-                    id=action["id"] if "id" in action else None,
+                    id=action.get("id"),
                     defaults=action,
                 )
                 if assign_tags is not None:
