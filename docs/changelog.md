@@ -31,7 +31,7 @@
 - Fix: only check workflow trigger source if not empty [@shamoon](https://github.com/shamoon) ([#5701](https://github.com/paperless-ngx/paperless-ngx/pull/5701))
 - Fix: frontend validation of number fields fails upon save [@shamoon](https://github.com/shamoon) ([#5646](https://github.com/paperless-ngx/paperless-ngx/pull/5646))
 - Fix: Explicit validation of custom field name unique constraint [@shamoon](https://github.com/shamoon) ([#5647](https://github.com/paperless-ngx/paperless-ngx/pull/5647))
-- Fix: Don't attempt to retrieve object types user doesnt have permissions to [@shamoon](https://github.com/shamoon) ([#5612](https://github.com/paperless-ngx/paperless-ngx/pull/5612))
+- Fix: Don't attempt to retrieve object types user doesn't have permissions to [@shamoon](https://github.com/shamoon) ([#5612](https://github.com/paperless-ngx/paperless-ngx/pull/5612))
 
 ### Documentation
 
@@ -92,7 +92,7 @@
 - Enhancement: mergeable bulk edit permissions [@shamoon](https://github.com/shamoon) ([#5508](https://github.com/paperless-ngx/paperless-ngx/pull/5508))
 - Enhancement: re-implement remote user auth for unsafe API requests as opt-in [@shamoon](https://github.com/shamoon) ([#5561](https://github.com/paperless-ngx/paperless-ngx/pull/5561))
 - Enhancement: Respect PDF cropbox for thumbnail generation [@henningBunk](https://github.com/henningBunk) ([#5531](https://github.com/paperless-ngx/paperless-ngx/pull/5531))
-- Fix: Don't attempt to retrieve object types user doesnt have permissions to [@shamoon](https://github.com/shamoon) ([#5612](https://github.com/paperless-ngx/paperless-ngx/pull/5612))
+- Fix: Don't attempt to retrieve object types user doesn't have permissions to [@shamoon](https://github.com/shamoon) ([#5612](https://github.com/paperless-ngx/paperless-ngx/pull/5612))
 </details>
 
 ## paperless-ngx 2.4.3
