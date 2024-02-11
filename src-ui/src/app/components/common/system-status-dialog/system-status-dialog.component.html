@@ -1,0 +1,101 @@
+<div class="modal-header">
+  <h5 class="modal-title" id="modal-basic-title" i18n>System Status</h5>
+  <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
+</div>
+<div class="modal-body">
+  @if (!status) {
+    <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+      <div>
+        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+        <ng-container i18n>Loading...</ng-container>
+      </div>
+    </div>
+  } @else {
+    <h5 i18n>General Info</h5>
+    <dl>
+      <dt i18n>Paperless-ngx Version:</dt>
+      <dd>{{status.pngx_version}}</dd>
+      <dt i18n>Install Type:</dt>
+      <dd>{{status.install_type}}</dd>
+      <dt i18n>Server OS:</dt>
+      <dd>{{status.server_os}}</dd>
+      <dt i18n>Media Storage:</dt>
+      <dd>
+        <ngb-progressbar style="height: 4px;" class="my-2" type="primary" [max]="status.storage.total" [value]="status.storage.total - status.storage.available"></ngb-progressbar>
+        <span class="small">{{status.storage.available | filesize}} <ng-container i18n>available</ng-container> ({{status.storage.total | filesize}} <ng-container i18n>total</ng-container>)</span>
+      </dd>
+    </dl>
+
+    <h5 i18n>Database</h5>
+    <dl>
+      <dt i18n>Type:</dt>
+      <dd>{{status.database.type}}</dd>
+      <dt i18n>URL:</dt>
+      <dd>{{status.database.url}}</dd>
+      <dt i18n>Status:</dt>
+      <dd>
+        {{status.database.status}}
+        @if (status.database.status === 'OK') {
+          <i-bs name="check-circle-fill" class="text-success ms-1"></i-bs>
+        } @else {
+          <i-bs name="exclamation-triangle-fill" class="text-danger ms-1" ngbPopover="{{status.database.error}}" triggers="mouseenter:mouseleave"></i-bs>
+        }
+      </dd>
+      <dt i18n>Migration Status:</dt>
+      <dd>
+        @if (status.database.migration_status.unapplied_migrations.length === 0) {
+          <ng-container>Up to date</ng-container><i-bs name="check-circle-fill" class="text-success ms-1" [ngbPopover]="migrationStatus" triggers="mouseenter:mouseleave"></i-bs>
+        } @else {
+          <ng-container>{{status.database.migration_status.unapplied_migrations.length}} Pending</ng-container><i-bs name="exclamation-triangle-fill" class="text-warning ms-1" [ngbPopover]="migrationStatus" triggers="mouseenter:mouseleave"></i-bs>
+        }
+        <ng-template #migrationStatus>
+          <ng-container i18n>Latest Migration</ng-container>: {{status.database.migration_status.latest_migration}}<br/>
+          @if (status.database.migration_status.unapplied_migrations.length > 0) {
+            <ng-container i18n>Pending Migrations</ng-container>:
+            <ul>
+              @for (migration of status.database.migration_status.unapplied_migrations; track migration) {
+                <li>{{migration}}</li>
+              }
+            </ul>
+          }
+        </ng-template>
+      </dd>
+      @if (status.database.migration_status.unapplied_migrations.length > 0) {
+        <dt i18n>Pending Migrations:</dt>
+        <dd>
+          <ul>
+            @for (migration of status.database.migration_status.unapplied_migrations; track migration) {
+              <li>{{migration}}</li>
+            }
+          </ul>
+        </dd>
+      }
+    </dl>
+
+    <h5 i18n>Redis</h5>
+    <dl>
+      <dt i18n>URL:</dt>
+      <dd>{{status.redis.url}}</dd>
+      <dt i18n>Status:</dt>
+      <dd>
+        {{status.redis.status}}
+        @if (status.redis.status === 'OK') {
+          <i-bs name="check-circle-fill" class="text-success ms-1"></i-bs>
+        } @else {
+          <i-bs name="exclamation-triangle-fill" class="text-danger ms-1" ngbPopover="{{status.redis.error}}" triggers="mouseenter:mouseleave"></i-bs>
+        }
+      </dd>
+    </dl>
+  }
+</div>
+<div class="modal-footer">
+  <button class="btn btn-sm btn-outline-secondary" (click)="copy()">
+    @if (!copied) {
+      <i-bs name="clipboard-fill"></i-bs>&nbsp;
+    }
+    @if (copied) {
+      <i-bs name="clipboard-check-fill"></i-bs>&nbsp;
+    }
+    <ng-container i18n>Copy</ng-container>
+  </button>
+</div>

@@ -38,6 +38,7 @@ import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop'
 import { SavedView } from 'src/app/data/saved-view'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { SystemStatusDialogComponent } from '../common/system-status-dialog/system-status-dialog.component'
 
 const saved_views = [
   {
@@ -414,5 +415,11 @@ describe('AppFrameComponent', () => {
     component.ngOnInit()
     expect(toastErrorSpy).toHaveBeenCalledTimes(2)
     expect(toastInfoSpy).toHaveBeenCalledTimes(3)
+  })
+
+  it('should open system status dialog', () => {
+    const modalOpenSpy = jest.spyOn(modalService, 'open')
+    component.showSystemStatus()
+    expect(modalOpenSpy).toHaveBeenCalledWith(SystemStatusDialogComponent)
   })
 })
