@@ -50,7 +50,7 @@ scikit-learn = "~=1.4"
 setproctitle = "*"
 tika-client = "*"
 tqdm = "*"
-uvicorn = {extras = ["standard"], version = "==0.25.0"}
+uvicorn = {extras = ["standard"], version = "==0.27.1"}
 watchdog = "~=3.0"
 whitenoise = "~=6.6"
 whoosh="~=2.7"
