@@ -88,64 +88,71 @@ class BarcodePlugin(ConsumeTaskPlugin):
         self.detect()
 
         # Update/overwrite an ASN if possible
-        located_asn = self.asn
-        if located_asn is not None:
+        if (
+            settings.CONSUMER_ENABLE_ASN_BARCODE
+            and (located_asn := self.asn) is not None
+        ):
             logger.info(f"Found ASN in barcode: {located_asn}")
             self.metadata.asn = located_asn
 
         # try reading tags from barcodes
-        if settings.CONSUMER_ENABLE_TAG_BARCODE:
-            tags = self.tags
-            if tags is not None and len(tags) > 0:
-                if self.metadata.tag_ids:
-                    self.metadata.tag_ids += tags
-                else:
-                    self.metadata.tag_ids = tags
-                logger.info(f"Found tags in barcode: {tags}")
+        if (
+            settings.CONSUMER_ENABLE_TAG_BARCODE
+            and (tags := self.tags) is not None
+            and len(tags) > 0
+        ):
+            if self.metadata.tag_ids:
+                self.metadata.tag_ids += tags
+            else:
+                self.metadata.tag_ids = tags
+            logger.info(f"Found tags in barcode: {tags}")
 
-        separator_pages = self.get_separation_pages()
-        if not separator_pages:
-            return "No pages to split on!"
+        # Lastly attempt to split documents
+        if settings.CONSUMER_ENABLE_BARCODES:
 
-        # We have pages to split against
+            separator_pages = self.get_separation_pages()
+            if not separator_pages:
+                return "No pages to split on!"
 
-        # Note this does NOT use the base_temp_dir, as that will be removed
-        tmp_dir = Path(
-            tempfile.mkdtemp(
-                dir=settings.SCRATCH_DIR,
-                prefix="paperless-barcode-split-",
-            ),
-        ).resolve()
+            # We have pages to split against
 
-        from documents import tasks
-
-        # Create the split document tasks
-        for new_document in self.separate_pages(separator_pages):
-            copy_file_with_basic_stats(new_document, tmp_dir / new_document.name)
-
-            task = tasks.consume_file.delay(
-                ConsumableDocument(
-                    # Same source, for templates
-                    source=self.input_doc.source,
-                    mailrule_id=self.input_doc.mailrule_id,
-                    # Can't use same folder or the consume might grab it again
-                    original_file=(tmp_dir / new_document.name).resolve(),
+            # Note this does NOT use the base_temp_dir, as that will be removed
+            tmp_dir = Path(
+                tempfile.mkdtemp(
+                    dir=settings.SCRATCH_DIR,
+                    prefix="paperless-barcode-split-",
                 ),
-                # All the same metadata
-                self.metadata,
-            )
-            logger.info(f"Created new task {task.id} for {new_document.name}")
+            ).resolve()
 
-        # This file is now two or more files
-        self.input_doc.original_file.unlink()
+            from documents import tasks
 
-        msg = "Barcode splitting complete!"
+            # Create the split document tasks
+            for new_document in self.separate_pages(separator_pages):
+                copy_file_with_basic_stats(new_document, tmp_dir / new_document.name)
 
-        # Update the progress to complete
-        self.status_mgr.send_progress(ProgressStatusOptions.SUCCESS, msg, 100, 100)
+                task = tasks.consume_file.delay(
+                    ConsumableDocument(
+                        # Same source, for templates
+                        source=self.input_doc.source,
+                        mailrule_id=self.input_doc.mailrule_id,
+                        # Can't use same folder or the consume might grab it again
+                        original_file=(tmp_dir / new_document.name).resolve(),
+                    ),
+                    # All the same metadata
+                    self.metadata,
+                )
+                logger.info(f"Created new task {task.id} for {new_document.name}")
 
-        # Request the consume task stops
-        raise StopConsumeTaskError(msg)
+            # This file is now two or more files
+            self.input_doc.original_file.unlink()
+
+            msg = "Barcode splitting complete!"
+
+            # Update the progress to complete
+            self.status_mgr.send_progress(ProgressStatusOptions.SUCCESS, msg, 100, 100)
+
+            # Request the consume task stops
+            raise StopConsumeTaskError(msg)
 
     def cleanup(self) -> None:
         self.temp_dir.cleanup()
