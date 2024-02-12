@@ -37,10 +37,11 @@ const status: PaperlessSystemStatus = {
       unapplied_migrations: [],
     },
   },
-  redis: {
-    url: 'redis://localhost:6379',
-    status: PaperlessConnectionStatus.ERROR,
-    error: 'Error 61 connecting to localhost:6379. Connection refused.',
+  tasks: {
+    redis_url: 'redis://localhost:6379',
+    redis_status: PaperlessConnectionStatus.ERROR,
+    redis_error: 'Error 61 connecting to localhost:6379. Connection refused.',
+    celery_status: PaperlessConnectionStatus.ERROR,
   },
 }
 

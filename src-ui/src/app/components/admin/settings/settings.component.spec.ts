@@ -9,6 +9,8 @@ import {
   NgbModule,
   NgbAlertModule,
   NgbNavLink,
+  NgbModal,
+  NgbModalModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of, throwError } from 'rxjs'
@@ -39,6 +41,7 @@ import { SettingsComponent } from './settings.component'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
+import { SystemStatusDialogComponent } from '../../common/system-status-dialog/system-status-dialog.component'
 
 const savedViews = [
   { id: 1, name: 'view1', show_in_sidebar: true, show_on_dashboard: true },
@@ -65,6 +68,7 @@ describe('SettingsComponent', () => {
   let userService: UserService
   let permissionsService: PermissionsService
   let groupService: GroupService
+  let modalService: NgbModal
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -96,6 +100,7 @@ describe('SettingsComponent', () => {
         NgbAlertModule,
         NgSelectModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        NgbModalModule,
       ],
     }).compileComponents()
 
@@ -107,6 +112,7 @@ describe('SettingsComponent', () => {
     settingsService.currentUser = users[0]
     userService = TestBed.inject(UserService)
     permissionsService = TestBed.inject(PermissionsService)
+    modalService = TestBed.inject(NgbModal)
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     jest
       .spyOn(permissionsService, 'currentUserHasObjectPermissions')
@@ -371,5 +377,14 @@ describe('SettingsComponent', () => {
     completeSetup(groupService)
     fixture.detectChanges()
     expect(toastErrorSpy).toBeCalled()
+  })
+
+  it('should open system status dialog', () => {
+    const modalOpenSpy = jest.spyOn(modalService, 'open')
+    completeSetup()
+    component.showSystemStatus()
+    expect(modalOpenSpy).toHaveBeenCalledWith(SystemStatusDialogComponent, {
+      size: 'xl',
+    })
   })
 })

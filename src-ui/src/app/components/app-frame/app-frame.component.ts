@@ -46,7 +46,6 @@ import {
 } from '@angular/cdk/drag-drop'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
-import { SystemStatusDialogComponent } from '../common/system-status-dialog/system-status-dialog.component'
 
 @Component({
   selector: 'pngx-app-frame',
@@ -316,9 +315,5 @@ export class AppFrameComponent
 
   onLogout() {
     this.openDocumentsService.closeAll()
-  }
-
-  showSystemStatus() {
-    this.modalService.open(SystemStatusDialogComponent)
   }
 }

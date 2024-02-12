@@ -9,7 +9,7 @@ import {
 } from '@angular/core'
 import { FormGroup, FormControl } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
-import { NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
+import { NgbModal, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
 import { DirtyComponent, dirtyCheck } from '@ngneat/dirty-check-forms'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 import {
@@ -40,6 +40,7 @@ import {
 } from 'src/app/services/settings.service'
 import { ToastService, Toast } from 'src/app/services/toast.service'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { SystemStatusDialogComponent } from '../../common/system-status-dialog/system-status-dialog.component'
 
 enum SettingsNavIDs {
   General = 1,
@@ -131,7 +132,8 @@ export class SettingsComponent
     private usersService: UserService,
     private groupsService: GroupService,
     private router: Router,
-    public permissionsService: PermissionsService
+    public permissionsService: PermissionsService,
+    private modalService: NgbModal
   ) {
     super()
     this.settings.settingsSaved.subscribe(() => {
@@ -564,5 +566,11 @@ export class SettingsComponent
 
   clearThemeColor() {
     this.settingsForm.get('themeColor').patchValue('')
+  }
+
+  showSystemStatus() {
+    this.modalService.open(SystemStatusDialogComponent, {
+      size: 'xl',
+    })
   }
 }

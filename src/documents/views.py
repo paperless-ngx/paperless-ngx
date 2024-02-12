@@ -14,6 +14,7 @@ from unicodedata import normalize
 from urllib.parse import quote
 
 import pathvalidate
+from celery import Celery
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import connections
@@ -1555,6 +1556,12 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
 
         current_version = version.__full_version_str__
 
+        install_type = "bare-metal"
+        if os.environ.get("KUBERNETES_SERVICE_HOST") is not None:
+            install_type = "kubernetes"
+        elif os.environ.get("PNGX_CONTAINERIZED") == "1":
+            install_type = "docker"
+
         media_stats = os.statvfs(settings.MEDIA_ROOT)
 
         db_conn = connections["default"]
@@ -1583,15 +1590,21 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
                 redis_status = "ERROR"
                 redis_error = str(e)
 
+        try:
+            app = Celery("paperless")
+            app.config_from_object("django.conf:settings", namespace="CELERY")
+            ping = app.control.inspect().ping()
+            first_worker_ping = ping[next(iter(ping.keys()))]
+            if first_worker_ping["ok"] == "pong":
+                celery_active = "OK"
+        except Exception:
+            celery_active = "ERROR"
+
         return Response(
             {
                 "pngx_version": current_version,
                 "server_os": platform.platform(),
-                "install_type": (
-                    "containerized"
-                    if os.environ.get("PNGX_CONTAINERIZED") == "1"
-                    else "bare-metal"
-                ),
+                "install_type": install_type,
                 "storage": {
                     "total": media_stats.f_frsize * media_stats.f_blocks,
                     "available": media_stats.f_frsize * media_stats.f_bavail,
@@ -1608,10 +1621,11 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
                         ],
                     },
                 },
-                "redis": {
-                    "url": redis_url,
-                    "status": redis_status,
-                    "error": redis_error,
+                "tasks": {
+                    "redis_url": redis_url,
+                    "redis_status": redis_status,
+                    "redis_error": redis_error,
+                    "celery_status": celery_active,
                 },
             },
         )

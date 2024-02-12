@@ -26,9 +26,10 @@ export interface PaperlessSystemStatus {
       unapplied_migrations: string[]
     }
   }
-  redis: {
-    url: string
-    status: PaperlessConnectionStatus
-    error: string
+  tasks: {
+    redis_url: string
+    redis_status: PaperlessConnectionStatus
+    redis_error: string
+    celery_status: PaperlessConnectionStatus
   }
 }
