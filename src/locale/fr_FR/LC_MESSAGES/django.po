@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-08 11:56-0800\n"
-"PO-Revision-Date: 2024-02-09 12:08\n"
+"PO-Revision-Date: 2024-02-12 12:09\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -907,7 +907,7 @@ msgstr "Voici un lien vers la documentation."
 #: documents/templates/socialaccount/authentication_error.html:15
 #: documents/templates/socialaccount/login.html:15
 msgid "Paperless-ngx social account sign in"
-msgstr ""
+msgstr "Connexion à Paperless-ngx avec un compte externe"
 
 #: documents/templates/socialaccount/authentication_error.html:43
 #, python-format
@@ -925,7 +925,7 @@ msgstr "Continuer"
 
 #: documents/templates/socialaccount/signup.html:14
 msgid "Paperless-ngx social account sign up"
-msgstr ""
+msgstr "Inscription à Paperless-ngx avec un compte externe"
 
 #: documents/templates/socialaccount/signup.html:53
 #, python-format

@@ -4379,7 +4379,7 @@
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">What's this?</target>
+        <target state="translated">Šta je ovo?</target>
       </trans-unit>
       <trans-unit id="2827984212740060090" datatype="html">
         <source>Read more</source>
@@ -5498,7 +5498,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">352</context>
         </context-group>
-        <target state="needs-translation">Ok</target>
+        <target state="translated">Ok</target>
       </trans-unit>
       <trans-unit id="5758784066858623886" datatype="html">
         <source>Error retrieving metadata</source>
