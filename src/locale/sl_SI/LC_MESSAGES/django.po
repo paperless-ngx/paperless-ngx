@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-08 11:56-0800\n"
-"PO-Revision-Date: 2024-02-08 19:57\n"
+"PO-Revision-Date: 2024-02-10 19:44\n"
 "Last-Translator: \n"
 "Language-Team: Slovenian\n"
 "Language: sl_SI\n"
@@ -757,7 +757,7 @@ msgstr ""
 
 #: documents/models.py:1120
 msgid "enabled"
-msgstr ""
+msgstr "omogočeno"
 
 #: documents/serialisers.py:113
 #, python-format
@@ -958,7 +958,7 @@ msgstr "Paperless"
 
 #: paperless/models.py:26
 msgid "pdf"
-msgstr ""
+msgstr "pdf"
 
 #: paperless/models.py:27
 msgid "pdfa"
@@ -994,7 +994,7 @@ msgstr ""
 
 #: paperless/models.py:50
 msgid "never"
-msgstr ""
+msgstr "nikoli"
 
 #: paperless/models.py:51
 msgid "with_text"
@@ -1002,7 +1002,7 @@ msgstr ""
 
 #: paperless/models.py:52
 msgid "always"
-msgstr ""
+msgstr "vedno"
 
 #: paperless/models.py:60
 msgid "clean"
@@ -1030,7 +1030,7 @@ msgstr ""
 
 #: paperless/models.py:73
 msgid "Gray"
-msgstr ""
+msgstr "Siva"
 
 #: paperless/models.py:74
 msgid "CMYK"
@@ -1090,11 +1090,11 @@ msgstr ""
 
 #: paperless/models.py:171
 msgid "Application title"
-msgstr ""
+msgstr "Naslov aplikacije"
 
 #: paperless/models.py:178
 msgid "Application logo"
-msgstr ""
+msgstr "Logotip aplikacije"
 
 #: paperless/models.py:188
 msgid "paperless application settings"
@@ -1166,7 +1166,7 @@ msgstr "Italijanščina"
 
 #: paperless/settings.py:658
 msgid "Japanese"
-msgstr ""
+msgstr "japonščina"
 
 #: paperless/settings.py:659
 msgid "Luxembourgish"
