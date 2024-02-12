@@ -402,6 +402,7 @@ class TestBarcode(
 
             self.assertEqual(len(documents), 2)
 
+    @override_settings(CONSUMER_ENABLE_BARCODES=True)
     def test_separate_pages_no_list(self):
         """
         GIVEN:
