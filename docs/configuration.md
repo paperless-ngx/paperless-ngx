@@ -540,8 +540,8 @@ This is for use with self-signed certificates against local IMAP servers.
 
 : This variable is used to setup login and signup via social account providers which are compatible with django-allauth.
 See the corresponding [django-allauth documentation](https://docs.allauth.org/en/0.60.0/socialaccount/providers/index.html)
-for a list of provider configurations. You will also likely need to include the relevant Django 'application' inside the
-[PAPERLESS_APPS](#PAPERLESS_APPS) setting.
+for a list of provider configurations. You will also need to include the relevant Django 'application' inside the
+[PAPERLESS_APPS](#PAPERLESS_APPS) setting to activate that specific authentication provider (e.g. `allauth.socialaccount.providers.openid_connect` for the [OIDC Connect provider](https://docs.allauth.org/en/latest/socialaccount/providers/openid_connect.html)).
 
     Defaults to None, which does not enable any third party authentication systems.
 
