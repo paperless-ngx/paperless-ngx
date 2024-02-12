@@ -90,8 +90,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
         # Update/overwrite an ASN if possible
         if (
             settings.CONSUMER_ENABLE_ASN_BARCODE
-            and (located_asn := self.asn)
-            and located_asn is not None
+            and (located_asn := self.asn) is not None
         ):
             logger.info(f"Found ASN in barcode: {located_asn}")
             self.metadata.asn = located_asn
@@ -99,8 +98,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
         # try reading tags from barcodes
         if (
             settings.CONSUMER_ENABLE_TAG_BARCODE
-            and (tags := self.tags)
-            and tags is not None
+            and (tags := self.tags) is not None
             and len(tags) > 0
         ):
             if self.metadata.tag_ids:
