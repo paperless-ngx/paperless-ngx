@@ -1562,23 +1562,26 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
         elif os.environ.get("PNGX_CONTAINERIZED") == "1":
             install_type = "docker"
 
-        media_stats = os.statvfs(settings.MEDIA_ROOT)
-
         db_conn = connections["default"]
         db_url = db_conn.settings_dict["NAME"]
-        loader = MigrationLoader(connection=db_conn)
-        all_migrations = [f"{app}.{name}" for app, name in loader.graph.nodes]
-        applied_migrations = [
-            f"{m.app}.{m.name}"
-            for m in MigrationRecorder.Migration.objects.all().order_by("id")
-        ]
         db_error = None
+
         try:
-            db_conn.cursor()
+            db_conn.ensure_connection()
             db_status = "OK"
-        except Exception as e:
+            loader = MigrationLoader(connection=db_conn)
+            all_migrations = [f"{app}.{name}" for app, name in loader.graph.nodes]
+            applied_migrations = [
+                f"{m.app}.{m.name}"
+                for m in MigrationRecorder.Migration.objects.all().order_by("id")
+            ]
+        except Exception as e:  # pragma: no cover
+            applied_migrations = []
             db_status = "ERROR"
-            db_error = str(e)
+            logger.exception(f"System status error connecting to database: {e}")
+            db_error = "Error connecting to database, check logs for more detail."
+
+        media_stats = os.statvfs(settings.MEDIA_ROOT)
 
         redis_url = settings._CELERY_REDIS_URL
         redis_error = None
@@ -1588,7 +1591,8 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
                 redis_status = "OK"
             except Exception as e:
                 redis_status = "ERROR"
-                redis_error = str(e)
+                logger.exception(f"System status error connecting to redis: {e}")
+                redis_error = "Error connecting to redis, check logs for more detail."
 
         try:
             ping = celery_app.control.inspect().ping()

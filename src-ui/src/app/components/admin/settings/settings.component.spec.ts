@@ -415,6 +415,11 @@ describe('SettingsComponent', () => {
     completeSetup()
     expect(component['systemStatus']).toEqual(status) // private
     expect(component.systemStatusHasErrors).toBeTruthy()
+    // coverage
+    component['systemStatus'].database.status = PaperlessConnectionStatus.OK
+    component['systemStatus'].tasks.redis_status = PaperlessConnectionStatus.OK
+    component['systemStatus'].tasks.celery_status = PaperlessConnectionStatus.OK
+    expect(component.systemStatusHasErrors).toBeFalsy()
   })
 
   it('should open system status dialog', () => {
