@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-08 11:56-0800\n"
-"PO-Revision-Date: 2024-02-09 12:08\n"
+"PO-Revision-Date: 2024-02-11 12:08\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -912,7 +912,7 @@ msgstr "Paperless-ngx Drittanbieterkonto-Anmeldung"
 #: documents/templates/socialaccount/authentication_error.html:43
 #, python-format
 msgid "An error occurred while attempting to login via your social network account. Back to the <a href=\"%(login_url)s\">login page</a>"
-msgstr "Beim Versuch, sich über Ihren Social-Media-Account anzumelden, ist ein Fehler aufgetreten. Zurück zur <a href=\"%(login_url)s\">Login-Seite</a>"
+msgstr "Fehler beim Anmelden über Ihr Drittanbieterkonto. Zurück zur <a href=\"%(login_url)s\">Anmeldeseite</a>"
 
 #: documents/templates/socialaccount/login.html:44
 #, python-format
