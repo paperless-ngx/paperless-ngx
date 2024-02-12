@@ -42,6 +42,12 @@ import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
 import { SystemStatusDialogComponent } from '../../common/system-status-dialog/system-status-dialog.component'
+import { SystemStatusService } from 'src/app/services/system-status.service'
+import {
+  PaperlessSystemStatus,
+  PaperlessInstallType,
+  PaperlessConnectionStatus,
+} from 'src/app/data/system-status'
 
 const savedViews = [
   { id: 1, name: 'view1', show_in_sidebar: true, show_on_dashboard: true },
@@ -69,6 +75,7 @@ describe('SettingsComponent', () => {
   let permissionsService: PermissionsService
   let groupService: GroupService
   let modalService: NgbModal
+  let systemStatusService: SystemStatusService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -113,6 +120,7 @@ describe('SettingsComponent', () => {
     userService = TestBed.inject(UserService)
     permissionsService = TestBed.inject(PermissionsService)
     modalService = TestBed.inject(NgbModal)
+    systemStatusService = TestBed.inject(SystemStatusService)
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     jest
       .spyOn(permissionsService, 'currentUserHasObjectPermissions')
@@ -377,6 +385,36 @@ describe('SettingsComponent', () => {
     completeSetup(groupService)
     fixture.detectChanges()
     expect(toastErrorSpy).toBeCalled()
+  })
+
+  it('should load system status on initialize, show errors if needed', () => {
+    const status: PaperlessSystemStatus = {
+      pngx_version: '2.4.3',
+      server_os: 'macOS-14.1.1-arm64-arm-64bit',
+      install_type: PaperlessInstallType.BareMetal,
+      storage: { total: 494384795648, available: 13573525504 },
+      database: {
+        type: 'sqlite',
+        url: '/paperless-ngx/data/db.sqlite3',
+        status: PaperlessConnectionStatus.ERROR,
+        error: null,
+        migration_status: {
+          latest_migration: 'socialaccount.0006_alter_socialaccount_extra_data',
+          unapplied_migrations: [],
+        },
+      },
+      tasks: {
+        redis_url: 'redis://localhost:6379',
+        redis_status: PaperlessConnectionStatus.ERROR,
+        redis_error:
+          'Error 61 connecting to localhost:6379. Connection refused.',
+        celery_status: PaperlessConnectionStatus.ERROR,
+      },
+    }
+    jest.spyOn(systemStatusService, 'get').mockReturnValue(of(status))
+    completeSetup()
+    expect(component['systemStatus']).toEqual(status) // private
+    expect(component.systemStatusHasErrors).toBeTruthy()
   })
 
   it('should open system status dialog', () => {

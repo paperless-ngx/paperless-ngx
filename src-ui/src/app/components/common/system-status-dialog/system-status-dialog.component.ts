@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, Input } from '@angular/core'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { PaperlessSystemStatus } from 'src/app/data/system-status'
 import { SystemStatusService } from 'src/app/services/system-status.service'
@@ -16,13 +16,8 @@ export class SystemStatusDialogComponent {
 
   constructor(
     public activeModal: NgbActiveModal,
-    private systemStatusService: SystemStatusService,
     private clipboard: Clipboard
-  ) {
-    this.systemStatusService.get().subscribe((status) => {
-      this.status = status
-    })
-  }
+  ) {}
 
   public close() {
     this.activeModal.close()

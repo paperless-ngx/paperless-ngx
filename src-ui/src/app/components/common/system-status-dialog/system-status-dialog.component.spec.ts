@@ -48,9 +48,7 @@ const status: PaperlessSystemStatus = {
 describe('SystemStatusDialogComponent', () => {
   let component: SystemStatusDialogComponent
   let fixture: ComponentFixture<SystemStatusDialogComponent>
-  let systemStatusService: SystemStatusService
   let clipboard: Clipboard
-  let getStatusSpy
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -66,19 +64,11 @@ describe('SystemStatusDialogComponent', () => {
       ],
     }).compileComponents()
 
-    systemStatusService = TestBed.inject(SystemStatusService)
-    getStatusSpy = jest
-      .spyOn(systemStatusService, 'get')
-      .mockReturnValue(of(status))
     fixture = TestBed.createComponent(SystemStatusDialogComponent)
     component = fixture.componentInstance
+    component.status = status
     clipboard = TestBed.inject(Clipboard)
     fixture.detectChanges()
-  })
-
-  it('should subscribe to system status service', () => {
-    expect(getStatusSpy).toHaveBeenCalled()
-    expect(component.status).toEqual(status)
   })
 
   it('should close the active modal', () => {
