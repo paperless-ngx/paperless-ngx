@@ -569,6 +569,14 @@ barcode is located. However, differing from the splitting, the page with the
 barcode _will_ be retained. This allows application of a barcode to any page, including
 one which holds data to keep in the document.
 
+### Tag Assignment
+
+When enabled, Paperless will parse barcodes and attempt to interpret and assign tags.
+
+See the relevant settings [`PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE`](configuration.md#PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE)
+and [`PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING`](configuration.md#PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING)
+for more information.
+
 ## Automatic collation of double-sided documents {#collate}
 
 !!! note
