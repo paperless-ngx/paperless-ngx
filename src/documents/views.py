@@ -14,7 +14,6 @@ from unicodedata import normalize
 from urllib.parse import quote
 
 import pathvalidate
-from celery import Celery
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import connections
@@ -144,6 +143,7 @@ from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_updated
 from documents.tasks import consume_file
 from paperless import version
+from paperless.celery import app as celery_app
 from paperless.config import GeneralConfig
 from paperless.db import GnuPG
 from paperless.views import StandardPagination
@@ -1591,9 +1591,7 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
                 redis_error = str(e)
 
         try:
-            app = Celery("paperless")
-            app.config_from_object("django.conf:settings", namespace="CELERY")
-            ping = app.control.inspect().ping()
+            ping = celery_app.control.inspect().ping()
             first_worker_ping = ping[next(iter(ping.keys()))]
             if first_worker_ping["ok"] == "pong":
                 celery_active = "OK"
