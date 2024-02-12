@@ -11,14 +11,20 @@
     [disabled]="!systemStatus"
     *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Admin }">
     @if (!systemStatus) {
-      <div class="spinner-border spinner-border-sm me-1" role="status"></div>
+      <div class="spinner-border spinner-border-sm me-1 h-75" role="status"></div>
     } @else {
-      <i-bs class="me-1" name="card-checklist"></i-bs>
+      <i-bs class="me-2" name="card-checklist"></i-bs>
       @if (systemStatusHasErrors) {
-        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill py-1 px-2">!</span>
+        <span class="badge bg-body position-absolute top-0 start-100 translate-middle rounded-pill p-0">
+          <i-bs name="exclamation-circle-fill" class="text-danger" width="1.75em" height="1.75em"></i-bs>
+        </span>
+      } @else {
+        <span class="badge bg-body position-absolute top-0 start-100 translate-middle rounded-pill p-0">
+          <i-bs name="check-circle-fill" class="text-success" width="1.75em" height="1.75em"></i-bs>
+        </span>
       }
     }
-    &nbsp;<ng-container i18n>System Status</ng-container>
+    <ng-container i18n>System Status</ng-container>
   </button>
   <a *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Admin }" class="btn btn-sm btn-primary ms-3" href="admin/" target="_blank">
     <ng-container i18n>Open Django Admin</ng-container>
