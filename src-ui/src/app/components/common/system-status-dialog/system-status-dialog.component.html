@@ -63,27 +63,17 @@
                   <ng-container>{{status.database.migration_status.unapplied_migrations.length}} Pending</ng-container><i-bs name="exclamation-triangle-fill" class="text-warning ms-1" [ngbPopover]="migrationStatus" triggers="mouseenter:mouseleave"></i-bs>
                 }
                 <ng-template #migrationStatus>
-                  <ng-container i18n>Latest Migration</ng-container>: {{status.database.migration_status.latest_migration}}<br/>
+                  <h6><ng-container i18n>Latest Migration</ng-container>:</h6> <span class="font-monospace small">{{status.database.migration_status.latest_migration}}</span>
                   @if (status.database.migration_status.unapplied_migrations.length > 0) {
-                    <ng-container i18n>Pending Migrations</ng-container>:
+                    <h6 class="mt-3"><ng-container i18n>Pending Migrations</ng-container>:</h6>
                     <ul>
                       @for (migration of status.database.migration_status.unapplied_migrations; track migration) {
-                        <li>{{migration}}</li>
+                        <li class="font-monospace small">{{migration}}</li>
                       }
                     </ul>
                   }
                 </ng-template>
               </dd>
-              @if (status.database.migration_status.unapplied_migrations.length > 0) {
-                <dt i18n>Pending Migrations:</dt>
-                <dd>
-                  <ul>
-                    @for (migration of status.database.migration_status.unapplied_migrations; track migration) {
-                      <li>{{migration}}</li>
-                    }
-                  </ul>
-                </dd>
-              }
             </dl>
           </div>
         </div>
