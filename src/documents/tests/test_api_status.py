@@ -52,16 +52,9 @@ class TestSystemStatusView(APITestCase):
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.data["install_type"], "kubernetes")
 
-    class MockRedis:
-        def from_url(self, url):
-            pass
-
-        def ping(self):
-            return True
-
-    @mock.patch("redis.Redis")
+    @mock.patch("redis.Redis.execute_command")
     def test_system_status_redis_ping(self, mock_ping):
-        mock_ping.return_value = self.MockRedis()
+        mock_ping.return_value = True
         self.client.force_login(self.user)
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
