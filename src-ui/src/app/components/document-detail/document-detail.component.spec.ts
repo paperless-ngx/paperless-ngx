@@ -95,12 +95,12 @@ const doc: Document = {
     {
       created: new Date(),
       note: 'note 1',
-      user: 1,
+      user: { id: 1, username: 'user1' },
     },
     {
       created: new Date(),
       note: 'note 2',
-      user: 2,
+      user: { id: 2, username: 'user2' },
     },
   ],
   custom_fields: [
