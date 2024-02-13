@@ -19,22 +19,32 @@ const notes: DocumentNote[] = [
   {
     id: 23,
     note: 'Note 23',
-    user: 1,
+    user: {
+      id: 1,
+      username: 'user1',
+      first_name: 'User1',
+      last_name: 'Lastname1',
+    },
   },
   {
     id: 24,
     note: 'Note 24',
-    user: 1,
+    user: {
+      id: 1,
+      username: 'user1',
+      first_name: 'User1',
+      last_name: 'Lastname1',
+    },
   },
   {
     id: 25,
     note: 'Note 25',
-    user: 2,
+    user: { id: 2, username: 'user2' },
   },
   {
     id: 30,
     note: 'Note 30',
-    user: 3,
+    user: { id: 3, username: 'user3' },
   },
 ]
 
@@ -123,11 +133,24 @@ describe('DocumentNotesComponent', () => {
   })
 
   it('should handle note user display in all situations', () => {
-    expect(component.displayName({ id: 1, user: 1 })).toEqual(
-      'User1 Lastname1 (user1)'
-    )
-    expect(component.displayName({ id: 1, user: 2 })).toEqual('user2')
-    expect(component.displayName({ id: 1, user: 4 })).toEqual('')
+    expect(
+      component.displayName({
+        id: 1,
+        user: {
+          id: 1,
+          username: 'user1',
+          first_name: 'User1',
+          last_name: 'Lastname1',
+        },
+      })
+    ).toEqual('User1 Lastname1 (user1)')
+    expect(
+      component.displayName({ id: 1, user: { id: 2, username: 'user2' } })
+    ).toEqual('user2')
+    expect(component.displayName({ id: 1, user: 2 } as any)).toEqual('user2')
+    expect(
+      component.displayName({ id: 1, user: { id: 4, username: 'user4' } })
+    ).toEqual('')
     expect(component.displayName({ id: 1 })).toEqual('')
   })
 
@@ -146,7 +169,9 @@ describe('DocumentNotesComponent', () => {
     expect(addSpy).toHaveBeenCalledWith(12, note)
     expect(toastsSpy).toHaveBeenCalled()
 
-    addSpy.mockReturnValueOnce(of([...notes, { id: 31, note, user: 1 }]))
+    addSpy.mockReturnValueOnce(
+      of([...notes, { id: 31, note, user: { id: 1 } }])
+    )
     addButton.triggerEventHandler('click')
     fixture.detectChanges()
     expect(fixture.debugElement.nativeElement.textContent).toContain(note)
