@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Observable } from 'rxjs'
-import { PaperlessSystemStatus } from '../data/system-status'
+import { SystemStatus } from '../data/system-status'
 import { environment } from 'src/environments/environment'
 
 @Injectable({
@@ -12,8 +12,8 @@ export class SystemStatusService {
 
   constructor(private http: HttpClient) {}
 
-  get(): Observable<PaperlessSystemStatus> {
-    return this.http.get<PaperlessSystemStatus>(
+  get(): Observable<SystemStatus> {
+    return this.http.get<SystemStatus>(
       `${environment.apiBaseUrl}${this.endpoint}/`
     )
   }

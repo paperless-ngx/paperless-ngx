@@ -44,9 +44,9 @@ import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-butt
 import { SystemStatusDialogComponent } from '../../common/system-status-dialog/system-status-dialog.component'
 import { SystemStatusService } from 'src/app/services/system-status.service'
 import {
-  PaperlessSystemStatus,
-  PaperlessInstallType,
-  PaperlessConnectionStatus,
+  SystemStatus,
+  InstallType,
+  SystemStatusItemStatus,
 } from 'src/app/data/system-status'
 
 const savedViews = [
@@ -388,15 +388,15 @@ describe('SettingsComponent', () => {
   })
 
   it('should load system status on initialize, show errors if needed', () => {
-    const status: PaperlessSystemStatus = {
+    const status: SystemStatus = {
       pngx_version: '2.4.3',
       server_os: 'macOS-14.1.1-arm64-arm-64bit',
-      install_type: PaperlessInstallType.BareMetal,
+      install_type: InstallType.BareMetal,
       storage: { total: 494384795648, available: 13573525504 },
       database: {
         type: 'sqlite',
         url: '/paperless-ngx/data/db.sqlite3',
-        status: PaperlessConnectionStatus.ERROR,
+        status: SystemStatusItemStatus.ERROR,
         error: null,
         migration_status: {
           latest_migration: 'socialaccount.0006_alter_socialaccount_extra_data',
@@ -405,10 +405,16 @@ describe('SettingsComponent', () => {
       },
       tasks: {
         redis_url: 'redis://localhost:6379',
-        redis_status: PaperlessConnectionStatus.ERROR,
+        redis_status: SystemStatusItemStatus.ERROR,
         redis_error:
           'Error 61 connecting to localhost:6379. Connection refused.',
-        celery_status: PaperlessConnectionStatus.ERROR,
+        celery_status: SystemStatusItemStatus.ERROR,
+        index_status: SystemStatusItemStatus.OK,
+        index_last_modified: new Date(),
+        index_error: null,
+        classifier_status: SystemStatusItemStatus.OK,
+        classifier_last_modified: new Date(),
+        classifier_error: null,
       },
     }
     jest.spyOn(systemStatusService, 'get').mockReturnValue(of(status))
@@ -416,9 +422,9 @@ describe('SettingsComponent', () => {
     expect(component['systemStatus']).toEqual(status) // private
     expect(component.systemStatusHasErrors).toBeTruthy()
     // coverage
-    component['systemStatus'].database.status = PaperlessConnectionStatus.OK
-    component['systemStatus'].tasks.redis_status = PaperlessConnectionStatus.OK
-    component['systemStatus'].tasks.celery_status = PaperlessConnectionStatus.OK
+    component['systemStatus'].database.status = SystemStatusItemStatus.OK
+    component['systemStatus'].tasks.redis_status = SystemStatusItemStatus.OK
+    component['systemStatus'].tasks.celery_status = SystemStatusItemStatus.OK
     expect(component.systemStatusHasErrors).toBeFalsy()
   })
 

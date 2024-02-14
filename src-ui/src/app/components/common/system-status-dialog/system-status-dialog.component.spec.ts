@@ -8,29 +8,28 @@ import {
   NgbActiveModal,
   NgbModalModule,
   NgbPopoverModule,
+  NgbProgressbarModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { Clipboard, ClipboardModule } from '@angular/cdk/clipboard'
-import { SystemStatusService } from 'src/app/services/system-status.service'
 import { SystemStatusDialogComponent } from './system-status-dialog.component'
-import { of } from 'rxjs'
 import {
-  PaperlessConnectionStatus,
-  PaperlessInstallType,
-  PaperlessSystemStatus,
+  SystemStatusItemStatus,
+  InstallType,
+  SystemStatus,
 } from 'src/app/data/system-status'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { NgxFilesizeModule } from 'ngx-filesize'
 
-const status: PaperlessSystemStatus = {
+const status: SystemStatus = {
   pngx_version: '2.4.3',
   server_os: 'macOS-14.1.1-arm64-arm-64bit',
-  install_type: PaperlessInstallType.BareMetal,
+  install_type: InstallType.BareMetal,
   storage: { total: 494384795648, available: 13573525504 },
   database: {
     type: 'sqlite',
     url: '/paperless-ngx/data/db.sqlite3',
-    status: PaperlessConnectionStatus.ERROR,
+    status: SystemStatusItemStatus.ERROR,
     error: null,
     migration_status: {
       latest_migration: 'socialaccount.0006_alter_socialaccount_extra_data',
@@ -39,9 +38,15 @@ const status: PaperlessSystemStatus = {
   },
   tasks: {
     redis_url: 'redis://localhost:6379',
-    redis_status: PaperlessConnectionStatus.ERROR,
+    redis_status: SystemStatusItemStatus.ERROR,
     redis_error: 'Error 61 connecting to localhost:6379. Connection refused.',
-    celery_status: PaperlessConnectionStatus.ERROR,
+    celery_status: SystemStatusItemStatus.ERROR,
+    index_status: SystemStatusItemStatus.OK,
+    index_last_modified: new Date(),
+    index_error: null,
+    classifier_status: SystemStatusItemStatus.OK,
+    classifier_last_modified: new Date(),
+    classifier_error: null,
   },
 }
 
@@ -61,6 +66,7 @@ describe('SystemStatusDialogComponent', () => {
         NgxBootstrapIconsModule.pick(allIcons),
         NgxFilesizeModule,
         NgbPopoverModule,
+        NgbProgressbarModule,
       ],
     }).compileComponents()
 

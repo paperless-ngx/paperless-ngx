@@ -25,7 +25,7 @@ describe('SystemStatusService', () => {
     httpTestingController.verify()
   })
 
-  it('calls get statys endpoint', () => {
+  it('calls get status endpoint', () => {
     service.get().subscribe()
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}status/`

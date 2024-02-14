@@ -47,8 +47,8 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
 import { SystemStatusDialogComponent } from '../../common/system-status-dialog/system-status-dialog.component'
 import { SystemStatusService } from 'src/app/services/system-status.service'
 import {
-  PaperlessConnectionStatus,
-  PaperlessSystemStatus,
+  SystemStatusItemStatus,
+  SystemStatus,
 } from 'src/app/data/system-status'
 
 enum SettingsNavIDs {
@@ -121,14 +121,15 @@ export class SettingsComponent
   users: User[]
   groups: Group[]
 
-  private systemStatus: PaperlessSystemStatus
+  private systemStatus: SystemStatus
 
   get systemStatusHasErrors(): boolean {
     return (
-      this.systemStatus.database.status === PaperlessConnectionStatus.ERROR ||
-      this.systemStatus.tasks.redis_status ===
-        PaperlessConnectionStatus.ERROR ||
-      this.systemStatus.tasks.celery_status === PaperlessConnectionStatus.ERROR
+      this.systemStatus.database.status === SystemStatusItemStatus.ERROR ||
+      this.systemStatus.tasks.redis_status === SystemStatusItemStatus.ERROR ||
+      this.systemStatus.tasks.celery_status === SystemStatusItemStatus.ERROR ||
+      this.systemStatus.tasks.index_status === SystemStatusItemStatus.ERROR ||
+      this.systemStatus.tasks.classifier_status === SystemStatusItemStatus.ERROR
     )
   }
 
