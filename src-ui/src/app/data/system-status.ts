@@ -32,10 +32,10 @@ export interface SystemStatus {
     redis_error: string
     celery_status: SystemStatusItemStatus
     index_status: SystemStatusItemStatus
-    index_last_modified: Date
+    index_last_modified: string // ISO date string
     index_error: string
     classifier_status: SystemStatusItemStatus
-    classifier_last_modified: Date
+    classifier_last_modified: string // ISO date string
     classifier_error: string
   }
 }

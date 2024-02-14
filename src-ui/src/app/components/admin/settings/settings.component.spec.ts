@@ -410,10 +410,10 @@ describe('SettingsComponent', () => {
           'Error 61 connecting to localhost:6379. Connection refused.',
         celery_status: SystemStatusItemStatus.ERROR,
         index_status: SystemStatusItemStatus.OK,
-        index_last_modified: new Date(),
+        index_last_modified: new Date().toISOString(),
         index_error: null,
         classifier_status: SystemStatusItemStatus.OK,
-        classifier_last_modified: new Date(),
+        classifier_last_modified: new Date().toISOString(),
         classifier_error: null,
       },
     }

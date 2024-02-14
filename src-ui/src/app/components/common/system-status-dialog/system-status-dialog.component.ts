@@ -30,4 +30,10 @@ export class SystemStatusDialogComponent {
       this.copied = false
     }, 3000)
   }
+
+  public isStale(dateStr: string, hours: number = 24): boolean {
+    const date = new Date(dateStr)
+    const now = new Date()
+    return now.getTime() - date.getTime() > hours * 60 * 60 * 1000
+  }
 }

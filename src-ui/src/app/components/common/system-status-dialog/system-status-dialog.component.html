@@ -106,25 +106,33 @@
               <dd>
                 {{status.tasks.index_status}}
                 @if (status.tasks.index_status === 'OK') {
-                  <i-bs name="check-circle-fill" class="text-success ms-1" [ngbPopover]="indexStatus" triggers="mouseenter:mouseleave"></i-bs>
+                  @if (isStale(status.tasks.index_last_modified)) {
+                    <i-bs name="exclamation-triangle-fill" class="text-warning ms-1" [ngbPopover]="indexStatus" triggers="mouseenter:mouseleave"></i-bs>
+                  } @else {
+                    <i-bs name="check-circle-fill" class="text-success ms-1" [ngbPopover]="indexStatus" triggers="mouseenter:mouseleave"></i-bs>
+                  }
                 } @else {
                   <i-bs name="exclamation-triangle-fill" class="text-danger ms-1" ngbPopover="{{status.tasks.index_error}}" triggers="mouseenter:mouseleave"></i-bs>
                 }
               </dd>
               <ng-template #indexStatus>
-                <h6><ng-container i18n>Last Updated</ng-container>:</h6> <span class="font-monospace small">{{status.tasks.index_last_modified}}</span>
+                <h6><ng-container i18n>Last Updated</ng-container>:</h6> <span class="font-monospace small">{{status.tasks.index_last_modified | customDate:'medium'}}</span>
               </ng-template>
               <dt i18n>Classifier Status</dt>
               <dd>
                 {{status.tasks.classifier_status}}
                 @if (status.tasks.classifier_status === 'OK') {
-                  <i-bs name="check-circle-fill" class="text-success ms-1" [ngbPopover]="classifierStatus" triggers="mouseenter:mouseleave"></i-bs>
+                  @if (isStale(status.tasks.classifier_last_modified)) {
+                    <i-bs name="exclamation-triangle-fill" class="text-warning ms-1" [ngbPopover]="classifierStatus" triggers="mouseenter:mouseleave"></i-bs>
+                  } @else {
+                    <i-bs name="check-circle-fill" class="text-success ms-1" [ngbPopover]="classifierStatus" triggers="mouseenter:mouseleave"></i-bs>
+                  }
                 } @else {
                   <i-bs name="exclamation-triangle-fill" class="text-danger ms-1" ngbPopover="{{status.tasks.classifier_error}}" triggers="mouseenter:mouseleave"></i-bs>
                 }
               </dd>
               <ng-template #classifierStatus>
-                <h6><ng-container i18n>Last Updated</ng-container>:</h6> <span class="font-monospace small">{{status.tasks.classifier_last_modified}}</span>
+                <h6><ng-container i18n>Last Updated</ng-container>:</h6> <span class="font-monospace small">{{status.tasks.classifier_last_modified | customDate:'medium'}}</span>
               </ng-template>
             </dl>
           </div>
