@@ -670,6 +670,11 @@ relevant [configuration settings](configuration.md#PAPERLESS_SOCIALACCOUNT_PROVI
 [django-allauth docs](https://docs.allauth.org/en/latest/socialaccount/configuration.html)
 for more information.
 
+To associate an existing Paperless-ngx account with a social account, first login with your
+regular credentials and then choose "My Profile" from the user dropdown in the app and you
+will see options to connect social account(s). If enabled, signup options will be available
+on the login page.
+
 As an example, to set up login via Github, the following environment variables would need to be
 set:
 
@@ -686,4 +691,4 @@ PAPERLESS_SOCIALACCOUNT_PROVIDERS='
 {"openid_connect": {"APPS": [{"provider_id": "keycloak","name": "Keycloak","client_id": "paperless","secret": "<CLIENT_SECRET>","settings": { "server_url": "https://<KEYCLOAK_SERVER>/realms/<REALM>/.well-known/openid-configuration"}}]}}'
 ```
 
-More details about configuration option for various providers can be found in the allauth documentation: https://docs.allauth.org/en/latest/socialaccount/providers/index.html#provider-specifics
+More details about configuration option for various providers can be found in the [allauth documentation](https://docs.allauth.org/en/latest/socialaccount/providers/index.html#provider-specifics).
