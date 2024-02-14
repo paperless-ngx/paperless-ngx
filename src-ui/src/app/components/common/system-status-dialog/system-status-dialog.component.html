@@ -102,7 +102,7 @@
                   <i-bs name="exclamation-triangle-fill" class="text-danger ms-1"></i-bs>
                 }
               </dd>
-              <dt i18n>Index Status</dt>
+              <dt i18n>Search Index</dt>
               <dd>
                 {{status.tasks.index_status}}
                 @if (status.tasks.index_status === 'OK') {
@@ -118,7 +118,7 @@
               <ng-template #indexStatus>
                 <h6><ng-container i18n>Last Updated</ng-container>:</h6> <span class="font-monospace small">{{status.tasks.index_last_modified | customDate:'medium'}}</span>
               </ng-template>
-              <dt i18n>Classifier Status</dt>
+              <dt i18n>Classifier</dt>
               <dd>
                 {{status.tasks.classifier_status}}
                 @if (status.tasks.classifier_status === 'OK') {
