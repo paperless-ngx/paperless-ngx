@@ -48,7 +48,7 @@
               <dd>
                 {{status.database.status}}
                 @if (status.database.status === 'OK') {
-                  <i-bs name="check-circle-fill" class="text-success ms-1" ngbPopover="{{status.database.url}}" triggers="mouseenter:mouseleave"></i-bs>
+                  <i-bs name="check-circle-fill" class="text-primary ms-1" ngbPopover="{{status.database.url}}" triggers="mouseenter:mouseleave"></i-bs>
                 } @else {
                   <i-bs name="exclamation-triangle-fill" class="text-danger ms-1" ngbPopover="{{status.database.url}}: {{status.database.error}}" triggers="mouseenter:mouseleave"></i-bs>
                 }
@@ -56,7 +56,7 @@
               <dt i18n>Migration Status</dt>
               <dd>
                 @if (status.database.migration_status.unapplied_migrations.length === 0) {
-                  <ng-container>Up to date</ng-container><i-bs name="check-circle-fill" class="text-success ms-1" [ngbPopover]="migrationStatus" triggers="mouseenter:mouseleave"></i-bs>
+                  <ng-container>Up to date</ng-container><i-bs name="check-circle-fill" class="text-primary ms-1" [ngbPopover]="migrationStatus" triggers="mouseenter:mouseleave"></i-bs>
                 } @else {
                   <ng-container>{{status.database.migration_status.unapplied_migrations.length}} Pending</ng-container><i-bs name="exclamation-triangle-fill" class="text-warning ms-1" [ngbPopover]="migrationStatus" triggers="mouseenter:mouseleave"></i-bs>
                 }
@@ -88,7 +88,7 @@
               <dd>
                 {{status.tasks.redis_status}}
                 @if (status.tasks.redis_status === 'OK') {
-                  <i-bs name="check-circle-fill" class="text-success ms-1" ngbPopover="{{status.tasks.redis_url}}" triggers="mouseenter:mouseleave"></i-bs>
+                  <i-bs name="check-circle-fill" class="text-primary ms-1" ngbPopover="{{status.tasks.redis_url}}" triggers="mouseenter:mouseleave"></i-bs>
                 } @else {
                   <i-bs name="exclamation-triangle-fill" class="text-danger ms-1" ngbPopover="{{status.tasks.redis_url}}: {{status.tasks.redis_error}}" triggers="mouseenter:mouseleave"></i-bs>
                 }
@@ -97,7 +97,7 @@
               <dd>
                 {{status.tasks.celery_status}}
                 @if (status.tasks.celery_status === 'OK') {
-                  <i-bs name="check-circle-fill" class="text-success ms-1"></i-bs>
+                  <i-bs name="check-circle-fill" class="text-primary ms-1"></i-bs>
                 } @else {
                   <i-bs name="exclamation-triangle-fill" class="text-danger ms-1"></i-bs>
                 }
@@ -109,7 +109,7 @@
                   @if (isStale(status.tasks.index_last_modified)) {
                     <i-bs name="exclamation-triangle-fill" class="text-warning ms-1" [ngbPopover]="indexStatus" triggers="mouseenter:mouseleave"></i-bs>
                   } @else {
-                    <i-bs name="check-circle-fill" class="text-success ms-1" [ngbPopover]="indexStatus" triggers="mouseenter:mouseleave"></i-bs>
+                    <i-bs name="check-circle-fill" class="text-primary ms-1" [ngbPopover]="indexStatus" triggers="mouseenter:mouseleave"></i-bs>
                   }
                 } @else {
                   <i-bs name="exclamation-triangle-fill" class="text-danger ms-1" ngbPopover="{{status.tasks.index_error}}" triggers="mouseenter:mouseleave"></i-bs>
@@ -125,7 +125,7 @@
                   @if (isStale(status.tasks.classifier_last_modified)) {
                     <i-bs name="exclamation-triangle-fill" class="text-warning ms-1" [ngbPopover]="classifierStatus" triggers="mouseenter:mouseleave"></i-bs>
                   } @else {
-                    <i-bs name="check-circle-fill" class="text-success ms-1" [ngbPopover]="classifierStatus" triggers="mouseenter:mouseleave"></i-bs>
+                    <i-bs name="check-circle-fill" class="text-primary ms-1" [ngbPopover]="classifierStatus" triggers="mouseenter:mouseleave"></i-bs>
                   }
                 } @else {
                   <i-bs name="exclamation-triangle-fill" class="text-danger ms-1" ngbPopover="{{status.tasks.classifier_error}}" triggers="mouseenter:mouseleave"></i-bs>
