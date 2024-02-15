@@ -2685,7 +2685,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-button/confirm-button.component.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Are you sure?</target>
+        <target state="translated">Estàs segur?</target>
       </trans-unit>
       <trans-unit id="1234709746630139322" datatype="html">
         <source>Confirmation</source>
@@ -4583,7 +4583,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="needs-translation">Connected social accounts</target>
+        <target state="translated">Comptes socials connectats</target>
       </trans-unit>
       <trans-unit id="8383227756109993898" datatype="html">
         <source>Set a password before disconnecting social account.</source>
@@ -4591,7 +4591,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">63</context>
         </context-group>
-        <target state="needs-translation">Set a password before disconnecting social account.</target>
+        <target state="translated">Estableix contrasenya abans de desconnextar compte social.</target>
       </trans-unit>
       <trans-unit id="2907016025519254862" datatype="html">
         <source>Disconnect</source>
@@ -4599,7 +4599,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">69</context>
         </context-group>
-        <target state="needs-translation">Disconnect</target>
+        <target state="translated">Desconnectar</target>
       </trans-unit>
       <trans-unit id="5322995394400578831" datatype="html">
         <source>Disconnect <x id="INTERPOLATION" equiv-text="{{ account.name }}"/> social account</source>
@@ -4607,7 +4607,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">71</context>
         </context-group>
-        <target state="needs-translation">Disconnect <x id="INTERPOLATION" equiv-text="{{ account.name }}"/> social account</target>
+        <target state="translated">Desconnectat <x id="INTERPOLATION" equiv-text="{{ account.name }}"/> compte social</target>
       </trans-unit>
       <trans-unit id="649824314893051979" datatype="html">
         <source>Warning: disconnecting social accounts cannot be undone</source>
@@ -4615,7 +4615,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">81</context>
         </context-group>
-        <target state="needs-translation">Warning: disconnecting social accounts cannot be undone</target>
+        <target state="translated">Compte: desconnectar comptes socials no es pot desfer</target>
       </trans-unit>
       <trans-unit id="1375396510511350122" datatype="html">
         <source>Connect new social account</source>
@@ -4623,7 +4623,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">86</context>
         </context-group>
-        <target state="needs-translation">Connect new social account</target>
+        <target state="translated">Connecta nou compte social</target>
       </trans-unit>
       <trans-unit id="6141884091799403188" datatype="html">
         <source>Emails must match</source>
@@ -4671,7 +4671,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
           <context context-type="linenumber">210</context>
         </context-group>
-        <target state="needs-translation">Error disconnecting social account</target>
+        <target state="translated">Error desconnectant compte social</target>
       </trans-unit>
       <trans-unit id="3797570084942068182" datatype="html">
         <source>Select</source>
@@ -7064,7 +7064,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">303</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete all objects.</target>
+        <target state="translated">Aquesta operació esborrarà tots els objectes.</target>
       </trans-unit>
       <trans-unit id="5897787932098828336" datatype="html">
         <source>Objects deleted successfully</source>
@@ -7072,7 +7072,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">317</context>
         </context-group>
-        <target state="needs-translation">Objects deleted successfully</target>
+        <target state="translated">Objecte esborrat correctament</target>
       </trans-unit>
       <trans-unit id="8273353839648035634" datatype="html">
         <source>Error deleting objects</source>
@@ -7080,7 +7080,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">323</context>
         </context-group>
-        <target state="needs-translation">Error deleting objects</target>
+        <target state="translated">Error esborrant objectes</target>
       </trans-unit>
       <trans-unit id="5101757640976222639" datatype="html">
         <source>storage path</source>
