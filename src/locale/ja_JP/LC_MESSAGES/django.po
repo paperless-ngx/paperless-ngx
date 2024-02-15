@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-08 11:56-0800\n"
-"PO-Revision-Date: 2024-02-12 00:23\n"
+"POT-Creation-Date: 2024-02-14 16:47-0800\n"
+"PO-Revision-Date: 2024-02-15 00:52\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -929,9 +929,12 @@ msgstr "Paperless-ngx ソーシャルアカウント登録"
 
 #: documents/templates/socialaccount/signup.html:53
 #, python-format
-msgid "You are about to use your %(provider_name)s account to login to\n"
-"%(site_name)s. As a final step, please complete the following form:"
-msgstr "%(provider_name)s のアカウントで %(site_name)s にログインしようとしています。最後に、次のフォームに記入してください。"
+msgid "You are about to use your %(provider_name)s account to login."
+msgstr ""
+
+#: documents/templates/socialaccount/signup.html:54
+msgid "As a final step, please complete the following form:"
+msgstr ""
 
 #: documents/templates/socialaccount/signup.html:72
 msgid "Sign up"
