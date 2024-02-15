@@ -279,7 +279,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</target>
+        <target state="translated">Документ <x id="PH" equiv-text="status.filename"/> был добавлен в paperless.</target>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html" approved="yes">
         <source>Open document</source>
@@ -307,7 +307,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">120</context>
         </context-group>
-        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> is being processed by Paperless-ngx.</target>
+        <target state="translated">Документ <x id="PH" equiv-text="status.filename"/> обрабатывается в Paperless-ngx.</target>
       </trans-unit>
       <trans-unit id="2501522447884928778" datatype="html">
         <source>Prev</source>
@@ -395,7 +395,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Manage e-mail accounts and rules for automatically importing documents.</target>
+        <target state="translated">Управление учётными записями электронной почты и правилами для автоматического импорта документов.</target>
       </trans-unit>
       <trans-unit id="2258659358902319601" datatype="html">
         <source>Workflows give you more control over the document pipeline.</source>
@@ -403,7 +403,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">180</context>
         </context-group>
-        <target state="needs-translation">Workflows give you more control over the document pipeline.</target>
+        <target state="translated">Автоматизации дают вам больше контроля над обработкой документов.</target>
       </trans-unit>
       <trans-unit id="4680387114119209483" datatype="html">
         <source>File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</source>
@@ -423,7 +423,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">196</context>
         </context-group>
-        <target state="needs-translation">Check out the settings for various tweaks to the web app and toggle settings for saved views.</target>
+        <target state="translated">Просматривайте различные настройки приложения и настраивайте сохранённые представления.</target>
       </trans-unit>
       <trans-unit id="7172877665285340082" datatype="html">
         <source>Thank you! 🙏</source>
@@ -463,7 +463,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of Paperless-ngx. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</target>
+        <target state="translated">Глобальные параметры конфигурации приложения, которые применяются к &lt;strong&gt;каждому&lt;strong&gt; пользователю данной установки Paperless-ngx. Параметры также могут быть заданы с помощью переменных окружения или конфигурационного файла, но значение, указанное здесь, всегда будет иметь приоритет.</target>
       </trans-unit>
       <trans-unit id="187187500641108332" datatype="html">
         <source>
@@ -481,7 +481,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="ategory}}"/></target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="ategory}}"/></target>
       </trans-unit>
       <trans-unit id="7991430199894172363" datatype="html">
         <source>Read the documentation about this setting</source>
@@ -497,7 +497,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Enable</target>
+        <target state="translated">Включить</target>
       </trans-unit>
       <trans-unit id="3823219296477075982" datatype="html" approved="yes">
         <source>Discard</source>
@@ -581,7 +581,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
           <context context-type="linenumber">81</context>
         </context-group>
-        <target state="needs-translation">Error retrieving config</target>
+        <target state="translated">Ошибка при загрузки конфигурации</target>
       </trans-unit>
       <trans-unit id="1172622527269118932" datatype="html">
         <source>Invalid JSON</source>
@@ -589,7 +589,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="needs-translation">Invalid JSON</target>
+        <target state="translated">Неверный JSON</target>
       </trans-unit>
       <trans-unit id="5103146006962696736" datatype="html">
         <source>Configuration updated</source>
@@ -613,7 +613,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
           <context context-type="linenumber">178</context>
         </context-group>
-        <target state="needs-translation">File successfully updated</target>
+        <target state="translated">Файл успешно обновлён</target>
       </trans-unit>
       <trans-unit id="5902783625859504265" datatype="html">
         <source>An error occurred uploading file</source>
@@ -621,7 +621,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
           <context context-type="linenumber">183</context>
         </context-group>
-        <target state="needs-translation">An error occurred uploading file</target>
+        <target state="translated">Произошла ошибка при загрузке файла</target>
       </trans-unit>
       <trans-unit id="4804785061014590286" datatype="html" approved="yes">
         <source>Logs</source>
@@ -645,7 +645,7 @@
           <context context-type="sourcefile">src/app/components/admin/logs/logs.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Review the log files for the application and for email checking.</target>
+        <target state="translated">Просмотрите файлы журналов для приложения и для проверки электронной почты.</target>
       </trans-unit>
       <trans-unit id="8838884664569764142" datatype="html">
         <source>Auto refresh</source>
@@ -761,7 +761,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Options to customize appearance, notifications, saved views and more. Settings apply to the &lt;strong&gt;current user only&lt;/strong&gt;.</target>
+        <target state="translated">Настройки внешнего вида, уведомлений, сохраненных представлений и многого другого. Настройки применяются &lt;strong&gt;только к текущему пользователю&lt;/strong&gt;.</target>
       </trans-unit>
       <trans-unit id="1685061484835793745" datatype="html">
         <source>Start tour</source>
@@ -961,7 +961,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">150,153</context>
         </context-group>
-        <target state="needs-translation"> Update checking works by pinging the public <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>GitHub API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> for the latest release to determine whether a new version is available.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Actual updating of the app must still be performed manually. </target>
+        <target state="translated"> Проверка обновлений работает путем обращения к публичному <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>GitHub API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> для определения новой версии.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Фактическое обновление приложения по-прежнему должно выполняться вручную. </target>
       </trans-unit>
       <trans-unit id="5489945693955857309" datatype="html">
         <source><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&gt;"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
@@ -985,7 +985,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">161</context>
         </context-group>
-        <target state="needs-translation">Document editing</target>
+        <target state="translated">Редактирование документа</target>
       </trans-unit>
       <trans-unit id="2959590948110714366" datatype="html">
         <source>Automatically remove inbox tag(s) on save</source>
@@ -993,7 +993,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">165</context>
         </context-group>
-        <target state="needs-translation">Automatically remove inbox tag(s) on save</target>
+        <target state="translated">Автоматически удалять входящие этикетки при сохранении</target>
       </trans-unit>
       <trans-unit id="8508424367627989968" datatype="html" approved="yes">
         <source>Bulk editing</source>
@@ -1129,7 +1129,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">204</context>
         </context-group>
-        <target state="needs-translation">Default Owner</target>
+        <target state="translated">Владелец по умолчанию</target>
       </trans-unit>
       <trans-unit id="734147282056744882" datatype="html">
         <source>Objects without an owner can be viewed and edited by all users</source>
@@ -1149,7 +1149,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">213</context>
         </context-group>
-        <target state="needs-translation">Default View Permissions</target>
+        <target state="translated">Разрешения на просмотр по умолчанию</target>
       </trans-unit>
       <trans-unit id="2191775412581217688" datatype="html">
         <source>Users:</source>
@@ -1213,7 +1213,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">240</context>
         </context-group>
-        <target state="needs-translation">Default Edit Permissions</target>
+        <target state="translated">Разрешения на редактирование по умолчанию</target>
       </trans-unit>
       <trans-unit id="3728984448750213892" datatype="html">
         <source>Edit permissions also grant viewing permissions</source>
@@ -1433,7 +1433,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">310,311</context>
         </context-group>
-        <target state="needs-translation"> <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Appears on<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated"><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;"/>Появляется на<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="4104807402967139762" datatype="html" approved="yes">
         <source>Show on dashboard</source>
@@ -1665,7 +1665,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="needs-translation">Error retrieving users</target>
+        <target state="translated">Ошибка при загрузке пользователей</target>
       </trans-unit>
       <trans-unit id="3066660568529853846" datatype="html">
         <source>Error retrieving groups</source>
@@ -1677,7 +1677,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">63</context>
         </context-group>
-        <target state="needs-translation">Error retrieving groups</target>
+        <target state="translated">Ошибка при загрузке групп</target>
       </trans-unit>
       <trans-unit id="5610279464668232148" datatype="html" approved="yes">
         <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
@@ -1729,7 +1729,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
           <context context-type="linenumber">555</context>
         </context-group>
-        <target state="needs-translation">Error while storing settings on server.</target>
+        <target state="translated">Ошибка при сохранении настроек на сервере.</target>
       </trans-unit>
       <trans-unit id="2991443309752293110" datatype="html">
         <source>File Tasks</source>
@@ -1845,7 +1845,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">109</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {One <x id="INTERPOLATION"/> task} other {<x id="INTERPOLATION_1"/> total <x id="INTERPOLATION"/> tasks}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {Одну <x id="INTERPOLATION"/> задачу} other {<x id="INTERPOLATION_1"/> всего <x id="INTERPOLATION"/> задачи}}</target>
       </trans-unit>
       <trans-unit id="1943508481059904274" datatype="html">
         <source> (<x id="INTERPOLATION" equiv-text="{{selectedTasks.size}}"/> selected)</source>
@@ -1853,7 +1853,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">111</context>
         </context-group>
-        <target state="needs-translation"> (<x id="INTERPOLATION" equiv-text="{{selectedTasks.size}}"/> selected)</target>
+        <target state="translated"> (<x id="INTERPOLATION" equiv-text="{{selectedTasks.size}}"/> выбранное)</target>
       </trans-unit>
       <trans-unit id="5639839509673911668" datatype="html">
         <source>Failed<x id="START_BLOCK_IF" equiv-text="@if (tasksService.failedFileTasks.length &gt; 0) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></source>
@@ -1917,7 +1917,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="needs-translation">Dismiss all <x id="PH" equiv-text="tasks.size"/> tasks?</target>
+        <target state="translated">Отказаться от всех <x id="PH" equiv-text="tasks.size"/> заданий?</target>
       </trans-unit>
       <trans-unit id="9011556615675272238" datatype="html">
         <source>queued</source>
@@ -1925,7 +1925,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">133</context>
         </context-group>
-        <target state="needs-translation">queued</target>
+        <target state="translated">в очереди</target>
       </trans-unit>
       <trans-unit id="6415892379431855826" datatype="html">
         <source>started</source>
@@ -1973,7 +1973,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Create, delete and edit users and groups.</target>
+        <target state="translated">Создание, удаление и редактирование пользователей и групп.</target>
       </trans-unit>
       <trans-unit id="4555457172864212828" datatype="html">
         <source>Users</source>
@@ -2117,7 +2117,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.html</context>
           <context context-type="linenumber">85</context>
         </context-group>
-        <target state="needs-translation">No groups defined</target>
+        <target state="translated">Группы не определены</target>
       </trans-unit>
       <trans-unit id="4510369340305901516" datatype="html">
         <source>Password has been changed, you will be logged out momentarily.</source>
@@ -2277,7 +2277,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">156</context>
         </context-group>
-        <target state="needs-translation">Error saving group.</target>
+        <target state="translated">Ошибка сохранения группы.</target>
       </trans-unit>
       <trans-unit id="6538873300613683004" datatype="html">
         <source>Confirm delete user group</source>
@@ -2309,7 +2309,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">180</context>
         </context-group>
-        <target state="needs-translation">Error deleting group.</target>
+        <target state="translated">Ошибка при удалении группы.</target>
       </trans-unit>
       <trans-unit id="7931334600001636863" datatype="html">
         <source>by Paperless-ngx</source>
@@ -2317,7 +2317,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">by Paperless-ngx</target>
+        <target state="translated">от Paperless-ngx</target>
       </trans-unit>
       <trans-unit id="7100953725264790651" datatype="html" approved="yes">
         <source>Search documents</source>
@@ -2645,7 +2645,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
           <context context-type="linenumber">282</context>
         </context-group>
-        <target state="needs-translation">Sidebar views updated</target>
+        <target state="translated">Обновлена боковая панель</target>
       </trans-unit>
       <trans-unit id="3547923076537026828" datatype="html">
         <source>Error updating sidebar views</source>
@@ -2653,7 +2653,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
           <context context-type="linenumber">285</context>
         </context-group>
-        <target state="needs-translation">Error updating sidebar views</target>
+        <target state="translated">Ошибка при обновлении боковой панели</target>
       </trans-unit>
       <trans-unit id="2526035785704676448" datatype="html">
         <source>An error occurred while saving update checking settings.</source>
@@ -2685,7 +2685,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-button/confirm-button.component.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Are you sure?</target>
+        <target state="translated">Вы уверены?</target>
       </trans-unit>
       <trans-unit id="1234709746630139322" datatype="html" approved="yes">
         <source>Confirmation</source>
@@ -2797,7 +2797,7 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Create New Field</target>
+        <target state="translated">Создать новое поле</target>
       </trans-unit>
       <trans-unit id="3249513483374643425" datatype="html">
         <source>Add</source>
@@ -2817,7 +2817,7 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.ts</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="needs-translation">Choose field</target>
+        <target state="translated">Выбрать поле</target>
       </trans-unit>
       <trans-unit id="7284517513296281043" datatype="html">
         <source>No unused fields found</source>
@@ -2825,7 +2825,7 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.ts</context>
           <context context-type="linenumber">56</context>
         </context-group>
-        <target state="needs-translation">No unused fields found</target>
+        <target state="translated">Неиспользуемые поля не найдены</target>
       </trans-unit>
       <trans-unit id="6973528734330066202" datatype="html">
         <source>Saved field &quot;<x id="PH" equiv-text="newField.name"/>&quot;.</source>
@@ -2837,7 +2837,7 @@
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.ts</context>
           <context context-type="linenumber">56</context>
         </context-group>
-        <target state="needs-translation">Saved field "<x id="PH" equiv-text="newField.name"/>".</target>
+        <target state="translated">Сохранено поле "<x id="PH" equiv-text="newField.name"/>".</target>
       </trans-unit>
       <trans-unit id="1841172489943868696" datatype="html">
         <source>Error saving field.</source>
@@ -2849,7 +2849,7 @@
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.ts</context>
           <context context-type="linenumber">63</context>
         </context-group>
-        <target state="needs-translation">Error saving field.</target>
+        <target state="translated">Ошибка при сохранении поля.</target>
       </trans-unit>
       <trans-unit id="6052766076365105714" datatype="html">
         <source>now</source>
@@ -3001,7 +3001,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Data type cannot be changed after a field is created</target>
+        <target state="translated">Нельзя изменить дататип после создания поля</target>
       </trans-unit>
       <trans-unit id="528950215505228201" datatype="html">
         <source>Create new custom field</source>
@@ -3009,7 +3009,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Create new custom field</target>
+        <target state="translated">Создать новое пользовательское поле</target>
       </trans-unit>
       <trans-unit id="8751213029607178010" datatype="html">
         <source>Edit custom field</source>
@@ -3017,7 +3017,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Edit custom field</target>
+        <target state="translated">Редактировать пользовательское поле</target>
       </trans-unit>
       <trans-unit id="6672809941092516947" datatype="html" approved="yes">
         <source>Create new document type</source>
@@ -3309,7 +3309,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Filter attachment filename includes</target>
+        <target state="translated">Фильтр: имя файла вложения включает</target>
       </trans-unit>
       <trans-unit id="4245210767172267486" datatype="html">
         <source>Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</source>
@@ -3325,7 +3325,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Filter attachment filename excluding</target>
+        <target state="translated">Фильтр: имя файла вложения исключает</target>
       </trans-unit>
       <trans-unit id="6774472763442688477" datatype="html">
         <source>Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</source>
@@ -3333,7 +3333,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</target>
+        <target state="translated">Не используйте документы, полностью совпадающие с этим именем, если оно указано. Допускаются подстановочные знаки, такие как *.pdf или *invoice*. Нечувствительность к регистру.</target>
       </trans-unit>
       <trans-unit id="9216117865911519658" datatype="html">
         <source>Action</source>
@@ -3365,7 +3365,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Assignments specified here will supersede any consumption templates.</target>
+        <target state="translated">Задания, указанные здесь, заменяют все шаблоны потребления.</target>
       </trans-unit>
       <trans-unit id="6093797930511670257" datatype="html">
         <source>Assign title from</source>
@@ -3413,7 +3413,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Assign owner from rule</target>
+        <target state="translated">Назначить владельца этого правила</target>
       </trans-unit>
       <trans-unit id="1519954996184640001" datatype="html" approved="yes">
         <source>Error</source>
@@ -3521,7 +3521,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">84</context>
         </context-group>
-        <target state="needs-translation">Do not assign title from this rule</target>
+        <target state="translated">Не назначать заголовок из этого правила</target>
       </trans-unit>
       <trans-unit id="1568902914205618549" datatype="html">
         <source>Do not assign a correspondent</source>
@@ -3905,7 +3905,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">178</context>
         </context-group>
-        <target state="needs-translation">Filter filename</target>
+        <target state="translated">Фильтр имя файла</target>
       </trans-unit>
       <trans-unit id="3694878959415278689" datatype="html">
         <source>Apply to documents that match this filename. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</source>
@@ -3961,7 +3961,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">185</context>
         </context-group>
-        <target state="needs-translation">Content matching algorithm</target>
+        <target state="translated">Алгоритм подбора содержимого</target>
       </trans-unit>
       <trans-unit id="510635115034690805" datatype="html">
         <source>Content matching pattern</source>
@@ -3969,7 +3969,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">187</context>
         </context-group>
-        <target state="needs-translation">Content matching pattern</target>
+        <target state="translated">Шаблон подбора содержимого</target>
       </trans-unit>
       <trans-unit id="1333789258712064056" datatype="html">
         <source>Has tags</source>
@@ -3977,7 +3977,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">196</context>
         </context-group>
-        <target state="needs-translation">Has tags</target>
+        <target state="translated">Есть этикетки</target>
       </trans-unit>
       <trans-unit id="5281365940563983618" datatype="html">
         <source>Has correspondent</source>
@@ -3985,7 +3985,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">197</context>
         </context-group>
-        <target state="needs-translation">Has correspondent</target>
+        <target state="translated">Имеет корреспондента</target>
       </trans-unit>
       <trans-unit id="4806713133917046341" datatype="html">
         <source>Has document type</source>
@@ -3993,7 +3993,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">198</context>
         </context-group>
-        <target state="needs-translation">Has document type</target>
+        <target state="translated">Имеет тип документа</target>
       </trans-unit>
       <trans-unit id="4626030417479279989" datatype="html">
         <source>Consume Folder</source>
@@ -4246,7 +4246,7 @@
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.ts</context>
           <context context-type="linenumber">155</context>
         </context-group>
-        <target state="needs-translation">Filter documents with this <x id="PH" equiv-text="this.title"/></target>
+        <target state="translated">Фильтровать документы с этим <x id="PH" equiv-text="this.title"/></target>
       </trans-unit>
       <trans-unit id="6423278459497515329" datatype="html">
         <source>No documents found</source>
@@ -4254,7 +4254,7 @@
           <context context-type="sourcefile">src/app/components/common/input/document-link/document-link.component.ts</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">No documents found</target>
+        <target state="translated">Не найдены документы</target>
       </trans-unit>
       <trans-unit id="6932865105766151309" datatype="html">
         <source>Upload</source>
@@ -4347,7 +4347,7 @@
           <context context-type="sourcefile">src/app/components/common/input/switch/switch.component.html</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="needs-translation">Note: value has not yet been set and will not apply until explicitly changed</target>
+        <target state="translated">Примечание: значение еще не установлено и не будет применяться до тех пор, пока не будет изменено в явном виде</target>
       </trans-unit>
       <trans-unit id="6560126119609945418" datatype="html" approved="yes">
         <source>Add tag</source>
@@ -4363,7 +4363,7 @@
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Filter documents with these Tags</target>
+        <target state="translated">Фильтровать документы с этими этикетами</target>
       </trans-unit>
       <trans-unit id="1388712764439031120" datatype="html">
         <source>Open link</source>
@@ -4387,7 +4387,7 @@
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Read more</target>
+        <target state="translated">Подробнее</target>
       </trans-unit>
       <trans-unit id="7940755769131903278" datatype="html">
         <source>Merge with existing permissions</source>
@@ -4395,7 +4395,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Merge with existing permissions</target>
+        <target state="translated">Объединить с существующими правами</target>
       </trans-unit>
       <trans-unit id="7062872617520618723" datatype="html">
         <source>Set permissions</source>
@@ -4411,7 +4411,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Edit permissions for </target>
+        <target state="translated">Редактировать права доступа для </target>
       </trans-unit>
       <trans-unit id="347498040201588614" datatype="html">
         <source>Existing owner, user and group permissions will be merged with these settings.</source>
@@ -4419,7 +4419,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">74</context>
         </context-group>
-        <target state="needs-translation">Existing owner, user and group permissions will be merged with these settings.</target>
+        <target state="translated">Существующие права владельцев, пользователей и групп будут объединены с этими настройками.</target>
       </trans-unit>
       <trans-unit id="3434726483516379481" datatype="html">
         <source>Any and all existing owner, user and group permissions will be replaced.</source>
@@ -4427,7 +4427,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">75</context>
         </context-group>
-        <target state="needs-translation">Any and all existing owner, user and group permissions will be replaced.</target>
+        <target state="translated">Все существующие права владельца, пользователя и группы будут заменены.</target>
       </trans-unit>
       <trans-unit id="5947558132119506443" datatype="html">
         <source>My documents</source>
@@ -4499,7 +4499,7 @@
           <context context-type="sourcefile">src/app/components/common/preview-popup/preview-popup.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Error loading preview</target>
+        <target state="translated">Ошибка при загрузке предпросмотра</target>
       </trans-unit>
       <trans-unit id="2984628903434675339" datatype="html">
         <source>Edit Profile</source>
@@ -4583,7 +4583,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="needs-translation">Connected social accounts</target>
+        <target state="translated">Подключенные сторонние учетные записи</target>
       </trans-unit>
       <trans-unit id="8383227756109993898" datatype="html">
         <source>Set a password before disconnecting social account.</source>
@@ -4591,7 +4591,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">63</context>
         </context-group>
-        <target state="needs-translation">Set a password before disconnecting social account.</target>
+        <target state="translated">Установите пароль перед отключением сторонней учётной записи.</target>
       </trans-unit>
       <trans-unit id="2907016025519254862" datatype="html">
         <source>Disconnect</source>
@@ -4599,7 +4599,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">69</context>
         </context-group>
-        <target state="needs-translation">Disconnect</target>
+        <target state="translated">Отключить</target>
       </trans-unit>
       <trans-unit id="5322995394400578831" datatype="html">
         <source>Disconnect <x id="INTERPOLATION" equiv-text="{{ account.name }}"/> social account</source>
@@ -4607,7 +4607,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">71</context>
         </context-group>
-        <target state="needs-translation">Disconnect <x id="INTERPOLATION" equiv-text="{{ account.name }}"/> social account</target>
+        <target state="translated">Отключить <x id="INTERPOLATION" equiv-text="{{ account.name }}"/> стороннюю учётную запись</target>
       </trans-unit>
       <trans-unit id="649824314893051979" datatype="html">
         <source>Warning: disconnecting social accounts cannot be undone</source>
@@ -4615,7 +4615,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">81</context>
         </context-group>
-        <target state="needs-translation">Warning: disconnecting social accounts cannot be undone</target>
+        <target state="translated">Внимание: отключение сторонний учётной записью невозможно отменить</target>
       </trans-unit>
       <trans-unit id="1375396510511350122" datatype="html">
         <source>Connect new social account</source>
@@ -4623,7 +4623,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">86</context>
         </context-group>
-        <target state="needs-translation">Connect new social account</target>
+        <target state="translated">Подключить новый сторонний сервис</target>
       </trans-unit>
       <trans-unit id="6141884091799403188" datatype="html">
         <source>Emails must match</source>
@@ -4671,7 +4671,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
           <context context-type="linenumber">210</context>
         </context-group>
-        <target state="needs-translation">Error disconnecting social account</target>
+        <target state="translated">Ошибка при отключении стороннего сервиса</target>
       </trans-unit>
       <trans-unit id="3797570084942068182" datatype="html" approved="yes">
         <source>Select</source>
@@ -4707,7 +4707,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Share Links</target>
+        <target state="translated">Ссылки для обмена</target>
       </trans-unit>
       <trans-unit id="6617773613987957957" datatype="html">
         <source> No existing links </source>
@@ -4715,7 +4715,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
           <context context-type="linenumber">9,11</context>
         </context-group>
-        <target state="needs-translation"> No existing links </target>
+        <target state="translated"> Нет существующих ссылок </target>
       </trans-unit>
       <trans-unit id="7419704019640008953" datatype="html">
         <source>Share</source>
@@ -4723,7 +4723,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Share</target>
+        <target state="translated">Поделиться</target>
       </trans-unit>
       <trans-unit id="6811921365829755679" datatype="html">
         <source>Share archive version</source>
@@ -4731,7 +4731,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
           <context context-type="linenumber">47</context>
         </context-group>
-        <target state="needs-translation">Share archive version</target>
+        <target state="translated">Поделиться версией архива</target>
       </trans-unit>
       <trans-unit id="8037476586059399916" datatype="html">
         <source>Expires</source>
@@ -4739,7 +4739,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="needs-translation">Expires</target>
+        <target state="translated">Истекает</target>
       </trans-unit>
       <trans-unit id="4776429682428363094" datatype="html">
         <source>1 day</source>
@@ -4783,7 +4783,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">75</context>
         </context-group>
-        <target state="needs-translation">Error retrieving links</target>
+        <target state="translated">Ошибка при получении ссылок</target>
       </trans-unit>
       <trans-unit id="3242255798983858463" datatype="html">
         <source><x id="PH" equiv-text="days"/> days</source>
@@ -4791,7 +4791,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="needs-translation"><x id="PH" equiv-text="days"/> days</target>
+        <target state="translated"><x id="PH" equiv-text="days"/> дни</target>
       </trans-unit>
       <trans-unit id="2897042887615940599" datatype="html">
         <source>Error deleting link</source>
@@ -4827,7 +4827,7 @@
           <context context-type="sourcefile">src/app/components/common/toasts/toasts.component.html</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Copy Raw Error</target>
+        <target state="translated">Скопировать ошибку</target>
       </trans-unit>
       <trans-unit id="6581372518205328477" datatype="html">
         <source>Hello <x id="PH" equiv-text="this.settingsService.displayName"/>, welcome to <x id="PH_1" equiv-text="environment.appTitle"/></source>
@@ -4843,7 +4843,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Welcome to <x id="PH" equiv-text="environment.appTitle"/></target>
+        <target state="translated">Добро пожаловать в <x id="PH" equiv-text="environment.appTitle"/></target>
       </trans-unit>
       <trans-unit id="1325877348738783391" datatype="html">
         <source>Dashboard updated</source>
@@ -4931,7 +4931,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
           <context context-type="linenumber">47</context>
         </context-group>
-        <target state="needs-translation">View Preview</target>
+        <target state="translated">Предпросмотр</target>
       </trans-unit>
       <trans-unit id="3099741642167775297" datatype="html" approved="yes">
         <source>Download</source>
@@ -5174,7 +5174,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">-</target>
+        <target state="translated">-</target>
       </trans-unit>
       <trans-unit id="8479257185772414452" datatype="html">
         <source>+</source>
@@ -5182,7 +5182,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">+</target>
+        <target state="translated">+</target>
       </trans-unit>
       <trans-unit id="8659635229098859487" datatype="html" approved="yes">
         <source>Download original</source>
@@ -5434,7 +5434,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">272,275</context>
         </context-group>
-        <target state="needs-translation">Notes <x id="START_BLOCK_IF" equiv-text="@if (document?.notes.length) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="ngth}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></target>
+        <target state="translated">Примечания <x id="START_BLOCK_IF" equiv-text="@if (document?.notes.length) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="ngth}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></target>
       </trans-unit>
       <trans-unit id="5129524307369213584" datatype="html" approved="yes">
         <source>Save &amp; next</source>
@@ -5450,7 +5450,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">312</context>
         </context-group>
-        <target state="needs-translation">Save &amp; close</target>
+        <target state="translated">Сохранить &amp; закрыть</target>
       </trans-unit>
       <trans-unit id="8191371354890763172" datatype="html">
         <source>Enter Password</source>
@@ -5474,7 +5474,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">348</context>
         </context-group>
-        <target state="needs-translation">Document changes detected</target>
+        <target state="translated">Обнаружены изменения документа</target>
       </trans-unit>
       <trans-unit id="2887155916749964" datatype="html">
         <source>The version of this document in your browser session appears older than the existing version.</source>
@@ -5482,7 +5482,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">349</context>
         </context-group>
-        <target state="needs-translation">The version of this document in your browser session appears older than the existing version.</target>
+        <target state="translated">Версия этого документа в вашем браузере появляется старше существующей версии.</target>
       </trans-unit>
       <trans-unit id="237142428785956348" datatype="html">
         <source>Saving the document here may overwrite other changes that were made. To restore the existing version, discard your changes or close the document.</source>
@@ -5490,7 +5490,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">350</context>
         </context-group>
-        <target state="needs-translation">Saving the document here may overwrite other changes that were made. To restore the existing version, discard your changes or close the document.</target>
+        <target state="translated">Сохранение документа здесь может привести к перезаписи внесенных изменений. Чтобы восстановить существующую версию, отмените изменения или закройте документ.</target>
       </trans-unit>
       <trans-unit id="8720977247725652816" datatype="html">
         <source>Ok</source>
@@ -5498,7 +5498,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">352</context>
         </context-group>
-        <target state="needs-translation">Ok</target>
+        <target state="translated">Хорошо</target>
       </trans-unit>
       <trans-unit id="5758784066858623886" datatype="html">
         <source>Error retrieving metadata</source>
@@ -5618,7 +5618,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">783</context>
         </context-group>
-        <target state="needs-translation">Error executing operation</target>
+        <target state="translated">Ошибка при выполнении операции</target>
       </trans-unit>
       <trans-unit id="4458954481601077369" datatype="html">
         <source>Page Fit</source>
@@ -5626,7 +5626,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">852</context>
         </context-group>
-        <target state="needs-translation">Page Fit</target>
+        <target state="translated">Вместить страницу</target>
       </trans-unit>
       <trans-unit id="6857598786757174736" datatype="html" approved="yes">
         <source>Select:</source>
@@ -5730,7 +5730,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">218</context>
         </context-group>
-        <target state="needs-translation">Error executing bulk operation</target>
+        <target state="translated">Ошибка при выполнении массовой операции</target>
       </trans-unit>
       <trans-unit id="7894972847287473517" datatype="html">
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot;</source>
@@ -6396,7 +6396,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">185,187</context>
         </context-group>
-        <target state="needs-translation">Document type: <x id="PH" equiv-text="this.documentTypes.find(               (dt) =&gt; dt.id == +rule.value             )?.name"/></target>
+        <target state="translated">Тип документа: <x id="PH" equiv-text="this.documentTypes.find(               (dt) =&gt; dt.id == +rule.value             )?.name"/></target>
       </trans-unit>
       <trans-unit id="4362173610367509215" datatype="html" approved="yes">
         <source>Without document type</source>
@@ -6412,7 +6412,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">195,197</context>
         </context-group>
-        <target state="needs-translation">Storage path: <x id="PH" equiv-text="this.storagePaths.find(               (sp) =&gt; sp.id == +rule.value             )?.name"/></target>
+        <target state="translated">Путь хранения: <x id="PH" equiv-text="this.storagePaths.find(               (sp) =&gt; sp.id == +rule.value             )?.name"/></target>
       </trans-unit>
       <trans-unit id="1562820715074533164" datatype="html">
         <source>Without storage path</source>
@@ -6420,7 +6420,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">199</context>
         </context-group>
-        <target state="needs-translation">Without storage path</target>
+        <target state="translated">Без пути хранения</target>
       </trans-unit>
       <trans-unit id="8180755793012580465" datatype="html">
         <source>Tag: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)             ?.name"/></source>
@@ -6608,7 +6608,7 @@
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Customize the data fields that can be attached to documents.</target>
+        <target state="translated">Настройка полей данных, которые могут быть прикреплены к документам.</target>
       </trans-unit>
       <trans-unit id="8019331026479399960" datatype="html">
         <source>Add Field</source>
@@ -6640,7 +6640,7 @@
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.ts</context>
           <context context-type="linenumber">71</context>
         </context-group>
-        <target state="needs-translation">Confirm delete field</target>
+        <target state="translated">Подтвердить удаление поля</target>
       </trans-unit>
       <trans-unit id="2939457975223185057" datatype="html">
         <source>This operation will permanently delete this field.</source>
@@ -6648,7 +6648,7 @@
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.ts</context>
           <context context-type="linenumber">72</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this field.</target>
+        <target state="translated">Эта операция окончательно удалит данное поле.</target>
       </trans-unit>
       <trans-unit id="5137089475515834162" datatype="html">
         <source>Deleted field</source>
@@ -6656,7 +6656,7 @@
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.ts</context>
           <context context-type="linenumber">81</context>
         </context-group>
-        <target state="needs-translation">Deleted field</target>
+        <target state="translated">Удаленное поле</target>
       </trans-unit>
       <trans-unit id="6352403551920829405" datatype="html">
         <source>Error deleting field.</source>
@@ -6664,7 +6664,7 @@
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.ts</context>
           <context context-type="linenumber">86</context>
         </context-group>
-        <target state="needs-translation">Error deleting field.</target>
+        <target state="translated">Ошибка при сохранении поля.</target>
       </trans-unit>
       <trans-unit id="8084492669582894778" datatype="html">
         <source>document type</source>
@@ -6760,7 +6760,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">56</context>
         </context-group>
-        <target state="needs-translation">Error retrieving mail accounts</target>
+        <target state="translated">Ошибка при получении учетных записей почты</target>
       </trans-unit>
       <trans-unit id="5241231471117657636" datatype="html">
         <source>Error retrieving mail rules</source>
@@ -6768,7 +6768,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">70</context>
         </context-group>
-        <target state="needs-translation">Error retrieving mail rules</target>
+        <target state="translated">Ошибка при получении почтовых правил</target>
       </trans-unit>
       <trans-unit id="6327501535846658797" datatype="html">
         <source>Saved account &quot;<x id="PH" equiv-text="newMailAccount.name"/>&quot;.</source>
@@ -6784,7 +6784,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">104</context>
         </context-group>
-        <target state="needs-translation">Error saving account.</target>
+        <target state="translated">Ошибка при сохранении учетной записи.</target>
       </trans-unit>
       <trans-unit id="5641934153807844674" datatype="html">
         <source>Confirm delete mail account</source>
@@ -6816,7 +6816,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">132</context>
         </context-group>
-        <target state="needs-translation">Error deleting mail account.</target>
+        <target state="translated">Ошибка при удалении учетных записей почты.</target>
       </trans-unit>
       <trans-unit id="123368655395433699" datatype="html">
         <source>Saved rule &quot;<x id="PH" equiv-text="newMailRule.name"/>&quot;.</source>
@@ -6832,7 +6832,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">163</context>
         </context-group>
-        <target state="needs-translation">Error saving rule.</target>
+        <target state="translated">Ошибка при сохранении правила.</target>
       </trans-unit>
       <trans-unit id="3896080636020672118" datatype="html">
         <source>Confirm delete mail rule</source>
@@ -6864,7 +6864,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">190</context>
         </context-group>
-        <target state="needs-translation">Error deleting mail rule.</target>
+        <target state="translated">Ошибка при удалении почтового правила.</target>
       </trans-unit>
       <trans-unit id="3061362835271417984" datatype="html">
         <source>Permissions updated</source>
@@ -7064,7 +7064,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">303</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete all objects.</target>
+        <target state="translated">Эта операция окончательно удалит все объекты.</target>
       </trans-unit>
       <trans-unit id="5897787932098828336" datatype="html">
         <source>Objects deleted successfully</source>
@@ -7072,7 +7072,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">317</context>
         </context-group>
-        <target state="needs-translation">Objects deleted successfully</target>
+        <target state="translated">Объекты успешно удалены</target>
       </trans-unit>
       <trans-unit id="8273353839648035634" datatype="html">
         <source>Error deleting objects</source>
@@ -7080,7 +7080,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">323</context>
         </context-group>
-        <target state="needs-translation">Error deleting objects</target>
+        <target state="translated">Ошибка при удалении объектов</target>
       </trans-unit>
       <trans-unit id="5101757640976222639" datatype="html">
         <source>storage path</source>
@@ -7136,7 +7136,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Use workflows to customize the behavior of Paperless-ngx when events 'trigger' a workflow.</target>
+        <target state="translated">Используйте автомации, чтобы настроить поведение Paperless-ngx, когда события "запускают" автомацию.</target>
       </trans-unit>
       <trans-unit id="2437630016855517844" datatype="html">
         <source>Add Workflow</source>
@@ -7152,7 +7152,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">Disabled</target>
+        <target state="translated">Отключено</target>
       </trans-unit>
       <trans-unit id="1624023882313260402" datatype="html">
         <source>No workflows defined.</source>
@@ -7160,7 +7160,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="needs-translation">No workflows defined.</target>
+        <target state="translated">Не определены автомации.</target>
       </trans-unit>
       <trans-unit id="4200688335642457098" datatype="html">
         <source>Saved workflow &quot;<x id="PH" equiv-text="newWorkflow.name"/>&quot;.</source>
@@ -7168,7 +7168,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">79</context>
         </context-group>
-        <target state="needs-translation">Saved workflow "<x id="PH" equiv-text="newWorkflow.name"/>".</target>
+        <target state="translated">Сохраненная автомация "<x id="PH" equiv-text="newWorkflow.name"/>".</target>
       </trans-unit>
       <trans-unit id="7593065565369163325" datatype="html">
         <source>Error saving workflow.</source>
@@ -7176,7 +7176,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="needs-translation">Error saving workflow.</target>
+        <target state="translated">Ошибка при сохранении автомации.</target>
       </trans-unit>
       <trans-unit id="563460864902055482" datatype="html">
         <source>Confirm delete workflow</source>
@@ -7184,7 +7184,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">95</context>
         </context-group>
-        <target state="needs-translation">Confirm delete workflow</target>
+        <target state="translated">Подтвердите удаление автомации</target>
       </trans-unit>
       <trans-unit id="6874008462443189248" datatype="html">
         <source>This operation will permanently delete this workflow.</source>
@@ -7192,7 +7192,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this workflow.</target>
+        <target state="translated">Эта операция окончательно удалит автомацию.</target>
       </trans-unit>
       <trans-unit id="1848226135059921165" datatype="html">
         <source>Deleted workflow</source>
@@ -7200,7 +7200,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">105</context>
         </context-group>
-        <target state="needs-translation">Deleted workflow</target>
+        <target state="translated">Удаленная автомация</target>
       </trans-unit>
       <trans-unit id="3177411222429626224" datatype="html">
         <source>Error deleting workflow.</source>
@@ -7208,7 +7208,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">110</context>
         </context-group>
-        <target state="needs-translation">Error deleting workflow.</target>
+        <target state="translated">Ошибка при удалении автомации.</target>
       </trans-unit>
       <trans-unit id="2649252321173430744" datatype="html">
         <source>Not Found</source>
@@ -7264,7 +7264,7 @@
           <context context-type="sourcefile">src/app/data/custom-field.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Monetary</target>
+        <target state="translated">Денежный</target>
       </trans-unit>
       <trans-unit id="6162693758764653365" datatype="html">
         <source>Text</source>
@@ -7288,7 +7288,7 @@
           <context context-type="sourcefile">src/app/data/custom-field.ts</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Document Link</target>
+        <target state="translated">Ярлык на документ</target>
       </trans-unit>
       <trans-unit id="2167862279705099846" datatype="html" approved="yes">
         <source>Auto: Learn matching automatically</source>
@@ -7941,7 +7941,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">136</context>
         </context-group>
-        <target state="needs-translation">Japanese</target>
+        <target state="translated">Японский</target>
       </trans-unit>
       <trans-unit id="1334425850005897370" datatype="html">
         <source>Luxembourgish</source>

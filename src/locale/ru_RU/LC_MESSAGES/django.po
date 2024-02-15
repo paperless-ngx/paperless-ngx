@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-08 11:56-0800\n"
-"PO-Revision-Date: 2024-02-08 19:57\n"
+"POT-Creation-Date: 2024-02-14 16:47-0800\n"
+"PO-Revision-Date: 2024-02-15 00:52\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -27,7 +27,7 @@ msgstr "владелец"
 
 #: documents/models.py:53 documents/models.py:897
 msgid "None"
-msgstr "Ничего"
+msgstr "Никакой"
 
 #: documents/models.py:54 documents/models.py:898
 msgid "Any word"
@@ -369,15 +369,15 @@ msgstr "больше похожих"
 
 #: documents/models.py:447
 msgid "has tags in"
-msgstr "имеет теги в"
+msgstr "имеет этикетки в"
 
 #: documents/models.py:448
 msgid "ASN greater than"
-msgstr "ASN больше чем"
+msgstr "АН больше чем"
 
 #: documents/models.py:449
 msgid "ASN less than"
-msgstr "ASN меньше чем"
+msgstr "АН меньше чем"
 
 #: documents/models.py:450
 msgid "storage path is"
@@ -385,27 +385,27 @@ msgstr "путь хранения является"
 
 #: documents/models.py:451
 msgid "has correspondent in"
-msgstr ""
+msgstr "имеет корреспондента в"
 
 #: documents/models.py:452
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "не имеет корреспондента в"
 
 #: documents/models.py:453
 msgid "has document type in"
-msgstr ""
+msgstr "имеет тип документа в"
 
 #: documents/models.py:454
 msgid "does not have document type in"
-msgstr ""
+msgstr "не имеет тип документа в"
 
 #: documents/models.py:455
 msgid "has storage path in"
-msgstr ""
+msgstr "имеет путь хранения в"
 
 #: documents/models.py:456
 msgid "does not have storage path in"
-msgstr ""
+msgstr "не имеет пути хранения в"
 
 #: documents/models.py:457
 msgid "owner is"
@@ -413,7 +413,7 @@ msgstr "владелец"
 
 #: documents/models.py:458
 msgid "has owner in"
-msgstr ""
+msgstr "имеет владельца в"
 
 #: documents/models.py:459
 msgid "does not have owner"
@@ -421,15 +421,15 @@ msgstr "не имеет владельца"
 
 #: documents/models.py:460
 msgid "does not have owner in"
-msgstr ""
+msgstr "не имеет владельца в"
 
 #: documents/models.py:461
 msgid "has custom field value"
-msgstr ""
+msgstr "имеет пользовательское значение поля"
 
 #: documents/models.py:462
 msgid "is shared by me"
-msgstr ""
+msgstr "делится мною"
 
 #: documents/models.py:472
 msgid "rule type"
@@ -461,7 +461,7 @@ msgstr "Подтверждено"
 
 #: documents/models.py:596
 msgid "If the task is acknowledged via the frontend or API"
-msgstr "Если задание подтверждено через интерфейс сайта или API"
+msgstr "Если задание подтверждено через внешний интерфейс или API"
 
 #: documents/models.py:602
 msgid "Task Filename"
@@ -473,7 +473,7 @@ msgstr "Имя файла, для которого была запущена з�
 
 #: documents/models.py:609
 msgid "Task Name"
-msgstr "Название Задачи"
+msgstr "Название задачи"
 
 #: documents/models.py:610
 msgid "Name of the Task which was run"
@@ -521,7 +521,7 @@ msgstr "Данные, возвращаемые задачей"
 
 #: documents/models.py:655
 msgid "Note for the document"
-msgstr ""
+msgstr "Заметка для документа"
 
 #: documents/models.py:679
 msgid "user"
@@ -549,15 +549,15 @@ msgstr "Срок действия"
 
 #: documents/models.py:712
 msgid "slug"
-msgstr ""
+msgstr "динамический идентификатор"
 
 #: documents/models.py:744
 msgid "share link"
-msgstr "Поделиться ссылкой"
+msgstr "ссылка для обмена"
 
 #: documents/models.py:745
 msgid "share links"
-msgstr ""
+msgstr "ссылки для обмена"
 
 #: documents/models.py:757
 msgid "String"
@@ -585,11 +585,11 @@ msgstr "С плавающей точкой"
 
 #: documents/models.py:763
 msgid "Monetary"
-msgstr ""
+msgstr "Валюта"
 
 #: documents/models.py:764
 msgid "Document Link"
-msgstr ""
+msgstr "Ярлык на документ"
 
 #: documents/models.py:776
 msgid "data type"
@@ -605,11 +605,11 @@ msgstr "Пользовательские поля"
 
 #: documents/models.py:847
 msgid "custom field instance"
-msgstr ""
+msgstr "пользовательский образец поля"
 
 #: documents/models.py:848
 msgid "custom field instances"
-msgstr ""
+msgstr "пользовательские образцы поля"
 
 #: documents/models.py:905
 msgid "Consumption Started"
@@ -629,7 +629,7 @@ msgstr "Обработка из папки"
 
 #: documents/models.py:911
 msgid "Api Upload"
-msgstr "Загрузка API"
+msgstr "API загрузка"
 
 #: documents/models.py:912
 msgid "Mail Fetch"
@@ -637,19 +637,19 @@ msgstr "Получить почту"
 
 #: documents/models.py:915
 msgid "Workflow Trigger Type"
-msgstr ""
+msgstr "Tип пускового механизма автоматизации"
 
 #: documents/models.py:927
 msgid "filter path"
-msgstr ""
+msgstr "фильтр путя"
 
 #: documents/models.py:932
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr ""
+msgstr "Обрабатывает только документы, соответствующие этому пути если он указан. Допускаются такие символы, как *. Верхний и нижний регистр не учитываются."
 
 #: documents/models.py:939
 msgid "filter filename"
-msgstr ""
+msgstr "фильтр имя файла"
 
 #: documents/models.py:944 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
@@ -657,27 +657,27 @@ msgstr "Обрабатывать только документы, которые
 
 #: documents/models.py:955
 msgid "filter documents from this mail rule"
-msgstr ""
+msgstr "фильтр документов из этого правила электронной почты"
 
 #: documents/models.py:971
 msgid "has these tag(s)"
-msgstr ""
+msgstr "имеет эти этикетки"
 
 #: documents/models.py:979
 msgid "has this document type"
-msgstr ""
+msgstr "имеет этот тип документа"
 
 #: documents/models.py:987
 msgid "has this correspondent"
-msgstr ""
+msgstr "имеет этого корреспондента"
 
 #: documents/models.py:991
 msgid "workflow trigger"
-msgstr ""
+msgstr "пусковой механизм автоматизации"
 
 #: documents/models.py:992
 msgid "workflow triggers"
-msgstr ""
+msgstr "пусковые механизмы автоматизации"
 
 #: documents/models.py:1000
 msgid "Assignment"
@@ -685,7 +685,7 @@ msgstr "Задание"
 
 #: documents/models.py:1003
 msgid "Workflow Action Type"
-msgstr ""
+msgstr "Тип действия автоматизации"
 
 #: documents/models.py:1009
 msgid "assign title"
@@ -693,7 +693,7 @@ msgstr "присвоить заголовок"
 
 #: documents/models.py:1014
 msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr ""
+msgstr "Назначьте заголовок документа. Оно может содержать заполнители, см. документацию."
 
 #: documents/models.py:1022 paperless_mail/models.py:216
 msgid "assign this tag"
@@ -709,39 +709,39 @@ msgstr "назначить этого корреспондента"
 
 #: documents/models.py:1046
 msgid "assign this storage path"
-msgstr ""
+msgstr "назначить этот путь хранения"
 
 #: documents/models.py:1055
 msgid "assign this owner"
-msgstr ""
+msgstr "назначить этого владельца"
 
 #: documents/models.py:1062
 msgid "grant view permissions to these users"
-msgstr ""
+msgstr "предоставьте права на отображение этим пользователям"
 
 #: documents/models.py:1069
 msgid "grant view permissions to these groups"
-msgstr ""
+msgstr "предоставьте права на отображение этим группам"
 
 #: documents/models.py:1076
 msgid "grant change permissions to these users"
-msgstr ""
+msgstr "предоставьте права на редактирование этим пользователям"
 
 #: documents/models.py:1083
 msgid "grant change permissions to these groups"
-msgstr ""
+msgstr "предоставьте права на редактирование этим группам"
 
 #: documents/models.py:1090
 msgid "assign these custom fields"
-msgstr ""
+msgstr "назначьте эти пользовательские поля"
 
 #: documents/models.py:1094
 msgid "workflow action"
-msgstr ""
+msgstr "действия автоматизации"
 
 #: documents/models.py:1095
 msgid "workflow actions"
-msgstr ""
+msgstr "действия автоматизации"
 
 #: documents/models.py:1104 paperless_mail/models.py:95
 msgid "order"
@@ -749,11 +749,11 @@ msgstr "порядок"
 
 #: documents/models.py:1110
 msgid "triggers"
-msgstr ""
+msgstr "пусковые механизмы"
 
 #: documents/models.py:1117
 msgid "actions"
-msgstr ""
+msgstr "действия"
 
 #: documents/models.py:1120
 msgid "enabled"
@@ -791,11 +791,11 @@ msgstr "Неправильные имя пользователя или паро
 
 #: documents/templates/account/login.html:54
 msgid "Share link was not found."
-msgstr "Эта ссылка не найдена."
+msgstr "Ссылка для обмена не найдена."
 
 #: documents/templates/account/login.html:58
 msgid "Share link has expired."
-msgstr "Срок действия ссылки истёк."
+msgstr "Срок действия ссылки для обмена истёк."
 
 #: documents/templates/account/login.html:61
 #: documents/templates/socialaccount/signup.html:56
@@ -816,11 +816,11 @@ msgstr "Забыли пароль?"
 
 #: documents/templates/account/login.html:83
 msgid "or sign in via"
-msgstr ""
+msgstr "или войдите в систему через"
 
 #: documents/templates/account/password_reset.html:15
 msgid "Paperless-ngx reset password request"
-msgstr ""
+msgstr "Запрос на сброс пароля Paperless-ngx"
 
 #: documents/templates/account/password_reset.html:43
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
@@ -828,7 +828,7 @@ msgstr "Введите ваш адрес электронной почты ни�
 
 #: documents/templates/account/password_reset.html:46
 msgid "An error occurred. Please try again."
-msgstr "Произошла ошибка. Пожалуйста, попробуйте снова."
+msgstr "Произошла ошибка. Пожалуйста, попробуйте еще раз."
 
 #: documents/templates/account/password_reset.html:49
 #: documents/templates/socialaccount/signup.html:57
@@ -849,23 +849,23 @@ msgstr "Проверье ваш почтовый ящик."
 
 #: documents/templates/account/password_reset_done.html:41
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
-msgstr ""
+msgstr "Мы отправили вам инструкции по установке нового пароля. Вы должны получить письмо в ближайшее время!"
 
 #: documents/templates/account/password_reset_from_key.html:15
 msgid "Paperless-ngx reset password confirmation"
-msgstr ""
+msgstr "Подтверждение сброса пароля Paperless-ngx"
 
 #: documents/templates/account/password_reset_from_key.html:44
 msgid "request a new password reset"
-msgstr "запросить новый пароль"
+msgstr "запрос сброса пароля вновь"
 
 #: documents/templates/account/password_reset_from_key.html:46
 msgid "Set a new password."
-msgstr "Придумайте новый пароль"
+msgstr "Установите новый пароль."
 
 #: documents/templates/account/password_reset_from_key.html:50
 msgid "Passwords did not match or too weak. Try again."
-msgstr ""
+msgstr "Пароли не совпадают или слишком слабые. Пожалуйста, попробуйте еще раз."
 
 #: documents/templates/account/password_reset_from_key.html:53
 msgid "New Password"
@@ -881,16 +881,16 @@ msgstr "Сменить пароль"
 
 #: documents/templates/account/password_reset_from_key_done.html:14
 msgid "Paperless-ngx reset password complete"
-msgstr ""
+msgstr "Сброс пароля Paperless-ngx завершен"
 
 #: documents/templates/account/password_reset_from_key_done.html:40
 msgid "Password reset complete."
-msgstr "Изменение пароля прошло успешно."
+msgstr "Сброс пароля пароля завершен."
 
 #: documents/templates/account/password_reset_from_key_done.html:42
 #, python-format
 msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
-msgstr ""
+msgstr "Ваш новый пароль был установлен. Теперь вы можете <a href=\"%(login_url)s\">войти</a>"
 
 #: documents/templates/index.html:79
 msgid "Paperless-ngx is loading..."
@@ -907,50 +907,53 @@ msgstr "Вот ссылка на документацию."
 #: documents/templates/socialaccount/authentication_error.html:15
 #: documents/templates/socialaccount/login.html:15
 msgid "Paperless-ngx social account sign in"
-msgstr ""
+msgstr "Paperless-ngx вход через через сторонние сервисы"
 
 #: documents/templates/socialaccount/authentication_error.html:43
 #, python-format
 msgid "An error occurred while attempting to login via your social network account. Back to the <a href=\"%(login_url)s\">login page</a>"
-msgstr ""
+msgstr "Ошибка при входе в систему через учетную запись стороннего сервиса. Вернуться на <a href=\"%(login_url)s\">страницу входа</a>"
 
 #: documents/templates/socialaccount/login.html:44
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
-msgstr ""
+msgstr "Вы собираетесь связать аккаунт стороннего сервисыа через %(provider)s."
 
 #: documents/templates/socialaccount/login.html:47
 msgid "Continue"
-msgstr ""
+msgstr "Продолжить"
 
 #: documents/templates/socialaccount/signup.html:14
 msgid "Paperless-ngx social account sign up"
-msgstr ""
+msgstr "Paperless-ngx регистрация через сторонний сервис"
 
 #: documents/templates/socialaccount/signup.html:53
 #, python-format
-msgid "You are about to use your %(provider_name)s account to login to\n"
-"%(site_name)s. As a final step, please complete the following form:"
+msgid "You are about to use your %(provider_name)s account to login."
+msgstr ""
+
+#: documents/templates/socialaccount/signup.html:54
+msgid "As a final step, please complete the following form:"
 msgstr ""
 
 #: documents/templates/socialaccount/signup.html:72
 msgid "Sign up"
-msgstr ""
+msgstr "Зарегистрироваться"
 
 #: documents/validators.py:17
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "Невозможно разобрать URI {value}, отсутствует схема"
 
 #: documents/validators.py:22
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
+msgstr "Невозможно разобрать URI {value}, отсутствует расположение сети или путь"
 
 #: documents/validators.py:27
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "Невозможно разобрать URI {value}"
 
 #: paperless/apps.py:10
 msgid "Paperless"
@@ -958,147 +961,147 @@ msgstr "Paperless"
 
 #: paperless/models.py:26
 msgid "pdf"
-msgstr ""
+msgstr "pdf"
 
 #: paperless/models.py:27
 msgid "pdfa"
-msgstr ""
+msgstr "pdfa"
 
 #: paperless/models.py:28
 msgid "pdfa-1"
-msgstr ""
+msgstr "pdfa-1"
 
 #: paperless/models.py:29
 msgid "pdfa-2"
-msgstr ""
+msgstr "pdfa-2"
 
 #: paperless/models.py:30
 msgid "pdfa-3"
-msgstr ""
+msgstr "pdfa-3"
 
 #: paperless/models.py:39
 msgid "skip"
-msgstr ""
+msgstr "пропустить"
 
 #: paperless/models.py:40
 msgid "redo"
-msgstr ""
+msgstr "повторить"
 
 #: paperless/models.py:41
 msgid "force"
-msgstr ""
+msgstr "заставить"
 
 #: paperless/models.py:42
 msgid "skip_noarchive"
-msgstr ""
+msgstr "skip_noarchive"
 
 #: paperless/models.py:50
 msgid "never"
-msgstr ""
+msgstr "некогда"
 
 #: paperless/models.py:51
 msgid "with_text"
-msgstr ""
+msgstr "with_text"
 
 #: paperless/models.py:52
 msgid "always"
-msgstr ""
+msgstr "всегда"
 
 #: paperless/models.py:60
 msgid "clean"
-msgstr ""
+msgstr "очистить"
 
 #: paperless/models.py:61
 msgid "clean-final"
-msgstr ""
+msgstr "clean-final"
 
 #: paperless/models.py:62
 msgid "none"
-msgstr ""
+msgstr "никакие"
 
 #: paperless/models.py:70
 msgid "LeaveColorUnchanged"
-msgstr ""
+msgstr "LeaveColorUnchanged"
 
 #: paperless/models.py:71
 msgid "RGB"
-msgstr ""
+msgstr "RGB"
 
 #: paperless/models.py:72
 msgid "UseDeviceIndependentColor"
-msgstr ""
+msgstr "UseDeviceIndependentColor"
 
 #: paperless/models.py:73
 msgid "Gray"
-msgstr ""
+msgstr "Серый"
 
 #: paperless/models.py:74
 msgid "CMYK"
-msgstr ""
+msgstr "CMYK"
 
 #: paperless/models.py:83
 msgid "Sets the output PDF type"
-msgstr ""
+msgstr "Определяет тип PDF выходного файла"
 
 #: paperless/models.py:95
 msgid "Do OCR from page 1 to this value"
-msgstr ""
+msgstr "Выполните OCR со страницы 1 до этого значения"
 
 #: paperless/models.py:101
 msgid "Do OCR using these languages"
-msgstr ""
+msgstr "Выполните OCR для этих языков"
 
 #: paperless/models.py:108
 msgid "Sets the OCR mode"
-msgstr ""
+msgstr "Определяет режим OCR"
 
 #: paperless/models.py:116
 msgid "Controls the generation of an archive file"
-msgstr ""
+msgstr "Управляет созданием архивного файла"
 
 #: paperless/models.py:124
 msgid "Sets image DPI fallback value"
-msgstr ""
+msgstr "Устанавливает обратное значение DPI изображения"
 
 #: paperless/models.py:131
 msgid "Controls the unpaper cleaning"
-msgstr ""
+msgstr "Контролирует очистку от бумаги"
 
 #: paperless/models.py:138
 msgid "Enables deskew"
-msgstr ""
+msgstr "Активирует коррекцю перекоса"
 
 #: paperless/models.py:141
 msgid "Enables page rotation"
-msgstr ""
+msgstr "Активирует поворот страницы"
 
 #: paperless/models.py:146
 msgid "Sets the threshold for rotation of pages"
-msgstr ""
+msgstr "Устанавливает порог для поворота страниц"
 
 #: paperless/models.py:152
 msgid "Sets the maximum image size for decompression"
-msgstr ""
+msgstr "Устанавливает максимальный размер изображения для распаковки"
 
 #: paperless/models.py:158
 msgid "Sets the Ghostscript color conversion strategy"
-msgstr ""
+msgstr "Устанавливает стратегию преобразования цвета Ghostscript"
 
 #: paperless/models.py:166
 msgid "Adds additional user arguments for OCRMyPDF"
-msgstr ""
+msgstr "Добавляет дополнительные пользовательские аргументы для OCRMyPDF"
 
 #: paperless/models.py:171
 msgid "Application title"
-msgstr ""
+msgstr "Заголовок приложения"
 
 #: paperless/models.py:178
 msgid "Application logo"
-msgstr ""
+msgstr "Логотип приложения"
 
 #: paperless/models.py:188
 msgid "paperless application settings"
-msgstr ""
+msgstr "настройки приложения paperless"
 
 #: paperless/settings.py:642
 msgid "English (US)"
@@ -1166,7 +1169,7 @@ msgstr "Итальянский"
 
 #: paperless/settings.py:658
 msgid "Japanese"
-msgstr ""
+msgstr "Японский"
 
 #: paperless/settings.py:659
 msgid "Luxembourgish"
@@ -1366,7 +1369,7 @@ msgstr "Пометить почту, не обрабатывать помече�
 
 #: paperless_mail/models.py:80
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr "Отметить почту указанным тегом, не обрабатывать помеченные письма"
+msgstr "Отметить почту указанной этикеткой, не обрабатывать этикетированные письма"
 
 #: paperless_mail/models.py:83
 msgid "Use subject as title"
@@ -1378,7 +1381,7 @@ msgstr "Использовать имя вложенного файла как �
 
 #: paperless_mail/models.py:85
 msgid "Do not assign title from rule"
-msgstr ""
+msgstr "Использовать тему в качестве заголовки"
 
 #: paperless_mail/models.py:88
 msgid "Do not assign a correspondent"
@@ -1414,7 +1417,7 @@ msgstr "фильтр по отправителю"
 
 #: paperless_mail/models.py:122
 msgid "filter to"
-msgstr "отфильтровать по"
+msgstr "фильтр по"
 
 #: paperless_mail/models.py:129
 msgid "filter subject"
@@ -1426,15 +1429,15 @@ msgstr "фильтр по тексту сообщения"
 
 #: paperless_mail/models.py:143
 msgid "filter attachment filename inclusive"
-msgstr ""
+msgstr "фильтр по именю файла вложения (включительно)"
 
 #: paperless_mail/models.py:155
 msgid "filter attachment filename exclusive"
-msgstr ""
+msgstr "фильтр по именю файла вложения (исключительно)"
 
 #: paperless_mail/models.py:160
 msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "Не используйте документы, полностью совпадающие с этим именем, если оно указано. Допускаются подстановочные знаки, такие как *.pdf или *invoice*. Нечувствительность к регистру."
 
 #: paperless_mail/models.py:167
 msgid "maximum age"
@@ -1454,7 +1457,7 @@ msgstr "Вложенные вложения включая встраиваем�
 
 #: paperless_mail/models.py:183
 msgid "consumption scope"
-msgstr "рамки потребления"
+msgstr "объем обработки"
 
 #: paperless_mail/models.py:189
 msgid "action"
@@ -1478,7 +1481,7 @@ msgstr "назначить корреспондента из"
 
 #: paperless_mail/models.py:242
 msgid "Assign the rule owner to documents"
-msgstr ""
+msgstr "Назначить документам правилавладелеца"
 
 #: paperless_mail/models.py:268
 msgid "uid"
@@ -1486,7 +1489,7 @@ msgstr "uid"
 
 #: paperless_mail/models.py:276
 msgid "subject"
-msgstr "предмет"
+msgstr "тема"
 
 #: paperless_mail/models.py:284
 msgid "received"

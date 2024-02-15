@@ -87,14 +87,6 @@ class BarcodePlugin(ConsumeTaskPlugin):
         # Locate any barcodes in the files
         self.detect()
 
-        # Update/overwrite an ASN if possible
-        if (
-            settings.CONSUMER_ENABLE_ASN_BARCODE
-            and (located_asn := self.asn) is not None
-        ):
-            logger.info(f"Found ASN in barcode: {located_asn}")
-            self.metadata.asn = located_asn
-
         # try reading tags from barcodes
         if (
             settings.CONSUMER_ENABLE_TAG_BARCODE
@@ -153,6 +145,15 @@ class BarcodePlugin(ConsumeTaskPlugin):
 
             # Request the consume task stops
             raise StopConsumeTaskError(msg)
+
+        # Update/overwrite an ASN if possible
+        # After splitting, as otherwise each split document gets the same ASN
+        if (
+            settings.CONSUMER_ENABLE_ASN_BARCODE
+            and (located_asn := self.asn) is not None
+        ):
+            logger.info(f"Found ASN in barcode: {located_asn}")
+            self.metadata.asn = located_asn
 
     def cleanup(self) -> None:
         self.temp_dir.cleanup()

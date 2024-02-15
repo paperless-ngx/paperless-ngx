@@ -39,7 +39,6 @@
           <path d="M757.6,293.7c-20-10.8-42.6-16.2-67.8-16.2H600c-8.5,39.2-21.1,76.4-37.6,111.3c-9.9,20.8-21.1,40.6-33.6,59.4v207.2h88.9 V521.5h72c25.2,0,47.8-5.4,67.8-16.2s35.7-25.6,47.1-44.2c11.4-18.7,17.1-39.1,17.1-61.3c0.1-22.7-5.6-43.3-17-61.9 C793.3,319.2,777.6,304.5,757.6,293.7z M716.6,434.3c-9.3,8.9-21.6,13.3-36.7,13.3l-62.2,0.4v-92.5l62.2-0.4 c15.1,0,27.3,4.4,36.7,13.3c9.4,8.9,14,19.9,14,32.9C730.6,414.5,726,425.4,716.6,434.3z" transform="translate(0)"/>
         </g>
       </svg>
-      <!-- TODO: Translations? -->
       {% if form.errors.username %}
         <div class="alert alert-danger" role="alert">
           {{ form.errors.username }}
@@ -50,9 +49,10 @@
           {{ form.errors.email }}
         </div>
       {% endif %}
-        {% blocktrans with provider_name=account.get_provider.name site_name=site.name %}You are about to use your {{provider_name}} account to login to
-{{site_name}}. As a final step, please complete the following form:{% endblocktrans %}
-    </p>
+      <p>
+        {% blocktrans with provider_name=account.get_provider.name %}You are about to use your {{provider_name}} account to login.{% endblocktrans %}
+        {% blocktrans %}As a final step, please complete the following form:{% endblocktrans %}
+      </p>
  			{% translate "Username" as i18n_username %}
  			{% translate "Email" as i18n_email %}
       <div class="form-floating">
