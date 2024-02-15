@@ -1,5 +1,29 @@
 # Changelog
 
+## paperless-ngx 2.5.2
+
+### Bug Fixes
+
+- Fix: Generated secret key may include single or double quotes [@schmidtnz](https://github.com/schmidtnz) ([#5767](https://github.com/paperless-ngx/paperless-ngx/pull/5767))
+- Fix: consumer status alerts container blocks elements [@shamoon](https://github.com/shamoon) ([#5762](https://github.com/paperless-ngx/paperless-ngx/pull/5762))
+- Fix: handle document notes user format api change [@shamoon](https://github.com/shamoon) ([#5751](https://github.com/paperless-ngx/paperless-ngx/pull/5751))
+- Fix: Assign ASN from barcode only after any splitting [@stumpylog](https://github.com/stumpylog) ([#5745](https://github.com/paperless-ngx/paperless-ngx/pull/5745))
+
+### Dependencies
+
+- Chore(deps): Bump the major-versions group with 1 update [@dependabot](https://github.com/dependabot) ([#5741](https://github.com/paperless-ngx/paperless-ngx/pull/5741))
+
+### All App Changes
+
+<details>
+<summary>4 changes</summary>
+
+- Fix: consumer status alerts container blocks elements [@shamoon](https://github.com/shamoon) ([#5762](https://github.com/paperless-ngx/paperless-ngx/pull/5762))
+- Fix: handle document notes user format api change [@shamoon](https://github.com/shamoon) ([#5751](https://github.com/paperless-ngx/paperless-ngx/pull/5751))
+- Fix: Assign ASN from barcode only after any splitting [@stumpylog](https://github.com/stumpylog) ([#5745](https://github.com/paperless-ngx/paperless-ngx/pull/5745))
+- Chore(deps): Bump the major-versions group with 1 update [@dependabot](https://github.com/dependabot) ([#5741](https://github.com/paperless-ngx/paperless-ngx/pull/5741))
+</details>
+
 ## paperless-ngx 2.5.1
 
 ### Bug Fixes
