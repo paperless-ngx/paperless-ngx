@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-08 11:56-0800\n"
-"PO-Revision-Date: 2024-02-08 19:57\n"
+"PO-Revision-Date: 2024-02-13 12:08\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -816,7 +816,7 @@ msgstr "Contrasenya oblidada?"
 
 #: documents/templates/account/login.html:83
 msgid "or sign in via"
-msgstr ""
+msgstr "o accedeix via"
 
 #: documents/templates/account/password_reset.html:15
 msgid "Paperless-ngx reset password request"
@@ -907,35 +907,36 @@ msgstr "Link als documents."
 #: documents/templates/socialaccount/authentication_error.html:15
 #: documents/templates/socialaccount/login.html:15
 msgid "Paperless-ngx social account sign in"
-msgstr ""
+msgstr "Paperless-ngx accés a través de compte social"
 
 #: documents/templates/socialaccount/authentication_error.html:43
 #, python-format
 msgid "An error occurred while attempting to login via your social network account. Back to the <a href=\"%(login_url)s\">login page</a>"
-msgstr ""
+msgstr "Error al autenticar amb xarxa social. Torna a <a href=\"%(login_url)s\">pàgina de login</a>"
 
 #: documents/templates/socialaccount/login.html:44
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
-msgstr ""
+msgstr "Estàs a punt de connectar un nou proveïdor extern des de %(provider)s."
 
 #: documents/templates/socialaccount/login.html:47
 msgid "Continue"
-msgstr ""
+msgstr "Continuar"
 
 #: documents/templates/socialaccount/signup.html:14
 msgid "Paperless-ngx social account sign up"
-msgstr ""
+msgstr "Paperless-ngx alta de xarxa social"
 
 #: documents/templates/socialaccount/signup.html:53
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login to\n"
 "%(site_name)s. As a final step, please complete the following form:"
-msgstr ""
+msgstr "Estàs a punt d'usar el teu %(provider_name) compte per a logar-te a\n"
+"%(site_name). Completa el següent:"
 
 #: documents/templates/socialaccount/signup.html:72
 msgid "Sign up"
-msgstr ""
+msgstr "Registra't"
 
 #: documents/validators.py:17
 #, python-brace-format
