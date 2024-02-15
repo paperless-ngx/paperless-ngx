@@ -122,7 +122,7 @@
               <dd>
                 {{status.tasks.classifier_status}}
                 @if (status.tasks.classifier_status === 'OK') {
-                  @if (isStale(status.tasks.classifier_last_modified)) {
+                  @if (isStale(status.tasks.classifier_last_trained)) {
                     <i-bs name="exclamation-triangle-fill" class="text-warning ms-1" [ngbPopover]="classifierStatus" triggers="mouseenter:mouseleave"></i-bs>
                   } @else {
                     <i-bs name="check-circle-fill" class="text-primary ms-1" [ngbPopover]="classifierStatus" triggers="mouseenter:mouseleave"></i-bs>
@@ -132,7 +132,7 @@
                 }
               </dd>
               <ng-template #classifierStatus>
-                <h6><ng-container i18n>Last Updated</ng-container>:</h6> <span class="font-monospace small">{{status.tasks.classifier_last_modified | customDate:'medium'}}</span>
+                <h6><ng-container i18n>Last Trained</ng-container>:</h6> <span class="font-monospace small">{{status.tasks.classifier_last_trained | customDate:'medium'}}</span>
               </ng-template>
             </dl>
           </div>

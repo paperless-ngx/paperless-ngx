@@ -35,7 +35,7 @@ export interface SystemStatus {
     index_last_modified: string // ISO date string
     index_error: string
     classifier_status: SystemStatusItemStatus
-    classifier_last_modified: string // ISO date string
+    classifier_last_trained: string // ISO date string
     classifier_error: string
   }
 }

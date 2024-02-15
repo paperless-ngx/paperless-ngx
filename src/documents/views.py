@@ -14,6 +14,7 @@ from unicodedata import normalize
 from urllib.parse import quote
 
 import pathvalidate
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import connections
@@ -1621,12 +1622,21 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
         try:
             load_classifier()
             classifier_status = "OK"
-            classifier_last_modified = make_aware(
-                datetime.fromtimestamp(os.path.getmtime(settings.MODEL_FILE)),
+            task_result_model = apps.get_model("django_celery_results", "taskresult")
+            result = (
+                task_result_model.objects.filter(
+                    task_name="documents.tasks.train_classifier",
+                    status="SUCCESS",
+                )
+                .order_by(
+                    "-date_done",
+                )
+                .first()
             )
+            classifier_last_trained = result.date_done if result else None
         except Exception as e:
             classifier_status = "ERROR"
-            classifier_last_modified = None
+            classifier_last_trained = None
             classifier_error = "Error loading classifier, check logs for more detail."
             logger.exception(f"System status error loading classifier: {e}")
 
@@ -1660,7 +1670,7 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
                     "index_last_modified": index_last_modified,
                     "index_error": index_error,
                     "classifier_status": classifier_status,
-                    "classifier_last_modified": classifier_last_modified,
+                    "classifier_last_trained": classifier_last_trained,
                     "classifier_error": classifier_error,
                 },
             },
