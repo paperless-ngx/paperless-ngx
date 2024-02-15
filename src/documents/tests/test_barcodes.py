@@ -15,6 +15,7 @@ from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.models import Tag
+from documents.plugins.base import StopConsumeTaskError
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DocumentConsumeDelayMixin
 from documents.tests.utils import DummyProgressManager
@@ -415,7 +416,10 @@ class TestBarcode(
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
         with self.get_reader(test_file) as reader:
-            self.assertEqual("No pages to split on!", reader.run())
+            try:
+                reader.run()
+            except StopConsumeTaskError:
+                self.fail("Barcode reader split pages unexpectedly")
 
     @override_settings(
         CONSUMER_ENABLE_BARCODES=True,
