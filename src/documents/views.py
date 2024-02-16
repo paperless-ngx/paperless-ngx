@@ -1620,7 +1620,9 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
 
         classifier_error = None
         try:
-            load_classifier()
+            classifier = load_classifier()
+            if classifier is None:
+                raise Exception("Classifier not loaded")
             classifier_status = "OK"
             task_result_model = apps.get_model("django_celery_results", "taskresult")
             result = (
