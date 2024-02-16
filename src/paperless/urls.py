@@ -193,6 +193,7 @@ urlpatterns = [
         RedirectView.as_view(
             url=settings.STATIC_URL + "frontend/en-US/assets/%(path)s",
         ),
+        # TODO: with localization, this is even worse! :/
     ),
     # App logo
     re_path(
@@ -200,7 +201,6 @@ urlpatterns = [
         serve,
         kwargs={"document_root": os.path.join(settings.MEDIA_ROOT, "logo")},
     ),
-    # TODO: with localization, this is even worse! :/
     # login, logout
     path("accounts/", include("allauth.urls")),
     # Root of the Frontend
