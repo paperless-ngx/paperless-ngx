@@ -100,11 +100,9 @@ class BarcodePlugin(ConsumeTaskPlugin):
             logger.info(f"Found tags in barcode: {tags}")
 
         # Lastly attempt to split documents
-        if settings.CONSUMER_ENABLE_BARCODES:
-
-            separator_pages = self.get_separation_pages()
-            if not separator_pages:
-                return "No pages to split on!"
+        if settings.CONSUMER_ENABLE_BARCODES and (
+            separator_pages := self.get_separation_pages()
+        ):
 
             # We have pages to split against
 
