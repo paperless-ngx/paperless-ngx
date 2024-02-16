@@ -45,20 +45,20 @@
               <dt i18n>Type</dt>
               <dd>{{status.database.type}}</dd>
               <dt i18n>Status</dt>
-              <dd>
+              <dd class="d-flex align-items-center">
                 {{status.database.status}}
                 @if (status.database.status === 'OK') {
-                  <i-bs name="check-circle-fill" class="text-primary ms-1" ngbPopover="{{status.database.url}}" triggers="mouseenter:mouseleave"></i-bs>
+                  <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1" ngbPopover="{{status.database.url}}" triggers="mouseenter:mouseleave"></i-bs>
                 } @else {
-                  <i-bs name="exclamation-triangle-fill" class="text-danger ms-1" ngbPopover="{{status.database.url}}: {{status.database.error}}" triggers="mouseenter:mouseleave"></i-bs>
+                  <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1" ngbPopover="{{status.database.url}}: {{status.database.error}}" triggers="mouseenter:mouseleave"></i-bs>
                 }
               </dd>
               <dt i18n>Migration Status</dt>
-              <dd>
+              <dd class="d-flex align-items-center">
                 @if (status.database.migration_status.unapplied_migrations.length === 0) {
-                  <ng-container>Up to date</ng-container><i-bs name="check-circle-fill" class="text-primary ms-1" [ngbPopover]="migrationStatus" triggers="mouseenter:mouseleave"></i-bs>
+                  <ng-container>Up to date</ng-container><i-bs name="check-circle-fill" class="text-primary ms-2 lh-1" [ngbPopover]="migrationStatus" triggers="mouseenter:mouseleave"></i-bs>
                 } @else {
-                  <ng-container>{{status.database.migration_status.unapplied_migrations.length}} Pending</ng-container><i-bs name="exclamation-triangle-fill" class="text-warning ms-1" [ngbPopover]="migrationStatus" triggers="mouseenter:mouseleave"></i-bs>
+                  <ng-container>{{status.database.migration_status.unapplied_migrations.length}} Pending</ng-container><i-bs name="exclamation-triangle-fill" class="text-warning ms-2 lh-1" [ngbPopover]="migrationStatus" triggers="mouseenter:mouseleave"></i-bs>
                 }
                 <ng-template #migrationStatus>
                   <h6><ng-container i18n>Latest Migration</ng-container>:</h6> <span class="font-monospace small">{{status.database.migration_status.latest_migration}}</span>
@@ -85,50 +85,50 @@
           <div class="card-body">
             <dl class="card-text">
               <dt i18n>Redis Status</dt>
-              <dd>
+              <dd class="d-flex align-items-center">
                 {{status.tasks.redis_status}}
                 @if (status.tasks.redis_status === 'OK') {
-                  <i-bs name="check-circle-fill" class="text-primary ms-1" ngbPopover="{{status.tasks.redis_url}}" triggers="mouseenter:mouseleave"></i-bs>
+                  <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1" ngbPopover="{{status.tasks.redis_url}}" triggers="mouseenter:mouseleave"></i-bs>
                 } @else {
-                  <i-bs name="exclamation-triangle-fill" class="text-danger ms-1" ngbPopover="{{status.tasks.redis_url}}: {{status.tasks.redis_error}}" triggers="mouseenter:mouseleave"></i-bs>
+                  <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1" ngbPopover="{{status.tasks.redis_url}}: {{status.tasks.redis_error}}" triggers="mouseenter:mouseleave"></i-bs>
                 }
               </dd>
               <dt i18n>Celery Status</dt>
-              <dd>
+              <dd class="d-flex align-items-center">
                 {{status.tasks.celery_status}}
                 @if (status.tasks.celery_status === 'OK') {
-                  <i-bs name="check-circle-fill" class="text-primary ms-1"></i-bs>
+                  <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
                 } @else {
-                  <i-bs name="exclamation-triangle-fill" class="text-danger ms-1"></i-bs>
+                  <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
                 }
               </dd>
               <dt i18n>Search Index</dt>
-              <dd>
+              <dd class="d-flex align-items-center">
                 {{status.tasks.index_status}}
                 @if (status.tasks.index_status === 'OK') {
                   @if (isStale(status.tasks.index_last_modified)) {
-                    <i-bs name="exclamation-triangle-fill" class="text-warning ms-1" [ngbPopover]="indexStatus" triggers="mouseenter:mouseleave"></i-bs>
+                    <i-bs name="exclamation-triangle-fill" class="text-warning ms-2 lh-1" [ngbPopover]="indexStatus" triggers="mouseenter:mouseleave"></i-bs>
                   } @else {
-                    <i-bs name="check-circle-fill" class="text-primary ms-1" [ngbPopover]="indexStatus" triggers="mouseenter:mouseleave"></i-bs>
+                    <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1" [ngbPopover]="indexStatus" triggers="mouseenter:mouseleave"></i-bs>
                   }
                 } @else {
-                  <i-bs name="exclamation-triangle-fill" class="text-danger ms-1" ngbPopover="{{status.tasks.index_error}}" triggers="mouseenter:mouseleave"></i-bs>
+                  <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1" ngbPopover="{{status.tasks.index_error}}" triggers="mouseenter:mouseleave"></i-bs>
                 }
               </dd>
               <ng-template #indexStatus>
                 <h6><ng-container i18n>Last Updated</ng-container>:</h6> <span class="font-monospace small">{{status.tasks.index_last_modified | customDate:'medium'}}</span>
               </ng-template>
               <dt i18n>Classifier</dt>
-              <dd>
+              <dd class="d-flex align-items-center">
                 {{status.tasks.classifier_status}}
                 @if (status.tasks.classifier_status === 'OK') {
                   @if (isStale(status.tasks.classifier_last_trained)) {
-                    <i-bs name="exclamation-triangle-fill" class="text-warning ms-1" [ngbPopover]="classifierStatus" triggers="mouseenter:mouseleave"></i-bs>
+                    <i-bs name="exclamation-triangle-fill" class="text-warning ms-2 lh-1" [ngbPopover]="classifierStatus" triggers="mouseenter:mouseleave"></i-bs>
                   } @else {
-                    <i-bs name="check-circle-fill" class="text-primary ms-1" [ngbPopover]="classifierStatus" triggers="mouseenter:mouseleave"></i-bs>
+                    <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1" [ngbPopover]="classifierStatus" triggers="mouseenter:mouseleave"></i-bs>
                   }
                 } @else {
-                  <i-bs name="exclamation-triangle-fill" class="text-danger ms-1" ngbPopover="{{status.tasks.classifier_error}}" triggers="mouseenter:mouseleave"></i-bs>
+                  <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1" ngbPopover="{{status.tasks.classifier_error}}" triggers="mouseenter:mouseleave"></i-bs>
                 }
               </dd>
               <ng-template #classifierStatus>
