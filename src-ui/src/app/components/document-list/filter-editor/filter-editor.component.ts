@@ -362,10 +362,11 @@ export class FilterEditorComponent
                     this.dateCreatedRelativeDate =
                       RELATIVE_DATE_QUERYSTRINGS.find(
                         (qS) => qS.dateQuery == match[1]
-                      )?.relativeDate
+                      )?.relativeDate ?? null
                   }
                 }
               )
+              if (this.dateCreatedRelativeDate === null) textQueryArgs.push(arg) // relative query not in the quick list
             } else if (arg.match(RELATIVE_DATE_QUERY_REGEXP_ADDED)) {
               ;[...arg.matchAll(RELATIVE_DATE_QUERY_REGEXP_ADDED)].forEach(
                 (match) => {
@@ -373,10 +374,11 @@ export class FilterEditorComponent
                     this.dateAddedRelativeDate =
                       RELATIVE_DATE_QUERYSTRINGS.find(
                         (qS) => qS.dateQuery == match[1]
-                      )?.relativeDate
+                      )?.relativeDate ?? null
                   }
                 }
               )
+              if (this.dateAddedRelativeDate === null) textQueryArgs.push(arg) // relative query not in the quick list
             } else {
               textQueryArgs.push(arg)
             }
@@ -785,27 +787,6 @@ export class FilterEditorComponent
           rule_type: FILTER_FULLTEXT_QUERY,
           value: queryArgs.join(','),
         })
-      }
-    }
-    if (
-      this.dateCreatedRelativeDate == null &&
-      this.dateAddedRelativeDate == null
-    ) {
-      const existingRule = filterRules.find(
-        (fr) => fr.rule_type == FILTER_FULLTEXT_QUERY
-      )
-      if (
-        existingRule?.value.match(RELATIVE_DATE_QUERY_REGEXP_CREATED) ||
-        existingRule?.value.match(RELATIVE_DATE_QUERY_REGEXP_ADDED)
-      ) {
-        // remove any existing date query
-        existingRule.value = existingRule.value
-          .replace(RELATIVE_DATE_QUERY_REGEXP_CREATED, '')
-          .replace(RELATIVE_DATE_QUERY_REGEXP_ADDED, '')
-        if (existingRule.value.replace(',', '').trim() === '') {
-          // if its empty now, remove it entirely
-          filterRules.splice(filterRules.indexOf(existingRule), 1)
-        }
       }
     }
     if (this.permissionsSelectionModel.ownerFilter == OwnerFilterType.SELF) {
