@@ -831,6 +831,7 @@ class MailAccountHandler(LoggingMixin):
         input_doc = ConsumableDocument(
             source=DocumentSource.MailFetch,
             original_file=temp_filename,
+            mailrule_id=rule.pk,
         )
         doc_overrides = DocumentMetadataOverrides(
             title=message.subject,
