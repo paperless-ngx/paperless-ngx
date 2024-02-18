@@ -198,3 +198,81 @@ jobs:
                 await sleep(1000);
               }
             }
+  close-unsupported-feature-requests:
+    name: 'Close Unsupported Feature Requests'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            function sleep(ms) {
+              return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            const CUTOFF_1_DAYS = 180;
+            const CUTOFF_1_COUNT = 5;
+            const CUTOFF_2_DAYS = 365;
+            const CUTOFF_2_COUNT = 10;
+
+            const cutoff1Date = new Date();
+            cutoff1Date.setDate(cutoff1Date.getDate() - CUTOFF_1_DAYS);
+            const cutoff2Date = new Date();
+            cutoff2Date.setDate(cutoff2Date.getDate() - CUTOFF_2_DAYS);
+
+            const query = `query(
+                $owner:String!,
+                $name:String!,
+                $featureRequestsCategory:ID!,
+              ) {
+              repository(owner:$owner, name:$name){
+                discussions(
+                  categoryId:$featureRequestsCategory,
+                  last:100,
+                  states:[OPEN],
+                ) {
+                  nodes {
+                    id,
+                    number,
+                    updatedAt,
+                    upvoteCount,
+                  }
+                },
+              }
+            }`;
+            const variables = {
+              owner: context.repo.owner,
+              name: context.repo.repo,
+              featureRequestsCategory: "DIC_kwDOG1Zs184CBNr4"
+            }
+            const result = await github.graphql(query, variables);
+
+            for (const discussion of result.repository.discussions.nodes) {
+              const discussionDate = new Date(discussion.updatedAt);
+              if ((discussionDate < cutoff1Date && discussion.upvoteCount < CUTOFF_1_COUNT) ||
+                  (discussionDate < cutoff2Date && discussion.upvoteCount < CUTOFF_2_COUNT)) {
+                console.log(`Closing discussion #${discussion.number} (${discussion.id}), last updated at ${discussion.updatedAt} with votes ${discussion.upvoteCount}`);
+                const addCommentMutation = `mutation($discussion:ID!, $body:String!) {
+                  addDiscussionComment(input:{discussionId:$discussion, body:$body}) {
+                    clientMutationId
+                  }
+                }`;
+                const commentVariables = {
+                  discussion: discussion.id,
+                  body: 'This discussion has been automatically closed due to lack of community interest.',
+                }
+                await github.graphql(addCommentMutation, commentVariables);
+
+                const closeDiscussionMutation = `mutation($discussion:ID!, $reason:DiscussionCloseReason!) {
+                  closeDiscussion(input:{discussionId:$discussion, reason:$reason}) {
+                    clientMutationId
+                  }
+                }`;
+                const closeVariables = {
+                  discussion: discussion.id,
+                  reason: "OUTDATED",
+                }
+                await github.graphql(closeDiscussionMutation, closeVariables);
+
+                await sleep(1000);
+              }
+            }
