@@ -4583,7 +4583,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="translated">Verbundene Drittanbieterkonten</target>
+        <target state="translated">Verbundene Social-Media-Accounts</target>
       </trans-unit>
       <trans-unit id="8383227756109993898" datatype="html">
         <source>Set a password before disconnecting social account.</source>
@@ -4591,7 +4591,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">63</context>
         </context-group>
-        <target state="translated">Legen Sie vor der Trennung eines Drittanbieterkontos ein Kennwort fest.</target>
+        <target state="translated">Vor der Trennung des Sozial-Media-Accounts Passwort festlegen</target>
       </trans-unit>
       <trans-unit id="2907016025519254862" datatype="html" approved="yes">
         <source>Disconnect</source>
@@ -4607,7 +4607,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">71</context>
         </context-group>
-        <target state="translated">Drittanbieterkonto <x id="INTERPOLATION" equiv-text="{{ account.name }}"/> trennen</target>
+        <target state="translated">Sozial-Media-Account <x id="INTERPOLATION" equiv-text="{{ account.name }}"/> trennen</target>
       </trans-unit>
       <trans-unit id="649824314893051979" datatype="html">
         <source>Warning: disconnecting social accounts cannot be undone</source>
@@ -4615,7 +4615,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">81</context>
         </context-group>
-        <target state="translated">Warnung: Die Trennung von Drittanbieterkonten kann nicht rückgängig gemacht werden</target>
+        <target state="translated">Warnung: Die Trennung des Social-Media-Accounts kann nicht rückgängig gemacht werden</target>
       </trans-unit>
       <trans-unit id="1375396510511350122" datatype="html">
         <source>Connect new social account</source>
@@ -4623,7 +4623,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">86</context>
         </context-group>
-        <target state="translated">Mit neuem Drittanbieterkonto verbinden</target>
+        <target state="translated">Mit neuem Social-Media-Account verbinden</target>
       </trans-unit>
       <trans-unit id="6141884091799403188" datatype="html" approved="yes">
         <source>Emails must match</source>
@@ -4671,7 +4671,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
           <context context-type="linenumber">210</context>
         </context-group>
-        <target state="translated">Fehler beim Trennen des Drittanbieterkontos</target>
+        <target state="translated">Fehler beim Abmelden vom Social-Media-Account</target>
       </trans-unit>
       <trans-unit id="3797570084942068182" datatype="html" approved="yes">
         <source>Select</source>

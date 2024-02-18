@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-14 16:47-0800\n"
-"PO-Revision-Date: 2024-02-15 00:52\n"
+"PO-Revision-Date: 2024-02-15 12:08\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -47,11 +47,11 @@ msgstr "정규 표현식"
 
 #: documents/models.py:58 documents/models.py:902
 msgid "Fuzzy word"
-msgstr "불분명한 단어"
+msgstr ""
 
 #: documents/models.py:59
 msgid "Automatic"
-msgstr "자동"
+msgstr ""
 
 #: documents/models.py:62 documents/models.py:397 documents/models.py:1102
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
