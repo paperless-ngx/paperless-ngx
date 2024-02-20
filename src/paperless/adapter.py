@@ -9,7 +9,10 @@ class CustomAccountAdapter(DefaultAccountAdapter):
     def is_open_for_signup(self, request):
         allow_signups = super().is_open_for_signup(request)
         # Override with setting, otherwise default to super.
-        return getattr(settings, "ACCOUNT_ALLOW_SIGNUPS", allow_signups)
+        return (
+            getattr(settings, "ACCOUNT_ALLOW_SIGNUPS", allow_signups)
+            and not settings.DISABLE_REGULAR_LOGIN
+        )
 
     def is_safe_url(self, url):
         # see https://github.com/paperless-ngx/paperless-ngx/issues/5780
