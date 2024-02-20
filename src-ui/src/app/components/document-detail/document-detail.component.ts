@@ -634,11 +634,14 @@ export class DocumentDetailComponent
           // in case data changed while saving eg removing inbox_tags
           this.documentForm.patchValue(docValues)
           this.store.next(this.documentForm.value)
+          this.openDocumentService.setDirty(this.document, false)
           this.toastService.showInfo($localize`Document saved successfully.`)
-          close && this.close()
           this.networkActive = false
           this.error = null
-          this.openDocumentService.refreshDocument(this.documentId)
+          close &&
+            this.close(() =>
+              this.openDocumentService.refreshDocument(this.documentId)
+            )
         },
         error: (error) => {
           this.networkActive = false
@@ -693,12 +696,13 @@ export class DocumentDetailComponent
       })
   }
 
-  close() {
+  close(closedCallback: () => void = null) {
     this.openDocumentService
       .closeDocument(this.document)
       .pipe(first())
       .subscribe((closed) => {
         if (!closed) return
+        if (closedCallback) closedCallback()
         if (this.documentListViewService.activeSavedViewId) {
           this.router.navigate([
             'view',
