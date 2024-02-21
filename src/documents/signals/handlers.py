@@ -434,6 +434,7 @@ def update_filename_and_move_files(sender, instance: Document, **kwargs):
             Document.objects.filter(pk=instance.pk).update(
                 filename=instance.filename,
                 archive_filename=instance.archive_filename,
+                modified=timezone.now(),
             )
 
         except (OSError, DatabaseError, CannotMoveFilesException) as e:
