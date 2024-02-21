@@ -13,7 +13,6 @@ import {
   NgbModalModule,
   NgbModalRef,
   NgbPaginationModule,
-  NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { of, throwError } from 'rxjs'
 import { Tag } from 'src/app/data/tag'
@@ -38,7 +37,6 @@ import { MATCH_NONE } from 'src/app/data/matching-model'
 import { MATCH_LITERAL } from 'src/app/data/matching-model'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
 import { BulkEditObjectOperation } from 'src/app/services/rest/abstract-name-filter-service'
 
 const tags: Tag[] = [
@@ -78,7 +76,6 @@ describe('ManagementListComponent', () => {
         SafeHtmlPipe,
         ConfirmDialogComponent,
         PermissionsDialogComponent,
-        ConfirmButtonComponent,
       ],
       providers: [
         {
@@ -100,7 +97,6 @@ describe('ManagementListComponent', () => {
         NgbModalModule,
         RouterTestingModule.withRoutes(routes),
         NgxBootstrapIconsModule.pick(allIcons),
-        NgbPopoverModule,
       ],
     }).compileComponents()
 
@@ -197,23 +193,27 @@ describe('ManagementListComponent', () => {
   })
 
   it('should support delete, show notification on error / success', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const deleteSpy = jest.spyOn(tagService, 'delete')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
-    const deleteButton = fixture.debugElement.query(
-      By.directive(ConfirmButtonComponent)
-    )
+    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[8]
+    deleteButton.triggerEventHandler('click')
+
+    expect(modal).not.toBeUndefined()
+    const editDialog = modal.componentInstance as ConfirmDialogComponent
 
     // fail first
     deleteSpy.mockReturnValueOnce(throwError(() => new Error('error deleting')))
-    deleteButton.nativeElement.dispatchEvent(new Event('confirm'))
+    editDialog.confirmClicked.emit()
     expect(toastErrorSpy).toHaveBeenCalled()
     expect(reloadSpy).not.toHaveBeenCalled()
 
     // succeed
     deleteSpy.mockReturnValueOnce(of(true))
-    deleteButton.nativeElement.dispatchEvent(new Event('confirm'))
+    editDialog.confirmClicked.emit()
     expect(reloadSpy).toHaveBeenCalled()
   })
 
