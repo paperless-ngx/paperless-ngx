@@ -20,6 +20,7 @@ from django.db.models import Q
 from django.dispatch import receiver
 from django.utils import timezone
 from filelock import FileLock
+from guardian.shortcuts import remove_perm
 
 from documents import matching
 from documents.caching import clear_metadata_cache
@@ -34,6 +35,7 @@ from documents.models import MatchingModel
 from documents.models import PaperlessTask
 from documents.models import Tag
 from documents.models import Workflow
+from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import set_permissions_for_object
@@ -538,113 +540,187 @@ def run_workflow(
             workflow,
             trigger_type,
         ):
+            action: WorkflowAction
             for action in workflow.actions.all():
                 logger.info(
                     f"Applying {action} from {workflow}",
                     extra={"group": logging_group},
                 )
-                if action.assign_tags.all().count() > 0:
-                    document.tags.add(*action.assign_tags.all())
 
-                if action.assign_correspondent is not None:
-                    document.correspondent = action.assign_correspondent
+                if action.type == WorkflowAction.WorkflowActionType.ASSIGNMENT:
+                    if action.assign_tags.all().count() > 0:
+                        document.tags.add(*action.assign_tags.all())
 
-                if action.assign_document_type is not None:
-                    document.document_type = action.assign_document_type
+                    if action.assign_correspondent is not None:
+                        document.correspondent = action.assign_correspondent
 
-                if action.assign_storage_path is not None:
-                    document.storage_path = action.assign_storage_path
+                    if action.assign_document_type is not None:
+                        document.document_type = action.assign_document_type
 
-                if action.assign_owner is not None:
-                    document.owner = action.assign_owner
+                    if action.assign_storage_path is not None:
+                        document.storage_path = action.assign_storage_path
 
-                if action.assign_title is not None:
-                    try:
-                        document.title = parse_doc_title_w_placeholders(
-                            action.assign_title,
-                            (
-                                document.correspondent.name
-                                if document.correspondent is not None
-                                else ""
-                            ),
-                            (
-                                document.document_type.name
-                                if document.document_type is not None
-                                else ""
-                            ),
-                            (
-                                document.owner.username
-                                if document.owner is not None
-                                else ""
-                            ),
-                            timezone.localtime(document.added),
-                            (
-                                document.original_filename
-                                if document.original_filename is not None
-                                else ""
-                            ),
-                            timezone.localtime(document.created),
-                        )
-                    except Exception:
-                        logger.exception(
-                            f"Error occurred parsing title assignment '{action.assign_title}', falling back to original",
-                            extra={"group": logging_group},
-                        )
+                    if action.assign_owner is not None:
+                        document.owner = action.assign_owner
 
-                if (
-                    (
-                        action.assign_view_users is not None
-                        and action.assign_view_users.count() > 0
-                    )
-                    or (
-                        action.assign_view_groups is not None
-                        and action.assign_view_groups.count() > 0
-                    )
-                    or (
-                        action.assign_change_users is not None
-                        and action.assign_change_users.count() > 0
-                    )
-                    or (
-                        action.assign_change_groups is not None
-                        and action.assign_change_groups.count() > 0
-                    )
-                ):
-                    permissions = {
-                        "view": {
-                            "users": action.assign_view_users.all().values_list("id")
-                            or [],
-                            "groups": action.assign_view_groups.all().values_list("id")
-                            or [],
-                        },
-                        "change": {
-                            "users": action.assign_change_users.all().values_list("id")
-                            or [],
-                            "groups": action.assign_change_groups.all().values_list(
-                                "id",
+                    if action.assign_title is not None:
+                        try:
+                            document.title = parse_doc_title_w_placeholders(
+                                action.assign_title,
+                                (
+                                    document.correspondent.name
+                                    if document.correspondent is not None
+                                    else ""
+                                ),
+                                (
+                                    document.document_type.name
+                                    if document.document_type is not None
+                                    else ""
+                                ),
+                                (
+                                    document.owner.username
+                                    if document.owner is not None
+                                    else ""
+                                ),
+                                timezone.localtime(document.added),
+                                (
+                                    document.original_filename
+                                    if document.original_filename is not None
+                                    else ""
+                                ),
+                                timezone.localtime(document.created),
                             )
-                            or [],
-                        },
-                    }
-                    set_permissions_for_object(
-                        permissions=permissions,
-                        object=document,
-                        merge=True,
-                    )
-
-                if action.assign_custom_fields is not None:
-                    for field in action.assign_custom_fields.all():
-                        if (
-                            CustomFieldInstance.objects.filter(
-                                field=field,
-                                document=document,
-                            ).count()
-                            == 0
-                        ):
-                            # can be triggered on existing docs, so only add the field if it doesn't already exist
-                            CustomFieldInstance.objects.create(
-                                field=field,
-                                document=document,
+                        except Exception:
+                            logger.exception(
+                                f"Error occurred parsing title assignment '{action.assign_title}', falling back to original",
+                                extra={"group": logging_group},
                             )
+
+                    if (
+                        (
+                            action.assign_view_users is not None
+                            and action.assign_view_users.count() > 0
+                        )
+                        or (
+                            action.assign_view_groups is not None
+                            and action.assign_view_groups.count() > 0
+                        )
+                        or (
+                            action.assign_change_users is not None
+                            and action.assign_change_users.count() > 0
+                        )
+                        or (
+                            action.assign_change_groups is not None
+                            and action.assign_change_groups.count() > 0
+                        )
+                    ):
+                        permissions = {
+                            "view": {
+                                "users": action.assign_view_users.all().values_list(
+                                    "id",
+                                )
+                                or [],
+                                "groups": action.assign_view_groups.all().values_list(
+                                    "id",
+                                )
+                                or [],
+                            },
+                            "change": {
+                                "users": action.assign_change_users.all().values_list(
+                                    "id",
+                                )
+                                or [],
+                                "groups": action.assign_change_groups.all().values_list(
+                                    "id",
+                                )
+                                or [],
+                            },
+                        }
+                        set_permissions_for_object(
+                            permissions=permissions,
+                            object=document,
+                            merge=True,
+                        )
+
+                    if action.assign_custom_fields is not None:
+                        for field in action.assign_custom_fields.all():
+                            if (
+                                CustomFieldInstance.objects.filter(
+                                    field=field,
+                                    document=document,
+                                ).count()
+                                == 0
+                            ):
+                                # can be triggered on existing docs, so only add the field if it doesn't already exist
+                                CustomFieldInstance.objects.create(
+                                    field=field,
+                                    document=document,
+                                )
+
+                elif action.type == WorkflowAction.WorkflowActionType.REMOVAL:
+                    if action.remove_all_tags:
+                        document.tags.clear()
+                    elif action.remove_tags.all().count() > 0:
+                        document.tags.remove(*action.remove_tags.all())
+
+                    if action.remove_all_correspondents or (
+                        document.correspondent in action.remove_correspondents.all()
+                    ):
+                        document.correspondent = None
+
+                    if action.remove_all_document_types or (
+                        document.document_type in action.remove_document_types.all()
+                    ):
+                        document.document_type = None
+
+                    if action.remove_all_storage_paths or (
+                        document.storage_path in action.remove_storage_paths.all()
+                    ):
+                        document.storage_path = None
+
+                    if action.remove_all_owners or (
+                        document.owner in action.remove_owners.all()
+                    ):
+                        document.owner = None
+
+                    if action.remove_all_permissions:
+                        permissions = {
+                            "view": {
+                                "users": [],
+                                "groups": [],
+                            },
+                            "change": {
+                                "users": [],
+                                "groups": [],
+                            },
+                        }
+                        set_permissions_for_object(
+                            permissions=permissions,
+                            object=document,
+                            merge=False,
+                        )
+                    elif (
+                        (action.remove_view_users.all().count() > 0)
+                        or (action.remove_view_groups.all().count() > 0)
+                        or (action.remove_change_users.all().count() > 0)
+                        or (action.remove_change_groups.all().count() > 0)
+                    ):
+                        for user in action.remove_view_users.all():
+                            remove_perm("view_document", user, document)
+                        for user in action.remove_change_users.all():
+                            remove_perm("change_document", user, document)
+                        for group in action.remove_view_groups.all():
+                            remove_perm("view_document", group, document)
+                        for group in action.remove_change_groups.all():
+                            remove_perm("change_document", group, document)
+
+                    if action.remove_all_custom_fields:
+                        CustomFieldInstance.objects.filter(document=document).delete()
+                    elif action.remove_custom_fields.all().count() > 0:
+                        CustomFieldInstance.objects.filter(
+                            field__in=action.remove_custom_fields.all(),
+                            document=document,
+                        ).delete()
 
             document.save()
 

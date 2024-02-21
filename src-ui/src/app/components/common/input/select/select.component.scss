@@ -1,6 +1,7 @@
 // styles for ng-select child are in styles.scss
 .paperless-input-select.disabled {
-    .input-group {
+    .input-group,
+    div > div {
         cursor: not-allowed;
     }
 

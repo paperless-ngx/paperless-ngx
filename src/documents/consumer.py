@@ -35,6 +35,7 @@ from documents.models import FileInfo
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import Workflow
+from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
@@ -63,9 +64,10 @@ class WorkflowTriggerPlugin(
         """
         Get overrides from matching workflows
         """
+        msg = ""
         overrides = DocumentMetadataOverrides()
         for workflow in Workflow.objects.filter(enabled=True).order_by("order"):
-            template_overrides = DocumentMetadataOverrides()
+            action_overrides = DocumentMetadataOverrides()
 
             if document_matches_workflow(
                 self.input_doc,
@@ -73,49 +75,113 @@ class WorkflowTriggerPlugin(
                 WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
             ):
                 for action in workflow.actions.all():
-                    if action.assign_title is not None:
-                        template_overrides.title = action.assign_title
-                    if action.assign_tags is not None:
-                        template_overrides.tag_ids = [
-                            tag.pk for tag in action.assign_tags.all()
-                        ]
-                    if action.assign_correspondent is not None:
-                        template_overrides.correspondent_id = (
-                            action.assign_correspondent.pk
-                        )
-                    if action.assign_document_type is not None:
-                        template_overrides.document_type_id = (
-                            action.assign_document_type.pk
-                        )
-                    if action.assign_storage_path is not None:
-                        template_overrides.storage_path_id = (
-                            action.assign_storage_path.pk
-                        )
-                    if action.assign_owner is not None:
-                        template_overrides.owner_id = action.assign_owner.pk
-                    if action.assign_view_users is not None:
-                        template_overrides.view_users = [
-                            user.pk for user in action.assign_view_users.all()
-                        ]
-                    if action.assign_view_groups is not None:
-                        template_overrides.view_groups = [
-                            group.pk for group in action.assign_view_groups.all()
-                        ]
-                    if action.assign_change_users is not None:
-                        template_overrides.change_users = [
-                            user.pk for user in action.assign_change_users.all()
-                        ]
-                    if action.assign_change_groups is not None:
-                        template_overrides.change_groups = [
-                            group.pk for group in action.assign_change_groups.all()
-                        ]
-                    if action.assign_custom_fields is not None:
-                        template_overrides.custom_field_ids = [
-                            field.pk for field in action.assign_custom_fields.all()
-                        ]
+                    msg += f"Applying {action} from {workflow}\n"
+                    if action.type == WorkflowAction.WorkflowActionType.ASSIGNMENT:
+                        if action.assign_title is not None:
+                            action_overrides.title = action.assign_title
+                        if action.assign_tags is not None:
+                            action_overrides.tag_ids = [
+                                tag.pk for tag in action.assign_tags.all()
+                            ]
+                        if action.assign_correspondent is not None:
+                            action_overrides.correspondent_id = (
+                                action.assign_correspondent.pk
+                            )
+                        if action.assign_document_type is not None:
+                            action_overrides.document_type_id = (
+                                action.assign_document_type.pk
+                            )
+                        if action.assign_storage_path is not None:
+                            action_overrides.storage_path_id = (
+                                action.assign_storage_path.pk
+                            )
+                        if action.assign_owner is not None:
+                            action_overrides.owner_id = action.assign_owner.pk
+                        if action.assign_view_users is not None:
+                            action_overrides.view_users = [
+                                user.pk for user in action.assign_view_users.all()
+                            ]
+                        if action.assign_view_groups is not None:
+                            action_overrides.view_groups = [
+                                group.pk for group in action.assign_view_groups.all()
+                            ]
+                        if action.assign_change_users is not None:
+                            action_overrides.change_users = [
+                                user.pk for user in action.assign_change_users.all()
+                            ]
+                        if action.assign_change_groups is not None:
+                            action_overrides.change_groups = [
+                                group.pk for group in action.assign_change_groups.all()
+                            ]
+                        if action.assign_custom_fields is not None:
+                            action_overrides.custom_field_ids = [
+                                field.pk for field in action.assign_custom_fields.all()
+                            ]
+                        overrides.update(action_overrides)
+                    elif action.type == WorkflowAction.WorkflowActionType.REMOVAL:
+                        # Removal actions overwrite the current overrides
+                        if action.remove_all_tags:
+                            overrides.tag_ids = []
+                        elif action.remove_tags.all().count() > 0:
+                            for tag in action.remove_tags.all():
+                                overrides.tag_ids.remove(tag.pk)
 
-                    overrides.update(template_overrides)
+                        if action.remove_all_correspondents:
+                            overrides.correspondent_id = None
+                        elif action.remove_correspondents.all().count() > 0:
+                            for correspondent in action.remove_correspondents.all():
+                                if overrides.correspondent_id == correspondent.pk:
+                                    overrides.correspondent_id = None
+
+                        if action.remove_all_document_types:
+                            overrides.document_type_id = None
+                        elif action.remove_document_types.all().count() > 0:
+                            for doc_type in action.remove_document_types.all():
+                                if overrides.document_type_id == doc_type.pk:
+                                    overrides.document_type_id = None
+
+                        if action.remove_all_storage_paths:
+                            overrides.storage_path_id = None
+                        elif action.remove_storage_paths.all().count() > 0:
+                            for storage_path in action.remove_storage_paths.all():
+                                if overrides.storage_path_id == storage_path.pk:
+                                    overrides.storage_path_id = None
+
+                        if action.remove_all_custom_fields:
+                            overrides.custom_field_ids = []
+                        elif action.remove_custom_fields.all().count() > 0:
+                            for field in action.remove_custom_fields.all():
+                                if field.pk in overrides.custom_field_ids:
+                                    overrides.custom_field_ids.remove(field.pk)
+
+                        if action.remove_all_owners:
+                            overrides.owner_id = None
+                        elif action.remove_owners.all().count() > 0:
+                            for owner in action.remove_owners.all():
+                                if overrides.owner_id == owner.pk:
+                                    overrides.owner_id = None
+
+                        if action.remove_all_permissions:
+                            overrides.view_users = []
+                            overrides.view_groups = []
+                            overrides.change_users = []
+                            overrides.change_groups = []
+                        else:
+                            for user in action.remove_view_users.all():
+                                if user.pk in overrides.view_users:
+                                    overrides.view_users.remove(user.pk)
+                            for user in action.remove_change_users.all():
+                                if user.pk in overrides.change_users:
+                                    overrides.change_users.remove(user.pk)
+                            for group in action.remove_view_groups.all():
+                                if group.pk in overrides.view_groups:
+                                    overrides.view_groups.remove(group.pk)
+                            for group in action.remove_change_groups.all():
+                                if group.pk in overrides.change_groups:
+                                    overrides.change_groups.remove(group.pk)
+
         self.metadata.update(overrides)
+        return msg
 
 
 class ConsumerError(Exception):

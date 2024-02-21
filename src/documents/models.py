@@ -997,7 +997,14 @@ class WorkflowTrigger(models.Model):
 
 class WorkflowAction(models.Model):
     class WorkflowActionType(models.IntegerChoices):
-        ASSIGNMENT = 1, _("Assignment")
+        ASSIGNMENT = (
+            1,
+            _("Assignment"),
+        )
+        REMOVAL = (
+            2,
+            _("Removal"),
+        )
 
     type = models.PositiveIntegerField(
         _("Workflow Action Type"),
@@ -1019,6 +1026,7 @@ class WorkflowAction(models.Model):
     assign_tags = models.ManyToManyField(
         Tag,
         blank=True,
+        related_name="+",
         verbose_name=_("assign this tag"),
     )
 
@@ -1027,6 +1035,7 @@ class WorkflowAction(models.Model):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
+        related_name="+",
         verbose_name=_("assign this document type"),
     )
 
@@ -1035,6 +1044,7 @@ class WorkflowAction(models.Model):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
+        related_name="+",
         verbose_name=_("assign this correspondent"),
     )
 
@@ -1043,6 +1053,7 @@ class WorkflowAction(models.Model):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
+        related_name="+",
         verbose_name=_("assign this storage path"),
     )
 
@@ -1088,6 +1099,111 @@ class WorkflowAction(models.Model):
         blank=True,
         related_name="+",
         verbose_name=_("assign these custom fields"),
+    )
+
+    remove_tags = models.ManyToManyField(
+        Tag,
+        blank=True,
+        related_name="+",
+        verbose_name=_("remove these tag(s)"),
+    )
+
+    remove_all_tags = models.BooleanField(
+        default=False,
+        verbose_name=_("remove all tags"),
+    )
+
+    remove_document_types = models.ManyToManyField(
+        DocumentType,
+        blank=True,
+        related_name="+",
+        verbose_name=_("remove these document type(s)"),
+    )
+
+    remove_all_document_types = models.BooleanField(
+        default=False,
+        verbose_name=_("remove all document types"),
+    )
+
+    remove_correspondents = models.ManyToManyField(
+        Correspondent,
+        blank=True,
+        related_name="+",
+        verbose_name=_("remove these correspondent(s)"),
+    )
+
+    remove_all_correspondents = models.BooleanField(
+        default=False,
+        verbose_name=_("remove all correspondents"),
+    )
+
+    remove_storage_paths = models.ManyToManyField(
+        StoragePath,
+        blank=True,
+        related_name="+",
+        verbose_name=_("remove these storage path(s)"),
+    )
+
+    remove_all_storage_paths = models.BooleanField(
+        default=False,
+        verbose_name=_("remove all storage paths"),
+    )
+
+    remove_owners = models.ManyToManyField(
+        User,
+        blank=True,
+        related_name="+",
+        verbose_name=_("remove these owner(s)"),
+    )
+
+    remove_all_owners = models.BooleanField(
+        default=False,
+        verbose_name=_("remove all owners"),
+    )
+
+    remove_view_users = models.ManyToManyField(
+        User,
+        blank=True,
+        related_name="+",
+        verbose_name=_("remove view permissions for these users"),
+    )
+
+    remove_view_groups = models.ManyToManyField(
+        Group,
+        blank=True,
+        related_name="+",
+        verbose_name=_("remove view permissions for these groups"),
+    )
+
+    remove_change_users = models.ManyToManyField(
+        User,
+        blank=True,
+        related_name="+",
+        verbose_name=_("remove change permissions for these users"),
+    )
+
+    remove_change_groups = models.ManyToManyField(
+        Group,
+        blank=True,
+        related_name="+",
+        verbose_name=_("remove change permissions for these groups"),
+    )
+
+    remove_all_permissions = models.BooleanField(
+        default=False,
+        verbose_name=_("remove all permissions"),
+    )
+
+    remove_custom_fields = models.ManyToManyField(
+        CustomField,
+        blank=True,
+        related_name="+",
+        verbose_name=_("remove these custom fields"),
+    )
+
+    remove_all_custom_fields = models.BooleanField(
+        default=False,
+        verbose_name=_("remove all custom fields"),
     )
 
     class Meta:
