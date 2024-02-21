@@ -4,26 +4,17 @@ import django.db.models.deletion
 import multiselectfield.db.fields
 from django.conf import settings
 from django.contrib.auth.management import create_permissions
-from django.contrib.auth.models import Group
-from django.contrib.auth.models import Permission
-from django.contrib.auth.models import User
 from django.db import migrations
 from django.db import models
 from django.db import transaction
 from django.db.models import Q
 
-from documents.models import Correspondent
-from documents.models import CustomField
-from documents.models import DocumentType
-from documents.models import StoragePath
-from documents.models import Tag
-from documents.models import Workflow
-from documents.models import WorkflowAction
-from documents.models import WorkflowTrigger
-from paperless_mail.models import MailRule
-
 
 def add_workflow_permissions(apps, schema_editor):
+    app_name = "auth"
+    User = apps.get_model(app_label=app_name, model_name="User")
+    Group = apps.get_model(app_label=app_name, model_name="Group")
+    Permission = apps.get_model(app_label=app_name, model_name="Permission")
     # create permissions without waiting for post_migrate signal
     for app_config in apps.get_app_configs():
         app_config.models_module = True
@@ -43,6 +34,10 @@ def add_workflow_permissions(apps, schema_editor):
 
 
 def remove_workflow_permissions(apps, schema_editor):
+    app_name = "auth"
+    User = apps.get_model(app_label=app_name, model_name="User")
+    Group = apps.get_model(app_label=app_name, model_name="Group")
+    Permission = apps.get_model(app_label=app_name, model_name="Permission")
     workflow_permissions = Permission.objects.filter(
         codename__contains="workflow",
     )
@@ -59,15 +54,28 @@ def migrate_consumption_templates(apps, schema_editor):
     Migrate consumption templates to workflows. At this point ConsumptionTemplate still exists
     but objects are not returned as their true model so we have to manually do that
     """
-    model_name = "ConsumptionTemplate"
     app_name = "documents"
 
-    ConsumptionTemplate = apps.get_model(app_label=app_name, model_name=model_name)
+    ConsumptionTemplate = apps.get_model(
+        app_label=app_name,
+        model_name="ConsumptionTemplate",
+    )
+    Workflow = apps.get_model(app_label=app_name, model_name="Workflow")
+    WorkflowAction = apps.get_model(app_label=app_name, model_name="WorkflowAction")
+    WorkflowTrigger = apps.get_model(app_label=app_name, model_name="WorkflowTrigger")
+    DocumentType = apps.get_model(app_label=app_name, model_name="DocumentType")
+    Correspondent = apps.get_model(app_label=app_name, model_name="Correspondent")
+    StoragePath = apps.get_model(app_label=app_name, model_name="StoragePath")
+    Tag = apps.get_model(app_label=app_name, model_name="Tag")
+    CustomField = apps.get_model(app_label=app_name, model_name="CustomField")
+    MailRule = apps.get_model(app_label="paperless_mail", model_name="MailRule")
+    User = apps.get_model(app_label="auth", model_name="User")
+    Group = apps.get_model(app_label="auth", model_name="Group")
 
     with transaction.atomic():
         for template in ConsumptionTemplate.objects.all():
             trigger = WorkflowTrigger(
-                type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                type=1,  # WorkflowTriggerType.CONSUMPTION
                 sources=template.sources,
                 filter_path=template.filter_path,
                 filter_filename=template.filter_filename,
@@ -143,10 +151,13 @@ def migrate_consumption_templates(apps, schema_editor):
 
 
 def unmigrate_consumption_templates(apps, schema_editor):
-    model_name = "ConsumptionTemplate"
     app_name = "documents"
 
-    ConsumptionTemplate = apps.get_model(app_label=app_name, model_name=model_name)
+    ConsumptionTemplate = apps.get_model(
+        app_label=app_name,
+        model_name="ConsumptionTemplate",
+    )
+    Workflow = apps.get_model(app_label=app_name, model_name="Workflow")
 
     for workflow in Workflow.objects.all():
         template = ConsumptionTemplate.objects.create(
