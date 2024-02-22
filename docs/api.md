@@ -60,7 +60,7 @@ fields:
 
 !!! note
 
-    Be aware that the URLs of all of these endpoints end with a `/`slash.
+    Note that all endpoint URLs must end with a `/`slash.
 
 ## Downloading documents
 
