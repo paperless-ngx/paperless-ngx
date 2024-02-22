@@ -407,7 +407,7 @@ The following custom field types are supported:
 - `URL`: a valid url
 - `Integer`: integer number e.g. 12
 - `Number`: float number e.g. 12.3456
-- `Monetary`: float number with exactly two decimals, e.g. 12.30
+- `Monetary`: [ISO 4217 currency code](https://en.wikipedia.org/wiki/ISO_4217#List_of_ISO_4217_currency_codes) and a number with exactly two decimals, e.g. USD12.30
 - `Document Link`: reference(s) to other document(s) displayed as links, automatically creates a symmetrical link in reverse
 
 ## Share Links
