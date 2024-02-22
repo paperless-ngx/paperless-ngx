@@ -58,6 +58,10 @@ fields:
 - `custom_fields`: Array of custom fields & values, specified as
   `{ field: CUSTOM_FIELD_ID, value: VALUE }`
 
+!!! note
+
+    Be aware that the URLs of all of these endpoints end with a `/`slash.
+
 ## Downloading documents
 
 In addition to that, the document endpoint offers these additional
