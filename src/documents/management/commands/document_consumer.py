@@ -342,7 +342,7 @@ class Command(BaseCommand):
                 # If files are waiting, need to exit read() to check them
                 # Otherwise, go back to infinite sleep time, but only if not testing
                 if len(notified_files) > 0:
-                    timeout = inotify_debounce
+                    timeout = inotify_debounce * 1000
                 elif is_testing:
                     timeout = self.testing_timeout_ms
                 else:
