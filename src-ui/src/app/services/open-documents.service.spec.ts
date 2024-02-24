@@ -108,6 +108,7 @@ describe('OpenDocumentsService', () => {
   })
 
   it('should close documents', () => {
+    openDocumentsService.closeDocument({ id: 999 } as any)
     subscriptions.push(
       openDocumentsService.openDocument(documents[0]).subscribe()
     )
@@ -128,15 +129,21 @@ describe('OpenDocumentsService', () => {
     subscriptions.push(
       openDocumentsService.openDocument(documents[0]).subscribe()
     )
+    openDocumentsService.setDirty({ id: 999 }, true) // coverage
     openDocumentsService.setDirty(documents[0], false)
     expect(openDocumentsService.hasDirty()).toBeFalsy()
     openDocumentsService.setDirty(documents[0], true)
     expect(openDocumentsService.hasDirty()).toBeTruthy()
+    let openModal
+    modalService.activeInstances.subscribe((instances) => {
+      openModal = instances[0]
+    })
     const modalSpy = jest.spyOn(modalService, 'open')
     subscriptions.push(
       openDocumentsService.closeDocument(documents[0]).subscribe()
     )
     expect(modalSpy).toHaveBeenCalled()
+    openModal.componentInstance.confirmClicked.next()
   })
 
   it('should allow set dirty status, warn on closeAll', () => {
@@ -148,9 +155,14 @@ describe('OpenDocumentsService', () => {
     )
     openDocumentsService.setDirty(documents[0], true)
     expect(openDocumentsService.hasDirty()).toBeTruthy()
+    let openModal
+    modalService.activeInstances.subscribe((instances) => {
+      openModal = instances[0]
+    })
     const modalSpy = jest.spyOn(modalService, 'open')
     subscriptions.push(openDocumentsService.closeAll().subscribe())
     expect(modalSpy).toHaveBeenCalled()
+    openModal.componentInstance.confirmClicked.next()
   })
 
   it('should load open documents from localStorage', () => {
