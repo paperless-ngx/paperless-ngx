@@ -119,6 +119,8 @@ describe('UploadFileWidgetComponent', () => {
     const processingStatus = new FileStatus()
     processingStatus.phase = FileStatusPhase.WORKING
     expect(component.getStatusColor(processingStatus)).toEqual('primary')
+    processingStatus.phase = FileStatusPhase.UPLOADING
+    expect(component.getStatusColor(processingStatus)).toEqual('primary')
     const failedStatus = new FileStatus()
     failedStatus.phase = FileStatusPhase.FAILED
     expect(component.getStatusColor(failedStatus)).toEqual('danger')
