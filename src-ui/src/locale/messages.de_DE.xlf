@@ -1626,6 +1626,10 @@
           <context context-type="linenumber">96</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
+          <context context-type="linenumber">208</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
@@ -2199,7 +2203,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">304</context>
+          <context context-type="linenumber">320</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
@@ -2239,7 +2243,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">306</context>
+          <context context-type="linenumber">322</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
@@ -4577,21 +4581,21 @@
         </context-group>
         <target state="final">Warnung: das Ändern des Tokens kann nicht rückgängig gemacht werden</target>
       </trans-unit>
-      <trans-unit id="8935717557476105185" datatype="html">
+      <trans-unit id="8935717557476105185" datatype="html" approved="yes">
         <source>Connected social accounts</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="translated">Verbundene Drittanbieterkonten</target>
+        <target state="final">Verbundene Drittanbieterkonten</target>
       </trans-unit>
-      <trans-unit id="8383227756109993898" datatype="html">
+      <trans-unit id="8383227756109993898" datatype="html" approved="yes">
         <source>Set a password before disconnecting social account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">63</context>
         </context-group>
-        <target state="translated">Legen Sie vor der Trennung eines Drittanbieterkontos ein Kennwort fest.</target>
+        <target state="final">Legen Sie vor der Trennung eines Drittanbieterkontos ein Kennwort fest.</target>
       </trans-unit>
       <trans-unit id="2907016025519254862" datatype="html" approved="yes">
         <source>Disconnect</source>
@@ -4601,29 +4605,29 @@
         </context-group>
         <target state="final">Trennen</target>
       </trans-unit>
-      <trans-unit id="5322995394400578831" datatype="html">
+      <trans-unit id="5322995394400578831" datatype="html" approved="yes">
         <source>Disconnect <x id="INTERPOLATION" equiv-text="{{ account.name }}"/> social account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">71</context>
         </context-group>
-        <target state="translated">Drittanbieterkonto <x id="INTERPOLATION" equiv-text="{{ account.name }}"/> trennen</target>
+        <target state="final">Drittanbieterkonto <x id="INTERPOLATION" equiv-text="{{ account.name }}"/> trennen</target>
       </trans-unit>
-      <trans-unit id="649824314893051979" datatype="html">
+      <trans-unit id="649824314893051979" datatype="html" approved="yes">
         <source>Warning: disconnecting social accounts cannot be undone</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">81</context>
         </context-group>
-        <target state="translated">Warnung: Die Trennung von Drittanbieterkonten kann nicht rückgängig gemacht werden</target>
+        <target state="final">Warnung: Die Trennung von Drittanbieterkonten kann nicht rückgängig gemacht werden</target>
       </trans-unit>
-      <trans-unit id="1375396510511350122" datatype="html">
+      <trans-unit id="1375396510511350122" datatype="html" approved="yes">
         <source>Connect new social account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">86</context>
         </context-group>
-        <target state="translated">Mit neuem Drittanbieterkonto verbinden</target>
+        <target state="final">Mit neuem Drittanbieterkonto verbinden</target>
       </trans-unit>
       <trans-unit id="6141884091799403188" datatype="html" approved="yes">
         <source>Emails must match</source>
@@ -4665,13 +4669,13 @@
         </context-group>
         <target state="final">Fehler beim Generieren des Authentifizierungstokens</target>
       </trans-unit>
-      <trans-unit id="4153637646944982460" datatype="html">
+      <trans-unit id="4153637646944982460" datatype="html" approved="yes">
         <source>Error disconnecting social account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
           <context context-type="linenumber">210</context>
         </context-group>
-        <target state="translated">Fehler beim Trennen des Drittanbieterkontos</target>
+        <target state="final">Fehler beim Trennen des Drittanbieterkontos</target>
       </trans-unit>
       <trans-unit id="3797570084942068182" datatype="html" approved="yes">
         <source>Select</source>
@@ -5548,7 +5552,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">302</context>
+          <context context-type="linenumber">204</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
+          <context context-type="linenumber">318</context>
         </context-group>
         <target state="final">Löschen bestätigen</target>
       </trans-unit>
@@ -6882,7 +6890,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">289</context>
+          <context context-type="linenumber">305</context>
         </context-group>
         <target state="final">Fehler beim Aktualisieren der Berechtigungen</target>
       </trans-unit>
@@ -6970,19 +6978,19 @@
         <source>{VAR_PLURAL, plural, =1 {One <x id="INTERPOLATION"/>} other {<x id="INTERPOLATION_1"/> total <x id="INTERPOLATION_2"/>}}</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">110</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">110</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">110</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">110</context>
         </context-group>
         <target state="final">{VAR_PLURAL, plural,  =1 {Ein <x id="INTERPOLATION"/>} other {Insgesamt <x id="INTERPOLATION_1"/> <x id="INTERPOLATION_2"/>}}</target>
       </trans-unit>
@@ -6990,7 +6998,7 @@
         <source>Automatic</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">113</context>
+          <context context-type="linenumber">116</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
@@ -7002,7 +7010,7 @@
         <source>None</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">115</context>
+          <context context-type="linenumber">118</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
@@ -7014,7 +7022,7 @@
         <source>Successfully created <x id="PH" equiv-text="this.typeName"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">158</context>
+          <context context-type="linenumber">161</context>
         </context-group>
         <target state="final"><x id="PH" equiv-text="this.typeName"/> erfolgreich erstellt.</target>
       </trans-unit>
@@ -7022,7 +7030,7 @@
         <source>Error occurred while creating <x id="PH" equiv-text="this.typeName"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">163</context>
+          <context context-type="linenumber">166</context>
         </context-group>
         <target state="final">Fehler beim Erstellen von <x id="PH" equiv-text="this.typeName"/>.</target>
       </trans-unit>
@@ -7030,7 +7038,7 @@
         <source>Successfully updated <x id="PH" equiv-text="this.typeName"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">178</context>
+          <context context-type="linenumber">181</context>
         </context-group>
         <target state="final"><x id="PH" equiv-text="this.typeName"/> erfolgreich aktualisiert.</target>
       </trans-unit>
@@ -7038,15 +7046,23 @@
         <source>Error occurred while saving <x id="PH" equiv-text="this.typeName"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">183</context>
+          <context context-type="linenumber">186</context>
         </context-group>
         <target state="final">Fehler beim Speichern von <x id="PH" equiv-text="this.typeName"/>.</target>
+      </trans-unit>
+      <trans-unit id="8371896857609524947" datatype="html" approved="yes">
+        <source>Associated documents will not be deleted.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
+          <context context-type="linenumber">206</context>
+        </context-group>
+        <target state="final">Verknüpfte Dokumente werden nicht gelöscht.</target>
       </trans-unit>
       <trans-unit id="6639207128255974941" datatype="html" approved="yes">
         <source>Error while deleting element</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">207</context>
+          <context context-type="linenumber">222</context>
         </context-group>
         <target state="final">Fehler beim Löschen des Elements</target>
       </trans-unit>
@@ -7054,7 +7070,7 @@
         <source>Permissions updated successfully</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">282</context>
+          <context context-type="linenumber">298</context>
         </context-group>
         <target state="final">Berechtigungen wurden erfolgreich aktualisiert</target>
       </trans-unit>
@@ -7062,7 +7078,7 @@
         <source>This operation will permanently delete all objects.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">303</context>
+          <context context-type="linenumber">319</context>
         </context-group>
         <target state="final">Dieser Vorgang wird alle Objekte permanent löschen.</target>
       </trans-unit>
@@ -7070,7 +7086,7 @@
         <source>Objects deleted successfully</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">317</context>
+          <context context-type="linenumber">333</context>
         </context-group>
         <target state="final">Objekte erfolgreich gelöscht</target>
       </trans-unit>
@@ -7078,7 +7094,7 @@
         <source>Error deleting objects</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">323</context>
+          <context context-type="linenumber">339</context>
         </context-group>
         <target state="final">Fehler beim Löschen der Objekte</target>
       </trans-unit>

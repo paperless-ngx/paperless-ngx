@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-14 16:47-0800\n"
-"PO-Revision-Date: 2024-02-15 00:52\n"
+"PO-Revision-Date: 2024-02-22 12:08\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -930,11 +930,11 @@ msgstr "Paperless-ngx Drittanbieterkonto-Registrierung"
 #: documents/templates/socialaccount/signup.html:53
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
-msgstr ""
+msgstr "Sie sind dabei, Ihr %(provider_name)s-Konto zur Anmeldung zu verwenden."
 
 #: documents/templates/socialaccount/signup.html:54
 msgid "As a final step, please complete the following form:"
-msgstr ""
+msgstr "Bitte füllen Sie zum Abschluss folgendes Formular aus:"
 
 #: documents/templates/socialaccount/signup.html:72
 msgid "Sign up"

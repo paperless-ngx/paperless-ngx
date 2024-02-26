@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-14 16:47-0800\n"
-"PO-Revision-Date: 2024-02-15 00:52\n"
+"PO-Revision-Date: 2024-02-25 00:25\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -47,7 +47,7 @@ msgstr "التعابير النظامية"
 
 #: documents/models.py:58 documents/models.py:902
 msgid "Fuzzy word"
-msgstr "كلمة غامضة"
+msgstr ""
 
 #: documents/models.py:59
 msgid "Automatic"
@@ -365,7 +365,7 @@ msgstr "استعلام كامل النص"
 
 #: documents/models.py:446
 msgid "more like this"
-msgstr "أخرى مثلها"
+msgstr "المزيد مثل هذا"
 
 #: documents/models.py:447
 msgid "has tags in"
@@ -589,7 +589,7 @@ msgstr ""
 
 #: documents/models.py:764
 msgid "Document Link"
-msgstr ""
+msgstr "رابط المستند"
 
 #: documents/models.py:776
 msgid "data type"
@@ -617,11 +617,11 @@ msgstr ""
 
 #: documents/models.py:906
 msgid "Document Added"
-msgstr ""
+msgstr "تم إضافة المستند"
 
 #: documents/models.py:907
 msgid "Document Updated"
-msgstr ""
+msgstr "تم تحديث المستند"
 
 #: documents/models.py:910
 msgid "Consume Folder"
@@ -753,11 +753,11 @@ msgstr ""
 
 #: documents/models.py:1117
 msgid "actions"
-msgstr ""
+msgstr "إجراءات"
 
 #: documents/models.py:1120
 msgid "enabled"
-msgstr ""
+msgstr "مفعل"
 
 #: documents/serialisers.py:113
 #, python-format
@@ -816,7 +816,7 @@ msgstr "نسيت كلمة المرور؟"
 
 #: documents/templates/account/login.html:83
 msgid "or sign in via"
-msgstr ""
+msgstr "أو تسجيل الدخول عبر"
 
 #: documents/templates/account/password_reset.html:15
 msgid "Paperless-ngx reset password request"
@@ -921,7 +921,7 @@ msgstr ""
 
 #: documents/templates/socialaccount/login.html:47
 msgid "Continue"
-msgstr ""
+msgstr "استمر"
 
 #: documents/templates/socialaccount/signup.html:14
 msgid "Paperless-ngx social account sign up"
@@ -938,7 +938,7 @@ msgstr ""
 
 #: documents/templates/socialaccount/signup.html:72
 msgid "Sign up"
-msgstr ""
+msgstr "إنشاء حساب"
 
 #: documents/validators.py:17
 #, python-brace-format
@@ -1009,7 +1009,7 @@ msgstr "دائماً"
 
 #: paperless/models.py:60
 msgid "clean"
-msgstr ""
+msgstr "نظيف"
 
 #: paperless/models.py:61
 msgid "clean-final"
@@ -1073,7 +1073,7 @@ msgstr ""
 
 #: paperless/models.py:141
 msgid "Enables page rotation"
-msgstr ""
+msgstr "تمكين تدوير الصفحة"
 
 #: paperless/models.py:146
 msgid "Sets the threshold for rotation of pages"
@@ -1093,11 +1093,11 @@ msgstr ""
 
 #: paperless/models.py:171
 msgid "Application title"
-msgstr ""
+msgstr "عنوان التطبيق"
 
 #: paperless/models.py:178
 msgid "Application logo"
-msgstr ""
+msgstr "شعار التطبيق"
 
 #: paperless/models.py:188
 msgid "paperless application settings"

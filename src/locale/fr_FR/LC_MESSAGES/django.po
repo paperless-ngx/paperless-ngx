@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-14 16:47-0800\n"
-"PO-Revision-Date: 2024-02-15 00:52\n"
+"PO-Revision-Date: 2024-02-21 23:28\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -365,7 +365,7 @@ msgstr "recherche en texte intégral"
 
 #: documents/models.py:446
 msgid "more like this"
-msgstr "documents relatifs"
+msgstr "plus comme cela"
 
 #: documents/models.py:447
 msgid "has tags in"
@@ -381,7 +381,7 @@ msgstr "NSA inférieur à"
 
 #: documents/models.py:450
 msgid "storage path is"
-msgstr "Le chemin de stockage est"
+msgstr "le chemin de stockage est"
 
 #: documents/models.py:451
 msgid "has correspondent in"
@@ -930,11 +930,11 @@ msgstr "Inscription à Paperless-ngx avec un compte externe"
 #: documents/templates/socialaccount/signup.html:53
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
-msgstr ""
+msgstr "Vous vous apprêtez à utiliser votre compte %(provider_name)s pour vous connecter."
 
 #: documents/templates/socialaccount/signup.html:54
 msgid "As a final step, please complete the following form:"
-msgstr ""
+msgstr "Pour finir, veuillez remplir le formulaire suivant :"
 
 #: documents/templates/socialaccount/signup.html:72
 msgid "Sign up"
