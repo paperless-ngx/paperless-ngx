@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-14 16:47-0800\n"
-"PO-Revision-Date: 2024-02-15 00:52\n"
+"PO-Revision-Date: 2024-02-16 00:22\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -425,7 +425,7 @@ msgstr "не имеет владельца в"
 
 #: documents/models.py:461
 msgid "has custom field value"
-msgstr "имеет пользовательское значение поля"
+msgstr "имеет спецзначение поля"
 
 #: documents/models.py:462
 msgid "is shared by me"
@@ -545,7 +545,7 @@ msgstr "Оригинал"
 
 #: documents/models.py:705
 msgid "expiration"
-msgstr "Срок действия"
+msgstr "истечение"
 
 #: documents/models.py:712
 msgid "slug"
@@ -593,23 +593,23 @@ msgstr "Ярлык на документ"
 
 #: documents/models.py:776
 msgid "data type"
-msgstr "Тип данных"
+msgstr "тип данных"
 
 #: documents/models.py:784
 msgid "custom field"
-msgstr "Пользовательское поле"
+msgstr "спецполе"
 
 #: documents/models.py:785
 msgid "custom fields"
-msgstr "Пользовательские поля"
+msgstr "спецполя"
 
 #: documents/models.py:847
 msgid "custom field instance"
-msgstr "пользовательский образец поля"
+msgstr "спецобразец поля"
 
 #: documents/models.py:848
 msgid "custom field instances"
-msgstr "пользовательские образцы поля"
+msgstr "спецобразцы поля"
 
 #: documents/models.py:905
 msgid "Consumption Started"
@@ -733,7 +733,7 @@ msgstr "предоставьте права на редактирование э
 
 #: documents/models.py:1090
 msgid "assign these custom fields"
-msgstr "назначьте эти пользовательские поля"
+msgstr "назначьте эти спецполя"
 
 #: documents/models.py:1094
 msgid "workflow action"
@@ -837,7 +837,7 @@ msgstr "Электронная почта"
 
 #: documents/templates/account/password_reset.html:56
 msgid "Send me instructions!"
-msgstr "Отправить мне инструкции!"
+msgstr "Отправьте мне инструкции!"
 
 #: documents/templates/account/password_reset_done.html:14
 msgid "Paperless-ngx reset password sent"
@@ -845,7 +845,7 @@ msgstr "Пароль сброса Paperless-ngx отправлен"
 
 #: documents/templates/account/password_reset_done.html:40
 msgid "Check your inbox."
-msgstr "Проверье ваш почтовый ящик."
+msgstr "Проверьте ваш входящий ящик."
 
 #: documents/templates/account/password_reset_done.html:41
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
@@ -885,7 +885,7 @@ msgstr "Сброс пароля Paperless-ngx завершен"
 
 #: documents/templates/account/password_reset_from_key_done.html:40
 msgid "Password reset complete."
-msgstr "Сброс пароля пароля завершен."
+msgstr "Сброс пароля завершен."
 
 #: documents/templates/account/password_reset_from_key_done.html:42
 #, python-format
@@ -898,7 +898,7 @@ msgstr "Paperless-ngx загружается..."
 
 #: documents/templates/index.html:80
 msgid "Still here?! Hmm, something might be wrong."
-msgstr "Все еще здесь?! Хмм, возможно что-то не так."
+msgstr "Все еще здесь?! Возможно что-то не так."
 
 #: documents/templates/index.html:80
 msgid "Here's a link to the docs."
@@ -907,7 +907,7 @@ msgstr "Вот ссылка на документацию."
 #: documents/templates/socialaccount/authentication_error.html:15
 #: documents/templates/socialaccount/login.html:15
 msgid "Paperless-ngx social account sign in"
-msgstr "Paperless-ngx вход через через сторонние сервисы"
+msgstr "Paperless-ngx вход через сторонние сервисы"
 
 #: documents/templates/socialaccount/authentication_error.html:43
 #, python-format
@@ -917,7 +917,7 @@ msgstr "Ошибка при входе в систему через учетну
 #: documents/templates/socialaccount/login.html:44
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
-msgstr "Вы собираетесь связать аккаунт стороннего сервисыа через %(provider)s."
+msgstr "Вы собираетесь связать аккаунт стороннего сервиса через %(provider)s."
 
 #: documents/templates/socialaccount/login.html:47
 msgid "Continue"
@@ -930,11 +930,11 @@ msgstr "Paperless-ngx регистрация через сторонний се�
 #: documents/templates/socialaccount/signup.html:53
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
-msgstr ""
+msgstr "Вы собираетесь войти через сторонний сервис %(provider_name)s."
 
 #: documents/templates/socialaccount/signup.html:54
 msgid "As a final step, please complete the following form:"
-msgstr ""
+msgstr "На завершение, пожалуйста заполните следующую форму:"
 
 #: documents/templates/socialaccount/signup.html:72
 msgid "Sign up"
