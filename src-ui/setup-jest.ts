@@ -94,6 +94,10 @@ Object.defineProperty(navigator, 'clipboard', {
 })
 Object.defineProperty(navigator, 'canShare', { value: () => true })
 Object.defineProperty(window, 'ResizeObserver', { value: mock() })
+Object.defineProperty(window, 'location', {
+  configurable: true,
+  value: { reload: jest.fn() },
+})
 
 HTMLCanvasElement.prototype.getContext = <
   typeof HTMLCanvasElement.prototype.getContext

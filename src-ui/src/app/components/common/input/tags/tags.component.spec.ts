@@ -169,4 +169,12 @@ describe('TagsComponent', () => {
     expect(component.getTag(2)).toEqual(tags[1])
     expect(component.getTag(4)).toBeUndefined()
   })
+
+  it('should emit filtered documents', () => {
+    component.value = [10]
+    component.tags = tags
+    const emitSpy = jest.spyOn(component.filterDocuments, 'emit')
+    component.onFilterDocuments()
+    expect(emitSpy).toHaveBeenCalledWith([tags[2]])
+  })
 })
