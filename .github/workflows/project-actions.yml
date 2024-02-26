@@ -22,6 +22,6 @@ jobs:
     if: github.event_name == 'pull_request_target' && (github.event.action == 'opened' || github.event.action == 'reopened') && github.event.pull_request.user.login != 'dependabot'
     steps:
       - name: Label PR with release-drafter
-        uses: release-drafter/release-drafter@v5
+        uses: release-drafter/release-drafter@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
