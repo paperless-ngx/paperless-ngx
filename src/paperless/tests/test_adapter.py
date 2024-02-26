@@ -4,6 +4,7 @@ from allauth.account.adapter import get_adapter
 from allauth.core import context
 from allauth.socialaccount.adapter import get_adapter as get_social_adapter
 from django.conf import settings
+from django.forms import ValidationError
 from django.http import HttpRequest
 from django.test import TestCase
 from django.test import override_settings
@@ -46,6 +47,19 @@ class TestCustomAccountAdapter(TestCase):
             url = "//evil.com"
             # False because request host is not in allowed hosts
             self.assertFalse(adapter.is_safe_url(url))
+
+    @mock.patch("allauth.core.ratelimit._consume_rate", return_value=True)
+    def test_pre_authenticate(self, mock_consume_rate):
+        adapter = get_adapter()
+        request = HttpRequest()
+        request.get_host = mock.Mock(return_value="example.com")
+
+        settings.DISABLE_REGULAR_LOGIN = False
+        adapter.pre_authenticate(request)
+
+        settings.DISABLE_REGULAR_LOGIN = True
+        with self.assertRaises(ValidationError):
+            adapter.pre_authenticate(request)
 
 
 class TestCustomSocialAccountAdapter(TestCase):

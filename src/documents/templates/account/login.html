@@ -58,29 +58,33 @@
           {% translate "Share link has expired." %}
         </div>
 			{% endif %}
-			{% translate "Username" as i18n_username %}
-			{% translate "Password" as i18n_password %}
-      <div class="form-floating">
-        <input type="text" name="login" id="inputUsername" placeholder="{{ i18n_username }}" class="form-control" autocorrect="off" autocapitalize="none" required autofocus>
-        <label for="inputUsername">{{ i18n_username }}</label>
-      </div>
-      <div class="form-floating">
-        <input type="password" name="password" id="inputPassword" placeholder="{{ i18n_password }}" class="form-control" required>
-			  <label for="inputPassword">{{ i18n_password }}</label>
-      </div>
-      <div class="d-grid mt-3">
-        <button class="btn btn-lg btn-primary" type="submit">{% translate "Sign in" %}</button>
-      </div>
-      {% if EMAIL_ENABLED %}
-      <div class="d-grid mt-3">
-        <a class="btn btn-link" href="{% url 'account_reset_password' %}">{% translate "Forgot your password?" %}</a>
-      </div>
+      {% if not DISABLE_REGULAR_LOGIN %}
+        {% translate "Username" as i18n_username %}
+        {% translate "Password" as i18n_password %}
+        <div class="form-floating">
+          <input type="text" name="login" id="inputUsername" placeholder="{{ i18n_username }}" class="form-control" autocorrect="off" autocapitalize="none" required autofocus>
+          <label for="inputUsername">{{ i18n_username }}</label>
+        </div>
+        <div class="form-floating">
+          <input type="password" name="password" id="inputPassword" placeholder="{{ i18n_password }}" class="form-control" required>
+          <label for="inputPassword">{{ i18n_password }}</label>
+        </div>
+        <div class="d-grid mt-3">
+          <button class="btn btn-lg btn-primary" type="submit">{% translate "Sign in" %}</button>
+        </div>
+        {% if EMAIL_ENABLED %}
+        <div class="d-grid mt-3">
+          <a class="btn btn-link" href="{% url 'account_reset_password' %}">{% translate "Forgot your password?" %}</a>
+        </div>
+        {% endif %}
       {% endif %}
 		</form>
 {% load allauth socialaccount %}
 {% get_providers as socialaccount_providers %}
 {% if socialaccount_providers %}
-    <p class="mt-3">{% translate "or sign in via" %}</p>
+    {% if not DISABLE_REGULAR_LOGIN %}
+      <p class="mt-3">{% translate "or sign in via" %}</p>
+    {% endif %}
     <ul class="m-0 p-0">
         {% for provider in socialaccount_providers %}
             {% if provider.id == "openid" %}

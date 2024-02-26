@@ -692,3 +692,7 @@ PAPERLESS_SOCIALACCOUNT_PROVIDERS='
 ```
 
 More details about configuration option for various providers can be found in the [allauth documentation](https://docs.allauth.org/en/latest/socialaccount/providers/index.html#provider-specifics).
+
+### Disabling Regular Login
+
+Once external auth is set up, 'regular' login can be disabled with the [PAPERLESS_DISABLE_REGULAR_LOGIN](configuration.md#PAPERLESS_DISABLE_REGULAR_LOGIN) setting.
