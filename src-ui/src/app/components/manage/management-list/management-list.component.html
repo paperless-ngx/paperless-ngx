@@ -2,10 +2,10 @@
   <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()" [hidden]="selectedObjects.size === 0">
     <i-bs  name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
     </button>
-    <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="setPermissions()" [disabled]="!userOwnsAll || selectedObjects.size === 0">
+    <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="setPermissions()" [disabled]="!userCanBulkEdit(PermissionAction.Change) || selectedObjects.size === 0">
       <i-bs name="person-fill-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
     </button>
-    <button type="button" class="btn btn-sm btn-outline-danger me-5" (click)="delete()" [disabled]="!userOwnsAll || selectedObjects.size === 0">
+    <button type="button" class="btn btn-sm btn-outline-danger me-5" (click)="delete()" [disabled]="!userCanBulkEdit(PermissionAction.Delete) || selectedObjects.size === 0">
       <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
     </button>
     <button type="button" class="btn btn-sm btn-outline-primary" (click)="openCreateDialog()" *pngxIfPermissions="{ action: PermissionAction.Add, type: permissionType }">

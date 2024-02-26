@@ -1419,7 +1419,15 @@ class BulkEditObjectsView(GenericAPIView, PassUserMixin):
         objs = object_class.objects.filter(pk__in=object_ids)
 
         if not user.is_superuser:
-            has_perms = all((obj.owner == user or obj.owner is None) for obj in objs)
+            model_name = object_class._meta.verbose_name
+            perm = (
+                f"documents.change_{model_name}"
+                if operation == "set_permissions"
+                else f"documents.delete_{model_name}"
+            )
+            has_perms = user.has_perm(perm) and all(
+                (obj.owner == user or obj.owner is None) for obj in objs
+            )
 
             if not has_perms:
                 return HttpResponseForbidden("Insufficient permissions")

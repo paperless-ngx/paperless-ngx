@@ -23,7 +23,10 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { TagListComponent } from '../tag-list/tag-list.component'
 import { ManagementListComponent } from './management-list.component'
-import { PermissionsService } from 'src/app/services/permissions.service'
+import {
+  PermissionAction,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { EditDialogComponent } from '../../common/edit-dialog/edit-dialog.component'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
@@ -65,6 +68,7 @@ describe('ManagementListComponent', () => {
   let modalService: NgbModal
   let toastService: ToastService
   let documentListViewService: DocumentListViewService
+  let permissionsService: PermissionsService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -77,18 +81,7 @@ describe('ManagementListComponent', () => {
         ConfirmDialogComponent,
         PermissionsDialogComponent,
       ],
-      providers: [
-        {
-          provide: PermissionsService,
-          useValue: {
-            currentUserCan: () => true,
-            currentUserHasObjectPermissions: () => true,
-            currentUserOwnsObject: () => true,
-          },
-        },
-        DatePipe,
-        PermissionsGuard,
-      ],
+      providers: [DatePipe, PermissionsGuard],
       imports: [
         HttpClientTestingModule,
         NgbPaginationModule,
@@ -115,6 +108,14 @@ describe('ManagementListComponent', () => {
           })
         }
       )
+    permissionsService = TestBed.inject(PermissionsService)
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    jest
+      .spyOn(permissionsService, 'currentUserHasObjectPermissions')
+      .mockReturnValue(true)
+    jest
+      .spyOn(permissionsService, 'currentUserOwnsObject')
+      .mockReturnValue(true)
     modalService = TestBed.inject(NgbModal)
     toastService = TestBed.inject(ToastService)
     documentListViewService = TestBed.inject(DocumentListViewService)
@@ -311,5 +312,11 @@ describe('ManagementListComponent', () => {
     modal.componentInstance.confirmClicked.emit(null)
     expect(bulkEditSpy).toHaveBeenCalled()
     expect(successToastSpy).toHaveBeenCalled()
+  })
+
+  it('should disallow bulk permissions or delete objects if no global perms', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(false)
+    expect(component.userCanBulkEdit(PermissionAction.Delete)).toBeFalsy()
+    expect(component.userCanBulkEdit(PermissionAction.Change)).toBeFalsy()
   })
 })
