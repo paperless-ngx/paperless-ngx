@@ -163,7 +163,7 @@ export const routes: Routes = [
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
-            action: PermissionAction.View,
+            action: PermissionAction.Change,
             type: PermissionType.UISettings,
           },
         },
