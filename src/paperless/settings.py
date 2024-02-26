@@ -437,6 +437,8 @@ SOCIALACCOUNT_PROVIDERS = json.loads(
     os.getenv("PAPERLESS_SOCIALACCOUNT_PROVIDERS", "{}"),
 )
 
+ACCOUNT_EMAIL_SUBJECT_PREFIX = "[Paperless-ngx] "
+
 DISABLE_REGULAR_LOGIN = __get_boolean("PAPERLESS_DISABLE_REGULAR_LOGIN")
 
 AUTO_LOGIN_USERNAME = os.getenv("PAPERLESS_AUTO_LOGIN_USERNAME")
@@ -498,18 +500,23 @@ if DEBUG:
     CORS_ALLOWED_ORIGINS.append("http://localhost:4200")
 
 ALLOWED_HOSTS = __get_list("PAPERLESS_ALLOWED_HOSTS", ["*"])
-
-_paperless_url = os.getenv("PAPERLESS_URL")
-if _paperless_url:
-    _paperless_uri = urlparse(_paperless_url)
-    CSRF_TRUSTED_ORIGINS.append(_paperless_url)
-    CORS_ALLOWED_ORIGINS.append(_paperless_url)
-
 if ["*"] != ALLOWED_HOSTS:
     # always allow localhost. Necessary e.g. for healthcheck in docker.
     ALLOWED_HOSTS.append("localhost")
-    if _paperless_url:
-        ALLOWED_HOSTS.append(_paperless_uri.hostname)
+
+
+def _parse_paperless_url():
+    global CSRF_TRUSTED_ORIGINS, CORS_ALLOWED_ORIGINS, ALLOWED_HOSTS
+    url = os.getenv("PAPERLESS_URL")
+    if url:
+        CSRF_TRUSTED_ORIGINS.append(url)
+        CORS_ALLOWED_ORIGINS.append(url)
+        ALLOWED_HOSTS.append(urlparse(url).hostname)
+
+    return url
+
+
+PAPERLESS_URL = _parse_paperless_url()
 
 # For use with trusted proxies
 TRUSTED_PROXIES = __get_list("PAPERLESS_TRUSTED_PROXIES")
@@ -1126,3 +1133,6 @@ DEFAULT_FROM_EMAIL: Final[str] = os.getenv("PAPERLESS_EMAIL_FROM", EMAIL_HOST_US
 EMAIL_USE_TLS: Final[bool] = __get_boolean("PAPERLESS_EMAIL_USE_TLS")
 EMAIL_USE_SSL: Final[bool] = __get_boolean("PAPERLESS_EMAIL_USE_SSL")
 EMAIL_SUBJECT_PREFIX: Final[str] = "[Paperless-ngx] "
+if DEBUG:  # pragma: no cover
+    EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+    EMAIL_FILE_PATH = BASE_DIR / "sent_emails"

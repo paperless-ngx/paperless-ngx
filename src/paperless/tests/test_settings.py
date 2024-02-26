@@ -8,6 +8,7 @@ from celery.schedules import crontab
 from paperless.settings import _parse_beat_schedule
 from paperless.settings import _parse_db_settings
 from paperless.settings import _parse_ignore_dates
+from paperless.settings import _parse_paperless_url
 from paperless.settings import _parse_redis_url
 from paperless.settings import default_threads_per_worker
 
@@ -349,3 +350,27 @@ class TestDBSettings(TestCase):
                 },
                 databases["sqlite"]["OPTIONS"],
             )
+
+
+class TestPaperlessURLSettings(TestCase):
+    def test_paperless_url(self):
+        """
+        GIVEN:
+            - PAPERLESS_URL is set
+        WHEN:
+            - The URL is parsed
+        THEN:
+            - The URL is returned and present in related settings
+        """
+        with mock.patch.dict(
+            os.environ,
+            {
+                "PAPERLESS_URL": "https://example.com",
+            },
+        ):
+            url = _parse_paperless_url()
+            self.assertEqual("https://example.com", url)
+            from django.conf import settings
+
+            self.assertIn(url, settings.CSRF_TRUSTED_ORIGINS)
+            self.assertIn(url, settings.CORS_ALLOWED_ORIGINS)

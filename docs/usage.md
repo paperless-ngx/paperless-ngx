@@ -253,7 +253,8 @@ permissions can be granted to limit access to certain parts of the UI (and corre
 ### Password reset
 
 In order to enable the password reset feature you will need to setup an SMTP backend, see
-[`PAPERLESS_EMAIL_HOST`](configuration.md#PAPERLESS_EMAIL_HOST)
+[`PAPERLESS_EMAIL_HOST`](configuration.md#PAPERLESS_EMAIL_HOST). If your installation does not have
+[`PAPERLESS_URL`](configuration.md#PAPERLESS_URL) set, the reset link included in emails will use the server host.
 
 ## Workflows
 
