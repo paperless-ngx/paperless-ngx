@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-14 16:47-0800\n"
-"PO-Revision-Date: 2024-02-15 00:52\n"
+"PO-Revision-Date: 2024-02-15 12:08\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
@@ -47,11 +47,11 @@ msgstr "Regulære uttrykk"
 
 #: documents/models.py:58 documents/models.py:902
 msgid "Fuzzy word"
-msgstr "Fuzzy word"
+msgstr ""
 
 #: documents/models.py:59
 msgid "Automatic"
-msgstr "Automatisk"
+msgstr ""
 
 #: documents/models.py:62 documents/models.py:397 documents/models.py:1102
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
@@ -365,7 +365,7 @@ msgstr "full tekst spørring"
 
 #: documents/models.py:446
 msgid "more like this"
-msgstr "mer som dette"
+msgstr ""
 
 #: documents/models.py:447
 msgid "has tags in"
