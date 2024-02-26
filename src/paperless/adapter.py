@@ -2,17 +2,36 @@ from allauth.account.adapter import DefaultAccountAdapter
 from allauth.core import context
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.conf import settings
+from django.forms import ValidationError
 from django.urls import reverse
 
 
 class CustomAccountAdapter(DefaultAccountAdapter):
     def is_open_for_signup(self, request):
+        """
+        Check whether the site is open for signups, which can be
+        disabled via the ACCOUNT_ALLOW_SIGNUPS setting.
+        """
         allow_signups = super().is_open_for_signup(request)
         # Override with setting, otherwise default to super.
         return getattr(settings, "ACCOUNT_ALLOW_SIGNUPS", allow_signups)
 
+    def pre_authenticate(self, request, **credentials):
+        """
+        Called prior to calling the authenticate method on the
+        authentication backend. If login is disabled using DISABLE_REGULAR_LOGIN,
+        raise ValidationError to prevent the login.
+        """
+        if settings.DISABLE_REGULAR_LOGIN:
+            raise ValidationError("Regular login is disabled")
+
+        return super().pre_authenticate(request, **credentials)
+
     def is_safe_url(self, url):
-        # see https://github.com/paperless-ngx/paperless-ngx/issues/5780
+        """
+        Check if the URL is a safe URL.
+        See https://github.com/paperless-ngx/paperless-ngx/issues/5780
+        """
         from django.utils.http import url_has_allowed_host_and_scheme
 
         # get_host already validates the given host, so no need to check it again
@@ -29,6 +48,10 @@ class CustomAccountAdapter(DefaultAccountAdapter):
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     def is_open_for_signup(self, request, sociallogin):
+        """
+        Check whether the site is open for signups via social account, which can be
+        disabled via the SOCIALACCOUNT_ALLOW_SIGNUPS setting.
+        """
         allow_signups = super().is_open_for_signup(request, sociallogin)
         # Override with setting, otherwise default to super.
         return getattr(settings, "SOCIALACCOUNT_ALLOW_SIGNUPS", allow_signups)
@@ -42,5 +65,9 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         return url
 
     def populate_user(self, request, sociallogin, data):
+        """
+        Populate the user with data from the social account. Stub is kept in case
+        global default permissions are implemented in the future.
+        """
         # TODO: If default global permissions are implemented, should also be here
         return super().populate_user(request, sociallogin, data)  # pragma: no cover

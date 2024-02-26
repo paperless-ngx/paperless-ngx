@@ -572,6 +572,12 @@ system. See the corresponding
 
     Defaults to 'https'
 
+#### [`PAPERLESS_DISABLE_REGULAR_LOGIN=<bool>`](#PAPERLESS_DISABLE_REGULAR_LOGIN) {#PAPERLESS_DISABLE_REGULAR_LOGIN}
+
+: Disables the regular frontend username / password login, i.e. once you have setup SSO. Note that the Django admin login cannot be disabled.
+
+    Defaults to False
+
 ## OCR settings {#ocr}
 
 Paperless uses [OCRmyPDF](https://ocrmypdf.readthedocs.io/en/latest/)
