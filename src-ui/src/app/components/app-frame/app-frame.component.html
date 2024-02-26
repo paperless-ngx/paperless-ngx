@@ -55,7 +55,7 @@
           <i-bs class="me-2" name="person"></i-bs>&nbsp;<ng-container i18n>My Profile</ng-container>
         </button>
         <a ngbDropdownItem class="nav-link" routerLink="settings" (click)="closeMenu()"
-          *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.UISettings }">
+          *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.UISettings }">
           <i-bs class="me-2" name="gear"></i-bs><ng-container i18n>Settings</ng-container>
         </a>
         <a ngbDropdownItem class="nav-link d-flex" href="accounts/logout/" (click)="onLogout()">
@@ -227,7 +227,7 @@
           <span i18n>Administration</span>
         </h6>
         <ul class="nav flex-column mb-2">
-          <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.UISettings }"
+          <li class="nav-item" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.UISettings }"
             tourAnchor="tour.settings">
             <a class="nav-link" routerLink="settings" routerLinkActive="active" (click)="closeMenu()"
               ngbPopover="Settings" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
@@ -256,10 +256,10 @@
               ngbPopover="File Tasks" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
               container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <i-bs class="me-1" name="list-task"></i-bs><span>&nbsp;<ng-container i18n>File Tasks</ng-container>@if (tasksService.failedFileTasks.length > 0) {
-                <span><span class="badge bg-danger ms-2">{{tasksService.failedFileTasks.length}}</span></span>
+                <span><span class="badge bg-danger ms-2 d-inline">{{tasksService.failedFileTasks.length}}</span></span>
               }</span>
               @if (tasksService.failedFileTasks.length > 0 && slimSidebarEnabled) {
-                <span class="badge bg-danger position-absolute top-0 end-0">{{tasksService.failedFileTasks.length}}</span>
+                <span class="badge bg-danger position-absolute top-0 end-0 d-none d-md-block">{{tasksService.failedFileTasks.length}}</span>
               }
             </a>
           </li>

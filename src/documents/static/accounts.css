@@ -26,30 +26,36 @@ body {
   --bs-btn-active-color: var(--pngx-primary-active);
 }
 
-.form-signin {
+.form-accounts {
   max-width: 330px;
 }
 
-#inputUsername,
-#inputPassword1 {
+.form-stacked-top input {
   margin-bottom: -1px;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
 }
 
-#inputUsername:focus {
+.form-stacked-middle input {
+  margin-bottom: -1px;
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.form-stacked-bottom input {
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+}
+
+.form-accounts .form-floating input:focus {
   position: relative;
   z-index: 100;
 }
 
-#inputUsername:focus~label {
+.form-accounts .form-floating input:focus~label {
   z-index: 101;
-}
-
-#inputPassword,
-#inputPassword2 {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
 }
 
 @media (prefers-color-scheme: dark) {

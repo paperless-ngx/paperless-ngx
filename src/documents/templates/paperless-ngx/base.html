@@ -1,0 +1,56 @@
+<!doctype html>
+{% load static i18n %}
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="author" content="Paperless-ngx project and contributors">
+        <meta name="robots" content="noindex,nofollow">
+
+        <title>
+            {% block head_title %}
+            {% endblock head_title %}
+        </title>
+        <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
+        <link href="{% static 'accounts.css' %}" rel="stylesheet">
+    </head>
+
+    <body class="text-center">
+        <div class="position-absolute top-50 start-50 translate-middle">
+            <form class="form-accounts" method="post">
+                {% csrf_token %}
+                {% include "paperless-ngx/snippets/svg_logo.html" with extra_attrs="width='300' class='logo mb-4'" %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.level_tag }}" role="alert">
+                    {{ message }}
+                    </div>
+                {% endfor %}
+                {% block form_top_content %}
+                {% endblock form_top_content %}
+                {% if form.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                {{ error }}
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                {% elif request.GET.sharelink_notfound %}
+                    <div class="alert alert-danger" role="alert">
+                    {% translate "Share link was not found." %}
+                    </div>
+                {% elif request.GET.sharelink_expired %}
+                    <div class="alert alert-danger" role="alert">
+                    {% translate "Share link has expired." %}
+                    </div>
+                {% endif %}
+
+                {% block form_content %}
+                {% endblock form_content %}
+            </form>
+            {% block after_form_content %}
+            {% endblock after_form_content %}
+        </div>
+    </body>
+</html>
