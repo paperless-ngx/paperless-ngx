@@ -118,4 +118,18 @@ describe('SelectComponent', () => {
     tick(3000)
     expect(clearSpy).toHaveBeenCalled()
   }))
+
+  it('should emit filtered documents', () => {
+    component.value = 10
+    component.items = items
+    const emitSpy = jest.spyOn(component.filterDocuments, 'emit')
+    component.onFilterDocuments()
+    expect(emitSpy).toHaveBeenCalledWith([items[2]])
+  })
+
+  it('should return the correct filter button title', () => {
+    component.title = 'Tag'
+    const expectedTitle = `Filter documents with this ${component.title}`
+    expect(component.filterButtonTitle).toEqual(expectedTitle)
+  })
 })

@@ -13,7 +13,6 @@ import {
   NgbModalModule,
   NgbModalRef,
   NgbPaginationModule,
-  NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { of, throwError } from 'rxjs'
 import { Tag } from 'src/app/data/tag'
@@ -24,7 +23,10 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { TagListComponent } from '../tag-list/tag-list.component'
 import { ManagementListComponent } from './management-list.component'
-import { PermissionsService } from 'src/app/services/permissions.service'
+import {
+  PermissionAction,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { EditDialogComponent } from '../../common/edit-dialog/edit-dialog.component'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
@@ -38,7 +40,6 @@ import { MATCH_NONE } from 'src/app/data/matching-model'
 import { MATCH_LITERAL } from 'src/app/data/matching-model'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
 import { BulkEditObjectOperation } from 'src/app/services/rest/abstract-name-filter-service'
 
 const tags: Tag[] = [
@@ -67,6 +68,7 @@ describe('ManagementListComponent', () => {
   let modalService: NgbModal
   let toastService: ToastService
   let documentListViewService: DocumentListViewService
+  let permissionsService: PermissionsService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -78,20 +80,8 @@ describe('ManagementListComponent', () => {
         SafeHtmlPipe,
         ConfirmDialogComponent,
         PermissionsDialogComponent,
-        ConfirmButtonComponent,
       ],
-      providers: [
-        {
-          provide: PermissionsService,
-          useValue: {
-            currentUserCan: () => true,
-            currentUserHasObjectPermissions: () => true,
-            currentUserOwnsObject: () => true,
-          },
-        },
-        DatePipe,
-        PermissionsGuard,
-      ],
+      providers: [DatePipe, PermissionsGuard],
       imports: [
         HttpClientTestingModule,
         NgbPaginationModule,
@@ -100,7 +90,6 @@ describe('ManagementListComponent', () => {
         NgbModalModule,
         RouterTestingModule.withRoutes(routes),
         NgxBootstrapIconsModule.pick(allIcons),
-        NgbPopoverModule,
       ],
     }).compileComponents()
 
@@ -119,6 +108,14 @@ describe('ManagementListComponent', () => {
           })
         }
       )
+    permissionsService = TestBed.inject(PermissionsService)
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    jest
+      .spyOn(permissionsService, 'currentUserHasObjectPermissions')
+      .mockReturnValue(true)
+    jest
+      .spyOn(permissionsService, 'currentUserOwnsObject')
+      .mockReturnValue(true)
     modalService = TestBed.inject(NgbModal)
     toastService = TestBed.inject(ToastService)
     documentListViewService = TestBed.inject(DocumentListViewService)
@@ -197,23 +194,27 @@ describe('ManagementListComponent', () => {
   })
 
   it('should support delete, show notification on error / success', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const deleteSpy = jest.spyOn(tagService, 'delete')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
-    const deleteButton = fixture.debugElement.query(
-      By.directive(ConfirmButtonComponent)
-    )
+    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[8]
+    deleteButton.triggerEventHandler('click')
+
+    expect(modal).not.toBeUndefined()
+    const editDialog = modal.componentInstance as ConfirmDialogComponent
 
     // fail first
     deleteSpy.mockReturnValueOnce(throwError(() => new Error('error deleting')))
-    deleteButton.nativeElement.dispatchEvent(new Event('confirm'))
+    editDialog.confirmClicked.emit()
     expect(toastErrorSpy).toHaveBeenCalled()
     expect(reloadSpy).not.toHaveBeenCalled()
 
     // succeed
     deleteSpy.mockReturnValueOnce(of(true))
-    deleteButton.nativeElement.dispatchEvent(new Event('confirm'))
+    editDialog.confirmClicked.emit()
     expect(reloadSpy).toHaveBeenCalled()
   })
 
@@ -311,5 +312,11 @@ describe('ManagementListComponent', () => {
     modal.componentInstance.confirmClicked.emit(null)
     expect(bulkEditSpy).toHaveBeenCalled()
     expect(successToastSpy).toHaveBeenCalled()
+  })
+
+  it('should disallow bulk permissions or delete objects if no global perms', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(false)
+    expect(component.userCanBulkEdit(PermissionAction.Delete)).toBeFalsy()
+    expect(component.userCanBulkEdit(PermissionAction.Change)).toBeFalsy()
   })
 })

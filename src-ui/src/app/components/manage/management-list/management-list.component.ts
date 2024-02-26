@@ -22,6 +22,7 @@ import {
 } from 'src/app/directives/sortable.directive'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
+  PermissionAction,
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
@@ -194,21 +195,34 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     ])
   }
 
-  deleteObject(object: T) {
-    this.service
-      .delete(object)
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe({
-        next: () => {
-          this.reloadData()
-        },
-        error: (error) => {
-          this.toastService.showError(
-            $localize`Error while deleting element`,
-            error
-          )
-        },
-      })
+  openDeleteDialog(object: T) {
+    var activeModal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    activeModal.componentInstance.title = $localize`Confirm delete`
+    activeModal.componentInstance.messageBold = this.getDeleteMessage(object)
+    activeModal.componentInstance.message = $localize`Associated documents will not be deleted.`
+    activeModal.componentInstance.btnClass = 'btn-danger'
+    activeModal.componentInstance.btnCaption = $localize`Delete`
+    activeModal.componentInstance.confirmClicked.subscribe(() => {
+      activeModal.componentInstance.buttonsEnabled = false
+      this.service
+        .delete(object)
+        .pipe(takeUntil(this.unsubscribeNotifier))
+        .subscribe({
+          next: () => {
+            activeModal.close()
+            this.reloadData()
+          },
+          error: (error) => {
+            activeModal.componentInstance.buttonsEnabled = true
+            this.toastService.showError(
+              $localize`Error while deleting element`,
+              error
+            )
+          },
+        })
+    })
   }
 
   get nameFilter() {
@@ -234,7 +248,9 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     )
   }
 
-  get userOwnsAll(): boolean {
+  userCanBulkEdit(action: PermissionAction): boolean {
+    if (!this.permissionsService.currentUserCan(action, this.permissionType))
+      return false
     let ownsAll: boolean = true
     const objects = this.data.filter((o) => this.selectedObjects.has(o.id))
     ownsAll = objects.every((o) =>
