@@ -51,6 +51,7 @@ from rest_framework.mixins import DestroyModelMixin
 from rest_framework.mixins import ListModelMixin
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.mixins import UpdateModelMixin
+from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -103,6 +104,7 @@ from documents.models import SavedView
 from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import UiSettings
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
@@ -1190,8 +1192,14 @@ class StoragePathViewSet(ModelViewSet, PassUserMixin):
 
 
 class UiSettingsView(GenericAPIView):
-    permission_classes = (IsAuthenticated,)
+    queryset = UiSettings.objects.all()
+    permission_classes = (IsAuthenticated, DjangoModelPermissions)
     serializer_class = UiSettingsViewSerializer
+
+    perms_map = {
+        "GET": ["%(app_label)s.view_%(model_name)s"],
+        "POST": ["%(app_label)s.change_%(model_name)s"],
+    }
 
     def get(self, request, format=None):
         serializer = self.get_serializer(data=request.data)
