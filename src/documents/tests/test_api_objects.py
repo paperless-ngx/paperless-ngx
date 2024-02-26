@@ -1,6 +1,7 @@
 import json
 from unittest import mock
 
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -310,7 +311,62 @@ class TestBulkEditObjects(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(StoragePath.objects.count(), 0)
 
-    def test_bulk_edit_object_permissions_insufficient_perms(self):
+    def test_bulk_edit_object_permissions_insufficient_global_perms(self):
+        """
+        GIVEN:
+            - Existing objects, user does not have global delete permissions
+        WHEN:
+            - bulk_edit_objects API endpoint is called with delete operation
+        THEN:
+            - User is not able to delete objects
+        """
+        self.client.force_authenticate(user=self.user1)
+
+        response = self.client.post(
+            "/api/bulk_edit_objects/",
+            json.dumps(
+                {
+                    "objects": [self.t1.id, self.t2.id],
+                    "object_type": "tags",
+                    "operation": "delete",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.content, b"Insufficient permissions")
+
+    def test_bulk_edit_object_permissions_sufficient_global_perms(self):
+        """
+        GIVEN:
+            - Existing objects, user does have global delete permissions
+        WHEN:
+            - bulk_edit_objects API endpoint is called with delete operation
+        THEN:
+            - User is able to delete objects
+        """
+        self.user1.user_permissions.add(
+            *Permission.objects.filter(codename="delete_tag"),
+        )
+        self.user1.save()
+        self.client.force_authenticate(user=self.user1)
+
+        response = self.client.post(
+            "/api/bulk_edit_objects/",
+            json.dumps(
+                {
+                    "objects": [self.t1.id, self.t2.id],
+                    "object_type": "tags",
+                    "operation": "delete",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_bulk_edit_object_permissions_insufficient_object_perms(self):
         """
         GIVEN:
             - Objects owned by user other than logged in user
@@ -319,8 +375,13 @@ class TestBulkEditObjects(APITestCase):
         THEN:
             - User is not able to delete objects
         """
-        self.t1.owner = User.objects.get(username="temp_admin")
-        self.t1.save()
+        self.t2.owner = User.objects.get(username="temp_admin")
+        self.t2.save()
+
+        self.user1.user_permissions.add(
+            *Permission.objects.filter(codename="delete_tag"),
+        )
+        self.user1.save()
         self.client.force_authenticate(user=self.user1)
 
         response = self.client.post(
