@@ -6,4 +6,5 @@ def settings(request):
         "EMAIL_ENABLED": django_settings.EMAIL_HOST != "localhost"
         or django_settings.EMAIL_HOST_USER != "",
         "DISABLE_REGULAR_LOGIN": django_settings.DISABLE_REGULAR_LOGIN,
+        "ACCOUNT_ALLOW_SIGNUPS": django_settings.ACCOUNT_ALLOW_SIGNUPS,
     }
