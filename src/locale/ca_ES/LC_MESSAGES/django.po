@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-14 16:47-0800\n"
-"PO-Revision-Date: 2024-02-15 00:52\n"
+"PO-Revision-Date: 2024-02-16 00:22\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -47,7 +47,7 @@ msgstr "Expressió Regular"
 
 #: documents/models.py:58 documents/models.py:902
 msgid "Fuzzy word"
-msgstr "Paraula difusa"
+msgstr "Paraula Difusa"
 
 #: documents/models.py:59
 msgid "Automatic"
@@ -930,11 +930,11 @@ msgstr "Paperless-ngx alta de xarxa social"
 #: documents/templates/socialaccount/signup.html:53
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
-msgstr ""
+msgstr "Estàs a punt d'emprar el teu %(provider_name)s compte per a fer login."
 
 #: documents/templates/socialaccount/signup.html:54
 msgid "As a final step, please complete the following form:"
-msgstr ""
+msgstr "Com a pas final, completa el següent formulari:"
 
 #: documents/templates/socialaccount/signup.html:72
 msgid "Sign up"
