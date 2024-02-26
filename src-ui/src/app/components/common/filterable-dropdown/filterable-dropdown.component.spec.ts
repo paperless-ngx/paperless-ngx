@@ -493,12 +493,17 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     expect(changedResult.getExcludedItems()).toEqual(items)
   }))
 
-  it('FilterableDropdownSelectionModel should sort items by state', () => {
-    component.items = items
+  it('selection model should sort items by state', () => {
+    component.items = items.concat([{ id: null, name: 'Null B' }])
     component.selectionModel = selectionModel
     selectionModel.toggle(items[1].id)
     selectionModel.apply()
-    expect(selectionModel.itemsSorted).toEqual([nullItem, items[1], items[0]])
+    expect(selectionModel.itemsSorted).toEqual([
+      nullItem,
+      { id: null, name: 'Null B' },
+      items[1],
+      items[0],
+    ])
   })
 
   it('should set support create, keep open model and call createRef method', fakeAsync(() => {
@@ -542,4 +547,34 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     tick(300)
     expect(createSpy).toHaveBeenCalled()
   }))
+
+  it('should exclude item and trigger change event', () => {
+    const id = 1
+    const state = ToggleableItemState.Selected
+    component.selectionModel = selectionModel
+    component.manyToOne = true
+    component.selectionModel.singleSelect = true
+    component.selectionModel.intersection = Intersection.Include
+    component.selectionModel['temporarySelectionStates'].set(id, state)
+    const changedSpy = jest.spyOn(component.selectionModel.changed, 'next')
+    component.selectionModel.exclude(id)
+    expect(component.selectionModel.temporaryLogicalOperator).toBe(
+      LogicalOperator.And
+    )
+    expect(component.selectionModel['temporarySelectionStates'].get(id)).toBe(
+      ToggleableItemState.Excluded
+    )
+    expect(component.selectionModel['temporarySelectionStates'].size).toBe(1)
+    expect(changedSpy).toHaveBeenCalled()
+  })
+
+  it('should initialize selection states and apply changes', () => {
+    selectionModel.items = items
+    const map = new Map<number, ToggleableItemState>()
+    map.set(1, ToggleableItemState.Selected)
+    map.set(2, ToggleableItemState.Excluded)
+    selectionModel.init(map)
+    expect(selectionModel.getSelectedItems()).toEqual([items[0]])
+    expect(selectionModel.getExcludedItems()).toEqual([items[1]])
+  })
 })
