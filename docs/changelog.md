@@ -1,5 +1,37 @@
 # Changelog
 
+## paperless-ngx 2.5.4
+
+### Bug Fixes
+
+- Fix: handle title placeholder for docs without original_filename [@shamoon](https://github.com/shamoon) ([#5828](https://github.com/paperless-ngx/paperless-ngx/pull/5828))
+- Fix: bulk edit objects does not respect global permissions [@shamoon](https://github.com/shamoon) ([#5888](https://github.com/paperless-ngx/paperless-ngx/pull/5888))
+- Fix: intermittent save \& close warnings [@shamoon](https://github.com/shamoon) ([#5838](https://github.com/paperless-ngx/paperless-ngx/pull/5838))
+- Fix: inotify read timeout not in ms [@grembo](https://github.com/grembo) ([#5876](https://github.com/paperless-ngx/paperless-ngx/pull/5876))
+- Fix: allow relative date queries not in quick list [@shamoon](https://github.com/shamoon) ([#5801](https://github.com/paperless-ngx/paperless-ngx/pull/5801))
+- Fix: pass rule id to consumed .eml files [@shamoon](https://github.com/shamoon) ([#5800](https://github.com/paperless-ngx/paperless-ngx/pull/5800))
+
+### Dependencies
+
+- Chore(deps): Bump cryptography from 42.0.2 to 42.0.4 [@dependabot](https://github.com/dependabot) ([#5851](https://github.com/paperless-ngx/paperless-ngx/pull/5851))
+- Chore(deps-dev): Bump ip from 2.0.0 to 2.0.1 in /src-ui [@dependabot](https://github.com/dependabot) ([#5835](https://github.com/paperless-ngx/paperless-ngx/pull/5835))
+- Chore(deps): Bump undici and [@<!---->angular-devkit/build-angular in /src-ui @dependabot](https://github.com/<!---->angular-devkit/build-angular in /src-ui @dependabot) ([#5796](https://github.com/paperless-ngx/paperless-ngx/pull/5796))
+
+### All App Changes
+
+<details>
+<summary>8 changes</summary>
+
+- Fix: handle title placeholder for docs without original_filename [@shamoon](https://github.com/shamoon) ([#5828](https://github.com/paperless-ngx/paperless-ngx/pull/5828))
+- Fix: bulk edit objects does not respect global permissions [@shamoon](https://github.com/shamoon) ([#5888](https://github.com/paperless-ngx/paperless-ngx/pull/5888))
+- Fix: intermittent save \& close warnings [@shamoon](https://github.com/shamoon) ([#5838](https://github.com/paperless-ngx/paperless-ngx/pull/5838))
+- Fix: inotify read timeout not in ms [@grembo](https://github.com/grembo) ([#5876](https://github.com/paperless-ngx/paperless-ngx/pull/5876))
+- Chore(deps-dev): Bump ip from 2.0.0 to 2.0.1 in /src-ui [@dependabot](https://github.com/dependabot) ([#5835](https://github.com/paperless-ngx/paperless-ngx/pull/5835))
+- Chore(deps): Bump undici and [@<!---->angular-devkit/build-angular in /src-ui @dependabot](https://github.com/<!---->angular-devkit/build-angular in /src-ui @dependabot) ([#5796](https://github.com/paperless-ngx/paperless-ngx/pull/5796))
+- Fix: allow relative date queries not in quick list [@shamoon](https://github.com/shamoon) ([#5801](https://github.com/paperless-ngx/paperless-ngx/pull/5801))
+- Fix: pass rule id to consumed .eml files [@shamoon](https://github.com/shamoon) ([#5800](https://github.com/paperless-ngx/paperless-ngx/pull/5800))
+</details>
+
 ## paperless-ngx 2.5.3
 
 ### Bug Fixes
