@@ -137,3 +137,19 @@ All team members are notified when mentioned or assigned to a relevant issue or 
 We are not overly strict with inviting people to the organization. If you have read the [team permissions](#permissions) and think having additional access would enhance your contributions, please reach out to an [admin](#structure) of the team.
 
 The admins occasionally invite contributors directly if we believe having them on a team will accelerate their work.
+
+# Automatic Respoistory Maintenance
+
+The Paperless-ngx team appreciates all effort and interest from the community in filing bug reports, creating feature requests, sharing ideas and helping other
+community members. That said, in an effort to keep the repository organized and managebale the project uses automatic handling of certain areas:
+
+- Issues that cannot be reproduced will be marked 'stale' after 7 days of inactivity and closed after 14 further days of inactivity.
+- Issues, pull requests and discussions that are closed will be locked after 30 days of inactivity.
+- Discussions with a marked answer will be automatically closed.
+- Discussions in the 'General' or 'Support' categories will be closed after 180 days of inactivity.
+- Feature requests that do not meet the following thresholds will be closed: 5 "up-votes" after 180 days of inactivity or 10 "up-votes" after 365 days.
+
+In all cases, threads can be re-opened by project maintainers and, of course, users can always create a new discussion for related concerns.
+Finally, remember that all information remains searchable and 'closed' feature requests can still serve as inspiration for new features.
+
+Thank you all for your contributions.

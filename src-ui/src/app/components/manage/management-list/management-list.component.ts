@@ -15,7 +15,10 @@ import {
   MATCH_NONE,
 } from 'src/app/data/matching-model'
 import { ObjectWithId } from 'src/app/data/object-with-id'
-import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
+import {
+  ObjectWithPermissions,
+  PermissionsObject,
+} from 'src/app/data/object-with-permissions'
 import {
   SortableDirective,
   SortEvent,
@@ -194,21 +197,34 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     ])
   }
 
-  deleteObject(object: T) {
-    this.service
-      .delete(object)
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe({
-        next: () => {
-          this.reloadData()
-        },
-        error: (error) => {
-          this.toastService.showError(
-            $localize`Error while deleting element`,
-            error
-          )
-        },
-      })
+  openDeleteDialog(object: T) {
+    var activeModal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    activeModal.componentInstance.title = $localize`Confirm delete`
+    activeModal.componentInstance.messageBold = this.getDeleteMessage(object)
+    activeModal.componentInstance.message = $localize`Associated documents will not be deleted.`
+    activeModal.componentInstance.btnClass = 'btn-danger'
+    activeModal.componentInstance.btnCaption = $localize`Delete`
+    activeModal.componentInstance.confirmClicked.subscribe(() => {
+      activeModal.componentInstance.buttonsEnabled = false
+      this.service
+        .delete(object)
+        .pipe(takeUntil(this.unsubscribeNotifier))
+        .subscribe({
+          next: () => {
+            activeModal.close()
+            this.reloadData()
+          },
+          error: (error) => {
+            activeModal.componentInstance.buttonsEnabled = true
+            this.toastService.showError(
+              $localize`Error while deleting element`,
+              error
+            )
+          },
+        })
+    })
   }
 
   get nameFilter() {

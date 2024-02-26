@@ -14,7 +14,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import GenericAPIView
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import DjangoObjectPermissions
+from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -171,7 +171,7 @@ class ApplicationConfigurationViewSet(ModelViewSet):
     queryset = ApplicationConfiguration.objects
 
     serializer_class = ApplicationConfigurationSerializer
-    permission_classes = (IsAuthenticated, DjangoObjectPermissions)
+    permission_classes = (IsAuthenticated, DjangoModelPermissions)
 
 
 class DisconnectSocialAccountView(GenericAPIView):

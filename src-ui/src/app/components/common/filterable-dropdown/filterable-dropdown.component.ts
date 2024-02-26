@@ -275,7 +275,7 @@ export class FilterableDropdownSelectionModel {
     )
   }
 
-  init(map) {
+  init(map: Map<number, ToggleableItemState>) {
     this.temporarySelectionStates = map
     this.apply()
   }

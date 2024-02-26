@@ -309,10 +309,15 @@ describe('SettingsComponent', () => {
     component.store.getValue()['displayLanguage'] = 'en-US'
     component.store.getValue()['updateCheckingEnabled'] = false
     component.settingsForm.value.displayLanguage = 'en-GB'
-    component.settingsForm.value.updateCheckingEnabled = true
-    jest.spyOn(settingsService, 'storeSettings').mockReturnValueOnce(of(true))
+    jest.spyOn(settingsService, 'storeSettings').mockReturnValue(of(true))
     component.saveSettings()
     expect(toast.actionName).toEqual('Reload now')
+
+    component.settingsForm.value.updateCheckingEnabled = true
+    component.saveSettings()
+
+    expect(toast.actionName).toEqual('Reload now')
+    toast.action()
   })
 
   it('should allow setting theme color, visually apply change immediately but not save', () => {
