@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-14 16:47-0800\n"
-"PO-Revision-Date: 2024-02-15 00:52\n"
+"PO-Revision-Date: 2024-02-24 00:25\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -47,7 +47,7 @@ msgstr "Wyrażenie regularne"
 
 #: documents/models.py:58 documents/models.py:902
 msgid "Fuzzy word"
-msgstr "Dopasowanie rozmyte"
+msgstr ""
 
 #: documents/models.py:59
 msgid "Automatic"
@@ -365,7 +365,7 @@ msgstr "zapytanie pełnotekstowe"
 
 #: documents/models.py:446
 msgid "more like this"
-msgstr "podobne dokumenty"
+msgstr ""
 
 #: documents/models.py:447
 msgid "has tags in"
@@ -930,11 +930,11 @@ msgstr "Zarejestruj w Paperless-ngx konto społecznościowe"
 #: documents/templates/socialaccount/signup.html:53
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
-msgstr ""
+msgstr "Zamierzasz użyć konta %(provider_name)s aby się zalogować."
 
 #: documents/templates/socialaccount/signup.html:54
 msgid "As a final step, please complete the following form:"
-msgstr ""
+msgstr "Na koniec należy wypełnić poniższy formularz:"
 
 #: documents/templates/socialaccount/signup.html:72
 msgid "Sign up"
