@@ -42,7 +42,7 @@ jobs:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       -
         name: Check files
-        uses: pre-commit/action@v3.0.0
+        uses: pre-commit/action@v3.0.1
 
   documentation:
     name: "Build & Deploy Documentation"
@@ -577,7 +577,7 @@ jobs:
       -
         name: Create Release and Changelog
         id: create-release
-        uses: release-drafter/release-drafter@v5
+        uses: release-drafter/release-drafter@v6
         with:
           name: Paperless-ngx ${{ steps.get_version.outputs.version }}
           tag: ${{ steps.get_version.outputs.version }}
