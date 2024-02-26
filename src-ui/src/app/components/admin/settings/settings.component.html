@@ -351,5 +351,5 @@
 
   <div [ngbNavOutlet]="nav" class="border-start border-end border-bottom p-3 mb-3 shadow-sm"></div>
 
-  <button type="submit" class="btn btn-primary mb-2" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.UISettings }" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
+  <button type="submit" class="btn btn-primary mb-2" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
 </form>
