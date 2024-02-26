@@ -56,8 +56,8 @@ if ! command -v docker &> /dev/null ; then
 	exit 1
 fi
 
-if ! command -v docker compose &> /dev/null ; then
-	echo "docker compose executable not found. Is docker compose installed?"
+if ! docker compose &> /dev/null ; then
+	echo "docker compose plugin not found. Is docker compose installed?"
 	exit 1
 fi
 
