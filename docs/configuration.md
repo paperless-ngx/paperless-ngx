@@ -572,6 +572,17 @@ system. See the corresponding
 
     Defaults to 'https'
 
+#### [`PAPERLESS_ACCOUNT_EMAIL_VERIFICATION=<string>`](#PAPERLESS_ACCOUNT_EMAIL_VERIFICATION) {#PAPERLESS_ACCOUNT_EMAIL_VERIFICATION}
+
+: Determines whether email addresses are verified during signup (as performed by Django allauth). See the relevant
+[paperless settings](#PAPERLESS_EMAIL_HOST) and [the allauth docs](https://docs.allauth.org/en/latest/account/configuration.html)
+
+    Defaults to 'optional'
+
+!!! note
+
+    If you do not have a working email server set up you should set this to 'none'.
+
 #### [`PAPERLESS_DISABLE_REGULAR_LOGIN=<bool>`](#PAPERLESS_DISABLE_REGULAR_LOGIN) {#PAPERLESS_DISABLE_REGULAR_LOGIN}
 
 : Disables the regular frontend username / password login, i.e. once you have setup SSO. Note that the Django admin login cannot be disabled.

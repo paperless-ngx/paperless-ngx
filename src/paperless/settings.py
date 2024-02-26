@@ -441,6 +441,11 @@ DISABLE_REGULAR_LOGIN = __get_boolean("PAPERLESS_DISABLE_REGULAR_LOGIN")
 
 AUTO_LOGIN_USERNAME = os.getenv("PAPERLESS_AUTO_LOGIN_USERNAME")
 
+ACCOUNT_EMAIL_VERIFICATION = os.getenv(
+    "PAPERLESS_ACCOUNT_EMAIL_VERIFICATION",
+    "optional",
+)
+
 if AUTO_LOGIN_USERNAME:
     _index = MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware")
     # This overrides everything the auth middleware is doing but still allows
