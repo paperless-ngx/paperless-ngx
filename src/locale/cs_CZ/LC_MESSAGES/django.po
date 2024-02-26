@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-14 16:47-0800\n"
-"PO-Revision-Date: 2024-02-15 00:52\n"
+"PO-Revision-Date: 2024-02-16 12:08\n"
 "Last-Translator: \n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -365,7 +365,7 @@ msgstr "Fulltextový dotaz"
 
 #: documents/models.py:446
 msgid "more like this"
-msgstr "Podobné"
+msgstr "podobné"
 
 #: documents/models.py:447
 msgid "has tags in"
