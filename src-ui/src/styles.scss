@@ -262,7 +262,7 @@ a.btn-link:focus-visible,
     }
 
     .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
-      background-color: var(--pngx-bg-darker) !important;
+      background-color: var(--pngx-bg-alt) !important;
       color: var(--pngx-body-color-accent) !important;
     }
 
@@ -439,7 +439,7 @@ ul.pagination {
     color: var(--bs-body-color);
 
     &:hover, &:focus {
-      background-color: var(--pngx-bg-darker);
+      background-color: var(--pngx-bg-alt);
       color: var(--bs-body-color);
     }
 

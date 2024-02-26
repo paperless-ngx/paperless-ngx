@@ -76,12 +76,26 @@ describe(`Additional service tests for MailRuleService`, () => {
   it('should support patchMany', () => {
     subscription = service.patchMany(mail_rules).subscribe()
     mail_rules.forEach((mail_rule) => {
-      const reqs = httpTestingController.match(
+      const req = httpTestingController.expectOne(
         `${environment.apiBaseUrl}${endpoint}/${mail_rule.id}/`
       )
-      expect(reqs).toHaveLength(1)
-      expect(reqs[0].request.method).toEqual('PATCH')
+      expect(req.request.method).toEqual('PATCH')
+      req.flush(mail_rule)
     })
+    const reloadReq = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
+    )
+    reloadReq.flush({ results: mail_rules })
+  })
+
+  it('should support reload', () => {
+    service['reload']()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
+    )
+    expect(req.request.method).toEqual('GET')
+    req.flush({ results: mail_rules })
+    expect(service.allRules).toEqual(mail_rules)
   })
 
   beforeEach(() => {

@@ -381,6 +381,28 @@ describe('FilterEditorComponent', () => {
     expect(component.textFilter).toBeNull()
   }))
 
+  it('should ingest text filter content with relative dates that are not in quick list', fakeAsync(() => {
+    expect(component.dateAddedRelativeDate).toBeNull()
+    component.filterRules = [
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'added:[-2 week to now]',
+      },
+    ]
+    expect(component.dateAddedRelativeDate).toBeNull()
+    expect(component.textFilter).toEqual('added:[-2 week to now]')
+
+    expect(component.dateCreatedRelativeDate).toBeNull()
+    component.filterRules = [
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'created:[-2 week to now]',
+      },
+    ]
+    expect(component.dateCreatedRelativeDate).toBeNull()
+    expect(component.textFilter).toEqual('created:[-2 week to now]')
+  }))
+
   it('should ingest text filter rules for more like', fakeAsync(() => {
     const moreLikeSpy = jest.spyOn(documentService, 'get')
     moreLikeSpy.mockReturnValue(of({ id: 1, title: 'Foo Bar' }))
@@ -1368,6 +1390,34 @@ describe('FilterEditorComponent', () => {
       {
         rule_type: FILTER_FULLTEXT_QUERY,
         value: 'foo,created:[-1 week to now]',
+      },
+    ])
+  }))
+
+  it('should leave relative dates not in quick list intact', fakeAsync(() => {
+    component.textFilterInput.nativeElement.value = 'created:[-2 week to now]'
+    component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
+    const textFieldTargetDropdown = fixture.debugElement.queryAll(
+      By.directive(NgbDropdownItem)
+    )[4]
+    textFieldTargetDropdown.triggerEventHandler('click')
+    fixture.detectChanges()
+    tick(400)
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'created:[-2 week to now]',
+      },
+    ])
+
+    component.textFilterInput.nativeElement.value = 'added:[-2 month to now]'
+    component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
+    fixture.detectChanges()
+    tick(400)
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'added:[-2 month to now]',
       },
     ])
   }))

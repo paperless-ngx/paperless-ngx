@@ -575,7 +575,11 @@ def run_workflow(
                                 else ""
                             ),
                             timezone.localtime(document.added),
-                            document.original_filename,
+                            (
+                                document.original_filename
+                                if document.original_filename is not None
+                                else ""
+                            ),
                             timezone.localtime(document.created),
                         )
                     except Exception:
