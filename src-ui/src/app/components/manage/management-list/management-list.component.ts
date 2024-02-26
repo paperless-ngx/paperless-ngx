@@ -15,16 +15,14 @@ import {
   MATCH_NONE,
 } from 'src/app/data/matching-model'
 import { ObjectWithId } from 'src/app/data/object-with-id'
-import {
-  ObjectWithPermissions,
-  PermissionsObject,
-} from 'src/app/data/object-with-permissions'
+import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import {
   SortableDirective,
   SortEvent,
 } from 'src/app/directives/sortable.directive'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
+  PermissionAction,
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
@@ -250,7 +248,9 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     )
   }
 
-  get userOwnsAll(): boolean {
+  userCanBulkEdit(action: PermissionAction): boolean {
+    if (!this.permissionsService.currentUserCan(action, this.permissionType))
+      return false
     let ownsAll: boolean = true
     const objects = this.data.filter((o) => this.selectedObjects.has(o.id))
     ownsAll = objects.every((o) =>
