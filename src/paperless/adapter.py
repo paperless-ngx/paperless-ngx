@@ -1,3 +1,5 @@
+from urllib.parse import quote
+
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.core import context
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
@@ -44,6 +46,20 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             return url_has_allowed_host_and_scheme(url, allowed_hosts=allowed_hosts)
 
         return url_has_allowed_host_and_scheme(url, allowed_hosts=allowed_hosts)
+
+    def get_reset_password_from_key_url(self, key):
+        """
+        Return the URL to reset a password e.g. in reset email.
+        """
+        if settings.PAPERLESS_URL is None:
+            return super().get_reset_password_from_key_url(key)
+        else:
+            path = reverse(
+                "account_reset_password_from_key",
+                kwargs={"uidb36": "UID", "key": "KEY"},
+            )
+            path = path.replace("UID-KEY", quote(key))
+            return settings.PAPERLESS_URL + path
 
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):

@@ -61,6 +61,27 @@ class TestCustomAccountAdapter(TestCase):
         with self.assertRaises(ValidationError):
             adapter.pre_authenticate(request)
 
+    def test_get_reset_password_from_key_url(self):
+        request = HttpRequest()
+        request.get_host = mock.Mock(return_value="foo.org")
+        with context.request_context(request):
+            adapter = get_adapter()
+
+            # Test when PAPERLESS_URL is None
+            expected_url = f"https://foo.org{reverse('account_reset_password_from_key', kwargs={'uidb36': 'UID', 'key': 'KEY'})}"
+            self.assertEqual(
+                adapter.get_reset_password_from_key_url("UID-KEY"),
+                expected_url,
+            )
+
+            # Test when PAPERLESS_URL is not None
+            with override_settings(PAPERLESS_URL="https://bar.com"):
+                expected_url = f"https://bar.com{reverse('account_reset_password_from_key', kwargs={'uidb36': 'UID', 'key': 'KEY'})}"
+                self.assertEqual(
+                    adapter.get_reset_password_from_key_url("UID-KEY"),
+                    expected_url,
+                )
+
 
 class TestCustomSocialAccountAdapter(TestCase):
     def test_is_open_for_signup(self):
