@@ -838,7 +838,7 @@ class CustomFieldInstance(models.Model):
 
     value_float = models.FloatField(null=True)
 
-    value_monetary = models.DecimalField(null=True, decimal_places=2, max_digits=12)
+    value_monetary = models.CharField(null=True, max_length=128)
 
     value_document_ids = models.JSONField(null=True)
 

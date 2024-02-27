@@ -142,14 +142,12 @@
                       [error]="getCustomFieldError(i)"></pngx-input-number>
                     }
                     @case (CustomFieldDataType.Monetary) {
-                      <pngx-input-number formControlName="value"
+                      <pngx-input-monetary formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
                       [removable]="userIsOwner"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
-                      [showAdd]="false"
-                      [step]=".01"
-                      [error]="getCustomFieldError(i)"></pngx-input-number>
+                      [error]="getCustomFieldError(i)"></pngx-input-monetary>
                     }
                     @case (CustomFieldDataType.Boolean) {
                       <pngx-input-check formControlName="value"

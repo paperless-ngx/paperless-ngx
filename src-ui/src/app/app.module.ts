@@ -113,6 +113,7 @@ import { ConfigComponent } from './components/admin/config/config.component'
 import { FileComponent } from './components/common/input/file/file.component'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { ConfirmButtonComponent } from './components/common/confirm-button/confirm-button.component'
+import { MonetaryComponent } from './components/common/input/monetary/monetary.component'
 import {
   archive,
   arrowCounterclockwise,
@@ -443,6 +444,7 @@ function initializeApp(settings: SettingsService) {
     ConfigComponent,
     FileComponent,
     ConfirmButtonComponent,
+    MonetaryComponent,
   ],
   imports: [
     BrowserModule,
