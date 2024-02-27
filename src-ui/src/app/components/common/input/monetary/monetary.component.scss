@@ -1,0 +1,11 @@
+.input-group-text {
+    font-size: inherit;
+}
+
+.text-muted:focus-within {
+    color: var(--bs-body-color) !important;
+}
+
+.mw-60 {
+    max-width: 60px;
+}
