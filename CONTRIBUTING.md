@@ -138,7 +138,7 @@ We are not overly strict with inviting people to the organization. If you have r
 
 The admins occasionally invite contributors directly if we believe having them on a team will accelerate their work.
 
-# Automatic Respoistory Maintenance
+# Automatic Repository Maintenance
 
 The Paperless-ngx team appreciates all effort and interest from the community in filing bug reports, creating feature requests, sharing ideas and helping other
 community members. That said, in an effort to keep the repository organized and managebale the project uses automatic handling of certain areas:
