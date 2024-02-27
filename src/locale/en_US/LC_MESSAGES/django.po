@@ -777,12 +777,12 @@ msgstr ""
 msgid "Invalid color."
 msgstr ""
 
-#: documents/serialisers.py:1061
+#: documents/serialisers.py:1073
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr ""
 
-#: documents/serialisers.py:1164
+#: documents/serialisers.py:1176
 msgid "Invalid variable detected."
 msgstr ""
 

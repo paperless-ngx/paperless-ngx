@@ -12,6 +12,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import DecimalValidator
 from django.core.validators import MaxLengthValidator
+from django.core.validators import RegexValidator
 from django.core.validators import integer_validator
 from django.utils import timezone
 from django.utils.crypto import get_random_string
@@ -528,9 +529,17 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
             elif field.data_type == CustomField.FieldDataType.INT:
                 integer_validator(data["value"])
             elif field.data_type == CustomField.FieldDataType.MONETARY:
-                DecimalValidator(max_digits=12, decimal_places=2)(
-                    Decimal(str(data["value"])),
-                )
+                try:
+                    # First try to validate as a number from legacy format
+                    DecimalValidator(max_digits=12, decimal_places=2)(
+                        Decimal(str(data["value"])),
+                    )
+                except Exception:
+                    # If that fails, try to validate as a monetary string
+                    RegexValidator(
+                        regex=r"^[A-Z][A-Z][A-Z]\d+(\.\d{2,2})$",
+                        message="Must be a two-decimal number with optional currency code e.g. GBP123.45",
+                    )(data["value"])
             elif field.data_type == CustomField.FieldDataType.STRING:
                 MaxLengthValidator(limit_value=128)(data["value"])
 
