@@ -90,13 +90,13 @@ initialize() {
 		fi
 	done
 
-	local -r tmp_dir="/tmp/paperless"
-	echo "Creating directory ${tmp_dir}"
+	local -r tmp_dir="${PAPERLESS_SCRATCH_DIR:=/tmp/paperless}"
+	echo "Creating directory scratch directory ${tmp_dir}"
 	mkdir --parents "${tmp_dir}"
 
 	set +e
 	echo "Adjusting permissions of paperless files. This may take a while."
-	chown -R paperless:paperless ${tmp_dir}
+	chown -R paperless:paperless "${tmp_dir}"
 	for dir in \
 		"${export_dir}" \
 		"${DATA_DIR}" \
