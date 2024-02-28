@@ -732,7 +732,7 @@ class Consumer(LoggingMixin):
 
         storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
-        title = file_info.title[:127]
+        title = file_info.title
         if self.override_title is not None:
             try:
                 title = self._parse_title_placeholders(self.override_title)
@@ -742,7 +742,7 @@ class Consumer(LoggingMixin):
                 )
 
         document = Document.objects.create(
-            title=title,
+            title=title[:127],
             content=text,
             mime_type=mime_type,
             checksum=hashlib.md5(self.working_copy.read_bytes()).hexdigest(),
