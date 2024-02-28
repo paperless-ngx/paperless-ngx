@@ -161,8 +161,11 @@ class CustomFieldsFilter(Filter):
                 | qs.filter(custom_fields__value_text__icontains=value)
                 | qs.filter(custom_fields__value_bool__icontains=value)
                 | qs.filter(custom_fields__value_int__icontains=value)
+                | qs.filter(custom_fields__value_float__icontains=value)
                 | qs.filter(custom_fields__value_date__icontains=value)
                 | qs.filter(custom_fields__value_url__icontains=value)
+                | qs.filter(custom_fields__value_monetary__icontains=value)
+                | qs.filter(custom_fields__value_document_ids__icontains=value)
             )
         else:
             return qs
