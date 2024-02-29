@@ -5,6 +5,7 @@ from collections import Counter
 from contextlib import contextmanager
 from datetime import datetime
 from datetime import timezone
+from shutil import rmtree
 from typing import Optional
 
 from dateutil.parser import isoparse
@@ -36,7 +37,6 @@ from whoosh.searching import Searcher
 from whoosh.util.times import timespan
 from whoosh.writing import AsyncWriter
 
-# from documents.models import CustomMetadata
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import Note
@@ -87,8 +87,11 @@ def open_index(recreate=False) -> FileIndex:
     except Exception:
         logger.exception("Error while opening the index, recreating.")
 
-    if not os.path.isdir(settings.INDEX_DIR):
-        settings.INDEX_DIR.mkdir(parents=True, exist_ok=True)
+    # create_in doesn't handle corrupted indexes very well, remove the directory entirely first
+    if os.path.isdir(settings.INDEX_DIR):
+        rmtree(settings.INDEX_DIR)
+    settings.INDEX_DIR.mkdir(parents=True, exist_ok=True)
+
     return create_in(settings.INDEX_DIR, get_schema())
 
 
