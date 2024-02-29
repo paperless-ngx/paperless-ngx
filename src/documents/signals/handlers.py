@@ -22,6 +22,7 @@ from django.utils import timezone
 from filelock import FileLock
 
 from documents import matching
+from documents.caching import clear_metadata_cache
 from documents.classifier import DocumentClassifier
 from documents.consumer import parse_doc_title_w_placeholders
 from documents.file_handling import create_source_path_directory
@@ -434,7 +435,9 @@ def update_filename_and_move_files(sender, instance: Document, **kwargs):
             Document.objects.filter(pk=instance.pk).update(
                 filename=instance.filename,
                 archive_filename=instance.archive_filename,
+                modified=timezone.now(),
             )
+            clear_metadata_cache(instance.pk)
 
         except (OSError, DatabaseError, CannotMoveFilesException) as e:
             logger.warning(f"Exception during file handling: {e}")
