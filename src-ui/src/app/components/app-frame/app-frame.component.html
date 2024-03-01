@@ -13,7 +13,7 @@
         d="M194.7,0C164.22,70.94,17.64,79.74,64.55,194.06c.58,1.47-10.85,17-18.47,29.9-1.76-6.45-3.81-13.48-3.52-14.07,38.11-45.14-27.26-70.65-30.78-107.58C-4.64,131.62-10.5,182.92,39,212.53c.3,0,2.64,11.14,3.81,16.71a58.55,58.55,0,0,0-2.93,6.45c-1.17,2.93,7.62,2.64,7.62,3.22.88-.29,21.7-36.93,22.28-37.23C187.67,174.72,208.48,68.6,194.7,0ZM134.61,74.75C79.5,124,70.12,160.64,71.88,178.53,53.41,134.85,107.64,86.77,134.61,74.75ZM28.2,145.11c10.55,9.67,28.14,39.28,13.19,56.57C44.91,193.77,46.08,175.89,28.2,145.11Z"
         transform="translate(0 0)" />
     </svg>
-    <div class="ms-3 d-inline-block" [class.d-md-none]="slimSidebarEnabled">
+    <div class="ms-2 ms-md-3 d-inline-block" [class.d-md-none]="slimSidebarEnabled">
       @if (customAppTitle?.length) {
         <div class="d-flex flex-column align-items-start">
           <span class="title">{{customAppTitle}}</span>
@@ -27,7 +27,7 @@
   <div class="search-form-container flex-grow-1 py-2 pb-3 pb-sm-2 px-3 ps-md-4 me-sm-auto order-3 order-sm-1"
     *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
     <form (ngSubmit)="search()" class="form-inline flex-grow-1">
-      <i-bs style="top: .25em;" width="1em" height="1em" name="search"></i-bs>
+      <i-bs width="1em" height="1em" name="search"></i-bs>
       <input class="form-control form-control-sm" type="text" placeholder="Search documents" aria-label="Search"
         [formControl]="searchField" [ngbTypeahead]="searchAutoComplete" (keyup)="searchFieldKeyup($event)"
         (selectItem)="itemSelected($event)" i18n-placeholder>

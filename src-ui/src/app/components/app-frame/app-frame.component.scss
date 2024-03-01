@@ -262,9 +262,15 @@ main {
     > i-bs {
       position: absolute;
       left: 0.6rem;
-      top: 0.5rem;
+      top: .35rem;
       color: rgba(255, 255, 255, 0.6);
+
+      @media screen and (min-width: 768px) {
+        // adjust for smaller font size on non-mobile
+        top: 0.25rem;
+      }
     }
+
   }
 
 
