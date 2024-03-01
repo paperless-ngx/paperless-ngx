@@ -183,7 +183,7 @@ export class DocumentService extends AbstractPaperlessService<Document> {
   update(o: Document): Observable<Document> {
     // we want to only set created_date
     o.created = undefined
-    o.remove_inbox_tags = this.settingsService.get(
+    o.remove_inbox_tags = !!this.settingsService.get(
       SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS
     )
     return super.update(o)
