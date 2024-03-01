@@ -665,6 +665,8 @@ class DocumentSerializer(
     remove_inbox_tags = serializers.BooleanField(
         default=False,
         write_only=True,
+        allow_null=True,
+        required=False,
     )
 
     def get_original_file_name(self, obj):
