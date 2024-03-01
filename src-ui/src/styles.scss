@@ -320,6 +320,17 @@ textarea,
     background-color: var(--pngx-bg-darker);
     color: var(--bs-body-color);
   }
+
+  @media(max-width: 768px) {
+    font-size: 1rem;
+  }
+}
+
+.input-group .form-control-sm {
+  // accommodate larger font size on mobile
+  padding-top: .15rem;
+  padding-bottom: .15rem;
+  min-height: calc(1.3em + 0.5rem + calc(var(--bs-border-width) * 2)) !important;
 }
 
 .input-group .btn-outline-secondary {
