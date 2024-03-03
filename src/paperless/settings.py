@@ -351,11 +351,19 @@ if __get_boolean("PAPERLESS_ENABLE_COMPRESSION", "yes"):  # pragma: no cover
 
 ROOT_URLCONF = "paperless.urls"
 
-FORCE_SCRIPT_NAME = os.getenv("PAPERLESS_FORCE_SCRIPT_NAME")
-BASE_URL = (FORCE_SCRIPT_NAME or "") + "/"
-LOGIN_URL = BASE_URL + "accounts/login/"
-LOGIN_REDIRECT_URL = "/dashboard"
-LOGOUT_REDIRECT_URL = os.getenv("PAPERLESS_LOGOUT_REDIRECT_URL")
+
+def _parse_base_paths() -> tuple[str, str, str, str, str]:
+    script_name = os.getenv("PAPERLESS_FORCE_SCRIPT_NAME")
+    base_url = (script_name or "") + "/"
+    login_url = base_url + "accounts/login/"
+    login_redirect_url = base_url + "dashboard"
+    logout_redirect_url = os.getenv("PAPERLESS_LOGOUT_REDIRECT_URL", base_url)
+    return script_name, base_url, login_url, login_redirect_url, logout_redirect_url
+
+
+FORCE_SCRIPT_NAME, BASE_URL, LOGIN_URL, LOGIN_REDIRECT_URL, LOGOUT_REDIRECT_URL = (
+    _parse_base_paths()
+)
 
 WSGI_APPLICATION = "paperless.wsgi.application"
 ASGI_APPLICATION = "paperless.asgi.application"
