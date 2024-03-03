@@ -118,6 +118,7 @@ import { SystemStatusDialogComponent } from './components/common/system-status-d
 import { NgxFilesizeModule } from 'ngx-filesize'
 import { RotateConfirmDialogComponent } from './components/common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { MergeConfirmDialogComponent } from './components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
+import { SplitConfirmDialogComponent } from './components/common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
 import {
   airplane,
   archive,
@@ -193,6 +194,7 @@ import {
   plus,
   plusCircle,
   questionCircle,
+  scissors,
   search,
   slashCircle,
   sliders2Vertical,
@@ -286,6 +288,7 @@ const icons = {
   plus,
   plusCircle,
   questionCircle,
+  scissors,
   search,
   slashCircle,
   sliders2Vertical,
@@ -468,6 +471,7 @@ function initializeApp(settings: SettingsService) {
     SystemStatusDialogComponent,
     RotateConfirmDialogComponent,
     MergeConfirmDialogComponent,
+    SplitConfirmDialogComponent,
   ],
   imports: [
     BrowserModule,

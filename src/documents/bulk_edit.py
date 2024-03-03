@@ -212,31 +212,13 @@ def merge(doc_ids: list[int], metadata_document_id: Optional[int] = None):
     )
     merged_pdf.save(filepath)
 
-    overrides = DocumentMetadataOverrides()
-
     if metadata_document_id:
         metadata_document = qs.get(id=metadata_document_id)
         if metadata_document is not None:
+            overrides = DocumentMetadataOverrides.from_document(metadata_document)
             overrides.title = metadata_document.title + " (merged)"
-            overrides.correspondent_id = (
-                metadata_document.correspondent.pk
-                if metadata_document.correspondent
-                else None
-            )
-            overrides.document_type_id = (
-                metadata_document.document_type.pk
-                if metadata_document.document_type
-                else None
-            )
-            overrides.storage_path_id = (
-                metadata_document.storage_path.pk
-                if metadata_document.storage_path
-                else None
-            )
-            overrides.tag_ids = list(
-                metadata_document.tags.values_list("id", flat=True),
-            )
-            # Include owner and permissions?
+    else:
+        overrides = DocumentMetadataOverrides()
 
     logger.info("Adding merged document to the task queue.")
     consume_file.delay(
@@ -246,5 +228,44 @@ def merge(doc_ids: list[int], metadata_document_id: Optional[int] = None):
         ),
         overrides,
     )
+
+    return "OK"
+
+
+def split(doc_ids: list[int], pages: list[list[int]]):
+    logger.info(
+        f"Attempting to split document {doc_ids[0]} into {len(pages)} documents",
+    )
+    doc = Document.objects.get(id=doc_ids[0])
+    import pikepdf
+
+    path = os.path.join(settings.ORIGINALS_DIR, str(doc.filename))
+    try:
+        with pikepdf.open(path, allow_overwriting_input=True) as pdf:
+            for idx, split_doc in enumerate(pages):
+                dst = pikepdf.new()
+                for page in split_doc:
+                    dst.pages.append(pdf.pages[page - 1])
+                filepath = os.path.join(
+                    settings.CONSUMPTION_DIR,
+                    f"{doc.filename}_{split_doc[0]}-{split_doc[-1]}.pdf",
+                )
+
+                dst.save(filepath)
+
+                overrides = DocumentMetadataOverrides().from_document(doc)
+                overrides.title = f"{doc.title} (split {idx + 1})"
+                logger.info(
+                    f"Adding split document with pages {split_doc} to the task queue.",
+                )
+                consume_file.delay(
+                    ConsumableDocument(
+                        source=DocumentSource.ConsumeFolder,
+                        original_file=filepath,
+                    ),
+                    overrides,
+                )
+    except Exception as e:
+        logger.exception(f"Error splitting document {doc.id}", e)
 
     return "OK"
