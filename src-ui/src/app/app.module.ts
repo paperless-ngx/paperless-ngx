@@ -117,6 +117,7 @@ import { MonetaryComponent } from './components/common/input/monetary/monetary.c
 import { SystemStatusDialogComponent } from './components/common/system-status-dialog/system-status-dialog.component'
 import { NgxFilesizeModule } from 'ngx-filesize'
 import { RotateConfirmDialogComponent } from './components/common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
+import { MergeConfirmDialogComponent } from './components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
 import {
   airplane,
   archive,
@@ -177,6 +178,7 @@ import {
   hddStack,
   house,
   infoCircle,
+  journals,
   link,
   listTask,
   listUl,
@@ -269,6 +271,7 @@ const icons = {
   hddStack,
   house,
   infoCircle,
+  journals,
   link,
   listTask,
   listUl,
@@ -464,6 +467,7 @@ function initializeApp(settings: SettingsService) {
     MonetaryComponent,
     SystemStatusDialogComponent,
     RotateConfirmDialogComponent,
+    MergeConfirmDialogComponent,
   ],
   imports: [
     BrowserModule,

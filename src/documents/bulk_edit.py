@@ -2,15 +2,20 @@ import hashlib
 import itertools
 import logging
 import os
+from typing import Optional
 
 from django.db.models import Q
 
+from documents.data_models import ConsumableDocument
+from documents.data_models import DocumentMetadataOverrides
+from documents.data_models import DocumentSource
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.permissions import set_permissions_for_object
 from documents.tasks import bulk_update_documents
+from documents.tasks import consume_file
 from documents.tasks import update_document_archive_file
 from paperless import settings
 
@@ -177,5 +182,69 @@ def rotate(doc_ids: list[int], degrees: int):
 
     if len(affected_docs) > 0:
         bulk_update_documents.delay(document_ids=affected_docs)
+
+    return "OK"
+
+
+def merge(doc_ids: list[int], metadata_document_id: Optional[int] = None):
+    qs = Document.objects.filter(id__in=doc_ids)
+    import pikepdf
+
+    merged_pdf = pikepdf.new()
+    # use doc_ids to preserve order
+    for doc_id in doc_ids:
+        doc = qs.get(id=doc_id)
+        if doc is None:
+            continue
+        path = os.path.join(settings.ORIGINALS_DIR, str(doc.filename))
+        try:
+            with pikepdf.open(path, allow_overwriting_input=True) as pdf:
+                merged_pdf.pages.extend(pdf.pages)
+        except Exception as e:
+            logger.exception(
+                f"Error merging document {doc.id}, it will not be included in the merge",
+                e,
+            )
+
+    filepath = os.path.join(
+        settings.CONSUMPTION_DIR,
+        f"merged_{('_'.join([str(doc_id) for doc_id in doc_ids]))[:100]}.pdf",
+    )
+    merged_pdf.save(filepath)
+
+    overrides = DocumentMetadataOverrides()
+
+    if metadata_document_id:
+        metadata_document = qs.get(id=metadata_document_id)
+        if metadata_document is not None:
+            overrides.title = metadata_document.title + " (merged)"
+            overrides.correspondent_id = (
+                metadata_document.correspondent.pk
+                if metadata_document.correspondent
+                else None
+            )
+            overrides.document_type_id = (
+                metadata_document.document_type.pk
+                if metadata_document.document_type
+                else None
+            )
+            overrides.storage_path_id = (
+                metadata_document.storage_path.pk
+                if metadata_document.storage_path
+                else None
+            )
+            overrides.tag_ids = list(
+                metadata_document.tags.values_list("id", flat=True),
+            )
+            # Include owner and permissions?
+
+    logger.info("Adding merged document to the task queue.")
+    consume_file.delay(
+        ConsumableDocument(
+            source=DocumentSource.ConsumeFolder,
+            original_file=filepath,
+        ),
+        overrides,
+    )
 
     return "OK"

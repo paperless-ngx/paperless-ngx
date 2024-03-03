@@ -870,6 +870,7 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
             "redo_ocr",
             "set_permissions",
             "rotate",
+            "merge",
         ],
         label="Method",
         write_only=True,
@@ -909,6 +910,8 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
             return bulk_edit.set_permissions
         elif method == "rotate":
             return bulk_edit.rotate
+        elif method == "merge":
+            return bulk_edit.merge
         else:
             raise serializers.ValidationError("Unsupported method.")
 

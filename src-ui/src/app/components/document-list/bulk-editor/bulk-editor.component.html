@@ -94,6 +94,9 @@
                 <button ngbDropdownItem (click)="rotateSelected()" [disabled]="!userCanEditAll">
                   <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
                 </button>
+                <button ngbDropdownItem (click)="mergeSelected()" [disabled]="!userCanEditAll || list.selected.size < 2">
+                  <i-bs name="journals"></i-bs>&nbsp;<ng-container i18n>Merge</ng-container>
+                </button>
               </div>
             </div>
           </div>
