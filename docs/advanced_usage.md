@@ -695,4 +695,10 @@ More details about configuration option for various providers can be found in th
 
 ### Disabling Regular Login
 
-Once external auth is set up, 'regular' login can be disabled with the [PAPERLESS_DISABLE_REGULAR_LOGIN](configuration.md#PAPERLESS_DISABLE_REGULAR_LOGIN) setting.
+Once external auth is set up, 'regular' login can be disabled with the [PAPERLESS_DISABLE_REGULAR_LOGIN](configuration.md#PAPERLESS_DISABLE_REGULAR_LOGIN) setting. This setting will not black access to the built-in Django login form at `/admin/login`. To block access to that page, consider blocking it in your web server configuration. For example, with Nginx, try:
+
+```
+location /admin/login {
+  return 403;
+}
+```
