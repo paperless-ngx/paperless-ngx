@@ -320,6 +320,7 @@ Paperless provides the following placeholders within filenames:
 - `{owner_username}`: Username of document owner, if any, or "none"
 - `{original_name}`: Document original filename, minus the extension, if any, or "none"
 - `{doc_pk}`: The paperless identifier (primary key) for the document.
+- `{customfield<id_of_custom_field>}`: Content of custom field. Replace <id_of_custom_field> with the id of the custom_field. If custom field is not assigned to document, "-none-" will be set.
 
 Paperless will try to conserve the information from your database as
 much as possible. However, some characters that you can use in document
