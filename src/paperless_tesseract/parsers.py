@@ -299,10 +299,11 @@ class RasterisedDocumentParser(DocumentParser):
         ):
             # Convert pixels to mega-pixels and provide to ocrmypdf
             max_pixels_mpixels = self.settings.max_image_pixel / 1_000_000.0
-            if max_pixels_mpixels == 0:
-                msg = "OCR pixel limit is disabled!"
-            else:
-                msg = f"Calculated {max_pixels_mpixels} megapixels for OCR"
+            msg = (
+                "OCR pixel limit is disabled!"
+                if max_pixels_mpixels == 0
+                else f"Calculated {max_pixels_mpixels} megapixels for OCR"
+            )
             self.log.debug(msg)
             ocrmypdf_args["max_image_mpixels"] = max_pixels_mpixels
 
