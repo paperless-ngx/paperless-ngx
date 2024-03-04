@@ -122,41 +122,60 @@ class WorkflowTriggerPlugin(
                         # Removal actions overwrite the current overrides
                         if action.remove_all_tags:
                             overrides.tag_ids = []
-                        elif action.remove_tags.all().count() > 0:
+                        elif (
+                            action.remove_tags.all().count() > 0
+                            and len(overrides.tag_ids) > 0
+                        ):
                             for tag in action.remove_tags.all():
-                                overrides.tag_ids.remove(tag.pk)
+                                if tag.pk in overrides.tag_ids:
+                                    overrides.tag_ids.remove(tag.pk)
 
                         if action.remove_all_correspondents:
                             overrides.correspondent_id = None
-                        elif action.remove_correspondents.all().count() > 0:
+                        elif (
+                            action.remove_correspondents.all().count() > 0
+                            and overrides.correspondent_id is not None
+                        ):
                             for correspondent in action.remove_correspondents.all():
                                 if overrides.correspondent_id == correspondent.pk:
                                     overrides.correspondent_id = None
 
                         if action.remove_all_document_types:
                             overrides.document_type_id = None
-                        elif action.remove_document_types.all().count() > 0:
+                        elif (
+                            action.remove_document_types.all().count() > 0
+                            and overrides.document_type_id is not None
+                        ):
                             for doc_type in action.remove_document_types.all():
                                 if overrides.document_type_id == doc_type.pk:
                                     overrides.document_type_id = None
 
                         if action.remove_all_storage_paths:
                             overrides.storage_path_id = None
-                        elif action.remove_storage_paths.all().count() > 0:
+                        elif (
+                            action.remove_storage_paths.all().count() > 0
+                            and overrides.storage_path_id is not None
+                        ):
                             for storage_path in action.remove_storage_paths.all():
                                 if overrides.storage_path_id == storage_path.pk:
                                     overrides.storage_path_id = None
 
                         if action.remove_all_custom_fields:
                             overrides.custom_field_ids = []
-                        elif action.remove_custom_fields.all().count() > 0:
+                        elif (
+                            action.remove_custom_fields.all().count() > 0
+                            and len(overrides.custom_field_ids) > 0
+                        ):
                             for field in action.remove_custom_fields.all():
                                 if field.pk in overrides.custom_field_ids:
                                     overrides.custom_field_ids.remove(field.pk)
 
                         if action.remove_all_owners:
                             overrides.owner_id = None
-                        elif action.remove_owners.all().count() > 0:
+                        elif (
+                            action.remove_owners.all().count() > 0
+                            and overrides.owner_id is not None
+                        ):
                             for owner in action.remove_owners.all():
                                 if overrides.owner_id == owner.pk:
                                     overrides.owner_id = None

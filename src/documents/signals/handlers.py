@@ -661,7 +661,9 @@ def run_workflow(
                     if action.remove_all_tags:
                         document.tags.clear()
                     elif action.remove_tags.all().count() > 0:
-                        document.tags.remove(*action.remove_tags.all())
+                        for tag in action.remove_tags.all():
+                            if tag in document.tags.all():
+                                document.tags.remove(tag)
 
                     if action.remove_all_correspondents or (
                         document.correspondent in action.remove_correspondents.all()
