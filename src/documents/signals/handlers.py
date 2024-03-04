@@ -378,6 +378,11 @@ def validate_move(instance, old_path, new_path):
         raise CannotMoveFilesException
 
 
+@receiver(models.signals.post_save, sender=CustomFieldInstance)
+def update_custom_field_instance(sender, instance: CustomFieldInstance, **kwargs):
+    doc = Document.objects.get(pk=instance.document.pk)
+    update_filename_and_move_files(sender,doc)
+
 @receiver(models.signals.m2m_changed, sender=Document.tags.through)
 @receiver(models.signals.post_save, sender=Document)
 def update_filename_and_move_files(sender, instance: Document, **kwargs):

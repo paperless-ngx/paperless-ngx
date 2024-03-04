@@ -9,6 +9,8 @@ from django.template.defaultfilters import slugify
 from django.utils import timezone
 
 from documents.models import Document
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 
 logger = logging.getLogger("paperless.filehandling")
 
@@ -194,33 +196,40 @@ def generate_filename(
             # Convert UTC database datetime to localized date
             local_added = timezone.localdate(doc.added)
             local_created = timezone.localdate(doc.created)
+            placeholders = {
+                "title":pathvalidate.sanitize_filename(doc.title, replacement_text="-"),
+                "correspondent":correspondent,
+                "document_type":document_type,
+                "created":local_created.isoformat(),
+                "created_year":local_created.strftime("%Y"),
+                "created_year_short":local_created.strftime("%y"),
+                "created_month":local_created.strftime("%m"),
+                "created_month_name":local_created.strftime("%B"),
+                "created_month_name_short":local_created.strftime("%b"),
+                "created_day":local_created.strftime("%d"),
+                "added":local_added.isoformat(),
+                "added_year":local_added.strftime("%Y"),
+                "added_year_short":local_added.strftime("%y"),
+                "added_month":local_added.strftime("%m"),
+                "added_month_name":local_added.strftime("%B"),
+                "added_month_name_short":local_added.strftime("%b"),
+                "added_day":local_added.strftime("%d"),
+                "asn":asn,
+                "tags":tags,
+                "tag_list":tag_list,
+                "owner_username":owner_username_str,
+                "original_name":original_name,
+                "doc_pk":f"{doc.pk:07}",
+            }
 
-            path = filename_format.format(
-                title=pathvalidate.sanitize_filename(doc.title, replacement_text="-"),
-                correspondent=correspondent,
-                document_type=document_type,
-                created=local_created.isoformat(),
-                created_year=local_created.strftime("%Y"),
-                created_year_short=local_created.strftime("%y"),
-                created_month=local_created.strftime("%m"),
-                created_month_name=local_created.strftime("%B"),
-                created_month_name_short=local_created.strftime("%b"),
-                created_day=local_created.strftime("%d"),
-                added=local_added.isoformat(),
-                added_year=local_added.strftime("%Y"),
-                added_year_short=local_added.strftime("%y"),
-                added_month=local_added.strftime("%m"),
-                added_month_name=local_added.strftime("%B"),
-                added_month_name_short=local_added.strftime("%b"),
-                added_day=local_added.strftime("%d"),
-                asn=asn,
-                tags=tags,
-                tag_list=tag_list,
-                owner_username=owner_username_str,
-                original_name=original_name,
-                doc_pk=f"{doc.pk:07}",
-            ).strip()
+            for field in CustomField.objects.all():
+                placeholders['customfield' + f'{field.pk}'] = '-none-'  
 
+            for field_instance in CustomFieldInstance.objects.filter(document=doc):
+                placeholders['customfield' + f'{field_instance.field.id}'] = field_instance.value
+			
+			
+            path = filename_format.format(**placeholders).strip()																						
             if settings.FILENAME_FORMAT_REMOVE_NONE:
                 path = path.replace("/-none-/", "/")  # remove empty directories
                 path = path.replace(" -none-", "")  # remove when spaced, with space
