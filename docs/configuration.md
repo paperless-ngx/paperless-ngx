@@ -777,7 +777,7 @@ but could result in missing text content.
     !!! warning
 
         The limit is intended to prevent malicious files from consuming
-        system resources and causing crashes and other errors. Only increase
+        system resources and causing crashes and other errors. Only change
         this value if you are certain your documents are not malicious and
         you need the text which was not OCRed
 
