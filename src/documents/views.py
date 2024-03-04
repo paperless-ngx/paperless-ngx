@@ -1586,7 +1586,7 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
 
         media_stats = os.statvfs(settings.MEDIA_ROOT)
 
-        redis_url = settings._CELERY_REDIS_URL
+        redis_url = settings._CHANNELS_REDIS_URL
         redis_error = None
         with Redis.from_url(url=redis_url) as client:
             try:

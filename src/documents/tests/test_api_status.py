@@ -20,6 +20,14 @@ class TestSystemStatus(APITestCase):
         )
 
     def test_system_status(self):
+        """
+        GIVEN:
+            - A user is logged in
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains relevant system status information
+        """
         self.client.force_login(self.user)
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -38,6 +46,14 @@ class TestSystemStatus(APITestCase):
         self.assertIsNotNone(response.data["tasks"]["redis_error"])
 
     def test_system_status_insufficient_permissions(self):
+        """
+        GIVEN:
+            - A user is not logged in or does not have permissions
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains a 401 status code or a 403 status code
+        """
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         normal_user = User.objects.create_user(username="normal_user")
@@ -46,6 +62,14 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_system_status_container_detection(self):
+        """
+        GIVEN:
+            - The application is running in a containerized environment
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains the correct install type
+        """
         self.client.force_login(self.user)
         os.environ["PNGX_CONTAINERIZED"] = "1"
         response = self.client.get(self.ENDPOINT)
@@ -57,6 +81,14 @@ class TestSystemStatus(APITestCase):
 
     @mock.patch("redis.Redis.execute_command")
     def test_system_status_redis_ping(self, mock_ping):
+        """
+        GIVEN:
+            - Redies ping returns True
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains the correct redis status
+        """
         mock_ping.return_value = True
         self.client.force_login(self.user)
         response = self.client.get(self.ENDPOINT)
@@ -65,6 +97,14 @@ class TestSystemStatus(APITestCase):
 
     @mock.patch("celery.app.control.Inspect.ping")
     def test_system_status_celery_ping(self, mock_ping):
+        """
+        GIVEN:
+            - Celery ping returns pong
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains the correct celery status
+        """
         mock_ping.return_value = {"hostname": {"ok": "pong"}}
         self.client.force_login(self.user)
         response = self.client.get(self.ENDPOINT)
@@ -74,6 +114,14 @@ class TestSystemStatus(APITestCase):
     @override_settings(INDEX_DIR="/tmp/index")
     @mock.patch("whoosh.index.FileIndex.last_modified")
     def test_system_status_index_ok(self, mock_last_modified):
+        """
+        GIVEN:
+            - The index last modified time is set
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains the correct index status
+        """
         mock_last_modified.return_value = 1707839087
         self.client.force_login(self.user)
         response = self.client.get(self.ENDPOINT)
@@ -84,6 +132,14 @@ class TestSystemStatus(APITestCase):
     @override_settings(INDEX_DIR="/tmp/index/")
     @mock.patch("documents.index.open_index", autospec=True)
     def test_system_status_index_error(self, mock_open_index):
+        """
+        GIVEN:
+            - The index is not found
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains the correct index status
+        """
         mock_open_index.return_value = None
         mock_open_index.side_effect = Exception("Index error")
         self.client.force_login(self.user)
@@ -95,6 +151,14 @@ class TestSystemStatus(APITestCase):
 
     @override_settings(DATA_DIR="/tmp/does_not_exist/data/")
     def test_system_status_classifier_ok(self):
+        """
+        GIVEN:
+            - The classifier is found
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains the correct classifier status
+        """
         load_classifier()
         test_classifier = DocumentClassifier()
         test_classifier.save()
@@ -105,6 +169,14 @@ class TestSystemStatus(APITestCase):
         self.assertIsNone(response.data["tasks"]["classifier_error"])
 
     def test_system_status_classifier_error(self):
+        """
+        GIVEN:
+            - The classifier is not found
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains an error classifier status
+        """
         with override_settings(MODEL_FILE="does_not_exist"):
             self.client.force_login(self.user)
             response = self.client.get(self.ENDPOINT)
