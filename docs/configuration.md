@@ -766,6 +766,8 @@ but could result in missing text content.
     If unset, will default to the value determined by
     [Pillow](https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.MAX_IMAGE_PIXELS).
 
+    Setting this value to 0 will entirely disable the limit.  See the below warning.
+
     !!! note
 
         Increasing this limit could cause Paperless to consume additional
