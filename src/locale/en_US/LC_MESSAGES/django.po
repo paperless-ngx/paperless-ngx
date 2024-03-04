@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-26 13:34-0800\n"
+"POT-Creation-Date: 2024-02-27 10:51-0800\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -53,7 +53,7 @@ msgstr ""
 msgid "Automatic"
 msgstr ""
 
-#: documents/models.py:62 documents/models.py:397 documents/models.py:1102
+#: documents/models.py:62 documents/models.py:397 documents/models.py:1218
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
 msgid "name"
 msgstr ""
@@ -687,102 +687,174 @@ msgstr ""
 msgid "workflow triggers"
 msgstr ""
 
-#: documents/models.py:1000
+#: documents/models.py:1002
 msgid "Assignment"
 msgstr ""
 
-#: documents/models.py:1003
+#: documents/models.py:1006
+msgid "Removal"
+msgstr ""
+
+#: documents/models.py:1010
 msgid "Workflow Action Type"
 msgstr ""
 
-#: documents/models.py:1009
+#: documents/models.py:1016
 msgid "assign title"
 msgstr ""
 
-#: documents/models.py:1014
+#: documents/models.py:1021
 msgid ""
 "Assign a document title, can include some placeholders, see documentation."
 msgstr ""
 
-#: documents/models.py:1022 paperless_mail/models.py:216
+#: documents/models.py:1030 paperless_mail/models.py:216
 msgid "assign this tag"
 msgstr ""
 
-#: documents/models.py:1030 paperless_mail/models.py:224
+#: documents/models.py:1039 paperless_mail/models.py:224
 msgid "assign this document type"
 msgstr ""
 
-#: documents/models.py:1038 paperless_mail/models.py:238
+#: documents/models.py:1048 paperless_mail/models.py:238
 msgid "assign this correspondent"
 msgstr ""
 
-#: documents/models.py:1046
+#: documents/models.py:1057
 msgid "assign this storage path"
 msgstr ""
 
-#: documents/models.py:1055
+#: documents/models.py:1066
 msgid "assign this owner"
 msgstr ""
 
-#: documents/models.py:1062
+#: documents/models.py:1073
 msgid "grant view permissions to these users"
 msgstr ""
 
-#: documents/models.py:1069
+#: documents/models.py:1080
 msgid "grant view permissions to these groups"
 msgstr ""
 
-#: documents/models.py:1076
+#: documents/models.py:1087
 msgid "grant change permissions to these users"
 msgstr ""
 
-#: documents/models.py:1083
+#: documents/models.py:1094
 msgid "grant change permissions to these groups"
 msgstr ""
 
-#: documents/models.py:1090
+#: documents/models.py:1101
 msgid "assign these custom fields"
 msgstr ""
 
-#: documents/models.py:1094
-msgid "workflow action"
+#: documents/models.py:1108
+msgid "remove these tag(s)"
 msgstr ""
 
-#: documents/models.py:1095
-msgid "workflow actions"
-msgstr ""
-
-#: documents/models.py:1104 paperless_mail/models.py:95
-msgid "order"
-msgstr ""
-
-#: documents/models.py:1110
-msgid "triggers"
-msgstr ""
-
-#: documents/models.py:1117
-msgid "actions"
+#: documents/models.py:1113
+msgid "remove all tags"
 msgstr ""
 
 #: documents/models.py:1120
+msgid "remove these document type(s)"
+msgstr ""
+
+#: documents/models.py:1125
+msgid "remove all document types"
+msgstr ""
+
+#: documents/models.py:1132
+msgid "remove these correspondent(s)"
+msgstr ""
+
+#: documents/models.py:1137
+msgid "remove all correspondents"
+msgstr ""
+
+#: documents/models.py:1144
+msgid "remove these storage path(s)"
+msgstr ""
+
+#: documents/models.py:1149
+msgid "remove all storage paths"
+msgstr ""
+
+#: documents/models.py:1156
+msgid "remove these owner(s)"
+msgstr ""
+
+#: documents/models.py:1161
+msgid "remove all owners"
+msgstr ""
+
+#: documents/models.py:1168
+msgid "remove view permissions for these users"
+msgstr ""
+
+#: documents/models.py:1175
+msgid "remove view permissions for these groups"
+msgstr ""
+
+#: documents/models.py:1182
+msgid "remove change permissions for these users"
+msgstr ""
+
+#: documents/models.py:1189
+msgid "remove change permissions for these groups"
+msgstr ""
+
+#: documents/models.py:1194
+msgid "remove all permissions"
+msgstr ""
+
+#: documents/models.py:1201
+msgid "remove these custom fields"
+msgstr ""
+
+#: documents/models.py:1206
+msgid "remove all custom fields"
+msgstr ""
+
+#: documents/models.py:1210
+msgid "workflow action"
+msgstr ""
+
+#: documents/models.py:1211
+msgid "workflow actions"
+msgstr ""
+
+#: documents/models.py:1220 paperless_mail/models.py:95
+msgid "order"
+msgstr ""
+
+#: documents/models.py:1226
+msgid "triggers"
+msgstr ""
+
+#: documents/models.py:1233
+msgid "actions"
+msgstr ""
+
+#: documents/models.py:1236
 msgid "enabled"
 msgstr ""
 
-#: documents/serialisers.py:113
+#: documents/serialisers.py:114
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr ""
 
-#: documents/serialisers.py:407
+#: documents/serialisers.py:408
 msgid "Invalid color."
 msgstr ""
 
-#: documents/serialisers.py:1073
+#: documents/serialisers.py:1070
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr ""
 
-#: documents/serialisers.py:1176
+#: documents/serialisers.py:1173
 msgid "Invalid variable detected."
 msgstr ""
 
