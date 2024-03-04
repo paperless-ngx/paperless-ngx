@@ -7,7 +7,7 @@ name = "pypi"
 dateparser = "~=1.2"
 # WARNING: django does not use semver.
 #          Only patch versions are guaranteed to not introduce breaking changes.
-django = "~=4.2.10"
+django = "~=4.2.11"
 django-allauth = "*"
 django-auditlog = "*"
 django-celery-results = "*"
