@@ -1,6 +1,9 @@
 <form [formGroup]="objectForm" (ngSubmit)="save()" autocomplete="off">
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
+    @if (object?.id) {
+      <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{object.id}}</span>
+    }
     <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
     </button>
   </div>
@@ -35,7 +38,7 @@
                   <div ngbAccordionItem>
                     <div ngbAccordionHeader>
                       <button ngbAccordionButton>{{i + 1}}. {{getTriggerTypeOptionName(triggerFields.controls[i].value.type)}}
-                        @if(trigger.id > -1) {
+                        @if(trigger.id) {
                           <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{trigger.id}}</span>
                         }
                         <pngx-confirm-button
@@ -77,7 +80,7 @@
                   <div ngbAccordionItem cdkDrag [formGroup]="actionFields.controls[i]">
                     <div ngbAccordionHeader>
                       <button ngbAccordionButton>{{i + 1}}. {{getActionTypeOptionName(actionFields.controls[i].value.type)}}
-                        @if(action.id > -1) {
+                        @if(action.id) {
                           <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{action.id}}</span>
                         }
                         <pngx-confirm-button
