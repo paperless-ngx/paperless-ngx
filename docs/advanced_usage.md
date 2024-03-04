@@ -437,7 +437,7 @@ with Prometheus, as it exports metrics. For details on its capabilities,
 refer to the [Flower](https://flower.readthedocs.io/en/latest/index.html)
 documentation.
 
-Flower can be enabled with the setting [PAPERLESS_ENABLE_FLOWER](configuration/#PAPERLESS_ENABLE_FLOWER).
+Flower can be enabled with the setting [PAPERLESS_ENABLE_FLOWER](configuration.md#PAPERLESS_ENABLE_FLOWER).
 To configure Flower further, create a `flowerconfig.py` and
 place it into the `src/paperless` directory. For a Docker
 installation, you can use volumes to accomplish this:
