@@ -537,6 +537,17 @@ def run_workflow(
             triggers__type=trigger_type,
         )
         .prefetch_related("actions")
+        .prefetch_related("actions__assign_view_users")
+        .prefetch_related("actions__assign_view_groups")
+        .prefetch_related("actions__assign_change_users")
+        .prefetch_related("actions__assign_change_groups")
+        .prefetch_related("actions__assign_custom_fields")
+        .prefetch_related("actions__remove_tags")
+        .prefetch_related("actions__remove_correspondents")
+        .prefetch_related("actions__remove_document_types")
+        .prefetch_related("actions__remove_storage_paths")
+        .prefetch_related("actions__remove_custom_fields")
+        .prefetch_related("actions__remove_owners")
         .prefetch_related("triggers")
         .order_by("order")
     ):
@@ -665,28 +676,45 @@ def run_workflow(
                 elif action.type == WorkflowAction.WorkflowActionType.REMOVAL:
                     if action.remove_all_tags:
                         document.tags.clear()
-                    elif action.remove_tags.all().count() > 0:
-                        for tag in action.remove_tags.all():
-                            if tag in document.tags.all():
-                                document.tags.remove(tag)
+                    else:
+                        for tag in action.remove_tags.filter(
+                            pk__in=list(document.tags.values_list("pk", flat=True)),
+                        ).all():
+                            document.tags.remove(tag.pk)
 
                     if action.remove_all_correspondents or (
-                        document.correspondent in action.remove_correspondents.all()
+                        document.correspondent
+                        and (
+                            action.remove_correspondents.filter(
+                                pk=document.correspondent.pk,
+                            ).exists()
+                        )
                     ):
                         document.correspondent = None
 
                     if action.remove_all_document_types or (
-                        document.document_type in action.remove_document_types.all()
+                        document.document_type
+                        and (
+                            action.remove_document_types.filter(
+                                pk=document.document_type.pk,
+                            ).exists()
+                        )
                     ):
                         document.document_type = None
 
                     if action.remove_all_storage_paths or (
-                        document.storage_path in action.remove_storage_paths.all()
+                        document.storage_path
+                        and (
+                            action.remove_storage_paths.filter(
+                                pk=document.storage_path.pk,
+                            ).exists()
+                        )
                     ):
                         document.storage_path = None
 
                     if action.remove_all_owners or (
-                        document.owner in action.remove_owners.all()
+                        document.owner
+                        and (action.remove_owners.filter(pk=document.owner.pk).exists())
                     ):
                         document.owner = None
 
