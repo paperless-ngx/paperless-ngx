@@ -9,6 +9,8 @@ import {
   NgbModule,
   NgbAlertModule,
   NgbNavLink,
+  NgbModal,
+  NgbModalModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of, throwError } from 'rxjs'
@@ -39,6 +41,13 @@ import { SettingsComponent } from './settings.component'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
+import { SystemStatusDialogComponent } from '../../common/system-status-dialog/system-status-dialog.component'
+import { SystemStatusService } from 'src/app/services/system-status.service'
+import {
+  SystemStatus,
+  InstallType,
+  SystemStatusItemStatus,
+} from 'src/app/data/system-status'
 
 const savedViews = [
   { id: 1, name: 'view1', show_in_sidebar: true, show_on_dashboard: true },
@@ -65,6 +74,8 @@ describe('SettingsComponent', () => {
   let userService: UserService
   let permissionsService: PermissionsService
   let groupService: GroupService
+  let modalService: NgbModal
+  let systemStatusService: SystemStatusService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -96,6 +107,7 @@ describe('SettingsComponent', () => {
         NgbAlertModule,
         NgSelectModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        NgbModalModule,
       ],
     }).compileComponents()
 
@@ -107,6 +119,8 @@ describe('SettingsComponent', () => {
     settingsService.currentUser = users[0]
     userService = TestBed.inject(UserService)
     permissionsService = TestBed.inject(PermissionsService)
+    modalService = TestBed.inject(NgbModal)
+    systemStatusService = TestBed.inject(SystemStatusService)
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     jest
       .spyOn(permissionsService, 'currentUserHasObjectPermissions')
@@ -371,5 +385,55 @@ describe('SettingsComponent', () => {
     completeSetup(groupService)
     fixture.detectChanges()
     expect(toastErrorSpy).toBeCalled()
+  })
+
+  it('should load system status on initialize, show errors if needed', () => {
+    const status: SystemStatus = {
+      pngx_version: '2.4.3',
+      server_os: 'macOS-14.1.1-arm64-arm-64bit',
+      install_type: InstallType.BareMetal,
+      storage: { total: 494384795648, available: 13573525504 },
+      database: {
+        type: 'sqlite',
+        url: '/paperless-ngx/data/db.sqlite3',
+        status: SystemStatusItemStatus.ERROR,
+        error: null,
+        migration_status: {
+          latest_migration: 'socialaccount.0006_alter_socialaccount_extra_data',
+          unapplied_migrations: [],
+        },
+      },
+      tasks: {
+        redis_url: 'redis://localhost:6379',
+        redis_status: SystemStatusItemStatus.ERROR,
+        redis_error:
+          'Error 61 connecting to localhost:6379. Connection refused.',
+        celery_status: SystemStatusItemStatus.ERROR,
+        index_status: SystemStatusItemStatus.OK,
+        index_last_modified: new Date().toISOString(),
+        index_error: null,
+        classifier_status: SystemStatusItemStatus.OK,
+        classifier_last_trained: new Date().toISOString(),
+        classifier_error: null,
+      },
+    }
+    jest.spyOn(systemStatusService, 'get').mockReturnValue(of(status))
+    completeSetup()
+    expect(component['systemStatus']).toEqual(status) // private
+    expect(component.systemStatusHasErrors).toBeTruthy()
+    // coverage
+    component['systemStatus'].database.status = SystemStatusItemStatus.OK
+    component['systemStatus'].tasks.redis_status = SystemStatusItemStatus.OK
+    component['systemStatus'].tasks.celery_status = SystemStatusItemStatus.OK
+    expect(component.systemStatusHasErrors).toBeFalsy()
+  })
+
+  it('should open system status dialog', () => {
+    const modalOpenSpy = jest.spyOn(modalService, 'open')
+    completeSetup()
+    component.showSystemStatus()
+    expect(modalOpenSpy).toHaveBeenCalledWith(SystemStatusDialogComponent, {
+      size: 'xl',
+    })
   })
 })
