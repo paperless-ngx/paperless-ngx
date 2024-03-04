@@ -456,6 +456,14 @@ Paperless-ngx added the ability to create shareable links to files in version 2.
 
     If your paperless-ngx instance is behind a reverse-proxy you may want to create an exception to bypass any authentication layers that are part of your setup in order to make links truly publicly-accessible. Of course, do so with caution.
 
+## PDF Actions
+
+Paperless-ngx supports 3 basic editing operations for PDFs (these operations cannot be performed on non-PDF files):
+
+- Merging documents: available when selecting multiple documents for 'bulk editing'
+- Rotating documents: available when selecting multiple documents for 'bulk editing'. Note that rotation alters the source file.
+- Splitting documents: available from an individual documents details page
+
 ## Best practices {#basic-searching}
 
 Paperless offers a couple tools that help you organize your document

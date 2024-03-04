@@ -2,8 +2,8 @@
     <h4 class="modal-title" id="modal-basic-title">{{title}}</h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="cancel()">
     </button>
-  </div>
-  <div class="modal-body">
+</div>
+<div class="modal-body">
     <p>{{message}}</p>
     <div class="form-group">
         <label class="form-label" for="metadataDocumentID" i18n>Documents:</label>
@@ -28,23 +28,12 @@
         </select>
     </div>
     <p class="small text-muted fst-italic mt-4" i18n>Note that only PDFs will be included.</p>
-  </div>
-  <div class="modal-footer">
+</div>
+<div class="modal-footer">
     <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">
-          <span class="d-inline-block" style="padding-bottom: 1px;">{{cancelBtnCaption}}</span>
-        </button>
-    <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled">
-      <span>
-        {{btnCaption}}
-        <span class="visually-hidden">{{ seconds | number: '1.0-0' }} seconds</span>
-      </span>
-      @if (!confirmButtonEnabled) {
-        <ngb-progressbar style="height: 1px;" type="dark" [max]="secondsTotal" [value]="seconds"></ngb-progressbar>
-      }
+        <span class="d-inline-block" style="padding-bottom: 1px;">{{cancelBtnCaption}}</span>
     </button>
-    @if (alternativeBtnCaption) {
-      <button type="button" class="btn" [class]="alternativeBtnClass" (click)="alternative()" [disabled]="!alternativeButtonEnabled || !buttonsEnabled">
-        {{alternativeBtnCaption}}
-      </button>
-    }
-  </div>
+    <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled">
+        {{btnCaption}}
+    </button>
+</div>

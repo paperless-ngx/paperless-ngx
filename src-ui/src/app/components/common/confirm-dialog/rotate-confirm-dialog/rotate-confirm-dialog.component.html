@@ -2,8 +2,8 @@
     <h4 class="modal-title" id="modal-basic-title">{{title}}</h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="cancel()">
     </button>
-  </div>
-  <div class="modal-body">
+</div>
+<div class="modal-body">
     <div class="row">
         <div class="col-3 d-flex justify-content-end">
             <button class="btn btn-secondary mt-auto" (click)="rotate(false)">
@@ -31,23 +31,16 @@
             }
         </div>
     </div>
-  </div>
-  <div class="modal-footer">
+    <p class="small text-muted fst-italic mt-4" i18n>Note that only PDFs will be rotated.</p>
+</div>
+<div class="modal-footer">
     <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">
-          <span class="d-inline-block" style="padding-bottom: 1px;">{{cancelBtnCaption}}</span>
-        </button>
+        <span class="d-inline-block" style="padding-bottom: 1px;">{{cancelBtnCaption}}</span>
+    </button>
     <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled">
-      <span>
-        {{btnCaption}}
-        <span class="visually-hidden">{{ seconds | number: '1.0-0' }} seconds</span>
-      </span>
+      {{btnCaption}}
       @if (!confirmButtonEnabled) {
-        <ngb-progressbar style="height: 1px;" type="dark" [max]="secondsTotal" [value]="seconds"></ngb-progressbar>
+          <ngb-progressbar style="height: 1px;" type="dark" [max]="secondsTotal" [value]="seconds"></ngb-progressbar>
       }
     </button>
-    @if (alternativeBtnCaption) {
-      <button type="button" class="btn" [class]="alternativeBtnClass" (click)="alternative()" [disabled]="!alternativeButtonEnabled || !buttonsEnabled">
-        {{alternativeBtnCaption}}
-      </button>
-    }
-  </div>
+</div>

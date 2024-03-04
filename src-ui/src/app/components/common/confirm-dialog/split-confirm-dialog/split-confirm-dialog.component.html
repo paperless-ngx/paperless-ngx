@@ -2,15 +2,15 @@
     <h4 class="modal-title" id="modal-basic-title">{{title}}</h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="cancel()">
     </button>
-  </div>
-  <div class="modal-body">
+</div>
+<div class="modal-body">
     <p>{{message}}</p>
     <div class="row mb-2">
         <div class="col-6">
             <div class="input-group input-group-sm">
-              <div class="input-group-text" i18n>Page</div>
-              <input class="form-control" type="number" min="1" [(ngModel)]="page" />
-              <div class="input-group-text" i18n>of {{totalPages}}</div>
+                <div class="input-group-text" i18n>Page</div>
+                <input class="form-control" type="number" min="1" [(ngModel)]="page" />
+                <div class="input-group-text" i18n>of {{totalPages}}</div>
             </div>
             <div class="pdf-viewer-container w-100 mt-3">
                 <pngx-pdf-viewer [src]="pdfSrc" [(page)]="page"
@@ -44,12 +44,12 @@
             </ul>
         </div>
     </div>
-  </div>
-  <div class="modal-footer">
+</div>
+<div class="modal-footer">
     <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">
-          <span class="d-inline-block" style="padding-bottom: 1px;">{{cancelBtnCaption}}</span>
+            <span class="d-inline-block" style="padding-bottom: 1px;">{{cancelBtnCaption}}</span>
         </button>
     <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled">
         {{btnCaption}}
     </button>
-  </div>
+</div>
