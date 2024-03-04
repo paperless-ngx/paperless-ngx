@@ -68,6 +68,10 @@ export const WORKFLOW_ACTION_OPTIONS = [
     id: WorkflowActionType.Assignment,
     name: $localize`Assignment`,
   },
+  {
+    id: WorkflowActionType.Removal,
+    name: $localize`Removal`,
+  },
 ]
 
 const TRIGGER_MATCHING_ALGORITHMS = MATCHING_ALGORITHMS.filter(
@@ -84,6 +88,7 @@ export class WorkflowEditDialogComponent
   implements OnInit
 {
   public WorkflowTriggerType = WorkflowTriggerType
+  public WorkflowActionType = WorkflowActionType
 
   templates: Workflow[]
   correspondents: Correspondent[]
@@ -159,6 +164,124 @@ export class WorkflowEditDialogComponent
   ngOnInit(): void {
     super.ngOnInit()
     this.updateAllTriggerActionFields()
+    this.objectForm.valueChanges.subscribe(
+      this.checkRemovalActionFields.bind(this)
+    )
+    this.checkRemovalActionFields(this.objectForm.value)
+  }
+
+  private checkRemovalActionFields(formWorkflow: Workflow) {
+    formWorkflow.actions
+      .filter((action) => action.type === WorkflowActionType.Removal)
+      .forEach((action, i) => {
+        if (action.remove_all_tags) {
+          this.actionFields
+            .at(i)
+            .get('remove_tags')
+            .disable({ emitEvent: false })
+        } else {
+          this.actionFields
+            .at(i)
+            .get('remove_tags')
+            .enable({ emitEvent: false })
+        }
+
+        if (action.remove_all_document_types) {
+          this.actionFields
+            .at(i)
+            .get('remove_document_types')
+            .disable({ emitEvent: false })
+        } else {
+          this.actionFields
+            .at(i)
+            .get('remove_document_types')
+            .enable({ emitEvent: false })
+        }
+
+        if (action.remove_all_correspondents) {
+          this.actionFields
+            .at(i)
+            .get('remove_correspondents')
+            .disable({ emitEvent: false })
+        } else {
+          this.actionFields
+            .at(i)
+            .get('remove_correspondents')
+            .enable({ emitEvent: false })
+        }
+
+        if (action.remove_all_storage_paths) {
+          this.actionFields
+            .at(i)
+            .get('remove_storage_paths')
+            .disable({ emitEvent: false })
+        } else {
+          this.actionFields
+            .at(i)
+            .get('remove_storage_paths')
+            .enable({ emitEvent: false })
+        }
+
+        if (action.remove_all_custom_fields) {
+          this.actionFields
+            .at(i)
+            .get('remove_custom_fields')
+            .disable({ emitEvent: false })
+        } else {
+          this.actionFields
+            .at(i)
+            .get('remove_custom_fields')
+            .enable({ emitEvent: false })
+        }
+
+        if (action.remove_all_owners) {
+          this.actionFields
+            .at(i)
+            .get('remove_owners')
+            .disable({ emitEvent: false })
+        } else {
+          this.actionFields
+            .at(i)
+            .get('remove_owners')
+            .enable({ emitEvent: false })
+        }
+
+        if (action.remove_all_permissions) {
+          this.actionFields
+            .at(i)
+            .get('remove_view_users')
+            .disable({ emitEvent: false })
+          this.actionFields
+            .at(i)
+            .get('remove_view_groups')
+            .disable({ emitEvent: false })
+          this.actionFields
+            .at(i)
+            .get('remove_change_users')
+            .disable({ emitEvent: false })
+          this.actionFields
+            .at(i)
+            .get('remove_change_groups')
+            .disable({ emitEvent: false })
+        } else {
+          this.actionFields
+            .at(i)
+            .get('remove_view_users')
+            .enable({ emitEvent: false })
+          this.actionFields
+            .at(i)
+            .get('remove_view_groups')
+            .enable({ emitEvent: false })
+          this.actionFields
+            .at(i)
+            .get('remove_change_users')
+            .enable({ emitEvent: false })
+          this.actionFields
+            .at(i)
+            .get('remove_change_groups')
+            .enable({ emitEvent: false })
+        }
+      })
   }
 
   get triggerFields(): FormArray {
@@ -215,6 +338,31 @@ export class WorkflowEditDialogComponent
         assign_change_users: new FormControl(action.assign_change_users),
         assign_change_groups: new FormControl(action.assign_change_groups),
         assign_custom_fields: new FormControl(action.assign_custom_fields),
+        remove_tags: new FormControl(action.remove_tags),
+        remove_all_tags: new FormControl(action.remove_all_tags),
+        remove_document_types: new FormControl(action.remove_document_types),
+        remove_all_document_types: new FormControl(
+          action.remove_all_document_types
+        ),
+        remove_correspondents: new FormControl(action.remove_correspondents),
+        remove_all_correspondents: new FormControl(
+          action.remove_all_correspondents
+        ),
+        remove_storage_paths: new FormControl(action.remove_storage_paths),
+        remove_all_storage_paths: new FormControl(
+          action.remove_all_storage_paths
+        ),
+        remove_owners: new FormControl(action.remove_owners),
+        remove_all_owners: new FormControl(action.remove_all_owners),
+        remove_view_users: new FormControl(action.remove_view_users),
+        remove_view_groups: new FormControl(action.remove_view_groups),
+        remove_change_users: new FormControl(action.remove_change_users),
+        remove_change_groups: new FormControl(action.remove_change_groups),
+        remove_all_permissions: new FormControl(action.remove_all_permissions),
+        remove_custom_fields: new FormControl(action.remove_custom_fields),
+        remove_all_custom_fields: new FormControl(
+          action.remove_all_custom_fields
+        ),
       }),
       { emitEvent }
     )
@@ -290,6 +438,23 @@ export class WorkflowEditDialogComponent
       assign_change_users: [],
       assign_change_groups: [],
       assign_custom_fields: [],
+      remove_tags: [],
+      remove_all_tags: false,
+      remove_document_types: [],
+      remove_all_document_types: false,
+      remove_correspondents: [],
+      remove_all_correspondents: false,
+      remove_storage_paths: [],
+      remove_all_storage_paths: false,
+      remove_owners: [],
+      remove_all_owners: false,
+      remove_view_users: [],
+      remove_view_groups: [],
+      remove_change_users: [],
+      remove_change_groups: [],
+      remove_all_permissions: false,
+      remove_custom_fields: [],
+      remove_all_custom_fields: false,
     }
     this.object.actions.push(action)
     this.createActionField(action)
