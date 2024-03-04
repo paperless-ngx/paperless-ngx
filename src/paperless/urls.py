@@ -32,6 +32,7 @@ from documents.views import SharedLinkView
 from documents.views import ShareLinkViewSet
 from documents.views import StatisticsView
 from documents.views import StoragePathViewSet
+from documents.views import SystemStatusView
 from documents.views import TagViewSet
 from documents.views import TasksViewSet
 from documents.views import UiSettingsView
@@ -146,6 +147,11 @@ urlpatterns = [
                     "^profile/",
                     ProfileView.as_view(),
                     name="profile_view",
+                ),
+                re_path(
+                    "^status/",
+                    SystemStatusView.as_view(),
+                    name="system_status",
                 ),
                 *api_router.urls,
             ],

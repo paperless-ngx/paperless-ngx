@@ -59,7 +59,8 @@ ARG GS_VERSION=10.02.1
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     # Ignore warning from Whitenoise
-    PYTHONWARNINGS="ignore:::django.http.response:517"
+    PYTHONWARNINGS="ignore:::django.http.response:517" \
+    PNGX_CONTAINERIZED=1
 
 #
 # Begin installation and configuration

@@ -2,6 +2,7 @@ import itertools
 import json
 import logging
 import os
+import platform
 import re
 import tempfile
 import urllib
@@ -13,8 +14,12 @@ from unicodedata import normalize
 from urllib.parse import quote
 
 import pathvalidate
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db import connections
+from django.db.migrations.loader import MigrationLoader
+from django.db.migrations.recorder import MigrationRecorder
 from django.db.models import Case
 from django.db.models import Count
 from django.db.models import IntegerField
@@ -31,6 +36,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from django.utils.timezone import make_aware
 from django.utils.translation import get_language
 from django.views import View
 from django.views.decorators.cache import cache_control
@@ -40,6 +46,7 @@ from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from langdetect import detect
 from packaging import version as packaging_version
+from redis import Redis
 from rest_framework import parsers
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
@@ -61,6 +68,7 @@ from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.viewsets import ViewSet
 
 from documents import bulk_edit
+from documents import index
 from documents.bulk_download import ArchiveOnlyStrategy
 from documents.bulk_download import OriginalAndArchiveStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
@@ -138,6 +146,7 @@ from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_updated
 from documents.tasks import consume_file
 from paperless import version
+from paperless.celery import app as celery_app
 from paperless.config import GeneralConfig
 from paperless.db import GnuPG
 from paperless.views import StandardPagination
@@ -1539,3 +1548,132 @@ class CustomFieldViewSet(ModelViewSet):
     model = CustomField
 
     queryset = CustomField.objects.all().order_by("-created")
+
+
+class SystemStatusView(GenericAPIView, PassUserMixin):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        if not request.user.has_perm("admin.view_logentry"):
+            return HttpResponseForbidden("Insufficient permissions")
+
+        current_version = version.__full_version_str__
+
+        install_type = "bare-metal"
+        if os.environ.get("KUBERNETES_SERVICE_HOST") is not None:
+            install_type = "kubernetes"
+        elif os.environ.get("PNGX_CONTAINERIZED") == "1":
+            install_type = "docker"
+
+        db_conn = connections["default"]
+        db_url = db_conn.settings_dict["NAME"]
+        db_error = None
+
+        try:
+            db_conn.ensure_connection()
+            db_status = "OK"
+            loader = MigrationLoader(connection=db_conn)
+            all_migrations = [f"{app}.{name}" for app, name in loader.graph.nodes]
+            applied_migrations = [
+                f"{m.app}.{m.name}"
+                for m in MigrationRecorder.Migration.objects.all().order_by("id")
+            ]
+        except Exception as e:  # pragma: no cover
+            applied_migrations = []
+            db_status = "ERROR"
+            logger.exception(f"System status error connecting to database: {e}")
+            db_error = "Error connecting to database, check logs for more detail."
+
+        media_stats = os.statvfs(settings.MEDIA_ROOT)
+
+        redis_url = settings._CHANNELS_REDIS_URL
+        redis_error = None
+        with Redis.from_url(url=redis_url) as client:
+            try:
+                client.ping()
+                redis_status = "OK"
+            except Exception as e:
+                redis_status = "ERROR"
+                logger.exception(f"System status error connecting to redis: {e}")
+                redis_error = "Error connecting to redis, check logs for more detail."
+
+        try:
+            celery_ping = celery_app.control.inspect().ping()
+            first_worker_ping = celery_ping[next(iter(celery_ping.keys()))]
+            if first_worker_ping["ok"] == "pong":
+                celery_active = "OK"
+        except Exception:
+            celery_active = "ERROR"
+
+        index_error = None
+        try:
+            ix = index.open_index()
+            index_status = "OK"
+            index_last_modified = make_aware(
+                datetime.fromtimestamp(ix.last_modified()),
+            )
+        except Exception as e:
+            index_status = "ERROR"
+            index_error = "Error opening index, check logs for more detail."
+            logger.exception(f"System status error opening index: {e}")
+            index_last_modified = None
+
+        classifier_error = None
+        try:
+            classifier = load_classifier()
+            if classifier is None:
+                raise Exception("Classifier not loaded")
+            classifier_status = "OK"
+            task_result_model = apps.get_model("django_celery_results", "taskresult")
+            result = (
+                task_result_model.objects.filter(
+                    task_name="documents.tasks.train_classifier",
+                    status="SUCCESS",
+                )
+                .order_by(
+                    "-date_done",
+                )
+                .first()
+            )
+            classifier_last_trained = result.date_done if result else None
+        except Exception as e:
+            classifier_status = "ERROR"
+            classifier_last_trained = None
+            classifier_error = "Error loading classifier, check logs for more detail."
+            logger.exception(f"System status error loading classifier: {e}")
+
+        return Response(
+            {
+                "pngx_version": current_version,
+                "server_os": platform.platform(),
+                "install_type": install_type,
+                "storage": {
+                    "total": media_stats.f_frsize * media_stats.f_blocks,
+                    "available": media_stats.f_frsize * media_stats.f_bavail,
+                },
+                "database": {
+                    "type": db_conn.vendor,
+                    "url": db_url,
+                    "status": db_status,
+                    "error": db_error,
+                    "migration_status": {
+                        "latest_migration": applied_migrations[-1],
+                        "unapplied_migrations": [
+                            m for m in all_migrations if m not in applied_migrations
+                        ],
+                    },
+                },
+                "tasks": {
+                    "redis_url": redis_url,
+                    "redis_status": redis_status,
+                    "redis_error": redis_error,
+                    "celery_status": celery_active,
+                    "index_status": index_status,
+                    "index_last_modified": index_last_modified,
+                    "index_error": index_error,
+                    "classifier_status": classifier_status,
+                    "classifier_last_trained": classifier_last_trained,
+                    "classifier_error": classifier_error,
+                },
+            },
+        )
