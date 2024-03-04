@@ -1223,3 +1223,332 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
             title="test",
         )
         self.assertRaises(Exception, document_matches_workflow, doc, w, 4)
+
+    def test_removal_action_document_updated_workflow(self):
+        """
+        GIVEN:
+            - Workflow with removal action
+        WHEN:
+            - File that matches is updated
+        THEN:
+            - Action removals are applied
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+            filter_path="*",
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.REMOVAL,
+        )
+        action.remove_correspondents.add(self.c)
+        action.remove_tags.add(self.t1)
+        action.remove_document_types.add(self.dt)
+        action.remove_storage_paths.add(self.sp)
+        action.remove_owners.add(self.user2)
+        action.remove_custom_fields.add(self.cf1)
+        action.remove_view_users.add(self.user3)
+        action.remove_view_groups.add(self.group1)
+        action.remove_change_users.add(self.user3)
+        action.remove_change_groups.add(self.group1)
+        action.save()
+
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            document_type=self.dt,
+            storage_path=self.sp,
+            owner=self.user2,
+            original_filename="sample.pdf",
+        )
+        doc.tags.set([self.t1, self.t2])
+        CustomFieldInstance.objects.create(document=doc, field=self.cf1)
+        doc.save()
+        assign_perm("documents.view_document", self.user3, doc)
+        assign_perm("documents.change_document", self.user3, doc)
+        assign_perm("documents.view_document", self.group1, doc)
+        assign_perm("documents.change_document", self.group1, doc)
+
+        superuser = User.objects.create_superuser("superuser")
+        self.client.force_authenticate(user=superuser)
+
+        self.client.patch(
+            f"/api/documents/{doc.id}/",
+            {"title": "new title"},
+            format="json",
+        )
+        doc.refresh_from_db()
+
+        self.assertIsNone(doc.document_type)
+        self.assertIsNone(doc.correspondent)
+        self.assertIsNone(doc.storage_path)
+        self.assertEqual(doc.tags.all().count(), 1)
+        self.assertIn(self.t2, doc.tags.all())
+        self.assertIsNone(doc.owner)
+        self.assertEqual(doc.custom_fields.all().count(), 0)
+        self.assertFalse(self.user3.has_perm("documents.view_document", doc))
+        self.assertFalse(self.user3.has_perm("documents.change_document", doc))
+        group_perms: QuerySet = get_groups_with_perms(doc)
+        self.assertNotIn(self.group1, group_perms)
+
+    def test_removal_action_document_updated_removeall(self):
+        """
+        GIVEN:
+            - Workflow with removal action with remove all fields set
+        WHEN:
+            - File that matches is updated
+        THEN:
+            - Action removals are applied
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+            filter_path="*",
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.REMOVAL,
+            remove_all_correspondents=True,
+            remove_all_tags=True,
+            remove_all_document_types=True,
+            remove_all_storage_paths=True,
+            remove_all_custom_fields=True,
+            remove_all_owners=True,
+            remove_all_permissions=True,
+        )
+        action.save()
+
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            document_type=self.dt,
+            storage_path=self.sp,
+            owner=self.user2,
+            original_filename="sample.pdf",
+        )
+        doc.tags.set([self.t1, self.t2])
+        CustomFieldInstance.objects.create(document=doc, field=self.cf1)
+        doc.save()
+        assign_perm("documents.view_document", self.user3, doc)
+        assign_perm("documents.change_document", self.user3, doc)
+        assign_perm("documents.view_document", self.group1, doc)
+        assign_perm("documents.change_document", self.group1, doc)
+
+        superuser = User.objects.create_superuser("superuser")
+        self.client.force_authenticate(user=superuser)
+
+        self.client.patch(
+            f"/api/documents/{doc.id}/",
+            {"title": "new title"},
+            format="json",
+        )
+        doc.refresh_from_db()
+
+        self.assertIsNone(doc.document_type)
+        self.assertIsNone(doc.correspondent)
+        self.assertIsNone(doc.storage_path)
+        self.assertEqual(doc.tags.all().count(), 0)
+        self.assertEqual(doc.tags.all().count(), 0)
+        self.assertIsNone(doc.owner)
+        self.assertEqual(doc.custom_fields.all().count(), 0)
+        self.assertFalse(self.user3.has_perm("documents.view_document", doc))
+        self.assertFalse(self.user3.has_perm("documents.change_document", doc))
+        group_perms: QuerySet = get_groups_with_perms(doc)
+        self.assertNotIn(self.group1, group_perms)
+
+    @mock.patch("documents.consumer.Consumer.try_consume_file")
+    def test_removal_action_document_consumed(self, m):
+        """
+        GIVEN:
+            - Workflow with assignment and removal actions
+        WHEN:
+            - File that matches is consumed
+        THEN:
+            - Action removals are applied
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            filter_filename="*simple*",
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc from {correspondent}",
+            assign_correspondent=self.c,
+            assign_document_type=self.dt,
+            assign_storage_path=self.sp,
+            assign_owner=self.user2,
+        )
+        action.assign_tags.add(self.t1)
+        action.assign_tags.add(self.t2)
+        action.assign_tags.add(self.t3)
+        action.assign_view_users.add(self.user2)
+        action.assign_view_users.add(self.user3)
+        action.assign_view_groups.add(self.group1)
+        action.assign_view_groups.add(self.group2)
+        action.assign_change_users.add(self.user2)
+        action.assign_change_users.add(self.user3)
+        action.assign_change_groups.add(self.group1)
+        action.assign_change_groups.add(self.group2)
+        action.assign_custom_fields.add(self.cf1)
+        action.assign_custom_fields.add(self.cf2)
+        action.save()
+
+        action2 = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.REMOVAL,
+        )
+        action2.remove_correspondents.add(self.c)
+        action2.remove_tags.add(self.t1)
+        action2.remove_document_types.add(self.dt)
+        action2.remove_storage_paths.add(self.sp)
+        action2.remove_owners.add(self.user2)
+        action2.remove_custom_fields.add(self.cf1)
+        action2.remove_view_users.add(self.user3)
+        action2.remove_change_users.add(self.user3)
+        action2.remove_view_groups.add(self.group1)
+        action2.remove_change_groups.add(self.group1)
+        action2.save()
+
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.actions.add(action2)
+        w.save()
+
+        test_file = self.SAMPLE_DIR / "simple.pdf"
+
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
+            with self.assertLogs("paperless.matching", level="INFO") as cm:
+                tasks.consume_file(
+                    ConsumableDocument(
+                        source=DocumentSource.ConsumeFolder,
+                        original_file=test_file,
+                    ),
+                    None,
+                )
+                m.assert_called_once()
+                _, overrides = m.call_args
+                self.assertIsNone(overrides["override_correspondent_id"])
+                self.assertIsNone(overrides["override_document_type_id"])
+                self.assertEqual(
+                    overrides["override_tag_ids"],
+                    [self.t2.pk, self.t3.pk],
+                )
+                self.assertIsNone(overrides["override_storage_path_id"])
+                self.assertIsNone(overrides["override_owner_id"])
+                self.assertEqual(overrides["override_view_users"], [self.user2.pk])
+                self.assertEqual(overrides["override_view_groups"], [self.group2.pk])
+                self.assertEqual(overrides["override_change_users"], [self.user2.pk])
+                self.assertEqual(overrides["override_change_groups"], [self.group2.pk])
+                self.assertEqual(
+                    overrides["override_title"],
+                    "Doc from {correspondent}",
+                )
+                self.assertEqual(
+                    overrides["override_custom_field_ids"],
+                    [self.cf2.pk],
+                )
+
+        info = cm.output[0]
+        expected_str = f"Document matched {trigger} from {w}"
+        self.assertIn(expected_str, info)
+
+    @mock.patch("documents.consumer.Consumer.try_consume_file")
+    def test_removal_action_document_consumed_removeall(self, m):
+        """
+        GIVEN:
+            - Workflow with assignment and removal actions with remove all fields set
+        WHEN:
+            - File that matches is consumed
+        THEN:
+            - Action removals are applied
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            filter_filename="*simple*",
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc from {correspondent}",
+            assign_correspondent=self.c,
+            assign_document_type=self.dt,
+            assign_storage_path=self.sp,
+            assign_owner=self.user2,
+        )
+        action.assign_tags.add(self.t1)
+        action.assign_tags.add(self.t2)
+        action.assign_tags.add(self.t3)
+        action.assign_view_users.add(self.user3.pk)
+        action.assign_view_groups.add(self.group1.pk)
+        action.assign_change_users.add(self.user3.pk)
+        action.assign_change_groups.add(self.group1.pk)
+        action.assign_custom_fields.add(self.cf1.pk)
+        action.assign_custom_fields.add(self.cf2.pk)
+        action.save()
+
+        action2 = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.REMOVAL,
+            remove_all_correspondents=True,
+            remove_all_tags=True,
+            remove_all_document_types=True,
+            remove_all_storage_paths=True,
+            remove_all_custom_fields=True,
+            remove_all_owners=True,
+            remove_all_permissions=True,
+        )
+
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.actions.add(action2)
+        w.save()
+
+        test_file = self.SAMPLE_DIR / "simple.pdf"
+
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
+            with self.assertLogs("paperless.matching", level="INFO") as cm:
+                tasks.consume_file(
+                    ConsumableDocument(
+                        source=DocumentSource.ConsumeFolder,
+                        original_file=test_file,
+                    ),
+                    None,
+                )
+                m.assert_called_once()
+                _, overrides = m.call_args
+                self.assertIsNone(overrides["override_correspondent_id"])
+                self.assertIsNone(overrides["override_document_type_id"])
+                self.assertEqual(
+                    overrides["override_tag_ids"],
+                    [],
+                )
+                self.assertIsNone(overrides["override_storage_path_id"])
+                self.assertIsNone(overrides["override_owner_id"])
+                self.assertEqual(overrides["override_view_users"], [])
+                self.assertEqual(overrides["override_view_groups"], [])
+                self.assertEqual(overrides["override_change_users"], [])
+                self.assertEqual(overrides["override_change_groups"], [])
+                self.assertEqual(
+                    overrides["override_custom_field_ids"],
+                    [],
+                )
+
+        info = cm.output[0]
+        expected_str = f"Document matched {trigger} from {w}"
+        self.assertIn(expected_str, info)

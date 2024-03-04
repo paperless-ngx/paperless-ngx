@@ -329,13 +329,20 @@ Workflows allow you to filter by:
 
 ### Workflow Actions
 
-There is currently one type of workflow action, "Assignment", which can assign:
+There are currently two types of workflow actions, "Assignment", which can assign:
 
 - Title, see [title placeholders](usage.md#title-placeholders) below
 - Tags, correspondent, document type and storage path
 - Document owner
 - View and / or edit permissions to users or groups
 - Custom fields. Note that no value for the field will be set
+
+and "Removal" actions, which can remove either all of or specific sets of the following:
+
+- Tags, correspondents, document types or storage paths
+- Document owner
+- View and / or edit permissions
+- Custom fields
 
 #### Title placeholders
 
