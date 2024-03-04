@@ -229,7 +229,7 @@ def generate_filename(
                 placeholders['customfield' + f'{field_instance.field.id}'] = field_instance.value
 			
 			
-            path = filename_format.format(**placeholders).strip()																						
+            path = filename_format.format(**placeholders).strip()
             if settings.FILENAME_FORMAT_REMOVE_NONE:
                 path = path.replace("/-none-/", "/")  # remove empty directories
                 path = path.replace(" -none-", "")  # remove when spaced, with space
