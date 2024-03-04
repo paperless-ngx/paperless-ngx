@@ -7,6 +7,7 @@ from enum import Enum
 from pathlib import Path
 from subprocess import CompletedProcess
 from subprocess import run
+from typing import TYPE_CHECKING
 from typing import Optional
 
 import magic
@@ -66,7 +67,12 @@ class WorkflowTriggerPlugin(
         """
         msg = ""
         overrides = DocumentMetadataOverrides()
-        for workflow in Workflow.objects.filter(enabled=True).order_by("order"):
+        for workflow in (
+            Workflow.objects.filter(enabled=True)
+            .prefetch_related("actions")
+            .prefetch_related("triggers")
+            .order_by("order")
+        ):
             action_overrides = DocumentMetadataOverrides()
 
             if document_matches_workflow(
@@ -75,6 +81,8 @@ class WorkflowTriggerPlugin(
                 WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
             ):
                 for action in workflow.actions.all():
+                    if TYPE_CHECKING:
+                        assert isinstance(action, WorkflowAction)
                     msg += f"Applying {action} from {workflow}\n"
                     if action.type == WorkflowAction.WorkflowActionType.ASSIGNMENT:
                         if action.assign_title is not None:
@@ -122,10 +130,7 @@ class WorkflowTriggerPlugin(
                         # Removal actions overwrite the current overrides
                         if action.remove_all_tags:
                             overrides.tag_ids = []
-                        elif (
-                            action.remove_tags.all().count() > 0
-                            and len(overrides.tag_ids) > 0
-                        ):
+                        elif action.remove_tags.all().count() > 0 and overrides.tag_ids:
                             for tag in action.remove_tags.all():
                                 if tag.pk in overrides.tag_ids:
                                     overrides.tag_ids.remove(tag.pk)
@@ -164,7 +169,7 @@ class WorkflowTriggerPlugin(
                             overrides.custom_field_ids = []
                         elif (
                             action.remove_custom_fields.all().count() > 0
-                            and len(overrides.custom_field_ids) > 0
+                            and overrides.custom_field_ids
                         ):
                             for field in action.remove_custom_fields.all():
                                 if field.pk in overrides.custom_field_ids:
@@ -186,18 +191,22 @@ class WorkflowTriggerPlugin(
                             overrides.change_users = []
                             overrides.change_groups = []
                         else:
-                            for user in action.remove_view_users.all():
-                                if user.pk in overrides.view_users:
-                                    overrides.view_users.remove(user.pk)
-                            for user in action.remove_change_users.all():
-                                if user.pk in overrides.change_users:
-                                    overrides.change_users.remove(user.pk)
-                            for group in action.remove_view_groups.all():
-                                if group.pk in overrides.view_groups:
-                                    overrides.view_groups.remove(group.pk)
-                            for group in action.remove_change_groups.all():
-                                if group.pk in overrides.change_groups:
-                                    overrides.change_groups.remove(group.pk)
+                            if overrides.view_users:
+                                for user in action.remove_view_users.all():
+                                    if user.pk in overrides.view_users:
+                                        overrides.view_users.remove(user.pk)
+                            if overrides.change_users:
+                                for user in action.remove_change_users.all():
+                                    if user.pk in overrides.change_users:
+                                        overrides.change_users.remove(user.pk)
+                            if overrides.view_groups:
+                                for group in action.remove_view_groups.all():
+                                    if group.pk in overrides.view_groups:
+                                        overrides.view_groups.remove(group.pk)
+                            if overrides.change_groups:
+                                for group in action.remove_change_groups.all():
+                                    if group.pk in overrides.change_groups:
+                                        overrides.change_groups.remove(group.pk)
 
         self.metadata.update(overrides)
         return msg

@@ -531,10 +531,15 @@ def run_workflow(
     document: Document,
     logging_group=None,
 ):
-    for workflow in Workflow.objects.filter(
-        enabled=True,
-        triggers__type=trigger_type,
-    ).order_by("order"):
+    for workflow in (
+        Workflow.objects.filter(
+            enabled=True,
+            triggers__type=trigger_type,
+        )
+        .prefetch_related("actions")
+        .prefetch_related("triggers")
+        .order_by("order")
+    ):
         if matching.document_matches_workflow(
             document,
             workflow,
