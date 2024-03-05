@@ -1,5 +1,11 @@
 # Changelog
 
+## paperless-ngx 2.6.1
+
+### All App Changes
+
+- Change: tweaks to system status [@shamoon](https://github.com/shamoon) ([#6008](https://github.com/paperless-ngx/paperless-ngx/pull/6008))
+
 ## paperless-ngx 2.6.0
 
 ### Features
