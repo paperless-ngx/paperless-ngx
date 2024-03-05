@@ -1149,31 +1149,31 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             placeholders = {
                 "title": "title",
                 "correspondent": "correspondent",
-                "document_type":"document_type",
-                "created":"created",
-                "created_year":"created_year",
-                "created_year_short":"created_year_short",
-                "created_month":"created_month",
-                "created_month_name":"created_month_name",
-                "created_month_name_short":"created_month_name_short",
-                "created_day":"created_day",
-                "added":"added",
-                "added_year":"added_year",
-                "added_year_short":"added_year_short",
-                "added_month":"added_month",
-                "added_month_name":"added_month_name",
-                "added_month_name_short":"added_month_name_short",
-                "added_day":"added_day",
-                "asn":"asn",
-                "tags":"tags",
-                "tag_list":"tag_list",
-                "owner_username":"someone",
-                "original_name":"testfile",
-                "doc_pk":"doc_pk"
-			}
+                "document_type": "document_type",
+                "created": "created",
+                "created_year": "created_year",
+                "created_year_short": "created_year_short",
+                "created_month": "created_month",
+                "created_month_name": "created_month_name",
+                "created_month_name_short": "created_month_name_short",
+                "created_day": "created_day",
+                "added": "added",
+                "added_year": "added_year",
+                "added_year_short": "added_year_short",
+                "added_month": "added_month",
+                "added_month_name": "added_month_name",
+                "added_month_name_short": "added_month_name_short",
+                "added_day": "added_day",
+                "asn": "asn",
+                "tags": "tags",
+                "tag_list": "tag_list",
+                "owner_username": "someone",
+                "original_name": "testfile",
+                "doc_pk": "doc_pk",
+            }
 
             for field in CustomField.objects.all():
-                placeholders['customfield' + f'{field.pk}'] = '-none-'
+                placeholders["customfield" + f"{field.pk}"] = "-none-"
 
             path.format(**placeholders)
         except KeyError as err:
