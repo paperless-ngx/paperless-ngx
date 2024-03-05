@@ -1,4 +1,5 @@
 import os
+import tempfile
 from pathlib import Path
 from unittest import mock
 
@@ -7,8 +8,11 @@ from django.test import override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from documents.classifier import ClassifierModelCorruptError
 from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
+from documents.models import Document
+from documents.models import Tag
 from paperless import version
 
 
@@ -158,7 +162,7 @@ class TestSystemStatus(APITestCase):
         WHEN:
             - The user requests the system status
         THEN:
-            - The response contains the correct classifier status
+            - The response contains an OK classifier status
         """
         load_classifier()
         test_classifier = DocumentClassifier()
@@ -169,18 +173,66 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.data["tasks"]["classifier_status"], "OK")
         self.assertIsNone(response.data["tasks"]["classifier_error"])
 
-    def test_system_status_classifier_error(self):
+    def test_system_status_classifier_warning(self):
         """
         GIVEN:
-            - The classifier is not found
+            - The classifier does not exist yet
+            - > 0 documents and tags with auto matching exist
         WHEN:
             - The user requests the system status
         THEN:
-            - The response contains an error classifier status
+            - The response contains an WARNING classifier status
+        """
+        with override_settings(MODEL_FILE="does_not_exist"):
+            Document.objects.create(
+                title="Test Document",
+            )
+            Tag.objects.create(name="Test Tag", matching_algorithm=Tag.MATCH_AUTO)
+            self.client.force_login(self.user)
+            response = self.client.get(self.ENDPOINT)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(response.data["tasks"]["classifier_status"], "WARNING")
+            self.assertIsNotNone(response.data["tasks"]["classifier_error"])
+
+    def test_system_status_classifier_error(self):
+        """
+        GIVEN:
+            - The classifier does exist but is corrupt
+            - > 0 documents and tags with auto matching exist
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains an ERROR classifier status
+        """
+        does_exist = tempfile.NamedTemporaryFile(
+            dir="/tmp",
+            delete=False,
+        )
+        with override_settings(MODEL_FILE=does_exist):
+            with mock.patch("documents.classifier.load_classifier") as mock_load:
+                mock_load.side_effect = ClassifierModelCorruptError()
+                Document.objects.create(
+                    title="Test Document",
+                )
+                Tag.objects.create(name="Test Tag", matching_algorithm=Tag.MATCH_AUTO)
+                self.client.force_login(self.user)
+                response = self.client.get(self.ENDPOINT)
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertEqual(response.data["tasks"]["classifier_status"], "ERROR")
+                self.assertIsNotNone(response.data["tasks"]["classifier_error"])
+
+    def test_system_status_classifier_ok_no_objects(self):
+        """
+        GIVEN:
+            - The classifier does not exist (and should not)
+            - No documents nor objects with auto matching exist
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains an OK classifier status
         """
         with override_settings(MODEL_FILE="does_not_exist"):
             self.client.force_login(self.user)
             response = self.client.get(self.ENDPOINT)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertEqual(response.data["tasks"]["classifier_status"], "ERROR")
-            self.assertIsNotNone(response.data["tasks"]["classifier_error"])
+            self.assertEqual(response.data["tasks"]["classifier_status"], "OK")

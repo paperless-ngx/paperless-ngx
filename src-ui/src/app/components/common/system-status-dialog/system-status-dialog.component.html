@@ -128,7 +128,11 @@
                     <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1" [ngbPopover]="classifierStatus" triggers="mouseenter:mouseleave"></i-bs>
                   }
                 } @else {
-                  <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1" ngbPopover="{{status.tasks.classifier_error}}" triggers="mouseenter:mouseleave"></i-bs>
+                    <i-bs name="exclamation-triangle-fill" class="ms-2 lh-1"
+                    [class.text-danger]="status.tasks.classifier_status === SystemStatusItemStatus.ERROR"
+                    [class.text-warning]="status.tasks.classifier_status === SystemStatusItemStatus.WARNING"
+                    ngbPopover="{{status.tasks.classifier_error}}"
+                    triggers="mouseenter:mouseleave"></i-bs>
                 }
               </dd>
               <ng-template #classifierStatus>
