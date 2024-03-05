@@ -246,7 +246,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         self.assertRaises(ParseError, f)
 
-    @override_settings(OCR_IMAGE_DPI=72)
+    @override_settings(OCR_IMAGE_DPI=72, MAX_IMAGE_PIXELS=0)
     def test_image_no_dpi_default(self):
         parser = RasterisedDocumentParser(None)
 
