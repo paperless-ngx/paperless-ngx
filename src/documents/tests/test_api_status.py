@@ -9,6 +9,8 @@ from rest_framework.test import APITestCase
 
 from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
+from documents.models import Document
+from documents.models import Tag
 from paperless import version
 
 
@@ -172,15 +174,36 @@ class TestSystemStatus(APITestCase):
     def test_system_status_classifier_error(self):
         """
         GIVEN:
-            - The classifier is not found
+            - The classifier does not exist
+            - > 0 documents and tags with auto matching exist
         WHEN:
             - The user requests the system status
         THEN:
             - The response contains an error classifier status
         """
         with override_settings(MODEL_FILE="does_not_exist"):
+            Document.objects.create(
+                title="Test Document",
+            )
+            Tag.objects.create(name="Test Tag", matching_algorithm=Tag.MATCH_AUTO)
             self.client.force_login(self.user)
             response = self.client.get(self.ENDPOINT)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(response.data["tasks"]["classifier_status"], "ERROR")
             self.assertIsNotNone(response.data["tasks"]["classifier_error"])
+
+    def test_system_status_classifier_ok_no_objects(self):
+        """
+        GIVEN:
+            - The classifier does not exist (and should not)
+            - No documents nor objects with auto matching exist
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains an OK classifier status
+        """
+        with override_settings(MODEL_FILE="does_not_exist"):
+            self.client.force_login(self.user)
+            response = self.client.get(self.ENDPOINT)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(response.data["tasks"]["classifier_status"], "OK")

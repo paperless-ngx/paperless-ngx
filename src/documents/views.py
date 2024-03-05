@@ -1622,7 +1622,23 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
         try:
             classifier = load_classifier()
             if classifier is None:
-                raise Exception("Classifier not loaded")
+                # Check if classifier should exist
+                docs_queryset = Document.objects.exclude(
+                    tags__is_inbox_tag=True,
+                )
+                if docs_queryset.count() > 0 and (
+                    Tag.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
+                    or DocumentType.objects.filter(
+                        matching_algorithm=Tag.MATCH_AUTO,
+                    ).exists()
+                    or Correspondent.objects.filter(
+                        matching_algorithm=Tag.MATCH_AUTO,
+                    ).exists()
+                    or StoragePath.objects.filter(
+                        matching_algorithm=Tag.MATCH_AUTO,
+                    ).exists()
+                ):
+                    raise Exception("Classifier not loaded")
             classifier_status = "OK"
             task_result_model = apps.get_model("django_celery_results", "taskresult")
             result = (
