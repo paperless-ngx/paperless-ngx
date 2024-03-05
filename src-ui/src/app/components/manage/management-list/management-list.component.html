@@ -75,7 +75,7 @@
               <td scope="row">
                 <div class="btn-group d-block d-sm-none">
                   <div ngbDropdown class="d-inline-block">
-                    <button type="button" class="btn btn-link" id="actionsMenuMobile" ngbDropdownToggle>
+                    <button type="button" class="btn btn-link" id="actionsMenuMobile" (click)="$event.stopPropagation()" ngbDropdownToggle>
                       <i-bs name="three-dots-vertical"></i-bs>
                     </button>
                     <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">
