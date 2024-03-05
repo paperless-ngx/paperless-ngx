@@ -970,6 +970,10 @@ OCR_COLOR_CONVERSION_STRATEGY = os.getenv(
 
 OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS")
 
+MAX_IMAGE_PIXELS: Final[Optional[int]] = __get_optional_int(
+    "PAPERLESS_MAX_IMAGE_PIXELS",
+)
+
 # GNUPG needs a home directory for some reason
 GNUPG_HOME = os.getenv("HOME", "/tmp")
 
