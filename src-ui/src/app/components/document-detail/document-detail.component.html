@@ -1,11 +1,11 @@
 <pngx-page-header [(title)]="title">
   @if (contentRenderType === ContentRenderType.PDF && !useNativePdfViewer) {
-    <div class="input-group input-group-sm me-2 d-none d-md-flex">
+    <div class="input-group input-group-sm d-none d-md-flex">
       <div class="input-group-text" i18n>Page</div>
       <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages" [(ngModel)]="previewCurrentPage" />
       <div class="input-group-text" i18n>of {{previewNumPages}}</div>
     </div>
-    <div class="input-group input-group-sm me-5 d-none d-md-flex">
+    <div class="input-group input-group-sm me-md-5 d-none d-md-flex">
       <button class="btn btn-outline-secondary" (click)="decreaseZoom()" i18n>-</button>
       <select class="form-select" (change)="onZoomSelect($event)">
         @for (setting of zoomSettings; track setting) {
@@ -18,11 +18,11 @@
     </div>
   }
 
-  <button type="button" class="btn btn-sm btn-outline-danger me-4" (click)="delete()" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }">
+  <button type="button" class="btn btn-sm btn-outline-danger me-md-4" (click)="delete()" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }">
     <i-bs width="1.2em" height="1.2em" name="trash"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
   </button>
 
-  <div class="btn-group me-2">
+  <div class="btn-group">
     <a [href]="downloadUrl" class="btn btn-sm btn-outline-primary">
       <i-bs width="1.2em" height="1.2em" name="download"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Download</span>
     </a>
@@ -38,7 +38,7 @@
   </div>
 
   <div class="ms-auto" ngbDropdown>
-    <button class="btn btn-sm btn-outline-primary me-2" id="actionsDropdown" ngbDropdownToggle>
+    <button class="btn btn-sm btn-outline-primary" id="actionsDropdown" ngbDropdownToggle>
       <i-bs name="three-dots"></i-bs>
       <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
     </button>
@@ -55,7 +55,6 @@
 
   <pngx-custom-fields-dropdown
     *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }"
-    class="me-2"
     [documentId]="documentId"
     [disabled]="!userIsOwner"
     [existingFields]="document?.custom_fields"

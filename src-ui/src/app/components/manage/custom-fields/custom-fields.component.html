@@ -5,7 +5,7 @@
   i18n-info
   infoLink="usage/#custom-fields"
   >
-  <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editField()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.CustomField }">
+  <button type="button" class="btn btn-sm btn-outline-primary" (click)="editField()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.CustomField }">
     <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Field</ng-container>
   </button>
 </pngx-page-header>
