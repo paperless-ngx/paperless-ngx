@@ -6,6 +6,7 @@ export enum InstallType {
 export enum SystemStatusItemStatus {
   OK = 'OK',
   ERROR = 'ERROR',
+  WARNING = 'WARNING',
 }
 
 export interface SystemStatus {
