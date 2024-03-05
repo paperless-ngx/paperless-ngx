@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-14 16:47-0800\n"
-"PO-Revision-Date: 2024-02-15 12:08\n"
+"POT-Creation-Date: 2024-03-04 17:00-0800\n"
+"PO-Revision-Date: 2024-03-05 01:01\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -53,7 +53,7 @@ msgstr ""
 msgid "Automatic"
 msgstr ""
 
-#: documents/models.py:62 documents/models.py:397 documents/models.py:1102
+#: documents/models.py:62 documents/models.py:397 documents/models.py:1218
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
 msgid "name"
 msgstr "이름"
@@ -679,265 +679,366 @@ msgstr ""
 msgid "workflow triggers"
 msgstr ""
 
-#: documents/models.py:1000
+#: documents/models.py:1002
 msgid "Assignment"
 msgstr ""
 
-#: documents/models.py:1003
+#: documents/models.py:1006
+msgid "Removal"
+msgstr ""
+
+#: documents/models.py:1010
 msgid "Workflow Action Type"
 msgstr ""
 
-#: documents/models.py:1009
+#: documents/models.py:1016
 msgid "assign title"
 msgstr ""
 
-#: documents/models.py:1014
+#: documents/models.py:1021
 msgid "Assign a document title, can include some placeholders, see documentation."
 msgstr ""
 
-#: documents/models.py:1022 paperless_mail/models.py:216
+#: documents/models.py:1030 paperless_mail/models.py:216
 msgid "assign this tag"
 msgstr ""
 
-#: documents/models.py:1030 paperless_mail/models.py:224
+#: documents/models.py:1039 paperless_mail/models.py:224
 msgid "assign this document type"
 msgstr ""
 
-#: documents/models.py:1038 paperless_mail/models.py:238
+#: documents/models.py:1048 paperless_mail/models.py:238
 msgid "assign this correspondent"
 msgstr ""
 
-#: documents/models.py:1046
+#: documents/models.py:1057
 msgid "assign this storage path"
 msgstr ""
 
-#: documents/models.py:1055
+#: documents/models.py:1066
 msgid "assign this owner"
 msgstr ""
 
-#: documents/models.py:1062
+#: documents/models.py:1073
 msgid "grant view permissions to these users"
 msgstr ""
 
-#: documents/models.py:1069
+#: documents/models.py:1080
 msgid "grant view permissions to these groups"
 msgstr ""
 
-#: documents/models.py:1076
+#: documents/models.py:1087
 msgid "grant change permissions to these users"
 msgstr ""
 
-#: documents/models.py:1083
+#: documents/models.py:1094
 msgid "grant change permissions to these groups"
 msgstr ""
 
-#: documents/models.py:1090
+#: documents/models.py:1101
 msgid "assign these custom fields"
 msgstr ""
 
-#: documents/models.py:1094
-msgid "workflow action"
+#: documents/models.py:1108
+msgid "remove these tag(s)"
 msgstr ""
 
-#: documents/models.py:1095
-msgid "workflow actions"
-msgstr ""
-
-#: documents/models.py:1104 paperless_mail/models.py:95
-msgid "order"
-msgstr ""
-
-#: documents/models.py:1110
-msgid "triggers"
-msgstr ""
-
-#: documents/models.py:1117
-msgid "actions"
+#: documents/models.py:1113
+msgid "remove all tags"
 msgstr ""
 
 #: documents/models.py:1120
+msgid "remove these document type(s)"
+msgstr ""
+
+#: documents/models.py:1125
+msgid "remove all document types"
+msgstr ""
+
+#: documents/models.py:1132
+msgid "remove these correspondent(s)"
+msgstr ""
+
+#: documents/models.py:1137
+msgid "remove all correspondents"
+msgstr ""
+
+#: documents/models.py:1144
+msgid "remove these storage path(s)"
+msgstr ""
+
+#: documents/models.py:1149
+msgid "remove all storage paths"
+msgstr ""
+
+#: documents/models.py:1156
+msgid "remove these owner(s)"
+msgstr ""
+
+#: documents/models.py:1161
+msgid "remove all owners"
+msgstr ""
+
+#: documents/models.py:1168
+msgid "remove view permissions for these users"
+msgstr ""
+
+#: documents/models.py:1175
+msgid "remove view permissions for these groups"
+msgstr ""
+
+#: documents/models.py:1182
+msgid "remove change permissions for these users"
+msgstr ""
+
+#: documents/models.py:1189
+msgid "remove change permissions for these groups"
+msgstr ""
+
+#: documents/models.py:1194
+msgid "remove all permissions"
+msgstr ""
+
+#: documents/models.py:1201
+msgid "remove these custom fields"
+msgstr ""
+
+#: documents/models.py:1206
+msgid "remove all custom fields"
+msgstr ""
+
+#: documents/models.py:1210
+msgid "workflow action"
+msgstr ""
+
+#: documents/models.py:1211
+msgid "workflow actions"
+msgstr ""
+
+#: documents/models.py:1220 paperless_mail/models.py:95
+msgid "order"
+msgstr ""
+
+#: documents/models.py:1226
+msgid "triggers"
+msgstr ""
+
+#: documents/models.py:1233
+msgid "actions"
+msgstr ""
+
+#: documents/models.py:1236
 msgid "enabled"
 msgstr ""
 
-#: documents/serialisers.py:113
+#: documents/serialisers.py:114
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr ""
 
-#: documents/serialisers.py:407
+#: documents/serialisers.py:408
 msgid "Invalid color."
 msgstr ""
 
-#: documents/serialisers.py:1061
+#: documents/serialisers.py:1072
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr ""
 
-#: documents/serialisers.py:1164
+#: documents/serialisers.py:1175
 msgid "Invalid variable detected."
 msgstr ""
 
-#: documents/templates/account/login.html:14
+#: documents/templates/account/email/base_message.txt:1
+#, python-format
+msgid "Hello from %(site_name)s!"
+msgstr ""
+
+#: documents/templates/account/email/base_message.txt:5
+#, python-format
+msgid "Thank you for using %(site_name)s!\n"
+"%(site_domain)s"
+msgstr ""
+
+#: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
 msgstr "Paperless-ngx 로그인"
 
-#: documents/templates/account/login.html:47
+#: documents/templates/account/login.html:10
 msgid "Please sign in."
 msgstr "로그인해주세요."
 
-#: documents/templates/account/login.html:50
-msgid "Your username and password didn't match. Please try again."
-msgstr "사용자명과 비밀번호가 일치하지 않습니다. 다시 시도해주세요."
+#: documents/templates/account/login.html:12
+#, python-format
+msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
+msgstr ""
 
-#: documents/templates/account/login.html:54
-msgid "Share link was not found."
-msgstr "공유링크가 유효하지 않습니다."
-
-#: documents/templates/account/login.html:58
-msgid "Share link has expired."
-msgstr "공유링크가 만료되었습니다."
-
-#: documents/templates/account/login.html:61
-#: documents/templates/socialaccount/signup.html:56
+#: documents/templates/account/login.html:19
+#: documents/templates/account/signup.html:15
+#: documents/templates/socialaccount/signup.html:13
 msgid "Username"
 msgstr "사용자 이름"
 
-#: documents/templates/account/login.html:62
+#: documents/templates/account/login.html:20
+#: documents/templates/account/signup.html:17
 msgid "Password"
 msgstr "비밀번호"
 
-#: documents/templates/account/login.html:72
+#: documents/templates/account/login.html:30
 msgid "Sign in"
 msgstr "로그인"
 
-#: documents/templates/account/login.html:76
+#: documents/templates/account/login.html:34
 msgid "Forgot your password?"
 msgstr "비밀번호를 잊으셨나요?"
 
-#: documents/templates/account/login.html:83
+#: documents/templates/account/login.html:45
+#: documents/templates/account/signup.html:49
 msgid "or sign in via"
 msgstr ""
 
-#: documents/templates/account/password_reset.html:15
+#: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
 msgstr "Paperless-ngx 비밀번호 초기화 요청"
 
-#: documents/templates/account/password_reset.html:43
+#: documents/templates/account/password_reset.html:9
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
 msgstr "아래에 사용자 이메일 주소를 입력하세요. 새로운 비밀번호를 설정하는 방법을 메일로 보내드리겠습니다."
 
-#: documents/templates/account/password_reset.html:46
+#: documents/templates/account/password_reset.html:12
 msgid "An error occurred. Please try again."
 msgstr "에러가 발생했습니다. 다시 시도해주세요."
 
-#: documents/templates/account/password_reset.html:49
-#: documents/templates/socialaccount/signup.html:57
+#: documents/templates/account/password_reset.html:15
 msgid "Email"
 msgstr "전자우편"
 
-#: documents/templates/account/password_reset.html:56
+#: documents/templates/account/password_reset.html:21
 msgid "Send me instructions!"
 msgstr "방법 받기!"
 
-#: documents/templates/account/password_reset_done.html:14
+#: documents/templates/account/password_reset_done.html:5
 msgid "Paperless-ngx reset password sent"
 msgstr "Paperless-ngx 비밀번호 초기화 요청이 발송되었습니다"
 
-#: documents/templates/account/password_reset_done.html:40
+#: documents/templates/account/password_reset_done.html:9
 msgid "Check your inbox."
 msgstr "메일함을 확인해주세요."
 
-#: documents/templates/account/password_reset_done.html:41
+#: documents/templates/account/password_reset_done.html:13
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
 msgstr ""
 
-#: documents/templates/account/password_reset_from_key.html:15
+#: documents/templates/account/password_reset_from_key.html:5
 msgid "Paperless-ngx reset password confirmation"
 msgstr "Paperless-ngx 비밀번호 초기화 확인"
 
-#: documents/templates/account/password_reset_from_key.html:44
-msgid "request a new password reset"
-msgstr "새로운 비밀번호 초기화 요청"
-
-#: documents/templates/account/password_reset_from_key.html:46
+#: documents/templates/account/password_reset_from_key.html:9
 msgid "Set a new password."
 msgstr "새로운 비밀번호를 설정해주세요."
 
-#: documents/templates/account/password_reset_from_key.html:50
-msgid "Passwords did not match or too weak. Try again."
-msgstr "비밀번호가 일치하지 않거나 강력하지 않습니다. 다시 시도해주세요."
+#: documents/templates/account/password_reset_from_key.html:15
+msgid "request a new password reset"
+msgstr "새로운 비밀번호 초기화 요청"
 
-#: documents/templates/account/password_reset_from_key.html:53
+#: documents/templates/account/password_reset_from_key.html:17
 msgid "New Password"
 msgstr "새로운 비밀번호"
 
-#: documents/templates/account/password_reset_from_key.html:54
+#: documents/templates/account/password_reset_from_key.html:18
 msgid "Confirm Password"
 msgstr "비밀번호 확인"
 
-#: documents/templates/account/password_reset_from_key.html:65
+#: documents/templates/account/password_reset_from_key.html:28
 msgid "Change my password"
 msgstr "비밀번호 변경"
 
-#: documents/templates/account/password_reset_from_key_done.html:14
+#: documents/templates/account/password_reset_from_key_done.html:5
 msgid "Paperless-ngx reset password complete"
 msgstr "Paperless-ngx 비밀번호 초기화 완료"
 
-#: documents/templates/account/password_reset_from_key_done.html:40
+#: documents/templates/account/password_reset_from_key_done.html:9
 msgid "Password reset complete."
 msgstr "비밀번호를 초기화했습니다."
 
-#: documents/templates/account/password_reset_from_key_done.html:42
+#: documents/templates/account/password_reset_from_key_done.html:14
 #, python-format
 msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
 msgstr "새로운 비밀번호로 변경되었습니다. <a href=\"%(login_url)s\">여기</a>에서 로그인하세요"
 
-#: documents/templates/index.html:79
+#: documents/templates/account/signup.html:5
+msgid "Paperless-ngx sign up"
+msgstr ""
+
+#: documents/templates/account/signup.html:10
+#, python-format
+msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
+msgstr ""
+
+#: documents/templates/account/signup.html:16
+#: documents/templates/socialaccount/signup.html:14
+msgid "Email (optional)"
+msgstr ""
+
+#: documents/templates/account/signup.html:18
+msgid "Password (again)"
+msgstr ""
+
+#: documents/templates/account/signup.html:36
+#: documents/templates/socialaccount/signup.html:27
+msgid "Sign up"
+msgstr ""
+
+#: documents/templates/index.html:61
 msgid "Paperless-ngx is loading..."
 msgstr ""
 
-#: documents/templates/index.html:80
+#: documents/templates/index.html:62
 msgid "Still here?! Hmm, something might be wrong."
 msgstr ""
 
-#: documents/templates/index.html:80
+#: documents/templates/index.html:62
 msgid "Here's a link to the docs."
 msgstr ""
 
-#: documents/templates/socialaccount/authentication_error.html:15
-#: documents/templates/socialaccount/login.html:15
+#: documents/templates/paperless-ngx/base.html:41
+msgid "Share link was not found."
+msgstr "공유링크가 유효하지 않습니다."
+
+#: documents/templates/paperless-ngx/base.html:45
+msgid "Share link has expired."
+msgstr "공유링크가 만료되었습니다."
+
+#: documents/templates/socialaccount/authentication_error.html:5
+#: documents/templates/socialaccount/login.html:5
 msgid "Paperless-ngx social account sign in"
 msgstr ""
 
-#: documents/templates/socialaccount/authentication_error.html:43
+#: documents/templates/socialaccount/authentication_error.html:10
 #, python-format
 msgid "An error occurred while attempting to login via your social network account. Back to the <a href=\"%(login_url)s\">login page</a>"
 msgstr ""
 
-#: documents/templates/socialaccount/login.html:44
+#: documents/templates/socialaccount/login.html:10
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
 msgstr ""
 
-#: documents/templates/socialaccount/login.html:47
+#: documents/templates/socialaccount/login.html:13
 msgid "Continue"
 msgstr ""
 
-#: documents/templates/socialaccount/signup.html:14
+#: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
 msgstr ""
 
-#: documents/templates/socialaccount/signup.html:53
+#: documents/templates/socialaccount/signup.html:10
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
 msgstr ""
 
-#: documents/templates/socialaccount/signup.html:54
+#: documents/templates/socialaccount/signup.html:11
 msgid "As a final step, please complete the following form:"
-msgstr ""
-
-#: documents/templates/socialaccount/signup.html:72
-msgid "Sign up"
 msgstr ""
 
 #: documents/validators.py:17
@@ -1103,135 +1204,135 @@ msgstr ""
 msgid "paperless application settings"
 msgstr ""
 
-#: paperless/settings.py:642
+#: paperless/settings.py:664
 msgid "English (US)"
 msgstr "영어 (미국)"
 
-#: paperless/settings.py:643
+#: paperless/settings.py:665
 msgid "Arabic"
 msgstr "아랍어"
 
-#: paperless/settings.py:644
+#: paperless/settings.py:666
 msgid "Afrikaans"
 msgstr "아프리칸스어"
 
-#: paperless/settings.py:645
+#: paperless/settings.py:667
 msgid "Belarusian"
 msgstr "벨라루스어"
 
-#: paperless/settings.py:646
+#: paperless/settings.py:668
 msgid "Bulgarian"
 msgstr "불가리어"
 
-#: paperless/settings.py:647
+#: paperless/settings.py:669
 msgid "Catalan"
 msgstr "카탈로니아어"
 
-#: paperless/settings.py:648
+#: paperless/settings.py:670
 msgid "Czech"
 msgstr "체코어"
 
-#: paperless/settings.py:649
+#: paperless/settings.py:671
 msgid "Danish"
 msgstr "덴마크어"
 
-#: paperless/settings.py:650
+#: paperless/settings.py:672
 msgid "German"
 msgstr "독일어"
 
-#: paperless/settings.py:651
+#: paperless/settings.py:673
 msgid "Greek"
 msgstr "그리스어"
 
-#: paperless/settings.py:652
+#: paperless/settings.py:674
 msgid "English (GB)"
 msgstr "영어 (영국)"
 
-#: paperless/settings.py:653
+#: paperless/settings.py:675
 msgid "Spanish"
 msgstr "스페인어"
 
-#: paperless/settings.py:654
+#: paperless/settings.py:676
 msgid "Finnish"
 msgstr "핀란드어"
 
-#: paperless/settings.py:655
+#: paperless/settings.py:677
 msgid "French"
 msgstr "프랑스어"
 
-#: paperless/settings.py:656
+#: paperless/settings.py:678
 msgid "Hungarian"
 msgstr "헝가리어"
 
-#: paperless/settings.py:657
+#: paperless/settings.py:679
 msgid "Italian"
 msgstr "이탈리아어"
 
-#: paperless/settings.py:658
+#: paperless/settings.py:680
 msgid "Japanese"
 msgstr ""
 
-#: paperless/settings.py:659
+#: paperless/settings.py:681
 msgid "Luxembourgish"
 msgstr "룩셈부르크어"
 
-#: paperless/settings.py:660
+#: paperless/settings.py:682
 msgid "Norwegian"
 msgstr "노르웨이어"
 
-#: paperless/settings.py:661
+#: paperless/settings.py:683
 msgid "Dutch"
 msgstr "네덜란드어"
 
-#: paperless/settings.py:662
+#: paperless/settings.py:684
 msgid "Polish"
 msgstr "폴란드어"
 
-#: paperless/settings.py:663
+#: paperless/settings.py:685
 msgid "Portuguese (Brazil)"
 msgstr "포르투갈어 (브라질)"
 
-#: paperless/settings.py:664
+#: paperless/settings.py:686
 msgid "Portuguese"
 msgstr "포르투갈어"
 
-#: paperless/settings.py:665
+#: paperless/settings.py:687
 msgid "Romanian"
 msgstr "루마니아어"
 
-#: paperless/settings.py:666
+#: paperless/settings.py:688
 msgid "Russian"
 msgstr "러시아어"
 
-#: paperless/settings.py:667
+#: paperless/settings.py:689
 msgid "Slovak"
 msgstr "슬로바키아어"
 
-#: paperless/settings.py:668
+#: paperless/settings.py:690
 msgid "Slovenian"
 msgstr "슬로베니아어"
 
-#: paperless/settings.py:669
+#: paperless/settings.py:691
 msgid "Serbian"
 msgstr "세르비아어"
 
-#: paperless/settings.py:670
+#: paperless/settings.py:692
 msgid "Swedish"
 msgstr "스웨덴어"
 
-#: paperless/settings.py:671
+#: paperless/settings.py:693
 msgid "Turkish"
 msgstr "튀르키예어"
 
-#: paperless/settings.py:672
+#: paperless/settings.py:694
 msgid "Ukrainian"
 msgstr "우크라이나어"
 
-#: paperless/settings.py:673
+#: paperless/settings.py:695
 msgid "Chinese Simplified"
 msgstr "중국어 간체"
 
-#: paperless/urls.py:224
+#: paperless/urls.py:230
 msgid "Paperless-ngx administration"
 msgstr ""
 
