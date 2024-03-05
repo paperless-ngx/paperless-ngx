@@ -4710,7 +4710,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">152</context>
+          <context context-type="linenumber">156</context>
         </context-group>
         <target state="translated">Copiar</target>
       </trans-unit>
@@ -5130,7 +5130,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Last Trained</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">135</context>
+          <context context-type="linenumber">139</context>
         </context-group>
         <target state="needs-translation">Last Trained</target>
       </trans-unit>
