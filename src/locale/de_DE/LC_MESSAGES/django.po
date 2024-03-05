@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-04 17:00-0800\n"
-"PO-Revision-Date: 2024-03-05 01:01\n"
+"PO-Revision-Date: 2024-03-05 15:50\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -685,7 +685,7 @@ msgstr "Zuordnung"
 
 #: documents/models.py:1006
 msgid "Removal"
-msgstr ""
+msgstr "Entfernung"
 
 #: documents/models.py:1010
 msgid "Workflow Action Type"
@@ -741,19 +741,19 @@ msgstr "Diese benutzerdefinierten Felder zuweisen"
 
 #: documents/models.py:1108
 msgid "remove these tag(s)"
-msgstr ""
+msgstr "Diese(n) Tag(s) entfernen"
 
 #: documents/models.py:1113
 msgid "remove all tags"
-msgstr ""
+msgstr "Alle Tags entfernen"
 
 #: documents/models.py:1120
 msgid "remove these document type(s)"
-msgstr ""
+msgstr "Diese(n) Dokumenttyp(en) entfernen"
 
 #: documents/models.py:1125
 msgid "remove all document types"
-msgstr ""
+msgstr "Alle Dokumenttypen entfernen"
 
 #: documents/models.py:1132
 msgid "remove these correspondent(s)"
