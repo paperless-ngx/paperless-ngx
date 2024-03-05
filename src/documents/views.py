@@ -1581,7 +1581,9 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
         except Exception as e:  # pragma: no cover
             applied_migrations = []
             db_status = "ERROR"
-            logger.exception(f"System status error connecting to database: {e}")
+            logger.exception(
+                f"System status detected a possible problem while connecting to the database: {e}",
+            )
             db_error = "Error connecting to database, check logs for more detail."
 
         media_stats = os.statvfs(settings.MEDIA_ROOT)
@@ -1594,7 +1596,9 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
                 redis_status = "OK"
             except Exception as e:
                 redis_status = "ERROR"
-                logger.exception(f"System status error connecting to redis: {e}")
+                logger.exception(
+                    f"System status detected a possible problem while connecting to redis: {e}",
+                )
                 redis_error = "Error connecting to redis, check logs for more detail."
 
         try:
@@ -1615,7 +1619,9 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
         except Exception as e:
             index_status = "ERROR"
             index_error = "Error opening index, check logs for more detail."
-            logger.exception(f"System status error opening index: {e}")
+            logger.exception(
+                f"System status detected a possible problem while opening the index: {e}",
+            )
             index_last_modified = None
 
         classifier_error = None
@@ -1656,7 +1662,9 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
             classifier_status = "ERROR"
             classifier_last_trained = None
             classifier_error = "Error loading classifier, check logs for more detail."
-            logger.exception(f"System status error loading classifier: {e}")
+            logger.exception(
+                f"System status detected a possible problem while loading the classifier: {e}",
+            )
 
         return Response(
             {
