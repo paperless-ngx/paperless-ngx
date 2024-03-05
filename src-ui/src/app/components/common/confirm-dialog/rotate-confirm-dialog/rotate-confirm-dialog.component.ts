@@ -10,6 +10,7 @@ import { DocumentService } from 'src/app/services/rest/document.service'
 })
 export class RotateConfirmDialogComponent extends ConfirmDialogComponent {
   public documentID: number
+  public showPDFNote: boolean = true
 
   // animation is better if we dont normalize yet
   public rotation: number = 0

@@ -91,7 +91,7 @@
                 <button ngbDropdownItem (click)="redoOcrSelected()" [disabled]="!userCanEditAll">
                   <i-bs name="body-text"></i-bs>&nbsp;<ng-container i18n>Redo OCR</ng-container>
                 </button>
-                <button ngbDropdownItem (click)="rotateSelected()" [disabled]="!userCanEditAll">
+                <button ngbDropdownItem (click)="rotateSelected()" [disabled]="!userOwnsAll">
                   <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
                 </button>
                 <button ngbDropdownItem (click)="mergeSelected()" [disabled]="!userCanEditAll || list.selected.size < 2">

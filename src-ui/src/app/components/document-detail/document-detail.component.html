@@ -54,6 +54,10 @@
       <button ngbDropdownItem (click)="splitDocument()" [disabled]="contentRenderType !== ContentRenderType.PDF">
         <i-bs width="1em" height="1em" name="scissors"></i-bs>&nbsp;<span i18n>Split</span>
       </button>
+
+      <button ngbDropdownItem (click)="rotateDocument()" [disabled]="!userIsOwner || contentRenderType !== ContentRenderType.PDF">
+        <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
+      </button>
     </div>
   </div>
 
