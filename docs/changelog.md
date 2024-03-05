@@ -21,14 +21,13 @@
 - Fix: Don't assume the location of scratch directory in Docker [@stumpylog](https://github.com/stumpylog) ([#5948](https://github.com/paperless-ngx/paperless-ngx/pull/5948))
 - Fix: ensure document title always limited to 128 chars [@shamoon](https://github.com/shamoon) ([#5934](https://github.com/paperless-ngx/paperless-ngx/pull/5934))
 - Fix: use for password reset emails, if set [@shamoon](https://github.com/shamoon) ([#5902](https://github.com/paperless-ngx/paperless-ngx/pull/5902))
-- Fix: Correct docker compose check in install script (#<!---->5904) [@ShanSanear](https://github.com/ShanSanear) ([#5917](https://github.com/paperless-ngx/paperless-ngx/pull/5917))
+- Fix: Correct docker compose check in install script [@ShanSanear](https://github.com/ShanSanear) ([#5917](https://github.com/paperless-ngx/paperless-ngx/pull/5917))
 - Fix: respect global permissions for UI settings [@shamoon](https://github.com/shamoon) ([#5919](https://github.com/paperless-ngx/paperless-ngx/pull/5919))
 - Fix: allow disable email verification during signup [@shamoon](https://github.com/shamoon) ([#5895](https://github.com/paperless-ngx/paperless-ngx/pull/5895))
 - Fix: refactor accounts templates and create signup template [@shamoon](https://github.com/shamoon) ([#5899](https://github.com/paperless-ngx/paperless-ngx/pull/5899))
 
 ### Maintenance
 
-- Fix: Correct docker compose check in install script [@ShanSanear](https://github.com/ShanSanear) ([#5917](https://github.com/paperless-ngx/paperless-ngx/pull/5917))
 - Chore(deps): Bump the actions group with 3 updates [@dependabot](https://github.com/dependabot) ([#5907](https://github.com/paperless-ngx/paperless-ngx/pull/5907))
 - Chore: Ignores uvicorn updates in dependabot [@stumpylog](https://github.com/stumpylog) ([#5906](https://github.com/paperless-ngx/paperless-ngx/pull/5906))
 
