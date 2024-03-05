@@ -1625,26 +1625,34 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
             index_last_modified = None
 
         classifier_error = None
+        classifier_status = None
         try:
             classifier = load_classifier()
             if classifier is None:
-                # Check if classifier should exist
+                # Make sure classifier should exist
                 docs_queryset = Document.objects.exclude(
                     tags__is_inbox_tag=True,
                 )
-                if docs_queryset.count() > 0 and (
-                    Tag.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
-                    or DocumentType.objects.filter(
-                        matching_algorithm=Tag.MATCH_AUTO,
-                    ).exists()
-                    or Correspondent.objects.filter(
-                        matching_algorithm=Tag.MATCH_AUTO,
-                    ).exists()
-                    or StoragePath.objects.filter(
-                        matching_algorithm=Tag.MATCH_AUTO,
-                    ).exists()
+                if (
+                    docs_queryset.count() > 0
+                    and (
+                        Tag.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
+                        or DocumentType.objects.filter(
+                            matching_algorithm=Tag.MATCH_AUTO,
+                        ).exists()
+                        or Correspondent.objects.filter(
+                            matching_algorithm=Tag.MATCH_AUTO,
+                        ).exists()
+                        or StoragePath.objects.filter(
+                            matching_algorithm=Tag.MATCH_AUTO,
+                        ).exists()
+                    )
+                    and not os.path.isfile(settings.MODEL_FILE)
                 ):
-                    raise Exception("Classifier not loaded")
+                    # if classifier file doesn't exist just classify as a warning
+                    classifier_error = "Classifier file does not exist (yet). Re-training may be pending."
+                    classifier_status = "WARNING"
+                    raise FileNotFoundError(classifier_error)
             classifier_status = "OK"
             task_result_model = apps.get_model("django_celery_results", "taskresult")
             result = (
@@ -1659,9 +1667,13 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
             )
             classifier_last_trained = result.date_done if result else None
         except Exception as e:
-            classifier_status = "ERROR"
+            if classifier_status is None:
+                classifier_status = "ERROR"
             classifier_last_trained = None
-            classifier_error = "Error loading classifier, check logs for more detail."
+            if classifier_error is None:
+                classifier_error = (
+                    "Unable to load classifier, check logs for more detail."
+                )
             logger.exception(
                 f"System status detected a possible problem while loading the classifier: {e}",
             )
