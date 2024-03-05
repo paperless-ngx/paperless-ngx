@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-04 17:00-0800\n"
-"PO-Revision-Date: 2024-03-05 01:01\n"
+"PO-Revision-Date: 2024-03-05 15:50\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -685,7 +685,7 @@ msgstr "割り当て"
 
 #: documents/models.py:1006
 msgid "Removal"
-msgstr ""
+msgstr "削除"
 
 #: documents/models.py:1010
 msgid "Workflow Action Type"
@@ -741,71 +741,71 @@ msgstr "カスタム項目の割り当て"
 
 #: documents/models.py:1108
 msgid "remove these tag(s)"
-msgstr ""
+msgstr "タグの削除"
 
 #: documents/models.py:1113
 msgid "remove all tags"
-msgstr ""
+msgstr "すべてのタグの削除"
 
 #: documents/models.py:1120
 msgid "remove these document type(s)"
-msgstr ""
+msgstr "ドキュメントタイプの削除"
 
 #: documents/models.py:1125
 msgid "remove all document types"
-msgstr ""
+msgstr "すべてのドキュメントタイプの削除"
 
 #: documents/models.py:1132
 msgid "remove these correspondent(s)"
-msgstr ""
+msgstr "担当の削除"
 
 #: documents/models.py:1137
 msgid "remove all correspondents"
-msgstr ""
+msgstr "すべての担当の削除"
 
 #: documents/models.py:1144
 msgid "remove these storage path(s)"
-msgstr ""
+msgstr "フォルダーの削除"
 
 #: documents/models.py:1149
 msgid "remove all storage paths"
-msgstr ""
+msgstr "すべてのフォルダーの削除"
 
 #: documents/models.py:1156
 msgid "remove these owner(s)"
-msgstr ""
+msgstr "所有者の削除"
 
 #: documents/models.py:1161
 msgid "remove all owners"
-msgstr ""
+msgstr "すべての所有者の削除"
 
 #: documents/models.py:1168
 msgid "remove view permissions for these users"
-msgstr ""
+msgstr "ユーザの表示権限の削除"
 
 #: documents/models.py:1175
 msgid "remove view permissions for these groups"
-msgstr ""
+msgstr "グループの表示権限の削除"
 
 #: documents/models.py:1182
 msgid "remove change permissions for these users"
-msgstr ""
+msgstr "ユーザの編集権限の削除"
 
 #: documents/models.py:1189
 msgid "remove change permissions for these groups"
-msgstr ""
+msgstr "グループの編集権限の削除"
 
 #: documents/models.py:1194
 msgid "remove all permissions"
-msgstr ""
+msgstr "すべての権限の削除"
 
 #: documents/models.py:1201
 msgid "remove these custom fields"
-msgstr ""
+msgstr "カスタム項目の削除"
 
 #: documents/models.py:1206
 msgid "remove all custom fields"
-msgstr ""
+msgstr "すべてのカスタム項目の削除"
 
 #: documents/models.py:1210
 msgid "workflow action"
