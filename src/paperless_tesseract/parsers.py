@@ -12,6 +12,7 @@ from PIL import Image
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
+from documents.utils import maybe_override_pixel_limit
 from paperless.config import OcrConfig
 from paperless.models import ArchiveFileChoices
 from paperless.models import CleanChoices
@@ -255,6 +256,9 @@ class RasterisedDocumentParser(DocumentParser):
             ocrmypdf_args["sidecar"] = sidecar_file
 
         if self.is_image(mime_type):
+            # This may be required, depending on the known imformation
+            maybe_override_pixel_limit()
+
             dpi = self.get_dpi(input_file)
             a4_dpi = self.calculate_a4_dpi(input_file)
 
