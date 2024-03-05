@@ -223,12 +223,11 @@ def generate_filename(
             }
 
             for field in CustomField.objects.all():
-                placeholders['customfield' + f'{field.pk}'] = '-none-'  
+                placeholders['customfield' + f'{field.pk}'] = '-none-'
 
             for field_instance in CustomFieldInstance.objects.filter(document=doc):
                 placeholders['customfield' + f'{field_instance.field.id}'] = field_instance.value
-			
-			
+
             path = filename_format.format(**placeholders).strip()
             if settings.FILENAME_FORMAT_REMOVE_NONE:
                 path = path.replace("/-none-/", "/")  # remove empty directories
