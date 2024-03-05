@@ -1,6 +1,6 @@
 <pngx-page-header [title]="getTitle()">
 
-  <div ngbDropdown class="me-2 d-flex">
+  <div ngbDropdown class="d-flex">
     <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
       <i-bs name="text-indent-left"></i-bs>
       <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Select</ng-container></div>
@@ -26,7 +26,7 @@
     </label>
   </div>
 
-  <div ngbDropdown class="btn-group ms-2 flex-fill">
+  <div ngbDropdown class="btn-group flex-fill">
     <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle i18n>Sort</button>
     <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow dropdown-menu-right">
       <div class="w-100 d-flex pb-2 mb-1 border-bottom">
@@ -49,7 +49,7 @@
     </div>
   </div>
 
-  <div class="btn-group ms-2 flex-fill" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }" ngbDropdown role="group">
+  <div class="btn-group flex-fill" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }" ngbDropdown role="group">
     <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" tourAnchor="tour.documents-views" ngbDropdownToggle>
       <ng-container i18n>Views</ng-container>
       @if (savedViewIsModified) {
