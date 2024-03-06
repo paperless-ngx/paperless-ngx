@@ -32,7 +32,6 @@
         @if (showActionParamField) {
           <pngx-input-text i18n-title title="Action parameter" formControlName="action_parameter" [error]="error?.action_parameter"></pngx-input-text>
         }
-        <p class="small fst-italic mt-5" i18n>Assignments specified here will supersede any consumption templates.</p>
         <pngx-input-select i18n-title title="Assign title from" [items]="metadataTitleOptions" formControlName="assign_title_from"></pngx-input-select>
         <pngx-input-tags [allowCreate]="false" formControlName="assign_tags"></pngx-input-tags>
         <pngx-input-select i18n-title title="Assign document type" [items]="documentTypes" [allowNull]="true" formControlName="assign_document_type"></pngx-input-select>
