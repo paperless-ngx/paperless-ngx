@@ -20,6 +20,7 @@ from documents.plugins.base import StopConsumeTaskError
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
+from documents.utils import maybe_override_pixel_limit
 
 logger = logging.getLogger("paperless.barcodes")
 
@@ -81,6 +82,9 @@ class BarcodePlugin(ConsumeTaskPlugin):
         self.barcodes: list[Barcode] = []
 
     def run(self) -> Optional[str]:
+        # Some operations may use PIL, override pixel setting if needed
+        maybe_override_pixel_limit()
+
         # Maybe do the conversion of TIFF to PDF
         self.convert_from_tiff_to_pdf()
 

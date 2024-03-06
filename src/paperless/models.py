@@ -151,7 +151,7 @@ class ApplicationConfiguration(AbstractSingletonModel):
     max_image_pixels = models.FloatField(
         verbose_name=_("Sets the maximum image size for decompression"),
         null=True,
-        validators=[MinValueValidator(1_000_000.0)],
+        validators=[MinValueValidator(0.0)],
     )
 
     color_conversion_strategy = models.CharField(

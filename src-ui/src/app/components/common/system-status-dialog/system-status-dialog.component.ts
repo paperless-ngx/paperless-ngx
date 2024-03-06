@@ -1,6 +1,9 @@
 import { Component, Input } from '@angular/core'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { SystemStatus } from 'src/app/data/system-status'
+import {
+  SystemStatus,
+  SystemStatusItemStatus,
+} from 'src/app/data/system-status'
 import { SystemStatusService } from 'src/app/services/system-status.service'
 import { Clipboard } from '@angular/cdk/clipboard'
 
@@ -10,6 +13,7 @@ import { Clipboard } from '@angular/cdk/clipboard'
   styleUrl: './system-status-dialog.component.scss',
 })
 export class SystemStatusDialogComponent {
+  public SystemStatusItemStatus = SystemStatusItemStatus
   public status: SystemStatus
 
   public copied: boolean = false
