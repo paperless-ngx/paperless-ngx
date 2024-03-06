@@ -5,7 +5,7 @@
   i18n-info
   infoLink="usage/#workflows"
   >
-  <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editWorkflow()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Workflow }">
+  <button type="button" class="btn btn-sm btn-outline-primary" (click)="editWorkflow()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Workflow }">
     <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Workflow</ng-container>
   </button>
 </pngx-page-header>

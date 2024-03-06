@@ -9,7 +9,11 @@ import {
 } from '@angular/core'
 import { FormGroup, FormControl } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
-import { NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
+import {
+  NgbModal,
+  NgbModalRef,
+  NgbNavChangeEvent,
+} from '@ng-bootstrap/ng-bootstrap'
 import { DirtyComponent, dirtyCheck } from '@ngneat/dirty-check-forms'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 import {
@@ -40,6 +44,12 @@ import {
 } from 'src/app/services/settings.service'
 import { ToastService, Toast } from 'src/app/services/toast.service'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { SystemStatusDialogComponent } from '../../common/system-status-dialog/system-status-dialog.component'
+import { SystemStatusService } from 'src/app/services/system-status.service'
+import {
+  SystemStatusItemStatus,
+  SystemStatus,
+} from 'src/app/data/system-status'
 
 enum SettingsNavIDs {
   General = 1,
@@ -111,6 +121,18 @@ export class SettingsComponent
   users: User[]
   groups: Group[]
 
+  private systemStatus: SystemStatus
+
+  get systemStatusHasErrors(): boolean {
+    return (
+      this.systemStatus.database.status === SystemStatusItemStatus.ERROR ||
+      this.systemStatus.tasks.redis_status === SystemStatusItemStatus.ERROR ||
+      this.systemStatus.tasks.celery_status === SystemStatusItemStatus.ERROR ||
+      this.systemStatus.tasks.index_status === SystemStatusItemStatus.ERROR ||
+      this.systemStatus.tasks.classifier_status === SystemStatusItemStatus.ERROR
+    )
+  }
+
   get computedDateLocale(): string {
     return (
       this.settingsForm.value.dateLocale ||
@@ -131,7 +153,9 @@ export class SettingsComponent
     private usersService: UserService,
     private groupsService: GroupService,
     private router: Router,
-    public permissionsService: PermissionsService
+    public permissionsService: PermissionsService,
+    private modalService: NgbModal,
+    private systemStatusService: SystemStatusService
   ) {
     super()
     this.settings.settingsSaved.subscribe(() => {
@@ -360,6 +384,17 @@ export class SettingsComponent
       // prevents loss of unsaved changes
       this.settingsForm.patchValue(currentFormValue)
     }
+
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Admin
+      )
+    ) {
+      this.systemStatusService.get().subscribe((status) => {
+        this.systemStatus = status
+      })
+    }
   }
 
   private emptyGroup(group: FormGroup) {
@@ -564,5 +599,15 @@ export class SettingsComponent
 
   clearThemeColor() {
     this.settingsForm.get('themeColor').patchValue('')
+  }
+
+  showSystemStatus() {
+    const modal: NgbModalRef = this.modalService.open(
+      SystemStatusDialogComponent,
+      {
+        size: 'xl',
+      }
+    )
+    modal.componentInstance.status = this.systemStatus
   }
 }

@@ -766,6 +766,8 @@ but could result in missing text content.
     If unset, will default to the value determined by
     [Pillow](https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.MAX_IMAGE_PIXELS).
 
+    Setting this value to 0 will entirely disable the limit.  See the below warning.
+
     !!! note
 
         Increasing this limit could cause Paperless to consume additional
@@ -775,7 +777,7 @@ but could result in missing text content.
     !!! warning
 
         The limit is intended to prevent malicious files from consuming
-        system resources and causing crashes and other errors. Only increase
+        system resources and causing crashes and other errors. Only change
         this value if you are certain your documents are not malicious and
         you need the text which was not OCRed
 
@@ -966,6 +968,20 @@ documents.
 be used with caution!
 
     Defaults to None, which does not add any additional apps.
+
+#### [`PAPERLESS_MAX_IMAGE_PIXELS=<number>`](#PAPERLESS_MAX_IMAGE_PIXELS) {#PAPERLESS_MAX_IMAGE_PIXELS}
+
+: Configures the maximum size of an image PIL will allow to load without warning or error.
+
+: If unset, will default to the value determined by
+[Pillow](https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.MAX_IMAGE_PIXELS).
+
+    Defaults to None, which does change the limit
+
+    !!! warning
+
+        This limit is designed to prevent denial of service from malicious files.
+        It should only be raised or disabled in certain circumstances and with great care.
 
 ## Document Consumption {#consume_config}
 

@@ -32,7 +32,7 @@
         [formControl]="searchField" [ngbTypeahead]="searchAutoComplete" (keyup)="searchFieldKeyup($event)"
         (selectItem)="itemSelected($event)" i18n-placeholder>
       @if (!searchFieldEmpty) {
-        <button type="button" class="btn btn-link btn-sm px-0 position-absolute top-0 end-0" (click)="resetSearchField()">
+        <button type="button" class="btn btn-link btn-sm ps-0 pe-1 position-absolute top-0 end-0" (click)="resetSearchField()">
           <i-bs width="1em" height="1em" name="x"></i-bs>
         </button>
       }

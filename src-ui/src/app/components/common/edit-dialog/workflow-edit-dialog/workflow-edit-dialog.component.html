@@ -1,6 +1,9 @@
 <form [formGroup]="objectForm" (ngSubmit)="save()" autocomplete="off">
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
+    @if (object?.id) {
+      <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{object.id}}</span>
+    }
     <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
     </button>
   </div>
@@ -35,7 +38,7 @@
                   <div ngbAccordionItem>
                     <div ngbAccordionHeader>
                       <button ngbAccordionButton>{{i + 1}}. {{getTriggerTypeOptionName(triggerFields.controls[i].value.type)}}
-                        @if(trigger.id > -1) {
+                        @if(trigger.id) {
                           <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{trigger.id}}</span>
                         }
                         <pngx-confirm-button
@@ -77,7 +80,7 @@
                   <div ngbAccordionItem cdkDrag [formGroup]="actionFields.controls[i]">
                     <div ngbAccordionHeader>
                       <button ngbAccordionButton>{{i + 1}}. {{getActionTypeOptionName(actionFields.controls[i].value.type)}}
-                        @if(action.id > -1) {
+                        @if(action.id) {
                           <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{action.id}}</span>
                         }
                         <pngx-confirm-button
@@ -91,63 +94,7 @@
                     </div>
                     <div ngbAccordionCollapse>
                       <div ngbAccordionBody>
-                        <pngx-input-select i18n-title title="Action type" [horizontal]="true" [items]="actionTypeOptions" formControlName="type"></pngx-input-select>
-                        <input type="hidden" formControlName="id" />
-                        <div class="row">
-                          <div class="col">
-                            <pngx-input-text i18n-title title="Assign title" formControlName="assign_title" i18n-hint hint="Can include some placeholders, see <a target='_blank' href='https://docs.paperless-ngx.com/usage/#workflows'>documentation</a>." [error]="error?.actions?.[i]?.assign_title"></pngx-input-text>
-                            <pngx-input-tags [allowCreate]="false" i18n-title title="Assign tags" formControlName="assign_tags"></pngx-input-tags>
-                            <pngx-input-select i18n-title title="Assign document type" [items]="documentTypes" [allowNull]="true" formControlName="assign_document_type"></pngx-input-select>
-                            <pngx-input-select i18n-title title="Assign correspondent" [items]="correspondents" [allowNull]="true" formControlName="assign_correspondent"></pngx-input-select>
-                            <pngx-input-select i18n-title title="Assign storage path" [items]="storagePaths" [allowNull]="true" formControlName="assign_storage_path"></pngx-input-select>
-                            <pngx-input-select i18n-title title="Assign custom fields" multiple="true" [items]="customFields" [allowNull]="true" formControlName="assign_custom_fields"></pngx-input-select>
-                          </div>
-                          <div class="col">
-                            <pngx-input-select i18n-title title="Assign owner" [items]="users" bindLabel="username" formControlName="assign_owner" [allowNull]="true"></pngx-input-select>
-                            <div>
-                              <label class="form-label" i18n>Assign view permissions</label>
-                              <div class="mb-2">
-                                <div class="row mb-1">
-                                  <div class="col-lg-3">
-                                    <label class="form-label d-block my-2 text-nowrap" i18n>Users:</label>
-                                  </div>
-                                  <div class="col-lg-9">
-                                    <pngx-permissions-user type="view" formControlName="assign_view_users"></pngx-permissions-user>
-                                  </div>
-                                </div>
-                                <div class="row">
-                                  <div class="col-lg-3">
-                                    <label class="form-label d-block my-2 text-nowrap" i18n>Groups:</label>
-                                  </div>
-                                  <div class="col-lg-9">
-                                    <pngx-permissions-group type="view" formControlName="assign_view_groups"></pngx-permissions-group>
-                                  </div>
-                                </div>
-                              </div>
-                              <label class="form-label" i18n>Assign edit permissions</label>
-                              <div>
-                                <div class="row mb-1">
-                                  <div class="col-lg-3">
-                                    <label class="form-label d-block my-2 text-nowrap" i18n>Users:</label>
-                                  </div>
-                                  <div class="col-lg-9">
-                                    <pngx-permissions-user type="change" formControlName="assign_change_users"></pngx-permissions-user>
-                                  </div>
-                                </div>
-                                <div class="row">
-                                  <div class="col-lg-3">
-                                    <label class="form-label d-block my-2 text-nowrap" i18n>Groups:</label>
-                                  </div>
-                                  <div class="col-lg-9">
-                                    <pngx-permissions-group type="change" formControlName="assign_change_groups"></pngx-permissions-group>
-                                  </div>
-                                </div>
-                                <small class="form-text text-muted text-end d-block" i18n>Edit permissions also grant viewing permissions</small>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
+                        <ng-template [ngTemplateOutlet]="actionForm" [ngTemplateOutletContext]="{ formGroup: actionFields.controls[i], action: action }"></ng-template>
                       </div>
                     </div>
                   </div>
@@ -199,5 +146,156 @@
         </div>
       }
     </div>
+  </div>
+</ng-template>
+
+<ng-template #actionForm let-formGroup="formGroup" let action="action">
+  <div [formGroup]="formGroup">
+    <input type="hidden" formControlName="id" />
+    <pngx-input-select i18n-title title="Action type" [horizontal]="true" [items]="actionTypeOptions" formControlName="type"></pngx-input-select>
+    @switch(formGroup.get('type').value) {
+      @case ( WorkflowActionType.Assignment) {
+        <div class="row">
+          <div class="col">
+            <pngx-input-text i18n-title title="Assign title" formControlName="assign_title" i18n-hint hint="Can include some placeholders, see <a target='_blank' href='https://docs.paperless-ngx.com/usage/#workflows'>documentation</a>." [error]="error?.actions?.[i]?.assign_title"></pngx-input-text>
+            <pngx-input-tags [allowCreate]="false" i18n-title title="Assign tags" formControlName="assign_tags"></pngx-input-tags>
+            <pngx-input-select i18n-title title="Assign document type" [items]="documentTypes" [allowNull]="true" formControlName="assign_document_type"></pngx-input-select>
+            <pngx-input-select i18n-title title="Assign correspondent" [items]="correspondents" [allowNull]="true" formControlName="assign_correspondent"></pngx-input-select>
+            <pngx-input-select i18n-title title="Assign storage path" [items]="storagePaths" [allowNull]="true" formControlName="assign_storage_path"></pngx-input-select>
+            <pngx-input-select i18n-title title="Assign custom fields" multiple="true" [items]="customFields" [allowNull]="true" formControlName="assign_custom_fields"></pngx-input-select>
+          </div>
+          <div class="col">
+            <pngx-input-select i18n-title title="Assign owner" [items]="users" bindLabel="username" formControlName="assign_owner" [allowNull]="true"></pngx-input-select>
+            <div>
+              <label class="form-label" i18n>Assign view permissions</label>
+              <div class="mb-2">
+                <div class="row mb-1">
+                  <div class="col-lg-3">
+                    <label class="form-label d-block my-2 text-nowrap" i18n>Users:</label>
+                  </div>
+                  <div class="col-lg-9">
+                    <pngx-permissions-user type="view" formControlName="assign_view_users"></pngx-permissions-user>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-3">
+                    <label class="form-label d-block my-2 text-nowrap" i18n>Groups:</label>
+                  </div>
+                  <div class="col-lg-9">
+                    <pngx-permissions-group type="view" formControlName="assign_view_groups"></pngx-permissions-group>
+                  </div>
+                </div>
+              </div>
+              <label class="form-label" i18n>Assign edit permissions</label>
+              <div>
+                <div class="row mb-1">
+                  <div class="col-lg-3">
+                    <label class="form-label d-block my-2 text-nowrap" i18n>Users:</label>
+                  </div>
+                  <div class="col-lg-9">
+                    <pngx-permissions-user type="change" formControlName="assign_change_users"></pngx-permissions-user>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-3">
+                    <label class="form-label d-block my-2 text-nowrap" i18n>Groups:</label>
+                  </div>
+                  <div class="col-lg-9">
+                    <pngx-permissions-group type="change" formControlName="assign_change_groups"></pngx-permissions-group>
+                  </div>
+                </div>
+                <small class="form-text text-muted text-end d-block" i18n>Edit permissions also grant viewing permissions</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+      @case (WorkflowActionType.Removal) {
+        <div class="row">
+          <div class="col">
+            <h6 class="form-label" i18n>Remove tags</h6>
+            <pngx-input-switch i18n-title title="Remove all" [horizontal]="true" formControlName="remove_all_tags"></pngx-input-switch>
+            <div class="mt-n3">
+              <pngx-input-tags [allowCreate]="false" title="" formControlName="remove_tags"></pngx-input-tags>
+            </div>
+
+            <h6 class="form-label" i18n>Remove correspondents</h6>
+            <pngx-input-switch i18n-title title="Remove all" [horizontal]="true" formControlName="remove_all_correspondents"></pngx-input-switch>
+            <div class="mt-n3">
+              <pngx-input-select i18n-title title="" multiple="true" [items]="correspondents" formControlName="remove_correspondents"></pngx-input-select>
+            </div>
+
+            <h6 class="form-label" i18n>Remove document types</h6>
+            <pngx-input-switch i18n-title title="Remove all" [horizontal]="true" formControlName="remove_all_document_types"></pngx-input-switch>
+            <div class="mt-n3">
+              <pngx-input-select i18n-title title="" multiple="true" [items]="documentTypes" formControlName="remove_document_types"></pngx-input-select>
+            </div>
+
+            <h6 class="form-label" i18n>Remove storage paths</h6>
+            <pngx-input-switch i18n-title title="Remove all" [horizontal]="true" formControlName="remove_all_storage_paths"></pngx-input-switch>
+            <div class="mt-n3">
+              <pngx-input-select i18n-title title="" multiple="true" [items]="storagePaths" formControlName="remove_storage_paths"></pngx-input-select>
+            </div>
+
+            <h6 class="form-label" i18n>Remove custom fields</h6>
+            <pngx-input-switch i18n-title title="Remove all" [horizontal]="true" formControlName="remove_all_custom_fields"></pngx-input-switch>
+            <div class="mt-n3">
+              <pngx-input-select i18n-title title="" multiple="true" [items]="customFields" formControlName="remove_custom_fields"></pngx-input-select>
+            </div>
+          </div>
+          <div class="col">
+            <h6 class="form-label" i18n>Remove owners</h6>
+            <pngx-input-switch i18n-title title="Remove all" [horizontal]="true" formControlName="remove_all_owners"></pngx-input-switch>
+            <div class="mt-n3">
+              <pngx-input-select i18n-title title="" multiple="true" [items]="users" bindLabel="username" formControlName="remove_owners"></pngx-input-select>
+            </div>
+
+            <h6 class="form-label" i18n>Remove permissions</h6>
+            <pngx-input-switch i18n-title title="Remove all" [horizontal]="true" formControlName="remove_all_permissions"></pngx-input-switch>
+            <div>
+              <label class="form-label" i18n>View permissions</label>
+              <div class="mb-2">
+                <div class="row mb-1">
+                  <div class="col-lg-3">
+                    <label class="form-label d-block my-2 text-nowrap" i18n>Users:</label>
+                  </div>
+                  <div class="col-lg-9">
+                    <pngx-permissions-user type="view" formControlName="remove_view_users"></pngx-permissions-user>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-3">
+                    <label class="form-label d-block my-2 text-nowrap" i18n>Groups:</label>
+                  </div>
+                  <div class="col-lg-9">
+                    <pngx-permissions-group type="view" formControlName="remove_view_groups"></pngx-permissions-group>
+                  </div>
+                </div>
+              </div>
+              <label class="form-label" i18n>Edit permissions</label>
+              <div>
+                <div class="row mb-1">
+                  <div class="col-lg-3">
+                    <label class="form-label d-block my-2 text-nowrap" i18n>Users:</label>
+                  </div>
+                  <div class="col-lg-9">
+                    <pngx-permissions-user type="change" formControlName="remove_change_users"></pngx-permissions-user>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-3">
+                    <label class="form-label d-block my-2 text-nowrap" i18n>Groups:</label>
+                  </div>
+                  <div class="col-lg-9">
+                    <pngx-permissions-group type="change" formControlName="remove_change_groups"></pngx-permissions-group>
+                  </div>
+                </div>
+                <small class="form-text text-muted text-end d-block" i18n>Edit permissions also grant viewing permissions</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    }
   </div>
 </ng-template>
