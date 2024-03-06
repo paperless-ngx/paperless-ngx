@@ -380,8 +380,7 @@ def validate_move(instance, old_path, new_path):
 
 @receiver(models.signals.post_save, sender=CustomFieldInstance)
 def update_custom_field_instance(sender, instance: CustomFieldInstance, **kwargs):
-    doc = Document.objects.get(pk=instance.document.pk)
-    update_filename_and_move_files(sender, doc)
+    update_filename_and_move_files(sender, instance.document)
 
 
 @receiver(models.signals.m2m_changed, sender=Document.tags.through)
