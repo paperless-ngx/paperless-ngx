@@ -56,4 +56,10 @@ describe('MonetaryComponent', () => {
     component.monetaryValue = 10.5
     expect(component.value).toEqual('EUR10.50')
   })
+
+  it('should set the default currency code based on LOCALE_ID', () => {
+    expect(component.defaultCurrencyCode).toEqual('USD') // default
+    component = new MonetaryComponent('pt-BR')
+    expect(component.defaultCurrencyCode).toEqual('BRL')
+  })
 })
