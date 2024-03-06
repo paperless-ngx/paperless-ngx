@@ -1581,7 +1581,9 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
         except Exception as e:  # pragma: no cover
             applied_migrations = []
             db_status = "ERROR"
-            logger.exception(f"System status error connecting to database: {e}")
+            logger.exception(
+                f"System status detected a possible problem while connecting to the database: {e}",
+            )
             db_error = "Error connecting to database, check logs for more detail."
 
         media_stats = os.statvfs(settings.MEDIA_ROOT)
@@ -1594,7 +1596,9 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
                 redis_status = "OK"
             except Exception as e:
                 redis_status = "ERROR"
-                logger.exception(f"System status error connecting to redis: {e}")
+                logger.exception(
+                    f"System status detected a possible problem while connecting to redis: {e}",
+                )
                 redis_error = "Error connecting to redis, check logs for more detail."
 
         try:
@@ -1615,14 +1619,40 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
         except Exception as e:
             index_status = "ERROR"
             index_error = "Error opening index, check logs for more detail."
-            logger.exception(f"System status error opening index: {e}")
+            logger.exception(
+                f"System status detected a possible problem while opening the index: {e}",
+            )
             index_last_modified = None
 
         classifier_error = None
+        classifier_status = None
         try:
             classifier = load_classifier()
             if classifier is None:
-                raise Exception("Classifier not loaded")
+                # Make sure classifier should exist
+                docs_queryset = Document.objects.exclude(
+                    tags__is_inbox_tag=True,
+                )
+                if (
+                    docs_queryset.count() > 0
+                    and (
+                        Tag.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
+                        or DocumentType.objects.filter(
+                            matching_algorithm=Tag.MATCH_AUTO,
+                        ).exists()
+                        or Correspondent.objects.filter(
+                            matching_algorithm=Tag.MATCH_AUTO,
+                        ).exists()
+                        or StoragePath.objects.filter(
+                            matching_algorithm=Tag.MATCH_AUTO,
+                        ).exists()
+                    )
+                    and not os.path.isfile(settings.MODEL_FILE)
+                ):
+                    # if classifier file doesn't exist just classify as a warning
+                    classifier_error = "Classifier file does not exist (yet). Re-training may be pending."
+                    classifier_status = "WARNING"
+                    raise FileNotFoundError(classifier_error)
             classifier_status = "OK"
             task_result_model = apps.get_model("django_celery_results", "taskresult")
             result = (
@@ -1637,10 +1667,16 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
             )
             classifier_last_trained = result.date_done if result else None
         except Exception as e:
-            classifier_status = "ERROR"
+            if classifier_status is None:
+                classifier_status = "ERROR"
             classifier_last_trained = None
-            classifier_error = "Error loading classifier, check logs for more detail."
-            logger.exception(f"System status error loading classifier: {e}")
+            if classifier_error is None:
+                classifier_error = (
+                    "Unable to load classifier, check logs for more detail."
+                )
+            logger.exception(
+                f"System status detected a possible problem while loading the classifier: {e}",
+            )
 
         return Response(
             {

@@ -7,7 +7,7 @@
   <button class="btn btn-sm btn-outline-primary" (click)="tourService.start()">
     <i-bs class="me-1" name="airplane"></i-bs>&nbsp;<ng-container i18n>Start tour</ng-container>
   </button>
-  <button class="btn btn-sm btn-outline-primary position-relative ms-5" (click)="showSystemStatus()"
+  <button class="btn btn-sm btn-outline-primary position-relative ms-md-5 me-1" (click)="showSystemStatus()"
     [disabled]="!systemStatus"
     *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Admin }">
     @if (!systemStatus) {
@@ -26,7 +26,7 @@
     }
     <ng-container i18n>System Status</ng-container>
   </button>
-  <a *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Admin }" class="btn btn-sm btn-primary ms-3" href="admin/" target="_blank">
+  <a *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Admin }" class="btn btn-sm btn-primary" href="admin/" target="_blank">
     <ng-container i18n>Open Django Admin</ng-container>
     &nbsp;<i-bs name="arrow-up-right"></i-bs>
   </a>
