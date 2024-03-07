@@ -1,13 +1,14 @@
 import {
   Component,
-  DEFAULT_CURRENCY_CODE,
   ElementRef,
   forwardRef,
   Inject,
+  LOCALE_ID,
   ViewChild,
 } from '@angular/core'
 import { NG_VALUE_ACCESSOR } from '@angular/forms'
 import { AbstractInputComponent } from '../abstract-input'
+import { getLocaleCurrencyCode } from '@angular/common'
 
 @Component({
   providers: [
@@ -24,11 +25,12 @@ import { AbstractInputComponent } from '../abstract-input'
 export class MonetaryComponent extends AbstractInputComponent<string> {
   @ViewChild('currencyField')
   currencyField: ElementRef
+  defaultCurrencyCode: string
 
-  constructor(
-    @Inject(DEFAULT_CURRENCY_CODE) public defaultCurrencyCode: string
-  ) {
+  constructor(@Inject(LOCALE_ID) currentLocale: string) {
     super()
+
+    this.defaultCurrencyCode = getLocaleCurrencyCode(currentLocale)
   }
 
   get currencyCode(): string {
