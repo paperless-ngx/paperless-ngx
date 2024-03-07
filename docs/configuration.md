@@ -1405,6 +1405,17 @@ one pod).
 
     Defaults to 8000.
 
+
+#### [`PAPERLESS_START_REDIS`](#PAPERLESS_START_REDIS) {#PAPERLESS_START_REDIS}
+
+: Set to non-empty to start a built-in redis server inside the container.
+This option will override the `PAPERLESS_REDIS` option.
+
+    This option has no effect when not using Docker.
+
+    Defaults to '' (do not run built-in redis).
+
+
 #### [`USERMAP_UID=<uid>`](#USERMAP_UID) {#USERMAP_UID}
 
 : The ID of the paperless user in the container. Set this to your

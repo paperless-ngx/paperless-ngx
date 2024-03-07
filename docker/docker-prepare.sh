@@ -53,6 +53,11 @@ wait_for_mariadb() {
 	done
 }
 
+start_redis() {
+	echo "Starting Redis Server"
+	redis-server &
+}
+
 wait_for_redis() {
 	# We use a Python script to send the Redis ping
 	# instead of installing redis-tools just for 1 thing
@@ -101,6 +106,11 @@ do_work() {
 		wait_for_mariadb
 	elif [[ -n "${PAPERLESS_DBHOST}" ]]; then
 		wait_for_postgres
+	fi
+
+	if [[ -n "${PAPERLESS_START_REDIS}" ]]; then
+		export PAPERLESS_REDIS="redis://localhost:6379"
+		start_redis
 	fi
 
 	wait_for_redis

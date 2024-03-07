@@ -96,6 +96,7 @@ ARG RUNTIME_PACKAGES="\
   tesseract-ocr-spa \
   unpaper \
   pngquant \
+  redis \
   jbig2dec \
   # lxml
   libxml2 \
