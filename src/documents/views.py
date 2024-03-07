@@ -1211,6 +1211,22 @@ class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     filterset_class = StoragePathFilterSet
     ordering_fields = ("name", "path", "matching_algorithm", "match", "document_count")
 
+    def destroy(self, request, *args, **kwargs):
+        """
+        When a storage path is deleted, see if documents
+        using it require a rename/move
+        """
+        instance = self.get_object()
+        doc_ids = [doc.id for doc in instance.documents.all()]
+
+        # perform the deletion so renaming/moving can happen
+        response = super().destroy(request, *args, **kwargs)
+
+        if len(doc_ids):
+            bulk_edit.bulk_update_documents.delay(doc_ids)
+
+        return response
+
 
 class UiSettingsView(GenericAPIView):
     queryset = UiSettings.objects.all()
