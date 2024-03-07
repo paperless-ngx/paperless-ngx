@@ -264,7 +264,7 @@ directory. See [File name handling](advanced_usage.md#file-name-handling) for de
 : Tells paperless to replace placeholders in
 `PAPERLESS_FILENAME_FORMAT` that would resolve to
 'none' to be omitted from the resulting filename. This also holds
-true for directory names. See [File name handling](advanced_usage.md#file-name-handling) for
+true for directory names. See [File name handling](advanced_usage.md#empty-placeholders) for
 details.
 
     Defaults to `false` which disables this feature.
