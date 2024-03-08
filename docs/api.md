@@ -366,7 +366,7 @@ The following methods are supported:
 - `modify_tags`
   - Requires `parameters`: `{ "add_tags": [LIST_OF_TAG_IDS] }` and / or `{ "remove_tags": [LIST_OF_TAG_IDS] }`
 - `delete`
-  - No `parameters` required
+  - Empty `parameters` required: `{ }`
 - `redo_ocr`
   - No `parameters` required
 - `set_permissions`
