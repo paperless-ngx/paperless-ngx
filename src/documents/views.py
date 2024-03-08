@@ -24,6 +24,7 @@ from django.db.models import Case
 from django.db.models import Count
 from django.db.models import IntegerField
 from django.db.models import Max
+from django.db.models import Q
 from django.db.models import Sum
 from django.db.models import When
 from django.db.models.functions import Length
@@ -213,12 +214,37 @@ class PassUserMixin(CreateModelMixin):
         return super().get_serializer(*args, **kwargs)
 
 
-class CorrespondentViewSet(ModelViewSet, PassUserMixin):
+class PermissionsAwareDocumentCountMixin(PassUserMixin):
+    """
+    Mixin to add document count to queryset, permissions-aware if needed
+    """
+
+    def get_queryset(self):
+        filter = (
+            None
+            if self.request.user is None or self.request.user.is_superuser
+            else (
+                Q(
+                    documents__id__in=get_objects_for_user_owner_aware(
+                        self.request.user,
+                        "documents.view_document",
+                        Document,
+                    ).values_list("id", flat=True),
+                )
+            )
+        )
+        return (
+            super()
+            .get_queryset()
+            .annotate(document_count=Count("documents", filter=filter))
+        )
+
+
+class CorrespondentViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = Correspondent
 
     queryset = (
         Correspondent.objects.annotate(
-            document_count=Count("documents"),
             last_correspondence=Max("documents__created"),
         )
         .select_related("owner")
@@ -243,15 +269,11 @@ class CorrespondentViewSet(ModelViewSet, PassUserMixin):
     )
 
 
-class TagViewSet(ModelViewSet, PassUserMixin):
+class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = Tag
 
-    queryset = (
-        Tag.objects.annotate(document_count=Count("documents"))
-        .select_related("owner")
-        .order_by(
-            Lower("name"),
-        )
+    queryset = Tag.objects.select_related("owner").order_by(
+        Lower("name"),
     )
 
     def get_serializer_class(self, *args, **kwargs):
@@ -271,16 +293,10 @@ class TagViewSet(ModelViewSet, PassUserMixin):
     ordering_fields = ("color", "name", "matching_algorithm", "match", "document_count")
 
 
-class DocumentTypeViewSet(ModelViewSet, PassUserMixin):
+class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = DocumentType
 
-    queryset = (
-        DocumentType.objects.annotate(
-            document_count=Count("documents"),
-        )
-        .select_related("owner")
-        .order_by(Lower("name"))
-    )
+    queryset = DocumentType.objects.select_related("owner").order_by(Lower("name"))
 
     serializer_class = DocumentTypeSerializer
     pagination_class = StandardPagination
@@ -1177,15 +1193,11 @@ class BulkDownloadView(GenericAPIView):
             return response
 
 
-class StoragePathViewSet(ModelViewSet, PassUserMixin):
+class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = StoragePath
 
-    queryset = (
-        StoragePath.objects.annotate(document_count=Count("documents"))
-        .select_related("owner")
-        .order_by(
-            Lower("name"),
-        )
+    queryset = StoragePath.objects.select_related("owner").order_by(
+        Lower("name"),
     )
 
     serializer_class = StoragePathSerializer
@@ -1198,6 +1210,22 @@ class StoragePathViewSet(ModelViewSet, PassUserMixin):
     )
     filterset_class = StoragePathFilterSet
     ordering_fields = ("name", "path", "matching_algorithm", "match", "document_count")
+
+    def destroy(self, request, *args, **kwargs):
+        """
+        When a storage path is deleted, see if documents
+        using it require a rename/move
+        """
+        instance = self.get_object()
+        doc_ids = [doc.id for doc in instance.documents.all()]
+
+        # perform the deletion so renaming/moving can happen
+        response = super().destroy(request, *args, **kwargs)
+
+        if len(doc_ids):
+            bulk_edit.bulk_update_documents.delay(doc_ids)
+
+        return response
 
 
 class UiSettingsView(GenericAPIView):

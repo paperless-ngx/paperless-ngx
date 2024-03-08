@@ -155,7 +155,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     }
   }
 
-  .row-cols-paperless-cards .card {
+  .row-cols-paperless-cards .card, pngx-document-card-large .card {
     --bs-border-color-translucent: rgba(0, 0, 0, .3);
   }
 

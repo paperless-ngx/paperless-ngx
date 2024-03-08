@@ -224,6 +224,35 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
 
         self.assertCountEqual([document.pk], args[0])
 
+    @mock.patch("documents.bulk_edit.bulk_update_documents.delay")
+    def test_api_delete_storage_path(self, bulk_update_mock):
+        """
+        GIVEN:
+            - API request to delete a storage
+        WHEN:
+            - API is called
+        THEN:
+            - Documents using the storage path are updated
+        """
+        document = Document.objects.create(
+            mime_type="application/pdf",
+            storage_path=self.sp1,
+        )
+        response = self.client.delete(
+            f"{self.ENDPOINT}{self.sp1.pk}/",
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # sp with no documents
+        sp2 = StoragePath.objects.create(name="sp2", path="Something2/{checksum}")
+        response = self.client.delete(
+            f"{self.ENDPOINT}{sp2.pk}/",
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # only called once
+        bulk_update_mock.assert_called_once_with([document.pk])
+
 
 class TestBulkEditObjects(APITestCase):
     # See test_api_permissions.py for bulk tests on permissions
