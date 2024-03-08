@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-04 17:00-0800\n"
-"PO-Revision-Date: 2024-03-05 01:01\n"
+"PO-Revision-Date: 2024-03-07 00:18\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -685,7 +685,7 @@ msgstr "Affectation"
 
 #: documents/models.py:1006
 msgid "Removal"
-msgstr ""
+msgstr "Suppression"
 
 #: documents/models.py:1010
 msgid "Workflow Action Type"
@@ -721,11 +721,11 @@ msgstr "assigner ce propriétaire"
 
 #: documents/models.py:1073
 msgid "grant view permissions to these users"
-msgstr "accorder des permissions de vue à ces utilisateurs"
+msgstr "accorder des autorisations de consultation à ces utilisateurs"
 
 #: documents/models.py:1080
 msgid "grant view permissions to these groups"
-msgstr "accorder des droits de vue à ces groupes"
+msgstr "accorder des autorisations de consultation à ces groupes"
 
 #: documents/models.py:1087
 msgid "grant change permissions to these users"
@@ -741,71 +741,71 @@ msgstr "assigner ces champs personnalisés"
 
 #: documents/models.py:1108
 msgid "remove these tag(s)"
-msgstr ""
+msgstr "supprimer cette/ces étiquette(s)"
 
 #: documents/models.py:1113
 msgid "remove all tags"
-msgstr ""
+msgstr "supprimer toutes les étiquettes"
 
 #: documents/models.py:1120
 msgid "remove these document type(s)"
-msgstr ""
+msgstr "supprimer ce(s) type(s) de document"
 
 #: documents/models.py:1125
 msgid "remove all document types"
-msgstr ""
+msgstr "supprimer tous les types de document"
 
 #: documents/models.py:1132
 msgid "remove these correspondent(s)"
-msgstr ""
+msgstr "supprimer ce(s) correspondant(s)"
 
 #: documents/models.py:1137
 msgid "remove all correspondents"
-msgstr ""
+msgstr "supprimer tous les correspondants"
 
 #: documents/models.py:1144
 msgid "remove these storage path(s)"
-msgstr ""
+msgstr "supprimer ce(s) chemin(s) de stockage"
 
 #: documents/models.py:1149
 msgid "remove all storage paths"
-msgstr ""
+msgstr "supprimer tous les chemins de stockage"
 
 #: documents/models.py:1156
 msgid "remove these owner(s)"
-msgstr ""
+msgstr "supprimer ce(s) propriétaire(s)"
 
 #: documents/models.py:1161
 msgid "remove all owners"
-msgstr ""
+msgstr "supprimer tous les propriétaires"
 
 #: documents/models.py:1168
 msgid "remove view permissions for these users"
-msgstr ""
+msgstr "supprimer les autorisations de consultation pour ces utilisateurs"
 
 #: documents/models.py:1175
 msgid "remove view permissions for these groups"
-msgstr ""
+msgstr "supprimer les autorisations de consultation pour ces groupes"
 
 #: documents/models.py:1182
 msgid "remove change permissions for these users"
-msgstr ""
+msgstr "supprimer l'autorisation de modification pour ces utilisateurs"
 
 #: documents/models.py:1189
 msgid "remove change permissions for these groups"
-msgstr ""
+msgstr "supprimer l'autorisation de modification pour ces groupes"
 
 #: documents/models.py:1194
 msgid "remove all permissions"
-msgstr ""
+msgstr "supprimer toutes les autorisations"
 
 #: documents/models.py:1201
 msgid "remove these custom fields"
-msgstr ""
+msgstr "supprimer tous ces champs personnalisés"
 
 #: documents/models.py:1206
 msgid "remove all custom fields"
-msgstr ""
+msgstr "supprimer tous les champs personnalisés"
 
 #: documents/models.py:1210
 msgid "workflow action"
