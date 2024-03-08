@@ -56,7 +56,7 @@
               <dt i18n>Migration Status</dt>
               <dd class="d-flex align-items-center">
                 @if (status.database.migration_status.unapplied_migrations.length === 0) {
-                  <ng-container>Up to date</ng-container><i-bs name="check-circle-fill" class="text-primary ms-2 lh-1" [ngbPopover]="migrationStatus" triggers="mouseenter:mouseleave"></i-bs>
+                  <ng-container i18n>Up to date</ng-container><i-bs name="check-circle-fill" class="text-primary ms-2 lh-1" [ngbPopover]="migrationStatus" triggers="mouseenter:mouseleave"></i-bs>
                 } @else {
                   <ng-container>{{status.database.migration_status.unapplied_migrations.length}} Pending</ng-container><i-bs name="exclamation-triangle-fill" class="text-warning ms-2 lh-1" [ngbPopover]="migrationStatus" triggers="mouseenter:mouseleave"></i-bs>
                 }
