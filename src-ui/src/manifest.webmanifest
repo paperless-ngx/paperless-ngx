@@ -14,5 +14,6 @@
   ],
   "name": "Paperless-ngx",
   "short_name": "Paperless-ngx",
+  "theme_color": "#17541f",
   "start_url": "/"
 }
