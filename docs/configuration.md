@@ -264,7 +264,7 @@ directory. See [File name handling](advanced_usage.md#file-name-handling) for de
 : Tells paperless to replace placeholders in
 `PAPERLESS_FILENAME_FORMAT` that would resolve to
 'none' to be omitted from the resulting filename. This also holds
-true for directory names. See [File name handling](advanced_usage.md#file-name-handling) for
+true for directory names. See [File name handling](advanced_usage.md#empty-placeholders) for
 details.
 
     Defaults to `false` which disables this feature.
@@ -585,7 +585,7 @@ system. See the corresponding
 
 #### [`PAPERLESS_DISABLE_REGULAR_LOGIN=<bool>`](#PAPERLESS_DISABLE_REGULAR_LOGIN) {#PAPERLESS_DISABLE_REGULAR_LOGIN}
 
-: Disables the regular frontend username / password login, i.e. once you have setup SSO. Note that the Django admin login cannot be disabled.
+: Disables the regular frontend username / password login, i.e. once you have setup SSO. Note that this setting does not disable the Django admin login. To prevent logins directly to Django, consider blocking `/admin/` in your [web server or reverse proxy configuration](https://github.com/paperless-ngx/paperless-ngx/wiki/Using-a-Reverse-Proxy-with-Paperless-ngx).
 
     Defaults to False
 

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-04 17:00-0800\n"
-"PO-Revision-Date: 2024-03-05 01:01\n"
+"PO-Revision-Date: 2024-03-06 12:10\n"
 "Last-Translator: \n"
 "Language-Team: Swedish\n"
 "Language: sv_SE\n"
@@ -47,11 +47,11 @@ msgstr "Reguljära uttryck"
 
 #: documents/models.py:58 documents/models.py:902
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Ungefärligt ord"
 
 #: documents/models.py:59
 msgid "Automatic"
-msgstr ""
+msgstr "Automatisk"
 
 #: documents/models.py:62 documents/models.py:397 documents/models.py:1218
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
@@ -365,7 +365,7 @@ msgstr "fulltextfråga"
 
 #: documents/models.py:446
 msgid "more like this"
-msgstr ""
+msgstr "mer som detta"
 
 #: documents/models.py:447
 msgid "has tags in"
@@ -385,51 +385,51 @@ msgstr "sökväg till lagring är"
 
 #: documents/models.py:451
 msgid "has correspondent in"
-msgstr ""
+msgstr "har korrespondent i"
 
 #: documents/models.py:452
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "har inte korrespondent i"
 
 #: documents/models.py:453
 msgid "has document type in"
-msgstr ""
+msgstr "har dokumenttyp i"
 
 #: documents/models.py:454
 msgid "does not have document type in"
-msgstr ""
+msgstr "har inte dokumenttyp i"
 
 #: documents/models.py:455
 msgid "has storage path in"
-msgstr ""
+msgstr "har sökväg till lagring i"
 
 #: documents/models.py:456
 msgid "does not have storage path in"
-msgstr ""
+msgstr "har inte sökväg till lagring i"
 
 #: documents/models.py:457
 msgid "owner is"
-msgstr ""
+msgstr "ägare är"
 
 #: documents/models.py:458
 msgid "has owner in"
-msgstr ""
+msgstr "har ägare i"
 
 #: documents/models.py:459
 msgid "does not have owner"
-msgstr ""
+msgstr "har inte ägare"
 
 #: documents/models.py:460
 msgid "does not have owner in"
-msgstr ""
+msgstr "har inte ägare i"
 
 #: documents/models.py:461
 msgid "has custom field value"
-msgstr ""
+msgstr "har anpassat fältvärde"
 
 #: documents/models.py:462
 msgid "is shared by me"
-msgstr ""
+msgstr "delas av mig"
 
 #: documents/models.py:472
 msgid "rule type"
@@ -521,7 +521,7 @@ msgstr "De data som returneras av uppgiften"
 
 #: documents/models.py:655
 msgid "Note for the document"
-msgstr ""
+msgstr "Anteckning för dokumentet"
 
 #: documents/models.py:679
 msgid "user"
@@ -529,7 +529,7 @@ msgstr "användare"
 
 #: documents/models.py:684
 msgid "note"
-msgstr ""
+msgstr "anteckning"
 
 #: documents/models.py:685
 msgid "notes"
@@ -537,7 +537,7 @@ msgstr "anteckningar"
 
 #: documents/models.py:693
 msgid "Archive"
-msgstr ""
+msgstr "Arkiv"
 
 #: documents/models.py:694
 msgid "Original"
@@ -545,87 +545,87 @@ msgstr "Original"
 
 #: documents/models.py:705
 msgid "expiration"
-msgstr ""
+msgstr "utgångsdatum"
 
 #: documents/models.py:712
 msgid "slug"
-msgstr ""
+msgstr "permalänk"
 
 #: documents/models.py:744
 msgid "share link"
-msgstr ""
+msgstr "dela länk"
 
 #: documents/models.py:745
 msgid "share links"
-msgstr ""
+msgstr "dela länkar"
 
 #: documents/models.py:757
 msgid "String"
-msgstr ""
+msgstr "Sträng"
 
 #: documents/models.py:758
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: documents/models.py:759
 msgid "Date"
-msgstr ""
+msgstr "Datum"
 
 #: documents/models.py:760
 msgid "Boolean"
-msgstr ""
+msgstr "Boolean"
 
 #: documents/models.py:761
 msgid "Integer"
-msgstr ""
+msgstr "Heltal"
 
 #: documents/models.py:762
 msgid "Float"
-msgstr ""
+msgstr "Flyttal"
 
 #: documents/models.py:763
 msgid "Monetary"
-msgstr ""
+msgstr "Monetär"
 
 #: documents/models.py:764
 msgid "Document Link"
-msgstr ""
+msgstr "Dokumentlänk"
 
 #: documents/models.py:776
 msgid "data type"
-msgstr ""
+msgstr "datatyp"
 
 #: documents/models.py:784
 msgid "custom field"
-msgstr ""
+msgstr "anpassat fält"
 
 #: documents/models.py:785
 msgid "custom fields"
-msgstr ""
+msgstr "anpassade fält"
 
 #: documents/models.py:847
 msgid "custom field instance"
-msgstr ""
+msgstr "anpassad fältinstans"
 
 #: documents/models.py:848
 msgid "custom field instances"
-msgstr ""
+msgstr "anpassade fältinstanser"
 
 #: documents/models.py:905
 msgid "Consumption Started"
-msgstr ""
+msgstr "Konsumtion påbörjad"
 
 #: documents/models.py:906
 msgid "Document Added"
-msgstr ""
+msgstr "Dokument tillagt"
 
 #: documents/models.py:907
 msgid "Document Updated"
-msgstr ""
+msgstr "Dokument uppdaterat"
 
 #: documents/models.py:910
 msgid "Consume Folder"
-msgstr ""
+msgstr "Förbruka mapp"
 
 #: documents/models.py:911
 msgid "Api Upload"
