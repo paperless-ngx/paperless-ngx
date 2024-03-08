@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-04 17:00-0800\n"
-"PO-Revision-Date: 2024-03-05 15:50\n"
+"PO-Revision-Date: 2024-03-06 12:10\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -757,55 +757,55 @@ msgstr "Alle Dokumenttypen entfernen"
 
 #: documents/models.py:1132
 msgid "remove these correspondent(s)"
-msgstr ""
+msgstr "Diese(n) Korrespondenten entfernen"
 
 #: documents/models.py:1137
 msgid "remove all correspondents"
-msgstr ""
+msgstr "Alle Korrespondenten entfernen"
 
 #: documents/models.py:1144
 msgid "remove these storage path(s)"
-msgstr ""
+msgstr "Diese(n) Speicherpfad(e) entfernen"
 
 #: documents/models.py:1149
 msgid "remove all storage paths"
-msgstr ""
+msgstr "Alle Speicherpfade entfernen"
 
 #: documents/models.py:1156
 msgid "remove these owner(s)"
-msgstr ""
+msgstr "Diese(n) Eigentümer entfernen"
 
 #: documents/models.py:1161
 msgid "remove all owners"
-msgstr ""
+msgstr "Alle Eigentümer entfernen"
 
 #: documents/models.py:1168
 msgid "remove view permissions for these users"
-msgstr ""
+msgstr "Anzeigeberechtigungen für diese Benutzer entfernen"
 
 #: documents/models.py:1175
 msgid "remove view permissions for these groups"
-msgstr ""
+msgstr "Anzeigeberechtigungen für diese Gruppen entfernen"
 
 #: documents/models.py:1182
 msgid "remove change permissions for these users"
-msgstr ""
+msgstr "Bearbeitungsberechtigungen für diese Benutzer entfernen"
 
 #: documents/models.py:1189
 msgid "remove change permissions for these groups"
-msgstr ""
+msgstr "Bearbeitungsberechtigungen für diese Gruppen entfernen"
 
 #: documents/models.py:1194
 msgid "remove all permissions"
-msgstr ""
+msgstr "Alle Berechtigungen entfernen"
 
 #: documents/models.py:1201
 msgid "remove these custom fields"
-msgstr ""
+msgstr "Diese benutzerdefinierten Felder entfernen"
 
 #: documents/models.py:1206
 msgid "remove all custom fields"
-msgstr ""
+msgstr "Alle benutzerdefinierten Felder entfernen"
 
 #: documents/models.py:1210
 msgid "workflow action"
