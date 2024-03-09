@@ -228,7 +228,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
-                {"documents": [self.doc1.id], "method": "delete", "parameters": {}},
+                {"documents": [self.doc1.id], "method": "delete"},
             ),
             content_type="application/json",
         )
@@ -354,7 +354,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(Document.objects.count(), 5)
         response = self.client.post(
             "/api/documents/bulk_edit/",
-            json.dumps({"documents": [-235], "method": "delete", "parameters": {}}),
+            json.dumps({"documents": [-235], "method": "delete"}),
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -461,7 +461,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
-                {"documents": [self.doc2.id], "method": "add_tag", "parameters": {}},
+                {"documents": [self.doc2.id], "method": "add_tag"},
             ),
             content_type="application/json",
         )
@@ -488,7 +488,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
-                {"documents": [self.doc2.id], "method": "remove_tag", "parameters": {}},
+                {"documents": [self.doc2.id], "method": "remove_tag"},
             ),
             content_type="application/json",
         )
