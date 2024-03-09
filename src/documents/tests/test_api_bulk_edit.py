@@ -6,7 +6,6 @@ from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from documents import bulk_edit
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
@@ -15,7 +14,7 @@ from documents.models import Tag
 from documents.tests.utils import DirectoriesMixin
 
 
-class TestBulkEdit(DirectoriesMixin, APITestCase):
+class TestBulkEditAPI(DirectoriesMixin, APITestCase):
     def setUp(self):
         super().setUp()
 
@@ -50,144 +49,6 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         self.doc3.tags.add(self.t2)
         self.doc4.tags.add(self.t1, self.t2)
         self.sp1 = StoragePath.objects.create(name="sp1", path="Something/{checksum}")
-
-    def test_set_correspondent(self):
-        self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 1)
-        bulk_edit.set_correspondent(
-            [self.doc1.id, self.doc2.id, self.doc3.id],
-            self.c2.id,
-        )
-        self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 3)
-        self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
-        self.assertCountEqual(kwargs["document_ids"], [self.doc1.id, self.doc2.id])
-
-    def test_unset_correspondent(self):
-        self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 1)
-        bulk_edit.set_correspondent([self.doc1.id, self.doc2.id, self.doc3.id], None)
-        self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 0)
-        self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
-        self.assertCountEqual(kwargs["document_ids"], [self.doc2.id, self.doc3.id])
-
-    def test_set_document_type(self):
-        self.assertEqual(Document.objects.filter(document_type=self.dt2).count(), 1)
-        bulk_edit.set_document_type(
-            [self.doc1.id, self.doc2.id, self.doc3.id],
-            self.dt2.id,
-        )
-        self.assertEqual(Document.objects.filter(document_type=self.dt2).count(), 3)
-        self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
-        self.assertCountEqual(kwargs["document_ids"], [self.doc1.id, self.doc2.id])
-
-    def test_unset_document_type(self):
-        self.assertEqual(Document.objects.filter(document_type=self.dt2).count(), 1)
-        bulk_edit.set_document_type([self.doc1.id, self.doc2.id, self.doc3.id], None)
-        self.assertEqual(Document.objects.filter(document_type=self.dt2).count(), 0)
-        self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
-        self.assertCountEqual(kwargs["document_ids"], [self.doc2.id, self.doc3.id])
-
-    def test_set_document_storage_path(self):
-        """
-        GIVEN:
-            - 5 documents without defined storage path
-        WHEN:
-            - Bulk edit called to add storage path to 1 document
-        THEN:
-            - Single document storage path update
-        """
-        self.assertEqual(Document.objects.filter(storage_path=None).count(), 5)
-
-        bulk_edit.set_storage_path(
-            [self.doc1.id],
-            self.sp1.id,
-        )
-
-        self.assertEqual(Document.objects.filter(storage_path=None).count(), 4)
-
-        self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
-
-        self.assertCountEqual(kwargs["document_ids"], [self.doc1.id])
-
-    def test_unset_document_storage_path(self):
-        """
-        GIVEN:
-            - 4 documents without defined storage path
-            - 1 document with a defined storage
-        WHEN:
-            - Bulk edit called to remove storage path from 1 document
-        THEN:
-            - Single document storage path removed
-        """
-        self.assertEqual(Document.objects.filter(storage_path=None).count(), 5)
-
-        bulk_edit.set_storage_path(
-            [self.doc1.id],
-            self.sp1.id,
-        )
-
-        self.assertEqual(Document.objects.filter(storage_path=None).count(), 4)
-
-        bulk_edit.set_storage_path(
-            [self.doc1.id],
-            None,
-        )
-
-        self.assertEqual(Document.objects.filter(storage_path=None).count(), 5)
-
-        self.async_task.assert_called()
-        args, kwargs = self.async_task.call_args
-
-        self.assertCountEqual(kwargs["document_ids"], [self.doc1.id])
-
-    def test_add_tag(self):
-        self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 2)
-        bulk_edit.add_tag(
-            [self.doc1.id, self.doc2.id, self.doc3.id, self.doc4.id],
-            self.t1.id,
-        )
-        self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 4)
-        self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
-        self.assertCountEqual(kwargs["document_ids"], [self.doc1.id, self.doc3.id])
-
-    def test_remove_tag(self):
-        self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 2)
-        bulk_edit.remove_tag([self.doc1.id, self.doc3.id, self.doc4.id], self.t1.id)
-        self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 1)
-        self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
-        self.assertCountEqual(kwargs["document_ids"], [self.doc4.id])
-
-    def test_modify_tags(self):
-        tag_unrelated = Tag.objects.create(name="unrelated")
-        self.doc2.tags.add(tag_unrelated)
-        self.doc3.tags.add(tag_unrelated)
-        bulk_edit.modify_tags(
-            [self.doc2.id, self.doc3.id],
-            add_tags=[self.t2.id],
-            remove_tags=[self.t1.id],
-        )
-
-        self.assertCountEqual(list(self.doc2.tags.all()), [self.t2, tag_unrelated])
-        self.assertCountEqual(list(self.doc3.tags.all()), [self.t2, tag_unrelated])
-
-        self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
-        # TODO: doc3 should not be affected, but the query for that is rather complicated
-        self.assertCountEqual(kwargs["document_ids"], [self.doc2.id, self.doc3.id])
-
-    def test_delete(self):
-        self.assertEqual(Document.objects.count(), 5)
-        bulk_edit.delete([self.doc1.id, self.doc2.id])
-        self.assertEqual(Document.objects.count(), 3)
-        self.assertCountEqual(
-            [doc.id for doc in Document.objects.all()],
-            [self.doc3.id, self.doc4.id, self.doc5.id],
-        )
 
     @mock.patch("documents.serialisers.bulk_edit.set_correspondent")
     def test_api_set_correspondent(self, m):
@@ -367,7 +228,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
-                {"documents": [self.doc1.id], "method": "delete", "parameters": {}},
+                {"documents": [self.doc1.id], "method": "delete"},
             ),
             content_type="application/json",
         )
@@ -493,7 +354,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         self.assertEqual(Document.objects.count(), 5)
         response = self.client.post(
             "/api/documents/bulk_edit/",
-            json.dumps({"documents": [-235], "method": "delete", "parameters": {}}),
+            json.dumps({"documents": [-235], "method": "delete"}),
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -600,7 +461,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
-                {"documents": [self.doc2.id], "method": "add_tag", "parameters": {}},
+                {"documents": [self.doc2.id], "method": "add_tag"},
             ),
             content_type="application/json",
         )
@@ -627,7 +488,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
-                {"documents": [self.doc2.id], "method": "remove_tag", "parameters": {}},
+                {"documents": [self.doc2.id], "method": "remove_tag"},
             ),
             content_type="application/json",
         )
