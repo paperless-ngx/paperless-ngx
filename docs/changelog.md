@@ -1,5 +1,32 @@
 # Changelog
 
+## paperless-ngx 2.6.2
+
+### Features
+
+- Enhancement: move and rename files when storage paths deleted, update file handling docs [@shamoon](https://github.com/shamoon) ([#6033](https://github.com/paperless-ngx/paperless-ngx/pull/6033))
+- Enhancement: better detection of default currency code [@shamoon](https://github.com/shamoon) ([#6020](https://github.com/paperless-ngx/paperless-ngx/pull/6020))
+
+### Bug Fixes
+
+- Fix: make document counts in object lists permissions-aware [@shamoon](https://github.com/shamoon) ([#6019](https://github.com/paperless-ngx/paperless-ngx/pull/6019))
+
+### All App Changes
+
+<details>
+<summary>3 changes</summary>
+
+- Enhancement: move and rename files when storage paths deleted, update file handling docs [@shamoon](https://github.com/shamoon) ([#6033](https://github.com/paperless-ngx/paperless-ngx/pull/6033))
+- Fix: make document counts in object lists permissions-aware [@shamoon](https://github.com/shamoon) ([#6019](https://github.com/paperless-ngx/paperless-ngx/pull/6019))
+- Enhancement: better detection of default currency code [@shamoon](https://github.com/shamoon) ([#6020](https://github.com/paperless-ngx/paperless-ngx/pull/6020))
+</details>
+
+## paperless-ngx 2.6.1
+
+### All App Changes
+
+- Change: tweaks to system status [@shamoon](https://github.com/shamoon) ([#6008](https://github.com/paperless-ngx/paperless-ngx/pull/6008))
+
 ## paperless-ngx 2.6.0
 
 ### Features
