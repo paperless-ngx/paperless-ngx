@@ -228,8 +228,7 @@ in the UI by selecting documents and choosing the "Permissions" button.
 For objects created via the web UI (tags, doc types, etc.) the default is to set the current user
 as owner and no extra permissions, but you can explicitly set these under Settings > Permissions.
 
-Documents consumed via the consumption directory or directly to the API do not have an owner or
-additional permissions set by default, but again, can be controlled with [Workflows](#workflows).
+Documents consumed via the consumption directory do not have an owner or additional permissions set by default, but again, can be controlled with [Workflows](#workflows).
 
 ### Users and Groups
 
@@ -266,7 +265,7 @@ still have "object-level" permissions.
 | StoragePath   | Grants global permissions to add, edit, delete or view Storage Paths.                                                                                                                               |
 | Tag           | Grants global permissions to add, edit, delete or view Tags.                                                                                                                                        |
 | UISettings    | Grants global permissions to add, edit, delete or view the UI settings that are used by the web app.<br/>Users expected to access the web UI should usually be granted at least _View_ permissions. |
-| User          | Grants global permissions to add, edit, delete or view Groups.                                                                                                                                      |
+| User          | Grants global permissions to add, edit, delete or view Users.                                                                                                                                      |
 | Workflow      | Grants global permissions to add, edit, delete or view Workflows.<br/>Note that Workflows are global, in other words all users who can access workflows have access to the same set of them.        |
 
 #### Detailed Explanation of Object Permissions {#object-permissions}
