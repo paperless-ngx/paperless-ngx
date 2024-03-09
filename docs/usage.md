@@ -265,7 +265,7 @@ still have "object-level" permissions.
 | StoragePath   | Grants global permissions to add, edit, delete or view Storage Paths.                                                                                                                               |
 | Tag           | Grants global permissions to add, edit, delete or view Tags.                                                                                                                                        |
 | UISettings    | Grants global permissions to add, edit, delete or view the UI settings that are used by the web app.<br/>Users expected to access the web UI should usually be granted at least _View_ permissions. |
-| User          | Grants global permissions to add, edit, delete or view Users.                                                                                                                                      |
+| User          | Grants global permissions to add, edit, delete or view Users.                                                                                                                                       |
 | Workflow      | Grants global permissions to add, edit, delete or view Workflows.<br/>Note that Workflows are global, in other words all users who can access workflows have access to the same set of them.        |
 
 #### Detailed Explanation of Object Permissions {#object-permissions}
