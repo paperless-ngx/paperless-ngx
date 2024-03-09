@@ -340,7 +340,7 @@ The API supports various bulk-editing operations which are executed asynchronous
 
 ### Documents
 
-For bulk operations on documents, use the endpoint `/api/bulk_edit/` which accepts
+For bulk operations on documents, use the endpoint `/api/documents/bulk_edit/` which accepts
 a json payload of the format:
 
 ```json
