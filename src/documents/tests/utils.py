@@ -290,9 +290,7 @@ class TestMigrations(TransactionTestCase):
 
         assert (
             self.migrate_from and self.migrate_to
-        ), "TestCase '{}' must define migrate_from and migrate_to properties".format(
-            type(self).__name__,
-        )
+        ), f"TestCase '{type(self).__name__}' must define migrate_from and migrate_to properties"
         self.migrate_from = [(self.app, self.migrate_from)]
         if self.dependencies is not None:
             self.migrate_from.extend(self.dependencies)
