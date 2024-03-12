@@ -130,9 +130,7 @@ def set_checksums(apps, schema_editor):
                     fg="red",
                 ),
                 code=colourise(
-                    "  $ echo 'DELETE FROM documents_document WHERE id = {pk};' | ./manage.py dbshell".format(
-                        pk=document.pk,
-                    ),
+                    f"  $ echo 'DELETE FROM documents_document WHERE id = {document.pk};' | ./manage.py dbshell",
                     fg="green",
                 ),
                 line=colourise("\n{}\n".format("=" * 80), fg="white", opts=("bold",)),
