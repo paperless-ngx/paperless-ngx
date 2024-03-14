@@ -1618,7 +1618,10 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
         media_stats = os.statvfs(settings.MEDIA_ROOT)
 
         redis_url = settings._CHANNELS_REDIS_URL
-        redis_url_parsed = urlparse(settings._CHANNELS_REDIS_URL)
+        redis_url_parsed = urlparse(redis_url)
+        redis_constructed_url = f"{redis_url_parsed.scheme}://{redis_url_parsed.path or redis_url_parsed.hostname}"
+        if redis_url_parsed.hostname is not None:
+            redis_constructed_url += f":{redis_url_parsed.port}"
         redis_error = None
         with Redis.from_url(url=redis_url) as client:
             try:
@@ -1730,7 +1733,7 @@ class SystemStatusView(GenericAPIView, PassUserMixin):
                     },
                 },
                 "tasks": {
-                    "redis_url": f"{redis_url_parsed.hostname}:{redis_url_parsed.port}",
+                    "redis_url": redis_constructed_url,
                     "redis_status": redis_status,
                     "redis_error": redis_error,
                     "celery_status": celery_active,

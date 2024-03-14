@@ -46,7 +46,7 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.data["database"]["status"], "OK")
         self.assertIsNone(response.data["database"]["error"])
         self.assertIsNotNone(response.data["database"]["migration_status"])
-        self.assertEqual(response.data["tasks"]["redis_url"], "localhost:6379")
+        self.assertEqual(response.data["tasks"]["redis_url"], "redis://localhost:6379")
         self.assertEqual(response.data["tasks"]["redis_status"], "ERROR")
         self.assertIsNotNone(response.data["tasks"]["redis_error"])
 
@@ -109,11 +109,35 @@ class TestSystemStatus(APITestCase):
         THEN:
             - The response contains the redis URL but no credentials
         """
-        with override_settings(_CELERY_REDIS_URL="redis://:password@localhost:6379/0"):
+        with override_settings(
+            _CHANNELS_REDIS_URL="redis://username:password@localhost:6379",
+        ):
             self.client.force_login(self.user)
             response = self.client.get(self.ENDPOINT)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertEqual(response.data["tasks"]["redis_url"], "localhost:6379")
+            self.assertEqual(
+                response.data["tasks"]["redis_url"],
+                "redis://localhost:6379",
+            )
+
+    def test_system_status_redis_socket(self):
+        """
+        GIVEN:
+            - Redis URL is socket
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains the redis URL
+        """
+
+        with override_settings(_CHANNELS_REDIS_URL="unix:///path/to/redis.sock"):
+            self.client.force_login(self.user)
+            response = self.client.get(self.ENDPOINT)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(
+                response.data["tasks"]["redis_url"],
+                "unix:///path/to/redis.sock",
+            )
 
     @mock.patch("celery.app.control.Inspect.ping")
     def test_system_status_celery_ping(self, mock_ping):
