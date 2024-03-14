@@ -46,7 +46,7 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.data["database"]["status"], "OK")
         self.assertIsNone(response.data["database"]["error"])
         self.assertIsNotNone(response.data["database"]["migration_status"])
-        self.assertEqual(response.data["tasks"]["redis_url"], "redis://localhost:6379")
+        self.assertEqual(response.data["tasks"]["redis_url"], "localhost:6379")
         self.assertEqual(response.data["tasks"]["redis_status"], "ERROR")
         self.assertIsNotNone(response.data["tasks"]["redis_error"])
 
@@ -99,6 +99,21 @@ class TestSystemStatus(APITestCase):
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["tasks"]["redis_status"], "OK")
+
+    def test_system_status_redis_no_credentials(self):
+        """
+        GIVEN:
+            - Redis URL with credentials
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains the redis URL but no credentials
+        """
+        with override_settings(_CELERY_REDIS_URL="redis://:password@localhost:6379/0"):
+            self.client.force_login(self.user)
+            response = self.client.get(self.ENDPOINT)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(response.data["tasks"]["redis_url"], "localhost:6379")
 
     @mock.patch("celery.app.control.Inspect.ping")
     def test_system_status_celery_ping(self, mock_ping):
