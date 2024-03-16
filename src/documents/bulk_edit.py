@@ -200,11 +200,13 @@ def merge(doc_ids: list[int], metadata_document_id: Optional[int] = None):
     import pikepdf
 
     merged_pdf = pikepdf.new()
+    version = merged_pdf.pdf_version
     # use doc_ids to preserve order
     for doc_id in doc_ids:
         doc = qs.get(id=doc_id)
         try:
             with pikepdf.open(str(doc.source_path)) as pdf:
+                version = max(version, pdf.pdf_version)
                 merged_pdf.pages.extend(pdf.pages)
             affected_docs.append(doc.id)
         except Exception as e:
@@ -219,7 +221,8 @@ def merge(doc_ids: list[int], metadata_document_id: Optional[int] = None):
         settings.SCRATCH_DIR,
         f"{'_'.join([str(doc_id) for doc_id in doc_ids])[:100]}_merged.pdf",
     )
-    merged_pdf.save(filepath)
+    merged_pdf.remove_unreferenced_resources()
+    merged_pdf.save(filepath, min_version=version)
     merged_pdf.close()
 
     if metadata_document_id:
