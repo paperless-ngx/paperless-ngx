@@ -285,57 +285,47 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         super().setUp()
         sample1 = os.path.join(self.dirs.scratch_dir, "sample.pdf")
         shutil.copy(
-            os.path.join(
-                os.path.dirname(__file__),
-                "samples",
-                "documents",
-                "originals",
-                "0000001.pdf",
-            ),
+            Path(__file__).parent
+            / "samples"
+            / "documents"
+            / "originals"
+            / "0000001.pdf",
             sample1,
         )
         sample1_archive = os.path.join(self.dirs.archive_dir, "sample_archive.pdf")
         shutil.copy(
-            os.path.join(
-                os.path.dirname(__file__),
-                "samples",
-                "documents",
-                "originals",
-                "0000001.pdf",
-            ),
+            Path(__file__).parent
+            / "samples"
+            / "documents"
+            / "originals"
+            / "0000001.pdf",
             sample1_archive,
         )
         sample2 = os.path.join(self.dirs.scratch_dir, "sample2.pdf")
         shutil.copy(
-            os.path.join(
-                os.path.dirname(__file__),
-                "samples",
-                "documents",
-                "originals",
-                "0000002.pdf",
-            ),
+            Path(__file__).parent
+            / "samples"
+            / "documents"
+            / "originals"
+            / "0000002.pdf",
             sample2,
         )
         sample2_archive = os.path.join(self.dirs.archive_dir, "sample2_archive.pdf")
         shutil.copy(
-            os.path.join(
-                os.path.dirname(__file__),
-                "samples",
-                "documents",
-                "originals",
-                "0000002.pdf",
-            ),
+            Path(__file__).parent
+            / "samples"
+            / "documents"
+            / "originals"
+            / "0000002.pdf",
             sample2_archive,
         )
         sample3 = os.path.join(self.dirs.scratch_dir, "sample3.pdf")
         shutil.copy(
-            os.path.join(
-                os.path.dirname(__file__),
-                "samples",
-                "documents",
-                "originals",
-                "0000003.pdf",
-            ),
+            Path(__file__).parent
+            / "samples"
+            / "documents"
+            / "originals"
+            / "0000003.pdf",
             sample3,
         )
         self.doc1 = Document.objects.create(checksum="A", title="A", filename=sample1)
