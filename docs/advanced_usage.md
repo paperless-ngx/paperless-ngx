@@ -293,7 +293,7 @@ will create a directory structure as follows:
 !!! tip
 
     Paperless checks the filename of a document whenever it is saved. Changing (or deleting)
-    a [storage paths](#storage-paths) will automatically be reflected in the file system. However,
+    a [storage path](#storage-paths) will automatically be reflected in the file system. However,
     when changing `PAPERLESS_FILENAME_FORMAT` you will need to manually run the
     [`document renamer`](administration.md#renamer) to move any existing documents.
 
@@ -348,7 +348,7 @@ This happens if all the placeholders in a filename evaluate to the same
 value.
 
 If there are any errors in the placeholders included in `PAPERLESS_FILENAME_FORMAT`,
-paperless will fallback to using the default naming scheme instead.
+paperless will fall back to using the default naming scheme instead.
 
 !!! caution
 
