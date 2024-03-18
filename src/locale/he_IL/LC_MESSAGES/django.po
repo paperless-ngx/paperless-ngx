@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-04 17:00-0800\n"
-"PO-Revision-Date: 2024-03-05 01:01\n"
+"PO-Revision-Date: 2024-03-09 00:22\n"
 "Last-Translator: \n"
 "Language-Team: Hebrew\n"
 "Language: he_IL\n"
@@ -51,7 +51,7 @@ msgstr ""
 
 #: documents/models.py:59
 msgid "Automatic"
-msgstr ""
+msgstr "אוטומטי"
 
 #: documents/models.py:62 documents/models.py:397 documents/models.py:1218
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
@@ -621,7 +621,7 @@ msgstr "המסמך התווסף"
 
 #: documents/models.py:907
 msgid "Document Updated"
-msgstr ""
+msgstr "המסמך עודכן"
 
 #: documents/models.py:910
 msgid "Consume Folder"
@@ -685,7 +685,7 @@ msgstr ""
 
 #: documents/models.py:1006
 msgid "Removal"
-msgstr ""
+msgstr "הסרה"
 
 #: documents/models.py:1010
 msgid "Workflow Action Type"
