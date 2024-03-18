@@ -481,5 +481,8 @@ export class WorkflowEditDialogComponent
     this.actionFields.insert(event.currentIndex, actionField)
     // removing id will effectively re-create the actions in this order
     this.object.actions.forEach((a) => (a.id = null))
+    this.actionFields.controls.forEach((c) =>
+      c.get('id').setValue(null, { emitEvent: false })
+    )
   }
 }

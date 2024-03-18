@@ -589,6 +589,11 @@ system. See the corresponding
 
     Defaults to False
 
+#### [`PAPERLESS_ACCOUNT_SESSION_REMEMBER=<bool>`](#PAPERLESS_ACCOUNT_SESSION_REMEMBER) {#PAPERLESS_ACCOUNT_SESSION_REMEMBER}
+
+: See the corresponding
+[django-allauth documentation](https://docs.allauth.org/en/latest/account/configuration.html)
+
 ## OCR settings {#ocr}
 
 Paperless uses [OCRmyPDF](https://ocrmypdf.readthedocs.io/en/latest/)
