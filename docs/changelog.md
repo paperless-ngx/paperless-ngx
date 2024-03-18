@@ -1,5 +1,38 @@
 # Changelog
 
+## paperless-ngx 2.6.3
+
+### Bug Fixes
+
+- Fix: allow setting allauth [@shamoon](https://github.com/shamoon) ([#6105](https://github.com/paperless-ngx/paperless-ngx/pull/6105))
+- Change: dont require empty bulk edit parameters [@shamoon](https://github.com/shamoon) ([#6059](https://github.com/paperless-ngx/paperless-ngx/pull/6059))
+
+### Dependencies
+
+<details>
+<summary>4 changes</summary>
+
+- Chore(deps-dev): Bump follow-redirects from 1.15.5 to 1.15.6 in /src-ui [@dependabot](https://github.com/dependabot) ([#6120](https://github.com/paperless-ngx/paperless-ngx/pull/6120))
+- Chore(deps-dev): Bump the development group with 3 updates [@dependabot](https://github.com/dependabot) ([#6079](https://github.com/paperless-ngx/paperless-ngx/pull/6079))
+- Chore(deps): Bump the django group with 1 update [@dependabot](https://github.com/dependabot) ([#6080](https://github.com/paperless-ngx/paperless-ngx/pull/6080))
+- Chore(deps): Bump the small-changes group with 2 updates [@dependabot](https://github.com/dependabot) ([#6081](https://github.com/paperless-ngx/paperless-ngx/pull/6081))
+</details>
+
+### All App Changes
+
+<details>
+<summary>8 changes</summary>
+
+- Chore(deps-dev): Bump follow-redirects from 1.15.5 to 1.15.6 in /src-ui [@dependabot](https://github.com/dependabot) ([#6120](https://github.com/paperless-ngx/paperless-ngx/pull/6120))
+- Fix: allow setting allauth [@shamoon](https://github.com/shamoon) ([#6105](https://github.com/paperless-ngx/paperless-ngx/pull/6105))
+- Change: remove credentials from redis url in system status [@shamoon](https://github.com/shamoon) ([#6104](https://github.com/paperless-ngx/paperless-ngx/pull/6104))
+- Chore(deps-dev): Bump the development group with 3 updates [@dependabot](https://github.com/dependabot) ([#6079](https://github.com/paperless-ngx/paperless-ngx/pull/6079))
+- Chore(deps): Bump the django group with 1 update [@dependabot](https://github.com/dependabot) ([#6080](https://github.com/paperless-ngx/paperless-ngx/pull/6080))
+- Chore(deps): Bump the small-changes group with 2 updates [@dependabot](https://github.com/dependabot) ([#6081](https://github.com/paperless-ngx/paperless-ngx/pull/6081))
+- Change: dont require empty bulk edit parameters [@shamoon](https://github.com/shamoon) ([#6059](https://github.com/paperless-ngx/paperless-ngx/pull/6059))
+- Fix: missing translation string [@DimitriDR](https://github.com/DimitriDR) ([#6054](https://github.com/paperless-ngx/paperless-ngx/pull/6054))
+</details>
+
 ## paperless-ngx 2.6.2
 
 ### Features
