@@ -2087,7 +2087,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">55</context>
+          <context context-type="linenumber">53</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
@@ -4448,7 +4448,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">60</context>
+          <context context-type="linenumber">58</context>
         </context-group>
         <target state="translated">Zobraziť</target>
       </trans-unit>
@@ -5053,6 +5053,14 @@
         </context-group>
         <target state="needs-translation">Migration Status</target>
       </trans-unit>
+      <trans-unit id="7489316373554112115" datatype="html">
+        <source>Up to date</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+        <target state="needs-translation">Up to date</target>
+      </trans-unit>
       <trans-unit id="7881311375431899727" datatype="html">
         <source>Latest Migration</source>
         <context-group purpose="location">
@@ -5253,7 +5261,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">66</context>
+          <context context-type="linenumber">64</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
@@ -5516,7 +5524,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">52</context>
+          <context context-type="linenumber">50</context>
         </context-group>
         <target state="translated">Podobné ako</target>
       </trans-unit>
@@ -6226,7 +6234,7 @@
         <source>Filter by correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">21</context>
+          <context context-type="linenumber">20</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -6238,7 +6246,7 @@
         <source>Filter by tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">29</context>
+          <context context-type="linenumber">28</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -6250,7 +6258,7 @@
         <source>View notes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">73</context>
+          <context context-type="linenumber">70</context>
         </context-group>
         <target state="translated">Zobraziť poznámky</target>
       </trans-unit>
@@ -6258,7 +6266,7 @@
         <source><x id="INTERPOLATION" equiv-text="ocument.notes.length}}"/> Notes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">71</context>
         </context-group>
         <target state="translated"><x id="INTERPOLATION" equiv-text="ocument.notes.length}}"/> Poznámky</target>
       </trans-unit>
@@ -6266,7 +6274,7 @@
         <source>Filter by document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">75</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -6278,7 +6286,7 @@
         <source>Filter by storage path</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">84</context>
+          <context context-type="linenumber">81</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -6290,7 +6298,7 @@
         <source>Created: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate }}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">96,97</context>
+          <context context-type="linenumber">93,94</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
@@ -6302,7 +6310,7 @@
         <source>Added: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate }}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">97,98</context>
+          <context context-type="linenumber">94,95</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
@@ -6314,7 +6322,7 @@
         <source>Modified: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate }}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">98,99</context>
+          <context context-type="linenumber">95,96</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
@@ -6326,7 +6334,7 @@
         <source>Shared</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">111</context>
+          <context context-type="linenumber">108</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
@@ -6342,7 +6350,7 @@
         <source>Score:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">113</context>
         </context-group>
         <target state="translated">Skóre:</target>
       </trans-unit>
