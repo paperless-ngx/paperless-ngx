@@ -874,7 +874,7 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
         write_only=True,
     )
 
-    parameters = serializers.DictField(allow_empty=True)
+    parameters = serializers.DictField(allow_empty=True, default={}, write_only=True)
 
     def _validate_tag_id_list(self, tags, name="tags"):
         if not isinstance(tags, list):

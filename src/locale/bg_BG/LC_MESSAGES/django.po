@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-04 17:00-0800\n"
-"PO-Revision-Date: 2024-03-05 01:01\n"
+"PO-Revision-Date: 2024-03-10 00:25\n"
 "Last-Translator: \n"
 "Language-Team: Bulgarian\n"
 "Language: bg_BG\n"
@@ -47,11 +47,11 @@ msgstr "Регулярен израз"
 
 #: documents/models.py:58 documents/models.py:902
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Неясна дума"
 
 #: documents/models.py:59
 msgid "Automatic"
-msgstr ""
+msgstr "Автоматично"
 
 #: documents/models.py:62 documents/models.py:397 documents/models.py:1218
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
@@ -92,7 +92,7 @@ msgstr "Маркира този етикет като етикет за вход
 
 #: documents/models.py:112
 msgid "tag"
-msgstr "таг"
+msgstr "етикет"
 
 #: documents/models.py:113 documents/models.py:185
 msgid "tags"
@@ -365,7 +365,7 @@ msgstr "пълнотекстова заявка"
 
 #: documents/models.py:446
 msgid "more like this"
-msgstr ""
+msgstr "повече като този"
 
 #: documents/models.py:447
 msgid "has tags in"
@@ -617,11 +617,11 @@ msgstr ""
 
 #: documents/models.py:906
 msgid "Document Added"
-msgstr ""
+msgstr "Документът е добавен"
 
 #: documents/models.py:907
 msgid "Document Updated"
-msgstr ""
+msgstr "Документът е обновен"
 
 #: documents/models.py:910
 msgid "Consume Folder"
@@ -637,7 +637,7 @@ msgstr "Извличане на поща"
 
 #: documents/models.py:915
 msgid "Workflow Trigger Type"
-msgstr ""
+msgstr "Тип на тръгъра на работния процес"
 
 #: documents/models.py:927
 msgid "filter path"
@@ -661,35 +661,35 @@ msgstr "филтриране на документи по това правил�
 
 #: documents/models.py:971
 msgid "has these tag(s)"
-msgstr ""
+msgstr "има този/тези етикет/и"
 
 #: documents/models.py:979
 msgid "has this document type"
-msgstr ""
+msgstr "има този тип на документа"
 
 #: documents/models.py:987
 msgid "has this correspondent"
-msgstr ""
+msgstr "има този кореспондент"
 
 #: documents/models.py:991
 msgid "workflow trigger"
-msgstr ""
+msgstr "тръгър на работния процес"
 
 #: documents/models.py:992
 msgid "workflow triggers"
-msgstr ""
+msgstr "тръгъри на работния процес"
 
 #: documents/models.py:1002
 msgid "Assignment"
-msgstr ""
+msgstr "Задача"
 
 #: documents/models.py:1006
 msgid "Removal"
-msgstr ""
+msgstr "Премахване"
 
 #: documents/models.py:1010
 msgid "Workflow Action Type"
-msgstr ""
+msgstr "Тип на действието на работния процес"
 
 #: documents/models.py:1016
 msgid "assign title"
@@ -741,27 +741,27 @@ msgstr "присвояване на тези персонализирани по
 
 #: documents/models.py:1108
 msgid "remove these tag(s)"
-msgstr ""
+msgstr "премахни този/тези етикект/и"
 
 #: documents/models.py:1113
 msgid "remove all tags"
-msgstr ""
+msgstr "премахни всички етикети"
 
 #: documents/models.py:1120
 msgid "remove these document type(s)"
-msgstr ""
+msgstr "премахни този/тези тип/ове на документ"
 
 #: documents/models.py:1125
 msgid "remove all document types"
-msgstr ""
+msgstr "премахви всички типове на документ"
 
 #: documents/models.py:1132
 msgid "remove these correspondent(s)"
-msgstr ""
+msgstr "премахни тези кореспонденти"
 
 #: documents/models.py:1137
 msgid "remove all correspondents"
-msgstr ""
+msgstr "прехахни всички кореспонденти"
 
 #: documents/models.py:1144
 msgid "remove these storage path(s)"
@@ -773,47 +773,47 @@ msgstr ""
 
 #: documents/models.py:1156
 msgid "remove these owner(s)"
-msgstr ""
+msgstr "премахни всички тези собственици"
 
 #: documents/models.py:1161
 msgid "remove all owners"
-msgstr ""
+msgstr "премахни всички собственици"
 
 #: documents/models.py:1168
 msgid "remove view permissions for these users"
-msgstr ""
+msgstr "премахни всички права за прелед на тези потребители"
 
 #: documents/models.py:1175
 msgid "remove view permissions for these groups"
-msgstr ""
+msgstr "премахни всички права за прелед на тези групи"
 
 #: documents/models.py:1182
 msgid "remove change permissions for these users"
-msgstr ""
+msgstr "премахни всички права за промяна на тези потребители"
 
 #: documents/models.py:1189
 msgid "remove change permissions for these groups"
-msgstr ""
+msgstr "премахни всички права за прояна на тези групи"
 
 #: documents/models.py:1194
 msgid "remove all permissions"
-msgstr ""
+msgstr "премахнете всички права"
 
 #: documents/models.py:1201
 msgid "remove these custom fields"
-msgstr ""
+msgstr "премахни тези потребителски полета"
 
 #: documents/models.py:1206
 msgid "remove all custom fields"
-msgstr ""
+msgstr "премахни всички потребителски полета"
 
 #: documents/models.py:1210
 msgid "workflow action"
-msgstr ""
+msgstr "действие по работния процес"
 
 #: documents/models.py:1211
 msgid "workflow actions"
-msgstr ""
+msgstr "действия по работния процес"
 
 #: documents/models.py:1220 paperless_mail/models.py:95
 msgid "order"
@@ -821,15 +821,15 @@ msgstr "ред"
 
 #: documents/models.py:1226
 msgid "triggers"
-msgstr ""
+msgstr "тригъри"
 
 #: documents/models.py:1233
 msgid "actions"
-msgstr ""
+msgstr "действия"
 
 #: documents/models.py:1236
 msgid "enabled"
-msgstr ""
+msgstr "активирано"
 
 #: documents/serialisers.py:114
 #, python-format
@@ -852,13 +852,14 @@ msgstr "Засечена е невалидна променлива."
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
-msgstr ""
+msgstr "Здравейте от %(site_name)s!"
 
 #: documents/templates/account/email/base_message.txt:5
 #, python-format
 msgid "Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
-msgstr ""
+msgstr "Благодари, че използвате %(site_name)s!\n"
+"%(site_domain)s"
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
@@ -871,7 +872,7 @@ msgstr "Моля, впишете се."
 #: documents/templates/account/login.html:12
 #, python-format
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
-msgstr ""
+msgstr "Все още нямате профил? <a href=\"%(signup_url)s\">Регистрирайте се</a>"
 
 #: documents/templates/account/login.html:19
 #: documents/templates/account/signup.html:15
@@ -895,7 +896,7 @@ msgstr "Забравена парола?"
 #: documents/templates/account/login.html:45
 #: documents/templates/account/signup.html:49
 msgid "or sign in via"
-msgstr ""
+msgstr "или влезте чрез"
 
 #: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
@@ -973,21 +974,21 @@ msgstr ""
 #: documents/templates/account/signup.html:10
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
-msgstr ""
+msgstr "Вече имате акаунт? <a href=\"%(login_url)s\">Влезте</a>"
 
 #: documents/templates/account/signup.html:16
 #: documents/templates/socialaccount/signup.html:14
 msgid "Email (optional)"
-msgstr ""
+msgstr "Имейл (опционален)"
 
 #: documents/templates/account/signup.html:18
 msgid "Password (again)"
-msgstr ""
+msgstr "Парола (повторно)"
 
 #: documents/templates/account/signup.html:36
 #: documents/templates/socialaccount/signup.html:27
 msgid "Sign up"
-msgstr ""
+msgstr "Нов профил"
 
 #: documents/templates/index.html:61
 msgid "Paperless-ngx is loading..."
@@ -1012,21 +1013,21 @@ msgstr "Връзката за споделяне е изтекла."
 #: documents/templates/socialaccount/authentication_error.html:5
 #: documents/templates/socialaccount/login.html:5
 msgid "Paperless-ngx social account sign in"
-msgstr ""
+msgstr "Влизане посредством профил в социалните мрежи"
 
 #: documents/templates/socialaccount/authentication_error.html:10
 #, python-format
 msgid "An error occurred while attempting to login via your social network account. Back to the <a href=\"%(login_url)s\">login page</a>"
-msgstr ""
+msgstr "Възникна грешка при опит за влизане през вашия акаунт в социалната мрежа. Обратно към <a href=\"%(login_url)s\">страницата за вход</a>"
 
 #: documents/templates/socialaccount/login.html:10
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
-msgstr ""
+msgstr "На път сте да свържете нов акаунт на трета страна от %(provider)s."
 
 #: documents/templates/socialaccount/login.html:13
 msgid "Continue"
-msgstr ""
+msgstr "Продължи"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
@@ -1035,26 +1036,26 @@ msgstr ""
 #: documents/templates/socialaccount/signup.html:10
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
-msgstr ""
+msgstr "На път сте да използвате профила си в %(provider_name)s за влизане."
 
 #: documents/templates/socialaccount/signup.html:11
 msgid "As a final step, please complete the following form:"
-msgstr ""
+msgstr "Като последна стъпка, моля, попълнете следната форма:"
 
 #: documents/validators.py:17
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "Не може да се анализира URI {value}, липсва схема"
 
 #: documents/validators.py:22
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
+msgstr "Не може да се анализира URI {value}, липсва мрежово местоположение или път"
 
 #: documents/validators.py:27
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "Не може да се анализира URI {value}"
 
 #: paperless/apps.py:10
 msgid "Paperless"
@@ -1062,27 +1063,27 @@ msgstr "Paperless"
 
 #: paperless/models.py:26
 msgid "pdf"
-msgstr ""
+msgstr "pdf"
 
 #: paperless/models.py:27
 msgid "pdfa"
-msgstr ""
+msgstr "pdfa"
 
 #: paperless/models.py:28
 msgid "pdfa-1"
-msgstr ""
+msgstr "pdfa-1"
 
 #: paperless/models.py:29
 msgid "pdfa-2"
-msgstr ""
+msgstr "pdfa-2"
 
 #: paperless/models.py:30
 msgid "pdfa-3"
-msgstr ""
+msgstr "pdfa-3"
 
 #: paperless/models.py:39
 msgid "skip"
-msgstr ""
+msgstr "пропусни"
 
 #: paperless/models.py:40
 msgid "redo"
@@ -1098,7 +1099,7 @@ msgstr ""
 
 #: paperless/models.py:50
 msgid "never"
-msgstr ""
+msgstr "никога"
 
 #: paperless/models.py:51
 msgid "with_text"
@@ -1106,7 +1107,7 @@ msgstr ""
 
 #: paperless/models.py:52
 msgid "always"
-msgstr ""
+msgstr "винаги"
 
 #: paperless/models.py:60
 msgid "clean"
@@ -1126,7 +1127,7 @@ msgstr ""
 
 #: paperless/models.py:71
 msgid "RGB"
-msgstr ""
+msgstr "RGB"
 
 #: paperless/models.py:72
 msgid "UseDeviceIndependentColor"
@@ -1134,27 +1135,27 @@ msgstr ""
 
 #: paperless/models.py:73
 msgid "Gray"
-msgstr ""
+msgstr "Сиво"
 
 #: paperless/models.py:74
 msgid "CMYK"
-msgstr ""
+msgstr "CMYK"
 
 #: paperless/models.py:83
 msgid "Sets the output PDF type"
-msgstr ""
+msgstr "Задава изходния тип PDF"
 
 #: paperless/models.py:95
 msgid "Do OCR from page 1 to this value"
-msgstr ""
+msgstr "Извърши OCR от страница 1 до тази стойност"
 
 #: paperless/models.py:101
 msgid "Do OCR using these languages"
-msgstr ""
+msgstr "Извърши OCR разпознаване използвайки тези езици"
 
 #: paperless/models.py:108
 msgid "Sets the OCR mode"
-msgstr ""
+msgstr "Задава режима OCR"
 
 #: paperless/models.py:116
 msgid "Controls the generation of an archive file"
@@ -1170,39 +1171,39 @@ msgstr ""
 
 #: paperless/models.py:138
 msgid "Enables deskew"
-msgstr ""
+msgstr "Активира изкривяване (deskew)"
 
 #: paperless/models.py:141
 msgid "Enables page rotation"
-msgstr ""
+msgstr "Активира завъртане на страницата"
 
 #: paperless/models.py:146
 msgid "Sets the threshold for rotation of pages"
-msgstr ""
+msgstr "Задава прага за завъртане на страниците"
 
 #: paperless/models.py:152
 msgid "Sets the maximum image size for decompression"
-msgstr ""
+msgstr "Задава максималния размер на изображението за декомпресия"
 
 #: paperless/models.py:158
 msgid "Sets the Ghostscript color conversion strategy"
-msgstr ""
+msgstr "Задава стратегията за преобразуване на цветовете на Ghostscript"
 
 #: paperless/models.py:166
 msgid "Adds additional user arguments for OCRMyPDF"
-msgstr ""
+msgstr "Добавя допълнителни потребителски аргументи за OCRMyPDF"
 
 #: paperless/models.py:171
 msgid "Application title"
-msgstr ""
+msgstr "Наименование на софтуера"
 
 #: paperless/models.py:178
 msgid "Application logo"
-msgstr ""
+msgstr "Лого на софтуера"
 
 #: paperless/models.py:188
 msgid "paperless application settings"
-msgstr ""
+msgstr "настройки на софтуера"
 
 #: paperless/settings.py:664
 msgid "English (US)"
@@ -1270,7 +1271,7 @@ msgstr "Италиански"
 
 #: paperless/settings.py:680
 msgid "Japanese"
-msgstr ""
+msgstr "Японски"
 
 #: paperless/settings.py:681
 msgid "Luxembourgish"
