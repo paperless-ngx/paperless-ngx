@@ -152,9 +152,13 @@ export class OpenDocumentsService {
   }
 
   save() {
-    sessionStorage.setItem(
-      OPEN_DOCUMENT_SERVICE.DOCUMENTS,
-      JSON.stringify(this.openDocuments)
-    )
+    try {
+      sessionStorage.setItem(
+        OPEN_DOCUMENT_SERVICE.DOCUMENTS,
+        JSON.stringify(this.openDocuments)
+      )
+    } catch (e) {
+      console.error('Error saving open documents to session storage', e)
+    }
   }
 }
