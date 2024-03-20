@@ -468,9 +468,13 @@ def autocomplete(
         termCounts = Counter()
         if results.has_matched_terms():
             for hit in results:
-                for _, term in hit.matched_terms():
-                    termCounts[term] += 1
+                for _, match in hit.matched_terms():
+                    termCounts[match] += 1
             terms = [t for t, _ in termCounts.most_common(limit)]
+
+        term_encoded = term.encode("UTF-8")
+        if term_encoded in terms:
+            terms.insert(0, terms.pop(terms.index(term_encoded)))
 
     return terms
 
