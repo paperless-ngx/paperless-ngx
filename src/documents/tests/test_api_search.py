@@ -595,6 +595,28 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, [])
 
+    def test_search_autocomplete_search_term(self):
+        """
+        GIVEN:
+            - Search results for autocomplete include the exact search term
+        WHEN:
+            - API request for autocomplete
+        THEN:
+            - The search term is returned first in the autocomplete results
+        """
+        d1 = Document.objects.create(
+            title="doc1",
+            content="automobile automatic autobots automobile auto",
+            checksum="1",
+        )
+
+        with AsyncWriter(index.open_index()) as writer:
+            index.update_document(writer, d1)
+
+        response = self.client.get("/api/search/autocomplete/?term=auto")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0], b"auto")
+
     @pytest.mark.skip(reason="Not implemented yet")
     def test_search_spelling_correction(self):
         with AsyncWriter(index.open_index()) as writer:
