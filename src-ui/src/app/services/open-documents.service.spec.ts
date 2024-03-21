@@ -5,10 +5,11 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing'
 import { environment } from 'src/environments/environment'
-import { Subscription } from 'rxjs'
+import { Subscription, throwError } from 'rxjs'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ConfirmDialogComponent } from '../components/common/confirm-dialog/confirm-dialog.component'
 import { OPEN_DOCUMENT_SERVICE } from '../data/storage-keys'
+import { wind } from 'ngx-bootstrap-icons'
 
 const documents = [
   {
@@ -232,5 +233,13 @@ describe('OpenDocumentsService', () => {
     expect(req.request.method).toEqual('GET')
     req.error(new ErrorEvent('timeout'))
     expect(openDocumentsService.getOpenDocuments()).toHaveLength(0)
+  })
+
+  it('should log error on sessionStorage save', () => {
+    const doc = { ...documents[0] }
+    doc.content = 'a'.repeat(1000000)
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
+    openDocumentsService.openDocument(doc)
+    expect(consoleSpy).toHaveBeenCalled()
   })
 })
