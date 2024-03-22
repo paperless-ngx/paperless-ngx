@@ -356,3 +356,22 @@ processing documents with this issue.
 ## Platform-Specific Deployment Troubleshooting
 
 A user-maintained wiki page is available to help troubleshoot issues that may arise when trying to deploy Paperless-ngx on specific platforms, for example SELinux. Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Platform%E2%80%90Specific-Troubleshooting).
+
+## Consumption fails with "Input PDF has a digital signature"
+
+You might find messages like this in your log files:
+
+```
+[ERROR] [paperless.consumer] Error occurred while consuming document digital-signed.pdf: DigitalSignatureError: Input PDF has a digital signature. OCR would alter the document, invalidating the signature.
+```
+
+This can be fixed by adding following configuration to your settings.
+
+```yaml
+PAPERLESS_OCR_USER_ARGS={"invalidate_digital_signatures":true}
+```
+
+!!! note
+
+    This is a protection mechanism from the upstream project [OCRmyPDF](https://github.com/ocrmypdf/OCRmyPDF) and mid have legal implications.
+    Please read up on the details at [Digital signatures](https://ocrmypdf.readthedocs.io/en/latest/pdfsecurity.html#digital-signatures).
