@@ -4,6 +4,7 @@ import logging
 import os
 from typing import Optional
 
+from celery import chord
 from django.conf import settings
 from django.db.models import Q
 
@@ -167,6 +168,7 @@ def rotate(doc_ids: list[int], degrees: int):
     affected_docs = []
     import pikepdf
 
+    rotate_tasks = []
     for doc in qs:
         try:
             with pikepdf.open(doc.source_path, allow_overwriting_input=True) as pdf:
@@ -175,8 +177,10 @@ def rotate(doc_ids: list[int], degrees: int):
                 pdf.save()
                 doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
                 doc.save()
-                update_document_archive_file.delay(
-                    document_id=doc.id,
+                rotate_tasks.append(
+                    update_document_archive_file.s(
+                        document_id=doc.id,
+                    ),
                 )
                 logger.info(
                     f"Rotated document {doc.id} by {degrees} degrees",
@@ -186,7 +190,8 @@ def rotate(doc_ids: list[int], degrees: int):
             logger.exception(f"Error rotating document {doc.id}: {e}")
 
     if len(affected_docs) > 0:
-        bulk_update_documents.delay(document_ids=affected_docs)
+        bulk_update_task = bulk_update_documents.s(document_ids=affected_docs)
+        chord(header=rotate_tasks, body=bulk_update_task).delay()
 
     return "OK"
 

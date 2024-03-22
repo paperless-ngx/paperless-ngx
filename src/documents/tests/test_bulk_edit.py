@@ -452,9 +452,10 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
         mock_consume_file.assert_not_called()
 
-    @mock.patch("documents.tasks.bulk_update_documents.delay")
-    @mock.patch("documents.tasks.update_document_archive_file.delay")
-    def test_rotate(self, mock_update_document, mock_update_documents):
+    @mock.patch("documents.tasks.bulk_update_documents.s")
+    @mock.patch("documents.tasks.update_document_archive_file.s")
+    @mock.patch("celery.chord.delay")
+    def test_rotate(self, mock_chord, mock_update_document, mock_update_documents):
         """
         GIVEN:
         - Existing documents
@@ -467,7 +468,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         result = bulk_edit.rotate(doc_ids, 90)
         self.assertEqual(mock_update_document.call_count, 2)
         mock_update_documents.assert_called_once()
-
+        mock_chord.assert_called_once()
         self.assertEqual(result, "OK")
 
     @mock.patch("documents.tasks.bulk_update_documents.delay")
