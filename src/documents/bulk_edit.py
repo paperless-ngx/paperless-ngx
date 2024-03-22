@@ -262,6 +262,7 @@ def split(doc_ids: list[int], pages: list[list[int]]):
                     settings.SCRATCH_DIR,
                     f"{doc.id}_{split_doc[0]}-{split_doc[-1]}.pdf",
                 )
+                dst.remove_unreferenced_resources()
                 dst.save(filepath)
                 dst.close()
 
