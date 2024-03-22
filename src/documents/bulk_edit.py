@@ -173,7 +173,7 @@ def rotate(doc_ids: list[int], degrees: int):
                 for page in pdf.pages:
                     page.rotate(degrees, relative=True)
                 pdf.save()
-                doc.checksum = hashlib.md5(doc.source_file.read()).hexdigest()
+                doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
                 doc.save()
                 update_document_archive_file.delay(
                     document_id=doc.id,
