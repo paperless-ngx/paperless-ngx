@@ -97,7 +97,7 @@ def train_classifier():
             logger.debug("Training data unchanged.")
 
     except Exception as e:
-        logger.warning("Classifier error: " + str(e))
+        logger.warning(f"Classifier error: {e}")
 
 
 @shared_task(bind=True)
