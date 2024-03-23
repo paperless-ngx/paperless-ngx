@@ -5,6 +5,7 @@ from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.contrib.auth.views import LoginView
 from django.db.models.functions import Lower
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
@@ -223,3 +224,7 @@ class SocialAccountProvidersView(APIView):
             ]
 
         return Response(sorted(resp, key=lambda p: p["name"]))
+
+class LoginView401(LoginView):
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form), status=401)

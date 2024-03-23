@@ -49,6 +49,7 @@ from paperless.views import GroupViewSet
 from paperless.views import ProfileView
 from paperless.views import SocialAccountProvidersView
 from paperless.views import UserViewSet
+from paperless.views import LoginView401
 from paperless_mail.views import MailAccountTestView
 from paperless_mail.views import MailAccountViewSet
 from paperless_mail.views import MailRuleViewSet
@@ -215,6 +216,7 @@ urlpatterns = [
         login_required(ensure_csrf_cookie(IndexView.as_view())),
         name="base",
     ),
+    path("accounts/login/", LoginView401.as_view(), name="login")
 ]
 
 
