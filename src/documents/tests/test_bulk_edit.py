@@ -328,13 +328,28 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             / "0000003.pdf",
             sample3,
         )
-        self.doc1 = Document.objects.create(checksum="A", title="A", filename=sample1)
+        self.doc1 = Document.objects.create(
+            checksum="A",
+            title="A",
+            filename=sample1,
+            mime_type="application/pdf",
+        )
         self.doc1.archive_filename = sample1_archive
         self.doc1.save()
-        self.doc2 = Document.objects.create(checksum="B", title="B", filename=sample2)
+        self.doc2 = Document.objects.create(
+            checksum="B",
+            title="B",
+            filename=sample2,
+            mime_type="application/pdf",
+        )
         self.doc2.archive_filename = sample2_archive
         self.doc2.save()
-        self.doc3 = Document.objects.create(checksum="C", title="C", filename=sample3)
+        self.doc3 = Document.objects.create(
+            checksum="C",
+            title="C",
+            filename=sample3,
+            mime_type="application/pdf",
+        )
         img_doc = os.path.join(self.dirs.scratch_dir, "sample_image.jpg")
         shutil.copy(
             os.path.join(
@@ -348,17 +363,18 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             checksum="D",
             title="D",
             filename=img_doc,
+            mime_type="image/jpeg",
         )
 
     @mock.patch("documents.tasks.consume_file.delay")
     def test_merge(self, mock_consume_file):
         """
         GIVEN:
-        - Existing documents
+            - Existing documents
         WHEN:
-        - Merge action is called with 3 documents
+            - Merge action is called with 3 documents
         THEN:
-        - Consume file should be called
+            - Consume file should be called
         """
         doc_ids = [self.doc1.id, self.doc2.id, self.doc3.id]
         metadata_document_id = self.doc1.id
@@ -389,12 +405,12 @@ class TestPDFActions(DirectoriesMixin, TestCase):
     def test_merge_with_errors(self, mock_open_pdf, mock_consume_file):
         """
         GIVEN:
-        - Existing documents
+            - Existing documents
         WHEN:
-        - Merge action is called with 2 documents
-        - Error occurs when opening both files
+            - Merge action is called with 2 documents
+            - Error occurs when opening both files
         THEN:
-        - Consume file should not be called
+            - Consume file should not be called
         """
         mock_open_pdf.side_effect = Exception("Error opening PDF")
         doc_ids = [self.doc2.id, self.doc3.id]
@@ -413,11 +429,11 @@ class TestPDFActions(DirectoriesMixin, TestCase):
     def test_split(self, mock_consume_file):
         """
         GIVEN:
-        - Existing documents
+            - Existing documents
         WHEN:
-        - Split action is called with 1 document and 2 pages
+            - Split action is called with 1 document and 2 pages
         THEN:
-        - Consume file should be called twice
+            - Consume file should be called twice
         """
         doc_ids = [self.doc2.id]
         pages = [[1, 2], [3]]
@@ -433,12 +449,12 @@ class TestPDFActions(DirectoriesMixin, TestCase):
     def test_split_with_errors(self, mock_save_pdf, mock_consume_file):
         """
         GIVEN:
-        - Existing documents
+            - Existing documents
         WHEN:
-        - Split action is called with 1 document and 2 page groups
-        - Error occurs when saving the files
+            - Split action is called with 1 document and 2 page groups
+            - Error occurs when saving the files
         THEN:
-        - Consume file should not be called
+            - Consume file should not be called
         """
         mock_save_pdf.side_effect = Exception("Error saving PDF")
         doc_ids = [self.doc2.id]
@@ -458,11 +474,11 @@ class TestPDFActions(DirectoriesMixin, TestCase):
     def test_rotate(self, mock_chord, mock_update_document, mock_update_documents):
         """
         GIVEN:
-        - Existing documents
+            - Existing documents
         WHEN:
-        - Rotate action is called with 2 documents
+            - Rotate action is called with 2 documents
         THEN:
-        - Rotate action should be called twice
+            - Rotate action should be called twice
         """
         doc_ids = [self.doc1.id, self.doc2.id]
         result = bulk_edit.rotate(doc_ids, 90)
@@ -471,8 +487,8 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_chord.assert_called_once()
         self.assertEqual(result, "OK")
 
-    @mock.patch("documents.tasks.bulk_update_documents.delay")
-    @mock.patch("documents.tasks.update_document_archive_file.delay")
+    @mock.patch("documents.tasks.bulk_update_documents.s")
+    @mock.patch("documents.tasks.update_document_archive_file.s")
     @mock.patch("pikepdf.Pdf.save")
     def test_rotate_with_error(
         self,
@@ -482,12 +498,12 @@ class TestPDFActions(DirectoriesMixin, TestCase):
     ):
         """
         GIVEN:
-        - Existing documents
+            - Existing documents
         WHEN:
-        - Rotate action is called with 2 documents
-        - PikePDF raises an error
+            - Rotate action is called with 2 documents
+            - PikePDF raises an error
         THEN:
-        - Rotate action should be called 0 times
+            - Rotate action should be called 0 times
         """
         mock_pdf_save.side_effect = Exception("Error saving PDF")
         doc_ids = [self.doc2.id, self.doc3.id]
@@ -498,3 +514,30 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             expected_str = "Error rotating document"
             self.assertIn(expected_str, error_str)
             mock_update_archive_file.assert_not_called()
+
+    @mock.patch("documents.tasks.bulk_update_documents.s")
+    @mock.patch("documents.tasks.update_document_archive_file.s")
+    @mock.patch("celery.chord.delay")
+    def test_rotate_non_pdf(
+        self,
+        mock_chord,
+        mock_update_document,
+        mock_update_documents,
+    ):
+        """
+        GIVEN:
+            - Existing documents
+        WHEN:
+            - Rotate action is called with 2 documents, one of which is not a PDF
+        THEN:
+            - Rotate action should be performed 1 time, with the non-PDF document skipped
+        """
+        with self.assertLogs("paperless.bulk_edit", level="INFO") as cm:
+            result = bulk_edit.rotate([self.doc2.id, self.img_doc.id], 90)
+            output_str = cm.output[1]
+            expected_str = "Document 4 is not a PDF, skipping rotation"
+            self.assertIn(expected_str, output_str)
+            self.assertEqual(mock_update_document.call_count, 1)
+            mock_update_documents.assert_called_once()
+            mock_chord.assert_called_once()
+            self.assertEqual(result, "OK")

@@ -170,6 +170,11 @@ def rotate(doc_ids: list[int], degrees: int):
 
     rotate_tasks = []
     for doc in qs:
+        if doc.mime_type != "application/pdf":
+            logger.warning(
+                f"Document {doc.id} is not a PDF, skipping rotation.",
+            )
+            continue
         try:
             with pikepdf.open(doc.source_path, allow_overwriting_input=True) as pdf:
                 for page in pdf.pages:
