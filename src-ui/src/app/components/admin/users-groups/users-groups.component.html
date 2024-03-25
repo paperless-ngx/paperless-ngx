@@ -26,7 +26,7 @@
     @for (user of users; track user) {
       <li class="list-group-item">
         <div class="row">
-          <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editUser(user)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.User)">{{user.username}}</button></div>
+          <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editUser(user)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.User)">{{user.username}}</button></div>
           <div class="col d-flex align-items-center">{{user.first_name}} {{user.last_name}}</div>
           <div class="col d-flex align-items-center">{{user.groups?.map(getGroupName, this).join(', ')}}</div>
           <div class="col">
@@ -65,7 +65,7 @@
       @for (group of groups; track group) {
         <li class="list-group-item">
           <div class="row">
-            <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editGroup(group)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.Group)">{{group.name}}</button></div>
+            <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editGroup(group)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.Group)">{{group.name}}</button></div>
             <div class="col"></div>
             <div class="col"></div>
             <div class="col">
