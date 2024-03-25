@@ -25,7 +25,7 @@
   @for (workflow of workflows; track workflow.id) {
     <li class="list-group-item">
       <div class="row">
-        <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editWorkflow(workflow)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.Workflow)">{{workflow.name}}</button></div>
+        <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editWorkflow(workflow)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.Workflow)">{{workflow.name}}</button></div>
         <div class="col d-flex align-items-center"><code>{{workflow.order}}</code></div>
         <div class="col d-flex align-items-center"><code> @if(workflow.enabled) { <ng-container i18n>Enabled</ng-container> } @else { <span i18n class="text-muted">Disabled</span> }</code></div>
         <div class="col d-flex align-items-center">{{getTypesList(workflow)}}</div>
