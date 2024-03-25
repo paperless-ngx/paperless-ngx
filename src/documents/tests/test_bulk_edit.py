@@ -1,4 +1,3 @@
-import os
 import shutil
 from pathlib import Path
 from unittest import mock
@@ -283,7 +282,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
 class TestPDFActions(DirectoriesMixin, TestCase):
     def setUp(self):
         super().setUp()
-        sample1 = os.path.join(self.dirs.scratch_dir, "sample.pdf")
+        sample1 = self.dirs.scratch_dir / "sample.pdf"
         shutil.copy(
             Path(__file__).parent
             / "samples"
@@ -292,7 +291,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             / "0000001.pdf",
             sample1,
         )
-        sample1_archive = os.path.join(self.dirs.archive_dir, "sample_archive.pdf")
+        sample1_archive = self.dirs.archive_dir / "sample_archive.pdf"
         shutil.copy(
             Path(__file__).parent
             / "samples"
@@ -301,7 +300,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             / "0000001.pdf",
             sample1_archive,
         )
-        sample2 = os.path.join(self.dirs.scratch_dir, "sample2.pdf")
+        sample2 = self.dirs.scratch_dir / "sample2.pdf"
         shutil.copy(
             Path(__file__).parent
             / "samples"
@@ -310,7 +309,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             / "0000002.pdf",
             sample2,
         )
-        sample2_archive = os.path.join(self.dirs.archive_dir, "sample2_archive.pdf")
+        sample2_archive = self.dirs.archive_dir / "sample2_archive.pdf"
         shutil.copy(
             Path(__file__).parent
             / "samples"
@@ -319,7 +318,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             / "0000002.pdf",
             sample2_archive,
         )
-        sample3 = os.path.join(self.dirs.scratch_dir, "sample3.pdf")
+        sample3 = self.dirs.scratch_dir / "sample3.pdf"
         shutil.copy(
             Path(__file__).parent
             / "samples"
@@ -350,13 +349,9 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             filename=sample3,
             mime_type="application/pdf",
         )
-        img_doc = os.path.join(self.dirs.scratch_dir, "sample_image.jpg")
+        img_doc = self.dirs.scratch_dir / "sample_image.jpg"
         shutil.copy(
-            os.path.join(
-                os.path.dirname(__file__),
-                "samples",
-                "simple.jpg",
-            ),
+            Path(__file__).parent / "samples" / "simple.jpg",
             img_doc,
         )
         self.img_doc = Document.objects.create(
