@@ -44,11 +44,19 @@
     </button>
     <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
       <button ngbDropdownItem (click)="redoOcr()" [disabled]="!userCanEdit">
-        <i-bs width="1em" height="1em" name="arrow-counterclockwise"></i-bs><span class="ps-1" i18n>Redo OCR</span>
+        <i-bs width="1em" height="1em" name="arrow-counterclockwise"></i-bs>&nbsp;<span i18n>Redo OCR</span>
       </button>
 
       <button ngbDropdownItem (click)="moreLike()">
-        <i-bs width="1em" height="1em" name="diagram-3"></i-bs><span class="ps-1" i18n>More like this</span>
+        <i-bs width="1em" height="1em" name="diagram-3"></i-bs>&nbsp;<span i18n>More like this</span>
+      </button>
+
+      <button ngbDropdownItem (click)="splitDocument()" [disabled]="contentRenderType !== ContentRenderType.PDF || previewNumPages < 2">
+        <i-bs width="1em" height="1em" name="scissors"></i-bs>&nbsp;<span i18n>Split</span>
+      </button>
+
+      <button ngbDropdownItem (click)="rotateDocument()" [disabled]="!userIsOwner || contentRenderType !== ContentRenderType.PDF">
+        <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
       </button>
     </div>
   </div>
