@@ -357,6 +357,16 @@ extract the files inside the `export` folder first.
 
     Importing from a previous version of Paperless may work, but for best
     results it is suggested to match the versions.
+	
+!!! warning
+    The [Document importer](#importer) is meant to be run against a completely empty database
+	and a set of empty paperless folders.
+    Unless you take great care in making sure that there will be no collisions
+	(with the existing items in your paperless database) caused by the manifest data you
+	place in the `export` folder, the document_importer script may crash on duplicate items/files.
+	You run the risk of corrupting your target paperless instance if you import
+	items into a paperless instance that is not completely empty. 
+	
 
 ### Document retagger {#retagger}
 
