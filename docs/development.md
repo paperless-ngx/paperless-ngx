@@ -341,6 +341,16 @@ If you want to build the documentation locally, this is how you do it:
     ```bash
     $ pipenv install --dev
     ```
+You may need to install the follow extensions manually, if you find that mkdocs is complaining about missing modules, plugins or themes:
+    ```bash
+    $ pip install pymdown-extensions
+    ```
+    ```bash
+    $ pip install mkdocs-material-extensions mkdocs-material
+    ```
+    ```bash
+    $ pip install mkdocs-glightbox
+    ```		
 
 2.  Build the documentation
 

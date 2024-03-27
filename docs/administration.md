@@ -349,6 +349,10 @@ When you use the provided docker compose script, put the export inside
 the `export` folder in your paperless source directory. Specify
 `../export` as the `source`.
 
+If you have zipped the data and manifest 
+with the [Document exporter](#exporter) using the `-z` or `--zip` option, please
+extract the files inside the `export` folder first.
+
 !!! note
 
     Importing from a previous version of Paperless may work, but for best
