@@ -39,6 +39,7 @@
     "zone.js": "^0.14.8"
   },
   "devDependencies": {
+    "@angular-builders/custom-webpack": "^18.0.0",
     "@angular-builders/jest": "^18.0.0",
     "@angular-devkit/build-angular": "^18.2.2",
     "@angular-devkit/core": "^18.2.2",
@@ -50,6 +51,7 @@
     "@angular-eslint/template-parser": "18.3.0",
     "@angular/cli": "~18.2.2",
     "@angular/compiler-cli": "~18.2.2",
+    "@codecov/webpack-plugin": "^1.0.1",
     "@playwright/test": "^1.46.1",
     "@types/jest": "^29.5.12",
     "@types/node": "^22.0.2",
