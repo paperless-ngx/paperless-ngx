@@ -368,7 +368,7 @@ class Consumer(LoggingMixin):
         if Document.objects.filter(archive_serial_number=self.override_asn).exists():
             self._fail(
                 ConsumerStatusShortMessage.ASN_ALREADY_EXISTS,
-                f"Not consuming {self.filename}: Given ASN already exists!",
+                f"Not consuming {self.filename}: Given ASN {self.override_asn} already exists!",
             )
 
     def run_pre_consume_script(self):
