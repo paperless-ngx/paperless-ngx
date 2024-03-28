@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-04 17:00-0800\n"
-"PO-Revision-Date: 2024-03-05 01:01\n"
+"PO-Revision-Date: 2024-03-20 00:23\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -685,7 +685,7 @@ msgstr "Задание"
 
 #: documents/models.py:1006
 msgid "Removal"
-msgstr ""
+msgstr "Удаление"
 
 #: documents/models.py:1010
 msgid "Workflow Action Type"
@@ -741,15 +741,15 @@ msgstr "назначьте эти спецполя"
 
 #: documents/models.py:1108
 msgid "remove these tag(s)"
-msgstr ""
+msgstr "удалить выбранные таг(и)"
 
 #: documents/models.py:1113
 msgid "remove all tags"
-msgstr ""
+msgstr "удалить все таги"
 
 #: documents/models.py:1120
 msgid "remove these document type(s)"
-msgstr ""
+msgstr "удалить эти тип(ы) документов"
 
 #: documents/models.py:1125
 msgid "remove all document types"

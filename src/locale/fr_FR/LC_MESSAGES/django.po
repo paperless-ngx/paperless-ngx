@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-04 17:00-0800\n"
-"PO-Revision-Date: 2024-03-09 00:22\n"
+"PO-Revision-Date: 2024-03-28 00:23\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -871,7 +871,7 @@ msgstr "Veuillez vous connecter."
 #: documents/templates/account/login.html:12
 #, python-format
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
-msgstr "Vous n'avez pas encore de compte ? <a href=\"%(signup_url)s\">Inscrivez-vous</a>"
+msgstr "Vous n’avez pas encore de compte ? <a href=\"%(signup_url)s\">Inscrivez-vous</a>"
 
 #: documents/templates/account/login.html:19
 #: documents/templates/account/signup.html:15

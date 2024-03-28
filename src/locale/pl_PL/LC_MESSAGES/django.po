@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-04 17:00-0800\n"
-"PO-Revision-Date: 2024-03-05 01:01\n"
+"PO-Revision-Date: 2024-03-27 00:22\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -47,7 +47,7 @@ msgstr "Wyrażenie regularne"
 
 #: documents/models.py:58 documents/models.py:902
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Słowo rozmyte"
 
 #: documents/models.py:59
 msgid "Automatic"
@@ -365,7 +365,7 @@ msgstr "zapytanie pełnotekstowe"
 
 #: documents/models.py:446
 msgid "more like this"
-msgstr ""
+msgstr "więcej takich"
 
 #: documents/models.py:447
 msgid "has tags in"
@@ -685,7 +685,7 @@ msgstr "Przypisanie"
 
 #: documents/models.py:1006
 msgid "Removal"
-msgstr ""
+msgstr "Usuwanie"
 
 #: documents/models.py:1010
 msgid "Workflow Action Type"
@@ -741,71 +741,71 @@ msgstr "przypisz te pola dodatkowe"
 
 #: documents/models.py:1108
 msgid "remove these tag(s)"
-msgstr ""
+msgstr "usuń ten tag/te tagi"
 
 #: documents/models.py:1113
 msgid "remove all tags"
-msgstr ""
+msgstr "usuń wszystkie tagi"
 
 #: documents/models.py:1120
 msgid "remove these document type(s)"
-msgstr ""
+msgstr "usuń te typy dokumentów"
 
 #: documents/models.py:1125
 msgid "remove all document types"
-msgstr ""
+msgstr "usuń wszystkie typy dokumentów"
 
 #: documents/models.py:1132
 msgid "remove these correspondent(s)"
-msgstr ""
+msgstr "usuń tych korespondentów"
 
 #: documents/models.py:1137
 msgid "remove all correspondents"
-msgstr ""
+msgstr "usuń wszystkich korespondentów"
 
 #: documents/models.py:1144
 msgid "remove these storage path(s)"
-msgstr ""
+msgstr "usuń te ścieżki zapisu"
 
 #: documents/models.py:1149
 msgid "remove all storage paths"
-msgstr ""
+msgstr "usuń wszystkie ścieżki zapisu"
 
 #: documents/models.py:1156
 msgid "remove these owner(s)"
-msgstr ""
+msgstr "usuń tych właścicieli"
 
 #: documents/models.py:1161
 msgid "remove all owners"
-msgstr ""
+msgstr "usuń wszystkich właścicieli"
 
 #: documents/models.py:1168
 msgid "remove view permissions for these users"
-msgstr ""
+msgstr "usuń uprawnienia do wyświetlania dla tych użytkowników"
 
 #: documents/models.py:1175
 msgid "remove view permissions for these groups"
-msgstr ""
+msgstr "usuń uprawnienia do wyświetlania dla tych grup"
 
 #: documents/models.py:1182
 msgid "remove change permissions for these users"
-msgstr ""
+msgstr "usuń uprawnienia do zmiany dla tych użytkowników"
 
 #: documents/models.py:1189
 msgid "remove change permissions for these groups"
-msgstr ""
+msgstr "usuń uprawnienia do zmiany dla tych grup"
 
 #: documents/models.py:1194
 msgid "remove all permissions"
-msgstr ""
+msgstr "usuń wszystkie uprawnienia"
 
 #: documents/models.py:1201
 msgid "remove these custom fields"
-msgstr ""
+msgstr "usuń te pola dodatkowe"
 
 #: documents/models.py:1206
 msgid "remove all custom fields"
-msgstr ""
+msgstr "usuń wszystkie pola dodatkowe"
 
 #: documents/models.py:1210
 msgid "workflow action"
@@ -852,13 +852,14 @@ msgstr "Wykryto nieprawidłową zmienną."
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
-msgstr ""
+msgstr "Witaj z %(site_name)s!"
 
 #: documents/templates/account/email/base_message.txt:5
 #, python-format
 msgid "Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
-msgstr ""
+msgstr "Dziękujemy za korzystanie z %(site_name)s\n"
+"%(site_domain)s"
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
@@ -871,7 +872,7 @@ msgstr "Proszę się zalogować."
 #: documents/templates/account/login.html:12
 #, python-format
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
-msgstr ""
+msgstr "Nie posiadasz jeszcze konta? <a href=\"%(signup_url)s\">Zarejestruj się</a>"
 
 #: documents/templates/account/login.html:19
 #: documents/templates/account/signup.html:15
@@ -968,21 +969,21 @@ msgstr "Twoje nowe hasło zostało ustawione. Możesz się teraz <a href=\"%(log
 
 #: documents/templates/account/signup.html:5
 msgid "Paperless-ngx sign up"
-msgstr ""
+msgstr "Rejestracja w Paperless-ngx"
 
 #: documents/templates/account/signup.html:10
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
-msgstr ""
+msgstr "Masz już konto? <a href=\"%(login_url)s\">Zaloguj się</a>"
 
 #: documents/templates/account/signup.html:16
 #: documents/templates/socialaccount/signup.html:14
 msgid "Email (optional)"
-msgstr ""
+msgstr "Adres e-mail (opcjonalny)"
 
 #: documents/templates/account/signup.html:18
 msgid "Password (again)"
-msgstr ""
+msgstr "Hasło (powtórz)"
 
 #: documents/templates/account/signup.html:36
 #: documents/templates/socialaccount/signup.html:27

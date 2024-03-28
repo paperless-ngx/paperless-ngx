@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-04 17:00-0800\n"
-"PO-Revision-Date: 2024-03-05 01:01\n"
+"PO-Revision-Date: 2024-03-25 00:24\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -425,11 +425,11 @@ msgstr ""
 
 #: documents/models.py:461
 msgid "has custom field value"
-msgstr ""
+msgstr "sisältää mukautetun kentän arvon"
 
 #: documents/models.py:462
 msgid "is shared by me"
-msgstr ""
+msgstr "on minun jakamani"
 
 #: documents/models.py:472
 msgid "rule type"
@@ -589,19 +589,19 @@ msgstr ""
 
 #: documents/models.py:764
 msgid "Document Link"
-msgstr ""
+msgstr "Asiakirjan linkki"
 
 #: documents/models.py:776
 msgid "data type"
-msgstr ""
+msgstr "datatyyppi"
 
 #: documents/models.py:784
 msgid "custom field"
-msgstr ""
+msgstr "mukautettu kenttä"
 
 #: documents/models.py:785
 msgid "custom fields"
-msgstr ""
+msgstr "mukautetut kentät"
 
 #: documents/models.py:847
 msgid "custom field instance"
@@ -617,11 +617,11 @@ msgstr ""
 
 #: documents/models.py:906
 msgid "Document Added"
-msgstr ""
+msgstr "Asiakirja lisätty"
 
 #: documents/models.py:907
 msgid "Document Updated"
-msgstr ""
+msgstr "Asiakirja päivitetty"
 
 #: documents/models.py:910
 msgid "Consume Folder"
@@ -777,7 +777,7 @@ msgstr ""
 
 #: documents/models.py:1161
 msgid "remove all owners"
-msgstr ""
+msgstr "poista kaikki omistajat"
 
 #: documents/models.py:1168
 msgid "remove view permissions for these users"
@@ -797,23 +797,23 @@ msgstr ""
 
 #: documents/models.py:1194
 msgid "remove all permissions"
-msgstr ""
+msgstr "poista kaikki käyttöoikeudet"
 
 #: documents/models.py:1201
 msgid "remove these custom fields"
-msgstr ""
+msgstr "poista nämä mukautetut kentät"
 
 #: documents/models.py:1206
 msgid "remove all custom fields"
-msgstr ""
+msgstr "poista kaikki mukautetut kentät"
 
 #: documents/models.py:1210
 msgid "workflow action"
-msgstr ""
+msgstr "työnkulun toiminto"
 
 #: documents/models.py:1211
 msgid "workflow actions"
-msgstr ""
+msgstr "työnkulun toiminnot"
 
 #: documents/models.py:1220 paperless_mail/models.py:95
 msgid "order"
@@ -825,11 +825,11 @@ msgstr ""
 
 #: documents/models.py:1233
 msgid "actions"
-msgstr ""
+msgstr "toiminnot"
 
 #: documents/models.py:1236
 msgid "enabled"
-msgstr ""
+msgstr "käytössä"
 
 #: documents/serialisers.py:114
 #, python-format
@@ -852,17 +852,18 @@ msgstr "Virheellinen muuttuja havaittu."
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
-msgstr ""
+msgstr "Hei sivustolta %(site_name)s!"
 
 #: documents/templates/account/email/base_message.txt:5
 #, python-format
 msgid "Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
-msgstr ""
+msgstr "Kiitos kun käytät sivustoa %(site_name)s!\n"
+"%(site_domain)s"
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
-msgstr "Paperless-ngx kirjaudu sisään"
+msgstr "Paperless-ngx:n sisäänkirjautuminen"
 
 #: documents/templates/account/login.html:10
 msgid "Please sign in."
@@ -871,7 +872,7 @@ msgstr "Kirjaudu sisään."
 #: documents/templates/account/login.html:12
 #, python-format
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
-msgstr ""
+msgstr "Eikö sinulla ole vielä tiliä? <a href=\"%(signup_url)s\">Rekisteröidy</a>"
 
 #: documents/templates/account/login.html:19
 #: documents/templates/account/signup.html:15
@@ -895,7 +896,7 @@ msgstr "Unohditko salasanan?"
 #: documents/templates/account/login.html:45
 #: documents/templates/account/signup.html:49
 msgid "or sign in via"
-msgstr ""
+msgstr "tai kirjaudu käyttäen"
 
 #: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
@@ -968,26 +969,26 @@ msgstr "Uusi salasanasi on asetettu. Voit nyt <a href=\"%(login_url)s\">kirjautu
 
 #: documents/templates/account/signup.html:5
 msgid "Paperless-ngx sign up"
-msgstr ""
+msgstr "Paperless-ngx:n rekisteröityminen"
 
 #: documents/templates/account/signup.html:10
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
-msgstr ""
+msgstr "Onko sinulla jo tili? <a href=\"%(login_url)s\">Kirjaudu sisään</a>"
 
 #: documents/templates/account/signup.html:16
 #: documents/templates/socialaccount/signup.html:14
 msgid "Email (optional)"
-msgstr ""
+msgstr "Sähköposti (valinnainen)"
 
 #: documents/templates/account/signup.html:18
 msgid "Password (again)"
-msgstr ""
+msgstr "Salasana (uudestaan)"
 
 #: documents/templates/account/signup.html:36
 #: documents/templates/socialaccount/signup.html:27
 msgid "Sign up"
-msgstr ""
+msgstr "Rekisteröidy"
 
 #: documents/templates/index.html:61
 msgid "Paperless-ngx is loading..."
@@ -1026,7 +1027,7 @@ msgstr ""
 
 #: documents/templates/socialaccount/login.html:13
 msgid "Continue"
-msgstr ""
+msgstr "Jatka"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
@@ -1062,31 +1063,31 @@ msgstr "Paperless"
 
 #: paperless/models.py:26
 msgid "pdf"
-msgstr ""
+msgstr "pdf"
 
 #: paperless/models.py:27
 msgid "pdfa"
-msgstr ""
+msgstr "pdfa"
 
 #: paperless/models.py:28
 msgid "pdfa-1"
-msgstr ""
+msgstr "pdfa-1"
 
 #: paperless/models.py:29
 msgid "pdfa-2"
-msgstr ""
+msgstr "pdfa-2"
 
 #: paperless/models.py:30
 msgid "pdfa-3"
-msgstr ""
+msgstr "pdfa-3"
 
 #: paperless/models.py:39
 msgid "skip"
-msgstr ""
+msgstr "ohita"
 
 #: paperless/models.py:40
 msgid "redo"
-msgstr ""
+msgstr "tee uudelleen"
 
 #: paperless/models.py:41
 msgid "force"
@@ -1098,7 +1099,7 @@ msgstr ""
 
 #: paperless/models.py:50
 msgid "never"
-msgstr ""
+msgstr "ei koskaan"
 
 #: paperless/models.py:51
 msgid "with_text"
@@ -1106,7 +1107,7 @@ msgstr ""
 
 #: paperless/models.py:52
 msgid "always"
-msgstr ""
+msgstr "aina"
 
 #: paperless/models.py:60
 msgid "clean"
@@ -1126,7 +1127,7 @@ msgstr ""
 
 #: paperless/models.py:71
 msgid "RGB"
-msgstr ""
+msgstr "RGB"
 
 #: paperless/models.py:72
 msgid "UseDeviceIndependentColor"
@@ -1134,11 +1135,11 @@ msgstr ""
 
 #: paperless/models.py:73
 msgid "Gray"
-msgstr ""
+msgstr "Harmaa"
 
 #: paperless/models.py:74
 msgid "CMYK"
-msgstr ""
+msgstr "CMYK"
 
 #: paperless/models.py:83
 msgid "Sets the output PDF type"
@@ -1146,15 +1147,15 @@ msgstr ""
 
 #: paperless/models.py:95
 msgid "Do OCR from page 1 to this value"
-msgstr ""
+msgstr "Tee OCR sivulta 1 tähän arvoon"
 
 #: paperless/models.py:101
 msgid "Do OCR using these languages"
-msgstr ""
+msgstr "Tee OCR käyttämällä näitä kieliä"
 
 #: paperless/models.py:108
 msgid "Sets the OCR mode"
-msgstr ""
+msgstr "Asettaa OCR-tilan"
 
 #: paperless/models.py:116
 msgid "Controls the generation of an archive file"
@@ -1194,11 +1195,11 @@ msgstr ""
 
 #: paperless/models.py:171
 msgid "Application title"
-msgstr ""
+msgstr "Sovelluksen otsikko"
 
 #: paperless/models.py:178
 msgid "Application logo"
-msgstr ""
+msgstr "Sovelluksen logo"
 
 #: paperless/models.py:188
 msgid "paperless application settings"
@@ -1342,7 +1343,7 @@ msgstr "Autentikaatio"
 
 #: paperless_mail/admin.py:42
 msgid "Advanced settings"
-msgstr "Edistyneet asetukset"
+msgstr "Lisäasetukset"
 
 #: paperless_mail/admin.py:58
 msgid "Filter"
