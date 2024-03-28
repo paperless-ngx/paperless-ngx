@@ -355,10 +355,10 @@ Note that .zip files (as can be generated from the exporter) are not supported.
 
     Importing from a previous version of Paperless may work, but for best
     results it is suggested to match the versions.
-	
+
 !!! warning
     The importer should be run against a completely empty installation (database and directories) of Paperless-ngx.
-	
+
 
 ### Document retagger {#retagger}
 
