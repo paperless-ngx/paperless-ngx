@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-04 17:00-0800\n"
-"PO-Revision-Date: 2024-03-05 01:01\n"
+"PO-Revision-Date: 2024-03-25 12:08\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -907,7 +907,7 @@ msgstr "Masukkan email Anda di bawah ini, dan kami akan kirim email instruksi un
 
 #: documents/templates/account/password_reset.html:12
 msgid "An error occurred. Please try again."
-msgstr "Terjadi kesalahan. Harap coba lagi."
+msgstr "Terjadi sebuah kesalahan. Harap coba kembali."
 
 #: documents/templates/account/password_reset.html:15
 msgid "Email"
@@ -1012,12 +1012,12 @@ msgstr "Tautan telah kedaluwarsa."
 #: documents/templates/socialaccount/authentication_error.html:5
 #: documents/templates/socialaccount/login.html:5
 msgid "Paperless-ngx social account sign in"
-msgstr ""
+msgstr "Paperless-ngx masuk dengan akun sosial"
 
 #: documents/templates/socialaccount/authentication_error.html:10
 #, python-format
 msgid "An error occurred while attempting to login via your social network account. Back to the <a href=\"%(login_url)s\">login page</a>"
-msgstr ""
+msgstr "Terjadi sebuah kesalahan saat masuk dengan akun sosial Anda. Kembali ke halaman <a href=\"%(login_url)s\">masuk</a>"
 
 #: documents/templates/socialaccount/login.html:10
 #, python-format

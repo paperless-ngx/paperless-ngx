@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-04 17:00-0800\n"
-"PO-Revision-Date: 2024-03-05 01:01\n"
+"PO-Revision-Date: 2024-03-20 00:23\n"
 "Last-Translator: \n"
 "Language-Team: Croatian\n"
 "Language: hr_HR\n"
@@ -393,11 +393,11 @@ msgstr ""
 
 #: documents/models.py:453
 msgid "has document type in"
-msgstr ""
+msgstr "ima tip dokumenta u"
 
 #: documents/models.py:454
 msgid "does not have document type in"
-msgstr ""
+msgstr "nema tip dokumenta u"
 
 #: documents/models.py:455
 msgid "has storage path in"
