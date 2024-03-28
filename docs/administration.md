@@ -359,7 +359,6 @@ Note that .zip files (as can be generated from the exporter) are not supported.
 !!! warning
     The importer should be run against a completely empty installation (database and directories) of Paperless-ngx.
 
-
 ### Document retagger {#retagger}
 
 Say you've imported a few hundred documents and now want to introduce a
