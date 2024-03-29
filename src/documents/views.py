@@ -17,6 +17,7 @@ from urllib.parse import urlparse
 import pathvalidate
 from django.apps import apps
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.db import connections
@@ -152,7 +153,13 @@ from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import GeneralConfig
 from paperless.db import GnuPG
+from paperless.serialisers import GroupSerializer
+from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
+from paperless_mail.models import MailAccount
+from paperless_mail.models import MailRule
+from paperless_mail.serialisers import MailAccountSerializer
+from paperless_mail.serialisers import MailRuleSerializer
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
@@ -1116,6 +1123,98 @@ class SearchAutoCompleteView(APIView):
                 limit,
                 user,
             ),
+        )
+
+
+class GlobalSearchView(PassUserMixin):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = SearchResultSerializer
+
+    def get(self, request, *args, **kwargs):
+        query = request.query_params.get("query", None)
+        if query is None:
+            return HttpResponseBadRequest("Query required")
+        elif len(query) < 3:
+            return HttpResponseBadRequest("Query must be at least 3 characters")
+
+        docs = []
+        from documents import index
+
+        with index.open_index_searcher() as s:
+            q, _ = index.DelayedFullTextQuery(
+                s,
+                request.query_params,
+                10,
+                request.user,
+            )._get_query()
+            results = s.search(q, limit=10)
+            docs = Document.objects.filter(id__in=[r["id"] for r in results])
+
+        tags = Tag.objects.filter(name__contains=query)
+        correspondents = Correspondent.objects.filter(name__contains=query)
+        document_types = DocumentType.objects.filter(name__contains=query)
+        storage_paths = StoragePath.objects.filter(name__contains=query)
+        users = User.objects.filter(username__contains=query)
+        groups = Group.objects.filter(name__contains=query)
+        mail_rules = MailRule.objects.filter(name__contains=query)
+        mail_accounts = MailAccount.objects.filter(name__contains=query)
+        workflows = Workflow.objects.filter(name__contains=query)
+        custom_fields = CustomField.objects.filter(name__contains=query)
+
+        context = {
+            "request": request,
+        }
+
+        docs_serializer = DocumentSerializer(docs, many=True, context=context)
+        tags_serializer = TagSerializer(tags, many=True, context=context)
+        correspondents_serializer = CorrespondentSerializer(
+            correspondents,
+            many=True,
+            context=context,
+        )
+        document_types_serializer = DocumentTypeSerializer(
+            document_types,
+            many=True,
+            context=context,
+        )
+        storage_paths_serializer = StoragePathSerializer(
+            storage_paths,
+            many=True,
+            context=context,
+        )
+        users_serializer = UserSerializer(users, many=True, context=context)
+        groups_serializer = GroupSerializer(groups, many=True, context=context)
+        mail_rules_serializer = MailRuleSerializer(
+            mail_rules,
+            many=True,
+            context=context,
+        )
+        mail_accounts_serializer = MailAccountSerializer(
+            mail_accounts,
+            many=True,
+            context=context,
+        )
+        workflows_serializer = WorkflowSerializer(workflows, many=True, context=context)
+        custom_fields_serializer = CustomFieldSerializer(
+            custom_fields,
+            many=True,
+            context=context,
+        )
+
+        return Response(
+            {
+                "documents": docs_serializer.data,
+                "tags": tags_serializer.data,
+                "correspondents": correspondents_serializer.data,
+                "document_types": document_types_serializer.data,
+                "storage_paths": storage_paths_serializer.data,
+                "users": users_serializer.data,
+                "groups": groups_serializer.data,
+                "mail_rules": mail_rules_serializer.data,
+                "mail_accounts": mail_accounts_serializer.data,
+                "workflows": workflows_serializer.data,
+                "custom_fields": custom_fields_serializer.data,
+            },
         )
 
 

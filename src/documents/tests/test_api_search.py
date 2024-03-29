@@ -4,6 +4,7 @@ from unittest import mock
 
 import pytest
 from dateutil.relativedelta import relativedelta
+from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import override_settings
@@ -22,7 +23,10 @@ from documents.models import DocumentType
 from documents.models import Note
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import Workflow
 from documents.tests.utils import DirectoriesMixin
+from paperless_mail.models import MailAccount
+from paperless_mail.models import MailRule
 
 
 class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
@@ -1125,3 +1129,88 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             search_query("&ordering=-owner"),
             [d3.id, d2.id, d1.id],
         )
+
+    def test_global_search(self):
+        """
+        GIVEN:
+            - Multiple documents and objects
+        WHEN:
+            - Global search query is made
+        THEN:
+            - Appropriately filtered results are returned
+        """
+        d1 = Document.objects.create(
+            title="invoice doc1",
+            content="the thing i bought at a shop and paid with bank account",
+            checksum="A",
+            pk=1,
+        )
+        d2 = Document.objects.create(
+            title="bank statement doc2",
+            content="things i paid for in august",
+            checksum="B",
+            pk=2,
+        )
+        d3 = Document.objects.create(
+            title="tax bill doc3",
+            content="no b word",
+            checksum="C",
+            pk=3,
+        )
+
+        with index.open_index_writer() as writer:
+            index.update_document(writer, d1)
+            index.update_document(writer, d2)
+            index.update_document(writer, d3)
+
+        correspondent1 = Correspondent.objects.create(name="bank correspondent 1")
+        Correspondent.objects.create(name="correspondent 2")
+        document_type1 = DocumentType.objects.create(name="bank invoice")
+        DocumentType.objects.create(name="invoice")
+        storage_path1 = StoragePath.objects.create(name="bank path 1", path="path1")
+        StoragePath.objects.create(name="path 2", path="path2")
+        tag1 = Tag.objects.create(name="bank tag1")
+        Tag.objects.create(name="tag2")
+        user1 = User.objects.create_user("bank user1")
+        User.objects.create_user("user2")
+        group1 = Group.objects.create(name="bank group1")
+        Group.objects.create(name="group2")
+        mail_account1 = MailAccount.objects.create(name="bank mail account 1")
+        mail_account2 = MailAccount.objects.create(name="mail account 2")
+        mail_rule1 = MailRule.objects.create(
+            name="bank mail rule 1",
+            account=mail_account1,
+            action=MailRule.MailAction.MOVE,
+        )
+        MailRule.objects.create(
+            name="mail rule 2",
+            account=mail_account2,
+            action=MailRule.MailAction.MOVE,
+        )
+        custom_field1 = CustomField.objects.create(
+            name="bank custom field 1",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        CustomField.objects.create(
+            name="custom field 2",
+            data_type=CustomField.FieldDataType.INT,
+        )
+        workflow1 = Workflow.objects.create(name="bank workflow 1")
+        Workflow.objects.create(name="workflow 2")
+
+        response = self.client.get("/api/search/?query=bank")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data
+        self.assertEqual(len(results["documents"]), 2)
+        self.assertNotEqual(results["documents"][0]["id"], d3.id)
+        self.assertNotEqual(results["documents"][1]["id"], d3.id)
+        self.assertEqual(results["correspondents"][0]["id"], correspondent1.id)
+        self.assertEqual(results["document_types"][0]["id"], document_type1.id)
+        self.assertEqual(results["storage_paths"][0]["id"], storage_path1.id)
+        self.assertEqual(results["tags"][0]["id"], tag1.id)
+        self.assertEqual(results["users"][0]["id"], user1.id)
+        self.assertEqual(results["groups"][0]["id"], group1.id)
+        self.assertEqual(results["mail_accounts"][0]["id"], mail_account1.id)
+        self.assertEqual(results["mail_rules"][0]["id"], mail_rule1.id)
+        self.assertEqual(results["custom_fields"][0]["id"], custom_field1.id)
+        self.assertEqual(results["workflows"][0]["id"], workflow1.id)
