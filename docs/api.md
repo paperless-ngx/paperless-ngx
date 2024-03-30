@@ -288,6 +288,8 @@ The endpoint supports the following optional form fields:
 - `tags`: Similar to correspondent. Specify this multiple times to
   have multiple tags added to the document.
 - `archive_serial_number`: An optional archive serial number to set.
+- `custom_fields`: An array of custom field ids to assign (with an empty
+  value) to the document.
 
 The endpoint will immediately return HTTP 200 if the document consumption
 process was started successfully, with the UUID of the consumption task

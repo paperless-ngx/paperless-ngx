@@ -1113,6 +1113,14 @@ class PostDocumentSerializer(serializers.Serializer):
         max_value=Document.ARCHIVE_SERIAL_NUMBER_MAX,
     )
 
+    custom_fields = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=CustomField.objects.all(),
+        label="Custom fields",
+        write_only=True,
+        required=False,
+    )
+
     def validate_document(self, document):
         document_data = document.file.read()
         mime_type = magic.from_buffer(document_data, mime=True)
@@ -1145,6 +1153,12 @@ class PostDocumentSerializer(serializers.Serializer):
     def validate_tags(self, tags):
         if tags:
             return [tag.id for tag in tags]
+        else:
+            return None
+
+    def validate_custom_fields(self, custom_fields):
+        if custom_fields:
+            return [custom_field.id for custom_field in custom_fields]
         else:
             return None
 
