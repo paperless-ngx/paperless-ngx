@@ -930,6 +930,7 @@ class PostDocumentView(GenericAPIView):
         title = serializer.validated_data.get("title")
         created = serializer.validated_data.get("created")
         archive_serial_number = serializer.validated_data.get("archive_serial_number")
+        custom_field_ids = serializer.validated_data.get("custom_fields")
 
         t = int(mktime(datetime.now().timetuple()))
 
@@ -957,6 +958,7 @@ class PostDocumentView(GenericAPIView):
             created=created,
             asn=archive_serial_number,
             owner_id=request.user.id,
+            custom_field_ids=custom_field_ids,
         )
 
         async_task = consume_file.delay(
