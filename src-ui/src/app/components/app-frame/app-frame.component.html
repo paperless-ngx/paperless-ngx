@@ -24,19 +24,8 @@
       }
     </div>
   </a>
-  <div class="search-form-container flex-grow-1 py-2 pb-3 pb-sm-2 px-3 ps-md-4 me-sm-auto order-3 order-sm-1"
-    *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
-    <form (ngSubmit)="search()" class="form-inline flex-grow-1">
-      <i-bs width="1em" height="1em" name="search"></i-bs>
-      <input class="form-control form-control-sm" type="text" placeholder="Search documents" aria-label="Search"
-        [formControl]="searchField" [ngbTypeahead]="searchAutoComplete" (keyup)="searchFieldKeyup($event)"
-        (selectItem)="itemSelected($event)" i18n-placeholder>
-      @if (!searchFieldEmpty) {
-        <button type="button" class="btn btn-link btn-sm ps-0 pe-1 position-absolute top-0 end-0" (click)="resetSearchField()">
-          <i-bs width="1em" height="1em" name="x"></i-bs>
-        </button>
-      }
-    </form>
+  <div class="search-container flex-grow-1 py-2 pb-3 pb-sm-2 px-3 ps-md-4 me-sm-auto order-3 order-sm-1">
+    <pngx-global-search></pngx-global-search>
   </div>
   <ul ngbNav class="order-sm-3">
     <li ngbDropdown class="nav-item dropdown">

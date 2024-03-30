@@ -1120,19 +1120,19 @@ class GlobalSearchView(PassUserMixin):
                 10,
                 request.user,
             )._get_query()
-            results = s.search(q, limit=10)
+            results = s.search(q, limit=3)
             docs = Document.objects.filter(id__in=[r["id"] for r in results])
 
-        tags = Tag.objects.filter(name__contains=query)
-        correspondents = Correspondent.objects.filter(name__contains=query)
-        document_types = DocumentType.objects.filter(name__contains=query)
-        storage_paths = StoragePath.objects.filter(name__contains=query)
-        users = User.objects.filter(username__contains=query)
-        groups = Group.objects.filter(name__contains=query)
-        mail_rules = MailRule.objects.filter(name__contains=query)
-        mail_accounts = MailAccount.objects.filter(name__contains=query)
-        workflows = Workflow.objects.filter(name__contains=query)
-        custom_fields = CustomField.objects.filter(name__contains=query)
+        tags = Tag.objects.filter(name__contains=query)[:3]
+        correspondents = Correspondent.objects.filter(name__contains=query)[:3]
+        document_types = DocumentType.objects.filter(name__contains=query)[:3]
+        storage_paths = StoragePath.objects.filter(name__contains=query)[:3]
+        users = User.objects.filter(username__contains=query)[:3]
+        groups = Group.objects.filter(name__contains=query)[:3]
+        mail_rules = MailRule.objects.filter(name__contains=query)[:3]
+        mail_accounts = MailAccount.objects.filter(name__contains=query)[:3]
+        workflows = Workflow.objects.filter(name__contains=query)[:3]
+        custom_fields = CustomField.objects.filter(name__contains=query)[:3]
 
         context = {
             "request": request,
@@ -1176,6 +1176,17 @@ class GlobalSearchView(PassUserMixin):
 
         return Response(
             {
+                "total": len(docs)
+                + len(tags)
+                + len(correspondents)
+                + len(document_types)
+                + len(storage_paths)
+                + len(users)
+                + len(groups)
+                + len(mail_rules)
+                + len(mail_accounts)
+                + len(workflows)
+                + len(custom_fields),
                 "documents": docs_serializer.data,
                 "tags": tags_serializer.data,
                 "correspondents": correspondents_serializer.data,

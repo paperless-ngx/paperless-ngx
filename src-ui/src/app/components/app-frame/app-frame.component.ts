@@ -1,15 +1,7 @@
 import { Component, HostListener, OnInit } from '@angular/core'
-import { FormControl } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
-import { from, Observable } from 'rxjs'
-import {
-  debounceTime,
-  distinctUntilChanged,
-  map,
-  switchMap,
-  first,
-  catchError,
-} from 'rxjs/operators'
+import { Observable } from 'rxjs'
+import { first } from 'rxjs/operators'
 import { Document } from 'src/app/data/document'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import {
@@ -17,11 +9,8 @@ import {
   DjangoMessagesService,
 } from 'src/app/services/django-messages.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
-import { SearchService } from 'src/app/services/rest/search.service'
 import { environment } from 'src/environments/environment'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { FILTER_FULLTEXT_QUERY } from 'src/app/data/filter-rule-type'
 import {
   RemoteVersionService,
   AppRemoteVersion,
@@ -63,16 +52,12 @@ export class AppFrameComponent
 
   slimSidebarAnimating: boolean = false
 
-  searchField = new FormControl('')
-
   constructor(
     public router: Router,
     private activatedRoute: ActivatedRoute,
     private openDocumentsService: OpenDocumentsService,
-    private searchService: SearchService,
     public savedViewService: SavedViewService,
     private remoteVersionService: RemoteVersionService,
-    private list: DocumentListViewService,
     public settingsService: SettingsService,
     public tasksService: TasksService,
     private readonly toastService: ToastService,
@@ -162,65 +147,6 @@ export class AppFrameComponent
   @HostListener('window:beforeunload')
   canDeactivate(): Observable<boolean> | boolean {
     return !this.openDocumentsService.hasDirty()
-  }
-
-  get searchFieldEmpty(): boolean {
-    return this.searchField.value.trim().length == 0
-  }
-
-  resetSearchField() {
-    this.searchField.reset('')
-  }
-
-  searchFieldKeyup(event: KeyboardEvent) {
-    if (event.key == 'Escape') {
-      this.resetSearchField()
-    }
-  }
-
-  searchAutoComplete = (text$: Observable<string>) =>
-    text$.pipe(
-      debounceTime(200),
-      distinctUntilChanged(),
-      map((term) => {
-        if (term.lastIndexOf(' ') != -1) {
-          return term.substring(term.lastIndexOf(' ') + 1)
-        } else {
-          return term
-        }
-      }),
-      switchMap((term) =>
-        term.length < 2
-          ? from([[]])
-          : this.searchService.autocomplete(term).pipe(
-              catchError(() => {
-                return from([[]])
-              })
-            )
-      )
-    )
-
-  itemSelected(event) {
-    event.preventDefault()
-    let currentSearch: string = this.searchField.value
-    let lastSpaceIndex = currentSearch.lastIndexOf(' ')
-    if (lastSpaceIndex != -1) {
-      currentSearch = currentSearch.substring(0, lastSpaceIndex + 1)
-      currentSearch += event.item + ' '
-    } else {
-      currentSearch = event.item + ' '
-    }
-    this.searchField.patchValue(currentSearch)
-  }
-
-  search() {
-    this.closeMenu()
-    this.list.quickFilter([
-      {
-        rule_type: FILTER_FULLTEXT_QUERY,
-        value: (this.searchField.value as string).trim(),
-      },
-    ])
   }
 
   closeDocument(d: Document) {

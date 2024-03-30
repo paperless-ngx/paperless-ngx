@@ -1,0 +1,33 @@
+form {
+  &:focus-within {
+    .form-control::placeholder {
+      color: rgba(255, 255, 255, 0);
+    }
+  }
+
+  .badge {
+    font-size: 0.8rem;
+  }
+}
+
+.form-control {
+  color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(0, 0, 0, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+  transition: all .3s ease, padding-left 0s ease, background-color 0s ease; // Safari requires all
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  &:focus {
+    background-color: rgba(0, 0, 0, 0.3);
+    color: var(--bs-light);
+    flex-grow: 1;
+    padding-left: 0.5rem;
+  }
+}
+
+* {
+  --pngx-focus-alpha: 0;
+}

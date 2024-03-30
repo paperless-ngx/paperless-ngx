@@ -1,0 +1,104 @@
+
+<div ngbDropdown #resultsDropdown="ngbDropdown" (openChange)="onDropdownOpenChange">
+<form class="form-inline col-6 position-relative">
+    <input #searchInput class="form-control form-control-sm" type="text" name="query"
+        autocomplete="off" placeholder="Search everything" aria-label="Search" i18n-placeholder
+        [(ngModel)]="query" (ngModelChange)="this.queryDebounce.next($event)" (keyup)="searchInputKeyDown($event)" ngbDropdownAnchor>
+    <span class="badge text-muted position-absolute top-50 start-100 translate-middle ms-n4 fw-normal">⌘K</span>
+</form>
+
+<ng-template #resultItemTemplate let-item="item" let-nameProp="nameProp" let-type="type" let-icon="icon">
+    <div #resultItem ngbDropdownItem class="py-2 d-flex align-items-center focus-ring border-0" (click)="primaryAction(type, item)">
+        <i-bs width="1em" height="1em" name="{{icon}}" class="me-2"></i-bs>
+        <span>{{item[nameProp]}}</span>
+        <div class="btn-group ms-auto">
+            <button class="btn btn-sm btn-outline-primary" (click)="primaryAction(type, item); $event.stopPropagation()">
+                @if (type === 'document' || type === 'workflow' || type === 'customField' || type === 'group' || type === 'user') {
+                    <i-bs width="1em" height="1em" name="pencil"></i-bs>
+                } @else {
+                    <i-bs width="1em" height="1em" name="filter"></i-bs>
+                }
+            </button>
+            @if (type !== 'workflow' && type !== 'customField' && type !== 'group' && type !== 'user') {
+                <button class="btn btn-sm btn-outline-secondary" (click)="secondaryAction(type, item); $event.stopPropagation()">
+                    @if (type === 'document') {
+                        <i-bs width="1em" height="1em" name="download"></i-bs>
+                    } @else {
+                        <i-bs width="1em" height="1em" name="pencil"></i-bs>
+                    }
+                </button>
+            }
+        </div>
+    </div>
+</ng-template>
+
+    <div ngbDropdownMenu class="col-6">
+        @if (searchResults?.total === 0) {
+            <h6 class="dropdown-header" i18n="@@searchResults.noResults">No results</h6>
+        } @else {
+            @if (searchResults?.documents.length) {
+                <h6 class="dropdown-header" i18n="@@searchResults.documents">Documents</h6>
+                @for (document of searchResults.documents; track document.id) {
+                    <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: document, nameProp: 'title', type: 'document', icon: 'file-text'}"></ng-container>
+                }
+            }
+
+            @if (searchResults?.tags.length) {
+                <h6 class="dropdown-header" i18n="@@searchResults.tags">Tags</h6>
+                @for (tag of searchResults.tags; track tag.id) {
+                    <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: tag, nameProp: 'name', type: 'tag', icon: 'tag'}"></ng-container>
+                }
+            }
+
+            @if (searchResults?.correspondents.length) {
+                <h6 class="dropdown-header" i18n="@@searchResults.correspondents">Correspondents</h6>
+                @for (correspondent of searchResults.correspondents; track correspondent.id) {
+                    <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: correspondent, nameProp: 'name', type: 'correspondent', icon: 'person'}"></ng-container>
+                }
+            }
+
+            @if (searchResults?.document_types.length) {
+                <h6 class="dropdown-header" i18n="@@searchResults.documentTypes">Document types</h6>
+                @for (documentType of searchResults.document_types; track documentType.id) {
+                    <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: documentType, nameProp: 'name', type: 'documentType', icon: 'file-earmark'}"></ng-container>
+                }
+            }
+
+            @if (searchResults?.storage_paths.length) {
+                <h6 class="dropdown-header" i18n="@@searchResults.storagePaths">Storage paths</h6>
+                @for (storagePath of searchResults.storage_paths; track storagePath.id) {
+                    <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: storagePath, nameProp: 'name', type: 'storagePath', icon: 'folder'}"></ng-container>
+                }
+            }
+
+            @if (searchResults?.users.length) {
+                <h6 class="dropdown-header" i18n="@@searchResults.users">Users</h6>
+                @for (user of searchResults.users; track user.id) {
+                    <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: user, nameProp: 'username', type: 'user', icon: 'person-square'}"></ng-container>
+                }
+            }
+
+            @if (searchResults?.groups.length) {
+                <h6 class="dropdown-header" i18n="@@searchResults.groups">Groups</h6>
+                @for (group of searchResults.groups; track group.id) {
+                    <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: group, nameProp: 'name', type: 'group', icon: 'people'}"></ng-container>
+                }
+            }
+
+            @if (searchResults?.custom_fields.length) {
+                <h6 class="dropdown-header" i18n="@@searchResults.customFields">Custom fields</h6>
+                @for (customField of searchResults.custom_fields; track customField.id) {
+                    <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: customField, nameProp: 'name', type: 'customField', icon: 'ui-radios'}"></ng-container>
+                }
+            }
+
+            @if (searchResults?.workflows.length) {
+                <h6 class="dropdown-header" i18n="@@searchResults.workflows">Workflows</h6>
+                @for (workflow of searchResults.workflows; track workflow.id) {
+                    <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: workflow, nameProp: 'name', type: 'workflow', icon: 'boxes'}"></ng-container>
+                }
+            }
+        }
+
+    </div>
+</div>

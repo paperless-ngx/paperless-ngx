@@ -120,6 +120,7 @@ import { RotateConfirmDialogComponent } from './components/common/confirm-dialog
 import { MergeConfirmDialogComponent } from './components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
 import { SplitConfirmDialogComponent } from './components/common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
 import { DocumentHistoryComponent } from './components/document-history/document-history.component'
+import { GlobalSearchComponent } from './components/app-frame/global-search/global-search.component'
 import {
   airplane,
   archive,
@@ -192,6 +193,7 @@ import {
   personFill,
   personFillLock,
   personLock,
+  personSquare,
   plus,
   plusCircle,
   questionCircle,
@@ -202,6 +204,7 @@ import {
   sortAlphaDown,
   sortAlphaUpAlt,
   tagFill,
+  tag,
   tags,
   textIndentLeft,
   textLeft,
@@ -286,6 +289,7 @@ const icons = {
   personFill,
   personFillLock,
   personLock,
+  personSquare,
   plus,
   plusCircle,
   questionCircle,
@@ -296,6 +300,7 @@ const icons = {
   sortAlphaDown,
   sortAlphaUpAlt,
   tagFill,
+  tag,
   tags,
   textIndentLeft,
   textLeft,
@@ -474,6 +479,7 @@ function initializeApp(settings: SettingsService) {
     MergeConfirmDialogComponent,
     SplitConfirmDialogComponent,
     DocumentHistoryComponent,
+    GlobalSearchComponent,
   ],
   imports: [
     BrowserModule,
