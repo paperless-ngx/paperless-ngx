@@ -19,9 +19,20 @@ import { DocumentListViewService } from 'src/app/services/document-list-view.ser
 import { HttpClient } from '@angular/common/http'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { FILTER_HAS_CORRESPONDENT_ANY } from 'src/app/data/filter-rule-type'
+import {
+  FILTER_HAS_ANY_TAG,
+  FILTER_HAS_CORRESPONDENT_ANY,
+  FILTER_HAS_DOCUMENT_TYPE_ANY,
+  FILTER_HAS_STORAGE_PATH_ANY,
+  FILTER_HAS_TAGS_ANY,
+} from 'src/app/data/filter-rule-type'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { DocumentService } from 'src/app/services/rest/document.service'
+import { MailRuleEditDialogComponent } from '../../common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
+import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
+import { GroupEditDialogComponent } from '../../common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
+import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { WorkflowEditDialogComponent } from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
 
 const searchResults = {
   total: 11,
@@ -133,13 +144,6 @@ describe('GlobalSearchComponent', () => {
     fixture.detectChanges()
   })
 
-  it('should initialize properties', () => {
-    expect(component.query).toBeUndefined()
-    expect(component.queryDebounce).toBeInstanceOf(Subject)
-    expect(component.searchResults).toBeUndefined()
-    expect(component['currentItemIndex']).toBeUndefined()
-  })
-
   it('should handle keyboard events', () => {
     const focusSpy = jest.spyOn(component.searchInput.nativeElement, 'focus')
     component.handleKeyboardEvent(
@@ -176,7 +180,20 @@ describe('GlobalSearchComponent', () => {
     expect(component['currentItemIndex']).toBe(0)
     expect(zeroItemSpy).toHaveBeenCalled()
 
+    const inputFocusSpy = jest.spyOn(
+      component.searchInput.nativeElement,
+      'focus'
+    )
+    component.handleKeyboardEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowUp' })
+    )
+    expect(component['currentItemIndex']).toBe(-1)
+    expect(inputFocusSpy).toHaveBeenCalled()
+
     const actionSpy = jest.spyOn(component, 'primaryAction')
+    component.handleKeyboardEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown' })
+    )
     component.handleKeyboardEvent(
       new KeyboardEvent('keydown', { key: 'Enter' })
     )
@@ -208,61 +225,127 @@ describe('GlobalSearchComponent', () => {
       { rule_type: FILTER_HAS_CORRESPONDENT_ANY, value: object.id.toString() },
     ])
 
+    component.primaryAction('documentType', object)
+    expect(qfSpy).toHaveBeenCalledWith([
+      { rule_type: FILTER_HAS_DOCUMENT_TYPE_ANY, value: object.id.toString() },
+    ])
+
+    component.primaryAction('storagePath', object)
+    expect(qfSpy).toHaveBeenCalledWith([
+      { rule_type: FILTER_HAS_STORAGE_PATH_ANY, value: object.id.toString() },
+    ])
+
+    component.primaryAction('tag', object)
+    expect(qfSpy).toHaveBeenCalledWith([
+      { rule_type: FILTER_HAS_ANY_TAG, value: object.id.toString() },
+    ])
+
     component.primaryAction('user', object)
     expect(modalSpy).toHaveBeenCalledWith(UserEditDialogComponent, {
       size: 'lg',
+    })
+
+    component.primaryAction('group', object)
+    expect(modalSpy).toHaveBeenCalledWith(GroupEditDialogComponent, {
+      size: 'lg',
+    })
+
+    component.primaryAction('mailAccount', object)
+    expect(modalSpy).toHaveBeenCalledWith(MailAccountEditDialogComponent, {
+      size: 'xl',
+    })
+
+    component.primaryAction('mailRule', object)
+    expect(modalSpy).toHaveBeenCalledWith(MailRuleEditDialogComponent, {
+      size: 'xl',
+    })
+
+    component.primaryAction('customField', object)
+    expect(modalSpy).toHaveBeenCalledWith(CustomFieldEditDialogComponent, {
+      size: 'md',
+    })
+
+    component.primaryAction('workflow', object)
+    expect(modalSpy).toHaveBeenCalledWith(WorkflowEditDialogComponent, {
+      size: 'xl',
     })
   })
 
   it('should perform secondary action', () => {
     const doc = searchResults.documents[0]
-    const routerSpy = jest.spyOn(router, 'navigate')
+    const openSpy = jest.spyOn(window, 'open')
     component.secondaryAction('document', doc)
-    expect(routerSpy).toHaveBeenCalledWith(
-      [documentService.getDownloadUrl(doc.id)],
-      { skipLocationChange: true }
-    )
+    expect(openSpy).toHaveBeenCalledWith(documentService.getDownloadUrl(doc.id))
 
     const correspondent = searchResults.correspondents[0]
     const modalSpy = jest.spyOn(modalService, 'open')
     component.secondaryAction('correspondent', correspondent)
     expect(modalSpy).toHaveBeenCalledWith(CorrespondentEditDialogComponent, {
-      size: 'lg',
+      size: 'md',
+    })
+
+    component.secondaryAction('documentType', searchResults.document_types[0])
+    expect(modalSpy).toHaveBeenCalledWith(CorrespondentEditDialogComponent, {
+      size: 'md',
+    })
+
+    component.secondaryAction('storagePath', searchResults.storage_paths[0])
+    expect(modalSpy).toHaveBeenCalledWith(CorrespondentEditDialogComponent, {
+      size: 'md',
+    })
+
+    component.secondaryAction('tag', searchResults.tags[0])
+    expect(modalSpy).toHaveBeenCalledWith(CorrespondentEditDialogComponent, {
+      size: 'md',
     })
   })
 
-  // it('should reset', () => {
-  //   jest.spyOn(component.queryDebounce, 'next');
-  //   jest.spyOn(component.resultsDropdown, 'close');
-  //   component.reset();
-  //   expect(component.queryDebounce.next).toHaveBeenCalledWith('');
-  //   expect(component.searchResults).toBeNull();
-  //   expect(component['currentItemIndex']).toBeUndefined();
-  //   expect(component.resultsDropdown.close).toHaveBeenCalled();
-  // });
+  it('should reset', () => {
+    const debounce = jest.spyOn(component.queryDebounce, 'next')
+    const closeSpy = jest.spyOn(component.resultsDropdown, 'close')
+    component['reset'](true)
+    expect(debounce).toHaveBeenCalledWith(null)
+    expect(component.searchResults).toBeNull()
+    expect(component['currentItemIndex']).toBe(-1)
+    expect(closeSpy).toHaveBeenCalled()
+  })
 
-  // it('should set current item', () => {
-  //   jest.spyOn(component.resultItems.get(0).nativeElement, 'focus');
-  //   component.currentItemIndex = 0;
-  //   component.setCurrentItem();
-  //   expect(component.resultItems.get(0).nativeElement.focus).toHaveBeenCalled();
-  // });
+  it('should set current item', () => {
+    component.searchResults = searchResults as any
+    fixture.detectChanges()
+    const focusSpy = jest.spyOn(
+      component.resultItems.get(0).nativeElement,
+      'focus'
+    )
+    component['currentItemIndex'] = 0
+    component['setCurrentItem']()
+    expect(focusSpy).toHaveBeenCalled()
+  })
 
-  // it('should handle search input keydown', () => {
-  //   jest.spyOn(component.resultItems.first.nativeElement, 'click');
-  //   component.searchResults = { total: 1 };
-  //   component.resultsDropdown = { isOpen: () => true };
-  //   component.searchInputKeyDown(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
-  //   expect(component.currentItemIndex).toBe(0);
-  //   expect(component.resultItems.first.nativeElement.focus).toHaveBeenCalled();
+  it('should handle search input keydown', () => {
+    component.searchResults = searchResults as any
+    component.resultsDropdown.open()
+    fixture.detectChanges()
+    component.searchInputKeyDown(
+      new KeyboardEvent('keydown', { key: 'ArrowDown' })
+    )
+    expect(component['currentItemIndex']).toBe(0)
 
-  //   component.searchInputKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }));
-  //   expect(component.resultItems.first.nativeElement.click).toHaveBeenCalled();
-  // });
+    component.searchResults = { total: 1 } as any
+    const primaryActionSpy = jest.spyOn(component, 'primaryAction')
+    component.searchInputKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }))
+    expect(primaryActionSpy).toHaveBeenCalled()
 
-  // it('should handle dropdown open change', () => {
-  //   jest.spyOn(component, 'reset');
-  //   component.onDropdownOpenChange(false);
-  //   expect(component.reset).toHaveBeenCalled();
-  // });
+    const resetSpy = jest.spyOn(GlobalSearchComponent.prototype as any, 'reset')
+    component.searchInputKeyDown(
+      new KeyboardEvent('keydown', { key: 'Escape' })
+    )
+    expect(resetSpy).toHaveBeenCalled()
+  })
+
+  it('should reset on dropdown close', () => {
+    const resetSpy = jest.spyOn(GlobalSearchComponent.prototype as any, 'reset')
+    component.onDropdownOpenChange(false)
+    expect(resetSpy).toHaveBeenCalled()
+  })
 })

@@ -43,7 +43,7 @@ export class GlobalSearchComponent {
   public query: string
   public queryDebounce: Subject<string>
   public searchResults: GlobalSearchResult
-  private currentItemIndex: number
+  private currentItemIndex: number = -1
 
   @ViewChild('searchInput') searchInput: ElementRef
   @ViewChild('resultsDropdown') resultsDropdown: NgbDropdown
@@ -67,9 +67,16 @@ export class GlobalSearchComponent {
           this.currentItemIndex--
           this.setCurrentItem()
           event.preventDefault()
+        } else {
+          this.searchInput.nativeElement.focus()
+          this.currentItemIndex = -1
         }
-      } else if (event.key === 'Enter') {
+      } else if (
+        event.key === 'Enter' &&
+        document.activeElement !== this.searchInput.nativeElement
+      ) {
         this.resultItems.get(this.currentItemIndex).nativeElement.click()
+        event.preventDefault()
       }
     }
   }
@@ -87,11 +94,11 @@ export class GlobalSearchComponent {
       .pipe(
         debounceTime(400),
         distinctUntilChanged(),
-        filter((query) => !query.length || query.length > 2)
+        filter((query) => !query?.length || query?.length > 2)
       )
       .subscribe((text) => {
         this.query = text
-        this.search(text)
+        if (text) this.search(text)
       })
   }
 
@@ -106,6 +113,7 @@ export class GlobalSearchComponent {
     this.reset(true)
     let filterRuleType: number
     let editDialogComponent: any
+    let size: string = 'md'
     switch (type) {
       case 'document':
         this.router.navigate(['/documents', object.id])
@@ -124,21 +132,26 @@ export class GlobalSearchComponent {
         break
       case 'user':
         editDialogComponent = UserEditDialogComponent
+        size = 'lg'
         break
       case 'group':
         editDialogComponent = GroupEditDialogComponent
+        size = 'lg'
         break
       case 'mailAccount':
         editDialogComponent = MailAccountEditDialogComponent
+        size = 'xl'
         break
       case 'mailRule':
         editDialogComponent = MailRuleEditDialogComponent
+        size = 'xl'
         break
       case 'customField':
         editDialogComponent = CustomFieldEditDialogComponent
         break
       case 'workflow':
         editDialogComponent = WorkflowEditDialogComponent
+        size = 'xl'
         break
     }
 
@@ -149,7 +162,7 @@ export class GlobalSearchComponent {
     } else if (editDialogComponent) {
       const modalRef: NgbModalRef = this.modalService.open(
         editDialogComponent,
-        { size: 'lg' }
+        { size }
       )
       modalRef.componentInstance.dialogMode = EditDialogMode.EDIT
       modalRef.componentInstance.object = object
@@ -159,11 +172,10 @@ export class GlobalSearchComponent {
   public secondaryAction(type: string, object: ObjectWithId) {
     this.reset(true)
     let editDialogComponent: any
+    let size: string = 'md'
     switch (type) {
       case 'document':
-        this.router.navigate([this.documentService.getDownloadUrl(object.id)], {
-          skipLocationChange: true,
-        })
+        window.open(this.documentService.getDownloadUrl(object.id))
         break
       case 'correspondent':
         editDialogComponent = CorrespondentEditDialogComponent
@@ -182,7 +194,7 @@ export class GlobalSearchComponent {
     if (editDialogComponent) {
       const modalRef: NgbModalRef = this.modalService.open(
         editDialogComponent,
-        { size: 'lg' }
+        { size }
       )
       modalRef.componentInstance.dialogMode = EditDialogMode.EDIT
       modalRef.componentInstance.object = object
@@ -190,9 +202,9 @@ export class GlobalSearchComponent {
   }
 
   private reset(close: boolean = false) {
-    this.queryDebounce.next('')
+    this.queryDebounce.next(null)
     this.searchResults = null
-    this.currentItemIndex = undefined
+    this.currentItemIndex = -1
     if (close) {
       this.resultsDropdown.close()
     }
@@ -217,6 +229,8 @@ export class GlobalSearchComponent {
       this.resultsDropdown.isOpen()
     ) {
       this.resultItems.first.nativeElement.click()
+    } else if (event.key === 'Escape' && !this.resultsDropdown.isOpen()) {
+      this.reset(true)
     }
   }
 

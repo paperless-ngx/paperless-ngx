@@ -8,11 +8,11 @@
 </form>
 
 <ng-template #resultItemTemplate let-item="item" let-nameProp="nameProp" let-type="type" let-icon="icon">
-    <div #resultItem ngbDropdownItem class="py-2 d-flex align-items-center focus-ring border-0" (click)="primaryAction(type, item)">
-        <i-bs width="1em" height="1em" name="{{icon}}" class="me-2"></i-bs>
+    <div #resultItem ngbDropdownItem class="py-2 d-flex align-items-center focus-ring border-0 cursor-pointer" (click)="primaryAction(type, item)">
+        <i-bs width="1.2em" height="1.2em" name="{{icon}}" class="me-2 text-muted"></i-bs>
         <span>{{item[nameProp]}}</span>
         <div class="btn-group ms-auto">
-            <button class="btn btn-sm btn-outline-primary" (click)="primaryAction(type, item); $event.stopPropagation()">
+            <button type="button" class="btn btn-sm btn-outline-primary" (click)="primaryAction(type, item); $event.stopPropagation()">
                 @if (type === 'document' || type === 'workflow' || type === 'customField' || type === 'group' || type === 'user') {
                     <i-bs width="1em" height="1em" name="pencil"></i-bs>
                 } @else {
@@ -20,7 +20,7 @@
                 }
             </button>
             @if (type !== 'workflow' && type !== 'customField' && type !== 'group' && type !== 'user') {
-                <button class="btn btn-sm btn-outline-secondary" (click)="secondaryAction(type, item); $event.stopPropagation()">
+                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="secondaryAction(type, item); $event.stopPropagation()">
                     @if (type === 'document') {
                         <i-bs width="1em" height="1em" name="download"></i-bs>
                     } @else {
@@ -32,7 +32,7 @@
     </div>
 </ng-template>
 
-    <div ngbDropdownMenu class="col-6">
+    <div ngbDropdownMenu class="col-6 mh-75 overflow-y-scroll">
         @if (searchResults?.total === 0) {
             <h6 class="dropdown-header" i18n="@@searchResults.noResults">No results</h6>
         } @else {
