@@ -1121,12 +1121,30 @@ class GlobalSearchView(PassUserMixin):
                 request.user,
             )._get_query()
             results = s.search(q, limit=3)
-            docs = Document.objects.filter(id__in=[r["id"] for r in results])
+            docs = get_objects_for_user_owner_aware(
+                request.user,
+                "view_document",
+                Document,
+            ).filter(id__in=[r["id"] for r in results])
 
-        tags = Tag.objects.filter(name__contains=query)[:3]
-        correspondents = Correspondent.objects.filter(name__contains=query)[:3]
-        document_types = DocumentType.objects.filter(name__contains=query)[:3]
-        storage_paths = StoragePath.objects.filter(name__contains=query)[:3]
+        tags = get_objects_for_user_owner_aware(request.user, "view_tag", Tag).filter(
+            name__contains=query,
+        )[:3]
+        correspondents = get_objects_for_user_owner_aware(
+            request.user,
+            "view_correspondent",
+            Correspondent,
+        ).filter(name__contains=query)[:3]
+        document_types = get_objects_for_user_owner_aware(
+            request.user,
+            "view_documenttype",
+            DocumentType,
+        ).filter(name__contains=query)[:3]
+        storage_paths = get_objects_for_user_owner_aware(
+            request.user,
+            "view_storagepath",
+            StoragePath,
+        ).filter(name__contains=query)[:3]
         users = User.objects.filter(username__contains=query)[:3]
         groups = Group.objects.filter(name__contains=query)[:3]
         mail_rules = MailRule.objects.filter(name__contains=query)[:3]
