@@ -62,3 +62,24 @@ form {
 .dropdown-item:has(button:focus) {
   background-color: var(--pngx-bg-alt);
 }
+
+.dropdown-item button {
+  transition: all 0.3s ease;
+  max-width: 2rem;
+  overflow: hidden;
+}
+
+.dropdown-item button span {
+  opacity: 0;
+  transition: inherit;
+}
+
+.dropdown-item:hover button,
+.dropdown-item:has(button:focus) button {
+  max-width: 10rem;
+}
+
+.dropdown-item:hover button span,
+.dropdown-item:has(button:focus) span {
+  opacity: 1;
+}

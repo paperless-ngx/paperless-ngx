@@ -13,19 +13,23 @@
         <i-bs width="1.2em" height="1.2em" name="{{icon}}" class="me-2 text-muted"></i-bs>
         <span class="text-truncate">{{item[nameProp]}}</span>
         <div class="btn-group ms-auto">
-            <button #primaryButton type="button" class="btn btn-sm btn-outline-primary" (click)="primaryAction(type, item); $event.stopPropagation()">
+            <button #primaryButton type="button" class="btn btn-sm btn-outline-primary d-flex" (click)="primaryAction(type, item); $event.stopPropagation()">
                 @if (type === 'document' || type === 'workflow' || type === 'customField' || type === 'group' || type === 'user') {
                     <i-bs width="1em" height="1em" name="pencil"></i-bs>
+                    <span class="">&nbsp;<ng-container i18n>Edit</ng-container></span>
                 } @else {
                     <i-bs width="1em" height="1em" name="filter"></i-bs>
+                    <span class="">&nbsp;<ng-container i18n>Filter documents</ng-container></span>
                 }
             </button>
             @if (type !== 'workflow' && type !== 'customField' && type !== 'group' && type !== 'user') {
-                <button #secondaryButton type="button" class="btn btn-sm btn-outline-primary" (click)="secondaryAction(type, item); $event.stopPropagation()">
+                <button #secondaryButton type="button" class="btn btn-sm btn-outline-primary d-flex" (click)="secondaryAction(type, item); $event.stopPropagation()">
                     @if (type === 'document') {
                         <i-bs width="1em" height="1em" name="download"></i-bs>
+                        <span class="">&nbsp;<ng-container i18n>Download</ng-container></span>
                     } @else {
                         <i-bs width="1em" height="1em" name="pencil"></i-bs>
+                        <span class="">&nbsp;<ng-container i18n>Edit</ng-container></span>
                     }
                 </button>
             }
