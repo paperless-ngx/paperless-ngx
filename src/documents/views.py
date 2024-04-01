@@ -1111,46 +1111,87 @@ class GlobalSearchView(PassUserMixin):
             return HttpResponseBadRequest("Query must be at least 3 characters")
 
         docs = []
-        from documents import index
+        if request.user.has_perm("documents.view_document"):
+            from documents import index
 
-        with index.open_index_searcher() as s:
-            q, _ = index.DelayedFullTextQuery(
-                s,
-                request.query_params,
-                10,
-                request.user,
-            )._get_query()
-            results = s.search(q, limit=3)
-            docs = get_objects_for_user_owner_aware(
-                request.user,
-                "view_document",
-                Document,
-            ).filter(id__in=[r["id"] for r in results])
+            with index.open_index_searcher() as s:
+                q, _ = index.DelayedFullTextQuery(
+                    s,
+                    request.query_params,
+                    10,
+                    request.user,
+                )._get_query()
+                results = s.search(q, limit=3)
+                docs = get_objects_for_user_owner_aware(
+                    request.user,
+                    "view_document",
+                    Document,
+                ).filter(id__in=[r["id"] for r in results])
 
-        tags = get_objects_for_user_owner_aware(request.user, "view_tag", Tag).filter(
-            name__contains=query,
-        )[:3]
-        correspondents = get_objects_for_user_owner_aware(
-            request.user,
-            "view_correspondent",
-            Correspondent,
-        ).filter(name__contains=query)[:3]
-        document_types = get_objects_for_user_owner_aware(
-            request.user,
-            "view_documenttype",
-            DocumentType,
-        ).filter(name__contains=query)[:3]
-        storage_paths = get_objects_for_user_owner_aware(
-            request.user,
-            "view_storagepath",
-            StoragePath,
-        ).filter(name__contains=query)[:3]
-        users = User.objects.filter(username__contains=query)[:3]
-        groups = Group.objects.filter(name__contains=query)[:3]
-        mail_rules = MailRule.objects.filter(name__contains=query)[:3]
-        mail_accounts = MailAccount.objects.filter(name__contains=query)[:3]
-        workflows = Workflow.objects.filter(name__contains=query)[:3]
-        custom_fields = CustomField.objects.filter(name__contains=query)[:3]
+        tags = (
+            get_objects_for_user_owner_aware(request.user, "view_tag", Tag).filter(
+                name__contains=query,
+            )[:3]
+            if request.user.has_perm("documents.view_tag")
+            else []
+        )
+        correspondents = (
+            get_objects_for_user_owner_aware(
+                request.user,
+                "view_correspondent",
+                Correspondent,
+            ).filter(name__contains=query)[:3]
+            if request.user.has_perm("documents.view_correspondent")
+            else []
+        )
+        document_types = (
+            get_objects_for_user_owner_aware(
+                request.user,
+                "view_documenttype",
+                DocumentType,
+            ).filter(name__contains=query)[:3]
+            if request.user.has_perm("documents.view_documenttype")
+            else []
+        )
+        storage_paths = (
+            get_objects_for_user_owner_aware(
+                request.user,
+                "view_storagepath",
+                StoragePath,
+            ).filter(name__contains=query)[:3]
+            if request.user.has_perm("documents.view_storagepath")
+            else []
+        )
+        users = (
+            User.objects.filter(username__contains=query)[:3]
+            if request.user.has_perm("documents.view_user")
+            else []
+        )
+        groups = (
+            Group.objects.filter(name__contains=query)[:3]
+            if request.user.has_perm("documents.view_group")
+            else []
+        )
+        mail_rules = (
+            MailRule.objects.filter(name__contains=query)[:3]
+            if request.user.has_perm("documents.view_mailrule")
+            else []
+        )
+        mail_accounts = (
+            MailAccount.objects.filter(name__contains=query)[:3]
+            if request.user.has_perm("documents.view_mailaccount")
+            else []
+        )
+        workflows = (
+            Workflow.objects.filter(name__contains=query)[:3]
+            if request.user.has_perm("documents.view_workflow")
+            else []
+        )
+        custom_fields = (
+            CustomField.objects.filter(name__contains=query)[:3]
+            if request.user.has_perm("documents.view_customfield")
+            else []
+        )
 
         context = {
             "request": request,
