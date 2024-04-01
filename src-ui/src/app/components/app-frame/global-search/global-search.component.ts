@@ -47,7 +47,8 @@ export class GlobalSearchComponent {
 
   @ViewChild('searchInput') searchInput: ElementRef
   @ViewChild('resultsDropdown') resultsDropdown: NgbDropdown
-  @ViewChildren('resultItem') resultItems: QueryList<ElementRef>
+  @ViewChildren('primaryButton') primaryButtons: QueryList<ElementRef>
+  @ViewChildren('secondaryButton') secondaryButtons: QueryList<ElementRef>
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
@@ -57,7 +58,7 @@ export class GlobalSearchComponent {
 
     if (this.searchResults && this.resultsDropdown.isOpen()) {
       if (event.key === 'ArrowDown') {
-        if (this.currentItemIndex < this.resultItems.length - 1) {
+        if (this.currentItemIndex < this.searchResults.total - 1) {
           this.currentItemIndex++
           this.setCurrentItem()
           event.preventDefault()
@@ -71,12 +72,10 @@ export class GlobalSearchComponent {
           this.searchInput.nativeElement.focus()
           this.currentItemIndex = -1
         }
-      } else if (
-        event.key === 'Enter' &&
-        document.activeElement !== this.searchInput.nativeElement
-      ) {
-        this.resultItems.get(this.currentItemIndex).nativeElement.click()
-        event.preventDefault()
+      } else if (event.key === 'ArrowRight') {
+        this.secondaryButtons.get(this.currentItemIndex).nativeElement.focus()
+      } else if (event.key === 'ArrowLeft') {
+        this.primaryButtons.get(this.currentItemIndex).nativeElement.focus()
       }
     }
   }
@@ -211,7 +210,7 @@ export class GlobalSearchComponent {
   }
 
   private setCurrentItem() {
-    const item: ElementRef = this.resultItems.get(this.currentItemIndex)
+    const item: ElementRef = this.primaryButtons.get(this.currentItemIndex)
     item.nativeElement.focus()
   }
 
@@ -228,7 +227,7 @@ export class GlobalSearchComponent {
       this.searchResults?.total === 1 &&
       this.resultsDropdown.isOpen()
     ) {
-      this.resultItems.first.nativeElement.click()
+      this.primaryButtons.first.nativeElement.click()
     } else if (event.key === 'Escape' && !this.resultsDropdown.isOpen()) {
       this.reset(true)
     }

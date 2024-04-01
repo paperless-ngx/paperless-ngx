@@ -161,7 +161,7 @@ describe('GlobalSearchComponent', () => {
 
     component['currentItemIndex'] = 0
     const firstItemFocusSpy = jest.spyOn(
-      component.resultItems.get(1).nativeElement,
+      component.primaryButtons.get(1).nativeElement,
       'focus'
     )
     component.handleKeyboardEvent(
@@ -170,8 +170,22 @@ describe('GlobalSearchComponent', () => {
     expect(component['currentItemIndex']).toBe(1)
     expect(firstItemFocusSpy).toHaveBeenCalled()
 
+    const secondaryItemFocusSpy = jest.spyOn(
+      component.secondaryButtons.get(1).nativeElement,
+      'focus'
+    )
+    component.handleKeyboardEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowRight' })
+    )
+    expect(secondaryItemFocusSpy).toHaveBeenCalled()
+
+    component.handleKeyboardEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowLeft' })
+    )
+    expect(firstItemFocusSpy).toHaveBeenCalled()
+
     const zeroItemSpy = jest.spyOn(
-      component.resultItems.get(0).nativeElement,
+      component.primaryButtons.get(0).nativeElement,
       'focus'
     )
     component.handleKeyboardEvent(
@@ -189,15 +203,6 @@ describe('GlobalSearchComponent', () => {
     )
     expect(component['currentItemIndex']).toBe(-1)
     expect(inputFocusSpy).toHaveBeenCalled()
-
-    const actionSpy = jest.spyOn(component, 'primaryAction')
-    component.handleKeyboardEvent(
-      new KeyboardEvent('keydown', { key: 'ArrowDown' })
-    )
-    component.handleKeyboardEvent(
-      new KeyboardEvent('keydown', { key: 'Enter' })
-    )
-    expect(actionSpy).toHaveBeenCalled()
   })
 
   it('should search', fakeAsync(() => {
@@ -314,7 +319,7 @@ describe('GlobalSearchComponent', () => {
     component.searchResults = searchResults as any
     fixture.detectChanges()
     const focusSpy = jest.spyOn(
-      component.resultItems.get(0).nativeElement,
+      component.primaryButtons.get(0).nativeElement,
       'focus'
     )
     component['currentItemIndex'] = 0

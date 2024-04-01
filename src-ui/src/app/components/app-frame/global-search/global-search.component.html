@@ -9,11 +9,11 @@
 </form>
 
 <ng-template #resultItemTemplate let-item="item" let-nameProp="nameProp" let-type="type" let-icon="icon">
-    <div #resultItem ngbDropdownItem class="py-2 d-flex align-items-center focus-ring border-0 cursor-pointer" (click)="primaryAction(type, item)">
+    <div #resultItem ngbDropdownItem class="py-2 d-flex align-items-center focus-ring border-0 cursor-pointer" tabindex="-1" (click)="primaryAction(type, item)">
         <i-bs width="1.2em" height="1.2em" name="{{icon}}" class="me-2 text-muted"></i-bs>
-        <span>{{item[nameProp]}}</span>
+        <span class="text-truncate">{{item[nameProp]}}</span>
         <div class="btn-group ms-auto">
-            <button type="button" class="btn btn-sm btn-outline-primary" (click)="primaryAction(type, item); $event.stopPropagation()">
+            <button #primaryButton type="button" class="btn btn-sm btn-outline-primary" (click)="primaryAction(type, item); $event.stopPropagation()">
                 @if (type === 'document' || type === 'workflow' || type === 'customField' || type === 'group' || type === 'user') {
                     <i-bs width="1em" height="1em" name="pencil"></i-bs>
                 } @else {
@@ -21,7 +21,7 @@
                 }
             </button>
             @if (type !== 'workflow' && type !== 'customField' && type !== 'group' && type !== 'user') {
-                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="secondaryAction(type, item); $event.stopPropagation()">
+                <button #secondaryButton type="button" class="btn btn-sm btn-outline-primary" (click)="secondaryAction(type, item); $event.stopPropagation()">
                     @if (type === 'document') {
                         <i-bs width="1em" height="1em" name="download"></i-bs>
                     } @else {

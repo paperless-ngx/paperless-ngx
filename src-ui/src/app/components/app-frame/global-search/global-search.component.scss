@@ -58,3 +58,7 @@ form {
 .mh-75 {
   max-height: 75vh;
 }
+
+.dropdown-item:has(button:focus) {
+  background-color: var(--pngx-bg-alt);
+}
