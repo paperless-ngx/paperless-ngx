@@ -33,6 +33,7 @@ import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-ac
 import { GroupEditDialogComponent } from '../../common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { WorkflowEditDialogComponent } from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
+import { ElementRef } from '@angular/core'
 
 const searchResults = {
   total: 11,
@@ -144,7 +145,7 @@ describe('GlobalSearchComponent', () => {
     fixture.detectChanges()
   })
 
-  it('should handle keyboard events', () => {
+  it('should handle keyboard nav', () => {
     const focusSpy = jest.spyOn(component.searchInput.nativeElement, 'focus')
     component.handleKeyboardEvent(
       new KeyboardEvent('keydown', { key: 'k', ctrlKey: true })
@@ -205,7 +206,7 @@ describe('GlobalSearchComponent', () => {
     expect(inputFocusSpy).toHaveBeenCalled()
   })
 
-  it('should search', fakeAsync(() => {
+  it('should search on query debounce', fakeAsync(() => {
     const query = 'test'
     const searchSpy = jest.spyOn(searchService, 'globalSearch')
     searchSpy.mockReturnValue(of({} as any))
@@ -216,7 +217,7 @@ describe('GlobalSearchComponent', () => {
     expect(dropdownOpenSpy).toHaveBeenCalled()
   }))
 
-  it('should perform primary action', () => {
+  it('should support primary action', () => {
     const object = { id: 1 }
     const routerSpy = jest.spyOn(router, 'navigate')
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
@@ -276,7 +277,7 @@ describe('GlobalSearchComponent', () => {
     })
   })
 
-  it('should perform secondary action', () => {
+  it('should support secondary action', () => {
     const doc = searchResults.documents[0]
     const openSpy = jest.spyOn(window, 'open')
     component.secondaryAction('document', doc)
@@ -305,7 +306,7 @@ describe('GlobalSearchComponent', () => {
     })
   })
 
-  it('should reset', () => {
+  it('should support reset', () => {
     const debounce = jest.spyOn(component.queryDebounce, 'next')
     const closeSpy = jest.spyOn(component.resultsDropdown, 'close')
     component['reset'](true)
@@ -315,7 +316,7 @@ describe('GlobalSearchComponent', () => {
     expect(closeSpy).toHaveBeenCalled()
   })
 
-  it('should set current item', () => {
+  it('should support focus current item', () => {
     component.searchResults = searchResults as any
     fixture.detectChanges()
     const focusSpy = jest.spyOn(
@@ -327,7 +328,7 @@ describe('GlobalSearchComponent', () => {
     expect(focusSpy).toHaveBeenCalled()
   })
 
-  it('should handle search input keydown', () => {
+  it('should handle search input keyboard nav', () => {
     component.searchResults = searchResults as any
     component.resultsDropdown.open()
     fixture.detectChanges()
@@ -352,5 +353,25 @@ describe('GlobalSearchComponent', () => {
     const resetSpy = jest.spyOn(GlobalSearchComponent.prototype as any, 'reset')
     component.onDropdownOpenChange(false)
     expect(resetSpy).toHaveBeenCalled()
+  })
+
+  it('should focus button on dropdown item hover', () => {
+    component.searchResults = searchResults as any
+    fixture.detectChanges()
+    const item: ElementRef = component.resultItems.first
+    const focusSpy = jest.spyOn(
+      component.primaryButtons.first.nativeElement,
+      'focus'
+    )
+    component.onItemHover({ currentTarget: item.nativeElement } as any)
+    expect(component['currentItemIndex']).toBe(0)
+    expect(focusSpy).toHaveBeenCalled()
+  })
+
+  it('should focus on button hover', () => {
+    const event = { currentTarget: { focus: jest.fn() } }
+    const focusSpy = jest.spyOn(event.currentTarget, 'focus')
+    component.onButtonHover(event as any)
+    expect(focusSpy).toHaveBeenCalled()
   })
 })

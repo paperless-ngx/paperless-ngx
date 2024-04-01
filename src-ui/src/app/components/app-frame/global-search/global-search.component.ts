@@ -47,6 +47,7 @@ export class GlobalSearchComponent {
 
   @ViewChild('searchInput') searchInput: ElementRef
   @ViewChild('resultsDropdown') resultsDropdown: NgbDropdown
+  @ViewChildren('resultItem') resultItems: QueryList<ElementRef>
   @ViewChildren('primaryButton') primaryButtons: QueryList<ElementRef>
   @ViewChildren('secondaryButton') secondaryButtons: QueryList<ElementRef>
 
@@ -212,6 +213,18 @@ export class GlobalSearchComponent {
   private setCurrentItem() {
     const item: ElementRef = this.primaryButtons.get(this.currentItemIndex)
     item.nativeElement.focus()
+  }
+
+  onItemHover(event: MouseEvent) {
+    const item: ElementRef = this.resultItems
+      .toArray()
+      .find((item) => item.nativeElement === event.currentTarget)
+    this.currentItemIndex = this.resultItems.toArray().indexOf(item)
+    this.setCurrentItem()
+  }
+
+  onButtonHover(event: MouseEvent) {
+    ;(event.currentTarget as HTMLElement).focus()
   }
 
   public searchInputKeyDown(event: KeyboardEvent) {
