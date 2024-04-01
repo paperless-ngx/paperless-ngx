@@ -1,5 +1,23 @@
 form {
+  position: relative;
+
+  > i-bs {
+    position: absolute;
+    left: 0.6rem;
+    top: .35rem;
+    color: rgba(255, 255, 255, 0.6);
+
+    @media screen and (min-width: 768px) {
+      // adjust for smaller font size on non-mobile
+      top: 0.25rem;
+    }
+  }
+
   &:focus-within {
+    i-bs {
+      display: none;
+    }
+
     .form-control::placeholder {
       color: rgba(255, 255, 255, 0);
     }
@@ -13,6 +31,7 @@ form {
 .form-control {
   color: rgba(255, 255, 255, 0.3);
   background-color: rgba(0, 0, 0, 0.15);
+  padding-left: 1.8rem;
   border-color: rgba(255, 255, 255, 0.2);
   transition: all .3s ease, padding-left 0s ease, background-color 0s ease; // Safari requires all
 
