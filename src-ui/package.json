@@ -49,7 +49,7 @@
     "@angular-eslint/template-parser": "17.2.1",
     "@angular/cli": "~17.2.2",
     "@angular/compiler-cli": "~17.2.2",
-    "@playwright/test": "^1.42.0",
+    "@playwright/test": "^1.42.1",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.12.2",
     "@typescript-eslint/eslint-plugin": "^7.4.0",
