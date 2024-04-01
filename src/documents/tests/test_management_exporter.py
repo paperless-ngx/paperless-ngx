@@ -7,6 +7,7 @@ from pathlib import Path
 from unittest import mock
 from zipfile import ZipFile
 
+from auditlog.models import LogEntry
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
@@ -121,6 +122,19 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.workflow.triggers.add(self.trigger)
         self.workflow.actions.add(self.action)
         self.workflow.save()
+
+        LogEntry.objects.log_create(
+            instance=self.dt1,
+            changes=json.dumps(
+                {
+                    "name": [
+                        self.dt1.name,
+                        "New name",
+                    ],
+                },
+            ),
+            action=LogEntry.Action.UPDATE,
+        )
 
         super().setUp()
 
@@ -780,3 +794,17 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
             self.assertEqual(ContentType.objects.count(), num_content_type_objects)
             self.assertEqual(Permission.objects.count(), num_permission_objects + 1)
+
+    def test_exporter_with_auditlog_disabled(self):
+        shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
+        shutil.copytree(
+            os.path.join(os.path.dirname(__file__), "samples", "documents"),
+            os.path.join(self.dirs.media_dir, "documents"),
+        )
+
+        with override_settings(
+            AUDIT_LOG_DISABLED=True,
+        ):
+            manifest = self._do_export(use_filename_format=True)
+            for obj in manifest:
+                self.assertNotEqual(obj["model"], "auditlog.logentry")
