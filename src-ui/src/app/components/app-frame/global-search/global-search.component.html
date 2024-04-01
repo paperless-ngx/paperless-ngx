@@ -5,7 +5,13 @@
     <input #searchInput class="form-control form-control-sm" type="text" name="query"
         autocomplete="off" placeholder="Search" aria-label="Search" i18n-placeholder
         [(ngModel)]="query" (ngModelChange)="this.queryDebounce.next($event)" (keyup)="searchInputKeyDown($event)" ngbDropdownAnchor>
-    <span class="badge d-none d-lg-inline text-muted position-absolute top-50 start-100 translate-middle ms-n4 fw-normal">⌘K</span>
+    <div class="position-absolute top-50 end-0 translate-middle">
+            <span class="badge d-none d-lg-inline text-muted position-absolute top-50 start-100 translate-middle ms-n4 fw-normal">⌘K</span>
+            @if (loading) {
+                <div class="spinner-border spinner-border-sm text-muted mt-1"></div>
+            }
+    </div>
+
 </form>
 
 <ng-template #resultItemTemplate let-item="item" let-nameProp="nameProp" let-type="type" let-icon="icon">

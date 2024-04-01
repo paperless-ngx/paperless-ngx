@@ -14,8 +14,9 @@ form {
   }
 
   &:focus-within {
-    i-bs {
-      display: none;
+    i-bs,
+    .badge {
+      display: none !important;
     }
 
     .form-control::placeholder {

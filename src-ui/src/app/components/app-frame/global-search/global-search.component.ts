@@ -44,6 +44,7 @@ export class GlobalSearchComponent {
   public queryDebounce: Subject<string>
   public searchResults: GlobalSearchResult
   private currentItemIndex: number = -1
+  public loading: boolean = false
 
   @ViewChild('searchInput') searchInput: ElementRef
   @ViewChild('resultsDropdown') resultsDropdown: NgbDropdown
@@ -103,8 +104,10 @@ export class GlobalSearchComponent {
   }
 
   private search(query: string) {
+    this.loading = true
     this.searchService.globalSearch(query).subscribe((results) => {
       this.searchResults = results
+      this.loading = false
       this.resultsDropdown.open()
     })
   }
