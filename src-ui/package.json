@@ -51,7 +51,7 @@
     "@angular/compiler-cli": "~17.2.2",
     "@playwright/test": "^1.42.0",
     "@types/jest": "^29.5.12",
-    "@types/node": "^20.11.24",
+    "@types/node": "^20.12.2",
     "@typescript-eslint/eslint-plugin": "^7.4.0",
     "@typescript-eslint/parser": "^7.4.0",
     "concurrently": "^8.2.2",
