@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   ElementRef,
   HostListener,
@@ -8,7 +9,7 @@ import {
 } from '@angular/core'
 import { Router } from '@angular/router'
 import { NgbDropdown, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
-import { Subject, debounceTime, distinctUntilChanged, filter } from 'rxjs'
+import { Subject, debounceTime, distinctUntilChanged, filter, map } from 'rxjs'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import {
   GlobalSearchResult,
@@ -44,6 +45,7 @@ export class GlobalSearchComponent {
   public queryDebounce: Subject<string>
   public searchResults: GlobalSearchResult
   private currentItemIndex: number = -1
+  private domIndex: number = -1
   public loading: boolean = false
 
   @ViewChild('searchInput') searchInput: ElementRef
@@ -79,9 +81,9 @@ export class GlobalSearchComponent {
           this.currentItemIndex = -1
         }
       } else if (event.key === 'ArrowRight') {
-        this.secondaryButtons.get(this.currentItemIndex).nativeElement.focus()
+        this.secondaryButtons.get(this.domIndex).nativeElement.focus()
       } else if (event.key === 'ArrowLeft') {
-        this.primaryButtons.get(this.currentItemIndex).nativeElement.focus()
+        this.primaryButtons.get(this.domIndex).nativeElement.focus()
       }
     }
   }
@@ -218,7 +220,15 @@ export class GlobalSearchComponent {
   }
 
   private setCurrentItem() {
-    const item: ElementRef = this.primaryButtons.get(this.currentItemIndex)
+    // QueryLists do not always reflect the current DOM order, so we need to find the actual element
+    // Yes, using some vanilla JS
+    const result: HTMLElement = this.resultItems.first.nativeElement.parentNode
+      .querySelectorAll('.dropdown-item')
+      .item(this.currentItemIndex)
+    this.domIndex = this.resultItems
+      .toArray()
+      .indexOf(this.resultItems.find((item) => item.nativeElement === result))
+    const item: ElementRef = this.primaryButtons.get(this.domIndex)
     item.nativeElement.focus()
   }
 
