@@ -7,7 +7,6 @@ from pathlib import Path
 from unittest import mock
 from zipfile import ZipFile
 
-from auditlog.models import LogEntry
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
@@ -122,19 +121,6 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.workflow.triggers.add(self.trigger)
         self.workflow.actions.add(self.action)
         self.workflow.save()
-
-        LogEntry.objects.log_create(
-            instance=self.dt1,
-            changes=json.dumps(
-                {
-                    "name": [
-                        self.dt1.name,
-                        "New name",
-                    ],
-                },
-            ),
-            action=LogEntry.Action.UPDATE,
-        )
 
         super().setUp()
 
