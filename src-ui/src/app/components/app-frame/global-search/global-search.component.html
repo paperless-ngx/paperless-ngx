@@ -1,6 +1,6 @@
 
 <div ngbDropdown #resultsDropdown="ngbDropdown" (openChange)="onDropdownOpenChange">
-<form class="form-inline col-12 col-md-6 position-relative">
+<form class="form-inline position-relative">
     <i-bs width="1em" height="1em" name="search"></i-bs>
     <input #searchInput class="form-control form-control-sm" type="text" name="query"
         autocomplete="off" placeholder="Search" aria-label="Search" i18n-placeholder
@@ -57,7 +57,7 @@
     </div>
 </ng-template>
 
-    <div ngbDropdownMenu class="col-6 mh-75 overflow-y-scroll">
+    <div ngbDropdownMenu class="w-100 mh-75 overflow-y-scroll">
         @if (searchResults?.total === 0) {
             <h6 class="dropdown-header" i18n="@@searchResults.noResults">No results</h6>
         } @else {
