@@ -323,6 +323,10 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
           // navbar is og green in dark mode
           @include paperless-green;
         }
+
+        .navbar.bg-primary .dropdown-menu {
+          @include paperless-green-dark-mode;
+        }
       }
 
       @include dark-mode;

@@ -29,12 +29,15 @@
             <button #primaryButton type="button" class="btn btn-sm btn-outline-primary d-flex"
             (click)="primaryAction(type, item); $event.stopPropagation()"
             (mouseenter)="onButtonHover($event)">
-                @if (type === 'document' || type === 'workflow' || type === 'customField' || type === 'group' || type === 'user') {
+                @if (type === 'document') {
                     <i-bs width="1em" height="1em" name="pencil"></i-bs>
-                    <span class="">&nbsp;<ng-container i18n>Edit</ng-container></span>
+                    <span>&nbsp;<ng-container i18n>Open</ng-container></span>
+                } @else if (type === 'workflow' || type === 'customField' || type === 'group' || type === 'user') {
+                    <i-bs width="1em" height="1em" name="pencil"></i-bs>
+                    <span>&nbsp;<ng-container i18n>Edit</ng-container></span>
                 } @else {
                     <i-bs width="1em" height="1em" name="filter"></i-bs>
-                    <span class="">&nbsp;<ng-container i18n>Filter documents</ng-container></span>
+                    <span>&nbsp;<ng-container i18n>Filter documents</ng-container></span>
                 }
             </button>
             @if (type !== 'workflow' && type !== 'customField' && type !== 'group' && type !== 'user') {
@@ -43,10 +46,10 @@
                 (mouseenter)="onButtonHover($event)">
                     @if (type === 'document') {
                         <i-bs width="1em" height="1em" name="download"></i-bs>
-                        <span class="">&nbsp;<ng-container i18n>Download</ng-container></span>
+                        <span>&nbsp;<ng-container i18n>Download</ng-container></span>
                     } @else {
                         <i-bs width="1em" height="1em" name="pencil"></i-bs>
-                        <span class="">&nbsp;<ng-container i18n>Edit</ng-container></span>
+                        <span>&nbsp;<ng-container i18n>Edit</ng-container></span>
                     }
                 </button>
             }
