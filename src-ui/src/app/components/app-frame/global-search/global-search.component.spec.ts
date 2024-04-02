@@ -5,7 +5,7 @@ import {
   tick,
 } from '@angular/core/testing'
 import { GlobalSearchComponent } from './global-search.component'
-import { Subject, of } from 'rxjs'
+import { of } from 'rxjs'
 import { SearchService } from 'src/app/services/rest/search.service'
 import { Router } from '@angular/router'
 import {
@@ -16,7 +16,6 @@ import {
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { HttpClient } from '@angular/common/http'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
@@ -24,7 +23,6 @@ import {
   FILTER_HAS_CORRESPONDENT_ANY,
   FILTER_HAS_DOCUMENT_TYPE_ANY,
   FILTER_HAS_STORAGE_PATH_ANY,
-  FILTER_HAS_TAGS_ANY,
 } from 'src/app/data/filter-rule-type'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { DocumentService } from 'src/app/services/rest/document.service'
@@ -161,6 +159,7 @@ describe('GlobalSearchComponent', () => {
     fixture.detectChanges()
 
     component['currentItemIndex'] = 0
+    component['setCurrentItem']()
     const firstItemFocusSpy = jest.spyOn(
       component.primaryButtons.get(1).nativeElement,
       'focus'

@@ -36,6 +36,7 @@ import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop'
 import { SavedView } from 'src/app/data/saved-view'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { GlobalSearchComponent } from './global-search/global-search.component'
 
 const saved_views = [
   {
@@ -93,7 +94,11 @@ describe('AppFrameComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [AppFrameComponent, IfPermissionsDirective],
+      declarations: [
+        AppFrameComponent,
+        IfPermissionsDirective,
+        GlobalSearchComponent,
+      ],
       imports: [
         HttpClientTestingModule,
         BrowserModule,
