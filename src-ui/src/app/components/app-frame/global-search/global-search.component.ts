@@ -58,7 +58,11 @@ export class GlobalSearchComponent {
       this.searchInput.nativeElement.focus()
     }
 
-    if (this.searchResults && this.resultsDropdown.isOpen()) {
+    if (
+      this.searchResults &&
+      this.resultsDropdown.isOpen() &&
+      document.activeElement !== this.searchInput.nativeElement
+    ) {
       if (event.key === 'ArrowDown') {
         if (this.currentItemIndex < this.searchResults.total - 1) {
           this.currentItemIndex++
