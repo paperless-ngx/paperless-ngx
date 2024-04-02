@@ -6,20 +6,25 @@
         autocomplete="off" placeholder="Search" aria-label="Search" i18n-placeholder
         [(ngModel)]="query" (ngModelChange)="this.queryDebounce.next($event)" (keyup)="searchInputKeyDown($event)" ngbDropdownAnchor>
     <div class="position-absolute top-50 end-0 translate-middle">
-            <span class="badge d-none d-lg-inline text-muted position-absolute top-50 start-100 translate-middle ms-n4 fw-normal">⌘K</span>
-            @if (loading) {
-                <div class="spinner-border spinner-border-sm text-muted mt-1"></div>
-            }
+        <span class="badge d-none d-lg-inline text-muted position-absolute top-50 start-100 translate-middle ms-n4 fw-normal">⌘K</span>
+        @if (loading) {
+            <div class="spinner-border spinner-border-sm text-muted mt-1"></div>
+        }
     </div>
 
 </form>
 
-<ng-template #resultItemTemplate let-item="item" let-nameProp="nameProp" let-type="type" let-icon="icon">
+<ng-template #resultItemTemplate let-item="item" let-nameProp="nameProp" let-type="type" let-icon="icon" let-date="date">
     <div #resultItem ngbDropdownItem class="py-2 d-flex align-items-center focus-ring border-0 cursor-pointer" tabindex="-1"
     (click)="primaryAction(type, item)"
     (mouseenter)="onItemHover($event)">
         <i-bs width="1.2em" height="1.2em" name="{{icon}}" class="me-2 text-muted"></i-bs>
-        <span class="text-truncate">{{item[nameProp]}}</span>
+        <div class="text-truncate">
+            {{item[nameProp]}}
+            @if (date) {
+                <small class="small text-muted">{{date | customDate}}</small>
+            }
+        </div>
         <div class="btn-group ms-auto">
             <button #primaryButton type="button" class="btn btn-sm btn-outline-primary d-flex"
             (click)="primaryAction(type, item); $event.stopPropagation()"
@@ -56,7 +61,7 @@
             @if (searchResults?.documents.length) {
                 <h6 class="dropdown-header" i18n="@@searchResults.documents">Documents</h6>
                 @for (document of searchResults.documents; track document.id) {
-                    <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: document, nameProp: 'title', type: 'document', icon: 'file-text'}"></ng-container>
+                    <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: document, nameProp: 'title', type: 'document', icon: 'file-text', date: document.added}"></ng-container>
                 }
             }
 
