@@ -1164,12 +1164,12 @@ class GlobalSearchView(PassUserMixin):
         )
         users = (
             User.objects.filter(username__icontains=query)[:3]
-            if request.user.has_perm("documents.view_user")
+            if request.user.has_perm("auth.view_user")
             else []
         )
         groups = (
             Group.objects.filter(name__icontains=query)[:3]
-            if request.user.has_perm("documents.view_group")
+            if request.user.has_perm("auth.view_group")
             else []
         )
         mail_rules = (
