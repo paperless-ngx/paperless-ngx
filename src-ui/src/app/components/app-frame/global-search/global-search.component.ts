@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   Component,
   ElementRef,
   HostListener,
@@ -34,6 +33,10 @@ import {
   FILTER_HAS_DOCUMENT_TYPE_ANY,
   FILTER_HAS_STORAGE_PATH_ANY,
 } from 'src/app/data/filter-rule-type'
+import {
+  PermissionAction,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
 
 @Component({
   selector: 'pngx-global-search',
@@ -81,7 +84,7 @@ export class GlobalSearchComponent {
           this.currentItemIndex = -1
         }
       } else if (event.key === 'ArrowRight') {
-        this.secondaryButtons.get(this.domIndex).nativeElement.focus()
+        this.secondaryButtons.get(this.domIndex)?.nativeElement.focus()
       } else if (event.key === 'ArrowLeft') {
         this.primaryButtons.get(this.domIndex).nativeElement.focus()
       }
@@ -93,7 +96,8 @@ export class GlobalSearchComponent {
     private router: Router,
     private modalService: NgbModal,
     private documentService: DocumentService,
-    private documentListViewService: DocumentListViewService
+    private documentListViewService: DocumentListViewService,
+    private permissionsService: PermissionsService
   ) {
     this.queryDebounce = new Subject<string>()
 
@@ -267,5 +271,27 @@ export class GlobalSearchComponent {
     if (!open) {
       this.reset()
     }
+  }
+
+  public disablePrimaryButton(type: string, object: ObjectWithId): boolean {
+    if (['workflow', 'customField', 'group', 'user'].includes(type)) {
+      return !this.permissionsService.currentUserHasObjectPermissions(
+        PermissionAction.Change,
+        object
+      )
+    }
+
+    return false
+  }
+
+  public disableSecondaryButton(type: string, object: ObjectWithId): boolean {
+    if ('document' === type) {
+      return false
+    }
+
+    return !this.permissionsService.currentUserHasObjectPermissions(
+      PermissionAction.Change,
+      object
+    )
   }
 }

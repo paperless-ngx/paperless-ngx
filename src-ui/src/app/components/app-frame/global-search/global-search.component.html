@@ -28,6 +28,7 @@
         <div class="btn-group ms-auto">
             <button #primaryButton type="button" class="btn btn-sm btn-outline-primary d-flex"
             (click)="primaryAction(type, item); $event.stopPropagation()"
+            [disabled]="disablePrimaryButton(type, item)"
             (mouseenter)="onButtonHover($event)">
                 @if (type === 'document') {
                     <i-bs width="1em" height="1em" name="pencil"></i-bs>
@@ -43,6 +44,7 @@
             @if (type !== 'workflow' && type !== 'customField' && type !== 'group' && type !== 'user') {
                 <button #secondaryButton type="button" class="btn btn-sm btn-outline-primary d-flex"
                 (click)="secondaryAction(type, item); $event.stopPropagation()"
+                [disabled]="disableSecondaryButton(type, item)"
                 (mouseenter)="onButtonHover($event)">
                     @if (type === 'document') {
                         <i-bs width="1em" height="1em" name="download"></i-bs>
@@ -57,7 +59,7 @@
     </div>
 </ng-template>
 
-    <div ngbDropdownMenu class="w-100 mh-75 overflow-y-scroll shadow-lgs">
+    <div ngbDropdownMenu class="w-100 mh-75 overflow-y-scroll shadow-lg">
         @if (searchResults?.total === 0) {
             <h6 class="dropdown-header" i18n="@@searchResults.noResults">No results</h6>
         } @else {
