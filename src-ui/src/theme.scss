@@ -279,6 +279,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 
   .dropdown-menu {
     --bs-dropdown-color: var(--bs-body-color);
+    --pngx-bg-darker: var(--pngx-bg-alt);
   }
 
   .list-group {
