@@ -12,6 +12,7 @@ import {
   NgbDropdownModule,
   NgbModal,
   NgbModalModule,
+  NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
@@ -32,6 +33,7 @@ import { GroupEditDialogComponent } from '../../common/edit-dialog/group-edit-di
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { WorkflowEditDialogComponent } from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
 import { ElementRef } from '@angular/core'
+import { ToastService } from 'src/app/services/toast.service'
 
 const searchResults = {
   total: 11,
@@ -118,6 +120,7 @@ describe('GlobalSearchComponent', () => {
   let modalService: NgbModal
   let documentService: DocumentService
   let documentListViewService: DocumentListViewService
+  let toastService: ToastService
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -137,6 +140,7 @@ describe('GlobalSearchComponent', () => {
     modalService = TestBed.inject(NgbModal)
     documentService = TestBed.inject(DocumentService)
     documentListViewService = TestBed.inject(DocumentListViewService)
+    toastService = TestBed.inject(ToastService)
 
     fixture = TestBed.createComponent(GlobalSearchComponent)
     component = fixture.componentInstance
@@ -222,6 +226,9 @@ describe('GlobalSearchComponent', () => {
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
     const modalSpy = jest.spyOn(modalService, 'open')
 
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
+
     component.primaryAction('document', object)
     expect(routerSpy).toHaveBeenCalledWith(['/documents', object.id])
 
@@ -274,6 +281,18 @@ describe('GlobalSearchComponent', () => {
     expect(modalSpy).toHaveBeenCalledWith(WorkflowEditDialogComponent, {
       size: 'xl',
     })
+
+    const editDialog = modal.componentInstance as CustomFieldEditDialogComponent
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+
+    // fail first
+    editDialog.failed.emit({ error: 'error creating item' })
+    expect(toastErrorSpy).toHaveBeenCalled()
+
+    // succeed
+    editDialog.succeeded.emit(true)
+    expect(toastInfoSpy).toHaveBeenCalled()
   })
 
   it('should support secondary action', () => {
@@ -284,6 +303,10 @@ describe('GlobalSearchComponent', () => {
 
     const correspondent = searchResults.correspondents[0]
     const modalSpy = jest.spyOn(modalService, 'open')
+
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
+
     component.secondaryAction('correspondent', correspondent)
     expect(modalSpy).toHaveBeenCalledWith(CorrespondentEditDialogComponent, {
       size: 'md',
@@ -303,6 +326,18 @@ describe('GlobalSearchComponent', () => {
     expect(modalSpy).toHaveBeenCalledWith(CorrespondentEditDialogComponent, {
       size: 'md',
     })
+
+    const editDialog = modal.componentInstance as CustomFieldEditDialogComponent
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+
+    // fail first
+    editDialog.failed.emit({ error: 'error creating item' })
+    expect(toastErrorSpy).toHaveBeenCalled()
+
+    // succeed
+    editDialog.succeeded.emit(true)
+    expect(toastInfoSpy).toHaveBeenCalled()
   })
 
   it('should support reset', () => {

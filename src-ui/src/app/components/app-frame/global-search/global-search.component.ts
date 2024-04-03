@@ -1,42 +1,43 @@
 import {
   Component,
-  ElementRef,
-  HostListener,
-  QueryList,
   ViewChild,
+  ElementRef,
   ViewChildren,
+  QueryList,
+  HostListener,
 } from '@angular/core'
 import { Router } from '@angular/router'
 import { NgbDropdown, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
-import { Subject, debounceTime, distinctUntilChanged, filter, map } from 'rxjs'
+import { Subject, debounceTime, distinctUntilChanged, filter } from 'rxjs'
+import {
+  FILTER_HAS_CORRESPONDENT_ANY,
+  FILTER_HAS_DOCUMENT_TYPE_ANY,
+  FILTER_HAS_STORAGE_PATH_ANY,
+  FILTER_HAS_ANY_TAG,
+} from 'src/app/data/filter-rule-type'
 import { ObjectWithId } from 'src/app/data/object-with-id'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import {
+  PermissionsService,
+  PermissionAction,
+} from 'src/app/services/permissions.service'
+import { DocumentService } from 'src/app/services/rest/document.service'
 import {
   GlobalSearchResult,
   SearchService,
 } from 'src/app/services/rest/search.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
-import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
-import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
-import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
-import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
+import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { GroupEditDialogComponent } from '../../common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
 import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
 import { MailRuleEditDialogComponent } from '../../common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
+import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
 import { WorkflowEditDialogComponent } from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
-import { DocumentService } from 'src/app/services/rest/document.service'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import {
-  FILTER_HAS_ANY_TAG,
-  FILTER_HAS_CORRESPONDENT_ANY,
-  FILTER_HAS_DOCUMENT_TYPE_ANY,
-  FILTER_HAS_STORAGE_PATH_ANY,
-} from 'src/app/data/filter-rule-type'
-import {
-  PermissionAction,
-  PermissionsService,
-} from 'src/app/services/permissions.service'
 
 @Component({
   selector: 'pngx-global-search',
@@ -97,7 +98,8 @@ export class GlobalSearchComponent {
     private modalService: NgbModal,
     private documentService: DocumentService,
     private documentListViewService: DocumentListViewService,
-    private permissionsService: PermissionsService
+    private permissionsService: PermissionsService,
+    private toastService: ToastService
   ) {
     this.queryDebounce = new Subject<string>()
 
@@ -179,6 +181,12 @@ export class GlobalSearchComponent {
       )
       modalRef.componentInstance.dialogMode = EditDialogMode.EDIT
       modalRef.componentInstance.object = object
+      modalRef.componentInstance.succeeded.subscribe(() => {
+        this.toastService.showInfo($localize`Successfully updated object.`)
+      })
+      modalRef.componentInstance.failed.subscribe((e) => {
+        this.toastService.showError($localize`Error occurred saving object.`, e)
+      })
     }
   }
 
@@ -211,6 +219,12 @@ export class GlobalSearchComponent {
       )
       modalRef.componentInstance.dialogMode = EditDialogMode.EDIT
       modalRef.componentInstance.object = object
+      modalRef.componentInstance.succeeded.subscribe(() => {
+        this.toastService.showInfo($localize`Successfully updated object.`)
+      })
+      modalRef.componentInstance.failed.subscribe((e) => {
+        this.toastService.showError($localize`Error occurred saving object.`, e)
+      })
     }
   }
 
