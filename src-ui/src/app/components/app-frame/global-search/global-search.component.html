@@ -33,7 +33,7 @@
                 @if (type === DataType.Document) {
                     <i-bs width="1em" height="1em" name="pencil"></i-bs>
                     <span>&nbsp;<ng-container i18n>Open</ng-container></span>
-                } @else if (type === DataType.Workflow || type === DataType.CustomField || type === DataType.Group || type === DataType.User) {
+                } @else if (type === DataType.Workflow || type === DataType.CustomField || type === DataType.Group || type === DataType.User || type === DataType.MailAccount || type === DataType.MailRule) {
                     <i-bs width="1em" height="1em" name="pencil"></i-bs>
                     <span>&nbsp;<ng-container i18n>Edit</ng-container></span>
                 } @else {
@@ -41,7 +41,7 @@
                     <span>&nbsp;<ng-container i18n>Filter documents</ng-container></span>
                 }
             </button>
-            @if (type !== DataType.Workflow && type !== DataType.CustomField && type !== DataType.Group && type !== DataType.User) {
+            @if (type !== DataType.Workflow && type !== DataType.CustomField && type !== DataType.Group && type !== DataType.User && type !== DataType.MailAccount && type !== DataType.MailRule) {
                 <button #secondaryButton type="button" class="btn btn-sm btn-outline-primary d-flex"
                 (click)="secondaryAction(type, item); $event.stopPropagation()"
                 [disabled]="disableSecondaryButton(type, item)"
@@ -116,6 +116,20 @@
                 <h6 class="dropdown-header" i18n="@@searchResults.customFields">Custom fields</h6>
                 @for (customField of searchResults.custom_fields; track customField.id) {
                     <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: customField, nameProp: 'name', type: DataType.CustomField, icon: 'ui-radios'}"></ng-container>
+                }
+            }
+
+            @if (searchResults?.mail_accounts.length) {
+                <h6 class="dropdown-header" i18n="@@searchResults.mailAccounts">Mail accounts</h6>
+                @for (mailAccount of searchResults.mail_accounts; track mailAccount.id) {
+                    <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: mailAccount, nameProp: 'name', type: DataType.MailAccount, icon: 'envelope-at'}"></ng-container>
+                }
+            }
+
+            @if (searchResults?.mail_rules.length) {
+                <h6 class="dropdown-header" i18n="@@searchResults.mailRules">Mail rules</h6>
+                @for (mailRule of searchResults.mail_rules; track mailRule.id) {
+                    <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: mailRule, nameProp: 'name', type: DataType.MailRule, icon: 'envelope'}"></ng-container>
                 }
             }
 

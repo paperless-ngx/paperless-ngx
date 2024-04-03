@@ -1130,7 +1130,7 @@ class GlobalSearchView(PassUserMixin):
 
         tags = (
             get_objects_for_user_owner_aware(request.user, "view_tag", Tag).filter(
-                name__contains=query,
+                name__icontains=query,
             )[:3]
             if request.user.has_perm("documents.view_tag")
             else []
@@ -1140,7 +1140,7 @@ class GlobalSearchView(PassUserMixin):
                 request.user,
                 "view_correspondent",
                 Correspondent,
-            ).filter(name__contains=query)[:3]
+            ).filter(name__icontains=query)[:3]
             if request.user.has_perm("documents.view_correspondent")
             else []
         )
@@ -1149,7 +1149,7 @@ class GlobalSearchView(PassUserMixin):
                 request.user,
                 "view_documenttype",
                 DocumentType,
-            ).filter(name__contains=query)[:3]
+            ).filter(name__icontains=query)[:3]
             if request.user.has_perm("documents.view_documenttype")
             else []
         )
@@ -1158,37 +1158,37 @@ class GlobalSearchView(PassUserMixin):
                 request.user,
                 "view_storagepath",
                 StoragePath,
-            ).filter(name__contains=query)[:3]
+            ).filter(name__icontains=query)[:3]
             if request.user.has_perm("documents.view_storagepath")
             else []
         )
         users = (
-            User.objects.filter(username__contains=query)[:3]
+            User.objects.filter(username__icontains=query)[:3]
             if request.user.has_perm("documents.view_user")
             else []
         )
         groups = (
-            Group.objects.filter(name__contains=query)[:3]
+            Group.objects.filter(name__icontains=query)[:3]
             if request.user.has_perm("documents.view_group")
             else []
         )
         mail_rules = (
-            MailRule.objects.filter(name__contains=query)[:3]
-            if request.user.has_perm("documents.view_mailrule")
+            MailRule.objects.filter(name__icontains=query)[:3]
+            if request.user.has_perm("paperless_mail.view_mailrule")
             else []
         )
         mail_accounts = (
-            MailAccount.objects.filter(name__contains=query)[:3]
-            if request.user.has_perm("documents.view_mailaccount")
+            MailAccount.objects.filter(name__icontains=query)[:3]
+            if request.user.has_perm("paperless_mail.view_mailaccount")
             else []
         )
         workflows = (
-            Workflow.objects.filter(name__contains=query)[:3]
+            Workflow.objects.filter(name__icontains=query)[:3]
             if request.user.has_perm("documents.view_workflow")
             else []
         )
         custom_fields = (
-            CustomField.objects.filter(name__contains=query)[:3]
+            CustomField.objects.filter(name__icontains=query)[:3]
             if request.user.has_perm("documents.view_customfield")
             else []
         )

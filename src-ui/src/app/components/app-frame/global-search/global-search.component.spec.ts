@@ -66,7 +66,7 @@ const searchResults = {
   storage_paths: [
     {
       id: 1,
-      path: 'TestStoragePath',
+      name: 'TestStoragePath',
     },
   ],
   tags: [
@@ -208,6 +208,17 @@ describe('GlobalSearchComponent', () => {
     )
     expect(component['currentItemIndex']).toBe(-1)
     expect(inputFocusSpy).toHaveBeenCalled()
+
+    component.handleKeyboardEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown' })
+    )
+    component['currentItemIndex'] = searchResults.total - 1
+    component['setCurrentItem']()
+    component.handleKeyboardEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown' })
+    )
+    expect(component['currentItemIndex']).toBe(0)
+    expect(zeroItemSpy).toHaveBeenCalled()
   })
 
   it('should search on query debounce', fakeAsync(() => {
