@@ -169,7 +169,7 @@ describe('GlobalSearchComponent', () => {
       component.primaryButtons.get(1).nativeElement,
       'focus'
     )
-    component.handleKeyboardEvent(
+    component.dropdownKeyDown(
       new KeyboardEvent('keydown', { key: 'ArrowDown' })
     )
     expect(component['currentItemIndex']).toBe(1)
@@ -179,12 +179,12 @@ describe('GlobalSearchComponent', () => {
       component.secondaryButtons.get(1).nativeElement,
       'focus'
     )
-    component.handleKeyboardEvent(
+    component.dropdownKeyDown(
       new KeyboardEvent('keydown', { key: 'ArrowRight' })
     )
     expect(secondaryItemFocusSpy).toHaveBeenCalled()
 
-    component.handleKeyboardEvent(
+    component.dropdownKeyDown(
       new KeyboardEvent('keydown', { key: 'ArrowLeft' })
     )
     expect(firstItemFocusSpy).toHaveBeenCalled()
@@ -193,9 +193,7 @@ describe('GlobalSearchComponent', () => {
       component.primaryButtons.get(0).nativeElement,
       'focus'
     )
-    component.handleKeyboardEvent(
-      new KeyboardEvent('keydown', { key: 'ArrowUp' })
-    )
+    component.dropdownKeyDown(new KeyboardEvent('keydown', { key: 'ArrowUp' }))
     expect(component['currentItemIndex']).toBe(0)
     expect(zeroItemSpy).toHaveBeenCalled()
 
@@ -203,22 +201,42 @@ describe('GlobalSearchComponent', () => {
       component.searchInput.nativeElement,
       'focus'
     )
-    component.handleKeyboardEvent(
-      new KeyboardEvent('keydown', { key: 'ArrowUp' })
-    )
+    component.dropdownKeyDown(new KeyboardEvent('keydown', { key: 'ArrowUp' }))
     expect(component['currentItemIndex']).toBe(-1)
     expect(inputFocusSpy).toHaveBeenCalled()
 
-    component.handleKeyboardEvent(
+    component.dropdownKeyDown(
       new KeyboardEvent('keydown', { key: 'ArrowDown' })
     )
     component['currentItemIndex'] = searchResults.total - 1
     component['setCurrentItem']()
-    component.handleKeyboardEvent(
+    component.dropdownKeyDown(
+      new KeyboardEvent('keydown', { key: 'ArrowDown' })
+    )
+    expect(component['currentItemIndex']).toBe(-1)
+
+    // Search input
+
+    component.searchInputKeyDown(
+      new KeyboardEvent('keydown', { key: 'ArrowUp' })
+    )
+    expect(component['currentItemIndex']).toBe(searchResults.total - 1)
+
+    component.searchInputKeyDown(
       new KeyboardEvent('keydown', { key: 'ArrowDown' })
     )
     expect(component['currentItemIndex']).toBe(0)
-    expect(zeroItemSpy).toHaveBeenCalled()
+
+    component.searchResults = { total: 1 } as any
+    const primaryActionSpy = jest.spyOn(component, 'primaryAction')
+    component.searchInputKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }))
+    expect(primaryActionSpy).toHaveBeenCalled()
+
+    const resetSpy = jest.spyOn(GlobalSearchComponent.prototype as any, 'reset')
+    component.searchInputKeyDown(
+      new KeyboardEvent('keydown', { key: 'Escape' })
+    )
+    expect(resetSpy).toHaveBeenCalled()
   })
 
   it('should search on query debounce', fakeAsync(() => {
@@ -378,27 +396,6 @@ describe('GlobalSearchComponent', () => {
     component['currentItemIndex'] = 0
     component['setCurrentItem']()
     expect(focusSpy).toHaveBeenCalled()
-  })
-
-  it('should handle search input keyboard nav', () => {
-    component.searchResults = searchResults as any
-    component.resultsDropdown.open()
-    fixture.detectChanges()
-    component.searchInputKeyDown(
-      new KeyboardEvent('keydown', { key: 'ArrowDown' })
-    )
-    expect(component['currentItemIndex']).toBe(0)
-
-    component.searchResults = { total: 1 } as any
-    const primaryActionSpy = jest.spyOn(component, 'primaryAction')
-    component.searchInputKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }))
-    expect(primaryActionSpy).toHaveBeenCalled()
-
-    const resetSpy = jest.spyOn(GlobalSearchComponent.prototype as any, 'reset')
-    component.searchInputKeyDown(
-      new KeyboardEvent('keydown', { key: 'Escape' })
-    )
-    expect(resetSpy).toHaveBeenCalled()
   })
 
   it('should reset on dropdown close', () => {

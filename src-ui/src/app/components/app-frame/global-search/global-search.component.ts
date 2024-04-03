@@ -65,37 +65,6 @@ export class GlobalSearchComponent {
     if (event.key === 'k' && (event.ctrlKey || event.metaKey)) {
       this.searchInput.nativeElement.focus()
     }
-
-    if (
-      this.searchResults &&
-      this.resultsDropdown.isOpen() &&
-      document.activeElement !== this.searchInput.nativeElement
-    ) {
-      if (event.key === 'ArrowDown') {
-        if (this.currentItemIndex < this.searchResults.total - 1) {
-          event.preventDefault()
-          this.currentItemIndex++
-          this.setCurrentItem()
-        } else {
-          event.preventDefault()
-          this.currentItemIndex = 0
-          this.setCurrentItem()
-        }
-      } else if (event.key === 'ArrowUp') {
-        if (this.currentItemIndex > 0) {
-          event.preventDefault()
-          this.currentItemIndex--
-          this.setCurrentItem()
-        } else {
-          this.searchInput.nativeElement.focus()
-          this.currentItemIndex = -1
-        }
-      } else if (event.key === 'ArrowRight') {
-        this.secondaryButtons.get(this.domIndex)?.nativeElement.focus()
-      } else if (event.key === 'ArrowLeft') {
-        this.primaryButtons.get(this.domIndex).nativeElement.focus()
-      }
-    }
   }
 
   constructor(
@@ -278,6 +247,14 @@ export class GlobalSearchComponent {
       this.currentItemIndex = 0
       this.setCurrentItem()
     } else if (
+      event.key === 'ArrowUp' &&
+      this.searchResults?.total &&
+      this.resultsDropdown.isOpen()
+    ) {
+      event.preventDefault()
+      this.currentItemIndex = this.searchResults.total - 1
+      this.setCurrentItem()
+    } else if (
       event.key === 'Enter' &&
       this.searchResults?.total === 1 &&
       this.resultsDropdown.isOpen()
@@ -285,6 +262,40 @@ export class GlobalSearchComponent {
       this.primaryButtons.first.nativeElement.click()
     } else if (event.key === 'Escape' && !this.resultsDropdown.isOpen()) {
       this.reset(true)
+    }
+  }
+
+  dropdownKeyDown(event: KeyboardEvent) {
+    if (
+      this.searchResults?.total &&
+      this.resultsDropdown.isOpen() &&
+      document.activeElement !== this.searchInput.nativeElement
+    ) {
+      if (event.key === 'ArrowDown') {
+        event.preventDefault()
+        if (this.currentItemIndex < this.searchResults.total - 1) {
+          this.currentItemIndex++
+          this.setCurrentItem()
+        } else {
+          this.searchInput.nativeElement.focus()
+          this.currentItemIndex = -1
+        }
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault()
+        if (this.currentItemIndex > 0) {
+          this.currentItemIndex--
+          this.setCurrentItem()
+        } else {
+          this.searchInput.nativeElement.focus()
+          this.currentItemIndex = -1
+        }
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault()
+        this.secondaryButtons.get(this.domIndex)?.nativeElement.focus()
+      } else if (event.key === 'ArrowLeft') {
+        event.preventDefault()
+        this.primaryButtons.get(this.domIndex).nativeElement.focus()
+      }
     }
   }
 
