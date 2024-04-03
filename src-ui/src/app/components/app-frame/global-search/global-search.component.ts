@@ -13,7 +13,7 @@ import {
   FILTER_HAS_CORRESPONDENT_ANY,
   FILTER_HAS_DOCUMENT_TYPE_ANY,
   FILTER_HAS_STORAGE_PATH_ANY,
-  FILTER_HAS_ANY_TAG,
+  FILTER_HAS_TAGS_ANY,
 } from 'src/app/data/filter-rule-type'
 import { DataType } from 'src/app/data/datatype'
 import { ObjectWithId } from 'src/app/data/object-with-id'
@@ -145,7 +145,7 @@ export class GlobalSearchComponent {
         filterRuleType = FILTER_HAS_STORAGE_PATH_ANY
         break
       case DataType.Tag:
-        filterRuleType = FILTER_HAS_ANY_TAG
+        filterRuleType = FILTER_HAS_TAGS_ANY
         break
       case DataType.User:
         editDialogComponent = UserEditDialogComponent

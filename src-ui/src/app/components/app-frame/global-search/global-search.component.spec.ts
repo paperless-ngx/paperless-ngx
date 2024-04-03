@@ -20,10 +20,10 @@ import { DocumentListViewService } from 'src/app/services/document-list-view.ser
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
-  FILTER_HAS_ANY_TAG,
   FILTER_HAS_CORRESPONDENT_ANY,
   FILTER_HAS_DOCUMENT_TYPE_ANY,
   FILTER_HAS_STORAGE_PATH_ANY,
+  FILTER_HAS_TAGS_ANY,
 } from 'src/app/data/filter-rule-type'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { DocumentService } from 'src/app/services/rest/document.service'
@@ -250,7 +250,7 @@ describe('GlobalSearchComponent', () => {
 
     component.primaryAction(DataType.Tag, object)
     expect(qfSpy).toHaveBeenCalledWith([
-      { rule_type: FILTER_HAS_ANY_TAG, value: object.id.toString() },
+      { rule_type: FILTER_HAS_TAGS_ANY, value: object.id.toString() },
     ])
 
     component.primaryAction(DataType.User, object)
