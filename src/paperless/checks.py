@@ -204,7 +204,7 @@ def audit_log_check(app_configs, **kwargs):
     all_tables = db_conn.introspection.table_names()
     result = []
 
-    if ("auditlog_logentry" in all_tables) or (settings.AUDIT_LOG_DISABLED):
+    if ("auditlog_logentry" in all_tables) and (settings.AUDIT_LOG_DISABLED):
         result.append(
             Warning(
                 ("auditlog table was found but AUDIT_LOG_DISABLED is active."),
