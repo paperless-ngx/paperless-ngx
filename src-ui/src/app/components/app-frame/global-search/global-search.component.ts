@@ -15,6 +15,7 @@ import {
   FILTER_HAS_STORAGE_PATH_ANY,
   FILTER_HAS_ANY_TAG,
 } from 'src/app/data/filter-rule-type'
+import { DataType } from 'src/app/data/datatype'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
@@ -45,6 +46,7 @@ import { WorkflowEditDialogComponent } from '../../common/edit-dialog/workflow-e
   styleUrl: './global-search.component.scss',
 })
 export class GlobalSearchComponent {
+  public DataType = DataType
   public query: string
   public queryDebounce: Subject<string>
   public searchResults: GlobalSearchResult
@@ -130,41 +132,41 @@ export class GlobalSearchComponent {
     let editDialogComponent: any
     let size: string = 'md'
     switch (type) {
-      case 'document':
+      case DataType.Document:
         this.router.navigate(['/documents', object.id])
         return
-      case 'correspondent':
+      case DataType.Correspondent:
         filterRuleType = FILTER_HAS_CORRESPONDENT_ANY
         break
-      case 'documentType':
+      case DataType.DocumentType:
         filterRuleType = FILTER_HAS_DOCUMENT_TYPE_ANY
         break
-      case 'storagePath':
+      case DataType.StoragePath:
         filterRuleType = FILTER_HAS_STORAGE_PATH_ANY
         break
-      case 'tag':
+      case DataType.Tag:
         filterRuleType = FILTER_HAS_ANY_TAG
         break
-      case 'user':
+      case DataType.User:
         editDialogComponent = UserEditDialogComponent
         size = 'lg'
         break
-      case 'group':
+      case DataType.Group:
         editDialogComponent = GroupEditDialogComponent
         size = 'lg'
         break
-      case 'mailAccount':
+      case DataType.MailAccount:
         editDialogComponent = MailAccountEditDialogComponent
         size = 'xl'
         break
-      case 'mailRule':
+      case DataType.MailRule:
         editDialogComponent = MailRuleEditDialogComponent
         size = 'xl'
         break
-      case 'customField':
+      case DataType.CustomField:
         editDialogComponent = CustomFieldEditDialogComponent
         break
-      case 'workflow':
+      case DataType.Workflow:
         editDialogComponent = WorkflowEditDialogComponent
         size = 'xl'
         break
@@ -195,19 +197,19 @@ export class GlobalSearchComponent {
     let editDialogComponent: any
     let size: string = 'md'
     switch (type) {
-      case 'document':
+      case DataType.Document:
         window.open(this.documentService.getDownloadUrl(object.id))
         break
-      case 'correspondent':
+      case DataType.Correspondent:
         editDialogComponent = CorrespondentEditDialogComponent
         break
-      case 'documentType':
+      case DataType.DocumentType:
         editDialogComponent = DocumentTypeEditDialogComponent
         break
-      case 'storagePath':
+      case DataType.StoragePath:
         editDialogComponent = StoragePathEditDialogComponent
         break
-      case 'tag':
+      case DataType.Tag:
         editDialogComponent = TagEditDialogComponent
         break
     }
@@ -287,8 +289,15 @@ export class GlobalSearchComponent {
     }
   }
 
-  public disablePrimaryButton(type: string, object: ObjectWithId): boolean {
-    if (['workflow', 'customField', 'group', 'user'].includes(type)) {
+  public disablePrimaryButton(type: DataType, object: ObjectWithId): boolean {
+    if (
+      [
+        DataType.Workflow,
+        DataType.CustomField,
+        DataType.Group,
+        DataType.User,
+      ].includes(type)
+    ) {
       return !this.permissionsService.currentUserHasObjectPermissions(
         PermissionAction.Change,
         object
@@ -298,8 +307,8 @@ export class GlobalSearchComponent {
     return false
   }
 
-  public disableSecondaryButton(type: string, object: ObjectWithId): boolean {
-    if ('document' === type) {
+  public disableSecondaryButton(type: DataType, object: ObjectWithId): boolean {
+    if (DataType.Document === type) {
       return false
     }
 

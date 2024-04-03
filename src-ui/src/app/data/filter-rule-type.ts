@@ -1,3 +1,5 @@
+import { DataType } from './datatype'
+
 // These correspond to src/documents/models.py and changes here require a DB migration (and vice versa)
 export const FILTER_TITLE = 0
 export const FILTER_CONTENT = 1
@@ -74,57 +76,57 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     id: FILTER_CORRESPONDENT,
     filtervar: 'correspondent__id',
     isnull_filtervar: 'correspondent__isnull',
-    datatype: 'correspondent',
+    datatype: DataType.Correspondent,
     multi: false,
   },
   {
     id: FILTER_HAS_CORRESPONDENT_ANY,
     filtervar: 'correspondent__id__in',
-    datatype: 'correspondent',
+    datatype: DataType.Correspondent,
     multi: true,
   },
   {
     id: FILTER_DOES_NOT_HAVE_CORRESPONDENT,
     filtervar: 'correspondent__id__none',
-    datatype: 'correspondent',
+    datatype: DataType.Correspondent,
     multi: true,
   },
   {
     id: FILTER_STORAGE_PATH,
     filtervar: 'storage_path__id',
     isnull_filtervar: 'storage_path__isnull',
-    datatype: 'storage_path',
+    datatype: DataType.StoragePath,
     multi: false,
   },
   {
     id: FILTER_HAS_STORAGE_PATH_ANY,
     filtervar: 'storage_path__id__in',
-    datatype: 'storage_path',
+    datatype: DataType.StoragePath,
     multi: true,
   },
   {
     id: FILTER_DOES_NOT_HAVE_STORAGE_PATH,
     filtervar: 'storage_path__id__none',
-    datatype: 'storage_path',
+    datatype: DataType.StoragePath,
     multi: true,
   },
   {
     id: FILTER_DOCUMENT_TYPE,
     filtervar: 'document_type__id',
     isnull_filtervar: 'document_type__isnull',
-    datatype: 'document_type',
+    datatype: DataType.DocumentType,
     multi: false,
   },
   {
     id: FILTER_HAS_DOCUMENT_TYPE_ANY,
     filtervar: 'document_type__id__in',
-    datatype: 'document_type',
+    datatype: DataType.DocumentType,
     multi: true,
   },
   {
     id: FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
     filtervar: 'document_type__id__none',
-    datatype: 'document_type',
+    datatype: DataType.DocumentType,
     multi: true,
   },
   {
@@ -137,19 +139,19 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
     id: FILTER_HAS_TAGS_ALL,
     filtervar: 'tags__id__all',
-    datatype: 'tag',
+    datatype: DataType.Tag,
     multi: true,
   },
   {
     id: FILTER_HAS_TAGS_ANY,
     filtervar: 'tags__id__in',
-    datatype: 'tag',
+    datatype: DataType.Tag,
     multi: true,
   },
   {
     id: FILTER_DOES_NOT_HAVE_TAG,
     filtervar: 'tags__id__none',
-    datatype: 'tag',
+    datatype: DataType.Tag,
     multi: true,
   },
   {

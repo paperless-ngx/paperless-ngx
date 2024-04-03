@@ -34,6 +34,7 @@ import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-
 import { WorkflowEditDialogComponent } from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
 import { ElementRef } from '@angular/core'
 import { ToastService } from 'src/app/services/toast.service'
+import { DataType } from 'src/app/data/datatype'
 
 const searchResults = {
   total: 11,
@@ -229,55 +230,55 @@ describe('GlobalSearchComponent', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
 
-    component.primaryAction('document', object)
+    component.primaryAction(DataType.Document, object)
     expect(routerSpy).toHaveBeenCalledWith(['/documents', object.id])
 
-    component.primaryAction('correspondent', object)
+    component.primaryAction(DataType.Correspondent, object)
     expect(qfSpy).toHaveBeenCalledWith([
       { rule_type: FILTER_HAS_CORRESPONDENT_ANY, value: object.id.toString() },
     ])
 
-    component.primaryAction('documentType', object)
+    component.primaryAction(DataType.DocumentType, object)
     expect(qfSpy).toHaveBeenCalledWith([
       { rule_type: FILTER_HAS_DOCUMENT_TYPE_ANY, value: object.id.toString() },
     ])
 
-    component.primaryAction('storagePath', object)
+    component.primaryAction(DataType.StoragePath, object)
     expect(qfSpy).toHaveBeenCalledWith([
       { rule_type: FILTER_HAS_STORAGE_PATH_ANY, value: object.id.toString() },
     ])
 
-    component.primaryAction('tag', object)
+    component.primaryAction(DataType.Tag, object)
     expect(qfSpy).toHaveBeenCalledWith([
       { rule_type: FILTER_HAS_ANY_TAG, value: object.id.toString() },
     ])
 
-    component.primaryAction('user', object)
+    component.primaryAction(DataType.User, object)
     expect(modalSpy).toHaveBeenCalledWith(UserEditDialogComponent, {
       size: 'lg',
     })
 
-    component.primaryAction('group', object)
+    component.primaryAction(DataType.Group, object)
     expect(modalSpy).toHaveBeenCalledWith(GroupEditDialogComponent, {
       size: 'lg',
     })
 
-    component.primaryAction('mailAccount', object)
+    component.primaryAction(DataType.MailAccount, object)
     expect(modalSpy).toHaveBeenCalledWith(MailAccountEditDialogComponent, {
       size: 'xl',
     })
 
-    component.primaryAction('mailRule', object)
+    component.primaryAction(DataType.MailRule, object)
     expect(modalSpy).toHaveBeenCalledWith(MailRuleEditDialogComponent, {
       size: 'xl',
     })
 
-    component.primaryAction('customField', object)
+    component.primaryAction(DataType.CustomField, object)
     expect(modalSpy).toHaveBeenCalledWith(CustomFieldEditDialogComponent, {
       size: 'md',
     })
 
-    component.primaryAction('workflow', object)
+    component.primaryAction(DataType.Workflow, object)
     expect(modalSpy).toHaveBeenCalledWith(WorkflowEditDialogComponent, {
       size: 'xl',
     })
@@ -307,22 +308,28 @@ describe('GlobalSearchComponent', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
 
-    component.secondaryAction('correspondent', correspondent)
+    component.secondaryAction(DataType.Correspondent, correspondent)
     expect(modalSpy).toHaveBeenCalledWith(CorrespondentEditDialogComponent, {
       size: 'md',
     })
 
-    component.secondaryAction('documentType', searchResults.document_types[0])
+    component.secondaryAction(
+      DataType.DocumentType,
+      searchResults.document_types[0]
+    )
     expect(modalSpy).toHaveBeenCalledWith(CorrespondentEditDialogComponent, {
       size: 'md',
     })
 
-    component.secondaryAction('storagePath', searchResults.storage_paths[0])
+    component.secondaryAction(
+      DataType.StoragePath,
+      searchResults.storage_paths[0]
+    )
     expect(modalSpy).toHaveBeenCalledWith(CorrespondentEditDialogComponent, {
       size: 'md',
     })
 
-    component.secondaryAction('tag', searchResults.tags[0])
+    component.secondaryAction(DataType.Tag, searchResults.tags[0])
     expect(modalSpy).toHaveBeenCalledWith(CorrespondentEditDialogComponent, {
       size: 'md',
     })
