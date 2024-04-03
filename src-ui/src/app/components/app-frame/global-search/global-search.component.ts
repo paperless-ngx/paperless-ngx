@@ -73,15 +73,19 @@ export class GlobalSearchComponent {
     ) {
       if (event.key === 'ArrowDown') {
         if (this.currentItemIndex < this.searchResults.total - 1) {
+          event.preventDefault()
           this.currentItemIndex++
           this.setCurrentItem()
+        } else {
           event.preventDefault()
+          this.currentItemIndex = 0
+          this.setCurrentItem()
         }
       } else if (event.key === 'ArrowUp') {
         if (this.currentItemIndex > 0) {
+          event.preventDefault()
           this.currentItemIndex--
           this.setCurrentItem()
-          event.preventDefault()
         } else {
           this.searchInput.nativeElement.focus()
           this.currentItemIndex = -1
@@ -267,9 +271,10 @@ export class GlobalSearchComponent {
   public searchInputKeyDown(event: KeyboardEvent) {
     if (
       event.key === 'ArrowDown' &&
-      this.searchResults &&
+      this.searchResults?.total &&
       this.resultsDropdown.isOpen()
     ) {
+      event.preventDefault()
       this.currentItemIndex = 0
       this.setCurrentItem()
     } else if (
