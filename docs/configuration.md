@@ -1311,11 +1311,9 @@ assigns or creates tags if a properly formatted barcode is detected.
 
 #### [`PAPERLESS_AUDIT_LOG_ENABLED=<bool>`](#PAPERLESS_AUDIT_LOG_ENABLED) {#PAPERLESS_AUDIT_LOG_ENABLED}
 
-: Enables an audit trail for documents, document types, correspondents, and tags. Log entries can be viewed in the Django backend only.
+: Enables the audit trail for documents, document types, correspondents, and tags.
 
-    !!! warning
-
-        Once enabled cannot be disabled
+    Defaults to true.
 
 ## Collate Double-Sided Documents {#collate}
 
