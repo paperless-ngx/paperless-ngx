@@ -5,7 +5,6 @@ import shutil
 import stat
 
 from django.conf import settings
-from django.core.checks import Critical
 from django.core.checks import Error
 from django.core.checks import Warning
 from django.core.checks import register
@@ -205,13 +204,10 @@ def audit_log_check(app_configs, **kwargs):
     all_tables = db_conn.introspection.table_names()
     result = []
 
-    if ("auditlog_logentry" in all_tables) and not (settings.AUDIT_LOG_ENABLED):
+    if ("auditlog_logentry" in all_tables) and not settings.AUDIT_LOG_ENABLED:
         result.append(
-            Critical(
-                (
-                    "auditlog table was found but PAPERLESS_AUDIT_LOG_ENABLED"
-                    " is not active.  This setting cannot be disabled after enabling"
-                ),
+            Warning(
+                ("auditlog table was found but audit log is disabled."),
             ),
         )
 
