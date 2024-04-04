@@ -47,7 +47,7 @@ repos:
         exclude: "(^Pipfile\\.lock$)"
   # Python hooks
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.3.4'
+    rev: 'v0.3.5'
     hooks:
       - id: ruff
   - repo: https://github.com/psf/black-pre-commit-mirror
