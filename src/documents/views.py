@@ -1110,28 +1110,34 @@ class GlobalSearchView(PassUserMixin):
         elif len(query) < 3:
             return HttpResponseBadRequest("Query must be at least 3 characters")
 
+        OBJECT_LIMIT = 3
         docs = []
         if request.user.has_perm("documents.view_document"):
-            from documents import index
+            all_docs = get_objects_for_user_owner_aware(
+                request.user,
+                "view_document",
+                Document,
+            )
+            # First search by title
+            docs = all_docs.filter(title__icontains=query)[:OBJECT_LIMIT]
+            if len(docs) < OBJECT_LIMIT:
+                # If we don't have enough results, search by content
+                from documents import index
 
-            with index.open_index_searcher() as s:
-                q, _ = index.DelayedFullTextQuery(
-                    s,
-                    request.query_params,
-                    10,
-                    request.user,
-                )._get_query()
-                results = s.search(q, limit=3)
-                docs = get_objects_for_user_owner_aware(
-                    request.user,
-                    "view_document",
-                    Document,
-                ).filter(id__in=[r["id"] for r in results])
+                with index.open_index_searcher() as s:
+                    q, _ = index.DelayedFullTextQuery(
+                        s,
+                        request.query_params,
+                        10,
+                        request.user,
+                    )._get_query()
+                    results = s.search(q, limit=OBJECT_LIMIT)
+                    docs = docs | all_docs.filter(id__in=[r["id"] for r in results])
 
         tags = (
             get_objects_for_user_owner_aware(request.user, "view_tag", Tag).filter(
                 name__icontains=query,
-            )[:3]
+            )[:OBJECT_LIMIT]
             if request.user.has_perm("documents.view_tag")
             else []
         )
@@ -1140,7 +1146,7 @@ class GlobalSearchView(PassUserMixin):
                 request.user,
                 "view_correspondent",
                 Correspondent,
-            ).filter(name__icontains=query)[:3]
+            ).filter(name__icontains=query)[:OBJECT_LIMIT]
             if request.user.has_perm("documents.view_correspondent")
             else []
         )
@@ -1149,7 +1155,7 @@ class GlobalSearchView(PassUserMixin):
                 request.user,
                 "view_documenttype",
                 DocumentType,
-            ).filter(name__icontains=query)[:3]
+            ).filter(name__icontains=query)[:OBJECT_LIMIT]
             if request.user.has_perm("documents.view_documenttype")
             else []
         )
@@ -1158,37 +1164,37 @@ class GlobalSearchView(PassUserMixin):
                 request.user,
                 "view_storagepath",
                 StoragePath,
-            ).filter(name__icontains=query)[:3]
+            ).filter(name__icontains=query)[:OBJECT_LIMIT]
             if request.user.has_perm("documents.view_storagepath")
             else []
         )
         users = (
-            User.objects.filter(username__icontains=query)[:3]
+            User.objects.filter(username__icontains=query)[:OBJECT_LIMIT]
             if request.user.has_perm("auth.view_user")
             else []
         )
         groups = (
-            Group.objects.filter(name__icontains=query)[:3]
+            Group.objects.filter(name__icontains=query)[:OBJECT_LIMIT]
             if request.user.has_perm("auth.view_group")
             else []
         )
         mail_rules = (
-            MailRule.objects.filter(name__icontains=query)[:3]
+            MailRule.objects.filter(name__icontains=query)[:OBJECT_LIMIT]
             if request.user.has_perm("paperless_mail.view_mailrule")
             else []
         )
         mail_accounts = (
-            MailAccount.objects.filter(name__icontains=query)[:3]
+            MailAccount.objects.filter(name__icontains=query)[:OBJECT_LIMIT]
             if request.user.has_perm("paperless_mail.view_mailaccount")
             else []
         )
         workflows = (
-            Workflow.objects.filter(name__icontains=query)[:3]
+            Workflow.objects.filter(name__icontains=query)[:OBJECT_LIMIT]
             if request.user.has_perm("documents.view_workflow")
             else []
         )
         custom_fields = (
-            CustomField.objects.filter(name__icontains=query)[:3]
+            CustomField.objects.filter(name__icontains=query)[:OBJECT_LIMIT]
             if request.user.has_perm("documents.view_customfield")
             else []
         )
