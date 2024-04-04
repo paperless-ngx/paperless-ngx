@@ -43,7 +43,7 @@ from documents.plugins.helpers import ProgressStatusOptions
 from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated
 
-if not settings.AUDIT_LOG_DISABLED:
+if settings.AUDIT_LOG_ENABLED:
     import json
 
     from auditlog.models import LogEntry
@@ -275,7 +275,7 @@ def update_document_archive_file(document_id):
                     archive_filename=document.archive_filename,
                 )
                 newDocument = Document.objects.get(pk=document.pk)
-                if not settings.AUDIT_LOG_DISABLED:
+                if settings.AUDIT_LOG_ENABLED:
                     LogEntry.objects.log_create(
                         instance=oldDocument,
                         changes=json.dumps(

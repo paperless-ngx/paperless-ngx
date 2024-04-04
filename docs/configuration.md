@@ -1309,11 +1309,11 @@ assigns or creates tags if a properly formatted barcode is detected.
 
 ## Audit Trail
 
-#### [`PAPERLESS_AUDIT_LOG_DISABLED=<bool>`](#PAPERLESS_AUDIT_LOG_DISABLED) {#PAPERLESS_AUDIT_LOG_DISABLED}
+#### [`PAPERLESS_AUDIT_LOG_ENABLED=<bool>`](#PAPERLESS_AUDIT_LOG_ENABLED) {#PAPERLESS_AUDIT_LOG_ENABLED}
 
-: Disables the audit trail for documents, document types, correspondents, and tags.
+: Enables the audit trail for documents, document types, correspondents, and tags.
 
-    Defaults to false.
+    Defaults to true.
 
 ## Collate Double-Sided Documents {#collate}
 

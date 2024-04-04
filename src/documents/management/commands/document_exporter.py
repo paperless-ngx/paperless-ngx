@@ -10,7 +10,7 @@ from typing import Optional
 import tqdm
 from django.conf import settings
 
-if not settings.AUDIT_LOG_DISABLED:
+if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
@@ -310,7 +310,7 @@ class Command(BaseCommand):
                 serializers.serialize("json", ApplicationConfiguration.objects.all()),
             )
 
-            if not settings.AUDIT_LOG_DISABLED:
+            if settings.AUDIT_LOG_ENABLED:
                 manifest += json.loads(
                     serializers.serialize("json", LogEntry.objects.all()),
                 )

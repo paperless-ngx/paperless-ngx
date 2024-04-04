@@ -789,7 +789,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
 
         with override_settings(
-            AUDIT_LOG_DISABLED=True,
+            AUDIT_LOG_ENABLED=False,
         ):
             manifest = self._do_export(use_filename_format=True)
             for obj in manifest:

@@ -15,7 +15,7 @@ from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
 
-if not settings.AUDIT_LOG_DISABLED:
+if settings.AUDIT_LOG_ENABLED:
     from auditlog.admin import LogEntryAdmin
     from auditlog.models import LogEntry
 
@@ -197,7 +197,7 @@ admin.site.register(ShareLink, ShareLinksAdmin)
 admin.site.register(CustomField, CustomFieldsAdmin)
 admin.site.register(CustomFieldInstance, CustomFieldInstancesAdmin)
 
-if not settings.AUDIT_LOG_DISABLED:
+if settings.AUDIT_LOG_ENABLED:
 
     class LogEntryAUDIT(LogEntryAdmin):
         def has_delete_permission(self, request, obj=None):

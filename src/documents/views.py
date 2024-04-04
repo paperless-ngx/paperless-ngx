@@ -153,7 +153,7 @@ from paperless.config import GeneralConfig
 from paperless.db import GnuPG
 from paperless.views import StandardPagination
 
-if not settings.AUDIT_LOG_DISABLED:
+if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
 
 logger = logging.getLogger("paperless.api")
@@ -636,7 +636,7 @@ class DocumentViewSet(
                 c.save()
                 # If audit log is enabled make an entry in the log
                 # about this note change
-                if not settings.AUDIT_LOG_DISABLED:
+                if settings.AUDIT_LOG_ENABLED:
                     LogEntry.objects.log_create(
                         instance=doc,
                         changes=json.dumps(
@@ -671,7 +671,7 @@ class DocumentViewSet(
                 return HttpResponseForbidden("Insufficient permissions to delete notes")
 
             note = Note.objects.get(id=int(request.GET.get("id")))
-            if not settings.AUDIT_LOG_DISABLED:
+            if settings.AUDIT_LOG_ENABLED:
                 LogEntry.objects.log_create(
                     instance=doc,
                     changes=json.dumps(

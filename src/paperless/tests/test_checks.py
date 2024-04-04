@@ -247,7 +247,7 @@ class TestAuditLogChecks(TestCase):
         """
         introspect_mock = mock.MagicMock()
         introspect_mock.introspection.table_names.return_value = ["auditlog_logentry"]
-        with override_settings(AUDIT_LOG_DISABLED=True):
+        with override_settings(AUDIT_LOG_ENABLED=False):
             with mock.patch.dict(
                 "paperless.checks.connections",
                 {"default": introspect_mock},
@@ -259,6 +259,6 @@ class TestAuditLogChecks(TestCase):
                 msg = msgs[0]
 
                 self.assertIn(
-                    ("auditlog table was found but AUDIT_LOG_DISABLED is active."),
+                    ("auditlog table was found but audit log is disabled."),
                     msg.msg,
                 )

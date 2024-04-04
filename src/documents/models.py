@@ -20,7 +20,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from multiselectfield import MultiSelectField
 
-if not settings.AUDIT_LOG_DISABLED:
+if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
 
 from documents.data_models import DocumentSource
@@ -881,7 +881,7 @@ class CustomFieldInstance(models.Model):
         raise NotImplementedError(self.field.data_type)
 
 
-if not settings.AUDIT_LOG_DISABLED:
+if settings.AUDIT_LOG_ENABLED:
     auditlog.register(Document, m2m_fields={"tags"})
     auditlog.register(Correspondent)
     auditlog.register(Tag)

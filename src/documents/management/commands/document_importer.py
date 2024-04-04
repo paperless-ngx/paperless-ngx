@@ -36,7 +36,7 @@ from documents.signals.handlers import update_filename_and_move_files
 from documents.utils import copy_file_with_basic_stats
 from paperless import version
 
-if not settings.AUDIT_LOG_DISABLED:
+if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
 
 
@@ -160,7 +160,7 @@ class Command(BaseCommand):
             receiver=update_filename_and_move_files,
             sender=Document.tags.through,
         ):
-            if not settings.AUDIT_LOG_DISABLED:
+            if settings.AUDIT_LOG_ENABLED:
                 auditlog.unregister(Document)
                 auditlog.unregister(Correspondent)
                 auditlog.unregister(Tag)
