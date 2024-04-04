@@ -1,6 +1,5 @@
 import os
 import re
-import subprocess
 import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -13,6 +12,7 @@ from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
 from documents.utils import maybe_override_pixel_limit
+from documents.utils import run_subprocess
 from paperless.config import OcrConfig
 from paperless.models import ArchiveFileChoices
 from paperless.models import CleanChoices
@@ -103,7 +103,7 @@ class RasterisedDocumentParser(DocumentParser):
 
     def remove_alpha(self, image_path: str) -> Path:
         no_alpha_image = Path(self.tempdir) / "image-no-alpha"
-        subprocess.run(
+        run_subprocess(
             [
                 settings.CONVERT_BINARY,
                 "-alpha",
@@ -111,6 +111,7 @@ class RasterisedDocumentParser(DocumentParser):
                 image_path,
                 no_alpha_image,
             ],
+            logger=self.log,
         )
         return no_alpha_image
 
@@ -169,7 +170,7 @@ class RasterisedDocumentParser(DocumentParser):
                 mode="w+",
                 dir=self.tempdir,
             ) as tmp:
-                subprocess.run(
+                run_subprocess(
                     [
                         "pdftotext",
                         "-q",
@@ -179,6 +180,7 @@ class RasterisedDocumentParser(DocumentParser):
                         pdf_file,
                         tmp.name,
                     ],
+                    logger=self.log,
                 )
                 text = self.read_file_handle_unicode_errors(Path(tmp.name))
 
