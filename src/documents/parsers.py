@@ -169,7 +169,7 @@ def run_convert(
         run_subprocess(args, environment, logger)
     except subprocess.CalledProcessError as e:
         raise ParseError(f"Convert failed at {args}") from e
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         raise ParseError("Unknown error running convert") from e
 
 
