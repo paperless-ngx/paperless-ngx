@@ -5,8 +5,6 @@ import tempfile
 import uuid
 from enum import Enum
 from pathlib import Path
-from subprocess import CompletedProcess
-from subprocess import run
 from typing import TYPE_CHECKING
 from typing import Optional
 
@@ -51,6 +49,7 @@ from documents.signals import document_consumption_finished
 from documents.signals import document_consumption_started
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
+from documents.utils import run_subprocess
 
 
 class WorkflowTriggerPlugin(
@@ -397,19 +396,14 @@ class Consumer(LoggingMixin):
         script_env["TASK_ID"] = self.task_id or ""
 
         try:
-            completed_proc = run(
-                args=[
+            run_subprocess(
+                [
                     settings.PRE_CONSUME_SCRIPT,
                     original_file_path,
                 ],
-                env=script_env,
-                capture_output=True,
+                script_env,
+                self.log,
             )
-
-            self._log_script_outputs(completed_proc)
-
-            # Raises exception on non-zero output
-            completed_proc.check_returncode()
 
         except Exception as e:
             self._fail(
@@ -468,8 +462,8 @@ class Consumer(LoggingMixin):
         script_env["TASK_ID"] = self.task_id or ""
 
         try:
-            completed_proc = run(
-                args=[
+            run_subprocess(
+                [
                     settings.POST_CONSUME_SCRIPT,
                     str(document.pk),
                     document.get_public_filename(),
@@ -480,14 +474,9 @@ class Consumer(LoggingMixin):
                     str(document.correspondent),
                     str(",".join(document.tags.all().values_list("name", flat=True))),
                 ],
-                env=script_env,
-                capture_output=True,
+                script_env,
+                self.log,
             )
-
-            self._log_script_outputs(completed_proc)
-
-            # Raises exception on non-zero output
-            completed_proc.check_returncode()
 
         except Exception as e:
             self._fail(
@@ -928,41 +917,6 @@ class Consumer(LoggingMixin):
             copy_basic_file_stats(source, target)
         except Exception:  # pragma: no cover
             pass
-
-    def _log_script_outputs(self, completed_process: CompletedProcess):
-        """
-        Decodes a process stdout and stderr streams and logs them to the main log
-        """
-        # Log what the script exited as
-        self.log.info(
-            f"{completed_process.args[0]} exited {completed_process.returncode}",
-        )
-
-        # Decode the output (if any)
-        if len(completed_process.stdout):
-            stdout_str = (
-                completed_process.stdout.decode("utf8", errors="ignore")
-                .strip()
-                .split(
-                    "\n",
-                )
-            )
-            self.log.info("Script stdout:")
-            for line in stdout_str:
-                self.log.info(line)
-
-        if len(completed_process.stderr):
-            stderr_str = (
-                completed_process.stderr.decode("utf8", errors="ignore")
-                .strip()
-                .split(
-                    "\n",
-                )
-            )
-
-            self.log.warning("Script stderr:")
-            for line in stderr_str:
-                self.log.warning(line)
 
 
 def parse_doc_title_w_placeholders(
