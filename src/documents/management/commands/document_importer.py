@@ -21,7 +21,13 @@ from django.db.models.signals import post_save
 from filelock import FileLock
 
 from documents.file_handling import create_source_path_directory
+from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
+from documents.models import DocumentType
+from documents.models import Note
+from documents.models import Tag
 from documents.parsers import run_convert
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
@@ -29,6 +35,9 @@ from documents.settings import EXPORTER_THUMBNAIL_NAME
 from documents.signals.handlers import update_filename_and_move_files
 from documents.utils import copy_file_with_basic_stats
 from paperless import version
+
+if settings.AUDIT_LOG_ENABLED:
+    from auditlog.registry import auditlog
 
 
 @contextmanager
@@ -151,6 +160,15 @@ class Command(BaseCommand):
             receiver=update_filename_and_move_files,
             sender=Document.tags.through,
         ):
+            if settings.AUDIT_LOG_ENABLED:
+                auditlog.unregister(Document)
+                auditlog.unregister(Correspondent)
+                auditlog.unregister(Tag)
+                auditlog.unregister(DocumentType)
+                auditlog.unregister(Note)
+                auditlog.unregister(CustomField)
+                auditlog.unregister(CustomFieldInstance)
+
             # Fill up the database with whatever is in the manifest
             try:
                 with transaction.atomic():
