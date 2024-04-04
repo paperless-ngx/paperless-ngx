@@ -63,8 +63,8 @@ def maybe_override_pixel_limit() -> None:
 
 def run_subprocess(
     arguments: list[str],
-    env: dict[str, str] | None = None,
-    logger: logging.Logger | None = None,
+    env: Optional[dict[str, str]] = None,
+    logger: Optional[logging.Logger] = None,
     *,
     check_exit_code: bool = True,
     log_stdout: bool = True,
