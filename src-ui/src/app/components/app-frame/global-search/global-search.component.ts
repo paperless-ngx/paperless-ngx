@@ -5,6 +5,7 @@ import {
   ViewChildren,
   QueryList,
   HostListener,
+  OnInit,
 } from '@angular/core'
 import { Router } from '@angular/router'
 import { NgbDropdown, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
@@ -39,13 +40,14 @@ import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage
 import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
 import { WorkflowEditDialogComponent } from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
+import { HotKeyService } from 'src/app/services/hot-key.service'
 
 @Component({
   selector: 'pngx-global-search',
   templateUrl: './global-search.component.html',
   styleUrl: './global-search.component.scss',
 })
-export class GlobalSearchComponent {
+export class GlobalSearchComponent implements OnInit {
   public DataType = DataType
   public query: string
   public queryDebounce: Subject<string>
@@ -60,13 +62,6 @@ export class GlobalSearchComponent {
   @ViewChildren('primaryButton') primaryButtons: QueryList<ElementRef>
   @ViewChildren('secondaryButton') secondaryButtons: QueryList<ElementRef>
 
-  @HostListener('document:keydown', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent) {
-    if (event.key === 'k' && (event.ctrlKey || event.metaKey)) {
-      this.searchInput.nativeElement.focus()
-    }
-  }
-
   constructor(
     private searchService: SearchService,
     private router: Router,
@@ -74,7 +69,8 @@ export class GlobalSearchComponent {
     private documentService: DocumentService,
     private documentListViewService: DocumentListViewService,
     private permissionsService: PermissionsService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private hotkeyService: HotKeyService
   ) {
     this.queryDebounce = new Subject<string>()
 
@@ -88,6 +84,15 @@ export class GlobalSearchComponent {
         this.query = text
         if (text) this.search(text)
       })
+  }
+
+  ngOnInit() {
+    this.hotkeyService.addShortcut({ keys: 'meta.k' }).subscribe(() => {
+      this.searchInput.nativeElement.focus()
+    })
+    this.hotkeyService.addShortcut({ keys: 'control.k' }).subscribe(() => {
+      this.searchInput.nativeElement.focus()
+    })
   }
 
   private search(query: string) {

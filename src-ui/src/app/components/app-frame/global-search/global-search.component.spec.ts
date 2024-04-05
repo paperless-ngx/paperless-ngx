@@ -150,12 +150,12 @@ describe('GlobalSearchComponent', () => {
 
   it('should handle keyboard nav', () => {
     const focusSpy = jest.spyOn(component.searchInput.nativeElement, 'focus')
-    component.handleKeyboardEvent(
+    document.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'k', ctrlKey: true })
     )
     expect(focusSpy).toHaveBeenCalled()
     // coverage
-    component.handleKeyboardEvent(
+    document.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'k', metaKey: true })
     )
 
