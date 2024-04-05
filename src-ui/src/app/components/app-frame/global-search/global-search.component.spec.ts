@@ -232,11 +232,19 @@ describe('GlobalSearchComponent', () => {
     component.searchInputKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }))
     expect(primaryActionSpy).toHaveBeenCalled()
 
+    component.query = 'test'
     const resetSpy = jest.spyOn(GlobalSearchComponent.prototype as any, 'reset')
     component.searchInputKeyDown(
       new KeyboardEvent('keydown', { key: 'Escape' })
     )
     expect(resetSpy).toHaveBeenCalled()
+
+    component.query = ''
+    const blurSpy = jest.spyOn(component.searchInput.nativeElement, 'blur')
+    component.searchInputKeyDown(
+      new KeyboardEvent('keydown', { key: 'Escape' })
+    )
+    expect(blurSpy).toHaveBeenCalled()
   })
 
   it('should search on query debounce', fakeAsync(() => {

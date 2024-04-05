@@ -265,7 +265,11 @@ export class GlobalSearchComponent implements OnInit {
     ) {
       this.primaryButtons.first.nativeElement.click()
     } else if (event.key === 'Escape' && !this.resultsDropdown.isOpen()) {
-      this.reset(true)
+      if (this.query?.length) {
+        this.reset(true)
+      } else {
+        this.searchInput.nativeElement.blur()
+      }
     }
   }
 
