@@ -36,6 +36,7 @@ import { ToastService } from 'src/app/services/toast.service'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { FilterEditorComponent } from './filter-editor/filter-editor.component'
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component'
+import { HotKeyService } from 'src/app/services/hot-key.service'
 
 @Component({
   selector: 'pngx-document-list',
@@ -56,6 +57,7 @@ export class DocumentListComponent
     private consumerStatusService: ConsumerStatusService,
     public openDocumentsService: OpenDocumentsService,
     private settingsService: SettingsService,
+    private hotKeyService: HotKeyService,
     public permissionService: PermissionsService
   ) {
     super()
@@ -182,6 +184,33 @@ export class DocumentListComponent
           this.list.activateSavedView(null)
           this.list.loadFromQueryParams(queryParams)
           this.unmodifiedFilterRules = []
+        }
+      })
+
+    this.hotKeyService
+      .addShortcut({ keys: 'escape', description: $localize`Clear selection` })
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        if (this.list.selected.size > 0) {
+          this.list.selectNone()
+        } else {
+          this.filterEditor.resetSelected()
+        }
+      })
+
+    this.hotKeyService
+      .addShortcut({ keys: 'a', description: $localize`Select all` })
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        this.list.selectAll()
+      })
+
+    this.hotKeyService
+      .addShortcut({ keys: 'o', description: $localize`Open first document` })
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        if (this.list.documents.length > 0) {
+          this.openDocumentDetail(this.list.documents[0])
         }
       })
   }

@@ -7,12 +7,18 @@ import {
   OnDestroy,
   ViewChild,
   ElementRef,
+  AfterViewInit,
 } from '@angular/core'
 import { Tag } from 'src/app/data/tag'
 import { Correspondent } from 'src/app/data/correspondent'
 import { DocumentType } from 'src/app/data/document-type'
-import { Subject, Subscription } from 'rxjs'
-import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators'
+import { Observable, Subject, Subscription } from 'rxjs'
+import {
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  takeUntil,
+} from 'rxjs/operators'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
@@ -163,7 +169,7 @@ const DEFAULT_TEXT_FILTER_MODIFIER_OPTIONS = [
 })
 export class FilterEditorComponent
   extends ComponentWithPermissions
-  implements OnInit, OnDestroy
+  implements OnInit, OnDestroy, AfterViewInit
 {
   generateFilterName() {
     if (this.filterRules.length == 1) {
@@ -255,6 +261,8 @@ export class FilterEditorComponent
   _textFilter = ''
   _moreLikeId: number
   _moreLikeDoc: Document
+
+  unsubscribeNotifier: Subject<any> = new Subject()
 
   get textFilterTargets() {
     if (this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_MORELIKE) {
@@ -862,7 +870,6 @@ export class FilterEditorComponent
   }
 
   textFilterDebounce: Subject<string>
-  subscription: Subscription
 
   ngOnInit() {
     if (
@@ -908,8 +915,9 @@ export class FilterEditorComponent
 
     this.textFilterDebounce = new Subject<string>()
 
-    this.subscription = this.textFilterDebounce
+    this.textFilterDebounce
       .pipe(
+        takeUntil(this.unsubscribeNotifier),
         debounceTime(400),
         distinctUntilChanged(),
         filter((query) => !query.length || query.length > 2)
@@ -919,8 +927,12 @@ export class FilterEditorComponent
     if (this._textFilter) this.documentService.searchQuery = this._textFilter
   }
 
+  ngAfterViewInit() {
+    this.textFilterInput.nativeElement.focus()
+  }
+
   ngOnDestroy() {
-    this.textFilterDebounce.complete()
+    this.unsubscribeNotifier.next(true)
   }
 
   resetSelected() {

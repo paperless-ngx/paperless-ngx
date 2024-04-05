@@ -598,4 +598,29 @@ describe('DocumentListComponent', () => {
       { rule_type: FILTER_FULLTEXT_MORELIKE, value: '99' },
     ])
   })
+
+  it('should support hotkeys', () => {
+    fixture.detectChanges()
+    const resetSpy = jest.spyOn(component['filterEditor'], 'resetSelected')
+    component.clickTag(1)
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'escape' }))
+    expect(resetSpy).toHaveBeenCalled()
+
+    jest
+      .spyOn(documentListService, 'selected', 'get')
+      .mockReturnValue(new Set([1]))
+    const clearSelectedSpy = jest.spyOn(documentListService, 'selectNone')
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'escape' }))
+    expect(clearSelectedSpy).toHaveBeenCalled()
+
+    const selectAllSpy = jest.spyOn(documentListService, 'selectAll')
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }))
+    expect(selectAllSpy).toHaveBeenCalled()
+
+    jest.spyOn(documentListService, 'documents', 'get').mockReturnValue(docs)
+    fixture.detectChanges()
+    const detailSpy = jest.spyOn(component, 'openDocumentDetail')
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'o' }))
+    expect(detailSpy).toHaveBeenCalledWith(docs[0])
+  })
 })
