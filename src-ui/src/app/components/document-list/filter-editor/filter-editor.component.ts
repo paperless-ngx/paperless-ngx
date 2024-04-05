@@ -975,8 +975,12 @@ export class FilterEditorComponent
       if (filterString.length) {
         this.updateTextFilter(filterString)
       }
-    } else if (event.key == 'Escape') {
-      this.resetTextField()
+    } else if (event.key === 'Escape') {
+      if (this._textFilter?.length) {
+        this.resetTextField()
+      } else {
+        this.textFilterInput.nativeElement.blur()
+      }
     }
   }
 

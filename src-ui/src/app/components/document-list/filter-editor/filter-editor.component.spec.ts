@@ -1814,6 +1814,11 @@ describe('FilterEditorComponent', () => {
       new KeyboardEvent('keyup', { key: 'Escape' })
     )
     expect(component.textFilter).toEqual('')
+    const blurSpy = jest.spyOn(component.textFilterInput.nativeElement, 'blur')
+    component.textFilterInput.nativeElement.dispatchEvent(
+      new KeyboardEvent('keyup', { key: 'Escape' })
+    )
+    expect(blurSpy).toHaveBeenCalled()
   })
 
   it('should adjust text filter targets if more like search', () => {
