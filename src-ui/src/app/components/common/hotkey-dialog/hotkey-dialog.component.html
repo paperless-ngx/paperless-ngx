@@ -1,0 +1,23 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{title}}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
+</div>
+<div class="modal-body">
+    <table class="table">
+        <tbody>
+            @for (key of hotkeys.entries(); track key[0]) {
+                <tr>
+                  <td>{{ key[1] }}</td>
+                  <td class="d-flex justify-content-end">
+                    <kbd [innerHTML]="formatKey(key[0])"></kbd>
+                    @if (key[0].includes('control')) {
+                        &nbsp;(macOS&nbsp;<kbd [innerHTML]="formatKey(key[0], true)"></kbd>)
+                    }
+                  </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="modal-footer">
+</div>

@@ -7,7 +7,6 @@
             autocomplete="off" spellcheck="false"
             [(ngModel)]="query" (ngModelChange)="this.queryDebounce.next($event)" (keydown)="searchInputKeyDown($event)" ngbDropdownAnchor>
         <div class="position-absolute top-50 end-0 translate-middle">
-            <span class="badge d-none d-lg-inline text-muted position-absolute top-50 start-100 translate-middle ms-n4 fw-normal">⌘K</span>
             @if (loading) {
                 <div class="spinner-border spinner-border-sm text-muted mt-1"></div>
             }

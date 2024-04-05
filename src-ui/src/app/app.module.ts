@@ -121,6 +121,7 @@ import { MergeConfirmDialogComponent } from './components/common/confirm-dialog/
 import { SplitConfirmDialogComponent } from './components/common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
 import { DocumentHistoryComponent } from './components/document-history/document-history.component'
 import { GlobalSearchComponent } from './components/app-frame/global-search/global-search.component'
+import { HotkeyDialogComponent } from './components/common/hotkey-dialog/hotkey-dialog.component'
 import {
   airplane,
   archive,
@@ -482,6 +483,7 @@ function initializeApp(settings: SettingsService) {
     SplitConfirmDialogComponent,
     DocumentHistoryComponent,
     GlobalSearchComponent,
+    HotkeyDialogComponent,
   ],
   imports: [
     BrowserModule,

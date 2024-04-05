@@ -21,6 +21,7 @@ import { ToastService, Toast } from './services/toast.service'
 import { SettingsService } from './services/settings.service'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { NgxFileDropModule } from 'ngx-file-drop'
+import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap'
 
 describe('AppComponent', () => {
   let component: AppComponent
@@ -41,6 +42,7 @@ describe('AppComponent', () => {
         TourNgBootstrapModule,
         RouterTestingModule.withRoutes(routes),
         NgxFileDropModule,
+        NgbModalModule,
       ],
     }).compileComponents()
 
