@@ -53,8 +53,13 @@ export class HotKeyService {
           return
         }
 
-        e.preventDefault()
         this.modalService.dismissAll()
+        if (e.key === 'Escape' && this.modalService.hasOpenModals()) {
+          // If there is a modal open, just dismiss
+          return
+        }
+
+        e.preventDefault()
         observer.next(e)
       }
 

@@ -12,8 +12,12 @@ import {
 } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
-import { Router, ActivatedRoute, convertToParamMap } from '@angular/router'
-import { RouterTestingModule } from '@angular/router/testing'
+import {
+  Router,
+  ActivatedRoute,
+  convertToParamMap,
+  RouterModule,
+} from '@angular/router'
 import {
   NgbModal,
   NgbModule,
@@ -253,7 +257,7 @@ describe('DocumentDetailComponent', () => {
         DatePipe,
       ],
       imports: [
-        RouterTestingModule.withRoutes(routes),
+        RouterModule.forRoot(routes),
         HttpClientTestingModule,
         NgbModule,
         NgSelectModule,
@@ -1124,6 +1128,35 @@ describe('DocumentDetailComponent', () => {
       `${environment.apiBaseUrl}documents/bulk_edit/`
     )
     req.flush(true)
+  })
+
+  it('should support keyboard shortcuts', () => {
+    initNormally()
+
+    jest.spyOn(component, 'hasNext').mockReturnValue(true)
+    const nextSpy = jest.spyOn(component, 'nextDoc')
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'arrowright', ctrlKey: true })
+    )
+    expect(nextSpy).toHaveBeenCalled()
+
+    jest.spyOn(component, 'hasPrevious').mockReturnValue(true)
+    const prevSpy = jest.spyOn(component, 'previousDoc')
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'arrowleft', ctrlKey: true })
+    )
+    expect(prevSpy).toHaveBeenCalled()
+
+    jest.spyOn(openDocumentsService, 'isDirty').mockReturnValue(true)
+    const saveSpy = jest.spyOn(component, 'save')
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 's', ctrlKey: true })
+    )
+    expect(saveSpy).toHaveBeenCalled()
+
+    const closeSpy = jest.spyOn(component, 'close')
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'escape' }))
+    expect(closeSpy).toHaveBeenCalled()
   })
 
   function initNormally() {

@@ -90,6 +90,10 @@ export class OpenDocumentsService {
     return this.dirtyDocuments.size > 0
   }
 
+  isDirty(doc: Document): boolean {
+    return this.dirtyDocuments.has(doc.id)
+  }
+
   closeDocument(doc: Document): Observable<boolean> {
     let index = this.openDocuments.findIndex((d) => d.id == doc.id)
     if (index == -1) return of(true)

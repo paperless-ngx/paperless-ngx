@@ -22,6 +22,7 @@ import { SettingsService } from './services/settings.service'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { NgxFileDropModule } from 'ngx-file-drop'
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap'
+import { HotKeyService } from './services/hot-key.service'
 
 describe('AppComponent', () => {
   let component: AppComponent
@@ -32,6 +33,7 @@ describe('AppComponent', () => {
   let toastService: ToastService
   let router: Router
   let settingsService: SettingsService
+  let hotKeyService: HotKeyService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -52,6 +54,7 @@ describe('AppComponent', () => {
     settingsService = TestBed.inject(SettingsService)
     toastService = TestBed.inject(ToastService)
     router = TestBed.inject(Router)
+    hotKeyService = TestBed.inject(HotKeyService)
     fixture = TestBed.createComponent(AppComponent)
     component = fixture.componentInstance
   })
@@ -140,5 +143,16 @@ describe('AppComponent', () => {
     component.ngOnInit()
     fileStatusSubject.next(new FileStatus())
     expect(toastSpy).toHaveBeenCalled()
+  })
+
+  it('should support hotkeys', () => {
+    const addShortcutSpy = jest.spyOn(hotKeyService, 'addShortcut')
+    const routerSpy = jest.spyOn(router, 'navigate')
+    component.ngOnInit()
+    expect(addShortcutSpy).toHaveBeenCalled()
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'h', ctrlKey: true })
+    )
+    expect(routerSpy).toHaveBeenCalledWith(['/dashboard'])
   })
 })

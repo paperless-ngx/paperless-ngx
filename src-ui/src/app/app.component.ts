@@ -12,6 +12,7 @@ import {
   PermissionsService,
   PermissionType,
 } from './services/permissions.service'
+import { HotKeyService } from './services/hot-key.service'
 
 @Component({
   selector: 'pngx-root',
@@ -31,7 +32,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private tasksService: TasksService,
     public tourService: TourService,
     private renderer: Renderer2,
-    private permissionsService: PermissionsService
+    private permissionsService: PermissionsService,
+    private hotKeyService: HotKeyService
   ) {
     this.settings.updateAppearanceSettings()
   }
@@ -121,6 +123,17 @@ export class AppComponent implements OnInit, OnDestroy {
             delay: 5000,
           })
         }
+      })
+
+    this.hotKeyService
+      .addShortcut({ keys: 'control.h', description: $localize`Dashboard` })
+      .subscribe(() => {
+        this.router.navigate(['/dashboard'])
+      })
+    this.hotKeyService
+      .addShortcut({ keys: 'control.d', description: $localize`Documents` })
+      .subscribe(() => {
+        this.router.navigate(['/documents'])
       })
 
     const prevBtnTitle = $localize`Prev`
