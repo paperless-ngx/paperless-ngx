@@ -88,7 +88,7 @@ export class GlobalSearchComponent implements OnInit {
 
   ngOnInit() {
     this.hotkeyService
-      .addShortcut({ keys: 'control.k', description: $localize`Global search` })
+      .addShortcut({ keys: '/', description: $localize`Global search` })
       .subscribe(() => {
         this.searchInput.nativeElement.focus()
       })

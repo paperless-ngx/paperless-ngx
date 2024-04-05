@@ -5,8 +5,7 @@ import {
   fakeAsync,
   tick,
 } from '@angular/core/testing'
-import { Router } from '@angular/router'
-import { RouterTestingModule } from '@angular/router/testing'
+import { Router, RouterModule } from '@angular/router'
 import { TourService, TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { Subject } from 'rxjs'
 import { routes } from './app-routing.module'
@@ -23,6 +22,7 @@ import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { NgxFileDropModule } from 'ngx-file-drop'
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap'
 import { HotKeyService } from './services/hot-key.service'
+import { PermissionsGuard } from './guards/permissions.guard'
 
 describe('AppComponent', () => {
   let component: AppComponent
@@ -38,11 +38,11 @@ describe('AppComponent', () => {
   beforeEach(async () => {
     TestBed.configureTestingModule({
       declarations: [AppComponent, ToastsComponent, FileDropComponent],
-      providers: [],
+      providers: [PermissionsGuard],
       imports: [
         HttpClientTestingModule,
         TourNgBootstrapModule,
-        RouterTestingModule.withRoutes(routes),
+        RouterModule.forRoot(routes),
         NgxFileDropModule,
         NgbModalModule,
       ],
@@ -150,9 +150,10 @@ describe('AppComponent', () => {
     const routerSpy = jest.spyOn(router, 'navigate')
     component.ngOnInit()
     expect(addShortcutSpy).toHaveBeenCalled()
-    document.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'h', ctrlKey: true })
-    )
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'h' }))
     expect(routerSpy).toHaveBeenCalledWith(['/dashboard'])
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'd' }))
+    expect(routerSpy).toHaveBeenCalledWith(['/documents'])
   })
 })

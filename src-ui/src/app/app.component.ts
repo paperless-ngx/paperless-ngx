@@ -126,12 +126,12 @@ export class AppComponent implements OnInit, OnDestroy {
       })
 
     this.hotKeyService
-      .addShortcut({ keys: 'control.h', description: $localize`Dashboard` })
+      .addShortcut({ keys: 'h', description: $localize`Dashboard` })
       .subscribe(() => {
         this.router.navigate(['/dashboard'])
       })
     this.hotKeyService
-      .addShortcut({ keys: 'control.d', description: $localize`Documents` })
+      .addShortcut({ keys: 'd', description: $localize`Documents` })
       .subscribe(() => {
         this.router.navigate(['/documents'])
       })
