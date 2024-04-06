@@ -491,8 +491,9 @@ followed by the normalized actual header name.
 #### [`PAPERLESS_LOGOUT_REDIRECT_URL=<str>`](#PAPERLESS_LOGOUT_REDIRECT_URL) {#PAPERLESS_LOGOUT_REDIRECT_URL}
 
 : URL to redirect the user to after a logout. This can be used
-together with PAPERLESS_ENABLE_HTTP_REMOTE_USER to
-redirect the user back to the SSO application's logout page.
+together with PAPERLESS_ENABLE_HTTP_REMOTE_USER and SSO to
+redirect the user back to the SSO application's logout page to
+complete the logout process.
 
     Defaults to None, which disables this feature.
 

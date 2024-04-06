@@ -649,8 +649,9 @@ external authentication solution using one of the following methods:
 
 This is a simple option that uses remote user authentication made available by certain SSO
 applications. See the relevant configuration options for more information:
-[PAPERLESS_ENABLE_HTTP_REMOTE_USER](configuration.md#PAPERLESS_ENABLE_HTTP_REMOTE_USER) and
+[PAPERLESS_ENABLE_HTTP_REMOTE_USER](configuration.md#PAPERLESS_ENABLE_HTTP_REMOTE_USER),
 [PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME](configuration.md#PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME)
+and [PAPERLESS_LOGOUT_REDIRECT_URL](configuration.md#PAPERLESS_LOGOUT_REDIRECT_URL)
 
 ### OpenID Connect and social authentication
 
