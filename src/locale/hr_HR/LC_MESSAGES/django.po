@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-04 17:00-0800\n"
-"PO-Revision-Date: 2024-03-05 01:01\n"
+"POT-Creation-Date: 2024-04-04 14:31-0700\n"
+"PO-Revision-Date: 2024-04-04 21:33\n"
 "Last-Translator: \n"
 "Language-Team: Croatian\n"
 "Language: hr_HR\n"
@@ -393,11 +393,11 @@ msgstr ""
 
 #: documents/models.py:453
 msgid "has document type in"
-msgstr ""
+msgstr "ima tip dokumenta u"
 
 #: documents/models.py:454
 msgid "does not have document type in"
-msgstr ""
+msgstr "nema tip dokumenta u"
 
 #: documents/models.py:455
 msgid "has storage path in"
@@ -840,12 +840,12 @@ msgstr "Nevažeći regularni izraz: %(error)s"
 msgid "Invalid color."
 msgstr "Nevažeća boja."
 
-#: documents/serialisers.py:1072
+#: documents/serialisers.py:1130
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Vrsta datoteke %(type)s nije podržana"
 
-#: documents/serialisers.py:1175
+#: documents/serialisers.py:1239
 msgid "Invalid variable detected."
 msgstr "Otkrivena je nevaljana vrsta datoteke."
 
@@ -1204,131 +1204,131 @@ msgstr ""
 msgid "paperless application settings"
 msgstr ""
 
-#: paperless/settings.py:664
+#: paperless/settings.py:666
 msgid "English (US)"
 msgstr "Engleski (US)"
 
-#: paperless/settings.py:665
+#: paperless/settings.py:667
 msgid "Arabic"
 msgstr "Arapski"
 
-#: paperless/settings.py:666
+#: paperless/settings.py:668
 msgid "Afrikaans"
 msgstr ""
 
-#: paperless/settings.py:667
+#: paperless/settings.py:669
 msgid "Belarusian"
 msgstr "Bjeloruski"
 
-#: paperless/settings.py:668
+#: paperless/settings.py:670
 msgid "Bulgarian"
 msgstr ""
 
-#: paperless/settings.py:669
+#: paperless/settings.py:671
 msgid "Catalan"
 msgstr ""
 
-#: paperless/settings.py:670
+#: paperless/settings.py:672
 msgid "Czech"
 msgstr "Češki"
 
-#: paperless/settings.py:671
+#: paperless/settings.py:673
 msgid "Danish"
 msgstr "Danski"
 
-#: paperless/settings.py:672
+#: paperless/settings.py:674
 msgid "German"
 msgstr "Njemački"
 
-#: paperless/settings.py:673
+#: paperless/settings.py:675
 msgid "Greek"
 msgstr ""
 
-#: paperless/settings.py:674
+#: paperless/settings.py:676
 msgid "English (GB)"
 msgstr "Engleski (GB)"
 
-#: paperless/settings.py:675
+#: paperless/settings.py:677
 msgid "Spanish"
 msgstr "Španjolski"
 
-#: paperless/settings.py:676
+#: paperless/settings.py:678
 msgid "Finnish"
 msgstr ""
 
-#: paperless/settings.py:677
+#: paperless/settings.py:679
 msgid "French"
 msgstr "Francuski"
 
-#: paperless/settings.py:678
+#: paperless/settings.py:680
 msgid "Hungarian"
 msgstr ""
 
-#: paperless/settings.py:679
+#: paperless/settings.py:681
 msgid "Italian"
 msgstr "Talijanski"
 
-#: paperless/settings.py:680
+#: paperless/settings.py:682
 msgid "Japanese"
 msgstr ""
 
-#: paperless/settings.py:681
+#: paperless/settings.py:683
 msgid "Luxembourgish"
 msgstr "Luksemburški"
 
-#: paperless/settings.py:682
+#: paperless/settings.py:684
 msgid "Norwegian"
 msgstr ""
 
-#: paperless/settings.py:683
+#: paperless/settings.py:685
 msgid "Dutch"
 msgstr "Nizozemski"
 
-#: paperless/settings.py:684
+#: paperless/settings.py:686
 msgid "Polish"
 msgstr "Poljski"
 
-#: paperless/settings.py:685
+#: paperless/settings.py:687
 msgid "Portuguese (Brazil)"
 msgstr "Portugalski (Brazil)"
 
-#: paperless/settings.py:686
+#: paperless/settings.py:688
 msgid "Portuguese"
 msgstr "Portugalski"
 
-#: paperless/settings.py:687
+#: paperless/settings.py:689
 msgid "Romanian"
 msgstr "Rumunjski"
 
-#: paperless/settings.py:688
+#: paperless/settings.py:690
 msgid "Russian"
 msgstr "Ruski"
 
-#: paperless/settings.py:689
+#: paperless/settings.py:691
 msgid "Slovak"
 msgstr ""
 
-#: paperless/settings.py:690
+#: paperless/settings.py:692
 msgid "Slovenian"
 msgstr "Slovenski"
 
-#: paperless/settings.py:691
+#: paperless/settings.py:693
 msgid "Serbian"
 msgstr "Srpski"
 
-#: paperless/settings.py:692
+#: paperless/settings.py:694
 msgid "Swedish"
 msgstr "Švedski"
 
-#: paperless/settings.py:693
+#: paperless/settings.py:695
 msgid "Turkish"
 msgstr "Turski"
 
-#: paperless/settings.py:694
+#: paperless/settings.py:696
 msgid "Ukrainian"
 msgstr ""
 
-#: paperless/settings.py:695
+#: paperless/settings.py:697
 msgid "Chinese Simplified"
 msgstr "Pojednostavljeni kineski"
 
