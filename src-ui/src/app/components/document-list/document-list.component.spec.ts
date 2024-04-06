@@ -19,6 +19,7 @@ import {
   NgbModalRef,
   NgbPopoverModule,
   NgbTooltipModule,
+  NgbTypeaheadModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { ClearableBadgeComponent } from '../common/clearable-badge/clearable-badge.component'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -152,6 +153,7 @@ describe('DocumentListComponent', () => {
         NgbTooltipModule,
         NgxBootstrapIconsModule.pick(allIcons),
         NgSelectModule,
+        NgbTypeaheadModule,
       ],
     }).compileComponents()
 

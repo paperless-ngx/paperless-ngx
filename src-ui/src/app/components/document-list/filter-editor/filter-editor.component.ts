@@ -12,11 +12,14 @@ import {
 import { Tag } from 'src/app/data/tag'
 import { Correspondent } from 'src/app/data/correspondent'
 import { DocumentType } from 'src/app/data/document-type'
-import { Observable, Subject, Subscription } from 'rxjs'
+import { Observable, Subject, Subscription, from } from 'rxjs'
 import {
+  catchError,
   debounceTime,
   distinctUntilChanged,
   filter,
+  map,
+  switchMap,
   takeUntil,
 } from 'rxjs/operators'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
@@ -82,6 +85,7 @@ import {
   PermissionsService,
 } from 'src/app/services/permissions.service'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { SearchService } from 'src/app/services/rest/search.service'
 
 const TEXT_FILTER_TARGET_TITLE = 'title'
 const TEXT_FILTER_TARGET_TITLE_CONTENT = 'title-content'
@@ -240,7 +244,8 @@ export class FilterEditorComponent
     private correspondentService: CorrespondentService,
     private documentService: DocumentService,
     private storagePathService: StoragePathService,
-    public permissionsService: PermissionsService
+    public permissionsService: PermissionsService,
+    private searchService: SearchService
   ) {
     super()
   }
@@ -922,7 +927,12 @@ export class FilterEditorComponent
         distinctUntilChanged(),
         filter((query) => !query.length || query.length > 2)
       )
-      .subscribe((text) => this.updateTextFilter(text))
+      .subscribe((text) =>
+        this.updateTextFilter(
+          text,
+          this.textFilterTarget !== TEXT_FILTER_TARGET_FULLTEXT_QUERY
+        )
+      )
 
     if (this._textFilter) this.documentService.searchQuery = this._textFilter
   }
@@ -973,10 +983,12 @@ export class FilterEditorComponent
     this.storagePathSelectionModel.apply()
   }
 
-  updateTextFilter(text) {
+  updateTextFilter(text, updateRules = true) {
     this._textFilter = text
-    this.documentService.searchQuery = text
-    this.updateRules()
+    if (updateRules) {
+      this.documentService.searchQuery = text
+      this.updateRules()
+    }
   }
 
   textFilterKeyup(event: KeyboardEvent) {
@@ -1024,5 +1036,41 @@ export class FilterEditorComponent
     ) {
       this.updateRules()
     }
+  }
+
+  searchAutoComplete = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      filter(() => this.textFilterTarget === TEXT_FILTER_TARGET_FULLTEXT_QUERY),
+      map((term) => {
+        if (term.lastIndexOf(' ') != -1) {
+          return term.substring(term.lastIndexOf(' ') + 1)
+        } else {
+          return term
+        }
+      }),
+      switchMap((term) =>
+        term.length < 2
+          ? from([[]])
+          : this.searchService.autocomplete(term).pipe(
+              catchError(() => {
+                return from([[]])
+              })
+            )
+      )
+    )
+
+  itemSelected(event) {
+    event.preventDefault()
+    let currentSearch: string = this._textFilter ?? ''
+    let lastSpaceIndex = currentSearch.lastIndexOf(' ')
+    if (lastSpaceIndex != -1) {
+      currentSearch = currentSearch.substring(0, lastSpaceIndex + 1)
+      currentSearch += event.item + ' '
+    } else {
+      currentSearch = event.item + ' '
+    }
+    this.updateTextFilter(currentSearch)
   }
 }
