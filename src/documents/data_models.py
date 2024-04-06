@@ -103,14 +103,18 @@ class DocumentMetadataOverrides:
         overrides.owner_id = doc.owner.id if doc.owner else None
         overrides.tag_ids = list(doc.tags.values_list("id", flat=True))
 
-        overrides.view_users = get_users_with_perms(
-            doc,
-            only_with_perms_in=["view_document"],
-        ).values_list("id", flat=True)
-        overrides.change_users = get_users_with_perms(
-            doc,
-            only_with_perms_in=["change_document"],
-        ).values_list("id", flat=True)
+        overrides.view_users = list(
+            get_users_with_perms(
+                doc,
+                only_with_perms_in=["view_document"],
+            ).values_list("id", flat=True),
+        )
+        overrides.change_users = list(
+            get_users_with_perms(
+                doc,
+                only_with_perms_in=["change_document"],
+            ).values_list("id", flat=True),
+        )
         overrides.custom_field_ids = list(
             doc.custom_fields.values_list("id", flat=True),
         )
