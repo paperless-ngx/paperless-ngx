@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-04 17:00-0800\n"
-"PO-Revision-Date: 2024-03-05 01:01\n"
+"POT-Creation-Date: 2024-04-04 14:31-0700\n"
+"PO-Revision-Date: 2024-04-04 21:33\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -47,11 +47,11 @@ msgstr "Регулярний вираз"
 
 #: documents/models.py:58 documents/models.py:902
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Приблизний пошук"
 
 #: documents/models.py:59
 msgid "Automatic"
-msgstr ""
+msgstr "Автоматично"
 
 #: documents/models.py:62 documents/models.py:397 documents/models.py:1218
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
@@ -365,7 +365,7 @@ msgstr "повнотекстовий запит"
 
 #: documents/models.py:446
 msgid "more like this"
-msgstr ""
+msgstr "шукати подібне"
 
 #: documents/models.py:447
 msgid "has tags in"
@@ -685,7 +685,7 @@ msgstr "Призначення"
 
 #: documents/models.py:1006
 msgid "Removal"
-msgstr ""
+msgstr "Видалення"
 
 #: documents/models.py:1010
 msgid "Workflow Action Type"
@@ -741,71 +741,71 @@ msgstr "призначити користувацькі поля"
 
 #: documents/models.py:1108
 msgid "remove these tag(s)"
-msgstr ""
+msgstr "видалити тег(и)"
 
 #: documents/models.py:1113
 msgid "remove all tags"
-msgstr ""
+msgstr "видалити всі теги"
 
 #: documents/models.py:1120
 msgid "remove these document type(s)"
-msgstr ""
+msgstr "видалити тип(и) документів"
 
 #: documents/models.py:1125
 msgid "remove all document types"
-msgstr ""
+msgstr "видалити всі типи документів"
 
 #: documents/models.py:1132
 msgid "remove these correspondent(s)"
-msgstr ""
+msgstr "видалити кореспондента (-ів)"
 
 #: documents/models.py:1137
 msgid "remove all correspondents"
-msgstr ""
+msgstr "видалити всіх кореспондентів"
 
 #: documents/models.py:1144
 msgid "remove these storage path(s)"
-msgstr ""
+msgstr "видалити шлях для зберігання"
 
 #: documents/models.py:1149
 msgid "remove all storage paths"
-msgstr ""
+msgstr "видалити всі шляхи зберігання"
 
 #: documents/models.py:1156
 msgid "remove these owner(s)"
-msgstr ""
+msgstr "видалити власника (-ів)"
 
 #: documents/models.py:1161
 msgid "remove all owners"
-msgstr ""
+msgstr "видалити всіх власників"
 
 #: documents/models.py:1168
 msgid "remove view permissions for these users"
-msgstr ""
+msgstr "видалити дозволи на перегляд для цих користувачів"
 
 #: documents/models.py:1175
 msgid "remove view permissions for these groups"
-msgstr ""
+msgstr "видалити дозволи на перегляд для цих груп"
 
 #: documents/models.py:1182
 msgid "remove change permissions for these users"
-msgstr ""
+msgstr "видалити дозволи на редагування для цих користувачів"
 
 #: documents/models.py:1189
 msgid "remove change permissions for these groups"
-msgstr ""
+msgstr "видалити дозволи на редагування для цих груп"
 
 #: documents/models.py:1194
 msgid "remove all permissions"
-msgstr ""
+msgstr "видалити всі дозволи"
 
 #: documents/models.py:1201
 msgid "remove these custom fields"
-msgstr ""
+msgstr "видалити користувацькі поля"
 
 #: documents/models.py:1206
 msgid "remove all custom fields"
-msgstr ""
+msgstr "видалити всі користувацькі поля"
 
 #: documents/models.py:1210
 msgid "workflow action"
@@ -840,25 +840,26 @@ msgstr "Неправильний регулярний вираз: %(error)s"
 msgid "Invalid color."
 msgstr "Неправильний колір."
 
-#: documents/serialisers.py:1072
+#: documents/serialisers.py:1130
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Тип файлу %(type)s не підтримується"
 
-#: documents/serialisers.py:1175
+#: documents/serialisers.py:1239
 msgid "Invalid variable detected."
 msgstr "Виявлено неправильну змінну."
 
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
-msgstr ""
+msgstr "Вітання від %(site_name)s!"
 
 #: documents/templates/account/email/base_message.txt:5
 #, python-format
 msgid "Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
-msgstr ""
+msgstr "Дякуємо за використання %(site_name)s!\n"
+"%(site_domain)s"
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
@@ -871,7 +872,7 @@ msgstr "Будь ласка, увійдіть."
 #: documents/templates/account/login.html:12
 #, python-format
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
-msgstr ""
+msgstr "Ще не зареєстровані? <a href=\"%(signup_url)s\">Зареєструватися</a>"
 
 #: documents/templates/account/login.html:19
 #: documents/templates/account/signup.html:15
@@ -895,7 +896,7 @@ msgstr "Забули пароль?"
 #: documents/templates/account/login.html:45
 #: documents/templates/account/signup.html:49
 msgid "or sign in via"
-msgstr ""
+msgstr "або увійдіть за допомогою"
 
 #: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
@@ -968,26 +969,26 @@ msgstr "Ваш новий пароль встановлено. Тепер ви �
 
 #: documents/templates/account/signup.html:5
 msgid "Paperless-ngx sign up"
-msgstr ""
+msgstr "Зареєструватись у Paperless-ngx"
 
 #: documents/templates/account/signup.html:10
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
-msgstr ""
+msgstr "Вже зареєстровані? <a href=\"%(login_url)s\">Увійти</a>"
 
 #: documents/templates/account/signup.html:16
 #: documents/templates/socialaccount/signup.html:14
 msgid "Email (optional)"
-msgstr ""
+msgstr "Email (не обов'язково)"
 
 #: documents/templates/account/signup.html:18
 msgid "Password (again)"
-msgstr ""
+msgstr "Пароль (повторно)"
 
 #: documents/templates/account/signup.html:36
 #: documents/templates/socialaccount/signup.html:27
 msgid "Sign up"
-msgstr ""
+msgstr "Зареєструватись"
 
 #: documents/templates/index.html:61
 msgid "Paperless-ngx is loading..."
@@ -1012,21 +1013,21 @@ msgstr "Термін дії посилання закінчився."
 #: documents/templates/socialaccount/authentication_error.html:5
 #: documents/templates/socialaccount/login.html:5
 msgid "Paperless-ngx social account sign in"
-msgstr ""
+msgstr "Paperless-ngx увійти за допомогою акаунту в соцмережах"
 
 #: documents/templates/socialaccount/authentication_error.html:10
 #, python-format
 msgid "An error occurred while attempting to login via your social network account. Back to the <a href=\"%(login_url)s\">login page</a>"
-msgstr ""
+msgstr "Помилка авторизації за допомогою акаунту соцмереж. Повернутися до <a href=\"%(login_url)s\">сторінки авторизації</a>"
 
 #: documents/templates/socialaccount/login.html:10
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
-msgstr ""
+msgstr "Ви майже готові приєднатись за допомогою акаунту від %(provider)s."
 
 #: documents/templates/socialaccount/login.html:13
 msgid "Continue"
-msgstr ""
+msgstr "Продовжити"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
@@ -1204,131 +1205,131 @@ msgstr ""
 msgid "paperless application settings"
 msgstr "налаштування програми документообігу"
 
-#: paperless/settings.py:664
+#: paperless/settings.py:666
 msgid "English (US)"
 msgstr "Англійська (США)"
 
-#: paperless/settings.py:665
+#: paperless/settings.py:667
 msgid "Arabic"
 msgstr "Арабська"
 
-#: paperless/settings.py:666
+#: paperless/settings.py:668
 msgid "Afrikaans"
 msgstr "Африкаанс"
 
-#: paperless/settings.py:667
+#: paperless/settings.py:669
 msgid "Belarusian"
 msgstr "Білоруська"
 
-#: paperless/settings.py:668
+#: paperless/settings.py:670
 msgid "Bulgarian"
 msgstr "Болгарська"
 
-#: paperless/settings.py:669
+#: paperless/settings.py:671
 msgid "Catalan"
 msgstr "Каталонська"
 
-#: paperless/settings.py:670
+#: paperless/settings.py:672
 msgid "Czech"
 msgstr "Чеська"
 
-#: paperless/settings.py:671
+#: paperless/settings.py:673
 msgid "Danish"
 msgstr "Данська"
 
-#: paperless/settings.py:672
+#: paperless/settings.py:674
 msgid "German"
 msgstr "Німецька"
 
-#: paperless/settings.py:673
+#: paperless/settings.py:675
 msgid "Greek"
 msgstr "Грецька"
 
-#: paperless/settings.py:674
+#: paperless/settings.py:676
 msgid "English (GB)"
 msgstr "Англійська (Велика Британія)"
 
-#: paperless/settings.py:675
+#: paperless/settings.py:677
 msgid "Spanish"
 msgstr "Іспанська"
 
-#: paperless/settings.py:676
+#: paperless/settings.py:678
 msgid "Finnish"
 msgstr "Фінська"
 
-#: paperless/settings.py:677
+#: paperless/settings.py:679
 msgid "French"
 msgstr "Французька"
 
-#: paperless/settings.py:678
+#: paperless/settings.py:680
 msgid "Hungarian"
 msgstr "Угорська"
 
-#: paperless/settings.py:679
+#: paperless/settings.py:681
 msgid "Italian"
 msgstr "Італійська"
 
-#: paperless/settings.py:680
+#: paperless/settings.py:682
 msgid "Japanese"
 msgstr ""
 
-#: paperless/settings.py:681
+#: paperless/settings.py:683
 msgid "Luxembourgish"
 msgstr "Люксембурзька"
 
-#: paperless/settings.py:682
+#: paperless/settings.py:684
 msgid "Norwegian"
 msgstr "Норвезька"
 
-#: paperless/settings.py:683
+#: paperless/settings.py:685
 msgid "Dutch"
 msgstr "Нідерландська"
 
-#: paperless/settings.py:684
+#: paperless/settings.py:686
 msgid "Polish"
 msgstr "Польська"
 
-#: paperless/settings.py:685
+#: paperless/settings.py:687
 msgid "Portuguese (Brazil)"
 msgstr "Португальська (Бразилія)"
 
-#: paperless/settings.py:686
+#: paperless/settings.py:688
 msgid "Portuguese"
 msgstr "Португальська"
 
-#: paperless/settings.py:687
+#: paperless/settings.py:689
 msgid "Romanian"
 msgstr "Румунська"
 
-#: paperless/settings.py:688
+#: paperless/settings.py:690
 msgid "Russian"
 msgstr "Російська"
 
-#: paperless/settings.py:689
+#: paperless/settings.py:691
 msgid "Slovak"
 msgstr "Словацька"
 
-#: paperless/settings.py:690
+#: paperless/settings.py:692
 msgid "Slovenian"
 msgstr "Словенська"
 
-#: paperless/settings.py:691
+#: paperless/settings.py:693
 msgid "Serbian"
 msgstr "Сербська"
 
-#: paperless/settings.py:692
+#: paperless/settings.py:694
 msgid "Swedish"
 msgstr "Шведська"
 
-#: paperless/settings.py:693
+#: paperless/settings.py:695
 msgid "Turkish"
 msgstr "Турецька"
 
-#: paperless/settings.py:694
+#: paperless/settings.py:696
 msgid "Ukrainian"
 msgstr "Українська"
 
-#: paperless/settings.py:695
+#: paperless/settings.py:697
 msgid "Chinese Simplified"
 msgstr "Китайська спрощена"
 
