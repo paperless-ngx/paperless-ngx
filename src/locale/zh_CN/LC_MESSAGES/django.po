@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-04 17:00-0800\n"
-"PO-Revision-Date: 2024-03-13 12:09\n"
+"POT-Creation-Date: 2024-04-04 14:31-0700\n"
+"PO-Revision-Date: 2024-04-05 12:08\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -47,11 +47,11 @@ msgstr "正则表达式"
 
 #: documents/models.py:58 documents/models.py:902
 msgid "Fuzzy word"
-msgstr ""
+msgstr "模糊单词"
 
 #: documents/models.py:59
 msgid "Automatic"
-msgstr ""
+msgstr "自动"
 
 #: documents/models.py:62 documents/models.py:397 documents/models.py:1218
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
@@ -365,7 +365,7 @@ msgstr "全文检索"
 
 #: documents/models.py:446
 msgid "more like this"
-msgstr ""
+msgstr "如同这个"
 
 #: documents/models.py:447
 msgid "has tags in"
@@ -669,7 +669,7 @@ msgstr "具有此文档类型"
 
 #: documents/models.py:987
 msgid "has this correspondent"
-msgstr ""
+msgstr "已有此联系人"
 
 #: documents/models.py:991
 msgid "workflow trigger"
@@ -685,7 +685,7 @@ msgstr "分配任务"
 
 #: documents/models.py:1006
 msgid "Removal"
-msgstr ""
+msgstr "移除"
 
 #: documents/models.py:1010
 msgid "Workflow Action Type"
@@ -741,51 +741,51 @@ msgstr "分配这些自定义字段"
 
 #: documents/models.py:1108
 msgid "remove these tag(s)"
-msgstr ""
+msgstr "移除这些标签"
 
 #: documents/models.py:1113
 msgid "remove all tags"
-msgstr ""
+msgstr "删除所有的标签"
 
 #: documents/models.py:1120
 msgid "remove these document type(s)"
-msgstr ""
+msgstr "移除这些文档类型 "
 
 #: documents/models.py:1125
 msgid "remove all document types"
-msgstr ""
+msgstr "移除所有文档类型"
 
 #: documents/models.py:1132
 msgid "remove these correspondent(s)"
-msgstr ""
+msgstr "移除这些通讯员"
 
 #: documents/models.py:1137
 msgid "remove all correspondents"
-msgstr ""
+msgstr "移除所有通讯员"
 
 #: documents/models.py:1144
 msgid "remove these storage path(s)"
-msgstr ""
+msgstr "移除这些存储路径"
 
 #: documents/models.py:1149
 msgid "remove all storage paths"
-msgstr ""
+msgstr "移除全部存储路径"
 
 #: documents/models.py:1156
 msgid "remove these owner(s)"
-msgstr ""
+msgstr "移除这些所有者 "
 
 #: documents/models.py:1161
 msgid "remove all owners"
-msgstr ""
+msgstr "移除所有所有者"
 
 #: documents/models.py:1168
 msgid "remove view permissions for these users"
-msgstr ""
+msgstr "移除这些用户的查看权限"
 
 #: documents/models.py:1175
 msgid "remove view permissions for these groups"
-msgstr ""
+msgstr "移除这些组的查看权限"
 
 #: documents/models.py:1182
 msgid "remove change permissions for these users"
@@ -793,19 +793,19 @@ msgstr "为这些用户授予修改权限"
 
 #: documents/models.py:1189
 msgid "remove change permissions for these groups"
-msgstr ""
+msgstr "移除这些组的更改权限"
 
 #: documents/models.py:1194
 msgid "remove all permissions"
-msgstr ""
+msgstr "移除所有权限"
 
 #: documents/models.py:1201
 msgid "remove these custom fields"
-msgstr ""
+msgstr "移除这些自定义字段"
 
 #: documents/models.py:1206
 msgid "remove all custom fields"
-msgstr ""
+msgstr "移除所有自定义字段"
 
 #: documents/models.py:1210
 msgid "workflow action"
@@ -840,25 +840,26 @@ msgstr "无效的正则表达式：%(error)s"
 msgid "Invalid color."
 msgstr "无效的颜色"
 
-#: documents/serialisers.py:1072
+#: documents/serialisers.py:1130
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "不支持文件类型 %(type)s"
 
-#: documents/serialisers.py:1175
+#: documents/serialisers.py:1239
 msgid "Invalid variable detected."
 msgstr "检测到无效变量。"
 
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
-msgstr ""
+msgstr "来自 %(site_name)s的信息!"
 
 #: documents/templates/account/email/base_message.txt:5
 #, python-format
 msgid "Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
-msgstr ""
+msgstr "感谢您使用 %(site_name)s!\n"
+"%(site_domain)s"
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
@@ -871,7 +872,7 @@ msgstr "请登录。"
 #: documents/templates/account/login.html:12
 #, python-format
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
-msgstr ""
+msgstr "还没有账户? <a href=\"%(signup_url)s\">注册</a>"
 
 #: documents/templates/account/login.html:19
 #: documents/templates/account/signup.html:15
@@ -895,7 +896,7 @@ msgstr "忘记密码"
 #: documents/templates/account/login.html:45
 #: documents/templates/account/signup.html:49
 msgid "or sign in via"
-msgstr ""
+msgstr "或者通过以下方式登录"
 
 #: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
@@ -968,26 +969,26 @@ msgstr "你的新密码已经被设置，你现在可以<a href=\"%(login_url)s\
 
 #: documents/templates/account/signup.html:5
 msgid "Paperless-ngx sign up"
-msgstr ""
+msgstr "Paperless-ngx 注册"
 
 #: documents/templates/account/signup.html:10
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
-msgstr ""
+msgstr "已经有一个帐户？ <a href=\"%(login_url)s\">登录</a>"
 
 #: documents/templates/account/signup.html:16
 #: documents/templates/socialaccount/signup.html:14
 msgid "Email (optional)"
-msgstr ""
+msgstr "电子邮箱(可选)"
 
 #: documents/templates/account/signup.html:18
 msgid "Password (again)"
-msgstr ""
+msgstr "密码 (再输入一次)"
 
 #: documents/templates/account/signup.html:36
 #: documents/templates/socialaccount/signup.html:27
 msgid "Sign up"
-msgstr ""
+msgstr "注册"
 
 #: documents/templates/index.html:61
 msgid "Paperless-ngx is loading..."
@@ -1012,34 +1013,34 @@ msgstr "分享链接已失效！"
 #: documents/templates/socialaccount/authentication_error.html:5
 #: documents/templates/socialaccount/login.html:5
 msgid "Paperless-ngx social account sign in"
-msgstr ""
+msgstr "Paperless-ngx 社交媒体账户登录"
 
 #: documents/templates/socialaccount/authentication_error.html:10
 #, python-format
 msgid "An error occurred while attempting to login via your social network account. Back to the <a href=\"%(login_url)s\">login page</a>"
-msgstr ""
+msgstr "在尝试通过您的社交网络账户登录时出现了一个错误. 返回 <a href=\"%(login_url)s\">登录页面</a>"
 
 #: documents/templates/socialaccount/login.html:10
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
-msgstr ""
+msgstr "您即将连接 %(provider)s 的新第三方帐户。"
 
 #: documents/templates/socialaccount/login.html:13
 msgid "Continue"
-msgstr ""
+msgstr "继续"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
-msgstr ""
+msgstr "Paperless-ngx 社交媒体账户注册"
 
 #: documents/templates/socialaccount/signup.html:10
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
-msgstr ""
+msgstr "您将使用您的 %(provider_name)s 账户登录."
 
 #: documents/templates/socialaccount/signup.html:11
 msgid "As a final step, please complete the following form:"
-msgstr ""
+msgstr "作为最后一步，请填写以下表格："
 
 #: documents/validators.py:17
 #, python-brace-format
@@ -1094,7 +1095,7 @@ msgstr "强制"
 
 #: paperless/models.py:42
 msgid "skip_noarchive"
-msgstr ""
+msgstr "跳过_不存档"
 
 #: paperless/models.py:50
 msgid "never"
@@ -1102,7 +1103,7 @@ msgstr "从不"
 
 #: paperless/models.py:51
 msgid "with_text"
-msgstr ""
+msgstr "含文本"
 
 #: paperless/models.py:52
 msgid "always"
@@ -1114,7 +1115,7 @@ msgstr "清理"
 
 #: paperless/models.py:61
 msgid "clean-final"
-msgstr ""
+msgstr "清理结束"
 
 #: paperless/models.py:62
 msgid "none"
@@ -1122,7 +1123,7 @@ msgstr "无"
 
 #: paperless/models.py:70
 msgid "LeaveColorUnchanged"
-msgstr ""
+msgstr "保持颜色不变"
 
 #: paperless/models.py:71
 msgid "RGB"
@@ -1130,7 +1131,7 @@ msgstr "RGB"
 
 #: paperless/models.py:72
 msgid "UseDeviceIndependentColor"
-msgstr ""
+msgstr "使用设备独立的颜色"
 
 #: paperless/models.py:73
 msgid "Gray"
@@ -1194,141 +1195,141 @@ msgstr "为 OCRMyPDF 添加额外的用户参数"
 
 #: paperless/models.py:171
 msgid "Application title"
-msgstr ""
+msgstr "应用程序标题"
 
 #: paperless/models.py:178
 msgid "Application logo"
-msgstr ""
+msgstr "应用程序图标"
 
 #: paperless/models.py:188
 msgid "paperless application settings"
 msgstr "无纸应用设置"
 
-#: paperless/settings.py:664
+#: paperless/settings.py:666
 msgid "English (US)"
 msgstr "英语(美国)"
 
-#: paperless/settings.py:665
+#: paperless/settings.py:667
 msgid "Arabic"
 msgstr "阿拉伯语"
 
-#: paperless/settings.py:666
+#: paperless/settings.py:668
 msgid "Afrikaans"
 msgstr "Afrikaans 荷兰语"
 
-#: paperless/settings.py:667
+#: paperless/settings.py:669
 msgid "Belarusian"
 msgstr "白俄罗斯语"
 
-#: paperless/settings.py:668
+#: paperless/settings.py:670
 msgid "Bulgarian"
 msgstr "保加利亚语"
 
-#: paperless/settings.py:669
+#: paperless/settings.py:671
 msgid "Catalan"
 msgstr "Catalan 加泰罗尼亚语"
 
-#: paperless/settings.py:670
+#: paperless/settings.py:672
 msgid "Czech"
 msgstr "捷克语"
 
-#: paperless/settings.py:671
+#: paperless/settings.py:673
 msgid "Danish"
 msgstr "丹麦语"
 
-#: paperless/settings.py:672
+#: paperless/settings.py:674
 msgid "German"
 msgstr "德语"
 
-#: paperless/settings.py:673
+#: paperless/settings.py:675
 msgid "Greek"
 msgstr "Greek 希腊语"
 
-#: paperless/settings.py:674
+#: paperless/settings.py:676
 msgid "English (GB)"
 msgstr "英语(英国)"
 
-#: paperless/settings.py:675
+#: paperless/settings.py:677
 msgid "Spanish"
 msgstr "西班牙语"
 
-#: paperless/settings.py:676
+#: paperless/settings.py:678
 msgid "Finnish"
 msgstr "已完成"
 
-#: paperless/settings.py:677
+#: paperless/settings.py:679
 msgid "French"
 msgstr "法语"
 
-#: paperless/settings.py:678
+#: paperless/settings.py:680
 msgid "Hungarian"
 msgstr "匈牙利语"
 
-#: paperless/settings.py:679
+#: paperless/settings.py:681
 msgid "Italian"
 msgstr "意大利语"
 
-#: paperless/settings.py:680
+#: paperless/settings.py:682
 msgid "Japanese"
-msgstr ""
+msgstr "日语"
 
-#: paperless/settings.py:681
+#: paperless/settings.py:683
 msgid "Luxembourgish"
 msgstr "卢森堡语"
 
-#: paperless/settings.py:682
+#: paperless/settings.py:684
 msgid "Norwegian"
 msgstr "Norwegian 挪威语"
 
-#: paperless/settings.py:683
+#: paperless/settings.py:685
 msgid "Dutch"
 msgstr "荷兰语"
 
-#: paperless/settings.py:684
+#: paperless/settings.py:686
 msgid "Polish"
 msgstr "波兰语"
 
-#: paperless/settings.py:685
+#: paperless/settings.py:687
 msgid "Portuguese (Brazil)"
 msgstr "葡萄牙语 (巴西)"
 
-#: paperless/settings.py:686
+#: paperless/settings.py:688
 msgid "Portuguese"
 msgstr "葡萄牙语"
 
-#: paperless/settings.py:687
+#: paperless/settings.py:689
 msgid "Romanian"
 msgstr "罗马尼亚语"
 
-#: paperless/settings.py:688
+#: paperless/settings.py:690
 msgid "Russian"
 msgstr "俄语"
 
-#: paperless/settings.py:689
+#: paperless/settings.py:691
 msgid "Slovak"
 msgstr "Slovak 斯洛伐克语"
 
-#: paperless/settings.py:690
+#: paperless/settings.py:692
 msgid "Slovenian"
 msgstr "斯洛语尼亚语"
 
-#: paperless/settings.py:691
+#: paperless/settings.py:693
 msgid "Serbian"
 msgstr "塞尔维亚语"
 
-#: paperless/settings.py:692
+#: paperless/settings.py:694
 msgid "Swedish"
 msgstr "瑞典语"
 
-#: paperless/settings.py:693
+#: paperless/settings.py:695
 msgid "Turkish"
 msgstr "土耳其语"
 
-#: paperless/settings.py:694
+#: paperless/settings.py:696
 msgid "Ukrainian"
 msgstr "Ukrainian 乌克兰语"
 
-#: paperless/settings.py:695
+#: paperless/settings.py:697
 msgid "Chinese Simplified"
 msgstr "简体中文"
 
