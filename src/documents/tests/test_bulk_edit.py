@@ -463,7 +463,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
         mock_consume_file.assert_not_called()
 
-    @mock.patch("documents.tasks.bulk_update_documents.s")
+    @mock.patch("documents.tasks.bulk_update_documents.si")
     @mock.patch("documents.tasks.update_document_archive_file.s")
     @mock.patch("celery.chord.delay")
     def test_rotate(self, mock_chord, mock_update_document, mock_update_documents):
@@ -482,7 +482,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_chord.assert_called_once()
         self.assertEqual(result, "OK")
 
-    @mock.patch("documents.tasks.bulk_update_documents.s")
+    @mock.patch("documents.tasks.bulk_update_documents.si")
     @mock.patch("documents.tasks.update_document_archive_file.s")
     @mock.patch("pikepdf.Pdf.save")
     def test_rotate_with_error(
@@ -510,7 +510,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             self.assertIn(expected_str, error_str)
             mock_update_archive_file.assert_not_called()
 
-    @mock.patch("documents.tasks.bulk_update_documents.s")
+    @mock.patch("documents.tasks.bulk_update_documents.si")
     @mock.patch("documents.tasks.update_document_archive_file.s")
     @mock.patch("celery.chord.delay")
     def test_rotate_non_pdf(
