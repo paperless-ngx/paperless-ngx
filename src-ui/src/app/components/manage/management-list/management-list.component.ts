@@ -85,6 +85,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
   private _nameFilter: string
 
   public selectedObjects: Set<number> = new Set()
+  public togggleAll: boolean = false
 
   ngOnInit(): void {
     this.reloadData()
@@ -268,6 +269,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
   }
 
   clearSelection() {
+    this.togggleAll = false
     this.selectedObjects.clear()
   }
 

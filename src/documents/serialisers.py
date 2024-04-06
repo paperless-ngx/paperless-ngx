@@ -869,6 +869,9 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
             "delete",
             "redo_ocr",
             "set_permissions",
+            "rotate",
+            "merge",
+            "split",
         ],
         label="Method",
         write_only=True,
@@ -906,6 +909,12 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
             return bulk_edit.redo_ocr
         elif method == "set_permissions":
             return bulk_edit.set_permissions
+        elif method == "rotate":
+            return bulk_edit.rotate
+        elif method == "merge":
+            return bulk_edit.merge
+        elif method == "split":
+            return bulk_edit.split
         else:
             raise serializers.ValidationError("Unsupported method.")
 
@@ -984,6 +993,39 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
         if "merge" not in parameters:
             parameters["merge"] = False
 
+    def _validate_parameters_rotate(self, parameters):
+        try:
+            if (
+                "degrees" not in parameters
+                or not float(parameters["degrees"]).is_integer()
+            ):
+                raise serializers.ValidationError("invalid rotation degrees")
+        except ValueError:
+            raise serializers.ValidationError("invalid rotation degrees")
+
+    def _validate_parameters_split(self, parameters):
+        if "pages" not in parameters:
+            raise serializers.ValidationError("pages not specified")
+        try:
+            pages = []
+            docs = parameters["pages"].split(",")
+            for doc in docs:
+                if "-" in doc:
+                    pages.append(
+                        [
+                            x
+                            for x in range(
+                                int(doc.split("-")[0]),
+                                int(doc.split("-")[1]) + 1,
+                            )
+                        ],
+                    )
+                else:
+                    pages.append([int(doc)])
+            parameters["pages"] = pages
+        except ValueError:
+            raise serializers.ValidationError("invalid pages specified")
+
     def validate(self, attrs):
         method = attrs["method"]
         parameters = attrs["parameters"]
@@ -1000,6 +1042,14 @@ class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
             self._validate_storage_path(parameters)
         elif method == bulk_edit.set_permissions:
             self._validate_parameters_set_permissions(parameters)
+        elif method == bulk_edit.rotate:
+            self._validate_parameters_rotate(parameters)
+        elif method == bulk_edit.split:
+            if len(attrs["documents"]) > 1:
+                raise serializers.ValidationError(
+                    "Split method only supports one document",
+                )
+            self._validate_parameters_split(parameters)
 
         return attrs
 
@@ -1063,6 +1113,14 @@ class PostDocumentSerializer(serializers.Serializer):
         max_value=Document.ARCHIVE_SERIAL_NUMBER_MAX,
     )
 
+    custom_fields = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=CustomField.objects.all(),
+        label="Custom fields",
+        write_only=True,
+        required=False,
+    )
+
     def validate_document(self, document):
         document_data = document.file.read()
         mime_type = magic.from_buffer(document_data, mime=True)
@@ -1095,6 +1153,12 @@ class PostDocumentSerializer(serializers.Serializer):
     def validate_tags(self, tags):
         if tags:
             return [tag.id for tag in tags]
+        else:
+            return None
+
+    def validate_custom_fields(self, custom_fields):
+        if custom_fields:
+            return [custom_field.id for custom_field in custom_fields]
         else:
             return None
 

@@ -22,4 +22,4 @@ class Command(ProgressBarMixin, BaseCommand):
             Document.objects.all(),
             disable=self.no_progress_bar,
         ):
-            post_save.send(Document, instance=document)
+            post_save.send(Document, instance=document, created=False)

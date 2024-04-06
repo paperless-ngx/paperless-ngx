@@ -5,6 +5,8 @@ from pathlib import Path
 from typing import Optional
 
 import magic
+from guardian.shortcuts import get_groups_with_perms
+from guardian.shortcuts import get_users_with_perms
 
 
 @dataclasses.dataclass
@@ -87,6 +89,44 @@ class DocumentMetadataOverrides:
             self.custom_field_ids = list(set(self.custom_field_ids))
 
         return self
+
+    @staticmethod
+    def from_document(doc) -> "DocumentMetadataOverrides":
+        """
+        Fills in the overrides from a document object
+        """
+        overrides = DocumentMetadataOverrides()
+        overrides.title = doc.title
+        overrides.correspondent_id = doc.correspondent.id if doc.correspondent else None
+        overrides.document_type_id = doc.document_type.id if doc.document_type else None
+        overrides.storage_path_id = doc.storage_path.id if doc.storage_path else None
+        overrides.owner_id = doc.owner.id if doc.owner else None
+        overrides.tag_ids = list(doc.tags.values_list("id", flat=True))
+
+        overrides.view_users = get_users_with_perms(
+            doc,
+            only_with_perms_in=["view_document"],
+        ).values_list("id", flat=True)
+        overrides.change_users = get_users_with_perms(
+            doc,
+            only_with_perms_in=["change_document"],
+        ).values_list("id", flat=True)
+        overrides.custom_field_ids = list(
+            doc.custom_fields.values_list("id", flat=True),
+        )
+
+        groups_with_perms = get_groups_with_perms(
+            doc,
+            attach_perms=True,
+        )
+        overrides.view_groups = [
+            group.id for group, perms in groups_with_perms if "view_document" in perms
+        ]
+        overrides.change_groups = [
+            group.id for group, perms in groups_with_perms if "change_document" in perms
+        ]
+
+        return overrides
 
 
 class DocumentSource(IntEnum):

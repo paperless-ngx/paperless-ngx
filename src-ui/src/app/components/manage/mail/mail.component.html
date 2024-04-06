@@ -26,7 +26,7 @@
     @for (account of mailAccounts; track account) {
       <li class="list-group-item">
         <div class="row">
-          <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailAccount(account)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailAccount)">{{account.name}}</button></div>
+          <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editMailAccount(account)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailAccount)">{{account.name}}</button></div>
           <div class="col d-flex align-items-center">{{account.imap_server}}</div>
           <div class="col">
             <div class="btn-group">
@@ -70,7 +70,7 @@
     @for (rule of mailRules; track rule) {
       <li class="list-group-item">
         <div class="row">
-          <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editMailRule(rule)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailRule)">{{rule.name}}</button></div>
+          <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editMailRule(rule)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailRule)">{{rule.name}}</button></div>
           <div class="col d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
           <div class="col">
             <div class="btn-group">

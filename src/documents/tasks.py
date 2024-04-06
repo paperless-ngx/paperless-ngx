@@ -18,6 +18,7 @@ from whoosh.writing import AsyncWriter
 from documents import index
 from documents import sanity_checker
 from documents.barcodes import BarcodePlugin
+from documents.caching import clear_document_caches
 from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
 from documents.consumer import Consumer
@@ -213,6 +214,7 @@ def bulk_update_documents(document_ids):
     ix = index.open_index()
 
     for doc in documents:
+        clear_document_caches(doc.pk)
         document_updated.send(
             sender=None,
             document=doc,
@@ -304,6 +306,8 @@ def update_document_archive_file(document_id):
 
             with index.open_index_writer() as writer:
                 index.update_document(writer, document)
+
+            clear_document_caches(document.pk)
 
     except Exception:
         logger.exception(
