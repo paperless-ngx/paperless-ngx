@@ -130,11 +130,30 @@ export class AppComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.router.navigate(['/dashboard'])
       })
-    this.hotKeyService
-      .addShortcut({ keys: 'd', description: $localize`Documents` })
-      .subscribe(() => {
-        this.router.navigate(['/documents'])
-      })
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Document
+      )
+    ) {
+      this.hotKeyService
+        .addShortcut({ keys: 'd', description: $localize`Documents` })
+        .subscribe(() => {
+          this.router.navigate(['/documents'])
+        })
+    }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.Change,
+        PermissionType.UISettings
+      )
+    ) {
+      this.hotKeyService
+        .addShortcut({ keys: 's', description: $localize`Settings` })
+        .subscribe(() => {
+          this.router.navigate(['/settings'])
+        })
+    }
 
     const prevBtnTitle = $localize`Prev`
     const nextBtnTitle = $localize`Next`
