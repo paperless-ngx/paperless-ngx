@@ -18,6 +18,10 @@
     height: 0.8em;
   }
 
+  .nav-group:not(:has(.app-link)) .sidebar-heading {
+    display: none !important;
+  }
+
   // These come from the col-* classes for non-slim sidebar, needed for animation
   @media (min-width: 768px) {
     max-width: 25%;

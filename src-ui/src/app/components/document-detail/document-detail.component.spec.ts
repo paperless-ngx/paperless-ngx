@@ -75,6 +75,8 @@ import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service
 import { PdfViewerComponent } from '../common/pdf-viewer/pdf-viewer.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { environment } from 'src/environments/environment'
+import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
+import { SplitConfirmDialogComponent } from '../common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
 
 const doc: Document = {
   id: 3,
@@ -171,6 +173,8 @@ describe('DocumentDetailComponent', () => {
         ShareLinksDropdownComponent,
         CustomFieldsDropdownComponent,
         PdfViewerComponent,
+        SplitConfirmDialogComponent,
+        RotateConfirmDialogComponent,
       ],
       providers: [
         DocumentTitlePipe,
@@ -1068,6 +1072,58 @@ describe('DocumentDetailComponent', () => {
     expect(
       fixture.debugElement.query(By.css('object.preview-sticky'))
     ).not.toBeUndefined()
+  })
+
+  it('should support split', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    initNormally()
+    component.splitDocument()
+    expect(modal).not.toBeUndefined()
+    modal.componentInstance.documentID = doc.id
+    modal.componentInstance.totalPages = 5
+    modal.componentInstance.page = 2
+    modal.componentInstance.addSplit()
+    modal.componentInstance.confirm()
+    let req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    expect(req.request.body).toEqual({
+      documents: [doc.id],
+      method: 'split',
+      parameters: { pages: '1-2,3-5' },
+    })
+    req.error(new ProgressEvent('failed'))
+    modal.componentInstance.confirm()
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    req.flush(true)
+  })
+
+  it('should support rotate', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    initNormally()
+    component.rotateDocument()
+    expect(modal).not.toBeUndefined()
+    modal.componentInstance.documentID = doc.id
+    modal.componentInstance.rotate()
+    modal.componentInstance.confirm()
+    let req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    expect(req.request.body).toEqual({
+      documents: [doc.id],
+      method: 'rotate',
+      parameters: { degrees: 90 },
+    })
+    req.error(new ProgressEvent('failed'))
+    modal.componentInstance.confirm()
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    req.flush(true)
   })
 
   function initNormally() {

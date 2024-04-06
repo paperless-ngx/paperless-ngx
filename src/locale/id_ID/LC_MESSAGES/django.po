@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-04 17:00-0800\n"
-"PO-Revision-Date: 2024-03-05 01:01\n"
+"POT-Creation-Date: 2024-04-04 14:31-0700\n"
+"PO-Revision-Date: 2024-04-04 21:33\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -47,11 +47,11 @@ msgstr "Ekspresi reguler"
 
 #: documents/models.py:58 documents/models.py:902
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Kata samar"
 
 #: documents/models.py:59
 msgid "Automatic"
-msgstr ""
+msgstr "Otomatis"
 
 #: documents/models.py:62 documents/models.py:397 documents/models.py:1218
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
@@ -365,7 +365,7 @@ msgstr "kueri teks lengkap"
 
 #: documents/models.py:446
 msgid "more like this"
-msgstr ""
+msgstr "lebih seperti ini"
 
 #: documents/models.py:447
 msgid "has tags in"
@@ -669,27 +669,27 @@ msgstr "memiliki jenis dokumen ini"
 
 #: documents/models.py:987
 msgid "has this correspondent"
-msgstr ""
+msgstr "memiliki koresponden ini"
 
 #: documents/models.py:991
 msgid "workflow trigger"
-msgstr ""
+msgstr "pemicu alur kerja"
 
 #: documents/models.py:992
 msgid "workflow triggers"
-msgstr ""
+msgstr "pemicu alur kerja"
 
 #: documents/models.py:1002
 msgid "Assignment"
-msgstr ""
+msgstr "Tugas"
 
 #: documents/models.py:1006
 msgid "Removal"
-msgstr ""
+msgstr "Penghapusan"
 
 #: documents/models.py:1010
 msgid "Workflow Action Type"
-msgstr ""
+msgstr "Jenis Aksi Alur Kerja"
 
 #: documents/models.py:1016
 msgid "assign title"
@@ -757,11 +757,11 @@ msgstr ""
 
 #: documents/models.py:1132
 msgid "remove these correspondent(s)"
-msgstr ""
+msgstr "hapus koresponden ini"
 
 #: documents/models.py:1137
 msgid "remove all correspondents"
-msgstr ""
+msgstr "hapus semua koresponden"
 
 #: documents/models.py:1144
 msgid "remove these storage path(s)"
@@ -773,11 +773,11 @@ msgstr ""
 
 #: documents/models.py:1156
 msgid "remove these owner(s)"
-msgstr ""
+msgstr "hapus pemilik ini"
 
 #: documents/models.py:1161
 msgid "remove all owners"
-msgstr ""
+msgstr "hapus semua pemilik"
 
 #: documents/models.py:1168
 msgid "remove view permissions for these users"
@@ -797,7 +797,7 @@ msgstr ""
 
 #: documents/models.py:1194
 msgid "remove all permissions"
-msgstr ""
+msgstr "hapus semua izin"
 
 #: documents/models.py:1201
 msgid "remove these custom fields"
@@ -809,11 +809,11 @@ msgstr ""
 
 #: documents/models.py:1210
 msgid "workflow action"
-msgstr ""
+msgstr "aksi alur kerja"
 
 #: documents/models.py:1211
 msgid "workflow actions"
-msgstr ""
+msgstr "aksi alur kerja"
 
 #: documents/models.py:1220 paperless_mail/models.py:95
 msgid "order"
@@ -821,7 +821,7 @@ msgstr "urut"
 
 #: documents/models.py:1226
 msgid "triggers"
-msgstr ""
+msgstr "pemicu"
 
 #: documents/models.py:1233
 msgid "actions"
@@ -840,25 +840,26 @@ msgstr "Ekspresi reguler tidak valid: %(error)s"
 msgid "Invalid color."
 msgstr "Warna tidak valid."
 
-#: documents/serialisers.py:1072
+#: documents/serialisers.py:1130
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Jenis berkas %(type)s tidak didukung"
 
-#: documents/serialisers.py:1175
+#: documents/serialisers.py:1239
 msgid "Invalid variable detected."
 msgstr "Variabel ilegal terdeteksi."
 
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
-msgstr ""
+msgstr "Halo dari %(site_name)s!"
 
 #: documents/templates/account/email/base_message.txt:5
 #, python-format
 msgid "Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
-msgstr ""
+msgstr "Terima kasih telah menggunakan %(site_name)s!\n"
+"%(site_domain)s"
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
@@ -871,7 +872,7 @@ msgstr "Mohon masuk."
 #: documents/templates/account/login.html:12
 #, python-format
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
-msgstr ""
+msgstr "Tidak memiliki akun? <a href=\"%(signup_url)s\">Daftar</a>"
 
 #: documents/templates/account/login.html:19
 #: documents/templates/account/signup.html:15
@@ -895,11 +896,11 @@ msgstr "Lupa kata sandi Anda?"
 #: documents/templates/account/login.html:45
 #: documents/templates/account/signup.html:49
 msgid "or sign in via"
-msgstr ""
+msgstr "atau masuk melalui"
 
 #: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
-msgstr "Paperless-ngx permintaan mengatur ulang kata sandi"
+msgstr "Permintaan atur ulang kata sandi Paperless-ngx"
 
 #: documents/templates/account/password_reset.html:9
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
@@ -907,7 +908,7 @@ msgstr "Masukkan email Anda di bawah ini, dan kami akan kirim email instruksi un
 
 #: documents/templates/account/password_reset.html:12
 msgid "An error occurred. Please try again."
-msgstr "Terjadi kesalahan. Harap coba lagi."
+msgstr "Terjadi sebuah kesalahan. Harap coba kembali."
 
 #: documents/templates/account/password_reset.html:15
 msgid "Email"
@@ -919,7 +920,7 @@ msgstr "Kirim saya instruksi!"
 
 #: documents/templates/account/password_reset_done.html:5
 msgid "Paperless-ngx reset password sent"
-msgstr ""
+msgstr "Permintaan atur ulang kata sandi Paperless-ngx terkirim"
 
 #: documents/templates/account/password_reset_done.html:9
 msgid "Check your inbox."
@@ -939,7 +940,7 @@ msgstr "Setel kata sandi baru."
 
 #: documents/templates/account/password_reset_from_key.html:15
 msgid "request a new password reset"
-msgstr ""
+msgstr "minta atur ulang kata sandi baru"
 
 #: documents/templates/account/password_reset_from_key.html:17
 msgid "New Password"
@@ -968,12 +969,12 @@ msgstr ""
 
 #: documents/templates/account/signup.html:5
 msgid "Paperless-ngx sign up"
-msgstr ""
+msgstr "Daftar Paperless-ngx"
 
 #: documents/templates/account/signup.html:10
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
-msgstr ""
+msgstr "Sudah memiliki akun? <a href=\"%(login_url)s\">Masuk</a>"
 
 #: documents/templates/account/signup.html:16
 #: documents/templates/socialaccount/signup.html:14
@@ -982,12 +983,12 @@ msgstr ""
 
 #: documents/templates/account/signup.html:18
 msgid "Password (again)"
-msgstr ""
+msgstr "Kata Sandi (ulangi)"
 
 #: documents/templates/account/signup.html:36
 #: documents/templates/socialaccount/signup.html:27
 msgid "Sign up"
-msgstr ""
+msgstr "Daftar"
 
 #: documents/templates/index.html:61
 msgid "Paperless-ngx is loading..."
@@ -1012,34 +1013,34 @@ msgstr "Tautan telah kedaluwarsa."
 #: documents/templates/socialaccount/authentication_error.html:5
 #: documents/templates/socialaccount/login.html:5
 msgid "Paperless-ngx social account sign in"
-msgstr ""
+msgstr "Paperless-ngx masuk dengan akun sosial"
 
 #: documents/templates/socialaccount/authentication_error.html:10
 #, python-format
 msgid "An error occurred while attempting to login via your social network account. Back to the <a href=\"%(login_url)s\">login page</a>"
-msgstr ""
+msgstr "Terjadi sebuah kesalahan saat masuk dengan akun sosial Anda. Kembali ke halaman <a href=\"%(login_url)s\">masuk</a>"
 
 #: documents/templates/socialaccount/login.html:10
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
-msgstr ""
+msgstr "Anda akan menghubungkan akun pihak ketiga dari %(provider)s."
 
 #: documents/templates/socialaccount/login.html:13
 msgid "Continue"
-msgstr ""
+msgstr "Lanjutkan"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
-msgstr ""
+msgstr "Paperless-ngx daftar dengan akun sosial"
 
 #: documents/templates/socialaccount/signup.html:10
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
-msgstr ""
+msgstr "Anda akan menggunakan akun %(provider_name)s Anda untuk masuk."
 
 #: documents/templates/socialaccount/signup.html:11
 msgid "As a final step, please complete the following form:"
-msgstr ""
+msgstr "Sebagai langkah terakhir, mohon formulir berikut:"
 
 #: documents/validators.py:17
 #, python-brace-format
@@ -1086,11 +1087,11 @@ msgstr "lewati"
 
 #: paperless/models.py:40
 msgid "redo"
-msgstr ""
+msgstr "ulangi"
 
 #: paperless/models.py:41
 msgid "force"
-msgstr ""
+msgstr "paksa"
 
 #: paperless/models.py:42
 msgid "skip_noarchive"
@@ -1194,141 +1195,141 @@ msgstr ""
 
 #: paperless/models.py:171
 msgid "Application title"
-msgstr ""
+msgstr "Judul aplikasi"
 
 #: paperless/models.py:178
 msgid "Application logo"
-msgstr ""
+msgstr "Judul aplikasi"
 
 #: paperless/models.py:188
 msgid "paperless application settings"
-msgstr ""
+msgstr "pengaturan aplikasi paperless"
 
-#: paperless/settings.py:664
+#: paperless/settings.py:666
 msgid "English (US)"
 msgstr "Inggris (AS)"
 
-#: paperless/settings.py:665
+#: paperless/settings.py:667
 msgid "Arabic"
 msgstr "Arab"
 
-#: paperless/settings.py:666
+#: paperless/settings.py:668
 msgid "Afrikaans"
 msgstr ""
 
-#: paperless/settings.py:667
+#: paperless/settings.py:669
 msgid "Belarusian"
 msgstr "Belarusia"
 
-#: paperless/settings.py:668
+#: paperless/settings.py:670
 msgid "Bulgarian"
 msgstr ""
 
-#: paperless/settings.py:669
+#: paperless/settings.py:671
 msgid "Catalan"
 msgstr ""
 
-#: paperless/settings.py:670
+#: paperless/settings.py:672
 msgid "Czech"
 msgstr "Bahasa Ceko"
 
-#: paperless/settings.py:671
+#: paperless/settings.py:673
 msgid "Danish"
 msgstr ""
 
-#: paperless/settings.py:672
+#: paperless/settings.py:674
 msgid "German"
 msgstr "Jerman"
 
-#: paperless/settings.py:673
+#: paperless/settings.py:675
 msgid "Greek"
 msgstr "Yunani"
 
-#: paperless/settings.py:674
+#: paperless/settings.py:676
 msgid "English (GB)"
 msgstr "Inggris (GB)"
 
-#: paperless/settings.py:675
+#: paperless/settings.py:677
 msgid "Spanish"
 msgstr "Spanyol"
 
-#: paperless/settings.py:676
+#: paperless/settings.py:678
 msgid "Finnish"
 msgstr ""
 
-#: paperless/settings.py:677
+#: paperless/settings.py:679
 msgid "French"
 msgstr "Prancis"
 
-#: paperless/settings.py:678
+#: paperless/settings.py:680
 msgid "Hungarian"
 msgstr "Hungaria"
 
-#: paperless/settings.py:679
+#: paperless/settings.py:681
 msgid "Italian"
 msgstr "Italia"
 
-#: paperless/settings.py:680
+#: paperless/settings.py:682
 msgid "Japanese"
 msgstr ""
 
-#: paperless/settings.py:681
+#: paperless/settings.py:683
 msgid "Luxembourgish"
 msgstr "Luksemburg"
 
-#: paperless/settings.py:682
+#: paperless/settings.py:684
 msgid "Norwegian"
 msgstr "Norwegia"
 
-#: paperless/settings.py:683
+#: paperless/settings.py:685
 msgid "Dutch"
 msgstr "Belanda"
 
-#: paperless/settings.py:684
+#: paperless/settings.py:686
 msgid "Polish"
 msgstr "Polandia"
 
-#: paperless/settings.py:685
+#: paperless/settings.py:687
 msgid "Portuguese (Brazil)"
 msgstr "Portugis (Brasil)"
 
-#: paperless/settings.py:686
+#: paperless/settings.py:688
 msgid "Portuguese"
 msgstr "Portugis"
 
-#: paperless/settings.py:687
+#: paperless/settings.py:689
 msgid "Romanian"
 msgstr "Rumania"
 
-#: paperless/settings.py:688
+#: paperless/settings.py:690
 msgid "Russian"
 msgstr "Rusia"
 
-#: paperless/settings.py:689
+#: paperless/settings.py:691
 msgid "Slovak"
 msgstr "Slovakia"
 
-#: paperless/settings.py:690
+#: paperless/settings.py:692
 msgid "Slovenian"
 msgstr "Slovenia"
 
-#: paperless/settings.py:691
+#: paperless/settings.py:693
 msgid "Serbian"
 msgstr "Serbia"
 
-#: paperless/settings.py:692
+#: paperless/settings.py:694
 msgid "Swedish"
 msgstr "Swedia"
 
-#: paperless/settings.py:693
+#: paperless/settings.py:695
 msgid "Turkish"
 msgstr "Turki"
 
-#: paperless/settings.py:694
+#: paperless/settings.py:696
 msgid "Ukrainian"
 msgstr "Ukraina"
 
-#: paperless/settings.py:695
+#: paperless/settings.py:697
 msgid "Chinese Simplified"
 msgstr "Mandarin Sederhana"
 

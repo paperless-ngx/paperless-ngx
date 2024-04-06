@@ -1,6 +1,9 @@
+import logging
 import shutil
 from os import utime
 from pathlib import Path
+from subprocess import CompletedProcess
+from subprocess import run
 from typing import Optional
 from typing import Union
 
@@ -56,3 +59,54 @@ def maybe_override_pixel_limit() -> None:
         if pixel_count == 0:
             pixel_count = None
         Image.MAX_IMAGE_PIXELS = pixel_count
+
+
+def run_subprocess(
+    arguments: list[str],
+    env: Optional[dict[str, str]] = None,
+    logger: Optional[logging.Logger] = None,
+    *,
+    check_exit_code: bool = True,
+    log_stdout: bool = True,
+    log_stderr: bool = True,
+) -> CompletedProcess:
+    """
+    Runs a subprocess and logs its output, checking return code if requested
+    """
+
+    proc_name = arguments[0]
+
+    completed_proc = run(args=arguments, env=env, capture_output=True, check=False)
+
+    if logger:
+        logger.info(f"{proc_name} exited {completed_proc.returncode}")
+
+    if log_stdout and logger and completed_proc.stdout:
+        stdout_str = (
+            completed_proc.stdout.decode("utf8", errors="ignore")
+            .strip()
+            .split(
+                "\n",
+            )
+        )
+        logger.info(f"{proc_name} stdout:")
+        for line in stdout_str:
+            logger.info(line)
+
+    if log_stderr and logger and completed_proc.stderr:
+        stderr_str = (
+            completed_proc.stderr.decode("utf8", errors="ignore")
+            .strip()
+            .split(
+                "\n",
+            )
+        )
+        logger.info(f"{proc_name} stderr:")
+        for line in stderr_str:
+            logger.warning(line)
+
+    # Last, if requested, after logging outputs
+    if check_exit_code:
+        completed_proc.check_returncode()
+
+    return completed_proc

@@ -891,7 +891,8 @@ class BulkEditView(GenericAPIView, PassUserMixin):
             document_objs = Document.objects.filter(pk__in=documents)
             has_perms = (
                 all((doc.owner == user or doc.owner is None) for doc in document_objs)
-                if method == bulk_edit.set_permissions
+                if method
+                in [bulk_edit.set_permissions, bulk_edit.delete, bulk_edit.rotate]
                 else all(
                     has_perms_owner_aware(user, "change_document", doc)
                     for doc in document_objs
@@ -929,6 +930,7 @@ class PostDocumentView(GenericAPIView):
         title = serializer.validated_data.get("title")
         created = serializer.validated_data.get("created")
         archive_serial_number = serializer.validated_data.get("archive_serial_number")
+        custom_field_ids = serializer.validated_data.get("custom_fields")
 
         t = int(mktime(datetime.now().timetuple()))
 
@@ -956,6 +958,7 @@ class PostDocumentView(GenericAPIView):
             created=created,
             asn=archive_serial_number,
             owner_id=request.user.id,
+            custom_field_ids=custom_field_ids,
         )
 
         async_task = consume_file.delay(

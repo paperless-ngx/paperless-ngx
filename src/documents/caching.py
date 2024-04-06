@@ -189,13 +189,21 @@ def refresh_metadata_cache(
     cache.touch(doc_key, timeout)
 
 
-def clear_metadata_cache(document_id: int) -> None:
-    doc_key = get_metadata_cache_key(document_id)
-    cache.delete(doc_key)
-
-
 def get_thumbnail_modified_key(document_id: int) -> str:
     """
     Builds the key to store a thumbnail's timestamp
     """
     return f"doc_{document_id}_thumbnail_modified"
+
+
+def clear_document_caches(document_id: int) -> None:
+    """
+    Removes all cached items for the given document
+    """
+    cache.delete_many(
+        [
+            get_suggestion_cache_key(document_id),
+            get_metadata_cache_key(document_id),
+            get_thumbnail_modified_key(document_id),
+        ],
+    )

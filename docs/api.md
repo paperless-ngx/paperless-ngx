@@ -288,6 +288,8 @@ The endpoint supports the following optional form fields:
 - `tags`: Similar to correspondent. Specify this multiple times to
   have multiple tags added to the document.
 - `archive_serial_number`: An optional archive serial number to set.
+- `custom_fields`: An array of custom field ids to assign (with an empty
+  value) to the document.
 
 The endpoint will immediately return HTTP 200 if the document consumption
 process was started successfully, with the UUID of the consumption task
@@ -376,6 +378,18 @@ The following methods are supported:
     - `"merge": true or false` (defaults to false)
   - The `merge` flag determines if the supplied permissions will overwrite all existing permissions (including
     removing them) or be merged with existing permissions.
+- `merge`
+  - No additional `parameters` required.
+  - The ordering of the merged document is determined by the list of IDs.
+  - Optional `parameters`:
+    - `"metadata_document_id": DOC_ID` apply metadata (tags, correspondent, etc.) from this document to the merged document.
+- `split`
+  - Requires `parameters`:
+    - `"pages": [..]` The list should be a list of pages and/or a ranges, separated by commas e.g. `"[1,2-3,4,5-7]"`
+  - The split operation only accepts a single document.
+- `rotate`
+  - Requires `parameters`:
+    - `"degrees": DEGREES`. Must be an integer i.e. 90, 180, 270
 
 ### Objects
 

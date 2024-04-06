@@ -116,9 +116,13 @@ import { ConfirmButtonComponent } from './components/common/confirm-button/confi
 import { MonetaryComponent } from './components/common/input/monetary/monetary.component'
 import { SystemStatusDialogComponent } from './components/common/system-status-dialog/system-status-dialog.component'
 import { NgxFilesizeModule } from 'ngx-filesize'
+import { RotateConfirmDialogComponent } from './components/common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
+import { MergeConfirmDialogComponent } from './components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
+import { SplitConfirmDialogComponent } from './components/common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
 import {
   airplane,
   archive,
+  arrowClockwise,
   arrowCounterclockwise,
   arrowDown,
   arrowLeft,
@@ -127,6 +131,7 @@ import {
   arrowRightShort,
   arrowUpRight,
   asterisk,
+  bodyText,
   boxArrowUp,
   boxArrowUpRight,
   boxes,
@@ -174,6 +179,7 @@ import {
   hddStack,
   house,
   infoCircle,
+  journals,
   link,
   listTask,
   listUl,
@@ -188,6 +194,7 @@ import {
   plus,
   plusCircle,
   questionCircle,
+  scissors,
   search,
   slashCircle,
   sliders2Vertical,
@@ -209,6 +216,7 @@ import {
 const icons = {
   airplane,
   archive,
+  arrowClockwise,
   arrowCounterclockwise,
   arrowDown,
   arrowLeft,
@@ -217,6 +225,7 @@ const icons = {
   arrowRightShort,
   arrowUpRight,
   asterisk,
+  bodyText,
   boxArrowUp,
   boxArrowUpRight,
   boxes,
@@ -264,6 +273,7 @@ const icons = {
   hddStack,
   house,
   infoCircle,
+  journals,
   link,
   listTask,
   listUl,
@@ -278,6 +288,7 @@ const icons = {
   plus,
   plusCircle,
   questionCircle,
+  scissors,
   search,
   slashCircle,
   sliders2Vertical,
@@ -458,6 +469,9 @@ function initializeApp(settings: SettingsService) {
     ConfirmButtonComponent,
     MonetaryComponent,
     SystemStatusDialogComponent,
+    RotateConfirmDialogComponent,
+    MergeConfirmDialogComponent,
+    SplitConfirmDialogComponent,
   ],
   imports: [
     BrowserModule,

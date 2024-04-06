@@ -780,3 +780,17 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
             self.assertEqual(ContentType.objects.count(), num_content_type_objects)
             self.assertEqual(Permission.objects.count(), num_permission_objects + 1)
+
+    def test_exporter_with_auditlog_disabled(self):
+        shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
+        shutil.copytree(
+            os.path.join(os.path.dirname(__file__), "samples", "documents"),
+            os.path.join(self.dirs.media_dir, "documents"),
+        )
+
+        with override_settings(
+            AUDIT_LOG_ENABLED=False,
+        ):
+            manifest = self._do_export(use_filename_format=True)
+            for obj in manifest:
+                self.assertNotEqual(obj["model"], "auditlog.logentry")
