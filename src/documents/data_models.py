@@ -116,7 +116,7 @@ class DocumentMetadataOverrides:
             ).values_list("id", flat=True),
         )
         overrides.custom_field_ids = list(
-            doc.custom_fields.values_list("id", flat=True),
+            doc.custom_fields.values_list("field", flat=True),
         )
 
         groups_with_perms = get_groups_with_perms(
