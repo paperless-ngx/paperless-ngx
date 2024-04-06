@@ -4,14 +4,12 @@
 
 ### Notable Changes
 
-- Feature: PDF actions - merge, split \& rotate [@shamoon](https://github.com/shamoon) ([#6094](https://github.com/paperless-ngx/paperless-ngx/pull/6094))
-- Change: enable auditlog by default, fix import / export [@shamoon](https://github.com/shamoon) ([#6267](https://github.com/paperless-ngx/paperless-ngx/pull/6267))
+- Feature: PDF actions - merge, split \& rotate @shamoon ([#6094](https://github.com/paperless-ngx/paperless-ngx/pull/6094))
+- Change: enable auditlog by default, fix import / export @shamoon ([#6267](https://github.com/paperless-ngx/paperless-ngx/pull/6267))
 
-### Features
+### Enhancements
 
-- Feature: PDF actions - merge, split \& rotate [@shamoon](https://github.com/shamoon) ([#6094](https://github.com/paperless-ngx/paperless-ngx/pull/6094))
-- Change: enable auditlog by default, fix import / export [@shamoon](https://github.com/shamoon) ([#6267](https://github.com/paperless-ngx/paperless-ngx/pull/6267))
-- Enhancement: always place search term first in autocomplete results [@shamoon](https://github.com/shamoon) ([#6142](https://github.com/paperless-ngx/paperless-ngx/pull/6142))
+- Enhancement: always place search term first in autocomplete results @shamoon ([#6142](https://github.com/paperless-ngx/paperless-ngx/pull/6142))
 
 ### Maintenance
 
