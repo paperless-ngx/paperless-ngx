@@ -195,7 +195,7 @@ def rotate(doc_ids: list[int], degrees: int):
             logger.exception(f"Error rotating document {doc.id}: {e}")
 
     if len(affected_docs) > 0:
-        bulk_update_task = bulk_update_documents.s(document_ids=affected_docs)
+        bulk_update_task = bulk_update_documents.si(document_ids=affected_docs)
         chord(header=rotate_tasks, body=bulk_update_task).delay()
 
     return "OK"
