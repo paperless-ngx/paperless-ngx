@@ -349,10 +349,16 @@ When you use the provided docker compose script, put the export inside
 the `export` folder in your paperless source directory. Specify
 `../export` as the `source`.
 
+Note that .zip files (as can be generated from the exporter) are not supported.
+
 !!! note
 
     Importing from a previous version of Paperless may work, but for best
     results it is suggested to match the versions.
+
+!!! warning
+
+    The importer should be run against a completely empty installation (database and directories) of Paperless-ngx.
 
 ### Document retagger {#retagger}
 
