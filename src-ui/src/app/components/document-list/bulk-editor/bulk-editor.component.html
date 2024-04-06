@@ -80,18 +80,26 @@
 
             <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="setPermissions()" [disabled]="!userOwnsAll || !userCanEditAll">
               <i-bs name="person-fill-lock"></i-bs><div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Permissions</ng-container></div>
-              </button>
+            </button>
 
-              <div ngbDropdown>
-                <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
-                  <i-bs name="three-dots"></i-bs>
-                  <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
+            <div ngbDropdown>
+              <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
+                <i-bs name="three-dots"></i-bs>
+                <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
+              </button>
+              <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
+                <button ngbDropdownItem (click)="redoOcrSelected()" [disabled]="!userCanEditAll">
+                  <i-bs name="body-text"></i-bs>&nbsp;<ng-container i18n>Redo OCR</ng-container>
                 </button>
-                <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
-                  <button ngbDropdownItem (click)="redoOcrSelected()" [disabled]="!userCanEditAll" i18n>Redo OCR</button>
-                </div>
+                <button ngbDropdownItem (click)="rotateSelected()" [disabled]="!userOwnsAll">
+                  <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
+                </button>
+                <button ngbDropdownItem (click)="mergeSelected()" [disabled]="!userCanEditAll || list.selected.size < 2">
+                  <i-bs name="journals"></i-bs>&nbsp;<ng-container i18n>Merge</ng-container>
+                </button>
               </div>
             </div>
+          </div>
 
             <div class="btn-group btn-group-sm">
               <button class="btn btn-sm btn-outline-primary" [disabled]="awaitingDownload" (click)="downloadSelected()">
@@ -113,22 +121,16 @@
                     <div class="form-group ps-3 mb-2">
                       <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="downloadFileType_archive" formControlName="downloadFileTypeArchive" />
-                        <label class="form-check-label" for="downloadFileType_archive" i18n>
-                  Archived files
-                </label>
+                        <label class="form-check-label" for="downloadFileType_archive" i18n>Archived files</label>
                       </div>
                       <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="downloadFileType_originals" formControlName="downloadFileTypeOriginals" />
-                        <label class="form-check-label" for="downloadFileType_originals" i18n>
-                  Original files
-                </label>
+                        <label class="form-check-label" for="downloadFileType_originals" i18n>Original files</label>
                       </div>
                     </div>
                     <div class="form-check">
                       <input type="checkbox" class="form-check-input" id="downloadUseFormatting" formControlName="downloadUseFormatting" />
-                      <label class="form-check-label" for="downloadUseFormatting" i18n>
-                Use formatted filename
-              </label>
+                      <label class="form-check-label" for="downloadUseFormatting" i18n>Use formatted filename</label>
                     </div>
                   </form>
                 </div>

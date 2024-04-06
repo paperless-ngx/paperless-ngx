@@ -934,7 +934,7 @@ class PreConsumeTestCase(TestCase):
 
         return super().setUp()
 
-    @mock.patch("documents.consumer.run")
+    @mock.patch("documents.consumer.run_subprocess")
     @override_settings(PRE_CONSUME_SCRIPT=None)
     def test_no_pre_consume_script(self, m):
         c = Consumer()
@@ -942,7 +942,7 @@ class PreConsumeTestCase(TestCase):
         c.run_pre_consume_script()
         m.assert_not_called()
 
-    @mock.patch("documents.consumer.run")
+    @mock.patch("documents.consumer.run_subprocess")
     @mock.patch("documents.consumer.Consumer._send_progress")
     @override_settings(PRE_CONSUME_SCRIPT="does-not-exist")
     def test_pre_consume_script_not_found(self, m, m2):
@@ -951,7 +951,7 @@ class PreConsumeTestCase(TestCase):
         c.working_copy = "path-to-file"
         self.assertRaises(ConsumerError, c.run_pre_consume_script)
 
-    @mock.patch("documents.consumer.run")
+    @mock.patch("documents.consumer.run_subprocess")
     def test_pre_consume_script(self, m):
         with tempfile.NamedTemporaryFile() as script:
             with override_settings(PRE_CONSUME_SCRIPT=script.name):
@@ -963,10 +963,10 @@ class PreConsumeTestCase(TestCase):
 
                 m.assert_called_once()
 
-                args, kwargs = m.call_args
+                args, _ = m.call_args
 
-                command = kwargs["args"]
-                environment = kwargs["env"]
+                command = args[0]
+                environment = args[1]
 
                 self.assertEqual(command[0], script.name)
                 self.assertEqual(command[1], "path-to-file")
@@ -1050,7 +1050,7 @@ class PostConsumeTestCase(TestCase):
 
         return super().setUp()
 
-    @mock.patch("documents.consumer.run")
+    @mock.patch("documents.consumer.run_subprocess")
     @override_settings(POST_CONSUME_SCRIPT=None)
     def test_no_post_consume_script(self, m):
         doc = Document.objects.create(title="Test", mime_type="application/pdf")
@@ -1075,7 +1075,7 @@ class PostConsumeTestCase(TestCase):
             doc,
         )
 
-    @mock.patch("documents.consumer.run")
+    @mock.patch("documents.consumer.run_subprocess")
     def test_post_consume_script_simple(self, m):
         with tempfile.NamedTemporaryFile() as script:
             with override_settings(POST_CONSUME_SCRIPT=script.name):
@@ -1085,7 +1085,7 @@ class PostConsumeTestCase(TestCase):
 
                 m.assert_called_once()
 
-    @mock.patch("documents.consumer.run")
+    @mock.patch("documents.consumer.run_subprocess")
     def test_post_consume_script_with_correspondent(self, m):
         with tempfile.NamedTemporaryFile() as script:
             with override_settings(POST_CONSUME_SCRIPT=script.name):
@@ -1106,10 +1106,10 @@ class PostConsumeTestCase(TestCase):
 
                 m.assert_called_once()
 
-                _, kwargs = m.call_args
+                args, _ = m.call_args
 
-                command = kwargs["args"]
-                environment = kwargs["env"]
+                command = args[0]
+                environment = args[1]
 
                 self.assertEqual(command[0], script.name)
                 self.assertEqual(command[1], str(doc.pk))

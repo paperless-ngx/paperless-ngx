@@ -1,5 +1,4 @@
 from pathlib import Path
-from subprocess import run
 
 import img2pdf
 from django.conf import settings
@@ -7,6 +6,7 @@ from PIL import Image
 
 from documents.utils import copy_basic_file_stats
 from documents.utils import maybe_override_pixel_limit
+from documents.utils import run_subprocess
 
 
 def convert_from_tiff_to_pdf(tiff_path: Path, target_directory: Path) -> Path:
@@ -27,7 +27,7 @@ def convert_from_tiff_to_pdf(tiff_path: Path, target_directory: Path) -> Path:
         # Note the save into the temp folder, so as not to trigger a new
         # consume
         scratch_image = target_directory / tiff_path.name
-        run(
+        run_subprocess(
             [
                 settings.CONVERT_BINARY,
                 "-alpha",

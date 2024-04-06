@@ -781,3 +781,153 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         m.assert_called_once()
+
+    @mock.patch("documents.serialisers.bulk_edit.rotate")
+    def test_rotate(self, m):
+        m.return_value = "OK"
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id, self.doc3.id],
+                    "method": "rotate",
+                    "parameters": {"degrees": 90},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertCountEqual(args[0], [self.doc2.id, self.doc3.id])
+        self.assertEqual(kwargs["degrees"], 90)
+
+    @mock.patch("documents.serialisers.bulk_edit.rotate")
+    def test_rotate_invalid_params(self, m):
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id, self.doc3.id],
+                    "method": "rotate",
+                    "parameters": {"degrees": "foo"},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id, self.doc3.id],
+                    "method": "rotate",
+                    "parameters": {"degrees": 90.5},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        m.assert_not_called()
+
+    @mock.patch("documents.serialisers.bulk_edit.merge")
+    def test_merge(self, m):
+        m.return_value = "OK"
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id, self.doc3.id],
+                    "method": "merge",
+                    "parameters": {"metadata_document_id": self.doc3.id},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertCountEqual(args[0], [self.doc2.id, self.doc3.id])
+        self.assertEqual(kwargs["metadata_document_id"], self.doc3.id)
+
+    @mock.patch("documents.serialisers.bulk_edit.split")
+    def test_split(self, m):
+        m.return_value = "OK"
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "split",
+                    "parameters": {"pages": "1,2-4,5-6,7"},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertCountEqual(args[0], [self.doc2.id])
+        self.assertEqual(kwargs["pages"], [[1], [2, 3, 4], [5, 6], [7]])
+
+    def test_split_invalid_params(self):
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "split",
+                    "parameters": {},  # pages not specified
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"pages not specified", response.content)
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "split",
+                    "parameters": {"pages": "1:7"},  # wrong format
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"invalid pages specified", response.content)
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [
+                        self.doc1.id,
+                        self.doc2.id,
+                    ],  # only one document supported
+                    "method": "split",
+                    "parameters": {"pages": "1-2,3-7"},  # wrong format
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"Split method only supports one document", response.content)

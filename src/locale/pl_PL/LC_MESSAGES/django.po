@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-04 17:00-0800\n"
-"PO-Revision-Date: 2024-03-05 01:01\n"
+"POT-Creation-Date: 2024-04-04 14:31-0700\n"
+"PO-Revision-Date: 2024-04-04 21:33\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -47,7 +47,7 @@ msgstr "Wyrażenie regularne"
 
 #: documents/models.py:58 documents/models.py:902
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Słowo rozmyte"
 
 #: documents/models.py:59
 msgid "Automatic"
@@ -365,7 +365,7 @@ msgstr "zapytanie pełnotekstowe"
 
 #: documents/models.py:446
 msgid "more like this"
-msgstr ""
+msgstr "więcej takich"
 
 #: documents/models.py:447
 msgid "has tags in"
@@ -685,7 +685,7 @@ msgstr "Przypisanie"
 
 #: documents/models.py:1006
 msgid "Removal"
-msgstr ""
+msgstr "Usuwanie"
 
 #: documents/models.py:1010
 msgid "Workflow Action Type"
@@ -741,71 +741,71 @@ msgstr "przypisz te pola dodatkowe"
 
 #: documents/models.py:1108
 msgid "remove these tag(s)"
-msgstr ""
+msgstr "usuń ten tag/te tagi"
 
 #: documents/models.py:1113
 msgid "remove all tags"
-msgstr ""
+msgstr "usuń wszystkie tagi"
 
 #: documents/models.py:1120
 msgid "remove these document type(s)"
-msgstr ""
+msgstr "usuń te typy dokumentów"
 
 #: documents/models.py:1125
 msgid "remove all document types"
-msgstr ""
+msgstr "usuń wszystkie typy dokumentów"
 
 #: documents/models.py:1132
 msgid "remove these correspondent(s)"
-msgstr ""
+msgstr "usuń tych korespondentów"
 
 #: documents/models.py:1137
 msgid "remove all correspondents"
-msgstr ""
+msgstr "usuń wszystkich korespondentów"
 
 #: documents/models.py:1144
 msgid "remove these storage path(s)"
-msgstr ""
+msgstr "usuń te ścieżki zapisu"
 
 #: documents/models.py:1149
 msgid "remove all storage paths"
-msgstr ""
+msgstr "usuń wszystkie ścieżki zapisu"
 
 #: documents/models.py:1156
 msgid "remove these owner(s)"
-msgstr ""
+msgstr "usuń tych właścicieli"
 
 #: documents/models.py:1161
 msgid "remove all owners"
-msgstr ""
+msgstr "usuń wszystkich właścicieli"
 
 #: documents/models.py:1168
 msgid "remove view permissions for these users"
-msgstr ""
+msgstr "usuń uprawnienia do wyświetlania dla tych użytkowników"
 
 #: documents/models.py:1175
 msgid "remove view permissions for these groups"
-msgstr ""
+msgstr "usuń uprawnienia do wyświetlania dla tych grup"
 
 #: documents/models.py:1182
 msgid "remove change permissions for these users"
-msgstr ""
+msgstr "usuń uprawnienia do zmiany dla tych użytkowników"
 
 #: documents/models.py:1189
 msgid "remove change permissions for these groups"
-msgstr ""
+msgstr "usuń uprawnienia do zmiany dla tych grup"
 
 #: documents/models.py:1194
 msgid "remove all permissions"
-msgstr ""
+msgstr "usuń wszystkie uprawnienia"
 
 #: documents/models.py:1201
 msgid "remove these custom fields"
-msgstr ""
+msgstr "usuń te pola dodatkowe"
 
 #: documents/models.py:1206
 msgid "remove all custom fields"
-msgstr ""
+msgstr "usuń wszystkie pola dodatkowe"
 
 #: documents/models.py:1210
 msgid "workflow action"
@@ -840,25 +840,26 @@ msgstr "Nieprawidłowe wyrażenie regularne: %(error)s"
 msgid "Invalid color."
 msgstr "Nieprawidłowy kolor."
 
-#: documents/serialisers.py:1072
+#: documents/serialisers.py:1130
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Typ pliku %(type)s nie jest obsługiwany"
 
-#: documents/serialisers.py:1175
+#: documents/serialisers.py:1239
 msgid "Invalid variable detected."
 msgstr "Wykryto nieprawidłową zmienną."
 
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
-msgstr ""
+msgstr "Witaj z %(site_name)s!"
 
 #: documents/templates/account/email/base_message.txt:5
 #, python-format
 msgid "Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
-msgstr ""
+msgstr "Dziękujemy za korzystanie z %(site_name)s\n"
+"%(site_domain)s"
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
@@ -871,7 +872,7 @@ msgstr "Proszę się zalogować."
 #: documents/templates/account/login.html:12
 #, python-format
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
-msgstr ""
+msgstr "Nie posiadasz jeszcze konta? <a href=\"%(signup_url)s\">Zarejestruj się</a>"
 
 #: documents/templates/account/login.html:19
 #: documents/templates/account/signup.html:15
@@ -968,21 +969,21 @@ msgstr "Twoje nowe hasło zostało ustawione. Możesz się teraz <a href=\"%(log
 
 #: documents/templates/account/signup.html:5
 msgid "Paperless-ngx sign up"
-msgstr ""
+msgstr "Rejestracja w Paperless-ngx"
 
 #: documents/templates/account/signup.html:10
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
-msgstr ""
+msgstr "Masz już konto? <a href=\"%(login_url)s\">Zaloguj się</a>"
 
 #: documents/templates/account/signup.html:16
 #: documents/templates/socialaccount/signup.html:14
 msgid "Email (optional)"
-msgstr ""
+msgstr "Adres e-mail (opcjonalny)"
 
 #: documents/templates/account/signup.html:18
 msgid "Password (again)"
-msgstr ""
+msgstr "Hasło (powtórz)"
 
 #: documents/templates/account/signup.html:36
 #: documents/templates/socialaccount/signup.html:27
@@ -1204,131 +1205,131 @@ msgstr "Logo aplikacji"
 msgid "paperless application settings"
 msgstr "paperless ustawienia aplikacji"
 
-#: paperless/settings.py:664
+#: paperless/settings.py:666
 msgid "English (US)"
 msgstr "Angielski (USA)"
 
-#: paperless/settings.py:665
+#: paperless/settings.py:667
 msgid "Arabic"
 msgstr "arabski"
 
-#: paperless/settings.py:666
+#: paperless/settings.py:668
 msgid "Afrikaans"
 msgstr "Afrykanerski"
 
-#: paperless/settings.py:667
+#: paperless/settings.py:669
 msgid "Belarusian"
 msgstr "Białoruski"
 
-#: paperless/settings.py:668
+#: paperless/settings.py:670
 msgid "Bulgarian"
 msgstr "Bułgarski"
 
-#: paperless/settings.py:669
+#: paperless/settings.py:671
 msgid "Catalan"
 msgstr "Kataloński"
 
-#: paperless/settings.py:670
+#: paperless/settings.py:672
 msgid "Czech"
 msgstr "Czeski"
 
-#: paperless/settings.py:671
+#: paperless/settings.py:673
 msgid "Danish"
 msgstr "Duński"
 
-#: paperless/settings.py:672
+#: paperless/settings.py:674
 msgid "German"
 msgstr "Niemiecki"
 
-#: paperless/settings.py:673
+#: paperless/settings.py:675
 msgid "Greek"
 msgstr "Grecki"
 
-#: paperless/settings.py:674
+#: paperless/settings.py:676
 msgid "English (GB)"
 msgstr "Angielski (Wielka Brytania)"
 
-#: paperless/settings.py:675
+#: paperless/settings.py:677
 msgid "Spanish"
 msgstr "Hiszpański"
 
-#: paperless/settings.py:676
+#: paperless/settings.py:678
 msgid "Finnish"
 msgstr "Fiński"
 
-#: paperless/settings.py:677
+#: paperless/settings.py:679
 msgid "French"
 msgstr "Francuski"
 
-#: paperless/settings.py:678
+#: paperless/settings.py:680
 msgid "Hungarian"
 msgstr "Węgierski"
 
-#: paperless/settings.py:679
+#: paperless/settings.py:681
 msgid "Italian"
 msgstr "Włoski"
 
-#: paperless/settings.py:680
+#: paperless/settings.py:682
 msgid "Japanese"
 msgstr "Japoński"
 
-#: paperless/settings.py:681
+#: paperless/settings.py:683
 msgid "Luxembourgish"
 msgstr "Luksemburski"
 
-#: paperless/settings.py:682
+#: paperless/settings.py:684
 msgid "Norwegian"
 msgstr "Norweski"
 
-#: paperless/settings.py:683
+#: paperless/settings.py:685
 msgid "Dutch"
 msgstr "Holenderski"
 
-#: paperless/settings.py:684
+#: paperless/settings.py:686
 msgid "Polish"
 msgstr "Polski"
 
-#: paperless/settings.py:685
+#: paperless/settings.py:687
 msgid "Portuguese (Brazil)"
 msgstr "Portugalski (Brazylia)"
 
-#: paperless/settings.py:686
+#: paperless/settings.py:688
 msgid "Portuguese"
 msgstr "Portugalski"
 
-#: paperless/settings.py:687
+#: paperless/settings.py:689
 msgid "Romanian"
 msgstr "Rumuński"
 
-#: paperless/settings.py:688
+#: paperless/settings.py:690
 msgid "Russian"
 msgstr "Rosyjski"
 
-#: paperless/settings.py:689
+#: paperless/settings.py:691
 msgid "Slovak"
 msgstr "Słowacki"
 
-#: paperless/settings.py:690
+#: paperless/settings.py:692
 msgid "Slovenian"
 msgstr "Słoweński"
 
-#: paperless/settings.py:691
+#: paperless/settings.py:693
 msgid "Serbian"
 msgstr "Serbski"
 
-#: paperless/settings.py:692
+#: paperless/settings.py:694
 msgid "Swedish"
 msgstr "Szwedzki"
 
-#: paperless/settings.py:693
+#: paperless/settings.py:695
 msgid "Turkish"
 msgstr "Turecki"
 
-#: paperless/settings.py:694
+#: paperless/settings.py:696
 msgid "Ukrainian"
 msgstr "Ukraiński"
 
-#: paperless/settings.py:695
+#: paperless/settings.py:697
 msgid "Chinese Simplified"
 msgstr "Chiński uproszczony"
 

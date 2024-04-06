@@ -6,7 +6,7 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
 import {
   DocumentService,
   SelectionDataItem,
@@ -39,6 +39,8 @@ import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
 import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
+import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
 
 @Component({
   selector: 'pngx-bulk-editor',
@@ -192,12 +194,21 @@ export class BulkEditorComponent
     this.unsubscribeNotifier.complete()
   }
 
-  private executeBulkOperation(modal, method: string, args) {
+  private executeBulkOperation(
+    modal: NgbModalRef,
+    method: string,
+    args: any,
+    overrideDocumentIDs?: number[]
+  ) {
     if (modal) {
       modal.componentInstance.buttonsEnabled = false
     }
     this.documentService
-      .bulkEdit(Array.from(this.list.selected), method, args)
+      .bulkEdit(
+        overrideDocumentIDs ?? Array.from(this.list.selected),
+        method,
+        args
+      )
       .pipe(first())
       .subscribe({
         next: () => {
@@ -640,5 +651,50 @@ export class BulkEditorComponent
         })
       }
     )
+  }
+
+  rotateSelected() {
+    let modal = this.modalService.open(RotateConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    const rotateDialog = modal.componentInstance as RotateConfirmDialogComponent
+    rotateDialog.title = $localize`Rotate confirm`
+    rotateDialog.messageBold = $localize`This operation will permanently rotate ${this.list.selected.size} selected document(s).`
+    rotateDialog.message = $localize`This will alter the original copy.`
+    rotateDialog.btnClass = 'btn-danger'
+    rotateDialog.btnCaption = $localize`Proceed`
+    rotateDialog.documentID = Array.from(this.list.selected)[0]
+    rotateDialog.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        rotateDialog.buttonsEnabled = false
+        this.executeBulkOperation(modal, 'rotate', {
+          degrees: rotateDialog.degrees,
+        })
+      })
+  }
+
+  mergeSelected() {
+    let modal = this.modalService.open(MergeConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    const mergeDialog = modal.componentInstance as MergeConfirmDialogComponent
+    mergeDialog.title = $localize`Merge confirm`
+    mergeDialog.messageBold = $localize`This operation will merge ${this.list.selected.size} selected documents into a new document.`
+    mergeDialog.btnCaption = $localize`Proceed`
+    mergeDialog.documentIDs = Array.from(this.list.selected)
+    mergeDialog.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        const args = {}
+        if (mergeDialog.metadataDocumentID > -1) {
+          args['metadata_document_id'] = mergeDialog.metadataDocumentID
+        }
+        mergeDialog.buttonsEnabled = false
+        this.executeBulkOperation(modal, 'merge', args, mergeDialog.documentIDs)
+        this.toastService.showInfo(
+          $localize`Merged document will be queued for consumption.`
+        )
+      })
   }
 }
