@@ -4,15 +4,18 @@
 
 ### Notable Changes
 
-- Change: enable auditlog by default, fix import / export [@shamoon](https://github.com/shamoon) ([#6267](https://github.com/paperless-ngx/paperless-ngx/pull/6267))
 - Feature: PDF actions - merge, split \& rotate [@shamoon](https://github.com/shamoon) ([#6094](https://github.com/paperless-ngx/paperless-ngx/pull/6094))
+- Change: enable auditlog by default, fix import / export [@shamoon](https://github.com/shamoon) ([#6267](https://github.com/paperless-ngx/paperless-ngx/pull/6267))
 
 ### Features
 
-- Chore: Standardize subprocess running and logging [@stumpylog](https://github.com/stumpylog) ([#6275](https://github.com/paperless-ngx/paperless-ngx/pull/6275))
-- Change: enable auditlog by default, fix import / export [@shamoon](https://github.com/shamoon) ([#6267](https://github.com/paperless-ngx/paperless-ngx/pull/6267))
 - Feature: PDF actions - merge, split \& rotate [@shamoon](https://github.com/shamoon) ([#6094](https://github.com/paperless-ngx/paperless-ngx/pull/6094))
+- Change: enable auditlog by default, fix import / export [@shamoon](https://github.com/shamoon) ([#6267](https://github.com/paperless-ngx/paperless-ngx/pull/6267))
 - Enhancement: always place search term first in autocomplete results [@shamoon](https://github.com/shamoon) ([#6142](https://github.com/paperless-ngx/paperless-ngx/pull/6142))
+
+### Maintenance
+
+- Chore: Standardize subprocess running and logging [@stumpylog](https://github.com/stumpylog) ([#6275](https://github.com/paperless-ngx/paperless-ngx/pull/6275))
 
 ### Bug Fixes
 
@@ -23,11 +26,6 @@
 - Fix: allow scroll long upload files alerts list [@shamoon](https://github.com/shamoon) ([#6184](https://github.com/paperless-ngx/paperless-ngx/pull/6184))
 - Fix: document_renamer fails with audit_log enabled [@shamoon](https://github.com/shamoon) ([#6175](https://github.com/paperless-ngx/paperless-ngx/pull/6175))
 - Fix: catch sessionStorage errors for large documents [@shamoon](https://github.com/shamoon) ([#6150](https://github.com/paperless-ngx/paperless-ngx/pull/6150))
-
-### Documentation
-
-- Change: enable auditlog by default, fix import / export [@shamoon](https://github.com/shamoon) ([#6267](https://github.com/paperless-ngx/paperless-ngx/pull/6267))
-- Enhancement: support custom fields in post_document endpoint [@shamoon](https://github.com/shamoon) ([#6222](https://github.com/paperless-ngx/paperless-ngx/pull/6222))
 
 ### Dependencies
 
