@@ -1,5 +1,77 @@
 # Changelog
 
+## paperless-ngx 2.7.0
+
+### Notable Changes
+
+- Change: enable auditlog by default, fix import / export [@shamoon](https://github.com/shamoon) ([#6267](https://github.com/paperless-ngx/paperless-ngx/pull/6267))
+- Feature: PDF actions - merge, split \& rotate [@shamoon](https://github.com/shamoon) ([#6094](https://github.com/paperless-ngx/paperless-ngx/pull/6094))
+
+### Features
+
+- Chore: Standardize subprocess running and logging [@stumpylog](https://github.com/stumpylog) ([#6275](https://github.com/paperless-ngx/paperless-ngx/pull/6275))
+- Change: enable auditlog by default, fix import / export [@shamoon](https://github.com/shamoon) ([#6267](https://github.com/paperless-ngx/paperless-ngx/pull/6267))
+- Feature: PDF actions - merge, split \& rotate [@shamoon](https://github.com/shamoon) ([#6094](https://github.com/paperless-ngx/paperless-ngx/pull/6094))
+- Enhancement: always place search term first in autocomplete results [@shamoon](https://github.com/shamoon) ([#6142](https://github.com/paperless-ngx/paperless-ngx/pull/6142))
+
+### Bug Fixes
+
+- Fix: Escape the secret key when writing it to the env file [@stumpylog](https://github.com/stumpylog) ([#6243](https://github.com/paperless-ngx/paperless-ngx/pull/6243))
+- Fix: Hide sidebar labels if group is empty [@shamoon](https://github.com/shamoon) ([#6254](https://github.com/paperless-ngx/paperless-ngx/pull/6254))
+- Fix: management list clear all should clear header checkbox [@shamoon](https://github.com/shamoon) ([#6253](https://github.com/paperless-ngx/paperless-ngx/pull/6253))
+- Fix: start-align object names in some UI lists [@shamoon](https://github.com/shamoon) ([#6188](https://github.com/paperless-ngx/paperless-ngx/pull/6188))
+- Fix: allow scroll long upload files alerts list [@shamoon](https://github.com/shamoon) ([#6184](https://github.com/paperless-ngx/paperless-ngx/pull/6184))
+- Fix: document_renamer fails with audit_log enabled [@shamoon](https://github.com/shamoon) ([#6175](https://github.com/paperless-ngx/paperless-ngx/pull/6175))
+- Fix: catch sessionStorage errors for large documents [@shamoon](https://github.com/shamoon) ([#6150](https://github.com/paperless-ngx/paperless-ngx/pull/6150))
+
+### Documentation
+
+- Change: enable auditlog by default, fix import / export [@shamoon](https://github.com/shamoon) ([#6267](https://github.com/paperless-ngx/paperless-ngx/pull/6267))
+- Enhancement: support custom fields in post_document endpoint [@shamoon](https://github.com/shamoon) ([#6222](https://github.com/paperless-ngx/paperless-ngx/pull/6222))
+
+### Dependencies
+
+<details>
+<summary>9 changes</summary>
+
+- Chore(deps): Bump pillow from 10.2.0 to 10.3.0 [@dependabot](https://github.com/dependabot) ([#6268](https://github.com/paperless-ngx/paperless-ngx/pull/6268))
+- Chore(deps-dev): Bump the development group with 2 updates [@dependabot](https://github.com/dependabot) ([#6276](https://github.com/paperless-ngx/paperless-ngx/pull/6276))
+- Chore(deps): Bump the frontend-angular-dependencies group in /src-ui with 17 updates [@dependabot](https://github.com/dependabot) ([#6248](https://github.com/paperless-ngx/paperless-ngx/pull/6248))
+- Chore(deps-dev): Bump [@<!---->playwright/test from 1.42.0 to 1.42.1 in /src-ui @dependabot](https://github.com/<!---->playwright/test from 1.42.0 to 1.42.1 in /src-ui @dependabot) ([#6250](https://github.com/paperless-ngx/paperless-ngx/pull/6250))
+- Chore(deps-dev): Bump [@<!---->types/node from 20.11.24 to 20.12.2 in /src-ui @dependabot](https://github.com/<!---->types/node from 20.11.24 to 20.12.2 in /src-ui @dependabot) ([#6251](https://github.com/paperless-ngx/paperless-ngx/pull/6251))
+- Chore(deps-dev): Bump the frontend-eslint-dependencies group in /src-ui with 2 updates [@dependabot](https://github.com/dependabot) ([#6249](https://github.com/paperless-ngx/paperless-ngx/pull/6249))
+- Chore(deps-dev): Bump express from 4.18.3 to 4.19.2 in /src-ui [@dependabot](https://github.com/dependabot) ([#6207](https://github.com/paperless-ngx/paperless-ngx/pull/6207))
+- Chore(deps-dev): Bump webpack-dev-middleware from 5.3.3 to 5.3.4 in /src-ui [@dependabot](https://github.com/dependabot) ([#6161](https://github.com/paperless-ngx/paperless-ngx/pull/6161))
+- Chore(deps-dev): Bump the development group with 4 updates [@dependabot](https://github.com/dependabot) ([#6131](https://github.com/paperless-ngx/paperless-ngx/pull/6131))
+</details>
+
+### All App Changes
+
+<details>
+<summary>20 changes</summary>
+
+- Chore(deps-dev): Bump the development group with 2 updates [@dependabot](https://github.com/dependabot) ([#6276](https://github.com/paperless-ngx/paperless-ngx/pull/6276))
+- Chore: Standardize subprocess running and logging [@stumpylog](https://github.com/stumpylog) ([#6275](https://github.com/paperless-ngx/paperless-ngx/pull/6275))
+- Change: enable auditlog by default, fix import / export [@shamoon](https://github.com/shamoon) ([#6267](https://github.com/paperless-ngx/paperless-ngx/pull/6267))
+- Fix: Hide sidebar labels if group is empty [@shamoon](https://github.com/shamoon) ([#6254](https://github.com/paperless-ngx/paperless-ngx/pull/6254))
+- Fix: management list clear all should clear header checkbox [@shamoon](https://github.com/shamoon) ([#6253](https://github.com/paperless-ngx/paperless-ngx/pull/6253))
+- Chore(deps): Bump the frontend-angular-dependencies group in /src-ui with 17 updates [@dependabot](https://github.com/dependabot) ([#6248](https://github.com/paperless-ngx/paperless-ngx/pull/6248))
+- Chore(deps-dev): Bump [@<!---->playwright/test from 1.42.0 to 1.42.1 in /src-ui @dependabot](https://github.com/<!---->playwright/test from 1.42.0 to 1.42.1 in /src-ui @dependabot) ([#6250](https://github.com/paperless-ngx/paperless-ngx/pull/6250))
+- Chore(deps-dev): Bump [@<!---->types/node from 20.11.24 to 20.12.2 in /src-ui @dependabot](https://github.com/<!---->types/node from 20.11.24 to 20.12.2 in /src-ui @dependabot) ([#6251](https://github.com/paperless-ngx/paperless-ngx/pull/6251))
+- Chore(deps-dev): Bump the frontend-eslint-dependencies group in /src-ui with 2 updates [@dependabot](https://github.com/dependabot) ([#6249](https://github.com/paperless-ngx/paperless-ngx/pull/6249))
+- Enhancement: support custom fields in post_document endpoint [@shamoon](https://github.com/shamoon) ([#6222](https://github.com/paperless-ngx/paperless-ngx/pull/6222))
+- Enhancement: add ASN to consume rejection message [@eliasp](https://github.com/eliasp) ([#6217](https://github.com/paperless-ngx/paperless-ngx/pull/6217))
+- Chore(deps-dev): Bump express from 4.18.3 to 4.19.2 in /src-ui [@dependabot](https://github.com/dependabot) ([#6207](https://github.com/paperless-ngx/paperless-ngx/pull/6207))
+- Feature: PDF actions - merge, split \& rotate [@shamoon](https://github.com/shamoon) ([#6094](https://github.com/paperless-ngx/paperless-ngx/pull/6094))
+- Fix: start-align object names in some UI lists [@shamoon](https://github.com/shamoon) ([#6188](https://github.com/paperless-ngx/paperless-ngx/pull/6188))
+- Fix: allow scroll long upload files alerts list [@shamoon](https://github.com/shamoon) ([#6184](https://github.com/paperless-ngx/paperless-ngx/pull/6184))
+- Fix: document_renamer fails with audit_log enabled [@shamoon](https://github.com/shamoon) ([#6175](https://github.com/paperless-ngx/paperless-ngx/pull/6175))
+- Chore(deps-dev): Bump webpack-dev-middleware from 5.3.3 to 5.3.4 in /src-ui [@dependabot](https://github.com/dependabot) ([#6161](https://github.com/paperless-ngx/paperless-ngx/pull/6161))
+- Enhancement: always place search term first in autocomplete results [@shamoon](https://github.com/shamoon) ([#6142](https://github.com/paperless-ngx/paperless-ngx/pull/6142))
+- Fix: catch sessionStorage errors for large documents [@shamoon](https://github.com/shamoon) ([#6150](https://github.com/paperless-ngx/paperless-ngx/pull/6150))
+- Chore(deps-dev): Bump the development group with 4 updates [@dependabot](https://github.com/dependabot) ([#6131](https://github.com/paperless-ngx/paperless-ngx/pull/6131))
+</details>
+
 ## paperless-ngx 2.6.3
 
 ### Bug Fixes
