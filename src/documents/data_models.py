@@ -124,10 +124,14 @@ class DocumentMetadataOverrides:
             attach_perms=True,
         )
         overrides.view_groups = [
-            group.id for group, perms in groups_with_perms if "view_document" in perms
+            group.id
+            for group in groups_with_perms
+            if "view_document" in groups_with_perms[group]
         ]
         overrides.change_groups = [
-            group.id for group, perms in groups_with_perms if "change_document" in perms
+            group.id
+            for group in groups_with_perms
+            if "change_document" in groups_with_perms[group]
         ]
 
         return overrides
