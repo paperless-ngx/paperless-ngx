@@ -86,7 +86,7 @@ export class DocumentListComponent
   }
 
   get isFiltered() {
-    return this.filterEditor.rulesModified
+    return !!this.filterEditor?.rulesModified
   }
 
   getTitle() {
