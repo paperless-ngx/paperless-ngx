@@ -201,7 +201,7 @@ class IndexView(TemplateView):
         return context
 
 
-class PassUserMixin(CreateModelMixin):
+class PassUserMixin(GenericAPIView):
     """
     Pass a user object to serializer
     """
@@ -853,7 +853,7 @@ class LogViewSet(ViewSet):
         return Response(exist)
 
 
-class SavedViewViewSet(ModelViewSet, PassUserMixin):
+class SavedViewViewSet(ModelViewSet, PassUserMixin, CreateModelMixin):
     model = SavedView
 
     queryset = SavedView.objects.all()
@@ -873,7 +873,7 @@ class SavedViewViewSet(ModelViewSet, PassUserMixin):
         serializer.save(owner=self.request.user)
 
 
-class BulkEditView(GenericAPIView, PassUserMixin):
+class BulkEditView(PassUserMixin, CreateModelMixin):
     permission_classes = (IsAuthenticated,)
     serializer_class = BulkEditSerializer
     parser_classes = (parsers.JSONParser,)
@@ -1450,7 +1450,7 @@ def serve_file(doc: Document, use_archive: bool, disposition: str):
     return response
 
 
-class BulkEditObjectsView(GenericAPIView, PassUserMixin):
+class BulkEditObjectsView(PassUserMixin, CreateModelMixin):
     permission_classes = (IsAuthenticated,)
     serializer_class = BulkEditObjectsSerializer
     parser_classes = (parsers.JSONParser,)
@@ -1582,7 +1582,7 @@ class CustomFieldViewSet(ModelViewSet):
     queryset = CustomField.objects.all().order_by("-created")
 
 
-class SystemStatusView(GenericAPIView, PassUserMixin):
+class SystemStatusView(PassUserMixin):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
