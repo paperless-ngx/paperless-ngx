@@ -188,12 +188,15 @@ export class DocumentListComponent
       })
 
     this.hotKeyService
-      .addShortcut({ keys: 'escape', description: $localize`Clear selection` })
+      .addShortcut({
+        keys: 'escape',
+        description: $localize`Reset filters / selection`,
+      })
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         if (this.list.selected.size > 0) {
           this.list.selectNone()
-        } else {
+        } else if (this.isFiltered) {
           this.filterEditor.resetSelected()
         }
       })

@@ -604,6 +604,7 @@ describe('DocumentListComponent', () => {
   it('should support hotkeys', () => {
     fixture.detectChanges()
     const resetSpy = jest.spyOn(component['filterEditor'], 'resetSelected')
+    jest.spyOn(component, 'isFiltered', 'get').mockReturnValue(true)
     component.clickTag(1)
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'escape' }))
     expect(resetSpy).toHaveBeenCalled()
