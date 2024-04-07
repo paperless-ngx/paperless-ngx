@@ -148,8 +148,8 @@ export class DocumentDetailComponent
     custom_fields: new FormArray([]),
   })
 
-  previewCurrentPage: number = 1
-  previewNumPages: number = 1
+  previewCurrentPage: number
+  previewNumPages: number
   previewZoomSetting: ZoomSetting = ZoomSetting.One
   previewZoomScale: ZoomSetting = ZoomSetting.PageWidth
 
