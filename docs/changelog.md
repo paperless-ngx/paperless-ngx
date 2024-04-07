@@ -1,5 +1,25 @@
 # Changelog
 
+## paperless-ngx 2.7.1
+
+### Bug Fixes
+
+- Fix: Only disable split button if pages = 1 [@shamoon](https://github.com/shamoon) ([#6304](https://github.com/paperless-ngx/paperless-ngx/pull/6304))
+- Fix: Use correct custom field id when splitting [@shamoon](https://github.com/shamoon) ([#6303](https://github.com/paperless-ngx/paperless-ngx/pull/6303))
+- Fix: Rotation fails due to celery chord [@stumpylog](https://github.com/stumpylog) ([#6306](https://github.com/paperless-ngx/paperless-ngx/pull/6306))
+- Fix: split user / group objects error [@shamoon](https://github.com/shamoon) ([#6302](https://github.com/paperless-ngx/paperless-ngx/pull/6302))
+
+### All App Changes
+
+<details>
+<summary>4 changes</summary>
+
+- Fix: Only disable split button if pages = 1 [@shamoon](https://github.com/shamoon) ([#6304](https://github.com/paperless-ngx/paperless-ngx/pull/6304))
+- Fix: Use correct custom field id when splitting [@shamoon](https://github.com/shamoon) ([#6303](https://github.com/paperless-ngx/paperless-ngx/pull/6303))
+- Fix: Rotation fails due to celery chord [@stumpylog](https://github.com/stumpylog) ([#6306](https://github.com/paperless-ngx/paperless-ngx/pull/6306))
+- Fix: split user / group objects error [@shamoon](https://github.com/shamoon) ([#6302](https://github.com/paperless-ngx/paperless-ngx/pull/6302))
+</details>
+
 ## paperless-ngx 2.7.0
 
 ### Notable Changes
