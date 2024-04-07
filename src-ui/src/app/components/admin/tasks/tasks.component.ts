@@ -18,6 +18,7 @@ export class TasksComponent
 {
   public activeTab: string
   public selectedTasks: Set<number> = new Set()
+  public togggleAll: boolean = false
   public expandedTask: number
 
   public pageSize: number = 25
@@ -120,6 +121,7 @@ export class TasksComponent
   }
 
   clearSelection() {
+    this.togggleAll = false
     this.selectedTasks.clear()
   }
 
