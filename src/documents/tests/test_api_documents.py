@@ -815,6 +815,14 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.document_type_id)
         self.assertIsNone(overrides.tag_ids)
 
+    def test_create_wrong_endpoint(self):
+        response = self.client.post(
+            "/api/documents/",
+            {},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
     def test_upload_empty_metadata(self):
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),

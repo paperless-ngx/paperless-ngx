@@ -163,14 +163,23 @@ class SetPermissionsMixin:
         set_permissions_for_object(permissions, object)
 
 
-class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
+class SerializerWithPerms(serializers.Serializer):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
-        full_perms = kwargs.pop("full_perms", False)
+        self.full_perms = kwargs.pop("full_perms", False)
+        super().__init__(*args, **kwargs)
+
+
+class OwnedObjectSerializer(
+    SerializerWithPerms,
+    serializers.ModelSerializer,
+    SetPermissionsMixin,
+):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         try:
-            if full_perms:
+            if self.full_perms:
                 self.fields.pop("user_can_change")
                 self.fields.pop("is_shared_by_requester")
             else:
@@ -857,7 +866,11 @@ class DocumentListSerializer(serializers.Serializer):
         return documents
 
 
-class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
+class BulkEditSerializer(
+    SerializerWithPerms,
+    DocumentListSerializer,
+    SetPermissionsMixin,
+):
     method = serializers.ChoiceField(
         choices=[
             "set_correspondent",
@@ -1356,7 +1369,7 @@ class ShareLinkSerializer(OwnedObjectSerializer):
         return super().create(validated_data)
 
 
-class BulkEditObjectsSerializer(serializers.Serializer, SetPermissionsMixin):
+class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
     objects = serializers.ListField(
         required=True,
         allow_empty=False,
