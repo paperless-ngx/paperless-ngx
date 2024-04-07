@@ -138,6 +138,7 @@ from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer
 from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import SavedViewSerializer
+from documents.serialisers import SearchResultSerializer
 from documents.serialisers import ShareLinkSerializer
 from documents.serialisers import StoragePathSerializer
 from documents.serialisers import TagSerializer
@@ -797,34 +798,6 @@ class DocumentViewSet(
             )
 
         return Response(sorted(entries, key=lambda x: x["timestamp"], reverse=True))
-
-
-class SearchResultSerializer(DocumentSerializer, PassUserMixin):
-    def to_representation(self, instance):
-        doc = (
-            Document.objects.select_related(
-                "correspondent",
-                "storage_path",
-                "document_type",
-                "owner",
-            )
-            .prefetch_related("tags", "custom_fields", "notes")
-            .get(id=instance["id"])
-        )
-        notes = ",".join(
-            [str(c.note) for c in doc.notes.all()],
-        )
-        r = super().to_representation(doc)
-        r["__search_hit__"] = {
-            "score": instance.score,
-            "highlights": instance.highlights("content", text=doc.content),
-            "note_highlights": (
-                instance.highlights("notes", text=notes) if doc else None
-            ),
-            "rank": instance.rank,
-        }
-
-        return r
 
 
 class UnifiedSearchViewSet(DocumentViewSet):
