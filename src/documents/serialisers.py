@@ -166,17 +166,8 @@ class SetPermissionsMixin:
 class SerializerWithPerms(serializers.Serializer):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
-        full_perms = kwargs.pop("full_perms", False)
+        self.full_perms = kwargs.pop("full_perms", False)
         super().__init__(*args, **kwargs)
-
-        try:
-            if full_perms:
-                self.fields.pop("user_can_change")
-                self.fields.pop("is_shared_by_requester")
-            else:
-                self.fields.pop("permissions")
-        except KeyError:
-            pass
 
 
 class OwnedObjectSerializer(
@@ -184,6 +175,18 @@ class OwnedObjectSerializer(
     serializers.ModelSerializer,
     SetPermissionsMixin,
 ):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        try:
+            if self.full_perms:
+                self.fields.pop("user_can_change")
+                self.fields.pop("is_shared_by_requester")
+            else:
+                self.fields.pop("permissions")
+        except KeyError:
+            pass
+
     def get_permissions(self, obj):
         view_codename = f"view_{obj.__class__.__name__.lower()}"
         change_codename = f"change_{obj.__class__.__name__.lower()}"
