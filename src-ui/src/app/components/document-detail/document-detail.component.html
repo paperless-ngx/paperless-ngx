@@ -1,10 +1,12 @@
 <pngx-page-header [(title)]="title">
   @if (contentRenderType === ContentRenderType.PDF && !useNativePdfViewer) {
-    <div class="input-group input-group-sm d-none d-md-flex">
-      <div class="input-group-text" i18n>Page</div>
-      <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages" [(ngModel)]="previewCurrentPage" />
-      <div class="input-group-text" i18n>of {{previewNumPages}}</div>
-    </div>
+    @if (previewNumPages) {
+      <div class="input-group input-group-sm d-none d-md-flex">
+        <div class="input-group-text" i18n>Page</div>
+          <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages" [(ngModel)]="previewCurrentPage" />
+        <div class="input-group-text" i18n>of {{previewNumPages}}</div>
+      </div>
+    }
     <div class="input-group input-group-sm me-md-5 d-none d-md-flex">
       <button class="btn btn-outline-secondary" (click)="decreaseZoom()" i18n>-</button>
       <select class="form-select" (change)="onZoomSelect($event)">
