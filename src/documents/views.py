@@ -55,7 +55,6 @@ from rest_framework.exceptions import NotFound
 from rest_framework.filters import OrderingFilter
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import GenericAPIView
-from rest_framework.mixins import CreateModelMixin
 from rest_framework.mixins import DestroyModelMixin
 from rest_framework.mixins import ListModelMixin
 from rest_framework.mixins import RetrieveModelMixin
@@ -853,7 +852,7 @@ class LogViewSet(ViewSet):
         return Response(exist)
 
 
-class SavedViewViewSet(ModelViewSet, PassUserMixin, CreateModelMixin):
+class SavedViewViewSet(ModelViewSet, PassUserMixin):
     model = SavedView
 
     queryset = SavedView.objects.all()
@@ -873,7 +872,7 @@ class SavedViewViewSet(ModelViewSet, PassUserMixin, CreateModelMixin):
         serializer.save(owner=self.request.user)
 
 
-class BulkEditView(PassUserMixin, CreateModelMixin):
+class BulkEditView(PassUserMixin):
     permission_classes = (IsAuthenticated,)
     serializer_class = BulkEditSerializer
     parser_classes = (parsers.JSONParser,)
@@ -1450,7 +1449,7 @@ def serve_file(doc: Document, use_archive: bool, disposition: str):
     return response
 
 
-class BulkEditObjectsView(PassUserMixin, CreateModelMixin):
+class BulkEditObjectsView(PassUserMixin):
     permission_classes = (IsAuthenticated,)
     serializer_class = BulkEditObjectsSerializer
     parser_classes = (parsers.JSONParser,)

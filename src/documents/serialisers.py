@@ -163,7 +163,7 @@ class SetPermissionsMixin:
         set_permissions_for_object(permissions, object)
 
 
-class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
+class SerializerWithPerms(serializers.Serializer):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
         full_perms = kwargs.pop("full_perms", False)
@@ -178,6 +178,12 @@ class OwnedObjectSerializer(serializers.ModelSerializer, SetPermissionsMixin):
         except KeyError:
             pass
 
+
+class OwnedObjectSerializer(
+    SerializerWithPerms,
+    serializers.ModelSerializer,
+    SetPermissionsMixin,
+):
     def get_permissions(self, obj):
         view_codename = f"view_{obj.__class__.__name__.lower()}"
         change_codename = f"change_{obj.__class__.__name__.lower()}"
@@ -857,7 +863,11 @@ class DocumentListSerializer(serializers.Serializer):
         return documents
 
 
-class BulkEditSerializer(DocumentListSerializer, SetPermissionsMixin):
+class BulkEditSerializer(
+    SerializerWithPerms,
+    DocumentListSerializer,
+    SetPermissionsMixin,
+):
     method = serializers.ChoiceField(
         choices=[
             "set_correspondent",
@@ -1356,7 +1366,7 @@ class ShareLinkSerializer(OwnedObjectSerializer):
         return super().create(validated_data)
 
 
-class BulkEditObjectsSerializer(serializers.Serializer, SetPermissionsMixin):
+class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
     objects = serializers.ListField(
         required=True,
         allow_empty=False,
