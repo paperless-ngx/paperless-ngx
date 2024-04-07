@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-04 14:31-0700\n"
-"PO-Revision-Date: 2024-04-04 21:33\n"
+"PO-Revision-Date: 2024-04-06 12:08\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -561,7 +561,7 @@ msgstr "مشاركة الروابط"
 
 #: documents/models.py:757
 msgid "String"
-msgstr ""
+msgstr "سلسلة نصيّة"
 
 #: documents/models.py:758
 msgid "URL"
@@ -777,7 +777,7 @@ msgstr ""
 
 #: documents/models.py:1161
 msgid "remove all owners"
-msgstr ""
+msgstr "إزالة جميع المالكين"
 
 #: documents/models.py:1168
 msgid "remove view permissions for these users"
