@@ -466,7 +466,7 @@ Paperless-ngx supports 3 basic editing operations for PDFs (these operations can
 
 !!! important
 
-    Note that rotation alters the Paperless-ngx original file.
+    Note that rotation alters the Paperless-ngx _original_ file, which would, for example, invalidate a digital signature.
 
 ## Best practices {#basic-searching}
 
