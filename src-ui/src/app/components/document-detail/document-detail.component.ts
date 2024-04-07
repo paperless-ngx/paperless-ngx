@@ -1085,7 +1085,7 @@ export class DocumentDetailComponent
       backdrop: 'static',
     })
     modal.componentInstance.title = $localize`Rotate confirm`
-    modal.componentInstance.messageBold = $localize`This operation will permanently rotate the current document.`
+    modal.componentInstance.messageBold = $localize`This operation will permanently rotate the original version of the current document.`
     modal.componentInstance.message = $localize`This will alter the original copy.`
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.documentID = this.document.id
