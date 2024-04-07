@@ -209,6 +209,13 @@ export class DocumentListComponent
       })
 
     this.hotKeyService
+      .addShortcut({ keys: 'p', description: $localize`Select page` })
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        this.list.selectPage()
+      })
+
+    this.hotKeyService
       .addShortcut({ keys: 'o', description: $localize`Open first document` })
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {

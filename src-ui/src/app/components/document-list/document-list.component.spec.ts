@@ -620,6 +620,10 @@ describe('DocumentListComponent', () => {
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }))
     expect(selectAllSpy).toHaveBeenCalled()
 
+    const selectPageSpy = jest.spyOn(documentListService, 'selectPage')
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'p' }))
+    expect(selectPageSpy).toHaveBeenCalled()
+
     jest.spyOn(documentListService, 'documents', 'get').mockReturnValue(docs)
     fixture.detectChanges()
     const detailSpy = jest.spyOn(component, 'openDocumentDetail')
