@@ -325,7 +325,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">89</context>
+          <context context-type="linenumber">91</context>
         </context-group>
         <target state="translated">Επόμενο</target>
       </trans-unit>
@@ -507,7 +507,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">320</context>
+          <context context-type="linenumber">322</context>
         </context-group>
         <target state="translated">Απόρριψη</target>
       </trans-unit>
@@ -567,7 +567,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">312</context>
+          <context context-type="linenumber">314</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
@@ -707,7 +707,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">329</context>
+          <context context-type="linenumber">331</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -1087,7 +1087,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">288</context>
+          <context context-type="linenumber">290</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -1519,7 +1519,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">45</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -1595,7 +1595,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">22</context>
+          <context context-type="linenumber">24</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -1867,7 +1867,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">67</context>
+          <context context-type="linenumber">68</context>
         </context-group>
         <target state="translated">Παράβλεψη</target>
       </trans-unit>
@@ -1931,7 +1931,7 @@
         <source>Dismiss selected</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">31</context>
         </context-group>
         <target state="translated">Παράβλεψη επιλεγμένων</target>
       </trans-unit>
@@ -1939,7 +1939,7 @@
         <source>Dismiss all</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">32</context>
         </context-group>
         <target state="translated">Παράβλεψη όλων</target>
       </trans-unit>
@@ -1947,7 +1947,7 @@
         <source>Confirm Dismiss All</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">64</context>
+          <context context-type="linenumber">65</context>
         </context-group>
         <target state="translated">Επιβεβαίωση Παράβλεψης Όλων</target>
       </trans-unit>
@@ -1955,7 +1955,7 @@
         <source>Dismiss all <x id="PH" equiv-text="tasks.size"/> tasks?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">65</context>
+          <context context-type="linenumber">66</context>
         </context-group>
         <target state="needs-translation">Dismiss all <x id="PH" equiv-text="tasks.size"/> tasks?</target>
       </trans-unit>
@@ -1963,7 +1963,7 @@
         <source>queued</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">133</context>
+          <context context-type="linenumber">135</context>
         </context-group>
         <target state="translated">στην ουρά</target>
       </trans-unit>
@@ -1971,7 +1971,7 @@
         <source>started</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">135</context>
+          <context context-type="linenumber">137</context>
         </context-group>
         <target state="translated">ξεκίνησε</target>
       </trans-unit>
@@ -1979,7 +1979,7 @@
         <source>completed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">137</context>
+          <context context-type="linenumber">139</context>
         </context-group>
         <target state="translated">ολοκληρώθηκε</target>
       </trans-unit>
@@ -1987,7 +1987,7 @@
         <source>failed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">139</context>
+          <context context-type="linenumber">141</context>
         </context-group>
         <target state="translated">απέτυχε</target>
       </trans-unit>
@@ -2895,7 +2895,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">4</context>
+          <context context-type="linenumber">5</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -2911,7 +2911,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">6,7</context>
+          <context context-type="linenumber">7,8</context>
         </context-group>
         <target state="needs-translation">of <x id="INTERPOLATION" equiv-text="{{totalPages}}"/></target>
       </trans-unit>
@@ -5285,7 +5285,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">104</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -5309,7 +5309,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">106</context>
+          <context context-type="linenumber">108</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -5345,7 +5345,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">27</context>
+          <context context-type="linenumber">29</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -5556,7 +5556,7 @@
         <source>-</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">9</context>
+          <context context-type="linenumber">11</context>
         </context-group>
         <target state="translated">-</target>
       </trans-unit>
@@ -5564,7 +5564,7 @@
         <source>+</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">19</context>
         </context-group>
         <target state="translated">+</target>
       </trans-unit>
@@ -5572,7 +5572,7 @@
         <source>Download original</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">34</context>
+          <context context-type="linenumber">36</context>
         </context-group>
         <target state="translated">Λήψη πρωτότυπου</target>
       </trans-unit>
@@ -5580,7 +5580,7 @@
         <source>Redo OCR</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">49</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -5592,7 +5592,7 @@
         <source>More like this</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">51</context>
+          <context context-type="linenumber">53</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
@@ -5604,7 +5604,7 @@
         <source>Split</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">55</context>
+          <context context-type="linenumber">57</context>
         </context-group>
         <target state="needs-translation">Split</target>
       </trans-unit>
@@ -5612,7 +5612,7 @@
         <source>Rotate</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">59</context>
+          <context context-type="linenumber">61</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -5624,7 +5624,7 @@
         <source>Close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">85</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
@@ -5640,7 +5640,7 @@
         <source>Previous</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">88</context>
         </context-group>
         <target state="translated">Προηγούμενο</target>
       </trans-unit>
@@ -5648,7 +5648,7 @@
         <source>Details</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">99</context>
+          <context context-type="linenumber">101</context>
         </context-group>
         <target state="translated">Λεπτομέρειες</target>
       </trans-unit>
@@ -5656,7 +5656,7 @@
         <source>Archive serial number</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">103</context>
+          <context context-type="linenumber">105</context>
         </context-group>
         <target state="translated">Αρχειοθέτηση σειριακού αριθμού</target>
       </trans-unit>
@@ -5664,7 +5664,7 @@
         <source>Date created</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">104</context>
+          <context context-type="linenumber">106</context>
         </context-group>
         <target state="translated">Ημερομηνία δημιουργίας</target>
       </trans-unit>
@@ -5672,7 +5672,7 @@
         <source>Document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">108</context>
+          <context context-type="linenumber">110</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -5696,7 +5696,7 @@
         <source>Storage path</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">110</context>
+          <context context-type="linenumber">112</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -5716,7 +5716,7 @@
         <source>Default</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">111</context>
+          <context context-type="linenumber">113</context>
         </context-group>
         <target state="translated">Προεπιλογή</target>
       </trans-unit>
@@ -5724,7 +5724,7 @@
         <source>Content</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">195</context>
+          <context context-type="linenumber">197</context>
         </context-group>
         <target state="translated">Περιεχόμενο</target>
       </trans-unit>
@@ -5732,7 +5732,7 @@
         <source>Metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">204</context>
+          <context context-type="linenumber">206</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/metadata-collapse/metadata-collapse.component.ts</context>
@@ -5744,7 +5744,7 @@
         <source>Date modified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">211</context>
+          <context context-type="linenumber">213</context>
         </context-group>
         <target state="translated">Ημερομηνία τροποποίησης</target>
       </trans-unit>
@@ -5752,7 +5752,7 @@
         <source>Date added</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">215</context>
+          <context context-type="linenumber">217</context>
         </context-group>
         <target state="translated">Ημερομηνία προσθήκης</target>
       </trans-unit>
@@ -5760,7 +5760,7 @@
         <source>Media filename</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">219</context>
+          <context context-type="linenumber">221</context>
         </context-group>
         <target state="translated">Όνομα αρχείου πολυμέσων</target>
       </trans-unit>
@@ -5768,7 +5768,7 @@
         <source>Original filename</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">223</context>
+          <context context-type="linenumber">225</context>
         </context-group>
         <target state="translated">Πρωτότυπο όνομα αρχείου</target>
       </trans-unit>
@@ -5776,7 +5776,7 @@
         <source>Original MD5 checksum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">227</context>
+          <context context-type="linenumber">229</context>
         </context-group>
         <target state="translated">Αρχικό checksum MD5</target>
       </trans-unit>
@@ -5784,7 +5784,7 @@
         <source>Original file size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">231</context>
+          <context context-type="linenumber">233</context>
         </context-group>
         <target state="translated">Αρχικό μέγεθος αρχείου</target>
       </trans-unit>
@@ -5792,7 +5792,7 @@
         <source>Original mime type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">235</context>
+          <context context-type="linenumber">237</context>
         </context-group>
         <target state="translated">Αρχικός τύπος mime</target>
       </trans-unit>
@@ -5800,7 +5800,7 @@
         <source>Archive MD5 checksum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">240</context>
+          <context context-type="linenumber">242</context>
         </context-group>
         <target state="translated">Αρχειοθέτηση MD5 checksum</target>
       </trans-unit>
@@ -5808,7 +5808,7 @@
         <source>Archive file size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">246</context>
+          <context context-type="linenumber">248</context>
         </context-group>
         <target state="translated">Μέγεθος αρχείου αρχειοθέτησης</target>
       </trans-unit>
@@ -5816,7 +5816,7 @@
         <source>Original document metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">255</context>
+          <context context-type="linenumber">257</context>
         </context-group>
         <target state="translated">Πρωτότυπα μεταδεδομένα εγγράφου</target>
       </trans-unit>
@@ -5824,7 +5824,7 @@
         <source>Archived document metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">258</context>
+          <context context-type="linenumber">260</context>
         </context-group>
         <target state="translated">Αρχειοθετημένα μεταδεδομένα εγγράφου</target>
       </trans-unit>
@@ -5832,7 +5832,7 @@
         <source>Preview</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">265</context>
+          <context context-type="linenumber">267</context>
         </context-group>
         <target state="translated">Προεπισκόπηση</target>
       </trans-unit>
@@ -5840,7 +5840,7 @@
         <source>Notes <x id="START_BLOCK_IF" equiv-text="@if (document?.notes.length) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="ngth}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">277,280</context>
+          <context context-type="linenumber">279,282</context>
         </context-group>
         <target state="needs-translation">Notes <x id="START_BLOCK_IF" equiv-text="@if (document?.notes.length) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="ngth}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></target>
       </trans-unit>
@@ -5848,7 +5848,7 @@
         <source>Save &amp; next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">314</context>
+          <context context-type="linenumber">316</context>
         </context-group>
         <target state="translated">Αποθήκευση &amp; επόμενο</target>
       </trans-unit>
@@ -5856,7 +5856,7 @@
         <source>Save &amp; close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">317</context>
+          <context context-type="linenumber">319</context>
         </context-group>
         <target state="translated">Αποθήκευση &amp; κλείσιμο</target>
       </trans-unit>
@@ -5864,7 +5864,7 @@
         <source>Enter Password</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">368</context>
+          <context context-type="linenumber">370</context>
         </context-group>
         <target state="translated">Εισαγωγή Κωδικού Πρόσβασης</target>
       </trans-unit>
@@ -6084,13 +6084,13 @@
         </context-group>
         <target state="needs-translation">Rotate confirm</target>
       </trans-unit>
-      <trans-unit id="1012437160148058675" datatype="html">
-        <source>This operation will permanently rotate the current document.</source>
+      <trans-unit id="857641176955257111" datatype="html">
+        <source>This operation will permanently rotate the original version of the current document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1088</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently rotate the current document.</target>
+        <target state="needs-translation">This operation will permanently rotate the original version of the current document.</target>
       </trans-unit>
       <trans-unit id="4233432423256408453" datatype="html">
         <source>This will alter the original copy.</source>
@@ -6414,13 +6414,13 @@
         </context-group>
         <target state="translated">Αυτή η λειτουργία θα ξανακάνει οριστικά OCR για τα <x id="PH" equiv-text="this.list.selected.size"/> επιλεγμένο(α) έγγραφο(α).</target>
       </trans-unit>
-      <trans-unit id="945321812966882943" datatype="html">
-        <source>This operation will permanently rotate <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
+      <trans-unit id="6390006284731990222" datatype="html">
+        <source>This operation will permanently rotate the original version of <x id="PH" equiv-text="this.list.selected.size"/> document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">662</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently rotate <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="needs-translation">This operation will permanently rotate the original version of <x id="PH" equiv-text="this.list.selected.size"/> document(s).</target>
       </trans-unit>
       <trans-unit id="7910756456450124185" datatype="html">
         <source>Merge confirm</source>
