@@ -1,5 +1,25 @@
 # Changelog
 
+## paperless-ngx 2.7.2
+
+### Bug Fixes
+
+- Fix: select dropdown background colors not visible in light mode [@shamoon](https://github.com/shamoon) ([#6323](https://github.com/paperless-ngx/paperless-ngx/pull/6323))
+- Fix: spacing in reset and incorrect display in saved views [@shamoon](https://github.com/shamoon) ([#6324](https://github.com/paperless-ngx/paperless-ngx/pull/6324))
+- Fix: disable invalid create endpoints [@shamoon](https://github.com/shamoon) ([#6320](https://github.com/paperless-ngx/paperless-ngx/pull/6320))
+- Fix: dont initialize page numbers, allow split with browser pdf viewer [@shamoon](https://github.com/shamoon) ([#6314](https://github.com/paperless-ngx/paperless-ngx/pull/6314))
+
+### All App Changes
+
+<details>
+<summary>4 changes</summary>
+
+- Fix: select dropdown background colors not visible in light mode [@shamoon](https://github.com/shamoon) ([#6323](https://github.com/paperless-ngx/paperless-ngx/pull/6323))
+- Fix: spacing in reset and incorrect display in saved views [@shamoon](https://github.com/shamoon) ([#6324](https://github.com/paperless-ngx/paperless-ngx/pull/6324))
+- Fix: disable invalid create endpoints [@shamoon](https://github.com/shamoon) ([#6320](https://github.com/paperless-ngx/paperless-ngx/pull/6320))
+- Fix: dont initialize page numbers, allow split with browser pdf viewer [@shamoon](https://github.com/shamoon) ([#6314](https://github.com/paperless-ngx/paperless-ngx/pull/6314))
+</details>
+
 ## paperless-ngx 2.7.1
 
 ### Bug Fixes
