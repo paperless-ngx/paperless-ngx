@@ -21,7 +21,7 @@
             <pngx-filterable-dropdown title="Tags" icon="tag-fill" i18n-title
               filterPlaceholder="Filter tags" i18n-filterPlaceholder
               [items]="tags"
-              [disabled]="!userCanEditAll"
+              [disabled]="!userCanEditAll || disabled"
               [editing]="true"
               [manyToOne]="true"
               [applyOnClose]="applyOnClose"
@@ -29,49 +29,53 @@
               (opened)="openTagsDropdown()"
               [(selectionModel)]="tagSelectionModel"
               [documentCounts]="tagDocumentCounts"
-              (apply)="setTags($event)">
+              (apply)="setTags($event)"
+              shortcutKey="t">
             </pngx-filterable-dropdown>
           }
           @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
             <pngx-filterable-dropdown title="Correspondent" icon="person-fill" i18n-title
               filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
               [items]="correspondents"
-              [disabled]="!userCanEditAll"
+              [disabled]="!userCanEditAll || disabled"
               [editing]="true"
               [applyOnClose]="applyOnClose"
               [createRef]="createCorrespondent.bind(this)"
               (opened)="openCorrespondentDropdown()"
               [(selectionModel)]="correspondentSelectionModel"
               [documentCounts]="correspondentDocumentCounts"
-              (apply)="setCorrespondents($event)">
+              (apply)="setCorrespondents($event)"
+              shortcutKey="y">
             </pngx-filterable-dropdown>
           }
           @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
             <pngx-filterable-dropdown title="Document type" icon="file-earmark-fill" i18n-title
               filterPlaceholder="Filter document types" i18n-filterPlaceholder
               [items]="documentTypes"
-              [disabled]="!userCanEditAll"
+              [disabled]="!userCanEditAll || disabled"
               [editing]="true"
               [applyOnClose]="applyOnClose"
               [createRef]="createDocumentType.bind(this)"
               (opened)="openDocumentTypeDropdown()"
               [(selectionModel)]="documentTypeSelectionModel"
               [documentCounts]="documentTypeDocumentCounts"
-              (apply)="setDocumentTypes($event)">
+              (apply)="setDocumentTypes($event)"
+              shortcutKey="u">
             </pngx-filterable-dropdown>
           }
           @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
             <pngx-filterable-dropdown title="Storage path" icon="folder-fill" i18n-title
               filterPlaceholder="Filter storage paths" i18n-filterPlaceholder
               [items]="storagePaths"
-              [disabled]="!userCanEditAll"
+              [disabled]="!userCanEditAll || disabled"
               [editing]="true"
               [applyOnClose]="applyOnClose"
               [createRef]="createStoragePath.bind(this)"
               (opened)="openStoragePathDropdown()"
               [(selectionModel)]="storagePathsSelectionModel"
               [documentCounts]="storagePathDocumentCounts"
-              (apply)="setStoragePaths($event)">
+              (apply)="setStoragePaths($event)"
+              shortcutKey="i">
             </pngx-filterable-dropdown>
           }
         </div>

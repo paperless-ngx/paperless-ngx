@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Component, Input, OnDestroy, OnInit } from '@angular/core'
 import { Tag } from 'src/app/data/tag'
 import { Correspondent } from 'src/app/data/correspondent'
 import { DocumentType } from 'src/app/data/document-type'
@@ -73,6 +73,9 @@ export class BulkEditorComponent
     downloadFileTypeOriginals: new FormControl(false),
     downloadUseFormatting: new FormControl(false),
   })
+
+  @Input()
+  public disabled: boolean = false
 
   constructor(
     private documentTypeService: DocumentTypeService,

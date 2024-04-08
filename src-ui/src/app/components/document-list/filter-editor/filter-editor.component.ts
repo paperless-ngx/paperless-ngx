@@ -876,6 +876,9 @@ export class FilterEditorComponent
 
   textFilterDebounce: Subject<string>
 
+  @Input()
+  public disabled: boolean = false
+
   ngOnInit() {
     if (
       this.permissionsService.currentUserCan(
