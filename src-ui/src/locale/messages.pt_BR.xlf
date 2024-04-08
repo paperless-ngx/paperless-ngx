@@ -325,7 +325,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">89</context>
+          <context context-type="linenumber">91</context>
         </context-group>
         <target state="translated">Próximo</target>
       </trans-unit>
@@ -507,7 +507,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">320</context>
+          <context context-type="linenumber">322</context>
         </context-group>
         <target state="final">Descartar</target>
       </trans-unit>
@@ -567,7 +567,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">312</context>
+          <context context-type="linenumber">314</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
@@ -707,7 +707,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">329</context>
+          <context context-type="linenumber">331</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -1087,7 +1087,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">288</context>
+          <context context-type="linenumber">290</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -1519,7 +1519,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">45</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -1595,7 +1595,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">22</context>
+          <context context-type="linenumber">24</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -1867,7 +1867,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">67</context>
+          <context context-type="linenumber">68</context>
         </context-group>
         <target state="translated">Dispensar</target>
       </trans-unit>
@@ -1931,7 +1931,7 @@
         <source>Dismiss selected</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">31</context>
         </context-group>
         <target state="translated">Dispensar selecionado</target>
       </trans-unit>
@@ -1939,7 +1939,7 @@
         <source>Dismiss all</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">32</context>
         </context-group>
         <target state="translated">Dispensar todos</target>
       </trans-unit>
@@ -1947,7 +1947,7 @@
         <source>Confirm Dismiss All</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">64</context>
+          <context context-type="linenumber">65</context>
         </context-group>
         <target state="translated">Confirmar Dispensar Todos</target>
       </trans-unit>
@@ -1955,7 +1955,7 @@
         <source>Dismiss all <x id="PH" equiv-text="tasks.size"/> tasks?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">65</context>
+          <context context-type="linenumber">66</context>
         </context-group>
         <target state="needs-translation">Dismiss all <x id="PH" equiv-text="tasks.size"/> tasks?</target>
       </trans-unit>
@@ -1963,7 +1963,7 @@
         <source>queued</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">133</context>
+          <context context-type="linenumber">135</context>
         </context-group>
         <target state="needs-translation">queued</target>
       </trans-unit>
@@ -1971,7 +1971,7 @@
         <source>started</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">135</context>
+          <context context-type="linenumber">137</context>
         </context-group>
         <target state="needs-translation">started</target>
       </trans-unit>
@@ -1979,7 +1979,7 @@
         <source>completed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">137</context>
+          <context context-type="linenumber">139</context>
         </context-group>
         <target state="needs-translation">completed</target>
       </trans-unit>
@@ -1987,7 +1987,7 @@
         <source>failed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">139</context>
+          <context context-type="linenumber">141</context>
         </context-group>
         <target state="translated">falhou</target>
       </trans-unit>
@@ -2895,7 +2895,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">4</context>
+          <context context-type="linenumber">5</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -2911,7 +2911,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">6,7</context>
+          <context context-type="linenumber">7,8</context>
         </context-group>
         <target state="needs-translation">of <x id="INTERPOLATION" equiv-text="{{totalPages}}"/></target>
       </trans-unit>
@@ -5286,7 +5286,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">104</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -5310,7 +5310,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">106</context>
+          <context context-type="linenumber">108</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -5346,7 +5346,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">27</context>
+          <context context-type="linenumber">29</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -5557,7 +5557,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>-</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">9</context>
+          <context context-type="linenumber">11</context>
         </context-group>
         <target state="needs-translation">-</target>
       </trans-unit>
@@ -5565,7 +5565,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>+</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">19</context>
         </context-group>
         <target state="needs-translation">+</target>
       </trans-unit>
@@ -5573,7 +5573,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Download original</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">34</context>
+          <context context-type="linenumber">36</context>
         </context-group>
         <target state="final">Baixar original</target>
       </trans-unit>
@@ -5581,7 +5581,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Redo OCR</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">49</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -5593,7 +5593,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>More like this</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">51</context>
+          <context context-type="linenumber">53</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
@@ -5605,7 +5605,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Split</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">55</context>
+          <context context-type="linenumber">57</context>
         </context-group>
         <target state="needs-translation">Split</target>
       </trans-unit>
@@ -5613,7 +5613,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Rotate</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">59</context>
+          <context context-type="linenumber">61</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -5625,7 +5625,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">85</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
@@ -5641,7 +5641,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Previous</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">88</context>
         </context-group>
         <target state="translated">Anterior</target>
       </trans-unit>
@@ -5649,7 +5649,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Details</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">99</context>
+          <context context-type="linenumber">101</context>
         </context-group>
         <target state="final">Detalhes</target>
       </trans-unit>
@@ -5657,7 +5657,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Archive serial number</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">103</context>
+          <context context-type="linenumber">105</context>
         </context-group>
         <target state="final">Número de série de arquivamento</target>
       </trans-unit>
@@ -5665,7 +5665,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Date created</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">104</context>
+          <context context-type="linenumber">106</context>
         </context-group>
         <target state="final">Data de criação</target>
       </trans-unit>
@@ -5673,7 +5673,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">108</context>
+          <context context-type="linenumber">110</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -5697,7 +5697,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Storage path</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">110</context>
+          <context context-type="linenumber">112</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -5717,7 +5717,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Default</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">111</context>
+          <context context-type="linenumber">113</context>
         </context-group>
         <target state="translated">Padrão</target>
       </trans-unit>
@@ -5725,7 +5725,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Content</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">195</context>
+          <context context-type="linenumber">197</context>
         </context-group>
         <target state="final">Conteúdo</target>
       </trans-unit>
@@ -5733,7 +5733,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">204</context>
+          <context context-type="linenumber">206</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/metadata-collapse/metadata-collapse.component.ts</context>
@@ -5745,7 +5745,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Date modified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">211</context>
+          <context context-type="linenumber">213</context>
         </context-group>
         <target state="final">Data de modificação</target>
       </trans-unit>
@@ -5753,7 +5753,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Date added</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">215</context>
+          <context context-type="linenumber">217</context>
         </context-group>
         <target state="final">Data de adição</target>
       </trans-unit>
@@ -5761,7 +5761,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Media filename</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">219</context>
+          <context context-type="linenumber">221</context>
         </context-group>
         <target state="final">Nome do arquivo</target>
       </trans-unit>
@@ -5769,7 +5769,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Original filename</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">223</context>
+          <context context-type="linenumber">225</context>
         </context-group>
         <target state="translated">Nome do arquivo original</target>
       </trans-unit>
@@ -5777,7 +5777,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Original MD5 checksum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">227</context>
+          <context context-type="linenumber">229</context>
         </context-group>
         <target state="final">Soma de verificação MD5 original</target>
       </trans-unit>
@@ -5785,7 +5785,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Original file size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">231</context>
+          <context context-type="linenumber">233</context>
         </context-group>
         <target state="final">Tamanho do arquivo original</target>
       </trans-unit>
@@ -5793,7 +5793,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Original mime type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">235</context>
+          <context context-type="linenumber">237</context>
         </context-group>
         <target state="final">Tipo mime original</target>
       </trans-unit>
@@ -5801,7 +5801,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Archive MD5 checksum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">240</context>
+          <context context-type="linenumber">242</context>
         </context-group>
         <target state="final">Soma de verificação MD5 de arquivamento</target>
       </trans-unit>
@@ -5809,7 +5809,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Archive file size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">246</context>
+          <context context-type="linenumber">248</context>
         </context-group>
         <target state="final">Tamanho arquivado</target>
       </trans-unit>
@@ -5817,7 +5817,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Original document metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">255</context>
+          <context context-type="linenumber">257</context>
         </context-group>
         <target state="final">Metadados do documento original</target>
       </trans-unit>
@@ -5825,7 +5825,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Archived document metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">258</context>
+          <context context-type="linenumber">260</context>
         </context-group>
         <target state="final">Metadados do documento arquivado</target>
       </trans-unit>
@@ -5833,7 +5833,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Preview</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">265</context>
+          <context context-type="linenumber">267</context>
         </context-group>
         <target state="translated">Pré-visualizar</target>
       </trans-unit>
@@ -5841,7 +5841,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Notes <x id="START_BLOCK_IF" equiv-text="@if (document?.notes.length) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="ngth}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">277,280</context>
+          <context context-type="linenumber">279,282</context>
         </context-group>
         <target state="needs-translation">Notes <x id="START_BLOCK_IF" equiv-text="@if (document?.notes.length) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="ngth}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></target>
       </trans-unit>
@@ -5849,7 +5849,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Save &amp; next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">314</context>
+          <context context-type="linenumber">316</context>
         </context-group>
         <target state="final">Salvar &amp; próximo</target>
       </trans-unit>
@@ -5857,7 +5857,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Save &amp; close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">317</context>
+          <context context-type="linenumber">319</context>
         </context-group>
         <target state="translated">Salvar &amp; Fechar</target>
       </trans-unit>
@@ -5865,7 +5865,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Enter Password</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">368</context>
+          <context context-type="linenumber">370</context>
         </context-group>
         <target state="translated">Digite a senha</target>
       </trans-unit>
@@ -6085,13 +6085,13 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         </context-group>
         <target state="needs-translation">Rotate confirm</target>
       </trans-unit>
-      <trans-unit id="1012437160148058675" datatype="html">
-        <source>This operation will permanently rotate the current document.</source>
+      <trans-unit id="857641176955257111" datatype="html">
+        <source>This operation will permanently rotate the original version of the current document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1088</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently rotate the current document.</target>
+        <target state="needs-translation">This operation will permanently rotate the original version of the current document.</target>
       </trans-unit>
       <trans-unit id="4233432423256408453" datatype="html">
         <source>This will alter the original copy.</source>
@@ -6415,13 +6415,13 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         </context-group>
         <target state="needs-translation">This operation will permanently redo OCR for <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</target>
       </trans-unit>
-      <trans-unit id="945321812966882943" datatype="html">
-        <source>This operation will permanently rotate <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
+      <trans-unit id="6390006284731990222" datatype="html">
+        <source>This operation will permanently rotate the original version of <x id="PH" equiv-text="this.list.selected.size"/> document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">662</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently rotate <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="needs-translation">This operation will permanently rotate the original version of <x id="PH" equiv-text="this.list.selected.size"/> document(s).</target>
       </trans-unit>
       <trans-unit id="7910756456450124185" datatype="html">
         <source>Merge confirm</source>
