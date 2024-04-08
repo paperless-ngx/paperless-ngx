@@ -316,6 +316,29 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_document_audit_action(self):
+        doc = Document.objects.create(
+            title="First title",
+            checksum="123",
+            mime_type="application/pdf",
+        )
+        self.client.force_login(user=self.user)
+        self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            {"title": "New title"},
+            format="json",
+        )
+
+        response = self.client.get(f"/api/documents/{doc.pk}/audit/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]["actor"]["id"], self.user.id)
+        self.assertEqual(response.data[0]["action"], "update")
+        self.assertEqual(
+            response.data[0]["changes"],
+            {"title": ["First title", "New title"]},
+        )
+
     def test_document_filters(self):
         doc1 = Document.objects.create(
             title="none1",

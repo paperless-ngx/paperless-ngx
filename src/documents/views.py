@@ -729,6 +729,39 @@ class DocumentViewSet(
             ]
             return Response(links)
 
+    @action(methods=["get"], detail=True, name="Audit Trail")
+    def audit(self, request, pk=None):
+        try:
+            doc = Document.objects.get(pk=pk)
+            if not request.user.has_perm("auditlog.view_logentry") or (
+                doc.owner is not None and doc.owner != request.user
+            ):
+                return HttpResponseForbidden(
+                    "Insufficient permissions",
+                )
+        except Document.DoesNotExist:
+            raise Http404
+
+        if request.method == "GET":
+            entries = [
+                {
+                    "id": entry.id,
+                    "timestamp": entry.timestamp,
+                    "action": entry.get_action_display(),
+                    "changes": json.loads(entry.changes),
+                    "remote_addr": entry.remote_addr,
+                    "actor": (
+                        {"id": entry.actor.id, "username": entry.actor.username}
+                        if entry.actor
+                        else None
+                    ),
+                }
+                for entry in LogEntry.objects.filter(object_pk=doc.pk).order_by(
+                    "-timestamp",
+                )
+            ]
+            return Response(entries)
+
 
 class SearchResultSerializer(DocumentSerializer, PassUserMixin):
     def to_representation(self, instance):
