@@ -216,11 +216,18 @@ export class DocumentListComponent
       })
 
     this.hotKeyService
-      .addShortcut({ keys: 'o', description: $localize`Open first document` })
+      .addShortcut({
+        keys: 'o',
+        description: $localize`Open first [selected] document`,
+      })
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         if (this.list.documents.length > 0) {
-          this.openDocumentDetail(this.list.documents[0])
+          if (this.list.selected.size > 0) {
+            this.openDocumentDetail(Array.from(this.list.selected)[0])
+          } else {
+            this.openDocumentDetail(this.list.documents[0])
+          }
         }
       })
   }
@@ -301,8 +308,11 @@ export class DocumentListComponent
     })
   }
 
-  openDocumentDetail(document: Document) {
-    this.router.navigate(['documents', document.id])
+  openDocumentDetail(document: Document | number) {
+    this.router.navigate([
+      'documents',
+      typeof document === 'number' ? document : document.id,
+    ])
   }
 
   toggleSelected(document: Document, event: MouseEvent): void {

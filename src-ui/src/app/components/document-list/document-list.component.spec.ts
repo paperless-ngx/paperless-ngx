@@ -629,5 +629,13 @@ describe('DocumentListComponent', () => {
     const detailSpy = jest.spyOn(component, 'openDocumentDetail')
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'o' }))
     expect(detailSpy).toHaveBeenCalledWith(docs[0])
+
+    jest.spyOn(documentListService, 'documents', 'get').mockReturnValue(docs)
+    jest
+      .spyOn(documentListService, 'selected', 'get')
+      .mockReturnValue(new Set([docs[1].id]))
+    fixture.detectChanges()
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'o' }))
+    expect(detailSpy).toHaveBeenCalledWith(docs[1].id)
   })
 })
