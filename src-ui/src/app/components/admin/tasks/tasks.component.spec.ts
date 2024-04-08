@@ -29,6 +29,7 @@ import { PageHeaderComponent } from '../../common/page-header/page-header.compon
 import { TasksComponent } from './tasks.component'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { FormsModule } from '@angular/forms'
 
 const tasks: PaperlessTask[] = [
   {
@@ -140,6 +141,7 @@ describe('TasksComponent', () => {
         HttpClientTestingModule,
         RouterTestingModule.withRoutes(routes),
         NgxBootstrapIconsModule.pick(allIcons),
+        FormsModule,
       ],
     }).compileComponents()
 
