@@ -577,13 +577,4 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     expect(selectionModel.getSelectedItems()).toEqual([items[0]])
     expect(selectionModel.getExcludedItems()).toEqual([items[1]])
   })
-
-  it('should correctly pass open state', () => {
-    component.items = items
-    component.icon = 'tag-fill'
-    fixture.detectChanges()
-    expect(component.isOpen()).toBeFalsy()
-    component.dropdown.open()
-    expect(component.isOpen()).toBeTruthy()
-  })
 })

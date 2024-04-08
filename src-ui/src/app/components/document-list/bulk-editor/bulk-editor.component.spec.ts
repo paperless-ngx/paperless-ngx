@@ -1179,16 +1179,4 @@ describe('BulkEditorComponent', () => {
     )
     expect(component.storagePaths).toEqual(storagePaths.results)
   })
-
-  it('should correctly pass open state from dropdowns', () => {
-    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
-    fixture.detectChanges()
-    expect(component.hasOpenMenu).toBeFalsy()
-    component.filterableDropdowns = [
-      {
-        isOpen: () => true,
-      } as any,
-    ]
-    expect(component.hasOpenMenu).toBeTruthy()
-  })
 })

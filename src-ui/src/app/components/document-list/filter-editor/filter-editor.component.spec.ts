@@ -1870,14 +1870,4 @@ describe('FilterEditorComponent', () => {
     component.itemSelected({ item: 'world', preventDefault: () => true })
     expect(component.textFilter).toEqual('hello world ')
   })
-
-  it('should correctly pass open state from dropdowns', () => {
-    expect(component.hasOpenMenu).toBeFalsy()
-    component.filterableDropdowns = [
-      {
-        isOpen: () => true,
-      } as any,
-    ]
-    expect(component.hasOpenMenu).toBeTruthy()
-  })
 })

@@ -165,10 +165,4 @@ describe('PermissionsFilterDropdownComponent', () => {
       userID: null,
     })
   })
-
-  it('should correctly pass open state', () => {
-    expect(component.isOpen()).toBeFalsy()
-    component.dropdown.open()
-    expect(component.isOpen()).toBeTruthy()
-  })
 })

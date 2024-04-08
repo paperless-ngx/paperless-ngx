@@ -7,7 +7,7 @@ import {
   ViewChildren,
 } from '@angular/core'
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router'
-import { NgbDropdown, NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { filter, first, map, Subject, switchMap, takeUntil } from 'rxjs'
 import { FilterRule } from 'src/app/data/filter-rule'
 import {
@@ -37,7 +37,6 @@ import { ComponentWithPermissions } from '../with-permissions/with-permissions.c
 import { FilterEditorComponent } from './filter-editor/filter-editor.component'
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component'
 import { HotKeyService } from 'src/app/services/hot-key.service'
-import { BulkEditorComponent } from './bulk-editor/bulk-editor.component'
 
 @Component({
   selector: 'pngx-document-list',
@@ -67,12 +66,7 @@ export class DocumentListComponent
   @ViewChild('filterEditor')
   private filterEditor: FilterEditorComponent
 
-  @ViewChild('bulkEditor')
-  private bulkEditor: BulkEditorComponent
-
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>
-
-  @ViewChildren(NgbDropdown) dropdowns: QueryList<NgbDropdown>
 
   displayMode = 'smallCards' // largeCards, smallCards, details
 
@@ -133,14 +127,6 @@ export class DocumentListComponent
 
   get isBulkEditing(): boolean {
     return this.list.selected.size > 0
-  }
-
-  get hasOpenMenu(): boolean {
-    return (
-      this.dropdowns.some((d) => d.isOpen()) ||
-      this.filterEditor.hasOpenMenu ||
-      this.bulkEditor.hasOpenMenu
-    )
   }
 
   saveDisplayMode() {
@@ -206,10 +192,7 @@ export class DocumentListComponent
         keys: 'escape',
         description: $localize`Reset filters / selection`,
       })
-      .pipe(
-        takeUntil(this.unsubscribeNotifier),
-        filter(() => !this.hasOpenMenu)
-      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         if (this.list.selected.size > 0) {
           this.list.selectNone()

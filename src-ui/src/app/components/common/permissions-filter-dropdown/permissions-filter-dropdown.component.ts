@@ -1,10 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-  ViewChild,
-} from '@angular/core'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { first } from 'rxjs'
 import { User } from 'src/app/data/user'
 import {
@@ -15,7 +9,6 @@ import {
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
-import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
 
 export class PermissionsSelectionModel {
   ownerFilter: OwnerFilterType
@@ -66,17 +59,11 @@ export class PermissionsFilterDropdownComponent extends ComponentWithPermissions
 
   hideUnowned: boolean
 
-  @ViewChild(NgbDropdown) dropdown: NgbDropdown
-
   get isActive(): boolean {
     return (
       this.selectionModel.ownerFilter !== OwnerFilterType.NONE ||
       this.selectionModel.hideUnowned
     )
-  }
-
-  public isOpen(): boolean {
-    return this.dropdown.isOpen()
   }
 
   constructor(
