@@ -77,6 +77,7 @@ enum DocumentDetailNavIDs {
   Preview = 4,
   Notes = 5,
   Permissions = 6,
+  History = 7,
 }
 
 enum ContentRenderType {
