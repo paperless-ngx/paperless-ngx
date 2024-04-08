@@ -29,7 +29,7 @@
       <tr>
         <th scope="col">
           <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="all-tasks" [disabled]="currentTasks.length === 0" (click)="toggleAll($event); $event.stopPropagation();">
+            <input type="checkbox" class="form-check-input" id="all-tasks" [disabled]="currentTasks.length === 0" [(ngModel)]="togggleAll" (click)="toggleAll($event); $event.stopPropagation();">
             <label class="form-check-label" for="all-tasks"></label>
           </div>
         </th>

@@ -99,7 +99,7 @@
         @if (list.selected.size === 0) {
           <span i18n>{list.collectionSize, plural, =1 {One document} other {{{list.collectionSize || 0}} documents}}</span>
           }&nbsp;@if (isFiltered) {
-          <span i18n>(filtered)</span>
+            &nbsp;<span i18n>(filtered)</span>
         }
       }
       @if (!list.isReloading && isFiltered) {

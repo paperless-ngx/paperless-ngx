@@ -262,13 +262,14 @@ a.btn-link:focus-visible,
     }
 
     .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
-      background-color: var(--pngx-bg-alt) !important;
+      background-color: var(--pngx-bg-darker) !important;
       color: var(--pngx-body-color-accent) !important;
     }
 
     .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected,
     .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected.ng-option-marked {
-      background: none;
+      font-weight: bold;
+      background-color: var(--pngx-bg-alt2) !important;
     }
   }
 

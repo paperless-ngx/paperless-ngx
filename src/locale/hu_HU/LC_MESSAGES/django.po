@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-04 14:31-0700\n"
-"PO-Revision-Date: 2024-04-04 21:33\n"
+"POT-Creation-Date: 2024-04-07 18:36-0700\n"
+"PO-Revision-Date: 2024-04-08 01:36\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -836,16 +836,16 @@ msgstr ""
 msgid "Invalid regular expression: %(error)s"
 msgstr "Érvénytelen reguláris kifejezés: %(error)s"
 
-#: documents/serialisers.py:408
+#: documents/serialisers.py:417
 msgid "Invalid color."
 msgstr "Érvénytelen szín."
 
-#: documents/serialisers.py:1130
+#: documents/serialisers.py:1143
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Fájltípus %(type)s nem támogatott"
 
-#: documents/serialisers.py:1239
+#: documents/serialisers.py:1252
 msgid "Invalid variable detected."
 msgstr "Érvénytelen változót észleltek."
 
