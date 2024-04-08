@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Component, OnDestroy, OnInit, ViewChildren } from '@angular/core'
 import { Tag } from 'src/app/data/tag'
 import { Correspondent } from 'src/app/data/correspondent'
 import { DocumentType } from 'src/app/data/document-type'
@@ -6,7 +6,7 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
+import { NgbDropdown, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
 import {
   DocumentService,
   SelectionDataItem,
@@ -15,6 +15,7 @@ import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
 import {
   ChangedItems,
+  FilterableDropdownComponent,
   FilterableDropdownSelectionModel,
 } from '../../common/filterable-dropdown/filterable-dropdown.component'
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
@@ -74,6 +75,10 @@ export class BulkEditorComponent
     downloadUseFormatting: new FormControl(false),
   })
 
+  @ViewChildren(NgbDropdown) dropdowns: NgbDropdown[]
+  @ViewChildren(FilterableDropdownComponent)
+  filterableDropdowns: FilterableDropdownComponent[]
+
   constructor(
     private documentTypeService: DocumentTypeService,
     private tagService: TagService,
@@ -119,6 +124,13 @@ export class BulkEditorComponent
     const docs = this.list.documents.filter((d) => this.list.selected.has(d.id))
     ownsAll = docs.every((d) => this.permissionService.currentUserOwnsObject(d))
     return ownsAll
+  }
+
+  get hasOpenMenu(): boolean {
+    return (
+      this.filterableDropdowns.some((d) => d.isOpen()) ||
+      this.dropdowns.some((d) => d.isOpen())
+    )
   }
 
   ngOnInit() {

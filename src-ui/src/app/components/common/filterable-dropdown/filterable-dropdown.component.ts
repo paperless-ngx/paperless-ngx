@@ -425,6 +425,10 @@ export class FilterableDropdownComponent {
 
   modelIsDirty: boolean = false
 
+  public isOpen(): boolean {
+    return this.dropdown.isOpen()
+  }
+
   private keyboardIndex: number
 
   constructor(private filterPipe: FilterPipe) {

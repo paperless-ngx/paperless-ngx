@@ -630,4 +630,15 @@ describe('DocumentListComponent', () => {
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'o' }))
     expect(detailSpy).toHaveBeenCalledWith(docs[0])
   })
+
+  it('should ignore escape hotkey if there is a filter or bulk editor menu to close', () => {
+    fixture.detectChanges()
+    jest
+      .spyOn(component['filterEditor'], 'hasOpenMenu', 'get')
+      .mockReturnValue(true)
+    const resetSpy = jest.spyOn(component['filterEditor'], 'resetSelected')
+    component.clickTag(1)
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'escape' }))
+    expect(resetSpy).not.toHaveBeenCalled()
+  })
 })

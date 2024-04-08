@@ -135,4 +135,10 @@ describe('DateDropdownComponent', () => {
     input.dispatchEvent(event)
     expect(eventSpy).toHaveBeenCalled()
   })
+
+  it('should correctly pass open state', () => {
+    expect(component.isOpen()).toBeFalsy()
+    component.dropdown.open()
+    expect(component.isOpen()).toBeTruthy()
+  })
 })

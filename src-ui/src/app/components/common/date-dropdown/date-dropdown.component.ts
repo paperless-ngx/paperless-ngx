@@ -5,8 +5,9 @@ import {
   Output,
   OnInit,
   OnDestroy,
+  ViewChild,
 } from '@angular/core'
-import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap'
+import { NgbDateAdapter, NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
 import { Subject, Subscription } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -88,12 +89,18 @@ export class DateDropdownComponent implements OnInit, OnDestroy {
   @Input()
   disabled: boolean = false
 
+  @ViewChild(NgbDropdown) dropdown: NgbDropdown
+
   get isActive(): boolean {
     return (
       this.relativeDate !== null ||
       this.dateAfter?.length > 0 ||
       this.dateBefore?.length > 0
     )
+  }
+
+  public isOpen(): boolean {
+    return this.dropdown.isOpen()
   }
 
   private datesSetDebounce$ = new Subject()

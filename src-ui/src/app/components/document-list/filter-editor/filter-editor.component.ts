@@ -8,6 +8,7 @@ import {
   ViewChild,
   ElementRef,
   AfterViewInit,
+  ViewChildren,
 } from '@angular/core'
 import { Tag } from 'src/app/data/tag'
 import { Correspondent } from 'src/app/data/correspondent'
@@ -61,6 +62,7 @@ import {
   FILTER_SHARED_BY_USER,
 } from 'src/app/data/filter-rule-type'
 import {
+  FilterableDropdownComponent,
   FilterableDropdownSelectionModel,
   Intersection,
   LogicalOperator,
@@ -74,9 +76,13 @@ import {
 import { Document } from 'src/app/data/document'
 import { StoragePath } from 'src/app/data/storage-path'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
-import { RelativeDate } from '../../common/date-dropdown/date-dropdown.component'
+import {
+  DateDropdownComponent,
+  RelativeDate,
+} from '../../common/date-dropdown/date-dropdown.component'
 import {
   OwnerFilterType,
+  PermissionsFilterDropdownComponent,
   PermissionsSelectionModel,
 } from '../../common/permissions-filter-dropdown/permissions-filter-dropdown.component'
 import {
@@ -86,6 +92,7 @@ import {
 } from 'src/app/services/permissions.service'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { SearchService } from 'src/app/services/rest/search.service'
+import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
 
 const TEXT_FILTER_TARGET_TITLE = 'title'
 const TEXT_FILTER_TARGET_TITLE_CONTENT = 'title-content'
@@ -268,6 +275,13 @@ export class FilterEditorComponent
   _moreLikeDoc: Document
 
   unsubscribeNotifier: Subject<any> = new Subject()
+
+  @ViewChild(NgbDropdown) textFilterDropdown: NgbDropdown
+  @ViewChildren(FilterableDropdownComponent)
+  filterableDropdowns: FilterableDropdownComponent[]
+  @ViewChildren(DateDropdownComponent) dateDropdowns: DateDropdownComponent[]
+  @ViewChild(PermissionsFilterDropdownComponent)
+  permissionsDropdown: PermissionsFilterDropdownComponent
 
   get textFilterTargets() {
     if (this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_MORELIKE) {
@@ -875,6 +889,15 @@ export class FilterEditorComponent
   }
 
   textFilterDebounce: Subject<string>
+
+  get hasOpenMenu(): boolean {
+    return (
+      this.textFilterDropdown.isOpen() ||
+      this.filterableDropdowns.some((d) => d.isOpen()) ||
+      this.dateDropdowns.some((d) => d.isOpen()) ||
+      this.permissionsDropdown.isOpen()
+    )
+  }
 
   ngOnInit() {
     if (
