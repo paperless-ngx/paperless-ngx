@@ -72,12 +72,12 @@ if ! docker stats --no-stream &> /dev/null ; then
 fi
 
 # Added handling for timezone for busybox based linux, not having timedatectl available (i.e. QNAP QTS)
-# if neither timedatectl or /etc/TZ is suceeding, defaulting to GMT.
+# if neither timedatectl nor /etc/TZ is suceeding, defaulting to GMT.
 if  command -v timedatectl &> /dev/null ; then
         default_time_zone=$(timedatectl show -p Timezone --value)
 elif [ -f /etc/TZ ] && [ -f /etc/tzlist ] ; then
-        TZ=`cat /etc/TZ`
-        default_time_zone=$(grep -B 1 -m 1 $TZ /etc/tzlist | head -1 | cut -f 2 -d =)
+        TZ=$(cat /etc/TZ)
+        default_time_zone=$(grep -B 1 -m 1 "$TZ" /etc/tzlist | head -1 | cut -f 2 -d =)
 else
         default_time_zone="Europe/London"
 fi
