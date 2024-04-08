@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-04 14:31-0700\n"
-"PO-Revision-Date: 2024-04-04 21:33\n"
+"POT-Creation-Date: 2024-04-07 18:36-0700\n"
+"PO-Revision-Date: 2024-04-08 01:37\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -836,16 +836,16 @@ msgstr "ввімкнено"
 msgid "Invalid regular expression: %(error)s"
 msgstr "Неправильний регулярний вираз: %(error)s"
 
-#: documents/serialisers.py:408
+#: documents/serialisers.py:417
 msgid "Invalid color."
 msgstr "Неправильний колір."
 
-#: documents/serialisers.py:1130
+#: documents/serialisers.py:1143
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Тип файлу %(type)s не підтримується"
 
-#: documents/serialisers.py:1239
+#: documents/serialisers.py:1252
 msgid "Invalid variable detected."
 msgstr "Виявлено неправильну змінну."
 
