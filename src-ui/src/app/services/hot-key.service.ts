@@ -54,8 +54,13 @@ export class HotKeyService {
         }
 
         this.modalService.dismissAll()
-        if (e.key === 'Escape' && this.modalService.hasOpenModals()) {
-          // If there is a modal open, just dismiss
+        if (
+          e.key === 'Escape' &&
+          (this.modalService.hasOpenModals() ||
+            this.document.getElementsByClassName('dropdown-menu show').length >
+              0)
+        ) {
+          // If there is a modal open or menu open, ignore the keydown event
           return
         }
 
