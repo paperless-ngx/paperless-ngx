@@ -10,7 +10,9 @@ export interface AuditLogEntry {
   id: number
   timestamp: string
   action: AuditLogAction
-  changes: any
+  changes: {
+    [key: string]: string[]
+  }
   remote_addr: string
   actor?: User
 }

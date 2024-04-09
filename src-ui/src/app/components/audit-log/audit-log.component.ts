@@ -28,6 +28,11 @@ export class AuditLogComponent implements OnInit {
         .getAuditLog(this._documentId)
         .subscribe((auditLogEntries) => {
           this.entries = auditLogEntries
+            .map((entry) => {
+              delete entry.changes['modified']
+              return entry
+            })
+            .filter((entry) => Object.keys(entry.changes).length > 0)
           this.loading = false
         })
     }
