@@ -1,0 +1,33 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "./src",
+			"name": "Backend"
+		},
+		{
+			"path": "./src-ui",
+			"name": "Frontend"
+		},
+		{
+			"path": "./.github",
+			"name": "CI/CD"
+		}
+
+	],
+	"settings": {
+		"files.exclude": {
+			"**/__pycache__": true,
+			"**/.mypy_cache": true,
+			"**/.ruff_cache": true,
+			"**/.pytest_cache": true,
+			"**/.idea": true,
+			"**/.venv": true,
+			"**/.coverage": true,
+			"**/coverage.json": true
+	},
+	"python.defaultInterpreterPath": "./.venv/bin/python3.exe",
+	}
+}

@@ -2,15 +2,12 @@ import datetime
 import hashlib
 import os
 import tempfile
-import uuid
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Optional
 
 import magic
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import transaction
@@ -45,6 +42,7 @@ from documents.plugins.base import AlwaysRunPluginMixin
 from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import NoCleanupPluginMixin
 from documents.plugins.base import NoSetupPluginMixin
+from documents.plugins.helpers import ProgressStatusOptions
 from documents.signals import document_consumption_finished
 from documents.signals import document_consumption_started
 from documents.utils import copy_basic_file_stats
@@ -254,8 +252,14 @@ class ConsumerFilePhase(str, Enum):
     FAILED = "FAILED"
 
 
-class Consumer(LoggingMixin):
+class ConsumerPlugin(AlwaysRunPluginMixin, ConsumeTaskPlugin, LoggingMixin):
     logging_name = "paperless.consumer"
+
+    def setup(self) -> None:
+        pass
+
+    def cleanup(self) -> None:
+        pass
 
     def _send_progress(
         self,
@@ -265,19 +269,15 @@ class Consumer(LoggingMixin):
         message: Optional[ConsumerStatusShortMessage] = None,
         document_id=None,
     ):  # pragma: no cover
-        payload = {
-            "filename": os.path.basename(self.filename) if self.filename else None,
-            "task_id": self.task_id,
-            "current_progress": current_progress,
-            "max_progress": max_progress,
-            "status": status,
-            "message": message,
-            "document_id": document_id,
-            "owner_id": self.override_owner_id if self.override_owner_id else None,
-        }
-        async_to_sync(self.channel_layer.group_send)(
-            "status_updates",
-            {"type": "status_update", "data": payload},
+        self.status_mgr.send_progress(
+            ProgressStatusOptions.WORKING,
+            message,
+            current_progress,
+            max_progress,
+            {
+                "document_id": document_id,
+                "owner_id": self.override_owner_id if self.override_owner_id else None,
+            },
         )
 
     def _fail(
@@ -290,22 +290,6 @@ class Consumer(LoggingMixin):
         self._send_progress(100, 100, ConsumerFilePhase.FAILED, message)
         self.log.error(log_message or message, exc_info=exc_info)
         raise ConsumerError(f"{self.filename}: {log_message or message}") from exception
-
-    def __init__(self):
-        super().__init__()
-        self.path: Optional[Path] = None
-        self.original_path: Optional[Path] = None
-        self.filename = None
-        self.override_title = None
-        self.override_correspondent_id = None
-        self.override_tag_ids = None
-        self.override_document_type_id = None
-        self.override_asn = None
-        self.task_id = None
-        self.override_owner_id = None
-        self.override_custom_field_ids = None
-
-        self.channel_layer = get_channel_layer()
 
     def pre_check_file_exists(self):
         """
@@ -486,45 +470,26 @@ class Consumer(LoggingMixin):
                 exception=e,
             )
 
-    def try_consume_file(
-        self,
-        path: Path,
-        override_filename=None,
-        override_title=None,
-        override_correspondent_id=None,
-        override_document_type_id=None,
-        override_tag_ids=None,
-        override_storage_path_id=None,
-        task_id=None,
-        override_created=None,
-        override_asn=None,
-        override_owner_id=None,
-        override_view_users=None,
-        override_view_groups=None,
-        override_change_users=None,
-        override_change_groups=None,
-        override_custom_field_ids=None,
-    ) -> Document:
+    def run(self) -> str:
         """
         Return the document object if it was successfully created.
         """
 
-        self.original_path = Path(path).resolve()
-        self.filename = override_filename or self.original_path.name
-        self.override_title = override_title
-        self.override_correspondent_id = override_correspondent_id
-        self.override_document_type_id = override_document_type_id
-        self.override_tag_ids = override_tag_ids
-        self.override_storage_path_id = override_storage_path_id
-        self.task_id = task_id or str(uuid.uuid4())
-        self.override_created = override_created
-        self.override_asn = override_asn
-        self.override_owner_id = override_owner_id
-        self.override_view_users = override_view_users
-        self.override_view_groups = override_view_groups
-        self.override_change_users = override_change_users
-        self.override_change_groups = override_change_groups
-        self.override_custom_field_ids = override_custom_field_ids
+        self.original_path = self.input_doc.original_file
+        self.filename = self.metadata.filename or self.input_doc.original_file.name
+        self.override_title = self.metadata.title
+        self.override_correspondent_id = self.metadata.correspondent_id
+        self.override_document_type_id = self.metadata.document_type_id
+        self.override_tag_ids = self.metadata.tag_ids
+        self.override_storage_path_id = self.metadata.storage_path_id
+        self.override_created = self.metadata.created
+        self.override_asn = self.metadata.asn
+        self.override_owner_id = self.metadata.owner_id
+        self.override_view_users = self.metadata.view_users
+        self.override_view_groups = self.metadata.view_groups
+        self.override_change_users = self.metadata.change_users
+        self.override_change_groups = self.metadata.change_groups
+        self.override_custom_field_ids = self.metadata.custom_field_ids
 
         self._send_progress(
             0,
@@ -766,7 +731,7 @@ class Consumer(LoggingMixin):
         # Return the most up to date fields
         document.refresh_from_db()
 
-        return document
+        return f"Success. New document id {document.pk} created"
 
     def _parse_title_placeholders(self, title: str) -> str:
         local_added = timezone.localtime(timezone.now())
