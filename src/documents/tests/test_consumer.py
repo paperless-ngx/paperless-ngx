@@ -670,12 +670,12 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def testNoParsers(self, m):
         m.return_value = []
 
-        self.assertRaisesMessage(
-            ConsumerError,
-            "sample.pdf: Unsupported mime type application/pdf",
-            self.consumer.try_consume_file,
-            self.get_test_file(),
-        )
+        with self.get_consumer(self.get_test_file()) as consumer:
+            with self.assertRaisesMessage(
+                ConsumerError,
+                "sample.pdf: Unsupported mime type application/pdf",
+            ):
+                consumer.run()
 
         self._assert_first_last_send_progress(last_status="FAILED")
 
@@ -692,12 +692,12 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             ),
         ]
 
-        self.assertRaisesMessage(
-            ConsumerError,
-            "sample.pdf: Error occurred while consuming document sample.pdf: Does not compute.",
-            self.consumer.try_consume_file,
-            self.get_test_file(),
-        )
+        with self.get_consumer(self.get_test_file()) as consumer:
+            with self.assertRaisesMessage(
+                ConsumerError,
+                "sample.pdf: Error occurred while consuming document sample.pdf: Does not compute.",
+            ):
+                consumer.run()
 
         self._assert_first_last_send_progress(last_status="FAILED")
 
@@ -714,12 +714,12 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             ),
         ]
 
-        self.assertRaisesMessage(
-            ConsumerError,
-            "sample.pdf: Unexpected error while consuming document sample.pdf: Generic exception.",
-            self.consumer.try_consume_file,
-            self.get_test_file(),
-        )
+        with self.get_consumer(self.get_test_file()) as consumer:
+            with self.assertRaisesMessage(
+                ConsumerError,
+                "sample.pdf: Unexpected error while consuming document sample.pdf: Generic exception.",
+            ):
+                consumer.run()
 
         self._assert_first_last_send_progress(last_status="FAILED")
 
@@ -728,12 +728,12 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         filename = self.get_test_file()
         m.side_effect = OSError("NO.")
 
-        self.assertRaisesMessage(
-            ConsumerError,
-            "sample.pdf: The following error occurred while storing document sample.pdf after parsing: NO.",
-            self.consumer.try_consume_file,
-            filename,
-        )
+        with self.get_consumer(self.get_test_file()) as consumer:
+            with self.assertRaisesMessage(
+                ConsumerError,
+                "sample.pdf: The following error occurred while storing document sample.pdf after parsing: NO.",
+            ):
+                consumer.run()
 
         self._assert_first_last_send_progress(last_status="FAILED")
 
