@@ -15,8 +15,12 @@
                 <li class="list-group-item">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            {{ entry.timestamp | customDate:'longDate' }}
-                            {{ entry.timestamp | date:'shortTime' }}
+                            <ng-template #timestamp>
+                                <div class="text-light">
+                                    {{ entry.timestamp | customDate:'longDate' }} {{ entry.timestamp | date:'shortTime' }}
+                                </div>
+                            </ng-template>
+                            <span [ngbTooltip]="timestamp">{{ entry.timestamp | customDate:'relative' }}</span>
                             @if (entry.actor) {
                                 <span class="ms-3 fst-italic">{{ entry.actor.username }}</span>
                             } @else {
