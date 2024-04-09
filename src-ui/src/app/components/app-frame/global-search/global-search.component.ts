@@ -4,12 +4,11 @@ import {
   ElementRef,
   ViewChildren,
   QueryList,
-  HostListener,
   OnInit,
 } from '@angular/core'
 import { Router } from '@angular/router'
 import { NgbDropdown, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
-import { Subject, debounceTime, distinctUntilChanged, filter } from 'rxjs'
+import { Subject, debounceTime, distinctUntilChanged, filter, map } from 'rxjs'
 import {
   FILTER_HAS_CORRESPONDENT_ANY,
   FILTER_HAS_DOCUMENT_TYPE_ANY,
@@ -77,8 +76,9 @@ export class GlobalSearchComponent implements OnInit {
     this.queryDebounce
       .pipe(
         debounceTime(400),
-        distinctUntilChanged(),
-        filter((query) => !query?.length || query?.length > 2)
+        map((query) => query?.trim()),
+        filter((query) => !query?.length || query?.length > 2),
+        distinctUntilChanged()
       )
       .subscribe((text) => {
         this.query = text
