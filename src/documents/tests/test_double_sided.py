@@ -46,7 +46,7 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         with mock.patch(
             "documents.tasks.ProgressManager",
             DummyProgressManager,
-        ), mock.patch("documents.consumer.async_to_sync"):
+        ):
             msg = tasks.consume_file(
                 ConsumableDocument(
                     source=DocumentSource.ConsumeFolder,

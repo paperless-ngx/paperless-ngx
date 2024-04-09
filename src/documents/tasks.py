@@ -162,6 +162,8 @@ def consume_file(
             finally:
                 plugin.cleanup()
 
+    return msg
+
 
 @shared_task
 def sanity_check():

@@ -17,6 +17,7 @@ from filelock import FileLock
 from rest_framework.reverse import reverse
 
 from documents.classifier import load_classifier
+from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
@@ -42,6 +43,7 @@ from documents.plugins.base import AlwaysRunPluginMixin
 from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import NoCleanupPluginMixin
 from documents.plugins.base import NoSetupPluginMixin
+from documents.plugins.helpers import ProgressManager
 from documents.signals import document_consumption_finished
 from documents.signals import document_consumption_started
 from documents.utils import copy_basic_file_stats
@@ -253,6 +255,32 @@ class ConsumerFilePhase(str, Enum):
 
 class ConsumerPlugin(AlwaysRunPluginMixin, ConsumeTaskPlugin, LoggingMixin):
     logging_name = "paperless.consumer"
+
+    def __init__(
+        self,
+        input_doc: ConsumableDocument,
+        metadata: DocumentMetadataOverrides,
+        status_mgr: ProgressManager,
+        base_tmp_dir: Path,
+        task_id: str,
+    ) -> None:
+        super().__init__(input_doc, metadata, status_mgr, base_tmp_dir, task_id)
+
+        self.original_path = self.input_doc.original_file
+        self.filename = self.metadata.filename or self.input_doc.original_file.name
+        self.override_title = self.metadata.title
+        self.override_correspondent_id = self.metadata.correspondent_id
+        self.override_document_type_id = self.metadata.document_type_id
+        self.override_tag_ids = self.metadata.tag_ids
+        self.override_storage_path_id = self.metadata.storage_path_id
+        self.override_created = self.metadata.created
+        self.override_asn = self.metadata.asn
+        self.override_owner_id = self.metadata.owner_id
+        self.override_view_users = self.metadata.view_users
+        self.override_view_groups = self.metadata.view_groups
+        self.override_change_users = self.metadata.change_users
+        self.override_change_groups = self.metadata.change_groups
+        self.override_custom_field_ids = self.metadata.custom_field_ids
 
     def setup(self) -> None:
         pass
@@ -473,22 +501,6 @@ class ConsumerPlugin(AlwaysRunPluginMixin, ConsumeTaskPlugin, LoggingMixin):
         """
         Return the document object if it was successfully created.
         """
-
-        self.original_path = self.input_doc.original_file
-        self.filename = self.metadata.filename or self.input_doc.original_file.name
-        self.override_title = self.metadata.title
-        self.override_correspondent_id = self.metadata.correspondent_id
-        self.override_document_type_id = self.metadata.document_type_id
-        self.override_tag_ids = self.metadata.tag_ids
-        self.override_storage_path_id = self.metadata.storage_path_id
-        self.override_created = self.metadata.created
-        self.override_asn = self.metadata.asn
-        self.override_owner_id = self.metadata.owner_id
-        self.override_view_users = self.metadata.view_users
-        self.override_view_groups = self.metadata.view_groups
-        self.override_change_users = self.metadata.change_users
-        self.override_change_groups = self.metadata.change_groups
-        self.override_custom_field_ids = self.metadata.custom_field_ids
 
         self._send_progress(
             0,

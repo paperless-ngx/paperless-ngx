@@ -88,7 +88,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
 
         return super().setUp()
 
-    @mock.patch("documents.consumer.Consumer.try_consume_file")
+    @mock.patch("documents.consumer.ConsumerPlugin.run")
     def test_workflow_match(self, m):
         """
         GIVEN:
@@ -1467,7 +1467,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         expected_str = f"Document matched {trigger} from {w}"
         self.assertIn(expected_str, info)
 
-    @mock.patch("documents.consumer.Consumer.try_consume_file")
+    @mock.patch("documents.consumer.ConsumerPlugin.run")
     def test_removal_action_document_consumed_removeall(self, m):
         """
         GIVEN:
