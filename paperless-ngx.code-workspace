@@ -14,6 +14,10 @@
 		{
 			"path": "./.github",
 			"name": "CI/CD"
+		},
+		{
+			"path": "./docs",
+			"name": "Documentation"
 		}
 
 	],
@@ -27,7 +31,6 @@
 			"**/.venv": true,
 			"**/.coverage": true,
 			"**/coverage.json": true
-	},
-	"python.defaultInterpreterPath": "./.venv/bin/python3.exe",
+		}
 	}
 }

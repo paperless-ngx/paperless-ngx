@@ -42,7 +42,6 @@ from documents.plugins.base import AlwaysRunPluginMixin
 from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import NoCleanupPluginMixin
 from documents.plugins.base import NoSetupPluginMixin
-from documents.plugins.helpers import ProgressStatusOptions
 from documents.signals import document_consumption_finished
 from documents.signals import document_consumption_started
 from documents.utils import copy_basic_file_stats
@@ -266,15 +265,15 @@ class ConsumerPlugin(AlwaysRunPluginMixin, ConsumeTaskPlugin, LoggingMixin):
         current_progress: int,
         max_progress: int,
         status: ConsumerFilePhase,
-        message: Optional[ConsumerStatusShortMessage] = None,
+        message: Optional[ConsumerStatusShortMessage | str] = None,
         document_id=None,
     ):  # pragma: no cover
         self.status_mgr.send_progress(
-            ProgressStatusOptions.WORKING,
+            status,
             message,
             current_progress,
             max_progress,
-            {
+            extra_args={
                 "document_id": document_id,
                 "owner_id": self.override_owner_id if self.override_owner_id else None,
             },
@@ -282,7 +281,7 @@ class ConsumerPlugin(AlwaysRunPluginMixin, ConsumeTaskPlugin, LoggingMixin):
 
     def _fail(
         self,
-        message: ConsumerStatusShortMessage,
+        message: ConsumerStatusShortMessage | str,
         log_message: Optional[str] = None,
         exc_info=None,
         exception: Optional[Exception] = None,
@@ -555,9 +554,6 @@ class ConsumerPlugin(AlwaysRunPluginMixin, ConsumeTaskPlugin, LoggingMixin):
         )
 
         self.log.debug(f"Parser: {type(document_parser).__name__}")
-
-        # However, this already created working directories which we have to
-        # clean up.
 
         # Parse the document. This may take some time.
 
