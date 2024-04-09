@@ -1300,6 +1300,8 @@ class UiSettingsView(GenericAPIView):
         if general_config.app_logo is not None and len(general_config.app_logo) > 0:
             ui_settings["app_logo"] = general_config.app_logo
 
+        ui_settings["auditlog_enabled"] = settings.AUDIT_LOG_ENABLED
+
         user_resp = {
             "id": user.id,
             "username": user.username,

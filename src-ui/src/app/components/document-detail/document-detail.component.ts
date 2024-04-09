@@ -903,6 +903,16 @@ export class DocumentDetailComponent
     )
   }
 
+  get auditlogEnabled(): boolean {
+    return (
+      this.settings.get(SETTINGS_KEYS.AUDITLOG_ENABLED) &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.AuditLogEntry
+      )
+    )
+  }
+
   notesUpdated(notes: DocumentNote[]) {
     this.document.notes = notes
     this.openDocumentService.refreshDocument(this.documentId)

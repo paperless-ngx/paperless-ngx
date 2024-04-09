@@ -47,6 +47,7 @@ describe('SettingsService', () => {
       update_checking: { enabled: false, backend_setting: 'default' },
       saved_views: { warn_on_unsaved_change: true },
       notes_enabled: true,
+      auditlog_enabled: true,
       tour_complete: false,
       permissions: {
         default_owner: null,

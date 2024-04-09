@@ -37,6 +37,7 @@ export const SETTINGS_KEYS = {
   NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD:
     'general-settings:notifications:consumer-suppress-on-dashboard',
   NOTES_ENABLED: 'general-settings:notes-enabled',
+  AUDITLOG_ENABLED: 'general-settings:auditlog-enabled',
   SLIM_SIDEBAR: 'general-settings:slim-sidebar',
   UPDATE_CHECKING_ENABLED: 'general-settings:update-checking:enabled',
   UPDATE_CHECKING_BACKEND_SETTING:
@@ -140,6 +141,11 @@ export const SETTINGS: UiSetting[] = [
   },
   {
     key: SETTINGS_KEYS.NOTES_ENABLED,
+    type: 'boolean',
+    default: true,
+  },
+  {
+    key: SETTINGS_KEYS.AUDITLOG_ENABLED,
     type: 'boolean',
     default: true,
   },

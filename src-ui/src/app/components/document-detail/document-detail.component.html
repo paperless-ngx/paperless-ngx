@@ -285,14 +285,16 @@
           </li>
         }
 
-        <li *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.AuditLogEntry }" [ngbNavItem]="DocumentDetailNavIDs.History">
-          <a ngbNavLink i18n>History</a>
-          <ng-template ngbNavContent>
-            <div class="mb-3">
-              <pngx-audit-log [documentId]="documentId"></pngx-audit-log>
-            </div>
-          </ng-template>
-        </li>
+        @if (auditlogEnabled) {
+          <li [ngbNavItem]="DocumentDetailNavIDs.History">
+            <a ngbNavLink i18n>History</a>
+            <ng-template ngbNavContent>
+              <div class="mb-3">
+                <pngx-audit-log [documentId]="documentId"></pngx-audit-log>
+              </div>
+            </ng-template>
+          </li>
+        }
 
         @if (showPermissions) {
           <li [ngbNavItem]="DocumentDetailNavIDs.Permissions">
