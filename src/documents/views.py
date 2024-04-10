@@ -1110,6 +1110,8 @@ class GlobalSearchView(PassUserMixin):
         elif len(query) < 3:
             return HttpResponseBadRequest("Query must be at least 3 characters")
 
+        db_only = request.query_params.get("db_only", False)
+
         OBJECT_LIMIT = 3
         docs = []
         if request.user.has_perm("documents.view_document"):
@@ -1120,7 +1122,7 @@ class GlobalSearchView(PassUserMixin):
             )
             # First search by title
             docs = all_docs.filter(title__icontains=query)[:OBJECT_LIMIT]
-            if len(docs) < OBJECT_LIMIT:
+            if not db_only and len(docs) < OBJECT_LIMIT:
                 # If we don't have enough results, search by content
                 from documents import index
 

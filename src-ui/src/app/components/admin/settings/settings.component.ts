@@ -99,6 +99,7 @@ export class SettingsComponent
     defaultPermsEditUsers: new FormControl(null),
     defaultPermsEditGroups: new FormControl(null),
     documentEditingRemoveInboxTags: new FormControl(null),
+    searchDbOnly: new FormControl(null),
 
     notificationsConsumerNewDocument: new FormControl(null),
     notificationsConsumerSuccess: new FormControl(null),
@@ -299,6 +300,7 @@ export class SettingsComponent
       documentEditingRemoveInboxTags: this.settings.get(
         SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS
       ),
+      searchDbOnly: this.settings.get(SETTINGS_KEYS.SEARCH_DB_ONLY),
       savedViews: {},
     }
   }
@@ -521,6 +523,10 @@ export class SettingsComponent
     this.settings.set(
       SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS,
       this.settingsForm.value.documentEditingRemoveInboxTags
+    )
+    this.settings.set(
+      SETTINGS_KEYS.SEARCH_DB_ONLY,
+      this.settingsForm.value.searchDbOnly
     )
     this.settings.setLanguage(this.settingsForm.value.displayLanguage)
     this.settings

@@ -13,6 +13,8 @@ import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
 import { User } from 'src/app/data/user'
 import { Workflow } from 'src/app/data/workflow'
+import { SettingsService } from '../settings.service'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 
 export interface GlobalSearchResult {
   total: number
@@ -33,7 +35,10 @@ export interface GlobalSearchResult {
   providedIn: 'root',
 })
 export class SearchService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private settingsService: SettingsService
+  ) {}
 
   autocomplete(term: string): Observable<string[]> {
     return this.http.get<string[]>(
@@ -43,9 +48,13 @@ export class SearchService {
   }
 
   globalSearch(query: string): Observable<GlobalSearchResult> {
+    let params = new HttpParams().set('query', query)
+    if (this.settingsService.get(SETTINGS_KEYS.SEARCH_DB_ONLY)) {
+      params = params.set('db_only', true)
+    }
     return this.http.get<GlobalSearchResult>(
       `${environment.apiBaseUrl}search/`,
-      { params: new HttpParams().set('query', query) }
+      { params }
     )
   }
 }
