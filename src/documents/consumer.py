@@ -6,6 +6,7 @@ from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Optional
+from typing import Union
 
 import magic
 from django.conf import settings
@@ -295,7 +296,7 @@ class ConsumerPlugin(
         current_progress: int,
         max_progress: int,
         status: ConsumerFilePhase,
-        message: Optional[ConsumerStatusShortMessage | str] = None,
+        message: Optional[Union[ConsumerStatusShortMessage, str]] = None,
         document_id=None,
     ):  # pragma: no cover
         self.status_mgr.send_progress(
