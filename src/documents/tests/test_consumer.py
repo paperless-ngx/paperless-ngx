@@ -843,7 +843,10 @@ class TestConsumer(
         self.assertIsFile(dst)
 
         with self.get_consumer(dst) as consumer:
-            with self.assertRaises(ConsumerError):
+            with self.assertRaisesRegex(
+                ConsumerError,
+                r"sample\.pdf: Not consuming sample\.pdf: It is a duplicate of sample \(#\d+\)",
+            ):
                 consumer.run()
 
         self.assertIsFile(dst)
@@ -853,16 +856,16 @@ class TestConsumer(
     @mock.patch("documents.parsers.document_consumer_declaration.send")
     def test_similar_filenames(self, m):
         shutil.copy(
-            os.path.join(Path(__file__).parent, "samples", "simple.pdf"),
-            os.path.join(settings.CONSUMPTION_DIR, "simple.pdf"),
+            Path(__file__).parent / "samples" / "simple.pdf",
+            settings.CONSUMPTION_DIR / "simple.pdf",
         )
         shutil.copy(
-            os.path.join(Path(__file__).parent, "samples", "simple.png"),
-            os.path.join(settings.CONSUMPTION_DIR, "simple.png"),
+            Path(__file__).parent / "samples" / "simple.png",
+            settings.CONSUMPTION_DIR / "simple.png",
         )
         shutil.copy(
-            os.path.join(Path(__file__).parent, "samples", "simple-noalpha.png"),
-            os.path.join(settings.CONSUMPTION_DIR, "simple.png.pdf"),
+            Path(__file__).parent / "samples" / "simple-noalpha.png",
+            settings.CONSUMPTION_DIR / "simple.png.pdf",
         )
         m.return_value = [
             (
@@ -1171,7 +1174,10 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
         doc = Document.objects.create(title="Test", mime_type="application/pdf")
 
         with self.get_consumer(self.test_file) as consumer:
-            with self.assertRaises(ConsumerError):
+            with self.assertRaisesMessage(
+                ConsumerError,
+                "sample.pdf: Configured post-consume script does-not-exist does not exist",
+            ):
                 consumer.run_post_consume_script(doc)
 
     @mock.patch("documents.consumer.run_subprocess")
@@ -1251,5 +1257,8 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
 
                 doc = Document.objects.create(title="Test", mime_type="application/pdf")
                 with self.get_consumer(self.test_file) as consumer:
-                    with self.assertRaises(ConsumerError):
+                    with self.assertRaisesRegex(
+                        ConsumerError,
+                        r"sample\.pdf: Error while executing post-consume script: Command '\[.*\]' returned non-zero exit status \d+\.",
+                    ):
                         consumer.run_post_consume_script(doc)
