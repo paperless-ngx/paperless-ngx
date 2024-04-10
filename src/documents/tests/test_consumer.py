@@ -6,7 +6,7 @@ import stat
 import tempfile
 import zoneinfo
 from pathlib import Path
-from unittest import TestCase as StdLibTestCase
+from unittest import TestCase as UnittestTestCase
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -37,7 +37,7 @@ from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import GetConsumerMixin
 
 
-class TestAttributes(StdLibTestCase):
+class TestAttributes(UnittestTestCase):
     TAGS = ("tag1", "tag2", "tag3")
 
     def _test_guess_attributes_from_name(self, filename, sender, title, tags):
