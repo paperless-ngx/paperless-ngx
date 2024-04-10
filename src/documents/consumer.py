@@ -253,7 +253,13 @@ class ConsumerFilePhase(str, Enum):
     FAILED = "FAILED"
 
 
-class ConsumerPlugin(AlwaysRunPluginMixin, ConsumeTaskPlugin, LoggingMixin):
+class ConsumerPlugin(
+    AlwaysRunPluginMixin,
+    NoSetupPluginMixin,
+    NoCleanupPluginMixin,
+    LoggingMixin,
+    ConsumeTaskPlugin,
+):
     logging_name = "paperless.consumer"
 
     def __init__(
@@ -265,6 +271,8 @@ class ConsumerPlugin(AlwaysRunPluginMixin, ConsumeTaskPlugin, LoggingMixin):
         task_id: str,
     ) -> None:
         super().__init__(input_doc, metadata, status_mgr, base_tmp_dir, task_id)
+
+        self.renew_logging_group()
 
         self.original_path = self.input_doc.original_file
         self.filename = self.metadata.filename or self.input_doc.original_file.name
@@ -281,12 +289,6 @@ class ConsumerPlugin(AlwaysRunPluginMixin, ConsumeTaskPlugin, LoggingMixin):
         self.override_change_users = self.metadata.change_users
         self.override_change_groups = self.metadata.change_groups
         self.override_custom_field_ids = self.metadata.custom_field_ids
-
-    def setup(self) -> None:
-        pass
-
-    def cleanup(self) -> None:
-        pass
 
     def _send_progress(
         self,

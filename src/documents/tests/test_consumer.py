@@ -721,7 +721,7 @@ class TestConsumer(
         self.assertIsFile(filename)
 
         # Database empty
-        self.assertEqual(len(Document.objects.all()), 0)
+        self.assertEqual(Document.objects.all().count(), 0)
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
     def testFilenameHandling(self):
@@ -878,22 +878,24 @@ class TestConsumer(
         with self.get_consumer(settings.CONSUMPTION_DIR / "simple.png") as consumer:
             consumer.run()
 
-            doc1 = Document.objects.last()
+            doc1 = Document.objects.filter(pk=1).first()
 
         with self.get_consumer(settings.CONSUMPTION_DIR / "simple.pdf") as consumer:
             consumer.run()
 
-            doc2 = Document.objects.last()
+            doc2 = Document.objects.filter(pk=2).first()
 
         with self.get_consumer(settings.CONSUMPTION_DIR / "simple.png.pdf") as consumer:
             consumer.run()
 
-            doc3 = Document.objects.last()
+            doc3 = Document.objects.filter(pk=3).first()
 
         self.assertEqual(doc1.filename, "simple.png")
         self.assertEqual(doc1.archive_filename, "simple.pdf")
+
         self.assertEqual(doc2.filename, "simple.pdf")
         self.assertEqual(doc2.archive_filename, "simple_01.pdf")
+
         self.assertEqual(doc3.filename, "simple.png.pdf")
         self.assertEqual(doc3.archive_filename, "simple.png.pdf")
 
