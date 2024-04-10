@@ -17,7 +17,7 @@
   --page-margin: 10px auto;
 }
 
-::ng-deep .ng-select-taggable {
+::ng-deep form .ng-select-taggable {
   max-width: calc(100% - 90px); // fudge factor for (2x) ng-select button width
 }
 

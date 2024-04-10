@@ -1,10 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { CustomFieldsDropdownComponent } from './custom-fields-dropdown.component'
-import {
-  HttpClientTestingModule,
-  HttpTestingController,
-} from '@angular/common/http/testing'
+import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { ToastService } from 'src/app/services/toast.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { of } from 'rxjs'
