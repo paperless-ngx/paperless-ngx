@@ -312,7 +312,7 @@ class ConsumerPlugin(
 
     def _fail(
         self,
-        message: ConsumerStatusShortMessage | str,
+        message: Union[ConsumerStatusShortMessage, str],
         log_message: Optional[str] = None,
         exc_info=None,
         exception: Optional[Exception] = None,
