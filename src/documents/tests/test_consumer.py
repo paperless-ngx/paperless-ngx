@@ -20,7 +20,6 @@ from django.utils import timezone
 from guardian.core import ObjectPermissionChecker
 
 from documents.consumer import ConsumerError
-from documents.consumer import ConsumerFilePhase
 from documents.data_models import DocumentMetadataOverrides
 from documents.models import Correspondent
 from documents.models import CustomField
@@ -31,6 +30,7 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
+from documents.plugins.helpers import ProgressStatusOptions
 from documents.tasks import sanity_check
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
@@ -256,8 +256,8 @@ class TestConsumer(
 ):
     def _assert_first_last_send_progress(
         self,
-        first_status=ConsumerFilePhase.STARTED,
-        last_status=ConsumerFilePhase.SUCCESS,
+        first_status=ProgressStatusOptions.STARTED,
+        last_status=ProgressStatusOptions.SUCCESS,
         first_progress=0,
         first_progress_max=100,
         last_progress=100,
@@ -1077,7 +1077,7 @@ class PreConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                     self.assertEqual(command[1], str(self.test_file))
 
                     subset = {
-                        "DOCUMENT_SOURCE_PATH": str(c.original_path),
+                        "DOCUMENT_SOURCE_PATH": str(c.input_doc.original_file),
                         "DOCUMENT_WORKING_PATH": str(c.working_copy),
                         "TASK_ID": c.task_id,
                     }
