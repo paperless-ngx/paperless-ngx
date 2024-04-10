@@ -51,7 +51,7 @@ export class MonetaryComponent extends AbstractInputComponent<string> {
   get monetaryValue(): string {
     if (!this.value) return null
     const focused = document.activeElement === this.inputField?.nativeElement
-    const val = parseFloat(this.value.toString().replace(/[^0-9.,]+/g, ''))
+    const val = parseFloat(this.value.toString().replace(/[^0-9.,-]+/g, ''))
     return focused ? val.toString() : val.toFixed(2)
   }
 
