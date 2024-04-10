@@ -1,11 +1,4 @@
-import {
-  Component,
-  ElementRef,
-  forwardRef,
-  Inject,
-  LOCALE_ID,
-  ViewChild,
-} from '@angular/core'
+import { Component, forwardRef, Inject, LOCALE_ID } from '@angular/core'
 import { NG_VALUE_ACCESSOR } from '@angular/forms'
 import { AbstractInputComponent } from '../abstract-input'
 import { getLocaleCurrencyCode } from '@angular/common'
@@ -23,40 +16,47 @@ import { getLocaleCurrencyCode } from '@angular/common'
   styleUrls: ['./monetary.component.scss'],
 })
 export class MonetaryComponent extends AbstractInputComponent<string> {
-  @ViewChild('currencyField')
-  currencyField: ElementRef
+  public currency: string = ''
+  public monetaryValue: string = ''
   defaultCurrencyCode: string
 
   constructor(@Inject(LOCALE_ID) currentLocale: string) {
     super()
 
-    this.defaultCurrencyCode = getLocaleCurrencyCode(currentLocale)
+    this.currency = this.defaultCurrencyCode =
+      getLocaleCurrencyCode(currentLocale)
   }
 
-  get currencyCode(): string {
-    const focused = document.activeElement === this.currencyField?.nativeElement
-    if (focused && this.value)
-      return this.value.toUpperCase().match(/^([A-Z]{0,3})/)?.[0]
+  writeValue(newValue: any): void {
+    this.currency = this.parseCurrencyCode(newValue)
+    this.monetaryValue = this.parseMonetaryValue(newValue, true)
+
+    this.value = this.currency + this.monetaryValue
+  }
+
+  public monetaryValueChange(fixed: boolean = false): void {
+    this.monetaryValue = this.parseMonetaryValue(this.monetaryValue, fixed)
+    this.onChange(this.currency + this.monetaryValue)
+  }
+
+  public currencyChange(): void {
+    if (this.currency.length) {
+      this.currency = this.parseCurrencyCode(this.currency)
+      this.onChange(this.currency + this.monetaryValue?.toString())
+    }
+  }
+
+  private parseCurrencyCode(value: string): string {
     return (
-      this.value
+      value
         ?.toString()
         .toUpperCase()
         .match(/^([A-Z]{1,3})/)?.[0] ?? this.defaultCurrencyCode
     )
   }
 
-  set currencyCode(value: string) {
-    this.value = value.toUpperCase() + this.monetaryValue?.toString()
-  }
-
-  get monetaryValue(): string {
-    if (!this.value) return null
-    const focused = document.activeElement === this.inputField?.nativeElement
-    const val = parseFloat(this.value.toString().replace(/[^0-9.,-]+/g, ''))
-    return focused ? val.toString() : val.toFixed(2)
-  }
-
-  set monetaryValue(value: number) {
-    this.value = this.currencyCode + value.toFixed(2)
+  private parseMonetaryValue(value: string, fixed: boolean = false): string {
+    const val: number = parseFloat(value.toString().replace(/[^0-9.,-]+/g, ''))
+    return fixed ? val.toFixed(2) : val.toString()
   }
 }
