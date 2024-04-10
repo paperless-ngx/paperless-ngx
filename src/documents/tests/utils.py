@@ -334,7 +334,7 @@ class GetConsumerMixin:
     def get_consumer(
         self,
         filepath: Path,
-        overrides: DocumentMetadataOverrides | None = None,
+        overrides: Union[DocumentMetadataOverrides, None] = None,
         source: DocumentSource = DocumentSource.ConsumeFolder,
     ) -> Generator[ConsumerPlugin, None, None]:
         # Store this for verification
