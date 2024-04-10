@@ -14,53 +14,38 @@
             @for (entry of entries; track entry.id) {
                 <li class="list-group-item">
                     <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <ng-template #timestamp>
-                                <div class="text-light">
-                                    {{ entry.timestamp | customDate:'longDate' }} {{ entry.timestamp | date:'shortTime' }}
-                                </div>
-                            </ng-template>
-                            <span [ngbTooltip]="timestamp">{{ entry.timestamp | customDate:'relative' }}</span>
-                            @if (entry.actor) {
-                                <span class="ms-3 fst-italic">{{ entry.actor.username }}</span>
-                            } @else {
-                                <span class="ms-3 fst-italic">System</span>
-                            }
-                            <span class="badge bg-secondary ms-3">{{ entry.action | titlecase }}</span>
-                        </div>
-                        <button type="button" class="ml-auto btn btn-link" (click)="toggleEntry(entry)">
-                            <i-bs class="me-2" name="info-circle"></i-bs>
-                            <ng-container i18n>Details</ng-container>
-                        </button>
+                        <ng-template #timestamp>
+                            <div class="text-light">
+                                {{ entry.timestamp | customDate:'longDate' }} {{ entry.timestamp | date:'shortTime' }}
+                            </div>
+                        </ng-template>
+                        <span class="text-muted" [ngbTooltip]="timestamp">{{ entry.timestamp | customDate:'relative' }}</span>
+                        @if (entry.actor) {
+                            <span class="ms-3 fst-italic">{{ entry.actor.username }}</span>
+                        } @else {
+                            <span class="ms-3 fst-italic">System</span>
+                        }
+                        <span class="badge bg-secondary ms-auto" [class.bg-primary]="entry.action === AuditLogAction.Create">{{ entry.action | titlecase }}</span>
                     </div>
-                    <div #collapse="ngbCollapse" [ngbCollapse]="!openEntries.has(entry.id)">
-                        <table class="table table-borderless m-0 ms-2">
-                            <thead>
-                                <tr>
-                                    <th i18n>Field</th>
-                                    <th i18n>Change</th>
-                                </tr>
-                            <tbody>
-                                @for (change of entry.changes | keyvalue; track change.key) {
-                                    @if (change.value["type"] === 'm2m') {
-                                        <tr>
-                                            <td>{{ change.key | titlecase }}:</td>
-                                            <td>
-                                                {{ change.value["operation"] | titlecase }}
-                                                <span class="fst-italic">{{ change.value["objects"].join(', ') }}</span>
-                                            </td>
-                                        </tr>
-                                    }
-                                    @else {
-                                        <tr>
-                                            <td>{{ change.key | titlecase }}:</td>
-                                            <td>{{ change.value[1] }}</td>
-                                        </tr>
-                                    }
+                    @if (entry.action === AuditLogAction.Update) {
+                        <ul class="mt-2">
+                            @for (change of entry.changes | keyvalue; track change.key) {
+                                @if (change.value["type"] === 'm2m') {
+                                    <li>
+                                        <span class="fst-italic" i18n>{{ change.value["operation"] | titlecase }}</span>&nbsp;
+                                        <span class="text-light">{{ change.key | titlecase }}</span>:&nbsp;
+                                        <code class="text-primary">{{ change.value["objects"].join(', ') }}</code>
+                                    </li>
                                 }
-                            </tbody>
-                        </table>
-                    </div>
+                                @else {
+                                    <li>
+                                        <span class="text-light">{{ change.key | titlecase }}</span>:&nbsp;
+                                        <code class="text-primary">{{ change.value[1] }}</code>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    }
                 </li>
             }
         }

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core'
-import { AuditLogEntry } from 'src/app/data/auditlog-entry'
+import { AuditLogAction, AuditLogEntry } from 'src/app/data/auditlog-entry'
 import { DocumentService } from 'src/app/services/rest/document.service'
 
 @Component({
@@ -8,7 +8,9 @@ import { DocumentService } from 'src/app/services/rest/document.service'
   styleUrl: './audit-log.component.scss',
 })
 export class AuditLogComponent implements OnInit {
-  _documentId: number
+  public AuditLogAction = AuditLogAction
+
+  private _documentId: number
   @Input()
   set documentId(id: number) {
     this._documentId = id
