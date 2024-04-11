@@ -177,13 +177,13 @@ configure their endpoints, and enable the feature.
 
 #### [`PAPERLESS_TIKA_ENDPOINT=<url>`](#PAPERLESS_TIKA_ENDPOINT) {#PAPERLESS_TIKA_ENDPOINT}
 
-: Set the endpoint URL were Paperless can reach your Tika server.
+: Set the endpoint URL where Paperless can reach your Tika server.
 
     Defaults to "<http://localhost:9998>".
 
 #### [`PAPERLESS_TIKA_GOTENBERG_ENDPOINT=<url>`](#PAPERLESS_TIKA_GOTENBERG_ENDPOINT) {#PAPERLESS_TIKA_GOTENBERG_ENDPOINT}
 
-: Set the endpoint URL were Paperless can reach your Gotenberg server.
+: Set the endpoint URL where Paperless can reach your Gotenberg server.
 
     Defaults to "<http://localhost:3000>".
 
@@ -202,7 +202,7 @@ and watch out for indentation if editing the YAML file.
 
 #### [`PAPERLESS_CONSUMPTION_DIR=<path>`](#PAPERLESS_CONSUMPTION_DIR) {#PAPERLESS_CONSUMPTION_DIR}
 
-: This where your documents should go to be consumed. Make sure that
+: This is where your documents should go to be consumed. Make sure that
 it exists and that the user running the paperless service can
 read/write its contents before you start Paperless.
 
@@ -1086,7 +1086,7 @@ document text will be checked as normal.
 
 : Paperless searches an entire document for dates. The first date
 found will be used as the initial value for the created date. When
-this variable is greater than 0 (or left to it's default value),
+this variable is greater than 0 (or left to its default value),
 paperless will also suggest other dates found in the document, up to
 a maximum of this setting. Note that duplicates will be removed,
 which can result in fewer dates displayed in the frontend than this
@@ -1111,11 +1111,11 @@ This font can be changed here.
 
 #### [`PAPERLESS_IGNORE_DATES=<string>`](#PAPERLESS_IGNORE_DATES) {#PAPERLESS_IGNORE_DATES}
 
-: Paperless parses a documents creation date from filename and file
+: Paperless parses a document's creation date from filename and file
 content. You may specify a comma separated list of dates that should
 be ignored during this process. This is useful for special dates
 (like date of birth) that appear in documents regularly but are very
-unlikely to be the documents creation date.
+unlikely to be the document's creation date.
 
     The date is parsed using the order specified in PAPERLESS_DATE_ORDER
 
@@ -1242,7 +1242,7 @@ barcode.
 
 : Defines the upscale factor used in barcode detection.
 Improves the detection of small barcodes, i.e. with a value of 1.5 by
-upscaling the document beforce the detection process. Upscaling will
+upscaling the document before the detection process. Upscaling will
 only take place if value is bigger than 1.0. Otherwise upscaling will
 not be performed to save resources. Try using in combination with
 PAPERLESS_CONSUMER_BARCODE_DPI set to a value higher than default.
@@ -1453,7 +1453,7 @@ specified as "chi-tra".
     PAPERLESS_OCR_LANGUAGES=tur ces chi-tra
     ```
 
-    Make sure it's a space separated list when using several values.
+    Make sure it's a space-separated list when using several values.
 
     To actually use these languages, also set the default OCR language
     of paperless:
