@@ -772,6 +772,7 @@ class DocumentSerializer(
             "storage_path",
             "title",
             "content",
+            "translation",
             "tags",
             "created",
             "created_date",

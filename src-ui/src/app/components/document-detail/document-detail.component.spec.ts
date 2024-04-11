@@ -86,6 +86,7 @@ const doc: Document = {
   storage_path: 31,
   tags: [41, 42, 43],
   content: 'text content',
+  translation: 'text content',
   added: new Date('May 4, 2014 03:24:00'),
   created: new Date('May 4, 2014 03:24:00'),
   modified: new Date('May 4, 2014 03:24:00'),

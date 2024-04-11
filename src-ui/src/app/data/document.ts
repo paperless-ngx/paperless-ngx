@@ -32,6 +32,8 @@ export interface Document extends ObjectWithPermissions {
 
   content?: string
 
+  translation?: string
+
   tags$?: Observable<Tag[]>
 
   tags?: number[]

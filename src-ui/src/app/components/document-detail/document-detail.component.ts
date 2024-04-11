@@ -138,6 +138,7 @@ export class DocumentDetailComponent
   documentForm: FormGroup = new FormGroup({
     title: new FormControl(''),
     content: new FormControl(''),
+    translation: new FormControl(''),
     created_date: new FormControl(),
     correspondent: new FormControl(),
     document_type: new FormControl(),
@@ -404,6 +405,7 @@ export class DocumentDetailComponent
           this.store = new BehaviorSubject({
             title: doc.title,
             content: doc.content,
+            translation: doc.translation,
             created_date: doc.created_date,
             correspondent: doc.correspondent,
             document_type: doc.document_type,

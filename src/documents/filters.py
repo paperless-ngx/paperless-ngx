@@ -104,7 +104,11 @@ class InboxFilter(Filter):
 class TitleContentFilter(Filter):
     def filter(self, qs, value):
         if value:
-            return qs.filter(Q(title__icontains=value) | Q(content__icontains=value))
+            return qs.filter(
+                Q(title__icontains=value)
+                | Q(translation__icontains=value)
+                | Q(content__icontains=value),
+            )
         else:
             return qs
 

@@ -176,6 +176,15 @@ class Document(ModelWithOwner):
         ),
     )
 
+    translation = models.TextField(
+        _("translation"),
+        blank=True,
+        help_text=_(
+            "The translated version of the content field. This field can "
+            "also be used for searching.",
+        ),
+    )
+
     mime_type = models.CharField(_("mime type"), max_length=256, editable=False)
 
     tags = models.ManyToManyField(
