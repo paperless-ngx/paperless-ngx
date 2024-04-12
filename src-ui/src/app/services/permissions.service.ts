@@ -24,7 +24,6 @@ export enum PermissionType {
   MailRule = '%s_mailrule',
   User = '%s_user',
   Group = '%s_group',
-  Admin = '%s_logentry',
   ShareLink = '%s_sharelink',
   CustomField = '%s_customfield',
   Workflow = '%s_workflow',
@@ -50,6 +49,10 @@ export class PermissionsService {
       this.currentUser?.is_superuser ||
       this.permissions?.includes(this.getPermissionCode(action, type))
     )
+  }
+
+  public isAdmin(): boolean {
+    return this.currentUser?.is_staff
   }
 
   public currentUserOwnsObject(object: ObjectWithPermissions): boolean {
