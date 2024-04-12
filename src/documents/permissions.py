@@ -40,7 +40,7 @@ class PaperlessObjectPermissions(DjangoObjectPermissions):
 
 class PaperlessAdminPermissions(BasePermission):
     def has_permission(self, request, view):
-        return request.user.has_perm("admin.view_logentry")
+        return request.user.is_staff
 
 
 def get_groups_with_only_permission(obj, codename):
