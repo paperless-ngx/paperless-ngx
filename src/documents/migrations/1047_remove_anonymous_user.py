@@ -25,5 +25,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(forwards_func, reverse_func),
+        migrations.RunPython(delete_anonymous_user, create_anonymous_user),
     ]
