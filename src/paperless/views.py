@@ -90,7 +90,7 @@ class UserViewSet(ModelViewSet):
     model = User
 
     queryset = User.objects.exclude(
-        username__in=["consumer", "AnonymousUser"],
+        username__in=["consumer"],
     ).order_by(Lower("username"))
 
     serializer_class = UserSerializer

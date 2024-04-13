@@ -266,7 +266,7 @@ class Command(BaseCommand):
             manifest += json.loads(
                 serializers.serialize(
                     "json",
-                    User.objects.exclude(username__in=["consumer", "AnonymousUser"]),
+                    User.objects.exclude(username__in=["consumer"]),
                 ),
             )
 
