@@ -733,6 +733,8 @@ class DocumentViewSet(
 
     @action(methods=["get"], detail=True, name="Audit Trail")
     def audit(self, request, pk=None):
+        if not settings.AUDIT_LOG_ENABLED:
+            return HttpResponseBadRequest("Audit log is disabled")
         try:
             doc = Document.objects.get(pk=pk)
             if not request.user.has_perm("auditlog.view_logentry") or (
