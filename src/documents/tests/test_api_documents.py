@@ -316,7 +316,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_document_audit_action(self):
+    def test_document_history_action(self):
         """
         GIVEN:
             - Document
@@ -337,7 +337,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             format="json",
         )
 
-        response = self.client.get(f"/api/documents/{doc.pk}/audit/")
+        response = self.client.get(f"/api/documents/{doc.pk}/history/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
         self.assertEqual(response.data[0]["actor"]["id"], self.user.id)
@@ -347,7 +347,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             {"title": ["First title", "New title"]},
         )
 
-    def test_document_audit_action_w_custom_fields(self):
+    def test_document_history_action_w_custom_fields(self):
         """
         GIVEN:
             - Document with custom fields
@@ -379,7 +379,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             format="json",
         )
 
-        response = self.client.get(f"/api/documents/{doc.pk}/audit/")
+        response = self.client.get(f"/api/documents/{doc.pk}/history/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[1]["actor"]["id"], self.user.id)
         self.assertEqual(response.data[1]["action"], "create")
@@ -395,7 +395,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
 
     @override_settings(AUDIT_LOG_ENABLED=False)
-    def test_document_audit_action_disabled(self):
+    def test_document_history_action_disabled(self):
         """
         GIVEN:
             - Audit log is disabled
@@ -417,7 +417,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             format="json",
         )
 
-        response = self.client.get(f"/api/documents/{doc.pk}/audit/")
+        response = self.client.get(f"/api/documents/{doc.pk}/history/")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_document_filters(self):

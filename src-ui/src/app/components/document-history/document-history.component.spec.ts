@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { AuditLogComponent } from './audit-log.component'
+import { DocumentHistoryComponent } from './document-history.component'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { of } from 'rxjs'
 import { AuditLogAction } from 'src/app/data/auditlog-entry'
@@ -10,14 +10,14 @@ import { DatePipe } from '@angular/common'
 import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
-describe('AuditLogComponent', () => {
-  let component: AuditLogComponent
-  let fixture: ComponentFixture<AuditLogComponent>
+describe('DocumentHistoryComponent', () => {
+  let component: DocumentHistoryComponent
+  let fixture: ComponentFixture<DocumentHistoryComponent>
   let documentService: DocumentService
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [AuditLogComponent, CustomDatePipe],
+      declarations: [DocumentHistoryComponent, CustomDatePipe],
       providers: [DatePipe],
       imports: [
         HttpClientTestingModule,
@@ -26,14 +26,14 @@ describe('AuditLogComponent', () => {
       ],
     }).compileComponents()
 
-    fixture = TestBed.createComponent(AuditLogComponent)
+    fixture = TestBed.createComponent(DocumentHistoryComponent)
     documentService = TestBed.inject(DocumentService)
     component = fixture.componentInstance
   })
 
   it('should get audit log entries on init', () => {
-    const getAuditLogSpy = jest.spyOn(documentService, 'getAuditLog')
-    getAuditLogSpy.mockReturnValue(
+    const getHistorySpy = jest.spyOn(documentService, 'getHistory')
+    getHistorySpy.mockReturnValue(
       of([
         {
           id: 1,
@@ -52,6 +52,6 @@ describe('AuditLogComponent', () => {
     )
     component.documentId = 1
     fixture.detectChanges()
-    expect(getAuditLogSpy).toHaveBeenCalledWith(1)
+    expect(getHistorySpy).toHaveBeenCalledWith(1)
   })
 })

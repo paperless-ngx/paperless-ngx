@@ -903,12 +903,13 @@ export class DocumentDetailComponent
     )
   }
 
-  get auditlogEnabled(): boolean {
+  get historyEnabled(): boolean {
     return (
       this.settings.get(SETTINGS_KEYS.AUDITLOG_ENABLED) &&
+      this.userIsOwner &&
       this.permissionsService.currentUserCan(
         PermissionAction.View,
-        PermissionType.AuditLogEntry
+        PermissionType.History
       )
     )
   }

@@ -223,8 +223,8 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     )
   }
 
-  getAuditLog(id: number): Observable<AuditLogEntry[]> {
-    return this.http.get<AuditLogEntry[]>(this.getResourceUrl(id, 'audit'))
+  getHistory(id: number): Observable<AuditLogEntry[]> {
+    return this.http.get<AuditLogEntry[]>(this.getResourceUrl(id, 'history'))
   }
 
   bulkDownload(

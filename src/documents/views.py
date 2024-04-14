@@ -732,7 +732,7 @@ class DocumentViewSet(
             return Response(links)
 
     @action(methods=["get"], detail=True, name="Audit Trail")
-    def audit(self, request, pk=None):
+    def history(self, request, pk=None):
         if not settings.AUDIT_LOG_ENABLED:
             return HttpResponseBadRequest("Audit log is disabled")
         try:

@@ -268,9 +268,9 @@ describe(`DocumentService`, () => {
   })
 
   it('should call appropriate api endpoint for getting audit log', () => {
-    subscription = service.getAuditLog(documents[0].id).subscribe()
+    subscription = service.getHistory(documents[0].id).subscribe()
     const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/audit/`
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/history/`
     )
   })
 })

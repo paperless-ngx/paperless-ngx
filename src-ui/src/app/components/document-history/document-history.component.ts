@@ -3,11 +3,11 @@ import { AuditLogAction, AuditLogEntry } from 'src/app/data/auditlog-entry'
 import { DocumentService } from 'src/app/services/rest/document.service'
 
 @Component({
-  selector: 'pngx-audit-log',
-  templateUrl: './audit-log.component.html',
-  styleUrl: './audit-log.component.scss',
+  selector: 'pngx-document-history',
+  templateUrl: './document-history.component.html',
+  styleUrl: './document-history.component.scss',
 })
-export class AuditLogComponent implements OnInit {
+export class DocumentHistoryComponent implements OnInit {
   public AuditLogAction = AuditLogAction
 
   private _documentId: number
@@ -26,7 +26,7 @@ export class AuditLogComponent implements OnInit {
     if (this._documentId) {
       this.loading = true
       this.documentService
-        .getAuditLog(this._documentId)
+        .getHistory(this._documentId)
         .subscribe((auditLogEntries) => {
           this.entries = auditLogEntries
           this.loading = false
