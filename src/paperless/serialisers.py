@@ -27,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
     password = ObfuscatedUserPasswordField(required=False)
     user_permissions = serializers.SlugRelatedField(
         many=True,
-        queryset=Permission.objects.all(),
+        queryset=Permission.objects.exclude(content_type__app_label="admin"),
         slug_field="codename",
         required=False,
     )
