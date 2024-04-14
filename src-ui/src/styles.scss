@@ -250,7 +250,7 @@ a.btn-link:focus-visible,
     position: relative;
     flex: 1 1 auto;
     margin-bottom: 0;
-    min-height: calc(1.5em + 0.75rem + 5px);
+    min-height: calc(1em + 0.75rem + 5px);
     line-height: 1.5;
 
     .ng-select-container {
@@ -270,6 +270,11 @@ a.btn-link:focus-visible,
     .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected.ng-option-marked {
       font-weight: bold;
       background-color: var(--pngx-bg-alt2) !important;
+    }
+
+    &.ng-select-multiple .ng-select-container .ng-value-container .ng-placeholder,
+    .ng-select-container .ng-value-container .ng-placeholder {
+      top: 7px;
     }
   }
 
