@@ -418,6 +418,7 @@ describe('SettingsComponent', () => {
       },
     }
     jest.spyOn(systemStatusService, 'get').mockReturnValue(of(status))
+    jest.spyOn(permissionsService, 'isAdmin').mockReturnValue(true)
     completeSetup()
     expect(component['systemStatus']).toEqual(status) // private
     expect(component.systemStatusHasErrors).toBeTruthy()

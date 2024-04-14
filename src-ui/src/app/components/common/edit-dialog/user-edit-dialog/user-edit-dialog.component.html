@@ -16,10 +16,14 @@
           <pngx-input-text i18n-title title="First name" formControlName="first_name" [error]="error?.first_name"></pngx-input-text>
           <pngx-input-text i18n-title title="Last name" formControlName="last_name" [error]="error?.first_name"></pngx-input-text>
 
-          <div class="mb-2">
+          <div class="mb-2 d-flex flex-column">
             <div class="form-check form-switch form-check-inline">
               <input type="checkbox" class="form-check-input" id="is_active" formControlName="is_active">
               <label class="form-check-label" for="is_active" i18n>Active</label>
+            </div>
+            <div class="form-check form-switch form-check-inline">
+              <input type="checkbox" class="form-check-input" id="is_staff" formControlName="is_staff">
+              <label class="form-check-label" for="is_staff"><ng-container i18n>Admin</ng-container> <small class="form-text text-muted ms-1" i18n>Access logs, Django backend</small></label>
             </div>
             <div class="form-check form-switch form-check-inline">
               <input type="checkbox" class="form-check-input" id="is_superuser" formControlName="is_superuser" (change)="onToggleSuperUser()">
