@@ -121,7 +121,7 @@ export class SettingsComponent
   users: User[]
   groups: Group[]
 
-  private systemStatus: SystemStatus
+  public systemStatus: SystemStatus
 
   get systemStatusHasErrors(): boolean {
     return (
@@ -385,12 +385,7 @@ export class SettingsComponent
       this.settingsForm.patchValue(currentFormValue)
     }
 
-    if (
-      this.permissionsService.currentUserCan(
-        PermissionAction.View,
-        PermissionType.Admin
-      )
-    ) {
+    if (this.permissionsService.isAdmin()) {
       this.systemStatusService.get().subscribe((status) => {
         this.systemStatus = status
       })

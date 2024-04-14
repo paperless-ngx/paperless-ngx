@@ -27,6 +27,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
             {
                 "id": self.test_user.id,
                 "username": self.test_user.username,
+                "is_staff": True,
                 "is_superuser": True,
                 "groups": [],
                 "first_name": self.test_user.first_name,

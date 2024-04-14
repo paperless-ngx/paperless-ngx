@@ -1270,6 +1270,7 @@ class UiSettingsView(GenericAPIView):
         user_resp = {
             "id": user.id,
             "username": user.username,
+            "is_staff": user.is_staff,
             "is_superuser": user.is_superuser,
             "groups": list(user.groups.values_list("id", flat=True)),
         }

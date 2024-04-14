@@ -131,6 +131,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
     def test_api_sufficient_permissions(self):
         user = User.objects.create_user(username="test")
         user.user_permissions.add(*Permission.objects.all())
+        user.is_staff = True
         self.client.force_authenticate(user)
 
         Document.objects.create(title="Test")
