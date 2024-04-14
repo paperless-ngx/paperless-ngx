@@ -9,16 +9,12 @@
     }
 }
 
-::ng-deep .ng-select .ng-select-container .ng-value-container .ng-placeholder,
-::ng-deep .ng-select .ng-option,
-::ng-deep .ng-select .ng-select-container .ng-value-container .ng-value {
+::ng-deep .custom-fields-dropdown .ng-select .ng-select-container .ng-value-container .ng-placeholder,
+::ng-deep .custom-fields-dropdown .ng-select .ng-option,
+::ng-deep .custom-fields-dropdown .ng-select .ng-select-container .ng-value-container .ng-value {
     font-size: 0.875rem;
 }
 
-::ng-deep .paperless-input-select .ng-select {
-    min-height: calc(1em + 0.75rem + 5px);
-}
-
-::ng-deep .paperless-input-select .ng-select .ng-select-container .ng-value-container .ng-input {
+::ng-deep .custom-fields-dropdown .paperless-input-select .ng-select .ng-select-container .ng-value-container .ng-input {
     top: 4px;
 }
