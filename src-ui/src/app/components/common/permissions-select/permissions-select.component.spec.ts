@@ -106,10 +106,10 @@ describe('PermissionsSelectComponent', () => {
     expect(input2.nativeElement.disabled).toBeTruthy()
   })
 
-  it('should exclude auditlogentry permissions if disabled', () => {
+  it('should exclude history permissions if disabled', () => {
     settingsService.set(SETTINGS_KEYS.AUDITLOG_ENABLED, false)
     fixture = TestBed.createComponent(PermissionsSelectComponent)
     component = fixture.componentInstance
-    expect(component.allowedTypes).not.toContain('AuditLogEntry')
+    expect(component.allowedTypes).not.toContain('History')
   })
 })

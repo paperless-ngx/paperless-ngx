@@ -19,7 +19,7 @@ import {
   PermissionsService,
 } from '../permissions.service'
 import { SettingsService } from '../settings.service'
-import { SETTINGS, SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { AuditLogEntry } from 'src/app/data/auditlog-entry'
 
 export const DOCUMENT_SORT_FIELDS = [

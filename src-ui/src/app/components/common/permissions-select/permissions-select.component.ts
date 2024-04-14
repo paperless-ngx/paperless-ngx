@@ -70,7 +70,7 @@ export class PermissionsSelectComponent
   ) {
     super()
     if (!this.settingsService.get(SETTINGS_KEYS.AUDITLOG_ENABLED)) {
-      this.allowedTypes.splice(this.allowedTypes.indexOf('AuditLogEntry'), 1)
+      this.allowedTypes.splice(this.allowedTypes.indexOf('History'), 1)
     }
     this.allowedTypes.forEach((type) => {
       const control = new FormGroup({})
