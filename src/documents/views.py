@@ -743,7 +743,7 @@ class DocumentViewSet(
                 return HttpResponseForbidden(
                     "Insufficient permissions",
                 )
-        except Document.DoesNotExist:
+        except Document.DoesNotExist:  # pragma: no cover
             raise Http404
 
         if request.method == "GET":

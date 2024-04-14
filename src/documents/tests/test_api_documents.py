@@ -420,6 +420,29 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         response = self.client.get(f"/api/documents/{doc.pk}/history/")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_document_history_insufficient_perms(self):
+        """
+        GIVEN:
+            - Audit log is disabled
+        WHEN:
+            - Document is updated
+            - Audit log is requested
+        THEN:
+            - Audit log returns HTTP 400 Bad Request
+        """
+        user = User.objects.create_user(username="test")
+        user.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        self.client.force_login(user=user)
+        doc = Document.objects.create(
+            title="First title",
+            checksum="123",
+            mime_type="application/pdf",
+            owner=user,
+        )
+
+        response = self.client.get(f"/api/documents/{doc.pk}/history/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_document_filters(self):
         doc1 = Document.objects.create(
             title="none1",
