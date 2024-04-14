@@ -37,6 +37,12 @@
                                         <code class="text-primary">{{ change.value["objects"].join(', ') }}</code>
                                     </li>
                                 }
+                                @else if (change.value["type"] === 'custom_field') {
+                                    <li>
+                                        <span class="text-light">{{ change.value["field"] }}</span>:&nbsp;
+                                        <code class="text-primary">{{ change.value["value"] }}</code>
+                                    </li>
+                                }
                                 @else {
                                     <li>
                                         <span class="text-light">{{ change.key | titlecase }}</span>:&nbsp;

@@ -18,6 +18,7 @@ import pathvalidate
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.db import connections
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
@@ -105,6 +106,7 @@ from documents.matching import match_storage_paths
 from documents.matching import match_tags
 from documents.models import Correspondent
 from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
@@ -743,24 +745,48 @@ class DocumentViewSet(
             raise Http404
 
         if request.method == "GET":
+            # documents
             entries = [
                 {
                     "id": entry.id,
                     "timestamp": entry.timestamp,
                     "action": entry.get_action_display(),
                     "changes": json.loads(entry.changes),
-                    "remote_addr": entry.remote_addr,
                     "actor": (
                         {"id": entry.actor.id, "username": entry.actor.username}
                         if entry.actor
                         else None
                     ),
                 }
-                for entry in LogEntry.objects.filter(object_pk=doc.pk).order_by(
-                    "-timestamp",
-                )
+                for entry in LogEntry.objects.filter(object_pk=doc.pk)
             ]
-            return Response(entries)
+
+            # custom fields
+            for entry in LogEntry.objects.filter(
+                object_pk__in=doc.custom_fields.values_list("id", flat=True),
+                content_type=ContentType.objects.get_for_model(CustomFieldInstance),
+            ):
+                entries.append(
+                    {
+                        "id": entry.id,
+                        "timestamp": entry.timestamp,
+                        "action": entry.get_action_display(),
+                        "changes": {
+                            "custom_fields": {
+                                "type": "custom_field",
+                                "field": str(entry.object_repr).split(":")[0].strip(),
+                                "value": str(entry.object_repr).split(":")[1].strip(),
+                            },
+                        },
+                        "actor": (
+                            {"id": entry.actor.id, "username": entry.actor.username}
+                            if entry.actor
+                            else None
+                        ),
+                    },
+                )
+
+            return Response(sorted(entries, key=lambda x: x["timestamp"], reverse=True))
 
 
 class SearchResultSerializer(DocumentSerializer, PassUserMixin):
