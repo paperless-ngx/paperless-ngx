@@ -54,24 +54,4 @@ describe('AuditLogComponent', () => {
     fixture.detectChanges()
     expect(getAuditLogSpy).toHaveBeenCalledWith(1)
   })
-
-  it('should toggle entry', () => {
-    const entry = {
-      id: 1,
-      actor: {
-        id: 1,
-        username: 'user1',
-      },
-      action: AuditLogAction.Create,
-      timestamp: '2021-01-01T00:00:00Z',
-      remote_addr: '1.2.3.4',
-      changes: {
-        title: ['old title', 'new title'],
-      },
-    }
-    component.toggleEntry(entry)
-    expect(component.openEntries.has(1)).toBe(true)
-    component.toggleEntry(entry)
-    expect(component.openEntries.has(1)).toBe(false)
-  })
 })

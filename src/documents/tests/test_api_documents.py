@@ -317,6 +317,14 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_document_audit_action(self):
+        """
+        GIVEN:
+            - Document
+        WHEN:
+            - Document is updated
+        THEN:
+            - Audit log contains changes
+        """
         doc = Document.objects.create(
             title="First title",
             checksum="123",
@@ -388,6 +396,15 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
     @override_settings(AUDIT_LOG_ENABLED=False)
     def test_document_audit_action_disabled(self):
+        """
+        GIVEN:
+            - Audit log is disabled
+        WHEN:
+            - Document is updated
+            - Audit log is requested
+        THEN:
+            - Audit log returns HTTP 400 Bad Request
+        """
         doc = Document.objects.create(
             title="First title",
             checksum="123",

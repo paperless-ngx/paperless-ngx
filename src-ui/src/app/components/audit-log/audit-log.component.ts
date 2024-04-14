@@ -19,7 +19,6 @@ export class AuditLogComponent implements OnInit {
 
   public loading: boolean = true
   public entries: AuditLogEntry[] = []
-  public openEntries: Set<number> = new Set()
 
   constructor(private documentService: DocumentService) {}
 
@@ -30,21 +29,8 @@ export class AuditLogComponent implements OnInit {
         .getAuditLog(this._documentId)
         .subscribe((auditLogEntries) => {
           this.entries = auditLogEntries
-            .map((entry) => {
-              delete entry.changes['modified']
-              return entry
-            })
-            .filter((entry) => Object.keys(entry.changes).length > 0)
           this.loading = false
         })
-    }
-  }
-
-  toggleEntry(entry: AuditLogEntry) {
-    if (this.openEntries.has(entry.id)) {
-      this.openEntries.delete(entry.id)
-    } else {
-      this.openEntries.add(entry.id)
     }
   }
 }
