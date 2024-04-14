@@ -241,6 +241,11 @@ permissions can be granted to limit access to certain parts of the UI (and corre
 
     Superusers can access all parts of the front and backend application as well as any and all objects.
 
+#### Admin Status
+
+Admin status (Django 'staff status') grants access to viewing the paperless logs and the system status dialog
+as well as accessing the Django backend.
+
 #### Detailed Explanation of Global Permissions {#global-permissions}
 
 Global permissions define what areas of the app and API endpoints the user can access. For example, they
@@ -249,7 +254,6 @@ still have "object-level" permissions.
 
 | Type          | Details                                                                                                                                                                                             |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Admin         | _View_ or higher permissions grants access to the logs view as well as the system status.                                                                                                           |
 | AppConfig     | _Change_ or higher permissions grants access to the "Application Configuration" area.                                                                                                               |
 | Correspondent | Grants global permissions to add, edit, delete or view Correspondents.                                                                                                                              |
 | CustomField   | Grants global permissions to add, edit, delete or view Custom Fields.                                                                                                                               |
