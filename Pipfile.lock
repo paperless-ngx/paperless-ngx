@@ -479,12 +479,12 @@
         },
         "django-auditlog": {
             "hashes": [
-                "sha256:7bc2c87e4aff62dec9785d1b2359a2b27148f8c286f8a52b9114fc7876c5a9f7",
-                "sha256:b9d3acebb64f3f2785157efe3f2f802e0929aafc579d85bbfb9827db4adab532"
+                "sha256:92db1cf4a51ceca5c26b3ff46997d9e3305a02da1bd435e2efb5b8b6d300ce1f",
+                "sha256:9de49f80a4911135d136017123cd73461f869b4947eec14d5e76db4b88182f3f"
             ],
             "index": "pypi",
-            "markers": "python_version >= '3.7'",
-            "version": "==2.3.0"
+            "markers": "python_version >= '3.8'",
+            "version": "==3.0.0"
         },
         "django-celery-results": {
             "hashes": [

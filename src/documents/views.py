@@ -753,7 +753,7 @@ class DocumentViewSet(
                     "id": entry.id,
                     "timestamp": entry.timestamp,
                     "action": entry.get_action_display(),
-                    "changes": json.loads(entry.changes),
+                    "changes": entry.changes,
                     "actor": (
                         {"id": entry.actor.id, "username": entry.actor.username}
                         if entry.actor
