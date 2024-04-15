@@ -947,6 +947,17 @@ class PostDocumentView(GenericAPIView):
             source=DocumentSource.ApiUpload,
             original_file=temp_file_path,
         )
+
+        user = User.objects.get(pk=request.user.id)
+        permissions = {
+            "default_view_users": [],
+            "default_view_groups": [],
+            "default_edit_users": [],
+            "default_edit_groups": [],
+        }
+        if hasattr(user, "ui_settings"):
+            permissions = user.ui_settings.settings["permissions"]
+
         input_doc_overrides = DocumentMetadataOverrides(
             filename=doc_name,
             title=title,
@@ -957,6 +968,10 @@ class PostDocumentView(GenericAPIView):
             created=created,
             asn=archive_serial_number,
             owner_id=request.user.id,
+            view_users=permissions["default_view_users"],
+            view_groups=permissions["default_view_groups"],
+            change_users=permissions["default_edit_users"],
+            change_groups=permissions["default_edit_groups"],
             custom_field_ids=custom_field_ids,
         )
 
