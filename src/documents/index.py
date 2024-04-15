@@ -17,6 +17,8 @@ from guardian.shortcuts import get_users_with_perms
 from whoosh import classify
 from whoosh import highlight
 from whoosh import query
+from whoosh.analysis import CharsetFilter
+from whoosh.analysis import StemmingAnalyzer
 from whoosh.fields import BOOLEAN
 from whoosh.fields import DATETIME
 from whoosh.fields import KEYWORD
@@ -36,6 +38,7 @@ from whoosh.qparser.dateparse import DateParserPlugin
 from whoosh.qparser.dateparse import English
 from whoosh.qparser.plugins import FieldsPlugin
 from whoosh.scoring import TF_IDF
+from whoosh.support.charset import accent_map
 from whoosh.util.times import timespan
 from whoosh.writing import AsyncWriter
 
@@ -54,10 +57,13 @@ logger = logging.getLogger("paperless.index")
 
 
 def get_schema() -> Schema:
+    # add accent-folding filter to a stemming analyzer:
+    af_analyzer = StemmingAnalyzer() | CharsetFilter(accent_map)
+
     return Schema(
         id=NUMERIC(stored=True, unique=True),
-        title=TEXT(sortable=True),
-        content=TEXT(),
+        title=TEXT(sortable=True, analyzer=af_analyzer),
+        content=TEXT(analyzer=af_analyzer),
         asn=NUMERIC(sortable=True, signed=False),
         correspondent=TEXT(sortable=True),
         correspondent_id=NUMERIC(),
