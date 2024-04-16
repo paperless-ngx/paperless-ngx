@@ -64,6 +64,8 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { PermissionsService } from 'src/app/services/permissions.service'
+import { NgSelectModule } from '@ng-select/ng-select'
 
 const docs: Document[] = [
   {
@@ -101,6 +103,7 @@ describe('DocumentListComponent', () => {
   let toastService: ToastService
   let modalService: NgbModal
   let settingsService: SettingsService
+  let permissionService: PermissionsService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -148,6 +151,7 @@ describe('DocumentListComponent', () => {
         NgbPopoverModule,
         NgbTooltipModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        NgSelectModule,
       ],
     }).compileComponents()
 
@@ -160,6 +164,7 @@ describe('DocumentListComponent', () => {
     toastService = TestBed.inject(ToastService)
     modalService = TestBed.inject(NgbModal)
     settingsService = TestBed.inject(SettingsService)
+    permissionService = TestBed.inject(PermissionsService)
     fixture = TestBed.createComponent(DocumentListComponent)
     component = fixture.componentInstance
   })
@@ -548,18 +553,13 @@ describe('DocumentListComponent', () => {
     expect(routerSpy).toHaveBeenCalledWith(['documents', 99])
   })
 
-  it('should support checking if notes enabled to hide column', () => {
+  it('should hide columns if no perms or notes disabled', () => {
+    jest.spyOn(permissionService, 'currentUserCan').mockReturnValue(true)
     jest.spyOn(documentListService, 'documents', 'get').mockReturnValue(docs)
-    fixture.detectChanges()
     expect(documentListService.sortField).toEqual('created')
 
-    const detailsDisplayModeButton = fixture.debugElement.query(
-      By.css('input[type="radio"]')
-    )
-    detailsDisplayModeButton.nativeElement.checked = true
-    detailsDisplayModeButton.triggerEventHandler('change')
+    component.displayMode = 'details'
     fixture.detectChanges()
-    expect(component.displayMode).toEqual('details')
 
     expect(
       fixture.debugElement.queryAll(By.directive(SortableDirective))
@@ -572,6 +572,13 @@ describe('DocumentListComponent', () => {
     expect(
       fixture.debugElement.queryAll(By.directive(SortableDirective))
     ).toHaveLength(8)
+
+    // insufficient perms
+    jest.spyOn(permissionService, 'currentUserCan').mockReturnValue(false)
+    fixture.detectChanges()
+    expect(
+      fixture.debugElement.queryAll(By.directive(SortableDirective))
+    ).toHaveLength(5)
   })
 
   it('should support toggle on document objects', () => {
