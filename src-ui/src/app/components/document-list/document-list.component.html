@@ -141,13 +141,15 @@
             [currentSortReverse]="list.sortReverse"
             (sort)="onSort($event)"
           i18n>ASN</th>
-          <th class="d-none d-md-table-cell"
-            pngxSortable="correspondent__name"
-            title="Sort by correspondent" i18n-title
-            [currentSortField]="list.sortField"
-            [currentSortReverse]="list.sortReverse"
-            (sort)="onSort($event)"
-          i18n>Correspondent</th>
+          @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
+            <th class="d-none d-md-table-cell"
+              pngxSortable="correspondent__name"
+              title="Sort by correspondent" i18n-title
+              [currentSortField]="list.sortField"
+              [currentSortReverse]="list.sortReverse"
+              (sort)="onSort($event)"
+            i18n>Correspondent</th>
+          }
           <th
             pngxSortable="title"
             title="Sort by title" i18n-title
@@ -172,20 +174,24 @@
               (sort)="onSort($event)"
             i18n>Notes</th>
           }
-          <th class="d-none d-xl-table-cell"
-            pngxSortable="document_type__name"
-            title="Sort by document type" i18n-title
-            [currentSortField]="list.sortField"
-            [currentSortReverse]="list.sortReverse"
-            (sort)="onSort($event)"
-          i18n>Document type</th>
-          <th class="d-none d-xl-table-cell"
-            pngxSortable="storage_path__name"
-            title="Sort by storage path" i18n-title
-            [currentSortField]="list.sortField"
-            [currentSortReverse]="list.sortReverse"
-            (sort)="onSort($event)"
-          i18n>Storage path</th>
+          @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
+            <th class="d-none d-xl-table-cell"
+              pngxSortable="document_type__name"
+              title="Sort by document type" i18n-title
+              [currentSortField]="list.sortField"
+              [currentSortReverse]="list.sortReverse"
+              (sort)="onSort($event)"
+            i18n>Document type</th>
+          }
+          @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
+            <th class="d-none d-xl-table-cell"
+              pngxSortable="storage_path__name"
+              title="Sort by storage path" i18n-title
+              [currentSortField]="list.sortField"
+              [currentSortReverse]="list.sortReverse"
+              (sort)="onSort($event)"
+            i18n>Storage path</th>
+          }
           <th
             pngxSortable="created"
             title="Sort by created date" i18n-title
@@ -213,11 +219,13 @@
               <td class="d-none d-lg-table-cell">
                 {{d.archive_serial_number}}
               </td>
-              <td class="d-none d-md-table-cell">
-                @if (d.correspondent) {
-                  <a (click)="clickCorrespondent(d.correspondent);$event.stopPropagation()" title="Filter by correspondent" i18n-title>{{(d.correspondent$ | async)?.name}}</a>
-                }
-              </td>
+              @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
+                <td class="d-none d-md-table-cell">
+                  @if (d.correspondent) {
+                    <a (click)="clickCorrespondent(d.correspondent);$event.stopPropagation()" title="Filter by correspondent" i18n-title>{{(d.correspondent$ | async)?.name}}</a>
+                  }
+                </td>
+              }
               <td>
                 <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
                 @for (t of d.tags$ | async; track t) {
@@ -238,16 +246,20 @@
                   }
                 </td>
               }
-              <td class="d-none d-xl-table-cell">
-                @if (d.document_type) {
-                  <a (click)="clickDocumentType(d.document_type);$event.stopPropagation()" title="Filter by document type" i18n-title>{{(d.document_type$ | async)?.name}}</a>
-                }
-              </td>
-              <td class="d-none d-xl-table-cell">
-                @if (d.storage_path) {
-                  <a (click)="clickStoragePath(d.storage_path);$event.stopPropagation()" title="Filter by storage path" i18n-title>{{(d.storage_path$ | async)?.name}}</a>
-                }
-              </td>
+              @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
+                <td class="d-none d-xl-table-cell">
+                  @if (d.document_type) {
+                    <a (click)="clickDocumentType(d.document_type);$event.stopPropagation()" title="Filter by document type" i18n-title>{{(d.document_type$ | async)?.name}}</a>
+                  }
+                </td>
+              }
+              @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
+                <td class="d-none d-xl-table-cell">
+                  @if (d.storage_path) {
+                    <a (click)="clickStoragePath(d.storage_path);$event.stopPropagation()" title="Filter by storage path" i18n-title>{{(d.storage_path$ | async)?.name}}</a>
+                  }
+                </td>
+              }
               <td>
                 {{d.created_date | customDate}}
               </td>
