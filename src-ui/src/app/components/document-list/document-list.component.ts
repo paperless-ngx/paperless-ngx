@@ -29,11 +29,7 @@ import {
   DOCUMENT_SORT_FIELDS,
   DOCUMENT_SORT_FIELDS_FULLTEXT,
 } from 'src/app/services/rest/document.service'
-import {
-  PermissionAction,
-  PermissionsService,
-  PermissionType,
-} from 'src/app/services/permissions.service'
+import { PermissionsService } from 'src/app/services/permissions.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
