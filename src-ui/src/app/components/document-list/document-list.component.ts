@@ -29,6 +29,7 @@ import {
   DOCUMENT_SORT_FIELDS,
   DOCUMENT_SORT_FIELDS_FULLTEXT,
 } from 'src/app/services/rest/document.service'
+import { PermissionsService } from 'src/app/services/permissions.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -54,7 +55,8 @@ export class DocumentListComponent
     private modalService: NgbModal,
     private consumerStatusService: ConsumerStatusService,
     public openDocumentsService: OpenDocumentsService,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    public permissionService: PermissionsService
   ) {
     super()
   }
