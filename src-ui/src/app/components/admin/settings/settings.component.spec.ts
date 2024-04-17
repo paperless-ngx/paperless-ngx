@@ -437,4 +437,11 @@ describe('SettingsComponent', () => {
       size: 'xl',
     })
   })
+
+  it('should support reset', () => {
+    completeSetup()
+    component.settingsForm.get('themeColor').setValue('#ff0000')
+    component.reset()
+    expect(component.settingsForm.get('themeColor').value).toEqual('')
+  })
 })

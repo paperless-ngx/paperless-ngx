@@ -119,6 +119,7 @@ import { NgxFilesizeModule } from 'ngx-filesize'
 import { RotateConfirmDialogComponent } from './components/common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { MergeConfirmDialogComponent } from './components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
 import { SplitConfirmDialogComponent } from './components/common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
+import { DragDropSelectComponent } from './components/common/input/drag-drop-select/drag-drop-select.component'
 import {
   airplane,
   archive,
@@ -472,6 +473,7 @@ function initializeApp(settings: SettingsService) {
     RotateConfirmDialogComponent,
     MergeConfirmDialogComponent,
     SplitConfirmDialogComponent,
+    DragDropSelectComponent,
   ],
   imports: [
     BrowserModule,

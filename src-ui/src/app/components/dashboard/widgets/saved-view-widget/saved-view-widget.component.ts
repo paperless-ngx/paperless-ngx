@@ -13,6 +13,7 @@ import {
   DashboardViewTableColumn,
   DashboardViewMode,
   SavedView,
+  DASHBOARD_VIEW_TABLE_COLUMNS,
 } from 'src/app/data/saved-view'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
@@ -223,21 +224,6 @@ export class SavedViewWidgetComponent
   }
 
   public getColumnTitle(column: DashboardViewTableColumn): string {
-    switch (column) {
-      case DashboardViewTableColumn.TITLE:
-        return $localize`Title`
-      case DashboardViewTableColumn.CREATED:
-        return $localize`Created`
-      case DashboardViewTableColumn.ADDED:
-        return $localize`Added`
-      case DashboardViewTableColumn.TAGS:
-        return $localize`Tags`
-      case DashboardViewTableColumn.CORRESPONDENT:
-        return $localize`Correspondent`
-      case DashboardViewTableColumn.DOCUMENT_TYPE:
-        return $localize`Document type`
-      case DashboardViewTableColumn.STORAGE_PATH:
-        return $localize`Storage path`
-    }
+    return DASHBOARD_VIEW_TABLE_COLUMNS.find((c) => c.id === column)?.name
   }
 }

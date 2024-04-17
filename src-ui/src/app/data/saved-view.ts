@@ -16,6 +16,37 @@ export enum DashboardViewTableColumn {
   STORAGE_PATH = 'storagepath',
 }
 
+export const DASHBOARD_VIEW_TABLE_COLUMNS = [
+  {
+    id: DashboardViewTableColumn.TITLE,
+    name: $localize`Title`,
+  },
+  {
+    id: DashboardViewTableColumn.CREATED,
+    name: $localize`Created`,
+  },
+  {
+    id: DashboardViewTableColumn.ADDED,
+    name: $localize`Added`,
+  },
+  {
+    id: DashboardViewTableColumn.TAGS,
+    name: $localize`Tags`,
+  },
+  {
+    id: DashboardViewTableColumn.CORRESPONDENT,
+    name: $localize`Correspondent`,
+  },
+  {
+    id: DashboardViewTableColumn.DOCUMENT_TYPE,
+    name: $localize`Document type`,
+  },
+  {
+    id: DashboardViewTableColumn.STORAGE_PATH,
+    name: $localize`Storage path`,
+  },
+]
+
 export interface SavedView extends ObjectWithPermissions {
   name?: string
 
