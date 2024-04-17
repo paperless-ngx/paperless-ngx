@@ -32,6 +32,9 @@ import {
   PermissionType,
   PermissionsService,
 } from 'src/app/services/permissions.service'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
+import { Results } from 'src/app/data/results'
 
 @Component({
   selector: 'pngx-saved-view-widget',
@@ -44,8 +47,11 @@ export class SavedViewWidgetComponent
 {
   public DashboardViewMode = DashboardViewMode
   public DashboardViewTableColumn = DashboardViewTableColumn
+  public CustomFieldDataType = CustomFieldDataType
 
   loading: boolean = true
+
+  private customFields: CustomField[] = []
 
   constructor(
     private documentService: DocumentService,
@@ -54,7 +60,8 @@ export class SavedViewWidgetComponent
     private consumerStatusService: ConsumerStatusService,
     public openDocumentsService: OpenDocumentsService,
     public documentListViewService: DocumentListViewService,
-    public permissionsService: PermissionsService
+    public permissionsService: PermissionsService,
+    private customFieldService: CustomFieldsService
   ) {
     super()
   }
@@ -72,6 +79,14 @@ export class SavedViewWidgetComponent
   mouseOnPreview = false
   popoverHidden = true
 
+  visibleColumns: DashboardViewTableColumn[] = [
+    DashboardViewTableColumn.TITLE,
+    DashboardViewTableColumn.CREATED,
+    DashboardViewTableColumn.ADDED,
+  ]
+
+  docLinkDocuments: Document[] = []
+
   ngOnInit(): void {
     this.reload()
     this.consumerStatusService
@@ -80,6 +95,35 @@ export class SavedViewWidgetComponent
       .subscribe(() => {
         this.reload()
       })
+
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.CustomField
+      )
+    ) {
+      this.customFieldService
+        .listAll()
+        .pipe(takeUntil(this.unsubscribeNotifier))
+        .subscribe((customFields) => {
+          this.customFields = customFields.results
+          this.maybeGetDocuments()
+        })
+    }
+
+    this.savedView.dashboard_view_table_columns?.forEach((column) => {
+      let type: PermissionType = Object.values(PermissionType).find((t) =>
+        t.includes(column)
+      )
+      if (column.startsWith(DashboardViewTableColumn.CUSTOM_FIELD)) {
+        type = PermissionType.CustomField
+      }
+      if (
+        type &&
+        this.permissionsService.currentUserCan(PermissionAction.View, type)
+      )
+        this.visibleColumns.push(column)
+    })
   }
 
   ngOnDestroy(): void {
@@ -102,6 +146,7 @@ export class SavedViewWidgetComponent
       .subscribe((result) => {
         this.loading = false
         this.documents = result.results
+        this.maybeGetDocuments()
       })
   }
 
@@ -204,26 +249,73 @@ export class SavedViewWidgetComponent
     }, 300)
   }
 
-  public columnIsVisible(column: DashboardViewTableColumn): boolean {
-    if (
-      [
-        DashboardViewTableColumn.TITLE,
-        DashboardViewTableColumn.CREATED,
-        DashboardViewTableColumn.ADDED,
-      ].includes(column)
-    ) {
-      return true
-    } else {
-      const type: PermissionType = Object.values(PermissionType).find((t) =>
-        t.includes(column)
+  public getColumnTitle(column: DashboardViewTableColumn): string {
+    if (column.startsWith(DashboardViewTableColumn.CUSTOM_FIELD)) {
+      const id = column.split('_')[2]
+      return this.customFields.find((c) => c.id === parseInt(id))?.name
+    }
+    return DASHBOARD_VIEW_TABLE_COLUMNS.find((c) => c.id === column)?.name
+  }
+
+  public getCustomFieldDataType(column_id: string): string {
+    const customFieldId = parseInt(column_id.split('_')[2])
+    return this.customFields.find((cf) => cf.id === customFieldId)?.data_type
+  }
+
+  public getCustomFieldValue(document: Document, column_id: string): any {
+    const customFieldId = parseInt(column_id.split('_')[2])
+    return document.custom_fields.find((cf) => cf.field === customFieldId)
+      ?.value
+  }
+
+  public getMonetaryCustomFieldValue(
+    document: Document,
+    column_id: string
+  ): Array<number | string> {
+    const value = this.getCustomFieldValue(document, column_id)
+    if (!value) return [null, null]
+    const currencyCode = value.match(/[A-Z]{3}/)?.[0]
+    const amount = parseFloat(value.replace(currencyCode, ''))
+    return [amount, currencyCode]
+  }
+
+  maybeGetDocuments() {
+    // retrieve documents for document link columns
+    if (this.docLinkDocuments.length) return
+    let docIds = []
+    let docLinkColumns = []
+    this.savedView.dashboard_view_table_columns
+      ?.filter((column) =>
+        column.startsWith(DashboardViewTableColumn.CUSTOM_FIELD)
       )
-      return type
-        ? this.permissionsService.currentUserCan(PermissionAction.View, type)
-        : false
+      .forEach((column) => {
+        if (
+          this.getCustomFieldDataType(column) ===
+          CustomFieldDataType.DocumentLink
+        ) {
+          docLinkColumns.push(column)
+        }
+      })
+    this.documents.forEach((doc) => {
+      docLinkColumns.forEach((column) => {
+        const docs: number[] = this.getCustomFieldValue(doc, column)
+        if (docs) {
+          docIds = docIds.concat(docs)
+        }
+      })
+    })
+
+    if (docIds.length) {
+      this.documentService
+        .listAll(null, false, { id__in: docIds.join(',') })
+        .pipe(takeUntil(this.unsubscribeNotifier))
+        .subscribe((result: Results<Document>) => {
+          this.docLinkDocuments = result.results
+        })
     }
   }
 
-  public getColumnTitle(column: DashboardViewTableColumn): string {
-    return DASHBOARD_VIEW_TABLE_COLUMNS.find((c) => c.id === column)?.name
+  public getDocumentTitle(documentId: number): string {
+    return this.docLinkDocuments.find((doc) => doc.id === documentId)?.title
   }
 }
