@@ -799,6 +799,10 @@ class SavedViewFilterRuleSerializer(serializers.ModelSerializer):
 
 class SavedViewSerializer(OwnedObjectSerializer):
     filter_rules = SavedViewFilterRuleSerializer(many=True)
+    dashboard_view_table_columns = fields.MultipleChoiceField(
+        choices=SavedView.DashboardViewTableColumns.choices,
+        required=False,
+    )
 
     class Meta:
         model = SavedView
@@ -810,6 +814,9 @@ class SavedViewSerializer(OwnedObjectSerializer):
             "sort_field",
             "sort_reverse",
             "filter_rules",
+            "dashboard_view_limit",
+            "dashboard_view_mode",
+            "dashboard_view_table_columns",
             "owner",
             "permissions",
             "user_can_change",
