@@ -1534,6 +1534,62 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         v1 = SavedView.objects.get(id=v1.id)
         self.assertEqual(v1.filter_rules.count(), 0)
 
+    def test_saved_view_dashboard_view_options(self):
+        User.objects.create_user("user1")
+
+        view = {
+            "name": "test",
+            "show_on_dashboard": True,
+            "show_in_sidebar": True,
+            "sort_field": "created2",
+            "filter_rules": [{"rule_type": 4, "value": "test"}],
+            "dashboard_view_limit": 20,
+            "dashboard_view_mode": SavedView.DashboardViewDisplayMode.SMALL_CARDS,
+            "dashboard_view_table_columns": [
+                SavedView.DashboardViewTableColumns.TITLE,
+                SavedView.DashboardViewTableColumns.CREATED,
+            ],
+        }
+
+        response = self.client.post("/api/saved_views/", view, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        v1 = SavedView.objects.get(name="test")
+        self.assertEqual(v1.dashboard_view_limit, 20)
+        self.assertEqual(
+            v1.dashboard_view_mode,
+            SavedView.DashboardViewDisplayMode.SMALL_CARDS,
+        )
+        self.assertEqual(
+            v1.dashboard_view_table_columns,
+            [
+                SavedView.DashboardViewTableColumns.TITLE,
+                SavedView.DashboardViewTableColumns.CREATED,
+            ],
+        )
+
+        response = self.client.patch(
+            f"/api/saved_views/{v1.id}/",
+            {
+                "dashboard_view_table_columns": [
+                    SavedView.DashboardViewTableColumns.TAGS,
+                    SavedView.DashboardViewTableColumns.TITLE,
+                    SavedView.DashboardViewTableColumns.CREATED,
+                ],
+            },
+            format="json",
+        )
+
+        v1.refresh_from_db()
+        self.assertEqual(
+            v1.dashboard_view_table_columns,
+            [
+                SavedView.DashboardViewTableColumns.TAGS,
+                SavedView.DashboardViewTableColumns.TITLE,
+                SavedView.DashboardViewTableColumns.CREATED,
+            ],
+        )
+
     def test_get_logs(self):
         log_data = "test\ntest2\n"
         with open(os.path.join(settings.LOGGING_DIR, "mail.log"), "w") as f:
