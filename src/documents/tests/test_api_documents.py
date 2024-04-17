@@ -1579,6 +1579,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             },
             format="json",
         )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         v1.refresh_from_db()
         self.assertEqual(
@@ -1589,6 +1590,70 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
                 SavedView.DashboardViewTableColumns.CREATED,
             ],
         )
+
+    def test_saved_view_dashboard_view_customfields(self):
+        view = {
+            "name": "test",
+            "show_on_dashboard": True,
+            "show_in_sidebar": True,
+            "sort_field": "created2",
+            "filter_rules": [{"rule_type": 4, "value": "test"}],
+            "dashboard_view_limit": 20,
+            "dashboard_view_mode": SavedView.DashboardViewDisplayMode.SMALL_CARDS,
+            "dashboard_view_table_columns": [
+                SavedView.DashboardViewTableColumns.TITLE,
+                SavedView.DashboardViewTableColumns.CREATED,
+            ],
+        }
+
+        response = self.client.post("/api/saved_views/", view, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        v1 = SavedView.objects.get(name="test")
+
+        custom_field = CustomField.objects.create(
+            name="stringfield",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+
+        response = self.client.patch(
+            f"/api/saved_views/{v1.id}/",
+            {
+                "dashboard_view_table_columns": [
+                    SavedView.DashboardViewTableColumns.TITLE,
+                    SavedView.DashboardViewTableColumns.CREATED,
+                    SavedView.DashboardViewDynamicTableColumns.CUSTOM_FIELD[0]
+                    % custom_field.id,
+                ],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        v1.refresh_from_db()
+        self.assertEqual(
+            v1.dashboard_view_table_columns,
+            [
+                str(SavedView.DashboardViewTableColumns.TITLE),
+                str(SavedView.DashboardViewTableColumns.CREATED),
+                SavedView.DashboardViewDynamicTableColumns.CUSTOM_FIELD[0]
+                % custom_field.id,
+            ],
+        )
+
+        # Custom field not found
+        response = self.client.patch(
+            f"/api/saved_views/{v1.id}/",
+            {
+                "dashboard_view_table_columns": [
+                    SavedView.DashboardViewTableColumns.TITLE,
+                    SavedView.DashboardViewTableColumns.CREATED,
+                    SavedView.DashboardViewDynamicTableColumns.CUSTOM_FIELD[0] % 99,
+                ],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_logs(self):
         log_data = "test\ntest2\n"

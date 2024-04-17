@@ -797,10 +797,50 @@ class SavedViewFilterRuleSerializer(serializers.ModelSerializer):
         fields = ["rule_type", "value"]
 
 
+class DynamicOrderedMultipleChoiceField(fields.MultipleChoiceField):
+    """
+    A MultipleChoiceField that allows for dynamic choices from a model
+    and preserves the order of the choices.
+    """
+
+    def __init__(self, **kwargs):
+        self.dyanmic_choices = kwargs.pop("dyanmic_choices", None)
+        super().__init__(**kwargs)
+
+    def _get_choices(self):
+        return super()._get_choices()
+
+    def _set_choices(self, choices):
+        if self.dyanmic_choices is not None:
+            for key, Model in self.dyanmic_choices:
+                try:
+                    for obj in Model.objects.all():
+                        choices.append((key % obj.pk, obj.name))
+                except Exception:
+                    pass
+        return super()._set_choices(choices)
+
+    choices = property(_get_choices, _set_choices)
+
+    def to_internal_value(self, data):
+        # MultipleChoiceField doesn't preserve order, so we use an array
+        if isinstance(data, str) or not hasattr(data, "__iter__"):
+            self.fail("not_a_list", input_type=type(data).__name__)
+        if not self.allow_empty and len(data) == 0:
+            self.fail("empty")
+
+        return [fields.ChoiceField.to_internal_value(self, item) for item in data]
+
+    def to_representation(self, value):
+        # MultipleChoiceField doesn't preserve order, so we return as array to match the original order
+        return [self.choice_strings_to_values.get(str(item), item) for item in value]
+
+
 class SavedViewSerializer(OwnedObjectSerializer):
     filter_rules = SavedViewFilterRuleSerializer(many=True)
-    dashboard_view_table_columns = fields.MultipleChoiceField(
+    dashboard_view_table_columns = DynamicOrderedMultipleChoiceField(
         choices=SavedView.DashboardViewTableColumns.choices,
+        dyanmic_choices=[("custom_field_%d", CustomField)],
         required=False,
     )
 
@@ -822,22 +862,6 @@ class SavedViewSerializer(OwnedObjectSerializer):
             "user_can_change",
             "set_permissions",
         ]
-
-    def to_internal_value(self, data):
-        value = super().to_internal_value(data)
-        # MultipleChoiceField doesn't preserve order, so we revert the dict to the original array
-        if "dashboard_view_table_columns" in data:
-            value["dashboard_view_table_columns"] = data["dashboard_view_table_columns"]
-        return value
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        # MultipleChoiceField doesn't preserve order, so we re-order the array to match the original order
-        if "dashboard_view_table_columns" in representation:
-            representation["dashboard_view_table_columns"] = [
-                str(x) for x in instance.dashboard_view_table_columns
-            ]
-        return representation
 
     def update(self, instance, validated_data):
         if "filter_rules" in validated_data:
