@@ -11,8 +11,17 @@ import { RouterTestingModule } from '@angular/router/testing'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { of, Subject } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
-import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type'
-import { SavedView } from 'src/app/data/saved-view'
+import {
+  FILTER_CORRESPONDENT,
+  FILTER_DOCUMENT_TYPE,
+  FILTER_HAS_TAGS_ALL,
+  FILTER_STORAGE_PATH,
+} from 'src/app/data/filter-rule-type'
+import {
+  DashboardViewMode,
+  DashboardViewTableColumn,
+  SavedView,
+} from 'src/app/data/saved-view'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
@@ -44,6 +53,14 @@ const savedView: SavedView = {
       rule_type: FILTER_HAS_TAGS_ALL,
       value: '1,2',
     },
+  ],
+  dashboard_view_limit: 20,
+  dashboard_view_mode: DashboardViewMode.TABLE,
+  dashboard_view_table_columns: [
+    DashboardViewTableColumn.CREATED,
+    DashboardViewTableColumn.TITLE,
+    DashboardViewTableColumn.TAGS,
+    DashboardViewTableColumn.CORRESPONDENT,
   ],
 }
 
@@ -170,7 +187,7 @@ describe('SavedViewWidgetComponent', () => {
     component.ngOnInit()
     expect(listAllSpy).toHaveBeenCalledWith(
       1,
-      10,
+      20,
       savedView.sort_field,
       savedView.sort_reverse,
       savedView.filter_rules,
@@ -204,11 +221,120 @@ describe('SavedViewWidgetComponent', () => {
     })
   })
 
+  it('should navigate to document', () => {
+    const routerSpy = jest.spyOn(router, 'navigate')
+    component.openDocumentDetail(documentResults[0])
+    expect(routerSpy).toHaveBeenCalledWith(['documents', documentResults[0].id])
+  })
+
   it('should navigate via quickfilter on click tag', () => {
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    component.clickTag({ id: 11, name: 'Tag11' }, new MouseEvent('click'))
+    component.clickTag(11, new MouseEvent('click'))
     expect(qfSpy).toHaveBeenCalledWith([
       { rule_type: FILTER_HAS_TAGS_ALL, value: '11' },
     ])
+    component.clickTag(11) // coverage
+  })
+
+  it('should navigate via quickfilter on click correspondent', () => {
+    const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
+    component.clickCorrespondent(11, new MouseEvent('click'))
+    expect(qfSpy).toHaveBeenCalledWith([
+      { rule_type: FILTER_CORRESPONDENT, value: '11' },
+    ])
+    component.clickCorrespondent(11) // coverage
+  })
+
+  it('should navigate via quickfilter on click doc type', () => {
+    const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
+    component.clickDocType(11, new MouseEvent('click'))
+    expect(qfSpy).toHaveBeenCalledWith([
+      { rule_type: FILTER_DOCUMENT_TYPE, value: '11' },
+    ])
+    component.clickDocType(11) // coverage
+  })
+
+  it('should navigate via quickfilter on click storage path', () => {
+    const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
+    component.clickStoragePath(11, new MouseEvent('click'))
+    expect(qfSpy).toHaveBeenCalledWith([
+      { rule_type: FILTER_STORAGE_PATH, value: '11' },
+    ])
+    component.clickStoragePath(11) // coverage
+  })
+
+  it('should get correct column title', () => {
+    expect(component.getColumnTitle(DashboardViewTableColumn.TITLE)).toEqual(
+      'Title'
+    )
+    expect(component.getColumnTitle(DashboardViewTableColumn.CREATED)).toEqual(
+      'Created'
+    )
+    expect(component.getColumnTitle(DashboardViewTableColumn.ADDED)).toEqual(
+      'Added'
+    )
+    expect(component.getColumnTitle(DashboardViewTableColumn.TAGS)).toEqual(
+      'Tags'
+    )
+    expect(
+      component.getColumnTitle(DashboardViewTableColumn.CORRESPONDENT)
+    ).toEqual('Correspondent')
+    expect(
+      component.getColumnTitle(DashboardViewTableColumn.DOCUMENT_TYPE)
+    ).toEqual('Document type')
+    expect(
+      component.getColumnTitle(DashboardViewTableColumn.STORAGE_PATH)
+    ).toEqual('Storage path')
+  })
+
+  it('should check if column is visible including permissions', () => {
+    expect(
+      component.columnIsVisible(DashboardViewTableColumn.TITLE)
+    ).toBeTruthy()
+    expect(
+      component.columnIsVisible(DashboardViewTableColumn.CREATED)
+    ).toBeTruthy()
+    expect(
+      component.columnIsVisible(DashboardViewTableColumn.ADDED)
+    ).toBeTruthy()
+    expect(
+      component.columnIsVisible(DashboardViewTableColumn.TAGS)
+    ).toBeTruthy()
+    expect(
+      component.columnIsVisible(DashboardViewTableColumn.CORRESPONDENT)
+    ).toBeTruthy()
+    expect(
+      component.columnIsVisible(DashboardViewTableColumn.DOCUMENT_TYPE)
+    ).toBeTruthy()
+    expect(
+      component.columnIsVisible(DashboardViewTableColumn.STORAGE_PATH)
+    ).toBeTruthy()
+
+    jest
+      .spyOn(component.permissionsService, 'currentUserCan')
+      .mockReturnValue(false)
+    expect(
+      component.columnIsVisible(DashboardViewTableColumn.TITLE)
+    ).toBeTruthy()
+    expect(
+      component.columnIsVisible(DashboardViewTableColumn.CREATED)
+    ).toBeTruthy()
+    expect(
+      component.columnIsVisible(DashboardViewTableColumn.ADDED)
+    ).toBeTruthy()
+    expect(component.columnIsVisible(DashboardViewTableColumn.TAGS)).toBeFalsy()
+    expect(
+      component.columnIsVisible(DashboardViewTableColumn.CORRESPONDENT)
+    ).toBeFalsy()
+    expect(
+      component.columnIsVisible(DashboardViewTableColumn.DOCUMENT_TYPE)
+    ).toBeFalsy()
+    expect(
+      component.columnIsVisible(DashboardViewTableColumn.STORAGE_PATH)
+    ).toBeFalsy()
+
+    expect(
+      component.columnIsVisible('unknown' as DashboardViewTableColumn)
+    ).toBeFalsy() // coverage
   })
 })

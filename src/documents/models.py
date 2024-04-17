@@ -394,6 +394,19 @@ class Log(models.Model):
 
 
 class SavedView(ModelWithOwner):
+    class DashboardViewDisplayMode(models.TextChoices):
+        TABLE = ("table", _("Table"))
+        SMALL_CARDS = ("small_cards", _("Small Cards"))
+
+    class DashboardViewTableColumns(models.TextChoices):
+        TITLE = ("title", _("Title"))
+        CREATED = ("created", _("Created"))
+        ADDED = ("added", _("Added"))
+        TAGS = ("tag"), _("Tags")
+        DOCUMENT_TYPE = ("documenttype", _("Document Type"))
+        CORRESPONDENT = ("correspondent", _("Correspondent"))
+        STORAGE_PATH = ("storagepath", _("Storage Path"))
+
     name = models.CharField(_("name"), max_length=128)
 
     show_on_dashboard = models.BooleanField(
@@ -410,6 +423,26 @@ class SavedView(ModelWithOwner):
         blank=True,
     )
     sort_reverse = models.BooleanField(_("sort reverse"), default=False)
+
+    dashboard_view_limit = models.PositiveIntegerField(
+        _("Dashboard view limit"),
+        default=10,
+        validators=[MinValueValidator(1)],
+    )
+
+    dashboard_view_mode = models.CharField(
+        max_length=128,
+        verbose_name=_("Dashboard view display mode"),
+        choices=DashboardViewDisplayMode.choices,
+        default=DashboardViewDisplayMode.TABLE,
+    )
+
+    dashboard_view_table_columns = MultiSelectField(
+        max_length=128,
+        verbose_name=_("Dashboard view table display columns"),
+        choices=DashboardViewTableColumns.choices,
+        default=f"{DashboardViewTableColumns.CREATED},{DashboardViewTableColumns.TITLE},{DashboardViewTableColumns.TAGS},{DashboardViewTableColumns.CORRESPONDENT}",
+    )
 
     class Meta:
         ordering = ("name",)
