@@ -393,6 +393,164 @@ class Log(models.Model):
         return self.message
 
 
+class CustomField(models.Model):
+    """
+    Defines the name and type of a custom field
+    """
+
+    class FieldDataType(models.TextChoices):
+        STRING = ("string", _("String"))
+        URL = ("url", _("URL"))
+        DATE = ("date", _("Date"))
+        BOOL = ("boolean"), _("Boolean")
+        INT = ("integer", _("Integer"))
+        FLOAT = ("float", _("Float"))
+        MONETARY = ("monetary", _("Monetary"))
+        DOCUMENTLINK = ("documentlink", _("Document Link"))
+
+    created = models.DateTimeField(
+        _("created"),
+        default=timezone.now,
+        db_index=True,
+        editable=False,
+    )
+
+    name = models.CharField(max_length=128)
+
+    data_type = models.CharField(
+        _("data type"),
+        max_length=50,
+        choices=FieldDataType.choices,
+        editable=False,
+    )
+
+    class Meta:
+        ordering = ("created",)
+        verbose_name = _("custom field")
+        verbose_name_plural = _("custom fields")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name"],
+                name="%(app_label)s_%(class)s_unique_name",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.name} : {self.data_type}"
+
+
+class CustomFieldInstance(models.Model):
+    """
+    A single instance of a field, attached to a CustomField for the name and type
+    and attached to a single Document to be metadata for it
+    """
+
+    created = models.DateTimeField(
+        _("created"),
+        default=timezone.now,
+        db_index=True,
+        editable=False,
+    )
+
+    document = models.ForeignKey(
+        Document,
+        blank=False,
+        null=False,
+        on_delete=models.CASCADE,
+        related_name="custom_fields",
+        editable=False,
+    )
+
+    field = models.ForeignKey(
+        CustomField,
+        blank=False,
+        null=False,
+        on_delete=models.CASCADE,
+        related_name="fields",
+        editable=False,
+    )
+
+    # Actual data storage
+    value_text = models.CharField(max_length=128, null=True)
+
+    value_bool = models.BooleanField(null=True)
+
+    value_url = models.URLField(null=True)
+
+    value_date = models.DateField(null=True)
+
+    value_int = models.IntegerField(null=True)
+
+    value_float = models.FloatField(null=True)
+
+    value_monetary = models.CharField(null=True, max_length=128)
+
+    value_document_ids = models.JSONField(null=True)
+
+    class Meta:
+        ordering = ("created",)
+        verbose_name = _("custom field instance")
+        verbose_name_plural = _("custom field instances")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["document", "field"],
+                name="%(app_label)s_%(class)s_unique_document_field",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return str(self.field.name) + f" : {self.value}"
+
+    @property
+    def value(self):
+        """
+        Based on the data type, access the actual value the instance stores
+        A little shorthand/quick way to get what is actually here
+        """
+        if self.field.data_type == CustomField.FieldDataType.STRING:
+            return self.value_text
+        elif self.field.data_type == CustomField.FieldDataType.URL:
+            return self.value_url
+        elif self.field.data_type == CustomField.FieldDataType.DATE:
+            return self.value_date
+        elif self.field.data_type == CustomField.FieldDataType.BOOL:
+            return self.value_bool
+        elif self.field.data_type == CustomField.FieldDataType.INT:
+            return self.value_int
+        elif self.field.data_type == CustomField.FieldDataType.FLOAT:
+            return self.value_float
+        elif self.field.data_type == CustomField.FieldDataType.MONETARY:
+            return self.value_monetary
+        elif self.field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
+            return self.value_document_ids
+        raise NotImplementedError(self.field.data_type)
+
+
+class DynamicMultiSelectField(MultiSelectField):
+    """
+    A MultiSelectField that can have dynamic choices from a model
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.dynamic_choices = kwargs.pop("dyanmic_choices", None)
+        super().__init__(*args, **kwargs)
+
+    def _get_choices(self):
+        return self._choices
+
+    def _set_choices(self, value):
+        if self.dynamic_choices:
+            for key, model in self.dynamic_choices:
+                try:
+                    for obj in model.objects.all():
+                        value.append((key % obj.pk, obj.name))
+                except Exception:
+                    pass
+        self._choices = value
+
+    choices = property(_get_choices, _set_choices)
+
+
 class SavedView(ModelWithOwner):
     class DashboardViewDisplayMode(models.TextChoices):
         TABLE = ("table", _("Table"))
@@ -406,6 +564,9 @@ class SavedView(ModelWithOwner):
         DOCUMENT_TYPE = ("documenttype", _("Document Type"))
         CORRESPONDENT = ("correspondent", _("Correspondent"))
         STORAGE_PATH = ("storagepath", _("Storage Path"))
+
+    class DashboardViewDynamicTableColumns:
+        CUSTOM_FIELD = ("custom_field_%d", CustomField)
 
     name = models.CharField(_("name"), max_length=128)
 
@@ -437,10 +598,11 @@ class SavedView(ModelWithOwner):
         default=DashboardViewDisplayMode.TABLE,
     )
 
-    dashboard_view_table_columns = MultiSelectField(
+    dashboard_view_table_columns = DynamicMultiSelectField(
         max_length=128,
         verbose_name=_("Dashboard view table display columns"),
         choices=DashboardViewTableColumns.choices,
+        dyanmic_choices=[DashboardViewDynamicTableColumns.CUSTOM_FIELD],
         default=f"{DashboardViewTableColumns.CREATED},{DashboardViewTableColumns.TITLE},{DashboardViewTableColumns.TAGS},{DashboardViewTableColumns.CORRESPONDENT}",
     )
 
@@ -779,139 +941,6 @@ class ShareLink(models.Model):
 
     def __str__(self):
         return f"Share Link for {self.document.title}"
-
-
-class CustomField(models.Model):
-    """
-    Defines the name and type of a custom field
-    """
-
-    class FieldDataType(models.TextChoices):
-        STRING = ("string", _("String"))
-        URL = ("url", _("URL"))
-        DATE = ("date", _("Date"))
-        BOOL = ("boolean"), _("Boolean")
-        INT = ("integer", _("Integer"))
-        FLOAT = ("float", _("Float"))
-        MONETARY = ("monetary", _("Monetary"))
-        DOCUMENTLINK = ("documentlink", _("Document Link"))
-
-    created = models.DateTimeField(
-        _("created"),
-        default=timezone.now,
-        db_index=True,
-        editable=False,
-    )
-
-    name = models.CharField(max_length=128)
-
-    data_type = models.CharField(
-        _("data type"),
-        max_length=50,
-        choices=FieldDataType.choices,
-        editable=False,
-    )
-
-    class Meta:
-        ordering = ("created",)
-        verbose_name = _("custom field")
-        verbose_name_plural = _("custom fields")
-        constraints = [
-            models.UniqueConstraint(
-                fields=["name"],
-                name="%(app_label)s_%(class)s_unique_name",
-            ),
-        ]
-
-    def __str__(self) -> str:
-        return f"{self.name} : {self.data_type}"
-
-
-class CustomFieldInstance(models.Model):
-    """
-    A single instance of a field, attached to a CustomField for the name and type
-    and attached to a single Document to be metadata for it
-    """
-
-    created = models.DateTimeField(
-        _("created"),
-        default=timezone.now,
-        db_index=True,
-        editable=False,
-    )
-
-    document = models.ForeignKey(
-        Document,
-        blank=False,
-        null=False,
-        on_delete=models.CASCADE,
-        related_name="custom_fields",
-        editable=False,
-    )
-
-    field = models.ForeignKey(
-        CustomField,
-        blank=False,
-        null=False,
-        on_delete=models.CASCADE,
-        related_name="fields",
-        editable=False,
-    )
-
-    # Actual data storage
-    value_text = models.CharField(max_length=128, null=True)
-
-    value_bool = models.BooleanField(null=True)
-
-    value_url = models.URLField(null=True)
-
-    value_date = models.DateField(null=True)
-
-    value_int = models.IntegerField(null=True)
-
-    value_float = models.FloatField(null=True)
-
-    value_monetary = models.CharField(null=True, max_length=128)
-
-    value_document_ids = models.JSONField(null=True)
-
-    class Meta:
-        ordering = ("created",)
-        verbose_name = _("custom field instance")
-        verbose_name_plural = _("custom field instances")
-        constraints = [
-            models.UniqueConstraint(
-                fields=["document", "field"],
-                name="%(app_label)s_%(class)s_unique_document_field",
-            ),
-        ]
-
-    def __str__(self) -> str:
-        return str(self.field.name) + f" : {self.value}"
-
-    @property
-    def value(self):
-        """
-        Based on the data type, access the actual value the instance stores
-        A little shorthand/quick way to get what is actually here
-        """
-        if self.field.data_type == CustomField.FieldDataType.STRING:
-            return self.value_text
-        elif self.field.data_type == CustomField.FieldDataType.URL:
-            return self.value_url
-        elif self.field.data_type == CustomField.FieldDataType.DATE:
-            return self.value_date
-        elif self.field.data_type == CustomField.FieldDataType.BOOL:
-            return self.value_bool
-        elif self.field.data_type == CustomField.FieldDataType.INT:
-            return self.value_int
-        elif self.field.data_type == CustomField.FieldDataType.FLOAT:
-            return self.value_float
-        elif self.field.data_type == CustomField.FieldDataType.MONETARY:
-            return self.value_monetary
-        elif self.field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
-            return self.value_document_ids
-        raise NotImplementedError(self.field.data_type)
 
 
 if settings.AUDIT_LOG_ENABLED:
