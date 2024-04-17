@@ -40,6 +40,8 @@ import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { PreviewPopupComponent } from 'src/app/components/common/preview-popup/preview-popup.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { CustomFieldDataType } from 'src/app/data/custom-field'
 
 const savedView: SavedView = {
   id: 1,
@@ -61,6 +63,10 @@ const savedView: SavedView = {
     DashboardViewTableColumn.TITLE,
     DashboardViewTableColumn.TAGS,
     DashboardViewTableColumn.CORRESPONDENT,
+    DashboardViewTableColumn.DOCUMENT_TYPE,
+    DashboardViewTableColumn.STORAGE_PATH,
+    `${DashboardViewTableColumn.CUSTOM_FIELD}11` as any,
+    `${DashboardViewTableColumn.CUSTOM_FIELD}15` as any,
   ],
 }
 
@@ -68,11 +74,35 @@ const documentResults = [
   {
     id: 2,
     title: 'doc2',
+    custom_fields: [
+      { id: 1, field: 11, created: new Date(), value: 'custom', document: 2 },
+    ],
   },
   {
     id: 3,
     title: 'doc3',
     correspondent: 0,
+    custom_fields: [],
+  },
+  {
+    id: 4,
+    title: 'doc4',
+    custom_fields: [
+      { id: 32, field: 3, created: new Date(), value: 'EUR123', document: 4 },
+    ],
+  },
+  {
+    id: 5,
+    title: 'doc5',
+    custom_fields: [
+      {
+        id: 22,
+        field: 15,
+        created: new Date(),
+        value: [123, 456, 789],
+        document: 5,
+      },
+    ],
   },
 ]
 
@@ -106,6 +136,33 @@ describe('SavedViewWidgetComponent', () => {
         },
         CustomDatePipe,
         DatePipe,
+        {
+          provide: CustomFieldsService,
+          useValue: {
+            listAll: () =>
+              of({
+                all: [3, 11, 15],
+                count: 3,
+                results: [
+                  {
+                    id: 3,
+                    name: 'Custom field 3',
+                    data_type: CustomFieldDataType.Monetary,
+                  },
+                  {
+                    id: 11,
+                    name: 'Custom Field 11',
+                    data_type: CustomFieldDataType.String,
+                  },
+                  {
+                    id: 15,
+                    name: 'Custom Field 15',
+                    data_type: CustomFieldDataType.DocumentLink,
+                  },
+                ],
+              }),
+          },
+        },
       ],
       imports: [
         HttpClientTestingModule,
@@ -289,52 +346,97 @@ describe('SavedViewWidgetComponent', () => {
 
   it('should check if column is visible including permissions', () => {
     expect(
-      component.columnIsVisible(DashboardViewTableColumn.TITLE)
+      component.visibleColumns.includes(DashboardViewTableColumn.TITLE)
     ).toBeTruthy()
     expect(
-      component.columnIsVisible(DashboardViewTableColumn.CREATED)
+      component.visibleColumns.includes(DashboardViewTableColumn.CREATED)
     ).toBeTruthy()
     expect(
-      component.columnIsVisible(DashboardViewTableColumn.ADDED)
+      component.visibleColumns.includes(DashboardViewTableColumn.ADDED)
     ).toBeTruthy()
     expect(
-      component.columnIsVisible(DashboardViewTableColumn.TAGS)
+      component.visibleColumns.includes(DashboardViewTableColumn.TAGS)
     ).toBeTruthy()
     expect(
-      component.columnIsVisible(DashboardViewTableColumn.CORRESPONDENT)
+      component.visibleColumns.includes(DashboardViewTableColumn.CORRESPONDENT)
     ).toBeTruthy()
     expect(
-      component.columnIsVisible(DashboardViewTableColumn.DOCUMENT_TYPE)
+      component.visibleColumns.includes(DashboardViewTableColumn.DOCUMENT_TYPE)
     ).toBeTruthy()
     expect(
-      component.columnIsVisible(DashboardViewTableColumn.STORAGE_PATH)
+      component.visibleColumns.includes(DashboardViewTableColumn.STORAGE_PATH)
+    ).toBeTruthy()
+    expect(
+      component.visibleColumns.includes(
+        `${DashboardViewTableColumn.CUSTOM_FIELD}11` as any
+      )
     ).toBeTruthy()
 
+    component.visibleColumns = []
     jest
       .spyOn(component.permissionsService, 'currentUserCan')
       .mockReturnValue(false)
+    component.ngOnInit()
     expect(
-      component.columnIsVisible(DashboardViewTableColumn.TITLE)
-    ).toBeTruthy()
-    expect(
-      component.columnIsVisible(DashboardViewTableColumn.CREATED)
-    ).toBeTruthy()
-    expect(
-      component.columnIsVisible(DashboardViewTableColumn.ADDED)
-    ).toBeTruthy()
-    expect(component.columnIsVisible(DashboardViewTableColumn.TAGS)).toBeFalsy()
-    expect(
-      component.columnIsVisible(DashboardViewTableColumn.CORRESPONDENT)
+      component.visibleColumns.includes(DashboardViewTableColumn.TAGS)
     ).toBeFalsy()
     expect(
-      component.columnIsVisible(DashboardViewTableColumn.DOCUMENT_TYPE)
+      component.visibleColumns.includes(DashboardViewTableColumn.CORRESPONDENT)
     ).toBeFalsy()
     expect(
-      component.columnIsVisible(DashboardViewTableColumn.STORAGE_PATH)
+      component.visibleColumns.includes(DashboardViewTableColumn.DOCUMENT_TYPE)
     ).toBeFalsy()
+    expect(
+      component.visibleColumns.includes(DashboardViewTableColumn.STORAGE_PATH)
+    ).toBeFalsy()
+    expect(
+      component.visibleColumns.includes(
+        `${DashboardViewTableColumn.CUSTOM_FIELD}11` as any
+      )
+    ).toBeFalsy()
+  })
 
+  it('should display monetary custom field value', () => {
     expect(
-      component.columnIsVisible('unknown' as DashboardViewTableColumn)
-    ).toBeFalsy() // coverage
+      component.getMonetaryCustomFieldValue(
+        documentResults[2],
+        `${DashboardViewTableColumn.CUSTOM_FIELD}3`
+      )
+    ).toEqual([123, 'EUR'])
+    expect(
+      component.getMonetaryCustomFieldValue(
+        documentResults[0],
+        `${DashboardViewTableColumn.CUSTOM_FIELD}999`
+      )
+    ).toEqual([null, null])
+  })
+
+  it('should retrieve documents for document link columns', () => {
+    const listAllSpy = jest.spyOn(documentService, 'listAll')
+    listAllSpy.mockReturnValue(
+      of({
+        all: [123, 456, 789],
+        count: 3,
+        results: [
+          { id: 123, title: 'doc123' },
+          { id: 456, title: 'doc456' },
+          { id: 789, title: 'doc789' },
+        ],
+      })
+    )
+    jest.spyOn(documentService, 'listFiltered').mockReturnValue(
+      of({
+        all: [4, 5],
+        count: 2,
+        results: [documentResults[2], documentResults[3]],
+      })
+    )
+    component.ngOnInit()
+    expect(listAllSpy).toHaveBeenCalledWith(null, false, {
+      id__in: '123,456,789',
+    })
+    fixture.detectChanges()
+    expect(fixture.debugElement.nativeElement.textContent).toContain('doc123')
+    component.maybeGetDocuments() // coverage
   })
 })

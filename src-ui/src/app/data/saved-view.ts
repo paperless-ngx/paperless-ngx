@@ -14,6 +14,7 @@ export enum DashboardViewTableColumn {
   CORRESPONDENT = 'correspondent',
   DOCUMENT_TYPE = 'documenttype',
   STORAGE_PATH = 'storagepath',
+  CUSTOM_FIELD = 'custom_field_',
 }
 
 export const DASHBOARD_VIEW_TABLE_COLUMNS = [
