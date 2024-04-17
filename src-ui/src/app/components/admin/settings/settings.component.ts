@@ -26,7 +26,12 @@ import {
   tap,
 } from 'rxjs'
 import { Group } from 'src/app/data/group'
-import { SavedView } from 'src/app/data/saved-view'
+import {
+  DASHBOARD_VIEW_TABLE_COLUMNS,
+  DashboardViewMode,
+  DashboardViewTableColumn,
+  SavedView,
+} from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { User } from 'src/app/data/user'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
@@ -73,8 +78,8 @@ export class SettingsComponent
   extends ComponentWithPermissions
   implements OnInit, AfterViewInit, OnDestroy, DirtyComponent
 {
-  SettingsNavIDs = SettingsNavIDs
   activeNavID: number
+  DashboardViewMode = DashboardViewMode
 
   savedViewGroup = new FormGroup({})
 
@@ -110,6 +115,8 @@ export class SettingsComponent
   })
 
   savedViews: SavedView[]
+  SettingsNavIDs = SettingsNavIDs
+  DASHBOARD_VIEW_TABLE_COLUMNS = DASHBOARD_VIEW_TABLE_COLUMNS
 
   store: BehaviorSubject<any>
   storeSub: Subscription
@@ -340,6 +347,9 @@ export class SettingsComponent
           name: view.name,
           show_on_dashboard: view.show_on_dashboard,
           show_in_sidebar: view.show_in_sidebar,
+          dashboard_view_limit: view.dashboard_view_limit,
+          dashboard_view_mode: view.dashboard_view_mode,
+          dashboard_view_table_columns: view.dashboard_view_table_columns,
         }
         this.savedViewGroup.addControl(
           view.id.toString(),
@@ -348,6 +358,9 @@ export class SettingsComponent
             name: new FormControl(null),
             show_on_dashboard: new FormControl(null),
             show_in_sidebar: new FormControl(null),
+            dashboard_view_limit: new FormControl(null),
+            dashboard_view_mode: new FormControl(null),
+            dashboard_view_table_columns: new FormControl([]),
           })
         )
       }
@@ -590,6 +603,10 @@ export class SettingsComponent
     } else {
       this.saveLocalSettings()
     }
+  }
+
+  reset() {
+    this.settingsForm.patchValue(this.store.getValue())
   }
 
   clearThemeColor() {
