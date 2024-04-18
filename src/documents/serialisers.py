@@ -838,7 +838,7 @@ class DynamicOrderedMultipleChoiceField(fields.MultipleChoiceField):
 
 class SavedViewSerializer(OwnedObjectSerializer):
     filter_rules = SavedViewFilterRuleSerializer(many=True)
-    dashboard_view_table_columns = DynamicOrderedMultipleChoiceField(
+    document_display_fields = DynamicOrderedMultipleChoiceField(
         choices=SavedView.DashboardViewTableColumns.choices,
         dyanmic_choices=[("custom_field_%d", CustomField)],
         required=False,
@@ -856,7 +856,7 @@ class SavedViewSerializer(OwnedObjectSerializer):
             "filter_rules",
             "dashboard_view_limit",
             "dashboard_view_mode",
-            "dashboard_view_table_columns",
+            "document_display_fields",
             "owner",
             "permissions",
             "user_can_change",

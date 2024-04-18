@@ -598,9 +598,9 @@ class SavedView(ModelWithOwner):
         default=DashboardViewDisplayMode.TABLE,
     )
 
-    dashboard_view_table_columns = DynamicMultiSelectField(
+    document_display_fields = DynamicMultiSelectField(
         max_length=128,
-        verbose_name=_("Dashboard view table display columns"),
+        verbose_name=_("Document display fields"),
         choices=DashboardViewTableColumns.choices,
         dyanmic_choices=[DashboardViewDynamicTableColumns.CUSTOM_FIELD],
         default=f"{DashboardViewTableColumns.CREATED},{DashboardViewTableColumns.TITLE},{DashboardViewTableColumns.TAGS},{DashboardViewTableColumns.CORRESPONDENT}",

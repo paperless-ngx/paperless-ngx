@@ -13,7 +13,7 @@ import {
   DashboardViewTableColumn,
   DashboardViewMode,
   SavedView,
-  DASHBOARD_VIEW_TABLE_COLUMNS,
+  document_display_fields,
 } from 'src/app/data/saved-view'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
@@ -111,7 +111,7 @@ export class SavedViewWidgetComponent
         })
     }
 
-    this.savedView.dashboard_view_table_columns?.forEach((column) => {
+    this.savedView.document_display_fields?.forEach((column) => {
       let type: PermissionType = Object.values(PermissionType).find((t) =>
         t.includes(column)
       )
@@ -254,7 +254,7 @@ export class SavedViewWidgetComponent
       const id = column.split('_')[2]
       return this.customFields.find((c) => c.id === parseInt(id))?.name
     }
-    return DASHBOARD_VIEW_TABLE_COLUMNS.find((c) => c.id === column)?.name
+    return document_display_fields.find((c) => c.id === column)?.name
   }
 
   public getCustomFieldDataType(column_id: string): string {
@@ -284,7 +284,7 @@ export class SavedViewWidgetComponent
     if (this.docLinkDocuments.length) return
     let docIds = []
     let docLinkColumns = []
-    this.savedView.dashboard_view_table_columns
+    this.savedView.document_display_fields
       ?.filter((column) =>
         column.startsWith(DashboardViewTableColumn.CUSTOM_FIELD)
       )

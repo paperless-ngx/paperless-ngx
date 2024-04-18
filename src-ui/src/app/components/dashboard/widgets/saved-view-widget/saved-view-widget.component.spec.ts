@@ -58,7 +58,7 @@ const savedView: SavedView = {
   ],
   dashboard_view_limit: 20,
   dashboard_view_mode: DashboardViewMode.TABLE,
-  dashboard_view_table_columns: [
+  document_display_fields: [
     DashboardViewTableColumn.CREATED,
     DashboardViewTableColumn.TITLE,
     DashboardViewTableColumn.TAGS,

@@ -27,7 +27,7 @@ import {
 } from 'rxjs'
 import { Group } from 'src/app/data/group'
 import {
-  DASHBOARD_VIEW_TABLE_COLUMNS,
+  document_display_fields,
   DashboardViewMode,
   DashboardViewTableColumn,
   SavedView,
@@ -116,7 +116,7 @@ export class SettingsComponent
 
   savedViews: SavedView[]
   SettingsNavIDs = SettingsNavIDs
-  DASHBOARD_VIEW_TABLE_COLUMNS = DASHBOARD_VIEW_TABLE_COLUMNS
+  document_display_fields = document_display_fields
 
   store: BehaviorSubject<any>
   storeSub: Subscription
@@ -349,7 +349,7 @@ export class SettingsComponent
           show_in_sidebar: view.show_in_sidebar,
           dashboard_view_limit: view.dashboard_view_limit,
           dashboard_view_mode: view.dashboard_view_mode,
-          dashboard_view_table_columns: view.dashboard_view_table_columns,
+          document_display_fields: view.document_display_fields,
         }
         this.savedViewGroup.addControl(
           view.id.toString(),
@@ -360,7 +360,7 @@ export class SettingsComponent
             show_in_sidebar: new FormControl(null),
             dashboard_view_limit: new FormControl(null),
             dashboard_view_mode: new FormControl(null),
-            dashboard_view_table_columns: new FormControl([]),
+            document_display_fields: new FormControl([]),
           })
         )
       }
