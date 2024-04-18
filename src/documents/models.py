@@ -542,7 +542,7 @@ class DynamicMultiSelectField(MultiSelectField):
         if self.dynamic_choices:
             for key, model in self.dynamic_choices:
                 try:
-                    for obj in model.objects.all():
+                    for obj in model.objects.all():  # pragma: no cover
                         value.append((key % obj.pk, obj.name))
                 except Exception:
                     pass
@@ -552,11 +552,11 @@ class DynamicMultiSelectField(MultiSelectField):
 
 
 class SavedView(ModelWithOwner):
-    class DashboardViewDisplayMode(models.TextChoices):
+    class ViewDisplayMode(models.TextChoices):
         TABLE = ("table", _("Table"))
-        SMALL_CARDS = ("small_cards", _("Small Cards"))
+        SMALL_CARDS = ("smallCards", _("Small Cards"))
 
-    class DashboardViewTableColumns(models.TextChoices):
+    class DocumentDisplayFields(models.TextChoices):
         TITLE = ("title", _("Title"))
         CREATED = ("created", _("Created"))
         ADDED = ("added", _("Added"))
@@ -565,7 +565,7 @@ class SavedView(ModelWithOwner):
         CORRESPONDENT = ("correspondent", _("Correspondent"))
         STORAGE_PATH = ("storagepath", _("Storage Path"))
 
-    class DashboardViewDynamicTableColumns:
+    class DynamicDocumentDisplayFields:
         CUSTOM_FIELD = ("custom_field_%d", CustomField)
 
     name = models.CharField(_("name"), max_length=128)
@@ -585,25 +585,25 @@ class SavedView(ModelWithOwner):
     )
     sort_reverse = models.BooleanField(_("sort reverse"), default=False)
 
-    dashboard_view_limit = models.PositiveIntegerField(
-        _("Dashboard view limit"),
+    page_size = models.PositiveIntegerField(
+        _("View page size"),
         default=10,
         validators=[MinValueValidator(1)],
     )
 
-    dashboard_view_mode = models.CharField(
+    display_mode = models.CharField(
         max_length=128,
-        verbose_name=_("Dashboard view display mode"),
-        choices=DashboardViewDisplayMode.choices,
-        default=DashboardViewDisplayMode.TABLE,
+        verbose_name=_("View display mode"),
+        choices=ViewDisplayMode.choices,
+        default=ViewDisplayMode.TABLE,
     )
 
     document_display_fields = DynamicMultiSelectField(
         max_length=128,
         verbose_name=_("Document display fields"),
-        choices=DashboardViewTableColumns.choices,
-        dyanmic_choices=[DashboardViewDynamicTableColumns.CUSTOM_FIELD],
-        default=f"{DashboardViewTableColumns.CREATED},{DashboardViewTableColumns.TITLE},{DashboardViewTableColumns.TAGS},{DashboardViewTableColumns.CORRESPONDENT}",
+        choices=DocumentDisplayFields.choices,
+        dyanmic_choices=[DynamicDocumentDisplayFields.CUSTOM_FIELD],
+        default=f"{DocumentDisplayFields.CREATED},{DocumentDisplayFields.TITLE},{DocumentDisplayFields.TAGS},{DocumentDisplayFields.CORRESPONDENT}",
     )
 
     class Meta:

@@ -823,12 +823,8 @@ class DynamicOrderedMultipleChoiceField(fields.MultipleChoiceField):
     choices = property(_get_choices, _set_choices)
 
     def to_internal_value(self, data):
+        super().to_internal_value(data)
         # MultipleChoiceField doesn't preserve order, so we use an array
-        if isinstance(data, str) or not hasattr(data, "__iter__"):
-            self.fail("not_a_list", input_type=type(data).__name__)
-        if not self.allow_empty and len(data) == 0:
-            self.fail("empty")
-
         return [fields.ChoiceField.to_internal_value(self, item) for item in data]
 
     def to_representation(self, value):
@@ -839,7 +835,7 @@ class DynamicOrderedMultipleChoiceField(fields.MultipleChoiceField):
 class SavedViewSerializer(OwnedObjectSerializer):
     filter_rules = SavedViewFilterRuleSerializer(many=True)
     document_display_fields = DynamicOrderedMultipleChoiceField(
-        choices=SavedView.DashboardViewTableColumns.choices,
+        choices=SavedView.DocumentDisplayFields.choices,
         dyanmic_choices=[("custom_field_%d", CustomField)],
         required=False,
     )
@@ -854,8 +850,8 @@ class SavedViewSerializer(OwnedObjectSerializer):
             "sort_field",
             "sort_reverse",
             "filter_rules",
-            "dashboard_view_limit",
-            "dashboard_view_mode",
+            "page_size",
+            "display_mode",
             "document_display_fields",
             "owner",
             "permissions",

@@ -15,9 +15,9 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name="savedview",
-            name="dashboard_view_mode",
+            name="display_mode",
             field=models.CharField(
-                choices=[("table", "Table"), ("small_cards", "Small Cards")],
+                choices=[("table", "Table"), ("smallCards", "Small Cards")],
                 default="table",
                 max_length=128,
                 verbose_name="Dashboard view display mode",
@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name="savedview",
-            name="dashboard_view_limit",
+            name="page_size",
             field=models.PositiveIntegerField(
                 default=10,
                 validators=[django.core.validators.MinValueValidator(1)],

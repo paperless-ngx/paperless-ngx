@@ -11,7 +11,7 @@ import { Subject, takeUntil } from 'rxjs'
 import { Document } from 'src/app/data/document'
 import {
   DocumentDisplayField,
-  DashboardViewMode,
+  DisplayMode,
   SavedView,
   DOCUMENT_DISPLAY_FIELDS,
 } from 'src/app/data/saved-view'
@@ -45,7 +45,7 @@ export class SavedViewWidgetComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy
 {
-  public DashboardViewMode = DashboardViewMode
+  public DashboardViewMode = DisplayMode
   public DashboardViewTableColumn = DocumentDisplayField
   public CustomFieldDataType = CustomFieldDataType
 
@@ -136,7 +136,7 @@ export class SavedViewWidgetComponent
     this.documentService
       .listFiltered(
         1,
-        this.savedView.dashboard_view_limit,
+        this.savedView.page_size,
         this.savedView.sort_field,
         this.savedView.sort_reverse,
         this.savedView.filter_rules,

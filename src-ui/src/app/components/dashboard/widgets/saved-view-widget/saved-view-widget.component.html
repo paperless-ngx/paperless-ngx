@@ -9,7 +9,7 @@
     <a class="btn-link text-decoration-none" header-buttons [routerLink]="[]" (click)="showAll()" i18n>Show all</a>
   }
 
-  @if (documents.length && savedView.dashboard_view_mode === DashboardViewMode.TABLE) {
+  @if (documents.length && savedView.display_mode === DashboardViewMode.TABLE) {
     <table content class="table table-hover mb-0 mt-n2 align-middle">
       <thead>
         <tr>
@@ -111,7 +111,7 @@
         }
       </tbody>
     </table>
-  } @else if (documents.length && savedView.dashboard_view_mode === DashboardViewMode.SMALL_CARDS) {
+  } @else if (documents.length && savedView.display_mode === DashboardViewMode.SMALL_CARDS) {
     <div class="row row-cols-paperless-cards my-n2">
       @for (d of documents; track d.id) {
         <pngx-document-card-small class="p-0" (dblClickDocument)="openDocumentDetail(d)" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickStoragePath)="clickStoragePath($event)" (clickDocumentType)="clickDocumentType($event)"></pngx-document-card-small>

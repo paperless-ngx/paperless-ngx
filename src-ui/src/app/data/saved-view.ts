@@ -1,9 +1,9 @@
 import { FilterRule } from './filter-rule'
 import { ObjectWithPermissions } from './object-with-permissions'
 
-export enum DashboardViewMode {
+export enum DisplayMode {
   TABLE = 'table',
-  SMALL_CARDS = 'small_cards',
+  SMALL_CARDS = 'smallCards',
 }
 
 export enum DocumentDisplayField {
@@ -61,9 +61,9 @@ export interface SavedView extends ObjectWithPermissions {
 
   filter_rules: FilterRule[]
 
-  dashboard_view_limit?: number
+  page_size?: number
 
-  dashboard_view_mode?: DashboardViewMode
+  display_mode?: DisplayMode
 
   document_display_fields?: DocumentDisplayField[]
 }
