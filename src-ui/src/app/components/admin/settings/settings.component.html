@@ -354,16 +354,16 @@
               @if (savedViewGroup.get(view.id.toString()).get('show_on_dashboard').value) {
                 <div class="row">
                   <div class="col">
-                    <pngx-input-number i18n-title title="Widget list limit" [showAdd]="false" formControlName="dashboard_view_limit"></pngx-input-number>
+                    <pngx-input-number i18n-title title="Widget list limit" [showAdd]="false" formControlName="page_size"></pngx-input-number>
                   </div>
                   <div class="col">
-                    <label class="form-label" for="dashboard_view_mode_{{view.id}}" i18n>Widget display</label>
-                    <select class="form-select" formControlName="dashboard_view_mode">
+                    <label class="form-label" for="display_mode_{{view.id}}" i18n>Widget display</label>
+                    <select class="form-select" formControlName="display_mode">
                       <option [ngValue]="DashboardViewMode.TABLE" i18n>Table</option>
                       <option [ngValue]="DashboardViewMode.SMALL_CARDS" i18n>Cards</option>
                     </select>
                   </div>
-                  @if (savedViewGroup.get(view.id.toString()).get('dashboard_view_mode').value === DashboardViewMode.TABLE && documentDisplayFields) {
+                  @if (savedViewGroup.get(view.id.toString()).get('display_mode').value === DashboardViewMode.TABLE && documentDisplayFields) {
                     <pngx-input-drag-drop-select i18n-title title="Show" [items]="documentDisplayFields" formControlName="document_display_fields"></pngx-input-drag-drop-select>
                   }
                 </div>

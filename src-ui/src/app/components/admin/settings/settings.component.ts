@@ -28,7 +28,7 @@ import {
 import { Group } from 'src/app/data/group'
 import {
   DOCUMENT_DISPLAY_FIELDS,
-  DashboardViewMode,
+  DisplayMode,
   DocumentDisplayField,
   SavedView,
 } from 'src/app/data/saved-view'
@@ -80,7 +80,7 @@ export class SettingsComponent
   implements OnInit, AfterViewInit, OnDestroy, DirtyComponent
 {
   activeNavID: number
-  DashboardViewMode = DashboardViewMode
+  DashboardViewMode = DisplayMode
 
   savedViewGroup = new FormGroup({})
 
@@ -367,8 +367,8 @@ export class SettingsComponent
           name: view.name,
           show_on_dashboard: view.show_on_dashboard,
           show_in_sidebar: view.show_in_sidebar,
-          dashboard_view_limit: view.dashboard_view_limit,
-          dashboard_view_mode: view.dashboard_view_mode,
+          page_size: view.page_size,
+          display_mode: view.display_mode,
           document_display_fields: view.document_display_fields,
         }
         this.savedViewGroup.addControl(
@@ -378,8 +378,8 @@ export class SettingsComponent
             name: new FormControl(null),
             show_on_dashboard: new FormControl(null),
             show_in_sidebar: new FormControl(null),
-            dashboard_view_limit: new FormControl(null),
-            dashboard_view_mode: new FormControl(null),
+            page_size: new FormControl(null),
+            display_mode: new FormControl(null),
             document_display_fields: new FormControl([]),
           })
         )

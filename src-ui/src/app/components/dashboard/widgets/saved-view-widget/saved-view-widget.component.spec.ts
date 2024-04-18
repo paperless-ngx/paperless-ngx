@@ -18,7 +18,7 @@ import {
   FILTER_STORAGE_PATH,
 } from 'src/app/data/filter-rule-type'
 import {
-  DashboardViewMode,
+  DisplayMode,
   DocumentDisplayField,
   SavedView,
 } from 'src/app/data/saved-view'
@@ -56,8 +56,8 @@ const savedView: SavedView = {
       value: '1,2',
     },
   ],
-  dashboard_view_limit: 20,
-  dashboard_view_mode: DashboardViewMode.TABLE,
+  page_size: 20,
+  display_mode: DisplayMode.TABLE,
   document_display_fields: [
     DocumentDisplayField.CREATED,
     DocumentDisplayField.TITLE,
