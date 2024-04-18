@@ -1672,7 +1672,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             "filter_rules": [{"rule_type": 4, "value": "test"}],
             "dashboard_view_limit": 20,
             "dashboard_view_mode": SavedView.DashboardViewDisplayMode.SMALL_CARDS,
-            "dashboard_view_table_columns": [
+            "document_display_fields": [
                 SavedView.DashboardViewTableColumns.TITLE,
                 SavedView.DashboardViewTableColumns.CREATED,
             ],
@@ -1688,7 +1688,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             SavedView.DashboardViewDisplayMode.SMALL_CARDS,
         )
         self.assertEqual(
-            v1.dashboard_view_table_columns,
+            v1.document_display_fields,
             [
                 SavedView.DashboardViewTableColumns.TITLE,
                 SavedView.DashboardViewTableColumns.CREATED,
@@ -1698,7 +1698,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         response = self.client.patch(
             f"/api/saved_views/{v1.id}/",
             {
-                "dashboard_view_table_columns": [
+                "document_display_fields": [
                     SavedView.DashboardViewTableColumns.TAGS,
                     SavedView.DashboardViewTableColumns.TITLE,
                     SavedView.DashboardViewTableColumns.CREATED,
@@ -1710,7 +1710,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         v1.refresh_from_db()
         self.assertEqual(
-            v1.dashboard_view_table_columns,
+            v1.document_display_fields,
             [
                 SavedView.DashboardViewTableColumns.TAGS,
                 SavedView.DashboardViewTableColumns.TITLE,
@@ -1727,7 +1727,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             "filter_rules": [{"rule_type": 4, "value": "test"}],
             "dashboard_view_limit": 20,
             "dashboard_view_mode": SavedView.DashboardViewDisplayMode.SMALL_CARDS,
-            "dashboard_view_table_columns": [
+            "document_display_fields": [
                 SavedView.DashboardViewTableColumns.TITLE,
                 SavedView.DashboardViewTableColumns.CREATED,
             ],
@@ -1746,7 +1746,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         response = self.client.patch(
             f"/api/saved_views/{v1.id}/",
             {
-                "dashboard_view_table_columns": [
+                "document_display_fields": [
                     SavedView.DashboardViewTableColumns.TITLE,
                     SavedView.DashboardViewTableColumns.CREATED,
                     SavedView.DashboardViewDynamicTableColumns.CUSTOM_FIELD[0]
@@ -1759,7 +1759,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         v1.refresh_from_db()
         self.assertEqual(
-            v1.dashboard_view_table_columns,
+            v1.document_display_fields,
             [
                 str(SavedView.DashboardViewTableColumns.TITLE),
                 str(SavedView.DashboardViewTableColumns.CREATED),
@@ -1772,7 +1772,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         response = self.client.patch(
             f"/api/saved_views/{v1.id}/",
             {
-                "dashboard_view_table_columns": [
+                "document_display_fields": [
                     SavedView.DashboardViewTableColumns.TITLE,
                     SavedView.DashboardViewTableColumns.CREATED,
                     SavedView.DashboardViewDynamicTableColumns.CUSTOM_FIELD[0] % 99,

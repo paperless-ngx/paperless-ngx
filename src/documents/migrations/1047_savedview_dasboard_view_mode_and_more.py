@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name="savedview",
-            name="dashboard_view_table_columns",
+            name="document_display_fields",
             field=multiselectfield.db.fields.MultiSelectField(
                 choices=[
                     ("title", "Title"),

@@ -13,7 +13,7 @@
     <table content class="table table-hover mb-0 mt-n2 align-middle">
       <thead>
         <tr>
-          @for (column of savedView.dashboard_view_table_columns; track column; let i = $index) {
+          @for (column of savedView.document_display_fields; track column; let i = $index) {
             @if (visibleColumns.includes(column)) {
               <th
                 scope="col"
@@ -30,7 +30,7 @@
       <tbody>
         @for (doc of documents; track doc.id) {
           <tr>
-            @for (column of savedView.dashboard_view_table_columns; track column; let i = $index) {
+            @for (column of savedView.document_display_fields; track column; let i = $index) {
               @if (visibleColumns.includes(column)) {
                 <td class="py-2 py-md-3 position-relative" [ngClass]="{ 'd-none d-md-table-cell': i > 1 }">
                   @switch (column) {
@@ -89,7 +89,7 @@
                       }
                     }
                   }
-                  @if (i === savedView.dashboard_view_table_columns.length - 1) {
+                  @if (i === savedView.document_display_fields.length - 1) {
                     <div class="btn-group position-absolute top-50 end-0 translate-middle-y">
                       <a [href]="getPreviewUrl(doc)" title="View Preview" i18n-title target="_blank" class="btn px-4 btn-dark border-dark-subtle"
                         [ngbPopover]="previewContent" [popoverTitle]="doc.title | documentTitle"

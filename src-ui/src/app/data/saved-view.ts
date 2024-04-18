@@ -17,7 +17,7 @@ export enum DashboardViewTableColumn {
   CUSTOM_FIELD = 'custom_field_',
 }
 
-export const DASHBOARD_VIEW_TABLE_COLUMNS = [
+export const document_display_fields = [
   {
     id: DashboardViewTableColumn.TITLE,
     name: $localize`Title`,
@@ -65,5 +65,5 @@ export interface SavedView extends ObjectWithPermissions {
 
   dashboard_view_mode?: DashboardViewMode
 
-  dashboard_view_table_columns?: DashboardViewTableColumn[]
+  document_display_fields?: DashboardViewTableColumn[]
 }
