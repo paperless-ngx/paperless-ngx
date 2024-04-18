@@ -13,7 +13,7 @@ import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import {
-  DOCUMENT_DISPLAY_FIELDS,
+  DEFAULT_DOCUMENT_DISPLAY_FIELDS,
   DocumentDisplayField,
 } from 'src/app/data/saved-view'
 
@@ -43,7 +43,7 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
 
   @Input()
   displayFields: Set<DocumentDisplayField | string> = new Set(
-    DOCUMENT_DISPLAY_FIELDS.map((f) => f.id)
+    DEFAULT_DOCUMENT_DISPLAY_FIELDS.map((f) => f.id)
   )
 
   @Output()

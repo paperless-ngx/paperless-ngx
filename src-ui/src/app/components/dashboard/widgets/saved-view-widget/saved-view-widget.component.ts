@@ -13,7 +13,8 @@ import {
   DocumentDisplayField,
   DisplayMode,
   SavedView,
-  DOCUMENT_DISPLAY_FIELDS,
+  DEFAULT_DOCUMENT_DISPLAY_FIELDS,
+  DEFAULT_PAGE_SIZE,
 } from 'src/app/data/saved-view'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
@@ -133,7 +134,7 @@ export class SavedViewWidgetComponent
     this.documentService
       .listFiltered(
         1,
-        this.savedView.page_size,
+        this.savedView.page_size ?? DEFAULT_PAGE_SIZE,
         this.savedView.sort_field,
         this.savedView.sort_reverse,
         this.savedView.filter_rules,
@@ -250,6 +251,6 @@ export class SavedViewWidgetComponent
       const id = column.split('_')[2]
       return this.customFields.find((c) => c.id === parseInt(id))?.name
     }
-    return DOCUMENT_DISPLAY_FIELDS.find((c) => c.id === column)?.name
+    return DEFAULT_DOCUMENT_DISPLAY_FIELDS.find((c) => c.id === column)?.name
   }
 }

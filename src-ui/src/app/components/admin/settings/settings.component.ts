@@ -27,7 +27,7 @@ import {
 } from 'rxjs'
 import { Group } from 'src/app/data/group'
 import {
-  DOCUMENT_DISPLAY_FIELDS,
+  DEFAULT_DOCUMENT_DISPLAY_FIELDS,
   DisplayMode,
   DocumentDisplayField,
   SavedView,

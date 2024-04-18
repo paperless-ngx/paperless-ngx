@@ -9,7 +9,7 @@
     <a class="btn-link text-decoration-none" header-buttons [routerLink]="[]" (click)="showAll()" i18n>Show all</a>
   }
 
-  @if (documents.length && savedView.display_mode === DashboardViewMode.TABLE) {
+  @if (documents.length && (!savedView.display_mode || savedView.display_mode === DashboardViewMode.TABLE)) {
     <table content class="table table-hover mb-0 mt-n2 align-middle">
       <thead>
         <tr>

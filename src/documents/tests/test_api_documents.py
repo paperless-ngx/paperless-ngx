@@ -1614,7 +1614,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             status.HTTP_404_NOT_FOUND,
         )
 
-    def test_create_update_patch(self):
+    def test_savedview_create_update_patch(self):
         User.objects.create_user("user1")
 
         view = {

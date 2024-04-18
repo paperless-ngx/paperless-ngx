@@ -13,7 +13,7 @@ import { AppModule } from '../app.module'
 import { UiSettings, SETTINGS_KEYS } from '../data/ui-settings'
 import { SettingsService } from './settings.service'
 import {
-  DOCUMENT_DISPLAY_FIELDS,
+  DEFAULT_DOCUMENT_DISPLAY_FIELDS,
   DocumentDisplayField,
   SavedView,
 } from '../data/saved-view'
@@ -353,7 +353,7 @@ describe('SettingsService', () => {
     settingsService.initializeDisplayFields()
     expect(
       settingsService.allDocumentDisplayFields.includes(
-        DOCUMENT_DISPLAY_FIELDS[0]
+        DEFAULT_DOCUMENT_DISPLAY_FIELDS[0]
       )
     ).toBeTruthy()
     expect(

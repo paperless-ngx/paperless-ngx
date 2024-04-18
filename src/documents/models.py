@@ -555,6 +555,7 @@ class SavedView(ModelWithOwner):
     class ViewDisplayMode(models.TextChoices):
         TABLE = ("table", _("Table"))
         SMALL_CARDS = ("smallCards", _("Small Cards"))
+        LARGE_CARDS = ("largeCards", _("Large Cards"))
 
     class DocumentDisplayFields(models.TextChoices):
         TITLE = ("title", _("Title"))
@@ -587,7 +588,8 @@ class SavedView(ModelWithOwner):
 
     page_size = models.PositiveIntegerField(
         _("View page size"),
-        default=10,
+        null=True,
+        blank=True,
         validators=[MinValueValidator(1)],
     )
 
@@ -595,7 +597,8 @@ class SavedView(ModelWithOwner):
         max_length=128,
         verbose_name=_("View display mode"),
         choices=ViewDisplayMode.choices,
-        default=ViewDisplayMode.TABLE,
+        null=True,
+        blank=True,
     )
 
     document_display_fields = DynamicMultiSelectField(

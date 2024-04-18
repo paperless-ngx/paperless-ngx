@@ -26,7 +26,7 @@ import {
 } from './permissions.service'
 import { ToastService } from './toast.service'
 import {
-  DOCUMENT_DISPLAY_FIELDS,
+  DEFAULT_DOCUMENT_DISPLAY_FIELDS,
   DocumentDisplayField,
   SavedView,
 } from '../data/saved-view'
@@ -307,7 +307,7 @@ export class SettingsService {
   }
 
   public initializeDisplayFields() {
-    this.allDocumentDisplayFields = DOCUMENT_DISPLAY_FIELDS
+    this.allDocumentDisplayFields = DEFAULT_DOCUMENT_DISPLAY_FIELDS
 
     if (
       this.permissionsService.currentUserCan(
@@ -316,7 +316,7 @@ export class SettingsService {
       )
     ) {
       this.customFieldsService.listAll().subscribe((r) => {
-        this.allDocumentDisplayFields = DOCUMENT_DISPLAY_FIELDS.concat(
+        this.allDocumentDisplayFields = DEFAULT_DOCUMENT_DISPLAY_FIELDS.concat(
           r.results.map((field) => {
             return {
               id: `${DocumentDisplayField.CUSTOM_FIELD}${field.id}` as any,

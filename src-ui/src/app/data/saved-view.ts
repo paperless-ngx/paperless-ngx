@@ -4,6 +4,7 @@ import { ObjectWithPermissions } from './object-with-permissions'
 export enum DisplayMode {
   TABLE = 'table',
   SMALL_CARDS = 'smallCards',
+  LARGE_CARDS = 'largeCards',
 }
 
 export enum DocumentDisplayField {
@@ -21,7 +22,9 @@ export enum DocumentDisplayField {
   ASN = 'asn',
 }
 
-export const DOCUMENT_DISPLAY_FIELDS = [
+export const DEFAULT_PAGE_SIZE = 10
+
+export const DEFAULT_DOCUMENT_DISPLAY_FIELDS = [
   {
     id: DocumentDisplayField.TITLE,
     name: $localize`Title`,
