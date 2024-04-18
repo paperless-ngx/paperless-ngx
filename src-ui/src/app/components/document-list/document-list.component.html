@@ -234,13 +234,18 @@
             i18n>Created</th>
           }
           @if (activeDisplayFields.has(DocumentDisplayField.ADDED)) {
-            <th class="d-none d-xl-table-cell"
+            <th
               pngxSortable="added"
               title="Sort by added date" i18n-title
               [currentSortField]="list.sortField"
               [currentSortReverse]="list.sortReverse"
               (sort)="onSort($event)"
             i18n>Added</th>
+          }
+          @for (field of activeDisplayCustomFields; track field) {
+            <th>
+              {{getDisplayCustomFieldTitle(field)}}
+            </th>
           }
         </thead>
         <tbody>
@@ -310,8 +315,13 @@
                 </td>
               }
               @if (activeDisplayFields.has(DocumentDisplayField.ADDED)) {
-                <td class="d-none d-xl-table-cell">
+                <td>
                   {{d.added | customDate}}
+                </td>
+              }
+              @for (field of activeDisplayCustomFields; track field) {
+                <td>
+                  {{getCustomFieldValue(d, field)}}
                 </td>
               }
             </tr>

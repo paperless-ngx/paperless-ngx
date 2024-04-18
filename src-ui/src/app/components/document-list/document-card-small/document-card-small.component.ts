@@ -39,7 +39,7 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
   document: Document
 
   @Input()
-  displayFields: Set<DocumentDisplayField>
+  displayFields: Set<DocumentDisplayField | string>
 
   @Output()
   dblClickDocument = new EventEmitter()

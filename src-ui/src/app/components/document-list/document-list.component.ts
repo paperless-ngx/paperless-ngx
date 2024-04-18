@@ -72,8 +72,9 @@ export class DocumentListComponent
 
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>
 
-  displayMode: string = DisplayMode.SMALL_CARDS // largeCards, smallCards, details
-  activeDisplayFields: Set<string> = new Set([
+  displayMode: string = DisplayMode.SMALL_CARDS // largeCards, smallCards, table
+
+  _activeDisplayFields: Set<DocumentDisplayField | string> = new Set([
     DocumentDisplayField.TITLE,
     DocumentDisplayField.CORRESPONDENT,
     DocumentDisplayField.CREATED,
@@ -85,6 +86,26 @@ export class DocumentListComponent
     DocumentDisplayField.ASN,
     DocumentDisplayField.SHARED,
   ])
+
+  get activeDisplayFields(): Set<DocumentDisplayField | string> {
+    return this._activeDisplayFields
+  }
+
+  set activeDisplayFields(fields: Set<DocumentDisplayField | string>) {
+    this._activeDisplayFields = fields
+    this.updateDisplayCustomFields()
+  }
+  activeDisplayCustomFields: Set<string> = new Set()
+
+  public updateDisplayCustomFields() {
+    this.activeDisplayCustomFields = new Set(
+      Array.from(this.activeDisplayFields).filter(
+        (field) =>
+          typeof field === 'string' &&
+          field.startsWith(DocumentDisplayField.CUSTOM_FIELD)
+      )
+    )
+  }
 
   unmodifiedFilterRules: FilterRule[] = []
   private unmodifiedSavedView: SavedView
@@ -162,7 +183,19 @@ export class DocumentListComponent
     } else {
       this.activeDisplayFields.add(field)
     }
+    this.updateDisplayCustomFields()
     this.saveDisplayFields()
+  }
+
+  public getDisplayCustomFieldTitle(field: string) {
+    return this.settingsService.allDocumentDisplayFields.find(
+      (f) => f.id === field
+    )?.name
+  }
+
+  public getCustomFieldValue(document: Document, field: string) {
+    const fieldId = parseInt(field.split('_')[2])
+    return document.custom_fields.find((f) => f.field === fieldId)?.value
   }
 
   ngOnInit(): void {
