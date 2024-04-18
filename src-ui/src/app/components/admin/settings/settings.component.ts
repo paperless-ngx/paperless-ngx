@@ -117,7 +117,9 @@ export class SettingsComponent
 
   savedViews: SavedView[]
   SettingsNavIDs = SettingsNavIDs
-  documentDisplayFields: any[]
+  get documentDisplayFields() {
+    return this.settings.allDocumentDisplayFields
+  }
 
   store: BehaviorSubject<any>
   storeSub: Subscription
@@ -222,24 +224,6 @@ export class SettingsComponent
       this.savedViewService.listAll().subscribe((r) => {
         this.savedViews = r.results
         this.initialize(false)
-      })
-    }
-
-    if (
-      this.permissionsService.currentUserCan(
-        PermissionAction.View,
-        PermissionType.CustomField
-      )
-    ) {
-      this.customFieldsService.listAll().subscribe((r) => {
-        this.documentDisplayFields = DOCUMENT_DISPLAY_FIELDS.concat(
-          r.results.map((field) => {
-            return {
-              id: `${DocumentDisplayField.CUSTOM_FIELD}${field.id}` as any,
-              name: field.name,
-            }
-          })
-        )
       })
     }
 

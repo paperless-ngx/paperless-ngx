@@ -344,51 +344,51 @@ describe('SavedViewWidgetComponent', () => {
 
   it('should check if column is visible including permissions', () => {
     expect(
-      component.visibleColumns.includes(DocumentDisplayField.TITLE)
+      component.activeDisplayFields.includes(DocumentDisplayField.TITLE)
     ).toBeTruthy()
     expect(
-      component.visibleColumns.includes(DocumentDisplayField.CREATED)
+      component.activeDisplayFields.includes(DocumentDisplayField.CREATED)
     ).toBeTruthy()
     expect(
-      component.visibleColumns.includes(DocumentDisplayField.ADDED)
+      component.activeDisplayFields.includes(DocumentDisplayField.ADDED)
     ).toBeTruthy()
     expect(
-      component.visibleColumns.includes(DocumentDisplayField.TAGS)
+      component.activeDisplayFields.includes(DocumentDisplayField.TAGS)
     ).toBeTruthy()
     expect(
-      component.visibleColumns.includes(DocumentDisplayField.CORRESPONDENT)
+      component.activeDisplayFields.includes(DocumentDisplayField.CORRESPONDENT)
     ).toBeTruthy()
     expect(
-      component.visibleColumns.includes(DocumentDisplayField.DOCUMENT_TYPE)
+      component.activeDisplayFields.includes(DocumentDisplayField.DOCUMENT_TYPE)
     ).toBeTruthy()
     expect(
-      component.visibleColumns.includes(DocumentDisplayField.STORAGE_PATH)
+      component.activeDisplayFields.includes(DocumentDisplayField.STORAGE_PATH)
     ).toBeTruthy()
     expect(
-      component.visibleColumns.includes(
+      component.activeDisplayFields.includes(
         `${DocumentDisplayField.CUSTOM_FIELD}11` as any
       )
     ).toBeTruthy()
 
-    component.visibleColumns = []
+    component.activeDisplayFields = []
     jest
       .spyOn(component.permissionsService, 'currentUserCan')
       .mockReturnValue(false)
     component.ngOnInit()
     expect(
-      component.visibleColumns.includes(DocumentDisplayField.TAGS)
+      component.activeDisplayFields.includes(DocumentDisplayField.TAGS)
     ).toBeFalsy()
     expect(
-      component.visibleColumns.includes(DocumentDisplayField.CORRESPONDENT)
+      component.activeDisplayFields.includes(DocumentDisplayField.CORRESPONDENT)
     ).toBeFalsy()
     expect(
-      component.visibleColumns.includes(DocumentDisplayField.DOCUMENT_TYPE)
+      component.activeDisplayFields.includes(DocumentDisplayField.DOCUMENT_TYPE)
     ).toBeFalsy()
     expect(
-      component.visibleColumns.includes(DocumentDisplayField.STORAGE_PATH)
+      component.activeDisplayFields.includes(DocumentDisplayField.STORAGE_PATH)
     ).toBeFalsy()
     expect(
-      component.visibleColumns.includes(
+      component.activeDisplayFields.includes(
         `${DocumentDisplayField.CUSTOM_FIELD}11` as any
       )
     ).toBeFalsy()

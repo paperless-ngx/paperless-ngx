@@ -15,6 +15,10 @@ export enum DocumentDisplayField {
   DOCUMENT_TYPE = 'documenttype',
   STORAGE_PATH = 'storagepath',
   CUSTOM_FIELD = 'custom_field_',
+  NOTES = 'note',
+  OWNER = 'owner',
+  SHARED = 'shared',
+  ASN = 'asn',
 }
 
 export const DOCUMENT_DISPLAY_FIELDS = [
@@ -45,6 +49,22 @@ export const DOCUMENT_DISPLAY_FIELDS = [
   {
     id: DocumentDisplayField.STORAGE_PATH,
     name: $localize`Storage path`,
+  },
+  {
+    id: DocumentDisplayField.NOTES,
+    name: $localize`Notes`,
+  },
+  {
+    id: DocumentDisplayField.OWNER,
+    name: $localize`Owner`,
+  },
+  {
+    id: DocumentDisplayField.SHARED,
+    name: $localize`Shared`,
+  },
+  {
+    id: DocumentDisplayField.ASN,
+    name: $localize`ASN`,
   },
 ]
 

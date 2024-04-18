@@ -14,7 +14,7 @@
       <thead>
         <tr>
           @for (column of savedView.document_display_fields; track column; let i = $index) {
-            @if (visibleColumns.includes(column)) {
+            @if (activeDisplayFields.has(column)) {
               <th
                 scope="col"
                 [ngClass]="{
@@ -31,7 +31,7 @@
         @for (doc of documents; track doc.id) {
           <tr>
             @for (column of savedView.document_display_fields; track column; let i = $index) {
-              @if (visibleColumns.includes(column)) {
+              @if (activeDisplayFields.has(column)) {
                 <td class="py-2 py-md-3 position-relative" [ngClass]="{ 'd-none d-md-table-cell': i > 1 }">
                   @switch (column) {
                     @case (DashboardViewTableColumn.ADDED) {
@@ -114,7 +114,16 @@
   } @else if (documents.length && savedView.display_mode === DashboardViewMode.SMALL_CARDS) {
     <div class="row row-cols-paperless-cards my-n2">
       @for (d of documents; track d.id) {
-        <pngx-document-card-small class="p-0" (dblClickDocument)="openDocumentDetail(d)" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickStoragePath)="clickStoragePath($event)" (clickDocumentType)="clickDocumentType($event)"></pngx-document-card-small>
+        <pngx-document-card-small
+          class="p-0"
+          (dblClickDocument)="openDocumentDetail(d)"
+          [document]="d"
+          [displayFields]="activeDisplayFields"
+          (clickTag)="clickTag($event)"
+          (clickCorrespondent)="clickCorrespondent($event)"
+          (clickStoragePath)="clickStoragePath($event)"
+          (clickDocumentType)="clickDocumentType($event)">
+        </pngx-document-card-small>
       }
     </div>
   } @else {

@@ -16,7 +16,11 @@ import {
 } from 'src/app/utils/filter-rules'
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
 import { Document } from 'src/app/data/document'
-import { DisplayMode, SavedView } from 'src/app/data/saved-view'
+import {
+  DisplayMode,
+  DocumentDisplayField,
+  SavedView,
+} from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import {
   SortableDirective,
@@ -46,6 +50,8 @@ export class DocumentListComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy
 {
+  DocumentDisplayField = DocumentDisplayField
+
   constructor(
     public list: DocumentListViewService,
     public savedViewService: SavedViewService,
@@ -55,7 +61,7 @@ export class DocumentListComponent
     private modalService: NgbModal,
     private consumerStatusService: ConsumerStatusService,
     public openDocumentsService: OpenDocumentsService,
-    private settingsService: SettingsService,
+    public settingsService: SettingsService,
     public permissionService: PermissionsService
   ) {
     super()
@@ -67,6 +73,18 @@ export class DocumentListComponent
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>
 
   displayMode: string = DisplayMode.SMALL_CARDS // largeCards, smallCards, details
+  activeDisplayFields: Set<string> = new Set([
+    DocumentDisplayField.TITLE,
+    DocumentDisplayField.CORRESPONDENT,
+    DocumentDisplayField.CREATED,
+    DocumentDisplayField.TAGS,
+    DocumentDisplayField.DOCUMENT_TYPE,
+    DocumentDisplayField.STORAGE_PATH,
+    DocumentDisplayField.NOTES,
+    DocumentDisplayField.OWNER,
+    DocumentDisplayField.ASN,
+    DocumentDisplayField.SHARED,
+  ])
 
   unmodifiedFilterRules: FilterRule[] = []
   private unmodifiedSavedView: SavedView
@@ -131,9 +149,31 @@ export class DocumentListComponent
     localStorage.setItem('document-list:displayMode', this.displayMode)
   }
 
+  saveDisplayFields() {
+    localStorage.setItem(
+      'document-list:displayFields',
+      JSON.stringify(Array.from(this.activeDisplayFields))
+    )
+  }
+
+  toggleDisplayField(field: string) {
+    if (this.activeDisplayFields.has(field)) {
+      this.activeDisplayFields.delete(field)
+    } else {
+      this.activeDisplayFields.add(field)
+    }
+    this.saveDisplayFields()
+  }
+
   ngOnInit(): void {
     if (localStorage.getItem('document-list:displayMode') != null) {
       this.displayMode = localStorage.getItem('document-list:displayMode')
+    }
+
+    if (localStorage.getItem('document-list:displayFields') != null) {
+      this.activeDisplayFields = new Set(
+        JSON.parse(localStorage.getItem('document-list:displayFields'))
+      )
     }
 
     this.consumerStatusService

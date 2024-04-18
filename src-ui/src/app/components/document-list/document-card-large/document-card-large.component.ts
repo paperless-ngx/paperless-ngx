@@ -11,6 +11,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { DocumentDisplayField } from 'src/app/data/saved-view'
 
 @Component({
   selector: 'pngx-document-card-large',
@@ -18,6 +19,8 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
   styleUrls: ['./document-card-large.component.scss'],
 })
 export class DocumentCardLargeComponent extends ComponentWithPermissions {
+  DocumentDisplayField = DocumentDisplayField
+
   constructor(
     private documentService: DocumentService,
     public settingsService: SettingsService
@@ -27,6 +30,9 @@ export class DocumentCardLargeComponent extends ComponentWithPermissions {
 
   @Input()
   selected = false
+
+  @Input()
+  displayFields: Set<DocumentDisplayField>
 
   @Output()
   toggleSelected = new EventEmitter()

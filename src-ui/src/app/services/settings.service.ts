@@ -19,9 +19,18 @@ import {
 import { environment } from 'src/environments/environment'
 import { UiSettings, SETTINGS, SETTINGS_KEYS } from '../data/ui-settings'
 import { User } from '../data/user'
-import { PermissionsService } from './permissions.service'
+import {
+  PermissionAction,
+  PermissionType,
+  PermissionsService,
+} from './permissions.service'
 import { ToastService } from './toast.service'
-import { SavedView } from '../data/saved-view'
+import {
+  DOCUMENT_DISPLAY_FIELDS,
+  DocumentDisplayField,
+  SavedView,
+} from '../data/saved-view'
+import { CustomFieldsService } from './rest/custom-fields.service'
 
 export interface LanguageOption {
   code: string
@@ -257,6 +266,8 @@ export class SettingsService {
   public globalDropzoneActive: boolean = false
   public organizingSidebarSavedViews: boolean = false
 
+  public allDocumentDisplayFields: any
+
   constructor(
     rendererFactory: RendererFactory2,
     @Inject(DOCUMENT) private document,
@@ -265,7 +276,8 @@ export class SettingsService {
     @Inject(LOCALE_ID) private localeId: string,
     protected http: HttpClient,
     private toastService: ToastService,
-    private permissionsService: PermissionsService
+    private permissionsService: PermissionsService,
+    private customFieldsService: CustomFieldsService
   ) {
     this._renderer = rendererFactory.createRenderer(null, null)
   }
@@ -288,6 +300,26 @@ export class SettingsService {
           uisettings.permissions,
           this.currentUser
         )
+
+        this.allDocumentDisplayFields = DOCUMENT_DISPLAY_FIELDS
+
+        if (
+          this.permissionsService.currentUserCan(
+            PermissionAction.View,
+            PermissionType.CustomField
+          )
+        ) {
+          this.customFieldsService.listAll().subscribe((r) => {
+            this.allDocumentDisplayFields = DOCUMENT_DISPLAY_FIELDS.concat(
+              r.results.map((field) => {
+                return {
+                  id: `${DocumentDisplayField.CUSTOM_FIELD}${field.id}` as any,
+                  name: field.name,
+                }
+              })
+            )
+          })
+        }
       })
     )
   }

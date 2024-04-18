@@ -79,11 +79,11 @@ export class SavedViewWidgetComponent
   mouseOnPreview = false
   popoverHidden = true
 
-  visibleColumns: DocumentDisplayField[] = [
+  activeDisplayFields: Set<DocumentDisplayField> = new Set([
     DocumentDisplayField.TITLE,
     DocumentDisplayField.CREATED,
     DocumentDisplayField.ADDED,
-  ]
+  ])
 
   docLinkDocuments: Document[] = []
 
@@ -122,7 +122,7 @@ export class SavedViewWidgetComponent
         type &&
         this.permissionsService.currentUserCan(PermissionAction.View, type)
       )
-        this.visibleColumns.push(column)
+        this.activeDisplayFields.add(column)
     })
   }
 
