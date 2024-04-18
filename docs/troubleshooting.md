@@ -350,7 +350,7 @@ will still be consumed
 Newer versions of OCRmyPDF will fail if it encounters errors during processing.
 This is intentional as the output archive file may differ in unexpected or undesired
 ways from the original. As the logs indicate, if you encounter this error you can set
-`PAPERLESS_OCR_USER_ARGS: '{"continue_on_soft_render_error": true}'` to try to 'force'
+`PAPERLESS_OCR_USER_ARGS={"continue_on_soft_render_error": true}` to try to 'force'
 processing documents with this issue.
 
 ## Platform-Specific Deployment Troubleshooting
