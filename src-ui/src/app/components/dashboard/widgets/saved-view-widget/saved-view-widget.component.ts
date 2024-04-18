@@ -10,10 +10,10 @@ import { Router } from '@angular/router'
 import { Subject, takeUntil } from 'rxjs'
 import { Document } from 'src/app/data/document'
 import {
-  DashboardViewTableColumn,
+  DocumentDisplayField,
   DashboardViewMode,
   SavedView,
-  document_display_fields,
+  DOCUMENT_DISPLAY_FIELDS,
 } from 'src/app/data/saved-view'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
@@ -46,7 +46,7 @@ export class SavedViewWidgetComponent
   implements OnInit, OnDestroy
 {
   public DashboardViewMode = DashboardViewMode
-  public DashboardViewTableColumn = DashboardViewTableColumn
+  public DashboardViewTableColumn = DocumentDisplayField
   public CustomFieldDataType = CustomFieldDataType
 
   loading: boolean = true
@@ -79,10 +79,10 @@ export class SavedViewWidgetComponent
   mouseOnPreview = false
   popoverHidden = true
 
-  visibleColumns: DashboardViewTableColumn[] = [
-    DashboardViewTableColumn.TITLE,
-    DashboardViewTableColumn.CREATED,
-    DashboardViewTableColumn.ADDED,
+  visibleColumns: DocumentDisplayField[] = [
+    DocumentDisplayField.TITLE,
+    DocumentDisplayField.CREATED,
+    DocumentDisplayField.ADDED,
   ]
 
   docLinkDocuments: Document[] = []
@@ -115,7 +115,7 @@ export class SavedViewWidgetComponent
       let type: PermissionType = Object.values(PermissionType).find((t) =>
         t.includes(column)
       )
-      if (column.startsWith(DashboardViewTableColumn.CUSTOM_FIELD)) {
+      if (column.startsWith(DocumentDisplayField.CUSTOM_FIELD)) {
         type = PermissionType.CustomField
       }
       if (
@@ -249,12 +249,12 @@ export class SavedViewWidgetComponent
     }, 300)
   }
 
-  public getColumnTitle(column: DashboardViewTableColumn): string {
-    if (column.startsWith(DashboardViewTableColumn.CUSTOM_FIELD)) {
+  public getColumnTitle(column: DocumentDisplayField): string {
+    if (column.startsWith(DocumentDisplayField.CUSTOM_FIELD)) {
       const id = column.split('_')[2]
       return this.customFields.find((c) => c.id === parseInt(id))?.name
     }
-    return document_display_fields.find((c) => c.id === column)?.name
+    return DOCUMENT_DISPLAY_FIELDS.find((c) => c.id === column)?.name
   }
 
   public getCustomFieldDataType(column_id: string): string {
@@ -285,9 +285,7 @@ export class SavedViewWidgetComponent
     let docIds = []
     let docLinkColumns = []
     this.savedView.document_display_fields
-      ?.filter((column) =>
-        column.startsWith(DashboardViewTableColumn.CUSTOM_FIELD)
-      )
+      ?.filter((column) => column.startsWith(DocumentDisplayField.CUSTOM_FIELD))
       .forEach((column) => {
         if (
           this.getCustomFieldDataType(column) ===

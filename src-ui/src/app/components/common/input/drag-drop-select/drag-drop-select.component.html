@@ -1,5 +1,5 @@
 <div class="d-flex flex-row mt-2 align-items-center">
-    <ng-container i18n>Selected</ng-container>:
+    {{title}}:
     <div class="ms-2 d-flex flex-row gap-2 w-100"
         cdkDropList #selectedList="cdkDropList"
         cdkDropListOrientation="horizontal"
@@ -11,7 +11,6 @@
     </div>
 </div>
 <div class="d-flex flex-row mt-2 align-items-center bg-light p-2">
-    <ng-container i18n></ng-container>
     <div class="d-flex flex-row gap-2 w-100"
         cdkDropList #unselectedList="cdkDropList"
         cdkDropListOrientation="horizontal"

@@ -20,6 +20,8 @@ import {
   styleUrl: './drag-drop-select.component.scss',
 })
 export class DragDropSelectComponent extends AbstractInputComponent<string[]> {
+  @Input() title: string = $localize`Selected items`
+
   @Input() items: { id: string; name: string }[] = []
   public selectedItems: { id: string; name: string }[] = []
 
@@ -53,7 +55,10 @@ export class DragDropSelectComponent extends AbstractInputComponent<string[]> {
         0,
         this.unselectedItems[event.previousIndex]
       )
-    } else {
+    } else if (
+      event.container === this.unselectedList &&
+      event.previousContainer === this.selectedList
+    ) {
       this.selectedItems.splice(event.previousIndex, 1)
     }
     this.onChange(this.selectedItems.map((i) => i.id))

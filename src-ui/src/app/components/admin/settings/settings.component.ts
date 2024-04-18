@@ -27,9 +27,9 @@ import {
 } from 'rxjs'
 import { Group } from 'src/app/data/group'
 import {
-  document_display_fields,
+  DOCUMENT_DISPLAY_FIELDS,
   DashboardViewMode,
-  DashboardViewTableColumn,
+  DocumentDisplayField,
   SavedView,
 } from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
@@ -55,6 +55,7 @@ import {
   SystemStatusItemStatus,
   SystemStatus,
 } from 'src/app/data/system-status'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 
 enum SettingsNavIDs {
   General = 1,
@@ -116,7 +117,7 @@ export class SettingsComponent
 
   savedViews: SavedView[]
   SettingsNavIDs = SettingsNavIDs
-  document_display_fields = document_display_fields
+  documentDisplayFields: any[]
 
   store: BehaviorSubject<any>
   storeSub: Subscription
@@ -162,7 +163,8 @@ export class SettingsComponent
     private router: Router,
     public permissionsService: PermissionsService,
     private modalService: NgbModal,
-    private systemStatusService: SystemStatusService
+    private systemStatusService: SystemStatusService,
+    private customFieldsService: CustomFieldsService
   ) {
     super()
     this.settings.settingsSaved.subscribe(() => {
@@ -220,6 +222,24 @@ export class SettingsComponent
       this.savedViewService.listAll().subscribe((r) => {
         this.savedViews = r.results
         this.initialize(false)
+      })
+    }
+
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.CustomField
+      )
+    ) {
+      this.customFieldsService.listAll().subscribe((r) => {
+        this.documentDisplayFields = DOCUMENT_DISPLAY_FIELDS.concat(
+          r.results.map((field) => {
+            return {
+              id: `${DocumentDisplayField.CUSTOM_FIELD}${field.id}` as any,
+              name: field.name,
+            }
+          })
+        )
       })
     }
 

@@ -15,7 +15,11 @@ import {
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
-import { SavedView } from 'src/app/data/saved-view'
+import {
+  DOCUMENT_DISPLAY_FIELDS,
+  DocumentDisplayField,
+  SavedView,
+} from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
@@ -48,6 +52,8 @@ import {
   InstallType,
   SystemStatusItemStatus,
 } from 'src/app/data/system-status'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { CustomFieldDataType } from 'src/app/data/custom-field'
 
 const savedViews = [
   { id: 1, name: 'view1', show_in_sidebar: true, show_on_dashboard: true },
@@ -60,6 +66,20 @@ const users = [
 const groups = [
   { id: 1, name: 'group1' },
   { id: 2, name: 'group2' },
+]
+const customFields = [
+  {
+    id: 1,
+    name: 'Field 1',
+    created: new Date(),
+    data_type: CustomFieldDataType.Monetary,
+  },
+  {
+    id: 2,
+    name: 'Field 2',
+    created: new Date(),
+    data_type: CustomFieldDataType.String,
+  },
 ]
 
 describe('SettingsComponent', () => {
@@ -76,6 +96,7 @@ describe('SettingsComponent', () => {
   let groupService: GroupService
   let modalService: NgbModal
   let systemStatusService: SystemStatusService
+  let customFieldsService: CustomFieldsService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -121,6 +142,7 @@ describe('SettingsComponent', () => {
     permissionsService = TestBed.inject(PermissionsService)
     modalService = TestBed.inject(NgbModal)
     systemStatusService = TestBed.inject(SystemStatusService)
+    customFieldsService = TestBed.inject(CustomFieldsService)
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     jest
       .spyOn(permissionsService, 'currentUserHasObjectPermissions')
@@ -157,6 +179,15 @@ describe('SettingsComponent', () => {
           all: savedViews.map((v) => v.id),
           count: savedViews.length,
           results: (savedViews as SavedView[]).concat([]),
+        })
+      )
+    }
+    if (excludeService !== customFieldsService) {
+      jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+        of({
+          all: customFields.map((f) => f.id),
+          count: customFields.length,
+          results: customFields.concat([]),
         })
       )
     }
@@ -443,5 +474,18 @@ describe('SettingsComponent', () => {
     component.settingsForm.get('themeColor').setValue('#ff0000')
     component.reset()
     expect(component.settingsForm.get('themeColor').value).toEqual('')
+  })
+
+  it('should dynamically create display fields options including custom fields', () => {
+    completeSetup()
+    expect(
+      component.documentDisplayFields.includes(DOCUMENT_DISPLAY_FIELDS[0])
+    ).toBeTruthy()
+    expect(
+      component.documentDisplayFields.find(
+        (f) =>
+          f.id === `${DocumentDisplayField.CUSTOM_FIELD}${customFields[0].id}`
+      ).name
+    ).toEqual(customFields[0].name)
   })
 })

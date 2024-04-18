@@ -325,48 +325,49 @@
           @for (view of savedViews; track view) {
             <li class="list-group-item py-3">
             <div [formGroupName]="view.id" class="row">
-              <div class="col">
-                <pngx-input-text title="Name" formControlName="name"></pngx-input-text>
-                <div class="form-check form-switch mt-3">
-                  <input type="checkbox" class="form-check-input" id="show_on_dashboard_{{view.id}}" formControlName="show_on_dashboard">
-                  <label class="form-check-label" for="show_on_dashboard_{{view.id}}" i18n>Show on dashboard</label>
+              <div class="row">
+                <div class="col">
+                  <pngx-input-text title="Name" formControlName="name"></pngx-input-text>
                 </div>
-                <div class="form-check form-switch">
-                  <input type="checkbox" class="form-check-input" id="show_in_sidebar_{{view.id}}" formControlName="show_in_sidebar">
-                  <label class="form-check-label" for="show_in_sidebar_{{view.id}}" i18n>Show in sidebar</label>
-                </div>
-              </div>
-              <div class="col">
-                @if (savedViewGroup.get(view.id.toString()).get('show_on_dashboard').value) {
-                  <div class="row">
-                    <div class="col">
-                      <pngx-input-number i18n-title title="Limit documents" [showAdd]="false" formControlName="dashboard_view_limit"></pngx-input-number>
-                    </div>
-                    <div class="col">
-                      <label class="form-label" for="dashboard_view_mode_{{view.id}}" i18n>Display as</label>
-                      <select class="form-select" formControlName="dashboard_view_mode">
-                        <option [ngValue]="DashboardViewMode.TABLE" i18n>Table</option>
-                        <option [ngValue]="DashboardViewMode.SMALL_CARDS" i18n>Cards</option>
-                      </select>
-                    </div>
+                <div class="col">
+                  <div class="form-check form-switch mt-3">
+                    <input type="checkbox" class="form-check-input" id="show_on_dashboard_{{view.id}}" formControlName="show_on_dashboard">
+                    <label class="form-check-label" for="show_on_dashboard_{{view.id}}" i18n>Show on dashboard</label>
                   </div>
-                  @if (savedViewGroup.get(view.id.toString()).get('dashboard_view_mode').value === DashboardViewMode.TABLE) {
-                    <pngx-input-drag-drop-select [items]="document_display_fields" formControlName="document_display_fields"></pngx-input-drag-drop-select>
+                  <div class="form-check form-switch">
+                    <input type="checkbox" class="form-check-input" id="show_in_sidebar_{{view.id}}" formControlName="show_in_sidebar">
+                    <label class="form-check-label" for="show_in_sidebar_{{view.id}}" i18n>Show in sidebar</label>
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <label class="form-label" for="name_{{view.id}}" i18n>Actions</label>
+                  <pngx-confirm-button
+                    label="Delete"
+                    i18n-label
+                    (confirm)="deleteSavedView(view)"
+                    *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.SavedView }"
+                    buttonClasses="btn-sm btn-outline-danger form-control"
+                    iconName="trash">
+                  </pngx-confirm-button>
+                </div>
+              </div>
+              @if (savedViewGroup.get(view.id.toString()).get('show_on_dashboard').value) {
+                <div class="row">
+                  <div class="col">
+                    <pngx-input-number i18n-title title="Widget list limit" [showAdd]="false" formControlName="dashboard_view_limit"></pngx-input-number>
+                  </div>
+                  <div class="col">
+                    <label class="form-label" for="dashboard_view_mode_{{view.id}}" i18n>Widget display</label>
+                    <select class="form-select" formControlName="dashboard_view_mode">
+                      <option [ngValue]="DashboardViewMode.TABLE" i18n>Table</option>
+                      <option [ngValue]="DashboardViewMode.SMALL_CARDS" i18n>Cards</option>
+                    </select>
+                  </div>
+                  @if (savedViewGroup.get(view.id.toString()).get('dashboard_view_mode').value === DashboardViewMode.TABLE && documentDisplayFields) {
+                    <pngx-input-drag-drop-select i18n-title title="Show" [items]="documentDisplayFields" formControlName="document_display_fields"></pngx-input-drag-drop-select>
                   }
+                </div>
                 }
-              </div>
-              <div class="col-auto">
-                <label class="form-label" for="name_{{view.id}}" i18n>Actions</label>
-
-                <pngx-confirm-button
-                  label="Delete"
-                  i18n-label
-                  (confirm)="deleteSavedView(view)"
-                  *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.SavedView }"
-                  buttonClasses="btn-sm btn-outline-danger form-control"
-                  iconName="trash">
-                </pngx-confirm-button>
-              </div>
             </div>
             </li>
           }
