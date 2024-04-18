@@ -97,8 +97,8 @@
         @for (field of document.custom_fields; track field.id) {
           @if (displayFields.has(DocumentDisplayField.CUSTOM_FIELD + field.field)) {
             <div class="ps-0 p-1">
-              <i-bs width="1em" height="1em" class="me-2 text-muted" name="info-circle"></i-bs>
-              <small>{{field.value}}</small>
+              <i-bs width="1em" height="1em" class="me-2 text-muted" name="ui-radios"></i-bs>
+              <pngx-custom-field-display [document]="document" [fieldId]="field.field"></pngx-custom-field-display>
             </div>
           }
         }

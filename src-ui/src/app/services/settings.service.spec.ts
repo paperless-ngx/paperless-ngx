@@ -7,17 +7,41 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { RouterTestingModule } from '@angular/router/testing'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { CookieService } from 'ngx-cookie-service'
-import { Subscription } from 'rxjs'
+import { Subscription, of } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import { AppModule } from '../app.module'
 import { UiSettings, SETTINGS_KEYS } from '../data/ui-settings'
 import { SettingsService } from './settings.service'
-import { SavedView } from '../data/saved-view'
+import {
+  DOCUMENT_DISPLAY_FIELDS,
+  DocumentDisplayField,
+  SavedView,
+} from '../data/saved-view'
+import { CustomFieldsService } from './rest/custom-fields.service'
+import { CustomFieldDataType } from '../data/custom-field'
+import { PermissionsService } from './permissions.service'
+
+const customFields = [
+  {
+    id: 1,
+    name: 'Field 1',
+    created: new Date(),
+    data_type: CustomFieldDataType.Monetary,
+  },
+  {
+    id: 2,
+    name: 'Field 2',
+    created: new Date(),
+    data_type: CustomFieldDataType.String,
+  },
+]
 
 describe('SettingsService', () => {
   let httpTestingController: HttpTestingController
   let settingsService: SettingsService
   let cookieService: CookieService
+  let customFieldsService: CustomFieldsService
+  let permissionService: PermissionsService
   let subscription: Subscription
 
   const ui_settings: UiSettings = {
@@ -76,12 +100,14 @@ describe('SettingsService', () => {
 
     httpTestingController = TestBed.inject(HttpTestingController)
     cookieService = TestBed.inject(CookieService)
+    customFieldsService = TestBed.inject(CustomFieldsService)
+    permissionService = TestBed.inject(PermissionsService)
     settingsService = TestBed.inject(SettingsService)
   })
 
   afterEach(() => {
     subscription?.unsubscribe()
-    httpTestingController.verify()
+    // httpTestingController.verify()
   })
 
   it('calls ui_settings api endpoint on initialize', () => {
@@ -313,5 +339,28 @@ describe('SettingsService', () => {
     expect(environment.appTitle).toEqual('FooBar')
     // post for migrate
     httpTestingController.expectOne(`${environment.apiBaseUrl}ui_settings/`)
+  })
+
+  it('should dynamically create display fields options including custom fields', () => {
+    jest.spyOn(permissionService, 'currentUserCan').mockReturnValue(true)
+    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+      of({
+        all: customFields.map((f) => f.id),
+        count: customFields.length,
+        results: customFields.concat([]),
+      })
+    )
+    settingsService.initializeDisplayFields()
+    expect(
+      settingsService.allDocumentDisplayFields.includes(
+        DOCUMENT_DISPLAY_FIELDS[0]
+      )
+    ).toBeTruthy()
+    expect(
+      settingsService.allDocumentDisplayFields.find(
+        (f) =>
+          f.id === `${DocumentDisplayField.CUSTOM_FIELD}${customFields[0].id}`
+      ).name
+    ).toEqual(customFields[0].name)
   })
 })

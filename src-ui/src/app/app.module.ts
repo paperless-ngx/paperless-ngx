@@ -121,6 +121,7 @@ import { MergeConfirmDialogComponent } from './components/common/confirm-dialog/
 import { SplitConfirmDialogComponent } from './components/common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
 import { DocumentHistoryComponent } from './components/document-history/document-history.component'
 import { DragDropSelectComponent } from './components/common/input/drag-drop-select/drag-drop-select.component'
+import { CustomFieldDisplayComponent } from './components/common/custom-field-display/custom-field-display.component'
 import {
   airplane,
   archive,
@@ -478,6 +479,7 @@ function initializeApp(settings: SettingsService) {
     SplitConfirmDialogComponent,
     DocumentHistoryComponent,
     DragDropSelectComponent,
+    CustomFieldDisplayComponent,
   ],
   imports: [
     BrowserModule,

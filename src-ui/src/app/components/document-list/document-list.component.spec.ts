@@ -34,7 +34,7 @@ import {
 import { Subject, of, throwError } from 'rxjs'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router'
-import { SavedView } from 'src/app/data/saved-view'
+import { DocumentDisplayField, SavedView } from 'src/app/data/saved-view'
 import {
   FILTER_FULLTEXT_MORELIKE,
   FILTER_FULLTEXT_QUERY,
@@ -302,7 +302,7 @@ describe('DocumentListComponent', () => {
     displayModeButtons[0].nativeElement.checked = true
     displayModeButtons[0].triggerEventHandler('change')
     fixture.detectChanges()
-    expect(component.displayMode).toEqual('details')
+    expect(component.displayMode).toEqual('table')
     expect(fixture.debugElement.queryAll(By.css('tr'))).toHaveLength(3)
 
     displayModeButtons[1].nativeElement.checked = true
@@ -327,7 +327,7 @@ describe('DocumentListComponent', () => {
     fixture.detectChanges()
     const sortDropdown = fixture.debugElement.queryAll(
       By.directive(NgbDropdown)
-    )[1]
+    )[2]
     const asnSortFieldButton = sortDropdown.query(By.directive(NgbDropdownItem))
 
     asnSortFieldButton.triggerEventHandler('click')
@@ -337,6 +337,7 @@ describe('DocumentListComponent', () => {
   })
 
   it('should support setting sort field by table head', () => {
+    component.activeDisplayFields = new Set([DocumentDisplayField.ASN])
     jest.spyOn(documentListService, 'documents', 'get').mockReturnValue(docs)
     fixture.detectChanges()
     expect(documentListService.sortField).toEqual('created')
@@ -347,7 +348,7 @@ describe('DocumentListComponent', () => {
     detailsDisplayModeButton.nativeElement.checked = true
     detailsDisplayModeButton.triggerEventHandler('change')
     fixture.detectChanges()
-    expect(component.displayMode).toEqual('details')
+    expect(component.displayMode).toEqual('table')
 
     const sortTh = fixture.debugElement.query(By.directive(SortableDirective))
     sortTh.triggerEventHandler('click')
@@ -558,12 +559,12 @@ describe('DocumentListComponent', () => {
     jest.spyOn(documentListService, 'documents', 'get').mockReturnValue(docs)
     expect(documentListService.sortField).toEqual('created')
 
-    component.displayMode = 'details'
+    component.displayMode = 'table'
     fixture.detectChanges()
 
     expect(
       fixture.debugElement.queryAll(By.directive(SortableDirective))
-    ).toHaveLength(9)
+    ).toHaveLength(8)
 
     expect(component.notesEnabled).toBeTruthy()
     settingsService.set(SETTINGS_KEYS.NOTES_ENABLED, false)
@@ -571,14 +572,14 @@ describe('DocumentListComponent', () => {
     expect(component.notesEnabled).toBeFalsy()
     expect(
       fixture.debugElement.queryAll(By.directive(SortableDirective))
-    ).toHaveLength(8)
+    ).toHaveLength(7)
 
     // insufficient perms
     jest.spyOn(permissionService, 'currentUserCan').mockReturnValue(false)
     fixture.detectChanges()
     expect(
       fixture.debugElement.queryAll(By.directive(SortableDirective))
-    ).toHaveLength(5)
+    ).toHaveLength(4)
   })
 
   it('should support toggle on document objects', () => {
@@ -597,5 +598,41 @@ describe('DocumentListComponent', () => {
     expect(qfSpy).toHaveBeenCalledWith([
       { rule_type: FILTER_FULLTEXT_MORELIKE, value: '99' },
     ])
+  })
+
+  it('should load display fields from local storage', () => {
+    window.localStorage.setItem('document-list:displayFields', '["asn"]')
+    fixture.detectChanges()
+    expect(component.activeDisplayFields).toEqual(
+      new Set([DocumentDisplayField.ASN])
+    )
+    component.activeDisplayFields = new Set([DocumentDisplayField.TITLE])
+    component.saveDisplayFields()
+    expect(
+      JSON.parse(window.localStorage.getItem('document-list:displayFields'))
+    ).toEqual([DocumentDisplayField.TITLE])
+  })
+
+  it('should support toggling display fields', () => {
+    fixture.detectChanges()
+    component.activeDisplayFields = new Set([DocumentDisplayField.ASN])
+    component.toggleDisplayField(DocumentDisplayField.TITLE)
+    expect(component.activeDisplayFields).toEqual(
+      new Set([DocumentDisplayField.ASN, DocumentDisplayField.TITLE])
+    )
+    component.toggleDisplayField(DocumentDisplayField.ASN)
+    expect(component.activeDisplayFields).toEqual(
+      new Set([DocumentDisplayField.TITLE])
+    )
+  })
+
+  it('should get custom field title', () => {
+    fixture.detectChanges()
+    settingsService.allDocumentDisplayFields = [
+      { id: 'custom_field_1', name: 'Custom Field 1' },
+    ]
+    expect(component.getDisplayCustomFieldTitle('custom_field_1')).toEqual(
+      'Custom Field 1'
+    )
   })
 })

@@ -301,27 +301,31 @@ export class SettingsService {
           this.currentUser
         )
 
-        this.allDocumentDisplayFields = DOCUMENT_DISPLAY_FIELDS
-
-        if (
-          this.permissionsService.currentUserCan(
-            PermissionAction.View,
-            PermissionType.CustomField
-          )
-        ) {
-          this.customFieldsService.listAll().subscribe((r) => {
-            this.allDocumentDisplayFields = DOCUMENT_DISPLAY_FIELDS.concat(
-              r.results.map((field) => {
-                return {
-                  id: `${DocumentDisplayField.CUSTOM_FIELD}${field.id}` as any,
-                  name: field.name,
-                }
-              })
-            )
-          })
-        }
+        this.initializeDisplayFields()
       })
     )
+  }
+
+  public initializeDisplayFields() {
+    this.allDocumentDisplayFields = DOCUMENT_DISPLAY_FIELDS
+
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.CustomField
+      )
+    ) {
+      this.customFieldsService.listAll().subscribe((r) => {
+        this.allDocumentDisplayFields = DOCUMENT_DISPLAY_FIELDS.concat(
+          r.results.map((field) => {
+            return {
+              id: `${DocumentDisplayField.CUSTOM_FIELD}${field.id}` as any,
+              name: field.name,
+            }
+          })
+        )
+      })
+    }
   }
 
   get displayName(): string {

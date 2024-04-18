@@ -182,7 +182,6 @@
             <th
               pngxSortable="title"
               title="Sort by title" i18n-title
-              class="w-40"
               [currentSortField]="list.sortField"
               [currentSortReverse]="list.sortReverse"
               (sort)="onSort($event)"
@@ -258,12 +257,12 @@
                 </div>
               </td>
               @if (activeDisplayFields.has(DocumentDisplayField.ASN)) {
-                <td class="d-none d-lg-table-cell">
+                <td class="d-none d-xl-table-cell">
                   {{d.archive_serial_number}}
                 </td>
               }
               @if (activeDisplayFields.has(DocumentDisplayField.CORRESPONDENT) && permissionService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
-                <td class="d-none d-md-table-cell">
+                <td class="d-none d-xl-table-cell">
                   @if (d.correspondent) {
                     <a (click)="clickCorrespondent(d.correspondent);$event.stopPropagation()" title="Filter by correspondent" i18n-title>{{(d.correspondent$ | async)?.name}}</a>
                   }
@@ -320,8 +319,8 @@
                 </td>
               }
               @for (field of activeDisplayCustomFields; track field) {
-                <td>
-                  {{getCustomFieldValue(d, field)}}
+                <td class="d-none d-xl-table-cell">
+                  <pngx-custom-field-display [document]="d" [fieldDisplayKey]="field"></pngx-custom-field-display>
                 </td>
               }
             </tr>

@@ -42,6 +42,7 @@ import { PreviewPopupComponent } from 'src/app/components/common/preview-popup/p
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { CustomFieldDataType } from 'src/app/data/custom-field'
+import { CustomFieldDisplayComponent } from 'src/app/components/common/custom-field-display/custom-field-display.component'
 
 const savedView: SavedView = {
   id: 1,
@@ -124,6 +125,7 @@ describe('SavedViewWidgetComponent', () => {
         DocumentTitlePipe,
         SafeUrlPipe,
         PreviewPopupComponent,
+        CustomFieldDisplayComponent,
       ],
       providers: [
         PermissionsGuard,
@@ -340,101 +342,5 @@ describe('SavedViewWidgetComponent', () => {
     expect(component.getColumnTitle(DocumentDisplayField.STORAGE_PATH)).toEqual(
       'Storage path'
     )
-  })
-
-  it('should check if column is visible including permissions', () => {
-    expect(
-      component.activeDisplayFields.includes(DocumentDisplayField.TITLE)
-    ).toBeTruthy()
-    expect(
-      component.activeDisplayFields.includes(DocumentDisplayField.CREATED)
-    ).toBeTruthy()
-    expect(
-      component.activeDisplayFields.includes(DocumentDisplayField.ADDED)
-    ).toBeTruthy()
-    expect(
-      component.activeDisplayFields.includes(DocumentDisplayField.TAGS)
-    ).toBeTruthy()
-    expect(
-      component.activeDisplayFields.includes(DocumentDisplayField.CORRESPONDENT)
-    ).toBeTruthy()
-    expect(
-      component.activeDisplayFields.includes(DocumentDisplayField.DOCUMENT_TYPE)
-    ).toBeTruthy()
-    expect(
-      component.activeDisplayFields.includes(DocumentDisplayField.STORAGE_PATH)
-    ).toBeTruthy()
-    expect(
-      component.activeDisplayFields.includes(
-        `${DocumentDisplayField.CUSTOM_FIELD}11` as any
-      )
-    ).toBeTruthy()
-
-    component.activeDisplayFields = []
-    jest
-      .spyOn(component.permissionsService, 'currentUserCan')
-      .mockReturnValue(false)
-    component.ngOnInit()
-    expect(
-      component.activeDisplayFields.includes(DocumentDisplayField.TAGS)
-    ).toBeFalsy()
-    expect(
-      component.activeDisplayFields.includes(DocumentDisplayField.CORRESPONDENT)
-    ).toBeFalsy()
-    expect(
-      component.activeDisplayFields.includes(DocumentDisplayField.DOCUMENT_TYPE)
-    ).toBeFalsy()
-    expect(
-      component.activeDisplayFields.includes(DocumentDisplayField.STORAGE_PATH)
-    ).toBeFalsy()
-    expect(
-      component.activeDisplayFields.includes(
-        `${DocumentDisplayField.CUSTOM_FIELD}11` as any
-      )
-    ).toBeFalsy()
-  })
-
-  it('should display monetary custom field value', () => {
-    expect(
-      component.getMonetaryCustomFieldValue(
-        documentResults[2],
-        `${DocumentDisplayField.CUSTOM_FIELD}3`
-      )
-    ).toEqual([123, 'EUR'])
-    expect(
-      component.getMonetaryCustomFieldValue(
-        documentResults[0],
-        `${DocumentDisplayField.CUSTOM_FIELD}999`
-      )
-    ).toEqual([null, null])
-  })
-
-  it('should retrieve documents for document link columns', () => {
-    const listAllSpy = jest.spyOn(documentService, 'listAll')
-    listAllSpy.mockReturnValue(
-      of({
-        all: [123, 456, 789],
-        count: 3,
-        results: [
-          { id: 123, title: 'doc123' },
-          { id: 456, title: 'doc456' },
-          { id: 789, title: 'doc789' },
-        ],
-      })
-    )
-    jest.spyOn(documentService, 'listFiltered').mockReturnValue(
-      of({
-        all: [4, 5],
-        count: 2,
-        results: [documentResults[2], documentResults[3]],
-      })
-    )
-    component.ngOnInit()
-    expect(listAllSpy).toHaveBeenCalledWith(null, false, {
-      id__in: '123,456,789',
-    })
-    fixture.detectChanges()
-    expect(fixture.debugElement.nativeElement.textContent).toContain('doc123')
-    component.maybeGetDocuments() // coverage
   })
 })

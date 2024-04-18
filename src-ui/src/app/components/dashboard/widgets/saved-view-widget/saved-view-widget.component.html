@@ -65,29 +65,7 @@
                     }
                   }
                   @if (column.startsWith(DashboardViewTableColumn.CUSTOM_FIELD)) {
-                    @switch(getCustomFieldDataType(column)) {
-                      @case (CustomFieldDataType.Monetary) {
-                        {{ getMonetaryCustomFieldValue(doc, column)[0] | currency: getMonetaryCustomFieldValue(doc, column)[1] }}
-                      }
-                      @case (CustomFieldDataType.Date) {
-                        {{ getCustomFieldValue(doc, column) | customDate }}
-                      }
-                      @case (CustomFieldDataType.Url) {
-                        <a [href]="getCustomFieldValue(doc, column)" class="btn-link text-dark text-decoration-none" target="_blank">{{ getCustomFieldValue(doc, column) }}</a>
-                      }
-                      @case (CustomFieldDataType.DocumentLink) {
-                        <div class="d-flex gap-1 flex-wrap">
-                          @for (docId of getCustomFieldValue(doc, column); track docId) {
-                            <a routerLink="/documents/{{docId}}" class="badge bg-dark text-primary" title="View" i18n-title>
-                              <i-bs width="0.9em" height="0.9em" name="file-text"></i-bs>&nbsp;<span>{{ getDocumentTitle(docId) }}</span>
-                            </a>
-                          }
-                        </div>
-                      }
-                      @default {
-                        {{ getCustomFieldValue(doc, column) }}
-                      }
-                    }
+                    <pngx-custom-field-display [document]="doc" [fieldDisplayKey]="column"></pngx-custom-field-display>
                   }
                   @if (i === savedView.document_display_fields.length - 1) {
                     <div class="btn-group position-absolute top-50 end-0 translate-middle-y">

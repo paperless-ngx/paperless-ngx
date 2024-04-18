@@ -85,8 +85,6 @@ export class SavedViewWidgetComponent
     DocumentDisplayField.ADDED,
   ])
 
-  docLinkDocuments: Document[] = []
-
   ngOnInit(): void {
     this.reload()
     this.consumerStatusService
@@ -107,7 +105,6 @@ export class SavedViewWidgetComponent
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe((customFields) => {
           this.customFields = customFields.results
-          this.maybeGetDocuments()
         })
     }
 
@@ -146,7 +143,6 @@ export class SavedViewWidgetComponent
       .subscribe((result) => {
         this.loading = false
         this.documents = result.results
-        this.maybeGetDocuments()
       })
   }
 
@@ -255,65 +251,5 @@ export class SavedViewWidgetComponent
       return this.customFields.find((c) => c.id === parseInt(id))?.name
     }
     return DOCUMENT_DISPLAY_FIELDS.find((c) => c.id === column)?.name
-  }
-
-  public getCustomFieldDataType(column_id: string): string {
-    const customFieldId = parseInt(column_id.split('_')[2])
-    return this.customFields.find((cf) => cf.id === customFieldId)?.data_type
-  }
-
-  public getCustomFieldValue(document: Document, column_id: string): any {
-    const customFieldId = parseInt(column_id.split('_')[2])
-    return document.custom_fields.find((cf) => cf.field === customFieldId)
-      ?.value
-  }
-
-  public getMonetaryCustomFieldValue(
-    document: Document,
-    column_id: string
-  ): Array<number | string> {
-    const value = this.getCustomFieldValue(document, column_id)
-    if (!value) return [null, null]
-    const currencyCode = value.match(/[A-Z]{3}/)?.[0]
-    const amount = parseFloat(value.replace(currencyCode, ''))
-    return [amount, currencyCode]
-  }
-
-  maybeGetDocuments() {
-    // retrieve documents for document link columns
-    if (this.docLinkDocuments.length) return
-    let docIds = []
-    let docLinkColumns = []
-    this.savedView.document_display_fields
-      ?.filter((column) => column.startsWith(DocumentDisplayField.CUSTOM_FIELD))
-      .forEach((column) => {
-        if (
-          this.getCustomFieldDataType(column) ===
-          CustomFieldDataType.DocumentLink
-        ) {
-          docLinkColumns.push(column)
-        }
-      })
-    this.documents.forEach((doc) => {
-      docLinkColumns.forEach((column) => {
-        const docs: number[] = this.getCustomFieldValue(doc, column)
-        if (docs) {
-          docIds = docIds.concat(docs)
-        }
-      })
-    })
-
-    if (docIds.length) {
-      this.documentService
-        .listAll(null, false, { id__in: docIds.join(',') })
-        .pipe(takeUntil(this.unsubscribeNotifier))
-        .subscribe((result: Results<Document>) => {
-          this.docLinkDocuments = result.results
-        })
-    }
-  }
-
-  public getDocumentTitle(documentId: number): string {
-    return this.docLinkDocuments.find((doc) => doc.id === documentId)?.title
   }
 }

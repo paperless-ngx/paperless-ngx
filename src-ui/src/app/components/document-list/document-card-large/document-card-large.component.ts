@@ -11,7 +11,10 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
-import { DocumentDisplayField } from 'src/app/data/saved-view'
+import {
+  DOCUMENT_DISPLAY_FIELDS,
+  DocumentDisplayField,
+} from 'src/app/data/saved-view'
 
 @Component({
   selector: 'pngx-document-card-large',
@@ -32,7 +35,9 @@ export class DocumentCardLargeComponent extends ComponentWithPermissions {
   selected = false
 
   @Input()
-  displayFields: Set<DocumentDisplayField>
+  displayFields: Set<DocumentDisplayField | string> = new Set(
+    DOCUMENT_DISPLAY_FIELDS.map((f) => f.id)
+  )
 
   @Output()
   toggleSelected = new EventEmitter()

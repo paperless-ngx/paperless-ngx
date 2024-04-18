@@ -193,11 +193,6 @@ export class DocumentListComponent
     )?.name
   }
 
-  public getCustomFieldValue(document: Document, field: string) {
-    const fieldId = parseInt(field.split('_')[2])
-    return document.custom_fields.find((f) => f.field === fieldId)?.value
-  }
-
   ngOnInit(): void {
     if (localStorage.getItem('document-list:displayMode') != null) {
       this.displayMode = localStorage.getItem('document-list:displayMode')
