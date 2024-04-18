@@ -14,6 +14,7 @@ import { routes } from 'src/app/app-routing.module'
 import {
   FILTER_CORRESPONDENT,
   FILTER_DOCUMENT_TYPE,
+  FILTER_FULLTEXT_MORELIKE,
   FILTER_HAS_TAGS_ALL,
   FILTER_STORAGE_PATH,
 } from 'src/app/data/filter-rule-type'
@@ -320,6 +321,14 @@ describe('SavedViewWidgetComponent', () => {
       { rule_type: FILTER_STORAGE_PATH, value: '11' },
     ])
     component.clickStoragePath(11) // coverage
+  })
+
+  it('should navigate via quickfilter on click more like', () => {
+    const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
+    component.clickMoreLike(11)
+    expect(qfSpy).toHaveBeenCalledWith([
+      { rule_type: FILTER_FULLTEXT_MORELIKE, value: '11' },
+    ])
   })
 
   it('should get correct column title', () => {

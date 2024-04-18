@@ -104,6 +104,21 @@
         </pngx-document-card-small>
       }
     </div>
+  } @else if (documents.length && savedView.display_mode === DashboardViewMode.LARGE_CARDS) {
+    <div class="row my-n2">
+      @for (d of documents; track d.id) {
+        <pngx-document-card-large
+          (dblClickDocument)="openDocumentDetail(d)"
+          [document]="d"
+          [displayFields]="activeDisplayFields"
+          (clickTag)="clickTag($event)"
+          (clickCorrespondent)="clickCorrespondent($event)"
+          (clickStoragePath)="clickStoragePath($event)"
+          (clickDocumentType)="clickDocumentType($event)"
+          (clickMoreLike)="clickMoreLike(d.id)">
+        </pngx-document-card-large>
+      }
+    </div>
   } @else {
     <p i18n class="text-center text-muted mb-0 fst-italic">No documents</p>
   }

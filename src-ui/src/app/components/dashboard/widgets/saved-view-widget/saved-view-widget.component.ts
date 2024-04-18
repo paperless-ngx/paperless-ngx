@@ -21,6 +21,7 @@ import { DocumentService } from 'src/app/services/rest/document.service'
 import {
   FILTER_CORRESPONDENT,
   FILTER_DOCUMENT_TYPE,
+  FILTER_FULLTEXT_MORELIKE,
   FILTER_HAS_TAGS_ALL,
   FILTER_STORAGE_PATH,
 } from 'src/app/data/filter-rule-type'
@@ -190,6 +191,12 @@ export class SavedViewWidgetComponent
 
     this.list.quickFilter([
       { rule_type: FILTER_STORAGE_PATH, value: storagePathId.toString() },
+    ])
+  }
+
+  clickMoreLike(documentID: number) {
+    this.list.quickFilter([
+      { rule_type: FILTER_FULLTEXT_MORELIKE, value: documentID.toString() },
     ])
   }
 
