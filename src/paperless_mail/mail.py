@@ -425,6 +425,10 @@ class MailAccountHandler(LoggingMixin):
 
     logging_name = "paperless_mail"
 
+    def __init__(self) -> None:
+        super().__init__()
+        self.renew_logging_group()
+
     def _correspondent_from_name(self, name: str) -> Optional[Correspondent]:
         try:
             return Correspondent.objects.get_or_create(name=name)[0]
