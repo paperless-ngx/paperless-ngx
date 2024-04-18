@@ -328,6 +328,7 @@ class DocumentParser(LoggingMixin):
 
     def __init__(self, logging_group, progress_callback=None):
         super().__init__()
+        self.renew_logging_group()
         self.logging_group = logging_group
         self.settings = self.get_settings()
         settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
