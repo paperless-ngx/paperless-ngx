@@ -373,7 +373,7 @@ The following methods are supported:
   - No `parameters` required
 - `set_permissions`
   - Requires `parameters`:
-    - `"permissions": PERMISSIONS_OBJ` (see format [above](#permissions)) and / or
+    - `"set_permissions": PERMISSIONS_OBJ` (see format [above](#permissions)) and / or
     - `"owner": OWNER_ID or null`
     - `"merge": true or false` (defaults to false)
   - The `merge` flag determines if the supplied permissions will overwrite all existing permissions (including
