@@ -6,7 +6,7 @@ export enum DashboardViewMode {
   SMALL_CARDS = 'small_cards',
 }
 
-export enum DashboardViewTableColumn {
+export enum DocumentDisplayField {
   TITLE = 'title',
   CREATED = 'created',
   ADDED = 'added',
@@ -17,33 +17,33 @@ export enum DashboardViewTableColumn {
   CUSTOM_FIELD = 'custom_field_',
 }
 
-export const document_display_fields = [
+export const DOCUMENT_DISPLAY_FIELDS = [
   {
-    id: DashboardViewTableColumn.TITLE,
+    id: DocumentDisplayField.TITLE,
     name: $localize`Title`,
   },
   {
-    id: DashboardViewTableColumn.CREATED,
+    id: DocumentDisplayField.CREATED,
     name: $localize`Created`,
   },
   {
-    id: DashboardViewTableColumn.ADDED,
+    id: DocumentDisplayField.ADDED,
     name: $localize`Added`,
   },
   {
-    id: DashboardViewTableColumn.TAGS,
+    id: DocumentDisplayField.TAGS,
     name: $localize`Tags`,
   },
   {
-    id: DashboardViewTableColumn.CORRESPONDENT,
+    id: DocumentDisplayField.CORRESPONDENT,
     name: $localize`Correspondent`,
   },
   {
-    id: DashboardViewTableColumn.DOCUMENT_TYPE,
+    id: DocumentDisplayField.DOCUMENT_TYPE,
     name: $localize`Document type`,
   },
   {
-    id: DashboardViewTableColumn.STORAGE_PATH,
+    id: DocumentDisplayField.STORAGE_PATH,
     name: $localize`Storage path`,
   },
 ]
@@ -65,5 +65,5 @@ export interface SavedView extends ObjectWithPermissions {
 
   dashboard_view_mode?: DashboardViewMode
 
-  document_display_fields?: DashboardViewTableColumn[]
+  document_display_fields?: DocumentDisplayField[]
 }

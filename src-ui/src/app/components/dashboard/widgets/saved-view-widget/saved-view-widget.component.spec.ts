@@ -19,7 +19,7 @@ import {
 } from 'src/app/data/filter-rule-type'
 import {
   DashboardViewMode,
-  DashboardViewTableColumn,
+  DocumentDisplayField,
   SavedView,
 } from 'src/app/data/saved-view'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
@@ -59,14 +59,14 @@ const savedView: SavedView = {
   dashboard_view_limit: 20,
   dashboard_view_mode: DashboardViewMode.TABLE,
   document_display_fields: [
-    DashboardViewTableColumn.CREATED,
-    DashboardViewTableColumn.TITLE,
-    DashboardViewTableColumn.TAGS,
-    DashboardViewTableColumn.CORRESPONDENT,
-    DashboardViewTableColumn.DOCUMENT_TYPE,
-    DashboardViewTableColumn.STORAGE_PATH,
-    `${DashboardViewTableColumn.CUSTOM_FIELD}11` as any,
-    `${DashboardViewTableColumn.CUSTOM_FIELD}15` as any,
+    DocumentDisplayField.CREATED,
+    DocumentDisplayField.TITLE,
+    DocumentDisplayField.TAGS,
+    DocumentDisplayField.CORRESPONDENT,
+    DocumentDisplayField.DOCUMENT_TYPE,
+    DocumentDisplayField.STORAGE_PATH,
+    `${DocumentDisplayField.CUSTOM_FIELD}11` as any,
+    `${DocumentDisplayField.CUSTOM_FIELD}15` as any,
   ],
 }
 
@@ -321,54 +321,52 @@ describe('SavedViewWidgetComponent', () => {
   })
 
   it('should get correct column title', () => {
-    expect(component.getColumnTitle(DashboardViewTableColumn.TITLE)).toEqual(
+    expect(component.getColumnTitle(DocumentDisplayField.TITLE)).toEqual(
       'Title'
     )
-    expect(component.getColumnTitle(DashboardViewTableColumn.CREATED)).toEqual(
+    expect(component.getColumnTitle(DocumentDisplayField.CREATED)).toEqual(
       'Created'
     )
-    expect(component.getColumnTitle(DashboardViewTableColumn.ADDED)).toEqual(
+    expect(component.getColumnTitle(DocumentDisplayField.ADDED)).toEqual(
       'Added'
     )
-    expect(component.getColumnTitle(DashboardViewTableColumn.TAGS)).toEqual(
-      'Tags'
-    )
+    expect(component.getColumnTitle(DocumentDisplayField.TAGS)).toEqual('Tags')
     expect(
-      component.getColumnTitle(DashboardViewTableColumn.CORRESPONDENT)
+      component.getColumnTitle(DocumentDisplayField.CORRESPONDENT)
     ).toEqual('Correspondent')
     expect(
-      component.getColumnTitle(DashboardViewTableColumn.DOCUMENT_TYPE)
+      component.getColumnTitle(DocumentDisplayField.DOCUMENT_TYPE)
     ).toEqual('Document type')
-    expect(
-      component.getColumnTitle(DashboardViewTableColumn.STORAGE_PATH)
-    ).toEqual('Storage path')
+    expect(component.getColumnTitle(DocumentDisplayField.STORAGE_PATH)).toEqual(
+      'Storage path'
+    )
   })
 
   it('should check if column is visible including permissions', () => {
     expect(
-      component.visibleColumns.includes(DashboardViewTableColumn.TITLE)
+      component.visibleColumns.includes(DocumentDisplayField.TITLE)
     ).toBeTruthy()
     expect(
-      component.visibleColumns.includes(DashboardViewTableColumn.CREATED)
+      component.visibleColumns.includes(DocumentDisplayField.CREATED)
     ).toBeTruthy()
     expect(
-      component.visibleColumns.includes(DashboardViewTableColumn.ADDED)
+      component.visibleColumns.includes(DocumentDisplayField.ADDED)
     ).toBeTruthy()
     expect(
-      component.visibleColumns.includes(DashboardViewTableColumn.TAGS)
+      component.visibleColumns.includes(DocumentDisplayField.TAGS)
     ).toBeTruthy()
     expect(
-      component.visibleColumns.includes(DashboardViewTableColumn.CORRESPONDENT)
+      component.visibleColumns.includes(DocumentDisplayField.CORRESPONDENT)
     ).toBeTruthy()
     expect(
-      component.visibleColumns.includes(DashboardViewTableColumn.DOCUMENT_TYPE)
+      component.visibleColumns.includes(DocumentDisplayField.DOCUMENT_TYPE)
     ).toBeTruthy()
     expect(
-      component.visibleColumns.includes(DashboardViewTableColumn.STORAGE_PATH)
+      component.visibleColumns.includes(DocumentDisplayField.STORAGE_PATH)
     ).toBeTruthy()
     expect(
       component.visibleColumns.includes(
-        `${DashboardViewTableColumn.CUSTOM_FIELD}11` as any
+        `${DocumentDisplayField.CUSTOM_FIELD}11` as any
       )
     ).toBeTruthy()
 
@@ -378,20 +376,20 @@ describe('SavedViewWidgetComponent', () => {
       .mockReturnValue(false)
     component.ngOnInit()
     expect(
-      component.visibleColumns.includes(DashboardViewTableColumn.TAGS)
+      component.visibleColumns.includes(DocumentDisplayField.TAGS)
     ).toBeFalsy()
     expect(
-      component.visibleColumns.includes(DashboardViewTableColumn.CORRESPONDENT)
+      component.visibleColumns.includes(DocumentDisplayField.CORRESPONDENT)
     ).toBeFalsy()
     expect(
-      component.visibleColumns.includes(DashboardViewTableColumn.DOCUMENT_TYPE)
+      component.visibleColumns.includes(DocumentDisplayField.DOCUMENT_TYPE)
     ).toBeFalsy()
     expect(
-      component.visibleColumns.includes(DashboardViewTableColumn.STORAGE_PATH)
+      component.visibleColumns.includes(DocumentDisplayField.STORAGE_PATH)
     ).toBeFalsy()
     expect(
       component.visibleColumns.includes(
-        `${DashboardViewTableColumn.CUSTOM_FIELD}11` as any
+        `${DocumentDisplayField.CUSTOM_FIELD}11` as any
       )
     ).toBeFalsy()
   })
@@ -400,13 +398,13 @@ describe('SavedViewWidgetComponent', () => {
     expect(
       component.getMonetaryCustomFieldValue(
         documentResults[2],
-        `${DashboardViewTableColumn.CUSTOM_FIELD}3`
+        `${DocumentDisplayField.CUSTOM_FIELD}3`
       )
     ).toEqual([123, 'EUR'])
     expect(
       component.getMonetaryCustomFieldValue(
         documentResults[0],
-        `${DashboardViewTableColumn.CUSTOM_FIELD}999`
+        `${DocumentDisplayField.CUSTOM_FIELD}999`
       )
     ).toEqual([null, null])
   })
