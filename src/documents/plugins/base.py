@@ -67,7 +67,8 @@ class ConsumeTaskPlugin(abc.ABC):
         self.status_mgr = status_mgr
         self.task_id: Final = task_id
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def able_to_run(self) -> bool:
         """
         Return True if the conditions are met for the plugin to run, False otherwise
