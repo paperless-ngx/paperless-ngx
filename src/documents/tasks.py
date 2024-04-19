@@ -6,7 +6,6 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Optional
 
-import requests
 import tqdm
 from celery import Task
 from celery import shared_task
@@ -51,26 +50,19 @@ logger = logging.getLogger("paperless.tasks")
 
 
 def translate_content(content):
+    import bergamot
 
-    headers = {
-        "Authorization": "DeepL-Auth-Key " + settings.DEEPL_TOKEN,
-        "Content-Type": "application/json",
-    }
+    service = bergamot.Service(bergamot.ServiceConfig())
 
-    json_data = {
-        "text": [
-            content,
-        ],
-        "target_lang": settings.TRANSLATION_TARGET,
-    }
-
-    response = requests.post(
-        "https://api-free.deepl.com/v2/translate",
-        headers=headers,
-        json=json_data,
+    model = service.modelFromConfigPath(
+        bergamot.REPOSITORY.modelConfigPath("browsermt", settings.TRANSLATION_MODEL),
     )
-
-    return response.json()["translations"][0]["text"]
+    result = service.translate(
+        model,
+        bergamot.VectorString([content]),
+        bergamot.ResponseOptions(),
+    )
+    return next(r.target.text for r in result)
 
 
 @shared_task
@@ -268,10 +260,13 @@ def update_document_archive_file(document_id):
                 )
                 oldDocument = Document.objects.get(pk=document.pk)
                 content = parser.get_text()
+                translation = (
+                    translate_content(content) if settings.TRANSLATION_MODEL else ""
+                )
                 Document.objects.filter(pk=document.pk).update(
                     archive_checksum=checksum,
                     content=content,
-                    translation=translate_content(content),
+                    translation=translation,
                     archive_filename=document.archive_filename,
                 )
                 newDocument = Document.objects.get(pk=document.pk)
