@@ -34,10 +34,10 @@ export class MergeConfirmDialogComponent
 
   ngOnInit() {
     this.documentService
-      .getCachedMany(this.documentIDs)
+      .getFew(this.documentIDs)
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((documents) => {
-        this._documents = documents
+      .subscribe((r) => {
+        this._documents = r.results
       })
   }
 
