@@ -53,11 +53,7 @@ import {
   DisplayMode,
   Document,
 } from 'src/app/data/document'
-import {
-  DOCUMENT_SORT_FIELDS,
-  DOCUMENT_SORT_FIELDS_FULLTEXT,
-  DocumentService,
-} from 'src/app/services/rest/document.service'
+import { DocumentService } from 'src/app/services/rest/document.service'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component'
@@ -193,7 +189,7 @@ describe('DocumentListComponent', () => {
       },
     ]
     fixture.detectChanges()
-    expect(component.getSortFields()).toEqual(DOCUMENT_SORT_FIELDS)
+    expect(component.getSortFields()).toEqual(documentListService.sortFields)
 
     documentListService.filterRules = [
       {
@@ -202,7 +198,9 @@ describe('DocumentListComponent', () => {
       },
     ]
     fixture.detectChanges()
-    expect(component.getSortFields()).toEqual(DOCUMENT_SORT_FIELDS_FULLTEXT)
+    expect(component.getSortFields()).toEqual(
+      documentListService.sortFieldsFullText
+    )
   })
 
   it('should determine if filtered, support reset', () => {

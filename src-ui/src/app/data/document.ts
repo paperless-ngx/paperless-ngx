@@ -84,6 +84,25 @@ export const DEFAULT_DASHBOARD_DISPLAY_FIELDS = [
   DisplayField.CORRESPONDENT,
 ]
 
+export const DOCUMENT_SORT_FIELDS = [
+  { field: 'archive_serial_number', name: $localize`ASN` },
+  { field: 'correspondent__name', name: $localize`Correspondent` },
+  { field: 'title', name: $localize`Title` },
+  { field: 'document_type__name', name: $localize`Document type` },
+  { field: 'created', name: $localize`Created` },
+  { field: 'added', name: $localize`Added` },
+  { field: 'modified', name: $localize`Modified` },
+  { field: 'num_notes', name: $localize`Notes` },
+  { field: 'owner', name: $localize`Owner` },
+]
+
+export const DOCUMENT_SORT_FIELDS_FULLTEXT = [
+  {
+    field: 'score',
+    name: $localize`:Score is a value returned by the full text search engine and specifies how well a result matches the given query:Search score`,
+  },
+]
+
 export interface SearchHit {
   score?: number
   rank?: number

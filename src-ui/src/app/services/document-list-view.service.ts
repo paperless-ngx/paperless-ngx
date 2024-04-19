@@ -17,11 +17,7 @@ import { SavedView } from '../data/saved-view'
 import { SETTINGS_KEYS } from '../data/ui-settings'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
 import { paramsFromViewState, paramsToViewState } from '../utils/query-params'
-import {
-  DocumentService,
-  DOCUMENT_SORT_FIELDS,
-  SelectionData,
-} from './rest/document.service'
+import { DocumentService, SelectionData } from './rest/document.service'
 import { SettingsService } from './settings.service'
 
 /**
@@ -302,9 +298,8 @@ export class DocumentListViewService {
               errorMessage = Object.keys(error.error)
                 .map((fieldName) => {
                   const fieldError: Array<string> = error.error[fieldName]
-                  return `${DOCUMENT_SORT_FIELDS.find(
-                    (f) => f.field == fieldName
-                  )?.name}: ${fieldError[0]}`
+                  return `${this.sortFields.find((f) => f.field == fieldName)
+                    ?.name}: ${fieldError[0]}`
                 })
                 .join(', ')
             } else {
@@ -331,6 +326,14 @@ export class DocumentListViewService {
 
   get filterRules(): FilterRule[] {
     return this.activeListViewState.filterRules
+  }
+
+  get sortFields(): any[] {
+    return this.documentService.sortFields
+  }
+
+  get sortFieldsFullText(): any[] {
+    return this.documentService.sortFieldsFullText
   }
 
   set sortField(field: string) {
