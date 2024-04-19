@@ -48,8 +48,6 @@ import {
   InstallType,
   SystemStatusItemStatus,
 } from 'src/app/data/system-status'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { CustomFieldDataType } from 'src/app/data/custom-field'
 
 const savedViews = [
   { id: 1, name: 'view1', show_in_sidebar: true, show_on_dashboard: true },
@@ -78,7 +76,6 @@ describe('SettingsComponent', () => {
   let groupService: GroupService
   let modalService: NgbModal
   let systemStatusService: SystemStatusService
-  let customFieldsService: CustomFieldsService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -124,7 +121,6 @@ describe('SettingsComponent', () => {
     permissionsService = TestBed.inject(PermissionsService)
     modalService = TestBed.inject(NgbModal)
     systemStatusService = TestBed.inject(SystemStatusService)
-    customFieldsService = TestBed.inject(CustomFieldsService)
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     jest
       .spyOn(permissionsService, 'currentUserHasObjectPermissions')

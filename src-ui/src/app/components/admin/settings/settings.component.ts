@@ -26,12 +26,7 @@ import {
   tap,
 } from 'rxjs'
 import { Group } from 'src/app/data/group'
-import {
-  DEFAULT_DISPLAY_FIELDS,
-  DisplayMode,
-  DisplayField,
-  SavedView,
-} from 'src/app/data/saved-view'
+import { DisplayMode, SavedView } from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { User } from 'src/app/data/user'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
@@ -55,7 +50,6 @@ import {
   SystemStatusItemStatus,
   SystemStatus,
 } from 'src/app/data/system-status'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 
 enum SettingsNavIDs {
   General = 1,
@@ -80,7 +74,7 @@ export class SettingsComponent
   implements OnInit, AfterViewInit, OnDestroy, DirtyComponent
 {
   activeNavID: number
-  DashboardViewMode = DisplayMode
+  DisplayMode = DisplayMode
 
   savedViewGroup = new FormGroup({})
 
@@ -165,8 +159,7 @@ export class SettingsComponent
     private router: Router,
     public permissionsService: PermissionsService,
     private modalService: NgbModal,
-    private systemStatusService: SystemStatusService,
-    private customFieldsService: CustomFieldsService
+    private systemStatusService: SystemStatusService
   ) {
     super()
     this.settings.settingsSaved.subscribe(() => {

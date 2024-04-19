@@ -31,59 +31,57 @@
         @for (doc of documents; track doc.id) {
           <tr>
             @for (field of displayFields; track field; let i = $index) {
-              @if (displayFields.includes(field)) {
-                <td class="py-2 py-md-3 position-relative" [ngClass]="{ 'd-none d-md-table-cell': i > 1 }">
-                  @switch (field) {
-                    @case (DisplayField.ADDED) {
-                      <a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.added | customDate}}</a>
-                    }
-                    @case (DisplayField.CREATED) {
-                      <a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.created_date | customDate}}</a>
-                    }
-                    @case (DisplayField.TITLE) {
-                      <a routerLink="/documents/{{doc.id}}" title="Edit" i18n-title class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.title | documentTitle}}</a>
-                    }
-                    @case (DisplayField.CORRESPONDENT) {
-                      @if (doc.correspondent) {
-                        <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickCorrespondent(doc.correspondent, $event)">{{(doc.correspondent$ | async)?.name}}</a>
-                      }
-                    }
-                    @case (DisplayField.TAGS) {
-                      @for (t of doc.tags$ | async; track t) {
-                        <pngx-tag [tag]="t" class="ms-1" (click)="clickTag(t.id, $event)"></pngx-tag>
-                      }
-                    }
-                    @case (DisplayField.DOCUMENT_TYPE) {
-                      @if (doc.document_type) {
-                        <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickDocType(doc.document_type, $event)">{{(doc.document_type$ | async)?.name}}</a>
-                      }
-                    }
-                    @case (DisplayField.STORAGE_PATH) {
-                      @if (doc.storage_path) {
-                        <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickStoragePath(doc.storage_path, $event)">{{(doc.storage_path$ | async)?.name}}</a>
-                      }
+              <td class="py-2 py-md-3 position-relative" [ngClass]="{ 'd-none d-md-table-cell': i > 1 }">
+                @switch (field) {
+                  @case (DisplayField.ADDED) {
+                    <a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.added | customDate}}</a>
+                  }
+                  @case (DisplayField.CREATED) {
+                    <a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.created_date | customDate}}</a>
+                  }
+                  @case (DisplayField.TITLE) {
+                    <a routerLink="/documents/{{doc.id}}" title="Edit" i18n-title class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.title | documentTitle}}</a>
+                  }
+                  @case (DisplayField.CORRESPONDENT) {
+                    @if (doc.correspondent) {
+                      <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickCorrespondent(doc.correspondent, $event)">{{(doc.correspondent$ | async)?.name}}</a>
                     }
                   }
-                  @if (field.startsWith(DisplayField.CUSTOM_FIELD)) {
-                    <pngx-custom-field-display [document]="doc" [fieldDisplayKey]="field"></pngx-custom-field-display>
+                  @case (DisplayField.TAGS) {
+                    @for (t of doc.tags$ | async; track t) {
+                      <pngx-tag [tag]="t" class="ms-1" (click)="clickTag(t.id, $event)"></pngx-tag>
+                    }
                   }
-                  @if (i === displayFields.length - 1) {
-                    <div class="btn-group position-absolute top-50 end-0 translate-middle-y">
-                      <a [href]="getPreviewUrl(doc)" title="View Preview" i18n-title target="_blank" class="btn px-4 btn-dark border-dark-subtle"
-                        [ngbPopover]="previewContent" [popoverTitle]="doc.title | documentTitle"
-                        autoClose="true" popoverClass="shadow popover-preview" container="body" (mouseenter)="mouseEnterPreviewButton(doc)" (mouseleave)="mouseLeavePreviewButton()" #popover="ngbPopover">
-                        <i-bs width="0.8em" height="0.8em" name="eye"></i-bs>
-                      </a>
-                      <ng-template #previewContent>
-                        <pngx-preview-popup [document]="doc" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()"></pngx-preview-popup>
-                      </ng-template>
-                      <a [href]="getDownloadUrl(doc)" class="btn px-4 btn-dark border-dark-subtle" title="Download" i18n-title (click)="$event.stopPropagation()">
-                        <i-bs width="0.8em" height="0.8em" name="download"></i-bs>
-                      </a>
-                    </div>
+                  @case (DisplayField.DOCUMENT_TYPE) {
+                    @if (doc.document_type) {
+                      <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickDocType(doc.document_type, $event)">{{(doc.document_type$ | async)?.name}}</a>
+                    }
                   }
-                </td>
-              }
+                  @case (DisplayField.STORAGE_PATH) {
+                    @if (doc.storage_path) {
+                      <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickStoragePath(doc.storage_path, $event)">{{(doc.storage_path$ | async)?.name}}</a>
+                    }
+                  }
+                }
+                @if (field.startsWith(DisplayField.CUSTOM_FIELD)) {
+                  <pngx-custom-field-display [document]="doc" [fieldDisplayKey]="field"></pngx-custom-field-display>
+                }
+                @if (i === displayFields.length - 1) {
+                  <div class="btn-group position-absolute top-50 end-0 translate-middle-y">
+                    <a [href]="getPreviewUrl(doc)" title="View Preview" i18n-title target="_blank" class="btn px-4 btn-dark border-dark-subtle"
+                      [ngbPopover]="previewContent" [popoverTitle]="doc.title | documentTitle"
+                      autoClose="true" popoverClass="shadow popover-preview" container="body" (mouseenter)="mouseEnterPreviewButton(doc)" (mouseleave)="mouseLeavePreviewButton()" #popover="ngbPopover">
+                      <i-bs width="0.8em" height="0.8em" name="eye"></i-bs>
+                    </a>
+                    <ng-template #previewContent>
+                      <pngx-preview-popup [document]="doc" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()"></pngx-preview-popup>
+                    </ng-template>
+                    <a [href]="getDownloadUrl(doc)" class="btn px-4 btn-dark border-dark-subtle" title="Download" i18n-title (click)="$event.stopPropagation()">
+                      <i-bs width="0.8em" height="0.8em" name="download"></i-bs>
+                    </a>
+                  </div>
+                }
+              </td>
             }
           </tr>
         }

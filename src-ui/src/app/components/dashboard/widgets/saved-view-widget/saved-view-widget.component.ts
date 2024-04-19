@@ -15,6 +15,7 @@ import {
   SavedView,
   DEFAULT_DISPLAY_FIELDS,
   DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
+  DEFAULT_DASHBOARD_DISPLAY_FIELDS,
 } from 'src/app/data/saved-view'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
@@ -82,12 +83,7 @@ export class SavedViewWidgetComponent
 
   displayMode: DisplayMode
 
-  displayFields: DisplayField[] = [
-    DisplayField.CREATED,
-    DisplayField.TITLE,
-    DisplayField.TAGS,
-    DisplayField.CORRESPONDENT,
-  ]
+  displayFields: DisplayField[] = DEFAULT_DASHBOARD_DISPLAY_FIELDS
 
   ngOnInit(): void {
     this.reload()
@@ -269,11 +265,11 @@ export class SavedViewWidgetComponent
     }, 300)
   }
 
-  public getColumnTitle(column: DisplayField): string {
-    if (column.startsWith(DisplayField.CUSTOM_FIELD)) {
-      const id = column.split('_')[2]
-      return this.customFields.find((c) => c.id === parseInt(id))?.name
+  public getColumnTitle(field: DisplayField): string {
+    if (field.startsWith(DisplayField.CUSTOM_FIELD)) {
+      const id = field.split('_')[2]
+      return this.customFields.find((f) => f.id === parseInt(id))?.name
     }
-    return DEFAULT_DISPLAY_FIELDS.find((c) => c.id === column)?.name
+    return DEFAULT_DISPLAY_FIELDS.find((f) => f.id === field)?.name
   }
 }

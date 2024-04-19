@@ -22,8 +22,6 @@ export enum DisplayField {
   ASN = 'asn',
 }
 
-export const DEFAULT_DASHBOARD_VIEW_PAGE_SIZE = 10
-
 export const DEFAULT_DISPLAY_FIELDS = [
   {
     id: DisplayField.TITLE,
@@ -69,6 +67,15 @@ export const DEFAULT_DISPLAY_FIELDS = [
     id: DisplayField.ASN,
     name: $localize`ASN`,
   },
+]
+
+export const DEFAULT_DASHBOARD_VIEW_PAGE_SIZE = 10
+
+export const DEFAULT_DASHBOARD_DISPLAY_FIELDS = [
+  DisplayField.CREATED,
+  DisplayField.TITLE,
+  DisplayField.TAGS,
+  DisplayField.CORRESPONDENT,
 ]
 
 export interface SavedView extends ObjectWithPermissions {
