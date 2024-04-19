@@ -36,14 +36,18 @@ describe('MergeConfirmDialogComponent', () => {
       { id: 2, name: 'Document 2' },
       { id: 3, name: 'Document 3' },
     ]
-    jest.spyOn(documentService, 'getCachedMany').mockReturnValue(of(documents))
+    jest.spyOn(documentService, 'getFew').mockReturnValue(
+      of({
+        all: documents.map((d) => d.id),
+        count: documents.length,
+        results: documents,
+      })
+    )
 
     component.ngOnInit()
 
     expect(component.documents).toEqual(documents)
-    expect(documentService.getCachedMany).toHaveBeenCalledWith(
-      component.documentIDs
-    )
+    expect(documentService.getFew).toHaveBeenCalledWith(component.documentIDs)
   })
 
   it('should move documentIDs on drop', () => {
@@ -64,7 +68,13 @@ describe('MergeConfirmDialogComponent', () => {
       { id: 2, name: 'Document 2' },
       { id: 3, name: 'Document 3' },
     ]
-    jest.spyOn(documentService, 'getCachedMany').mockReturnValue(of(documents))
+    jest.spyOn(documentService, 'getFew').mockReturnValue(
+      of({
+        all: documents.map((d) => d.id),
+        count: documents.length,
+        results: documents,
+      })
+    )
 
     component.ngOnInit()
 

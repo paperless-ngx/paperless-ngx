@@ -866,9 +866,13 @@ describe('BulkEditorComponent', () => {
     jest
       .spyOn(documentListViewService, 'documents', 'get')
       .mockReturnValue([{ id: 3 }, { id: 4 }])
-    jest
-      .spyOn(documentService, 'getCachedMany')
-      .mockReturnValue(of([{ id: 3 }, { id: 4 }]))
+    jest.spyOn(documentService, 'getFew').mockReturnValue(
+      of({
+        all: [3, 4],
+        count: 2,
+        results: [{ id: 3 }, { id: 4 }],
+      })
+    )
     jest
       .spyOn(documentListViewService, 'selected', 'get')
       .mockReturnValue(new Set([3, 4]))
