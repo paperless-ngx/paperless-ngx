@@ -25,10 +25,7 @@ import {
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
-import {
-  DOCUMENT_SORT_FIELDS,
-  DOCUMENT_SORT_FIELDS_FULLTEXT,
-} from 'src/app/services/rest/document.service'
+import { DocumentService } from 'src/app/services/rest/document.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -56,7 +53,8 @@ export class DocumentListComponent
     private consumerStatusService: ConsumerStatusService,
     public openDocumentsService: OpenDocumentsService,
     private settingsService: SettingsService,
-    public permissionService: PermissionsService
+    public permissionService: PermissionsService,
+    private documentService: DocumentService
   ) {
     super()
   }
@@ -102,9 +100,9 @@ export class DocumentListComponent
   }
 
   getSortFields() {
-    return isFullTextFilterRule(this.list.filterRules)
-      ? DOCUMENT_SORT_FIELDS_FULLTEXT
-      : DOCUMENT_SORT_FIELDS
+    return this.documentService.getSortFields(
+      isFullTextFilterRule(this.list.filterRules)
+    )
   }
 
   set listSortReverse(reverse: boolean) {

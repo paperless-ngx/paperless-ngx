@@ -48,11 +48,7 @@ import { DocumentCardLargeComponent } from './document-card-large/document-card-
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { UsernamePipe } from 'src/app/pipes/username.pipe'
 import { Document } from 'src/app/data/document'
-import {
-  DOCUMENT_SORT_FIELDS,
-  DOCUMENT_SORT_FIELDS_FULLTEXT,
-  DocumentService,
-} from 'src/app/services/rest/document.service'
+import { DocumentService } from 'src/app/services/rest/document.service'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component'
@@ -199,7 +195,9 @@ describe('DocumentListComponent', () => {
       },
     ]
     fixture.detectChanges()
-    expect(component.getSortFields()).toEqual(DOCUMENT_SORT_FIELDS)
+    expect(component.getSortFields()).toEqual(
+      documentService.getSortFields(false)
+    )
 
     documentListService.filterRules = [
       {
@@ -208,7 +206,9 @@ describe('DocumentListComponent', () => {
       },
     ]
     fixture.detectChanges()
-    expect(component.getSortFields()).toEqual(DOCUMENT_SORT_FIELDS_FULLTEXT)
+    expect(component.getSortFields()).toEqual(
+      documentService.getSortFields(true)
+    )
   })
 
   it('should determine if filtered, support reset', () => {
@@ -578,7 +578,7 @@ describe('DocumentListComponent', () => {
     fixture.detectChanges()
     expect(
       fixture.debugElement.queryAll(By.directive(SortableDirective))
-    ).toHaveLength(5)
+    ).toHaveLength(4)
   })
 
   it('should support toggle on document objects', () => {

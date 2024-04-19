@@ -40,7 +40,7 @@
         </label>
       </div>
       <div>
-        @for (f of getSortFields(); track f) {
+        @for (f of getSortFields(); track f.name) {
           <button ngbDropdownItem (click)="setSortField(f.field)"
             [class.active]="list.sortField === f.field">{{f.name}}
           </button>
@@ -158,13 +158,15 @@
             [currentSortReverse]="list.sortReverse"
             (sort)="onSort($event)"
           i18n>Title</th>
-          <th class="d-none d-xl-table-cell"
-            pngxSortable="owner"
-            title="Sort by owner" i18n-title
-            [currentSortField]="list.sortField"
-            [currentSortReverse]="list.sortReverse"
-            (sort)="onSort($event)"
-          i18n>Owner</th>
+          @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.User)) {
+            <th class="d-none d-xl-table-cell"
+              pngxSortable="owner"
+              title="Sort by owner" i18n-title
+              [currentSortField]="list.sortField"
+              [currentSortReverse]="list.sortReverse"
+              (sort)="onSort($event)"
+            i18n>Owner</th>
+          }
           @if (notesEnabled) {
             <th class="d-none d-xl-table-cell"
               pngxSortable="num_notes"
@@ -232,9 +234,11 @@
                   <pngx-tag [tag]="t" class="ms-1" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(t.id);$event.stopPropagation()"></pngx-tag>
                 }
               </td>
-              <td>
-                {{d.owner | username}}
-              </td>
+              @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.User)) {
+                <td>
+                  {{d.owner | username}}
+                </td>
+              }
               @if (notesEnabled) {
                 <td class="d-none d-xl-table-cell">
                   @if (d.notes.length) {

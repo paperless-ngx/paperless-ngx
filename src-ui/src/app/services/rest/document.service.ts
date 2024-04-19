@@ -21,26 +21,6 @@ import {
 import { SettingsService } from '../settings.service'
 import { SETTINGS, SETTINGS_KEYS } from 'src/app/data/ui-settings'
 
-export const DOCUMENT_SORT_FIELDS = [
-  { field: 'archive_serial_number', name: $localize`ASN` },
-  { field: 'correspondent__name', name: $localize`Correspondent` },
-  { field: 'title', name: $localize`Title` },
-  { field: 'document_type__name', name: $localize`Document type` },
-  { field: 'created', name: $localize`Created` },
-  { field: 'added', name: $localize`Added` },
-  { field: 'modified', name: $localize`Modified` },
-  { field: 'num_notes', name: $localize`Notes` },
-  { field: 'owner', name: $localize`Owner` },
-]
-
-export const DOCUMENT_SORT_FIELDS_FULLTEXT = [
-  ...DOCUMENT_SORT_FIELDS,
-  {
-    field: 'score',
-    name: $localize`:Score is a value returned by the full text search engine and specifies how well a result matches the given query:Search score`,
-  },
-]
-
 export interface SelectionDataItem {
   id: number
   document_count: number
@@ -240,5 +220,65 @@ export class DocumentService extends AbstractPaperlessService<Document> {
 
   public set searchQuery(query: string) {
     this._searchQuery = query
+  }
+
+  getSortFields(fulltext: boolean) {
+    let result = [{ field: 'archive_serial_number', name: $localize`ASN` }]
+
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Correspondent
+      )
+    ) {
+      result.push({
+        field: 'correspondent__name',
+        name: $localize`Correspondent`,
+      })
+    }
+    result.push({ field: 'title', name: $localize`Title` })
+
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.DocumentType
+      )
+    ) {
+      result.push({
+        field: 'document_type__name',
+        name: $localize`Document type`,
+      })
+    }
+
+    result.push(
+      ...[
+        { field: 'created', name: $localize`Created` },
+        { field: 'added', name: $localize`Added` },
+        { field: 'modified', name: $localize`Modified` },
+      ]
+    )
+
+    if (this.settingsService.get(SETTINGS_KEYS.NOTES_ENABLED)) {
+      result.push({ field: 'num_notes', name: $localize`Notes` })
+    }
+
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.User
+      )
+    ) {
+      result.push({ field: 'owner', name: $localize`Owner` })
+    }
+
+    if (fulltext) {
+      result.push({
+        field: 'score',
+        name: $localize`:Score is a value returned by the full text search engine and specifies how well a result matches the given query:Search score`,
+      })
+    }
+
+    console.log('Returing sort fields', result)
+    return result
   }
 }
