@@ -746,49 +746,48 @@ class DocumentViewSet(
         except Document.DoesNotExist:  # pragma: no cover
             raise Http404
 
-        if request.method == "GET":
-            # documents
-            entries = [
+        # documents
+        entries = [
+            {
+                "id": entry.id,
+                "timestamp": entry.timestamp,
+                "action": entry.get_action_display(),
+                "changes": entry.changes,
+                "actor": (
+                    {"id": entry.actor.id, "username": entry.actor.username}
+                    if entry.actor
+                    else None
+                ),
+            }
+            for entry in LogEntry.objects.filter(object_pk=doc.pk)
+        ]
+
+        # custom fields
+        for entry in LogEntry.objects.filter(
+            object_pk__in=doc.custom_fields.values_list("id", flat=True),
+            content_type=ContentType.objects.get_for_model(CustomFieldInstance),
+        ):
+            entries.append(
                 {
                     "id": entry.id,
                     "timestamp": entry.timestamp,
                     "action": entry.get_action_display(),
-                    "changes": entry.changes,
+                    "changes": {
+                        "custom_fields": {
+                            "type": "custom_field",
+                            "field": str(entry.object_repr).split(":")[0].strip(),
+                            "value": str(entry.object_repr).split(":")[1].strip(),
+                        },
+                    },
                     "actor": (
                         {"id": entry.actor.id, "username": entry.actor.username}
                         if entry.actor
                         else None
                     ),
-                }
-                for entry in LogEntry.objects.filter(object_pk=doc.pk)
-            ]
+                },
+            )
 
-            # custom fields
-            for entry in LogEntry.objects.filter(
-                object_pk__in=doc.custom_fields.values_list("id", flat=True),
-                content_type=ContentType.objects.get_for_model(CustomFieldInstance),
-            ):
-                entries.append(
-                    {
-                        "id": entry.id,
-                        "timestamp": entry.timestamp,
-                        "action": entry.get_action_display(),
-                        "changes": {
-                            "custom_fields": {
-                                "type": "custom_field",
-                                "field": str(entry.object_repr).split(":")[0].strip(),
-                                "value": str(entry.object_repr).split(":")[1].strip(),
-                            },
-                        },
-                        "actor": (
-                            {"id": entry.actor.id, "username": entry.actor.username}
-                            if entry.actor
-                            else None
-                        ),
-                    },
-                )
-
-            return Response(sorted(entries, key=lambda x: x["timestamp"], reverse=True))
+        return Response(sorted(entries, key=lambda x: x["timestamp"], reverse=True))
 
 
 class SearchResultSerializer(DocumentSerializer, PassUserMixin):
