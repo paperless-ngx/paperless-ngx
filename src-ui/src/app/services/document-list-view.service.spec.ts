@@ -13,9 +13,9 @@ import {
   FILTER_HAS_TAGS_ANY,
 } from '../data/filter-rule-type'
 import {
-  DEFAULT_DOCUMENT_DISPLAY_FIELDS,
+  DEFAULT_DISPLAY_FIELDS,
   DisplayMode,
-  DocumentDisplayField,
+  DisplayField,
   SavedView,
 } from '../data/saved-view'
 import { FilterRule } from '../data/filter-rule'
@@ -569,25 +569,25 @@ describe('DocumentListViewService', () => {
 
   it('should update default view state when display fields change', () => {
     const localStorageSpy = jest.spyOn(localStorage, 'setItem')
-    documentListViewService.documentDisplayFields = [
-      DocumentDisplayField.ADDED,
-      DocumentDisplayField.TITLE,
+    documentListViewService.displayFields = [
+      DisplayField.ADDED,
+      DisplayField.TITLE,
     ]
-    expect(documentListViewService.documentDisplayFields).toEqual([
-      DocumentDisplayField.ADDED,
-      DocumentDisplayField.TITLE,
+    expect(documentListViewService.displayFields).toEqual([
+      DisplayField.ADDED,
+      DisplayField.TITLE,
     ])
     expect(localStorageSpy).toHaveBeenCalled()
     // reload triggered
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
     )
-    documentListViewService.documentDisplayFields = null
+    documentListViewService.displayFields = null
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
     )
-    expect(documentListViewService.documentDisplayFields).toEqual(
-      DEFAULT_DOCUMENT_DISPLAY_FIELDS.map((f) => f.id)
+    expect(documentListViewService.displayFields).toEqual(
+      DEFAULT_DISPLAY_FIELDS.map((f) => f.id)
     )
   })
 })

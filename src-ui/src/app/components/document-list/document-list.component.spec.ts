@@ -35,9 +35,9 @@ import { Subject, of, throwError } from 'rxjs'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router'
 import {
-  DEFAULT_DOCUMENT_DISPLAY_FIELDS,
+  DEFAULT_DISPLAY_FIELDS,
   DisplayMode,
-  DocumentDisplayField,
+  DisplayField,
   SavedView,
 } from 'src/app/data/saved-view'
 import {
@@ -331,7 +331,7 @@ describe('DocumentListComponent', () => {
   })
 
   it('should support setting sort field by table head', () => {
-    component.activeDisplayFields = [DocumentDisplayField.ASN]
+    component.activeDisplayFields = [DisplayField.ASN]
     jest.spyOn(documentListService, 'documents', 'get').mockReturnValue(docs)
     fixture.detectChanges()
     expect(documentListService.sortField).toEqual('created')
@@ -555,7 +555,7 @@ describe('DocumentListComponent', () => {
       ],
       page_size: 5,
       display_mode: DisplayMode.SMALL_CARDS,
-      document_display_fields: [DocumentDisplayField.TITLE],
+      display_fields: [DisplayField.TITLE],
     }
     jest.spyOn(savedViewService, 'getCached').mockReturnValue(of(view))
     const queryParams = { view: view.id.toString() }
@@ -567,9 +567,9 @@ describe('DocumentListComponent', () => {
     fixture.detectChanges()
     expect(documentListService.activeSavedViewId).toEqual(10)
 
-    component.list.documentDisplayFields = [DocumentDisplayField.ASN]
+    component.list.displayFields = [DisplayField.ASN]
     expect(component.savedViewIsModified).toBeTruthy()
-    component.list.documentDisplayFields = [DocumentDisplayField.TITLE]
+    component.list.displayFields = [DisplayField.TITLE]
     expect(component.savedViewIsModified).toBeFalsy()
     component.list.displayMode = DisplayMode.TABLE
     expect(component.savedViewIsModified).toBeTruthy()
@@ -590,9 +590,7 @@ describe('DocumentListComponent', () => {
     expect(documentListService.sortField).toEqual('created')
 
     component.list.displayMode = DisplayMode.TABLE
-    component.list.documentDisplayFields = DEFAULT_DOCUMENT_DISPLAY_FIELDS.map(
-      (f) => f.id
-    )
+    component.list.displayFields = DEFAULT_DISPLAY_FIELDS.map((f) => f.id)
     fixture.detectChanges()
 
     expect(
@@ -635,19 +633,19 @@ describe('DocumentListComponent', () => {
 
   it('should support toggling display fields', () => {
     fixture.detectChanges()
-    component.activeDisplayFields = [DocumentDisplayField.ASN]
-    component.toggleDisplayField(DocumentDisplayField.TITLE)
+    component.activeDisplayFields = [DisplayField.ASN]
+    component.toggleDisplayField(DisplayField.TITLE)
     expect(component.activeDisplayFields).toEqual([
-      DocumentDisplayField.ASN,
-      DocumentDisplayField.TITLE,
+      DisplayField.ASN,
+      DisplayField.TITLE,
     ])
-    component.toggleDisplayField(DocumentDisplayField.ASN)
-    expect(component.activeDisplayFields).toEqual([DocumentDisplayField.TITLE])
+    component.toggleDisplayField(DisplayField.ASN)
+    expect(component.activeDisplayFields).toEqual([DisplayField.TITLE])
   })
 
   it('should get custom field title', () => {
     fixture.detectChanges()
-    settingsService.allDocumentDisplayFields = [
+    settingsService.allDisplayFields = [
       { id: 'custom_field_1', name: 'Custom Field 1' },
     ]
     expect(component.getDisplayCustomFieldTitle('custom_field_1')).toEqual(

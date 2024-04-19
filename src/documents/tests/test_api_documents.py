@@ -1614,7 +1614,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             status.HTTP_404_NOT_FOUND,
         )
 
-    def test_savedview_create_update_patch(self):
+    def test_saved_view_create_update_patch(self):
         User.objects.create_user("user1")
 
         view = {
@@ -1661,7 +1661,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         v1 = SavedView.objects.get(id=v1.id)
         self.assertEqual(v1.filter_rules.count(), 0)
 
-    def test_saved_view_dashboard_view_options(self):
+    def test_saved_view_display_options(self):
         User.objects.create_user("user1")
 
         view = {
@@ -1671,10 +1671,10 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             "sort_field": "created2",
             "filter_rules": [{"rule_type": 4, "value": "test"}],
             "page_size": 20,
-            "display_mode": SavedView.ViewDisplayMode.SMALL_CARDS,
-            "document_display_fields": [
-                SavedView.DocumentDisplayFields.TITLE,
-                SavedView.DocumentDisplayFields.CREATED,
+            "display_mode": SavedView.DisplayMode.SMALL_CARDS,
+            "display_fields": [
+                SavedView.DisplayFields.TITLE,
+                SavedView.DisplayFields.CREATED,
             ],
         }
 
@@ -1685,23 +1685,23 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(v1.page_size, 20)
         self.assertEqual(
             v1.display_mode,
-            SavedView.ViewDisplayMode.SMALL_CARDS,
+            SavedView.DisplayMode.SMALL_CARDS,
         )
         self.assertEqual(
-            v1.document_display_fields,
+            v1.display_fields,
             [
-                SavedView.DocumentDisplayFields.TITLE,
-                SavedView.DocumentDisplayFields.CREATED,
+                SavedView.DisplayFields.TITLE,
+                SavedView.DisplayFields.CREATED,
             ],
         )
 
         response = self.client.patch(
             f"/api/saved_views/{v1.id}/",
             {
-                "document_display_fields": [
-                    SavedView.DocumentDisplayFields.TAGS,
-                    SavedView.DocumentDisplayFields.TITLE,
-                    SavedView.DocumentDisplayFields.CREATED,
+                "display_fields": [
+                    SavedView.DisplayFields.TAGS,
+                    SavedView.DisplayFields.TITLE,
+                    SavedView.DisplayFields.CREATED,
                 ],
             },
             format="json",
@@ -1710,15 +1710,15 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         v1.refresh_from_db()
         self.assertEqual(
-            v1.document_display_fields,
+            v1.display_fields,
             [
-                SavedView.DocumentDisplayFields.TAGS,
-                SavedView.DocumentDisplayFields.TITLE,
-                SavedView.DocumentDisplayFields.CREATED,
+                SavedView.DisplayFields.TAGS,
+                SavedView.DisplayFields.TITLE,
+                SavedView.DisplayFields.CREATED,
             ],
         )
 
-    def test_saved_view_dashboard_view_customfields(self):
+    def test_saved_view_display_customfields(self):
         view = {
             "name": "test",
             "show_on_dashboard": True,
@@ -1726,10 +1726,10 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             "sort_field": "created2",
             "filter_rules": [{"rule_type": 4, "value": "test"}],
             "page_size": 20,
-            "display_mode": SavedView.ViewDisplayMode.SMALL_CARDS,
-            "document_display_fields": [
-                SavedView.DocumentDisplayFields.TITLE,
-                SavedView.DocumentDisplayFields.CREATED,
+            "display_mode": SavedView.DisplayMode.SMALL_CARDS,
+            "display_fields": [
+                SavedView.DisplayFields.TITLE,
+                SavedView.DisplayFields.CREATED,
             ],
         }
 
@@ -1746,11 +1746,10 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         response = self.client.patch(
             f"/api/saved_views/{v1.id}/",
             {
-                "document_display_fields": [
-                    SavedView.DocumentDisplayFields.TITLE,
-                    SavedView.DocumentDisplayFields.CREATED,
-                    SavedView.DynamicDocumentDisplayFields.CUSTOM_FIELD[0]
-                    % custom_field.id,
+                "display_fields": [
+                    SavedView.DisplayFields.TITLE,
+                    SavedView.DisplayFields.CREATED,
+                    SavedView.DynamicDisplayFields.CUSTOM_FIELD[0] % custom_field.id,
                 ],
             },
             format="json",
@@ -1759,12 +1758,11 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         v1.refresh_from_db()
         self.assertEqual(
-            v1.document_display_fields,
+            v1.display_fields,
             [
-                str(SavedView.DocumentDisplayFields.TITLE),
-                str(SavedView.DocumentDisplayFields.CREATED),
-                SavedView.DynamicDocumentDisplayFields.CUSTOM_FIELD[0]
-                % custom_field.id,
+                str(SavedView.DisplayFields.TITLE),
+                str(SavedView.DisplayFields.CREATED),
+                SavedView.DynamicDisplayFields.CUSTOM_FIELD[0] % custom_field.id,
             ],
         )
 
@@ -1772,10 +1770,10 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         response = self.client.patch(
             f"/api/saved_views/{v1.id}/",
             {
-                "document_display_fields": [
-                    SavedView.DocumentDisplayFields.TITLE,
-                    SavedView.DocumentDisplayFields.CREATED,
-                    SavedView.DynamicDocumentDisplayFields.CUSTOM_FIELD[0] % 99,
+                "display_fields": [
+                    SavedView.DisplayFields.TITLE,
+                    SavedView.DisplayFields.CREATED,
+                    SavedView.DynamicDisplayFields.CUSTOM_FIELD[0] % 99,
                 ],
             },
             format="json",

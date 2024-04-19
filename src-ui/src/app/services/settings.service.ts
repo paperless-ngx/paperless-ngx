@@ -26,8 +26,8 @@ import {
 } from './permissions.service'
 import { ToastService } from './toast.service'
 import {
-  DEFAULT_DOCUMENT_DISPLAY_FIELDS,
-  DocumentDisplayField,
+  DEFAULT_DISPLAY_FIELDS,
+  DisplayField,
   SavedView,
 } from '../data/saved-view'
 import { CustomFieldsService } from './rest/custom-fields.service'
@@ -266,7 +266,7 @@ export class SettingsService {
   public globalDropzoneActive: boolean = false
   public organizingSidebarSavedViews: boolean = false
 
-  public allDocumentDisplayFields: any
+  public allDisplayFields: any
 
   constructor(
     rendererFactory: RendererFactory2,
@@ -307,7 +307,7 @@ export class SettingsService {
   }
 
   public initializeDisplayFields() {
-    this.allDocumentDisplayFields = DEFAULT_DOCUMENT_DISPLAY_FIELDS
+    this.allDisplayFields = DEFAULT_DISPLAY_FIELDS
 
     if (
       this.permissionsService.currentUserCan(
@@ -316,10 +316,10 @@ export class SettingsService {
       )
     ) {
       this.customFieldsService.listAll().subscribe((r) => {
-        this.allDocumentDisplayFields = DEFAULT_DOCUMENT_DISPLAY_FIELDS.concat(
+        this.allDisplayFields = DEFAULT_DISPLAY_FIELDS.concat(
           r.results.map((field) => {
             return {
-              id: `${DocumentDisplayField.CUSTOM_FIELD}${field.id}` as any,
+              id: `${DisplayField.CUSTOM_FIELD}${field.id}` as any,
               name: field.name,
             }
           })

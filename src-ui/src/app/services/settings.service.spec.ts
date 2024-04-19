@@ -13,8 +13,8 @@ import { AppModule } from '../app.module'
 import { UiSettings, SETTINGS_KEYS } from '../data/ui-settings'
 import { SettingsService } from './settings.service'
 import {
-  DEFAULT_DOCUMENT_DISPLAY_FIELDS,
-  DocumentDisplayField,
+  DEFAULT_DISPLAY_FIELDS,
+  DisplayField,
   SavedView,
 } from '../data/saved-view'
 import { CustomFieldsService } from './rest/custom-fields.service'
@@ -352,14 +352,11 @@ describe('SettingsService', () => {
     )
     settingsService.initializeDisplayFields()
     expect(
-      settingsService.allDocumentDisplayFields.includes(
-        DEFAULT_DOCUMENT_DISPLAY_FIELDS[0]
-      )
+      settingsService.allDisplayFields.includes(DEFAULT_DISPLAY_FIELDS[0])
     ).toBeTruthy()
     expect(
-      settingsService.allDocumentDisplayFields.find(
-        (f) =>
-          f.id === `${DocumentDisplayField.CUSTOM_FIELD}${customFields[0].id}`
+      settingsService.allDisplayFields.find(
+        (f) => f.id === `${DisplayField.CUSTOM_FIELD}${customFields[0].id}`
       ).name
     ).toEqual(customFields[0].name)
   })

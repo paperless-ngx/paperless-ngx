@@ -27,9 +27,9 @@ import {
 } from 'rxjs'
 import { Group } from 'src/app/data/group'
 import {
-  DEFAULT_DOCUMENT_DISPLAY_FIELDS,
+  DEFAULT_DISPLAY_FIELDS,
   DisplayMode,
-  DocumentDisplayField,
+  DisplayField,
   SavedView,
 } from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
@@ -117,8 +117,8 @@ export class SettingsComponent
 
   savedViews: SavedView[]
   SettingsNavIDs = SettingsNavIDs
-  get documentDisplayFields() {
-    return this.settings.allDocumentDisplayFields
+  get displayFields() {
+    return this.settings.allDisplayFields
   }
 
   store: BehaviorSubject<any>
@@ -353,7 +353,7 @@ export class SettingsComponent
           show_in_sidebar: view.show_in_sidebar,
           page_size: view.page_size,
           display_mode: view.display_mode,
-          document_display_fields: view.document_display_fields,
+          display_fields: view.display_fields,
         }
         this.savedViewGroup.addControl(
           view.id.toString(),
@@ -364,7 +364,7 @@ export class SettingsComponent
             show_in_sidebar: new FormControl(null),
             page_size: new FormControl(null),
             display_mode: new FormControl(null),
-            document_display_fields: new FormControl([]),
+            display_fields: new FormControl([]),
           })
         )
       }

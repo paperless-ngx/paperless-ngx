@@ -363,8 +363,8 @@
                     <option [ngValue]="DashboardViewMode.LARGE_CARDS" i18n>Large Cards</option>
                   </select>
                 </div>
-                  @if (documentDisplayFields) {
-                    <pngx-input-drag-drop-select i18n-title title="Show" [items]="documentDisplayFields" formControlName="document_display_fields"></pngx-input-drag-drop-select>
+                  @if (displayFields) {
+                    <pngx-input-drag-drop-select i18n-title title="Show" [items]="displayFields" formControlName="display_fields"></pngx-input-drag-drop-select>
                   }
                 </div>
             </div>

@@ -552,12 +552,12 @@ class DynamicMultiSelectField(MultiSelectField):
 
 
 class SavedView(ModelWithOwner):
-    class ViewDisplayMode(models.TextChoices):
+    class DisplayMode(models.TextChoices):
         TABLE = ("table", _("Table"))
         SMALL_CARDS = ("smallCards", _("Small Cards"))
         LARGE_CARDS = ("largeCards", _("Large Cards"))
 
-    class DocumentDisplayFields(models.TextChoices):
+    class DisplayFields(models.TextChoices):
         TITLE = ("title", _("Title"))
         CREATED = ("created", _("Created"))
         ADDED = ("added", _("Added"))
@@ -566,7 +566,7 @@ class SavedView(ModelWithOwner):
         CORRESPONDENT = ("correspondent", _("Correspondent"))
         STORAGE_PATH = ("storagepath", _("Storage Path"))
 
-    class DynamicDocumentDisplayFields:
+    class DynamicDisplayFields:
         CUSTOM_FIELD = ("custom_field_%d", CustomField)
 
     name = models.CharField(_("name"), max_length=128)
@@ -596,17 +596,17 @@ class SavedView(ModelWithOwner):
     display_mode = models.CharField(
         max_length=128,
         verbose_name=_("View display mode"),
-        choices=ViewDisplayMode.choices,
+        choices=DisplayMode.choices,
         null=True,
         blank=True,
     )
 
-    document_display_fields = DynamicMultiSelectField(
+    display_fields = DynamicMultiSelectField(
         max_length=128,
         verbose_name=_("Document display fields"),
-        choices=DocumentDisplayFields.choices,
-        dyanmic_choices=[DynamicDocumentDisplayFields.CUSTOM_FIELD],
-        default=f"{DocumentDisplayFields.CREATED},{DocumentDisplayFields.TITLE},{DocumentDisplayFields.TAGS},{DocumentDisplayFields.CORRESPONDENT}",
+        choices=DisplayFields.choices,
+        dyanmic_choices=[DynamicDisplayFields.CUSTOM_FIELD],
+        default=f"{DisplayFields.CREATED},{DisplayFields.TITLE},{DisplayFields.TAGS},{DisplayFields.CORRESPONDENT}",
     )
 
     class Meta:

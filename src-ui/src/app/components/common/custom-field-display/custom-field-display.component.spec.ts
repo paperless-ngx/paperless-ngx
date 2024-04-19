@@ -6,7 +6,7 @@ import { CustomFieldDisplayComponent } from './custom-field-display.component'
 import { Document } from 'src/app/data/document'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { DocumentDisplayField } from 'src/app/data/saved-view'
+import { DisplayField } from 'src/app/data/saved-view'
 
 const customFields: CustomField[] = [
   { id: 1, name: 'Field 1', data_type: CustomFieldDataType.String },
@@ -57,7 +57,7 @@ describe('CustomFieldDisplayComponent', () => {
       .spyOn(documentService, 'getFew')
       .mockReturnValue(of({ results: [] } as any))
 
-    component.fieldDisplayKey = DocumentDisplayField.CUSTOM_FIELD + '2'
+    component.fieldDisplayKey = DisplayField.CUSTOM_FIELD + '2'
     expect(component.fieldId).toEqual(2)
     component.document = document
     expect(component.document.title).toEqual('Doc 1')

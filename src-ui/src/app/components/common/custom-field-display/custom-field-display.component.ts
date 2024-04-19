@@ -3,7 +3,7 @@ import { Subject, takeUntil } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { Document } from 'src/app/data/document'
 import { Results } from 'src/app/data/results'
-import { DocumentDisplayField } from 'src/app/data/saved-view'
+import { DisplayField } from 'src/app/data/saved-view'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 
@@ -39,10 +39,7 @@ export class CustomFieldDisplayComponent implements OnInit, OnDestroy {
 
   @Input()
   set fieldDisplayKey(key: string) {
-    this.fieldId = parseInt(
-      key.replace(DocumentDisplayField.CUSTOM_FIELD, ''),
-      10
-    )
+    this.fieldId = parseInt(key.replace(DisplayField.CUSTOM_FIELD, ''), 10)
   }
 
   value: any

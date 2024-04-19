@@ -839,8 +839,8 @@ class DynamicOrderedMultipleChoiceField(fields.MultipleChoiceField):
 
 class SavedViewSerializer(OwnedObjectSerializer):
     filter_rules = SavedViewFilterRuleSerializer(many=True)
-    document_display_fields = DynamicOrderedMultipleChoiceField(
-        choices=SavedView.DocumentDisplayFields.choices,
+    display_fields = DynamicOrderedMultipleChoiceField(
+        choices=SavedView.DisplayFields.choices,
         dyanmic_choices=[("custom_field_%d", CustomField)],
         required=False,
     )
@@ -857,7 +857,7 @@ class SavedViewSerializer(OwnedObjectSerializer):
             "filter_rules",
             "page_size",
             "display_mode",
-            "document_display_fields",
+            "display_fields",
             "owner",
             "permissions",
             "user_can_change",

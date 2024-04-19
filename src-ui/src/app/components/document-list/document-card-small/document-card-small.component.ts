@@ -12,10 +12,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
-import {
-  DEFAULT_DOCUMENT_DISPLAY_FIELDS,
-  DocumentDisplayField,
-} from 'src/app/data/saved-view'
+import { DEFAULT_DISPLAY_FIELDS, DisplayField } from 'src/app/data/saved-view'
 
 @Component({
   selector: 'pngx-document-card-small',
@@ -23,7 +20,7 @@ import {
   styleUrls: ['./document-card-small.component.scss'],
 })
 export class DocumentCardSmallComponent extends ComponentWithPermissions {
-  DocumentDisplayField = DocumentDisplayField
+  DisplayField = DisplayField
 
   constructor(
     private documentService: DocumentService,
@@ -42,7 +39,7 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
   document: Document
 
   @Input()
-  displayFields: string[] = DEFAULT_DOCUMENT_DISPLAY_FIELDS.map((f) => f.id)
+  displayFields: string[] = DEFAULT_DISPLAY_FIELDS.map((f) => f.id)
 
   @Output()
   dblClickDocument = new EventEmitter()

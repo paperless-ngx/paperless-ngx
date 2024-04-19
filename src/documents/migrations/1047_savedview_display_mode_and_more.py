@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name="savedview",
-            name="document_display_fields",
+            name="display_fields",
             field=multiselectfield.db.fields.MultiSelectField(
                 choices=[
                     ("title", "Title"),

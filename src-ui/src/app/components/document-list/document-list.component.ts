@@ -16,11 +16,7 @@ import {
 } from 'src/app/utils/filter-rules'
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
 import { Document } from 'src/app/data/document'
-import {
-  DisplayMode,
-  DocumentDisplayField,
-  SavedView,
-} from 'src/app/data/saved-view'
+import { DisplayMode, DisplayField, SavedView } from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import {
   SortableDirective,
@@ -50,7 +46,7 @@ export class DocumentListComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy
 {
-  DocumentDisplayField = DocumentDisplayField
+  DisplayField = DisplayField
   DisplayMode = DisplayMode
 
   constructor(
@@ -73,12 +69,12 @@ export class DocumentListComponent
 
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>
 
-  get activeDisplayFields(): DocumentDisplayField[] {
-    return this.list.documentDisplayFields
+  get activeDisplayFields(): DisplayField[] {
+    return this.list.displayFields
   }
 
-  set activeDisplayFields(fields: DocumentDisplayField[]) {
-    this.list.documentDisplayFields = fields
+  set activeDisplayFields(fields: DisplayField[]) {
+    this.list.displayFields = fields
     this.updateDisplayCustomFields()
   }
   activeDisplayCustomFields: Set<string> = new Set()
@@ -88,7 +84,7 @@ export class DocumentListComponent
       Array.from(this.activeDisplayFields).filter(
         (field) =>
           typeof field === 'string' &&
-          field.startsWith(DocumentDisplayField.CUSTOM_FIELD)
+          field.startsWith(DisplayField.CUSTOM_FIELD)
       )
     )
   }
@@ -107,7 +103,7 @@ export class DocumentListComponent
         (this.unmodifiedSavedView.page_size &&
           this.unmodifiedSavedView.page_size !== this.list.pageSize) ||
         this.unmodifiedSavedView.display_mode !== this.list.displayMode ||
-        this.unmodifiedSavedView.document_display_fields.join(',') !==
+        this.unmodifiedSavedView.display_fields.join(',') !==
           this.activeDisplayFields.join(',') ||
         filterRulesDiffer(
           this.unmodifiedSavedView.filter_rules,
@@ -153,7 +149,7 @@ export class DocumentListComponent
     return this.list.selected.size > 0
   }
 
-  toggleDisplayField(field: DocumentDisplayField) {
+  toggleDisplayField(field: DisplayField) {
     if (this.activeDisplayFields.includes(field)) {
       this.activeDisplayFields = this.activeDisplayFields.filter(
         (f) => f !== field
@@ -165,9 +161,8 @@ export class DocumentListComponent
   }
 
   public getDisplayCustomFieldTitle(field: string) {
-    return this.settingsService.allDocumentDisplayFields.find(
-      (f) => f.id === field
-    )?.name
+    return this.settingsService.allDisplayFields.find((f) => f.id === field)
+      ?.name
   }
 
   ngOnInit(): void {
@@ -198,8 +193,8 @@ export class DocumentListComponent
         if (!view.display_mode) {
           view.display_mode = this.list.displayMode
         }
-        if (!view.document_display_fields) {
-          view.document_display_fields = this.list.documentDisplayFields
+        if (!view.display_fields) {
+          view.display_fields = this.list.displayFields
         }
         this.unmodifiedSavedView = view
         this.list.activateSavedViewWithQueryParams(

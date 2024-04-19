@@ -18,11 +18,7 @@ import {
   FILTER_HAS_TAGS_ALL,
   FILTER_STORAGE_PATH,
 } from 'src/app/data/filter-rule-type'
-import {
-  DisplayMode,
-  DocumentDisplayField,
-  SavedView,
-} from 'src/app/data/saved-view'
+import { DisplayMode, DisplayField, SavedView } from 'src/app/data/saved-view'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
@@ -60,15 +56,15 @@ const savedView: SavedView = {
   ],
   page_size: 20,
   display_mode: DisplayMode.TABLE,
-  document_display_fields: [
-    DocumentDisplayField.CREATED,
-    DocumentDisplayField.TITLE,
-    DocumentDisplayField.TAGS,
-    DocumentDisplayField.CORRESPONDENT,
-    DocumentDisplayField.DOCUMENT_TYPE,
-    DocumentDisplayField.STORAGE_PATH,
-    `${DocumentDisplayField.CUSTOM_FIELD}11` as any,
-    `${DocumentDisplayField.CUSTOM_FIELD}15` as any,
+  display_fields: [
+    DisplayField.CREATED,
+    DisplayField.TITLE,
+    DisplayField.TAGS,
+    DisplayField.CORRESPONDENT,
+    DisplayField.DOCUMENT_TYPE,
+    DisplayField.STORAGE_PATH,
+    `${DisplayField.CUSTOM_FIELD}11` as any,
+    `${DisplayField.CUSTOM_FIELD}15` as any,
   ],
 }
 
@@ -332,23 +328,17 @@ describe('SavedViewWidgetComponent', () => {
   })
 
   it('should get correct column title', () => {
-    expect(component.getColumnTitle(DocumentDisplayField.TITLE)).toEqual(
-      'Title'
+    expect(component.getColumnTitle(DisplayField.TITLE)).toEqual('Title')
+    expect(component.getColumnTitle(DisplayField.CREATED)).toEqual('Created')
+    expect(component.getColumnTitle(DisplayField.ADDED)).toEqual('Added')
+    expect(component.getColumnTitle(DisplayField.TAGS)).toEqual('Tags')
+    expect(component.getColumnTitle(DisplayField.CORRESPONDENT)).toEqual(
+      'Correspondent'
     )
-    expect(component.getColumnTitle(DocumentDisplayField.CREATED)).toEqual(
-      'Created'
+    expect(component.getColumnTitle(DisplayField.DOCUMENT_TYPE)).toEqual(
+      'Document type'
     )
-    expect(component.getColumnTitle(DocumentDisplayField.ADDED)).toEqual(
-      'Added'
-    )
-    expect(component.getColumnTitle(DocumentDisplayField.TAGS)).toEqual('Tags')
-    expect(
-      component.getColumnTitle(DocumentDisplayField.CORRESPONDENT)
-    ).toEqual('Correspondent')
-    expect(
-      component.getColumnTitle(DocumentDisplayField.DOCUMENT_TYPE)
-    ).toEqual('Document type')
-    expect(component.getColumnTitle(DocumentDisplayField.STORAGE_PATH)).toEqual(
+    expect(component.getColumnTitle(DisplayField.STORAGE_PATH)).toEqual(
       'Storage path'
     )
   })

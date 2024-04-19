@@ -7,7 +7,7 @@ export enum DisplayMode {
   LARGE_CARDS = 'largeCards',
 }
 
-export enum DocumentDisplayField {
+export enum DisplayField {
   TITLE = 'title',
   CREATED = 'created',
   ADDED = 'added',
@@ -22,51 +22,51 @@ export enum DocumentDisplayField {
   ASN = 'asn',
 }
 
-export const DEFAULT_PAGE_SIZE = 10
+export const DEFAULT_DASHBOARD_VIEW_PAGE_SIZE = 10
 
-export const DEFAULT_DOCUMENT_DISPLAY_FIELDS = [
+export const DEFAULT_DISPLAY_FIELDS = [
   {
-    id: DocumentDisplayField.TITLE,
+    id: DisplayField.TITLE,
     name: $localize`Title`,
   },
   {
-    id: DocumentDisplayField.CREATED,
+    id: DisplayField.CREATED,
     name: $localize`Created`,
   },
   {
-    id: DocumentDisplayField.ADDED,
+    id: DisplayField.ADDED,
     name: $localize`Added`,
   },
   {
-    id: DocumentDisplayField.TAGS,
+    id: DisplayField.TAGS,
     name: $localize`Tags`,
   },
   {
-    id: DocumentDisplayField.CORRESPONDENT,
+    id: DisplayField.CORRESPONDENT,
     name: $localize`Correspondent`,
   },
   {
-    id: DocumentDisplayField.DOCUMENT_TYPE,
+    id: DisplayField.DOCUMENT_TYPE,
     name: $localize`Document type`,
   },
   {
-    id: DocumentDisplayField.STORAGE_PATH,
+    id: DisplayField.STORAGE_PATH,
     name: $localize`Storage path`,
   },
   {
-    id: DocumentDisplayField.NOTES,
+    id: DisplayField.NOTES,
     name: $localize`Notes`,
   },
   {
-    id: DocumentDisplayField.OWNER,
+    id: DisplayField.OWNER,
     name: $localize`Owner`,
   },
   {
-    id: DocumentDisplayField.SHARED,
+    id: DisplayField.SHARED,
     name: $localize`Shared`,
   },
   {
-    id: DocumentDisplayField.ASN,
+    id: DisplayField.ASN,
     name: $localize`ASN`,
   },
 ]
@@ -88,5 +88,5 @@ export interface SavedView extends ObjectWithPermissions {
 
   display_mode?: DisplayMode
 
-  document_display_fields?: DocumentDisplayField[]
+  display_fields?: DisplayField[]
 }

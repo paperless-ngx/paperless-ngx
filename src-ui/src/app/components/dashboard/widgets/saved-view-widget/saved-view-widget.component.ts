@@ -10,11 +10,11 @@ import { Router } from '@angular/router'
 import { Subject, takeUntil } from 'rxjs'
 import { Document } from 'src/app/data/document'
 import {
-  DocumentDisplayField,
+  DisplayField,
   DisplayMode,
   SavedView,
-  DEFAULT_DOCUMENT_DISPLAY_FIELDS,
-  DEFAULT_PAGE_SIZE,
+  DEFAULT_DISPLAY_FIELDS,
+  DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
 } from 'src/app/data/saved-view'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
@@ -47,7 +47,7 @@ export class SavedViewWidgetComponent
   implements OnInit, OnDestroy
 {
   public DashboardViewMode = DisplayMode
-  public DashboardViewTableColumn = DocumentDisplayField
+  public DashboardViewTableColumn = DisplayField
   public CustomFieldDataType = CustomFieldDataType
 
   loading: boolean = true
@@ -80,10 +80,10 @@ export class SavedViewWidgetComponent
   mouseOnPreview = false
   popoverHidden = true
 
-  activeDisplayFields: DocumentDisplayField[] = [
-    DocumentDisplayField.TITLE,
-    DocumentDisplayField.CREATED,
-    DocumentDisplayField.ADDED,
+  activeDisplayFields: DisplayField[] = [
+    DisplayField.TITLE,
+    DisplayField.CREATED,
+    DisplayField.ADDED,
   ]
 
   ngOnInit(): void {
@@ -109,11 +109,11 @@ export class SavedViewWidgetComponent
         })
     }
 
-    this.savedView.document_display_fields?.forEach((column) => {
+    this.savedView.display_fields?.forEach((column) => {
       let type: PermissionType = Object.values(PermissionType).find((t) =>
         t.includes(column)
       )
-      if (column.startsWith(DocumentDisplayField.CUSTOM_FIELD)) {
+      if (column.startsWith(DisplayField.CUSTOM_FIELD)) {
         type = PermissionType.CustomField
       }
       if (
@@ -134,7 +134,7 @@ export class SavedViewWidgetComponent
     this.documentService
       .listFiltered(
         1,
-        this.savedView.page_size ?? DEFAULT_PAGE_SIZE,
+        this.savedView.page_size ?? DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
         this.savedView.sort_field,
         this.savedView.sort_reverse,
         this.savedView.filter_rules,
@@ -252,11 +252,11 @@ export class SavedViewWidgetComponent
     }, 300)
   }
 
-  public getColumnTitle(column: DocumentDisplayField): string {
-    if (column.startsWith(DocumentDisplayField.CUSTOM_FIELD)) {
+  public getColumnTitle(column: DisplayField): string {
+    if (column.startsWith(DisplayField.CUSTOM_FIELD)) {
       const id = column.split('_')[2]
       return this.customFields.find((c) => c.id === parseInt(id))?.name
     }
-    return DEFAULT_DOCUMENT_DISPLAY_FIELDS.find((c) => c.id === column)?.name
+    return DEFAULT_DISPLAY_FIELDS.find((c) => c.id === column)?.name
   }
 }

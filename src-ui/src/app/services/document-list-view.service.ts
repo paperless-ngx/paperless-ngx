@@ -9,9 +9,9 @@ import {
 } from '../utils/filter-rules'
 import { Document } from '../data/document'
 import {
-  DEFAULT_DOCUMENT_DISPLAY_FIELDS,
+  DEFAULT_DISPLAY_FIELDS,
   DisplayMode,
-  DocumentDisplayField,
+  DisplayField,
   SavedView,
 } from '../data/saved-view'
 import { SETTINGS_KEYS } from '../data/ui-settings'
@@ -78,7 +78,7 @@ export interface ListViewState {
   /**
    * The fields to display in the document list.
    */
-  documentDisplayFields?: DocumentDisplayField[]
+  displayFields?: DisplayField[]
 }
 
 /**
@@ -196,8 +196,7 @@ export class DocumentListViewService {
     }
     this.activeListViewState.displayMode = view.display_mode
     this.activeListViewState.pageSize = view.page_size
-    this.activeListViewState.documentDisplayFields =
-      view.document_display_fields
+    this.activeListViewState.displayFields = view.display_fields
 
     this.reduceSelectionToFilter()
 
@@ -411,15 +410,15 @@ export class DocumentListViewService {
     )
   }
 
-  get documentDisplayFields(): DocumentDisplayField[] {
+  get displayFields(): DisplayField[] {
     return (
-      this.activeListViewState.documentDisplayFields ??
-      DEFAULT_DOCUMENT_DISPLAY_FIELDS.map((f) => f.id)
+      this.activeListViewState.displayFields ??
+      DEFAULT_DISPLAY_FIELDS.map((f) => f.id)
     )
   }
 
-  set documentDisplayFields(fields: DocumentDisplayField[]) {
-    this.activeListViewState.documentDisplayFields = fields
+  set displayFields(fields: DisplayField[]) {
+    this.activeListViewState.displayFields = fields
     this.saveDocumentListView()
   }
 
@@ -432,7 +431,7 @@ export class DocumentListViewService {
         sortField: this.activeListViewState.sortField,
         sortReverse: this.activeListViewState.sortReverse,
         displayMode: this.activeListViewState.displayMode,
-        documentDisplayFields: this.activeListViewState.documentDisplayFields,
+        displayFields: this.activeListViewState.displayFields,
       }
       localStorage.setItem(
         DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG,
