@@ -6,7 +6,7 @@
     <div ngbDropdownMenu aria-labelledby="customFieldsDropdown" class="shadow custom-fields-dropdown">
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
-                <pngx-input-select class="mb-3"
+                <pngx-input-select
                     [items]="unusedFields"
                     bindLabel="name"
                     [(ngModel)]="field"
@@ -14,14 +14,15 @@
                     [notFoundText]="notFoundText"
                     [disableCreateNew]="!canCreateFields"
                     (createNew)="createField($event)"
+                    [hideAddButton]="true"
                     bindValue="id">
                 </pngx-input-select>
                 <div class="btn-toolbar" role="toolbar">
                     <button class="btn btn-sm btn-outline-secondary me-auto" type="button" (click)="createField()" [disabled]="!canCreateFields">
                         <i-bs width="1em" height="1em" name="asterisk"></i-bs>&nbsp;<ng-container i18n>Create New Field</ng-container>
                     </button>
-                    <button class="btn btn-sm btn-outline-primary me-1" type="button" (click)="addField(); fieldDropdown.close()" [disabled]="field === undefined">
-                        <i-bs width="1.2em" height="1.2em" name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add</ng-container>
+                    <button class="btn btn-sm btn-outline-primary" type="button" (click)="addField(); fieldDropdown.close()" [disabled]="field === undefined">
+                        <i-bs width="1.2em" height="1.2em" name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add to document</ng-container>
                     </button>
                 </div>
             </li>
