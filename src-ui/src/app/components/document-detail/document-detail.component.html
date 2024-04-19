@@ -112,7 +112,7 @@
               <pngx-input-select [items]="storagePaths" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
               (createNew)="createStoragePath($event)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }"></pngx-input-select>
               <pngx-input-tags formControlName="tags" [suggestions]="suggestions?.tags" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></pngx-input-tags>
-              @for (fieldInstance of document?.custom_fields; track fieldInstance; let i = $index) {
+              @for (fieldInstance of document?.custom_fields; track fieldInstance.field; let i = $index) {
                 <div [formGroup]="customFieldFormFields.controls[i]">
                   @switch (getCustomFieldFromInstance(fieldInstance)?.data_type) {
                     @case (CustomFieldDataType.String) {
