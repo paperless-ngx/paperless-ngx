@@ -15,8 +15,8 @@ import {
   isFullTextFilterRule,
 } from 'src/app/utils/filter-rules'
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
-import { Document } from 'src/app/data/document'
-import { DisplayMode, DisplayField, SavedView } from 'src/app/data/saved-view'
+import { DisplayField, DisplayMode, Document } from 'src/app/data/document'
+import { SavedView } from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import {
   SortableDirective,

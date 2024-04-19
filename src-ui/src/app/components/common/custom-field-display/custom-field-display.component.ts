@@ -1,9 +1,8 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core'
 import { Subject, takeUntil } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
-import { Document } from 'src/app/data/document'
+import { DisplayField, Document } from 'src/app/data/document'
 import { Results } from 'src/app/data/results'
-import { DisplayField } from 'src/app/data/saved-view'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 

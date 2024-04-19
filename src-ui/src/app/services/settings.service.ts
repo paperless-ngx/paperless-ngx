@@ -25,12 +25,9 @@ import {
   PermissionsService,
 } from './permissions.service'
 import { ToastService } from './toast.service'
-import {
-  DEFAULT_DISPLAY_FIELDS,
-  DisplayField,
-  SavedView,
-} from '../data/saved-view'
+import { SavedView } from '../data/saved-view'
 import { CustomFieldsService } from './rest/custom-fields.service'
+import { DEFAULT_DISPLAY_FIELDS, DisplayField } from '../data/document'
 
 export interface LanguageOption {
   code: string

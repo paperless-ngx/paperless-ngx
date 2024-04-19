@@ -34,12 +34,7 @@ import {
 import { Subject, of, throwError } from 'rxjs'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router'
-import {
-  DEFAULT_DISPLAY_FIELDS,
-  DisplayMode,
-  DisplayField,
-  SavedView,
-} from 'src/app/data/saved-view'
+import { SavedView } from 'src/app/data/saved-view'
 import {
   FILTER_FULLTEXT_MORELIKE,
   FILTER_FULLTEXT_QUERY,
@@ -52,7 +47,12 @@ import { DocumentCardSmallComponent } from './document-card-small/document-card-
 import { DocumentCardLargeComponent } from './document-card-large/document-card-large.component'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { UsernamePipe } from 'src/app/pipes/username.pipe'
-import { Document } from 'src/app/data/document'
+import {
+  DEFAULT_DISPLAY_FIELDS,
+  DisplayField,
+  DisplayMode,
+  Document,
+} from 'src/app/data/document'
 import {
   DOCUMENT_SORT_FIELDS,
   DOCUMENT_SORT_FIELDS_FULLTEXT,

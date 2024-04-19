@@ -7,13 +7,13 @@ import {
   cloneFilterRules,
   isFullTextFilterRule,
 } from '../utils/filter-rules'
-import { Document } from '../data/document'
 import {
   DEFAULT_DISPLAY_FIELDS,
-  DisplayMode,
   DisplayField,
-  SavedView,
-} from '../data/saved-view'
+  DisplayMode,
+  Document,
+} from '../data/document'
+import { SavedView } from '../data/saved-view'
 import { SETTINGS_KEYS } from '../data/ui-settings'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
 import { paramsFromViewState, paramsToViewState } from '../utils/query-params'

@@ -3,10 +3,9 @@ import { of } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { CustomFieldDisplayComponent } from './custom-field-display.component'
-import { Document } from 'src/app/data/document'
+import { DisplayField, Document } from 'src/app/data/document'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { DisplayField } from 'src/app/data/saved-view'
 
 const customFields: CustomField[] = [
   { id: 1, name: 'Field 1', data_type: CustomFieldDataType.String },

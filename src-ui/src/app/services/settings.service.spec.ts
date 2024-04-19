@@ -12,14 +12,11 @@ import { environment } from 'src/environments/environment'
 import { AppModule } from '../app.module'
 import { UiSettings, SETTINGS_KEYS } from '../data/ui-settings'
 import { SettingsService } from './settings.service'
-import {
-  DEFAULT_DISPLAY_FIELDS,
-  DisplayField,
-  SavedView,
-} from '../data/saved-view'
+import { SavedView } from '../data/saved-view'
 import { CustomFieldsService } from './rest/custom-fields.service'
 import { CustomFieldDataType } from '../data/custom-field'
 import { PermissionsService } from './permissions.service'
+import { DEFAULT_DISPLAY_FIELDS, DisplayField } from '../data/document'
 
 const customFields = [
   {

@@ -26,7 +26,7 @@ import {
   tap,
 } from 'rxjs'
 import { Group } from 'src/app/data/group'
-import { DisplayMode, SavedView } from 'src/app/data/saved-view'
+import { SavedView } from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { User } from 'src/app/data/user'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
@@ -50,6 +50,7 @@ import {
   SystemStatusItemStatus,
   SystemStatus,
 } from 'src/app/data/system-status'
+import { DisplayMode } from 'src/app/data/document'
 
 enum SettingsNavIDs {
   General = 1,

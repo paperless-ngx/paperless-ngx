@@ -6,13 +6,16 @@ import {
   ViewChild,
 } from '@angular/core'
 import { map } from 'rxjs/operators'
-import { Document } from 'src/app/data/document'
+import {
+  DEFAULT_DISPLAY_FIELDS,
+  DisplayField,
+  Document,
+} from 'src/app/data/document'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
-import { DEFAULT_DISPLAY_FIELDS, DisplayField } from 'src/app/data/saved-view'
 
 @Component({
   selector: 'pngx-document-card-small',

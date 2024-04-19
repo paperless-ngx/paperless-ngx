@@ -8,15 +8,15 @@ import {
 } from '@angular/core'
 import { Router } from '@angular/router'
 import { Subject, takeUntil } from 'rxjs'
-import { Document } from 'src/app/data/document'
 import {
+  DEFAULT_DASHBOARD_DISPLAY_FIELDS,
+  DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
+  DEFAULT_DISPLAY_FIELDS,
   DisplayField,
   DisplayMode,
-  SavedView,
-  DEFAULT_DISPLAY_FIELDS,
-  DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
-  DEFAULT_DASHBOARD_DISPLAY_FIELDS,
-} from 'src/app/data/saved-view'
+  Document,
+} from 'src/app/data/document'
+import { SavedView } from 'src/app/data/saved-view'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import {

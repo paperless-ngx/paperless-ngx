@@ -12,19 +12,18 @@ import {
   FILTER_HAS_TAGS_ALL,
   FILTER_HAS_TAGS_ANY,
 } from '../data/filter-rule-type'
-import {
-  DEFAULT_DISPLAY_FIELDS,
-  DisplayMode,
-  DisplayField,
-  SavedView,
-} from '../data/saved-view'
+import { SavedView } from '../data/saved-view'
 import { FilterRule } from '../data/filter-rule'
 import { RouterTestingModule } from '@angular/router/testing'
 import { routes } from 'src/app/app-routing.module'
 import { PermissionsGuard } from '../guards/permissions.guard'
 import { SettingsService } from './settings.service'
 import { SETTINGS_KEYS } from '../data/ui-settings'
-import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
+import {
+  DisplayMode,
+  DisplayField,
+  DEFAULT_DISPLAY_FIELDS,
+} from '../data/document'
 
 const documents = [
   {

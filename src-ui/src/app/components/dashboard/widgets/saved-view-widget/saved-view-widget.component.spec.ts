@@ -18,7 +18,7 @@ import {
   FILTER_HAS_TAGS_ALL,
   FILTER_STORAGE_PATH,
 } from 'src/app/data/filter-rule-type'
-import { DisplayMode, DisplayField, SavedView } from 'src/app/data/saved-view'
+import { SavedView } from 'src/app/data/saved-view'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
@@ -40,6 +40,7 @@ import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldDisplayComponent } from 'src/app/components/common/custom-field-display/custom-field-display.component'
+import { DisplayMode, DisplayField } from 'src/app/data/document'
 
 const savedView: SavedView = {
   id: 1,
