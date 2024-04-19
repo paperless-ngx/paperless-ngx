@@ -69,7 +69,7 @@ describe('HotKeyService', () => {
     expect(modalSpy).not.toHaveBeenCalled()
   })
 
-  it('should dismiss all modals on escape but not fire event', () => {
+  it('should dismiss all modals on escape and not fire event', () => {
     const callback = jest.fn()
     service
       .addShortcut({ keys: 'escape', description: 'Escape' })
@@ -82,6 +82,18 @@ describe('HotKeyService', () => {
     const dismissAllSpy = jest.spyOn(modalService, 'dismissAll')
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
     expect(dismissAllSpy).toHaveBeenCalled()
+    expect(callback).not.toHaveBeenCalled()
+  })
+
+  it('should not fire event on escape when open dropdowns ', () => {
+    const callback = jest.fn()
+    service
+      .addShortcut({ keys: 'escape', description: 'Escape' })
+      .subscribe(callback)
+    const dropdown = document.createElement('div')
+    dropdown.classList.add('dropdown-menu', 'show')
+    document.body.appendChild(dropdown)
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
     expect(callback).not.toHaveBeenCalled()
   })
 })

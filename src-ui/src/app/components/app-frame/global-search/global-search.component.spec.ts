@@ -276,6 +276,9 @@ describe('GlobalSearchComponent', () => {
     component.primaryAction(DataType.Document, object)
     expect(routerSpy).toHaveBeenCalledWith(['/documents', object.id])
 
+    component.primaryAction(DataType.SavedView, object)
+    expect(routerSpy).toHaveBeenCalledWith(['/view', object.id])
+
     component.primaryAction(DataType.Correspondent, object)
     expect(qfSpy).toHaveBeenCalledWith([
       { rule_type: FILTER_HAS_CORRESPONDENT_ANY, value: object.id.toString() },

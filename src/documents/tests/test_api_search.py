@@ -1225,3 +1225,15 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(results["mail_rules"][0]["id"], mail_rule1.id)
         self.assertEqual(results["custom_fields"][0]["id"], custom_field1.id)
         self.assertEqual(results["workflows"][0]["id"], workflow1.id)
+
+    def test_global_search_bad_request(self):
+        """
+        WHEN:
+            - Global search query is made without or with query < 3 characters
+        THEN:
+            - Error is returned
+        """
+        response = self.client.get("/api/search/")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        response = self.client.get("/api/search/?query=no")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
