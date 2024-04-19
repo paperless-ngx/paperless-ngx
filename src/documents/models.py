@@ -523,7 +523,7 @@ class CustomFieldInstance(models.Model):
             return self.value_monetary
         elif self.field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
             return self.value_document_ids
-        raise NotImplementedError(self.field.data_type)
+        raise NotImplementedError(self.field.data_type)  # pragma: no cover
 
 
 class DynamicMultiSelectField(MultiSelectField):
