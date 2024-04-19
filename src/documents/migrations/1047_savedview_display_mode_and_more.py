@@ -42,6 +42,7 @@ class Migration(migrations.Migration):
             model_name="savedview",
             name="display_fields",
             field=multiselectfield.db.fields.MultiSelectField(
+                blank=True,
                 choices=[
                     ("title", "Title"),
                     ("created", "Created"),
@@ -51,8 +52,9 @@ class Migration(migrations.Migration):
                     ("correspondent", "Correspondent"),
                     ("storagepath", "Storage Path"),
                 ],
-                default="created,title,tag,correspondent",
                 max_length=128,
+                null=True,
+                verbose_name="Document display fields",
             ),
         ),
     ]

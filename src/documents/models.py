@@ -606,7 +606,8 @@ class SavedView(ModelWithOwner):
         verbose_name=_("Document display fields"),
         choices=DisplayFields.choices,
         dyanmic_choices=[DynamicDisplayFields.CUSTOM_FIELD],
-        default=f"{DisplayFields.CREATED},{DisplayFields.TITLE},{DisplayFields.TAGS},{DisplayFields.CORRESPONDENT}",
+        null=True,
+        blank=True,
     )
 
     class Meta:

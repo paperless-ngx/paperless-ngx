@@ -9,19 +9,19 @@
     <a class="btn-link text-decoration-none" header-buttons [routerLink]="[]" (click)="showAll()" i18n>Show all</a>
   }
 
-  @if (documents.length && (!savedView.display_mode || savedView.display_mode === DashboardViewMode.TABLE)) {
+  @if (documents.length && displayMode === DisplayMode.TABLE) {
     <table content class="table table-hover mb-0 mt-n2 align-middle">
       <thead>
         <tr>
-          @for (column of savedView.display_fields; track column; let i = $index) {
-            @if (activeDisplayFields.includes(column)) {
+          @for (field of displayFields; track field; let i = $index) {
+            @if (displayFields.includes(field)) {
               <th
                 scope="col"
                 [ngClass]="{
                   'd-none d-md-table-cell': i > 1,
-                  'w-25': column === DashboardViewTableColumn.CREATED || column === DashboardViewTableColumn.ADDED
+                  'w-25': field === DisplayField.CREATED || field === DisplayField.ADDED
                 }">
-                {{ getColumnTitle(column) }}
+                {{ getColumnTitle(field) }}
               </th>
             }
           }
@@ -30,44 +30,44 @@
       <tbody>
         @for (doc of documents; track doc.id) {
           <tr>
-            @for (column of savedView.display_fields; track column; let i = $index) {
-              @if (activeDisplayFields.includes(column)) {
+            @for (field of displayFields; track field; let i = $index) {
+              @if (displayFields.includes(field)) {
                 <td class="py-2 py-md-3 position-relative" [ngClass]="{ 'd-none d-md-table-cell': i > 1 }">
-                  @switch (column) {
-                    @case (DashboardViewTableColumn.ADDED) {
+                  @switch (field) {
+                    @case (DisplayField.ADDED) {
                       <a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.added | customDate}}</a>
                     }
-                    @case (DashboardViewTableColumn.CREATED) {
+                    @case (DisplayField.CREATED) {
                       <a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.created_date | customDate}}</a>
                     }
-                    @case (DashboardViewTableColumn.TITLE) {
+                    @case (DisplayField.TITLE) {
                       <a routerLink="/documents/{{doc.id}}" title="Edit" i18n-title class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.title | documentTitle}}</a>
                     }
-                    @case (DashboardViewTableColumn.CORRESPONDENT) {
+                    @case (DisplayField.CORRESPONDENT) {
                       @if (doc.correspondent) {
                         <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickCorrespondent(doc.correspondent, $event)">{{(doc.correspondent$ | async)?.name}}</a>
                       }
                     }
-                    @case (DashboardViewTableColumn.TAGS) {
+                    @case (DisplayField.TAGS) {
                       @for (t of doc.tags$ | async; track t) {
                         <pngx-tag [tag]="t" class="ms-1" (click)="clickTag(t.id, $event)"></pngx-tag>
                       }
                     }
-                    @case (DashboardViewTableColumn.DOCUMENT_TYPE) {
+                    @case (DisplayField.DOCUMENT_TYPE) {
                       @if (doc.document_type) {
                         <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickDocType(doc.document_type, $event)">{{(doc.document_type$ | async)?.name}}</a>
                       }
                     }
-                    @case (DashboardViewTableColumn.STORAGE_PATH) {
+                    @case (DisplayField.STORAGE_PATH) {
                       @if (doc.storage_path) {
                         <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickStoragePath(doc.storage_path, $event)">{{(doc.storage_path$ | async)?.name}}</a>
                       }
                     }
                   }
-                  @if (column.startsWith(DashboardViewTableColumn.CUSTOM_FIELD)) {
-                    <pngx-custom-field-display [document]="doc" [fieldDisplayKey]="column"></pngx-custom-field-display>
+                  @if (field.startsWith(DisplayField.CUSTOM_FIELD)) {
+                    <pngx-custom-field-display [document]="doc" [fieldDisplayKey]="field"></pngx-custom-field-display>
                   }
-                  @if (i === savedView.display_fields.length - 1) {
+                  @if (i === displayFields.length - 1) {
                     <div class="btn-group position-absolute top-50 end-0 translate-middle-y">
                       <a [href]="getPreviewUrl(doc)" title="View Preview" i18n-title target="_blank" class="btn px-4 btn-dark border-dark-subtle"
                         [ngbPopover]="previewContent" [popoverTitle]="doc.title | documentTitle"
@@ -89,14 +89,14 @@
         }
       </tbody>
     </table>
-  } @else if (documents.length && savedView.display_mode === DashboardViewMode.SMALL_CARDS) {
+  } @else if (documents.length && displayMode === DisplayMode.SMALL_CARDS) {
     <div class="row row-cols-paperless-cards my-n2">
       @for (d of documents; track d.id) {
         <pngx-document-card-small
           class="p-0"
           (dblClickDocument)="openDocumentDetail(d)"
           [document]="d"
-          [displayFields]="activeDisplayFields"
+          [displayFields]="displayFields"
           (clickTag)="clickTag($event)"
           (clickCorrespondent)="clickCorrespondent($event)"
           (clickStoragePath)="clickStoragePath($event)"
@@ -104,13 +104,13 @@
         </pngx-document-card-small>
       }
     </div>
-  } @else if (documents.length && savedView.display_mode === DashboardViewMode.LARGE_CARDS) {
+  } @else if (documents.length && displayMode === DisplayMode.LARGE_CARDS) {
     <div class="row my-n2">
       @for (d of documents; track d.id) {
         <pngx-document-card-large
           (dblClickDocument)="openDocumentDetail(d)"
           [document]="d"
-          [displayFields]="activeDisplayFields"
+          [displayFields]="displayFields"
           (clickTag)="clickTag($event)"
           (clickCorrespondent)="clickCorrespondent($event)"
           (clickStoragePath)="clickStoragePath($event)"

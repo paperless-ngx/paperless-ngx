@@ -46,8 +46,8 @@ export class SavedViewWidgetComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy
 {
-  public DashboardViewMode = DisplayMode
-  public DashboardViewTableColumn = DisplayField
+  public DisplayMode = DisplayMode
+  public DisplayField = DisplayField
   public CustomFieldDataType = CustomFieldDataType
 
   loading: boolean = true
@@ -80,14 +80,18 @@ export class SavedViewWidgetComponent
   mouseOnPreview = false
   popoverHidden = true
 
-  activeDisplayFields: DisplayField[] = [
-    DisplayField.TITLE,
+  displayMode: DisplayMode
+
+  displayFields: DisplayField[] = [
     DisplayField.CREATED,
-    DisplayField.ADDED,
+    DisplayField.TITLE,
+    DisplayField.TAGS,
+    DisplayField.CORRESPONDENT,
   ]
 
   ngOnInit(): void {
     this.reload()
+    this.displayMode = this.savedView.display_mode ?? DisplayMode.TABLE
     this.consumerStatusService
       .onDocumentConsumptionFinished()
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -109,19 +113,32 @@ export class SavedViewWidgetComponent
         })
     }
 
-    this.savedView.display_fields?.forEach((column) => {
-      let type: PermissionType = Object.values(PermissionType).find((t) =>
-        t.includes(column)
-      )
-      if (column.startsWith(DisplayField.CUSTOM_FIELD)) {
-        type = PermissionType.CustomField
-      }
-      if (
-        type &&
-        this.permissionsService.currentUserCan(PermissionAction.View, type)
-      )
-        this.activeDisplayFields.push(column)
-    })
+    if (this.savedView.display_fields) {
+      this.displayFields = this.savedView.display_fields
+        ?.map((field) => {
+          if (
+            [
+              DisplayField.TITLE,
+              DisplayField.CREATED,
+              DisplayField.ADDED,
+            ].includes(field)
+          ) {
+            return field
+          }
+
+          let type: PermissionType = Object.values(PermissionType).find((t) =>
+            t.includes(field)
+          )
+          if (field.startsWith(DisplayField.CUSTOM_FIELD)) {
+            type = PermissionType.CustomField
+          }
+          return type &&
+            this.permissionsService.currentUserCan(PermissionAction.View, type)
+            ? field
+            : null
+        })
+        .filter((f) => f)
+    }
   }
 
   ngOnDestroy(): void {

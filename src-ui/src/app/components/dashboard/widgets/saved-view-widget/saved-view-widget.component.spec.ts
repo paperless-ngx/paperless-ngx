@@ -342,4 +342,39 @@ describe('SavedViewWidgetComponent', () => {
       'Storage path'
     )
   })
+
+  it('should hide fields if no perms', () => {
+    fixture = TestBed.createComponent(SavedViewWidgetComponent)
+    component = fixture.componentInstance
+    component.savedView = {
+      sort_field: 'added',
+      sort_reverse: true,
+      show_in_sidebar: true,
+      show_on_dashboard: true,
+      filter_rules: [],
+      display_fields: [DisplayField.TITLE, 'foo' as any, 'bar' as any],
+    }
+    component.ngOnInit()
+    expect(component.displayFields).toEqual([DisplayField.TITLE])
+  })
+
+  it('should use fallback display settings', () => {
+    fixture = TestBed.createComponent(SavedViewWidgetComponent)
+    component = fixture.componentInstance
+    component.savedView = {
+      sort_field: 'added',
+      sort_reverse: true,
+      show_in_sidebar: true,
+      show_on_dashboard: true,
+      filter_rules: [],
+    }
+    component.ngOnInit()
+    expect(component.displayMode).toEqual(DisplayMode.TABLE)
+    expect(component.displayFields).toEqual([
+      DisplayField.CREATED,
+      DisplayField.TITLE,
+      DisplayField.TAGS,
+      DisplayField.CORRESPONDENT,
+    ])
+  })
 })

@@ -1,6 +1,6 @@
 <div class="d-flex flex-row mt-2 align-items-center">
-    {{title}}:
-    <div class="ms-2 d-flex flex-row gap-2 w-100"
+    <span class="me-2">{{title}}:</span>
+    <div class="d-flex flex-row gap-2 w-100 mh-1" style="min-height: 1em;"
         cdkDropList #selectedList="cdkDropList"
         cdkDropListOrientation="horizontal"
         (cdkDropListDropped)="drop($event)"
@@ -11,7 +11,7 @@
     </div>
 </div>
 <div class="d-flex flex-row mt-2 align-items-center bg-light p-2">
-    <div class="d-flex flex-row gap-2 w-100"
+    <div class="d-flex flex-row gap-2 w-100 mh-1" style="min-height: 1em;"
         cdkDropList #unselectedList="cdkDropList"
         cdkDropListOrientation="horizontal"
         (cdkDropListDropped)="drop($event)"

@@ -32,6 +32,9 @@ describe('DragDropSelectComponent', () => {
       { id: '2', name: 'Item 2' },
       { id: '3', name: 'Item 3' },
     ])
+
+    component.writeValue(null)
+    expect(component.selectedItems).toEqual([])
   })
 
   it('should update selectedItems when an item is dropped within selectedList', () => {

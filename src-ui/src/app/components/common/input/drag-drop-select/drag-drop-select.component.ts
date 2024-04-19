@@ -34,9 +34,8 @@ export class DragDropSelectComponent extends AbstractInputComponent<string[]> {
 
   writeValue(newValue: string[]): void {
     super.writeValue(newValue)
-    this.selectedItems = newValue.map((id) =>
-      this.items.find((i) => i.id === id)
-    )
+    this.selectedItems =
+      newValue?.map((id) => this.items.find((i) => i.id === id)) ?? []
   }
 
   public drop(event: CdkDragDrop<string[]>) {

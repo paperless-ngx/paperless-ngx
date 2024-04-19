@@ -102,9 +102,11 @@ export class DocumentListComponent
         this.unmodifiedSavedView.sort_reverse !== this.list.sortReverse ||
         (this.unmodifiedSavedView.page_size &&
           this.unmodifiedSavedView.page_size !== this.list.pageSize) ||
-        this.unmodifiedSavedView.display_mode !== this.list.displayMode ||
-        this.unmodifiedSavedView.display_fields.join(',') !==
-          this.activeDisplayFields.join(',') ||
+        (this.unmodifiedSavedView.display_mode &&
+          this.unmodifiedSavedView.display_mode !== this.list.displayMode) ||
+        (this.unmodifiedSavedView.display_fields &&
+          this.unmodifiedSavedView.display_fields.join(',') !==
+            this.activeDisplayFields.join(',')) ||
         filterRulesDiffer(
           this.unmodifiedSavedView.filter_rules,
           this.list.filterRules
@@ -189,12 +191,6 @@ export class DocumentListComponent
             replaceUrl: true,
           })
           return
-        }
-        if (!view.display_mode) {
-          view.display_mode = this.list.displayMode
-        }
-        if (!view.display_fields) {
-          view.display_fields = this.list.displayFields
         }
         this.unmodifiedSavedView = view
         this.list.activateSavedViewWithQueryParams(
