@@ -33,6 +33,9 @@
                     @if (type === DataType.Document) {
                         <i-bs width="1em" height="1em" name="pencil"></i-bs>
                         <span>&nbsp;<ng-container i18n>Open</ng-container></span>
+                    } @else if (type === DataType.SavedView) {
+                        <i-bs width="1em" height="1em" name="eye"></i-bs>
+                        <span>&nbsp;<ng-container i18n>Open</ng-container></span>
                     } @else if (type === DataType.Workflow || type === DataType.CustomField || type === DataType.Group || type === DataType.User || type === DataType.MailAccount || type === DataType.MailRule) {
                         <i-bs width="1em" height="1em" name="pencil"></i-bs>
                         <span>&nbsp;<ng-container i18n>Edit</ng-container></span>
@@ -41,7 +44,7 @@
                         <span>&nbsp;<ng-container i18n>Filter documents</ng-container></span>
                     }
                 </button>
-                @if (type !== DataType.Workflow && type !== DataType.CustomField && type !== DataType.Group && type !== DataType.User && type !== DataType.MailAccount && type !== DataType.MailRule) {
+                @if (type !== DataType.SavedView && type !== DataType.Workflow && type !== DataType.CustomField && type !== DataType.Group && type !== DataType.User && type !== DataType.MailAccount && type !== DataType.MailRule) {
                     <button #secondaryButton type="button" class="btn btn-sm btn-outline-primary d-flex"
                     (click)="secondaryAction(type, item); $event.stopPropagation()"
                     [disabled]="disableSecondaryButton(type, item)"
@@ -67,6 +70,12 @@
                 <h6 class="dropdown-header" i18n="@@searchResults.documents">Documents</h6>
                 @for (document of searchResults.documents; track document.id) {
                     <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: document, nameProp: 'title', type: DataType.Document, icon: 'file-text', date: document.added}"></ng-container>
+                }
+            }
+            @if (searchResults?.saved_views.length) {
+                <h6 class="dropdown-header" i18n="@@searchResults.saved_views">Saved Views</h6>
+                @for (saved_view of searchResults.saved_views; track saved_view.id) {
+                    <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: saved_view, nameProp: 'name', type: DataType.SavedView, icon: 'funnel'}"></ng-container>
                 }
             }
 

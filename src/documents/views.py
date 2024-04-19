@@ -1135,7 +1135,13 @@ class GlobalSearchView(PassUserMixin):
                     )._get_query()
                     results = s.search(q, limit=OBJECT_LIMIT)
                     docs = docs | all_docs.filter(id__in=[r["id"] for r in results])
-
+        saved_views = (
+            SavedView.objects.filter(owner=request.user, name__icontains=query)[
+                :OBJECT_LIMIT
+            ]
+            if request.user.has_perm("documents.view_savedview")
+            else []
+        )
         tags = (
             get_objects_for_user_owner_aware(request.user, "view_tag", Tag).filter(
                 name__icontains=query,
@@ -1206,6 +1212,11 @@ class GlobalSearchView(PassUserMixin):
         }
 
         docs_serializer = DocumentSerializer(docs, many=True, context=context)
+        saved_views_serializer = SavedViewSerializer(
+            saved_views,
+            many=True,
+            context=context,
+        )
         tags_serializer = TagSerializer(tags, many=True, context=context)
         correspondents_serializer = CorrespondentSerializer(
             correspondents,
@@ -1244,6 +1255,7 @@ class GlobalSearchView(PassUserMixin):
         return Response(
             {
                 "total": len(docs)
+                + len(saved_views)
                 + len(tags)
                 + len(correspondents)
                 + len(document_types)
@@ -1255,6 +1267,7 @@ class GlobalSearchView(PassUserMixin):
                 + len(workflows)
                 + len(custom_fields),
                 "documents": docs_serializer.data,
+                "saved_views": saved_views_serializer.data,
                 "tags": tags_serializer.data,
                 "correspondents": correspondents_serializer.data,
                 "document_types": document_types_serializer.data,

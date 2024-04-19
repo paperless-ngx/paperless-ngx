@@ -51,6 +51,12 @@ const searchResults = {
       custom_fields: [],
     },
   ],
+  saved_views: [
+    {
+      id: 1,
+      name: 'TestSavedView',
+    },
+  ],
   correspondents: [
     {
       id: 1,

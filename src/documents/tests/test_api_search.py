@@ -21,6 +21,7 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
+from documents.models import SavedView
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import Workflow
@@ -1171,10 +1172,17 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         StoragePath.objects.create(name="path 2", path="path2")
         tag1 = Tag.objects.create(name="bank tag1")
         Tag.objects.create(name="tag2")
-        user1 = User.objects.create_user("bank user1")
+        user1 = User.objects.create_superuser("bank user1")
         User.objects.create_user("user2")
         group1 = Group.objects.create(name="bank group1")
         Group.objects.create(name="group2")
+        SavedView.objects.create(
+            name="bank view",
+            show_on_dashboard=True,
+            show_in_sidebar=True,
+            sort_field="",
+            owner=user1,
+        )
         mail_account1 = MailAccount.objects.create(name="bank mail account 1")
         mail_account2 = MailAccount.objects.create(name="mail account 2")
         mail_rule1 = MailRule.objects.create(
@@ -1198,10 +1206,13 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         workflow1 = Workflow.objects.create(name="bank workflow 1")
         Workflow.objects.create(name="workflow 2")
 
+        self.client.force_authenticate(user1)
+
         response = self.client.get("/api/search/?query=bank")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data
         self.assertEqual(len(results["documents"]), 2)
+        self.assertEqual(len(results["saved_views"]), 1)
         self.assertNotEqual(results["documents"][0]["id"], d3.id)
         self.assertNotEqual(results["documents"][1]["id"], d3.id)
         self.assertEqual(results["correspondents"][0]["id"], correspondent1.id)

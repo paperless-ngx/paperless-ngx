@@ -15,10 +15,12 @@ import { User } from 'src/app/data/user'
 import { Workflow } from 'src/app/data/workflow'
 import { SettingsService } from '../settings.service'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { SavedView } from 'src/app/data/saved-view'
 
 export interface GlobalSearchResult {
   total: number
   documents: Document[]
+  saved_views: SavedView[]
   correspondents: Correspondent[]
   document_types: DocumentType[]
   storage_paths: StoragePath[]

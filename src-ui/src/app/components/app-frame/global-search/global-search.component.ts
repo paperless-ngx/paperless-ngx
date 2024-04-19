@@ -112,6 +112,9 @@ export class GlobalSearchComponent implements OnInit {
       case DataType.Document:
         this.router.navigate(['/documents', object.id])
         return
+      case DataType.SavedView:
+        this.router.navigate(['/view', object.id])
+        return
       case DataType.Correspondent:
         filterRuleType = FILTER_HAS_CORRESPONDENT_ANY
         break
