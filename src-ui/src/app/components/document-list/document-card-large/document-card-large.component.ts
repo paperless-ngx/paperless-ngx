@@ -35,9 +35,7 @@ export class DocumentCardLargeComponent extends ComponentWithPermissions {
   selected = false
 
   @Input()
-  displayFields: Set<DocumentDisplayField | string> = new Set(
-    DEFAULT_DOCUMENT_DISPLAY_FIELDS.map((f) => f.id)
-  )
+  displayFields: string[] = DEFAULT_DOCUMENT_DISPLAY_FIELDS.map((f) => f.id)
 
   @Output()
   toggleSelected = new EventEmitter()

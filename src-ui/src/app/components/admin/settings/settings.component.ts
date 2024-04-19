@@ -547,7 +547,6 @@ export class SettingsComponent
       .subscribe({
         next: () => {
           this.store.next(this.settingsForm.value)
-          this.documentListViewService.updatePageSize()
           this.settings.updateAppearanceSettings()
           let savedToast: Toast = {
             content: $localize`Settings were saved successfully.`,

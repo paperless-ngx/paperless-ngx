@@ -36,7 +36,6 @@ import {
 } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
-import { Results } from 'src/app/data/results'
 
 @Component({
   selector: 'pngx-saved-view-widget',
@@ -81,11 +80,11 @@ export class SavedViewWidgetComponent
   mouseOnPreview = false
   popoverHidden = true
 
-  activeDisplayFields: Set<DocumentDisplayField> = new Set([
+  activeDisplayFields: DocumentDisplayField[] = [
     DocumentDisplayField.TITLE,
     DocumentDisplayField.CREATED,
     DocumentDisplayField.ADDED,
-  ])
+  ]
 
   ngOnInit(): void {
     this.reload()
@@ -121,7 +120,7 @@ export class SavedViewWidgetComponent
         type &&
         this.permissionsService.currentUserCan(PermissionAction.View, type)
       )
-        this.activeDisplayFields.add(column)
+        this.activeDisplayFields.push(column)
     })
   }
 

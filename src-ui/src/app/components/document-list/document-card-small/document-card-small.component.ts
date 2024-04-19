@@ -42,9 +42,7 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
   document: Document
 
   @Input()
-  displayFields: Set<DocumentDisplayField | string> = new Set(
-    DEFAULT_DOCUMENT_DISPLAY_FIELDS.map((f) => f.id)
-  )
+  displayFields: string[] = DEFAULT_DOCUMENT_DISPLAY_FIELDS.map((f) => f.id)
 
   @Output()
   dblClickDocument = new EventEmitter()

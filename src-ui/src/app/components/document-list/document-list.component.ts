@@ -51,6 +51,7 @@ export class DocumentListComponent
   implements OnInit, OnDestroy
 {
   DocumentDisplayField = DocumentDisplayField
+  DisplayMode = DisplayMode
 
   constructor(
     public list: DocumentListViewService,
@@ -72,27 +73,12 @@ export class DocumentListComponent
 
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>
 
-  displayMode: string = DisplayMode.SMALL_CARDS // largeCards, smallCards, table
-
-  _activeDisplayFields: Set<DocumentDisplayField | string> = new Set([
-    DocumentDisplayField.TITLE,
-    DocumentDisplayField.CORRESPONDENT,
-    DocumentDisplayField.CREATED,
-    DocumentDisplayField.TAGS,
-    DocumentDisplayField.DOCUMENT_TYPE,
-    DocumentDisplayField.STORAGE_PATH,
-    DocumentDisplayField.NOTES,
-    DocumentDisplayField.OWNER,
-    DocumentDisplayField.ASN,
-    DocumentDisplayField.SHARED,
-  ])
-
-  get activeDisplayFields(): Set<DocumentDisplayField | string> {
-    return this._activeDisplayFields
+  get activeDisplayFields(): DocumentDisplayField[] {
+    return this.list.documentDisplayFields
   }
 
-  set activeDisplayFields(fields: Set<DocumentDisplayField | string>) {
-    this._activeDisplayFields = fields
+  set activeDisplayFields(fields: DocumentDisplayField[]) {
+    this.list.documentDisplayFields = fields
     this.updateDisplayCustomFields()
   }
   activeDisplayCustomFields: Set<string> = new Set()
@@ -118,6 +104,11 @@ export class DocumentListComponent
       return (
         this.unmodifiedSavedView.sort_field !== this.list.sortField ||
         this.unmodifiedSavedView.sort_reverse !== this.list.sortReverse ||
+        (this.unmodifiedSavedView.page_size &&
+          this.unmodifiedSavedView.page_size !== this.list.pageSize) ||
+        this.unmodifiedSavedView.display_mode !== this.list.displayMode ||
+        this.unmodifiedSavedView.document_display_fields.join(',') !==
+          this.activeDisplayFields.join(',') ||
         filterRulesDiffer(
           this.unmodifiedSavedView.filter_rules,
           this.list.filterRules
@@ -154,10 +145,6 @@ export class DocumentListComponent
     return this.list.sortReverse
   }
 
-  setSortField(field: string) {
-    this.list.sortField = field
-  }
-
   onSort(event: SortEvent) {
     this.list.setSort(event.column, event.reverse)
   }
@@ -166,25 +153,15 @@ export class DocumentListComponent
     return this.list.selected.size > 0
   }
 
-  saveDisplayMode() {
-    localStorage.setItem('document-list:displayMode', this.displayMode)
-  }
-
-  saveDisplayFields() {
-    localStorage.setItem(
-      'document-list:displayFields',
-      JSON.stringify(Array.from(this.activeDisplayFields))
-    )
-  }
-
-  toggleDisplayField(field: string) {
-    if (this.activeDisplayFields.has(field)) {
-      this.activeDisplayFields.delete(field)
+  toggleDisplayField(field: DocumentDisplayField) {
+    if (this.activeDisplayFields.includes(field)) {
+      this.activeDisplayFields = this.activeDisplayFields.filter(
+        (f) => f !== field
+      )
     } else {
-      this.activeDisplayFields.add(field)
+      this.activeDisplayFields = [...this.activeDisplayFields, field]
     }
     this.updateDisplayCustomFields()
-    this.saveDisplayFields()
   }
 
   public getDisplayCustomFieldTitle(field: string) {
@@ -194,16 +171,6 @@ export class DocumentListComponent
   }
 
   ngOnInit(): void {
-    if (localStorage.getItem('document-list:displayMode') != null) {
-      this.displayMode = localStorage.getItem('document-list:displayMode')
-    }
-
-    if (localStorage.getItem('document-list:displayFields') != null) {
-      this.activeDisplayFields = new Set(
-        JSON.parse(localStorage.getItem('document-list:displayFields'))
-      )
-    }
-
     this.consumerStatusService
       .onDocumentConsumptionFinished()
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -227,6 +194,12 @@ export class DocumentListComponent
             replaceUrl: true,
           })
           return
+        }
+        if (!view.display_mode) {
+          view.display_mode = this.list.displayMode
+        }
+        if (!view.document_display_fields) {
+          view.document_display_fields = this.list.documentDisplayFields
         }
         this.unmodifiedSavedView = view
         this.list.activateSavedViewWithQueryParams(

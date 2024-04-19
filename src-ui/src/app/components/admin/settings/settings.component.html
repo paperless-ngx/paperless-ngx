@@ -352,19 +352,17 @@
                 </div>
               </div>
               <div class="row">
-                  @if (savedViewGroup.get(view.id.toString()).get('show_on_dashboard').value) {
-                    <div class="col">
-                      <pngx-input-number i18n-title title="Widget list limit" [showAdd]="false" formControlName="page_size"></pngx-input-number>
-                    </div>
-                    <div class="col">
-                      <label class="form-label" for="display_mode_{{view.id}}" i18n>Widget display</label>
-                      <select class="form-select" formControlName="display_mode">
-                        <option [ngValue]="DashboardViewMode.TABLE" i18n>Table</option>
-                        <option [ngValue]="DashboardViewMode.SMALL_CARDS" i18n>Small Cards</option>
-                        <option [ngValue]="DashboardViewMode.LARGE_CARDS" i18n>Large Cards</option>
-                      </select>
-                    </div>
-                  }
+                <div class="col">
+                  <pngx-input-number i18n-title title="Documents page size" [showAdd]="false" formControlName="page_size"></pngx-input-number>
+                </div>
+                <div class="col">
+                  <label class="form-label" for="display_mode_{{view.id}}" i18n>Display as</label>
+                  <select class="form-select" formControlName="display_mode">
+                    <option [ngValue]="DashboardViewMode.TABLE" i18n>Table</option>
+                    <option [ngValue]="DashboardViewMode.SMALL_CARDS" i18n>Small Cards</option>
+                    <option [ngValue]="DashboardViewMode.LARGE_CARDS" i18n>Large Cards</option>
+                  </select>
+                </div>
                   @if (documentDisplayFields) {
                     <pngx-input-drag-drop-select i18n-title title="Show" [items]="documentDisplayFields" formControlName="document_display_fields"></pngx-input-drag-drop-select>
                   }
