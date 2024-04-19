@@ -46,7 +46,8 @@
           "sv-SE": "src/locale/messages.sv_SE.xlf",
           "tr-TR": "src/locale/messages.tr_TR.xlf",
           "uk-UA": "src/locale/messages.uk_UA.xlf",
-          "zh-CN": "src/locale/messages.zh_CN.xlf"
+          "zh-CN": "src/locale/messages.zh_CN.xlf",
+          "vi-VN": "src/locale/messages.vi_VN.xlf"
         }
       },
       "architect": {

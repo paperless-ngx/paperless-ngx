@@ -337,6 +337,7 @@ import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeUk from '@angular/common/locales/uk'
 import localeZh from '@angular/common/locales/zh'
+import localeVi from '@angular/common/locales/vi'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -369,6 +370,7 @@ registerLocaleData(localeSv)
 registerLocaleData(localeTr)
 registerLocaleData(localeUk)
 registerLocaleData(localeZh)
+registerLocaleData(localeVi)
 
 function initializeApp(settings: SettingsService) {
   return () => {

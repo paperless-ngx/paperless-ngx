@@ -89,6 +89,7 @@ ARG RUNTIME_PACKAGES="\
   mariadb-client \
   # OCRmyPDF dependencies
   tesseract-ocr \
+  tesseract-ocr-vie \
   tesseract-ocr-eng \
   tesseract-ocr-deu \
   tesseract-ocr-fra \
@@ -244,6 +245,8 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
 
 # copy backend
 COPY --chown=1000:1000 ./src ./
+
+RUN pip3 install python-decouple==3.8
 
 # copy frontend
 COPY --from=compile-frontend --chown=1000:1000 /src/src/documents/static/frontend/ ./documents/static/frontend/

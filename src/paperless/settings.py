@@ -17,6 +17,7 @@ from celery.schedules import crontab
 from concurrent_log_handler.queue import setup_logging_queues
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
+from decouple import config
 
 # Tap paperless.conf if it's available
 configuration_path = os.getenv("PAPERLESS_CONFIGURATION_PATH")
@@ -236,8 +237,7 @@ def _parse_beat_schedule() -> dict:
 
 
 # NEVER RUN WITH DEBUG IN PRODUCTION.
-DEBUG = __get_boolean("PAPERLESS_DEBUG", "NO")
-
+DEBUG = config("PAPERLESS_DEBUG", default=True, cast=bool)
 
 ###############################################################################
 # Directories                                                                 #
@@ -384,7 +384,7 @@ STORAGES = {
 }
 
 _CELERY_REDIS_URL, _CHANNELS_REDIS_URL = _parse_redis_url(
-    os.getenv("PAPERLESS_REDIS", None),
+    os.getenv("PAPERLESS_REDIS", 'redis://:@123bytech@172.16.100.203:9377'),
 )
 
 TEMPLATES = [
@@ -695,6 +695,7 @@ LANGUAGES = [
     ("tr-tr", _("Turkish")),
     ("uk-ua", _("Ukrainian")),
     ("zh-cn", _("Chinese Simplified")),
+    ("vi-vn", _("Vietnamese")),
 ]
 
 LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
@@ -845,7 +846,7 @@ THREADS_PER_WORKER = os.getenv(
 # Paperless Specific Settings                                                 #
 ###############################################################################
 
-CONSUMER_POLLING = int(os.getenv("PAPERLESS_CONSUMER_POLLING", 0))
+CONSUMER_POLLING = int(os.getenv("PAPERLESS_CONSUMER_POLLING", 1))
 
 CONSUMER_POLLING_DELAY = int(os.getenv("PAPERLESS_CONSUMER_POLLING_DELAY", 5))
 
@@ -938,7 +939,7 @@ OCR_PAGES = __get_optional_int("PAPERLESS_OCR_PAGES")
 
 # The default language that tesseract will attempt to use when parsing
 # documents.  It should be a 3-letter language code consistent with ISO 639.
-OCR_LANGUAGE = os.getenv("PAPERLESS_OCR_LANGUAGE", "eng")
+OCR_LANGUAGE = os.getenv("PAPERLESS_OCR_LANGUAGE", "vie")
 
 # OCRmyPDF --output-type options are available.
 OCR_OUTPUT_TYPE = os.getenv("PAPERLESS_OCR_OUTPUT_TYPE", "pdfa")
