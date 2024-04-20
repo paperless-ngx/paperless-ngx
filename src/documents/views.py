@@ -759,14 +759,16 @@ class DocumentViewSet(
                     else None
                 ),
             }
-            for entry in LogEntry.objects.filter(object_pk=doc.pk)
+            for entry in LogEntry.objects.filter(object_pk=doc.pk).select_related(
+                "actor",
+            )
         ]
 
         # custom fields
         for entry in LogEntry.objects.filter(
             object_pk__in=doc.custom_fields.values_list("id", flat=True),
             content_type=ContentType.objects.get_for_model(CustomFieldInstance),
-        ):
+        ).select_related("actor"):
             entries.append(
                 {
                     "id": entry.id,
