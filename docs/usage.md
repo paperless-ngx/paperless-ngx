@@ -550,6 +550,16 @@ collection.
 
 ## Searching {#basic-usage_searching}
 
+### Global search
+
+The top search bar in the web UI performs a "global" search of the various
+objects Paperless-ngx uses, including documents, tags, workflows, etc. Only
+objects for which the user has appropriate permissions are returned. For
+documents, if there are < 3 results, "advanced" search results (which use
+the document index) will also be included. This can be disabled under settings.
+
+### Document searches
+
 Paperless offers an extensive searching mechanism that is designed to
 allow you to quickly find a document you're looking for (for example,
 that thing that just broke and you bought a couple months ago, that
@@ -604,6 +614,12 @@ Whoosh's default query language. Head over to [Whoosh query
 language](https://whoosh.readthedocs.io/en/latest/querylang.html). For
 details on what date parsing utilities are available, see [Date
 parsing](https://whoosh.readthedocs.io/en/latest/dates.html#parsing-date-queries).
+
+## Keyboard shortcuts / hotkeys
+
+A list of available hotkeys can be shown on any page using <kbd>Shift</kbd> +
+<kbd>?</kbd>. The help dialog shows only the keys that are currently available
+based on which area of Paperless-ngx you are using.
 
 ## The recommended workflow {#usage-recommended-workflow}
 
