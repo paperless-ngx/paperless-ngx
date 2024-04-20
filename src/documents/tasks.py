@@ -13,6 +13,7 @@ from django.conf import settings
 from django.db import transaction
 from django.db.models.signals import post_save
 from filelock import FileLock
+from langdetect import detect
 from whoosh.writing import AsyncWriter
 
 from documents import index
@@ -52,17 +53,29 @@ logger = logging.getLogger("paperless.tasks")
 def translate_content(content):
     import bergamot
 
-    service = bergamot.Service(bergamot.ServiceConfig())
+    models = settings.TRANSLATION_MODELS.split(",")
+    original_language = detect(content)
 
-    model = service.modelFromConfigPath(
-        bergamot.REPOSITORY.modelConfigPath("browsermt", settings.TRANSLATION_MODEL),
-    )
-    result = service.translate(
-        model,
-        bergamot.VectorString([content]),
-        bergamot.ResponseOptions(),
-    )
-    return next(r.target.text for r in result)
+    # Avoid translating if we already have the target language
+    if original_language == settings.TRANSLATION_TARGET_LANGUAGE:
+        return ""
+
+    for model in models:
+        # Find the right model for the translation
+        # bergamot models usually end with "tiny" or "base" so we remove that
+        if original_language in model.replace("base", "").replace("tiny", ""):
+            service = bergamot.Service(bergamot.ServiceConfig())
+
+            model = service.modelFromConfigPath(
+                bergamot.REPOSITORY.modelConfigPath("browsermt", model),
+            )
+            result = service.translate(
+                model,
+                bergamot.VectorString([content]),
+                bergamot.ResponseOptions(),
+            )
+            return next(r.target.text for r in result)
+    return ""
 
 
 @shared_task

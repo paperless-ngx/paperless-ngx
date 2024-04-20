@@ -94,3 +94,6 @@ types-Pygments = "*"
 types-colorama = "*"
 types-psycopg2 = "*"
 types-setuptools = "*"
+
+[translation]
+bergamot = "0.4.5"
