@@ -80,7 +80,7 @@ class FaviconView(View):
             "static",
             "paperless",
             "img",
-            "favicon.ico",
+            "logo__1_-removebg-preview-removebg-preview 1.ico",
         )
         with open(favicon, "rb") as f:
             return HttpResponse(f, content_type="image/x-icon")
