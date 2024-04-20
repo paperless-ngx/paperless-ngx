@@ -825,6 +825,34 @@ they use underscores instead of dashes.
     {"deskew": true, "optimize": 3, "unpaper_args": "--pre-rotate 90"}
     ```
 
+## Translations {#translations}
+
+Paperless uses [Bergamot](https://browser.mt/) to automatically translate
+documents locally. When this feature is used you can search in documents using
+their translated version.
+
+    !!! warning
+
+        Translations are an optional Paperless feature and needs to be
+        installed using `pip install bergamot` or
+        `pipenv sync --categories translation`
+
+#### [`PAPERLESS_TRANSLATION_TARGET=<string>`](#PAPERLESS_TRANSLATION_TARGET) {#PAPERLESS_TRANSLATION_TARGET}
+
+: Use this parameter to enable automatic translation of documents not already
+in the target language. For example, specify `en` to translate all non-English
+documents to English.
+
+    The default is blank, which means nothing will be translated.
+
+#### [`PAPERLESS_TRANSLATION_MODELS=<string>`](#PAPERLESS_TRANSLATION_MODELS) {#PAPERLESS_TRANSLATION_MODELS}
+
+: Use this parameter to tell Bergamot what language models to use. To see
+and download models use `bergamot ls` and `bergamot download`. For example,
+if you download the Ukrainian to English model using `bergamot download -m
+uk-en-tiny`, you can specify `uk-en-tiny`. Use multiple models by separating
+them with a comma.
+
 ## Software tweaks {#software_tweaks}
 
 #### [`PAPERLESS_TASK_WORKERS=<num>`](#PAPERLESS_TASK_WORKERS) {#PAPERLESS_TASK_WORKERS}
