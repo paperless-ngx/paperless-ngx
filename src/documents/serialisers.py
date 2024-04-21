@@ -802,48 +802,8 @@ class SavedViewFilterRuleSerializer(serializers.ModelSerializer):
         fields = ["rule_type", "value"]
 
 
-class DynamicOrderedMultipleChoiceField(fields.MultipleChoiceField):
-    """
-    A MultipleChoiceField that allows for dynamic choices from a model
-    and preserves the order of the choices.
-    """
-
-    def __init__(self, **kwargs):
-        self.dyanmic_choices = kwargs.pop("dyanmic_choices", None)
-        super().__init__(**kwargs)
-
-    def _get_choices(self):
-        return super()._get_choices()
-
-    def _set_choices(self, choices):
-        if self.dyanmic_choices is not None:
-            for key, Model in self.dyanmic_choices:
-                try:
-                    for obj in Model.objects.all():
-                        choices.append((key % obj.pk, obj.name))
-                except Exception:
-                    pass
-        return super()._set_choices(choices)
-
-    choices = property(_get_choices, _set_choices)
-
-    def to_internal_value(self, data):
-        super().to_internal_value(data)
-        # MultipleChoiceField doesn't preserve order, so we use an array
-        return [fields.ChoiceField.to_internal_value(self, item) for item in data]
-
-    def to_representation(self, value):
-        # MultipleChoiceField doesn't preserve order, so we return as array to match the original order
-        return [self.choice_strings_to_values.get(str(item), item) for item in value]
-
-
 class SavedViewSerializer(OwnedObjectSerializer):
     filter_rules = SavedViewFilterRuleSerializer(many=True)
-    display_fields = DynamicOrderedMultipleChoiceField(
-        choices=SavedView.DisplayFields.choices,
-        dyanmic_choices=[("custom_field_%d", CustomField)],
-        required=False,
-    )
 
     class Meta:
         model = SavedView
@@ -863,6 +823,22 @@ class SavedViewSerializer(OwnedObjectSerializer):
             "user_can_change",
             "set_permissions",
         ]
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if "display_fields" in attrs:
+            for field in attrs["display_fields"]:
+                if re.sub(r"\d+", "%d", field) == SavedView.DisplayFields.CUSTOM_FIELD:
+                    field_id = int(re.search(r"\d+", field)[0])
+                    if not CustomField.objects.filter(id=field_id).exists():
+                        raise serializers.ValidationError(
+                            f"Invalid field: {field}",
+                        )
+                elif field not in SavedView.DisplayFields.values:
+                    raise serializers.ValidationError(
+                        f"Invalid field: {field}",
+                    )
+        return attrs
 
     def update(self, instance, validated_data):
         if "filter_rules" in validated_data:
