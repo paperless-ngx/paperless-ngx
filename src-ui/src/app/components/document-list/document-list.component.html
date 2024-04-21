@@ -187,6 +187,9 @@
               (sort)="onSort($event)"
             i18n>Title</th>
           }
+          @if (activeDisplayFields.includes(DisplayField.TAGS) && !activeDisplayFields.includes(DisplayField.TITLE)) {
+            <th i18n>Tags</th>
+          }
           @if (activeDisplayFields.includes(DisplayField.OWNER) && permissionService.currentUserCan(PermissionAction.View, PermissionType.User)) {
             <th class="d-none d-xl-table-cell"
               pngxSortable="owner"
