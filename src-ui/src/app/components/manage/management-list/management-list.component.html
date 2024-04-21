@@ -24,7 +24,7 @@
   <ngb-pagination class="col-auto" [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page" [maxSize]="5" (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
 </div>
 
-<div class="card border mb-3">
+<div class="card border table-responsive mb-3">
   <table class="table table-striped align-middle shadow-sm mb-0">
     <thead>
       <tr>
@@ -74,7 +74,7 @@
           }
           <td scope="row">
             <div class="btn-group d-block d-sm-none">
-              <div ngbDropdown class="d-inline-block">
+              <div ngbDropdown container="body" class="d-inline-block">
                 <button type="button" class="btn btn-link" id="actionsMenuMobile" (click)="$event.stopPropagation()" ngbDropdownToggle>
                   <i-bs name="three-dots-vertical"></i-bs>
                 </button>
