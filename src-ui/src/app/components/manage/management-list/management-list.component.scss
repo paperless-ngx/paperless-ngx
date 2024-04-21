@@ -1,16 +1,6 @@
-// horizontal scrolling for large table contents
-.card.border {
-    overflow-x: auto;
-}
-
 // hide caret on mobile dropdown
 .d-block.d-sm-none .dropdown-toggle::after {
     display: none;
-}
-
-// dropdown menu can flow outside the tables bounding box
-.dropdown-menu.show {
-    position: fixed !important;
 }
 
 tbody tr:last-child td {
