@@ -542,6 +542,7 @@ export class SettingsComponent
         next: () => {
           this.store.next(this.settingsForm.value)
           this.settings.updateAppearanceSettings()
+          this.settings.initializeDisplayFields()
           let savedToast: Toast = {
             content: $localize`Settings were saved successfully.`,
             delay: 5000,

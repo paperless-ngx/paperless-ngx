@@ -643,9 +643,11 @@ describe('DocumentListComponent', () => {
 
   it('should get custom field title', () => {
     fixture.detectChanges()
-    settingsService.allDisplayFields = [
-      { id: 'custom_field_1', name: 'Custom Field 1' },
-    ]
+    jest
+      .spyOn(settingsService, 'allDisplayFields', 'get')
+      .mockReturnValue([
+        { id: 'custom_field_1' as any, name: 'Custom Field 1' },
+      ])
     expect(component.getDisplayCustomFieldTitle('custom_field_1')).toEqual(
       'Custom Field 1'
     )

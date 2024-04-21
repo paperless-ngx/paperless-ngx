@@ -338,6 +338,33 @@ describe('SettingsService', () => {
     httpTestingController.expectOne(`${environment.apiBaseUrl}ui_settings/`)
   })
 
+  it('should hide fields if no perms or disabled', () => {
+    jest.spyOn(permissionService, 'currentUserCan').mockReturnValue(false)
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}ui_settings/`
+    )
+    req.flush(ui_settings)
+    settingsService.initializeDisplayFields()
+    expect(
+      settingsService.allDisplayFields.includes(DEFAULT_DISPLAY_FIELDS[0])
+    ).toBeTruthy() // title
+    expect(
+      settingsService.allDisplayFields.includes(DEFAULT_DISPLAY_FIELDS[4])
+    ).toBeFalsy() // correspondent
+
+    settingsService.set(SETTINGS_KEYS.NOTES_ENABLED, false)
+    settingsService.initializeDisplayFields()
+    expect(
+      settingsService.allDisplayFields.includes(DEFAULT_DISPLAY_FIELDS[8])
+    ).toBeFalsy() // notes
+
+    jest.spyOn(permissionService, 'currentUserCan').mockReturnValue(true)
+    settingsService.initializeDisplayFields()
+    expect(
+      settingsService.allDisplayFields.includes(DEFAULT_DISPLAY_FIELDS[4])
+    ).toBeTruthy() // correspondent
+  })
+
   it('should dynamically create display fields options including custom fields', () => {
     jest.spyOn(permissionService, 'currentUserCan').mockReturnValue(true)
     jest.spyOn(customFieldsService, 'listAll').mockReturnValue(

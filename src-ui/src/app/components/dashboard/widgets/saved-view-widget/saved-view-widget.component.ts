@@ -37,6 +37,7 @@ import {
 } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
+import { SettingsService } from 'src/app/services/settings.service'
 
 @Component({
   selector: 'pngx-saved-view-widget',
@@ -63,6 +64,7 @@ export class SavedViewWidgetComponent
     public openDocumentsService: OpenDocumentsService,
     public documentListViewService: DocumentListViewService,
     public permissionsService: PermissionsService,
+    private settingsService: SettingsService,
     private customFieldService: CustomFieldsService
   ) {
     super()
@@ -111,30 +113,14 @@ export class SavedViewWidgetComponent
 
     if (this.savedView.display_fields) {
       this.displayFields = this.savedView.display_fields
-        ?.map((field) => {
-          if (
-            [
-              DisplayField.TITLE,
-              DisplayField.CREATED,
-              DisplayField.ADDED,
-            ].includes(field)
-          ) {
-            return field
-          }
-
-          let type: PermissionType = Object.values(PermissionType).find((t) =>
-            t.includes(field)
-          )
-          if (field.startsWith(DisplayField.CUSTOM_FIELD)) {
-            type = PermissionType.CustomField
-          }
-          return type &&
-            this.permissionsService.currentUserCan(PermissionAction.View, type)
-            ? field
-            : null
-        })
-        .filter((f) => f)
     }
+
+    // filter by perms etc
+    this.displayFields = this.displayFields.filter(
+      (field) =>
+        this.settingsService.allDisplayFields.find((f) => f.id === field) !==
+        undefined
+    )
   }
 
   ngOnDestroy(): void {

@@ -263,7 +263,11 @@ export class SettingsService {
   public globalDropzoneActive: boolean = false
   public organizingSidebarSavedViews: boolean = false
 
-  public allDisplayFields: any
+  private _allDisplayFields: Array<{ id: DisplayField; name: string }> =
+    DEFAULT_DISPLAY_FIELDS
+  public get allDisplayFields(): Array<{ id: DisplayField; name: string }> {
+    return this._allDisplayFields
+  }
 
   constructor(
     rendererFactory: RendererFactory2,
@@ -304,7 +308,43 @@ export class SettingsService {
   }
 
   public initializeDisplayFields() {
-    this.allDisplayFields = DEFAULT_DISPLAY_FIELDS
+    this._allDisplayFields = DEFAULT_DISPLAY_FIELDS
+
+    this._allDisplayFields = this._allDisplayFields
+      ?.map((field) => {
+        if (
+          field.id === DisplayField.NOTES &&
+          !this.get(SETTINGS_KEYS.NOTES_ENABLED)
+        ) {
+          return null
+        }
+
+        if (
+          [
+            DisplayField.TITLE,
+            DisplayField.CREATED,
+            DisplayField.ADDED,
+            DisplayField.ASN,
+            DisplayField.SHARED,
+          ].includes(field.id)
+        ) {
+          return field
+        }
+
+        let type: PermissionType = Object.values(PermissionType).find((t) =>
+          t.includes(field.id)
+        )
+        if (field.id === DisplayField.OWNER) {
+          type = PermissionType.User
+        }
+        return this.permissionsService.currentUserCan(
+          PermissionAction.View,
+          type
+        )
+          ? field
+          : null
+      })
+      .filter((f) => f)
 
     if (
       this.permissionsService.currentUserCan(
@@ -313,7 +353,7 @@ export class SettingsService {
       )
     ) {
       this.customFieldsService.listAll().subscribe((r) => {
-        this.allDisplayFields = DEFAULT_DISPLAY_FIELDS.concat(
+        this._allDisplayFields = this._allDisplayFields.concat(
           r.results.map((field) => {
             return {
               id: `${DisplayField.CUSTOM_FIELD}${field.id}` as any,
