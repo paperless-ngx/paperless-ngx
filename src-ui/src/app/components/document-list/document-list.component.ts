@@ -100,6 +100,9 @@ export class DocumentListComponent
           this.unmodifiedSavedView.page_size !== this.list.pageSize) ||
         (this.unmodifiedSavedView.display_mode &&
           this.unmodifiedSavedView.display_mode !== this.list.displayMode) ||
+        // if the saved view has no display mode, we assume it's small cards
+        (!this.unmodifiedSavedView.display_mode &&
+          this.list.displayMode !== DisplayMode.SMALL_CARDS) ||
         (this.unmodifiedSavedView.display_fields &&
           this.unmodifiedSavedView.display_fields.join(',') !==
             this.activeDisplayFields.join(',')) ||
