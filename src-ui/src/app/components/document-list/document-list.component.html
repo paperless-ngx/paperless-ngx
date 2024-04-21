@@ -19,9 +19,9 @@
     <div ngbDropdownMenu aria-labelledby="dropdownDisplayFields" class="shadow">
       <div class="px-3">
         @for (field of settingsService.allDisplayFields; track field.id) {
-          <div class="form-check small">
-            <input type="checkbox" class="form-check-input" id="displayField{{field.id}}" [checked]="activeDisplayFields.includes(field.id)" (change)="toggleDisplayField(field.id)">
-            <label class="form-check-label small" for="displayField{{field.id}}">{{field.name}}</label>
+          <div class="form-check my-1">
+            <input class="form-check-input mt-1" type="checkbox" id="displayField{{field.id}}" [checked]="activeDisplayFields.includes(field.id)" (change)="toggleDisplayField(field.id)">
+            <label class="form-check-label" for="displayField{{field.id}}">{{field.name}}</label>
           </div>
         }
       </div>
