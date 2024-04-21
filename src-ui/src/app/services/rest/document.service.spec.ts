@@ -298,6 +298,12 @@ it('should construct sort fields respecting permissions', () => {
     ...DOCUMENT_SORT_FIELDS,
     ...DOCUMENT_SORT_FIELDS_FULLTEXT,
   ])
+
+  settingsService.set(SETTINGS_KEYS.NOTES_ENABLED, false)
+  service['setupSortFields']()
+  expect(
+    service.sortFields.find((f) => f.field === 'num_notes')
+  ).toBeUndefined()
 })
 
 afterEach(() => {

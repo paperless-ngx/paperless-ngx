@@ -69,15 +69,14 @@ export class DocumentService extends AbstractPaperlessService<Document> {
 
   private setupSortFields() {
     this._sortFields = [...DOCUMENT_SORT_FIELDS]
+    let excludes = []
     if (
       !this.permissionsService.currentUserCan(
         PermissionAction.View,
         PermissionType.Correspondent
       )
     ) {
-      this._sortFields = this._sortFields.filter(
-        (field) => field.field !== 'correspondent__name'
-      )
+      excludes.push('correspondent__name')
     }
     if (
       !this.permissionsService.currentUserCan(
@@ -85,10 +84,22 @@ export class DocumentService extends AbstractPaperlessService<Document> {
         PermissionType.DocumentType
       )
     ) {
-      this._sortFields = this._sortFields.filter(
-        (field) => field.field !== 'document_type__name'
-      )
+      excludes.push('document_type__name')
     }
+    if (
+      !this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.User
+      )
+    ) {
+      excludes.push('owner')
+    }
+    if (!this.settingsService.get(SETTINGS_KEYS.NOTES_ENABLED)) {
+      excludes.push('num_notes')
+    }
+    this._sortFields = this._sortFields.filter(
+      (field) => !excludes.includes(field.field)
+    )
     this._sortFieldsFullText = [
       ...this._sortFields,
       ...DOCUMENT_SORT_FIELDS_FULLTEXT,
