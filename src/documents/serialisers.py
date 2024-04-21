@@ -826,7 +826,7 @@ class SavedViewSerializer(OwnedObjectSerializer):
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
-        if "display_fields" in attrs:
+        if "display_fields" in attrs and attrs["display_fields"] is not None:
             for field in attrs["display_fields"]:
                 if re.sub(r"\d+", "%d", field) == SavedView.DisplayFields.CUSTOM_FIELD:
                     field_id = int(re.search(r"\d+", field)[0])
