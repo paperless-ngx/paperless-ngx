@@ -25,6 +25,9 @@ export class DragDropSelectComponent extends AbstractInputComponent<string[]> {
   @Input() items: { id: string; name: string }[] = []
   public selectedItems: { id: string; name: string }[] = []
 
+  @Input()
+  emptyText = $localize`No items selected`
+
   @ViewChild('selectedList') selectedList: CdkDropList
   @ViewChild('unselectedList') unselectedList: CdkDropList
 

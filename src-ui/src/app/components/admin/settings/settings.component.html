@@ -364,7 +364,7 @@
                   </select>
                 </div>
                   @if (displayFields) {
-                    <pngx-input-drag-drop-select i18n-title title="Show" [items]="displayFields" formControlName="display_fields"></pngx-input-drag-drop-select>
+                    <pngx-input-drag-drop-select i18n-title title="Show" i18n-emptyText emptyText="Default" [items]="displayFields" formControlName="display_fields"></pngx-input-drag-drop-select>
                   }
                 </div>
             </div>

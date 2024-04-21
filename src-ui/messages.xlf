@@ -417,6 +417,10 @@
           <context context-type="linenumber">14,15</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/input/drag-drop-select/drag-drop-select.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
@@ -1469,6 +1473,17 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5607669932062416162" datatype="html">
+        <source>Default</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
+          <context context-type="linenumber">367</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">113</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7877440816920439876" datatype="html">
@@ -4172,6 +4187,13 @@
           <context context-type="linenumber">23</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="528456107179161277" datatype="html">
+        <source>No items selected</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/input/drag-drop-select/drag-drop-select.component.ts</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="6932865105766151309" datatype="html">
         <source>Upload</source>
         <context-group purpose="location">
@@ -5256,13 +5278,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/document.ts</context>
           <context context-type="linenumber">58</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="5607669932062416162" datatype="html">
-        <source>Default</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">113</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6205355627445317276" datatype="html">
