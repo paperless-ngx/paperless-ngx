@@ -56,6 +56,9 @@ export class MonetaryComponent extends AbstractInputComponent<string> {
   }
 
   private parseMonetaryValue(value: string, fixed: boolean = false): string {
+    if (!value) {
+      return ''
+    }
     const val: number = parseFloat(value.toString().replace(/[^0-9.,-]+/g, ''))
     return fixed ? val.toFixed(2) : val.toString()
   }

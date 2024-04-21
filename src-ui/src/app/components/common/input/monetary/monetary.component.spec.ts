@@ -46,4 +46,32 @@ describe('MonetaryComponent', () => {
     component = new MonetaryComponent('pt-BR')
     expect(component.defaultCurrencyCode).toEqual('BRL')
   })
+
+  it('should parse monetary value correctly', () => {
+    expect(component['parseMonetaryValue']('123.4')).toEqual('123.4')
+    expect(component['parseMonetaryValue']('123.4', true)).toEqual('123.40')
+    expect(component['parseMonetaryValue']('123.4', false)).toEqual('123.4')
+  })
+
+  it('should handle currency change', () => {
+    component.writeValue('USD123.4')
+    component.currency = 'EUR'
+    component.currencyChange()
+    expect(component.currency).toEqual('EUR')
+    expect(component.monetaryValue).toEqual('123.40')
+  })
+
+  it('should handle monetary value change', () => {
+    component.writeValue('USD123.4')
+    component.monetaryValue = '123.4'
+    component.monetaryValueChange()
+    expect(component.monetaryValue).toEqual('123.4')
+    expect(component.value).toEqual('USD123.40')
+  })
+
+  it('should handle null values', () => {
+    component.writeValue(null)
+    expect(component.currency).toEqual('USD')
+    expect(component.monetaryValue).toEqual('')
+  })
 })
