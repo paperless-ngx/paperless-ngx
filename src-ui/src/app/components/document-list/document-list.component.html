@@ -276,7 +276,8 @@
                   }
                 </td>
               }
-              <td>
+              @if (activeDisplayFields.includes(DisplayField.TITLE) || activeDisplayFields.includes(DisplayField.TAGS)) {
+                <td>
                   @if (activeDisplayFields.includes(DisplayField.TITLE)) {
                     <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
                   }
@@ -286,6 +287,7 @@
                     }
                   }
                 </td>
+              }
               @if (activeDisplayFields.includes(DisplayField.OWNER) && permissionService.currentUserCan(PermissionAction.View, PermissionType.User)) {
                 <td>
                   {{d.owner | username}}
