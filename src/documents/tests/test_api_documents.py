@@ -1662,6 +1662,15 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(v1.filter_rules.count(), 0)
 
     def test_saved_view_display_options(self):
+        """
+        GIVEN:
+            - Saved view
+        WHEN:
+            - Updating display options
+        THEN:
+            - Display options are updated
+            - Display fields are validated
+        """
         User.objects.create_user("user1")
 
         view = {
@@ -1718,7 +1727,28 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             ],
         )
 
+        # Invalid display field
+        response = self.client.patch(
+            f"/api/saved_views/{v1.id}/",
+            {
+                "display_fields": [
+                    "foobar",
+                ],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_saved_view_display_customfields(self):
+        """
+        GIVEN:
+            - Saved view
+        WHEN:
+            - Updating display options with custom fields
+        THEN:
+            - Display filds for custom fields are updated
+            - Display fields for custom fields are validated
+        """
         view = {
             "name": "test",
             "show_on_dashboard": True,
