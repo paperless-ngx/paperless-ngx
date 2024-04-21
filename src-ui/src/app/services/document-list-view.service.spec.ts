@@ -586,7 +586,9 @@ describe('DocumentListViewService', () => {
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
     )
     expect(documentListViewService.displayFields).toEqual(
-      DEFAULT_DISPLAY_FIELDS.map((f) => f.id)
+      DEFAULT_DISPLAY_FIELDS.filter((f) => f.id !== DisplayField.ADDED).map(
+        (f) => f.id
+      )
     )
   })
 })

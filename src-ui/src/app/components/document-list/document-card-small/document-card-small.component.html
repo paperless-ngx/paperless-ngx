@@ -58,7 +58,7 @@
             <small>{{(document.storage_path$ | async)?.name ?? privateName}}</small>
           </button>
         }
-        @if (displayFields.includes(DisplayField.CREATED) || displayFields.includes(DisplayField.ADDED)) {
+        @if (displayFields.includes(DisplayField.CREATED)) {
           <div class="list-group-item bg-transparent p-0 border-0 d-flex flex-wrap-reverse justify-content-between">
             <ng-template #dateTooltip>
               <div class="d-flex flex-column text-light">
@@ -70,8 +70,24 @@
             <div class="ps-0 p-1" placement="top" [ngbTooltip]="dateTooltip">
               <i-bs width="1em" height="1em" class="me-2 text-muted" name="calendar-event"></i-bs>
               <small>
-                @if (displayFields.includes(DisplayField.CREATED)) { {{document.created | customDate:'mediumDate'}} }
-                @else { {{document.added | customDate:'mediumDate'}} }
+                {{document.created | customDate:'mediumDate'}}
+              </small>
+            </div>
+          </div>
+        }
+        @if (displayFields.includes(DisplayField.ADDED)) {
+          <div class="list-group-item bg-transparent p-0 border-0 d-flex flex-wrap-reverse justify-content-between">
+            <ng-template #dateTooltip>
+              <div class="d-flex flex-column text-light">
+                <span i18n>Created: {{ document.created | customDate }}</span>
+                <span i18n>Added: {{ document.added | customDate }}</span>
+                <span i18n>Modified: {{ document.modified | customDate }}</span>
+              </div>
+            </ng-template>
+            <div class="ps-0 p-1" placement="top" [ngbTooltip]="dateTooltip">
+              <i-bs width="1em" height="1em" class="me-2 text-muted" name="calendar-event"></i-bs>
+              <small>
+                {{document.added | customDate:'mediumDate'}}
               </small>
             </div>
           </div>

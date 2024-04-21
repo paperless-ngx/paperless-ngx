@@ -414,10 +414,13 @@ export class DocumentListViewService {
   }
 
   get displayFields(): DisplayField[] {
-    return (
+    let fields =
       this.activeListViewState.displayFields ??
       DEFAULT_DISPLAY_FIELDS.map((f) => f.id)
-    )
+    if (!this.activeListViewState.displayFields) {
+      fields = fields.filter((f) => f !== DisplayField.ADDED)
+    }
+    return fields
   }
 
   set displayFields(fields: DisplayField[]) {
