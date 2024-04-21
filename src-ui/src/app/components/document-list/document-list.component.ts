@@ -266,6 +266,8 @@ export class DocumentListComponent
         filter_rules: this.list.filterRules,
         sort_reverse: this.list.sortReverse,
         sort_field: this.list.sortField,
+        display_mode: this.list.displayMode,
+        display_fields: this.activeDisplayFields,
       }
 
       this.savedViewService
