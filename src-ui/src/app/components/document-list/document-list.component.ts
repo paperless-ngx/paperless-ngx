@@ -227,6 +227,8 @@ export class DocumentListComponent
         filter_rules: this.list.filterRules,
         sort_field: this.list.sortField,
         sort_reverse: this.list.sortReverse,
+        display_mode: this.list.displayMode,
+        display_fields: this.activeDisplayFields,
       }
       this.savedViewService
         .patch(savedView)

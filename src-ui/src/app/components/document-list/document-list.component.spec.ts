@@ -423,6 +423,8 @@ describe('DocumentListComponent', () => {
           value: '20',
         },
       ],
+      display_mode: DisplayMode.SMALL_CARDS,
+      display_fields: [DisplayField.TITLE],
     }
     jest.spyOn(savedViewService, 'getCached').mockReturnValue(of(view))
     const queryParams = { view: view.id.toString() }
