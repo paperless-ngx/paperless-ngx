@@ -343,4 +343,13 @@ describe('SavedViewWidgetComponent', () => {
       'Storage path'
     )
   })
+
+  it('should get correct column title for custom field', () => {
+    expect(
+      component.getColumnTitle((DisplayField.CUSTOM_FIELD + 11) as any)
+    ).toEqual('Custom Field 11')
+    expect(
+      component.getColumnTitle((DisplayField.CUSTOM_FIELD + 15) as any)
+    ).toEqual('Custom Field 15')
+  })
 })
