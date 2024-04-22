@@ -23,11 +23,13 @@ from multiselectfield import MultiSelectField
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
 
+from django_softdelete.models import SoftDeleteModel
+
 from documents.data_models import DocumentSource
 from documents.parsers import get_default_file_extension
 
 
-class ModelWithOwner(models.Model):
+class ModelWithOwner(SoftDeleteModel):
     owner = models.ForeignKey(
         User,
         blank=True,
@@ -1262,7 +1264,7 @@ class WorkflowAction(models.Model):
         return f"WorkflowAction {self.pk}"
 
 
-class Workflow(models.Model):
+class Workflow(SoftDeleteModel):
     name = models.CharField(_("name"), max_length=256, unique=True)
 
     order = models.IntegerField(_("order"), default=0)

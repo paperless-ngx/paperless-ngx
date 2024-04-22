@@ -1362,6 +1362,20 @@ processing. This only has an effect if
 
     Defaults to false.
 
+## Trash
+
+#### [`EMPTY_TRASH_DELAY=<num>`](#EMPTY_TRASH_DELAY) {#EMPTY_TRASH_DELAY}
+
+: Sets how long in days objects remain in the 'trash' before they are permanently deleted.
+
+    Defaults to 30 days, minimum of 1 day.
+
+#### [`PAPERLESS_EMPTY_TRASH_TASK_CRON=<cron expression>`](#PAPERLESS_EMPTY_TRASH_TASK_CRON) {#PAPERLESS_EMPTY_TRASH_TASK_CRON}
+
+: Configures the schedule to empty the trash of expired deleted objects.
+
+    Defaults to `0 1 * * *`, once per day.
+
 ## Binaries
 
 There are a few external software packages that Paperless expects to

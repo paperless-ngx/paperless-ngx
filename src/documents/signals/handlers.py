@@ -1,6 +1,7 @@
 import logging
 import os
 import shutil
+from datetime import timedelta
 from typing import Optional
 
 from celery import states
@@ -302,7 +303,13 @@ def set_storage_path(
 
 
 @receiver(models.signals.post_delete, sender=Document)
-def cleanup_document_deletion(sender, instance, using, **kwargs):
+def cleanup_document_deletion(sender, instance, **kwargs):
+    now = timezone.localtime(timezone.now())
+    if now - instance.deleted_at < timedelta(days=settings.EMPTY_TRASH_DELAY):
+        logger.info(
+            f"Detected soft delete of {instance!s}. Deferring cleanup.",
+        )
+        return
     with FileLock(settings.MEDIA_LOCK):
         if settings.TRASH_DIR:
             # Find a non-conflicting filename in case a document with the same

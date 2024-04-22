@@ -540,6 +540,15 @@
             "index": "pypi",
             "version": "==0.1.12"
         },
+        "django-soft-delete": {
+            "hashes": [
+                "sha256:2b28ab95d18847ea301c46f6f172ea878490fdf12261c697ec7e44b9d652f866",
+                "sha256:5afe70c0f5ce066c0e287c39806fb949ab66e73305a11b88d4c533247f3b96f0"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.6'",
+            "version": "==1.0.12"
+        },
         "djangorestframework": {
             "hashes": [
                 "sha256:579a333e6256b09489cbe0a067e66abe55c6595d8926be6b99423786334350c8",
