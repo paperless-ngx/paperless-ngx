@@ -77,6 +77,7 @@ enum DocumentDetailNavIDs {
   Preview = 4,
   Notes = 5,
   Permissions = 6,
+  History = 7,
 }
 
 enum ContentRenderType {
@@ -898,6 +899,17 @@ export class DocumentDetailComponent
       this.permissionsService.currentUserCan(
         PermissionAction.View,
         PermissionType.Note
+      )
+    )
+  }
+
+  get historyEnabled(): boolean {
+    return (
+      this.settings.get(SETTINGS_KEYS.AUDITLOG_ENABLED) &&
+      this.userIsOwner &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.History
       )
     )
   }

@@ -316,6 +316,133 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_document_history_action(self):
+        """
+        GIVEN:
+            - Document
+        WHEN:
+            - Document is updated
+        THEN:
+            - Audit log contains changes
+        """
+        doc = Document.objects.create(
+            title="First title",
+            checksum="123",
+            mime_type="application/pdf",
+        )
+        self.client.force_login(user=self.user)
+        self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            {"title": "New title"},
+            format="json",
+        )
+
+        response = self.client.get(f"/api/documents/{doc.pk}/history/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]["actor"]["id"], self.user.id)
+        self.assertEqual(response.data[0]["action"], "update")
+        self.assertEqual(
+            response.data[0]["changes"],
+            {"title": ["First title", "New title"]},
+        )
+
+    def test_document_history_action_w_custom_fields(self):
+        """
+        GIVEN:
+            - Document with custom fields
+        WHEN:
+            - Document is updated
+        THEN:
+            - Audit log contains custom field changes
+        """
+        doc = Document.objects.create(
+            title="First title",
+            checksum="123",
+            mime_type="application/pdf",
+        )
+        custom_field = CustomField.objects.create(
+            name="custom field str",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        self.client.force_login(user=self.user)
+        self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            data={
+                "custom_fields": [
+                    {
+                        "field": custom_field.pk,
+                        "value": "custom value",
+                    },
+                ],
+            },
+            format="json",
+        )
+
+        response = self.client.get(f"/api/documents/{doc.pk}/history/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[1]["actor"]["id"], self.user.id)
+        self.assertEqual(response.data[1]["action"], "create")
+        self.assertEqual(
+            response.data[1]["changes"],
+            {
+                "custom_fields": {
+                    "type": "custom_field",
+                    "field": "custom field str",
+                    "value": "custom value",
+                },
+            },
+        )
+
+    @override_settings(AUDIT_LOG_ENABLED=False)
+    def test_document_history_action_disabled(self):
+        """
+        GIVEN:
+            - Audit log is disabled
+        WHEN:
+            - Document is updated
+            - Audit log is requested
+        THEN:
+            - Audit log returns HTTP 400 Bad Request
+        """
+        doc = Document.objects.create(
+            title="First title",
+            checksum="123",
+            mime_type="application/pdf",
+        )
+        self.client.force_login(user=self.user)
+        self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            {"title": "New title"},
+            format="json",
+        )
+
+        response = self.client.get(f"/api/documents/{doc.pk}/history/")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_document_history_insufficient_perms(self):
+        """
+        GIVEN:
+            - Audit log is disabled
+        WHEN:
+            - Document is updated
+            - Audit log is requested
+        THEN:
+            - Audit log returns HTTP 400 Bad Request
+        """
+        user = User.objects.create_user(username="test")
+        user.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        self.client.force_login(user=user)
+        doc = Document.objects.create(
+            title="First title",
+            checksum="123",
+            mime_type="application/pdf",
+            owner=user,
+        )
+
+        response = self.client.get(f"/api/documents/{doc.pk}/history/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_document_filters(self):
         doc1 = Document.objects.create(
             title="none1",

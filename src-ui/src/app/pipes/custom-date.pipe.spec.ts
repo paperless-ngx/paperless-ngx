@@ -30,4 +30,14 @@ describe('CustomDatePipe', () => {
       )
     ).toEqual('2023-05-04')
   })
+
+  it('should support relative date formatting', () => {
+    const now = new Date()
+    const notNow = new Date(now)
+    notNow.setDate(now.getDate() - 1)
+    expect(datePipe.transform(notNow, 'relative')).toEqual('1 day ago')
+    notNow.setDate(now.getDate() - 2)
+    expect(datePipe.transform(notNow, 'relative')).toEqual('2 days ago')
+    expect(datePipe.transform(now, 'relative')).toEqual('Just now')
+  })
 })

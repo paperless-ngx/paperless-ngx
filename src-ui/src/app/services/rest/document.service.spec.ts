@@ -266,6 +266,13 @@ describe(`DocumentService`, () => {
     )
     expect(req.request.body.remove_inbox_tags).toEqual(true)
   })
+
+  it('should call appropriate api endpoint for getting audit log', () => {
+    subscription = service.getHistory(documents[0].id).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/history/`
+    )
+  })
 })
 
 afterEach(() => {

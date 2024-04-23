@@ -882,7 +882,12 @@ class CustomFieldInstance(models.Model):
 
 
 if settings.AUDIT_LOG_ENABLED:
-    auditlog.register(Document, m2m_fields={"tags"})
+    auditlog.register(
+        Document,
+        m2m_fields={"tags"},
+        mask_fields=["content"],
+        exclude_fields=["modified"],
+    )
     auditlog.register(Correspondent)
     auditlog.register(Tag)
     auditlog.register(DocumentType)
