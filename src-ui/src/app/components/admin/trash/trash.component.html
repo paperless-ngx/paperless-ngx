@@ -3,19 +3,19 @@ title="Trash"
 i18n-title
 info="Manage trashed items."
 >
-<button class="btn btn-sm btn-outline-secondary" (click)="clearSelection()" [hidden]="selectedObjects.size === 0">
+<button class="btn btn-sm btn-outline-secondary" (click)="clearSelection()" [hidden]="selectedDocuments.size === 0">
   <i-bs  name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
 </button>
-<button type="button" class="btn btn-sm btn-outline-danger" (click)="emptyTrash(selectedObjects)" [disabled]="selectedObjects.size === 0">
-  <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete objects</ng-container>
+<button type="button" class="btn btn-sm btn-outline-danger" (click)="emptyTrash(selectedDocuments)" [disabled]="selectedDocuments.size === 0">
+  <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete selected</ng-container>
 </button>
-<button type="button" class="btn btn-sm btn-outline-danger" (click)="emptyTrash()" [disabled]="trashedObjects.length === 0">
+<button type="button" class="btn btn-sm btn-outline-danger" (click)="emptyTrash()" [disabled]="documentsInTrash.length === 0">
   <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Empty trash</ng-container>
 </button>
 </pngx-page-header>
 
   <div class="row mb-3">
-    <ngb-pagination class="col-auto" [pageSize]="25" [collectionSize]="trashedObjects.length" [(page)]="page" [maxSize]="5" (pageChange)="reload()" size="sm" aria-label="Pagination"></ngb-pagination>
+    <ngb-pagination class="col-auto" [pageSize]="25" [collectionSize]="documentsInTrash.length" [(page)]="page" [maxSize]="5" (pageChange)="reload()" size="sm" aria-label="Pagination"></ngb-pagination>
   </div>
 
   <div class="card border table-responsive mb-3">
@@ -24,7 +24,7 @@ info="Manage trashed items."
             <tr>
             <th scope="col">
                 <div class="form-check m-0 ms-2 me-n2">
-                <input type="checkbox" class="form-check-input" id="all-objects" [(ngModel)]="togggleAll" [disabled]="trashedObjects.length === 0" (click)="toggleAll($event); $event.stopPropagation();">
+                <input type="checkbox" class="form-check-input" id="all-objects" [(ngModel)]="togggleAll" [disabled]="documentsInTrash.length === 0" (click)="toggleAll($event); $event.stopPropagation();">
                 <label class="form-check-label" for="all-objects"></label>
                 </div>
             </th>
@@ -42,16 +42,16 @@ info="Manage trashed items."
                     </td>
                 </tr>
             }
-            @for (object of trashedObjects; track object.id) {
-                <tr (click)="toggleSelected(object); $event.stopPropagation();">
+            @for (document of documentsInTrash; track document.id) {
+                <tr (click)="toggleSelected(document); $event.stopPropagation();">
                     <td>
                     <div class="form-check m-0 ms-2 me-n2">
-                        <input type="checkbox" class="form-check-input" id="{{object.id}}" [checked]="selectedObjects.has(object.id)" (click)="toggleSelected(object); $event.stopPropagation();">
-                        <label class="form-check-label" for="{{object.id}}"></label>
+                        <input type="checkbox" class="form-check-input" id="{{document.id}}" [checked]="selectedDocuments.has(document.id)" (click)="toggleSelected(document); $event.stopPropagation();">
+                        <label class="form-check-label" for="{{document.id}}"></label>
                     </div>
                     </td>
-                    <td scope="row">{{ object['name'] ?? object['title'] }}</td>
-                    <td scope="row">{{ object['deleted_at'] | customDate }}</td>
+                    <td scope="row">{{ document.title }}</td>
+                    <td scope="row">{{ document.deleted_at | customDate }}</td>
                     <td scope="row">
                     <div class="btn-group d-block d-sm-none">
                         <div ngbDropdown container="body" class="d-inline-block">
@@ -59,16 +59,16 @@ info="Manage trashed items."
                             <i-bs name="three-dots-vertical"></i-bs>
                         </button>
                         <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">
-                            <button (click)="restoreObject(object)" ngbDropdownItem i18n>Restore</button>
-                            <button (click)="deleteObject(object)" ngbDropdownItem i18n>Delete</button>
+                            <button (click)="restore(document)" ngbDropdownItem i18n>Restore</button>
+                            <button (click)="delete(document)" ngbDropdownItem i18n>Delete</button>
                         </div>
                         </div>
                     </div>
                     <div class="btn-group d-none d-sm-block">
-                        <button class="btn btn-sm btn-outline-secondary" (click)="restoreObject(object); $event.stopPropagation();">
+                        <button class="btn btn-sm btn-outline-secondary" (click)="restore(document); $event.stopPropagation();">
                         <i-bs width="1em" height="1em" name="restore"></i-bs>&nbsp;<ng-container i18n>Restore</ng-container>
                         </button>
-                        <button class="btn btn-sm btn-outline-danger" (click)="deleteObject(object); $event.stopPropagation();">
+                        <button class="btn btn-sm btn-outline-danger" (click)="delete(document); $event.stopPropagation();">
                         <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
                         </button>
                     </div>
@@ -82,13 +82,13 @@ info="Manage trashed items."
 @if (!isLoading) {
     <div class="d-flex mb-2">
         <div>
-            <ng-container i18n>{trashedObjects.length, plural, =1 {One object in trash} other {{{trashedObjects.length || 0}} total objects in trash}}</ng-container>
-            @if (selectedObjects.size > 0) {
-            &nbsp;({{selectedObjects.size}} selected)
+            <ng-container i18n>{documentsInTrash.length, plural, =1 {One object in trash} other {{{documentsInTrash.length || 0}} total documents in trash}}</ng-container>
+            @if (selectedDocuments.size > 0) {
+            &nbsp;({{selectedDocuments.size}} selected)
             }
         </div>
-        @if (trashedObjects.length > 20) {
-            <ngb-pagination class="ms-auto" [pageSize]="25" [collectionSize]="trashedObjects.length" [(page)]="page" [maxSize]="5" (pageChange)="reload()" size="sm" aria-label="Pagination"></ngb-pagination>
+        @if (documentsInTrash.length > 20) {
+            <ngb-pagination class="ms-auto" [pageSize]="25" [collectionSize]="documentsInTrash.length" [(page)]="page" [maxSize]="5" (pageChange)="reload()" size="sm" aria-label="Pagination"></ngb-pagination>
         }
     </div>
 }

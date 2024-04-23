@@ -308,8 +308,6 @@ def cleanup_document_deletion(sender, instance, force=False, **kwargs):
         now = timezone.localtime(timezone.now())
         if now - instance.deleted_at < timedelta(days=settings.EMPTY_TRASH_DELAY):
             return
-    # print(instance.pk, force, kwargs)
-    return
     with FileLock(settings.MEDIA_LOCK):
         if settings.TRASH_DIR:
             # Find a non-conflicting filename in case a document with the same

@@ -2077,9 +2077,6 @@ class TrashView(PassUserMixin):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        # user = self.request.user
-        # method = serializer.validated_data.get("method")
-        # parameters = serializer.validated_data.get("parameters")
         doc_ids = serializer.validated_data.get("documents")
         action = serializer.validated_data.get("action")
         if action == "restore":

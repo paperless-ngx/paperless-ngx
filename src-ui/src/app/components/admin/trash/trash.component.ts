@@ -1,57 +1,91 @@
-import { HttpClient } from '@angular/common/http'
-import { Component } from '@angular/core'
-import { ObjectWithId } from 'src/app/data/object-with-id'
+import { Component, OnDestroy } from '@angular/core'
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { Document } from 'src/app/data/document'
 import { ToastService } from 'src/app/services/toast.service'
 import { TrashService } from 'src/app/services/trash.service'
-import { environment } from 'src/environments/environment'
+import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
+import { Subject, takeUntil } from 'rxjs'
 
 @Component({
   selector: 'pngx-trash',
   templateUrl: './trash.component.html',
   styleUrl: './trash.component.scss',
 })
-export class TrashComponent {
-  public trashedObjects: ObjectWithId[] = []
-  public selectedObjects: Set<number> = new Set()
+export class TrashComponent implements OnDestroy {
+  public documentsInTrash: Document[] = []
+  public selectedDocuments: Set<number> = new Set()
   public togggleAll: boolean = false
   public page: number = 1
   public isLoading: boolean = false
+  unsubscribeNotifier: Subject<void> = new Subject()
 
   constructor(
     private trashService: TrashService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private modalService: NgbModal
   ) {
     this.reload()
   }
 
+  ngOnDestroy() {
+    this.unsubscribeNotifier.next()
+    this.unsubscribeNotifier.complete()
+  }
+
   reload() {
     this.isLoading = true
-    this.trashService.getTrash().subscribe((trash) => {
-      this.trashedObjects = trash
+    this.trashService.getTrash().subscribe((documentsInTrash) => {
+      this.documentsInTrash = documentsInTrash
       this.isLoading = false
-      console.log('Trash:', trash)
+      console.log('Trash:', documentsInTrash)
     })
   }
 
-  deleteObject(object: ObjectWithId) {
-    this.trashService.emptyTrash([object.id]).subscribe(() => {
-      this.toastService.showInfo($localize`Object deleted`)
-      this.reload()
+  delete(document: Document) {
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
     })
-  }
-
-  emptyTrash(objects: Set<number> = null) {
-    console.log('Emptying trash')
-    this.trashService
-      .emptyTrash(objects ? Array.from(objects) : [])
+    modal.componentInstance.title = $localize`Confirm delete`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete this document.`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Delete`
+    modal.componentInstance.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        this.toastService.showInfo($localize`Object(s) deleted`)
-        this.reload()
+        modal.componentInstance.buttonsEnabled = false
+        this.trashService.emptyTrash([document.id]).subscribe(() => {
+          this.toastService.showInfo($localize`Document deleted`)
+          this.reload()
+        })
       })
   }
 
-  restoreObject(object: ObjectWithId) {
-    this.trashService.restoreObjects([object.id]).subscribe(() => {
+  emptyTrash(documents: Set<number> = null) {
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Confirm delete`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete ${
+      documents?.size ?? $localize`all`
+    } documents.`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Delete`
+    modal.componentInstance.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        this.trashService
+          .emptyTrash(documents ? Array.from(documents) : [])
+          .subscribe(() => {
+            this.toastService.showInfo($localize`Document(s) deleted`)
+            this.reload()
+          })
+      })
+  }
+
+  restore(document: Document) {
+    this.trashService.restoreDocuments([document.id]).subscribe(() => {
       this.toastService.showInfo($localize`Object restored`)
       this.reload()
     })
@@ -59,7 +93,7 @@ export class TrashComponent {
 
   restoreAll(objects: Set<number> = null) {
     this.trashService
-      .restoreObjects(objects ? Array.from(this.selectedObjects) : [])
+      .restoreDocuments(objects ? Array.from(this.selectedDocuments) : [])
       .subscribe(() => {
         this.toastService.showInfo($localize`Object(s) restored`)
         this.reload()
@@ -68,20 +102,20 @@ export class TrashComponent {
 
   toggleAll(event: PointerEvent) {
     if ((event.target as HTMLInputElement).checked) {
-      this.selectedObjects = new Set(this.trashedObjects.map((t) => t.id))
+      this.selectedDocuments = new Set(this.documentsInTrash.map((t) => t.id))
     } else {
       this.clearSelection()
     }
   }
 
-  toggleSelected(object: ObjectWithId) {
-    this.selectedObjects.has(object.id)
-      ? this.selectedObjects.delete(object.id)
-      : this.selectedObjects.add(object.id)
+  toggleSelected(object: Document) {
+    this.selectedDocuments.has(object.id)
+      ? this.selectedDocuments.delete(object.id)
+      : this.selectedDocuments.add(object.id)
   }
 
   clearSelection() {
     this.togggleAll = false
-    this.selectedObjects.clear()
+    this.selectedDocuments.clear()
   }
 }

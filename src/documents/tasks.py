@@ -307,27 +307,10 @@ def empty_trash(doc_ids=None):
         if doc_ids is not None
         else Document.deleted_objects.filter(deleted_at__gt=cutoff)
     )
-    # print(documents, doc_ids)
     for doc in documents:
-        # with disable_signal(
-        #     post_delete,
-        #     receiver=cleanup_document_deletion,
-        #     sender=Document,
-        # ):
         doc.delete()
         post_delete.send(
             sender=Document,
             instance=doc,
             force=True,
         )
-
-    # messages.log_messages()
-
-    # if messages.has_error:
-    #     raise SanityCheckFailedException("Sanity check failed with errors. See log.")
-    # elif messages.has_warning:
-    #     return "Sanity check exited with warnings. See log."
-    # elif len(messages) > 0:
-    #     return "Sanity check exited with infos. See log."
-    # else:
-    #     return "No issues detected."
