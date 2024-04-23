@@ -285,6 +285,17 @@
           </li>
         }
 
+        @if (historyEnabled) {
+          <li [ngbNavItem]="DocumentDetailNavIDs.History">
+            <a ngbNavLink i18n>History</a>
+            <ng-template ngbNavContent>
+              <div class="mb-3">
+                <pngx-document-history [documentId]="documentId"></pngx-document-history>
+              </div>
+            </ng-template>
+          </li>
+        }
+
         @if (showPermissions) {
           <li [ngbNavItem]="DocumentDetailNavIDs.Permissions">
             <a ngbNavLink i18n>Permissions</a>

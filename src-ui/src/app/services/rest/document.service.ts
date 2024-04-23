@@ -19,7 +19,8 @@ import {
   PermissionsService,
 } from '../permissions.service'
 import { SettingsService } from '../settings.service'
-import { SETTINGS, SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { AuditLogEntry } from 'src/app/data/auditlog-entry'
 
 export const DOCUMENT_SORT_FIELDS = [
   { field: 'archive_serial_number', name: $localize`ASN` },
@@ -220,6 +221,10 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     return this.http.get<DocumentSuggestions>(
       this.getResourceUrl(id, 'suggestions')
     )
+  }
+
+  getHistory(id: number): Observable<AuditLogEntry[]> {
+    return this.http.get<AuditLogEntry[]>(this.getResourceUrl(id, 'history'))
   }
 
   bulkDownload(

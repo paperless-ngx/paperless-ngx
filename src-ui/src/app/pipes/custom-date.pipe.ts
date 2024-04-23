@@ -34,6 +34,51 @@ export class CustomDatePipe implements PipeTransform {
       this.settings.get(SETTINGS_KEYS.DATE_LOCALE) ||
       this.defaultLocale
     let f = format || this.settings.get(SETTINGS_KEYS.DATE_FORMAT)
+    if (format === 'relative') {
+      const seconds = Math.floor((+new Date() - +new Date(value)) / 1000)
+      if (seconds < 60) return $localize`Just now`
+      const intervals = {
+        year: {
+          label: $localize`year ago`,
+          labelPlural: $localize`years ago`,
+          interval: 31536000,
+        },
+        month: {
+          label: $localize`month ago`,
+          labelPlural: $localize`months ago`,
+          interval: 2592000,
+        },
+        week: {
+          label: $localize`week ago`,
+          labelPlural: $localize`weeks ago`,
+          interval: 604800,
+        },
+        day: {
+          label: $localize`day ago`,
+          labelPlural: $localize`days ago`,
+          interval: 86400,
+        },
+        hour: {
+          label: $localize`hour ago`,
+          labelPlural: $localize`hours ago`,
+          interval: 3600,
+        },
+        minute: {
+          label: $localize`minute ago`,
+          labelPlural: $localize`minutes ago`,
+          interval: 60,
+        },
+      }
+      let counter
+      for (const i in intervals) {
+        counter = Math.floor(seconds / intervals[i].interval)
+        if (counter > 0) {
+          const label =
+            counter > 1 ? intervals[i].labelPlural : intervals[i].label
+          return `${counter} ${label}`
+        }
+      }
+    }
     if (l == 'iso-8601') {
       return this.datePipe.transform(value, FORMAT_TO_ISO_FORMAT[f], timezone)
     } else {
