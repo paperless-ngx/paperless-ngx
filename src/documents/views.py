@@ -142,12 +142,14 @@ from documents.serialisers import StoragePathSerializer
 from documents.serialisers import TagSerializer
 from documents.serialisers import TagSerializerVersion1
 from documents.serialisers import TasksViewSerializer
+from documents.serialisers import TrashSerializer
 from documents.serialisers import UiSettingsViewSerializer
 from documents.serialisers import WorkflowActionSerializer
 from documents.serialisers import WorkflowSerializer
 from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_updated
 from documents.tasks import consume_file
+from documents.tasks import empty_trash
 from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import GeneralConfig
@@ -2050,3 +2052,39 @@ class SystemStatusView(PassUserMixin):
                 },
             },
         )
+
+
+class TrashView(PassUserMixin):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = TrashSerializer
+
+    def get(self, request, format=None):
+        user = self.request.user
+        documents = Document.deleted_objects.filter(
+            owner=user,
+        ) | Document.deleted_objects.filter(
+            owner=None,
+        )
+
+        context = {
+            "request": request,
+        }
+
+        serializer = DocumentSerializer(documents, many=True, context=context)
+        return Response(serializer.data)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # user = self.request.user
+        # method = serializer.validated_data.get("method")
+        # parameters = serializer.validated_data.get("parameters")
+        doc_ids = serializer.validated_data.get("documents")
+        action = serializer.validated_data.get("action")
+        if action == "restore":
+            for doc in Document.deleted_objects.filter(id__in=doc_ids).all():
+                doc.restore(strict=False)
+        elif action == "empty":
+            empty_trash(doc_ids=doc_ids)
+        return Response({"result": "OK", "doc_ids": doc_ids})

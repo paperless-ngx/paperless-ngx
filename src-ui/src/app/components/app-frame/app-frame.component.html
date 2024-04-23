@@ -267,6 +267,15 @@
                 </a>
               </li>
             }
+            <!-- @if (permissionsService.isAdmin()) { -->
+              <li class="nav-item app-link">
+                <a class="nav-link" routerLink="trash" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Trash"
+                  i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body"
+                  triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+                  <i-bs class="me-1" name="trash"></i-bs><span>&nbsp;<ng-container i18n>Trash</ng-container></span>
+                </a>
+              </li>
+            <!-- } -->
             <li class="nav-item mt-2" tourAnchor="tour.outro">
               <a class="px-3 py-2 text-muted small d-flex align-items-center flex-wrap text-decoration-none"
                 target="_blank" rel="noopener noreferrer" href="https://docs.paperless-ngx.com" ngbPopover="Documentation"

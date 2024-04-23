@@ -462,7 +462,7 @@ class SavedView(ModelWithOwner):
         return f"SavedView {self.name}"
 
 
-class SavedViewFilterRule(models.Model):
+class SavedViewFilterRule(SoftDeleteModel):
     RULE_TYPES = [
         (0, _("title contains")),
         (1, _("content contains")),
@@ -694,7 +694,7 @@ class PaperlessTask(models.Model):
         return f"Task {self.task_id}"
 
 
-class Note(models.Model):
+class Note(SoftDeleteModel):
     note = models.TextField(
         _("content"),
         blank=True,
@@ -734,7 +734,7 @@ class Note(models.Model):
         return self.note
 
 
-class ShareLink(models.Model):
+class ShareLink(SoftDeleteModel):
     class FileVersion(models.TextChoices):
         ARCHIVE = ("archive", _("Archive"))
         ORIGINAL = ("original", _("Original"))
@@ -794,7 +794,7 @@ class ShareLink(models.Model):
         return f"Share Link for {self.document.title}"
 
 
-class CustomField(models.Model):
+class CustomField(SoftDeleteModel):
     """
     Defines the name and type of a custom field
     """
@@ -840,7 +840,7 @@ class CustomField(models.Model):
         return f"{self.name} : {self.data_type}"
 
 
-class CustomFieldInstance(models.Model):
+class CustomFieldInstance(SoftDeleteModel):
     """
     A single instance of a field, attached to a CustomField for the name and type
     and attached to a single Document to be metadata for it
@@ -941,7 +941,7 @@ if settings.AUDIT_LOG_ENABLED:
     auditlog.register(CustomFieldInstance)
 
 
-class WorkflowTrigger(models.Model):
+class WorkflowTrigger(SoftDeleteModel):
     class WorkflowTriggerMatching(models.IntegerChoices):
         # No auto matching
         NONE = MatchingModel.MATCH_NONE, _("None")
@@ -1045,7 +1045,7 @@ class WorkflowTrigger(models.Model):
         return f"WorkflowTrigger {self.pk}"
 
 
-class WorkflowAction(models.Model):
+class WorkflowAction(SoftDeleteModel):
     class WorkflowActionType(models.IntegerChoices):
         ASSIGNMENT = (
             1,

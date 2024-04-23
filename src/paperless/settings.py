@@ -212,7 +212,7 @@ def _parse_beat_schedule() -> dict:
             "env_key": "PAPERLESS_EMPTY_TRASH_TASK_CRON",
             # Default daily at 01:00
             "env_default": "0 1 * * *",
-            "task": "documents.tasks.sanity_check",
+            "task": "documents.tasks.empty_trash",
             "options": {
                 # 1 hour before default schedule sends again
                 "expires": 23.0

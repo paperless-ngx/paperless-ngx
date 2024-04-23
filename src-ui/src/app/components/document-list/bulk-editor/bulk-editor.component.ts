@@ -708,12 +708,10 @@ export class BulkEditorComponent
     let modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.delayConfirm(5)
     modal.componentInstance.title = $localize`Delete confirm`
-    modal.componentInstance.messageBold = $localize`This operation will permanently delete ${this.list.selected.size} selected document(s).`
-    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.messageBold = $localize`Move ${this.list.selected.size} selected document(s) to the trash?`
     modal.componentInstance.btnClass = 'btn-danger'
-    modal.componentInstance.btnCaption = $localize`Delete document(s)`
+    modal.componentInstance.btnCaption = $localize`Move to trash`
     modal.componentInstance.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {

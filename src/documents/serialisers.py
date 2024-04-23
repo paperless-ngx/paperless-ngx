@@ -786,6 +786,7 @@ class DocumentSerializer(
             "created_date",
             "modified",
             "added",
+            "deleted_at",
             "archive_serial_number",
             "original_file_name",
             "archived_file_name",
@@ -1863,3 +1864,33 @@ class WorkflowSerializer(serializers.ModelSerializer):
         self.prune_triggers_and_actions()
 
         return instance
+
+
+class TrashSerializer(SerializerWithPerms):
+    documents = serializers.ListField(
+        required=True,
+        label="Documents",
+        write_only=True,
+        child=serializers.IntegerField(),
+    )
+
+    action = serializers.ChoiceField(
+        choices=["restore", "empty"],
+        label="Action",
+        write_only=True,
+    )
+
+    def _validate_document_id_list(self, documents, name="documents"):
+        if not isinstance(documents, list):
+            raise serializers.ValidationError(f"{name} must be a list")
+        if not all(isinstance(i, int) for i in documents):
+            raise serializers.ValidationError(f"{name} must be a list of integers")
+        count = Document.deleted_objects.filter(id__in=documents).count()
+        if not count == len(documents):
+            raise serializers.ValidationError(
+                f"Some documents in {name} have not yet been deleted.",
+            )
+
+    def validate_documents(self, documents):
+        self._validate_document_id_list(documents)
+        return documents

@@ -2,6 +2,7 @@ import hashlib
 import logging
 import shutil
 import uuid
+from datetime import timedelta
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Optional
@@ -11,7 +12,9 @@ from celery import Task
 from celery import shared_task
 from django.conf import settings
 from django.db import transaction
+from django.db.models.signals import post_delete
 from django.db.models.signals import post_save
+from django.utils import timezone
 from filelock import FileLock
 from whoosh.writing import AsyncWriter
 
@@ -292,3 +295,39 @@ def update_document_archive_file(document_id):
         )
     finally:
         parser.cleanup()
+
+
+@shared_task
+def empty_trash(doc_ids=None):
+    cutoff = timezone.localtime(timezone.now()) - timedelta(
+        days=settings.EMPTY_TRASH_DELAY,
+    )
+    documents = (
+        Document.deleted_objects.filter(id__in=doc_ids)
+        if doc_ids is not None
+        else Document.deleted_objects.filter(deleted_at__gt=cutoff)
+    )
+    # print(documents, doc_ids)
+    for doc in documents:
+        # with disable_signal(
+        #     post_delete,
+        #     receiver=cleanup_document_deletion,
+        #     sender=Document,
+        # ):
+        doc.delete()
+        post_delete.send(
+            sender=Document,
+            instance=doc,
+            force=True,
+        )
+
+    # messages.log_messages()
+
+    # if messages.has_error:
+    #     raise SanityCheckFailedException("Sanity check failed with errors. See log.")
+    # elif messages.has_warning:
+    #     return "Sanity check exited with warnings. See log."
+    # elif len(messages) > 0:
+    #     return "Sanity check exited with infos. See log."
+    # else:
+    #     return "No issues detected."

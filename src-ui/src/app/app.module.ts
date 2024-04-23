@@ -357,6 +357,7 @@ import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeUk from '@angular/common/locales/uk'
 import localeZh from '@angular/common/locales/zh'
+import { TrashComponent } from './components/admin/trash/trash.component'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -497,6 +498,7 @@ function initializeApp(settings: SettingsService) {
     GlobalSearchComponent,
     HotkeyDialogComponent,
     DeletePagesConfirmDialogComponent,
+    TrashComponent,
   ],
   imports: [
     BrowserModule,
