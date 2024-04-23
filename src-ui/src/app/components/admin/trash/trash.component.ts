@@ -14,7 +14,7 @@ import { Subject, takeUntil } from 'rxjs'
 export class TrashComponent implements OnDestroy {
   public documentsInTrash: Document[] = []
   public selectedDocuments: Set<number> = new Set()
-  public togggleAll: boolean = false
+  public allToggled: boolean = false
   public page: number = 1
   public isLoading: boolean = false
   unsubscribeNotifier: Subject<void> = new Subject()
@@ -37,7 +37,7 @@ export class TrashComponent implements OnDestroy {
     this.trashService.getTrash().subscribe((documentsInTrash) => {
       this.documentsInTrash = documentsInTrash
       this.isLoading = false
-      console.log('Trash:', documentsInTrash)
+      this.selectedDocuments.clear()
     })
   }
 
@@ -79,6 +79,7 @@ export class TrashComponent implements OnDestroy {
           .emptyTrash(documents ? Array.from(documents) : [])
           .subscribe(() => {
             this.toastService.showInfo($localize`Document(s) deleted`)
+            this.allToggled = false
             this.reload()
           })
       })
@@ -86,7 +87,7 @@ export class TrashComponent implements OnDestroy {
 
   restore(document: Document) {
     this.trashService.restoreDocuments([document.id]).subscribe(() => {
-      this.toastService.showInfo($localize`Object restored`)
+      this.toastService.showInfo($localize`Document restored`)
       this.reload()
     })
   }
@@ -95,7 +96,8 @@ export class TrashComponent implements OnDestroy {
     this.trashService
       .restoreDocuments(objects ? Array.from(this.selectedDocuments) : [])
       .subscribe(() => {
-        this.toastService.showInfo($localize`Object(s) restored`)
+        this.toastService.showInfo($localize`Document(s) restored`)
+        this.allToggled = false
         this.reload()
       })
   }
@@ -115,7 +117,7 @@ export class TrashComponent implements OnDestroy {
   }
 
   clearSelection() {
-    this.togggleAll = false
+    this.allToggled = false
     this.selectedDocuments.clear()
   }
 }
