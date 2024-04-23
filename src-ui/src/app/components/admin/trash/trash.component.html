@@ -32,7 +32,7 @@ info="Manage trashed items."
                 </div>
             </th>
             <th scope="col" class="fw-normal" i18n>Name</th>
-            <th scope="col" class="fw-normal d-none d-sm-table-cell" i18n>Deleted</th>
+            <th scope="col" class="fw-normal d-none d-sm-table-cell" i18n>Remaining</th>
             <th scope="col" class="fw-normal" i18n>Actions</th>
             </tr>
         </thead>
@@ -54,7 +54,7 @@ info="Manage trashed items."
                     </div>
                     </td>
                     <td scope="row">{{ document.title }}</td>
-                    <td scope="row">{{ document.deleted_at | customDate }}</td>
+                    <td scope="row" i18n>{{ getDaysRemaining(document) }} days</td>
                     <td scope="row">
                     <div class="btn-group d-block d-sm-none">
                         <div ngbDropdown container="body" class="d-inline-block">

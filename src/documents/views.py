@@ -1559,6 +1559,8 @@ class UiSettingsView(GenericAPIView):
                 "backend_setting": settings.ENABLE_UPDATE_CHECK,
             }
 
+        ui_settings["trash_delay"] = settings.EMPTY_TRASH_DELAY
+
         general_config = GeneralConfig()
 
         ui_settings["app_title"] = settings.APP_TITLE

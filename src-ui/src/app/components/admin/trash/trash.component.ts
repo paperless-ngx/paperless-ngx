@@ -5,6 +5,8 @@ import { ToastService } from 'src/app/services/toast.service'
 import { TrashService } from 'src/app/services/trash.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { Subject, takeUntil } from 'rxjs'
+import { SettingsService } from 'src/app/services/settings.service'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 
 @Component({
   selector: 'pngx-trash',
@@ -22,7 +24,8 @@ export class TrashComponent implements OnDestroy {
   constructor(
     private trashService: TrashService,
     private toastService: ToastService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private settingsService: SettingsService
   ) {
     this.reload()
   }
@@ -119,5 +122,12 @@ export class TrashComponent implements OnDestroy {
   clearSelection() {
     this.allToggled = false
     this.selectedDocuments.clear()
+  }
+
+  getDaysRemaining(document: Document): number {
+    const delay = this.settingsService.get(SETTINGS_KEYS.EMPTY_TRASH_DELAY)
+    const diff = new Date().getTime() - new Date(document.deleted_at).getTime()
+    const days = Math.ceil(diff / (1000 * 3600 * 24))
+    return delay - days
   }
 }
