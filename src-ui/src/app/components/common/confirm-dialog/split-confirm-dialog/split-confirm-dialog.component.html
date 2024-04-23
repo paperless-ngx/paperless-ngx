@@ -6,7 +6,7 @@
 <div class="modal-body">
     <p>{{message}}</p>
     <div class="row mb-2">
-        <div class="col-6">
+        <div class="col-8">
             <div class="input-group input-group-sm">
                 <div class="input-group-text" i18n>Page</div>
                 <input class="form-control" type="number" min="1" [(ngModel)]="page" />
@@ -21,9 +21,9 @@
                 </pngx-pdf-viewer>
             </div>
         </div>
-        <div class="col-6">
+        <div class="col-4">
             <div class="d-grid">
-                <button class="btn btn-sm btn-primary" (click)="addSplit()">
+                <button class="btn btn-sm btn-primary" (click)="addSplit()" [disabled]="page === totalPages">
                     <i-bs name="plus-circle"></i-bs>&nbsp;
                     <span i18n>Add Split</span>
                 </button>
@@ -31,11 +31,11 @@
 
             <ul class="list-group mt-3">
                 @for (pageStr of pagesString.split(','); track pageStr; let i = $index) {
-                    <li class="list-group-item">
+                    <li class="list-group-item d-flex align-items-center">
                         {{pageStr}}
                         @if (pagesString.split(',').length > 1) {
                             &nbsp;
-                            <button class="btn btn-sm btn-danger" (click)="removeSplit(i)">
+                            <button class="btn btn-sm btn-danger ms-auto" (click)="removeSplit(i)">
                                 <i-bs name="trash"></i-bs>
                             </button>
                         }
