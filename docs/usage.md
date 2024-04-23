@@ -472,6 +472,12 @@ Paperless-ngx supports 3 basic editing operations for PDFs (these operations can
 
     Note that rotation alters the Paperless-ngx _original_ file, which would, for example, invalidate a digital signature.
 
+## Document History
+
+As of version 2.7, Paperless-ngx automatically records all changes to a document and records this in an audit log. The feature requires [`PAPERLESS_AUDIT_LOG_ENABLED`](configuration.md#PAPERLESS_AUDIT_LOG_ENABLED) be enabled, which it is by default as of version 2.7.
+Changes to documents are visible under the "History" tab. Note that certain changes such as those made by workflows, record the 'actor'
+as "System".
+
 ## Best practices {#basic-searching}
 
 Paperless offers a couple tools that help you organize your document

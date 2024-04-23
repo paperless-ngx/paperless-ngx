@@ -19,6 +19,7 @@ export enum PermissionType {
   PaperlessTask = '%s_paperlesstask',
   AppConfig = '%s_applicationconfiguration',
   UISettings = '%s_uisettings',
+  History = '%s_logentry',
   Note = '%s_note',
   MailAccount = '%s_mailaccount',
   MailRule = '%s_mailrule',

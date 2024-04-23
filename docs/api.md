@@ -140,6 +140,7 @@ document. Paperless only reports PDF metadata at this point.
 
 - `/api/documents/<id>/notes/`: Retrieve notes for a document.
 - `/api/documents/<id>/share_links/`: Retrieve share links for a document.
+- `/api/documents/<id>/history/`: Retrieve history of changes for a document.
 
 ## Authorization
 

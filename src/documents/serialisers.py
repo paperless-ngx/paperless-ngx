@@ -5,6 +5,7 @@ import zoneinfo
 from decimal import Decimal
 
 import magic
+from auditlog.context import set_actor
 from celery import states
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -746,7 +747,11 @@ class DocumentSerializer(
                     for tag in instance.tags.all()
                     if tag not in inbox_tags_not_being_added
                 ]
-        super().update(instance, validated_data)
+        if settings.AUDIT_LOG_ENABLED:
+            with set_actor(self.user):
+                super().update(instance, validated_data)
+        else:
+            super().update(instance, validated_data)
         return instance
 
     def __init__(self, *args, **kwargs):
