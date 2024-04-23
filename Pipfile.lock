@@ -1407,12 +1407,12 @@
         },
         "python-ipware": {
             "hashes": [
-                "sha256:70cde60542294432eb176ca739a7bad81499dfc6c8d888e5ed3c486f313de090",
-                "sha256:c465f6fba072f791d06892093afd02d558caddb18c953cf7777754b175e0d97f"
+                "sha256:9117b1c4dddcb5d5ca49e6a9617de2fc66aec2ef35394563ac4eecabdf58c062",
+                "sha256:fc936e6e7ec9fcc107f9315df40658f468ac72f739482a707181742882e36b60"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.7'",
-            "version": "==2.0.3"
+            "version": "==3.0.0"
         },
         "python-magic": {
             "hashes": [
