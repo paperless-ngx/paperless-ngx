@@ -70,6 +70,18 @@
           [documentCounts]="storagePathDocumentCounts"
           [allowSelectNone]="true"></pngx-filterable-dropdown>
         }
+
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.CustomField)) {
+          <pngx-filterable-dropdown class="flex-fill" title="Custom fields" icon="ui-radios" i18n-title
+          filterPlaceholder="Filter custom fields" i18n-filterPlaceholder
+          [items]="customFields"
+          [manyToOne]="true"
+          [(selectionModel)]="customFieldSelectionModel"
+          (selectionModelChange)="updateRules()"
+          (opened)="onCustomFieldsDropdownOpen()"
+          [documentCounts]="customFieldDocumentCounts"
+          [allowSelectNone]="true"></pngx-filterable-dropdown>
+        }
       </div>
       <div class="d-flex flex-wrap gap-2">
         <pngx-date-dropdown

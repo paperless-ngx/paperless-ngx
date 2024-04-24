@@ -68,6 +68,10 @@ const selectionData: SelectionData = {
     { id: 66, document_count: 3 },
     { id: 55, document_count: 0 },
   ],
+  selected_custom_fields: [
+    { id: 1, document_count: 3 },
+    { id: 2, document_count: 0 },
+  ],
 }
 
 describe('BulkEditorComponent', () => {

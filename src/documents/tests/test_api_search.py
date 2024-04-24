@@ -920,6 +920,34 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             ),
         )
 
+        self.assertIn(
+            d4.id,
+            search_query(
+                "&has_custom_fields=1",
+            ),
+        )
+
+        self.assertIn(
+            d4.id,
+            search_query(
+                "&custom_fields__id__in=" + str(cf1.id),
+            ),
+        )
+
+        self.assertIn(
+            d4.id,
+            search_query(
+                "&custom_fields__id__all=" + str(cf1.id),
+            ),
+        )
+
+        self.assertNotIn(
+            d4.id,
+            search_query(
+                "&custom_fields__id__none=" + str(cf1.id),
+            ),
+        )
+
     def test_search_filtering_respect_owner(self):
         """
         GIVEN:
