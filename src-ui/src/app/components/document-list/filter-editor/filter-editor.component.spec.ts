@@ -72,7 +72,7 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ClearableBadgeComponent } from '../../common/clearable-badge/clearable-badge.component'
-import { DateDropdownComponent } from '../../common/date-dropdown/date-dropdown.component'
+import { DatesDropdownComponent } from '../../common/dates-dropdown/dates-dropdown.component'
 import {
   FilterableDropdownComponent,
   LogicalOperator,
@@ -175,7 +175,7 @@ describe('FilterEditorComponent', () => {
         IfPermissionsDirective,
         ClearableBadgeComponent,
         ToggleableDropdownButtonComponent,
-        DateDropdownComponent,
+        DatesDropdownComponent,
         CustomDatePipe,
       ],
       providers: [
@@ -1517,7 +1517,7 @@ describe('FilterEditorComponent', () => {
 
   it('should convert user input to correct filter rules on date created after', fakeAsync(() => {
     const dateCreatedDropdown = fixture.debugElement.queryAll(
-      By.directive(DateDropdownComponent)
+      By.directive(DatesDropdownComponent)
     )[0]
     const dateCreatedAfter = dateCreatedDropdown.queryAll(By.css('input'))[0]
 
@@ -1537,7 +1537,7 @@ describe('FilterEditorComponent', () => {
 
   it('should convert user input to correct filter rules on date created before', fakeAsync(() => {
     const dateCreatedDropdown = fixture.debugElement.queryAll(
-      By.directive(DateDropdownComponent)
+      By.directive(DatesDropdownComponent)
     )[0]
     const dateCreatedBefore = dateCreatedDropdown.queryAll(By.css('input'))[1]
 
@@ -1557,7 +1557,7 @@ describe('FilterEditorComponent', () => {
 
   it('should convert user input to correct filter rules on date created with relative date', fakeAsync(() => {
     const dateCreatedDropdown = fixture.debugElement.queryAll(
-      By.directive(DateDropdownComponent)
+      By.directive(DatesDropdownComponent)
     )[0]
     const dateCreatedBeforeRelativeButton = dateCreatedDropdown.queryAll(
       By.css('button')
@@ -1576,7 +1576,7 @@ describe('FilterEditorComponent', () => {
   it('should carry over text filtering on date created with relative date', fakeAsync(() => {
     component.textFilter = 'foo'
     const dateCreatedDropdown = fixture.debugElement.queryAll(
-      By.directive(DateDropdownComponent)
+      By.directive(DatesDropdownComponent)
     )[0]
     const dateCreatedBeforeRelativeButton = dateCreatedDropdown.queryAll(
       By.css('button')
@@ -1621,10 +1621,10 @@ describe('FilterEditorComponent', () => {
   }))
 
   it('should convert user input to correct filter rules on date added after', fakeAsync(() => {
-    const dateAddedDropdown = fixture.debugElement.queryAll(
-      By.directive(DateDropdownComponent)
-    )[1]
-    const dateAddedAfter = dateAddedDropdown.queryAll(By.css('input'))[0]
+    const datesDropdown = fixture.debugElement.query(
+      By.directive(DatesDropdownComponent)
+    )
+    const dateAddedAfter = datesDropdown.queryAll(By.css('input'))[2]
 
     dateAddedAfter.nativeElement.value = '05/14/2023'
     // dateAddedAfter.triggerEventHandler('change')
@@ -1641,10 +1641,10 @@ describe('FilterEditorComponent', () => {
   }))
 
   it('should convert user input to correct filter rules on date added before', fakeAsync(() => {
-    const dateAddedDropdown = fixture.debugElement.queryAll(
-      By.directive(DateDropdownComponent)
-    )[1]
-    const dateAddedBefore = dateAddedDropdown.queryAll(By.css('input'))[1]
+    const datesDropdown = fixture.debugElement.query(
+      By.directive(DatesDropdownComponent)
+    )
+    const dateAddedBefore = datesDropdown.queryAll(By.css('input'))[2]
 
     dateAddedBefore.nativeElement.value = '05/14/2023'
     // dateAddedBefore.triggerEventHandler('change')
@@ -1661,38 +1661,38 @@ describe('FilterEditorComponent', () => {
   }))
 
   it('should convert user input to correct filter rules on date added with relative date', fakeAsync(() => {
-    const dateAddedDropdown = fixture.debugElement.queryAll(
-      By.directive(DateDropdownComponent)
-    )[1]
-    const dateAddedBeforeRelativeButton = dateAddedDropdown.queryAll(
+    const datesDropdown = fixture.debugElement.query(
+      By.directive(DatesDropdownComponent)
+    )
+    const dateCreatedBeforeRelativeButton = datesDropdown.queryAll(
       By.css('button')
     )[1]
-    dateAddedBeforeRelativeButton.triggerEventHandler('click')
+    dateCreatedBeforeRelativeButton.triggerEventHandler('click')
     fixture.detectChanges()
     tick(400)
     expect(component.filterRules).toEqual([
       {
         rule_type: FILTER_FULLTEXT_QUERY,
-        value: 'added:[-1 week to now]',
+        value: 'created:[-1 week to now]',
       },
     ])
   }))
 
   it('should carry over text filtering on date added with relative date', fakeAsync(() => {
     component.textFilter = 'foo'
-    const dateAddedDropdown = fixture.debugElement.queryAll(
-      By.directive(DateDropdownComponent)
-    )[1]
-    const dateAddedBeforeRelativeButton = dateAddedDropdown.queryAll(
+    const datesDropdown = fixture.debugElement.query(
+      By.directive(DatesDropdownComponent)
+    )
+    const dateCreatedBeforeRelativeButton = datesDropdown.queryAll(
       By.css('button')
     )[1]
-    dateAddedBeforeRelativeButton.triggerEventHandler('click')
+    dateCreatedBeforeRelativeButton.triggerEventHandler('click')
     fixture.detectChanges()
     tick(400)
     expect(component.filterRules).toEqual([
       {
         rule_type: FILTER_FULLTEXT_QUERY,
-        value: 'foo,added:[-1 week to now]',
+        value: 'foo,created:[-1 week to now]',
       },
     ])
   }))

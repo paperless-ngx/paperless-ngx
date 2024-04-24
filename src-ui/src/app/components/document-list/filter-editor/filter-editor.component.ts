@@ -69,7 +69,7 @@ import {
 import { Document } from 'src/app/data/document'
 import { StoragePath } from 'src/app/data/storage-path'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
-import { RelativeDate } from '../../common/date-dropdown/date-dropdown.component'
+import { RelativeDate } from '../../common/dates-dropdown/dates-dropdown.component'
 import {
   OwnerFilterType,
   PermissionsSelectionModel,
