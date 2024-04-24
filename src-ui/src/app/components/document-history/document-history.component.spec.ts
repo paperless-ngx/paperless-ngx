@@ -7,7 +7,7 @@ import { AuditLogAction } from 'src/app/data/auditlog-entry'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DatePipe } from '@angular/common'
-import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgbCollapseModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 describe('DocumentHistoryComponent', () => {
@@ -23,6 +23,7 @@ describe('DocumentHistoryComponent', () => {
         HttpClientTestingModule,
         NgbCollapseModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        NgbTooltipModule,
       ],
     }).compileComponents()
 
