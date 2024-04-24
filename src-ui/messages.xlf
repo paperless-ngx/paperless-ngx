@@ -7388,95 +7388,95 @@
           <context context-type="linenumber">36</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="4272436583644511364" datatype="html">
-        <source>Just now</source>
+      <trans-unit id="7811681478769461161" datatype="html">
+        <source>%s year ago</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3393387677918927062" datatype="html">
+        <source>%s years ago</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3053246523831285824" datatype="html">
+        <source>%s month ago</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1158628882375251480" datatype="html">
+        <source>%s months ago</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7039133412826927309" datatype="html">
+        <source>%s week ago</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2896962543647781653" datatype="html">
+        <source>%s weeks ago</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="91416192007234700" datatype="html">
+        <source>%s day ago</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5601594741748068208" datatype="html">
+        <source>%s days ago</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8387405724402999437" datatype="html">
+        <source>%s hour ago</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2008395012733474465" datatype="html">
+        <source>%s hours ago</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5782387980670840884" datatype="html">
+        <source>%s minute ago</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
           <context context-type="linenumber">39</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="8456127468852940807" datatype="html">
-        <source>year ago</source>
+      <trans-unit id="7573942914011074807" datatype="html">
+        <source>%s minutes ago</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
-          <context context-type="linenumber">42</context>
+          <context context-type="linenumber">40</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="963494111451627204" datatype="html">
-        <source>years ago</source>
+      <trans-unit id="4272436583644511364" datatype="html">
+        <source>Just now</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
-          <context context-type="linenumber">43</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="1919405338795657780" datatype="html">
-        <source>month ago</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
-          <context context-type="linenumber">47</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="6041340836190906216" datatype="html">
-        <source>months ago</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
-          <context context-type="linenumber">48</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="4072659649620334828" datatype="html">
-        <source>week ago</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
-          <context context-type="linenumber">52</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="2871318661796659216" datatype="html">
-        <source>weeks ago</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
-          <context context-type="linenumber">53</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="1328378419272652134" datatype="html">
-        <source>day ago</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
-          <context context-type="linenumber">57</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="5620397708418210833" datatype="html">
-        <source>days ago</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
-          <context context-type="linenumber">58</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="4259498317457105735" datatype="html">
-        <source>hour ago</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
-          <context context-type="linenumber">62</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="7576594819545407052" datatype="html">
-        <source>hours ago</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
-          <context context-type="linenumber">63</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="4063456036422970205" datatype="html">
-        <source>minute ago</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
-          <context context-type="linenumber">67</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="6906829094715901970" datatype="html">
-        <source>minutes ago</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
-          <context context-type="linenumber">68</context>
+          <context context-type="linenumber">72</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7536524521722799066" datatype="html">

@@ -9,6 +9,39 @@ const FORMAT_TO_ISO_FORMAT = {
   shortDate: 'y-MM-dd',
 }
 
+const INTERVALS = {
+  year: {
+    label: $localize`%s year ago`,
+    labelPlural: $localize`%s years ago`,
+    interval: 31536000,
+  },
+  month: {
+    label: $localize`%s month ago`,
+    labelPlural: $localize`%s months ago`,
+    interval: 2592000,
+  },
+  week: {
+    label: $localize`%s week ago`,
+    labelPlural: $localize`%s weeks ago`,
+    interval: 604800,
+  },
+  day: {
+    label: $localize`%s day ago`,
+    labelPlural: $localize`%s days ago`,
+    interval: 86400,
+  },
+  hour: {
+    label: $localize`%s hour ago`,
+    labelPlural: $localize`%s hours ago`,
+    interval: 3600,
+  },
+  minute: {
+    label: $localize`%s minute ago`,
+    labelPlural: $localize`%s minutes ago`,
+    interval: 60,
+  },
+}
+
 @Pipe({
   name: 'customDate',
 })
@@ -37,45 +70,13 @@ export class CustomDatePipe implements PipeTransform {
     if (format === 'relative') {
       const seconds = Math.floor((+new Date() - +new Date(value)) / 1000)
       if (seconds < 60) return $localize`Just now`
-      const intervals = {
-        year: {
-          label: $localize`year ago`,
-          labelPlural: $localize`years ago`,
-          interval: 31536000,
-        },
-        month: {
-          label: $localize`month ago`,
-          labelPlural: $localize`months ago`,
-          interval: 2592000,
-        },
-        week: {
-          label: $localize`week ago`,
-          labelPlural: $localize`weeks ago`,
-          interval: 604800,
-        },
-        day: {
-          label: $localize`day ago`,
-          labelPlural: $localize`days ago`,
-          interval: 86400,
-        },
-        hour: {
-          label: $localize`hour ago`,
-          labelPlural: $localize`hours ago`,
-          interval: 3600,
-        },
-        minute: {
-          label: $localize`minute ago`,
-          labelPlural: $localize`minutes ago`,
-          interval: 60,
-        },
-      }
       let counter
-      for (const i in intervals) {
-        counter = Math.floor(seconds / intervals[i].interval)
+      for (const i in INTERVALS) {
+        counter = Math.floor(seconds / INTERVALS[i].interval)
         if (counter > 0) {
           const label =
-            counter > 1 ? intervals[i].labelPlural : intervals[i].label
-          return `${counter} ${label}`
+            counter > 1 ? INTERVALS[i].labelPlural : INTERVALS[i].label
+          return label.replace('%s', counter.toString())
         }
       }
     }
