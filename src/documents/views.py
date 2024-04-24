@@ -766,7 +766,7 @@ class DocumentViewSet(
 
         # custom fields
         for entry in LogEntry.objects.filter(
-            object_pk__in=doc.custom_fields.values_list("id", flat=True),
+            object_pk__in=list(doc.custom_fields.values_list("id", flat=True)),
             content_type=ContentType.objects.get_for_model(CustomFieldInstance),
         ).select_related("actor"):
             entries.append(
