@@ -208,6 +208,7 @@ def merge(doc_ids: list[int], metadata_document_id: Optional[int] = None):
     qs = Document.objects.filter(id__in=doc_ids)
     affected_docs = []
     import pikepdf
+    from PIL import Image
 
     merged_pdf = pikepdf.new()
     version = merged_pdf.pdf_version
@@ -215,7 +216,20 @@ def merge(doc_ids: list[int], metadata_document_id: Optional[int] = None):
     for doc_id in doc_ids:
         doc = qs.get(id=doc_id)
         try:
-            with pikepdf.open(str(doc.source_path)) as pdf:
+            doc_path = str(doc.source_path)
+            if doc_path.lower().endswith('.jpg'):
+                # Convert JPG to PDF before merging
+                image = Image.open(doc_path)
+                image_pdf_path = doc_path + '.pdf'
+                # Convert image to PDF. If image is RGB, convert to RGBA to handle transparency.
+                if image.mode == 'RGB':
+                    image = image.convert('RGBA')
+                image.save(image_pdf_path, 'PDF', resolution=100.0)
+                pdf_path = image_pdf_path
+            else:
+                pdf_path = doc_path
+
+            with pikepdf.open(pdf_path) as pdf:
                 version = max(version, pdf.pdf_version)
                 merged_pdf.pages.extend(pdf.pages)
             affected_docs.append(doc.id)
