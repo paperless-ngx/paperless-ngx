@@ -1,10 +1,7 @@
 import { TestBed } from '@angular/core/testing'
 import { CustomDatePipe } from './custom-date.pipe'
 import { SettingsService } from '../services/settings.service'
-import {
-  HttpClientTestingModule,
-  HttpTestingController,
-} from '@angular/common/http/testing'
+import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { DatePipe } from '@angular/common'
 
 describe('CustomDatePipe', () => {
