@@ -82,8 +82,6 @@
           [documentCounts]="customFieldDocumentCounts"
           [allowSelectNone]="true"></pngx-filterable-dropdown>
         }
-      </div>
-      <div class="d-flex flex-wrap gap-2">
         <pngx-dates-dropdown
           title="Dates" i18n-title
           (datesSet)="updateRules()"
@@ -94,8 +92,6 @@
           [(addedDateAfter)]="dateAddedAfter"
           [(addedRelativeDate)]="dateAddedRelativeDate">
         </pngx-dates-dropdown>
-      </div>
-      <div class="d-flex flex-wrap">
         <pngx-permissions-filter-dropdown
           title="Permissions" i18n-title
           (ownerFilterSet)="updateRules()"

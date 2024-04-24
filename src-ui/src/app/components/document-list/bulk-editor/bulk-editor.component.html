@@ -74,6 +74,20 @@
               (apply)="setStoragePaths($event)">
             </pngx-filterable-dropdown>
           }
+          @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.CustomField)) {
+            <pngx-filterable-dropdown title="Custom fields" icon="ui-radios" i18n-title
+              filterPlaceholder="Filter custom fields" i18n-filterPlaceholder
+              [items]="customFields"
+              [disabled]="!userCanEditAll"
+              [editing]="true"
+              [applyOnClose]="applyOnClose"
+              [createRef]="createCustomField.bind(this)"
+              (opened)="openCustomFieldsDropdown()"
+              [(selectionModel)]="customFieldsSelectionModel"
+              [documentCounts]="customFieldDocumentCounts"
+              (apply)="setCustomFields($event)">
+            </pngx-filterable-dropdown>
+          }
         </div>
         <div class="d-flex align-items-center gap-2 ms-auto">
           <div class="btn-toolbar">
