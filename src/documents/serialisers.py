@@ -828,7 +828,9 @@ class SavedViewSerializer(OwnedObjectSerializer):
         attrs = super().validate(attrs)
         if "display_fields" in attrs and attrs["display_fields"] is not None:
             for field in attrs["display_fields"]:
-                if re.sub(r"\d+", "%d", field) == SavedView.DisplayFields.CUSTOM_FIELD:
+                if (
+                    SavedView.DisplayFields.CUSTOM_FIELD[:-2] in field
+                ):  # i.e. check for 'custom_field_' prefix
                     field_id = int(re.search(r"\d+", field)[0])
                     if not CustomField.objects.filter(id=field_id).exists():
                         raise serializers.ValidationError(
