@@ -500,6 +500,10 @@ class SavedViewFilterRule(models.Model):
         (35, _("does not have owner in")),
         (36, _("has custom field value")),
         (37, _("is shared by me")),
+        (38, _("has custom fields")),
+        (39, _("has custom field in")),
+        (40, _("does not have custom field in")),
+        (41, _("does not have custom field")),
     ]
 
     saved_view = models.ForeignKey(

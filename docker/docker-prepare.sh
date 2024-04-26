@@ -80,7 +80,7 @@ django_checks() {
 
 search_index() {
 
-	local -r index_version=8
+	local -r index_version=9
 	local -r index_version_file=${DATA_DIR}/.index_version
 
 	if [[ (! -f "${index_version_file}") || $(<"${index_version_file}") != "$index_version" ]]; then

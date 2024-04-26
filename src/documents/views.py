@@ -1045,6 +1045,18 @@ class SelectionDataView(GenericAPIView):
             ),
         )
 
+        custom_fields = CustomField.objects.annotate(
+            document_count=Count(
+                Case(
+                    When(
+                        fields__document__id__in=ids,
+                        then=1,
+                    ),
+                    output_field=IntegerField(),
+                ),
+            ),
+        )
+
         r = Response(
             {
                 "selected_correspondents": [
@@ -1060,6 +1072,10 @@ class SelectionDataView(GenericAPIView):
                 "selected_storage_paths": [
                     {"id": t.id, "document_count": t.document_count}
                     for t in storage_paths
+                ],
+                "selected_custom_fields": [
+                    {"id": t.id, "document_count": t.document_count}
+                    for t in custom_fields
                 ],
             },
         )
