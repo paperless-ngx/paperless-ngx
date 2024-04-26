@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.models import Correspondent
+from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
@@ -49,6 +50,8 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.doc3.tags.add(self.t2)
         self.doc4.tags.add(self.t1, self.t2)
         self.sp1 = StoragePath.objects.create(name="sp1", path="Something/{checksum}")
+        self.cf1 = CustomField.objects.create(name="cf1", data_type="text")
+        self.cf2 = CustomField.objects.create(name="cf2", data_type="text")
 
     @mock.patch("documents.serialisers.bulk_edit.set_correspondent")
     def test_api_set_correspondent(self, m):
@@ -214,6 +217,135 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
                     "method": "modify_tags",
                     "parameters": {
                         "add_tags": [self.t1.id],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        m.assert_not_called()
+
+    @mock.patch("documents.serialisers.bulk_edit.modify_custom_fields")
+    def test_api_modify_custom_fields(self, m):
+        m.return_value = "OK"
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id, self.doc3.id],
+                    "method": "modify_custom_fields",
+                    "parameters": {
+                        "add_custom_fields": [self.cf1.id],
+                        "remove_custom_fields": [self.cf2.id],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertListEqual(args[0], [self.doc1.id, self.doc3.id])
+        self.assertEqual(kwargs["add_custom_fields"], [self.cf1.id])
+        self.assertEqual(kwargs["remove_custom_fields"], [self.cf2.id])
+
+    @mock.patch("documents.serialisers.bulk_edit.modify_custom_fields")
+    def test_api_modify_custom_fields_invalid_params(self, m):
+        """
+        GIVEN:
+            - API data to modify custom fields is malformed
+        WHEN:
+            - API to edit custom fields is called
+        THEN:
+            - API returns HTTP 400
+            - modify_custom_fields is not called
+        """
+        m.return_value = "OK"
+
+        # Missing add_custom_fields
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id, self.doc3.id],
+                    "method": "modify_custom_fields",
+                    "parameters": {
+                        "add_custom_fields": [self.cf1.id],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        m.assert_not_called()
+
+        # Missing remove_custom_fields
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id, self.doc3.id],
+                    "method": "modify_custom_fields",
+                    "parameters": {
+                        "remove_custom_fields": [self.cf1.id],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        m.assert_not_called()
+
+        # Not a list
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id, self.doc3.id],
+                    "method": "modify_custom_fields",
+                    "parameters": {
+                        "add_custom_fields": self.cf1.id,
+                        "remove_custom_fields": self.cf2.id,
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        m.assert_not_called()
+
+        # Not a list of integers
+
+        # Missing remove_custom_fields
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id, self.doc3.id],
+                    "method": "modify_custom_fields",
+                    "parameters": {
+                        "add_custom_fields": ["foo"],
+                        "remove_custom_fields": ["bar"],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        m.assert_not_called()
+
+        # Custom field ID not found
+
+        # Missing remove_custom_fields
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id, self.doc3.id],
+                    "method": "modify_custom_fields",
+                    "parameters": {
+                        "add_custom_fields": [self.cf1.id],
+                        "remove_custom_fields": [99],
                     },
                 },
             ),

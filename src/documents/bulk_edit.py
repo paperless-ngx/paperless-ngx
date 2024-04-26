@@ -12,6 +12,7 @@ from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.models import Correspondent
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
@@ -114,6 +115,30 @@ def modify_tags(doc_ids, add_tags, remove_tags):
         ],
         ignore_conflicts=True,
     )
+
+    bulk_update_documents.delay(document_ids=affected_docs)
+
+    return "OK"
+
+
+def modify_custom_fields(doc_ids, add_custom_fields, remove_custom_fields):
+    qs = Document.objects.filter(id__in=doc_ids)
+    affected_docs = [doc.id for doc in qs]
+
+    fields_to_add = []
+    for field in add_custom_fields:
+        for doc_id in affected_docs:
+            fields_to_add.append(
+                CustomFieldInstance(
+                    document_id=doc_id,
+                    field_id=field,
+                ),
+            )
+    CustomFieldInstance.objects.bulk_create(fields_to_add)
+    CustomFieldInstance.objects.filter(
+        document_id__in=affected_docs,
+        field_id__in=remove_custom_fields,
+    ).delete()
 
     bulk_update_documents.delay(document_ids=affected_docs)
 

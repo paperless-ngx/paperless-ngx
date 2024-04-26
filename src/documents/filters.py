@@ -199,6 +199,25 @@ class DocumentFilterSet(FilterSet):
 
     custom_fields__icontains = CustomFieldsFilter()
 
+    custom_fields__id__all = ObjectFilter(field_name="custom_fields__field")
+
+    custom_fields__id__none = ObjectFilter(
+        field_name="custom_fields__field",
+        exclude=True,
+    )
+
+    custom_fields__id__in = ObjectFilter(
+        field_name="custom_fields__field",
+        in_list=True,
+    )
+
+    has_custom_fields = BooleanFilter(
+        label="Has custom field",
+        field_name="custom_fields",
+        lookup_expr="isnull",
+        exclude=True,
+    )
+
     shared_by__id = SharedByUser()
 
     class Meta:
