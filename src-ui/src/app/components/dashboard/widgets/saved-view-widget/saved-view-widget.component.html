@@ -9,58 +9,114 @@
     <a class="btn-link text-decoration-none" header-buttons [routerLink]="[]" (click)="showAll()" i18n>Show all</a>
   }
 
-  @if (documents.length) {
-    <table content class="table table-hover mb-0 align-middle">
+  @if (documents.length && displayMode === DisplayMode.TABLE) {
+    <table content class="table table-hover mb-0 mt-n2 align-middle">
       <thead>
         <tr>
-          <th scope="col" i18n>Created</th>
-          <th scope="col" i18n>Title</th>
-          @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Tag)) {
-            <th scope="col" class="d-none d-md-table-cell" i18n>Tags</th>
-          }
-          @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
-            <th scope="col" class="d-none d-md-table-cell" i18n>Correspondent</th>
-          } @else {
-            <th scope="col" class="d-none d-md-table-cell"></th>
+          @for (field of displayFields; track field; let i = $index) {
+            @if (displayFields.includes(field)) {
+              <th
+                scope="col"
+                [ngClass]="{
+                  'd-none d-md-table-cell': i > 1,
+                  'w-25': field === DisplayField.CREATED || field === DisplayField.ADDED
+                }">
+                {{ getColumnTitle(field) }}
+              </th>
+            }
           }
         </tr>
       </thead>
       <tbody>
-        @for (doc of documents; track doc) {
-          <tr (mouseleave)="maybeClosePopover()">
-            <td class="py-2 py-md-3"><a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.created_date | customDate}}</a></td>
-            <td class="py-2 py-md-3">
-              <a routerLink="/documents/{{doc.id}}" title="Edit" i18n-title class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.title | documentTitle}}</a>
-            </td>
-            @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Tag)) {
-              <td class="py-2 py-md-3 d-none d-md-table-cell">
-                @for (t of doc.tags$ | async; track t) {
-                  <pngx-tag [tag]="t" class="ms-1" (click)="clickTag(t, $event)"></pngx-tag>
+        @for (doc of documents; track doc.id) {
+          <tr>
+            @for (field of displayFields; track field; let i = $index) {
+              <td class="py-2 py-md-3 position-relative" [ngClass]="{ 'd-none d-md-table-cell': i > 1 }">
+                @switch (field) {
+                  @case (DisplayField.ADDED) {
+                    <a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.added | customDate}}</a>
+                  }
+                  @case (DisplayField.CREATED) {
+                    <a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.created_date | customDate}}</a>
+                  }
+                  @case (DisplayField.TITLE) {
+                    <a routerLink="/documents/{{doc.id}}" title="Edit" i18n-title class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.title | documentTitle}}</a>
+                  }
+                  @case (DisplayField.CORRESPONDENT) {
+                    @if (doc.correspondent) {
+                      <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickCorrespondent(doc.correspondent, $event)">{{(doc.correspondent$ | async)?.name}}</a>
+                    }
+                  }
+                  @case (DisplayField.TAGS) {
+                    @for (t of doc.tags$ | async; track t) {
+                      <pngx-tag [tag]="t" class="ms-1" (click)="clickTag(t.id, $event)"></pngx-tag>
+                    }
+                  }
+                  @case (DisplayField.DOCUMENT_TYPE) {
+                    @if (doc.document_type) {
+                      <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickDocType(doc.document_type, $event)">{{(doc.document_type$ | async)?.name}}</a>
+                    }
+                  }
+                  @case (DisplayField.STORAGE_PATH) {
+                    @if (doc.storage_path) {
+                      <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickStoragePath(doc.storage_path, $event)">{{(doc.storage_path$ | async)?.name}}</a>
+                    }
+                  }
+                }
+                @if (field.startsWith(DisplayField.CUSTOM_FIELD)) {
+                  <pngx-custom-field-display [document]="doc" [fieldDisplayKey]="field"></pngx-custom-field-display>
+                }
+                @if (i === displayFields.length - 1) {
+                  <div class="btn-group position-absolute top-50 end-0 translate-middle-y">
+                    <a [href]="getPreviewUrl(doc)" title="View Preview" i18n-title target="_blank" class="btn px-4 btn-dark border-dark-subtle"
+                      [ngbPopover]="previewContent" [popoverTitle]="doc.title | documentTitle"
+                      autoClose="true" popoverClass="shadow popover-preview" container="body" (mouseenter)="mouseEnterPreviewButton(doc)" (mouseleave)="mouseLeavePreviewButton()" #popover="ngbPopover">
+                      <i-bs width="0.8em" height="0.8em" name="eye"></i-bs>
+                    </a>
+                    <ng-template #previewContent>
+                      <pngx-preview-popup [document]="doc" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()"></pngx-preview-popup>
+                    </ng-template>
+                    <a [href]="getDownloadUrl(doc)" class="btn px-4 btn-dark border-dark-subtle" title="Download" i18n-title (click)="$event.stopPropagation()">
+                      <i-bs width="0.8em" height="0.8em" name="download"></i-bs>
+                    </a>
+                  </div>
                 }
               </td>
             }
-            <td class="position-relative py-2 py-md-3 d-none d-md-table-cell">
-              @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Correspondent) && doc.correspondent !== null) {
-                <a class="btn-link text-dark text-decoration-none py-2 py-md-3" routerLink="/documents" [queryParams]="getCorrespondentQueryParams(doc.correspondent)">{{(doc.correspondent$ | async)?.name}}</a>
-              }
-              <div class="btn-group position-absolute top-50 end-0 translate-middle-y">
-                <a [href]="getPreviewUrl(doc)" title="View Preview" i18n-title target="_blank" class="btn px-4 btn-dark border-dark-subtle"
-                  [ngbPopover]="previewContent" [popoverTitle]="doc.title | documentTitle"
-                  autoClose="true" popoverClass="shadow popover-preview" container="body" (mouseenter)="mouseEnterPreviewButton(doc)" (mouseleave)="mouseLeavePreviewButton()" #popover="ngbPopover">
-                  <i-bs width="0.8em" height="0.8em" name="eye"></i-bs>
-                </a>
-                <ng-template #previewContent>
-                  <pngx-preview-popup [document]="doc" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()"></pngx-preview-popup>
-                </ng-template>
-                <a [href]="getDownloadUrl(doc)" class="btn px-4 btn-dark border-dark-subtle" title="Download" i18n-title (click)="$event.stopPropagation()">
-                  <i-bs width="0.8em" height="0.8em" name="download"></i-bs>
-                </a>
-              </div>
-            </td>
           </tr>
         }
       </tbody>
     </table>
+  } @else if (documents.length && displayMode === DisplayMode.SMALL_CARDS) {
+    <div class="row row-cols-paperless-cards my-n2">
+      @for (d of documents; track d.id) {
+        <pngx-document-card-small
+          class="p-0"
+          (dblClickDocument)="openDocumentDetail(d)"
+          [document]="d"
+          [displayFields]="displayFields"
+          (clickTag)="clickTag($event)"
+          (clickCorrespondent)="clickCorrespondent($event)"
+          (clickStoragePath)="clickStoragePath($event)"
+          (clickDocumentType)="clickDocumentType($event)">
+        </pngx-document-card-small>
+      }
+    </div>
+  } @else if (documents.length && displayMode === DisplayMode.LARGE_CARDS) {
+    <div class="row my-n2">
+      @for (d of documents; track d.id) {
+        <pngx-document-card-large
+          (dblClickDocument)="openDocumentDetail(d)"
+          [document]="d"
+          [displayFields]="displayFields"
+          (clickTag)="clickTag($event)"
+          (clickCorrespondent)="clickCorrespondent($event)"
+          (clickStoragePath)="clickStoragePath($event)"
+          (clickDocumentType)="clickDocumentType($event)"
+          (clickMoreLike)="clickMoreLike(d.id)">
+        </pngx-document-card-large>
+      }
+    </div>
   } @else {
     <p i18n class="text-center text-muted mb-0 fst-italic">No documents</p>
   }

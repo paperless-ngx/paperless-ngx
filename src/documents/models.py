@@ -394,6 +394,25 @@ class Log(models.Model):
 
 
 class SavedView(ModelWithOwner):
+    class DisplayMode(models.TextChoices):
+        TABLE = ("table", _("Table"))
+        SMALL_CARDS = ("smallCards", _("Small Cards"))
+        LARGE_CARDS = ("largeCards", _("Large Cards"))
+
+    class DisplayFields(models.TextChoices):
+        TITLE = ("title", _("Title"))
+        CREATED = ("created", _("Created"))
+        ADDED = ("added", _("Added"))
+        TAGS = ("tag"), _("Tags")
+        CORRESPONDENT = ("correspondent", _("Correspondent"))
+        DOCUMENT_TYPE = ("documenttype", _("Document Type"))
+        STORAGE_PATH = ("storagepath", _("Storage Path"))
+        NOTES = ("note", _("Note"))
+        OWNER = ("owner", _("Owner"))
+        SHARED = ("shared", _("Shared"))
+        ASN = ("asn", _("ASN"))
+        CUSTOM_FIELD = ("custom_field_%d", ("Custom Field"))
+
     name = models.CharField(_("name"), max_length=128)
 
     show_on_dashboard = models.BooleanField(
@@ -410,6 +429,27 @@ class SavedView(ModelWithOwner):
         blank=True,
     )
     sort_reverse = models.BooleanField(_("sort reverse"), default=False)
+
+    page_size = models.PositiveIntegerField(
+        _("View page size"),
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1)],
+    )
+
+    display_mode = models.CharField(
+        max_length=128,
+        verbose_name=_("View display mode"),
+        choices=DisplayMode.choices,
+        null=True,
+        blank=True,
+    )
+
+    display_fields = models.JSONField(
+        verbose_name=_("Document display fields"),
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         ordering = ("name",)

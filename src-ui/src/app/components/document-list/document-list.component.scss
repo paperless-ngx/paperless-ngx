@@ -10,10 +10,6 @@ th {
   cursor: pointer;
 }
 
-th.w-40 {
-  width: 40%;
-}
-
 .table-row-selected {
   background-color: var(--pngx-primary-faded);
 }
@@ -83,4 +79,8 @@ $paperless-card-breakpoints: (
 
 a {
   cursor: pointer;
+}
+
+pngx-page-header .dropdown-menu {
+  --bs-dropdown-min-width: 12em;
 }

@@ -1614,7 +1614,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             status.HTTP_404_NOT_FOUND,
         )
 
-    def test_create_update_patch(self):
+    def test_saved_view_create_update_patch(self):
         User.objects.create_user("user1")
 
         view = {
@@ -1660,6 +1660,155 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         v1 = SavedView.objects.get(id=v1.id)
         self.assertEqual(v1.filter_rules.count(), 0)
+
+    def test_saved_view_display_options(self):
+        """
+        GIVEN:
+            - Saved view
+        WHEN:
+            - Updating display options
+        THEN:
+            - Display options are updated
+            - Display fields are validated
+        """
+        User.objects.create_user("user1")
+
+        view = {
+            "name": "test",
+            "show_on_dashboard": True,
+            "show_in_sidebar": True,
+            "sort_field": "created2",
+            "filter_rules": [{"rule_type": 4, "value": "test"}],
+            "page_size": 20,
+            "display_mode": SavedView.DisplayMode.SMALL_CARDS,
+            "display_fields": [
+                SavedView.DisplayFields.TITLE,
+                SavedView.DisplayFields.CREATED,
+            ],
+        }
+
+        response = self.client.post("/api/saved_views/", view, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        v1 = SavedView.objects.get(name="test")
+        self.assertEqual(v1.page_size, 20)
+        self.assertEqual(
+            v1.display_mode,
+            SavedView.DisplayMode.SMALL_CARDS,
+        )
+        self.assertEqual(
+            v1.display_fields,
+            [
+                SavedView.DisplayFields.TITLE,
+                SavedView.DisplayFields.CREATED,
+            ],
+        )
+
+        response = self.client.patch(
+            f"/api/saved_views/{v1.id}/",
+            {
+                "display_fields": [
+                    SavedView.DisplayFields.TAGS,
+                    SavedView.DisplayFields.TITLE,
+                    SavedView.DisplayFields.CREATED,
+                ],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        v1.refresh_from_db()
+        self.assertEqual(
+            v1.display_fields,
+            [
+                SavedView.DisplayFields.TAGS,
+                SavedView.DisplayFields.TITLE,
+                SavedView.DisplayFields.CREATED,
+            ],
+        )
+
+        # Invalid display field
+        response = self.client.patch(
+            f"/api/saved_views/{v1.id}/",
+            {
+                "display_fields": [
+                    "foobar",
+                ],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_saved_view_display_customfields(self):
+        """
+        GIVEN:
+            - Saved view
+        WHEN:
+            - Updating display options with custom fields
+        THEN:
+            - Display filds for custom fields are updated
+            - Display fields for custom fields are validated
+        """
+        view = {
+            "name": "test",
+            "show_on_dashboard": True,
+            "show_in_sidebar": True,
+            "sort_field": "created2",
+            "filter_rules": [{"rule_type": 4, "value": "test"}],
+            "page_size": 20,
+            "display_mode": SavedView.DisplayMode.SMALL_CARDS,
+            "display_fields": [
+                SavedView.DisplayFields.TITLE,
+                SavedView.DisplayFields.CREATED,
+            ],
+        }
+
+        response = self.client.post("/api/saved_views/", view, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        v1 = SavedView.objects.get(name="test")
+
+        custom_field = CustomField.objects.create(
+            name="stringfield",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+
+        response = self.client.patch(
+            f"/api/saved_views/{v1.id}/",
+            {
+                "display_fields": [
+                    SavedView.DisplayFields.TITLE,
+                    SavedView.DisplayFields.CREATED,
+                    SavedView.DisplayFields.CUSTOM_FIELD % custom_field.id,
+                ],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        v1.refresh_from_db()
+        self.assertEqual(
+            v1.display_fields,
+            [
+                str(SavedView.DisplayFields.TITLE),
+                str(SavedView.DisplayFields.CREATED),
+                SavedView.DisplayFields.CUSTOM_FIELD % custom_field.id,
+            ],
+        )
+
+        # Custom field not found
+        response = self.client.patch(
+            f"/api/saved_views/{v1.id}/",
+            {
+                "display_fields": [
+                    SavedView.DisplayFields.TITLE,
+                    SavedView.DisplayFields.CREATED,
+                    SavedView.DisplayFields.CUSTOM_FIELD % 99,
+                ],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_logs(self):
         log_data = "test\ntest2\n"

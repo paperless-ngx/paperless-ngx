@@ -21,6 +21,7 @@ import { DocumentCardLargeComponent } from './document-card-large.component'
 import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
 import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { CustomFieldDisplayComponent } from '../../common/custom-field-display/custom-field-display.component'
 
 const doc = {
   id: 10,
@@ -53,6 +54,7 @@ describe('DocumentCardLargeComponent', () => {
         SafeUrlPipe,
         IsNumberPipe,
         PreviewPopupComponent,
+        CustomFieldDisplayComponent,
       ],
       providers: [DatePipe],
       imports: [

@@ -815,11 +815,32 @@ class SavedViewSerializer(OwnedObjectSerializer):
             "sort_field",
             "sort_reverse",
             "filter_rules",
+            "page_size",
+            "display_mode",
+            "display_fields",
             "owner",
             "permissions",
             "user_can_change",
             "set_permissions",
         ]
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if "display_fields" in attrs and attrs["display_fields"] is not None:
+            for field in attrs["display_fields"]:
+                if (
+                    SavedView.DisplayFields.CUSTOM_FIELD[:-2] in field
+                ):  # i.e. check for 'custom_field_' prefix
+                    field_id = int(re.search(r"\d+", field)[0])
+                    if not CustomField.objects.filter(id=field_id).exists():
+                        raise serializers.ValidationError(
+                            f"Invalid field: {field}",
+                        )
+                elif field not in SavedView.DisplayFields.values:
+                    raise serializers.ValidationError(
+                        f"Invalid field: {field}",
+                    )
+        return attrs
 
     def update(self, instance, validated_data):
         if "filter_rules" in validated_data:

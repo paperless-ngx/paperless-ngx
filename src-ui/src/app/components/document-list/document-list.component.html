@@ -11,16 +11,32 @@
       <button ngbDropdownItem (click)="list.selectAll()" i18n>Select all</button>
     </div>
   </div>
+  <div ngbDropdown class="d-flex">
+    <button class="btn btn-sm btn-outline-primary" id="dropdownDisplayFields" ngbDropdownToggle>
+      <i-bs name="card-heading"></i-bs>
+      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Show</ng-container></div>
+    </button>
+    <div ngbDropdownMenu aria-labelledby="dropdownDisplayFields" class="shadow">
+      <div class="px-3">
+        @for (field of settingsService.allDisplayFields; track field.id) {
+          <div class="form-check my-1">
+            <input class="form-check-input mt-1" type="checkbox" id="displayField{{field.id}}" [checked]="activeDisplayFields.includes(field.id)" (change)="toggleDisplayField(field.id)">
+            <label class="form-check-label" for="displayField{{field.id}}">{{field.name}}</label>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
   <div class="btn-group flex-fill" role="group">
-    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="details" (ngModelChange)="saveDisplayMode()" id="displayModeDetails" name="displayModeDetails">
+    <input type="radio" class="btn-check" [(ngModel)]="list.displayMode" value="table" id="displayModeDetails" name="displayModeDetails">
     <label for="displayModeDetails" class="btn btn-outline-primary btn-sm">
       <i-bs name="list-ul"></i-bs>
     </label>
-    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="smallCards" (ngModelChange)="saveDisplayMode()" id="displayModeSmall" name="displayModeSmall">
+    <input type="radio" class="btn-check" [(ngModel)]="list.displayMode" value="smallCards" id="displayModeSmall" name="displayModeSmall">
     <label for="displayModeSmall" class="btn btn-outline-primary btn-sm">
       <i-bs name="grid"></i-bs>
     </label>
-    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="largeCards" (ngModelChange)="saveDisplayMode()" id="displayModeLarge" name="displayModeLarge">
+    <input type="radio" class="btn-check" [(ngModel)]="list.displayMode" value="largeCards" id="displayModeLarge" name="displayModeLarge">
     <label for="displayModeLarge" class="btn btn-outline-primary btn-sm">
       <i-bs name="hdd-stack"></i-bs>
     </label>
@@ -41,7 +57,7 @@
       </div>
       <div>
         @for (f of getSortFields(); track f) {
-          <button ngbDropdownItem (click)="setSortField(f.field)"
+          <button ngbDropdownItem (click)="list.sortField = f.field"
             [class.active]="list.sortField === f.field">{{f.name}}
           </button>
         }
@@ -109,7 +125,7 @@
         }
       </div>
       @if (list.collectionSize) {
-        <ngb-pagination [pageSize]="list.currentPageSize" [collectionSize]="list.collectionSize" [(page)]="list.currentPage" [maxSize]="5"
+        <ngb-pagination [pageSize]="list.pageSize" [collectionSize]="list.collectionSize" [(page)]="list.currentPage" [maxSize]="5"
         [rotate]="true" aria-label="Default pagination" size="sm"></ngb-pagination>
       }
     </div>
@@ -122,26 +138,38 @@
   @if (list.error ) {
     <div class="alert alert-danger" role="alert"><ng-container i18n>Error while loading documents</ng-container>: {{list.error}}</div>
   } @else {
-    @if (displayMode === 'largeCards') {
+    @if (list.displayMode === DisplayMode.LARGE_CARDS) {
       <div>
         @for (d of list.documents; track trackByDocumentId($index, d)) {
-          <pngx-document-card-large [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" (dblClickDocument)="openDocumentDetail(d)" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)" (clickStoragePath)="clickStoragePath($event)" (clickMoreLike)="clickMoreLike(d.id)">
+          <pngx-document-card-large
+            [selected]="list.isSelected(d)"
+            (toggleSelected)="toggleSelected(d, $event)"
+            (dblClickDocument)="openDocumentDetail(d)"
+            [document]="d"
+            [displayFields]="activeDisplayFields"
+            (clickTag)="clickTag($event)"
+            (clickCorrespondent)="clickCorrespondent($event)"
+            (clickDocumentType)="clickDocumentType($event)"
+            (clickStoragePath)="clickStoragePath($event)"
+            (clickMoreLike)="clickMoreLike(d.id)">
           </pngx-document-card-large>
         }
       </div>
     }
-    @if (displayMode === 'details') {
+    @if (list.displayMode === DisplayMode.TABLE) {
       <table class="table table-sm align-middle border shadow-sm">
         <thead>
           <th></th>
-          <th class="d-none d-lg-table-cell"
-            pngxSortable="archive_serial_number"
-            title="Sort by ASN" i18n-title
-            [currentSortField]="list.sortField"
-            [currentSortReverse]="list.sortReverse"
-            (sort)="onSort($event)"
-          i18n>ASN</th>
-          @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
+          @if (activeDisplayFields.includes(DisplayField.ASN)) {
+            <th class="d-none d-lg-table-cell"
+              pngxSortable="archive_serial_number"
+              title="Sort by ASN" i18n-title
+              [currentSortField]="list.sortField"
+              [currentSortReverse]="list.sortReverse"
+              (sort)="onSort($event)"
+            i18n>ASN</th>
+          }
+          @if (activeDisplayFields.includes(DisplayField.CORRESPONDENT) && permissionService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
             <th class="d-none d-md-table-cell"
               pngxSortable="correspondent__name"
               title="Sort by correspondent" i18n-title
@@ -150,22 +178,28 @@
               (sort)="onSort($event)"
             i18n>Correspondent</th>
           }
-          <th
-            pngxSortable="title"
-            title="Sort by title" i18n-title
-            class="w-40"
-            [currentSortField]="list.sortField"
-            [currentSortReverse]="list.sortReverse"
-            (sort)="onSort($event)"
-          i18n>Title</th>
-          <th class="d-none d-xl-table-cell"
-            pngxSortable="owner"
-            title="Sort by owner" i18n-title
-            [currentSortField]="list.sortField"
-            [currentSortReverse]="list.sortReverse"
-            (sort)="onSort($event)"
-          i18n>Owner</th>
-          @if (notesEnabled) {
+          @if (activeDisplayFields.includes(DisplayField.TITLE)) {
+            <th
+              pngxSortable="title"
+              title="Sort by title" i18n-title
+              [currentSortField]="list.sortField"
+              [currentSortReverse]="list.sortReverse"
+              (sort)="onSort($event)"
+            i18n>Title</th>
+          }
+          @if (activeDisplayFields.includes(DisplayField.TAGS) && !activeDisplayFields.includes(DisplayField.TITLE)) {
+            <th i18n>Tags</th>
+          }
+          @if (activeDisplayFields.includes(DisplayField.OWNER) && permissionService.currentUserCan(PermissionAction.View, PermissionType.User)) {
+            <th class="d-none d-xl-table-cell"
+              pngxSortable="owner"
+              title="Sort by owner" i18n-title
+              [currentSortField]="list.sortField"
+              [currentSortReverse]="list.sortReverse"
+              (sort)="onSort($event)"
+            i18n>Owner</th>
+          }
+          @if (activeDisplayFields.includes(DisplayField.NOTES) && notesEnabled) {
             <th class="d-none d-xl-table-cell"
               pngxSortable="num_notes"
               title="Sort by notes" i18n-title
@@ -174,7 +208,7 @@
               (sort)="onSort($event)"
             i18n>Notes</th>
           }
-          @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
+          @if (activeDisplayFields.includes(DisplayField.DOCUMENT_TYPE) && permissionService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
             <th class="d-none d-xl-table-cell"
               pngxSortable="document_type__name"
               title="Sort by document type" i18n-title
@@ -183,7 +217,7 @@
               (sort)="onSort($event)"
             i18n>Document type</th>
           }
-          @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
+          @if (activeDisplayFields.includes(DisplayField.STORAGE_PATH) && permissionService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
             <th class="d-none d-xl-table-cell"
               pngxSortable="storage_path__name"
               title="Sort by storage path" i18n-title
@@ -192,20 +226,34 @@
               (sort)="onSort($event)"
             i18n>Storage path</th>
           }
-          <th
-            pngxSortable="created"
-            title="Sort by created date" i18n-title
-            [currentSortField]="list.sortField"
-            [currentSortReverse]="list.sortReverse"
-            (sort)="onSort($event)"
-          i18n>Created</th>
-          <th class="d-none d-xl-table-cell"
-            pngxSortable="added"
-            title="Sort by added date" i18n-title
-            [currentSortField]="list.sortField"
-            [currentSortReverse]="list.sortReverse"
-            (sort)="onSort($event)"
-          i18n>Added</th>
+          @if (activeDisplayFields.includes(DisplayField.CREATED)) {
+            <th
+              pngxSortable="created"
+              title="Sort by created date" i18n-title
+              [currentSortField]="list.sortField"
+              [currentSortReverse]="list.sortReverse"
+              (sort)="onSort($event)"
+            i18n>Created</th>
+          }
+          @if (activeDisplayFields.includes(DisplayField.ADDED)) {
+            <th
+              pngxSortable="added"
+              title="Sort by added date" i18n-title
+              [currentSortField]="list.sortField"
+              [currentSortReverse]="list.sortReverse"
+              (sort)="onSort($event)"
+            i18n>Added</th>
+          }
+          @if (activeDisplayFields.includes(DisplayField.SHARED)) {
+            <th i18n>
+              Shared
+            </th>
+          }
+          @for (field of activeDisplayCustomFields; track field) {
+            <th>
+              {{getDisplayCustomFieldTitle(field)}}
+            </th>
+          }
         </thead>
         <tbody>
           @for (d of list.documents; track trackByDocumentId($index, d)) {
@@ -216,26 +264,36 @@
                   <label class="form-check-label" for="docCheck{{d.id}}"></label>
                 </div>
               </td>
-              <td class="d-none d-lg-table-cell">
-                {{d.archive_serial_number}}
-              </td>
-              @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
-                <td class="d-none d-md-table-cell">
+              @if (activeDisplayFields.includes(DisplayField.ASN)) {
+                <td class="d-none d-xl-table-cell">
+                  {{d.archive_serial_number}}
+                </td>
+              }
+              @if (activeDisplayFields.includes(DisplayField.CORRESPONDENT) && permissionService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
+                <td class="d-none d-xl-table-cell">
                   @if (d.correspondent) {
                     <a (click)="clickCorrespondent(d.correspondent);$event.stopPropagation()" title="Filter by correspondent" i18n-title>{{(d.correspondent$ | async)?.name}}</a>
                   }
                 </td>
               }
-              <td>
-                <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
-                @for (t of d.tags$ | async; track t) {
-                  <pngx-tag [tag]="t" class="ms-1" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(t.id);$event.stopPropagation()"></pngx-tag>
-                }
-              </td>
-              <td>
-                {{d.owner | username}}
-              </td>
-              @if (notesEnabled) {
+              @if (activeDisplayFields.includes(DisplayField.TITLE) || activeDisplayFields.includes(DisplayField.TAGS)) {
+                <td>
+                  @if (activeDisplayFields.includes(DisplayField.TITLE)) {
+                    <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
+                  }
+                  @if (activeDisplayFields.includes(DisplayField.TAGS)) {
+                    @for (t of d.tags$ | async; track t) {
+                      <pngx-tag [tag]="t" class="ms-1" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(t.id);$event.stopPropagation()"></pngx-tag>
+                    }
+                  }
+                </td>
+              }
+              @if (activeDisplayFields.includes(DisplayField.OWNER) && permissionService.currentUserCan(PermissionAction.View, PermissionType.User)) {
+                <td>
+                  {{d.owner | username}}
+                </td>
+              }
+              @if (activeDisplayFields.includes(DisplayField.NOTES) && notesEnabled) {
                 <td class="d-none d-xl-table-cell">
                   @if (d.notes.length) {
                     <a routerLink="/documents/{{d.id}}/notes" class="btn btn-sm p-0">
@@ -246,35 +304,59 @@
                   }
                 </td>
               }
-              @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
+              @if (activeDisplayFields.includes(DisplayField.DOCUMENT_TYPE) && permissionService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
                 <td class="d-none d-xl-table-cell">
                   @if (d.document_type) {
                     <a (click)="clickDocumentType(d.document_type);$event.stopPropagation()" title="Filter by document type" i18n-title>{{(d.document_type$ | async)?.name}}</a>
                   }
                 </td>
               }
-              @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
+              @if (activeDisplayFields.includes(DisplayField.STORAGE_PATH) && permissionService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
                 <td class="d-none d-xl-table-cell">
                   @if (d.storage_path) {
                     <a (click)="clickStoragePath(d.storage_path);$event.stopPropagation()" title="Filter by storage path" i18n-title>{{(d.storage_path$ | async)?.name}}</a>
                   }
                 </td>
               }
-              <td>
-                {{d.created_date | customDate}}
-              </td>
-              <td class="d-none d-xl-table-cell">
-                {{d.added | customDate}}
-              </td>
+              @if (activeDisplayFields.includes(DisplayField.CREATED)) {
+                <td>
+                  {{d.created_date | customDate}}
+                </td>
+              }
+              @if (activeDisplayFields.includes(DisplayField.ADDED)) {
+                <td>
+                  {{d.added | customDate}}
+                </td>
+              }
+              @if (activeDisplayFields.includes(DisplayField.SHARED)) {
+                <td>
+                  @if (d.is_shared_by_requester) { <ng-container i18n>Yes</ng-container> } @else { <ng-container i18n>No</ng-container> }
+                </td>
+              }
+              @for (field of activeDisplayCustomFields; track field) {
+                <td class="d-none d-xl-table-cell">
+                  <pngx-custom-field-display [document]="d" [fieldDisplayKey]="field"></pngx-custom-field-display>
+                </td>
+              }
             </tr>
           }
         </tbody>
       </table>
     }
-    @if (displayMode === 'smallCards') {
+    @if (list.displayMode === DisplayMode.SMALL_CARDS) {
       <div class="row row-cols-paperless-cards">
         @for (d of list.documents; track trackByDocumentId($index, d)) {
-          <pngx-document-card-small class="p-0" [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" (dblClickDocument)="openDocumentDetail(d)" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickStoragePath)="clickStoragePath($event)" (clickDocumentType)="clickDocumentType($event)"></pngx-document-card-small>
+          <pngx-document-card-small class="p-0"
+            [selected]="list.isSelected(d)"
+            (toggleSelected)="toggleSelected(d, $event)"
+            (dblClickDocument)="openDocumentDetail(d)"
+            [document]="d"
+            (clickTag)="clickTag($event)"
+            [displayFields]="activeDisplayFields"
+            (clickCorrespondent)="clickCorrespondent($event)"
+            (clickStoragePath)="clickStoragePath($event)"
+            (clickDocumentType)="clickDocumentType($event)">
+          </pngx-document-card-small>
         }
       </div>
     }

@@ -9,11 +9,17 @@ import { DocumentService } from './document.service'
 import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
 import { SettingsService } from '../settings.service'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import {
+  DOCUMENT_SORT_FIELDS,
+  DOCUMENT_SORT_FIELDS_FULLTEXT,
+} from 'src/app/data/document'
+import { PermissionsService } from '../permissions.service'
 
 let httpTestingController: HttpTestingController
 let service: DocumentService
 let subscription: Subscription
 let settingsService: SettingsService
+
 const endpoint = 'documents'
 const documents = [
   {
@@ -273,6 +279,31 @@ describe(`DocumentService`, () => {
       `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/history/`
     )
   })
+})
+
+it('should construct sort fields respecting permissions', () => {
+  expect(
+    service.sortFields.find((f) => f.field === 'correspondent__name')
+  ).toBeUndefined()
+  expect(
+    service.sortFields.find((f) => f.field === 'document_type__name')
+  ).toBeUndefined()
+
+  const permissionsService: PermissionsService =
+    TestBed.inject(PermissionsService)
+  jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+  service['setupSortFields']()
+  expect(service.sortFields).toEqual(DOCUMENT_SORT_FIELDS)
+  expect(service.sortFieldsFullText).toEqual([
+    ...DOCUMENT_SORT_FIELDS,
+    ...DOCUMENT_SORT_FIELDS_FULLTEXT,
+  ])
+
+  settingsService.set(SETTINGS_KEYS.NOTES_ENABLED, false)
+  service['setupSortFields']()
+  expect(
+    service.sortFields.find((f) => f.field === 'num_notes')
+  ).toBeUndefined()
 })
 
 afterEach(() => {
