@@ -5,7 +5,7 @@ import { RouterTestingModule } from '@angular/router/testing'
 import { routes } from 'src/app/app-routing.module'
 import { FilterEditorComponent } from './filter-editor/filter-editor.component'
 import { PermissionsFilterDropdownComponent } from '../common/permissions-filter-dropdown/permissions-filter-dropdown.component'
-import { DateDropdownComponent } from '../common/date-dropdown/date-dropdown.component'
+import { DatesDropdownComponent } from '../common/dates-dropdown/dates-dropdown.component'
 import { FilterableDropdownComponent } from '../common/filterable-dropdown/filterable-dropdown.component'
 import { PageHeaderComponent } from '../common/page-header/page-header.component'
 import { BulkEditorComponent } from './bulk-editor/bulk-editor.component'
@@ -113,7 +113,7 @@ describe('DocumentListComponent', () => {
         PageHeaderComponent,
         FilterEditorComponent,
         FilterableDropdownComponent,
-        DateDropdownComponent,
+        DatesDropdownComponent,
         PermissionsFilterDropdownComponent,
         ToggleableDropdownButtonComponent,
         BulkEditorComponent,

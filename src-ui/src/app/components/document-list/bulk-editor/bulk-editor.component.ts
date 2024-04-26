@@ -41,6 +41,9 @@ import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/docume
 import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
+import { CustomField } from 'src/app/data/custom-field'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 
 @Component({
   selector: 'pngx-bulk-editor',
@@ -55,15 +58,18 @@ export class BulkEditorComponent
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
   storagePaths: StoragePath[]
+  customFields: CustomField[]
 
   tagSelectionModel = new FilterableDropdownSelectionModel()
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
   storagePathsSelectionModel = new FilterableDropdownSelectionModel()
+  customFieldsSelectionModel = new FilterableDropdownSelectionModel()
   tagDocumentCounts: SelectionDataItem[]
   correspondentDocumentCounts: SelectionDataItem[]
   documentTypeDocumentCounts: SelectionDataItem[]
   storagePathDocumentCounts: SelectionDataItem[]
+  customFieldDocumentCounts: SelectionDataItem[]
   awaitingDownload: boolean
 
   unsubscribeNotifier: Subject<any> = new Subject()
@@ -85,6 +91,7 @@ export class BulkEditorComponent
     private settings: SettingsService,
     private toastService: ToastService,
     private storagePathService: StoragePathService,
+    private customFieldService: CustomFieldsService,
     private permissionService: PermissionsService
   ) {
     super()
@@ -165,6 +172,17 @@ export class BulkEditorComponent
         .listAll()
         .pipe(first())
         .subscribe((result) => (this.storagePaths = result.results))
+    }
+    if (
+      this.permissionService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.CustomField
+      )
+    ) {
+      this.customFieldService
+        .listAll()
+        .pipe(first())
+        .subscribe((result) => (this.customFields = result.results))
     }
 
     this.downloadForm
@@ -293,6 +311,19 @@ export class BulkEditorComponent
         this.applySelectionData(
           s.selected_storage_paths,
           this.storagePathsSelectionModel
+        )
+      })
+  }
+
+  openCustomFieldsDropdown() {
+    this.documentService
+      .getSelectionData(Array.from(this.list.selected))
+      .pipe(first())
+      .subscribe((s) => {
+        this.customFieldDocumentCounts = s.selected_custom_fields
+        this.applySelectionData(
+          s.selected_custom_fields,
+          this.customFieldsSelectionModel
         )
       })
   }
@@ -495,6 +526,74 @@ export class BulkEditorComponent
     }
   }
 
+  setCustomFields(changedCustomFields: ChangedItems) {
+    if (
+      changedCustomFields.itemsToAdd.length == 0 &&
+      changedCustomFields.itemsToRemove.length == 0
+    )
+      return
+
+    if (this.showConfirmationDialogs) {
+      let modal = this.modalService.open(ConfirmDialogComponent, {
+        backdrop: 'static',
+      })
+      modal.componentInstance.title = $localize`Confirm custom field assignment`
+      if (
+        changedCustomFields.itemsToAdd.length == 1 &&
+        changedCustomFields.itemsToRemove.length == 0
+      ) {
+        let customField = changedCustomFields.itemsToAdd[0]
+        modal.componentInstance.message = $localize`This operation will assign the custom field "${customField.name}" to ${this.list.selected.size} selected document(s).`
+      } else if (
+        changedCustomFields.itemsToAdd.length > 1 &&
+        changedCustomFields.itemsToRemove.length == 0
+      ) {
+        modal.componentInstance.message = $localize`This operation will assign the custom fields ${this._localizeList(
+          changedCustomFields.itemsToAdd
+        )} to ${this.list.selected.size} selected document(s).`
+      } else if (
+        changedCustomFields.itemsToAdd.length == 0 &&
+        changedCustomFields.itemsToRemove.length == 1
+      ) {
+        let customField = changedCustomFields.itemsToRemove[0]
+        modal.componentInstance.message = $localize`This operation will remove the custom field "${customField.name}" from ${this.list.selected.size} selected document(s).`
+      } else if (
+        changedCustomFields.itemsToAdd.length == 0 &&
+        changedCustomFields.itemsToRemove.length > 1
+      ) {
+        modal.componentInstance.message = $localize`This operation will remove the custom fields ${this._localizeList(
+          changedCustomFields.itemsToRemove
+        )} from ${this.list.selected.size} selected document(s).`
+      } else {
+        modal.componentInstance.message = $localize`This operation will assign the custom fields ${this._localizeList(
+          changedCustomFields.itemsToAdd
+        )} and remove the custom fields ${this._localizeList(
+          changedCustomFields.itemsToRemove
+        )} on ${this.list.selected.size} selected document(s).`
+      }
+
+      modal.componentInstance.btnClass = 'btn-warning'
+      modal.componentInstance.btnCaption = $localize`Confirm`
+      modal.componentInstance.confirmClicked
+        .pipe(takeUntil(this.unsubscribeNotifier))
+        .subscribe(() => {
+          this.executeBulkOperation(modal, 'modify_custom_fields', {
+            add_custom_fields: changedCustomFields.itemsToAdd.map((f) => f.id),
+            remove_custom_fields: changedCustomFields.itemsToRemove.map(
+              (f) => f.id
+            ),
+          })
+        })
+    } else {
+      this.executeBulkOperation(null, 'modify_custom_fields', {
+        add_custom_fields: changedCustomFields.itemsToAdd.map((f) => f.id),
+        remove_custom_fields: changedCustomFields.itemsToRemove.map(
+          (f) => f.id
+        ),
+      })
+    }
+  }
+
   createTag(name: string) {
     let modal = this.modalService.open(TagEditDialogComponent, {
       backdrop: 'static',
@@ -578,6 +677,27 @@ export class BulkEditorComponent
       .subscribe(({ newStoragePath, storagePaths }) => {
         this.storagePaths = storagePaths.results
         this.storagePathsSelectionModel.toggle(newStoragePath.id)
+      })
+  }
+
+  createCustomField(name: string) {
+    let modal = this.modalService.open(CustomFieldEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    modal.componentInstance.object = { name }
+    modal.componentInstance.succeeded
+      .pipe(
+        switchMap((newCustomField) => {
+          return this.customFieldService
+            .listAll()
+            .pipe(map((customFields) => ({ newCustomField, customFields })))
+        })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ newCustomField, customFields }) => {
+        this.customFields = customFields.results
+        this.customFieldsSelectionModel.toggle(newCustomField.id)
       })
   }
 

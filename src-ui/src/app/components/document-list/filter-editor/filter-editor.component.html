@@ -70,22 +70,28 @@
           [documentCounts]="storagePathDocumentCounts"
           [allowSelectNone]="true"></pngx-filterable-dropdown>
         }
-      </div>
-      <div class="d-flex flex-wrap gap-2">
-        <pngx-date-dropdown
-          title="Created" i18n-title
+
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.CustomField)) {
+          <pngx-filterable-dropdown class="flex-fill" title="Custom fields" icon="ui-radios" i18n-title
+          filterPlaceholder="Filter custom fields" i18n-filterPlaceholder
+          [items]="customFields"
+          [manyToOne]="true"
+          [(selectionModel)]="customFieldSelectionModel"
+          (selectionModelChange)="updateRules()"
+          (opened)="onCustomFieldsDropdownOpen()"
+          [documentCounts]="customFieldDocumentCounts"
+          [allowSelectNone]="true"></pngx-filterable-dropdown>
+        }
+        <pngx-dates-dropdown
+          title="Dates" i18n-title
           (datesSet)="updateRules()"
-          [(dateBefore)]="dateCreatedBefore"
-          [(dateAfter)]="dateCreatedAfter"
-        [(relativeDate)]="dateCreatedRelativeDate"></pngx-date-dropdown>
-        <pngx-date-dropdown
-          title="Added" i18n-title
-          (datesSet)="updateRules()"
-          [(dateBefore)]="dateAddedBefore"
-          [(dateAfter)]="dateAddedAfter"
-        [(relativeDate)]="dateAddedRelativeDate"></pngx-date-dropdown>
-      </div>
-      <div class="d-flex flex-wrap">
+          [(createdDateBefore)]="dateCreatedBefore"
+          [(createdDateAfter)]="dateCreatedAfter"
+          [(createdRelativeDate)]="dateCreatedRelativeDate"
+          [(addedDateBefore)]="dateAddedBefore"
+          [(addedDateAfter)]="dateAddedAfter"
+          [(addedRelativeDate)]="dateAddedRelativeDate">
+        </pngx-dates-dropdown>
         <pngx-permissions-filter-dropdown
           title="Permissions" i18n-title
           (ownerFilterSet)="updateRules()"

@@ -4,12 +4,12 @@ import {
   fakeAsync,
   tick,
 } from '@angular/core/testing'
-let fixture: ComponentFixture<DateDropdownComponent>
+let fixture: ComponentFixture<DatesDropdownComponent>
 import {
-  DateDropdownComponent,
+  DatesDropdownComponent,
   DateSelection,
   RelativeDate,
-} from './date-dropdown.component'
+} from './dates-dropdown.component'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -19,15 +19,15 @@ import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DatePipe } from '@angular/common'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
-describe('DateDropdownComponent', () => {
-  let component: DateDropdownComponent
+describe('DatesDropdownComponent', () => {
+  let component: DatesDropdownComponent
   let settingsService: SettingsService
   let settingsSpy
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
       declarations: [
-        DateDropdownComponent,
+        DatesDropdownComponent,
         ClearableBadgeComponent,
         CustomDatePipe,
       ],
@@ -44,7 +44,7 @@ describe('DateDropdownComponent', () => {
     settingsService = TestBed.inject(SettingsService)
     settingsSpy = jest.spyOn(settingsService, 'getLocalizedDateInputFormat')
 
-    fixture = TestBed.createComponent(DateDropdownComponent)
+    fixture = TestBed.createComponent(DatesDropdownComponent)
     component = fixture.componentInstance
 
     fixture.detectChanges()
@@ -57,7 +57,7 @@ describe('DateDropdownComponent', () => {
 
   it('should support date input, emit change', fakeAsync(() => {
     let result: string
-    component.dateAfterChange.subscribe((date) => (result = date))
+    component.createdDateAfterChange.subscribe((date) => (result = date))
     const input: HTMLInputElement = fixture.nativeElement.querySelector('input')
     input.value = '5/30/2023'
     input.dispatchEvent(new Event('change'))
@@ -78,45 +78,69 @@ describe('DateDropdownComponent', () => {
   it('should support relative dates', fakeAsync(() => {
     let result: DateSelection
     component.datesSet.subscribe((date) => (result = date))
-    component.setRelativeDate(null)
-    component.setRelativeDate(RelativeDate.LAST_7_DAYS)
+    component.setCreatedRelativeDate(null)
+    component.setCreatedRelativeDate(RelativeDate.LAST_7_DAYS)
+    component.setAddedRelativeDate(null)
+    component.setAddedRelativeDate(RelativeDate.LAST_7_DAYS)
     tick(500)
     expect(result).toEqual({
-      after: null,
-      before: null,
-      relativeDateID: RelativeDate.LAST_7_DAYS,
+      createdAfter: null,
+      createdBefore: null,
+      createdRelativeDateID: RelativeDate.LAST_7_DAYS,
+      addedAfter: null,
+      addedBefore: null,
+      addedRelativeDateID: RelativeDate.LAST_7_DAYS,
     })
   }))
 
   it('should support report if active', () => {
-    component.relativeDate = RelativeDate.LAST_7_DAYS
+    component.createdRelativeDate = RelativeDate.LAST_7_DAYS
     expect(component.isActive).toBeTruthy()
-    component.relativeDate = null
-    component.dateAfter = '2023-05-30'
+    component.createdRelativeDate = null
+    component.createdDateAfter = '2023-05-30'
     expect(component.isActive).toBeTruthy()
-    component.dateAfter = null
-    component.dateBefore = '2023-05-30'
+    component.createdDateAfter = null
+    component.createdDateBefore = '2023-05-30'
     expect(component.isActive).toBeTruthy()
-    component.dateBefore = null
+    component.createdDateBefore = null
+
+    component.addedRelativeDate = RelativeDate.LAST_7_DAYS
+    expect(component.isActive).toBeTruthy()
+    component.addedRelativeDate = null
+    component.addedDateAfter = '2023-05-30'
+    expect(component.isActive).toBeTruthy()
+    component.addedDateAfter = null
+    component.addedDateBefore = '2023-05-30'
+    expect(component.isActive).toBeTruthy()
+    component.addedDateBefore = null
+
     expect(component.isActive).toBeFalsy()
   })
 
   it('should support reset', () => {
-    component.dateAfter = '2023-05-30'
+    component.createdDateAfter = '2023-05-30'
     component.reset()
-    expect(component.dateAfter).toBeNull()
+    expect(component.createdDateAfter).toBeNull()
   })
 
   it('should support clearAfter', () => {
-    component.dateAfter = '2023-05-30'
-    component.clearAfter()
-    expect(component.dateAfter).toBeNull()
+    component.createdDateAfter = '2023-05-30'
+    component.clearCreatedAfter()
+    expect(component.createdDateAfter).toBeNull()
+
+    component.addedDateAfter = '2023-05-30'
+    component.clearAddedAfter()
+    expect(component.addedDateAfter).toBeNull()
   })
 
   it('should support clearBefore', () => {
-    component.dateBefore = '2023-05-30'
-    component.clearBefore()
-    expect(component.dateBefore).toBeNull()
+    component.createdDateBefore = '2023-05-30'
+    component.clearCreatedBefore()
+    expect(component.createdDateBefore).toBeNull()
+
+    component.addedDateBefore = '2023-05-30'
+    component.clearAddedBefore()
+    expect(component.addedDateBefore).toBeNull()
   })
 
   it('should limit keyboard events', () => {
