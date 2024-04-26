@@ -138,11 +138,11 @@ test('sorting', async ({ page }) => {
 test('change views', async ({ page }) => {
   await page.routeFromHAR(REQUESTS_HAR5, { notFound: 'fallback' })
   await page.goto('/documents')
-  await page.locator('pngx-page-header label').first().click()
+  await page.locator('.btn-group label').first().click()
   await expect(page.locator('pngx-document-list table')).toBeVisible()
-  await page.locator('pngx-page-header label').nth(1).click()
+  await page.locator('.btn-group label').nth(1).click()
   await expect(page.locator('pngx-document-card-small').first()).toBeAttached()
-  await page.locator('pngx-page-header label').nth(2).click()
+  await page.locator('.btn-group label').nth(2).click()
   await expect(page.locator('pngx-document-card-large').first()).toBeAttached()
 })
 

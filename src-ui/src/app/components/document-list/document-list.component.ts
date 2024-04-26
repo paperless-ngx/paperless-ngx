@@ -15,7 +15,7 @@ import {
   isFullTextFilterRule,
 } from 'src/app/utils/filter-rules'
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
-import { Document } from 'src/app/data/document'
+import { DisplayField, DisplayMode, Document } from 'src/app/data/document'
 import { SavedView } from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import {
@@ -25,10 +25,6 @@ import {
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
-import {
-  DOCUMENT_SORT_FIELDS,
-  DOCUMENT_SORT_FIELDS_FULLTEXT,
-} from 'src/app/services/rest/document.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -47,6 +43,9 @@ export class DocumentListComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy
 {
+  DisplayField = DisplayField
+  DisplayMode = DisplayMode
+
   constructor(
     public list: DocumentListViewService,
     public savedViewService: SavedViewService,
@@ -56,7 +55,7 @@ export class DocumentListComponent
     private modalService: NgbModal,
     private consumerStatusService: ConsumerStatusService,
     public openDocumentsService: OpenDocumentsService,
-    private settingsService: SettingsService,
+    public settingsService: SettingsService,
     private hotKeyService: HotKeyService,
     public permissionService: PermissionsService
   ) {
@@ -68,7 +67,25 @@ export class DocumentListComponent
 
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>
 
-  displayMode = 'smallCards' // largeCards, smallCards, details
+  get activeDisplayFields(): DisplayField[] {
+    return this.list.displayFields
+  }
+
+  set activeDisplayFields(fields: DisplayField[]) {
+    this.list.displayFields = fields
+    this.updateDisplayCustomFields()
+  }
+  activeDisplayCustomFields: Set<string> = new Set()
+
+  public updateDisplayCustomFields() {
+    this.activeDisplayCustomFields = new Set(
+      Array.from(this.activeDisplayFields).filter(
+        (field) =>
+          typeof field === 'string' &&
+          field.startsWith(DisplayField.CUSTOM_FIELD)
+      )
+    )
+  }
 
   unmodifiedFilterRules: FilterRule[] = []
   private unmodifiedSavedView: SavedView
@@ -81,6 +98,16 @@ export class DocumentListComponent
       return (
         this.unmodifiedSavedView.sort_field !== this.list.sortField ||
         this.unmodifiedSavedView.sort_reverse !== this.list.sortReverse ||
+        (this.unmodifiedSavedView.page_size &&
+          this.unmodifiedSavedView.page_size !== this.list.pageSize) ||
+        (this.unmodifiedSavedView.display_mode &&
+          this.unmodifiedSavedView.display_mode !== this.list.displayMode) ||
+        // if the saved view has no display mode, we assume it's small cards
+        (!this.unmodifiedSavedView.display_mode &&
+          this.list.displayMode !== DisplayMode.SMALL_CARDS) ||
+        (this.unmodifiedSavedView.display_fields &&
+          this.unmodifiedSavedView.display_fields.join(',') !==
+            this.activeDisplayFields.join(',')) ||
         filterRulesDiffer(
           this.unmodifiedSavedView.filter_rules,
           this.list.filterRules
@@ -105,8 +132,8 @@ export class DocumentListComponent
 
   getSortFields() {
     return isFullTextFilterRule(this.list.filterRules)
-      ? DOCUMENT_SORT_FIELDS_FULLTEXT
-      : DOCUMENT_SORT_FIELDS
+      ? this.list.sortFieldsFullText
+      : this.list.sortFields
   }
 
   set listSortReverse(reverse: boolean) {
@@ -117,10 +144,6 @@ export class DocumentListComponent
     return this.list.sortReverse
   }
 
-  setSortField(field: string) {
-    this.list.sortField = field
-  }
-
   onSort(event: SortEvent) {
     this.list.setSort(event.column, event.reverse)
   }
@@ -129,15 +152,23 @@ export class DocumentListComponent
     return this.list.selected.size > 0
   }
 
-  saveDisplayMode() {
-    localStorage.setItem('document-list:displayMode', this.displayMode)
+  toggleDisplayField(field: DisplayField) {
+    if (this.activeDisplayFields.includes(field)) {
+      this.activeDisplayFields = this.activeDisplayFields.filter(
+        (f) => f !== field
+      )
+    } else {
+      this.activeDisplayFields = [...this.activeDisplayFields, field]
+    }
+    this.updateDisplayCustomFields()
+  }
+
+  public getDisplayCustomFieldTitle(field: string) {
+    return this.settingsService.allDisplayFields.find((f) => f.id === field)
+      ?.name
   }
 
   ngOnInit(): void {
-    if (localStorage.getItem('document-list:displayMode') != null) {
-      this.displayMode = localStorage.getItem('document-list:displayMode')
-    }
-
     this.consumerStatusService
       .onDocumentConsumptionFinished()
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -245,6 +276,8 @@ export class DocumentListComponent
         filter_rules: this.list.filterRules,
         sort_field: this.list.sortField,
         sort_reverse: this.list.sortReverse,
+        display_mode: this.list.displayMode,
+        display_fields: this.activeDisplayFields,
       }
       this.savedViewService
         .patch(savedView)
@@ -284,6 +317,8 @@ export class DocumentListComponent
         filter_rules: this.list.filterRules,
         sort_reverse: this.list.sortReverse,
         sort_field: this.list.sortField,
+        display_mode: this.list.displayMode,
+        display_fields: this.activeDisplayFields,
       }
 
       this.savedViewService

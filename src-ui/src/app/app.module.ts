@@ -120,6 +120,8 @@ import { RotateConfirmDialogComponent } from './components/common/confirm-dialog
 import { MergeConfirmDialogComponent } from './components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
 import { SplitConfirmDialogComponent } from './components/common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
 import { DocumentHistoryComponent } from './components/document-history/document-history.component'
+import { DragDropSelectComponent } from './components/common/input/drag-drop-select/drag-drop-select.component'
+import { CustomFieldDisplayComponent } from './components/common/custom-field-display/custom-field-display.component'
 import { GlobalSearchComponent } from './components/app-frame/global-search/global-search.component'
 import { HotkeyDialogComponent } from './components/common/hotkey-dialog/hotkey-dialog.component'
 import {
@@ -141,6 +143,7 @@ import {
   calendar,
   calendarEvent,
   cardChecklist,
+  cardHeading,
   caretDown,
   caretUp,
   chatLeftText,
@@ -238,6 +241,7 @@ const icons = {
   calendar,
   calendarEvent,
   cardChecklist,
+  cardHeading,
   caretDown,
   caretUp,
   chatLeftText,
@@ -482,6 +486,8 @@ function initializeApp(settings: SettingsService) {
     MergeConfirmDialogComponent,
     SplitConfirmDialogComponent,
     DocumentHistoryComponent,
+    DragDropSelectComponent,
+    CustomFieldDisplayComponent,
     GlobalSearchComponent,
     HotkeyDialogComponent,
   ],
