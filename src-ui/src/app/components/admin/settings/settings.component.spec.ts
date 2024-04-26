@@ -48,6 +48,8 @@ import {
   InstallType,
   SystemStatusItemStatus,
 } from 'src/app/data/system-status'
+import { DragDropSelectComponent } from '../../common/input/drag-drop-select/drag-drop-select.component'
+import { DragDropModule } from '@angular/cdk/drag-drop'
 
 const savedViews = [
   { id: 1, name: 'view1', show_in_sidebar: true, show_on_dashboard: true },
@@ -96,6 +98,7 @@ describe('SettingsComponent', () => {
         PermissionsGroupComponent,
         IfOwnerDirective,
         ConfirmButtonComponent,
+        DragDropSelectComponent,
       ],
       providers: [CustomDatePipe, DatePipe, PermissionsGuard],
       imports: [
@@ -108,6 +111,7 @@ describe('SettingsComponent', () => {
         NgSelectModule,
         NgxBootstrapIconsModule.pick(allIcons),
         NgbModalModule,
+        DragDropModule,
       ],
     }).compileComponents()
 
@@ -436,5 +440,12 @@ describe('SettingsComponent', () => {
     expect(modalOpenSpy).toHaveBeenCalledWith(SystemStatusDialogComponent, {
       size: 'xl',
     })
+  })
+
+  it('should support reset', () => {
+    completeSetup()
+    component.settingsForm.get('themeColor').setValue('#ff0000')
+    component.reset()
+    expect(component.settingsForm.get('themeColor').value).toEqual('')
   })
 })

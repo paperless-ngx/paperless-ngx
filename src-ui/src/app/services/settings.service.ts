@@ -19,9 +19,15 @@ import {
 import { environment } from 'src/environments/environment'
 import { UiSettings, SETTINGS, SETTINGS_KEYS } from '../data/ui-settings'
 import { User } from '../data/user'
-import { PermissionsService } from './permissions.service'
+import {
+  PermissionAction,
+  PermissionType,
+  PermissionsService,
+} from './permissions.service'
 import { ToastService } from './toast.service'
 import { SavedView } from '../data/saved-view'
+import { CustomFieldsService } from './rest/custom-fields.service'
+import { DEFAULT_DISPLAY_FIELDS, DisplayField } from '../data/document'
 
 export interface LanguageOption {
   code: string
@@ -257,6 +263,12 @@ export class SettingsService {
   public globalDropzoneActive: boolean = false
   public organizingSidebarSavedViews: boolean = false
 
+  private _allDisplayFields: Array<{ id: DisplayField; name: string }> =
+    DEFAULT_DISPLAY_FIELDS
+  public get allDisplayFields(): Array<{ id: DisplayField; name: string }> {
+    return this._allDisplayFields
+  }
+
   constructor(
     rendererFactory: RendererFactory2,
     @Inject(DOCUMENT) private document,
@@ -265,7 +277,8 @@ export class SettingsService {
     @Inject(LOCALE_ID) private localeId: string,
     protected http: HttpClient,
     private toastService: ToastService,
-    private permissionsService: PermissionsService
+    private permissionsService: PermissionsService,
+    private customFieldsService: CustomFieldsService
   ) {
     this._renderer = rendererFactory.createRenderer(null, null)
   }
@@ -288,8 +301,68 @@ export class SettingsService {
           uisettings.permissions,
           this.currentUser
         )
+
+        this.initializeDisplayFields()
       })
     )
+  }
+
+  public initializeDisplayFields() {
+    this._allDisplayFields = DEFAULT_DISPLAY_FIELDS
+
+    this._allDisplayFields = this._allDisplayFields
+      ?.map((field) => {
+        if (
+          field.id === DisplayField.NOTES &&
+          !this.get(SETTINGS_KEYS.NOTES_ENABLED)
+        ) {
+          return null
+        }
+
+        if (
+          [
+            DisplayField.TITLE,
+            DisplayField.CREATED,
+            DisplayField.ADDED,
+            DisplayField.ASN,
+            DisplayField.SHARED,
+          ].includes(field.id)
+        ) {
+          return field
+        }
+
+        let type: PermissionType = Object.values(PermissionType).find((t) =>
+          t.includes(field.id)
+        )
+        if (field.id === DisplayField.OWNER) {
+          type = PermissionType.User
+        }
+        return this.permissionsService.currentUserCan(
+          PermissionAction.View,
+          type
+        )
+          ? field
+          : null
+      })
+      .filter((f) => f)
+
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.CustomField
+      )
+    ) {
+      this.customFieldsService.listAll().subscribe((r) => {
+        this._allDisplayFields = this._allDisplayFields.concat(
+          r.results.map((field) => {
+            return {
+              id: `${DisplayField.CUSTOM_FIELD}${field.id}` as any,
+              name: field.name,
+            }
+          })
+        )
+      })
+    }
   }
 
   get displayName(): string {

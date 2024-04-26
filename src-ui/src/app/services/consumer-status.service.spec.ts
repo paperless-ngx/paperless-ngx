@@ -18,6 +18,8 @@ describe('ConsumerStatusService', () => {
   let httpTestingController: HttpTestingController
   let consumerStatusService: ConsumerStatusService
   let documentService: DocumentService
+  let settingsService: SettingsService
+
   const server = new WS(
     `${environment.webSocketProtocol}//${environment.webSocketHost}${environment.webSocketBaseUrl}status/`,
     { jsonProtocol: true }
@@ -25,25 +27,17 @@ describe('ConsumerStatusService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        ConsumerStatusService,
-        DocumentService,
-        SettingsService,
-        {
-          provide: SettingsService,
-          useValue: {
-            currentUser: {
-              id: 1,
-              username: 'testuser',
-              is_superuser: false,
-            },
-          },
-        },
-      ],
+      providers: [ConsumerStatusService, DocumentService, SettingsService],
       imports: [HttpClientTestingModule],
     })
 
     httpTestingController = TestBed.inject(HttpTestingController)
+    settingsService = TestBed.inject(SettingsService)
+    settingsService.currentUser = {
+      id: 1,
+      username: 'testuser',
+      is_superuser: false,
+    }
     consumerStatusService = TestBed.inject(ConsumerStatusService)
     documentService = TestBed.inject(DocumentService)
   })

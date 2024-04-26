@@ -19,6 +19,11 @@ import { routes } from 'src/app/app-routing.module'
 import { PermissionsGuard } from '../guards/permissions.guard'
 import { SettingsService } from './settings.service'
 import { SETTINGS_KEYS } from '../data/ui-settings'
+import {
+  DisplayMode,
+  DisplayField,
+  DEFAULT_DISPLAY_FIELDS,
+} from '../data/document'
 
 const documents = [
   {
@@ -213,7 +218,7 @@ describe('DocumentListViewService', () => {
     documentListViewService.loadFromQueryParams(convertToParamMap(params))
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/?page=${page}&page_size=${
-        documentListViewService.currentPageSize
+        documentListViewService.pageSize
       }&ordering=${reverse ? '-' : ''}${sort}&truncate_content=true`
     )
     expect(req.request.method).toEqual('GET')
@@ -231,7 +236,7 @@ describe('DocumentListViewService', () => {
     }
     documentListViewService.loadFromQueryParams(convertToParamMap(params))
     let req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/?page=${documentListViewService.currentPage}&page_size=${documentListViewService.currentPageSize}&ordering=-added&truncate_content=true&tags__id__all=${tags__id__all}`
+      `${environment.apiBaseUrl}documents/?page=${documentListViewService.currentPage}&page_size=${documentListViewService.pageSize}&ordering=-added&truncate_content=true&tags__id__all=${tags__id__all}`
     )
     expect(req.request.method).toEqual('GET')
     expect(documentListViewService.filterRules).toEqual([
@@ -249,7 +254,7 @@ describe('DocumentListViewService', () => {
   it('should use filter rules to update query params', () => {
     documentListViewService.filterRules = filterRules
     const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/?page=${documentListViewService.currentPage}&page_size=${documentListViewService.currentPageSize}&ordering=-created&truncate_content=true&tags__id__all=${tags__id__all}`
+      `${environment.apiBaseUrl}documents/?page=${documentListViewService.currentPage}&page_size=${documentListViewService.pageSize}&ordering=-created&truncate_content=true&tags__id__all=${tags__id__all}`
     )
     expect(req.request.method).toEqual('GET')
   })
@@ -257,7 +262,7 @@ describe('DocumentListViewService', () => {
   it('should support quick filter', () => {
     documentListViewService.quickFilter(filterRules)
     const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/?page=${documentListViewService.currentPage}&page_size=${documentListViewService.currentPageSize}&ordering=-created&truncate_content=true&tags__id__all=${tags__id__all}`
+      `${environment.apiBaseUrl}documents/?page=${documentListViewService.currentPage}&page_size=${documentListViewService.pageSize}&ordering=-created&truncate_content=true&tags__id__all=${tags__id__all}`
     )
     expect(req.request.method).toEqual('GET')
   })
@@ -280,7 +285,7 @@ describe('DocumentListViewService', () => {
       convertToParamMap(params)
     )
     let req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/?page=${page}&page_size=${documentListViewService.currentPageSize}&ordering=-added&truncate_content=true&tags__id__all=${tags__id__all}`
+      `${environment.apiBaseUrl}documents/?page=${page}&page_size=${documentListViewService.pageSize}&ordering=-added&truncate_content=true&tags__id__all=${tags__id__all}`
     )
     expect(req.request.method).toEqual('GET')
     // reset the list
@@ -305,8 +310,7 @@ describe('DocumentListViewService', () => {
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
     )
     expect(documentListViewService.currentPage).toEqual(1)
-    documentListViewService.currentPageSize = 3
-    documentListViewService.reload()
+    documentListViewService.pageSize = 3
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/?page=1&page_size=3&ordering=-created&truncate_content=true`
     )
@@ -362,7 +366,10 @@ describe('DocumentListViewService', () => {
       .spyOn(documentListViewService, 'documents', 'get')
       .mockReturnValue(documents)
     expect(documentListViewService.currentPage).toEqual(1)
-    documentListViewService.currentPageSize = 3
+    documentListViewService.pageSize = 3
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=3&ordering=-created&truncate_content=true`
+    )
     jest
       .spyOn(documentListViewService, 'getLastPage')
       .mockReturnValue(Math.ceil(documents.length / 3))
@@ -410,7 +417,13 @@ describe('DocumentListViewService', () => {
       .spyOn(documentListViewService, 'documents', 'get')
       .mockReturnValue(documents)
     documentListViewService.currentPage = 2
-    documentListViewService.currentPageSize = 3
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=2&page_size=50&ordering=-created&truncate_content=true`
+    )
+    documentListViewService.pageSize = 3
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=2&page_size=3&ordering=-created&truncate_content=true`
+    )
     const reloadSpy = jest.spyOn(documentListViewService, 'reload')
     documentListViewService.getPrevious(1).subscribe({
       next: () => {},
@@ -426,8 +439,7 @@ describe('DocumentListViewService', () => {
 
   it('should update page size from settings', () => {
     settingsService.set(SETTINGS_KEYS.DOCUMENT_LIST_SIZE, 10)
-    documentListViewService.updatePageSize()
-    expect(documentListViewService.currentPageSize).toEqual(10)
+    expect(documentListViewService.pageSize).toEqual(10)
   })
 
   it('should support select a document', () => {
@@ -459,8 +471,7 @@ describe('DocumentListViewService', () => {
   })
 
   it('should support select page', () => {
-    documentListViewService.currentPageSize = 3
-    documentListViewService.reload()
+    documentListViewService.pageSize = 3
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/?page=1&page_size=3&ordering=-created&truncate_content=true`
     )
@@ -542,6 +553,42 @@ describe('DocumentListViewService', () => {
     expect(documentListViewService.sortField).toEqual('created')
     httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
+    )
+  })
+
+  it('should update default view state when display mode changes', () => {
+    const localStorageSpy = jest.spyOn(localStorage, 'setItem')
+    expect(documentListViewService.displayMode).toEqual(DisplayMode.SMALL_CARDS)
+    documentListViewService.displayMode = DisplayMode.LARGE_CARDS
+    expect(documentListViewService.displayMode).toEqual(DisplayMode.LARGE_CARDS)
+    documentListViewService.displayMode = 'details' as any // legacy
+    expect(documentListViewService.displayMode).toEqual(DisplayMode.TABLE)
+    expect(localStorageSpy).toHaveBeenCalledTimes(2)
+  })
+
+  it('should update default view state when display fields change', () => {
+    const localStorageSpy = jest.spyOn(localStorage, 'setItem')
+    documentListViewService.displayFields = [
+      DisplayField.ADDED,
+      DisplayField.TITLE,
+    ]
+    expect(documentListViewService.displayFields).toEqual([
+      DisplayField.ADDED,
+      DisplayField.TITLE,
+    ])
+    expect(localStorageSpy).toHaveBeenCalled()
+    // reload triggered
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
+    )
+    documentListViewService.displayFields = null
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
+    )
+    expect(documentListViewService.displayFields).toEqual(
+      DEFAULT_DISPLAY_FIELDS.filter((f) => f.id !== DisplayField.ADDED).map(
+        (f) => f.id
+      )
     )
   })
 })

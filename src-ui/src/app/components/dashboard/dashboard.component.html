@@ -23,7 +23,7 @@
       }
 
       <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
-        @for (v of dashboardViews; track v) {
+        @for (v of dashboardViews; track v.id) {
           <div class="col">
             <pngx-saved-view-widget
               [savedView]="v"

@@ -1,0 +1,25 @@
+@if (field) {
+    @switch (field.data_type) {
+        @case (CustomFieldDataType.Monetary) {
+            <span>{{value | currency: currency}}</span>
+        }
+        @case (CustomFieldDataType.Date) {
+            <span>{{value | customDate}}</span>
+        }
+        @case (CustomFieldDataType.Url) {
+            <a [href]="value" class="btn-link text-dark text-decoration-none" target="_blank">{{value}}</a>
+        }
+        @case (CustomFieldDataType.DocumentLink) {
+            <div class="d-flex gap-1 flex-wrap">
+                @for (docId of value; track docId) {
+                    <a routerLink="/documents/{{docId}}" class="badge bg-dark text-primary" title="View" i18n-title>
+                        <i-bs width="0.9em" height="0.9em" name="file-text"></i-bs>&nbsp;<span>{{ getDocumentTitle(docId) }}</span>
+                    </a>
+                }
+            </div>
+        }
+        @default {
+          <span>{{value}}</span>
+        }
+    }
+}
