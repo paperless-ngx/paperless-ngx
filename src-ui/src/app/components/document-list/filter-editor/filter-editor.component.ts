@@ -48,8 +48,12 @@ import {
   FILTER_OWNER_DOES_NOT_INCLUDE,
   FILTER_OWNER_ISNULL,
   FILTER_OWNER_ANY,
-  FILTER_CUSTOM_FIELDS,
+  FILTER_CUSTOM_FIELDS_TEXT,
   FILTER_SHARED_BY_USER,
+  FILTER_HAS_CUSTOM_FIELDS_ANY,
+  FILTER_HAS_CUSTOM_FIELDS_ALL,
+  FILTER_HAS_ANY_CUSTOM_FIELDS,
+  FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
 } from 'src/app/data/filter-rule-type'
 import {
   FilterableDropdownSelectionModel,
@@ -65,7 +69,7 @@ import {
 import { Document } from 'src/app/data/document'
 import { StoragePath } from 'src/app/data/storage-path'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
-import { RelativeDate } from '../../common/date-dropdown/date-dropdown.component'
+import { RelativeDate } from '../../common/dates-dropdown/dates-dropdown.component'
 import {
   OwnerFilterType,
   PermissionsSelectionModel,
@@ -76,6 +80,8 @@ import {
   PermissionsService,
 } from 'src/app/services/permissions.service'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { CustomField } from 'src/app/data/custom-field'
 
 const TEXT_FILTER_TARGET_TITLE = 'title'
 const TEXT_FILTER_TARGET_TITLE_CONTENT = 'title-content'
@@ -208,6 +214,16 @@ export class FilterEditorComponent
             return $localize`Without any tag`
           }
 
+        case FILTER_HAS_CUSTOM_FIELDS_ALL:
+          return $localize`Custom fields: ${this.customFields.find(
+            (f) => f.id == +rule.value
+          )?.name}`
+
+        case FILTER_HAS_ANY_CUSTOM_FIELDS:
+          if (rule.value == 'false') {
+            return $localize`Without any custom field`
+          }
+
         case FILTER_TITLE:
           return $localize`Title: ${rule.value}`
 
@@ -234,7 +250,8 @@ export class FilterEditorComponent
     private correspondentService: CorrespondentService,
     private documentService: DocumentService,
     private storagePathService: StoragePathService,
-    public permissionsService: PermissionsService
+    public permissionsService: PermissionsService,
+    private customFieldService: CustomFieldsService
   ) {
     super()
   }
@@ -246,11 +263,13 @@ export class FilterEditorComponent
   correspondents: Correspondent[] = []
   documentTypes: DocumentType[] = []
   storagePaths: StoragePath[] = []
+  customFields: CustomField[] = []
 
   tagDocumentCounts: SelectionDataItem[]
   correspondentDocumentCounts: SelectionDataItem[]
   documentTypeDocumentCounts: SelectionDataItem[]
   storagePathDocumentCounts: SelectionDataItem[]
+  customFieldDocumentCounts: SelectionDataItem[]
 
   _textFilter = ''
   _moreLikeId: number
@@ -288,6 +307,7 @@ export class FilterEditorComponent
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
   storagePathSelectionModel = new FilterableDropdownSelectionModel()
+  customFieldSelectionModel = new FilterableDropdownSelectionModel()
 
   dateCreatedBefore: string
   dateCreatedAfter: string
@@ -322,6 +342,7 @@ export class FilterEditorComponent
     this.storagePathSelectionModel.clear(false)
     this.tagSelectionModel.clear(false)
     this.correspondentSelectionModel.clear(false)
+    this.customFieldSelectionModel.clear(false)
     this._textFilter = null
     this._moreLikeId = null
     this.dateAddedBefore = null
@@ -347,7 +368,7 @@ export class FilterEditorComponent
           this._textFilter = rule.value
           this.textFilterTarget = TEXT_FILTER_TARGET_ASN
           break
-        case FILTER_CUSTOM_FIELDS:
+        case FILTER_CUSTOM_FIELDS_TEXT:
           this._textFilter = rule.value
           this.textFilterTarget = TEXT_FILTER_TARGET_CUSTOM_FIELDS
           break
@@ -488,6 +509,36 @@ export class FilterEditorComponent
             false
           )
           break
+        case FILTER_HAS_CUSTOM_FIELDS_ALL:
+          this.customFieldSelectionModel.logicalOperator = LogicalOperator.And
+          this.customFieldSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Selected,
+            false
+          )
+          break
+        case FILTER_HAS_CUSTOM_FIELDS_ANY:
+          this.customFieldSelectionModel.logicalOperator = LogicalOperator.Or
+          this.customFieldSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Selected,
+            false
+          )
+          break
+        case FILTER_HAS_ANY_CUSTOM_FIELDS:
+          this.customFieldSelectionModel.set(
+            null,
+            ToggleableItemState.Selected,
+            false
+          )
+          break
+        case FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS:
+          this.customFieldSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Excluded,
+            false
+          )
+          break
         case FILTER_ASN_ISNULL:
           this.textFilterTarget = TEXT_FILTER_TARGET_ASN
           this.textFilterModifier =
@@ -595,7 +646,7 @@ export class FilterEditorComponent
       this.textFilterTarget == TEXT_FILTER_TARGET_CUSTOM_FIELDS
     ) {
       filterRules.push({
-        rule_type: FILTER_CUSTOM_FIELDS,
+        rule_type: FILTER_CUSTOM_FIELDS_TEXT,
         value: this._textFilter,
       })
     }
@@ -700,6 +751,35 @@ export class FilterEditorComponent
           filterRules.push({
             rule_type: FILTER_DOES_NOT_HAVE_STORAGE_PATH,
             value: storagePath.id?.toString(),
+          })
+        })
+    }
+    if (this.customFieldSelectionModel.isNoneSelected()) {
+      filterRules.push({
+        rule_type: FILTER_HAS_ANY_CUSTOM_FIELDS,
+        value: 'false',
+      })
+    } else {
+      const customFieldFilterType =
+        this.customFieldSelectionModel.logicalOperator == LogicalOperator.And
+          ? FILTER_HAS_CUSTOM_FIELDS_ALL
+          : FILTER_HAS_CUSTOM_FIELDS_ANY
+      this.customFieldSelectionModel
+        .getSelectedItems()
+        .filter((field) => field.id)
+        .forEach((field) => {
+          filterRules.push({
+            rule_type: customFieldFilterType,
+            value: field.id?.toString(),
+          })
+        })
+      this.customFieldSelectionModel
+        .getExcludedItems()
+        .filter((field) => field.id)
+        .forEach((field) => {
+          filterRules.push({
+            rule_type: FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
+            value: field.id?.toString(),
           })
         })
     }
@@ -845,6 +925,8 @@ export class FilterEditorComponent
       selectionData?.selected_correspondents ?? null
     this.storagePathDocumentCounts =
       selectionData?.selected_storage_paths ?? null
+    this.customFieldDocumentCounts =
+      selectionData?.selected_custom_fields ?? null
   }
 
   rulesModified: boolean = false
@@ -905,6 +987,16 @@ export class FilterEditorComponent
         .listAll()
         .subscribe((result) => (this.storagePaths = result.results))
     }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.CustomField
+      )
+    ) {
+      this.customFieldService
+        .listAll()
+        .subscribe((result) => (this.customFields = result.results))
+    }
 
     this.textFilterDebounce = new Subject<string>()
 
@@ -959,6 +1051,10 @@ export class FilterEditorComponent
 
   onStoragePathDropdownOpen() {
     this.storagePathSelectionModel.apply()
+  }
+
+  onCustomFieldsDropdownOpen() {
+    this.customFieldSelectionModel.apply()
   }
 
   updateTextFilter(text) {

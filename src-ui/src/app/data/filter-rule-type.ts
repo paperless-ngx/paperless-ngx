@@ -47,7 +47,11 @@ export const FILTER_OWNER_ISNULL = 34
 export const FILTER_OWNER_DOES_NOT_INCLUDE = 35
 export const FILTER_SHARED_BY_USER = 37
 
-export const FILTER_CUSTOM_FIELDS = 36
+export const FILTER_CUSTOM_FIELDS_TEXT = 36
+export const FILTER_HAS_CUSTOM_FIELDS_ALL = 38
+export const FILTER_HAS_CUSTOM_FIELDS_ANY = 39
+export const FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS = 40
+export const FILTER_HAS_ANY_CUSTOM_FIELDS = 41
 
 export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
@@ -281,10 +285,35 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     multi: true,
   },
   {
-    id: FILTER_CUSTOM_FIELDS,
+    id: FILTER_CUSTOM_FIELDS_TEXT,
     filtervar: 'custom_fields__icontains',
     datatype: 'string',
     multi: false,
+  },
+  {
+    id: FILTER_HAS_CUSTOM_FIELDS_ALL,
+    filtervar: 'custom_fields__id__all',
+    datatype: 'number',
+    multi: true,
+  },
+  {
+    id: FILTER_HAS_CUSTOM_FIELDS_ANY,
+    filtervar: 'custom_fields__id__in',
+    datatype: 'number',
+    multi: true,
+  },
+  {
+    id: FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
+    filtervar: 'custom_fields__id__none',
+    datatype: 'number',
+    multi: true,
+  },
+  {
+    id: FILTER_HAS_ANY_CUSTOM_FIELDS,
+    filtervar: 'has_custom_fields',
+    datatype: 'boolean',
+    multi: false,
+    default: true,
   },
 ]
 

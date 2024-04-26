@@ -905,6 +905,7 @@ class BulkEditSerializer(
             "add_tag",
             "remove_tag",
             "modify_tags",
+            "modify_custom_fields",
             "delete",
             "redo_ocr",
             "set_permissions",
@@ -929,6 +930,17 @@ class BulkEditSerializer(
                 f"Some tags in {name} don't exist or were specified twice.",
             )
 
+    def _validate_custom_field_id_list(self, custom_fields, name="custom_fields"):
+        if not isinstance(custom_fields, list):
+            raise serializers.ValidationError(f"{name} must be a list")
+        if not all(isinstance(i, int) for i in custom_fields):
+            raise serializers.ValidationError(f"{name} must be a list of integers")
+        count = CustomField.objects.filter(id__in=custom_fields).count()
+        if not count == len(custom_fields):
+            raise serializers.ValidationError(
+                f"Some custom fields in {name} don't exist or were specified twice.",
+            )
+
     def validate_method(self, method):
         if method == "set_correspondent":
             return bulk_edit.set_correspondent
@@ -942,6 +954,8 @@ class BulkEditSerializer(
             return bulk_edit.remove_tag
         elif method == "modify_tags":
             return bulk_edit.modify_tags
+        elif method == "modify_custom_fields":
+            return bulk_edit.modify_custom_fields
         elif method == "delete":
             return bulk_edit.delete
         elif method == "redo_ocr":
@@ -1017,6 +1031,23 @@ class BulkEditSerializer(
         else:
             raise serializers.ValidationError("remove_tags not specified")
 
+    def _validate_parameters_modify_custom_fields(self, parameters):
+        if "add_custom_fields" in parameters:
+            self._validate_custom_field_id_list(
+                parameters["add_custom_fields"],
+                "add_custom_fields",
+            )
+        else:
+            raise serializers.ValidationError("add_custom_fields not specified")
+
+        if "remove_custom_fields" in parameters:
+            self._validate_custom_field_id_list(
+                parameters["remove_custom_fields"],
+                "remove_custom_fields",
+            )
+        else:
+            raise serializers.ValidationError("remove_custom_fields not specified")
+
     def _validate_owner(self, owner):
         ownerUser = User.objects.get(pk=owner)
         if ownerUser is None:
@@ -1079,6 +1110,8 @@ class BulkEditSerializer(
             self._validate_parameters_modify_tags(parameters)
         elif method == bulk_edit.set_storage_path:
             self._validate_storage_path(parameters)
+        elif method == bulk_edit.modify_custom_fields:
+            self._validate_parameters_modify_custom_fields(parameters)
         elif method == bulk_edit.set_permissions:
             self._validate_parameters_set_permissions(parameters)
         elif method == bulk_edit.rotate:

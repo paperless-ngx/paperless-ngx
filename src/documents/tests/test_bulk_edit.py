@@ -11,6 +11,8 @@ from guardian.shortcuts import get_users_with_perms
 
 from documents import bulk_edit
 from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
@@ -185,6 +187,53 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         args, kwargs = self.async_task.call_args
         # TODO: doc3 should not be affected, but the query for that is rather complicated
         self.assertCountEqual(kwargs["document_ids"], [self.doc2.id, self.doc3.id])
+
+    def test_modify_custom_fields(self):
+        cf = CustomField.objects.create(
+            name="cf1",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        cf2 = CustomField.objects.create(
+            name="cf2",
+            data_type=CustomField.FieldDataType.INT,
+        )
+        cf3 = CustomField.objects.create(
+            name="cf3",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        CustomFieldInstance.objects.create(
+            document=self.doc1,
+            field=cf,
+        )
+        CustomFieldInstance.objects.create(
+            document=self.doc2,
+            field=cf,
+        )
+        CustomFieldInstance.objects.create(
+            document=self.doc2,
+            field=cf3,
+        )
+        bulk_edit.modify_custom_fields(
+            [self.doc1.id, self.doc2.id],
+            add_custom_fields=[cf2.id],
+            remove_custom_fields=[cf.id],
+        )
+
+        self.doc1.refresh_from_db()
+        self.doc2.refresh_from_db()
+
+        self.assertEqual(
+            self.doc1.custom_fields.count(),
+            1,
+        )
+        self.assertEqual(
+            self.doc2.custom_fields.count(),
+            2,
+        )
+
+        self.async_task.assert_called_once()
+        args, kwargs = self.async_task.call_args
+        self.assertCountEqual(kwargs["document_ids"], [self.doc1.id, self.doc2.id])
 
     def test_delete(self):
         self.assertEqual(Document.objects.count(), 5)
