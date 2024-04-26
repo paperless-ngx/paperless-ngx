@@ -47,12 +47,13 @@ import { DocumentCardSmallComponent } from './document-card-small/document-card-
 import { DocumentCardLargeComponent } from './document-card-large/document-card-large.component'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { UsernamePipe } from 'src/app/pipes/username.pipe'
-import { Document } from 'src/app/data/document'
 import {
-  DOCUMENT_SORT_FIELDS,
-  DOCUMENT_SORT_FIELDS_FULLTEXT,
-  DocumentService,
-} from 'src/app/services/rest/document.service'
+  DEFAULT_DISPLAY_FIELDS,
+  DisplayField,
+  DisplayMode,
+  Document,
+} from 'src/app/data/document'
+import { DocumentService } from 'src/app/services/rest/document.service'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component'
@@ -169,17 +170,6 @@ describe('DocumentListComponent', () => {
     component = fixture.componentInstance
   })
 
-  it('should load display mode from local storage', () => {
-    window.localStorage.setItem('document-list:displayMode', 'largeCards')
-    fixture.detectChanges()
-    expect(component.displayMode).toEqual('largeCards')
-    component.displayMode = 'smallCards'
-    component.saveDisplayMode()
-    expect(window.localStorage.getItem('document-list:displayMode')).toEqual(
-      'smallCards'
-    )
-  })
-
   it('should reload on new document consumed', () => {
     const reloadSpy = jest.spyOn(documentListService, 'reload')
     const fileStatusSubject = new Subject<FileStatus>()
@@ -199,7 +189,7 @@ describe('DocumentListComponent', () => {
       },
     ]
     fixture.detectChanges()
-    expect(component.getSortFields()).toEqual(DOCUMENT_SORT_FIELDS)
+    expect(component.getSortFields()).toEqual(documentListService.sortFields)
 
     documentListService.filterRules = [
       {
@@ -208,7 +198,9 @@ describe('DocumentListComponent', () => {
       },
     ]
     fixture.detectChanges()
-    expect(component.getSortFields()).toEqual(DOCUMENT_SORT_FIELDS_FULLTEXT)
+    expect(component.getSortFields()).toEqual(
+      documentListService.sortFieldsFullText
+    )
   })
 
   it('should determine if filtered, support reset', () => {
@@ -297,18 +289,18 @@ describe('DocumentListComponent', () => {
     const displayModeButtons = fixture.debugElement.queryAll(
       By.css('input[type="radio"]')
     )
-    expect(component.displayMode).toEqual('smallCards')
+    expect(component.list.displayMode).toEqual('smallCards')
 
     displayModeButtons[0].nativeElement.checked = true
     displayModeButtons[0].triggerEventHandler('change')
     fixture.detectChanges()
-    expect(component.displayMode).toEqual('details')
+    expect(component.list.displayMode).toEqual('table')
     expect(fixture.debugElement.queryAll(By.css('tr'))).toHaveLength(3)
 
     displayModeButtons[1].nativeElement.checked = true
     displayModeButtons[1].triggerEventHandler('change')
     fixture.detectChanges()
-    expect(component.displayMode).toEqual('smallCards')
+    expect(component.list.displayMode).toEqual('smallCards')
     expect(
       fixture.debugElement.queryAll(By.directive(DocumentCardSmallComponent))
     ).toHaveLength(3)
@@ -316,7 +308,7 @@ describe('DocumentListComponent', () => {
     displayModeButtons[2].nativeElement.checked = true
     displayModeButtons[2].triggerEventHandler('change')
     fixture.detectChanges()
-    expect(component.displayMode).toEqual('largeCards')
+    expect(component.list.displayMode).toEqual('largeCards')
     expect(
       fixture.debugElement.queryAll(By.directive(DocumentCardLargeComponent))
     ).toHaveLength(3)
@@ -327,7 +319,7 @@ describe('DocumentListComponent', () => {
     fixture.detectChanges()
     const sortDropdown = fixture.debugElement.queryAll(
       By.directive(NgbDropdown)
-    )[1]
+    )[2]
     const asnSortFieldButton = sortDropdown.query(By.directive(NgbDropdownItem))
 
     asnSortFieldButton.triggerEventHandler('click')
@@ -337,6 +329,7 @@ describe('DocumentListComponent', () => {
   })
 
   it('should support setting sort field by table head', () => {
+    component.activeDisplayFields = [DisplayField.ASN]
     jest.spyOn(documentListService, 'documents', 'get').mockReturnValue(docs)
     fixture.detectChanges()
     expect(documentListService.sortField).toEqual('created')
@@ -347,7 +340,7 @@ describe('DocumentListComponent', () => {
     detailsDisplayModeButton.nativeElement.checked = true
     detailsDisplayModeButton.triggerEventHandler('change')
     fixture.detectChanges()
-    expect(component.displayMode).toEqual('details')
+    expect(component.list.displayMode).toEqual(DisplayMode.TABLE)
 
     const sortTh = fixture.debugElement.query(By.directive(SortableDirective))
     sortTh.triggerEventHandler('click')
@@ -430,6 +423,8 @@ describe('DocumentListComponent', () => {
           value: '20',
         },
       ],
+      display_mode: DisplayMode.SMALL_CARDS,
+      display_fields: [DisplayField.TITLE],
     }
     jest.spyOn(savedViewService, 'getCached').mockReturnValue(of(view))
     const queryParams = { view: view.id.toString() }
@@ -546,6 +541,42 @@ describe('DocumentListComponent', () => {
     expect(openModal.componentInstance.error).toEqual({ filter_rules: ['11'] })
   })
 
+  it('should detect saved view changes', () => {
+    const view: SavedView = {
+      id: 10,
+      name: 'Saved View 10',
+      sort_field: 'added',
+      sort_reverse: true,
+      filter_rules: [
+        {
+          rule_type: FILTER_HAS_TAGS_ANY,
+          value: '20',
+        },
+      ],
+      page_size: 5,
+      display_mode: DisplayMode.SMALL_CARDS,
+      display_fields: [DisplayField.TITLE],
+    }
+    jest.spyOn(savedViewService, 'getCached').mockReturnValue(of(view))
+    const queryParams = { view: view.id.toString() }
+    jest
+      .spyOn(activatedRoute, 'queryParamMap', 'get')
+      .mockReturnValue(of(convertToParamMap(queryParams)))
+    activatedRoute.snapshot.queryParams = queryParams
+    router.routerState.snapshot.url = '/view/10/'
+    fixture.detectChanges()
+    expect(documentListService.activeSavedViewId).toEqual(10)
+
+    component.list.displayFields = [DisplayField.ASN]
+    expect(component.savedViewIsModified).toBeTruthy()
+    component.list.displayFields = [DisplayField.TITLE]
+    expect(component.savedViewIsModified).toBeFalsy()
+    component.list.displayMode = DisplayMode.TABLE
+    expect(component.savedViewIsModified).toBeTruthy()
+    component.list.displayMode = DisplayMode.SMALL_CARDS
+    expect(component.savedViewIsModified).toBeFalsy()
+  })
+
   it('should navigate to a document', () => {
     fixture.detectChanges()
     const routerSpy = jest.spyOn(router, 'navigate')
@@ -558,7 +589,8 @@ describe('DocumentListComponent', () => {
     jest.spyOn(documentListService, 'documents', 'get').mockReturnValue(docs)
     expect(documentListService.sortField).toEqual('created')
 
-    component.displayMode = 'details'
+    component.list.displayMode = DisplayMode.TABLE
+    component.list.displayFields = DEFAULT_DISPLAY_FIELDS.map((f) => f.id)
     fixture.detectChanges()
 
     expect(
@@ -578,7 +610,7 @@ describe('DocumentListComponent', () => {
     fixture.detectChanges()
     expect(
       fixture.debugElement.queryAll(By.directive(SortableDirective))
-    ).toHaveLength(5)
+    ).toHaveLength(4)
   })
 
   it('should support toggle on document objects', () => {
@@ -597,5 +629,29 @@ describe('DocumentListComponent', () => {
     expect(qfSpy).toHaveBeenCalledWith([
       { rule_type: FILTER_FULLTEXT_MORELIKE, value: '99' },
     ])
+  })
+
+  it('should support toggling display fields', () => {
+    fixture.detectChanges()
+    component.activeDisplayFields = [DisplayField.ASN]
+    component.toggleDisplayField(DisplayField.TITLE)
+    expect(component.activeDisplayFields).toEqual([
+      DisplayField.ASN,
+      DisplayField.TITLE,
+    ])
+    component.toggleDisplayField(DisplayField.ASN)
+    expect(component.activeDisplayFields).toEqual([DisplayField.TITLE])
+  })
+
+  it('should get custom field title', () => {
+    fixture.detectChanges()
+    jest
+      .spyOn(settingsService, 'allDisplayFields', 'get')
+      .mockReturnValue([
+        { id: 'custom_field_1' as any, name: 'Custom Field 1' },
+      ])
+    expect(component.getDisplayCustomFieldTitle('custom_field_1')).toEqual(
+      'Custom Field 1'
+    )
   })
 })

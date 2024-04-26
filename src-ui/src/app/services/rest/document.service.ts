@@ -1,5 +1,9 @@
 import { Injectable } from '@angular/core'
-import { Document } from 'src/app/data/document'
+import {
+  DOCUMENT_SORT_FIELDS,
+  DOCUMENT_SORT_FIELDS_FULLTEXT,
+  Document,
+} from 'src/app/data/document'
 import { DocumentMetadata } from 'src/app/data/document-metadata'
 import { AbstractPaperlessService } from './abstract-paperless-service'
 import { HttpClient } from '@angular/common/http'
@@ -22,26 +26,6 @@ import { SettingsService } from '../settings.service'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { AuditLogEntry } from 'src/app/data/auditlog-entry'
 
-export const DOCUMENT_SORT_FIELDS = [
-  { field: 'archive_serial_number', name: $localize`ASN` },
-  { field: 'correspondent__name', name: $localize`Correspondent` },
-  { field: 'title', name: $localize`Title` },
-  { field: 'document_type__name', name: $localize`Document type` },
-  { field: 'created', name: $localize`Created` },
-  { field: 'added', name: $localize`Added` },
-  { field: 'modified', name: $localize`Modified` },
-  { field: 'num_notes', name: $localize`Notes` },
-  { field: 'owner', name: $localize`Owner` },
-]
-
-export const DOCUMENT_SORT_FIELDS_FULLTEXT = [
-  ...DOCUMENT_SORT_FIELDS,
-  {
-    field: 'score',
-    name: $localize`:Score is a value returned by the full text search engine and specifies how well a result matches the given query:Search score`,
-  },
-]
-
 export interface SelectionDataItem {
   id: number
   document_count: number
@@ -60,6 +44,16 @@ export interface SelectionData {
 export class DocumentService extends AbstractPaperlessService<Document> {
   private _searchQuery: string
 
+  private _sortFields
+  get sortFields() {
+    return this._sortFields
+  }
+
+  private _sortFieldsFullText
+  get sortFieldsFullText() {
+    return this._sortFieldsFullText
+  }
+
   constructor(
     http: HttpClient,
     private correspondentService: CorrespondentService,
@@ -70,6 +64,46 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     private settingsService: SettingsService
   ) {
     super(http, 'documents')
+    this.setupSortFields()
+  }
+
+  private setupSortFields() {
+    this._sortFields = [...DOCUMENT_SORT_FIELDS]
+    let excludes = []
+    if (
+      !this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Correspondent
+      )
+    ) {
+      excludes.push('correspondent__name')
+    }
+    if (
+      !this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.DocumentType
+      )
+    ) {
+      excludes.push('document_type__name')
+    }
+    if (
+      !this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.User
+      )
+    ) {
+      excludes.push('owner')
+    }
+    if (!this.settingsService.get(SETTINGS_KEYS.NOTES_ENABLED)) {
+      excludes.push('num_notes')
+    }
+    this._sortFields = this._sortFields.filter(
+      (field) => !excludes.includes(field.field)
+    )
+    this._sortFieldsFullText = [
+      ...this._sortFields,
+      ...DOCUMENT_SORT_FIELDS_FULLTEXT,
+    ]
   }
 
   addObservablesToDocument(doc: Document) {
