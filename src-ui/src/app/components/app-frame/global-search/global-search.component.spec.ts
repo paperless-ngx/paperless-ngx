@@ -20,6 +20,7 @@ import { DocumentListViewService } from 'src/app/services/document-list-view.ser
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
+  FILTER_FULLTEXT_QUERY,
   FILTER_HAS_CORRESPONDENT_ANY,
   FILTER_HAS_DOCUMENT_TYPE_ANY,
   FILTER_HAS_STORAGE_PATH_ANY,
@@ -439,5 +440,14 @@ describe('GlobalSearchComponent', () => {
     const focusSpy = jest.spyOn(event.currentTarget, 'focus')
     component.onButtonHover(event as any)
     expect(focusSpy).toHaveBeenCalled()
+  })
+
+  it('should support explicit advanced search', () => {
+    const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
+    component.query = 'test'
+    component.runAdvanedSearch()
+    expect(qfSpy).toHaveBeenCalledWith([
+      { rule_type: FILTER_FULLTEXT_QUERY, value: 'test' },
+    ])
   })
 })

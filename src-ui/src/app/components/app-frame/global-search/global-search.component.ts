@@ -10,6 +10,7 @@ import { Router } from '@angular/router'
 import { NgbDropdown, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
 import { Subject, debounceTime, distinctUntilChanged, filter, map } from 'rxjs'
 import {
+  FILTER_FULLTEXT_QUERY,
   FILTER_HAS_CORRESPONDENT_ANY,
   FILTER_HAS_DOCUMENT_TYPE_ANY,
   FILTER_HAS_STORAGE_PATH_ANY,
@@ -62,7 +63,7 @@ export class GlobalSearchComponent implements OnInit {
   @ViewChildren('secondaryButton') secondaryButtons: QueryList<ElementRef>
 
   constructor(
-    private searchService: SearchService,
+    public searchService: SearchService,
     private router: Router,
     private modalService: NgbModal,
     private documentService: DocumentService,
@@ -350,5 +351,12 @@ export class GlobalSearchComponent implements OnInit {
       PermissionAction.Change,
       object
     )
+  }
+
+  runAdvanedSearch() {
+    this.documentListViewService.quickFilter([
+      { rule_type: FILTER_FULLTEXT_QUERY, value: this.query },
+    ])
+    this.reset(true)
   }
 }

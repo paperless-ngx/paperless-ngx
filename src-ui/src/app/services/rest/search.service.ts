@@ -37,6 +37,8 @@ export interface GlobalSearchResult {
   providedIn: 'root',
 })
 export class SearchService {
+  public readonly searchResultObjectLimit: number = 3 // documents/views.py GlobalSearchView > OBJECT_LIMIT
+
   constructor(
     private http: HttpClient,
     private settingsService: SettingsService
@@ -51,12 +53,16 @@ export class SearchService {
 
   globalSearch(query: string): Observable<GlobalSearchResult> {
     let params = new HttpParams().set('query', query)
-    if (this.settingsService.get(SETTINGS_KEYS.SEARCH_DB_ONLY)) {
+    if (this.searchDbOnly) {
       params = params.set('db_only', true)
     }
     return this.http.get<GlobalSearchResult>(
       `${environment.apiBaseUrl}search/`,
       { params }
     )
+  }
+
+  public get searchDbOnly(): boolean {
+    return this.settingsService.get(SETTINGS_KEYS.SEARCH_DB_ONLY)
   }
 }
