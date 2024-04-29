@@ -1,7 +1,6 @@
 import logging
 import os
 import shutil
-from datetime import timedelta
 from typing import Optional
 
 from celery import states
@@ -302,12 +301,8 @@ def set_storage_path(
             document.save(update_fields=("storage_path",))
 
 
-@receiver(models.signals.post_delete, sender=Document)
-def cleanup_document_deletion(sender, instance, force=False, **kwargs):
-    if not force:
-        now = timezone.localtime(timezone.now())
-        if now - instance.deleted_at < timedelta(days=settings.EMPTY_TRASH_DELAY):
-            return
+# see empty_trash in documents/tasks.py for signal handling
+def cleanup_document_deletion(sender, instance, **kwargs):
     with FileLock(settings.MEDIA_LOCK):
         if settings.TRASH_DIR:
             # Find a non-conflicting filename in case a document with the same

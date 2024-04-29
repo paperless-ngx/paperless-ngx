@@ -79,7 +79,7 @@ export class TrashComponent implements OnDestroy {
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         this.trashService
-          .emptyTrash(documents ? Array.from(documents) : [])
+          .emptyTrash(documents ? Array.from(documents) : null)
           .subscribe(() => {
             this.toastService.showInfo($localize`Document(s) deleted`)
             this.allToggled = false
@@ -95,9 +95,9 @@ export class TrashComponent implements OnDestroy {
     })
   }
 
-  restoreAll(objects: Set<number> = null) {
+  restoreAll(documents: Set<number> = null) {
     this.trashService
-      .restoreDocuments(objects ? Array.from(this.selectedDocuments) : [])
+      .restoreDocuments(documents ? Array.from(documents) : null)
       .subscribe(() => {
         this.toastService.showInfo($localize`Document(s) restored`)
         this.allToggled = false

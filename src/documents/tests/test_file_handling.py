@@ -19,6 +19,7 @@ from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
+from documents.tasks import empty_trash
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 
@@ -169,6 +170,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         # Ensure that filename is properly generated
         document.filename = generate_filename(document)
+        document.save()
         self.assertEqual(document.filename, "none/none.pdf")
 
         create_source_path_directory(document.source_path)
@@ -176,6 +178,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         # Ensure file deletion after delete
         document.delete()
+        empty_trash([document.pk])
         self.assertIsNotFile(
             os.path.join(settings.ORIGINALS_DIR, "none", "none.pdf"),
         )
@@ -185,7 +188,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         FILENAME_FORMAT="{correspondent}/{correspondent}",
         TRASH_DIR=tempfile.mkdtemp(),
     )
-    def test_document_delete_trash(self):
+    def test_document_delete_trash_dir(self):
         document = Document()
         document.mime_type = "application/pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -193,6 +196,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         # Ensure that filename is properly generated
         document.filename = generate_filename(document)
+        document.save()
         self.assertEqual(document.filename, "none/none.pdf")
 
         create_source_path_directory(document.source_path)
@@ -201,6 +205,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         # Ensure file was moved to trash after delete
         self.assertIsNotFile(os.path.join(settings.TRASH_DIR, "none", "none.pdf"))
         document.delete()
+        empty_trash([document.pk])
         self.assertIsNotFile(
             os.path.join(settings.ORIGINALS_DIR, "none", "none.pdf"),
         )
@@ -214,9 +219,11 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
         document.filename = generate_filename(document)
+        document.save()
         create_source_path_directory(document.source_path)
         Path(document.source_path).touch()
         document.delete()
+        empty_trash([document.pk])
         self.assertIsFile(os.path.join(settings.TRASH_DIR, "none_01.pdf"))
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{correspondent}")
@@ -227,6 +234,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         document.save()
 
         document.delete()
+        empty_trash([document.pk])
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_directory_not_empty(self):
@@ -436,6 +444,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         # Ensure that filename is properly generated
         document.filename = generate_filename(document)
+        document.save()
         self.assertEqual(document.filename, "none/none/none.pdf")
         create_source_path_directory(document.source_path)
         Path(document.source_path).touch()
@@ -444,6 +453,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsDir(os.path.join(settings.ORIGINALS_DIR, "none/none"))
 
         document.delete()
+        empty_trash([document.pk])
 
         self.assertIsNotFile(
             os.path.join(settings.ORIGINALS_DIR, "none/none/none.pdf"),
@@ -550,6 +560,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertEqual(document2.filename, "qwe_01.pdf")
 
         document.delete()
+        empty_trash([document.pk])
 
         self.assertIsNotFile(document.source_path)
 
@@ -819,6 +830,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
         self.assertIsFile(doc.archive_path)
 
         doc.delete()
+        empty_trash([doc.pk])
 
         self.assertIsNotFile(original)
         self.assertIsNotFile(archive)
@@ -854,6 +866,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
         self.assertIsFile(doc2.source_path)
 
         doc2.delete()
+        empty_trash([doc2.pk])
 
         self.assertIsFile(doc1.source_path)
         self.assertIsFile(doc1.archive_path)
