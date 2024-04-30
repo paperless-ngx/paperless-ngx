@@ -254,7 +254,8 @@ class CorrespondentViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = Correspondent
 
     queryset = (
-        Correspondent.objects.annotate(
+        Correspondent.objects.prefetch_related("documents")
+        .annotate(
             last_correspondence=Max("documents__created"),
         )
         .select_related("owner")
@@ -402,7 +403,7 @@ class DocumentViewSet(
         )
 
     def file_response(self, pk, request, disposition):
-        doc = Document.objects.get(id=pk)
+        doc = Document.objects.select_related("owner").get(id=pk)
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "view_document",
@@ -446,7 +447,7 @@ class DocumentViewSet(
     )
     def metadata(self, request, pk=None):
         try:
-            doc = Document.objects.get(pk=pk)
+            doc = Document.objects.select_related("owner").get(pk=pk)
             if request.user is not None and not has_perms_owner_aware(
                 request.user,
                 "view_document",
@@ -506,7 +507,7 @@ class DocumentViewSet(
         ),
     )
     def suggestions(self, request, pk=None):
-        doc = get_object_or_404(Document, pk=pk)
+        doc = get_object_or_404(Document.objects.select_related("owner"), pk=pk)
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "view_document",
@@ -565,7 +566,7 @@ class DocumentViewSet(
     @method_decorator(last_modified(thumbnail_last_modified))
     def thumb(self, request, pk=None):
         try:
-            doc = Document.objects.get(id=pk)
+            doc = Document.objects.select_related("owner").get(id=pk)
             if request.user is not None and not has_perms_owner_aware(
                 request.user,
                 "view_document",
@@ -591,7 +592,7 @@ class DocumentViewSet(
     def getNotes(self, doc):
         return [
             {
-                "id": c.id,
+                "id": c.pk,
                 "note": c.note,
                 "created": c.created,
                 "user": {
@@ -601,14 +602,31 @@ class DocumentViewSet(
                     "last_name": c.user.last_name,
                 },
             }
-            for c in Note.objects.filter(document=doc).order_by("-created")
+            for c in Note.objects.select_related("user")
+            .only(
+                "pk",
+                "note",
+                "created",
+                "user__id",
+                "user__username",
+                "user__first_name",
+                "user__last_name",
+            )
+            .filter(document=doc)
+            .order_by("-created")
         ]
 
     @action(methods=["get", "post", "delete"], detail=True)
     def notes(self, request, pk=None):
+
         currentUser = request.user
         try:
-            doc = Document.objects.get(pk=pk)
+            doc = (
+                Document.objects.select_related("owner")
+                .prefetch_related("notes")
+                .only("pk", "owner__id")
+                .get(pk=pk)
+            )
             if currentUser is not None and not has_perms_owner_aware(
                 currentUser,
                 "view_document",
@@ -620,7 +638,8 @@ class DocumentViewSet(
 
         if request.method == "GET":
             try:
-                return Response(self.getNotes(doc))
+                notes = self.getNotes(doc)
+                return Response(notes)
             except Exception as e:
                 logger.warning(f"An error occurred retrieving notes: {e!s}")
                 return Response(
@@ -642,7 +661,6 @@ class DocumentViewSet(
                     note=request.data["note"],
                     user=currentUser,
                 )
-                c.save()
                 # If audit log is enabled make an entry in the log
                 # about this note change
                 if settings.AUDIT_LOG_ENABLED:
@@ -661,9 +679,11 @@ class DocumentViewSet(
 
                 from documents import index
 
-                index.add_or_update_document(self.get_object())
+                index.add_or_update_document(doc)
 
-                return Response(self.getNotes(doc))
+                notes = self.getNotes(doc)
+
+                return Response(notes)
             except Exception as e:
                 logger.warning(f"An error occurred saving note: {e!s}")
                 return Response(
@@ -712,7 +732,7 @@ class DocumentViewSet(
     def share_links(self, request, pk=None):
         currentUser = request.user
         try:
-            doc = Document.objects.get(pk=pk)
+            doc = Document.objects.select_related("owner").get(pk=pk)
             if currentUser is not None and not has_perms_owner_aware(
                 currentUser,
                 "change_document",
@@ -728,12 +748,13 @@ class DocumentViewSet(
             now = timezone.now()
             links = [
                 {
-                    "id": c.id,
+                    "id": c.pk,
                     "created": c.created,
                     "expiration": c.expiration,
                     "slug": c.slug,
                 }
                 for c in ShareLink.objects.filter(document=doc)
+                .only("pk", "created", "expiration", "slug")
                 .exclude(expiration__lt=now)
                 .order_by("-created")
             ]
@@ -929,7 +950,9 @@ class BulkEditView(PassUserMixin):
         documents = serializer.validated_data.get("documents")
 
         if not user.is_superuser:
-            document_objs = Document.objects.filter(pk__in=documents)
+            document_objs = Document.objects.select_related("owner").filter(
+                pk__in=documents,
+            )
             has_perms = (
                 all((doc.owner == user or doc.owner is None) for doc in document_objs)
                 if method
@@ -1302,16 +1325,21 @@ class StatisticsView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
+
         user = request.user if request.user is not None else None
 
         documents = (
-            Document.objects.all()
-            if user is None
-            else get_objects_for_user_owner_aware(
-                user,
-                "documents.view_document",
-                Document,
+            (
+                Document.objects.all()
+                if user is None
+                else get_objects_for_user_owner_aware(
+                    user,
+                    "documents.view_document",
+                    Document,
+                )
             )
+            .only("mime_type", "content")
+            .prefetch_related("tags")
         )
         tags = (
             Tag.objects.all()
@@ -1321,35 +1349,29 @@ class StatisticsView(APIView):
         correspondent_count = (
             Correspondent.objects.count()
             if user is None
-            else len(
-                get_objects_for_user_owner_aware(
-                    user,
-                    "documents.view_correspondent",
-                    Correspondent,
-                ),
-            )
+            else get_objects_for_user_owner_aware(
+                user,
+                "documents.view_correspondent",
+                Correspondent,
+            ).count()
         )
         document_type_count = (
             DocumentType.objects.count()
             if user is None
-            else len(
-                get_objects_for_user_owner_aware(
-                    user,
-                    "documents.view_documenttype",
-                    DocumentType,
-                ),
-            )
+            else get_objects_for_user_owner_aware(
+                user,
+                "documents.view_documenttype",
+                DocumentType,
+            ).count()
         )
         storage_path_count = (
             StoragePath.objects.count()
             if user is None
-            else len(
-                get_objects_for_user_owner_aware(
-                    user,
-                    "documents.view_storagepath",
-                    StoragePath,
-                ),
-            )
+            else get_objects_for_user_owner_aware(
+                user,
+                "documents.view_storagepath",
+                StoragePath,
+            ).count()
         )
 
         documents_total = documents.count()
@@ -1423,9 +1445,8 @@ class BulkDownloadView(GenericAPIView):
 
         with zipfile.ZipFile(temp.name, "w", compression) as zipf:
             strategy = strategy_class(zipf, follow_filename_format)
-            for id in ids:
-                doc = Document.objects.get(id=id)
-                strategy.add_document(doc)
+            for document in Document.objects.filter(pk__in=ids):
+                strategy.add_document(document)
 
         with open(temp.name, "rb") as f:
             response = HttpResponse(f, content_type="application/zip")
@@ -1486,7 +1507,7 @@ class UiSettingsView(GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user = User.objects.get(pk=request.user.id)
+        user = User.objects.select_related("ui_settings").get(pk=request.user.id)
         ui_settings = {}
         if hasattr(user, "ui_settings"):
             ui_settings = user.ui_settings.settings
@@ -1708,7 +1729,7 @@ class BulkEditObjectsView(PassUserMixin):
         object_class = serializer.get_object_class(object_type)
         operation = serializer.validated_data.get("operation")
 
-        objs = object_class.objects.filter(pk__in=object_ids)
+        objs = object_class.objects.select_related("owner").filter(pk__in=object_ids)
 
         if not user.is_superuser:
             model_name = object_class._meta.verbose_name

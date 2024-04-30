@@ -12,7 +12,7 @@ from documents.models import Document
 
 class SanityCheckMessages:
     def __init__(self):
-        self._messages = defaultdict(list)
+        self._messages: dict[int, list[dict]] = defaultdict(list)
         self.has_error = False
         self.has_warning = False
 
