@@ -18,6 +18,7 @@ export class TrashComponent implements OnDestroy {
   public selectedDocuments: Set<number> = new Set()
   public allToggled: boolean = false
   public page: number = 1
+  public totalDocuments: number
   public isLoading: boolean = false
   unsubscribeNotifier: Subject<void> = new Subject()
 
@@ -37,8 +38,9 @@ export class TrashComponent implements OnDestroy {
 
   reload() {
     this.isLoading = true
-    this.trashService.getTrash().subscribe((documentsInTrash) => {
-      this.documentsInTrash = documentsInTrash
+    this.trashService.getTrash(this.page).subscribe((r) => {
+      this.documentsInTrash = r.results
+      this.totalDocuments = r.count
       this.isLoading = false
       this.selectedDocuments.clear()
     })

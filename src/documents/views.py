@@ -2056,24 +2056,19 @@ class SystemStatusView(PassUserMixin):
         )
 
 
-class TrashView(PassUserMixin):
-    permission_classes = (IsAuthenticated,)
+class TrashView(ListModelMixin, PassUserMixin):
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     serializer_class = TrashSerializer
+    filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
+    pagination_class = StandardPagination
+
+    model = Document
+
+    queryset = Document.deleted_objects.all()
 
     def get(self, request, format=None):
-        user = self.request.user
-        documents = Document.deleted_objects.filter(
-            owner=user,
-        ) | Document.deleted_objects.filter(
-            owner=None,
-        )
-
-        context = {
-            "request": request,
-        }
-
-        serializer = DocumentSerializer(documents, many=True, context=context)
-        return Response(serializer.data)
+        self.serializer_class = DocumentSerializer
+        return self.list(request, format)
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

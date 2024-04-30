@@ -62,7 +62,13 @@ describe('TrashComponent', () => {
 
   it('should call correct service method on reload', () => {
     const trashSpy = jest.spyOn(trashService, 'getTrash')
-    trashSpy.mockReturnValue(of(documentsInTrash))
+    trashSpy.mockReturnValue(
+      of({
+        count: 2,
+        all: documentsInTrash.map((d) => d.id),
+        results: documentsInTrash,
+      })
+    )
     component.reload()
     expect(trashSpy).toHaveBeenCalled()
     expect(component.documentsInTrash).toEqual(documentsInTrash)

@@ -22,7 +22,7 @@ describe('TrashServiceService', () => {
   it('should call correct endpoint for getTrash', () => {
     service.getTrash().subscribe()
     const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}trash/`
+      `${environment.apiBaseUrl}trash/?page=1`
     )
     expect(req.request.method).toEqual('GET')
   })
