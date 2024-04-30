@@ -131,7 +131,12 @@ def get_metadata_cache(document_id: int) -> Optional[MetadataCacheData]:
     # The metadata exists in the cache
     if doc_metadata is not None:
         try:
-            doc = Document.objects.get(pk=document_id)
+            doc = Document.objects.only(
+                "pk",
+                "checksum",
+                "archive_checksum",
+                "archive_filename",
+            ).get(pk=document_id)
             # The original checksums match
             # If it has one, the archive checksums match
             # Then, we can use the metadata
