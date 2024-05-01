@@ -638,13 +638,17 @@ export class DocumentDetailComponent
           this.documentForm.patchValue(docValues)
           this.store.next(this.documentForm.value)
           this.openDocumentService.setDirty(this.document, false)
+          this.openDocumentService.save()
           this.toastService.showInfo($localize`Document saved successfully.`)
           this.networkActive = false
           this.error = null
-          close &&
+          if (close) {
             this.close(() =>
               this.openDocumentService.refreshDocument(this.documentId)
             )
+          } else {
+            this.openDocumentService.refreshDocument(this.documentId)
+          }
         },
         error: (error) => {
           this.networkActive = false
