@@ -1,7 +1,9 @@
 <pngx-page-header
 title="Trash"
 i18n-title
-info="Manage trashed items."
+info="Manage trashed documents that are pending deletion."
+i18n-info
+infoLink="usage/#document-trash"
 >
 <button class="btn btn-sm btn-outline-secondary" (click)="clearSelection()" [hidden]="selectedDocuments.size === 0">
   <i-bs  name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>

@@ -73,7 +73,7 @@ export class TrashComponent implements OnDestroy {
     modal.componentInstance.title = $localize`Confirm delete`
     modal.componentInstance.messageBold = $localize`This operation will permanently delete ${
       documents?.size ?? $localize`all`
-    } documents.`
+    } documents in the trash.`
     modal.componentInstance.message = $localize`This operation cannot be undone.`
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Delete`
