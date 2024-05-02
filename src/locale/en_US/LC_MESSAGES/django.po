@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-24 22:54-0700\n"
+"POT-Creation-Date: 2024-04-26 07:19-0700\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -917,12 +917,12 @@ msgstr ""
 msgid "Invalid color."
 msgstr ""
 
-#: documents/serialisers.py:1169
+#: documents/serialisers.py:1197
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr ""
 
-#: documents/serialisers.py:1278
+#: documents/serialisers.py:1306
 msgid "Invalid variable detected."
 msgstr ""
 
@@ -1418,7 +1418,7 @@ msgstr ""
 msgid "Chinese Simplified"
 msgstr ""
 
-#: paperless/urls.py:230
+#: paperless/urls.py:236
 msgid "Paperless-ngx administration"
 msgstr ""
 

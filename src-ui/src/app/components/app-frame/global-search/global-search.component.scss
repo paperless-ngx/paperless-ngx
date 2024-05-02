@@ -1,0 +1,97 @@
+form {
+  position: relative;
+
+  > i-bs[name="search"] {
+    position: absolute;
+    left: 0.6rem;
+    top: .35rem;
+    color: rgba(255, 255, 255, 0.6);
+
+    @media screen and (min-width: 768px) {
+      // adjust for smaller font size on non-mobile
+      top: 0.25rem;
+    }
+  }
+
+  &:focus-within {
+    i-bs[name="search"],
+    .badge {
+      display: none !important;
+    }
+
+    .form-control::placeholder {
+      color: rgba(255, 255, 255, 0);
+    }
+  }
+
+  .badge {
+    font-size: 0.8rem;
+  }
+
+  .input-group .btn {
+    border-color: rgba(255, 255, 255, 0.2);
+    color: var(--pngx-primary-text-contrast);
+  }
+
+  .form-control {
+    color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(0, 0, 0, 0.15);
+    padding-left: 1.8rem;
+    border-color: rgba(255, 255, 255, 0.2);
+    transition: all .3s ease, padding-left 0s ease, background-color 0s ease; // Safari requires all
+    > input {
+      outline: none;
+
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+      }
+    }
+
+    &:focus-within {
+      background-color: rgba(0, 0, 0, 0.3);
+      color: var(--bs-light);
+      flex-grow: 1;
+      padding-left: 0.5rem;
+    }
+  }
+
+}
+
+* {
+  --pngx-focus-alpha: 0;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.mh-75 {
+  max-height: 75vh;
+}
+
+.dropdown-item {
+  &:has(button:focus) {
+    background-color: var(--pngx-bg-darker);
+  }
+
+  & button {
+    transition: all 0.3s ease, color 0.15s ease;
+    max-width: 2rem;
+    overflow: hidden;
+  }
+
+  & button span {
+    opacity: 0;
+    transition: inherit;
+  }
+
+  &:hover button,
+  &:has(button:focus) button {
+    max-width: 10rem;
+  }
+
+  &:hover button span,
+  &:has(button:focus) span {
+    opacity: 1;
+  }
+}

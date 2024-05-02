@@ -19,6 +19,7 @@ import {
   NgbModalRef,
   NgbPopoverModule,
   NgbTooltipModule,
+  NgbTypeaheadModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { ClearableBadgeComponent } from '../common/clearable-badge/clearable-badge.component'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -153,6 +154,7 @@ describe('DocumentListComponent', () => {
         NgbTooltipModule,
         NgxBootstrapIconsModule.pick(allIcons),
         NgSelectModule,
+        NgbTypeaheadModule,
       ],
     }).compileComponents()
 
@@ -653,5 +655,43 @@ describe('DocumentListComponent', () => {
     expect(component.getDisplayCustomFieldTitle('custom_field_1')).toEqual(
       'Custom Field 1'
     )
+  })
+
+  it('should support hotkeys', () => {
+    fixture.detectChanges()
+    const resetSpy = jest.spyOn(component['filterEditor'], 'resetSelected')
+    jest.spyOn(component, 'isFiltered', 'get').mockReturnValue(true)
+    component.clickTag(1)
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'escape' }))
+    expect(resetSpy).toHaveBeenCalled()
+
+    jest
+      .spyOn(documentListService, 'selected', 'get')
+      .mockReturnValue(new Set([1]))
+    const clearSelectedSpy = jest.spyOn(documentListService, 'selectNone')
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'escape' }))
+    expect(clearSelectedSpy).toHaveBeenCalled()
+
+    const selectAllSpy = jest.spyOn(documentListService, 'selectAll')
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }))
+    expect(selectAllSpy).toHaveBeenCalled()
+
+    const selectPageSpy = jest.spyOn(documentListService, 'selectPage')
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'p' }))
+    expect(selectPageSpy).toHaveBeenCalled()
+
+    jest.spyOn(documentListService, 'documents', 'get').mockReturnValue(docs)
+    fixture.detectChanges()
+    const detailSpy = jest.spyOn(component, 'openDocumentDetail')
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'o' }))
+    expect(detailSpy).toHaveBeenCalledWith(docs[0])
+
+    jest.spyOn(documentListService, 'documents', 'get').mockReturnValue(docs)
+    jest
+      .spyOn(documentListService, 'selected', 'get')
+      .mockReturnValue(new Set([docs[1].id]))
+    fixture.detectChanges()
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'o' }))
+    expect(detailSpy).toHaveBeenCalledWith(docs[1].id)
   })
 })

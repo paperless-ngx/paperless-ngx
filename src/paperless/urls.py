@@ -21,6 +21,7 @@ from documents.views import BulkEditView
 from documents.views import CorrespondentViewSet
 from documents.views import CustomFieldViewSet
 from documents.views import DocumentTypeViewSet
+from documents.views import GlobalSearchView
 from documents.views import IndexView
 from documents.views import LogViewSet
 from documents.views import PostDocumentView
@@ -90,6 +91,11 @@ urlpatterns = [
                     "^search/autocomplete/",
                     SearchAutoCompleteView.as_view(),
                     name="autocomplete",
+                ),
+                re_path(
+                    "^search/",
+                    GlobalSearchView.as_view(),
+                    name="global_search",
                 ),
                 re_path("^statistics/", StatisticsView.as_view(), name="statistics"),
                 re_path(
