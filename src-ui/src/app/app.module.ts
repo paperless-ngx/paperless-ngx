@@ -122,6 +122,8 @@ import { SplitConfirmDialogComponent } from './components/common/confirm-dialog/
 import { DocumentHistoryComponent } from './components/document-history/document-history.component'
 import { DragDropSelectComponent } from './components/common/input/drag-drop-select/drag-drop-select.component'
 import { CustomFieldDisplayComponent } from './components/common/custom-field-display/custom-field-display.component'
+import { GlobalSearchComponent } from './components/app-frame/global-search/global-search.component'
+import { HotkeyDialogComponent } from './components/common/hotkey-dialog/hotkey-dialog.component'
 import {
   airplane,
   archive,
@@ -163,6 +165,7 @@ import {
   doorOpen,
   download,
   envelope,
+  envelopeAt,
   exclamationCircleFill,
   exclamationTriangle,
   exclamationTriangleFill,
@@ -196,6 +199,7 @@ import {
   personFill,
   personFillLock,
   personLock,
+  personSquare,
   plus,
   plusCircle,
   questionCircle,
@@ -206,6 +210,7 @@ import {
   sortAlphaDown,
   sortAlphaUpAlt,
   tagFill,
+  tag,
   tags,
   textIndentLeft,
   textLeft,
@@ -259,6 +264,7 @@ const icons = {
   doorOpen,
   download,
   envelope,
+  envelopeAt,
   exclamationCircleFill,
   exclamationTriangle,
   exclamationTriangleFill,
@@ -292,6 +298,7 @@ const icons = {
   personFill,
   personFillLock,
   personLock,
+  personSquare,
   plus,
   plusCircle,
   questionCircle,
@@ -302,6 +309,7 @@ const icons = {
   sortAlphaDown,
   sortAlphaUpAlt,
   tagFill,
+  tag,
   tags,
   textIndentLeft,
   textLeft,
@@ -482,6 +490,8 @@ function initializeApp(settings: SettingsService) {
     DocumentHistoryComponent,
     DragDropSelectComponent,
     CustomFieldDisplayComponent,
+    GlobalSearchComponent,
+    HotkeyDialogComponent,
   ],
   imports: [
     BrowserModule,

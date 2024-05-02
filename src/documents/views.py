@@ -17,6 +17,7 @@ from urllib.parse import urlparse
 import pathvalidate
 from django.apps import apps
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.db import connections
@@ -137,6 +138,7 @@ from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer
 from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import SavedViewSerializer
+from documents.serialisers import SearchResultSerializer
 from documents.serialisers import ShareLinkSerializer
 from documents.serialisers import StoragePathSerializer
 from documents.serialisers import TagSerializer
@@ -152,7 +154,13 @@ from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import GeneralConfig
 from paperless.db import GnuPG
+from paperless.serialisers import GroupSerializer
+from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
+from paperless_mail.models import MailAccount
+from paperless_mail.models import MailRule
+from paperless_mail.serialisers import MailAccountSerializer
+from paperless_mail.serialisers import MailRuleSerializer
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
@@ -813,34 +821,6 @@ class DocumentViewSet(
         return Response(sorted(entries, key=lambda x: x["timestamp"], reverse=True))
 
 
-class SearchResultSerializer(DocumentSerializer, PassUserMixin):
-    def to_representation(self, instance):
-        doc = (
-            Document.objects.select_related(
-                "correspondent",
-                "storage_path",
-                "document_type",
-                "owner",
-            )
-            .prefetch_related("tags", "custom_fields", "notes")
-            .get(id=instance["id"])
-        )
-        notes = ",".join(
-            [str(c.note) for c in doc.notes.all()],
-        )
-        r = super().to_representation(doc)
-        r["__search_hit__"] = {
-            "score": instance.score,
-            "highlights": instance.highlights("content", text=doc.content),
-            "note_highlights": (
-                instance.highlights("notes", text=notes) if doc else None
-            ),
-            "rank": instance.rank,
-        }
-
-        return r
-
-
 class UnifiedSearchViewSet(DocumentViewSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1155,6 +1135,189 @@ class SearchAutoCompleteView(APIView):
                 limit,
                 user,
             ),
+        )
+
+
+class GlobalSearchView(PassUserMixin):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = SearchResultSerializer
+
+    def get(self, request, *args, **kwargs):
+        query = request.query_params.get("query", None)
+        if query is None:
+            return HttpResponseBadRequest("Query required")
+        elif len(query) < 3:
+            return HttpResponseBadRequest("Query must be at least 3 characters")
+
+        db_only = request.query_params.get("db_only", False)
+
+        OBJECT_LIMIT = 3
+        docs = []
+        if request.user.has_perm("documents.view_document"):
+            all_docs = get_objects_for_user_owner_aware(
+                request.user,
+                "view_document",
+                Document,
+            )
+            # First search by title
+            docs = all_docs.filter(title__icontains=query)[:OBJECT_LIMIT]
+            if not db_only and len(docs) < OBJECT_LIMIT:
+                # If we don't have enough results, search by content
+                from documents import index
+
+                with index.open_index_searcher() as s:
+                    q, _ = index.DelayedFullTextQuery(
+                        s,
+                        request.query_params,
+                        10,
+                        request.user,
+                    )._get_query()
+                    results = s.search(q, limit=OBJECT_LIMIT)
+                    docs = docs | all_docs.filter(id__in=[r["id"] for r in results])
+        saved_views = (
+            SavedView.objects.filter(owner=request.user, name__icontains=query)[
+                :OBJECT_LIMIT
+            ]
+            if request.user.has_perm("documents.view_savedview")
+            else []
+        )
+        tags = (
+            get_objects_for_user_owner_aware(request.user, "view_tag", Tag).filter(
+                name__icontains=query,
+            )[:OBJECT_LIMIT]
+            if request.user.has_perm("documents.view_tag")
+            else []
+        )
+        correspondents = (
+            get_objects_for_user_owner_aware(
+                request.user,
+                "view_correspondent",
+                Correspondent,
+            ).filter(name__icontains=query)[:OBJECT_LIMIT]
+            if request.user.has_perm("documents.view_correspondent")
+            else []
+        )
+        document_types = (
+            get_objects_for_user_owner_aware(
+                request.user,
+                "view_documenttype",
+                DocumentType,
+            ).filter(name__icontains=query)[:OBJECT_LIMIT]
+            if request.user.has_perm("documents.view_documenttype")
+            else []
+        )
+        storage_paths = (
+            get_objects_for_user_owner_aware(
+                request.user,
+                "view_storagepath",
+                StoragePath,
+            ).filter(name__icontains=query)[:OBJECT_LIMIT]
+            if request.user.has_perm("documents.view_storagepath")
+            else []
+        )
+        users = (
+            User.objects.filter(username__icontains=query)[:OBJECT_LIMIT]
+            if request.user.has_perm("auth.view_user")
+            else []
+        )
+        groups = (
+            Group.objects.filter(name__icontains=query)[:OBJECT_LIMIT]
+            if request.user.has_perm("auth.view_group")
+            else []
+        )
+        mail_rules = (
+            MailRule.objects.filter(name__icontains=query)[:OBJECT_LIMIT]
+            if request.user.has_perm("paperless_mail.view_mailrule")
+            else []
+        )
+        mail_accounts = (
+            MailAccount.objects.filter(name__icontains=query)[:OBJECT_LIMIT]
+            if request.user.has_perm("paperless_mail.view_mailaccount")
+            else []
+        )
+        workflows = (
+            Workflow.objects.filter(name__icontains=query)[:OBJECT_LIMIT]
+            if request.user.has_perm("documents.view_workflow")
+            else []
+        )
+        custom_fields = (
+            CustomField.objects.filter(name__icontains=query)[:OBJECT_LIMIT]
+            if request.user.has_perm("documents.view_customfield")
+            else []
+        )
+
+        context = {
+            "request": request,
+        }
+
+        docs_serializer = DocumentSerializer(docs, many=True, context=context)
+        saved_views_serializer = SavedViewSerializer(
+            saved_views,
+            many=True,
+            context=context,
+        )
+        tags_serializer = TagSerializer(tags, many=True, context=context)
+        correspondents_serializer = CorrespondentSerializer(
+            correspondents,
+            many=True,
+            context=context,
+        )
+        document_types_serializer = DocumentTypeSerializer(
+            document_types,
+            many=True,
+            context=context,
+        )
+        storage_paths_serializer = StoragePathSerializer(
+            storage_paths,
+            many=True,
+            context=context,
+        )
+        users_serializer = UserSerializer(users, many=True, context=context)
+        groups_serializer = GroupSerializer(groups, many=True, context=context)
+        mail_rules_serializer = MailRuleSerializer(
+            mail_rules,
+            many=True,
+            context=context,
+        )
+        mail_accounts_serializer = MailAccountSerializer(
+            mail_accounts,
+            many=True,
+            context=context,
+        )
+        workflows_serializer = WorkflowSerializer(workflows, many=True, context=context)
+        custom_fields_serializer = CustomFieldSerializer(
+            custom_fields,
+            many=True,
+            context=context,
+        )
+
+        return Response(
+            {
+                "total": len(docs)
+                + len(saved_views)
+                + len(tags)
+                + len(correspondents)
+                + len(document_types)
+                + len(storage_paths)
+                + len(users)
+                + len(groups)
+                + len(mail_rules)
+                + len(mail_accounts)
+                + len(workflows)
+                + len(custom_fields),
+                "documents": docs_serializer.data,
+                "saved_views": saved_views_serializer.data,
+                "tags": tags_serializer.data,
+                "correspondents": correspondents_serializer.data,
+                "document_types": document_types_serializer.data,
+                "storage_paths": storage_paths_serializer.data,
+                "users": users_serializer.data,
+                "groups": groups_serializer.data,
+                "mail_rules": mail_rules_serializer.data,
+                "mail_accounts": mail_accounts_serializer.data,
+                "workflows": workflows_serializer.data,
+                "custom_fields": custom_fields_serializer.data,
+            },
         )
 
 

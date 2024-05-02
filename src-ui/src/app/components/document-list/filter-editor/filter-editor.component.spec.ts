@@ -11,14 +11,14 @@ import {
 } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
-import { RouterTestingModule } from '@angular/router/testing'
 import {
   NgbDropdownModule,
   NgbDatepickerModule,
   NgbDropdownItem,
+  NgbTypeaheadModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectComponent } from '@ng-select/ng-select'
-import { of } from 'rxjs'
+import { of, throwError } from 'rxjs'
 import {
   FILTER_TITLE,
   FILTER_TITLE_CONTENT,
@@ -92,6 +92,8 @@ import {
 import { environment } from 'src/environments/environment'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { RouterModule } from '@angular/router'
+import { SearchService } from 'src/app/services/rest/search.service'
 
 const tags: Tag[] = [
   {
@@ -164,6 +166,7 @@ describe('FilterEditorComponent', () => {
   let settingsService: SettingsService
   let permissionsService: PermissionsService
   let httpTestingController: HttpTestingController
+  let searchService: SearchService
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
@@ -222,12 +225,13 @@ describe('FilterEditorComponent', () => {
       ],
       imports: [
         HttpClientTestingModule,
-        RouterTestingModule,
+        RouterModule,
         NgbDropdownModule,
         FormsModule,
         ReactiveFormsModule,
         NgbDatepickerModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        NgbTypeaheadModule,
       ],
     }).compileComponents()
 
@@ -235,6 +239,7 @@ describe('FilterEditorComponent', () => {
     settingsService = TestBed.inject(SettingsService)
     settingsService.currentUser = users[0]
     permissionsService = TestBed.inject(PermissionsService)
+    searchService = TestBed.inject(SearchService)
     jest
       .spyOn(permissionsService, 'currentUserCan')
       .mockImplementation((action, type) => {
@@ -2034,6 +2039,11 @@ describe('FilterEditorComponent', () => {
       new KeyboardEvent('keyup', { key: 'Escape' })
     )
     expect(component.textFilter).toEqual('')
+    const blurSpy = jest.spyOn(component.textFilterInput.nativeElement, 'blur')
+    component.textFilterInput.nativeElement.dispatchEvent(
+      new KeyboardEvent('keyup', { key: 'Escape' })
+    )
+    expect(blurSpy).toHaveBeenCalled()
   })
 
   it('should adjust text filter targets if more like search', () => {
@@ -2043,5 +2053,41 @@ describe('FilterEditorComponent', () => {
       id: TEXT_FILTER_TARGET_FULLTEXT_MORELIKE,
       name: $localize`More like`,
     })
+  })
+
+  it('should call autocomplete endpoint on input', fakeAsync(() => {
+    component.textFilterTarget = 'fulltext-query' // TEXT_FILTER_TARGET_FULLTEXT_QUERY
+    const autocompleteSpy = jest.spyOn(searchService, 'autocomplete')
+    component.searchAutoComplete(of('hello')).subscribe()
+    tick(250)
+    expect(autocompleteSpy).toHaveBeenCalled()
+
+    component.searchAutoComplete(of('hello world 1')).subscribe()
+    tick(250)
+    expect(autocompleteSpy).toHaveBeenCalled()
+  }))
+
+  it('should handle autocomplete backend failure gracefully', fakeAsync(() => {
+    component.textFilterTarget = 'fulltext-query' // TEXT_FILTER_TARGET_FULLTEXT_QUERY
+    const serviceAutocompleteSpy = jest.spyOn(searchService, 'autocomplete')
+    serviceAutocompleteSpy.mockReturnValue(
+      throwError(() => new Error('autcomplete failed'))
+    )
+    // serviceAutocompleteSpy.mockReturnValue(of([' world']))
+    let result
+    component.searchAutoComplete(of('hello')).subscribe((res) => {
+      result = res
+    })
+    tick(250)
+    expect(serviceAutocompleteSpy).toHaveBeenCalled()
+    expect(result).toEqual([])
+  }))
+
+  it('should support choosing a autocomplete item', () => {
+    expect(component.textFilter).toBeNull()
+    component.itemSelected({ item: 'hello', preventDefault: () => true })
+    expect(component.textFilter).toEqual('hello ')
+    component.itemSelected({ item: 'world', preventDefault: () => true })
+    expect(component.textFilter).toEqual('hello world ')
   })
 })
