@@ -949,9 +949,9 @@ describe('DocumentDetailComponent', () => {
     fixture.detectChanges()
     expect(component.document.custom_fields).toHaveLength(initialLength - 1)
     expect(component.customFieldFormFields).toHaveLength(initialLength - 1)
-    expect(fixture.debugElement.nativeElement.textContent).not.toContain(
-      'Field 1'
-    )
+    expect(
+      fixture.debugElement.query(By.css('form')).nativeElement.textContent
+    ).not.toContain('Field 1')
     const updateSpy = jest.spyOn(documentService, 'update')
     component.save(true)
     expect(updateSpy.mock.lastCall[0].custom_fields).toHaveLength(

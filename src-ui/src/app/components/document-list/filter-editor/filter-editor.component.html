@@ -72,7 +72,7 @@
             [disabled]="disabled"
             shortcutKey="u"></pngx-filterable-dropdown>
         }
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.StoragePath) && storagePaths.length > 0) {
           <pngx-filterable-dropdown class="flex-fill" title="Storage path" icon="folder-fill" i18n-title
           filterPlaceholder="Filter storage paths" i18n-filterPlaceholder
           [items]="storagePaths"
@@ -85,7 +85,7 @@
           shortcutKey="i"></pngx-filterable-dropdown>
         }
 
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.CustomField)) {
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.CustomField) && customFields.length > 0) {
           <pngx-filterable-dropdown class="flex-fill" title="Custom fields" icon="ui-radios" i18n-title
           filterPlaceholder="Filter custom fields" i18n-filterPlaceholder
           [items]="customFields"
