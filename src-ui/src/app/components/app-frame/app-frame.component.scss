@@ -257,59 +257,6 @@ main {
   }
 }
 
-.navbar .search-form-container {
-  max-width: 550px;
-
-  form {
-    position: relative;
-
-    > i-bs {
-      position: absolute;
-      left: 0.6rem;
-      top: .35rem;
-      color: rgba(255, 255, 255, 0.6);
-
-      @media screen and (min-width: 768px) {
-        // adjust for smaller font size on non-mobile
-        top: 0.25rem;
-      }
-    }
-
-  }
-
-
-  &:focus-within {
-    form > i-bs {
-      display: none;
-    }
-
-    .form-control::placeholder {
-      color: rgba(255, 255, 255, 0);
-    }
-  }
-
-  .form-control {
-    color: rgba(255, 255, 255, 0.3);
-    background-color: rgba(0, 0, 0, 0.15);
-    padding-left: 1.8rem;
-    border-color: rgba(255, 255, 255, 0.2);
-    transition: all .3s ease, padding-left 0s ease, background-color 0s ease; // Safari requires all
-    max-width: 600px;
-    min-width: 300px; // 1/2 max
-
-    &::placeholder {
-      color: rgba(255, 255, 255, 0.4);
-    }
-
-    &:focus {
-      background-color: rgba(0, 0, 0, 0.3);
-      color: var(--bs-light);
-      flex-grow: 1;
-      padding-left: 0.5rem;
-    }
-  }
-}
-
 .version-check {
   animation: pulse 2s ease-in-out 0s 1;
 }

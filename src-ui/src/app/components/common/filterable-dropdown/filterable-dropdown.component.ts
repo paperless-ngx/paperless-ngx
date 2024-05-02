@@ -5,14 +5,17 @@ import {
   Output,
   ElementRef,
   ViewChild,
+  OnInit,
+  OnDestroy,
 } from '@angular/core'
 import { FilterPipe } from 'src/app/pipes/filter.pipe'
 import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
 import { ToggleableItemState } from './toggleable-dropdown-button/toggleable-dropdown-button.component'
 import { MatchingModel } from 'src/app/data/matching-model'
-import { Subject } from 'rxjs'
+import { Subject, filter, take, takeUntil } from 'rxjs'
 import { SelectionDataItem } from 'src/app/services/rest/document.service'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
+import { HotKeyService } from 'src/app/services/hot-key.service'
 
 export interface ChangedItems {
   itemsToAdd: MatchingModel[]
@@ -322,7 +325,7 @@ export class FilterableDropdownSelectionModel {
   templateUrl: './filterable-dropdown.component.html',
   styleUrls: ['./filterable-dropdown.component.scss'],
 })
-export class FilterableDropdownComponent {
+export class FilterableDropdownComponent implements OnDestroy, OnInit {
   @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
   @ViewChild('dropdown') dropdown: NgbDropdown
   @ViewChild('buttonItems') buttonItems: ElementRef
@@ -419,6 +422,9 @@ export class FilterableDropdownComponent {
   @Input()
   documentCounts: SelectionDataItem[]
 
+  @Input()
+  shortcutKey: string
+
   get name(): string {
     return this.title ? this.title.replace(/\s/g, '_').toLowerCase() : null
   }
@@ -427,10 +433,37 @@ export class FilterableDropdownComponent {
 
   private keyboardIndex: number
 
-  constructor(private filterPipe: FilterPipe) {
+  private unsubscribeNotifier: Subject<any> = new Subject()
+
+  constructor(
+    private filterPipe: FilterPipe,
+    private hotkeyService: HotKeyService
+  ) {
     this.selectionModelChange.subscribe((updatedModel) => {
       this.modelIsDirty = updatedModel.isDirty()
     })
+  }
+
+  ngOnInit(): void {
+    if (this.shortcutKey) {
+      this.hotkeyService
+        .addShortcut({
+          keys: this.shortcutKey,
+          description: $localize`Open ${this.title} filter`,
+        })
+        .pipe(
+          takeUntil(this.unsubscribeNotifier),
+          filter(() => !this.disabled)
+        )
+        .subscribe(() => {
+          this.dropdown.open()
+        })
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribeNotifier.next(true)
+    this.unsubscribeNotifier.complete()
   }
 
   applyClicked() {

@@ -87,7 +87,7 @@ table .btn-link {
   color: var(--pngx-primary-text-contrast) !important;
 }
 
-.navbar .dropdown .btn {
+.navbar .dropdown > .btn {
   color: var(--pngx-primary-text-contrast) !important;
 }
 
@@ -456,7 +456,7 @@ ul.pagination {
     color: var(--bs-body-color);
 
     &:hover, &:focus {
-      background-color: var(--pngx-bg-alt);
+      background-color: var(--pngx-bg-darker);
       color: var(--bs-body-color);
     }
 

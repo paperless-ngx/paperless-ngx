@@ -22,7 +22,13 @@
             <i-bs width="1em" height="1em" name="x"></i-bs>
           </button>
         }
-        <input #textFilterInput class="form-control form-control-sm" type="text" [disabled]="textFilterModifierIsNull" [(ngModel)]="textFilter" (keyup)="textFilterKeyup($event)" [readonly]="textFilterTarget === 'fulltext-morelike'">
+        <input #textFilterInput class="form-control form-control-sm" type="text"
+        [disabled]="textFilterModifierIsNull"
+        [(ngModel)]="textFilter"
+        (keyup)="textFilterKeyup($event)"
+        [ngbTypeahead]="searchAutoComplete"
+        (selectItem)="itemSelected($event)"
+        [readonly]="textFilterTarget === 'fulltext-morelike'">
       </div>
     </div>
   </div>
@@ -38,7 +44,9 @@
           (selectionModelChange)="updateRules()"
           (opened)="onTagsDropdownOpen()"
           [documentCounts]="tagDocumentCounts"
-          [allowSelectNone]="true"></pngx-filterable-dropdown>
+          [allowSelectNone]="true"
+          [disabled]="disabled"
+          shortcutKey="t"></pngx-filterable-dropdown>
         }
         @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
           <pngx-filterable-dropdown class="flex-fill" title="Correspondent" icon="person-fill" i18n-title
@@ -48,7 +56,9 @@
           (selectionModelChange)="updateRules()"
           (opened)="onCorrespondentDropdownOpen()"
           [documentCounts]="correspondentDocumentCounts"
-          [allowSelectNone]="true"></pngx-filterable-dropdown>
+          [allowSelectNone]="true"
+          [disabled]="disabled"
+          shortcutKey="y"></pngx-filterable-dropdown>
         }
         @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
             <pngx-filterable-dropdown class="flex-fill" title="Document type" icon="file-earmark-fill" i18n-title
@@ -58,7 +68,9 @@
             (selectionModelChange)="updateRules()"
             (opened)="onDocumentTypeDropdownOpen()"
             [documentCounts]="documentTypeDocumentCounts"
-            [allowSelectNone]="true"></pngx-filterable-dropdown>
+            [allowSelectNone]="true"
+            [disabled]="disabled"
+            shortcutKey="u"></pngx-filterable-dropdown>
         }
         @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.StoragePath) && storagePaths.length > 0) {
           <pngx-filterable-dropdown class="flex-fill" title="Storage path" icon="folder-fill" i18n-title
@@ -68,7 +80,9 @@
           (selectionModelChange)="updateRules()"
           (opened)="onStoragePathDropdownOpen()"
           [documentCounts]="storagePathDocumentCounts"
-          [allowSelectNone]="true"></pngx-filterable-dropdown>
+          [allowSelectNone]="true"
+          [disabled]="disabled"
+          shortcutKey="i"></pngx-filterable-dropdown>
         }
 
         @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.CustomField) && customFields.length > 0) {
