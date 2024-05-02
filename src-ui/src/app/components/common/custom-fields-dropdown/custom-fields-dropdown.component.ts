@@ -1,13 +1,17 @@
 import {
   Component,
+  ElementRef,
   EventEmitter,
   Input,
   OnDestroy,
   Output,
+  QueryList,
+  ViewChild,
+  ViewChildren,
 } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Subject, first, takeUntil } from 'rxjs'
-import { CustomField } from 'src/app/data/custom-field'
+import { CustomField, DATA_TYPE_LABELS } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -39,22 +43,24 @@ export class CustomFieldsDropdownComponent implements OnDestroy {
   @Output()
   created: EventEmitter<CustomField> = new EventEmitter()
 
+  @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
+  @ViewChildren('button') buttons: QueryList<ElementRef>
+
   private customFields: CustomField[] = []
-  public unusedFields: CustomField[]
+  private unusedFields: CustomField[] = []
+  private keyboardIndex: number
 
-  public name: string
+  public get filteredFields(): CustomField[] {
+    return this.unusedFields.filter(
+      (f) =>
+        !this.filterText ||
+        f.name.toLowerCase().includes(this.filterText.toLowerCase())
+    )
+  }
 
-  public field: number
+  public filterText: string
 
   private unsubscribeNotifier: Subject<any> = new Subject()
-
-  get placeholderText(): string {
-    return $localize`Choose field`
-  }
-
-  get notFoundText(): string {
-    return $localize`No unused fields found`
-  }
 
   get canCreateFields(): boolean {
     return this.permissionsService.currentUserCan(
@@ -87,28 +93,26 @@ export class CustomFieldsDropdownComponent implements OnDestroy {
       })
   }
 
-  public getCustomFieldFromInstance(
-    instance: CustomFieldInstance
-  ): CustomField {
-    return this.customFields.find((f) => f.id === instance.field)
-  }
-
   private updateUnusedFields() {
     this.unusedFields = this.customFields.filter(
-      (f) =>
-        !this.existingFields?.find(
-          (e) => this.getCustomFieldFromInstance(e)?.id === f.id
-        )
+      (f) => !this.existingFields?.find((e) => e.field === f.id)
     )
   }
 
-  onOpenClose() {
-    this.field = undefined
+  onOpenClose(open: boolean) {
+    if (open) {
+      setTimeout(() => {
+        this.listFilterTextInput.nativeElement.focus()
+      }, 100)
+    } else {
+      this.filterText = undefined
+    }
     this.updateUnusedFields()
   }
 
-  addField() {
-    this.added.emit(this.customFields.find((f) => f.id === this.field))
+  addField(field: CustomField) {
+    this.added.emit(field)
+    this.updateUnusedFields()
   }
 
   createField(newName: string = null) {
@@ -121,11 +125,90 @@ export class CustomFieldsDropdownComponent implements OnDestroy {
         this.customFieldsService.clearCache()
         this.getFields()
         this.created.emit(newField)
+        setTimeout(() => this.addField(newField), 100)
       })
     modal.componentInstance.failed
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((e) => {
         this.toastService.showError($localize`Error saving field.`, e)
       })
+  }
+
+  getDataTypeLabel(dataType: string) {
+    return DATA_TYPE_LABELS.find((l) => l.id === dataType)?.name
+  }
+
+  public listFilterEnter() {
+    if (this.filteredFields.length === 1) {
+      this.addField(this.filteredFields[0])
+    } else if (
+      this.filterText &&
+      this.filteredFields.length === 0 &&
+      this.canCreateFields
+    ) {
+      this.createField(this.filterText)
+    }
+  }
+
+  private focusNextButtonItem(setFocus: boolean = true) {
+    this.keyboardIndex = Math.min(
+      this.buttons.length - 1,
+      this.keyboardIndex + 1
+    )
+    if (setFocus) this.setButtonItemFocus()
+  }
+
+  focusPreviousButtonItem(setFocus: boolean = true) {
+    this.keyboardIndex = Math.max(0, this.keyboardIndex - 1)
+    if (setFocus) this.setButtonItemFocus()
+  }
+
+  setButtonItemFocus() {
+    this.buttons.get(this.keyboardIndex)?.nativeElement.focus()
+  }
+
+  public listKeyDown(event: KeyboardEvent) {
+    switch (event.key) {
+      case 'ArrowDown':
+        if (event.target instanceof HTMLInputElement) {
+          if (
+            !this.filterText ||
+            event.target.selectionStart === this.filterText.length
+          ) {
+            this.keyboardIndex = -1
+            this.focusNextButtonItem()
+            event.preventDefault()
+          }
+        } else if (event.target instanceof HTMLButtonElement) {
+          this.focusNextButtonItem()
+          event.preventDefault()
+        }
+        break
+      case 'ArrowUp':
+        if (event.target instanceof HTMLButtonElement) {
+          if (this.keyboardIndex === 0) {
+            this.listFilterTextInput.nativeElement.focus()
+          } else {
+            this.focusPreviousButtonItem()
+          }
+          event.preventDefault()
+        }
+        break
+      case 'Tab':
+        // just track the index in case user uses arrows
+        if (event.target instanceof HTMLInputElement) {
+          this.keyboardIndex = 0
+        } else if (event.target instanceof HTMLButtonElement) {
+          if (event.shiftKey) {
+            if (this.keyboardIndex > 0) {
+              this.focusPreviousButtonItem(false)
+            }
+          } else {
+            this.focusNextButtonItem(false)
+          }
+        }
+      default:
+        break
+    }
   }
 }
