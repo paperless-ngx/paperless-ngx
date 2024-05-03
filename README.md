@@ -25,6 +25,8 @@ Thanks to the generous folks at [DigitalOcean](https://m.do.co/c/8d70b916d462), 
 
 - [Features](#features)
 - [Getting started](#getting-started)
+  - [Self-hosting](#self-hosting)
+  - [Hosting Providers](#hosting-providers)
 - [Contributing](#contributing)
   - [Community Support](#community-support)
   - [Translation](#translation)
@@ -52,8 +54,11 @@ Thanks to the generous folks at [DigitalOcean](https://m.do.co/c/8d70b916d462), 
 </picture>
 
 A full list of [features](https://docs.paperless-ngx.com/#features) and [screenshots](https://docs.paperless-ngx.com/#screenshots) are available in the [documentation](https://docs.paperless-ngx.com/).
-
 # Getting started
+
+You can either host your paperless by yourself or go with a hosting provider.
+
+## Self-hosting
 
 The easiest way to deploy paperless is `docker compose`. The files in the [`/docker/compose` directory](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose) are configured to pull the image from GitHub Packages.
 
@@ -66,6 +71,12 @@ bash -c "$(curl -L https://raw.githubusercontent.com/paperless-ngx/paperless-ngx
 Alternatively, you can install the dependencies and setup apache and a database server yourself. The [documentation](https://docs.paperless-ngx.com/setup/#installation) has a step by step guide on how to do it.
 
 Migrating from Paperless-ng is easy, just drop in the new docker image! See the [documentation on migrating](https://docs.paperless-ngx.com/setup/#migrating-to-paperless-ngx) for more details.
+
+## Hosting Providers
+
+| Provider        | Free plan?    | Description  |
+| --------------- | ------------- | ------------ |
+| [Paperless&#x2011;home](https://paperless-home.com) | <p align="center">✔️</p> | Hosting service dedicated to Paperless. Features: Import over WebDAV or FTP, import of docx and other office document types. |
 
 <!-- omit in toc -->
 
