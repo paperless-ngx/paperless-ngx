@@ -292,6 +292,7 @@ export class GlobalSearchComponent implements OnInit {
     ) {
       if (event.key === 'ArrowDown') {
         event.preventDefault()
+        event.stopImmediatePropagation()
         if (this.currentItemIndex < this.searchResults.total - 1) {
           this.currentItemIndex++
           this.setCurrentItem()
@@ -301,6 +302,7 @@ export class GlobalSearchComponent implements OnInit {
         }
       } else if (event.key === 'ArrowUp') {
         event.preventDefault()
+        event.stopImmediatePropagation()
         if (this.currentItemIndex > 0) {
           this.currentItemIndex--
           this.setCurrentItem()
@@ -310,11 +312,22 @@ export class GlobalSearchComponent implements OnInit {
         }
       } else if (event.key === 'ArrowRight') {
         event.preventDefault()
+        event.stopImmediatePropagation()
         this.secondaryButtons.get(this.domIndex)?.nativeElement.focus()
       } else if (event.key === 'ArrowLeft') {
         event.preventDefault()
+        event.stopImmediatePropagation()
         this.primaryButtons.get(this.domIndex).nativeElement.focus()
       }
+    }
+  }
+
+  onButtonKeyDown(event: KeyboardEvent) {
+    // prevents ngBootstrap issue with keydown events
+    if (
+      !['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft'].includes(event.key)
+    ) {
+      event.stopImmediatePropagation()
     }
   }
 
