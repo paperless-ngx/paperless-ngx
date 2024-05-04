@@ -8,7 +8,7 @@ dateparser = "~=1.2"
 # WARNING: django does not use semver.
 #          Only patch versions are guaranteed to not introduce breaking changes.
 django = "~=4.2.11"
-django-allauth = "*"
+django-allauth = {extras = ["socialaccount"], version = "*"}
 django-auditlog = "*"
 django-celery-results = "*"
 django-compression-middleware = "*"
