@@ -30,7 +30,7 @@ Thanks to the generous folks at [DigitalOcean](https://m.do.co/c/8d70b916d462), 
   - [Translation](#translation)
   - [Feature Requests](#feature-requests)
   - [Bugs](#bugs)
-- [Affiliated Projects](#affiliated-projects)
+- [Related Projects](#related-projects)
 - [Important Note](#important-note)
 
 <p align="right">This project is supported by:<br/>
@@ -93,9 +93,9 @@ Feature requests can be submitted via [GitHub Discussions](https://github.com/pa
 
 For bugs please [open an issue](https://github.com/paperless-ngx/paperless-ngx/issues) or [start a discussion](https://github.com/paperless-ngx/paperless-ngx/discussions) if you have questions.
 
-# Affiliated Projects
+# Related Projects
 
-Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Affiliated-Projects) for a user-maintained list of affiliated projects and software that is compatible with Paperless-ngx.
+Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Related-Projects) for a user-maintained list of related projects and software that is compatible with Paperless-ngx.
 
 # Important Note
 
