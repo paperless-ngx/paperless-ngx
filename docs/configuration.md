@@ -1484,7 +1484,7 @@ started by the container.
 
 ## Frontend Settings
 
-#### [`PAPERLESS_APP_TITLE=<bool>`](#PAPERLESS_APP_TITLE) {#PAPERLESS_APP_TITLE}
+#### [`PAPERLESS_APP_TITLE=<str>`](#PAPERLESS_APP_TITLE) {#PAPERLESS_APP_TITLE}
 
 : If set, overrides the default name "Paperless-ngx"
 
