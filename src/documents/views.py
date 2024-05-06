@@ -1850,7 +1850,7 @@ class SystemStatusView(PassUserMixin):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        if not request.user.has_perm("admin.view_logentry"):
+        if not request.user.is_staff:
             return HttpResponseForbidden("Insufficient permissions")
 
         current_version = version.__full_version_str__
