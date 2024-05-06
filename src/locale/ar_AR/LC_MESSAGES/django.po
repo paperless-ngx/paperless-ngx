@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-07 18:36-0700\n"
-"PO-Revision-Date: 2024-04-08 01:36\n"
+"POT-Creation-Date: 2024-04-26 07:19-0700\n"
+"PO-Revision-Date: 2024-05-02 16:16\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -21,52 +21,52 @@ msgstr ""
 msgid "Documents"
 msgstr "المستندات"
 
-#: documents/models.py:36 documents/models.py:739
+#: documents/models.py:36 documents/models.py:779
 msgid "owner"
 msgstr "مالك"
 
-#: documents/models.py:53 documents/models.py:897
+#: documents/models.py:53 documents/models.py:942
 msgid "None"
 msgstr "لا شيء"
 
-#: documents/models.py:54 documents/models.py:898
+#: documents/models.py:54 documents/models.py:943
 msgid "Any word"
 msgstr "أي كلمة"
 
-#: documents/models.py:55 documents/models.py:899
+#: documents/models.py:55 documents/models.py:944
 msgid "All words"
 msgstr "كل الكلمات"
 
-#: documents/models.py:56 documents/models.py:900
+#: documents/models.py:56 documents/models.py:945
 msgid "Exact match"
 msgstr "تطابق تام"
 
-#: documents/models.py:57 documents/models.py:901
+#: documents/models.py:57 documents/models.py:946
 msgid "Regular expression"
 msgstr "التعابير النظامية"
 
-#: documents/models.py:58 documents/models.py:902
+#: documents/models.py:58 documents/models.py:947
 msgid "Fuzzy word"
-msgstr ""
+msgstr "كلمة مبهمة"
 
 #: documents/models.py:59
 msgid "Automatic"
 msgstr "تلقائي"
 
-#: documents/models.py:62 documents/models.py:397 documents/models.py:1218
+#: documents/models.py:62 documents/models.py:416 documents/models.py:1263
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
 msgid "name"
 msgstr "اسم"
 
-#: documents/models.py:64 documents/models.py:958
+#: documents/models.py:64 documents/models.py:1003
 msgid "match"
 msgstr "تطابق"
 
-#: documents/models.py:67 documents/models.py:961
+#: documents/models.py:67 documents/models.py:1006
 msgid "matching algorithm"
 msgstr "خوارزمية مطابقة"
 
-#: documents/models.py:72 documents/models.py:966
+#: documents/models.py:72 documents/models.py:1011
 msgid "is insensitive"
 msgstr "غير حساس"
 
@@ -130,7 +130,7 @@ msgstr "مشفر باستخدام حارس خصوصية GNU"
 msgid "title"
 msgstr "عنوان"
 
-#: documents/models.py:171 documents/models.py:653
+#: documents/models.py:171 documents/models.py:693
 msgid "content"
 msgstr "محتوى"
 
@@ -158,8 +158,8 @@ msgstr "مجموع الاختباري للأرشيف"
 msgid "The checksum of the archived document."
 msgstr "بصمة المِلَفّ للمستند ‏المحفوظ."
 
-#: documents/models.py:205 documents/models.py:385 documents/models.py:659
-#: documents/models.py:697 documents/models.py:767 documents/models.py:804
+#: documents/models.py:205 documents/models.py:385 documents/models.py:699
+#: documents/models.py:737 documents/models.py:807 documents/models.py:844
 msgid "created"
 msgstr "أُنشئ"
 
@@ -207,7 +207,7 @@ msgstr "الرَّقْم التسلسلي للأرشيف"
 msgid "The position of this document in your physical document archive."
 msgstr "موقع هذا المستند في ‏أرشيف المستند الفيزيائي."
 
-#: documents/models.py:279 documents/models.py:670 documents/models.py:724
+#: documents/models.py:279 documents/models.py:710 documents/models.py:764
 msgid "document"
 msgstr "مستند"
 
@@ -255,610 +255,679 @@ msgstr "سجل"
 msgid "logs"
 msgstr "السجلات"
 
+#: documents/models.py:398
+msgid "Table"
+msgstr "جدول"
+
+#: documents/models.py:399
+msgid "Small Cards"
+msgstr "بطاقات صغيرة"
+
 #: documents/models.py:400
+msgid "Large Cards"
+msgstr "بطاقات كبيرة"
+
+#: documents/models.py:403
+msgid "Title"
+msgstr "عنوان"
+
+#: documents/models.py:404
+msgid "Created"
+msgstr "تمّ إنشاؤه"
+
+#: documents/models.py:405
+msgid "Added"
+msgstr "تمّت إضافته"
+
+#: documents/models.py:406
+msgid "Tags"
+msgstr "سِمَات"
+
+#: documents/models.py:407
+msgid "Correspondent"
+msgstr "المُراسِل"
+
+#: documents/models.py:408
+msgid "Document Type"
+msgstr "نوع المستند"
+
+#: documents/models.py:409
+msgid "Storage Path"
+msgstr "مسار الحفظ"
+
+#: documents/models.py:410
+msgid "Note"
+msgstr "ملاحظة"
+
+#: documents/models.py:411
+msgid "Owner"
+msgstr "المالك"
+
+#: documents/models.py:412
+msgid "Shared"
+msgstr "مُشتَرَك"
+
+#: documents/models.py:413
+msgid "ASN"
+msgstr "ASN"
+
+#: documents/models.py:419
 msgid "show on dashboard"
 msgstr "عرض على لوحة التحكم"
 
-#: documents/models.py:403
+#: documents/models.py:422
 msgid "show in sidebar"
 msgstr "عرض على الشريط الجانبي"
 
-#: documents/models.py:407
+#: documents/models.py:426
 msgid "sort field"
 msgstr "فرز الحقل"
 
-#: documents/models.py:412
+#: documents/models.py:431
 msgid "sort reverse"
 msgstr "فرز بالعكس"
 
-#: documents/models.py:416 documents/models.py:469
+#: documents/models.py:434
+msgid "View page size"
+msgstr "عرض حجم الصفحة"
+
+#: documents/models.py:442
+msgid "View display mode"
+msgstr "عرض وضعية العرض"
+
+#: documents/models.py:449
+msgid "Document display fields"
+msgstr "حقول عرض المستند"
+
+#: documents/models.py:456 documents/models.py:509
 msgid "saved view"
 msgstr "العرض المحفوظ"
 
-#: documents/models.py:417
+#: documents/models.py:457
 msgid "saved views"
 msgstr "العروض المحفوظة"
 
-#: documents/models.py:425
+#: documents/models.py:465
 msgid "title contains"
 msgstr "العنوان يحتوي"
 
-#: documents/models.py:426
+#: documents/models.py:466
 msgid "content contains"
 msgstr "المحتوى يحتوي"
 
-#: documents/models.py:427
+#: documents/models.py:467
 msgid "ASN is"
 msgstr "ASN هو"
 
-#: documents/models.py:428
+#: documents/models.py:468
 msgid "correspondent is"
 msgstr "المراسل هو"
 
-#: documents/models.py:429
+#: documents/models.py:469
 msgid "document type is"
 msgstr "نوع المستند"
 
-#: documents/models.py:430
+#: documents/models.py:470
 msgid "is in inbox"
 msgstr "موجود في علبة الوارد"
 
-#: documents/models.py:431
+#: documents/models.py:471
 msgid "has tag"
 msgstr "لديه علامة"
 
-#: documents/models.py:432
+#: documents/models.py:472
 msgid "has any tag"
 msgstr "لديه أي وسم"
 
-#: documents/models.py:433
+#: documents/models.py:473
 msgid "created before"
 msgstr "أنشئت قبل"
 
-#: documents/models.py:434
+#: documents/models.py:474
 msgid "created after"
 msgstr "أنشئت بعد"
 
-#: documents/models.py:435
+#: documents/models.py:475
 msgid "created year is"
 msgstr "أنشئت سنة"
 
-#: documents/models.py:436
+#: documents/models.py:476
 msgid "created month is"
 msgstr "أنشئت شهر"
 
-#: documents/models.py:437
+#: documents/models.py:477
 msgid "created day is"
 msgstr "أنشئت يوم"
 
-#: documents/models.py:438
+#: documents/models.py:478
 msgid "added before"
 msgstr "أضيف قبل"
 
-#: documents/models.py:439
+#: documents/models.py:479
 msgid "added after"
 msgstr "أضيف بعد"
 
-#: documents/models.py:440
+#: documents/models.py:480
 msgid "modified before"
 msgstr "عُدِّل قبل"
 
-#: documents/models.py:441
+#: documents/models.py:481
 msgid "modified after"
 msgstr "عُدِّل بعد"
 
-#: documents/models.py:442
+#: documents/models.py:482
 msgid "does not have tag"
 msgstr "ليس لديه علامة"
 
-#: documents/models.py:443
+#: documents/models.py:483
 msgid "does not have ASN"
 msgstr "ليس لديه ASN"
 
-#: documents/models.py:444
+#: documents/models.py:484
 msgid "title or content contains"
 msgstr "العنوان أو المحتوى يحتوي"
 
-#: documents/models.py:445
+#: documents/models.py:485
 msgid "fulltext query"
 msgstr "استعلام كامل النص"
 
-#: documents/models.py:446
+#: documents/models.py:486
 msgid "more like this"
 msgstr "المزيد مثل هذا"
 
-#: documents/models.py:447
+#: documents/models.py:487
 msgid "has tags in"
 msgstr "لديه علامات في"
 
-#: documents/models.py:448
+#: documents/models.py:488
 msgid "ASN greater than"
 msgstr "ASN أكبر من"
 
-#: documents/models.py:449
+#: documents/models.py:489
 msgid "ASN less than"
 msgstr "ASN أقل من"
 
-#: documents/models.py:450
+#: documents/models.py:490
 msgid "storage path is"
 msgstr "مسار التخزين"
 
-#: documents/models.py:451
+#: documents/models.py:491
 msgid "has correspondent in"
 msgstr "له مراسل في"
 
-#: documents/models.py:452
+#: documents/models.py:492
 msgid "does not have correspondent in"
 msgstr "لا يوجد مراسل في"
 
-#: documents/models.py:453
+#: documents/models.py:493
 msgid "has document type in"
 msgstr "يحتوي على نوع المستند في"
 
-#: documents/models.py:454
+#: documents/models.py:494
 msgid "does not have document type in"
 msgstr "ليس لديه نوع مستند في"
 
-#: documents/models.py:455
+#: documents/models.py:495
 msgid "has storage path in"
 msgstr "لديه مسار تخزين في"
 
-#: documents/models.py:456
+#: documents/models.py:496
 msgid "does not have storage path in"
 msgstr "ليس لديه مسار تخزين في"
 
-#: documents/models.py:457
+#: documents/models.py:497
 msgid "owner is"
 msgstr "المالك هو"
 
-#: documents/models.py:458
+#: documents/models.py:498
 msgid "has owner in"
 msgstr "لديه مالك في"
 
-#: documents/models.py:459
+#: documents/models.py:499
 msgid "does not have owner"
 msgstr "ليس لديه مالك"
 
-#: documents/models.py:460
+#: documents/models.py:500
 msgid "does not have owner in"
 msgstr "ليس لديه مالك في"
 
-#: documents/models.py:461
+#: documents/models.py:501
 msgid "has custom field value"
 msgstr "له قيمة حقل مخصص"
 
-#: documents/models.py:462
+#: documents/models.py:502
 msgid "is shared by me"
 msgstr "تم المشاركة من قبلي"
 
-#: documents/models.py:472
+#: documents/models.py:512
 msgid "rule type"
 msgstr "نوع القاعدة"
 
-#: documents/models.py:474
+#: documents/models.py:514
 msgid "value"
 msgstr "قيمة"
 
-#: documents/models.py:477
+#: documents/models.py:517
 msgid "filter rule"
 msgstr "تصفية القاعدة"
 
-#: documents/models.py:478
+#: documents/models.py:518
 msgid "filter rules"
 msgstr "تصفية القواعد"
 
-#: documents/models.py:589
+#: documents/models.py:629
 msgid "Task ID"
 msgstr "الرمز التعريفي للمهمة"
 
-#: documents/models.py:590
+#: documents/models.py:630
 msgid "Celery ID for the Task that was run"
 msgstr "رمز المعرف للمهمة التي كانت تعمل"
 
-#: documents/models.py:595
+#: documents/models.py:635
 msgid "Acknowledged"
 msgstr "مُعترف"
 
-#: documents/models.py:596
+#: documents/models.py:636
 msgid "If the task is acknowledged via the frontend or API"
 msgstr "إذا عرف على المهمة عبر الواجهة الأمامية أو API"
 
-#: documents/models.py:602
+#: documents/models.py:642
 msgid "Task Filename"
 msgstr "اسم ملف المهمة"
 
-#: documents/models.py:603
+#: documents/models.py:643
 msgid "Name of the file which the Task was run for"
 msgstr "اسم المِلَفّ الذي وكل بالمهمة"
 
-#: documents/models.py:609
+#: documents/models.py:649
 msgid "Task Name"
 msgstr "اسم المهمة"
 
-#: documents/models.py:610
+#: documents/models.py:650
 msgid "Name of the Task which was run"
 msgstr "اسم المهمة التي كانت تعمل"
 
-#: documents/models.py:617
+#: documents/models.py:657
 msgid "Task State"
 msgstr "حالة المهمة"
 
-#: documents/models.py:618
+#: documents/models.py:658
 msgid "Current state of the task being run"
 msgstr "الحالة الراهنة للمهمة قيد العمل"
 
-#: documents/models.py:623
+#: documents/models.py:663
 msgid "Created DateTime"
 msgstr "تاريخ و وقت الإنشاء"
 
-#: documents/models.py:624
+#: documents/models.py:664
 msgid "Datetime field when the task result was created in UTC"
 msgstr "حقل التاريخ والوقت عند إنشاء نتيجة المهمة في UTC"
 
-#: documents/models.py:629
+#: documents/models.py:669
 msgid "Started DateTime"
 msgstr "تاريخ و وقت البداية"
 
-#: documents/models.py:630
+#: documents/models.py:670
 msgid "Datetime field when the task was started in UTC"
 msgstr "حقل التاريخ والوقت عند بدء المهمة في UTC"
 
-#: documents/models.py:635
+#: documents/models.py:675
 msgid "Completed DateTime"
 msgstr "التاريخ و الوقت المكتمل"
 
-#: documents/models.py:636
+#: documents/models.py:676
 msgid "Datetime field when the task was completed in UTC"
 msgstr "حقل التاريخ و الوقت عند اكتمال المهمة في UTC"
 
-#: documents/models.py:641
+#: documents/models.py:681
 msgid "Result Data"
 msgstr "نتائج البيانات"
 
-#: documents/models.py:643
+#: documents/models.py:683
 msgid "The data returned by the task"
 msgstr "البيانات المستردة من قبل المهمة"
 
-#: documents/models.py:655
+#: documents/models.py:695
 msgid "Note for the document"
 msgstr "ملاحظه على المستند"
 
-#: documents/models.py:679
+#: documents/models.py:719
 msgid "user"
 msgstr "المستخدم"
 
-#: documents/models.py:684
+#: documents/models.py:724
 msgid "note"
 msgstr "ملاحظة"
 
-#: documents/models.py:685
+#: documents/models.py:725
 msgid "notes"
 msgstr "ملاحظات"
 
-#: documents/models.py:693
+#: documents/models.py:733
 msgid "Archive"
 msgstr "أرشيف"
 
-#: documents/models.py:694
+#: documents/models.py:734
 msgid "Original"
 msgstr "الأصل"
 
-#: documents/models.py:705
+#: documents/models.py:745
 msgid "expiration"
 msgstr "تاريخ الانتهاء"
 
-#: documents/models.py:712
+#: documents/models.py:752
 msgid "slug"
 msgstr "slug"
 
-#: documents/models.py:744
+#: documents/models.py:784
 msgid "share link"
 msgstr "مشاركة الرابط"
 
-#: documents/models.py:745
+#: documents/models.py:785
 msgid "share links"
 msgstr "مشاركة الروابط"
 
-#: documents/models.py:757
+#: documents/models.py:797
 msgid "String"
 msgstr "سلسلة نصيّة"
 
-#: documents/models.py:758
+#: documents/models.py:798
 msgid "URL"
 msgstr "رابط"
 
-#: documents/models.py:759
+#: documents/models.py:799
 msgid "Date"
 msgstr "التاريخ"
 
-#: documents/models.py:760
+#: documents/models.py:800
 msgid "Boolean"
 msgstr "قيمة منطقية"
 
-#: documents/models.py:761
+#: documents/models.py:801
 msgid "Integer"
 msgstr "عدد صحيح"
 
-#: documents/models.py:762
+#: documents/models.py:802
 msgid "Float"
-msgstr ""
+msgstr "عائم"
 
-#: documents/models.py:763
+#: documents/models.py:803
 msgid "Monetary"
-msgstr ""
+msgstr "قيمة نقدية"
 
-#: documents/models.py:764
+#: documents/models.py:804
 msgid "Document Link"
 msgstr "رابط المستند"
 
-#: documents/models.py:776
+#: documents/models.py:816
 msgid "data type"
 msgstr "نوع البيانات"
 
-#: documents/models.py:784
+#: documents/models.py:824
 msgid "custom field"
-msgstr ""
+msgstr "حقل مخصص"
 
-#: documents/models.py:785
+#: documents/models.py:825
 msgid "custom fields"
-msgstr ""
+msgstr "حقول مخصصة"
 
-#: documents/models.py:847
+#: documents/models.py:887
 msgid "custom field instance"
-msgstr ""
+msgstr "مثيل الحقل المخصص"
 
-#: documents/models.py:848
+#: documents/models.py:888
 msgid "custom field instances"
-msgstr ""
+msgstr "مثيلات الحقل المخصصة"
 
-#: documents/models.py:905
+#: documents/models.py:950
 msgid "Consumption Started"
-msgstr ""
+msgstr "بدأ الإستهلاك"
 
-#: documents/models.py:906
+#: documents/models.py:951
 msgid "Document Added"
 msgstr "تم إضافة المستند"
 
-#: documents/models.py:907
+#: documents/models.py:952
 msgid "Document Updated"
 msgstr "تم تحديث المستند"
 
-#: documents/models.py:910
+#: documents/models.py:955
 msgid "Consume Folder"
 msgstr "‏مِلَفّ الاستهلاك"
 
-#: documents/models.py:911
+#: documents/models.py:956
 msgid "Api Upload"
 msgstr "تحميل Api"
 
-#: documents/models.py:912
+#: documents/models.py:957
 msgid "Mail Fetch"
 msgstr "جلب البريد"
 
-#: documents/models.py:915
+#: documents/models.py:960
 msgid "Workflow Trigger Type"
-msgstr ""
+msgstr "نوع محفز انطلاق سير العمل"
 
-#: documents/models.py:927
+#: documents/models.py:972
 msgid "filter path"
 msgstr "مسار التصفية"
 
-#: documents/models.py:932
+#: documents/models.py:977
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
 msgstr "فقط استهلك المستندات ذات المسار الذي يطابق هذا إذا تم تحديده. البطاقات البرية المحددة كما * مسموح بها. الحالة غير حساسة."
 
-#: documents/models.py:939
+#: documents/models.py:984
 msgid "filter filename"
 msgstr "تصفية اسم الملف"
 
-#: documents/models.py:944 paperless_mail/models.py:148
+#: documents/models.py:989 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "فقط المستندات التي تتطابق تماما مع اسم هذا المِلَفّ إذا تم تحديدها. المحارف البديلة مثل *.pdf أو *الفواتير* مسموح بها. لأنها غير حساسة."
 
-#: documents/models.py:955
+#: documents/models.py:1000
 msgid "filter documents from this mail rule"
 msgstr "تصفية المستندات من قاعدة البريد هذه"
 
-#: documents/models.py:971
-msgid "has these tag(s)"
-msgstr ""
-
-#: documents/models.py:979
-msgid "has this document type"
-msgstr ""
-
-#: documents/models.py:987
-msgid "has this correspondent"
-msgstr ""
-
-#: documents/models.py:991
-msgid "workflow trigger"
-msgstr ""
-
-#: documents/models.py:992
-msgid "workflow triggers"
-msgstr ""
-
-#: documents/models.py:1002
-msgid "Assignment"
-msgstr ""
-
-#: documents/models.py:1006
-msgid "Removal"
-msgstr ""
-
-#: documents/models.py:1010
-msgid "Workflow Action Type"
-msgstr ""
-
 #: documents/models.py:1016
+msgid "has these tag(s)"
+msgstr "لديه هذه العلامة ( أو العلامات)"
+
+#: documents/models.py:1024
+msgid "has this document type"
+msgstr "يحتوي على هذا النوع من المستندات"
+
+#: documents/models.py:1032
+msgid "has this correspondent"
+msgstr "لديه هذا المراسل"
+
+#: documents/models.py:1036
+msgid "workflow trigger"
+msgstr "محفز انطلاق سير العمل"
+
+#: documents/models.py:1037
+msgid "workflow triggers"
+msgstr "محفزات انطلاق سير العمل"
+
+#: documents/models.py:1047
+msgid "Assignment"
+msgstr "إسناد مهمة"
+
+#: documents/models.py:1051
+msgid "Removal"
+msgstr "إزالة"
+
+#: documents/models.py:1055
+msgid "Workflow Action Type"
+msgstr "نوع إجراء سير العمل"
+
+#: documents/models.py:1061
 msgid "assign title"
 msgstr "تعيين العنوان"
 
-#: documents/models.py:1021
+#: documents/models.py:1066
 msgid "Assign a document title, can include some placeholders, see documentation."
 msgstr "تعيين عنوان مستند، يمكن أن يتضمن بعض العناصر النائبة، انظر الوثائق."
 
-#: documents/models.py:1030 paperless_mail/models.py:216
+#: documents/models.py:1075 paperless_mail/models.py:216
 msgid "assign this tag"
 msgstr "تعيين هذه العلامة"
 
-#: documents/models.py:1039 paperless_mail/models.py:224
+#: documents/models.py:1084 paperless_mail/models.py:224
 msgid "assign this document type"
 msgstr "تعيين نوع هذا المستند"
 
-#: documents/models.py:1048 paperless_mail/models.py:238
+#: documents/models.py:1093 paperless_mail/models.py:238
 msgid "assign this correspondent"
 msgstr "تعيين هذا المراسل"
 
-#: documents/models.py:1057
+#: documents/models.py:1102
 msgid "assign this storage path"
 msgstr "تعيين مسار التخزين هذا"
 
-#: documents/models.py:1066
+#: documents/models.py:1111
 msgid "assign this owner"
 msgstr "تعيين هذا المالك"
 
-#: documents/models.py:1073
+#: documents/models.py:1118
 msgid "grant view permissions to these users"
 msgstr "منح أذونات العرض إلى هؤلاء المستخدمين"
 
-#: documents/models.py:1080
+#: documents/models.py:1125
 msgid "grant view permissions to these groups"
 msgstr "منح صلاحيات العرض إلى هذه المجموعات"
 
-#: documents/models.py:1087
+#: documents/models.py:1132
 msgid "grant change permissions to these users"
 msgstr "منح صلاحيات التغيير لهؤلاء المستخدمين"
 
-#: documents/models.py:1094
+#: documents/models.py:1139
 msgid "grant change permissions to these groups"
 msgstr "منح صلاحيات التغيير إلى هذه المجموعات"
 
-#: documents/models.py:1101
+#: documents/models.py:1146
 msgid "assign these custom fields"
-msgstr ""
+msgstr "تعيين هذه الحقول المخصصة"
 
-#: documents/models.py:1108
+#: documents/models.py:1153
 msgid "remove these tag(s)"
-msgstr ""
+msgstr "إزالة هذا الوسم (أو الوسوم)"
 
-#: documents/models.py:1113
+#: documents/models.py:1158
 msgid "remove all tags"
-msgstr ""
+msgstr "إزالة جميع الوسوم"
 
-#: documents/models.py:1120
+#: documents/models.py:1165
 msgid "remove these document type(s)"
-msgstr ""
+msgstr "إزالة نوع (أنواع) هذه المستندات"
 
-#: documents/models.py:1125
+#: documents/models.py:1170
 msgid "remove all document types"
-msgstr ""
+msgstr "إزالة نوع أو أنواع هذه المستندات"
 
-#: documents/models.py:1132
+#: documents/models.py:1177
 msgid "remove these correspondent(s)"
-msgstr ""
+msgstr "إزالة هذا المراسل (أو هؤلاء المراسلين)"
 
-#: documents/models.py:1137
+#: documents/models.py:1182
 msgid "remove all correspondents"
-msgstr ""
+msgstr "حذف كل المراسلين"
 
-#: documents/models.py:1144
+#: documents/models.py:1189
 msgid "remove these storage path(s)"
-msgstr ""
+msgstr "إزالة مسار (أو مسارات) التخزين هذه"
 
-#: documents/models.py:1149
+#: documents/models.py:1194
 msgid "remove all storage paths"
-msgstr ""
+msgstr "حذف كل مسارات الحفظ"
 
-#: documents/models.py:1156
+#: documents/models.py:1201
 msgid "remove these owner(s)"
-msgstr ""
+msgstr "إزالة هذا المالك (أو المالكين)"
 
-#: documents/models.py:1161
+#: documents/models.py:1206
 msgid "remove all owners"
 msgstr "إزالة جميع المالكين"
 
-#: documents/models.py:1168
+#: documents/models.py:1213
 msgid "remove view permissions for these users"
-msgstr ""
+msgstr "سحب أذونات العرض من هؤلاء المستخدمين"
 
-#: documents/models.py:1175
+#: documents/models.py:1220
 msgid "remove view permissions for these groups"
-msgstr ""
+msgstr "سحب أذونات العرض من هذه المجموعات"
 
-#: documents/models.py:1182
+#: documents/models.py:1227
 msgid "remove change permissions for these users"
-msgstr ""
+msgstr "سحب أذونات التغيير من هؤلاء المستخدمين"
 
-#: documents/models.py:1189
+#: documents/models.py:1234
 msgid "remove change permissions for these groups"
-msgstr ""
+msgstr "سحب أذونات التغيير من هذه المجموعات"
 
-#: documents/models.py:1194
+#: documents/models.py:1239
 msgid "remove all permissions"
-msgstr ""
+msgstr "سحب كل الأذونات"
 
-#: documents/models.py:1201
+#: documents/models.py:1246
 msgid "remove these custom fields"
-msgstr ""
+msgstr "حذف هذه الحقول المخصصة"
 
-#: documents/models.py:1206
+#: documents/models.py:1251
 msgid "remove all custom fields"
-msgstr ""
+msgstr "حذف كل الحقول المخصصة"
 
-#: documents/models.py:1210
+#: documents/models.py:1255
 msgid "workflow action"
-msgstr ""
+msgstr "إجراء في سير العمل"
 
-#: documents/models.py:1211
+#: documents/models.py:1256
 msgid "workflow actions"
-msgstr ""
+msgstr "إجراءات سير العمل"
 
-#: documents/models.py:1220 paperless_mail/models.py:95
+#: documents/models.py:1265 paperless_mail/models.py:95
 msgid "order"
 msgstr "الطلب"
 
-#: documents/models.py:1226
+#: documents/models.py:1271
 msgid "triggers"
-msgstr ""
+msgstr "قادحات triggers"
 
-#: documents/models.py:1233
+#: documents/models.py:1278
 msgid "actions"
 msgstr "إجراءات"
 
-#: documents/models.py:1236
+#: documents/models.py:1281
 msgid "enabled"
 msgstr "مفعل"
 
-#: documents/serialisers.py:114
+#: documents/serialisers.py:115
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "التعبير النظامي خاطىء: %(error)s"
 
-#: documents/serialisers.py:417
+#: documents/serialisers.py:418
 msgid "Invalid color."
 msgstr "لون خاطئ."
 
-#: documents/serialisers.py:1143
+#: documents/serialisers.py:1197
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "نوع الملف %(type)s غير مدعوم"
 
-#: documents/serialisers.py:1252
+#: documents/serialisers.py:1306
 msgid "Invalid variable detected."
 msgstr "اكتشاف متغير خاطئ."
 
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
-msgstr ""
+msgstr "ترحيب من %(site_name)s!"
 
 #: documents/templates/account/email/base_message.txt:5
 #, python-format
 msgid "Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
-msgstr ""
+msgstr "شكراً لكم على استعمالكم %(site_name)s!\n"
+"%(site_domain)s"
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
@@ -871,7 +940,7 @@ msgstr "الرجاء تسجيل الدخول."
 #: documents/templates/account/login.html:12
 #, python-format
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
-msgstr ""
+msgstr "ليس لديك حسابٌ بعدُ؟ <a href=\"%(signup_url)s\">سجِّل</a>"
 
 #: documents/templates/account/login.html:19
 #: documents/templates/account/signup.html:15
@@ -968,12 +1037,12 @@ msgstr "تم تعيين كلمة المرور الجديدة الخاصة بك. 
 
 #: documents/templates/account/signup.html:5
 msgid "Paperless-ngx sign up"
-msgstr ""
+msgstr "التسجيل في Paperless-ngx"
 
 #: documents/templates/account/signup.html:10
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
-msgstr ""
+msgstr "لديك حسابٌ مسبقاً؟ <a href=\"%(login_url)s\">أُدخُل</a>"
 
 #: documents/templates/account/signup.html:16
 #: documents/templates/socialaccount/signup.html:14
@@ -1012,17 +1081,17 @@ msgstr "انتهت صلاحية رابط المشاركة."
 #: documents/templates/socialaccount/authentication_error.html:5
 #: documents/templates/socialaccount/login.html:5
 msgid "Paperless-ngx social account sign in"
-msgstr ""
+msgstr "الدخول عن طريق الحسابات الاجتماعية إلى Paperless-ngx"
 
 #: documents/templates/socialaccount/authentication_error.html:10
 #, python-format
 msgid "An error occurred while attempting to login via your social network account. Back to the <a href=\"%(login_url)s\">login page</a>"
-msgstr ""
+msgstr "حدث حأ عند محاولة الدخول عبر حساب اجتماعي. عُد إلى <a href=\"%(login_url)s\">صفحة الدخول</a>"
 
 #: documents/templates/socialaccount/login.html:10
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
-msgstr ""
+msgstr "أنت على وشك الاتصال بحساب خارجي لطرف ثالث من %(provider)s."
 
 #: documents/templates/socialaccount/login.html:13
 msgid "Continue"
@@ -1030,31 +1099,31 @@ msgstr "استمر"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
-msgstr ""
+msgstr "التسجيل في Paperless-ngx عبر حساب اجتماعي"
 
 #: documents/templates/socialaccount/signup.html:10
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
-msgstr ""
+msgstr "أنت على وشك استعمال حسابك في %(provider_name) للدخول."
 
 #: documents/templates/socialaccount/signup.html:11
 msgid "As a final step, please complete the following form:"
-msgstr ""
+msgstr "كخطوة أخيرة، يرجى ملء النموذج التالي:"
 
 #: documents/validators.py:17
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "غير قادر على تحليل URI {value}، مخطط مفقود"
 
 #: documents/validators.py:22
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
+msgstr "غير قادر على تحليل URI {value}، موقع الشبكة أو المسار مفقود"
 
 #: documents/validators.py:27
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "غير قادر على تحليل URI {value}"
 
 #: paperless/apps.py:10
 msgid "Paperless"
@@ -1066,19 +1135,19 @@ msgstr "pdf"
 
 #: paperless/models.py:27
 msgid "pdfa"
-msgstr ""
+msgstr "تنسيق بي دي إف قابل للبحث pdfa"
 
 #: paperless/models.py:28
 msgid "pdfa-1"
-msgstr ""
+msgstr "تنسيق pdfa-1"
 
 #: paperless/models.py:29
 msgid "pdfa-2"
-msgstr ""
+msgstr "تنسيق pdfa-2"
 
 #: paperless/models.py:30
 msgid "pdfa-3"
-msgstr ""
+msgstr "تنسيق pdfa-3"
 
 #: paperless/models.py:39
 msgid "skip"
@@ -1094,7 +1163,7 @@ msgstr "إجبار"
 
 #: paperless/models.py:42
 msgid "skip_noarchive"
-msgstr ""
+msgstr "تخطّي ما ليس أرشيفاً skip_noarchive"
 
 #: paperless/models.py:50
 msgid "never"
@@ -1102,7 +1171,7 @@ msgstr "أبداً"
 
 #: paperless/models.py:51
 msgid "with_text"
-msgstr ""
+msgstr "بالنص with_text"
 
 #: paperless/models.py:52
 msgid "always"
@@ -1114,7 +1183,7 @@ msgstr "نظيف"
 
 #: paperless/models.py:61
 msgid "clean-final"
-msgstr ""
+msgstr "clean-final"
 
 #: paperless/models.py:62
 msgid "none"
@@ -1122,7 +1191,7 @@ msgstr "لا شيء"
 
 #: paperless/models.py:70
 msgid "LeaveColorUnchanged"
-msgstr ""
+msgstr "لا تُغيِّر الألوان LeaveColorUnchanged"
 
 #: paperless/models.py:71
 msgid "RGB"
@@ -1130,7 +1199,7 @@ msgstr "RGB"
 
 #: paperless/models.py:72
 msgid "UseDeviceIndependentColor"
-msgstr ""
+msgstr "إستعمال لون محايد غير معتمد على نوع الجهاز UseDeviceIndependentColor"
 
 #: paperless/models.py:73
 msgid "Gray"
@@ -1146,31 +1215,31 @@ msgstr "تعيين نوع إخراج PDF"
 
 #: paperless/models.py:95
 msgid "Do OCR from page 1 to this value"
-msgstr ""
+msgstr "إجراء OCR من الصفحة 1 إلى هذه القيمة"
 
 #: paperless/models.py:101
 msgid "Do OCR using these languages"
-msgstr ""
+msgstr "إجراء OCR باستعمال هذه اللغات"
 
 #: paperless/models.py:108
 msgid "Sets the OCR mode"
-msgstr ""
+msgstr "تعيين وضعية التعرٌّف الضوئي OCR"
 
 #: paperless/models.py:116
 msgid "Controls the generation of an archive file"
-msgstr ""
+msgstr "التحكم في توليد ملف أرشيف"
 
 #: paperless/models.py:124
 msgid "Sets image DPI fallback value"
-msgstr ""
+msgstr "تعيين القيمة الاحتياطية لدقة الـ DPI للصورة"
 
 #: paperless/models.py:131
 msgid "Controls the unpaper cleaning"
-msgstr ""
+msgstr "التحكم في التنظيف غير الورقي"
 
 #: paperless/models.py:138
 msgid "Enables deskew"
-msgstr ""
+msgstr "تمكين تعديل المَيْل"
 
 #: paperless/models.py:141
 msgid "Enables page rotation"
@@ -1178,19 +1247,19 @@ msgstr "تمكين تدوير الصفحة"
 
 #: paperless/models.py:146
 msgid "Sets the threshold for rotation of pages"
-msgstr ""
+msgstr "تعيين الحد الأدنى لتدوير الصفحات"
 
 #: paperless/models.py:152
 msgid "Sets the maximum image size for decompression"
-msgstr ""
+msgstr "تعيين الحد الأقصى لحجم الصورة لفك الضغط"
 
 #: paperless/models.py:158
 msgid "Sets the Ghostscript color conversion strategy"
-msgstr ""
+msgstr "تعيين استراتيجية تحويل الألوان في Ghostscript"
 
 #: paperless/models.py:166
 msgid "Adds additional user arguments for OCRMyPDF"
-msgstr ""
+msgstr "إضافة بارامترات مستخدم إضافية لـ OCRMyPDF"
 
 #: paperless/models.py:171
 msgid "Application title"
@@ -1202,137 +1271,137 @@ msgstr "شعار التطبيق"
 
 #: paperless/models.py:188
 msgid "paperless application settings"
-msgstr ""
+msgstr "إعدادات التطبيق paperless"
 
-#: paperless/settings.py:666
+#: paperless/settings.py:662
 msgid "English (US)"
 msgstr "الإنجليزية (الولايات المتحدة)"
 
-#: paperless/settings.py:667
+#: paperless/settings.py:663
 msgid "Arabic"
 msgstr "العربية"
 
-#: paperless/settings.py:668
+#: paperless/settings.py:664
 msgid "Afrikaans"
 msgstr "اللغة الأفريقانية"
 
-#: paperless/settings.py:669
+#: paperless/settings.py:665
 msgid "Belarusian"
 msgstr "البيلاروسية"
 
-#: paperless/settings.py:670
+#: paperless/settings.py:666
 msgid "Bulgarian"
 msgstr "البلغارية"
 
-#: paperless/settings.py:671
+#: paperless/settings.py:667
 msgid "Catalan"
 msgstr "اللغة الكتالونية"
 
-#: paperless/settings.py:672
+#: paperless/settings.py:668
 msgid "Czech"
 msgstr "التشيكية"
 
-#: paperless/settings.py:673
+#: paperless/settings.py:669
 msgid "Danish"
 msgstr "الدانماركية"
 
-#: paperless/settings.py:674
+#: paperless/settings.py:670
 msgid "German"
 msgstr "الألمانية"
 
-#: paperless/settings.py:675
+#: paperless/settings.py:671
 msgid "Greek"
 msgstr "اليونانية"
 
-#: paperless/settings.py:676
+#: paperless/settings.py:672
 msgid "English (GB)"
 msgstr "الإنجليزية (المملكة المتحدة)"
 
-#: paperless/settings.py:677
+#: paperless/settings.py:673
 msgid "Spanish"
 msgstr "الإسبانية"
 
-#: paperless/settings.py:678
+#: paperless/settings.py:674
 msgid "Finnish"
 msgstr "الفنلندية"
 
-#: paperless/settings.py:679
+#: paperless/settings.py:675
 msgid "French"
 msgstr "الفرنسية"
 
-#: paperless/settings.py:680
+#: paperless/settings.py:676
 msgid "Hungarian"
 msgstr "المجرية"
 
-#: paperless/settings.py:681
+#: paperless/settings.py:677
 msgid "Italian"
 msgstr "الإيطالية"
 
-#: paperless/settings.py:682
+#: paperless/settings.py:678
 msgid "Japanese"
 msgstr "اليابانية"
 
-#: paperless/settings.py:683
+#: paperless/settings.py:679
 msgid "Luxembourgish"
 msgstr "اللوكسمبرجية"
 
-#: paperless/settings.py:684
+#: paperless/settings.py:680
 msgid "Norwegian"
 msgstr "النرويجية"
 
-#: paperless/settings.py:685
+#: paperless/settings.py:681
 msgid "Dutch"
 msgstr "الهولندية"
 
-#: paperless/settings.py:686
+#: paperless/settings.py:682
 msgid "Polish"
 msgstr "البولندية"
 
-#: paperless/settings.py:687
+#: paperless/settings.py:683
 msgid "Portuguese (Brazil)"
 msgstr "البرتغالية (البرازيل)"
 
-#: paperless/settings.py:688
+#: paperless/settings.py:684
 msgid "Portuguese"
 msgstr "البرتغالية"
 
-#: paperless/settings.py:689
+#: paperless/settings.py:685
 msgid "Romanian"
 msgstr "الرومانية"
 
-#: paperless/settings.py:690
+#: paperless/settings.py:686
 msgid "Russian"
 msgstr "الروسية"
 
-#: paperless/settings.py:691
+#: paperless/settings.py:687
 msgid "Slovak"
 msgstr "السلوفاكية"
 
-#: paperless/settings.py:692
+#: paperless/settings.py:688
 msgid "Slovenian"
 msgstr "السلوفانية"
 
-#: paperless/settings.py:693
+#: paperless/settings.py:689
 msgid "Serbian"
 msgstr "الصربية"
 
-#: paperless/settings.py:694
+#: paperless/settings.py:690
 msgid "Swedish"
 msgstr "السويدية"
 
-#: paperless/settings.py:695
+#: paperless/settings.py:691
 msgid "Turkish"
 msgstr "التركية"
 
-#: paperless/settings.py:696
+#: paperless/settings.py:692
 msgid "Ukrainian"
 msgstr "الأوكرانية"
 
-#: paperless/settings.py:697
+#: paperless/settings.py:693
 msgid "Chinese Simplified"
 msgstr "الصينية المبسطة"
 
-#: paperless/urls.py:230
+#: paperless/urls.py:236
 msgid "Paperless-ngx administration"
 msgstr "Paperless-ngx الإدارة"
 
@@ -1530,15 +1599,15 @@ msgstr "تصفية الجسم"
 
 #: paperless_mail/models.py:143
 msgid "filter attachment filename inclusive"
-msgstr ""
+msgstr "فلترة أسماء الملفات المرفقة التي تحتوي على"
 
 #: paperless_mail/models.py:155
 msgid "filter attachment filename exclusive"
-msgstr ""
+msgstr "فلترة أسماء الملفات المرفقة التي لا تحتوي على"
 
 #: paperless_mail/models.py:160
 msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "لا تستهلك المستندات التي تتطابق تمامًا مع اسم الملف هذا إذا تم تحديده. يُسمح باستخدام أحرف البدل مثل *.pdf أو *invoice*. مع عدم اعتبار الحساسية لحالة الأحرف الصغيرة و الكبيرة."
 
 #: paperless_mail/models.py:167
 msgid "maximum age"
