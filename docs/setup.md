@@ -6,6 +6,7 @@ You can go multiple routes to setup and run Paperless:
 - [Pull the image from Docker Hub](#docker_hub)
 - [Build the Docker image yourself](#docker_build)
 - [Install Paperless directly on your system manually (bare metal)](#bare_metal)
+- A user-maintained list of commercial hosting providers can be found [in the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Related-Projects)
 
 The Docker routes are quick & easy. These are the recommended routes.
 This configures all the stuff from the above automatically so that it
