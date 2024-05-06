@@ -15,7 +15,7 @@
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
           <h5 class="card-title">
-            @if (document.correspondent) {
+            @if (displayFields.includes(DisplayField.CORRESPONDENT) && document.correspondent) {
               @if (clickCorrespondent.observers.length ) {
                 <a title="Filter by correspondent" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="fw-bold btn-link">{{(document.correspondent$ | async)?.name}}</a>
               } @else {
@@ -23,14 +23,18 @@
               }
               :
             }
-            {{document.title | documentTitle}}
-            @for (t of document.tags$ | async; track t) {
-              <pngx-tag [tag]="t" linkTitle="Filter by tag" i18n-linkTitle class="ms-1" (click)="clickTag.emit(t.id);$event.stopPropagation()" [clickable]="clickTag.observers.length"></pngx-tag>
+            @if (displayFields.includes(DisplayField.TITLE)) {
+              {{document.title | documentTitle}}
+            }
+            @if (displayFields.includes(DisplayField.TAGS)) {
+              @for (t of document.tags$ | async; track t) {
+                <pngx-tag [tag]="t" linkTitle="Filter by tag" i18n-linkTitle class="ms-1" (click)="clickTag.emit(t.id);$event.stopPropagation()" [clickable]="clickTag.observers.length"></pngx-tag>
+              }
             }
           </h5>
         </div>
         <p class="card-text">
-          @if (document.__search_hit__ && document.__search_hit__.highlights) {
+          @if (document.__search_hit__?.score && document.__search_hit__.highlights) {
             <span [innerHtml]="document.__search_hit__.highlights"></span>
           }
           @for (highlight of searchNoteHighlights; track highlight) {
@@ -39,7 +43,7 @@
               <span [innerHtml]="highlight"></span>
             </span>
           }
-          @if (!document.__search_hit__) {
+          @if (!document.__search_hit__?.score) {
             <span class="result-content">{{contentTrimmed}}</span>
           }
         </p>
@@ -66,44 +70,53 @@
             </div>
 
             <div class="list-group list-group-horizontal border-0 card-info ms-md-auto mt-2 mt-md-0">
-              @if (notesEnabled && document.notes.length) {
+              @if (displayFields.includes(DisplayField.NOTES) && notesEnabled && document.notes.length) {
                 <button routerLink="/documents/{{document.id}}/notes" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2 d-flex align-items-center" title="View notes" i18n-title>
                   <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="chat-left-text"></i-bs><small i18n>{{document.notes.length}} Notes</small>
                 </button>
               }
-              @if (document.document_type) {
+              @if (displayFields.includes(DisplayField.DOCUMENT_TYPE) && document.document_type) {
                 <button type="button" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2 d-flex align-items-center" title="Filter by document type" i18n-title
                   (click)="clickDocumentType.emit(document.document_type);$event.stopPropagation()">
                   <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="file-earmark"></i-bs><small>{{(document.document_type$ | async)?.name}}</small>
                 </button>
               }
-              @if (document.storage_path) {
+              @if (displayFields.includes(DisplayField.STORAGE_PATH) && document.storage_path) {
                 <button type="button" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2 d-flex align-items-center" title="Filter by storage path" i18n-title
                   (click)="clickStoragePath.emit(document.storage_path);$event.stopPropagation()">
                   <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="archive"></i-bs><small>{{(document.storage_path$ | async)?.name}}</small>
                 </button>
               }
-              @if (document.archive_serial_number | isNumber) {
+              @if (displayFields.includes(DisplayField.ASN) && document.archive_serial_number | isNumber) {
                 <div class="list-group-item me-2 bg-light text-dark p-1 border-0 d-flex align-items-center">
                   <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="upc-scan"></i-bs><small>#{{document.archive_serial_number}}</small>
                 </div>
               }
-              <ng-template #dateTooltip>
-                <div class="d-flex flex-column text-light">
-                  <span i18n>Created: {{ document.created | customDate }}</span>
-                  <span i18n>Added: {{ document.added | customDate }}</span>
-                  <span i18n>Modified: {{ document.modified | customDate }}</span>
-                </div>
-              </ng-template>
-              <div class="list-group-item bg-light text-dark p-1 border-0 d-flex align-items-center" [ngbTooltip]="dateTooltip">
-                <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="calendar-event"></i-bs><small>{{document.created_date | customDate:'mediumDate'}}</small>
-              </div>
-              @if (document.owner && document.owner !== settingsService.currentUser.id) {
+              @if (displayFields.includes(DisplayField.CREATED) || displayFields.includes(DisplayField.ADDED)) {
+                <ng-template #dateTooltip>
+                  <div class="d-flex flex-column text-light">
+                    <span i18n>Created: {{ document.created | customDate }}</span>
+                    <span i18n>Added: {{ document.added | customDate }}</span>
+                    <span i18n>Modified: {{ document.modified | customDate }}</span>
+                  </div>
+                </ng-template>
+                @if (displayFields.includes(DisplayField.CREATED)) {
+                  <div class="list-group-item bg-light text-dark p-1 border-0 d-flex align-items-center" [ngbTooltip]="dateTooltip">
+                    <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="calendar-event"></i-bs><small>{{document.created_date | customDate:'mediumDate'}}</small>
+                  </div>
+                }
+                @if (displayFields.includes(DisplayField.ADDED)) {
+                  <div class="list-group-item bg-light text-dark p-1 border-0 d-flex align-items-center" [ngbTooltip]="dateTooltip">
+                    <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="calendar-event"></i-bs><small>{{document.added | customDate:'mediumDate'}}</small>
+                  </div>
+                }
+              }
+              @if (displayFields.includes(DisplayField.OWNER) && document.owner && document.owner !== settingsService.currentUser.id) {
                 <div class="list-group-item bg-light text-dark p-1 border-0 d-flex align-items-center">
                   <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="person-fill-lock"></i-bs><small>{{document.owner | username}}</small>
                 </div>
               }
-              @if (document.is_shared_by_requester) {
+              @if (displayFields.includes(DisplayField.SHARED) && document.is_shared_by_requester) {
                 <div class="list-group-item bg-light text-dark p-1 border-0 d-flex align-items-center">
                   <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="people-fill"></i-bs><small i18n>Shared</small>
                 </div>
@@ -113,6 +126,16 @@
                   <small class="me-2 text-muted" i18n>Score:</small>
                   <ngb-progressbar [type]="searchScoreClass" [value]="document.__search_hit__.score" class="search-score-bar mx-2 mt-1" [max]="1"></ngb-progressbar>
                 </div>
+              }
+              @for (field of document.custom_fields; track field.id) {
+                @if (displayFields.includes(DisplayField.CUSTOM_FIELD + field.field)) {
+                  <div class="list-group-item bg-light text-dark p-1 border-0 d-flex align-items-center">
+                    <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="ui-radios"></i-bs>
+                    <small>
+                      <pngx-custom-field-display [document]="document" [fieldId]="field.field"></pngx-custom-field-display>
+                    </small>
+                  </div>
+                }
               }
             </div>
           </div>

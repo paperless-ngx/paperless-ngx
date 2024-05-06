@@ -7,16 +7,17 @@ import {
   cloneFilterRules,
   isFullTextFilterRule,
 } from '../utils/filter-rules'
-import { Document } from '../data/document'
+import {
+  DEFAULT_DISPLAY_FIELDS,
+  DisplayField,
+  DisplayMode,
+  Document,
+} from '../data/document'
 import { SavedView } from '../data/saved-view'
 import { SETTINGS_KEYS } from '../data/ui-settings'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
 import { paramsFromViewState, paramsToViewState } from '../utils/query-params'
-import {
-  DocumentService,
-  DOCUMENT_SORT_FIELDS,
-  SelectionData,
-} from './rest/document.service'
+import { DocumentService, SelectionData } from './rest/document.service'
 import { SettingsService } from './settings.service'
 
 /**
@@ -59,6 +60,21 @@ export interface ListViewState {
    * Contains the IDs of all selected documents.
    */
   selected?: Set<number>
+
+  /**
+   * The page size of the list view.
+   */
+  pageSize?: number
+
+  /**
+   * Display mode of the list view.
+   */
+  displayMode?: DisplayMode
+
+  /**
+   * The fields to display in the document list.
+   */
+  displayFields?: DisplayField[]
 }
 
 /**
@@ -79,8 +95,6 @@ export class DocumentListViewService {
   lastRangeSelectionToIndex: number
 
   selectionData?: SelectionData
-
-  currentPageSize: number = this.settings.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)
 
   private unsubscribeNotifier: Subject<any> = new Subject()
 
@@ -113,7 +127,7 @@ export class DocumentListViewService {
             delete savedState[k]
           }
         })
-        //only use restored state attributes instead of defaults if they are not null
+        // only use restored state attributes instead of defaults if they are not null
         let newState = Object.assign(this.defaultListViewState(), savedState)
         this.listViewStates.set(null, newState)
       } catch (e) {
@@ -176,6 +190,9 @@ export class DocumentListViewService {
     if (this._activeSavedViewId) {
       this.activeListViewState.title = view.name
     }
+    this.activeListViewState.displayMode = view.display_mode
+    this.activeListViewState.pageSize = view.page_size
+    this.activeListViewState.displayFields = view.display_fields
 
     this.reduceSelectionToFilter()
 
@@ -220,7 +237,7 @@ export class DocumentListViewService {
     this.documentService
       .listFiltered(
         activeListViewState.currentPage,
-        this.currentPageSize,
+        activeListViewState.pageSize ?? this.pageSize,
         activeListViewState.sortField,
         activeListViewState.sortReverse,
         activeListViewState.filterRules,
@@ -281,9 +298,8 @@ export class DocumentListViewService {
               errorMessage = Object.keys(error.error)
                 .map((fieldName) => {
                   const fieldError: Array<string> = error.error[fieldName]
-                  return `${DOCUMENT_SORT_FIELDS.find(
-                    (f) => f.field == fieldName
-                  )?.name}: ${fieldError[0]}`
+                  return `${this.sortFields.find((f) => f.field == fieldName)
+                    ?.name}: ${fieldError[0]}`
                 })
                 .join(', ')
             } else {
@@ -310,6 +326,14 @@ export class DocumentListViewService {
 
   get filterRules(): FilterRule[] {
     return this.activeListViewState.filterRules
+  }
+
+  get sortFields(): any[] {
+    return this.documentService.sortFields
+  }
+
+  get sortFieldsFullText(): any[] {
+    return this.documentService.sortFieldsFullText
   }
 
   set sortField(field: string) {
@@ -362,6 +386,51 @@ export class DocumentListViewService {
     this.saveDocumentListView()
   }
 
+  set displayMode(mode: DisplayMode) {
+    this.activeListViewState.displayMode = mode
+    this.saveDocumentListView()
+  }
+
+  get displayMode(): DisplayMode {
+    const mode = this.activeListViewState.displayMode ?? DisplayMode.SMALL_CARDS
+    if (mode === ('details' as any)) {
+      // legacy
+      return DisplayMode.TABLE
+    }
+    return mode
+  }
+
+  set pageSize(size: number) {
+    this.activeListViewState.pageSize = size
+    this.reload()
+    this.saveDocumentListView()
+  }
+
+  get pageSize(): number {
+    return (
+      this.activeListViewState.pageSize ??
+      this.settings.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)
+    )
+  }
+
+  get displayFields(): DisplayField[] {
+    let fields =
+      this.activeListViewState.displayFields ??
+      DEFAULT_DISPLAY_FIELDS.map((f) => f.id)
+    if (!this.activeListViewState.displayFields) {
+      fields = fields.filter((f) => f !== DisplayField.ADDED)
+    }
+    return fields.filter(
+      (field) =>
+        this.settings.allDisplayFields.find((f) => f.id === field) !== undefined
+    )
+  }
+
+  set displayFields(fields: DisplayField[]) {
+    this.activeListViewState.displayFields = fields
+    this.saveDocumentListView()
+  }
+
   private saveDocumentListView() {
     if (this._activeSavedViewId == null) {
       let savedState: ListViewState = {
@@ -370,6 +439,8 @@ export class DocumentListViewService {
         filterRules: this.activeListViewState.filterRules,
         sortField: this.activeListViewState.sortField,
         sortReverse: this.activeListViewState.sortReverse,
+        displayMode: this.activeListViewState.displayMode,
+        displayFields: this.activeListViewState.displayFields,
       }
       localStorage.setItem(
         DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG,
@@ -385,7 +456,7 @@ export class DocumentListViewService {
   }
 
   getLastPage(): number {
-    return Math.ceil(this.collectionSize / this.currentPageSize)
+    return Math.ceil(this.collectionSize / this.pageSize)
   }
 
   hasNext(doc: number) {
@@ -450,13 +521,6 @@ export class DocumentListViewService {
         prevDocId.complete()
       }
     })
-  }
-
-  updatePageSize() {
-    let newPageSize = this.settings.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)
-    if (newPageSize != this.currentPageSize) {
-      this.currentPageSize = newPageSize
-    }
   }
 
   selectNone() {

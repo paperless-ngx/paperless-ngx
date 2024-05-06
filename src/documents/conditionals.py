@@ -73,7 +73,7 @@ def metadata_etag(request, pk: int) -> Optional[str]:
     ETag
     """
     try:
-        doc = Document.objects.get(pk=pk)
+        doc = Document.objects.only("checksum").get(pk=pk)
         return doc.checksum
     except Document.DoesNotExist:  # pragma: no cover
         return None
@@ -87,7 +87,7 @@ def metadata_last_modified(request, pk: int) -> Optional[datetime]:
     error on the side of more cautious
     """
     try:
-        doc = Document.objects.get(pk=pk)
+        doc = Document.objects.only("modified").get(pk=pk)
         return doc.modified
     except Document.DoesNotExist:  # pragma: no cover
         return None
@@ -99,7 +99,7 @@ def preview_etag(request, pk: int) -> Optional[str]:
     ETag for the document preview, using the original or archive checksum, depending on the request
     """
     try:
-        doc = Document.objects.get(pk=pk)
+        doc = Document.objects.only("checksum", "archive_checksum").get(pk=pk)
         use_original = (
             "original" in request.query_params
             and request.query_params["original"] == "true"
@@ -116,7 +116,7 @@ def preview_last_modified(request, pk: int) -> Optional[datetime]:
     speaking correct, but close enough and quick
     """
     try:
-        doc = Document.objects.get(pk=pk)
+        doc = Document.objects.only("modified").get(pk=pk)
         return doc.modified
     except Document.DoesNotExist:  # pragma: no cover
         return None
@@ -129,7 +129,7 @@ def thumbnail_last_modified(request, pk: int) -> Optional[datetime]:
     Cache should be (slightly?) faster than filesystem
     """
     try:
-        doc = Document.objects.get(pk=pk)
+        doc = Document.objects.only("storage_type").get(pk=pk)
         if not doc.thumbnail_path.exists():
             return None
         doc_key = get_thumbnail_modified_key(pk)

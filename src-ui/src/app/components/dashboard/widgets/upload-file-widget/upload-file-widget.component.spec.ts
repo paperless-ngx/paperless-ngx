@@ -149,7 +149,7 @@ describe('UploadFileWidgetComponent', () => {
     expect(dismissSpy).toHaveBeenCalled()
   })
 
-  it('should allow dismissing all alerts', fakeAsync(() => {
+  it('should allow dismissing completed alerts', fakeAsync(() => {
     mockConsumerStatuses(consumerStatusService)
     component.alertsExpanded = true
     fixture.detectChanges()
@@ -160,7 +160,7 @@ describe('UploadFileWidgetComponent', () => {
     component.dismissCompleted()
     tick(1000)
     fixture.detectChanges()
-    expect(dismissSpy).toHaveBeenCalledTimes(10)
+    expect(dismissSpy).toHaveBeenCalledTimes(4)
   }))
 })
 

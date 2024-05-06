@@ -52,40 +52,38 @@
       <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Group</ng-container>
     </button>
   </h4>
-  @if (groups.length > 0) {
-    <ul class="list-group">
+  <ul class="list-group">
+    <li class="list-group-item">
+      <div class="row">
+        <div class="col" i18n>Name</div>
+        <div class="col"></div>
+        <div class="col"></div>
+        <div class="col" i18n>Actions</div>
+      </div>
+    </li>
+    @for (group of groups; track group) {
       <li class="list-group-item">
         <div class="row">
-          <div class="col" i18n>Name</div>
+          <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editGroup(group)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.Group)">{{group.name}}</button></div>
           <div class="col"></div>
           <div class="col"></div>
-          <div class="col" i18n>Actions</div>
-        </div>
-      </li>
-      @for (group of groups; track group) {
-        <li class="list-group-item">
-          <div class="row">
-            <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editGroup(group)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.Group)">{{group.name}}</button></div>
-            <div class="col"></div>
-            <div class="col"></div>
-            <div class="col">
-              <div class="btn-group">
-                <button class="btn btn-sm btn-outline-secondary" type="button" (click)="editGroup(group)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Group }">
-                  <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteGroup(group)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Group }">
-                  <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
-                </button>
-              </div>
+          <div class="col">
+            <div class="btn-group">
+              <button class="btn btn-sm btn-outline-secondary" type="button" (click)="editGroup(group)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Group }">
+                <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
+              </button>
+              <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteGroup(group)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Group }">
+                <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+              </button>
             </div>
           </div>
-        </li>
-      }
-      @if (groups.length === 0) {
-        <li class="list-group-item" i18n>No groups defined</li>
-      }
-    </ul>
-  }
+        </div>
+      </li>
+    }
+    @if (groups.length === 0) {
+      <li class="list-group-item" i18n>No groups defined</li>
+    }
+  </ul>
 }
 
 @if (!users || !groups) {

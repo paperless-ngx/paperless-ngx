@@ -6,7 +6,11 @@ import {
   ViewChild,
 } from '@angular/core'
 import { map } from 'rxjs/operators'
-import { Document } from 'src/app/data/document'
+import {
+  DEFAULT_DISPLAY_FIELDS,
+  DisplayField,
+  Document,
+} from 'src/app/data/document'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
@@ -19,6 +23,8 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
   styleUrls: ['./document-card-small.component.scss'],
 })
 export class DocumentCardSmallComponent extends ComponentWithPermissions {
+  DisplayField = DisplayField
+
   constructor(
     private documentService: DocumentService,
     public settingsService: SettingsService
@@ -34,6 +40,9 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
 
   @Input()
   document: Document
+
+  @Input()
+  displayFields: string[] = DEFAULT_DISPLAY_FIELDS.map((f) => f.id)
 
   @Output()
   dblClickDocument = new EventEmitter()

@@ -269,8 +269,7 @@ def consumable_document_matches_workflow(
 
     # Document mail rule vs trigger mail rule
     if (
-        document.mailrule_id is not None
-        and trigger.filter_mailrule is not None
+        trigger.filter_mailrule is not None
         and document.mailrule_id != trigger.filter_mailrule.pk
     ):
         reason = (

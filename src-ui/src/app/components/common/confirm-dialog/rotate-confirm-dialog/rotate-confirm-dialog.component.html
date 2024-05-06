@@ -12,7 +12,7 @@
         </div>
         <div class="col-8 d-flex align-items-center">
             @if (documentID) {
-                <img class="w-50 m-auto" [ngStyle]="{'transform': 'rotate('+rotation+'deg)'}" [src]="documentService.getThumbUrl(documentID)" />
+                <img class="w-75 m-auto" [ngStyle]="{'transform': 'rotate('+rotation+'deg)'}" [src]="documentService.getThumbUrl(documentID)" />
             }
         </div>
         <div class="col-2 d-flex">

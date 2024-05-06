@@ -11,7 +11,7 @@ The API provides the following main endpoints:
 - `/api/correspondents/`: Full CRUD support.
 - `/api/custom_fields/`: Full CRUD support.
 - `/api/documents/`: Full CRUD support, except POSTing new documents.
-  See below.
+  See [below](#posting-documents-file-uploads).
 - `/api/document_types/`: Full CRUD support.
 - `/api/groups/`: Full CRUD support.
 - `/api/logs/`: Read-Only.
@@ -24,6 +24,7 @@ The API provides the following main endpoints:
 - `/api/tasks/`: Read-only.
 - `/api/users/`: Full CRUD support.
 - `/api/workflows/`: Full CRUD support.
+- `/api/search/` GET, see [below](#global-search).
 
 All of these endpoints except for the logging endpoint allow you to
 fetch (and edit and delete where appropriate) individual objects by
@@ -140,6 +141,7 @@ document. Paperless only reports PDF metadata at this point.
 
 - `/api/documents/<id>/notes/`: Retrieve notes for a document.
 - `/api/documents/<id>/share_links/`: Retrieve share links for a document.
+- `/api/documents/<id>/history/`: Retrieve history of changes for a document.
 
 ## Authorization
 
@@ -186,6 +188,38 @@ The REST api provides four different forms of authentication.
     If enabled (see
     [configuration](configuration.md#PAPERLESS_ENABLE_HTTP_REMOTE_USER_API)),
     you can authenticate against the API using Remote User auth.
+
+## Global search
+
+A global search endpoint is available at `/api/search/` and requires a search term
+of > 2 characters e.g. `?query=foo`. This endpoint returns a maximum of 3 results
+across nearly all objects, e.g. documents, tags, saved views, mail rules, etc.
+Results are only included if the requesting user has the appropriate permissions.
+
+Results are returned in the following format:
+
+```json
+{
+  total: number
+  documents: []
+  saved_views: []
+  correspondents: []
+  document_types: []
+  storage_paths: []
+  tags: []
+  users: []
+  groups: []
+  mail_accounts: []
+  mail_rules: []
+  custom_fields: []
+  workflows: []
+}
+```
+
+Global search first searches objects by name (or title for documents) matching the query.
+If the optional `db_only` parameter is set, only document titles will be searched. Otherwise,
+if the amount of documents returned by a simple title string search is < 3, results from the
+search index will also be included.
 
 ## Searching for documents
 

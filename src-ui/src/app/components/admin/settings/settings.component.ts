@@ -50,6 +50,7 @@ import {
   SystemStatusItemStatus,
   SystemStatus,
 } from 'src/app/data/system-status'
+import { DisplayMode } from 'src/app/data/document'
 
 enum SettingsNavIDs {
   General = 1,
@@ -73,8 +74,8 @@ export class SettingsComponent
   extends ComponentWithPermissions
   implements OnInit, AfterViewInit, OnDestroy, DirtyComponent
 {
-  SettingsNavIDs = SettingsNavIDs
   activeNavID: number
+  DisplayMode = DisplayMode
 
   savedViewGroup = new FormGroup({})
 
@@ -99,6 +100,7 @@ export class SettingsComponent
     defaultPermsEditUsers: new FormControl(null),
     defaultPermsEditGroups: new FormControl(null),
     documentEditingRemoveInboxTags: new FormControl(null),
+    searchDbOnly: new FormControl(null),
 
     notificationsConsumerNewDocument: new FormControl(null),
     notificationsConsumerSuccess: new FormControl(null),
@@ -110,6 +112,10 @@ export class SettingsComponent
   })
 
   savedViews: SavedView[]
+  SettingsNavIDs = SettingsNavIDs
+  get displayFields() {
+    return this.settings.allDisplayFields
+  }
 
   store: BehaviorSubject<any>
   storeSub: Subscription
@@ -121,7 +127,7 @@ export class SettingsComponent
   users: User[]
   groups: Group[]
 
-  private systemStatus: SystemStatus
+  public systemStatus: SystemStatus
 
   get systemStatusHasErrors(): boolean {
     return (
@@ -299,6 +305,7 @@ export class SettingsComponent
       documentEditingRemoveInboxTags: this.settings.get(
         SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS
       ),
+      searchDbOnly: this.settings.get(SETTINGS_KEYS.SEARCH_DB_ONLY),
       savedViews: {},
     }
   }
@@ -340,6 +347,9 @@ export class SettingsComponent
           name: view.name,
           show_on_dashboard: view.show_on_dashboard,
           show_in_sidebar: view.show_in_sidebar,
+          page_size: view.page_size,
+          display_mode: view.display_mode,
+          display_fields: view.display_fields,
         }
         this.savedViewGroup.addControl(
           view.id.toString(),
@@ -348,6 +358,9 @@ export class SettingsComponent
             name: new FormControl(null),
             show_on_dashboard: new FormControl(null),
             show_in_sidebar: new FormControl(null),
+            page_size: new FormControl(null),
+            display_mode: new FormControl(null),
+            display_fields: new FormControl([]),
           })
         )
       }
@@ -385,12 +398,7 @@ export class SettingsComponent
       this.settingsForm.patchValue(currentFormValue)
     }
 
-    if (
-      this.permissionsService.currentUserCan(
-        PermissionAction.View,
-        PermissionType.Admin
-      )
-    ) {
+    if (this.permissionsService.isAdmin()) {
       this.systemStatusService.get().subscribe((status) => {
         this.systemStatus = status
       })
@@ -527,6 +535,10 @@ export class SettingsComponent
       SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS,
       this.settingsForm.value.documentEditingRemoveInboxTags
     )
+    this.settings.set(
+      SETTINGS_KEYS.SEARCH_DB_ONLY,
+      this.settingsForm.value.searchDbOnly
+    )
     this.settings.setLanguage(this.settingsForm.value.displayLanguage)
     this.settings
       .storeSettings()
@@ -535,8 +547,8 @@ export class SettingsComponent
       .subscribe({
         next: () => {
           this.store.next(this.settingsForm.value)
-          this.documentListViewService.updatePageSize()
           this.settings.updateAppearanceSettings()
+          this.settings.initializeDisplayFields()
           let savedToast: Toast = {
             content: $localize`Settings were saved successfully.`,
             delay: 5000,
@@ -595,6 +607,10 @@ export class SettingsComponent
     } else {
       this.saveLocalSettings()
     }
+  }
+
+  reset() {
+    this.settingsForm.patchValue(this.store.getValue())
   }
 
   clearThemeColor() {

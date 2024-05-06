@@ -155,8 +155,12 @@ class DocumentClassifier:
 
     def train(self):
         # Get non-inbox documents
-        docs_queryset = Document.objects.exclude(
-            tags__is_inbox_tag=True,
+        docs_queryset = (
+            Document.objects.exclude(
+                tags__is_inbox_tag=True,
+            )
+            .select_related("document_type", "correspondent", "storage_path")
+            .prefetch_related("tags")
         )
 
         # No documents exit to train against

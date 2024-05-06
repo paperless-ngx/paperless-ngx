@@ -10,19 +10,21 @@
         </div>
       </div>
 
-      <div class="tags d-flex flex-column text-end position-absolute me-1 fs-6">
-        @for (t of getTagsLimited$() | async; track t) {
-          <pngx-tag [tag]="t" (click)="clickTag.emit(t.id);$event.stopPropagation()" [clickable]="true" linkTitle="Toggle tag filter" i18n-linkTitle></pngx-tag>
-        }
-        @if (moreTags) {
-          <div>
-            <span class="badge text-dark">+ {{moreTags}}</span>
-          </div>
-        }
-      </div>
+      @if (displayFields?.includes(DisplayField.TAGS)) {
+        <div class="tags d-flex flex-column text-end position-absolute me-1 fs-6">
+          @for (t of getTagsLimited$() | async; track t) {
+            <pngx-tag [tag]="t" (click)="clickTag.emit(t.id);$event.stopPropagation()" [clickable]="true" linkTitle="Toggle tag filter" i18n-linkTitle></pngx-tag>
+          }
+          @if (moreTags) {
+            <div>
+              <span class="badge text-dark">+ {{moreTags}}</span>
+            </div>
+          }
+        </div>
+      }
     </div>
 
-    @if (notesEnabled && document.notes.length) {
+    @if (displayFields.includes(DisplayField.NOTES) && notesEnabled && document.notes.length) {
       <a routerLink="/documents/{{document.id}}/notes" class="document-card-notes py-2 px-1">
         <span class="badge rounded-pill bg-light border text-primary">
           <i-bs width="1.2em" height="1.2em" class="ms-1 me-1" name="chat-left-text"></i-bs>
@@ -32,58 +34,85 @@
 
     <div class="card-body bg-light p-2">
       <p class="card-text">
-        @if (document.correspondent) {
+        @if (displayFields.includes(DisplayField.CORRESPONDENT) && document.correspondent) {
           <a title="Toggle correspondent filter" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="fw-bold btn-link">{{(document.correspondent$ | async)?.name ?? privateName}}</a>:
         }
-        {{document.title | documentTitle}}
+        @if (displayFields.includes(DisplayField.TITLE)) {
+          {{document.title | documentTitle}}
+        }
       </p>
     </div>
     <div class="card-footer pt-0 pb-2 px-2">
       <div class="list-group list-group-flush border-0 pt-1 pb-2 card-info">
-        @if (document.document_type) {
+        @if (displayFields.includes(DisplayField.DOCUMENT_TYPE) && document.document_type) {
           <button type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0" title="Toggle document type filter" i18n-title
             (click)="clickDocumentType.emit(document.document_type);$event.stopPropagation()">
             <i-bs width="1em" height="1em" class="me-2 text-muted" name="file-earmark"></i-bs>
             <small>{{(document.document_type$ | async)?.name ?? privateName}}</small>
           </button>
         }
-        @if (document.storage_path) {
+        @if (displayFields.includes(DisplayField.STORAGE_PATH) && document.storage_path) {
           <button type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0" title="Toggle storage path filter" i18n-title
             (click)="clickStoragePath.emit(document.storage_path);$event.stopPropagation()">
             <i-bs width="1em" height="1em" class="me-2 text-muted" name="folder"></i-bs>
             <small>{{(document.storage_path$ | async)?.name ?? privateName}}</small>
           </button>
         }
-        <div class="list-group-item bg-transparent p-0 border-0 d-flex flex-wrap-reverse justify-content-between">
-          <ng-template #dateTooltip>
-            <div class="d-flex flex-column text-light">
-              <span i18n>Created: {{ document.created | customDate }}</span>
-              <span i18n>Added: {{ document.added | customDate }}</span>
-              <span i18n>Modified: {{ document.modified | customDate }}</span>
+        @if (displayFields.includes(DisplayField.CREATED)) {
+          <div class="list-group-item bg-transparent p-0 border-0 d-flex flex-wrap-reverse justify-content-between">
+            <ng-template #dateTooltip>
+              <div class="d-flex flex-column text-light">
+                <span i18n>Created: {{ document.created | customDate }}</span>
+                <span i18n>Added: {{ document.added | customDate }}</span>
+                <span i18n>Modified: {{ document.modified | customDate }}</span>
+              </div>
+            </ng-template>
+            <div class="ps-0 p-1" placement="top" [ngbTooltip]="dateTooltip">
+              <i-bs width="1em" height="1em" class="me-2 text-muted" name="calendar-event"></i-bs>
+              <small>{{document.created | customDate:'mediumDate'}}</small>
             </div>
-          </ng-template>
-          <div class="ps-0 p-1" placement="top" [ngbTooltip]="dateTooltip">
-            <i-bs width="1em" height="1em" class="me-2 text-muted" name="calendar-event"></i-bs>
-            <small>{{document.created_date | customDate:'mediumDate'}}</small>
           </div>
-        </div>
-        @if (document.archive_serial_number | isNumber) {
+        }
+        @if (displayFields.includes(DisplayField.ADDED)) {
+          <div class="list-group-item bg-transparent p-0 border-0 d-flex flex-wrap-reverse justify-content-between">
+            <ng-template #dateTooltip>
+              <div class="d-flex flex-column text-light">
+                <span i18n>Created: {{ document.created | customDate }}</span>
+                <span i18n>Added: {{ document.added | customDate }}</span>
+                <span i18n>Modified: {{ document.modified | customDate }}</span>
+              </div>
+            </ng-template>
+            <div class="ps-0 p-1" placement="top" [ngbTooltip]="dateTooltip">
+              <i-bs width="1em" height="1em" class="me-2 text-muted" name="calendar-event"></i-bs>
+              <small>{{document.added | customDate:'mediumDate'}}</small>
+            </div>
+          </div>
+        }
+        @if (displayFields.includes(DisplayField.ASN) && document.archive_serial_number | isNumber) {
           <div class="ps-0 p-1">
             <i-bs width="1em" height="1em" class="me-2 text-muted" name="upc-scan"></i-bs>
             <small>#{{document.archive_serial_number}}</small>
           </div>
         }
-        @if (document.owner && document.owner !== settingsService.currentUser.id) {
+        @if (displayFields.includes(DisplayField.OWNER) && document.owner && document.owner !== settingsService.currentUser.id) {
           <div class="ps-0 p-1">
             <i-bs width="1em" height="1em" class="me-2 text-muted" name="person-fill-lock"></i-bs>
             <small>{{document.owner | username}}</small>
           </div>
         }
-        @if (document.is_shared_by_requester) {
+        @if (displayFields.includes(DisplayField.SHARED) && document.is_shared_by_requester) {
           <div class="ps-0 p-1">
             <i-bs width="1em" height="1em" class="me-2 text-muted" name="people-fill"></i-bs>
             <small i18n>Shared</small>
           </div>
+        }
+        @for (field of document.custom_fields; track field.id) {
+          @if (displayFields.includes(DisplayField.CUSTOM_FIELD + field.field)) {
+            <div class="ps-0 p-1 d-flex align-items-center overflow-hidden">
+              <i-bs width="1em" height="1em" class="me-2 text-muted" name="ui-radios"></i-bs>
+              <small><pngx-custom-field-display [document]="document" [fieldId]="field.field"></pngx-custom-field-display></small>
+            </div>
+          }
         }
       </div>
       <div class="d-flex justify-content-between align-items-center">
