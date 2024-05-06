@@ -67,8 +67,6 @@ More details and step-by-step guides for alternative installation methods can be
 
 Migrating from Paperless-ng is easy, just drop in the new docker image! See the [documentation on migrating](https://docs.paperless-ngx.com/setup/#migrating-to-paperless-ngx) for more details.
 
-If you'd prefer to rely on a hosting provider, head over to the [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Related-Projects).
-
 <!-- omit in toc -->
 
 ### Documentation
