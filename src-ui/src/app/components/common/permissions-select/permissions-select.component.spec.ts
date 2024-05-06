@@ -12,6 +12,9 @@ import {
 } from 'src/app/services/permissions.service'
 import { By } from '@angular/platform-browser'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { SettingsService } from 'src/app/services/settings.service'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { HttpClientTestingModule } from '@angular/common/http/testing'
 
 const permissions = [
   'add_document',
@@ -28,6 +31,7 @@ describe('PermissionsSelectComponent', () => {
   let component: PermissionsSelectComponent
   let fixture: ComponentFixture<PermissionsSelectComponent>
   let permissionsChangeResult: Permissions
+  let settingsService: SettingsService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -38,9 +42,11 @@ describe('PermissionsSelectComponent', () => {
         ReactiveFormsModule,
         NgbModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        HttpClientTestingModule,
       ],
     }).compileComponents()
 
+    settingsService = TestBed.inject(SettingsService)
     fixture = TestBed.createComponent(PermissionsSelectComponent)
     fixture.debugElement.injector.get(NG_VALUE_ACCESSOR)
     component = fixture.componentInstance
@@ -98,5 +104,12 @@ describe('PermissionsSelectComponent', () => {
     expect(input1.nativeElement.disabled).toBeFalsy()
     const input2 = fixture.debugElement.query(By.css('input#Tag_Change'))
     expect(input2.nativeElement.disabled).toBeTruthy()
+  })
+
+  it('should exclude history permissions if disabled', () => {
+    settingsService.set(SETTINGS_KEYS.AUDITLOG_ENABLED, false)
+    fixture = TestBed.createComponent(PermissionsSelectComponent)
+    component = fixture.componentInstance
+    expect(component.allowedTypes).not.toContain('History')
   })
 })

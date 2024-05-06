@@ -57,7 +57,7 @@
         <i-bs width="1em" height="1em" name="scissors"></i-bs>&nbsp;<span i18n>Split</span>
       </button>
 
-      <button ngbDropdownItem (click)="rotateDocument()" [disabled]="!userIsOwner || contentRenderType !== ContentRenderType.PDF">
+      <button ngbDropdownItem (click)="rotateDocument()" [disabled]="!userIsOwner || metadata?.original_mime_type !== 'application/pdf'">
         <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
       </button>
     </div>
@@ -112,7 +112,7 @@
               <pngx-input-select [items]="storagePaths" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
               (createNew)="createStoragePath($event)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }"></pngx-input-select>
               <pngx-input-tags formControlName="tags" [suggestions]="suggestions?.tags" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></pngx-input-tags>
-              @for (fieldInstance of document?.custom_fields; track fieldInstance; let i = $index) {
+              @for (fieldInstance of document?.custom_fields; track fieldInstance.field; let i = $index) {
                 <div [formGroup]="customFieldFormFields.controls[i]">
                   @switch (getCustomFieldFromInstance(fieldInstance)?.data_type) {
                     @case (CustomFieldDataType.String) {
@@ -281,6 +281,17 @@
             }</a>
             <ng-template ngbNavContent>
               <pngx-document-notes [documentId]="documentId" [notes]="document?.notes" [addDisabled]="!userCanEdit" (updated)="notesUpdated($event)"></pngx-document-notes>
+            </ng-template>
+          </li>
+        }
+
+        @if (historyEnabled) {
+          <li [ngbNavItem]="DocumentDetailNavIDs.History">
+            <a ngbNavLink i18n>History</a>
+            <ng-template ngbNavContent>
+              <div class="mb-3">
+                <pngx-document-history [documentId]="documentId"></pngx-document-history>
+              </div>
             </ng-template>
           </li>
         }

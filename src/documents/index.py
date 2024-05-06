@@ -70,6 +70,8 @@ def get_schema():
         num_notes=NUMERIC(sortable=True, signed=False),
         custom_fields=TEXT(),
         custom_field_count=NUMERIC(sortable=True, signed=False),
+        has_custom_fields=BOOLEAN(),
+        custom_fields_id=KEYWORD(commas=True),
         owner=TEXT(),
         owner_id=NUMERIC(),
         has_owner=BOOLEAN(),
@@ -125,6 +127,9 @@ def update_document(writer: AsyncWriter, doc: Document):
     custom_fields = ",".join(
         [str(c) for c in CustomFieldInstance.objects.filter(document=doc)],
     )
+    custom_fields_ids = ",".join(
+        [str(f.field.id) for f in CustomFieldInstance.objects.filter(document=doc)],
+    )
     asn = doc.archive_serial_number
     if asn is not None and (
         asn < Document.ARCHIVE_SERIAL_NUMBER_MIN
@@ -166,6 +171,8 @@ def update_document(writer: AsyncWriter, doc: Document):
         num_notes=len(notes),
         custom_fields=custom_fields,
         custom_field_count=len(doc.custom_fields.all()),
+        has_custom_fields=len(custom_fields) > 0,
+        custom_fields_id=custom_fields_ids if custom_fields_ids else None,
         owner=doc.owner.username if doc.owner else None,
         owner_id=doc.owner.id if doc.owner else None,
         has_owner=doc.owner is not None,
@@ -206,7 +213,10 @@ class DelayedQuery:
         "created": ("created", ["date__lt", "date__gt"]),
         "checksum": ("checksum", ["icontains", "istartswith"]),
         "original_filename": ("original_filename", ["icontains", "istartswith"]),
-        "custom_fields": ("custom_fields", ["icontains", "istartswith"]),
+        "custom_fields": (
+            "custom_fields",
+            ["icontains", "istartswith", "id__all", "id__in", "id__none"],
+        ),
     }
 
     def _get_query(self):
@@ -218,6 +228,12 @@ class DelayedQuery:
             # is_tagged is a special case
             if key == "is_tagged":
                 criterias.append(query.Term("has_tag", self.evalBoolean(value)))
+                continue
+
+            if key == "has_custom_fields":
+                criterias.append(
+                    query.Term("has_custom_fields", self.evalBoolean(value)),
+                )
                 continue
 
             # Don't process query params without a filter

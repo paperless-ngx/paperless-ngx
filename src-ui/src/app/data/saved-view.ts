@@ -1,3 +1,4 @@
+import { DisplayMode, DisplayField } from './document'
 import { FilterRule } from './filter-rule'
 import { ObjectWithPermissions } from './object-with-permissions'
 
@@ -13,4 +14,10 @@ export interface SavedView extends ObjectWithPermissions {
   sort_reverse: boolean
 
   filter_rules: FilterRule[]
+
+  page_size?: number
+
+  display_mode?: DisplayMode
+
+  display_fields?: DisplayField[]
 }

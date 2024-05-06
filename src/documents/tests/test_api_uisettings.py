@@ -27,6 +27,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
             {
                 "id": self.test_user.id,
                 "username": self.test_user.username,
+                "is_staff": True,
                 "is_superuser": True,
                 "groups": [],
                 "first_name": self.test_user.first_name,
@@ -38,6 +39,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
             {
                 "app_title": None,
                 "app_logo": None,
+                "auditlog_enabled": True,
                 "update_checking": {
                     "backend_setting": "default",
                 },

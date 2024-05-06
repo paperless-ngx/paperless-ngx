@@ -1,3 +1,4 @@
+import shutil
 from datetime import timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -88,8 +89,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
 
         return super().setUp()
 
-    @mock.patch("documents.consumer.Consumer.try_consume_file")
-    def test_workflow_match(self, m):
+    def test_workflow_match(self):
         """
         GIVEN:
             - Existing workflow
@@ -102,7 +102,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
             type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
             sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
             filter_filename="*simple*",
-            filter_path="*/samples/*",
+            filter_path=f"*/{self.dirs.scratch_dir.parts[-1]}/*",
         )
         action = WorkflowAction.objects.create(
             assign_title="Doc from {correspondent}",
@@ -133,7 +133,10 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         self.assertEqual(trigger.__str__(), "WorkflowTrigger 1")
         self.assertEqual(action.__str__(), "WorkflowAction 1")
 
-        test_file = self.SAMPLE_DIR / "simple.pdf"
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
 
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             with self.assertLogs("paperless.matching", level="INFO") as cm:
@@ -144,26 +147,53 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
                     ),
                     None,
                 )
-                m.assert_called_once()
-                _, overrides = m.call_args
-                self.assertEqual(overrides["override_correspondent_id"], self.c.pk)
-                self.assertEqual(overrides["override_document_type_id"], self.dt.pk)
+
+                document = Document.objects.first()
+                self.assertEqual(document.correspondent, self.c)
+                self.assertEqual(document.document_type, self.dt)
+                self.assertEqual(list(document.tags.all()), [self.t1, self.t2, self.t3])
+                self.assertEqual(document.storage_path, self.sp)
+                self.assertEqual(document.owner, self.user2)
                 self.assertEqual(
-                    overrides["override_tag_ids"],
-                    [self.t1.pk, self.t2.pk, self.t3.pk],
-                )
-                self.assertEqual(overrides["override_storage_path_id"], self.sp.pk)
-                self.assertEqual(overrides["override_owner_id"], self.user2.pk)
-                self.assertEqual(overrides["override_view_users"], [self.user3.pk])
-                self.assertEqual(overrides["override_view_groups"], [self.group1.pk])
-                self.assertEqual(overrides["override_change_users"], [self.user3.pk])
-                self.assertEqual(overrides["override_change_groups"], [self.group1.pk])
-                self.assertEqual(
-                    overrides["override_title"],
-                    "Doc from {correspondent}",
+                    list(
+                        get_users_with_perms(
+                            document,
+                            only_with_perms_in=["view_document"],
+                        ),
+                    ),
+                    [self.user3],
                 )
                 self.assertEqual(
-                    overrides["override_custom_field_ids"],
+                    list(
+                        get_groups_with_perms(
+                            document,
+                        ),
+                    ),
+                    [self.group1],
+                )
+                self.assertEqual(
+                    list(
+                        get_users_with_perms(
+                            document,
+                            only_with_perms_in=["change_document"],
+                        ),
+                    ),
+                    [self.user3],
+                )
+                self.assertEqual(
+                    list(
+                        get_groups_with_perms(
+                            document,
+                        ),
+                    ),
+                    [self.group1],
+                )
+                self.assertEqual(
+                    document.title,
+                    f"Doc from {self.c.name}",
+                )
+                self.assertEqual(
+                    list(document.custom_fields.all().values_list("field", flat=True)),
                     [self.cf1.pk, self.cf2.pk],
                 )
 
@@ -171,8 +201,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         expected_str = f"Document matched {trigger} from {w}"
         self.assertIn(expected_str, info)
 
-    @mock.patch("documents.consumer.Consumer.try_consume_file")
-    def test_workflow_match_mailrule(self, m):
+    def test_workflow_match_mailrule(self):
         """
         GIVEN:
             - Existing workflow
@@ -211,7 +240,11 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         w.actions.add(action)
         w.save()
 
-        test_file = self.SAMPLE_DIR / "simple.pdf"
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
+
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             with self.assertLogs("paperless.matching", level="INFO") as cm:
                 tasks.consume_file(
@@ -222,31 +255,55 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
                     ),
                     None,
                 )
-                m.assert_called_once()
-                _, overrides = m.call_args
-                self.assertEqual(overrides["override_correspondent_id"], self.c.pk)
-                self.assertEqual(overrides["override_document_type_id"], self.dt.pk)
+                document = Document.objects.first()
+                self.assertEqual(document.correspondent, self.c)
+                self.assertEqual(document.document_type, self.dt)
+                self.assertEqual(list(document.tags.all()), [self.t1, self.t2, self.t3])
+                self.assertEqual(document.storage_path, self.sp)
+                self.assertEqual(document.owner, self.user2)
                 self.assertEqual(
-                    overrides["override_tag_ids"],
-                    [self.t1.pk, self.t2.pk, self.t3.pk],
+                    list(
+                        get_users_with_perms(
+                            document,
+                            only_with_perms_in=["view_document"],
+                        ),
+                    ),
+                    [self.user3],
                 )
-                self.assertEqual(overrides["override_storage_path_id"], self.sp.pk)
-                self.assertEqual(overrides["override_owner_id"], self.user2.pk)
-                self.assertEqual(overrides["override_view_users"], [self.user3.pk])
-                self.assertEqual(overrides["override_view_groups"], [self.group1.pk])
-                self.assertEqual(overrides["override_change_users"], [self.user3.pk])
-                self.assertEqual(overrides["override_change_groups"], [self.group1.pk])
                 self.assertEqual(
-                    overrides["override_title"],
-                    "Doc from {correspondent}",
+                    list(
+                        get_groups_with_perms(
+                            document,
+                        ),
+                    ),
+                    [self.group1],
                 )
-
+                self.assertEqual(
+                    list(
+                        get_users_with_perms(
+                            document,
+                            only_with_perms_in=["change_document"],
+                        ),
+                    ),
+                    [self.user3],
+                )
+                self.assertEqual(
+                    list(
+                        get_groups_with_perms(
+                            document,
+                        ),
+                    ),
+                    [self.group1],
+                )
+                self.assertEqual(
+                    document.title,
+                    f"Doc from {self.c.name}",
+                )
         info = cm.output[0]
         expected_str = f"Document matched {trigger} from {w}"
         self.assertIn(expected_str, info)
 
-    @mock.patch("documents.consumer.Consumer.try_consume_file")
-    def test_workflow_match_multiple(self, m):
+    def test_workflow_match_multiple(self):
         """
         GIVEN:
             - Multiple existing workflow
@@ -259,7 +316,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         trigger1 = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
             sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
-            filter_path="*/samples/*",
+            filter_path=f"*/{self.dirs.scratch_dir.parts[-1]}/*",
         )
         action1 = WorkflowAction.objects.create(
             assign_title="Doc from {correspondent}",
@@ -301,7 +358,10 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         w2.actions.add(action2)
         w2.save()
 
-        test_file = self.SAMPLE_DIR / "simple.pdf"
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
 
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             with self.assertLogs("paperless.matching", level="INFO") as cm:
@@ -312,21 +372,25 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
                     ),
                     None,
                 )
-                m.assert_called_once()
-                _, overrides = m.call_args
+                document = Document.objects.first()
                 # template 1
-                self.assertEqual(overrides["override_document_type_id"], self.dt.pk)
+                self.assertEqual(document.document_type, self.dt)
                 # template 2
-                self.assertEqual(overrides["override_correspondent_id"], self.c2.pk)
-                self.assertEqual(overrides["override_storage_path_id"], self.sp.pk)
+                self.assertEqual(document.correspondent, self.c2)
+                self.assertEqual(document.storage_path, self.sp)
                 # template 1 & 2
                 self.assertEqual(
-                    overrides["override_tag_ids"],
-                    [self.t1.pk, self.t2.pk, self.t3.pk],
+                    list(document.tags.all()),
+                    [self.t1, self.t2, self.t3],
                 )
                 self.assertEqual(
-                    overrides["override_view_users"],
-                    [self.user2.pk, self.user3.pk],
+                    list(
+                        get_users_with_perms(
+                            document,
+                            only_with_perms_in=["view_document"],
+                        ),
+                    ),
+                    [self.user2, self.user3],
                 )
 
         expected_str = f"Document matched {trigger1} from {w1}"
@@ -334,8 +398,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         expected_str = f"Document matched {trigger2} from {w2}"
         self.assertIn(expected_str, cm.output[1])
 
-    @mock.patch("documents.consumer.Consumer.try_consume_file")
-    def test_workflow_fnmatch_path(self, m):
+    def test_workflow_fnmatch_path(self):
         """
         GIVEN:
             - Existing workflow
@@ -348,7 +411,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
             sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
-            filter_path="*sample*",
+            filter_path=f"*{self.dirs.scratch_dir.parts[-1]}*",
         )
         action = WorkflowAction.objects.create(
             assign_title="Doc fnmatch title",
@@ -363,7 +426,10 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         w.actions.add(action)
         w.save()
 
-        test_file = self.SAMPLE_DIR / "simple.pdf"
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
 
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             with self.assertLogs("paperless.matching", level="DEBUG") as cm:
@@ -374,15 +440,13 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
                     ),
                     None,
                 )
-                m.assert_called_once()
-                _, overrides = m.call_args
-                self.assertEqual(overrides["override_title"], "Doc fnmatch title")
+                document = Document.objects.first()
+                self.assertEqual(document.title, "Doc fnmatch title")
 
         expected_str = f"Document matched {trigger} from {w}"
         self.assertIn(expected_str, cm.output[0])
 
-    @mock.patch("documents.consumer.Consumer.try_consume_file")
-    def test_workflow_no_match_filename(self, m):
+    def test_workflow_no_match_filename(self):
         """
         GIVEN:
             - Existing workflow
@@ -414,7 +478,10 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         w.actions.add(action)
         w.save()
 
-        test_file = self.SAMPLE_DIR / "simple.pdf"
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
 
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             with self.assertLogs("paperless.matching", level="DEBUG") as cm:
@@ -425,26 +492,36 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
                     ),
                     None,
                 )
-                m.assert_called_once()
-                _, overrides = m.call_args
-                self.assertIsNone(overrides["override_correspondent_id"])
-                self.assertIsNone(overrides["override_document_type_id"])
-                self.assertIsNone(overrides["override_tag_ids"])
-                self.assertIsNone(overrides["override_storage_path_id"])
-                self.assertIsNone(overrides["override_owner_id"])
-                self.assertIsNone(overrides["override_view_users"])
-                self.assertIsNone(overrides["override_view_groups"])
-                self.assertIsNone(overrides["override_change_users"])
-                self.assertIsNone(overrides["override_change_groups"])
-                self.assertIsNone(overrides["override_title"])
+                document = Document.objects.first()
+                self.assertIsNone(document.correspondent)
+                self.assertIsNone(document.document_type)
+                self.assertEqual(document.tags.all().count(), 0)
+                self.assertIsNone(document.storage_path)
+                self.assertIsNone(document.owner)
+                self.assertEqual(
+                    get_users_with_perms(
+                        document,
+                        only_with_perms_in=["view_document"],
+                    ).count(),
+                    0,
+                )
+                self.assertEqual(get_groups_with_perms(document).count(), 0)
+                self.assertEqual(
+                    get_users_with_perms(
+                        document,
+                        only_with_perms_in=["change_document"],
+                    ).count(),
+                    0,
+                )
+                self.assertEqual(get_groups_with_perms(document).count(), 0)
+                self.assertEqual(document.title, "simple")
 
         expected_str = f"Document did not match {w}"
         self.assertIn(expected_str, cm.output[0])
         expected_str = f"Document filename {test_file.name} does not match"
         self.assertIn(expected_str, cm.output[1])
 
-    @mock.patch("documents.consumer.Consumer.try_consume_file")
-    def test_workflow_no_match_path(self, m):
+    def test_workflow_no_match_path(self):
         """
         GIVEN:
             - Existing workflow
@@ -475,7 +552,10 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         w.actions.add(action)
         w.save()
 
-        test_file = self.SAMPLE_DIR / "simple.pdf"
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
 
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             with self.assertLogs("paperless.matching", level="DEBUG") as cm:
@@ -486,26 +566,46 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
                     ),
                     None,
                 )
-                m.assert_called_once()
-                _, overrides = m.call_args
-                self.assertIsNone(overrides["override_correspondent_id"])
-                self.assertIsNone(overrides["override_document_type_id"])
-                self.assertIsNone(overrides["override_tag_ids"])
-                self.assertIsNone(overrides["override_storage_path_id"])
-                self.assertIsNone(overrides["override_owner_id"])
-                self.assertIsNone(overrides["override_view_users"])
-                self.assertIsNone(overrides["override_view_groups"])
-                self.assertIsNone(overrides["override_change_users"])
-                self.assertIsNone(overrides["override_change_groups"])
-                self.assertIsNone(overrides["override_title"])
+                document = Document.objects.first()
+                self.assertIsNone(document.correspondent)
+                self.assertIsNone(document.document_type)
+                self.assertEqual(document.tags.all().count(), 0)
+                self.assertIsNone(document.storage_path)
+                self.assertIsNone(document.owner)
+                self.assertEqual(
+                    get_users_with_perms(
+                        document,
+                        only_with_perms_in=["view_document"],
+                    ).count(),
+                    0,
+                )
+                self.assertEqual(
+                    get_groups_with_perms(
+                        document,
+                    ).count(),
+                    0,
+                )
+                self.assertEqual(
+                    get_users_with_perms(
+                        document,
+                        only_with_perms_in=["change_document"],
+                    ).count(),
+                    0,
+                )
+                self.assertEqual(
+                    get_groups_with_perms(
+                        document,
+                    ).count(),
+                    0,
+                )
+                self.assertEqual(document.title, "simple")
 
         expected_str = f"Document did not match {w}"
         self.assertIn(expected_str, cm.output[0])
         expected_str = f"Document path {test_file} does not match"
         self.assertIn(expected_str, cm.output[1])
 
-    @mock.patch("documents.consumer.Consumer.try_consume_file")
-    def test_workflow_no_match_mail_rule(self, m):
+    def test_workflow_no_match_mail_rule(self):
         """
         GIVEN:
             - Existing workflow
@@ -536,7 +636,10 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         w.actions.add(action)
         w.save()
 
-        test_file = self.SAMPLE_DIR / "simple.pdf"
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
 
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             with self.assertLogs("paperless.matching", level="DEBUG") as cm:
@@ -548,26 +651,46 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
                     ),
                     None,
                 )
-                m.assert_called_once()
-                _, overrides = m.call_args
-                self.assertIsNone(overrides["override_correspondent_id"])
-                self.assertIsNone(overrides["override_document_type_id"])
-                self.assertIsNone(overrides["override_tag_ids"])
-                self.assertIsNone(overrides["override_storage_path_id"])
-                self.assertIsNone(overrides["override_owner_id"])
-                self.assertIsNone(overrides["override_view_users"])
-                self.assertIsNone(overrides["override_view_groups"])
-                self.assertIsNone(overrides["override_change_users"])
-                self.assertIsNone(overrides["override_change_groups"])
-                self.assertIsNone(overrides["override_title"])
+                document = Document.objects.first()
+                self.assertIsNone(document.correspondent)
+                self.assertIsNone(document.document_type)
+                self.assertEqual(document.tags.all().count(), 0)
+                self.assertIsNone(document.storage_path)
+                self.assertIsNone(document.owner)
+                self.assertEqual(
+                    get_users_with_perms(
+                        document,
+                        only_with_perms_in=["view_document"],
+                    ).count(),
+                    0,
+                )
+                self.assertEqual(
+                    get_groups_with_perms(
+                        document,
+                    ).count(),
+                    0,
+                )
+                self.assertEqual(
+                    get_users_with_perms(
+                        document,
+                        only_with_perms_in=["change_document"],
+                    ).count(),
+                    0,
+                )
+                self.assertEqual(
+                    get_groups_with_perms(
+                        document,
+                    ).count(),
+                    0,
+                )
+                self.assertEqual(document.title, "simple")
 
         expected_str = f"Document did not match {w}"
         self.assertIn(expected_str, cm.output[0])
         expected_str = "Document mail rule 99 !="
         self.assertIn(expected_str, cm.output[1])
 
-    @mock.patch("documents.consumer.Consumer.try_consume_file")
-    def test_workflow_no_match_source(self, m):
+    def test_workflow_no_match_source(self):
         """
         GIVEN:
             - Existing workflow
@@ -598,7 +721,10 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         w.actions.add(action)
         w.save()
 
-        test_file = self.SAMPLE_DIR / "simple.pdf"
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
 
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             with self.assertLogs("paperless.matching", level="DEBUG") as cm:
@@ -609,18 +735,39 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
                     ),
                     None,
                 )
-                m.assert_called_once()
-                _, overrides = m.call_args
-                self.assertIsNone(overrides["override_correspondent_id"])
-                self.assertIsNone(overrides["override_document_type_id"])
-                self.assertIsNone(overrides["override_tag_ids"])
-                self.assertIsNone(overrides["override_storage_path_id"])
-                self.assertIsNone(overrides["override_owner_id"])
-                self.assertIsNone(overrides["override_view_users"])
-                self.assertIsNone(overrides["override_view_groups"])
-                self.assertIsNone(overrides["override_change_users"])
-                self.assertIsNone(overrides["override_change_groups"])
-                self.assertIsNone(overrides["override_title"])
+                document = Document.objects.first()
+                self.assertIsNone(document.correspondent)
+                self.assertIsNone(document.document_type)
+                self.assertEqual(document.tags.all().count(), 0)
+                self.assertIsNone(document.storage_path)
+                self.assertIsNone(document.owner)
+                self.assertEqual(
+                    get_users_with_perms(
+                        document,
+                        only_with_perms_in=["view_document"],
+                    ).count(),
+                    0,
+                )
+                self.assertEqual(
+                    get_groups_with_perms(
+                        document,
+                    ).count(),
+                    0,
+                )
+                self.assertEqual(
+                    get_users_with_perms(
+                        document,
+                        only_with_perms_in=["change_document"],
+                    ).count(),
+                    0,
+                )
+                self.assertEqual(
+                    get_groups_with_perms(
+                        document,
+                    ).count(),
+                    0,
+                )
+                self.assertEqual(document.title, "simple")
 
         expected_str = f"Document did not match {w}"
         self.assertIn(expected_str, cm.output[0])
@@ -662,8 +809,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
             expected_str = f"No matching triggers with type {WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED} found"
             self.assertIn(expected_str, cm.output[1])
 
-    @mock.patch("documents.consumer.Consumer.try_consume_file")
-    def test_workflow_repeat_custom_fields(self, m):
+    def test_workflow_repeat_custom_fields(self):
         """
         GIVEN:
             - Existing workflows which assign the same custom field
@@ -693,7 +839,10 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         w.actions.add(action1, action2)
         w.save()
 
-        test_file = self.SAMPLE_DIR / "simple.pdf"
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
 
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             with self.assertLogs("paperless.matching", level="INFO") as cm:
@@ -704,10 +853,9 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
                     ),
                     None,
                 )
-                m.assert_called_once()
-                _, overrides = m.call_args
+                document = Document.objects.first()
                 self.assertEqual(
-                    overrides["override_custom_field_ids"],
+                    list(document.custom_fields.all().values_list("field", flat=True)),
                     [self.cf1.pk],
                 )
 
@@ -1369,8 +1517,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         group_perms: QuerySet = get_groups_with_perms(doc)
         self.assertNotIn(self.group1, group_perms)
 
-    @mock.patch("documents.consumer.Consumer.try_consume_file")
-    def test_removal_action_document_consumed(self, m):
+    def test_removal_action_document_consumed(self):
         """
         GIVEN:
             - Workflow with assignment and removal actions
@@ -1429,7 +1576,10 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         w.actions.add(action2)
         w.save()
 
-        test_file = self.SAMPLE_DIR / "simple.pdf"
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
 
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             with self.assertLogs("paperless.matching", level="INFO") as cm:
@@ -1440,26 +1590,57 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
                     ),
                     None,
                 )
-                m.assert_called_once()
-                _, overrides = m.call_args
-                self.assertIsNone(overrides["override_correspondent_id"])
-                self.assertIsNone(overrides["override_document_type_id"])
+
+                document = Document.objects.first()
+
+                self.assertIsNone(document.correspondent)
+                self.assertIsNone(document.document_type)
                 self.assertEqual(
-                    overrides["override_tag_ids"],
-                    [self.t2.pk, self.t3.pk],
+                    list(document.tags.all()),
+                    [self.t2, self.t3],
                 )
-                self.assertIsNone(overrides["override_storage_path_id"])
-                self.assertIsNone(overrides["override_owner_id"])
-                self.assertEqual(overrides["override_view_users"], [self.user2.pk])
-                self.assertEqual(overrides["override_view_groups"], [self.group2.pk])
-                self.assertEqual(overrides["override_change_users"], [self.user2.pk])
-                self.assertEqual(overrides["override_change_groups"], [self.group2.pk])
+                self.assertIsNone(document.storage_path)
+                self.assertIsNone(document.owner)
                 self.assertEqual(
-                    overrides["override_title"],
-                    "Doc from {correspondent}",
+                    list(
+                        get_users_with_perms(
+                            document,
+                            only_with_perms_in=["view_document"],
+                        ),
+                    ),
+                    [self.user2],
                 )
                 self.assertEqual(
-                    overrides["override_custom_field_ids"],
+                    list(
+                        get_groups_with_perms(
+                            document,
+                        ),
+                    ),
+                    [self.group2],
+                )
+                self.assertEqual(
+                    list(
+                        get_users_with_perms(
+                            document,
+                            only_with_perms_in=["change_document"],
+                        ),
+                    ),
+                    [self.user2],
+                )
+                self.assertEqual(
+                    list(
+                        get_groups_with_perms(
+                            document,
+                        ),
+                    ),
+                    [self.group2],
+                )
+                self.assertEqual(
+                    document.title,
+                    "Doc from None",
+                )
+                self.assertEqual(
+                    list(document.custom_fields.all().values_list("field", flat=True)),
                     [self.cf2.pk],
                 )
 
@@ -1467,8 +1648,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         expected_str = f"Document matched {trigger} from {w}"
         self.assertIn(expected_str, info)
 
-    @mock.patch("documents.consumer.Consumer.try_consume_file")
-    def test_removal_action_document_consumed_removeall(self, m):
+    def test_removal_action_document_consumed_remove_all(self):
         """
         GIVEN:
             - Workflow with assignment and removal actions with remove all fields set
@@ -1519,7 +1699,10 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         w.actions.add(action2)
         w.save()
 
-        test_file = self.SAMPLE_DIR / "simple.pdf"
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
 
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             with self.assertLogs("paperless.matching", level="INFO") as cm:
@@ -1530,23 +1713,46 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
                     ),
                     None,
                 )
-                m.assert_called_once()
-                _, overrides = m.call_args
-                self.assertIsNone(overrides["override_correspondent_id"])
-                self.assertIsNone(overrides["override_document_type_id"])
+                document = Document.objects.first()
+                self.assertIsNone(document.correspondent)
+                self.assertIsNone(document.document_type)
+                self.assertEqual(document.tags.all().count(), 0)
+
+                self.assertIsNone(document.storage_path)
+                self.assertIsNone(document.owner)
                 self.assertEqual(
-                    overrides["override_tag_ids"],
-                    [],
+                    get_users_with_perms(
+                        document,
+                        only_with_perms_in=["view_document"],
+                    ).count(),
+                    0,
                 )
-                self.assertIsNone(overrides["override_storage_path_id"])
-                self.assertIsNone(overrides["override_owner_id"])
-                self.assertEqual(overrides["override_view_users"], [])
-                self.assertEqual(overrides["override_view_groups"], [])
-                self.assertEqual(overrides["override_change_users"], [])
-                self.assertEqual(overrides["override_change_groups"], [])
                 self.assertEqual(
-                    overrides["override_custom_field_ids"],
-                    [],
+                    get_groups_with_perms(
+                        document,
+                    ).count(),
+                    0,
+                )
+                self.assertEqual(
+                    get_users_with_perms(
+                        document,
+                        only_with_perms_in=["change_document"],
+                    ).count(),
+                    0,
+                )
+                self.assertEqual(
+                    get_groups_with_perms(
+                        document,
+                    ).count(),
+                    0,
+                )
+                self.assertEqual(
+                    document.custom_fields.all()
+                    .values_list(
+                        "field",
+                    )
+                    .count(),
+                    0,
                 )
 
         info = cm.output[0]

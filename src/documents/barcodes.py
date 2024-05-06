@@ -330,10 +330,10 @@ class BarcodePlugin(ConsumeTaskPlugin):
                             break
 
                     if tag:
-                        tag = Tag.objects.get_or_create(
+                        tag, _ = Tag.objects.get_or_create(
                             name__iexact=tag,
                             defaults={"name": tag},
-                        )[0]
+                        )
 
                         logger.debug(
                             f"Found Tag Barcode '{raw}', substituted "

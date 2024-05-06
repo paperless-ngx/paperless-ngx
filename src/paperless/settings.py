@@ -7,7 +7,6 @@ import re
 import tempfile
 from os import PathLike
 from pathlib import Path
-from platform import machine
 from typing import Final
 from typing import Optional
 from typing import Union
@@ -112,7 +111,7 @@ def __get_list(
         return []
 
 
-def _parse_redis_url(env_redis: Optional[str]) -> tuple[str]:
+def _parse_redis_url(env_redis: Optional[str]) -> tuple[str, str]:
     """
     Gets the Redis information from the environment or a default and handles
     converting from incompatible django_channels and celery formats.
@@ -371,10 +370,7 @@ ASGI_APPLICATION = "paperless.asgi.application"
 STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", BASE_URL + "static/")
 WHITENOISE_STATIC_PREFIX = "/static/"
 
-if machine().lower() == "aarch64":  # pragma: no cover
-    _static_backend = "django.contrib.staticfiles.storage.StaticFilesStorage"
-else:
-    _static_backend = "whitenoise.storage.CompressedStaticFilesStorage"
+_static_backend = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
 STORAGES = {
     "staticfiles": {

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-07 18:36-0700\n"
-"PO-Revision-Date: 2024-04-08 01:36\n"
+"POT-Creation-Date: 2024-04-26 07:19-0700\n"
+"PO-Revision-Date: 2024-05-02 16:16\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -21,31 +21,31 @@ msgstr ""
 msgid "Documents"
 msgstr "Έγγραφα"
 
-#: documents/models.py:36 documents/models.py:739
+#: documents/models.py:36 documents/models.py:779
 msgid "owner"
 msgstr "ιδιοκτήτης"
 
-#: documents/models.py:53 documents/models.py:897
+#: documents/models.py:53 documents/models.py:942
 msgid "None"
 msgstr "Τίποτα"
 
-#: documents/models.py:54 documents/models.py:898
+#: documents/models.py:54 documents/models.py:943
 msgid "Any word"
 msgstr "Οποιαδήποτε λέξη"
 
-#: documents/models.py:55 documents/models.py:899
+#: documents/models.py:55 documents/models.py:944
 msgid "All words"
 msgstr "Όλες οι λέξεις"
 
-#: documents/models.py:56 documents/models.py:900
+#: documents/models.py:56 documents/models.py:945
 msgid "Exact match"
 msgstr "Ακριβής ταύτιση"
 
-#: documents/models.py:57 documents/models.py:901
+#: documents/models.py:57 documents/models.py:946
 msgid "Regular expression"
 msgstr "Κανονική έκφραση"
 
-#: documents/models.py:58 documents/models.py:902
+#: documents/models.py:58 documents/models.py:947
 msgid "Fuzzy word"
 msgstr ""
 
@@ -53,20 +53,20 @@ msgstr ""
 msgid "Automatic"
 msgstr ""
 
-#: documents/models.py:62 documents/models.py:397 documents/models.py:1218
+#: documents/models.py:62 documents/models.py:416 documents/models.py:1263
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
 msgid "name"
 msgstr "όνομα"
 
-#: documents/models.py:64 documents/models.py:958
+#: documents/models.py:64 documents/models.py:1003
 msgid "match"
 msgstr "αντιστοίχιση"
 
-#: documents/models.py:67 documents/models.py:961
+#: documents/models.py:67 documents/models.py:1006
 msgid "matching algorithm"
 msgstr "αλγόριθμος αντιστοίχισης"
 
-#: documents/models.py:72 documents/models.py:966
+#: documents/models.py:72 documents/models.py:1011
 msgid "is insensitive"
 msgstr "χωρίς διάκριση πεζών - κεφαλαίων"
 
@@ -130,7 +130,7 @@ msgstr "Κρυπτογραφημένο με GNU Privacy Guard"
 msgid "title"
 msgstr "τίτλος"
 
-#: documents/models.py:171 documents/models.py:653
+#: documents/models.py:171 documents/models.py:693
 msgid "content"
 msgstr "περιεχόμενο"
 
@@ -158,8 +158,8 @@ msgstr "checksum αρχειοθέτησης"
 msgid "The checksum of the archived document."
 msgstr "Το checksum του αρχειοθετημένου εγγράφου."
 
-#: documents/models.py:205 documents/models.py:385 documents/models.py:659
-#: documents/models.py:697 documents/models.py:767 documents/models.py:804
+#: documents/models.py:205 documents/models.py:385 documents/models.py:699
+#: documents/models.py:737 documents/models.py:807 documents/models.py:844
 msgid "created"
 msgstr "δημιουργήθηκε"
 
@@ -207,7 +207,7 @@ msgstr "σειριακός αριθμός αρχειοθέτησης"
 msgid "The position of this document in your physical document archive."
 msgstr "Η θέση αυτού του εγγράφου στο αρχείο φυσικών εγγράφων σας."
 
-#: documents/models.py:279 documents/models.py:670 documents/models.py:724
+#: documents/models.py:279 documents/models.py:710 documents/models.py:764
 msgid "document"
 msgstr "αρχείο"
 
@@ -255,597 +255,665 @@ msgstr "αρχείο καταγραφής"
 msgid "logs"
 msgstr "αρχεία καταγραφής"
 
+#: documents/models.py:398
+msgid "Table"
+msgstr ""
+
+#: documents/models.py:399
+msgid "Small Cards"
+msgstr ""
+
 #: documents/models.py:400
+msgid "Large Cards"
+msgstr ""
+
+#: documents/models.py:403
+msgid "Title"
+msgstr ""
+
+#: documents/models.py:404
+msgid "Created"
+msgstr ""
+
+#: documents/models.py:405
+msgid "Added"
+msgstr ""
+
+#: documents/models.py:406
+msgid "Tags"
+msgstr ""
+
+#: documents/models.py:407
+msgid "Correspondent"
+msgstr ""
+
+#: documents/models.py:408
+msgid "Document Type"
+msgstr ""
+
+#: documents/models.py:409
+msgid "Storage Path"
+msgstr ""
+
+#: documents/models.py:410
+msgid "Note"
+msgstr ""
+
+#: documents/models.py:411
+msgid "Owner"
+msgstr ""
+
+#: documents/models.py:412
+msgid "Shared"
+msgstr ""
+
+#: documents/models.py:413
+msgid "ASN"
+msgstr ""
+
+#: documents/models.py:419
 msgid "show on dashboard"
 msgstr "εμφάνιση στο Ταμπλό"
 
-#: documents/models.py:403
+#: documents/models.py:422
 msgid "show in sidebar"
 msgstr "προβολή στην πλευρική στήλη"
 
-#: documents/models.py:407
+#: documents/models.py:426
 msgid "sort field"
 msgstr "πεδίο ταξινόμησης"
 
-#: documents/models.py:412
+#: documents/models.py:431
 msgid "sort reverse"
 msgstr "αντίστροφη ταξινόμηση"
 
-#: documents/models.py:416 documents/models.py:469
+#: documents/models.py:434
+msgid "View page size"
+msgstr ""
+
+#: documents/models.py:442
+msgid "View display mode"
+msgstr ""
+
+#: documents/models.py:449
+msgid "Document display fields"
+msgstr ""
+
+#: documents/models.py:456 documents/models.py:509
 msgid "saved view"
 msgstr "αποθηκευμένη προβολή"
 
-#: documents/models.py:417
+#: documents/models.py:457
 msgid "saved views"
 msgstr "αποθηκευμένες προβολές"
 
-#: documents/models.py:425
+#: documents/models.py:465
 msgid "title contains"
 msgstr "ο τίτλος περιέχει"
 
-#: documents/models.py:426
+#: documents/models.py:466
 msgid "content contains"
 msgstr "το περιεχόμενο περιέχει"
 
-#: documents/models.py:427
+#: documents/models.py:467
 msgid "ASN is"
 msgstr "Το ASN είναι"
 
-#: documents/models.py:428
+#: documents/models.py:468
 msgid "correspondent is"
 msgstr "ο ανταποκριτής είναι"
 
-#: documents/models.py:429
+#: documents/models.py:469
 msgid "document type is"
 msgstr "ο τύπος εγγράφου είναι"
 
-#: documents/models.py:430
+#: documents/models.py:470
 msgid "is in inbox"
 msgstr "είναι στα εισερχόμενα"
 
-#: documents/models.py:431
+#: documents/models.py:471
 msgid "has tag"
 msgstr "έχει ετικέτα"
 
-#: documents/models.py:432
+#: documents/models.py:472
 msgid "has any tag"
 msgstr "έχει οποιαδήποτε ετικέτα"
 
-#: documents/models.py:433
+#: documents/models.py:473
 msgid "created before"
 msgstr "δημιουργήθηκε πριν από"
 
-#: documents/models.py:434
+#: documents/models.py:474
 msgid "created after"
 msgstr "δημιουργήθηκε μετά από"
 
-#: documents/models.py:435
+#: documents/models.py:475
 msgid "created year is"
 msgstr "το έτος δημιουργίας είναι"
 
-#: documents/models.py:436
+#: documents/models.py:476
 msgid "created month is"
 msgstr "ο μήνας δημιουργίας είναι"
 
-#: documents/models.py:437
+#: documents/models.py:477
 msgid "created day is"
 msgstr "η ημέρα δημιουργίας είναι"
 
-#: documents/models.py:438
+#: documents/models.py:478
 msgid "added before"
 msgstr "προστέθηκε πριν"
 
-#: documents/models.py:439
+#: documents/models.py:479
 msgid "added after"
 msgstr "προστέθηκε μετά"
 
-#: documents/models.py:440
+#: documents/models.py:480
 msgid "modified before"
 msgstr "τροποποιήθηκε πριν"
 
-#: documents/models.py:441
+#: documents/models.py:481
 msgid "modified after"
 msgstr "τροποποιήθηκε μετά"
 
-#: documents/models.py:442
+#: documents/models.py:482
 msgid "does not have tag"
 msgstr "δεν έχει ετικέτα"
 
-#: documents/models.py:443
+#: documents/models.py:483
 msgid "does not have ASN"
 msgstr "δεν έχει ASN"
 
-#: documents/models.py:444
+#: documents/models.py:484
 msgid "title or content contains"
 msgstr "ο τίτλος ή το περιεχόμενο περιέχει"
 
-#: documents/models.py:445
+#: documents/models.py:485
 msgid "fulltext query"
 msgstr "ερώτημα πλήρους κειμένου"
 
-#: documents/models.py:446
+#: documents/models.py:486
 msgid "more like this"
 msgstr ""
 
-#: documents/models.py:447
+#: documents/models.py:487
 msgid "has tags in"
 msgstr "έχει ετικέτες σε"
 
-#: documents/models.py:448
+#: documents/models.py:488
 msgid "ASN greater than"
 msgstr "ASN μεγαλύτερο από"
 
-#: documents/models.py:449
+#: documents/models.py:489
 msgid "ASN less than"
 msgstr "ASN μικρότερο από"
 
-#: documents/models.py:450
+#: documents/models.py:490
 msgid "storage path is"
 msgstr "η διαδρομή αποθήκευσης είναι"
 
-#: documents/models.py:451
+#: documents/models.py:491
 msgid "has correspondent in"
 msgstr "έχει ανταποκριτή σε"
 
-#: documents/models.py:452
+#: documents/models.py:492
 msgid "does not have correspondent in"
 msgstr "δεν έχει ανταποκριτή σε"
 
-#: documents/models.py:453
+#: documents/models.py:493
 msgid "has document type in"
 msgstr "έχει τύπο εγγράφου σε"
 
-#: documents/models.py:454
+#: documents/models.py:494
 msgid "does not have document type in"
 msgstr "δεν έχει τύπο εγγράφου σε"
 
-#: documents/models.py:455
+#: documents/models.py:495
 msgid "has storage path in"
 msgstr "έχει διαδρομή αποθήκευσης σε"
 
-#: documents/models.py:456
+#: documents/models.py:496
 msgid "does not have storage path in"
 msgstr "δεν έχει διαδρομή αποθήκευσης σε"
 
-#: documents/models.py:457
+#: documents/models.py:497
 msgid "owner is"
 msgstr "ο ιδιοκτήτης είναι"
 
-#: documents/models.py:458
+#: documents/models.py:498
 msgid "has owner in"
 msgstr "έχει ιδιοκτήτη σε"
 
-#: documents/models.py:459
+#: documents/models.py:499
 msgid "does not have owner"
 msgstr "δεν έχει ιδιοκτήτη"
 
-#: documents/models.py:460
+#: documents/models.py:500
 msgid "does not have owner in"
 msgstr "δεν έχει ιδιοκτήτη σε"
 
-#: documents/models.py:461
+#: documents/models.py:501
 msgid "has custom field value"
 msgstr "έχει προσαρμοσμένη τιμή πεδίου"
 
-#: documents/models.py:462
+#: documents/models.py:502
 msgid "is shared by me"
 msgstr "μοιράζεται από μένα"
 
-#: documents/models.py:472
+#: documents/models.py:512
 msgid "rule type"
 msgstr "τύπος κανόνα"
 
-#: documents/models.py:474
+#: documents/models.py:514
 msgid "value"
 msgstr "τιμή"
 
-#: documents/models.py:477
+#: documents/models.py:517
 msgid "filter rule"
 msgstr "κανόνας φίλτρου"
 
-#: documents/models.py:478
+#: documents/models.py:518
 msgid "filter rules"
 msgstr "κανόνες φίλτρων"
 
-#: documents/models.py:589
+#: documents/models.py:629
 msgid "Task ID"
 msgstr "Task ID"
 
-#: documents/models.py:590
+#: documents/models.py:630
 msgid "Celery ID for the Task that was run"
 msgstr "Celery ID για την εργασία που εκτελέστηκε"
 
-#: documents/models.py:595
+#: documents/models.py:635
 msgid "Acknowledged"
 msgstr "Αναγνωρίστηκε"
 
-#: documents/models.py:596
+#: documents/models.py:636
 msgid "If the task is acknowledged via the frontend or API"
 msgstr "Εάν η εργασία αναγνωρίζεται μέσω του frontend ή του API"
 
-#: documents/models.py:602
+#: documents/models.py:642
 msgid "Task Filename"
 msgstr "Όνομα Αρχείου Εργασίας"
 
-#: documents/models.py:603
+#: documents/models.py:643
 msgid "Name of the file which the Task was run for"
 msgstr "Όνομα του αρχείου για το οποίο εκτελέστηκε η εργασία"
 
-#: documents/models.py:609
+#: documents/models.py:649
 msgid "Task Name"
 msgstr "Όνομα Εργασίας"
 
-#: documents/models.py:610
+#: documents/models.py:650
 msgid "Name of the Task which was run"
 msgstr "Όνομα της εργασίας που εκτελέστηκε"
 
-#: documents/models.py:617
+#: documents/models.py:657
 msgid "Task State"
 msgstr "Κατάσταση Εργασίας"
 
-#: documents/models.py:618
+#: documents/models.py:658
 msgid "Current state of the task being run"
 msgstr "Τρέχουσα κατάσταση εκτέλεσης της εργασίας"
 
-#: documents/models.py:623
+#: documents/models.py:663
 msgid "Created DateTime"
 msgstr "Ημερομηνία/Ώρα Δημιουργίας"
 
-#: documents/models.py:624
+#: documents/models.py:664
 msgid "Datetime field when the task result was created in UTC"
 msgstr "Πεδίο ημερομηνίας/ώρας κατά τη δημιουργία της εργασίας σε UTC"
 
-#: documents/models.py:629
+#: documents/models.py:669
 msgid "Started DateTime"
 msgstr "Ημερομηνία/Ώρα Έναρξης"
 
-#: documents/models.py:630
+#: documents/models.py:670
 msgid "Datetime field when the task was started in UTC"
 msgstr "Πεδίο ημερομηνίας/ώρας κατά την έναρξη της εργασίας σε UTC"
 
-#: documents/models.py:635
+#: documents/models.py:675
 msgid "Completed DateTime"
 msgstr "Ημερομηνία/Ώρα Ολοκλήρωσης"
 
-#: documents/models.py:636
+#: documents/models.py:676
 msgid "Datetime field when the task was completed in UTC"
 msgstr "Πεδίο ημερομηνίας/ώρας κατά την ολοκλήρωση της εργασίας σε UTC"
 
-#: documents/models.py:641
+#: documents/models.py:681
 msgid "Result Data"
 msgstr "Αποτέλεσμα Δεδομένων"
 
-#: documents/models.py:643
+#: documents/models.py:683
 msgid "The data returned by the task"
 msgstr "Τα δεδομένα που επιστράφηκαν από την εργασία"
 
-#: documents/models.py:655
+#: documents/models.py:695
 msgid "Note for the document"
 msgstr "Σημείωση για το έγγραφο"
 
-#: documents/models.py:679
+#: documents/models.py:719
 msgid "user"
 msgstr "χρήστης"
 
-#: documents/models.py:684
+#: documents/models.py:724
 msgid "note"
 msgstr "σημείωση"
 
-#: documents/models.py:685
+#: documents/models.py:725
 msgid "notes"
 msgstr "σημειώσεις"
 
-#: documents/models.py:693
+#: documents/models.py:733
 msgid "Archive"
 msgstr "Αρχειοθέτηση"
 
-#: documents/models.py:694
+#: documents/models.py:734
 msgid "Original"
 msgstr "Πρωτότυπο"
 
-#: documents/models.py:705
+#: documents/models.py:745
 msgid "expiration"
 msgstr "λήξη"
 
-#: documents/models.py:712
+#: documents/models.py:752
 msgid "slug"
 msgstr "slug"
 
-#: documents/models.py:744
+#: documents/models.py:784
 msgid "share link"
 msgstr "κοινοποίηση συνδέσμου"
 
-#: documents/models.py:745
+#: documents/models.py:785
 msgid "share links"
 msgstr "κοινοποίηση συνδέσμων"
 
-#: documents/models.py:757
+#: documents/models.py:797
 msgid "String"
 msgstr "Συμβολοσειρά"
 
-#: documents/models.py:758
+#: documents/models.py:798
 msgid "URL"
 msgstr "URL"
 
-#: documents/models.py:759
+#: documents/models.py:799
 msgid "Date"
 msgstr "Ημερομηνία"
 
-#: documents/models.py:760
+#: documents/models.py:800
 msgid "Boolean"
 msgstr "Δυαδικές τιμές"
 
-#: documents/models.py:761
+#: documents/models.py:801
 msgid "Integer"
 msgstr "Ακέραιος"
 
-#: documents/models.py:762
+#: documents/models.py:802
 msgid "Float"
 msgstr "Δεκαδικός"
 
-#: documents/models.py:763
+#: documents/models.py:803
 msgid "Monetary"
 msgstr "Νομισματικό"
 
-#: documents/models.py:764
+#: documents/models.py:804
 msgid "Document Link"
 msgstr "Σύνδεσμος Εγγράφου"
 
-#: documents/models.py:776
+#: documents/models.py:816
 msgid "data type"
 msgstr "τύπος δεδομένων"
 
-#: documents/models.py:784
+#: documents/models.py:824
 msgid "custom field"
 msgstr "προσαρμοσμένο πεδίο"
 
-#: documents/models.py:785
+#: documents/models.py:825
 msgid "custom fields"
 msgstr "προσαρμοσμένα πεδία"
 
-#: documents/models.py:847
+#: documents/models.py:887
 msgid "custom field instance"
 msgstr "στιγμιότυπο προσαρμοσμένου πεδίου"
 
-#: documents/models.py:848
+#: documents/models.py:888
 msgid "custom field instances"
 msgstr "στιγμιότυπα προσαρμοσμένων πεδίων"
 
-#: documents/models.py:905
+#: documents/models.py:950
 msgid "Consumption Started"
 msgstr "Η Κατανάλωση Ξεκίνησε"
 
-#: documents/models.py:906
+#: documents/models.py:951
 msgid "Document Added"
 msgstr ""
 
-#: documents/models.py:907
+#: documents/models.py:952
 msgid "Document Updated"
 msgstr ""
 
-#: documents/models.py:910
+#: documents/models.py:955
 msgid "Consume Folder"
 msgstr "Φάκελος Κατανάλωσης"
 
-#: documents/models.py:911
+#: documents/models.py:956
 msgid "Api Upload"
 msgstr "Μεταφόρτωση μέσω API"
 
-#: documents/models.py:912
+#: documents/models.py:957
 msgid "Mail Fetch"
 msgstr "Λήψη Αλληλογραφίας"
 
-#: documents/models.py:915
+#: documents/models.py:960
 msgid "Workflow Trigger Type"
 msgstr ""
 
-#: documents/models.py:927
+#: documents/models.py:972
 msgid "filter path"
 msgstr "διαδρομή φίλτρου"
 
-#: documents/models.py:932
+#: documents/models.py:977
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
 msgstr "Μόνο κατανάλωση εγγράφων με μια διαδρομή που ταιριάζει με αυτό αν έχει καθοριστεί. Επιτρέπεται η χρήση μπαλαντέρ που ορίζεται ως *. Χωρίς διάκριση πεζών-κεφαλαίων."
 
-#: documents/models.py:939
+#: documents/models.py:984
 msgid "filter filename"
 msgstr "φιλτράρισμα ονόματος αρχείου"
 
-#: documents/models.py:944 paperless_mail/models.py:148
+#: documents/models.py:989 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "Μόνο κατανάλωση αρχείων που ταιριάζουν απόλυτα με το όνομα αρχείου, εάν καθοριστεί. Επιτρέπεται η χρήση μπαλαντέρ όπως *.pdf ή *invoice*. Δεν υπάρχει έλεγχος πεζών/κεφαλαίων."
 
-#: documents/models.py:955
+#: documents/models.py:1000
 msgid "filter documents from this mail rule"
 msgstr "φιλτράρισμα εγγράφων από αυτόν τον κανόνα αλληλογραφίας"
 
-#: documents/models.py:971
+#: documents/models.py:1016
 msgid "has these tag(s)"
 msgstr ""
 
-#: documents/models.py:979
+#: documents/models.py:1024
 msgid "has this document type"
 msgstr ""
 
-#: documents/models.py:987
+#: documents/models.py:1032
 msgid "has this correspondent"
 msgstr ""
 
-#: documents/models.py:991
+#: documents/models.py:1036
 msgid "workflow trigger"
 msgstr ""
 
-#: documents/models.py:992
+#: documents/models.py:1037
 msgid "workflow triggers"
 msgstr ""
 
-#: documents/models.py:1002
+#: documents/models.py:1047
 msgid "Assignment"
 msgstr ""
 
-#: documents/models.py:1006
+#: documents/models.py:1051
 msgid "Removal"
 msgstr ""
 
-#: documents/models.py:1010
+#: documents/models.py:1055
 msgid "Workflow Action Type"
 msgstr ""
 
-#: documents/models.py:1016
+#: documents/models.py:1061
 msgid "assign title"
 msgstr "ανάθεση τίτλου"
 
-#: documents/models.py:1021
+#: documents/models.py:1066
 msgid "Assign a document title, can include some placeholders, see documentation."
 msgstr "Η ανάθεση τίτλου εγγράφου μπορεί να περιέχει μερικά placeholders, δείτε την τεκμηρίωση."
 
-#: documents/models.py:1030 paperless_mail/models.py:216
+#: documents/models.py:1075 paperless_mail/models.py:216
 msgid "assign this tag"
 msgstr "ανάθεση αυτής της ετικέτας"
 
-#: documents/models.py:1039 paperless_mail/models.py:224
+#: documents/models.py:1084 paperless_mail/models.py:224
 msgid "assign this document type"
 msgstr "ανάθεση αυτού του τύπου εγγράφου"
 
-#: documents/models.py:1048 paperless_mail/models.py:238
+#: documents/models.py:1093 paperless_mail/models.py:238
 msgid "assign this correspondent"
 msgstr "ανάθεση αυτού του ανταποκριτή"
 
-#: documents/models.py:1057
+#: documents/models.py:1102
 msgid "assign this storage path"
 msgstr "ανάθεση αυτής της διαδρομής αποθήκευσης"
 
-#: documents/models.py:1066
+#: documents/models.py:1111
 msgid "assign this owner"
 msgstr "ανάθεση αυτού του ιδιοκτήτη"
 
-#: documents/models.py:1073
+#: documents/models.py:1118
 msgid "grant view permissions to these users"
 msgstr "εκχώρηση δικαιωμάτων προβολής σε αυτούς τους χρήστες"
 
-#: documents/models.py:1080
+#: documents/models.py:1125
 msgid "grant view permissions to these groups"
 msgstr "εκχώρηση δικαιωμάτων προβολής σε αυτές τις ομάδες"
 
-#: documents/models.py:1087
+#: documents/models.py:1132
 msgid "grant change permissions to these users"
 msgstr "εκχώρηση δικαιωμάτων μεταβολής σε αυτές τις ομάδες"
 
-#: documents/models.py:1094
+#: documents/models.py:1139
 msgid "grant change permissions to these groups"
 msgstr "εκχώρηση δικαιωμάτων μεταβολής σε αυτές τις ομάδες"
 
-#: documents/models.py:1101
+#: documents/models.py:1146
 msgid "assign these custom fields"
 msgstr ""
 
-#: documents/models.py:1108
+#: documents/models.py:1153
 msgid "remove these tag(s)"
 msgstr ""
 
-#: documents/models.py:1113
+#: documents/models.py:1158
 msgid "remove all tags"
 msgstr ""
 
-#: documents/models.py:1120
+#: documents/models.py:1165
 msgid "remove these document type(s)"
 msgstr ""
 
-#: documents/models.py:1125
+#: documents/models.py:1170
 msgid "remove all document types"
 msgstr ""
 
-#: documents/models.py:1132
+#: documents/models.py:1177
 msgid "remove these correspondent(s)"
 msgstr ""
 
-#: documents/models.py:1137
+#: documents/models.py:1182
 msgid "remove all correspondents"
 msgstr ""
 
-#: documents/models.py:1144
+#: documents/models.py:1189
 msgid "remove these storage path(s)"
 msgstr ""
 
-#: documents/models.py:1149
+#: documents/models.py:1194
 msgid "remove all storage paths"
 msgstr ""
 
-#: documents/models.py:1156
+#: documents/models.py:1201
 msgid "remove these owner(s)"
 msgstr ""
 
-#: documents/models.py:1161
+#: documents/models.py:1206
 msgid "remove all owners"
 msgstr ""
 
-#: documents/models.py:1168
+#: documents/models.py:1213
 msgid "remove view permissions for these users"
 msgstr ""
 
-#: documents/models.py:1175
+#: documents/models.py:1220
 msgid "remove view permissions for these groups"
 msgstr ""
 
-#: documents/models.py:1182
+#: documents/models.py:1227
 msgid "remove change permissions for these users"
 msgstr ""
 
-#: documents/models.py:1189
+#: documents/models.py:1234
 msgid "remove change permissions for these groups"
 msgstr ""
 
-#: documents/models.py:1194
+#: documents/models.py:1239
 msgid "remove all permissions"
 msgstr ""
 
-#: documents/models.py:1201
+#: documents/models.py:1246
 msgid "remove these custom fields"
 msgstr ""
 
-#: documents/models.py:1206
+#: documents/models.py:1251
 msgid "remove all custom fields"
 msgstr ""
 
-#: documents/models.py:1210
+#: documents/models.py:1255
 msgid "workflow action"
 msgstr ""
 
-#: documents/models.py:1211
+#: documents/models.py:1256
 msgid "workflow actions"
 msgstr ""
 
-#: documents/models.py:1220 paperless_mail/models.py:95
+#: documents/models.py:1265 paperless_mail/models.py:95
 msgid "order"
 msgstr "σειρά"
 
-#: documents/models.py:1226
+#: documents/models.py:1271
 msgid "triggers"
 msgstr ""
 
-#: documents/models.py:1233
+#: documents/models.py:1278
 msgid "actions"
 msgstr "ενέργειες"
 
-#: documents/models.py:1236
+#: documents/models.py:1281
 msgid "enabled"
 msgstr ""
 
-#: documents/serialisers.py:114
+#: documents/serialisers.py:115
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Άκυρη έκφραση: %(error)s"
 
-#: documents/serialisers.py:417
+#: documents/serialisers.py:418
 msgid "Invalid color."
 msgstr "Άκυρο χρώμα."
 
-#: documents/serialisers.py:1143
+#: documents/serialisers.py:1197
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Ο τύπος αρχείου %(type)s δεν υποστηρίζεται"
 
-#: documents/serialisers.py:1252
+#: documents/serialisers.py:1306
 msgid "Invalid variable detected."
 msgstr "Εντοπίστηκε μη έγκυρη μεταβλητή."
 
@@ -1204,135 +1272,135 @@ msgstr ""
 msgid "paperless application settings"
 msgstr ""
 
-#: paperless/settings.py:666
+#: paperless/settings.py:662
 msgid "English (US)"
 msgstr "Αγγλικά (ΗΠΑ)"
 
-#: paperless/settings.py:667
+#: paperless/settings.py:663
 msgid "Arabic"
 msgstr "Αραβικά"
 
-#: paperless/settings.py:668
+#: paperless/settings.py:664
 msgid "Afrikaans"
 msgstr "Αφρικανικά"
 
-#: paperless/settings.py:669
+#: paperless/settings.py:665
 msgid "Belarusian"
 msgstr "Λευκορωσικά"
 
-#: paperless/settings.py:670
+#: paperless/settings.py:666
 msgid "Bulgarian"
 msgstr "Βουλγαρικά"
 
-#: paperless/settings.py:671
+#: paperless/settings.py:667
 msgid "Catalan"
 msgstr "Καταλανικά"
 
-#: paperless/settings.py:672
+#: paperless/settings.py:668
 msgid "Czech"
 msgstr "Τσέχικα"
 
-#: paperless/settings.py:673
+#: paperless/settings.py:669
 msgid "Danish"
 msgstr "Δανέζικα"
 
-#: paperless/settings.py:674
+#: paperless/settings.py:670
 msgid "German"
 msgstr "Γερμανικά"
 
-#: paperless/settings.py:675
+#: paperless/settings.py:671
 msgid "Greek"
 msgstr "Ελληνικά"
 
-#: paperless/settings.py:676
+#: paperless/settings.py:672
 msgid "English (GB)"
 msgstr "Αγγλικά (Ηνωμένο Βασίλειο)"
 
-#: paperless/settings.py:677
+#: paperless/settings.py:673
 msgid "Spanish"
 msgstr "Ισπανικά"
 
-#: paperless/settings.py:678
+#: paperless/settings.py:674
 msgid "Finnish"
 msgstr "Φινλανδικά"
 
-#: paperless/settings.py:679
+#: paperless/settings.py:675
 msgid "French"
 msgstr "Γαλλικά"
 
-#: paperless/settings.py:680
+#: paperless/settings.py:676
 msgid "Hungarian"
 msgstr "Ουγγρικά"
 
-#: paperless/settings.py:681
+#: paperless/settings.py:677
 msgid "Italian"
 msgstr "Ιταλικά"
 
-#: paperless/settings.py:682
+#: paperless/settings.py:678
 msgid "Japanese"
 msgstr ""
 
-#: paperless/settings.py:683
+#: paperless/settings.py:679
 msgid "Luxembourgish"
 msgstr "Λουξεμβουργικά"
 
-#: paperless/settings.py:684
+#: paperless/settings.py:680
 msgid "Norwegian"
 msgstr "Νορβηγικά"
 
-#: paperless/settings.py:685
+#: paperless/settings.py:681
 msgid "Dutch"
 msgstr "Ολλανδικά"
 
-#: paperless/settings.py:686
+#: paperless/settings.py:682
 msgid "Polish"
 msgstr "Πολωνικά"
 
-#: paperless/settings.py:687
+#: paperless/settings.py:683
 msgid "Portuguese (Brazil)"
 msgstr "Πορτογαλικά (Βραζιλίας)"
 
-#: paperless/settings.py:688
+#: paperless/settings.py:684
 msgid "Portuguese"
 msgstr "Πορτογαλικά"
 
-#: paperless/settings.py:689
+#: paperless/settings.py:685
 msgid "Romanian"
 msgstr "Ρουμάνικα"
 
-#: paperless/settings.py:690
+#: paperless/settings.py:686
 msgid "Russian"
 msgstr "Ρωσικά"
 
-#: paperless/settings.py:691
+#: paperless/settings.py:687
 msgid "Slovak"
 msgstr "Σλοβακικά"
 
-#: paperless/settings.py:692
+#: paperless/settings.py:688
 msgid "Slovenian"
 msgstr "Σλοβενικά"
 
-#: paperless/settings.py:693
+#: paperless/settings.py:689
 msgid "Serbian"
 msgstr "Σερβικά"
 
-#: paperless/settings.py:694
+#: paperless/settings.py:690
 msgid "Swedish"
 msgstr "Σουηδικά"
 
-#: paperless/settings.py:695
+#: paperless/settings.py:691
 msgid "Turkish"
 msgstr "Τούρκικα"
 
-#: paperless/settings.py:696
+#: paperless/settings.py:692
 msgid "Ukrainian"
 msgstr "Ουκρανικά"
 
-#: paperless/settings.py:697
+#: paperless/settings.py:693
 msgid "Chinese Simplified"
 msgstr "Κινέζικα Απλοποιημένα"
 
-#: paperless/urls.py:230
+#: paperless/urls.py:236
 msgid "Paperless-ngx administration"
 msgstr "Διαχείριση Paperless-ngx"
 

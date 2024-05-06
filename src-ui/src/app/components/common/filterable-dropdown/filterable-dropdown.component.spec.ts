@@ -26,6 +26,7 @@ import { TagComponent } from '../tag/tag.component'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { HotKeyService } from 'src/app/services/hot-key.service'
 
 const items: Tag[] = [
   {
@@ -53,6 +54,7 @@ let selectionModel: FilterableDropdownSelectionModel
 describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () => {
   let component: FilterableDropdownComponent
   let fixture: ComponentFixture<FilterableDropdownComponent>
+  let hotkeyService: HotKeyService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -72,6 +74,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       ],
     }).compileComponents()
 
+    hotkeyService = TestBed.inject(HotKeyService)
     fixture = TestBed.createComponent(FilterableDropdownComponent)
     component = fixture.componentInstance
     selectionModel = new FilterableDropdownSelectionModel()
@@ -576,5 +579,15 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     selectionModel.init(map)
     expect(selectionModel.getSelectedItems()).toEqual([items[0]])
     expect(selectionModel.getExcludedItems()).toEqual([items[1]])
+  })
+
+  it('should support shortcut keys', () => {
+    component.items = items
+    component.icon = 'tag-fill'
+    component.shortcutKey = 't'
+    fixture.detectChanges()
+    const openSpy = jest.spyOn(component.dropdown, 'open')
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 't' }))
+    expect(openSpy).toHaveBeenCalled()
   })
 })

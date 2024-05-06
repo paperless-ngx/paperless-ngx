@@ -94,6 +94,9 @@ export class SelectComponent extends AbstractInputComponent<number> {
   @Input()
   disableCreateNew: boolean = false
 
+  @Input()
+  hideAddButton: boolean = false
+
   @Output()
   createNew = new EventEmitter<string>()
 
