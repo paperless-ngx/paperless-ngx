@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-26 07:19-0700\n"
-"PO-Revision-Date: 2024-05-02 16:16\n"
+"PO-Revision-Date: 2024-05-06 21:23\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -1104,7 +1104,7 @@ msgstr "التسجيل في Paperless-ngx عبر حساب اجتماعي"
 #: documents/templates/socialaccount/signup.html:10
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
-msgstr "أنت على وشك استعمال حسابك في %(provider_name) للدخول."
+msgstr "أنت على وشك استعمال حسابك في %(provider_name)s للدخ."
 
 #: documents/templates/socialaccount/signup.html:11
 msgid "As a final step, please complete the following form:"
