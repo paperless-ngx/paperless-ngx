@@ -1,3 +1,5 @@
+import { DataType } from './datatype'
+
 // These correspond to src/documents/models.py and changes here require a DB migration (and vice versa)
 export const FILTER_TITLE = 0
 export const FILTER_CONTENT = 1
@@ -47,7 +49,11 @@ export const FILTER_OWNER_ISNULL = 34
 export const FILTER_OWNER_DOES_NOT_INCLUDE = 35
 export const FILTER_SHARED_BY_USER = 37
 
-export const FILTER_CUSTOM_FIELDS = 36
+export const FILTER_CUSTOM_FIELDS_TEXT = 36
+export const FILTER_HAS_CUSTOM_FIELDS_ALL = 38
+export const FILTER_HAS_CUSTOM_FIELDS_ANY = 39
+export const FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS = 40
+export const FILTER_HAS_ANY_CUSTOM_FIELDS = 41
 
 export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
@@ -74,57 +80,57 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     id: FILTER_CORRESPONDENT,
     filtervar: 'correspondent__id',
     isnull_filtervar: 'correspondent__isnull',
-    datatype: 'correspondent',
+    datatype: DataType.Correspondent,
     multi: false,
   },
   {
     id: FILTER_HAS_CORRESPONDENT_ANY,
     filtervar: 'correspondent__id__in',
-    datatype: 'correspondent',
+    datatype: DataType.Correspondent,
     multi: true,
   },
   {
     id: FILTER_DOES_NOT_HAVE_CORRESPONDENT,
     filtervar: 'correspondent__id__none',
-    datatype: 'correspondent',
+    datatype: DataType.Correspondent,
     multi: true,
   },
   {
     id: FILTER_STORAGE_PATH,
     filtervar: 'storage_path__id',
     isnull_filtervar: 'storage_path__isnull',
-    datatype: 'storage_path',
+    datatype: DataType.StoragePath,
     multi: false,
   },
   {
     id: FILTER_HAS_STORAGE_PATH_ANY,
     filtervar: 'storage_path__id__in',
-    datatype: 'storage_path',
+    datatype: DataType.StoragePath,
     multi: true,
   },
   {
     id: FILTER_DOES_NOT_HAVE_STORAGE_PATH,
     filtervar: 'storage_path__id__none',
-    datatype: 'storage_path',
+    datatype: DataType.StoragePath,
     multi: true,
   },
   {
     id: FILTER_DOCUMENT_TYPE,
     filtervar: 'document_type__id',
     isnull_filtervar: 'document_type__isnull',
-    datatype: 'document_type',
+    datatype: DataType.DocumentType,
     multi: false,
   },
   {
     id: FILTER_HAS_DOCUMENT_TYPE_ANY,
     filtervar: 'document_type__id__in',
-    datatype: 'document_type',
+    datatype: DataType.DocumentType,
     multi: true,
   },
   {
     id: FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
     filtervar: 'document_type__id__none',
-    datatype: 'document_type',
+    datatype: DataType.DocumentType,
     multi: true,
   },
   {
@@ -137,19 +143,19 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
     id: FILTER_HAS_TAGS_ALL,
     filtervar: 'tags__id__all',
-    datatype: 'tag',
+    datatype: DataType.Tag,
     multi: true,
   },
   {
     id: FILTER_HAS_TAGS_ANY,
     filtervar: 'tags__id__in',
-    datatype: 'tag',
+    datatype: DataType.Tag,
     multi: true,
   },
   {
     id: FILTER_DOES_NOT_HAVE_TAG,
     filtervar: 'tags__id__none',
-    datatype: 'tag',
+    datatype: DataType.Tag,
     multi: true,
   },
   {
@@ -281,10 +287,35 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     multi: true,
   },
   {
-    id: FILTER_CUSTOM_FIELDS,
+    id: FILTER_CUSTOM_FIELDS_TEXT,
     filtervar: 'custom_fields__icontains',
     datatype: 'string',
     multi: false,
+  },
+  {
+    id: FILTER_HAS_CUSTOM_FIELDS_ALL,
+    filtervar: 'custom_fields__id__all',
+    datatype: 'number',
+    multi: true,
+  },
+  {
+    id: FILTER_HAS_CUSTOM_FIELDS_ANY,
+    filtervar: 'custom_fields__id__in',
+    datatype: 'number',
+    multi: true,
+  },
+  {
+    id: FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
+    filtervar: 'custom_fields__id__none',
+    datatype: 'number',
+    multi: true,
+  },
+  {
+    id: FILTER_HAS_ANY_CUSTOM_FIELDS,
+    filtervar: 'has_custom_fields',
+    datatype: 'boolean',
+    multi: false,
+    default: true,
   },
 ]
 

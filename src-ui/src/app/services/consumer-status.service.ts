@@ -4,7 +4,7 @@ import { environment } from 'src/environments/environment'
 import { WebsocketConsumerStatusMessage } from '../data/websocket-consumer-status-message'
 import { SettingsService } from './settings.service'
 
-// see ConsumerFilePhase in src/documents/consumer.py
+// see ProgressStatusOptions in src/documents/plugins/helpers.py
 export enum FileStatusPhase {
   STARTED = 0,
   UPLOADING = 1,

@@ -141,10 +141,7 @@ export const routes: Routes = [
         component: LogsComponent,
         canActivate: [PermissionsGuard],
         data: {
-          requiredPermission: {
-            action: PermissionAction.View,
-            type: PermissionType.Admin,
-          },
+          requireAdmin: true,
         },
       },
       // redirect old paths

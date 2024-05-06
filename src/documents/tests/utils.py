@@ -3,6 +3,7 @@ import tempfile
 import time
 import warnings
 from collections import namedtuple
+from collections.abc import Generator
 from collections.abc import Iterator
 from contextlib import contextmanager
 from os import PathLike
@@ -21,8 +22,10 @@ from django.db.migrations.executor import MigrationExecutor
 from django.test import TransactionTestCase
 from django.test import override_settings
 
+from documents.consumer import ConsumerPlugin
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
+from documents.data_models import DocumentSource
 from documents.parsers import ParseError
 from documents.plugins.helpers import ProgressStatusOptions
 
@@ -324,6 +327,30 @@ class SampleDirMixin:
     SAMPLE_DIR = Path(__file__).parent / "samples"
 
     BARCODE_SAMPLE_DIR = SAMPLE_DIR / "barcodes"
+
+
+class GetConsumerMixin:
+    @contextmanager
+    def get_consumer(
+        self,
+        filepath: Path,
+        overrides: Union[DocumentMetadataOverrides, None] = None,
+        source: DocumentSource = DocumentSource.ConsumeFolder,
+    ) -> Generator[ConsumerPlugin, None, None]:
+        # Store this for verification
+        self.status = DummyProgressManager(filepath.name, None)
+        reader = ConsumerPlugin(
+            ConsumableDocument(source, original_file=filepath),
+            overrides or DocumentMetadataOverrides(),
+            self.status,  # type: ignore
+            self.dirs.scratch_dir,
+            "task-id",
+        )
+        reader.setup()
+        try:
+            yield reader
+        finally:
+            reader.cleanup()
 
 
 class DummyProgressManager:

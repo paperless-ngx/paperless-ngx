@@ -85,6 +85,7 @@ const mock = () => {
   }
 }
 
+Object.defineProperty(window, 'open', { value: jest.fn() })
 Object.defineProperty(window, 'localStorage', { value: mock() })
 Object.defineProperty(window, 'sessionStorage', { value: mock() })
 Object.defineProperty(window, 'getComputedStyle', {

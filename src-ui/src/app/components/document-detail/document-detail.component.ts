@@ -69,6 +69,7 @@ import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service
 import { PDFDocumentProxy } from '../common/pdf-viewer/typings'
 import { SplitConfirmDialogComponent } from '../common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
 import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
+import { HotKeyService } from 'src/app/services/hot-key.service'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -77,6 +78,7 @@ enum DocumentDetailNavIDs {
   Preview = 4,
   Notes = 5,
   Permissions = 6,
+  History = 7,
 }
 
 enum ContentRenderType {
@@ -200,7 +202,8 @@ export class DocumentDetailComponent
     private permissionsService: PermissionsService,
     private userService: UserService,
     private customFieldsService: CustomFieldsService,
-    private http: HttpClient
+    private http: HttpClient,
+    private hotKeyService: HotKeyService
   ) {
     super()
   }
@@ -454,6 +457,40 @@ export class DocumentDetailComponent
         })
       }
     })
+
+    this.hotKeyService
+      .addShortcut({
+        keys: 'control.arrowright',
+        description: $localize`Next document`,
+      })
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        if (this.hasNext()) this.nextDoc()
+      })
+
+    this.hotKeyService
+      .addShortcut({
+        keys: 'control.arrowleft',
+        description: $localize`Previous document`,
+      })
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        if (this.hasPrevious()) this.previousDoc()
+      })
+
+    this.hotKeyService
+      .addShortcut({ keys: 'escape', description: $localize`Close document` })
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        this.close()
+      })
+
+    this.hotKeyService
+      .addShortcut({ keys: 'control.s', description: $localize`Save document` })
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        if (this.openDocumentService.isDirty(this.document)) this.save()
+      })
   }
 
   ngOnDestroy(): void {
@@ -637,13 +674,17 @@ export class DocumentDetailComponent
           this.documentForm.patchValue(docValues)
           this.store.next(this.documentForm.value)
           this.openDocumentService.setDirty(this.document, false)
+          this.openDocumentService.save()
           this.toastService.showInfo($localize`Document saved successfully.`)
           this.networkActive = false
           this.error = null
-          close &&
+          if (close) {
             this.close(() =>
               this.openDocumentService.refreshDocument(this.documentId)
             )
+          } else {
+            this.openDocumentService.refreshDocument(this.documentId)
+          }
         },
         error: (error) => {
           this.networkActive = false
@@ -898,6 +939,17 @@ export class DocumentDetailComponent
       this.permissionsService.currentUserCan(
         PermissionAction.View,
         PermissionType.Note
+      )
+    )
+  }
+
+  get historyEnabled(): boolean {
+    return (
+      this.settings.get(SETTINGS_KEYS.AUDITLOG_ENABLED) &&
+      this.userIsOwner &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.History
       )
     )
   }

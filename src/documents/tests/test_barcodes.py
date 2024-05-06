@@ -14,6 +14,7 @@ from documents.barcodes import BarcodePlugin
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
+from documents.models import Document
 from documents.models import Tag
 from documents.plugins.base import StopConsumeTaskError
 from documents.tests.utils import DirectoriesMixin
@@ -674,9 +675,7 @@ class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         dst = settings.SCRATCH_DIR / "barcode-39-asn-123.pdf"
         shutil.copy(test_file, dst)
 
-        with mock.patch(
-            "documents.consumer.Consumer.try_consume_file",
-        ) as mocked_consumer:
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             tasks.consume_file(
                 ConsumableDocument(
                     source=DocumentSource.ConsumeFolder,
@@ -684,10 +683,10 @@ class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
                 ),
                 None,
             )
-            mocked_consumer.assert_called_once()
-            args, kwargs = mocked_consumer.call_args
 
-            self.assertEqual(kwargs["override_asn"], 123)
+            document = Document.objects.first()
+
+            self.assertEqual(document.archive_serial_number, 123)
 
     @override_settings(CONSUMER_BARCODE_SCANNER="PYZBAR")
     def test_scan_file_for_qrcode_without_upscale(self):

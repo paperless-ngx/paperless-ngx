@@ -30,14 +30,13 @@ import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { ActivatedRoute, Router } from '@angular/router'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { SearchService } from 'src/app/services/rest/search.service'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { FILTER_FULLTEXT_QUERY } from 'src/app/data/filter-rule-type'
 import { routes } from 'src/app/app-routing.module'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop'
 import { SavedView } from 'src/app/data/saved-view'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { GlobalSearchComponent } from './global-search/global-search.component'
 
 const saved_views = [
   {
@@ -89,15 +88,17 @@ describe('AppFrameComponent', () => {
   let toastService: ToastService
   let messagesService: DjangoMessagesService
   let openDocumentsService: OpenDocumentsService
-  let searchService: SearchService
-  let documentListViewService: DocumentListViewService
   let router: Router
   let savedViewSpy
   let modalService: NgbModal
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [AppFrameComponent, IfPermissionsDirective],
+      declarations: [
+        AppFrameComponent,
+        IfPermissionsDirective,
+        GlobalSearchComponent,
+      ],
       imports: [
         HttpClientTestingModule,
         BrowserModule,
@@ -159,8 +160,6 @@ describe('AppFrameComponent', () => {
     toastService = TestBed.inject(ToastService)
     messagesService = TestBed.inject(DjangoMessagesService)
     openDocumentsService = TestBed.inject(OpenDocumentsService)
-    searchService = TestBed.inject(SearchService)
-    documentListViewService = TestBed.inject(DocumentListViewService)
     modalService = TestBed.inject(NgbModal)
     router = TestBed.inject(Router)
 
@@ -294,62 +293,6 @@ describe('AppFrameComponent', () => {
   it('should warn before close if dirty documents', () => {
     jest.spyOn(openDocumentsService, 'hasDirty').mockReturnValue(true)
     expect(component.canDeactivate()).toBeFalsy()
-  })
-
-  it('should call autocomplete endpoint on input', fakeAsync(() => {
-    const autocompleteSpy = jest.spyOn(searchService, 'autocomplete')
-    component.searchAutoComplete(of('hello')).subscribe()
-    tick(250)
-    expect(autocompleteSpy).toHaveBeenCalled()
-
-    component.searchAutoComplete(of('hello world 1')).subscribe()
-    tick(250)
-    expect(autocompleteSpy).toHaveBeenCalled()
-  }))
-
-  it('should handle autocomplete backend failure gracefully', fakeAsync(() => {
-    const serviceAutocompleteSpy = jest.spyOn(searchService, 'autocomplete')
-    serviceAutocompleteSpy.mockReturnValue(
-      throwError(() => new Error('autcomplete failed'))
-    )
-    // serviceAutocompleteSpy.mockReturnValue(of([' world']))
-    let result
-    component.searchAutoComplete(of('hello')).subscribe((res) => {
-      result = res
-    })
-    tick(250)
-    expect(serviceAutocompleteSpy).toHaveBeenCalled()
-    expect(result).toEqual([])
-  }))
-
-  it('should support reset search field', () => {
-    const resetSpy = jest.spyOn(component, 'resetSearchField')
-    const input = (fixture.nativeElement as HTMLDivElement).querySelector(
-      'input'
-    ) as HTMLInputElement
-    input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Escape' }))
-    expect(resetSpy).toHaveBeenCalled()
-  })
-
-  it('should support choosing a search item', () => {
-    expect(component.searchField.value).toEqual('')
-    component.itemSelected({ item: 'hello', preventDefault: () => true })
-    expect(component.searchField.value).toEqual('hello ')
-    component.itemSelected({ item: 'world', preventDefault: () => true })
-    expect(component.searchField.value).toEqual('hello world ')
-  })
-
-  it('should navigate via quickFilter on search', () => {
-    const str = 'hello world '
-    component.searchField.patchValue(str)
-    const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    component.search()
-    expect(qfSpy).toHaveBeenCalledWith([
-      {
-        rule_type: FILTER_FULLTEXT_QUERY,
-        value: str.trim(),
-      },
-    ])
   })
 
   it('should disable global dropzone on start drag + drop, re-enable after', () => {

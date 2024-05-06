@@ -241,6 +241,11 @@ permissions can be granted to limit access to certain parts of the UI (and corre
 
     Superusers can access all parts of the front and backend application as well as any and all objects.
 
+#### Admin Status
+
+Admin status (Django 'staff status') grants access to viewing the paperless logs and the system status dialog
+as well as accessing the Django backend.
+
 #### Detailed Explanation of Global Permissions {#global-permissions}
 
 Global permissions define what areas of the app and API endpoints the user can access. For example, they
@@ -249,7 +254,6 @@ still have "object-level" permissions.
 
 | Type          | Details                                                                                                                                                                                             |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Admin         | _View_ or higher permissions grants access to the logs view as well as the system status.                                                                                                           |
 | AppConfig     | _Change_ or higher permissions grants access to the "Application Configuration" area.                                                                                                               |
 | Correspondent | Grants global permissions to add, edit, delete or view Correspondents.                                                                                                                              |
 | CustomField   | Grants global permissions to add, edit, delete or view Custom Fields.                                                                                                                               |
@@ -468,6 +472,12 @@ Paperless-ngx supports 3 basic editing operations for PDFs (these operations can
 
     Note that rotation alters the Paperless-ngx _original_ file, which would, for example, invalidate a digital signature.
 
+## Document History
+
+As of version 2.7, Paperless-ngx automatically records all changes to a document and records this in an audit log. The feature requires [`PAPERLESS_AUDIT_LOG_ENABLED`](configuration.md#PAPERLESS_AUDIT_LOG_ENABLED) be enabled, which it is by default as of version 2.7.
+Changes to documents are visible under the "History" tab. Note that certain changes such as those made by workflows, record the 'actor'
+as "System".
+
 ## Best practices {#basic-searching}
 
 Paperless offers a couple tools that help you organize your document
@@ -540,6 +550,16 @@ collection.
 
 ## Searching {#basic-usage_searching}
 
+### Global search
+
+The top search bar in the web UI performs a "global" search of the various
+objects Paperless-ngx uses, including documents, tags, workflows, etc. Only
+objects for which the user has appropriate permissions are returned. For
+documents, if there are < 3 results, "advanced" search results (which use
+the document index) will also be included. This can be disabled under settings.
+
+### Document searches
+
 Paperless offers an extensive searching mechanism that is designed to
 allow you to quickly find a document you're looking for (for example,
 that thing that just broke and you bought a couple months ago, that
@@ -594,6 +614,12 @@ Whoosh's default query language. Head over to [Whoosh query
 language](https://whoosh.readthedocs.io/en/latest/querylang.html). For
 details on what date parsing utilities are available, see [Date
 parsing](https://whoosh.readthedocs.io/en/latest/dates.html#parsing-date-queries).
+
+## Keyboard shortcuts / hotkeys
+
+A list of available hotkeys can be shown on any page using <kbd>Shift</kbd> +
+<kbd>?</kbd>. The help dialog shows only the keys that are currently available
+based on which area of Paperless-ngx you are using.
 
 ## The recommended workflow {#usage-recommended-workflow}
 

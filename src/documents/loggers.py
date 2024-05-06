@@ -3,9 +3,6 @@ import uuid
 
 
 class LoggingMixin:
-    def __init__(self) -> None:
-        self.renew_logging_group()
-
     def renew_logging_group(self):
         """
         Creates a new UUID to group subsequent log calls together with

@@ -135,6 +135,7 @@ describe('OpenDocumentsService', () => {
     expect(openDocumentsService.hasDirty()).toBeFalsy()
     openDocumentsService.setDirty(documents[0], true)
     expect(openDocumentsService.hasDirty()).toBeTruthy()
+    expect(openDocumentsService.isDirty(documents[0])).toBeTruthy()
     let openModal
     modalService.activeInstances.subscribe((instances) => {
       openModal = instances[0]
