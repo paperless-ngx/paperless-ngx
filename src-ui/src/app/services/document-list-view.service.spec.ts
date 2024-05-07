@@ -591,4 +591,18 @@ describe('DocumentListViewService', () => {
       )
     )
   })
+
+  it('should not filter out custom fields if settings not initialized', () => {
+    const customFields = ['custom_field_1', 'custom_field_2']
+    documentListViewService.displayFields = customFields as any
+    settingsService.displayFieldsInitialized = false
+    expect(documentListViewService.displayFields).toEqual(customFields)
+    jest.spyOn(settingsService, 'allDisplayFields', 'get').mockReturnValue([
+      { id: DisplayField.ADDED, name: 'Added' },
+      { id: DisplayField.TITLE, name: 'Title' },
+      { id: 'custom_field_1', name: 'Custom Field 1' },
+    ] as any)
+    settingsService.displayFieldsInitialized = true
+    expect(documentListViewService.displayFields).toEqual(['custom_field_1'])
+  })
 })
