@@ -35,6 +35,7 @@ import type {
 import { PDFSinglePageViewer } from 'pdfjs-dist/web/pdf_viewer'
 
 PDFJS['verbosity'] = PDFJS.VerbosityLevel.ERRORS
+PDFJS['isEvalSupported'] = false
 
 export enum RenderTextMode {
   DISABLED,
