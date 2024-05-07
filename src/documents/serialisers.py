@@ -547,7 +547,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
                 except Exception:
                     # If that fails, try to validate as a monetary string
                     RegexValidator(
-                        regex=r"^[A-Z]{3}-?\d+(\.\d{2,2})$",
+                        regex=r"^[A-Z]{3}-?\d+(\.\d{1,2})$",
                         message="Must be a two-decimal number with optional currency code e.g. GBP123.45",
                     )(data["value"])
             elif field.data_type == CustomField.FieldDataType.STRING:
