@@ -16,7 +16,6 @@
 
 ### Features
 
-- Chore(deps): Bump all allowed backend packages [@stumpylog](https://github.com/stumpylog) ([#6562](https://github.com/paperless-ngx/paperless-ngx/pull/6562))
 - Feature: global search, keyboard shortcuts / hotkey support [@shamoon](https://github.com/shamoon) ([#6449](https://github.com/paperless-ngx/paperless-ngx/pull/6449))
 - Feature: customizable fields display for documents, saved views \& dashboard widgets [@shamoon](https://github.com/shamoon) ([#6439](https://github.com/paperless-ngx/paperless-ngx/pull/6439))
 - Feature: document history (audit log UI) [@shamoon](https://github.com/shamoon) ([#6388](https://github.com/paperless-ngx/paperless-ngx/pull/6388))
@@ -33,11 +32,12 @@
 - Fix: dont dismiss active alerts on dismiss completed [@shamoon](https://github.com/shamoon) ([#6364](https://github.com/paperless-ngx/paperless-ngx/pull/6364))
 - Fix: Allow lowercase letters in monetary currency code field [@shamoon](https://github.com/shamoon) ([#6359](https://github.com/paperless-ngx/paperless-ngx/pull/6359))
 - Fix: Allow negative monetary values with a current code [@stumpylog](https://github.com/stumpylog) ([#6358](https://github.com/paperless-ngx/paperless-ngx/pull/6358))
+- Fix: add timezone fallback to install script [@Harald-Berghoff](https://github.com/Harald-Berghoff) ([#6336](https://github.com/paperless-ngx/paperless-ngx/pull/6336))
 
 ### Maintenance
 
 - Chore(deps): Bump stumpylog/image-cleaner-action from 0.5.0 to 0.6.0 in the actions group [@dependabot](https://github.com/dependabot) ([#6541](https://github.com/paperless-ngx/paperless-ngx/pull/6541))
-- Fix: add timezone fallback to install script [@Harald-Berghoff](https://github.com/Harald-Berghoff) ([#6336](https://github.com/paperless-ngx/paperless-ngx/pull/6336))
+- Chore(deps): Bump all allowed backend packages [@stumpylog](https://github.com/stumpylog) ([#6562](https://github.com/paperless-ngx/paperless-ngx/pull/6562))
 
 ### Dependencies
 
