@@ -140,16 +140,12 @@ def modify_custom_fields(doc_ids: list[int], add_custom_fields, remove_custom_fi
     qs = Document.objects.filter(id__in=doc_ids).only("pk")
     affected_docs = list(qs.values_list("pk", flat=True))
 
-    fields_to_add = []
     for field in add_custom_fields:
         for doc_id in affected_docs:
-            fields_to_add.append(
-                CustomFieldInstance(
-                    document_id=doc_id,
-                    field_id=field,
-                ),
+            CustomFieldInstance.objects.update_or_create(
+                document_id=doc_id,
+                field_id=field,
             )
-    CustomFieldInstance.objects.bulk_create(fields_to_add)
     CustomFieldInstance.objects.filter(
         document_id__in=affected_docs,
         field_id__in=remove_custom_fields,
