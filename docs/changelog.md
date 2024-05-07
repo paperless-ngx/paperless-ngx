@@ -22,16 +22,6 @@
 - Fix: bulk edit custom fields should support multiple items [@shamoon](https://github.com/shamoon) ([#6589](https://github.com/paperless-ngx/paperless-ngx/pull/6589))
 </details>
 
-## paperless-ngx 2.8.1
-
-### Bug Fixes
-
-- Fix: bulk edit custom fields should support multiple items [@shamoon](https://github.com/shamoon) ([#6589](https://github.com/paperless-ngx/paperless-ngx/pull/6589))
-
-### All App Changes
-
-- Fix: bulk edit custom fields should support multiple items [@shamoon](https://github.com/shamoon) ([#6589](https://github.com/paperless-ngx/paperless-ngx/pull/6589))
-
 ## paperless-ngx 2.8.0
 
 ### Breaking Changes
