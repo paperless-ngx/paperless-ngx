@@ -17,7 +17,15 @@ import { getLocaleCurrencyCode } from '@angular/common'
 })
 export class MonetaryComponent extends AbstractInputComponent<string> {
   public currency: string = ''
-  public monetaryValue: string = ''
+
+  public _monetaryValue: string = ''
+  public get monetaryValue(): string {
+    return this._monetaryValue
+  }
+  public set monetaryValue(value: string) {
+    if (value) this._monetaryValue = value
+  }
+
   defaultCurrencyCode: string
 
   constructor(@Inject(LOCALE_ID) currentLocale: string) {
