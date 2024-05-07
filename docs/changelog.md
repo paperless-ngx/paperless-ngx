@@ -4,6 +4,28 @@
 
 ### Bug Fixes
 
+- Fix: saved views dont immediately display custom fields in table view [@shamoon](https://github.com/shamoon) ([#6594](https://github.com/paperless-ngx/paperless-ngx/pull/6594))
+- Fix: bulk edit custom fields should support multiple items [@shamoon](https://github.com/shamoon) ([#6589](https://github.com/paperless-ngx/paperless-ngx/pull/6589))
+
+### Dependencies
+
+- Chore(deps-dev): Bump jinja2 from 3.1.3 to 3.1.4 [@dependabot](https://github.com/dependabot) ([#6579](https://github.com/paperless-ngx/paperless-ngx/pull/6579))
+- Chore(deps-dev): Bump mkdocs-glightbox from 0.3.7 to 0.4.0 in the small-changes group [@dependabot](https://github.com/dependabot) ([#6581](https://github.com/paperless-ngx/paperless-ngx/pull/6581))
+
+### All App Changes
+
+<details>
+<summary>3 changes</summary>
+
+- Fix: saved views dont immediately display custom fields in table view [@shamoon](https://github.com/shamoon) ([#6594](https://github.com/paperless-ngx/paperless-ngx/pull/6594))
+- Chore(deps-dev): Bump mkdocs-glightbox from 0.3.7 to 0.4.0 in the small-changes group [@dependabot](https://github.com/dependabot) ([#6581](https://github.com/paperless-ngx/paperless-ngx/pull/6581))
+- Fix: bulk edit custom fields should support multiple items [@shamoon](https://github.com/shamoon) ([#6589](https://github.com/paperless-ngx/paperless-ngx/pull/6589))
+</details>
+
+## paperless-ngx 2.8.1
+
+### Bug Fixes
+
 - Fix: bulk edit custom fields should support multiple items [@shamoon](https://github.com/shamoon) ([#6589](https://github.com/paperless-ngx/paperless-ngx/pull/6589))
 
 ### All App Changes
