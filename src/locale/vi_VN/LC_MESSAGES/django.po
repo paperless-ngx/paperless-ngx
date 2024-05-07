@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-07 18:36-0700\n"
+"POT-Creation-Date: 2024-05-03 06:44+0000\n"
 "PO-Revision-Date: 2024-04-08 01:37\n"
 "Last-Translator: \n"
 "Language-Team: Vietnamese\n"
@@ -88,7 +88,7 @@ msgstr "là thẻ inbox"
 
 #: documents/models.py:106
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr ""
+msgstr "Đánh dấu thẻ này là một thẻ hộp thư đến: Tất cả các tài liệu mới được tiêu thụ sẽ được gắn thẻ với các thẻ hộp thư đến."
 
 #: documents/models.py:112
 msgid "tag"
@@ -135,8 +135,12 @@ msgid "content"
 msgstr "nội dung"
 
 #: documents/models.py:174
-msgid "The raw, text-only data of the document. This field is primarily used for searching."
+msgid ""
+"The raw, text-only data of the document. This field is primarily used for "
+"searching."
 msgstr ""
+"Dữ liệu gốc chỉ bao gồm văn bản của tài liệu. Trường này chủ yếu được sử "
+"dụng cho mục đích tìm kiếm."
 
 #: documents/models.py:179
 msgid "mime type"
@@ -148,15 +152,15 @@ msgstr "kiểm tra giá trị"
 
 #: documents/models.py:193
 msgid "The checksum of the original document."
-msgstr ""
+msgstr "Giá trị kiểm tra của tài liệu gốc."
 
 #: documents/models.py:197
 msgid "archive checksum"
-msgstr ""
+msgstr "kiểm tra giá trị lưu trữ"
 
 #: documents/models.py:202
 msgid "The checksum of the archived document."
-msgstr ""
+msgstr "Giá trị kiểm tra của tài liệu đã được lưu trữ."
 
 #: documents/models.py:205 documents/models.py:385 documents/models.py:659
 #: documents/models.py:697 documents/models.py:767 documents/models.py:804
@@ -181,31 +185,31 @@ msgstr "tên tập tin"
 
 #: documents/models.py:236
 msgid "Current filename in storage"
-msgstr "Tên tệp hiện tại trong bộ nhớ"
+msgstr "Tên tệp hiện tại trong lưu trữ"
 
 #: documents/models.py:240
 msgid "archive filename"
-msgstr ""
+msgstr "tên tệp lưu trữ"
 
 #: documents/models.py:246
 msgid "Current archive filename in storage"
-msgstr ""
+msgstr "Tên tệp lưu trữ hiện tại trong lưu trữ"
 
 #: documents/models.py:250
 msgid "original filename"
-msgstr ""
+msgstr "tên tệp gốc"
 
 #: documents/models.py:256
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "Tên ban đầu của tệp khi được tải lên"
 
 #: documents/models.py:263
 msgid "archive serial number"
-msgstr ""
+msgstr "số serial lưu trữ"
 
 #: documents/models.py:273
 msgid "The position of this document in your physical document archive."
-msgstr ""
+msgstr "Vị trí của tài liệu này trong lưu trữ tài liệu vật lý của bạn."
 
 #: documents/models.py:279 documents/models.py:670 documents/models.py:724
 msgid "document"
@@ -233,7 +237,7 @@ msgstr "lỗi"
 
 #: documents/models.py:372
 msgid "critical"
-msgstr ""
+msgstr "nghiêm trọng"
 
 #: documents/models.py:375
 msgid "group"
@@ -245,7 +249,7 @@ msgstr "tin nhắn"
 
 #: documents/models.py:380
 msgid "level"
-msgstr ""
+msgstr "mức độ"
 
 #: documents/models.py:389
 msgid "log"
@@ -253,15 +257,15 @@ msgstr "bản ghi"
 
 #: documents/models.py:390
 msgid "logs"
-msgstr "log"
+msgstr "bản ghi"
 
 #: documents/models.py:400
 msgid "show on dashboard"
-msgstr "hiển thị dashboard"
+msgstr "hiển thị trên bảng điều khiển"
 
 #: documents/models.py:403
 msgid "show in sidebar"
-msgstr "hiển thị trong slidebar"
+msgstr "hiển thị trong thanh bên"
 
 #: documents/models.py:407
 msgid "sort field"
@@ -269,7 +273,7 @@ msgstr "trường sắp xếp"
 
 #: documents/models.py:412
 msgid "sort reverse"
-msgstr ""
+msgstr "đảo ngược sắp xếp"
 
 #: documents/models.py:416 documents/models.py:469
 msgid "saved view"
@@ -281,633 +285,653 @@ msgstr "lưu chế độ xem"
 
 #: documents/models.py:425
 msgid "title contains"
-msgstr ""
+msgstr "tiêu đề chứa"
 
 #: documents/models.py:426
 msgid "content contains"
-msgstr ""
+msgstr "nội dung chứa"
 
 #: documents/models.py:427
 msgid "ASN is"
-msgstr ""
+msgstr "ASN là"
 
 #: documents/models.py:428
 msgid "correspondent is"
-msgstr ""
+msgstr "người tương ứng là"
 
 #: documents/models.py:429
 msgid "document type is"
-msgstr ""
+msgstr "loại tài liệu là"
 
 #: documents/models.py:430
 msgid "is in inbox"
-msgstr ""
+msgstr "nằm trong hộp thư đến"
 
 #: documents/models.py:431
 msgid "has tag"
-msgstr ""
+msgstr "có nhãn"
 
 #: documents/models.py:432
 msgid "has any tag"
-msgstr ""
+msgstr "có bất kỳ nhãn nào"
 
 #: documents/models.py:433
 msgid "created before"
-msgstr ""
+msgstr "đã tạo trước"
 
 #: documents/models.py:434
 msgid "created after"
-msgstr ""
+msgstr "đã tạo sau"
 
 #: documents/models.py:435
 msgid "created year is"
-msgstr ""
+msgstr "năm tạo là"
 
 #: documents/models.py:436
 msgid "created month is"
-msgstr ""
+msgstr "tháng tạo là"
 
 #: documents/models.py:437
 msgid "created day is"
-msgstr ""
+msgstr "ngày tạo là"
 
 #: documents/models.py:438
 msgid "added before"
-msgstr ""
+msgstr "đã thêm trước"
 
 #: documents/models.py:439
 msgid "added after"
-msgstr ""
+msgstr "đã thêm sau"
 
 #: documents/models.py:440
 msgid "modified before"
-msgstr ""
+msgstr "đã sửa đổi trước"
 
 #: documents/models.py:441
 msgid "modified after"
-msgstr ""
+msgstr "đã sửa đổi sau"
 
 #: documents/models.py:442
 msgid "does not have tag"
-msgstr ""
+msgstr "không có nhãn"
 
 #: documents/models.py:443
 msgid "does not have ASN"
-msgstr ""
+msgstr "không có ASN"
 
 #: documents/models.py:444
 msgid "title or content contains"
-msgstr ""
+msgstr "tiêu đề hoặc nội dung chứa"
 
 #: documents/models.py:445
 msgid "fulltext query"
-msgstr ""
+msgstr "truy vấn toàn văn"
 
 #: documents/models.py:446
 msgid "more like this"
-msgstr ""
+msgstr "nhiều hơn như thế này"
 
 #: documents/models.py:447
 msgid "has tags in"
-msgstr ""
+msgstr "có nhãn trong"
 
 #: documents/models.py:448
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN lớn hơn"
 
 #: documents/models.py:449
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN nhỏ hơn"
 
 #: documents/models.py:450
 msgid "storage path is"
-msgstr ""
+msgstr "đường dẫn lưu trữ là"
 
 #: documents/models.py:451
 msgid "has correspondent in"
-msgstr ""
+msgstr "có người tương ứng trong"
 
 #: documents/models.py:452
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "không có người tương ứng trong"
 
 #: documents/models.py:453
 msgid "has document type in"
-msgstr ""
+msgstr "có loại tài liệu trong"
 
 #: documents/models.py:454
 msgid "does not have document type in"
-msgstr ""
+msgstr "không có loại tài liệu trong"
 
 #: documents/models.py:455
 msgid "has storage path in"
-msgstr ""
+msgstr "có đường dẫn lưu trữ trong"
 
 #: documents/models.py:456
 msgid "does not have storage path in"
-msgstr ""
+msgstr "không có đường dẫn lưu trữ trong"
 
 #: documents/models.py:457
 msgid "owner is"
-msgstr ""
+msgstr "chủ sở hữu là"
 
 #: documents/models.py:458
 msgid "has owner in"
-msgstr ""
+msgstr "có chủ sở hữu trong"
 
 #: documents/models.py:459
 msgid "does not have owner"
-msgstr ""
+msgstr "không có chủ sở hữu"
 
 #: documents/models.py:460
 msgid "does not have owner in"
-msgstr ""
+msgstr "không có chủ sở hữu trong"
 
 #: documents/models.py:461
 msgid "has custom field value"
-msgstr ""
+msgstr "có giá trị trường tùy chỉnh"
 
 #: documents/models.py:462
 msgid "is shared by me"
-msgstr ""
+msgstr "được chia sẻ bởi tôi"
 
 #: documents/models.py:472
 msgid "rule type"
-msgstr ""
+msgstr "loại quy tắc"
 
 #: documents/models.py:474
 msgid "value"
-msgstr ""
+msgstr "giá trị"
 
 #: documents/models.py:477
 msgid "filter rule"
-msgstr ""
+msgstr "quy tắc lọc"
 
 #: documents/models.py:478
 msgid "filter rules"
-msgstr ""
+msgstr "quy tắc lọc"
 
 #: documents/models.py:589
 msgid "Task ID"
-msgstr ""
+msgstr "ID công việc"
 
 #: documents/models.py:590
 msgid "Celery ID for the Task that was run"
-msgstr ""
+msgstr "ID Celery cho công việc đã được thực thi"
 
 #: documents/models.py:595
 msgid "Acknowledged"
-msgstr ""
+msgstr "Đã nhận"
 
 #: documents/models.py:596
 msgid "If the task is acknowledged via the frontend or API"
-msgstr ""
+msgstr "Nếu công việc đã được nhận thông qua giao diện người dùng hoặc API"
 
 #: documents/models.py:602
 msgid "Task Filename"
-msgstr ""
+msgstr "Tên tệp công việc"
 
 #: documents/models.py:603
 msgid "Name of the file which the Task was run for"
-msgstr ""
+msgstr "Tên của tệp mà Công việc đã được thực thi cho"
 
 #: documents/models.py:609
 msgid "Task Name"
-msgstr ""
+msgstr "Tên công việc"
 
 #: documents/models.py:610
 msgid "Name of the Task which was run"
-msgstr ""
+msgstr "Tên của Công việc đã được thực thi"
 
 #: documents/models.py:617
 msgid "Task State"
-msgstr ""
+msgstr "Trạng thái công việc"
 
 #: documents/models.py:618
 msgid "Current state of the task being run"
-msgstr ""
+msgstr "Trạng thái hiện tại của công việc đang thực thi"
 
 #: documents/models.py:623
 msgid "Created DateTime"
-msgstr ""
+msgstr "Thời gian tạo"
 
 #: documents/models.py:624
 msgid "Datetime field when the task result was created in UTC"
-msgstr ""
+msgstr "Trường ngày giờ khi kết quả công việc được tạo ra ở múi giờ UTC"
 
 #: documents/models.py:629
 msgid "Started DateTime"
-msgstr ""
+msgstr "Thời gian bắt đầu"
 
 #: documents/models.py:630
 msgid "Datetime field when the task was started in UTC"
-msgstr ""
+msgstr "Trường ngày giờ khi công việc được bắt đầu ở múi giờ UTC"
 
 #: documents/models.py:635
 msgid "Completed DateTime"
-msgstr ""
+msgstr "Thời gian hoàn thành"
 
 #: documents/models.py:636
 msgid "Datetime field when the task was completed in UTC"
-msgstr ""
+msgstr "Trường ngày giờ khi công việc được hoàn thành ở múi giờ UTC"
 
 #: documents/models.py:641
 msgid "Result Data"
-msgstr ""
+msgstr "Dữ liệu kết quả"
 
 #: documents/models.py:643
 msgid "The data returned by the task"
-msgstr ""
+msgstr "Dữ liệu được trả về bởi công việc"
 
 #: documents/models.py:655
 msgid "Note for the document"
-msgstr ""
+msgstr "Ghi chú cho tài liệu"
 
 #: documents/models.py:679
 msgid "user"
-msgstr ""
+msgstr "người dùng"
 
 #: documents/models.py:684
 msgid "note"
-msgstr ""
+msgstr "ghi chú"
 
 #: documents/models.py:685
 msgid "notes"
-msgstr ""
+msgstr "ghi chú"
 
 #: documents/models.py:693
 msgid "Archive"
-msgstr ""
+msgstr "Lưu trữ"
 
 #: documents/models.py:694
 msgid "Original"
-msgstr ""
+msgstr "Gốc"
 
 #: documents/models.py:705
 msgid "expiration"
-msgstr ""
+msgstr "hết hạn"
 
 #: documents/models.py:712
 msgid "slug"
-msgstr ""
+msgstr "slug"
 
 #: documents/models.py:744
 msgid "share link"
-msgstr ""
+msgstr "liên kết chia sẻ"
 
 #: documents/models.py:745
 msgid "share links"
-msgstr ""
+msgstr "liên kết chia sẻ"
 
 #: documents/models.py:757
 msgid "String"
-msgstr ""
+msgstr "Chuỗi"
 
 #: documents/models.py:758
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: documents/models.py:759
 msgid "Date"
-msgstr ""
+msgstr "Ngày"
 
 #: documents/models.py:760
 msgid "Boolean"
-msgstr ""
+msgstr "Boolean"
 
 #: documents/models.py:761
 msgid "Integer"
-msgstr ""
+msgstr "Số nguyên"
 
 #: documents/models.py:762
 msgid "Float"
-msgstr ""
+msgstr "Số thực"
 
 #: documents/models.py:763
 msgid "Monetary"
-msgstr ""
+msgstr "Tiền tệ"
 
 #: documents/models.py:764
 msgid "Document Link"
-msgstr ""
+msgstr "Liên kết tài liệu"
 
 #: documents/models.py:776
 msgid "data type"
-msgstr ""
+msgstr "kiểu dữ liệu"
 
 #: documents/models.py:784
 msgid "custom field"
-msgstr ""
+msgstr "trường tùy chỉnh"
 
 #: documents/models.py:785
 msgid "custom fields"
-msgstr ""
+msgstr "các trường tùy chỉnh"
 
 #: documents/models.py:847
 msgid "custom field instance"
-msgstr ""
+msgstr "thể hiện trường tùy chỉnh"
 
 #: documents/models.py:848
 msgid "custom field instances"
-msgstr ""
+msgstr "các thể hiện trường tùy chỉnh"
 
 #: documents/models.py:905
 msgid "Consumption Started"
-msgstr ""
+msgstr "Bắt đầu tiêu thụ"
 
 #: documents/models.py:906
 msgid "Document Added"
-msgstr ""
+msgstr "Tài liệu Đã Thêm"
 
 #: documents/models.py:907
 msgid "Document Updated"
-msgstr ""
+msgstr "Tài liệu Đã Cập Nhật"
 
 #: documents/models.py:910
 msgid "Consume Folder"
-msgstr ""
+msgstr "Thư mục Tiêu Thụ"
 
 #: documents/models.py:911
 msgid "Api Upload"
-msgstr ""
+msgstr "Tải Lên API"
 
 #: documents/models.py:912
 msgid "Mail Fetch"
-msgstr ""
+msgstr "Lấy Thư"
 
 #: documents/models.py:915
 msgid "Workflow Trigger Type"
-msgstr ""
+msgstr "Loại Kích Hoạt Luồng Công Việc"
 
 #: documents/models.py:927
 msgid "filter path"
-msgstr ""
+msgstr "đường dẫn bộ lọc"
 
 #: documents/models.py:932
-msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
+msgid ""
+"Only consume documents with a path that matches this if specified. Wildcards "
+"specified as * are allowed. Case insensitive."
 msgstr ""
+"Chỉ tiêu thụ các tài liệu có đường dẫn khớp với điều này nếu được chỉ định. "
+"Ký tự đại diện được xác định là * được cho phép. Không phân biệt chữ hoa chữ "
+"thường."
 
 #: documents/models.py:939
 msgid "filter filename"
-msgstr ""
+msgstr "tên tệp bộ lọc"
 
 #: documents/models.py:944 paperless_mail/models.py:148
-msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgid ""
+"Only consume documents which entirely match this filename if specified. "
+"Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr ""
+"Chỉ tiêu thụ các tài liệu có đường dẫn khớp với điều này nếu được chỉ định. "
+"Ký tự đại diện được xác định là * được cho phép. Không phân biệt chữ hoa chữ "
+"thường."
 
 #: documents/models.py:955
 msgid "filter documents from this mail rule"
-msgstr ""
+msgstr "bộ lọc tài liệu từ quy tắc thư này"
 
 #: documents/models.py:971
 msgid "has these tag(s)"
-msgstr ""
+msgstr "có các nhãn này"
 
 #: documents/models.py:979
 msgid "has this document type"
-msgstr ""
+msgstr "có loại tài liệu này"
 
 #: documents/models.py:987
 msgid "has this correspondent"
-msgstr ""
+msgstr "có người tương ứng này"
 
 #: documents/models.py:991
 msgid "workflow trigger"
-msgstr ""
+msgstr "kích hoạt luồng công việc"
 
 #: documents/models.py:992
 msgid "workflow triggers"
-msgstr ""
+msgstr "các kích hoạt luồng công việc"
 
 #: documents/models.py:1002
 msgid "Assignment"
-msgstr ""
+msgstr "Phân công"
 
 #: documents/models.py:1006
 msgid "Removal"
-msgstr ""
+msgstr "Xóa bỏ"
 
 #: documents/models.py:1010
 msgid "Workflow Action Type"
-msgstr ""
+msgstr "Loại Hành Động Luồng Công Việc"
 
 #: documents/models.py:1016
 msgid "assign title"
-msgstr ""
+msgstr "gán tiêu đề"
 
 #: documents/models.py:1021
-msgid "Assign a document title, can include some placeholders, see documentation."
+msgid ""
+"Assign a document title, can include some placeholders, see documentation."
 msgstr ""
+"Gán tiêu đề cho tài liệu, có thể bao gồm một số trình giữ chỗ, xem tài liệu "
+"hướng dẫn để biết thêm thông tin chi tiết."
 
 #: documents/models.py:1030 paperless_mail/models.py:216
 msgid "assign this tag"
-msgstr ""
+msgstr "gán nhãn này"
 
 #: documents/models.py:1039 paperless_mail/models.py:224
 msgid "assign this document type"
-msgstr ""
+msgstr "gán loại tài liệu này"
 
 #: documents/models.py:1048 paperless_mail/models.py:238
 msgid "assign this correspondent"
-msgstr ""
+msgstr "gán người tương ứng này"
 
 #: documents/models.py:1057
 msgid "assign this storage path"
-msgstr ""
+msgstr "gán đường dẫn lưu trữ này"
 
 #: documents/models.py:1066
 msgid "assign this owner"
-msgstr ""
+msgstr "gán chủ sở hữu này"
 
 #: documents/models.py:1073
 msgid "grant view permissions to these users"
-msgstr ""
+msgstr "cấp quyền xem cho các người dùng này"
 
 #: documents/models.py:1080
 msgid "grant view permissions to these groups"
-msgstr ""
+msgstr "cấp quyền xem cho các nhóm này"
 
 #: documents/models.py:1087
 msgid "grant change permissions to these users"
-msgstr ""
+msgstr "cấp quyền thay đổi cho các người dùng này"
 
 #: documents/models.py:1094
 msgid "grant change permissions to these groups"
-msgstr ""
+msgstr "cấp quyền thay đổi cho các nhóm này"
 
 #: documents/models.py:1101
 msgid "assign these custom fields"
-msgstr ""
+msgstr "gán các trường tùy chỉnh này"
 
 #: documents/models.py:1108
 msgid "remove these tag(s)"
-msgstr ""
+msgstr "xóa các nhãn này"
 
 #: documents/models.py:1113
 msgid "remove all tags"
-msgstr ""
+msgstr "xóa tất cả các nhãn"
 
 #: documents/models.py:1120
 msgid "remove these document type(s)"
-msgstr ""
+msgstr "xóa các loại tài liệu này"
 
 #: documents/models.py:1125
 msgid "remove all document types"
-msgstr ""
+msgstr "xóa tất cả các loại tài liệu"
 
 #: documents/models.py:1132
 msgid "remove these correspondent(s)"
-msgstr ""
+msgstr "xóa các người tương ứng này"
 
 #: documents/models.py:1137
 msgid "remove all correspondents"
-msgstr ""
+msgstr "xóa tất cả các người tương ứng"
 
 #: documents/models.py:1144
 msgid "remove these storage path(s)"
-msgstr ""
+msgstr "xóa các đường dẫn lưu trữ này"
 
 #: documents/models.py:1149
 msgid "remove all storage paths"
-msgstr ""
+msgstr "xóa tất cả các đường dẫn lưu trữ"
 
 #: documents/models.py:1156
 msgid "remove these owner(s)"
-msgstr ""
+msgstr "xóa các chủ sở hữu này"
 
 #: documents/models.py:1161
 msgid "remove all owners"
-msgstr ""
+msgstr "xóa tất cả các chủ sở hữu"
 
 #: documents/models.py:1168
 msgid "remove view permissions for these users"
-msgstr ""
+msgstr "xóa quyền xem cho các người dùng này"
 
 #: documents/models.py:1175
 msgid "remove view permissions for these groups"
-msgstr ""
+msgstr "xóa quyền xem cho các nhóm này"
 
 #: documents/models.py:1182
 msgid "remove change permissions for these users"
-msgstr ""
+msgstr "xóa quyền thay đổi cho các người dùng này"
 
 #: documents/models.py:1189
 msgid "remove change permissions for these groups"
-msgstr ""
+msgstr "xóa quyền thay đổi cho các nhóm này"
 
 #: documents/models.py:1194
 msgid "remove all permissions"
-msgstr ""
+msgstr "xóa tất cả các quyền"
 
 #: documents/models.py:1201
 msgid "remove these custom fields"
-msgstr ""
+msgstr "xóa các trường tùy chỉnh này"
 
 #: documents/models.py:1206
 msgid "remove all custom fields"
-msgstr ""
+msgstr "xóa tất cả các trường tùy chỉnh"
 
 #: documents/models.py:1210
 msgid "workflow action"
-msgstr ""
+msgstr "hành động luồng công việc"
 
 #: documents/models.py:1211
 msgid "workflow actions"
-msgstr ""
+msgstr "các hành động luồng công việc"
 
 #: documents/models.py:1220 paperless_mail/models.py:95
 msgid "order"
-msgstr ""
+msgstr "thứ tự"
 
 #: documents/models.py:1226
 msgid "triggers"
-msgstr ""
+msgstr "kích hoạt"
 
 #: documents/models.py:1233
 msgid "actions"
-msgstr ""
+msgstr "hành động"
 
 #: documents/models.py:1236
 msgid "enabled"
-msgstr ""
+msgstr "đã kích hoạt"
 
 #: documents/serialisers.py:114
 #, python-format
 msgid "Invalid regular expression: %(error)s"
-msgstr ""
+msgstr "Biểu thức chính quy không hợp lệ: %(error)s"
 
 #: documents/serialisers.py:417
 msgid "Invalid color."
-msgstr ""
+msgstr "Màu không hợp lệ."
 
 #: documents/serialisers.py:1143
 #, python-format
 msgid "File type %(type)s not supported"
-msgstr ""
+msgstr "Loại tệp %(type)s không được hỗ trợ"
 
 #: documents/serialisers.py:1252
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "Phát hiện biến không hợp lệ."
 
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
-msgstr ""
+msgstr "Xin chào từ %(site_name)s!"
 
 #: documents/templates/account/email/base_message.txt:5
 #, python-format
-msgid "Thank you for using %(site_name)s!\n"
+msgid ""
+"Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
 msgstr ""
+"Cảm ơn bạn đã sử dụng %(site_name)s!\n"
+"%(site_domain)s"
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "Đăng nhập Tc group"
 
 #: documents/templates/account/login.html:10
 msgid "Please sign in."
-msgstr ""
+msgstr "Vui lòng đăng nhập."
 
 #: documents/templates/account/login.html:12
 #, python-format
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
-msgstr ""
+msgstr "Chưa có tài khoản? <a href=\"%(signup_url)s\">Đăng ký</a>"
 
 #: documents/templates/account/login.html:19
 #: documents/templates/account/signup.html:15
 #: documents/templates/socialaccount/signup.html:13
 msgid "Username"
-msgstr ""
+msgstr "Tên người dùng"
 
 #: documents/templates/account/login.html:20
 #: documents/templates/account/signup.html:17
 msgid "Password"
-msgstr ""
+msgstr "Mật khẩu"
 
 #: documents/templates/account/login.html:30
 msgid "Sign in"
-msgstr ""
+msgstr "Đăng nhập"
 
 #: documents/templates/account/login.html:34
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Quên mật khẩu?"
 
 #: documents/templates/account/login.html:45
 #: documents/templates/account/signup.html:49
 msgid "or sign in via"
-msgstr ""
+msgstr "hoặc đăng nhập qua"
 
 #: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
-msgstr ""
+msgstr "Yêu cầu đặt lại mật khẩu Tc group"
 
 #: documents/templates/account/password_reset.html:9
-msgid "Enter your email address below, and we'll email instructions for setting a new one."
+msgid ""
+"Enter your email address below, and we'll email instructions for setting a "
+"new one."
 msgstr ""
+"Vui lòng nhập địa chỉ email của bạn bên dưới, chúng tôi sẽ gửi cho bạn hướng "
+"dẫn để thiết lập mật khẩu mới."
 
 #: documents/templates/account/password_reset.html:12
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "Một lỗi đã xảy ra. Vui lòng thử lại."
 
 #: documents/templates/account/password_reset.html:15
 msgid "Email"
@@ -915,692 +939,736 @@ msgstr ""
 
 #: documents/templates/account/password_reset.html:21
 msgid "Send me instructions!"
-msgstr ""
+msgstr "Gửi cho tôi hướng dẫn!"
 
 #: documents/templates/account/password_reset_done.html:5
 msgid "Paperless-ngx reset password sent"
-msgstr ""
+msgstr "Tc group đã gửi yêu cầu đặt lại mật khẩu"
 
 #: documents/templates/account/password_reset_done.html:9
 msgid "Check your inbox."
-msgstr ""
+msgstr "Kiểm tra hộp thư đến của bạn."
 
 #: documents/templates/account/password_reset_done.html:13
-msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
+msgid ""
+"We've emailed you instructions for setting your password. You should receive "
+"the email shortly!"
 msgstr ""
+"Chúng tôi đã gửi cho bạn hướng dẫn để thiết lập mật khẩu. Bạn sẽ nhận được "
+"email trong một thời gian ngắn!"
 
 #: documents/templates/account/password_reset_from_key.html:5
 msgid "Paperless-ngx reset password confirmation"
-msgstr ""
+msgstr "Xác nhận đặt lại mật khẩu Tc group"
 
 #: documents/templates/account/password_reset_from_key.html:9
 msgid "Set a new password."
-msgstr ""
+msgstr "Đặt mật khẩu mới."
 
 #: documents/templates/account/password_reset_from_key.html:15
 msgid "request a new password reset"
-msgstr ""
+msgstr "yêu cầu đặt lại mật khẩu mới"
 
 #: documents/templates/account/password_reset_from_key.html:17
 msgid "New Password"
-msgstr ""
+msgstr "Mật khẩu mới"
 
 #: documents/templates/account/password_reset_from_key.html:18
 msgid "Confirm Password"
-msgstr ""
+msgstr "Xác nhận mật khẩu"
 
 #: documents/templates/account/password_reset_from_key.html:28
 msgid "Change my password"
-msgstr ""
+msgstr "Đổi mật khẩu của tôi"
 
 #: documents/templates/account/password_reset_from_key_done.html:5
 msgid "Paperless-ngx reset password complete"
-msgstr ""
+msgstr "Hoàn tất đặt lại mật khẩu Tc group"
 
 #: documents/templates/account/password_reset_from_key_done.html:9
 msgid "Password reset complete."
-msgstr ""
+msgstr "Đặt lại mật khẩu hoàn tất."
 
 #: documents/templates/account/password_reset_from_key_done.html:14
 #, python-format
-msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
+msgid ""
+"Your new password has been set. You can now <a href=\"%(login_url)s\">log "
+"in</a>"
 msgstr ""
+"Mật khẩu mới của bạn đã được thiết lập. Bây giờ bạn có thể <a "
+"href=\"%(login_url)s\">đăng nhập</a>."
 
 #: documents/templates/account/signup.html:5
 msgid "Paperless-ngx sign up"
-msgstr ""
+msgstr "Đăng ký Tc group"
 
 #: documents/templates/account/signup.html:10
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
-msgstr ""
+msgstr "Đã có tài khoản? <a href=\"%(login_url)s\">Đăng nhập</a>"
 
 #: documents/templates/account/signup.html:16
 #: documents/templates/socialaccount/signup.html:14
 msgid "Email (optional)"
-msgstr ""
+msgstr "Email (tùy chọn)"
 
 #: documents/templates/account/signup.html:18
 msgid "Password (again)"
-msgstr ""
+msgstr "Nhập lại mật khẩu"
 
 #: documents/templates/account/signup.html:36
 #: documents/templates/socialaccount/signup.html:27
 msgid "Sign up"
-msgstr ""
+msgstr "Đăng ký"
 
 #: documents/templates/index.html:61
 msgid "Paperless-ngx is loading..."
-msgstr ""
+msgstr "Tc group đang tải..."
 
 #: documents/templates/index.html:62
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "Vẫn ở đây?! Hình như có gì đó không đúng."
 
 #: documents/templates/index.html:62
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "Dưới đây là liên kết đến tài liệu."
 
 #: documents/templates/paperless-ngx/base.html:41
 msgid "Share link was not found."
-msgstr ""
+msgstr "Liên kết chia sẻ không được tìm thấy."
 
 #: documents/templates/paperless-ngx/base.html:45
 msgid "Share link has expired."
-msgstr ""
+msgstr "Liên kết chia sẻ đã hết hạn."
 
 #: documents/templates/socialaccount/authentication_error.html:5
 #: documents/templates/socialaccount/login.html:5
 msgid "Paperless-ngx social account sign in"
-msgstr ""
+msgstr "Đăng nhập tài khoản xã hội Tc group"
 
 #: documents/templates/socialaccount/authentication_error.html:10
 #, python-format
-msgid "An error occurred while attempting to login via your social network account. Back to the <a href=\"%(login_url)s\">login page</a>"
+msgid ""
+"An error occurred while attempting to login via your social network account. "
+"Back to the <a href=\"%(login_url)s\">login page</a>"
 msgstr ""
+"Đã xảy ra lỗi khi cố gắng đăng nhập qua tài khoản mạng xã hội của bạn. Quay "
+"lại <a href=\"%(login_url)s\">trang đăng nhập</a>"
 
 #: documents/templates/socialaccount/login.html:10
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
 msgstr ""
+"Bạn đang chuẩn bị kết nối một tài khoản bên thứ ba mới từ %(provider)s."
 
 #: documents/templates/socialaccount/login.html:13
 msgid "Continue"
-msgstr ""
+msgstr "Tiếp tục"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
-msgstr ""
+msgstr "Đăng ký tài khoản xã hội Tc group"
 
 #: documents/templates/socialaccount/signup.html:10
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
-msgstr ""
+msgstr "Bạn sắp sử dụng tài khoản %(provider_name)s của mình để đăng nhập."
 
 #: documents/templates/socialaccount/signup.html:11
 msgid "As a final step, please complete the following form:"
-msgstr ""
+msgstr "Là bước cuối cùng, vui lòng hoàn tất biểu mẫu sau:"
 
 #: documents/validators.py:17
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "Không thể phân tích URI {value}, thiếu scheme"
 
 #: documents/validators.py:22
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
+msgstr "Không thể phân tích URI {value}, thiếu vị trí mạng hoặc đường dẫn"
 
 #: documents/validators.py:27
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "Không thể phân tích URI {value}"
 
 #: paperless/apps.py:10
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/models.py:26
 msgid "pdf"
-msgstr ""
+msgstr "pdf"
 
 #: paperless/models.py:27
 msgid "pdfa"
-msgstr ""
+msgstr "pdfa"
 
 #: paperless/models.py:28
 msgid "pdfa-1"
-msgstr ""
+msgstr "pdfa-1"
 
 #: paperless/models.py:29
 msgid "pdfa-2"
-msgstr ""
+msgstr "pdfa-2"
 
 #: paperless/models.py:30
 msgid "pdfa-3"
-msgstr ""
+msgstr "pdfa-3"
 
 #: paperless/models.py:39
 msgid "skip"
-msgstr ""
+msgstr "bỏ qua"
 
 #: paperless/models.py:40
 msgid "redo"
-msgstr ""
+msgstr "làm lại"
 
 #: paperless/models.py:41
 msgid "force"
-msgstr ""
+msgstr "bắt buộc"
 
 #: paperless/models.py:42
 msgid "skip_noarchive"
-msgstr ""
+msgstr "bỏ qua không lưu trữ"
 
 #: paperless/models.py:50
 msgid "never"
-msgstr ""
+msgstr "không bao giờ"
 
 #: paperless/models.py:51
 msgid "with_text"
-msgstr ""
+msgstr "với văn bản"
 
 #: paperless/models.py:52
 msgid "always"
-msgstr ""
+msgstr "luôn luôn"
 
 #: paperless/models.py:60
 msgid "clean"
-msgstr ""
+msgstr "làm sạch"
 
 #: paperless/models.py:61
 msgid "clean-final"
-msgstr ""
+msgstr "làm sạch cuối cùng"
 
 #: paperless/models.py:62
 msgid "none"
-msgstr ""
+msgstr "không gì"
 
 #: paperless/models.py:70
 msgid "LeaveColorUnchanged"
-msgstr ""
+msgstr "Để màu không thay đổi"
 
 #: paperless/models.py:71
 msgid "RGB"
-msgstr ""
+msgstr "RGB"
 
 #: paperless/models.py:72
 msgid "UseDeviceIndependentColor"
-msgstr ""
+msgstr "Sử dụng màu độc lập với thiết bị"
 
 #: paperless/models.py:73
 msgid "Gray"
-msgstr ""
+msgstr "Xám"
 
 #: paperless/models.py:74
 msgid "CMYK"
-msgstr ""
+msgstr "CMYK"
 
 #: paperless/models.py:83
 msgid "Sets the output PDF type"
-msgstr ""
+msgstr "Thiết lập loại PDF đầu ra"
 
 #: paperless/models.py:95
 msgid "Do OCR from page 1 to this value"
-msgstr ""
+msgstr "Thực hiện OCR từ trang 1 đến giá trị này"
 
 #: paperless/models.py:101
 msgid "Do OCR using these languages"
-msgstr ""
+msgstr "Thực hiện OCR bằng các ngôn ngữ này"
 
 #: paperless/models.py:108
 msgid "Sets the OCR mode"
-msgstr ""
+msgstr "Thiết lập chế độ OCR"
 
 #: paperless/models.py:116
 msgid "Controls the generation of an archive file"
-msgstr ""
+msgstr "Kiểm soát việc tạo ra một tệp lưu trữ"
 
 #: paperless/models.py:124
 msgid "Sets image DPI fallback value"
-msgstr ""
+msgstr "Thiết lập giá trị sao chép DPI hình ảnh"
 
 #: paperless/models.py:131
 msgid "Controls the unpaper cleaning"
-msgstr ""
+msgstr "Kiểm soát việc làm sạch unpaper"
 
 #: paperless/models.py:138
 msgid "Enables deskew"
-msgstr ""
+msgstr "Cho phép chỉnh sửa"
 
 #: paperless/models.py:141
 msgid "Enables page rotation"
-msgstr ""
+msgstr "Cho phép xoay trang"
 
 #: paperless/models.py:146
 msgid "Sets the threshold for rotation of pages"
-msgstr ""
+msgstr "Thiết lập ngưỡng cho việc xoay trang"
 
 #: paperless/models.py:152
 msgid "Sets the maximum image size for decompression"
-msgstr ""
+msgstr "Thiết lập kích thước hình ảnh tối đa cho việc giải nén"
 
 #: paperless/models.py:158
 msgid "Sets the Ghostscript color conversion strategy"
-msgstr ""
+msgstr "Thiết lập chiến lược chuyển đổi màu Ghostscript"
 
 #: paperless/models.py:166
 msgid "Adds additional user arguments for OCRMyPDF"
-msgstr ""
+msgstr "Thêm các đối số người dùng bổ sung cho OCRMyPDF"
 
 #: paperless/models.py:171
 msgid "Application title"
-msgstr ""
+msgstr "Tiêu đề ứng dụng"
 
 #: paperless/models.py:178
 msgid "Application logo"
-msgstr ""
+msgstr "Logo ứng dụng"
 
 #: paperless/models.py:188
 msgid "paperless application settings"
-msgstr ""
+msgstr "cài đặt ứng dụng không giấy"
 
 #: paperless/settings.py:666
 msgid "English (US)"
-msgstr ""
+msgstr "Tiếng Anh (Mỹ)"
 
 #: paperless/settings.py:667
 msgid "Arabic"
-msgstr ""
+msgstr "Tiếng Ả Rập"
 
 #: paperless/settings.py:668
 msgid "Afrikaans"
-msgstr ""
+msgstr "Tiếng Afrikaans"
 
 #: paperless/settings.py:669
 msgid "Belarusian"
-msgstr ""
+msgstr "Tiếng Belarus"
 
 #: paperless/settings.py:670
 msgid "Bulgarian"
-msgstr ""
+msgstr "Tiếng Bulgaria"
 
 #: paperless/settings.py:671
 msgid "Catalan"
-msgstr ""
+msgstr "Tiếng Catalan"
 
 #: paperless/settings.py:672
 msgid "Czech"
-msgstr ""
+msgstr "Tiếng Séc"
 
 #: paperless/settings.py:673
 msgid "Danish"
-msgstr ""
+msgstr "Tiếng Đan Mạch"
 
 #: paperless/settings.py:674
 msgid "German"
-msgstr ""
+msgstr "Tiếng Đức"
 
 #: paperless/settings.py:675
 msgid "Greek"
-msgstr ""
+msgstr "Tiếng Hy Lạp"
 
 #: paperless/settings.py:676
 msgid "English (GB)"
-msgstr ""
+msgstr "Tiếng Anh (Anh)"
 
 #: paperless/settings.py:677
 msgid "Spanish"
-msgstr ""
+msgstr "Tiếng Tây Ban Nha"
 
 #: paperless/settings.py:678
 msgid "Finnish"
-msgstr ""
+msgstr "Tiếng Phần Lan"
 
 #: paperless/settings.py:679
 msgid "French"
-msgstr ""
+msgstr "Tiếng Pháp"
 
 #: paperless/settings.py:680
 msgid "Hungarian"
-msgstr ""
+msgstr "Tiếng Hungary"
 
 #: paperless/settings.py:681
 msgid "Italian"
-msgstr ""
+msgstr "Tiếng Ý"
 
 #: paperless/settings.py:682
 msgid "Japanese"
-msgstr ""
+msgstr "Tiếng Nhật"
 
 #: paperless/settings.py:683
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Tiếng Luxembourg"
 
 #: paperless/settings.py:684
 msgid "Norwegian"
-msgstr ""
+msgstr "Tiếng Na Uy"
 
 #: paperless/settings.py:685
 msgid "Dutch"
-msgstr ""
+msgstr "Tiếng Hà Lan"
 
 #: paperless/settings.py:686
 msgid "Polish"
-msgstr ""
+msgstr "Tiếng Ba Lan"
 
 #: paperless/settings.py:687
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "Tiếng Bồ Đào Nha (Braxin)"
 
 #: paperless/settings.py:688
 msgid "Portuguese"
-msgstr ""
+msgstr "Tiếng Bồ Đào Nha"
 
 #: paperless/settings.py:689
 msgid "Romanian"
-msgstr ""
+msgstr "Tiếng Romania"
 
 #: paperless/settings.py:690
 msgid "Russian"
-msgstr ""
+msgstr "Tiếng Nga"
 
 #: paperless/settings.py:691
 msgid "Slovak"
-msgstr ""
+msgstr "Tiếng Slovakia"
 
 #: paperless/settings.py:692
 msgid "Slovenian"
-msgstr ""
+msgstr "Tiếng Slovenia"
 
 #: paperless/settings.py:693
 msgid "Serbian"
-msgstr ""
+msgstr "Tiếng Serbia"
 
 #: paperless/settings.py:694
 msgid "Swedish"
-msgstr ""
+msgstr "Tiếng Thụy Điển"
 
 #: paperless/settings.py:695
 msgid "Turkish"
-msgstr ""
+msgstr "Tiếng Thổ Nhĩ Kỳ"
 
 #: paperless/settings.py:696
 msgid "Ukrainian"
-msgstr ""
+msgstr "Tiếng Ukraina"
 
 #: paperless/settings.py:697
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "Tiếng Trung giản thể"
+
+#: paperless/settings.py:698
+#, fuzzy
+#| msgid "filename"
+msgid "Vietnamese"
+msgstr "tên tập tin"
 
 #: paperless/urls.py:230
 msgid "Paperless-ngx administration"
-msgstr ""
+msgstr "Quản trị Tc group"
 
 #: paperless_mail/admin.py:39
 msgid "Authentication"
-msgstr ""
+msgstr "Xác thực"
 
 #: paperless_mail/admin.py:42
 msgid "Advanced settings"
-msgstr ""
+msgstr "Cài đặt nâng cao"
 
 #: paperless_mail/admin.py:58
 msgid "Filter"
-msgstr ""
+msgstr "Bộ lọc"
 
 #: paperless_mail/admin.py:61
-msgid "Paperless will only process mails that match ALL of the filters given below."
+msgid ""
+"Paperless will only process mails that match ALL of the filters given below."
 msgstr ""
+"Tc group chỉ xử lý thư điện tử nào khớp với TẤT CẢ các bộ lọc được cung cấp "
+"dưới đây."
 
 #: paperless_mail/admin.py:78
 msgid "Actions"
-msgstr ""
+msgstr "Hành động"
 
 #: paperless_mail/admin.py:81
-msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
+msgid ""
+"The action applied to the mail. This action is only performed when the mail "
+"body or attachments were consumed from the mail."
 msgstr ""
+"Hành động được áp dụng cho thư. Hành động này chỉ được thực hiện khi nội "
+"dung thư hoặc tệp đính kèm đã được sử dụng từ thư."
 
 #: paperless_mail/admin.py:89
 msgid "Metadata"
-msgstr ""
+msgstr "Siêu dữ liệu"
 
 #: paperless_mail/admin.py:92
-msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
+msgid ""
+"Assign metadata to documents consumed from this rule automatically. If you "
+"do not assign tags, types or correspondents here, paperless will still "
+"process all matching rules that you have defined."
 msgstr ""
+"Gán siêu dữ liệu cho các tài liệu đã được sử dụng từ quy tắc này một cách tự "
+"động. Nếu bạn không gán nhãn, loại hoặc người tương ứng ở đây, Paperless vẫn "
+"sẽ xử lý tất cả các quy tắc khớp mà bạn đã xác định."
 
 #: paperless_mail/apps.py:11
 msgid "Paperless mail"
-msgstr ""
+msgstr "Thư Paperless"
 
 #: paperless_mail/models.py:10
 msgid "mail account"
-msgstr ""
+msgstr "tài khoản email"
 
 #: paperless_mail/models.py:11
 msgid "mail accounts"
-msgstr ""
+msgstr "các tài khoản email"
 
 #: paperless_mail/models.py:14
 msgid "No encryption"
-msgstr ""
+msgstr "Không mã hóa"
 
 #: paperless_mail/models.py:15
 msgid "Use SSL"
-msgstr ""
+msgstr "Sử dụng SSL"
 
 #: paperless_mail/models.py:16
 msgid "Use STARTTLS"
-msgstr ""
+msgstr "Sử dụng STARTTLS"
 
 #: paperless_mail/models.py:20
 msgid "IMAP server"
-msgstr ""
+msgstr "Máy chủ IMAP"
 
 #: paperless_mail/models.py:23
 msgid "IMAP port"
-msgstr ""
+msgstr "Cổng IMAP"
 
 #: paperless_mail/models.py:27
-msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
+msgid ""
+"This is usually 143 for unencrypted and STARTTLS connections, and 993 for "
+"SSL connections."
 msgstr ""
+"Thường thì, số cổng 143 được sử dụng cho kết nối không mã hóa và kết nối "
+"STARTTLS, trong khi số cổng 993 được sử dụng cho kết nối SSL."
 
 #: paperless_mail/models.py:33
 msgid "IMAP security"
-msgstr ""
+msgstr "Bảo mật IMAP"
 
 #: paperless_mail/models.py:38
 msgid "username"
-msgstr ""
+msgstr "tên người dùng"
 
 #: paperless_mail/models.py:40
 msgid "password"
-msgstr ""
+msgstr "mật khẩu"
 
 #: paperless_mail/models.py:42
 msgid "Is token authentication"
-msgstr ""
+msgstr "Sử dụng xác thực thông qua mã thông báo"
 
 #: paperless_mail/models.py:45
 msgid "character set"
-msgstr ""
+msgstr "bảng ký tự"
 
 #: paperless_mail/models.py:49
-msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
+msgid ""
+"The character set to use when communicating with the mail server, such as "
+"'UTF-8' or 'US-ASCII'."
 msgstr ""
+"Bộ ký tự được sử dụng khi giao tiếp với máy chủ thư, ví dụ như 'UTF-8' hoặc "
+"'US-ASCII'."
 
 #: paperless_mail/models.py:60
 msgid "mail rule"
-msgstr ""
+msgstr "quy tắc thư"
 
 #: paperless_mail/models.py:61
 msgid "mail rules"
-msgstr ""
+msgstr "các quy tắc thư"
 
 #: paperless_mail/models.py:64 paperless_mail/models.py:72
 msgid "Only process attachments."
-msgstr ""
+msgstr "Chỉ xử lý tệp đính kèm."
 
 #: paperless_mail/models.py:65
 msgid "Process full Mail (with embedded attachments in file) as .eml"
-msgstr ""
+msgstr "Xử lý toàn bộ thư (với tệp đính kèm nhúng trong tệp) dưới dạng .eml"
 
 #: paperless_mail/models.py:67
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr ""
+msgstr "Xử lý toàn bộ thư (bao gồm tệp đính kèm nhúng trong tệp) dưới dạng .eml + xử lý tệp đính kèm như các tài liệu riêng biệt."
 
 #: paperless_mail/models.py:73
 msgid "Process all files, including 'inline' attachments."
-msgstr ""
+msgstr "Xử lý tất cả các tệp, bao gồm cả các tệp đính kèm 'inline'."
 
 #: paperless_mail/models.py:76
 msgid "Delete"
-msgstr ""
+msgstr "Xóa"
 
 #: paperless_mail/models.py:77
 msgid "Move to specified folder"
-msgstr ""
+msgstr "Di chuyển đến thư mục chỉ định"
 
 #: paperless_mail/models.py:78
 msgid "Mark as read, don't process read mails"
-msgstr ""
+msgstr "Đánh dấu là đã đọc, không xử lý thư đã đọc"
 
 #: paperless_mail/models.py:79
 msgid "Flag the mail, don't process flagged mails"
-msgstr ""
+msgstr "Đánh dấu thư, không xử lý thư đã được đánh dấu"
 
 #: paperless_mail/models.py:80
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr ""
+msgstr "Gắn thẻ cho thư với thẻ đã chỉ định, không xử lý thư đã được gắn thẻ"
 
 #: paperless_mail/models.py:83
 msgid "Use subject as title"
-msgstr ""
+msgstr "Sử dụng chủ đề làm tiêu đề"
 
 #: paperless_mail/models.py:84
 msgid "Use attachment filename as title"
-msgstr ""
+msgstr "Sử dụng tên tệp đính kèm làm tiêu đề"
 
 #: paperless_mail/models.py:85
 msgid "Do not assign title from rule"
-msgstr ""
+msgstr "Không gán tiêu đề từ quy tắc"
 
 #: paperless_mail/models.py:88
 msgid "Do not assign a correspondent"
-msgstr ""
+msgstr "Không gán đối tác"
 
 #: paperless_mail/models.py:89
 msgid "Use mail address"
-msgstr ""
+msgstr "Sử dụng địa chỉ email"
 
 #: paperless_mail/models.py:90
 msgid "Use name (or mail address if not available)"
-msgstr ""
+msgstr "Sử dụng tên (hoặc địa chỉ email nếu không có)"
 
 #: paperless_mail/models.py:91
 msgid "Use correspondent selected below"
-msgstr ""
+msgstr "Sử dụng đối tác được chọn dưới đây"
 
 #: paperless_mail/models.py:101
 msgid "account"
-msgstr ""
+msgstr "tài khoản"
 
 #: paperless_mail/models.py:105 paperless_mail/models.py:260
 msgid "folder"
-msgstr ""
+msgstr "thư mục"
 
 #: paperless_mail/models.py:109
-msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
+msgid ""
+"Subfolders must be separated by a delimiter, often a dot ('.') or slash "
+"('/'), but it varies by mail server."
 msgstr ""
+"Các thư mục con phải được phân tách bằng một ký tự phân cách, thường là dấu "
+"chấm ('.') hoặc dấu gạch chéo ('/'), tuy nhiên ký tự phân cách có thể thay "
+"đổi tùy theo máy chủ thư."
 
 #: paperless_mail/models.py:115
 msgid "filter from"
-msgstr ""
+msgstr "bộ lọc từ"
 
 #: paperless_mail/models.py:122
 msgid "filter to"
-msgstr ""
+msgstr "bộ lọc đến"
 
 #: paperless_mail/models.py:129
 msgid "filter subject"
-msgstr ""
+msgstr "bộ lọc chủ đề"
 
 #: paperless_mail/models.py:136
 msgid "filter body"
-msgstr ""
+msgstr "bộ lọc nội dung"
 
 #: paperless_mail/models.py:143
 msgid "filter attachment filename inclusive"
-msgstr ""
+msgstr "bộ lọc tên tệp đính kèm (bao gồm)"
 
 #: paperless_mail/models.py:155
 msgid "filter attachment filename exclusive"
-msgstr ""
+msgstr "bộ lọc tên tệp đính kèm (ngoại trừ)"
 
 #: paperless_mail/models.py:160
 msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "Không tiêu thụ các tài liệu mà hoàn toàn khớp với tên tệp nếu được chỉ định. Ký tự đại diện như *.pdf hoặc *invoice* được cho phép. Không phân biệt chữ hoa chữ thường."
 
 #: paperless_mail/models.py:167
 msgid "maximum age"
-msgstr ""
+msgstr "tuổi tối đa"
 
 #: paperless_mail/models.py:169
 msgid "Specified in days."
-msgstr ""
+msgstr "Được chỉ định theo ngày."
 
 #: paperless_mail/models.py:173
 msgid "attachment type"
-msgstr ""
+msgstr "loại tệp đính kèm"
 
 #: paperless_mail/models.py:177
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
-msgstr ""
+msgstr "Các tệp đính kèm nội tuyến bao gồm hình ảnh được nhúng, vì vậy tốt nhất là kết hợp tùy chọn này với bộ lọc tên tệp."
 
 #: paperless_mail/models.py:183
 msgid "consumption scope"
-msgstr ""
+msgstr "phạm vi tiêu thụ"
 
 #: paperless_mail/models.py:189
 msgid "action"
-msgstr ""
+msgstr "hành động"
 
 #: paperless_mail/models.py:195
 msgid "action parameter"
-msgstr ""
+msgstr "tham số hành động"
 
 #: paperless_mail/models.py:200
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr ""
+msgstr "Tham số bổ sung cho hành động đã được chọn ở trên, tức là thư mục đích của hành động di chuyển đến thư mục. Các thư mục con phải được phân tách bằng dấu chấm."
 
 #: paperless_mail/models.py:208
 msgid "assign title from"
-msgstr ""
+msgstr "gán tiêu đề từ"
 
 #: paperless_mail/models.py:228
 msgid "assign correspondent from"
-msgstr ""
+msgstr "gán đối tác từ"
 
 #: paperless_mail/models.py:242
 msgid "Assign the rule owner to documents"
-msgstr ""
+msgstr "Gán chủ sở hữu quy tắc cho tài liệu"
 
 #: paperless_mail/models.py:268
 msgid "uid"
-msgstr ""
+msgstr "uid"
 
 #: paperless_mail/models.py:276
 msgid "subject"
-msgstr ""
+msgstr "chủ đề"
 
 #: paperless_mail/models.py:284
 msgid "received"
-msgstr ""
+msgstr "nhận"
 
 #: paperless_mail/models.py:291
 msgid "processed"
-msgstr ""
+msgstr "đã xử lý"
 
 #: paperless_mail/models.py:297
 msgid "status"
-msgstr ""
-
+msgstr "trạng thái"
