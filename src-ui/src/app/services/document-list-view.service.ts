@@ -420,10 +420,13 @@ export class DocumentListViewService {
     if (!this.activeListViewState.displayFields) {
       fields = fields.filter((f) => f !== DisplayField.ADDED)
     }
-    return fields.filter(
-      (field) =>
-        this.settings.allDisplayFields.find((f) => f.id === field) !== undefined
-    )
+    return this.settings.displayFieldsInitialized
+      ? fields.filter(
+          (field) =>
+            this.settings.allDisplayFields.find((f) => f.id === field) !==
+            undefined
+        )
+      : fields
   }
 
   set displayFields(fields: DisplayField[]) {

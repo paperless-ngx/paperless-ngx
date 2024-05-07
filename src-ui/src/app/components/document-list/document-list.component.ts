@@ -209,6 +209,7 @@ export class DocumentListComponent
         takeUntil(this.unsubscribeNotifier)
       )
       .subscribe((queryParams) => {
+        this.updateDisplayCustomFields()
         if (queryParams.has('view')) {
           // loading a saved view on /documents
           this.loadViewConfig(parseInt(queryParams.get('view')))
