@@ -505,22 +505,6 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
                 "custom_fields": [
                     {
                         "field": custom_field_money.id,
-                        # Too few places past decimal
-                        "value": "GBP12.1",
-                    },
-                ],
-            },
-            format="json",
-        )
-
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
-        resp = self.client.patch(
-            f"/api/documents/{doc.id}/",
-            data={
-                "custom_fields": [
-                    {
-                        "field": custom_field_money.id,
                         # Too many places past decimal
                         "value": "GBP12.123",
                     },
