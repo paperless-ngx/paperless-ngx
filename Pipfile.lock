@@ -3092,11 +3092,11 @@
         },
         "mkdocs-glightbox": {
             "hashes": [
-                "sha256:4e890140a97dd4ad128cb92174384bd0ac33adec3304bbd2b7c48d0847685c4f",
-                "sha256:9659631a9829d93d8fb0ce3a20a10261c258605ba4dc87a3b7b5d847b93a276d"
+                "sha256:392b34207bf95991071a16d5f8916d1d2f2cd5d5bb59ae2997485ccd778c70d9",
+                "sha256:e0107beee75d3eb7380ac06ea2d6eac94c999eaa49f8c3cbab0e7be2ac006ccf"
             ],
             "index": "pypi",
-            "version": "==0.3.7"
+            "version": "==0.4.0"
         },
         "mkdocs-material": {
             "hashes": [
