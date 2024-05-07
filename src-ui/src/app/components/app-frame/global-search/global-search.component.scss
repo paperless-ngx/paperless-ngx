@@ -41,6 +41,7 @@ form {
     transition: all .3s ease, padding-left 0s ease, background-color 0s ease; // Safari requires all
     > input {
       outline: none;
+      color: var(--pngx-primary-text-contrast);
 
       &::placeholder {
         color: rgba(255, 255, 255, 0.4);
