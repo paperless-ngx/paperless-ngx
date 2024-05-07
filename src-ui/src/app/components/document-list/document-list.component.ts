@@ -199,6 +199,7 @@ export class DocumentListComponent
           convertToParamMap(this.route.snapshot.queryParams)
         )
         this.list.reload()
+        this.updateDisplayCustomFields()
         this.unmodifiedFilterRules = view.filter_rules
       })
 
