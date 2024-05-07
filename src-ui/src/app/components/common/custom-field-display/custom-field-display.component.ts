@@ -41,6 +41,9 @@ export class CustomFieldDisplayComponent implements OnInit, OnDestroy {
     this.fieldId = parseInt(key.replace(DisplayField.CUSTOM_FIELD, ''), 10)
   }
 
+  @Input()
+  showNameIfEmpty: boolean = false
+
   value: any
   currency: string
 

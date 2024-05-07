@@ -1,25 +1,34 @@
 @if (field) {
-    @switch (field.data_type) {
-        @case (CustomFieldDataType.Monetary) {
-            <span>{{value | currency: currency}}</span>
-        }
-        @case (CustomFieldDataType.Date) {
-            <span>{{value | customDate}}</span>
-        }
-        @case (CustomFieldDataType.Url) {
-            <a [href]="value" class="btn-link text-dark text-decoration-none" target="_blank">{{value}}</a>
-        }
-        @case (CustomFieldDataType.DocumentLink) {
-            <div class="d-flex gap-1 flex-wrap">
-                @for (docId of value; track docId) {
-                    <a routerLink="/documents/{{docId}}" class="badge bg-dark text-primary" title="View" i18n-title>
-                        <i-bs width="0.9em" height="0.9em" name="file-text"></i-bs>&nbsp;<span>{{ getDocumentTitle(docId) }}</span>
-                    </a>
-                }
+    @if (value?.toString().length > 0) {
+        <ng-template #nameTooltip>
+            <div class="d-flex flex-column text-light">
+                {{field.name}}
             </div>
+        </ng-template>
+        @switch (field.data_type) {
+            @case (CustomFieldDataType.Monetary) {
+                <span [ngbTooltip]="nameTooltip">{{value | currency: currency}}</span>
+            }
+            @case (CustomFieldDataType.Date) {
+                <span [ngbTooltip]="nameTooltip">{{value | customDate}}</span>
+            }
+            @case (CustomFieldDataType.Url) {
+                <a [ngbTooltip]="nameTooltip" [href]="value" class="btn-link text-dark text-decoration-none" target="_blank">{{value}}</a>
+            }
+            @case (CustomFieldDataType.DocumentLink) {
+                <div [ngbTooltip]="nameTooltip" class="d-flex gap-1 flex-wrap">
+                    @for (docId of value; track docId) {
+                        <a routerLink="/documents/{{docId}}" class="badge bg-dark text-primary" title="View" i18n-title>
+                            <i-bs width="0.9em" height="0.9em" name="file-text"></i-bs>&nbsp;<span>{{ getDocumentTitle(docId) }}</span>
+                        </a>
+                    }
+                </div>
+            }
+            @default {
+              <span [ngbTooltip]="nameTooltip">{{value}}</span>
+            }
         }
-        @default {
-          <span>{{value}}</span>
-        }
+    } @else if (showNameIfEmpty) {
+        <span class="fst-italic text-muted" i18n>{{field.name}}</span>
     }
 }
