@@ -1276,7 +1276,7 @@ assigns or creates tags if a properly formatted barcode is detected.
 
 : Defines a dictionary of filter regex and substitute expressions.
 
-    Syntax: {"<regex>": "<substitute>" [,...]]}
+    Syntax: `{"<regex>": "<substitute>" [,...]]}`
 
     A barcode is considered for tagging if the barcode text matches
     at least one of the provided <regex> pattern.
@@ -1288,20 +1288,20 @@ assigns or creates tags if a properly formatted barcode is detected.
 
     Defaults to:
 
-    {"TAG:(.*)": "\\g<1>"} which defines
+    `{"TAG:(.*)": "\\g<1>"}` which defines
     - a regex TAG:(.*) which includes barcodes beginning with TAG:
       followed by any text that gets stored into match group #1 and
-    - a substitute \\g<1> that replaces the original barcode text
+    - a substitute `\\g<1>` that replaces the original barcode text
       by the content in match group #1.
     Consequently, the tag is the barcode text without its TAG: prefix.
 
     More examples:
 
-    {"ASN12.*": "JOHN", "ASN13.*": "SMITH"} for example maps
+    `{"ASN12.*": "JOHN", "ASN13.*": "SMITH"}` for example maps
     - ASN12nnnn barcodes to the tag JOHN and
     - ASN13nnnn barcodes to the tag SMITH.
 
-    {"T-J": "JOHN", "T-S": "SMITH", "T-D": "DOE"} directly maps
+    `{"T-J": "JOHN", "T-S": "SMITH", "T-D": "DOE"}` directly maps
     - T-J barcodes to the tag JOHN,
     - T-S barcodes to the tag SMITH and
     - T-D barcodes to the tag DOE.
