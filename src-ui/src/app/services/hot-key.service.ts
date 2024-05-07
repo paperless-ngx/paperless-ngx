@@ -45,11 +45,13 @@ export class HotKeyService {
     return new Observable((observer) => {
       const handler = (e: KeyboardEvent) => {
         if (
-          !(e.altKey || e.metaKey || e.ctrlKey) &&
+          (!(e.altKey || e.metaKey || e.ctrlKey) ||
+            e.key.toLowerCase().includes('arrow')) &&
           (e.target instanceof HTMLInputElement ||
             e.target instanceof HTMLTextAreaElement)
         ) {
           // Ignore keydown events from input elements that dont have a modifier key
+          // or if the key is an arrow key to allow for navigation within the input
           return
         }
 
