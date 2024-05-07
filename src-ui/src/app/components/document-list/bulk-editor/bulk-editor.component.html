@@ -84,6 +84,7 @@
               [items]="customFields"
               [disabled]="!userCanEditAll"
               [editing]="true"
+              [manyToOne]="true"
               [applyOnClose]="applyOnClose"
               [createRef]="createCustomField.bind(this)"
               (opened)="openCustomFieldsDropdown()"
