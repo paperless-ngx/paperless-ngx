@@ -558,6 +558,10 @@
           <context context-type="linenumber">14,15</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/custom-field-display/custom-field-display.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/drag-drop-select/drag-drop-select.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
@@ -3239,7 +3243,7 @@
         <source>View</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-field-display/custom-field-display.component.html</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="linenumber">21</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
@@ -6612,7 +6616,7 @@
         </context-group>
         <target state="final">Benutzerdefinierte Felder</target>
       </trans-unit>
-      <trans-unit id="6475890479659129881" datatype="html">
+      <trans-unit id="6475890479659129881" datatype="html" approved="yes">
         <source>Filter custom fields</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -6622,7 +6626,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="translated">Benutzerdefinierte Felder filtern</target>
+        <target state="final">Benutzerdefinierte Felder filtern</target>
       </trans-unit>
       <trans-unit id="3206542606001340679" datatype="html" approved="yes">
         <source>Merge</source>
@@ -6822,53 +6826,53 @@
         </context-group>
         <target state="final">Diese Aktion wird den Speicherpfad von <x id="PH" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten entfernen.</target>
       </trans-unit>
-      <trans-unit id="4187352575310415704" datatype="html">
+      <trans-unit id="4187352575310415704" datatype="html" approved="yes">
         <source>Confirm custom field assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">543</context>
         </context-group>
-        <target state="translated">Benutzerdefinierte Feldzuweisung bestätigen</target>
+        <target state="final">Benutzerdefinierte Feldzuweisung bestätigen</target>
       </trans-unit>
-      <trans-unit id="7966494636326273856" datatype="html">
+      <trans-unit id="7966494636326273856" datatype="html" approved="yes">
         <source>This operation will assign the custom field &quot;<x id="PH" equiv-text="customField.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">549</context>
         </context-group>
-        <target state="translated">Dieser Vorgang wird <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten das benutzerdefinierte Feld „<x id="PH" equiv-text="customField.name"/>“ zuweisen.</target>
+        <target state="final">Dieser Vorgang wird <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten das benutzerdefinierte Feld „<x id="PH" equiv-text="customField.name"/>“ zuweisen.</target>
       </trans-unit>
-      <trans-unit id="5789455969634598553" datatype="html">
+      <trans-unit id="5789455969634598553" datatype="html" approved="yes">
         <source>This operation will assign the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">554,556</context>
         </context-group>
-        <target state="translated">Dieser Vorgang wird <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten die benutzerdefinierten Felder <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> zuweisen.</target>
+        <target state="final">Dieser Vorgang wird <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten die benutzerdefinierten Felder <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> zuweisen.</target>
       </trans-unit>
-      <trans-unit id="5648572354333199245" datatype="html">
+      <trans-unit id="5648572354333199245" datatype="html" approved="yes">
         <source>This operation will remove the custom field &quot;<x id="PH" equiv-text="customField.name"/>&quot; from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">562</context>
         </context-group>
-        <target state="translated">Dieser Vorgang wird das benutzerdefinierte Feld „<x id="PH" equiv-text="customField.name"/>“ von <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten entfernen.</target>
+        <target state="final">Dieser Vorgang wird das benutzerdefinierte Feld „<x id="PH" equiv-text="customField.name"/>“ von <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten entfernen.</target>
       </trans-unit>
-      <trans-unit id="6666899594015948817" datatype="html">
+      <trans-unit id="6666899594015948817" datatype="html" approved="yes">
         <source>This operation will remove the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">567,569</context>
         </context-group>
-        <target state="translated">Dieser Vorgang wird die benutzerdefinierten Felder <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> von <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten entfernen.</target>
+        <target state="final">Dieser Vorgang wird die benutzerdefinierten Felder <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> von <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten entfernen.</target>
       </trans-unit>
-      <trans-unit id="8050047262594964176" datatype="html">
+      <trans-unit id="8050047262594964176" datatype="html" approved="yes">
         <source>This operation will assign the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> and remove the custom fields <x id="PH_1" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">571,575</context>
         </context-group>
-        <target state="translated">Dieser Vorgang wird <x id="PH_2" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten die benutzerdefinierten Felder <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> zuweisen und die benutzerdefinierten Felder <x id="PH_1" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> entfernen.</target>
+        <target state="final">Dieser Vorgang wird <x id="PH_2" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten die benutzerdefinierten Felder <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> zuweisen und die benutzerdefinierten Felder <x id="PH_1" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> entfernen.</target>
       </trans-unit>
       <trans-unit id="749430623564850405" datatype="html" approved="yes">
         <source>Delete confirm</source>
@@ -7122,7 +7126,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">243</context>
+          <context context-type="linenumber">245</context>
         </context-group>
         <target state="final">Seite auswählen</target>
       </trans-unit>
@@ -7134,7 +7138,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">236</context>
+          <context context-type="linenumber">238</context>
         </context-group>
         <target state="final">Alles auswählen</target>
       </trans-unit>
@@ -7358,23 +7362,23 @@
         <source>Reset filters / selection</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">224</context>
+          <context context-type="linenumber">226</context>
         </context-group>
         <target state="final">Filter / Auswahl zurücksetzen</target>
       </trans-unit>
-      <trans-unit id="4135055128446167640" datatype="html">
+      <trans-unit id="4135055128446167640" datatype="html" approved="yes">
         <source>Open first [selected] document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">252</context>
+          <context context-type="linenumber">254</context>
         </context-group>
-        <target state="translated">Erstes [ausgewähltes] Dokument öffnen</target>
+        <target state="final">Erstes [ausgewähltes] Dokument öffnen</target>
       </trans-unit>
       <trans-unit id="2155249406916744630" datatype="html" approved="yes">
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">288</context>
+          <context context-type="linenumber">290</context>
         </context-group>
         <target state="final">Ansicht „<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>“ erfolgreich gespeichert.</target>
       </trans-unit>
@@ -7382,7 +7386,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">331</context>
+          <context context-type="linenumber">333</context>
         </context-group>
         <target state="final">Ansicht „<x id="PH" equiv-text="savedView.name"/>“ erfolgreich erstellt.</target>
       </trans-unit>
@@ -7514,21 +7518,21 @@
         </context-group>
         <target state="final">Ohne Tag</target>
       </trans-unit>
-      <trans-unit id="6370692707013694620" datatype="html">
+      <trans-unit id="6370692707013694620" datatype="html" approved="yes">
         <source>Custom fields: <x id="PH" equiv-text="this.customFields.find(             (f) =&gt; f.id == +rule.value           )?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">228,230</context>
         </context-group>
-        <target state="translated">Benutzerdefinierte Felder: <x id="PH" equiv-text="this.customFields.find(             (f) =&gt; f.id == +rule.value           )?.name"/></target>
+        <target state="final">Benutzerdefinierte Felder: <x id="PH" equiv-text="this.customFields.find(             (f) =&gt; f.id == +rule.value           )?.name"/></target>
       </trans-unit>
-      <trans-unit id="5297600960590041873" datatype="html">
+      <trans-unit id="5297600960590041873" datatype="html" approved="yes">
         <source>Without any custom field</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">234</context>
         </context-group>
-        <target state="translated">Ohne benutzerdefinierte Felder</target>
+        <target state="final">Ohne benutzerdefinierte Felder</target>
       </trans-unit>
       <trans-unit id="6523384805359286307" datatype="html" approved="yes">
         <source>Title: <x id="PH" equiv-text="rule.value"/></source>
@@ -9255,7 +9259,7 @@
         <source>Successfully completed one-time migratration of settings to the database!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">550</context>
+          <context context-type="linenumber">554</context>
         </context-group>
         <target state="final">Einmalige Migration der Einstellungen in die Datenbank erfolgreich abgeschlossen!</target>
       </trans-unit>
@@ -9263,7 +9267,7 @@
         <source>Unable to migrate settings to the database, please try saving manually.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">551</context>
+          <context context-type="linenumber">555</context>
         </context-group>
         <target state="final">Einstellungen konnten nicht in die Datenbank migriert werden. Bitte versuchen Sie, manuell zu speichern.</target>
       </trans-unit>
@@ -9271,7 +9275,7 @@
         <source>You can restart the tour from the settings page.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">621</context>
+          <context context-type="linenumber">625</context>
         </context-group>
         <target state="final">Sie können die Tour in den Einstellungen erneut starten.</target>
       </trans-unit>
