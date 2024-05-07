@@ -1160,7 +1160,7 @@ class GlobalSearchView(PassUserMixin):
                 Document,
             )
             # First search by title
-            docs = all_docs.filter(title__icontains=query)[:OBJECT_LIMIT]
+            docs = all_docs.filter(title__icontains=query)
             if not db_only and len(docs) < OBJECT_LIMIT:
                 # If we don't have enough results, search by content
                 from documents import index
@@ -1174,77 +1174,87 @@ class GlobalSearchView(PassUserMixin):
                     )._get_query()
                     results = s.search(q, limit=OBJECT_LIMIT)
                     docs = docs | all_docs.filter(id__in=[r["id"] for r in results])
+            docs = docs[:OBJECT_LIMIT]
         saved_views = (
-            SavedView.objects.filter(owner=request.user, name__icontains=query)[
-                :OBJECT_LIMIT
-            ]
+            SavedView.objects.filter(owner=request.user, name__icontains=query)
             if request.user.has_perm("documents.view_savedview")
             else []
         )
+        saved_views = saved_views[:OBJECT_LIMIT]
         tags = (
             get_objects_for_user_owner_aware(request.user, "view_tag", Tag).filter(
                 name__icontains=query,
-            )[:OBJECT_LIMIT]
+            )
             if request.user.has_perm("documents.view_tag")
             else []
         )
+        tags = tags[:OBJECT_LIMIT]
         correspondents = (
             get_objects_for_user_owner_aware(
                 request.user,
                 "view_correspondent",
                 Correspondent,
-            ).filter(name__icontains=query)[:OBJECT_LIMIT]
+            ).filter(name__icontains=query)
             if request.user.has_perm("documents.view_correspondent")
             else []
         )
+        correspondents = correspondents[:OBJECT_LIMIT]
         document_types = (
             get_objects_for_user_owner_aware(
                 request.user,
                 "view_documenttype",
                 DocumentType,
-            ).filter(name__icontains=query)[:OBJECT_LIMIT]
+            ).filter(name__icontains=query)
             if request.user.has_perm("documents.view_documenttype")
             else []
         )
+        document_types = document_types[:OBJECT_LIMIT]
         storage_paths = (
             get_objects_for_user_owner_aware(
                 request.user,
                 "view_storagepath",
                 StoragePath,
-            ).filter(name__icontains=query)[:OBJECT_LIMIT]
+            ).filter(name__icontains=query)
             if request.user.has_perm("documents.view_storagepath")
             else []
         )
+        storage_paths = storage_paths[:OBJECT_LIMIT]
         users = (
-            User.objects.filter(username__icontains=query)[:OBJECT_LIMIT]
+            User.objects.filter(username__icontains=query)
             if request.user.has_perm("auth.view_user")
             else []
         )
+        users = users[:OBJECT_LIMIT]
         groups = (
-            Group.objects.filter(name__icontains=query)[:OBJECT_LIMIT]
+            Group.objects.filter(name__icontains=query)
             if request.user.has_perm("auth.view_group")
             else []
         )
+        groups = groups[:OBJECT_LIMIT]
         mail_rules = (
-            MailRule.objects.filter(name__icontains=query)[:OBJECT_LIMIT]
+            MailRule.objects.filter(name__icontains=query)
             if request.user.has_perm("paperless_mail.view_mailrule")
             else []
         )
+        mail_rules = mail_rules[:OBJECT_LIMIT]
         mail_accounts = (
-            MailAccount.objects.filter(name__icontains=query)[:OBJECT_LIMIT]
+            MailAccount.objects.filter(name__icontains=query)
             if request.user.has_perm("paperless_mail.view_mailaccount")
             else []
         )
+        mail_accounts = mail_accounts[:OBJECT_LIMIT]
         workflows = (
-            Workflow.objects.filter(name__icontains=query)[:OBJECT_LIMIT]
+            Workflow.objects.filter(name__icontains=query)
             if request.user.has_perm("documents.view_workflow")
             else []
         )
+        workflows = workflows[:OBJECT_LIMIT]
         custom_fields = (
-            CustomField.objects.filter(name__icontains=query)[:OBJECT_LIMIT]
+            CustomField.objects.filter(name__icontains=query)
             if request.user.has_perm("documents.view_customfield")
             else []
         )
+        custom_fields = custom_fields[:OBJECT_LIMIT]
 
         context = {
             "request": request,
