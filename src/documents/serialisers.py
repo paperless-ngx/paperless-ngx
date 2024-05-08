@@ -5,7 +5,6 @@ import zoneinfo
 from decimal import Decimal
 
 import magic
-from auditlog.context import set_actor
 from celery import states
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -27,6 +26,9 @@ from guardian.utils import get_user_obj_perms_model
 from rest_framework import fields
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
+
+if settings.AUDIT_LOG_ENABLED:
+    from auditlog.context import set_actor
 
 from documents import bulk_edit
 from documents.data_models import DocumentSource

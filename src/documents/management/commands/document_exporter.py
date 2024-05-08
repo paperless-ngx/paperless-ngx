@@ -9,9 +9,6 @@ from typing import Optional
 
 import tqdm
 from django.conf import settings
-
-if settings.AUDIT_LOG_ENABLED:
-    from auditlog.models import LogEntry
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
@@ -24,6 +21,9 @@ from django.utils import timezone
 from filelock import FileLock
 from guardian.models import GroupObjectPermission
 from guardian.models import UserObjectPermission
+
+if settings.AUDIT_LOG_ENABLED:
+    from auditlog.models import LogEntry
 
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_filename
