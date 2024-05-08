@@ -558,6 +558,10 @@
           <context context-type="linenumber">14,15</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/custom-field-display/custom-field-display.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/drag-drop-select/drag-drop-select.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
@@ -3239,7 +3243,7 @@
         <source>View</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-field-display/custom-field-display.component.html</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="linenumber">21</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
@@ -7122,7 +7126,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">243</context>
+          <context context-type="linenumber">245</context>
         </context-group>
         <target state="final">Sélectionner la page</target>
       </trans-unit>
@@ -7134,7 +7138,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">236</context>
+          <context context-type="linenumber">238</context>
         </context-group>
         <target state="final">Sélectionner tout</target>
       </trans-unit>
@@ -7358,7 +7362,7 @@
         <source>Reset filters / selection</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">224</context>
+          <context context-type="linenumber">226</context>
         </context-group>
         <target state="translated">Réinitialiser les filtres / la sélection</target>
       </trans-unit>
@@ -7366,7 +7370,7 @@
         <source>Open first [selected] document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">252</context>
+          <context context-type="linenumber">254</context>
         </context-group>
         <target state="translated">Ouvrir le premier document [sélectionné]</target>
       </trans-unit>
@@ -7374,7 +7378,7 @@
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">288</context>
+          <context context-type="linenumber">290</context>
         </context-group>
         <target state="final">Vue "<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>" enregistrée avec succès.</target>
       </trans-unit>
@@ -7382,7 +7386,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">331</context>
+          <context context-type="linenumber">333</context>
         </context-group>
         <target state="final">Vue « <x id="PH" equiv-text="savedView.name"/> » créée avec succès.</target>
       </trans-unit>
@@ -9255,7 +9259,7 @@
         <source>Successfully completed one-time migratration of settings to the database!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">550</context>
+          <context context-type="linenumber">554</context>
         </context-group>
         <target state="final">La migration des paramètres vers la base de données a été effectuée avec succès !</target>
       </trans-unit>
@@ -9263,7 +9267,7 @@
         <source>Unable to migrate settings to the database, please try saving manually.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">551</context>
+          <context context-type="linenumber">555</context>
         </context-group>
         <target state="final">Impossible de migrer les paramètres vers la base de données, veuillez essayer d’enregistrer manuellement.</target>
       </trans-unit>
@@ -9271,7 +9275,7 @@
         <source>You can restart the tour from the settings page.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">621</context>
+          <context context-type="linenumber">625</context>
         </context-group>
         <target state="final">Vous pouvez recommencer la visite depuis les paramètres.</target>
       </trans-unit>
