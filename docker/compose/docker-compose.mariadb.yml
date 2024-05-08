@@ -35,7 +35,7 @@ services:
       - redisdata:/data
 
   db:
-    image: docker.io/library/mariadb:10
+    image: docker.io/library/mariadb:11
     restart: unless-stopped
     volumes:
       - dbdata:/var/lib/mysql
