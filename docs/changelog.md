@@ -1,5 +1,35 @@
 # Changelog
 
+## paperless-ngx 2.8.2
+
+### Bug Fixes
+
+- Fix: Restore the compression of static files for x86_64 [@stumpylog](https://github.com/stumpylog) ([#6627](https://github.com/paperless-ngx/paperless-ngx/pull/6627))
+- Fix: make backend monetary validation accept unpadded decimals [@shamoon](https://github.com/shamoon) ([#6626](https://github.com/paperless-ngx/paperless-ngx/pull/6626))
+- Fix: allow bulk edit with existing fields [@shamoon](https://github.com/shamoon) ([#6625](https://github.com/paperless-ngx/paperless-ngx/pull/6625))
+- Fix: table view doesnt immediately display custom fields on app startup [@shamoon](https://github.com/shamoon) ([#6600](https://github.com/paperless-ngx/paperless-ngx/pull/6600))
+- Fix: dont use limit in subqueries in global search for mariadb compatibility [@shamoon](https://github.com/shamoon) ([#6611](https://github.com/paperless-ngx/paperless-ngx/pull/6611))
+- Fix: exclude admin perms from group permissions serializer [@shamoon](https://github.com/shamoon) ([#6608](https://github.com/paperless-ngx/paperless-ngx/pull/6608))
+- Fix: global search text illegible in light mode [@shamoon](https://github.com/shamoon) ([#6602](https://github.com/paperless-ngx/paperless-ngx/pull/6602))
+- Fix: document history text color illegible in light mode [@shamoon](https://github.com/shamoon) ([#6601](https://github.com/paperless-ngx/paperless-ngx/pull/6601))
+
+### All App Changes
+
+<details>
+<summary>10 changes</summary>
+
+- Fix: Restore the compression of static files for x86_64 [@stumpylog](https://github.com/stumpylog) ([#6627](https://github.com/paperless-ngx/paperless-ngx/pull/6627))
+- Fix: make backend monetary validation accept unpadded decimals [@shamoon](https://github.com/shamoon) ([#6626](https://github.com/paperless-ngx/paperless-ngx/pull/6626))
+- Fix: allow bulk edit with existing fields [@shamoon](https://github.com/shamoon) ([#6625](https://github.com/paperless-ngx/paperless-ngx/pull/6625))
+- Enhancement: show custom field name on cards if empty, add tooltip [@shamoon](https://github.com/shamoon) ([#6620](https://github.com/paperless-ngx/paperless-ngx/pull/6620))
+- Security: Disable in pdfjs [@shamoon](https://github.com/shamoon) ([#6615](https://github.com/paperless-ngx/paperless-ngx/pull/6615))
+- Fix: table view doesnt immediately display custom fields on app startup [@shamoon](https://github.com/shamoon) ([#6600](https://github.com/paperless-ngx/paperless-ngx/pull/6600))
+- Fix: dont use limit in subqueries in global search for mariadb compatibility [@shamoon](https://github.com/shamoon) ([#6611](https://github.com/paperless-ngx/paperless-ngx/pull/6611))
+- Fix: exclude admin perms from group permissions serializer [@shamoon](https://github.com/shamoon) ([#6608](https://github.com/paperless-ngx/paperless-ngx/pull/6608))
+- Fix: global search text illegible in light mode [@shamoon](https://github.com/shamoon) ([#6602](https://github.com/paperless-ngx/paperless-ngx/pull/6602))
+- Fix: document history text color illegible in light mode [@shamoon](https://github.com/shamoon) ([#6601](https://github.com/paperless-ngx/paperless-ngx/pull/6601))
+</details>
+
 ## paperless-ngx 2.8.1
 
 ### Bug Fixes
