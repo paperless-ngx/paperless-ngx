@@ -487,7 +487,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">212</context>
         </context-group>
-        <target state="needs-translation">Workflows give you more control over the document pipeline.</target>
+        <target state="translated">Tokovi vam daju više kontrole nad cevovodom dokumenata.</target>
       </trans-unit>
       <trans-unit id="4680387114119209483" datatype="html">
         <source>File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</source>
@@ -539,7 +539,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="needs-translation">Application Configuration</target>
+        <target state="translated">Konfiguracija Aplikacije</target>
       </trans-unit>
       <trans-unit id="8528041182664173532" datatype="html">
         <source>Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of Paperless-ngx. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</source>
