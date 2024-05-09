@@ -767,7 +767,9 @@ class DocumentViewSet(
         try:
             doc = Document.objects.get(pk=pk)
             if not request.user.has_perm("auditlog.view_logentry") or (
-                doc.owner is not None and doc.owner != request.user
+                doc.owner is not None
+                and doc.owner != request.user
+                and not request.user.is_superuser
             ):
                 return HttpResponseForbidden(
                     "Insufficient permissions",
