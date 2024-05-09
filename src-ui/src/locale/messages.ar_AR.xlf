@@ -1133,7 +1133,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">204</context>
         </context-group>
-        <target state="needs-translation">Search database only (do not include advanced search results)</target>
+        <target state="translated">البحث في قاعدة البيانات فقط (لا تشمل نتائج البحث المتقدمة)</target>
       </trans-unit>
       <trans-unit id="8104421162933956065" datatype="html">
         <source>Notes</source>
@@ -2901,7 +2901,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Search</target>
+        <target state="translated">بحث</target>
       </trans-unit>
       <trans-unit id="1010505078885609376" datatype="html">
         <source>Advanced search</source>
@@ -2925,7 +2925,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">48</context>
         </context-group>
-        <target state="needs-translation">Open</target>
+        <target state="translated">فتح</target>
       </trans-unit>
       <trans-unit id="6329940072345709724" datatype="html">
         <source>Filter documents</source>
@@ -2933,7 +2933,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">Filter documents</target>
+        <target state="translated">فلترة المستندات</target>
       </trans-unit>
       <trans-unit id="3099741642167775297" datatype="html" approved="yes">
         <source>Download</source>
@@ -2969,7 +2969,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">79</context>
         </context-group>
-        <target state="needs-translation">No results</target>
+        <target state="translated">لا توجد نتائج</target>
       </trans-unit>
       <trans-unit id="searchResults.documents" datatype="html">
         <source>Documents</source>
@@ -2977,7 +2977,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">82</context>
         </context-group>
-        <target state="needs-translation">Documents</target>
+        <target state="translated">المستندات</target>
       </trans-unit>
       <trans-unit id="searchResults.saved_views" datatype="html">
         <source>Saved Views</source>
@@ -2993,7 +2993,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">95</context>
         </context-group>
-        <target state="needs-translation">Tags</target>
+        <target state="translated">أوسمة البحث</target>
       </trans-unit>
       <trans-unit id="searchResults.correspondents" datatype="html">
         <source>Correspondents</source>
@@ -3009,7 +3009,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">109</context>
         </context-group>
-        <target state="needs-translation">Document types</target>
+        <target state="translated">أنواع المستندات</target>
       </trans-unit>
       <trans-unit id="searchResults.storagePaths" datatype="html">
         <source>Storage paths</source>
@@ -3025,7 +3025,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">123</context>
         </context-group>
-        <target state="needs-translation">Users</target>
+        <target state="translated">المستخدمين</target>
       </trans-unit>
       <trans-unit id="searchResults.groups" datatype="html">
         <source>Groups</source>
@@ -3033,7 +3033,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">130</context>
         </context-group>
-        <target state="needs-translation">Groups</target>
+        <target state="translated">المجموعات</target>
       </trans-unit>
       <trans-unit id="searchResults.customFields" datatype="html">
         <source>Custom fields</source>
@@ -7396,7 +7396,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">100</context>
         </context-group>
-        <target state="needs-translation">Dates</target>
+        <target state="translated">التواريخ</target>
       </trans-unit>
       <trans-unit id="3100631071441658964" datatype="html">
         <source>Title &amp; content</source>
