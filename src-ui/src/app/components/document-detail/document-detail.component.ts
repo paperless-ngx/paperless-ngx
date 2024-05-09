@@ -417,7 +417,7 @@ export class DocumentDetailComponent
               owner: doc.owner,
               set_permissions: doc.permissions,
             },
-            custom_fields: doc.custom_fields,
+            custom_fields: [...doc.custom_fields],
           })
 
           this.isDirty$ = dirtyCheck(
