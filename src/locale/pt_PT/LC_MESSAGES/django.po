@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-26 07:19-0700\n"
-"PO-Revision-Date: 2024-05-02 16:16\n"
+"PO-Revision-Date: 2024-05-09 00:23\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -47,7 +47,7 @@ msgstr "Expressão regular"
 
 #: documents/models.py:58 documents/models.py:947
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Palavra difusa"
 
 #: documents/models.py:59
 msgid "Automatic"
@@ -257,59 +257,59 @@ msgstr "registos"
 
 #: documents/models.py:398
 msgid "Table"
-msgstr ""
+msgstr "Tabela"
 
 #: documents/models.py:399
 msgid "Small Cards"
-msgstr ""
+msgstr "Cartões Pequenos"
 
 #: documents/models.py:400
 msgid "Large Cards"
-msgstr ""
+msgstr "Cartões Grandes"
 
 #: documents/models.py:403
 msgid "Title"
-msgstr ""
+msgstr "Título"
 
 #: documents/models.py:404
 msgid "Created"
-msgstr ""
+msgstr "Criado"
 
 #: documents/models.py:405
 msgid "Added"
-msgstr ""
+msgstr "Adicionado"
 
 #: documents/models.py:406
 msgid "Tags"
-msgstr ""
+msgstr "Etiquetas"
 
 #: documents/models.py:407
 msgid "Correspondent"
-msgstr ""
+msgstr "Correspondente"
 
 #: documents/models.py:408
 msgid "Document Type"
-msgstr ""
+msgstr "Tipo de Documento"
 
 #: documents/models.py:409
 msgid "Storage Path"
-msgstr ""
+msgstr "Caminho de armazenamento"
 
 #: documents/models.py:410
 msgid "Note"
-msgstr ""
+msgstr "Nota"
 
 #: documents/models.py:411
 msgid "Owner"
-msgstr ""
+msgstr "Proprietário"
 
 #: documents/models.py:412
 msgid "Shared"
-msgstr ""
+msgstr "Partilhado"
 
 #: documents/models.py:413
 msgid "ASN"
-msgstr ""
+msgstr "ASN"
 
 #: documents/models.py:419
 msgid "show on dashboard"
@@ -329,15 +329,15 @@ msgstr "ordenar inversamente"
 
 #: documents/models.py:434
 msgid "View page size"
-msgstr ""
+msgstr "Exibir tamanho da página"
 
 #: documents/models.py:442
 msgid "View display mode"
-msgstr ""
+msgstr "Modo de visualização"
 
 #: documents/models.py:449
 msgid "Document display fields"
-msgstr ""
+msgstr "Exibir Campos de Documento"
 
 #: documents/models.py:456 documents/models.py:509
 msgid "saved view"
@@ -433,7 +433,7 @@ msgstr "consulta de texto completo"
 
 #: documents/models.py:486
 msgid "more like this"
-msgstr ""
+msgstr "mais como este"
 
 #: documents/models.py:487
 msgid "has tags in"
@@ -473,15 +473,15 @@ msgstr "tem caminho de armazenamento em"
 
 #: documents/models.py:496
 msgid "does not have storage path in"
-msgstr ""
+msgstr "não possui caminho de armazenamento em"
 
 #: documents/models.py:497
 msgid "owner is"
-msgstr ""
+msgstr "o proprietário é"
 
 #: documents/models.py:498
 msgid "has owner in"
-msgstr ""
+msgstr "tem proprietário em"
 
 #: documents/models.py:499
 msgid "does not have owner"
@@ -489,15 +489,15 @@ msgstr "não tem proprietário"
 
 #: documents/models.py:500
 msgid "does not have owner in"
-msgstr ""
+msgstr "não tem proprietário em"
 
 #: documents/models.py:501
 msgid "has custom field value"
-msgstr ""
+msgstr "tem valor de campo personalizado"
 
 #: documents/models.py:502
 msgid "is shared by me"
-msgstr ""
+msgstr "é partilhado por mim"
 
 #: documents/models.py:512
 msgid "rule type"
@@ -589,7 +589,7 @@ msgstr "Os dados devolvidos pela tarefa"
 
 #: documents/models.py:695
 msgid "Note for the document"
-msgstr ""
+msgstr "Nota do documento"
 
 #: documents/models.py:719
 msgid "user"
@@ -597,7 +597,7 @@ msgstr "utilizador"
 
 #: documents/models.py:724
 msgid "note"
-msgstr ""
+msgstr "nota"
 
 #: documents/models.py:725
 msgid "notes"
@@ -605,23 +605,23 @@ msgstr "notas"
 
 #: documents/models.py:733
 msgid "Archive"
-msgstr ""
+msgstr "Arquivo"
 
 #: documents/models.py:734
 msgid "Original"
-msgstr ""
+msgstr "Original"
 
 #: documents/models.py:745
 msgid "expiration"
-msgstr ""
+msgstr "validade"
 
 #: documents/models.py:752
 msgid "slug"
-msgstr ""
+msgstr "slug"
 
 #: documents/models.py:784
 msgid "share link"
-msgstr ""
+msgstr "partilhar ligação"
 
 #: documents/models.py:785
 msgid "share links"
@@ -629,11 +629,11 @@ msgstr "compartilhar links"
 
 #: documents/models.py:797
 msgid "String"
-msgstr ""
+msgstr "Texto"
 
 #: documents/models.py:798
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: documents/models.py:799
 msgid "Date"
@@ -641,67 +641,67 @@ msgstr "Data"
 
 #: documents/models.py:800
 msgid "Boolean"
-msgstr ""
+msgstr "Booleano"
 
 #: documents/models.py:801
 msgid "Integer"
-msgstr ""
+msgstr "Inteiro"
 
 #: documents/models.py:802
 msgid "Float"
-msgstr ""
+msgstr "Virgula flutuante"
 
 #: documents/models.py:803
 msgid "Monetary"
-msgstr ""
+msgstr "Moeda"
 
 #: documents/models.py:804
 msgid "Document Link"
-msgstr ""
+msgstr "Endereço do Documento"
 
 #: documents/models.py:816
 msgid "data type"
-msgstr ""
+msgstr "tipo de dados"
 
 #: documents/models.py:824
 msgid "custom field"
-msgstr ""
+msgstr "campo personalizado"
 
 #: documents/models.py:825
 msgid "custom fields"
-msgstr ""
+msgstr "campos personalizados"
 
 #: documents/models.py:887
 msgid "custom field instance"
-msgstr ""
+msgstr "instância de campo personalizado"
 
 #: documents/models.py:888
 msgid "custom field instances"
-msgstr ""
+msgstr "instâncias de campo personalizado"
 
 #: documents/models.py:950
 msgid "Consumption Started"
-msgstr ""
+msgstr "Consumo Iniciado"
 
 #: documents/models.py:951
 msgid "Document Added"
-msgstr ""
+msgstr "Documento Adicionado"
 
 #: documents/models.py:952
 msgid "Document Updated"
-msgstr ""
+msgstr "Documento Atualizado"
 
 #: documents/models.py:955
 msgid "Consume Folder"
-msgstr ""
+msgstr "Pasta de consumo"
 
 #: documents/models.py:956
 msgid "Api Upload"
-msgstr ""
+msgstr "Envio de Api"
 
 #: documents/models.py:957
 msgid "Mail Fetch"
-msgstr ""
+msgstr "Obter E-mail"
 
 #: documents/models.py:960
 msgid "Workflow Trigger Type"
@@ -1046,16 +1046,16 @@ msgstr ""
 #: documents/templates/account/signup.html:16
 #: documents/templates/socialaccount/signup.html:14
 msgid "Email (optional)"
-msgstr ""
+msgstr "Email (opcional)"
 
 #: documents/templates/account/signup.html:18
 msgid "Password (again)"
-msgstr ""
+msgstr "Palavra-passe (novamente)"
 
 #: documents/templates/account/signup.html:36
 #: documents/templates/socialaccount/signup.html:27
 msgid "Sign up"
-msgstr ""
+msgstr "Criar conta"
 
 #: documents/templates/index.html:61
 msgid "Paperless-ngx is loading..."
