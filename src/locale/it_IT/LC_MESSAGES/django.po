@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-26 07:19-0700\n"
-"PO-Revision-Date: 2024-05-02 16:16\n"
+"PO-Revision-Date: 2024-05-09 00:23\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -51,7 +51,7 @@ msgstr ""
 
 #: documents/models.py:59
 msgid "Automatic"
-msgstr ""
+msgstr "Automatico"
 
 #: documents/models.py:62 documents/models.py:416 documents/models.py:1263
 #: paperless_mail/models.py:18 paperless_mail/models.py:93
@@ -269,7 +269,7 @@ msgstr ""
 
 #: documents/models.py:403
 msgid "Title"
-msgstr ""
+msgstr "Titolo"
 
 #: documents/models.py:404
 msgid "Created"
@@ -281,19 +281,19 @@ msgstr ""
 
 #: documents/models.py:406
 msgid "Tags"
-msgstr ""
+msgstr "Etichette"
 
 #: documents/models.py:407
 msgid "Correspondent"
-msgstr ""
+msgstr "Corrispondente"
 
 #: documents/models.py:408
 msgid "Document Type"
-msgstr ""
+msgstr "Tipo di documento"
 
 #: documents/models.py:409
 msgid "Storage Path"
-msgstr ""
+msgstr "Percorso archiviazione"
 
 #: documents/models.py:410
 msgid "Note"
@@ -301,7 +301,7 @@ msgstr ""
 
 #: documents/models.py:411
 msgid "Owner"
-msgstr ""
+msgstr "Proprietario"
 
 #: documents/models.py:412
 msgid "Shared"
@@ -433,7 +433,7 @@ msgstr "query fulltext"
 
 #: documents/models.py:486
 msgid "more like this"
-msgstr ""
+msgstr "altro come questo"
 
 #: documents/models.py:487
 msgid "has tags in"
@@ -753,7 +753,7 @@ msgstr "Assegnazione"
 
 #: documents/models.py:1051
 msgid "Removal"
-msgstr ""
+msgstr "Rimozione"
 
 #: documents/models.py:1055
 msgid "Workflow Action Type"
@@ -1046,16 +1046,16 @@ msgstr ""
 #: documents/templates/account/signup.html:16
 #: documents/templates/socialaccount/signup.html:14
 msgid "Email (optional)"
-msgstr ""
+msgstr "Email (opzionale)"
 
 #: documents/templates/account/signup.html:18
 msgid "Password (again)"
-msgstr ""
+msgstr "Password (ripeti)"
 
 #: documents/templates/account/signup.html:36
 #: documents/templates/socialaccount/signup.html:27
 msgid "Sign up"
-msgstr ""
+msgstr "Registrati"
 
 #: documents/templates/index.html:61
 msgid "Paperless-ngx is loading..."
@@ -1094,7 +1094,7 @@ msgstr ""
 
 #: documents/templates/socialaccount/login.html:13
 msgid "Continue"
-msgstr ""
+msgstr "Continua"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
@@ -1262,11 +1262,11 @@ msgstr "Aggiunge argomenti utente aggiuntivi per OCRMyPDF"
 
 #: paperless/models.py:171
 msgid "Application title"
-msgstr ""
+msgstr "Titolo applicazione"
 
 #: paperless/models.py:178
 msgid "Application logo"
-msgstr ""
+msgstr "Logo applicazione"
 
 #: paperless/models.py:188
 msgid "paperless application settings"
@@ -1338,7 +1338,7 @@ msgstr "Italiano"
 
 #: paperless/settings.py:678
 msgid "Japanese"
-msgstr ""
+msgstr "Giapponese"
 
 #: paperless/settings.py:679
 msgid "Luxembourgish"
