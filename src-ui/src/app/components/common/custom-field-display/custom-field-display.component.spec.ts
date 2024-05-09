@@ -17,7 +17,7 @@ const document: Document = {
   title: 'Doc 1',
   custom_fields: [
     { field: 1, document: 1, created: null, value: 'Text value' },
-    { field: 2, document: 1, created: null, value: '100 USD' },
+    { field: 2, document: 1, created: null, value: 'USD100' },
     { field: 3, document: 1, created: null, value: '1,2,3' },
   ],
 }
@@ -85,5 +85,17 @@ describe('CustomFieldDisplayComponent', () => {
     expect(title1).toEqual('Document 1')
     expect(title2).toEqual('Document 2')
     expect(title3).toEqual('Document 3')
+  })
+
+  it('should fallback to default currency', () => {
+    component['defaultCurrencyCode'] = 'EUR' // mock default locale injection
+    component.fieldId = 2
+    component.document = {
+      id: 1,
+      title: 'Doc 1',
+      custom_fields: [{ field: 2, document: 1, created: null, value: '100' }],
+    }
+    expect(component.currency).toEqual('EUR')
+    expect(component.value).toEqual(100)
   })
 })
