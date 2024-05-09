@@ -22,8 +22,9 @@ export class MonetaryComponent extends AbstractInputComponent<string> {
   public get monetaryValue(): string {
     return this._monetaryValue
   }
-  public set monetaryValue(value: string) {
-    if (value) this._monetaryValue = value
+  public set monetaryValue(value: any) {
+    if (value || value?.toString() === '0')
+      this._monetaryValue = value.toString()
   }
 
   defaultCurrencyCode: string
@@ -44,6 +45,9 @@ export class MonetaryComponent extends AbstractInputComponent<string> {
 
   public monetaryValueChange(fixed: boolean = false): void {
     this.monetaryValue = this.parseMonetaryValue(this.monetaryValue, fixed)
+    if (this.monetaryValue === '0') {
+      this.monetaryValue = '0.00'
+    }
     this.onChange(this.currency + this.monetaryValue)
   }
 
