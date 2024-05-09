@@ -1,4 +1,12 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core'
+import { getLocaleCurrencyCode } from '@angular/common'
+import {
+  Component,
+  Inject,
+  Input,
+  LOCALE_ID,
+  OnDestroy,
+  OnInit,
+} from '@angular/core'
 import { Subject, takeUntil } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { DisplayField, Document } from 'src/app/data/document'
@@ -54,11 +62,14 @@ export class CustomFieldDisplayComponent implements OnInit, OnDestroy {
   private docLinkDocuments: Document[] = []
 
   private unsubscribeNotifier: Subject<any> = new Subject()
+  private defaultCurrencyCode: any
 
   constructor(
     private customFieldService: CustomFieldsService,
-    private documentService: DocumentService
+    private documentService: DocumentService,
+    @Inject(LOCALE_ID) currentLocale: string
   ) {
+    this.defaultCurrencyCode = getLocaleCurrencyCode(currentLocale)
     this.customFieldService.listAll().subscribe((r) => {
       this.customFields = r.results
       this.init()
@@ -78,7 +89,8 @@ export class CustomFieldDisplayComponent implements OnInit, OnDestroy {
       (f) => f.field === this._fieldId
     )?.value
     if (this.value && this.field.data_type === CustomFieldDataType.Monetary) {
-      this.currency = this.value.match(/([A-Z]{3})/)?.[0]
+      this.currency =
+        this.value.match(/([A-Z]{3})/)?.[0] ?? this.defaultCurrencyCode
       this.value = parseFloat(this.value.replace(this.currency, ''))
     } else if (
       this.value?.length &&
