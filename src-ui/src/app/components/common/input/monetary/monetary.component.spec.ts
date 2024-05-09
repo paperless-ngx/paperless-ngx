@@ -74,4 +74,13 @@ describe('MonetaryComponent', () => {
     expect(component.currency).toEqual('USD')
     expect(component.monetaryValue).toEqual('')
   })
+
+  it('should handle zero values', () => {
+    component.writeValue('USD0.00')
+    expect(component.currency).toEqual('USD')
+    expect(component.monetaryValue).toEqual('0.00')
+    component.monetaryValue = '0'
+    component.monetaryValueChange()
+    expect(component.value).toEqual('USD0.00')
+  })
 })
