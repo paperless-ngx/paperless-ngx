@@ -56,6 +56,10 @@ whitenoise = "~=6.6"
 whoosh="~=2.7"
 zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
 
+# Locked for issues
+# See https://github.com/paperless-ngx/paperless-ngx/discussions/6610 & https://bugs.launchpad.net/lxml/+bug/2059910
+lxml = "==5.1.1"
+
 [dev-packages]
 # Linting
 black = "*"
