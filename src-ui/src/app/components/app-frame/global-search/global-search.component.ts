@@ -318,6 +318,11 @@ export class GlobalSearchComponent implements OnInit {
         event.preventDefault()
         event.stopImmediatePropagation()
         this.primaryButtons.get(this.domIndex).nativeElement.focus()
+      } else if (event.key === 'Escape') {
+        event.preventDefault()
+        event.stopImmediatePropagation()
+        this.reset(true)
+        this.searchInput.nativeElement.focus()
       }
     }
   }
@@ -325,7 +330,9 @@ export class GlobalSearchComponent implements OnInit {
   onButtonKeyDown(event: KeyboardEvent) {
     // prevents ngBootstrap issue with keydown events
     if (
-      !['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft'].includes(event.key)
+      !['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft', 'Escape'].includes(
+        event.key
+      )
     ) {
       event.stopImmediatePropagation()
     }
