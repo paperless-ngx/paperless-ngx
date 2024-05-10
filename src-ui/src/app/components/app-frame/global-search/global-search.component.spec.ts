@@ -475,13 +475,6 @@ describe('GlobalSearchComponent', () => {
     expect(focusSpy).toHaveBeenCalled()
   })
 
-  it('should prevent event propagation for keyboard events on buttons that are not arrows', () => {
-    const event = { stopImmediatePropagation: jest.fn(), key: 'Enter' }
-    const stopPropagationSpy = jest.spyOn(event, 'stopImmediatePropagation')
-    component.onButtonKeyDown(event as any)
-    expect(stopPropagationSpy).toHaveBeenCalled()
-  })
-
   it('should support explicit advanced search', () => {
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
     component.query = 'test'

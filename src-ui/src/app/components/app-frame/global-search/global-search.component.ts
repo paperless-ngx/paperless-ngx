@@ -88,7 +88,7 @@ export class GlobalSearchComponent implements OnInit {
       })
   }
 
-  ngOnInit() {
+  public ngOnInit() {
     this.hotkeyService
       .addShortcut({ keys: '/', description: $localize`Global search` })
       .subscribe(() => {
@@ -241,7 +241,7 @@ export class GlobalSearchComponent implements OnInit {
     item.nativeElement.focus()
   }
 
-  onItemHover(event: MouseEvent) {
+  public onItemHover(event: MouseEvent) {
     const item: ElementRef = this.resultItems
       .toArray()
       .find((item) => item.nativeElement === event.currentTarget)
@@ -249,7 +249,7 @@ export class GlobalSearchComponent implements OnInit {
     this.setCurrentItem()
   }
 
-  onButtonHover(event: MouseEvent) {
+  public onButtonHover(event: MouseEvent) {
     ;(event.currentTarget as HTMLElement).focus()
   }
 
@@ -289,7 +289,7 @@ export class GlobalSearchComponent implements OnInit {
     }
   }
 
-  dropdownKeyDown(event: KeyboardEvent) {
+  public dropdownKeyDown(event: KeyboardEvent) {
     if (
       this.searchResults?.total &&
       this.resultsDropdown.isOpen() &&
@@ -332,17 +332,9 @@ export class GlobalSearchComponent implements OnInit {
     }
   }
 
-  onButtonKeyDown(event: KeyboardEvent) {
+  public onButtonKeyDown(event: KeyboardEvent) {
     if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
       event.target.dispatchEvent(new MouseEvent('click', { ctrlKey: true }))
-    }
-    // prevents ngBootstrap issue with keydown events
-    if (
-      !['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft', 'Escape'].includes(
-        event.key
-      )
-    ) {
-      event.stopImmediatePropagation()
     }
   }
 

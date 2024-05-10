@@ -10,7 +10,8 @@
                     spellcheck="false"
                     [(ngModel)]="query"
                     (ngModelChange)="this.queryDebounce.next($event)"
-                    (keydown)="searchInputKeyDown($event)">
+                    (keydown)="searchInputKeyDown($event)"
+                    ngbDropdownAnchor>
                 <div class="position-absolute top-50 end-0 translate-middle">
                     @if (loading) {
                         <div class="spinner-border spinner-border-sm text-muted mt-1"></div>
