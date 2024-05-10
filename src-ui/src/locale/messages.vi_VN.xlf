@@ -270,7 +270,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="3527354815023530656" datatype="html">
-        <source>Document <x id="PH" equiv-text="status.filename"/> was added to Tc group.</source>
+        <source>Document <x id="PH" equiv-text="status.filename"/> was added to TC GROUP.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">81</context>
@@ -302,7 +302,7 @@
         <target state="translated">Không thể thêm <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></target>
       </trans-unit>
       <trans-unit id="1218124467712564468" datatype="html">
-        <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by Tc group.</source>
+        <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by TC GROUP.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">120</context>
@@ -346,7 +346,7 @@
         <target state="translated">Trang dashboard có thể được sử dụng để hiển thị các chế độ xem đã lưu, chẳng hạn như 'Hộp thư đến'. Những cài đặt đó được tìm thấy trong Cài đặt &gt; Đã lưu Chế độ xem sau khi bạn đã tạo.</target>
       </trans-unit>
       <trans-unit id="9075755296812854717" datatype="html">
-        <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Tc group will start training its machine learning algorithms.</source>
+        <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, TC GROUP will start training its machine learning algorithms.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">141</context>
@@ -442,7 +442,7 @@
         <target state="translated">Xem tài liệu hoặc truy cập dự án trên GitHub để tìm hiểu thêm hoặc báo cáo sự cố.</target>
       </trans-unit>
       <trans-unit id="4270528545616947218" datatype="html">
-        <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using Tc group!</source>
+        <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using TC GROUP!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">208</context>
@@ -458,12 +458,12 @@
         <target state="needs-translation">Cấu hình ứng dụng</target>
       </trans-unit>
       <trans-unit id="8528041182664173532" datatype="html">
-        <source>Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of Tc group. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</source>
+        <source>Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of TC GROUP. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of Tc group. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</target>
+        <target state="needs-translation">Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of TC GROUP. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</target>
       </trans-unit>
       <trans-unit id="187187500641108332" datatype="html">
         <source>
@@ -1157,7 +1157,7 @@
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Objects without an owner can be viewed and edited by all users</target>
+        <target state="needs-translation">Các đối tượng không có chủ sở hữu có thể được xem và chỉnh sửa bởi tất cả người dùng.</target>
       </trans-unit>
       <trans-unit id="1835394624061684099" datatype="html">
         <source>Default View Permissions</source>
@@ -2368,12 +2368,12 @@
         <target state="translated">Lỗi khi xóa nhóm.</target>
       </trans-unit>
       <trans-unit id="7931334600001636863" datatype="html">
-        <source>by Tc group</source>
+        <source>by TC GROUP</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">by Tc group</target>
+        <target state="needs-translation">by TC GROUP</target>
       </trans-unit>
       <trans-unit id="7100953725264790651" datatype="html">
         <source>Search documents</source>
@@ -2672,12 +2672,12 @@
         <target state="translated">Nhấp để xem.</target>
       </trans-unit>
       <trans-unit id="9811291095862612" datatype="html">
-        <source>Tc group can automatically check for updates</source>
+        <source>TC GROUP can automatically check for updates</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">303</context>
         </context-group>
-        <target state="needs-translation">Tc group can automatically check for updates</target>
+        <target state="needs-translation">TC GROUP can automatically check for updates</target>
       </trans-unit>
       <trans-unit id="894819944961861800" datatype="html">
         <source> How does this work? </source>
@@ -5066,12 +5066,12 @@
         <target state="needs-translation">Môi trường</target>
       </trans-unit>
       <trans-unit id="5973078531069712831" datatype="html">
-        <source>Tc group Version</source>
+        <source>TC GROUP Version</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">Tc group Version</target>
+        <target state="needs-translation">TC GROUP Version</target>
       </trans-unit>
       <trans-unit id="6269705781013540301" datatype="html">
         <source>Install Type</source>
@@ -5505,7 +5505,7 @@
         <target state="needs-translation">, </target>
       </trans-unit>
       <trans-unit id="7915903586014997661" datatype="html">
-        <source>Tc group is running!</source>
+        <source>TC GROUP is running!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">2</context>
@@ -5521,7 +5521,7 @@
         <target state="translated">Bạn đã có thể tải tài liệu lên! Tự mình khám phá các tính năng khác nhau của ứng dụng web này hoặc bắt đầu chuyến tham quan nhanh bằng nút bên dưới.</target>
       </trans-unit>
       <trans-unit id="4474647174688421179" datatype="html">
-        <source>More detail on how to use and configure Tc group is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</source>
+        <source>More detail on how to use and configure TC GROUP is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">4</context>
@@ -5529,12 +5529,12 @@
         <target state="translated">Thông tin chi tiết hơn về cách sử dụng và định cấu hình có sẵn trong <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>tài liệu<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
       </trans-unit>
       <trans-unit id="4294899532887357745" datatype="html">
-        <source>Thanks for being a part of the Tc group community!</source>
+        <source>Thanks for being a part of the TC GROUP community!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="needs-translation">Cảm ơn bạn đã trở thành một phần của cộng đồng Tc group</target>
+        <target state="needs-translation">Cảm ơn bạn đã trở thành một phần của cộng đồng TC GROUP</target>
       </trans-unit>
       <trans-unit id="1415832194529539652" datatype="html">
         <source>Start the tour</source>
@@ -7671,12 +7671,12 @@
         <target state="needs-translation">Do you really want to delete the tag "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
       <trans-unit id="1229748338333965418" datatype="html">
-        <source>Use workflows to customize the behavior of Tc group when events &apos;trigger&apos; a workflow.</source>
+        <source>Use workflows to customize the behavior of TC GROUP when events &apos;trigger&apos; a workflow.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Sử dụng quy trình công việc để tùy chỉnh hành vi của Tc group khi các sự kiện 'kích hoạt' quy trình công việc</target>
+        <target state="needs-translation">Sử dụng quy trình công việc để tùy chỉnh hành vi của TC GROUP khi các sự kiện 'kích hoạt' quy trình công việc</target>
       </trans-unit>
       <trans-unit id="2437630016855517844" datatype="html">
         <source>Add Workflow</source>
