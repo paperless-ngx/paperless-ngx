@@ -36,6 +36,7 @@ import { WorkflowEditDialogComponent } from '../../common/edit-dialog/workflow-e
 import { ElementRef } from '@angular/core'
 import { ToastService } from 'src/app/services/toast.service'
 import { DataType } from 'src/app/data/datatype'
+import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
 
 const searchResults = {
   total: 11,
@@ -283,7 +284,6 @@ describe('GlobalSearchComponent', () => {
   it('should support primary action', () => {
     const object = { id: 1 }
     const routerSpy = jest.spyOn(router, 'navigate')
-    const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
     const modalSpy = jest.spyOn(modalService, 'open')
 
     let modal: NgbModalRef
@@ -296,23 +296,41 @@ describe('GlobalSearchComponent', () => {
     expect(routerSpy).toHaveBeenCalledWith(['/view', object.id])
 
     component.primaryAction(DataType.Correspondent, object)
-    expect(qfSpy).toHaveBeenCalledWith([
-      { rule_type: FILTER_HAS_CORRESPONDENT_ANY, value: object.id.toString() },
+    expect(routerSpy).toHaveBeenCalledWith([
+      '/documents',
+      queryParamsFromFilterRules([
+        {
+          rule_type: FILTER_HAS_CORRESPONDENT_ANY,
+          value: object.id.toString(),
+        },
+      ]),
     ])
 
     component.primaryAction(DataType.DocumentType, object)
-    expect(qfSpy).toHaveBeenCalledWith([
-      { rule_type: FILTER_HAS_DOCUMENT_TYPE_ANY, value: object.id.toString() },
+    expect(routerSpy).toHaveBeenCalledWith([
+      '/documents',
+      queryParamsFromFilterRules([
+        {
+          rule_type: FILTER_HAS_DOCUMENT_TYPE_ANY,
+          value: object.id.toString(),
+        },
+      ]),
     ])
 
     component.primaryAction(DataType.StoragePath, object)
-    expect(qfSpy).toHaveBeenCalledWith([
-      { rule_type: FILTER_HAS_STORAGE_PATH_ANY, value: object.id.toString() },
+    expect(routerSpy).toHaveBeenCalledWith([
+      '/documents',
+      queryParamsFromFilterRules([
+        { rule_type: FILTER_HAS_STORAGE_PATH_ANY, value: object.id.toString() },
+      ]),
     ])
 
     component.primaryAction(DataType.Tag, object)
-    expect(qfSpy).toHaveBeenCalledWith([
-      { rule_type: FILTER_HAS_TAGS_ANY, value: object.id.toString() },
+    expect(routerSpy).toHaveBeenCalledWith([
+      '/documents',
+      queryParamsFromFilterRules([
+        { rule_type: FILTER_HAS_TAGS_ANY, value: object.id.toString() },
+      ]),
     ])
 
     component.primaryAction(DataType.User, object)
@@ -471,5 +489,26 @@ describe('GlobalSearchComponent', () => {
     expect(qfSpy).toHaveBeenCalledWith([
       { rule_type: FILTER_FULLTEXT_QUERY, value: 'test' },
     ])
+  })
+
+  it('should support open in new window', () => {
+    const openSpy = jest.spyOn(window, 'open')
+    const event = new Event('click')
+    event['ctrlKey'] = true
+    component.primaryAction(DataType.Document, { id: 2 }, event as any)
+    expect(openSpy).toHaveBeenCalledWith('/documents/2', '_blank')
+
+    component.searchResults = searchResults as any
+    component.resultsDropdown.open()
+    fixture.detectChanges()
+
+    const button = component.primaryButtons.get(0).nativeElement
+    const keyboardEvent = new KeyboardEvent('keydown', {
+      key: 'Enter',
+      ctrlKey: true,
+    })
+    const dispatchSpy = jest.spyOn(button, 'dispatchEvent')
+    button.dispatchEvent(keyboardEvent)
+    expect(dispatchSpy).toHaveBeenCalledTimes(2) // once for keydown, second for click
   })
 })

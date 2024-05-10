@@ -220,6 +220,7 @@ export class GlobalSearchComponent implements OnInit {
 
   private reset(close: boolean = false) {
     this.queryDebounce.next(null)
+    this.query = null
     this.searchResults = null
     this.currentItemIndex = -1
     if (close) {
@@ -273,11 +274,11 @@ export class GlobalSearchComponent implements OnInit {
       if (this.searchResults?.total === 1 && this.resultsDropdown.isOpen()) {
         this.primaryButtons.first.nativeElement.click()
         this.searchInput.nativeElement.blur()
-      } else if (this.searchResults?.total && !this.resultsDropdown.isOpen()) {
-        this.resultsDropdown.open()
       } else if (this.query?.length) {
         this.runAdvanedSearch()
         this.reset(true)
+      } else if (this.searchResults?.total && !this.resultsDropdown.isOpen()) {
+        this.resultsDropdown.open()
       }
     } else if (event.key === 'Escape' && !this.resultsDropdown.isOpen()) {
       if (this.query?.length) {
