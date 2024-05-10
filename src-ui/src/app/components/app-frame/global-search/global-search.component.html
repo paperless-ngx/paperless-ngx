@@ -28,7 +28,7 @@
 
     <ng-template #resultItemTemplate let-item="item" let-nameProp="nameProp" let-type="type" let-icon="icon" let-date="date">
         <div #resultItem ngbDropdownItem class="py-2 d-flex align-items-center focus-ring border-0 cursor-pointer" tabindex="-1"
-        (click)="primaryAction(type, item)"
+        (click)="primaryAction(type, item, $event)"
         (mouseenter)="onItemHover($event)">
             <i-bs width="1.2em" height="1.2em" name="{{icon}}" class="me-2 text-muted"></i-bs>
             <div class="text-truncate">
@@ -39,7 +39,7 @@
             </div>
             <div class="btn-group ms-auto">
                 <button #primaryButton type="button" class="btn btn-sm btn-outline-primary d-flex"
-                (click)="primaryAction(type, item); $event.stopImmediatePropagation()"
+                (click)="primaryAction(type, item, $event); $event.stopImmediatePropagation()"
                 (keydown)="onButtonKeyDown($event)"
                 [disabled]="disablePrimaryButton(type, item)"
                 (mouseenter)="onButtonHover($event)">
@@ -59,7 +59,7 @@
                 </button>
                 @if (type !== DataType.SavedView && type !== DataType.Workflow && type !== DataType.CustomField && type !== DataType.Group && type !== DataType.User && type !== DataType.MailAccount && type !== DataType.MailRule) {
                     <button #secondaryButton type="button" class="btn btn-sm btn-outline-primary d-flex"
-                    (click)="secondaryAction(type, item); $event.stopImmediatePropagation()"
+                    (click)="secondaryAction(type, item, $event); $event.stopImmediatePropagation()"
                     (keydown)="onButtonKeyDown($event)"
                     [disabled]="disableSecondaryButton(type, item)"
                     (mouseenter)="onButtonHover($event)">
