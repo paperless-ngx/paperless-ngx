@@ -1391,7 +1391,9 @@ class StatisticsView(APIView):
         inbox_tag = tags.filter(is_inbox_tag=True)
 
         documents_inbox = (
-            documents.filter(tags__is_inbox_tag=True).distinct().count()
+            documents.filter(tags__is_inbox_tag=True, tags__id__in=tags)
+            .distinct()
+            .count()
             if inbox_tag.exists()
             else None
         )
