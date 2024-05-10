@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-03 06:44+0000\n"
+"POT-Creation-Date: 2024-05-10 02:59+0000\n"
 "PO-Revision-Date: 2024-04-08 01:37\n"
 "Last-Translator: \n"
 "Language-Team: Vietnamese\n"
@@ -87,8 +87,12 @@ msgid "is inbox tag"
 msgstr "là thẻ inbox"
 
 #: documents/models.py:106
-msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr "Đánh dấu thẻ này là một thẻ hộp thư đến: Tất cả các tài liệu mới được tiêu thụ sẽ được gắn thẻ với các thẻ hộp thư đến."
+msgid ""
+"Marks this tag as an inbox tag: All newly consumed documents will be tagged "
+"with inbox tags."
+msgstr ""
+"Đánh dấu thẻ này là một thẻ hộp thư đến: Tất cả các tài liệu mới được tiêu "
+"thụ sẽ được gắn thẻ với các thẻ hộp thư đến."
 
 #: documents/models.py:112
 msgid "tag"
@@ -881,8 +885,8 @@ msgstr ""
 "%(site_domain)s"
 
 #: documents/templates/account/login.html:5
-msgid "Paperless-ngx sign in"
-msgstr "Đăng nhập Tc group"
+msgid "TC GROUP sign in"
+msgstr ""
 
 #: documents/templates/account/login.html:10
 msgid "Please sign in."
@@ -919,7 +923,7 @@ msgstr "hoặc đăng nhập qua"
 
 #: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
-msgstr "Yêu cầu đặt lại mật khẩu Tc group"
+msgstr "Yêu cầu đặt lại mật khẩu TC GROUP"
 
 #: documents/templates/account/password_reset.html:9
 msgid ""
@@ -943,7 +947,7 @@ msgstr "Gửi cho tôi hướng dẫn!"
 
 #: documents/templates/account/password_reset_done.html:5
 msgid "Paperless-ngx reset password sent"
-msgstr "Tc group đã gửi yêu cầu đặt lại mật khẩu"
+msgstr "TC GROUP đã gửi yêu cầu đặt lại mật khẩu"
 
 #: documents/templates/account/password_reset_done.html:9
 msgid "Check your inbox."
@@ -959,7 +963,7 @@ msgstr ""
 
 #: documents/templates/account/password_reset_from_key.html:5
 msgid "Paperless-ngx reset password confirmation"
-msgstr "Xác nhận đặt lại mật khẩu Tc group"
+msgstr "Xác nhận đặt lại mật khẩu TC GROUP"
 
 #: documents/templates/account/password_reset_from_key.html:9
 msgid "Set a new password."
@@ -983,7 +987,7 @@ msgstr "Đổi mật khẩu của tôi"
 
 #: documents/templates/account/password_reset_from_key_done.html:5
 msgid "Paperless-ngx reset password complete"
-msgstr "Hoàn tất đặt lại mật khẩu Tc group"
+msgstr "Hoàn tất đặt lại mật khẩu TC GROUP"
 
 #: documents/templates/account/password_reset_from_key_done.html:9
 msgid "Password reset complete."
@@ -1000,7 +1004,7 @@ msgstr ""
 
 #: documents/templates/account/signup.html:5
 msgid "Paperless-ngx sign up"
-msgstr "Đăng ký Tc group"
+msgstr "Đăng ký TC GROUP"
 
 #: documents/templates/account/signup.html:10
 #, python-format
@@ -1023,7 +1027,7 @@ msgstr "Đăng ký"
 
 #: documents/templates/index.html:61
 msgid "Paperless-ngx is loading..."
-msgstr "Tc group đang tải..."
+msgstr "TC GROUP đang tải..."
 
 #: documents/templates/index.html:62
 msgid "Still here?! Hmm, something might be wrong."
@@ -1044,7 +1048,7 @@ msgstr "Liên kết chia sẻ đã hết hạn."
 #: documents/templates/socialaccount/authentication_error.html:5
 #: documents/templates/socialaccount/login.html:5
 msgid "Paperless-ngx social account sign in"
-msgstr "Đăng nhập tài khoản xã hội Tc group"
+msgstr "Đăng nhập tài khoản xã hội TC GROUP"
 
 #: documents/templates/socialaccount/authentication_error.html:10
 #, python-format
@@ -1067,7 +1071,7 @@ msgstr "Tiếp tục"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
-msgstr "Đăng ký tài khoản xã hội Tc group"
+msgstr "Đăng ký tài khoản xã hội TC GROUP"
 
 #: documents/templates/socialaccount/signup.html:10
 #, python-format
@@ -1377,7 +1381,7 @@ msgstr "tên tập tin"
 
 #: paperless/urls.py:230
 msgid "Paperless-ngx administration"
-msgstr "Quản trị Tc group"
+msgstr "Quản trị TC GROUP"
 
 #: paperless_mail/admin.py:39
 msgid "Authentication"
@@ -1395,7 +1399,7 @@ msgstr "Bộ lọc"
 msgid ""
 "Paperless will only process mails that match ALL of the filters given below."
 msgstr ""
-"Tc group chỉ xử lý thư điện tử nào khớp với TẤT CẢ các bộ lọc được cung cấp "
+"TC GROUP chỉ xử lý thư điện tử nào khớp với TẤT CẢ các bộ lọc được cung cấp "
 "dưới đây."
 
 #: paperless_mail/admin.py:78
@@ -1509,8 +1513,12 @@ msgid "Process full Mail (with embedded attachments in file) as .eml"
 msgstr "Xử lý toàn bộ thư (với tệp đính kèm nhúng trong tệp) dưới dạng .eml"
 
 #: paperless_mail/models.py:67
-msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr "Xử lý toàn bộ thư (bao gồm tệp đính kèm nhúng trong tệp) dưới dạng .eml + xử lý tệp đính kèm như các tài liệu riêng biệt."
+msgid ""
+"Process full Mail (with embedded attachments in file) as .eml + process "
+"attachments as separate documents"
+msgstr ""
+"Xử lý toàn bộ thư (bao gồm tệp đính kèm nhúng trong tệp) dưới dạng .eml + xử "
+"lý tệp đính kèm như các tài liệu riêng biệt."
 
 #: paperless_mail/models.py:73
 msgid "Process all files, including 'inline' attachments."
@@ -1606,8 +1614,13 @@ msgid "filter attachment filename exclusive"
 msgstr "bộ lọc tên tệp đính kèm (ngoại trừ)"
 
 #: paperless_mail/models.py:160
-msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr "Không tiêu thụ các tài liệu mà hoàn toàn khớp với tên tệp nếu được chỉ định. Ký tự đại diện như *.pdf hoặc *invoice* được cho phép. Không phân biệt chữ hoa chữ thường."
+msgid ""
+"Do not consume documents which entirely match this filename if specified. "
+"Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr ""
+"Không tiêu thụ các tài liệu mà hoàn toàn khớp với tên tệp nếu được chỉ định. "
+"Ký tự đại diện như *.pdf hoặc *invoice* được cho phép. Không phân biệt chữ "
+"hoa chữ thường."
 
 #: paperless_mail/models.py:167
 msgid "maximum age"
@@ -1622,8 +1635,12 @@ msgid "attachment type"
 msgstr "loại tệp đính kèm"
 
 #: paperless_mail/models.py:177
-msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
-msgstr "Các tệp đính kèm nội tuyến bao gồm hình ảnh được nhúng, vì vậy tốt nhất là kết hợp tùy chọn này với bộ lọc tên tệp."
+msgid ""
+"Inline attachments include embedded images, so it's best to combine this "
+"option with a filename filter."
+msgstr ""
+"Các tệp đính kèm nội tuyến bao gồm hình ảnh được nhúng, vì vậy tốt nhất là "
+"kết hợp tùy chọn này với bộ lọc tên tệp."
 
 #: paperless_mail/models.py:183
 msgid "consumption scope"
@@ -1638,8 +1655,13 @@ msgid "action parameter"
 msgstr "tham số hành động"
 
 #: paperless_mail/models.py:200
-msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr "Tham số bổ sung cho hành động đã được chọn ở trên, tức là thư mục đích của hành động di chuyển đến thư mục. Các thư mục con phải được phân tách bằng dấu chấm."
+msgid ""
+"Additional parameter for the action selected above, i.e., the target folder "
+"of the move to folder action. Subfolders must be separated by dots."
+msgstr ""
+"Tham số bổ sung cho hành động đã được chọn ở trên, tức là thư mục đích của "
+"hành động di chuyển đến thư mục. Các thư mục con phải được phân tách bằng "
+"dấu chấm."
 
 #: paperless_mail/models.py:208
 msgid "assign title from"
@@ -1672,3 +1694,6 @@ msgstr "đã xử lý"
 #: paperless_mail/models.py:297
 msgid "status"
 msgstr "trạng thái"
+
+#~ msgid "Paperless-ngx sign in"
+#~ msgstr "Đăng nhập TC GROUP"
