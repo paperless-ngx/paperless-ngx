@@ -249,10 +249,7 @@ describe('GlobalSearchComponent', () => {
     expect(blurSpy).toHaveBeenCalled()
 
     component.searchResults = { total: 1 } as any
-    component.resultsDropdown.close()
-    const openSpy = jest.spyOn(component.resultsDropdown, 'open')
-    component.searchInputKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }))
-    expect(openSpy).toHaveBeenCalled()
+    component.resultsDropdown.open()
 
     component.searchInputKeyDown(
       new KeyboardEvent('keydown', { key: 'ArrowDown' })

@@ -277,8 +277,6 @@ export class GlobalSearchComponent implements OnInit {
       } else if (this.query?.length) {
         this.runAdvanedSearch()
         this.reset(true)
-      } else if (this.searchResults?.total && !this.resultsDropdown.isOpen()) {
-        this.resultsDropdown.open()
       }
     } else if (event.key === 'Escape' && !this.resultsDropdown.isOpen()) {
       if (this.query?.length) {
