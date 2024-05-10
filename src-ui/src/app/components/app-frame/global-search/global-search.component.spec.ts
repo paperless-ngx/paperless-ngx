@@ -260,6 +260,13 @@ describe('GlobalSearchComponent', () => {
     const closeSpy = jest.spyOn(component.resultsDropdown, 'close')
     component.dropdownKeyDown(new KeyboardEvent('keydown', { key: 'Escape' }))
     expect(closeSpy).toHaveBeenCalled()
+
+    component.searchResults = searchResults as any
+    component.resultsDropdown.open()
+    component.query = 'test'
+    const advancedSearchSpy = jest.spyOn(component, 'runAdvanedSearch')
+    component.searchInputKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }))
+    expect(advancedSearchSpy).toHaveBeenCalled()
   })
 
   it('should search on query debounce', fakeAsync(() => {

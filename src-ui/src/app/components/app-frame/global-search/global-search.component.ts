@@ -262,19 +262,16 @@ export class GlobalSearchComponent implements OnInit {
       event.preventDefault()
       this.currentItemIndex = this.searchResults.total - 1
       this.setCurrentItem()
-    } else if (
-      event.key === 'Enter' &&
-      this.searchResults?.total === 1 &&
-      this.resultsDropdown.isOpen()
-    ) {
-      this.primaryButtons.first.nativeElement.click()
-      this.searchInput.nativeElement.blur()
-    } else if (
-      event.key === 'Enter' &&
-      this.searchResults?.total &&
-      !this.resultsDropdown.isOpen()
-    ) {
-      this.resultsDropdown.open()
+    } else if (event.key === 'Enter') {
+      if (this.searchResults?.total === 1 && this.resultsDropdown.isOpen()) {
+        this.primaryButtons.first.nativeElement.click()
+        this.searchInput.nativeElement.blur()
+      } else if (this.searchResults?.total && !this.resultsDropdown.isOpen()) {
+        this.resultsDropdown.open()
+      } else if (this.query?.length) {
+        this.runAdvanedSearch()
+        this.reset(true)
+      }
     } else if (event.key === 'Escape' && !this.resultsDropdown.isOpen()) {
       if (this.query?.length) {
         this.reset(true)

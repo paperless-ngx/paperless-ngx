@@ -6,15 +6,18 @@
             <div class="form-control form-control-sm">
                 <input class="bg-transparent border-0 w-100 h-100" #searchInput type="text" name="query"
                     placeholder="Search" aria-label="Search" i18n-placeholder
-                    autocomplete="off" spellcheck="false"
-                    [(ngModel)]="query" (ngModelChange)="this.queryDebounce.next($event)" (keydown)="searchInputKeyDown($event)">
+                    autocomplete="off"
+                    spellcheck="false"
+                    [(ngModel)]="query"
+                    (ngModelChange)="this.queryDebounce.next($event)"
+                    (keydown)="searchInputKeyDown($event)">
                 <div class="position-absolute top-50 end-0 translate-middle">
                     @if (loading) {
                         <div class="spinner-border spinner-border-sm text-muted mt-1"></div>
                     }
                 </div>
             </div>
-            @if (query && (searchResults?.documents.length === searchService.searchResultObjectLimit || searchService.searchDbOnly)) {
+            @if (query) {
                 <button class="btn btn-sm btn-outline-secondary" type="button" (click)="runAdvanedSearch()">
                     <ng-container i18n>Advanced search</ng-container>
                     <i-bs width="1em" height="1em" name="arrow-right-short"></i-bs>
