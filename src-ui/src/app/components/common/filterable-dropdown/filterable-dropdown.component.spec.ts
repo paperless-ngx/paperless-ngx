@@ -501,11 +501,11 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     component.selectionModel = selectionModel
     selectionModel.toggle(items[1].id)
     selectionModel.apply()
-    expect(selectionModel.itemsSorted).toEqual([
+    expect(component.items).toEqual([
       nullItem,
       { id: null, name: 'Null B' },
-      items[1],
       items[0],
+      items[1],
     ])
   })
 

@@ -22,7 +22,7 @@ test('basic filtering', async ({ page }) => {
   await page.getByRole('button', { name: 'Correspondent' }).click()
   await page.getByRole('menuitem', { name: 'Test Correspondent 1' }).click()
   await page.getByRole('menuitem', { name: 'Correspondent 9' }).click()
-  await expect(page).toHaveURL(/correspondent__id__in=12,1/)
+  await expect(page).toHaveURL(/correspondent__id__in=1,12/)
   await expect(page.locator('pngx-document-list')).toHaveText(/7 documents/)
   await page
     .locator('pngx-filter-editor')

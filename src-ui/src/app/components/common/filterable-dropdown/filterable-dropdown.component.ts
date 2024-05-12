@@ -44,32 +44,9 @@ export class FilterableDropdownSelectionModel {
 
   items: MatchingModel[] = []
 
-  get itemsSorted(): MatchingModel[] {
-    // TODO: this is getting called very often
-    return this.items.sort((a, b) => {
-      if (a.id == null && b.id != null) {
-        return -1
-      } else if (a.id != null && b.id == null) {
-        return 1
-      } else if (
-        this.getNonTemporary(a.id) == ToggleableItemState.NotSelected &&
-        this.getNonTemporary(b.id) != ToggleableItemState.NotSelected
-      ) {
-        return 1
-      } else if (
-        this.getNonTemporary(a.id) != ToggleableItemState.NotSelected &&
-        this.getNonTemporary(b.id) == ToggleableItemState.NotSelected
-      ) {
-        return -1
-      } else {
-        return a.name.localeCompare(b.name)
-      }
-    })
-  }
-
   private selectionStates = new Map<number, ToggleableItemState>()
 
-  private temporarySelectionStates = new Map<number, ToggleableItemState>()
+  temporarySelectionStates = new Map<number, ToggleableItemState>()
 
   getSelectedItems() {
     return this.items.filter(
@@ -188,7 +165,7 @@ export class FilterableDropdownSelectionModel {
     }
   }
 
-  private getNonTemporary(id: number) {
+  getNonTemporary(id: number) {
     return this.selectionStates.get(id) || ToggleableItemState.NotSelected
   }
 
@@ -335,12 +312,71 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
   @Input()
   set items(items: MatchingModel[]) {
     if (items) {
-      this._selectionModel.items = Array.from(items)
+      this._selectionModel.items = this.itemsSorted(items)
       this._selectionModel.items.unshift({
         name: $localize`:Filter drop down element to filter for documents with no correspondent/type/tag assigned:Not assigned`,
         id: null,
       })
     }
+  }
+
+  itemsSorted(
+    items: MatchingModel[],
+    isEditModeActive: boolean = true
+  ): MatchingModel[] {
+    const isUnassignedElement = (a) => a.id == null
+    const getSelectionCount = (a) =>
+      this._documentCounts?.find((c) => c.id === a.id)?.document_count || 0
+    enum priority {
+      NotAssignable = 5,
+      HasTemporarySelection = 4,
+      HasSelection = 3,
+      HasDocuments = 2,
+      Other = 1,
+    }
+    const getPriority = (a): priority => {
+      if (isUnassignedElement(a)) {
+        return priority.NotAssignable
+      } else if (this.selectionModel.temporarySelectionStates.get(a.id)) {
+        return priority.HasTemporarySelection
+      } else if (
+        this.selectionModel.getNonTemporary(a.id) !=
+        ToggleableItemState.NotSelected
+      ) {
+        return priority.HasSelection
+      } else if (getSelectionCount(a) > 0) {
+        return priority.HasDocuments
+      } else {
+        return priority.Other
+      }
+    }
+
+    return items
+      .sort((a, b) => {
+        const aPriority = getPriority(a)
+        const bPriority = getPriority(b)
+
+        if (aPriority != bPriority) {
+          return aPriority > bPriority ? -1 : 1
+        } else {
+          if (aPriority >= priority.HasSelection) {
+            return getSelectionCount(a) > getSelectionCount(b) ? -1 : 1
+          } else if (priority.HasDocuments == aPriority) {
+            return a.document_count > b.document_count ? -1 : 1
+          } else {
+            return a.name.localeCompare(b.name)
+          }
+        }
+      })
+      .filter(
+        (a: SelectionDataItem) =>
+          isEditModeActive ||
+          getSelectionCount(a) ||
+          isUnassignedElement(a) ||
+          this.selectionModel.getNonTemporary(a.id) !=
+            ToggleableItemState.NotSelected ||
+          this.selectionModel.temporarySelectionStates.get(a.id)
+      )
   }
 
   get items(): MatchingModel[] {
@@ -354,7 +390,7 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
   set selectionModel(model: FilterableDropdownSelectionModel) {
     if (this.selectionModel) {
       this.selectionModel.changed.complete()
-      model.items = this.selectionModel.items
+      model.items = this.itemsSorted(this.selectionModel.items)
       model.manyToOne = this.selectionModel.manyToOne
       model.singleSelect = this.editing && !this.selectionModel.manyToOne
     }
@@ -419,8 +455,14 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
       : !this.selectionModel.isNoneSelected()
   }
 
+  _documentCounts: SelectionDataItem[] = []
   @Input()
-  documentCounts: SelectionDataItem[]
+  set documentCounts(documentCounts: SelectionDataItem[]) {
+    this._documentCounts = documentCounts
+    if (documentCounts) {
+      this.selectionModel.items = this.itemsSorted(this.selectionModel.items)
+    }
+  }
 
   @Input()
   shortcutKey: string
@@ -533,8 +575,8 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
   }
 
   getUpdatedDocumentCount(id: number) {
-    if (this.documentCounts) {
-      return this.documentCounts.find((c) => c.id === id)?.document_count
+    if (this._documentCounts) {
+      return this._documentCounts.find((c) => c.id === id)?.document_count
     }
   }
 
