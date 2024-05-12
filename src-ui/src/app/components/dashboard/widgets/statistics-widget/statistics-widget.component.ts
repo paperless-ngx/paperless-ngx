@@ -18,6 +18,7 @@ export interface Statistics {
   correspondent_count?: number
   document_type_count?: number
   storage_path_count?: number
+  current_asn?: number
 }
 
 interface DocumentFileType {

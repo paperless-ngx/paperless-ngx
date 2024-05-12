@@ -189,4 +189,38 @@ describe('StatisticsWidgetComponent', () => {
       'Other(0.9%)'
     )
   })
+
+  it('should display the current ASN', () => {
+    const mockStats = {
+      current_asn: 122,
+    }
+
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}statistics/`
+    )
+
+    req.flush(mockStats)
+    fixture.detectChanges()
+
+    expect(fixture.nativeElement.textContent.replace(/\s/g, '')).toContain(
+      'CurrentASN:122'
+    )
+  })
+
+  it('should not display the current ASN if it is not available', () => {
+    const mockStats = {
+      current_asn: 0,
+    }
+
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}statistics/`
+    )
+
+    req.flush(mockStats)
+    fixture.detectChanges()
+
+    expect(fixture.nativeElement.textContent.replace(/\s/g, '')).not.toContain(
+      'CurrentASN:'
+    )
+  })
 })

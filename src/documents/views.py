@@ -1414,6 +1414,12 @@ class StatisticsView(APIView):
             .get("characters__sum")
         )
 
+        current_asn = Document.objects.aggregate(
+            Max("archive_serial_number", default=0),
+        ).get(
+            "archive_serial_number__max",
+        )
+
         return Response(
             {
                 "documents_total": documents_total,
@@ -1425,6 +1431,7 @@ class StatisticsView(APIView):
                 "correspondent_count": correspondent_count,
                 "document_type_count": document_type_count,
                 "storage_path_count": storage_path_count,
+                "current_asn": current_asn,
             },
         )
 
