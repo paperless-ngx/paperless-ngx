@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { ConfirmDialogComponent } from '../confirm-dialog.component'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { DocumentService } from 'src/app/services/rest/document.service'
-import { PDFDocumentProxy } from '../../pdf-viewer/typings'
+import { PDFDocumentProxy } from 'ng2-pdf-viewer'
 
 @Component({
   selector: 'pngx-split-confirm-dialog',
