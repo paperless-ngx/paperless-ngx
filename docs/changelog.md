@@ -6,7 +6,7 @@
 
 - Fix: respect superuser for document history [@shamoon](https://github.com/shamoon) ([#6661](https://github.com/paperless-ngx/paperless-ngx/pull/6661))
 - Fix: allow 0 in monetary field [@shamoon](https://github.com/shamoon) ([#6658](https://github.com/paperless-ngx/paperless-ngx/pull/6658))
-- Fix: custom field removal doesnt always trigger change detection [@shamoon](https://github.com/shamoon) ([#6653](https://github.com/paperless-ngx/paperless-ngx/pull/6653))
+- Fix: custom field removal doesn't always trigger change detection [@shamoon](https://github.com/shamoon) ([#6653](https://github.com/paperless-ngx/paperless-ngx/pull/6653))
 - Fix: Downgrade and lock lxml [@stumpylog](https://github.com/stumpylog) ([#6655](https://github.com/paperless-ngx/paperless-ngx/pull/6655))
 - Fix: correctly handle global search esc key when open and button foucsed [@shamoon](https://github.com/shamoon) ([#6644](https://github.com/paperless-ngx/paperless-ngx/pull/6644))
 - Fix: consistent monetary field display in list and cards [@shamoon](https://github.com/shamoon) ([#6645](https://github.com/paperless-ngx/paperless-ngx/pull/6645))
@@ -24,7 +24,7 @@
 
 - Fix: respect superuser for document history [@shamoon](https://github.com/shamoon) ([#6661](https://github.com/paperless-ngx/paperless-ngx/pull/6661))
 - Fix: allow 0 in monetary field [@shamoon](https://github.com/shamoon) ([#6658](https://github.com/paperless-ngx/paperless-ngx/pull/6658))
-- Fix: custom field removal doesnt always trigger change detection [@shamoon](https://github.com/shamoon) ([#6653](https://github.com/paperless-ngx/paperless-ngx/pull/6653))
+- Fix: custom field removal doesn't always trigger change detection [@shamoon](https://github.com/shamoon) ([#6653](https://github.com/paperless-ngx/paperless-ngx/pull/6653))
 - Fix: correctly handle global search esc key when open and button foucsed [@shamoon](https://github.com/shamoon) ([#6644](https://github.com/paperless-ngx/paperless-ngx/pull/6644))
 - Fix: consistent monetary field display in list and cards [@shamoon](https://github.com/shamoon) ([#6645](https://github.com/paperless-ngx/paperless-ngx/pull/6645))
 - Fix: doc links and more illegible in light mode [@shamoon](https://github.com/shamoon) ([#6643](https://github.com/paperless-ngx/paperless-ngx/pull/6643))
