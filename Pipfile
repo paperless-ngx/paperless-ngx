@@ -58,7 +58,7 @@ zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
 
 # Locked for issues
 # See https://github.com/paperless-ngx/paperless-ngx/discussions/6610 & https://bugs.launchpad.net/lxml/+bug/2059910
-lxml = "==5.1.1"
+lxml = "==5.2.2"
 
 [dev-packages]
 # Linting
