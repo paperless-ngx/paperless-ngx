@@ -161,7 +161,7 @@
         <thead>
           <th></th>
           @if (activeDisplayFields.includes(DisplayField.ASN)) {
-            <th class="d-none d-lg-table-cell"
+            <th class="d-none d-lg-table-cell cursor-pointer"
               pngxSortable="archive_serial_number"
               title="Sort by ASN" i18n-title
               [currentSortField]="list.sortField"
@@ -170,7 +170,7 @@
             i18n>ASN</th>
           }
           @if (activeDisplayFields.includes(DisplayField.CORRESPONDENT) && permissionService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
-            <th class="d-none d-md-table-cell"
+            <th class="d-none d-md-table-cell cursor-pointer"
               pngxSortable="correspondent__name"
               title="Sort by correspondent" i18n-title
               [currentSortField]="list.sortField"
@@ -179,7 +179,7 @@
             i18n>Correspondent</th>
           }
           @if (activeDisplayFields.includes(DisplayField.TITLE)) {
-            <th
+            <th class="cursor-pointer"
               pngxSortable="title"
               title="Sort by title" i18n-title
               [currentSortField]="list.sortField"
@@ -191,7 +191,7 @@
             <th i18n>Tags</th>
           }
           @if (activeDisplayFields.includes(DisplayField.OWNER) && permissionService.currentUserCan(PermissionAction.View, PermissionType.User)) {
-            <th class="d-none d-xl-table-cell"
+            <th class="d-none d-xl-table-cell cursor-pointer"
               pngxSortable="owner"
               title="Sort by owner" i18n-title
               [currentSortField]="list.sortField"
@@ -200,7 +200,7 @@
             i18n>Owner</th>
           }
           @if (activeDisplayFields.includes(DisplayField.NOTES) && notesEnabled) {
-            <th class="d-none d-xl-table-cell"
+            <th class="d-none d-xl-table-cell cursor-pointer"
               pngxSortable="num_notes"
               title="Sort by notes" i18n-title
               [currentSortField]="list.sortField"
@@ -209,7 +209,7 @@
             i18n>Notes</th>
           }
           @if (activeDisplayFields.includes(DisplayField.DOCUMENT_TYPE) && permissionService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
-            <th class="d-none d-xl-table-cell"
+            <th class="d-none d-xl-table-cell cursor-pointer"
               pngxSortable="document_type__name"
               title="Sort by document type" i18n-title
               [currentSortField]="list.sortField"
@@ -218,7 +218,7 @@
             i18n>Document type</th>
           }
           @if (activeDisplayFields.includes(DisplayField.STORAGE_PATH) && permissionService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
-            <th class="d-none d-xl-table-cell"
+            <th class="d-none d-xl-table-cell cursor-pointer"
               pngxSortable="storage_path__name"
               title="Sort by storage path" i18n-title
               [currentSortField]="list.sortField"
@@ -227,7 +227,7 @@
             i18n>Storage path</th>
           }
           @if (activeDisplayFields.includes(DisplayField.CREATED)) {
-            <th
+            <th class="cursor-pointer"
               pngxSortable="created"
               title="Sort by created date" i18n-title
               [currentSortField]="list.sortField"
@@ -236,7 +236,7 @@
             i18n>Created</th>
           }
           @if (activeDisplayFields.includes(DisplayField.ADDED)) {
-            <th
+            <th class="cursor-pointer"
               pngxSortable="added"
               title="Sort by added date" i18n-title
               [currentSortField]="list.sortField"
@@ -277,7 +277,7 @@
                 </td>
               }
               @if (activeDisplayFields.includes(DisplayField.TITLE) || activeDisplayFields.includes(DisplayField.TAGS)) {
-                <td>
+                <td width="30%">
                   @if (activeDisplayFields.includes(DisplayField.TITLE)) {
                     <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
                   }
