@@ -1,5 +1,30 @@
 # Changelog
 
+## paperless-ngx 2.8.4
+
+### Features
+
+- Enhancement: display current ASN in statistics [@darmiel](https://github.com/darmiel) ([#6692](https://github.com/paperless-ngx/paperless-ngx/pull/6692))
+- Enhancement: global search tweaks [@shamoon](https://github.com/shamoon) ([#6674](https://github.com/paperless-ngx/paperless-ngx/pull/6674))
+
+### Bug Fixes
+
+- Security: Correctly disable in pdfjs [@shamoon](https://github.com/shamoon) ([#6702](https://github.com/paperless-ngx/paperless-ngx/pull/6702))
+- Fix: history timestamp tooltip illegible in dark mode [@shamoon](https://github.com/shamoon) ([#6696](https://github.com/paperless-ngx/paperless-ngx/pull/6696))
+- Fix: only count inbox documents from inbox tags with permissions [@shamoon](https://github.com/shamoon) ([#6670](https://github.com/paperless-ngx/paperless-ngx/pull/6670))
+
+### All App Changes
+
+<details>
+<summary>5 changes</summary>
+
+- Enhancement: global search tweaks [@shamoon](https://github.com/shamoon) ([#6674](https://github.com/paperless-ngx/paperless-ngx/pull/6674))
+- Security: Correctly disable in pdfjs [@shamoon](https://github.com/shamoon) ([#6702](https://github.com/paperless-ngx/paperless-ngx/pull/6702))
+- Fix: history timestamp tooltip illegible in dark mode [@shamoon](https://github.com/shamoon) ([#6696](https://github.com/paperless-ngx/paperless-ngx/pull/6696))
+- Enhancement: display current ASN in statistics [@darmiel](https://github.com/darmiel) ([#6692](https://github.com/paperless-ngx/paperless-ngx/pull/6692))
+- Fix: only count inbox documents from inbox tags with permissions [@shamoon](https://github.com/shamoon) ([#6670](https://github.com/paperless-ngx/paperless-ngx/pull/6670))
+</details>
+
 ## paperless-ngx 2.8.3
 
 ### Bug Fixes
