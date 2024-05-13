@@ -7,7 +7,7 @@ name = "pypi"
 dateparser = "~=1.2"
 # WARNING: django does not use semver.
 #          Only patch versions are guaranteed to not introduce breaking changes.
-django = "~=4.2.11"
+django = "~=4.2.13"
 django-allauth = {extras = ["socialaccount"], version = "*"}
 django-auditlog = "*"
 django-celery-results = "*"
@@ -17,7 +17,7 @@ django-extensions = "*"
 django-filter = "~=24.2"
 django-guardian = "*"
 django-multiselectfield = "*"
-djangorestframework = "==3.14.0"
+djangorestframework = "==3.15.1"
 djangorestframework-guardian = "*"
 drf-writable-nested = "*"
 bleach = "*"
