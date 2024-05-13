@@ -35,7 +35,6 @@ import type {
 import { PDFSinglePageViewer } from 'pdfjs-dist/web/pdf_viewer'
 
 PDFJS['verbosity'] = PDFJS.VerbosityLevel.ERRORS
-PDFJS['isEvalSupported'] = false
 
 export enum RenderTextMode {
   DISABLED,
@@ -440,6 +439,7 @@ export class PdfViewerComponent
       cMapPacked: true,
       enableXfa: true,
     }
+    params.isEvalSupported = false
 
     if (srcType === 'string') {
       params.url = this.src

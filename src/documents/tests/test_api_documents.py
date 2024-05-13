@@ -930,6 +930,45 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.data["documents_inbox"], None)
         self.assertEqual(response.data["inbox_tag"], None)
 
+    def test_statistics_multiple_users(self):
+        """
+        GIVEN:
+            - Inbox tags with different owners and documents that are accessible to different users
+        WHEN:
+            - Statistics are requested
+        THEN:
+            - Statistics only include inbox counts for tags accessible by the user
+        """
+        u1 = User.objects.create_user("user1")
+        u2 = User.objects.create_user("user2")
+        inbox_tag_u1 = Tag.objects.create(name="inbox_u1", is_inbox_tag=True, owner=u1)
+        Tag.objects.create(name="inbox_u2", is_inbox_tag=True, owner=u2)
+        doc_u1 = Document.objects.create(
+            title="none1",
+            checksum="A",
+            mime_type="application/pdf",
+            owner=u1,
+        )
+        doc2_u1 = Document.objects.create(
+            title="none2",
+            checksum="B",
+            mime_type="application/pdf",
+        )
+        doc_u1.tags.add(inbox_tag_u1)
+        doc2_u1.save()
+        doc2_u1.tags.add(inbox_tag_u1)
+        doc2_u1.save()
+
+        self.client.force_authenticate(user=u1)
+        response = self.client.get("/api/statistics/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["documents_inbox"], 2)
+
+        self.client.force_authenticate(user=u2)
+        response = self.client.get("/api/statistics/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["documents_inbox"], 0)
+
     def test_upload(self):
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
