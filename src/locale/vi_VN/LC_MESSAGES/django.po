@@ -886,7 +886,7 @@ msgstr ""
 
 #: documents/templates/account/login.html:5
 msgid "TC GROUP sign in"
-msgstr ""
+msgstr "TC GROUP đăng nhập"
 
 #: documents/templates/account/login.html:10
 msgid "Please sign in."
@@ -1099,7 +1099,7 @@ msgstr "Không thể phân tích URI {value}"
 
 #: paperless/apps.py:10
 msgid "Paperless"
-msgstr "Paperless"
+msgstr "EDMS"
 
 #: paperless/models.py:26
 msgid "pdf"
@@ -1425,12 +1425,12 @@ msgid ""
 "process all matching rules that you have defined."
 msgstr ""
 "Gán siêu dữ liệu cho các tài liệu đã được sử dụng từ quy tắc này một cách tự "
-"động. Nếu bạn không gán nhãn, loại hoặc người tương ứng ở đây, Paperless vẫn "
+"động. Nếu bạn không gán nhãn, loại hoặc người tương ứng ở đây, EDMS vẫn "
 "sẽ xử lý tất cả các quy tắc khớp mà bạn đã xác định."
 
 #: paperless_mail/apps.py:11
 msgid "Paperless mail"
-msgstr "Thư Paperless"
+msgstr "Thư EDMS"
 
 #: paperless_mail/models.py:10
 msgid "mail account"
