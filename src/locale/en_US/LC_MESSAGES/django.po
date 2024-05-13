@@ -872,7 +872,7 @@ msgstr ""
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "EDMS sign in"
 
 #: documents/templates/account/login.html:10
 msgid "Please sign in."
