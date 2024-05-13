@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-26 07:19-0700\n"
-"PO-Revision-Date: 2024-05-02 16:16\n"
+"PO-Revision-Date: 2024-05-11 00:23\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -289,11 +289,11 @@ msgstr ""
 
 #: documents/models.py:408
 msgid "Document Type"
-msgstr ""
+msgstr "Tipo de documento"
 
 #: documents/models.py:409
 msgid "Storage Path"
-msgstr ""
+msgstr "Caminho de armazenamento"
 
 #: documents/models.py:410
 msgid "Note"

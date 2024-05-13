@@ -1391,7 +1391,9 @@ class StatisticsView(APIView):
         inbox_tag = tags.filter(is_inbox_tag=True)
 
         documents_inbox = (
-            documents.filter(tags__is_inbox_tag=True).distinct().count()
+            documents.filter(tags__is_inbox_tag=True, tags__id__in=tags)
+            .distinct()
+            .count()
             if inbox_tag.exists()
             else None
         )
@@ -1412,6 +1414,12 @@ class StatisticsView(APIView):
             .get("characters__sum")
         )
 
+        current_asn = Document.objects.aggregate(
+            Max("archive_serial_number", default=0),
+        ).get(
+            "archive_serial_number__max",
+        )
+
         return Response(
             {
                 "documents_total": documents_total,
@@ -1423,6 +1431,7 @@ class StatisticsView(APIView):
                 "correspondent_count": correspondent_count,
                 "document_type_count": document_type_count,
                 "storage_path_count": storage_path_count,
+                "current_asn": current_asn,
             },
         )
 

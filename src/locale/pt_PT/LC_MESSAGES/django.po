@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-26 07:19-0700\n"
-"PO-Revision-Date: 2024-05-09 00:23\n"
+"PO-Revision-Date: 2024-05-09 20:20\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -705,19 +705,19 @@ msgstr "Obter E-mail"
 
 #: documents/models.py:960
 msgid "Workflow Trigger Type"
-msgstr ""
+msgstr "Tipo de acionamento de fluxo de trabalho"
 
 #: documents/models.py:972
 msgid "filter path"
-msgstr ""
+msgstr "caminho do filtro"
 
 #: documents/models.py:977
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr ""
+msgstr "Apenas consume documentos com um caminho que combina com o especificado. Wildcards especificados como * são permitidos. Não faz distinção entre maiúsculas de minúsculas."
 
 #: documents/models.py:984
 msgid "filter filename"
-msgstr ""
+msgstr "filtro do nome do ficheiro"
 
 #: documents/models.py:989 paperless_mail/models.py:148
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
