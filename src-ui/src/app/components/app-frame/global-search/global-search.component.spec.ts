@@ -287,48 +287,44 @@ describe('GlobalSearchComponent', () => {
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
 
     component.primaryAction(DataType.Document, object)
-    expect(routerSpy).toHaveBeenCalledWith(['/documents', object.id])
+    expect(routerSpy).toHaveBeenCalledWith(['/documents', object.id], {})
 
     component.primaryAction(DataType.SavedView, object)
-    expect(routerSpy).toHaveBeenCalledWith(['/view', object.id])
+    expect(routerSpy).toHaveBeenCalledWith(['/view', object.id], {})
 
     component.primaryAction(DataType.Correspondent, object)
-    expect(routerSpy).toHaveBeenCalledWith([
-      '/documents',
-      queryParamsFromFilterRules([
+    expect(routerSpy).toHaveBeenCalledWith(['/documents'], {
+      queryParams: queryParamsFromFilterRules([
         {
           rule_type: FILTER_HAS_CORRESPONDENT_ANY,
           value: object.id.toString(),
         },
       ]),
-    ])
+    })
 
     component.primaryAction(DataType.DocumentType, object)
-    expect(routerSpy).toHaveBeenCalledWith([
-      '/documents',
-      queryParamsFromFilterRules([
+    expect(routerSpy).toHaveBeenCalledWith(['/documents'], {
+      queryParams: queryParamsFromFilterRules([
         {
           rule_type: FILTER_HAS_DOCUMENT_TYPE_ANY,
           value: object.id.toString(),
         },
       ]),
-    ])
+    })
 
     component.primaryAction(DataType.StoragePath, object)
-    expect(routerSpy).toHaveBeenCalledWith([
-      '/documents',
-      queryParamsFromFilterRules([
+    expect(routerSpy).toHaveBeenCalledWith(['/documents'], {
+      queryParams: queryParamsFromFilterRules([
         { rule_type: FILTER_HAS_STORAGE_PATH_ANY, value: object.id.toString() },
       ]),
-    ])
+    })
 
     component.primaryAction(DataType.Tag, object)
-    expect(routerSpy).toHaveBeenCalledWith([
-      '/documents',
-      queryParamsFromFilterRules([
+    expect(routerSpy).toHaveBeenCalledWith(['/documents'], {
+      queryParams: queryParamsFromFilterRules([
         { rule_type: FILTER_HAS_TAGS_ANY, value: object.id.toString() },
       ]),
-    ])
+    })
 
     component.primaryAction(DataType.User, object)
     expect(modalSpy).toHaveBeenCalledWith(UserEditDialogComponent, {
