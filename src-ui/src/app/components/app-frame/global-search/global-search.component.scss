@@ -31,6 +31,9 @@ form {
   .input-group .btn {
     border-color: rgba(255, 255, 255, 0.2);
     color: var(--pngx-primary-text-contrast);
+    padding-top: .15rem;
+    padding-bottom: .15rem;
+    min-height: calc(1.3em + 0.5rem + calc(var(--bs-border-width) * 2)) !important;
   }
 
   .form-control {
