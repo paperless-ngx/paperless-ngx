@@ -34,7 +34,7 @@
           </h5>
         </div>
         <p class="card-text">
-          @if (document.__search_hit__?.score && document.__search_hit__.highlights) {
+          @if (document.__search_hit__ && document.__search_hit__.highlights) {
             <span [innerHtml]="document.__search_hit__.highlights"></span>
           }
           @for (highlight of searchNoteHighlights; track highlight) {
