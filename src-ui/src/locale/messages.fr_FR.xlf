@@ -5735,7 +5735,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Current ASN</target>
+        <target state="translated">NSA actuel</target>
       </trans-unit>
       <trans-unit id="8693603235657020323" datatype="html" approved="yes">
         <source>Other</source>
