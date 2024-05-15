@@ -24,7 +24,7 @@ import {
   FILTER_HAS_CORRESPONDENT_ANY,
   FILTER_HAS_DOCUMENT_TYPE_ANY,
   FILTER_HAS_STORAGE_PATH_ANY,
-  FILTER_HAS_TAGS_ANY,
+  FILTER_HAS_TAGS_ALL,
 } from 'src/app/data/filter-rule-type'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { DocumentService } from 'src/app/services/rest/document.service'
@@ -294,36 +294,67 @@ describe('GlobalSearchComponent', () => {
 
     component.primaryAction(DataType.Correspondent, object)
     expect(routerSpy).toHaveBeenCalledWith(['/documents'], {
-      queryParams: queryParamsFromFilterRules([
+      queryParams: Object.assign(
         {
-          rule_type: FILTER_HAS_CORRESPONDENT_ANY,
-          value: object.id.toString(),
+          page: 1,
+          reverse: 1,
+          sort: 'created',
         },
-      ]),
+        queryParamsFromFilterRules([
+          {
+            rule_type: FILTER_HAS_CORRESPONDENT_ANY,
+            value: object.id.toString(),
+          },
+        ])
+      ),
     })
 
     component.primaryAction(DataType.DocumentType, object)
     expect(routerSpy).toHaveBeenCalledWith(['/documents'], {
-      queryParams: queryParamsFromFilterRules([
+      queryParams: Object.assign(
         {
-          rule_type: FILTER_HAS_DOCUMENT_TYPE_ANY,
-          value: object.id.toString(),
+          page: 1,
+          reverse: 1,
+          sort: 'created',
         },
-      ]),
+        queryParamsFromFilterRules([
+          {
+            rule_type: FILTER_HAS_DOCUMENT_TYPE_ANY,
+            value: object.id.toString(),
+          },
+        ])
+      ),
     })
 
     component.primaryAction(DataType.StoragePath, object)
     expect(routerSpy).toHaveBeenCalledWith(['/documents'], {
-      queryParams: queryParamsFromFilterRules([
-        { rule_type: FILTER_HAS_STORAGE_PATH_ANY, value: object.id.toString() },
-      ]),
+      queryParams: Object.assign(
+        {
+          page: 1,
+          reverse: 1,
+          sort: 'created',
+        },
+        queryParamsFromFilterRules([
+          {
+            rule_type: FILTER_HAS_STORAGE_PATH_ANY,
+            value: object.id.toString(),
+          },
+        ])
+      ),
     })
 
     component.primaryAction(DataType.Tag, object)
     expect(routerSpy).toHaveBeenCalledWith(['/documents'], {
-      queryParams: queryParamsFromFilterRules([
-        { rule_type: FILTER_HAS_TAGS_ANY, value: object.id.toString() },
-      ]),
+      queryParams: Object.assign(
+        {
+          page: 1,
+          reverse: 1,
+          sort: 'created',
+        },
+        queryParamsFromFilterRules([
+          { rule_type: FILTER_HAS_TAGS_ALL, value: object.id.toString() },
+        ])
+      ),
     })
 
     component.primaryAction(DataType.User, object)
