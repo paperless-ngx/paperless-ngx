@@ -40,6 +40,7 @@ from documents.views import UnifiedSearchViewSet
 from documents.views import WorkflowActionViewSet
 from documents.views import WorkflowTriggerViewSet
 from documents.views import WorkflowViewSet
+from documents.views import WarehouseViewSet
 from paperless.consumers import StatusConsumer
 from paperless.views import ApplicationConfigurationViewSet
 from paperless.views import DisconnectSocialAccountView
@@ -52,6 +53,7 @@ from paperless.views import UserViewSet
 from paperless_mail.views import MailAccountTestView
 from paperless_mail.views import MailAccountViewSet
 from paperless_mail.views import MailRuleViewSet
+
 
 api_router = DefaultRouter()
 api_router.register(r"correspondents", CorrespondentViewSet)
@@ -72,9 +74,11 @@ api_router.register(r"workflow_actions", WorkflowActionViewSet)
 api_router.register(r"workflows", WorkflowViewSet)
 api_router.register(r"custom_fields", CustomFieldViewSet)
 api_router.register(r"config", ApplicationConfigurationViewSet)
+api_router.register(r"warehouses", WarehouseViewSet)
 
 
 urlpatterns = [
+    
     re_path(
         r"^api/",
         include(

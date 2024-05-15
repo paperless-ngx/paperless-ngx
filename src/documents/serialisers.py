@@ -45,6 +45,7 @@ from documents.models import UiSettings
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
+from documents.models import Warehouse
 from documents.parsers import is_mime_type_supported
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import set_permissions_for_object
@@ -1384,6 +1385,7 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
             "correspondents",
             "document_types",
             "storage_paths",
+            "warehouses",
         ],
         label="Object Type",
         write_only=True,
@@ -1428,6 +1430,8 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
             object_class = DocumentType
         elif object_type == "storage_paths":
             object_class = StoragePath
+        elif object_type == "warehouses":
+            object_class = Warehouse
         return object_class
 
     def _validate_objects(self, objects, object_type):
@@ -1740,3 +1744,22 @@ class WorkflowSerializer(serializers.ModelSerializer):
         self.prune_triggers_and_actions()
 
         return instance
+
+
+
+
+
+
+class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
+    parent_warehouse_reference = serializers.SerializerMethodField()
+    class Meta:
+        model = Warehouse
+        fields = '__all__'
+        
+    def get_parent_warehouse_reference(self, obj):
+        if obj.parent_warehouse:
+            return WarehouseSerializer(obj.parent_warehouse).data
+        return None  
+    
+    
+    
