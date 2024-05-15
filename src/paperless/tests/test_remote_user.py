@@ -2,6 +2,7 @@ import os
 from unittest import mock
 
 from django.contrib.auth.models import User
+from django.test import override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -88,47 +89,37 @@ class TestRemoteUser(DirectoriesMixin, APITestCase):
 
             self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    @override_settings(
+        REST_FRAMEWORK={
+            "DEFAULT_AUTHENTICATION_CLASSES": [
+                "rest_framework.authentication.BasicAuthentication",
+                "rest_framework.authentication.TokenAuthentication",
+                "rest_framework.authentication.SessionAuthentication",
+            ],
+        },
+    )
     def test_remote_user_api_disabled(self):
         """
         GIVEN:
             - Configured user
             - Remote user auth enabled for frontend but disabled for the API
+            - Note that REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'] is set in settings.py in production
         WHEN:
             - API call is made to get documents
         THEN:
             - Call fails
         """
-
-        with mock.patch.dict(
-            os.environ,
-            {
-                "PAPERLESS_ENABLE_HTTP_REMOTE_USER": "True",
-                "PAPERLESS_ENABLE_HTTP_REMOTE_USER_API": "False",
+        response = self.client.get(
+            "/api/documents/",
+            headers={
+                "Remote-User": self.user.username,
             },
-        ):
-            _parse_remote_user_settings()
-            from django.conf import settings
+        )
 
-            # Only needed in testing (on ci?), in production this is handled in the settings
-            if (
-                "paperless.auth.PaperlessRemoteUserAuthentication"
-                in settings.REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"]
-            ):
-                settings.REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].remove(
-                    "paperless.auth.PaperlessRemoteUserAuthentication",
-                )
-
-            response = self.client.get(
-                "/api/documents/",
-                headers={
-                    "Remote-User": self.user.username,
-                },
-            )
-
-            self.assertIn(
-                response.status_code,
-                [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN],
-            )
+        self.assertIn(
+            response.status_code,
+            [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN],
+        )
 
     def test_remote_user_header_setting(self):
         """
