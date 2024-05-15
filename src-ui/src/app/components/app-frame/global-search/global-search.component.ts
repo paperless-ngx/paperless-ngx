@@ -163,7 +163,9 @@ export class GlobalSearchComponent implements OnInit {
       let params = queryParamsFromFilterRules([
         { rule_type: filterRuleType, value: object.id.toString() },
       ])
-      this.navigateOrOpenInNewWindow(['/documents', params], newWindow)
+      this.navigateOrOpenInNewWindow(['/documents'], newWindow, {
+        queryParams: params,
+      })
     } else if (editDialogComponent) {
       const modalRef: NgbModalRef = this.modalService.open(
         editDialogComponent,
@@ -378,12 +380,18 @@ export class GlobalSearchComponent implements OnInit {
     this.reset(true)
   }
 
-  private navigateOrOpenInNewWindow(commands: any, newWindow: boolean = false) {
+  private navigateOrOpenInNewWindow(
+    commands: any,
+    newWindow: boolean = false,
+    extras: Object = {}
+  ) {
     if (newWindow) {
-      const url = this.router.serializeUrl(this.router.createUrlTree(commands))
+      const url = this.router.serializeUrl(
+        this.router.createUrlTree(commands, extras)
+      )
       window.open(url, '_blank')
     } else {
-      this.router.navigate(commands)
+      this.router.navigate(commands, extras)
     }
   }
 }
