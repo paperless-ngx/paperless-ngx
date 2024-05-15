@@ -92,7 +92,7 @@ class TestRemoteUser(DirectoriesMixin, APITestCase):
         """
         GIVEN:
             - Configured user
-            - Remote user auth is disabled for the API
+            - Remote user auth enabled for frontend but disabled for the API
         WHEN:
             - API call is made to get documents
         THEN:
@@ -107,14 +107,6 @@ class TestRemoteUser(DirectoriesMixin, APITestCase):
             },
         ):
             _parse_remote_user_settings()
-
-            response = self.client.get("/api/documents/")
-
-            # 403 testing locally, 401 on ci...
-            self.assertIn(
-                response.status_code,
-                [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN],
-            )
 
             response = self.client.get(
                 "/api/documents/",

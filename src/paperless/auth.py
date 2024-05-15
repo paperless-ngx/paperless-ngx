@@ -55,6 +55,12 @@ class HttpRemoteUserMiddleware(PersistentRemoteUserMiddleware):
     def process_request(self, request: HttpRequest) -> None:
         # If remote user auth is enabled only for the frontend, not the API,
         # then we need dont want to authenticate the user for API requests.
+        logger.debug(
+            request.path,
+        )
+        logger.debug(
+            settings.REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"],
+        )
         if (
             "/api/" in request.path
             and "paperless.auth.PaperlessRemoteUserAuthentication"
