@@ -19,6 +19,7 @@ from documents.models import Log
 from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import Warehouse
 
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]
@@ -257,3 +258,16 @@ class ObjectOwnedOrGrantedPermissionsFilter(ObjectPermissionsFilter):
         objects_owned = queryset.filter(owner=request.user)
         objects_unowned = queryset.filter(owner__isnull=True)
         return objects_with_perms | objects_owned | objects_unowned
+
+
+
+
+class WarehouseFilterSet(FilterSet):
+    class Meta:
+        model = Warehouse
+        fields = {
+            "id": ID_KWARGS,
+            "name": CHAR_KWARGS,
+            "type": CHAR_KWARGS,
+            "parent_warehouse": ID_KWARGS,
+        }

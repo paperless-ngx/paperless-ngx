@@ -99,6 +99,8 @@ from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
 from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
+from documents.filters import WarehouseFilterSet
+
 from documents.matching import match_correspondents
 from documents.matching import match_document_types
 from documents.matching import match_storage_paths
@@ -117,6 +119,8 @@ from documents.models import UiSettings
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
+from documents.models import Warehouse
+
 from documents.parsers import get_parser_class_for_mime_type
 from documents.parsers import parse_date_generator
 from documents.permissions import PaperlessAdminPermissions
@@ -144,6 +148,8 @@ from documents.serialisers import UiSettingsViewSerializer
 from documents.serialisers import WorkflowActionSerializer
 from documents.serialisers import WorkflowSerializer
 from documents.serialisers import WorkflowTriggerSerializer
+from documents.serialisers import WarehouseSerializer
+
 from documents.signals import document_updated
 from documents.tasks import consume_file
 from paperless import version
@@ -1749,3 +1755,24 @@ class SystemStatusView(PassUserMixin):
                 },
             },
         )
+        
+        
+
+class WarehouseViewSet(ModelViewSet):
+    model = Warehouse
+
+    queryset = Warehouse.objects.select_related("owner").order_by(
+        Lower("name"),
+    )
+
+    serializer_class = WarehouseSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
+    filterset_class = WarehouseFilterSet
+    ordering_fields = ("name", "type", "parent_warehouse")
+

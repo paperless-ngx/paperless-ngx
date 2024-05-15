@@ -1237,3 +1237,30 @@ class Workflow(models.Model):
 
     def __str__(self):
         return f"Workflow: {self.name}"
+
+
+
+
+class Warehouse(ModelWithOwner):
+       
+    WAREHOUSE = "Warehouse"
+    SHELF = "Shelf"
+    BOXCASE = "Boxcase"
+    TYPE_WAREHOUSE = (
+        (WAREHOUSE, _("Warehouse")),
+        (SHELF, _("Shelf")),
+        (BOXCASE, _("Boxcase")),
+    )
+    
+    name = models.CharField(_("name"), max_length=256, unique=True)
+    type = models.CharField(max_length=20, null=True, blank=True, 
+                                      choices=TYPE_WAREHOUSE,
+                                      default=WAREHOUSE,)
+    parent_warehouse = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name="parent_warehouses" )
+    
+    class Meta: 
+        verbose_name = _("warehouse")
+        verbose_name_plural = _("warehouses")
+    
+    def __str__(self):
+        return self.name
