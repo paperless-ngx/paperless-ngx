@@ -88,6 +88,46 @@ class TestRemoteUser(DirectoriesMixin, APITestCase):
 
             self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_remote_user_api_disabled(self):
+        """
+        GIVEN:
+            - Configured user
+            - Remote user auth is disabled for the API
+        WHEN:
+            - API call is made to get documents
+        THEN:
+            - Call fails
+        """
+
+        with mock.patch.dict(
+            os.environ,
+            {
+                "PAPERLESS_ENABLE_HTTP_REMOTE_USER": "True",
+                "PAPERLESS_ENABLE_HTTP_REMOTE_USER_API": "False",
+            },
+        ):
+            _parse_remote_user_settings()
+
+            response = self.client.get("/api/documents/")
+
+            # 403 testing locally, 401 on ci...
+            self.assertIn(
+                response.status_code,
+                [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN],
+            )
+
+            response = self.client.get(
+                "/api/documents/",
+                headers={
+                    "Remote-User": self.user.username,
+                },
+            )
+
+            self.assertIn(
+                response.status_code,
+                [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN],
+            )
+
     def test_remote_user_header_setting(self):
         """
         GIVEN:
