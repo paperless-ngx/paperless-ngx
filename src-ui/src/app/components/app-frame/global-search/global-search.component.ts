@@ -14,7 +14,7 @@ import {
   FILTER_HAS_CORRESPONDENT_ANY,
   FILTER_HAS_DOCUMENT_TYPE_ANY,
   FILTER_HAS_STORAGE_PATH_ANY,
-  FILTER_HAS_TAGS_ANY,
+  FILTER_HAS_TAGS_ALL,
 } from 'src/app/data/filter-rule-type'
 import { DataType } from 'src/app/data/datatype'
 import { ObjectWithId } from 'src/app/data/object-with-id'
@@ -41,7 +41,7 @@ import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog
 import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
 import { WorkflowEditDialogComponent } from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
 import { HotKeyService } from 'src/app/services/hot-key.service'
-import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
+import { paramsFromViewState } from 'src/app/utils/query-params'
 
 @Component({
   selector: 'pngx-global-search',
@@ -132,7 +132,7 @@ export class GlobalSearchComponent implements OnInit {
         filterRuleType = FILTER_HAS_STORAGE_PATH_ANY
         break
       case DataType.Tag:
-        filterRuleType = FILTER_HAS_TAGS_ANY
+        filterRuleType = FILTER_HAS_TAGS_ALL
         break
       case DataType.User:
         editDialogComponent = UserEditDialogComponent
@@ -160,9 +160,14 @@ export class GlobalSearchComponent implements OnInit {
     }
 
     if (filterRuleType) {
-      let params = queryParamsFromFilterRules([
-        { rule_type: filterRuleType, value: object.id.toString() },
-      ])
+      let params = paramsFromViewState({
+        filterRules: [
+          { rule_type: filterRuleType, value: object.id.toString() },
+        ],
+        currentPage: 1,
+        sortField: this.documentListViewService.sortField ?? 'created',
+        sortReverse: this.documentListViewService.sortReverse,
+      })
       this.navigateOrOpenInNewWindow(['/documents'], newWindow, {
         queryParams: params,
       })
