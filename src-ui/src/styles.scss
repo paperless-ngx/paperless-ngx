@@ -332,6 +332,14 @@ textarea,
   }
 }
 
+@media(max-width: 768px) {
+  .input-group-sm .btn-sm {
+    // accommodate larger font size on mobile
+    padding-top: .35rem;
+    padding-bottom: .35rem;
+  }
+}
+
 .input-group .form-control-sm {
   // accommodate larger font size on mobile
   padding-top: .15rem;
