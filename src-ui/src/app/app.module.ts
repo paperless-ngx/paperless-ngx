@@ -105,7 +105,7 @@ import { CustomFieldsComponent } from './components/manage/custom-fields/custom-
 import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { CustomFieldsDropdownComponent } from './components/common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { ProfileEditDialogComponent } from './components/common/profile-edit-dialog/profile-edit-dialog.component'
-import { PdfViewerComponent } from './components/common/pdf-viewer/pdf-viewer.component'
+import { PdfViewerModule } from 'ng2-pdf-viewer'
 import { DocumentLinkComponent } from './components/common/input/document-link/document-link.component'
 import { PreviewPopupComponent } from './components/common/preview-popup/preview-popup.component'
 import { SwitchComponent } from './components/common/input/switch/switch.component'
@@ -475,7 +475,6 @@ function initializeApp(settings: SettingsService) {
     CustomFieldEditDialogComponent,
     CustomFieldsDropdownComponent,
     ProfileEditDialogComponent,
-    PdfViewerComponent,
     DocumentLinkComponent,
     PreviewPopupComponent,
     SwitchComponent,
@@ -500,6 +499,7 @@ function initializeApp(settings: SettingsService) {
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
+    PdfViewerModule,
     NgxFileDropModule,
     NgSelectModule,
     ColorSliderModule,
