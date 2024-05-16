@@ -107,7 +107,6 @@ class BarcodePlugin(ConsumeTaskPlugin):
         if settings.CONSUMER_ENABLE_BARCODES and (
             separator_pages := self.get_separation_pages()
         ):
-
             # We have pages to split against
 
             # Note this does NOT use the base_temp_dir, as that will be removed
