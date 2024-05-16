@@ -66,10 +66,10 @@ import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { PDFDocumentProxy } from '../common/pdf-viewer/typings'
 import { SplitConfirmDialogComponent } from '../common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
 import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { HotKeyService } from 'src/app/services/hot-key.service'
+import { PDFDocumentProxy } from 'ng2-pdf-viewer'
 
 enum DocumentDetailNavIDs {
   Details = 1,

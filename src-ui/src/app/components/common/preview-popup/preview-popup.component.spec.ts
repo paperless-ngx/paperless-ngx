@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { PreviewPopupComponent } from './preview-popup.component'
-import { PdfViewerComponent } from '../pdf-viewer/pdf-viewer.component'
 import { By } from '@angular/platform-browser'
 import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -9,6 +8,7 @@ import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { PdfViewerModule } from 'ng2-pdf-viewer'
 
 const doc = {
   id: 10,
@@ -25,10 +25,11 @@ describe('PreviewPopupComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [PreviewPopupComponent, PdfViewerComponent, SafeUrlPipe],
+      declarations: [PreviewPopupComponent, SafeUrlPipe],
       imports: [
         HttpClientTestingModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        PdfViewerModule,
       ],
     })
     settingsService = TestBed.inject(SettingsService)
@@ -69,7 +70,7 @@ describe('PreviewPopupComponent', () => {
     settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, false)
     fixture.detectChanges()
     expect(fixture.debugElement.query(By.css('object'))).toBeNull()
-    expect(fixture.debugElement.query(By.css('pngx-pdf-viewer'))).not.toBeNull()
+    expect(fixture.debugElement.query(By.css('pdf-viewer'))).not.toBeNull()
   })
 
   it('should show lock icon on password error', () => {

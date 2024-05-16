@@ -13,12 +13,12 @@
                 <div class="input-group-text" i18n>of {{totalPages}}</div>
             </div>
             <div class="pdf-viewer-container w-100 mt-3">
-                <pngx-pdf-viewer [src]="pdfSrc" [(page)]="page"
+                <pdf-viewer [src]="pdfSrc" [(page)]="page"
                 [original-size]="false"
                 [zoom]="1"
                 zoom-scale="page-fit"
                 (after-load-complete)="pdfPreviewLoaded($event)">
-                </pngx-pdf-viewer>
+                </pdf-viewer>
             </div>
         </div>
         <div class="col-4">

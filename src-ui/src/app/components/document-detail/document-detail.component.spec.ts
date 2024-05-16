@@ -76,11 +76,11 @@ import { ShareLinksDropdownComponent } from '../common/share-links-dropdown/shar
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { PdfViewerComponent } from '../common/pdf-viewer/pdf-viewer.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { environment } from 'src/environments/environment'
 import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { SplitConfirmDialogComponent } from '../common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
+import { PdfViewerModule } from 'ng2-pdf-viewer'
 
 const doc: Document = {
   id: 3,
@@ -176,7 +176,6 @@ describe('DocumentDetailComponent', () => {
         SafeUrlPipe,
         ShareLinksDropdownComponent,
         CustomFieldsDropdownComponent,
-        PdfViewerComponent,
         SplitConfirmDialogComponent,
         RotateConfirmDialogComponent,
       ],
@@ -265,6 +264,7 @@ describe('DocumentDetailComponent', () => {
         ReactiveFormsModule,
         NgbModalModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        PdfViewerModule,
       ],
     }).compileComponents()
 
@@ -885,7 +885,7 @@ describe('DocumentDetailComponent', () => {
     jest.spyOn(settingsService, 'get').mockReturnValue(false)
     expect(component.useNativePdfViewer).toBeFalsy()
     fixture.detectChanges()
-    expect(fixture.debugElement.query(By.css('pngx-pdf-viewer'))).not.toBeNull()
+    expect(fixture.debugElement.query(By.css('pdf-viewer'))).not.toBeNull()
   })
 
   it('should display native pdf viewer if enabled', () => {
