@@ -1758,7 +1758,7 @@ class SystemStatusView(PassUserMixin):
         
         
 
-class WarehouseViewSet(ModelViewSet):
+class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = Warehouse
 
     queryset = Warehouse.objects.select_related("owner").order_by(
@@ -1774,5 +1774,5 @@ class WarehouseViewSet(ModelViewSet):
         ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = WarehouseFilterSet
-    ordering_fields = ("name", "type", "parent_warehouse")
+    ordering_fields = ("name", "type", "parent_warehouse", "document_count")
 

@@ -428,6 +428,9 @@ class TagsField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         return Tag.objects.all()
 
+class WarehousesField(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        return Warehouse.objects.all()
 
 class DocumentTypeField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
@@ -653,6 +656,7 @@ class DocumentSerializer(
 ):
     correspondent = CorrespondentField(allow_null=True)
     tags = TagsField(many=True)
+    warehouses = WarehousesField(allow_null=True)
     document_type = DocumentTypeField(allow_null=True)
     storage_path = StoragePathField(allow_null=True)
 
@@ -774,6 +778,7 @@ class DocumentSerializer(
             "title",
             "content",
             "tags",
+            "warehouses",
             "created",
             "created_date",
             "modified",
@@ -1751,15 +1756,18 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
 
 class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
-    parent_warehouse_reference = serializers.SerializerMethodField()
+    
     class Meta:
         model = Warehouse
         fields = '__all__'
         
-    def get_parent_warehouse_reference(self, obj):
-        if obj.parent_warehouse:
-            return WarehouseSerializer(obj.parent_warehouse).data
-        return None  
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if instance.parent_warehouse:
+            data['parent_warehouse'] = WarehouseSerializer(instance.parent_warehouse).data
+        else:
+            data['parent_warehouse'] = None
+        return data 
     
     
     

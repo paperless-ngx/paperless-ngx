@@ -129,6 +129,29 @@ class StoragePath(MatchingModel):
         verbose_name = _("storage path")
         verbose_name_plural = _("storage paths")
 
+class Warehouse(ModelWithOwner):
+       
+    WAREHOUSE = "Warehouse"
+    SHELF = "Shelf"
+    BOXCASE = "Boxcase"
+    TYPE_WAREHOUSE = (
+        (WAREHOUSE, _("Warehouse")),
+        (SHELF, _("Shelf")),
+        (BOXCASE, _("Boxcase")),
+    )
+    
+    name = models.CharField(_("name"), max_length=256, unique=True)
+    type = models.CharField(max_length=20, null=True, blank=True, 
+                                      choices=TYPE_WAREHOUSE,
+                                      default=WAREHOUSE,)
+    parent_warehouse = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name="parent_warehouses" )
+    
+    class Meta: 
+        verbose_name = _("warehouse")
+        verbose_name_plural = _("warehouses")
+    
+    def __str__(self):
+        return self.name
 
 class Document(ModelWithOwner):
     STORAGE_TYPE_UNENCRYPTED = "unencrypted"
@@ -183,6 +206,15 @@ class Document(ModelWithOwner):
         related_name="documents",
         blank=True,
         verbose_name=_("tags"),
+    )
+    
+    warehouses = models.ForeignKey(
+        Warehouse,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL,
+        verbose_name=_("warehouses"),
     )
 
     checksum = models.CharField(
@@ -1241,26 +1273,3 @@ class Workflow(models.Model):
 
 
 
-class Warehouse(ModelWithOwner):
-       
-    WAREHOUSE = "Warehouse"
-    SHELF = "Shelf"
-    BOXCASE = "Boxcase"
-    TYPE_WAREHOUSE = (
-        (WAREHOUSE, _("Warehouse")),
-        (SHELF, _("Shelf")),
-        (BOXCASE, _("Boxcase")),
-    )
-    
-    name = models.CharField(_("name"), max_length=256, unique=True)
-    type = models.CharField(max_length=20, null=True, blank=True, 
-                                      choices=TYPE_WAREHOUSE,
-                                      default=WAREHOUSE,)
-    parent_warehouse = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name="parent_warehouses" )
-    
-    class Meta: 
-        verbose_name = _("warehouse")
-        verbose_name_plural = _("warehouses")
-    
-    def __str__(self):
-        return self.name
