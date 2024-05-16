@@ -7,14 +7,18 @@
 .pdf-viewer-container {
   background-color: gray;
 
-  pngx-pdf-viewer {
+  pdf-viewer {
     width: 100%;
     height: 100%;
   }
 }
 
-::ng-deep .pngx-pdf-viewer-container .page {
+::ng-deep .ng2-pdf-viewer-container .page {
   --page-margin: 10px auto;
+}
+
+::ng-deep .ng2-pdf-viewer-container .page:last-child {
+  --page-margin: 10px auto 20px;
 }
 
 ::ng-deep form .ng-select-taggable {

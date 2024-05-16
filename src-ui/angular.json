@@ -76,8 +76,7 @@
             ],
             "scripts": [],
             "allowedCommonJsDependencies": [
-              "pdfjs-dist",
-              "pdfjs-dist/web/pdf_viewer",
+              "ng2-pdf-viewer",
               "filesize",
               "file-saver"
             ],
