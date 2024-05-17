@@ -7,7 +7,7 @@ name = "pypi"
 dateparser = "~=1.2"
 # WARNING: django does not use semver.
 #          Only patch versions are guaranteed to not introduce breaking changes.
-django = "~=4.2.11"
+django = "~=4.2.13"
 django-allauth = {extras = ["socialaccount"], version = "*"}
 django-auditlog = "*"
 django-celery-results = "*"
@@ -50,15 +50,12 @@ scikit-learn = "~=1.4"
 setproctitle = "*"
 tika-client = "*"
 tqdm = "*"
+# See https://github.com/paperless-ngx/paperless-ngx/issues/5494
 uvicorn = {extras = ["standard"], version = "==0.25.0"}
 watchdog = "~=4.0"
 whitenoise = "~=6.6"
 whoosh="~=2.7"
 zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
-
-# Locked for issues
-# See https://github.com/paperless-ngx/paperless-ngx/discussions/6610 & https://bugs.launchpad.net/lxml/+bug/2059910
-lxml = "==5.1.1"
 
 [dev-packages]
 # Linting
