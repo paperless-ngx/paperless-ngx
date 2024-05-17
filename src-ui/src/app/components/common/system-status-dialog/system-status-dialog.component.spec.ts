@@ -87,7 +87,7 @@ describe('SystemStatusDialogComponent', () => {
     jest.spyOn(clipboard, 'copy')
     component.copy()
     expect(clipboard.copy).toHaveBeenCalledWith(
-      JSON.stringify(component.status)
+      JSON.stringify(component.status, null, 4)
     )
     expect(component.copied).toBeTruthy()
     tick(3000)

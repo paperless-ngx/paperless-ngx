@@ -28,7 +28,7 @@ export class SystemStatusDialogComponent {
   }
 
   public copy() {
-    this.clipboard.copy(JSON.stringify(this.status))
+    this.clipboard.copy(JSON.stringify(this.status, null, 4))
     this.copied = true
     setTimeout(() => {
       this.copied = false
