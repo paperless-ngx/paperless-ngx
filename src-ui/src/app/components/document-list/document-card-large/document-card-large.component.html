@@ -95,7 +95,7 @@
               @if (displayFields.includes(DisplayField.CREATED) || displayFields.includes(DisplayField.ADDED)) {
                 <ng-template #dateTooltip>
                   <div class="d-flex flex-column text-light">
-                    <span i18n>Created: {{ document.created | customDate }}</span>
+                    <span i18n>Created: {{ document.created_date | customDate }}</span>
                     <span i18n>Added: {{ document.added | customDate }}</span>
                     <span i18n>Modified: {{ document.modified | customDate }}</span>
                   </div>
