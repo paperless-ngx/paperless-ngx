@@ -37,10 +37,16 @@ from documents.sanity_checker import check_sanity
 from documents.settings import EXPORTER_FILE_NAME
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
+from documents.tests.utils import SampleDirMixin
 from documents.tests.utils import paperless_environment
 
 
-class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
+class TestExportImport(
+    DirectoriesMixin,
+    FileSystemAssertsMixin,
+    SampleDirMixin,
+    TestCase,
+):
     def setUp(self) -> None:
         self.target = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.target)
@@ -139,6 +145,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     @override_settings(PASSPHRASE="test")
     def _do_export(
         self,
+        *,
         use_filename_format=False,
         compare_checksums=False,
         delete=False,
@@ -146,6 +153,7 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         no_thumbnail=False,
         split_manifest=False,
         use_folder_prefix=False,
+        data_only=False,
     ):
         args = ["document_exporter", self.target]
         if use_filename_format:
@@ -162,6 +170,8 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             args += ["--split-manifest"]
         if use_folder_prefix:
             args += ["--use-folder-prefix"]
+        if data_only:
+            args += ["--data-only"]
 
         call_command(*args)
 
@@ -794,3 +804,25 @@ class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             manifest = self._do_export(use_filename_format=True)
             for obj in manifest:
                 self.assertNotEqual(obj["model"], "auditlog.logentry")
+
+    def test_export_data_only(self):
+        """
+        GIVEN:
+            - Request to export documents with data only
+        WHEN:
+            - Export command is called
+        THEN:
+            - No document files are exported
+            - Manifest and version are exported
+        """
+
+        shutil.rmtree(self.dirs.media_dir / "documents")
+        shutil.copytree(
+            self.SAMPLE_DIR / "documents",
+            self.dirs.media_dir / "documents",
+        )
+
+        _ = self._do_export(data_only=True)
+
+        # Manifest and version files only should be present in the exported directory
+        self.assertFileCountInDir(self.target, 2)

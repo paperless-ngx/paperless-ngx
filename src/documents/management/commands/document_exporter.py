@@ -5,7 +5,6 @@ import shutil
 import tempfile
 import time
 from pathlib import Path
-from typing import Optional
 
 import tqdm
 from django.conf import settings
@@ -148,6 +147,13 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
+            "--data-only",
+            default=False,
+            action="store_true",
+            help="If set, only the database will be exported, not files",
+        )
+
+        parser.add_argument(
             "--no-progress-bar",
             default=False,
             action="store_true",
@@ -166,6 +172,7 @@ class Command(BaseCommand):
         self.delete = False
         self.no_archive = False
         self.no_thumbnail = False
+        self.data_only = False
 
     def handle(self, *args, **options):
         self.target = Path(options["target"]).resolve()
@@ -177,14 +184,14 @@ class Command(BaseCommand):
         self.no_archive: bool = options["no_archive"]
         self.no_thumbnail: bool = options["no_thumbnail"]
         self.zip_export: bool = options["zip"]
+        self.data_only: bool = options["data_only"]
+        self.no_progress_bar: bool = options["no_progress_bar"]
 
         # If zipping, save the original target for later and
         # get a temporary directory for the target instead
         temp_dir = None
-        self.original_target: Optional[Path] = None
+        self.original_target = self.target
         if self.zip_export:
-            self.original_target = self.target
-
             settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
             temp_dir = tempfile.TemporaryDirectory(
                 dir=settings.SCRATCH_DIR,
@@ -203,7 +210,7 @@ class Command(BaseCommand):
 
         try:
             with FileLock(settings.MEDIA_LOCK):
-                self.dump(options["no_progress_bar"])
+                self.dump()
 
                 # We've written everything to the temporary directory in this case,
                 # now make an archive in the original target, with all files stored
@@ -222,7 +229,7 @@ class Command(BaseCommand):
             if self.zip_export and temp_dir is not None:
                 temp_dir.cleanup()
 
-    def dump(self, progress_bar_disable=False):
+    def dump(self):
         # 1. Take a snapshot of what files exist in the current export folder
         for x in self.target.glob("**/*"):
             if x.is_file():
@@ -334,11 +341,15 @@ class Command(BaseCommand):
                 manifest += notes
                 manifest += custom_field_instances
 
+        if self.data_only:
+            self.stdout.write(self.style.NOTICE("Data only export completed"))
+            return
+
         # 3. Export files from each document
         for index, document_dict in tqdm.tqdm(
             enumerate(document_manifest),
             total=len(document_manifest),
-            disable=progress_bar_disable,
+            disable=self.no_progress_bar,
         ):
             # 3.1. store files unencrypted
             document_dict["fields"]["storage_type"] = Document.STORAGE_TYPE_UNENCRYPTED

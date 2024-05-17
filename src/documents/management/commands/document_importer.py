@@ -57,11 +57,19 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("source")
+
         parser.add_argument(
             "--no-progress-bar",
             default=False,
             action="store_true",
             help="If set, the progress bar will not be shown",
+        )
+
+        parser.add_argument(
+            "--data-only",
+            default=False,
+            action="store_true",
+            help="If set, only the database will be exported, not files",
         )
 
     def __init__(self, *args, **kwargs):
@@ -82,17 +90,21 @@ class Command(BaseCommand):
         if not os.access(self.source, os.R_OK):
             raise CommandError("That path doesn't appear to be readable")
 
-        for document_dir in [settings.ORIGINALS_DIR, settings.ARCHIVE_DIR]:
-            if document_dir.exists() and document_dir.is_dir():
-                for entry in document_dir.glob("**/*"):
-                    if entry.is_dir():
-                        continue
-                    self.stdout.write(
-                        self.style.WARNING(
-                            f"Found file {entry.relative_to(document_dir)}, this might indicate a non-empty installation",
-                        ),
-                    )
-                    break
+        # Skip this check if operating only on the database
+        # We can data to exist
+        if not self.data_only:
+
+            for document_dir in [settings.ORIGINALS_DIR, settings.ARCHIVE_DIR]:
+                if document_dir.exists() and document_dir.is_dir():
+                    for entry in document_dir.glob("**/*"):
+                        if entry.is_dir():
+                            continue
+                        self.stdout.write(
+                            self.style.WARNING(
+                                f"Found file {entry.relative_to(document_dir)}, this might indicate a non-empty installation",
+                            ),
+                        )
+                        break
         if (
             User.objects.exclude(username__in=["consumer", "AnonymousUser"]).count()
             != 0
@@ -113,6 +125,8 @@ class Command(BaseCommand):
         logging.getLogger().handlers[0].level = logging.ERROR
 
         self.source = Path(options["source"]).resolve()
+        self.data_only: bool = options["data_only"]
+        self.no_progress_bar: bool = options["no_progress_bar"]
 
         self.pre_check()
 
@@ -200,7 +214,12 @@ class Command(BaseCommand):
                     )
                     raise e
 
-            self._import_files_from_manifest(options["no_progress_bar"])
+            if not self.data_only:
+                self._import_files_from_manifest(options["no_progress_bar"])
+
+            else:
+
+                self.stdout.write(self.style.NOTICE("Data only import completed"))
 
         self.stdout.write("Updating search index...")
         call_command(
