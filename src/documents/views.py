@@ -2076,7 +2076,11 @@ class TrashView(ListModelMixin, PassUserMixin):
         serializer.is_valid(raise_exception=True)
 
         doc_ids = serializer.validated_data.get("documents")
-        docs = Document.global_objects.filter(id__in=doc_ids)
+        docs = (
+            Document.global_objects.filter(id__in=doc_ids)
+            if doc_ids is not None
+            else Document.deleted_objects.all()
+        )
         checker = ObjectPermissionChecker(request.user)
         checker.prefetch_perms(docs)
         for doc in docs:
@@ -2087,5 +2091,7 @@ class TrashView(ListModelMixin, PassUserMixin):
             for doc in Document.deleted_objects.filter(id__in=doc_ids).all():
                 doc.restore(strict=False)
         elif action == "empty":
+            if doc_ids is None:
+                doc_ids = [doc.id for doc in docs]
             empty_trash(doc_ids=doc_ids)
         return Response({"result": "OK", "doc_ids": doc_ids})

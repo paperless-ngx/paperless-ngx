@@ -64,6 +64,39 @@ class TestTrashAPI(APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(Document.global_objects.count(), 0)
 
+    def test_trash_api_empty_all(self):
+        """
+        GIVEN:
+            - Existing documents in trash
+        WHEN:
+            - API request to empty trash
+        THEN:
+            - Trash is emptied
+        """
+
+        document = Document.objects.create(
+            title="Title",
+            content="content",
+            checksum="checksum",
+            mime_type="application/pdf",
+        )
+        document.delete()
+        document2 = Document.objects.create(
+            title="Title2",
+            content="content2",
+            checksum="checksum2",
+            mime_type="application/pdf",
+        )
+        document2.delete()
+
+        self.client.force_login(user=self.user)
+        resp = self.client.post(
+            "/api/trash/",
+            {"action": "empty", "documents": []},
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(Document.global_objects.count(), 0)
+
     def test_api_trash_insufficient_permissions(self):
         """
         GIVEN:

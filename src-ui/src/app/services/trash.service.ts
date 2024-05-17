@@ -18,11 +18,14 @@ export class TrashService {
     })
   }
 
-  public emptyTrash(documents: number[] = []): Observable<any> {
-    return this.http.post(`${environment.apiBaseUrl}trash/`, {
+  public emptyTrash(documents?: number[]): Observable<any> {
+    const data = {
       action: 'empty',
-      documents,
-    })
+    }
+    if (documents?.length) {
+      data['documents'] = documents
+    }
+    return this.http.post(`${environment.apiBaseUrl}trash/`, data)
   }
 
   public restoreDocuments(documents: number[]): Observable<any> {

@@ -7,7 +7,7 @@ import {
 } from '@angular/common/http/testing'
 import { environment } from 'src/environments/environment'
 
-describe('TrashServiceService', () => {
+describe('TrashService', () => {
   let service: TrashService
   let httpTestingController: HttpTestingController
 
@@ -33,7 +33,16 @@ describe('TrashServiceService', () => {
       `${environment.apiBaseUrl}trash/`
     )
     expect(req.request.method).toEqual('POST')
-    expect(req.request.body).toEqual({ action: 'empty', documents: [] })
+    expect(req.request.body).toEqual({ action: 'empty' })
+
+    service.emptyTrash([1, 2, 3]).subscribe()
+    const req2 = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}trash/`
+    )
+    expect(req2.request.body).toEqual({
+      action: 'empty',
+      documents: [1, 2, 3],
+    })
   })
 
   it('should call correct endpoint for restoreDocuments', () => {

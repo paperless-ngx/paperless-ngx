@@ -66,7 +66,7 @@ export class TrashComponent implements OnDestroy {
       })
   }
 
-  emptyTrash(documents: Set<number> = null) {
+  emptyTrash(documents?: Set<number>) {
     let modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
     })
