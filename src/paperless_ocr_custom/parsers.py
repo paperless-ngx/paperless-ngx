@@ -247,30 +247,28 @@ class RasterisedDocumentParser(DocumentParser):
                 
                 packet = io.BytesIO()
                 can = canvas.Canvas(packet, pagesize=letter)
-                page_image = page.to_image()
-                page_image.save(packet, "JPG")
                 pdfmetrics.registerFont(TTFont('Arial', font_path))
-                
+                width_api_img = data["pages"][page_num]["dimensions"][1]
+                height_api_img = data["pages"][page_num]["dimensions"][0]
+                rolate_height =  height_api_img /page_height
+                rolate_width = width_api_img /page_width
                 for block in data["pages"][page_num]["blocks"]:
                     for line in block.get("lines", []):
                         for word in line.get("words", []):   
-                            x1 = word["bbox"][0][0]
-                            y1 = word["bbox"][0][1]
-                            x2 = word["bbox"][1][0]
-                            y2 = word["bbox"][1][1]
+                            x1 = word["bbox"][0][0] / float(rolate_width)
+                            y1 = word["bbox"][0][1] / float(rolate_height)
+                            x2 = word["bbox"][1][0] / float(rolate_width)
+                            y2 = word["bbox"][1][1] / float(rolate_height)
                             value = word["value"]
-                            font_size = (y2-y1) * 72 / 96
-                            
+                            font_size = float(y2-y1) * 72 / 96 
                             x_center_coordinates =x2 - (x2-x1)/2
                             y_center_coordinates =y2 - (y2-y1)/2
                             w = can.stringWidth(value, font_name, font_size)
-                            self.log.debug('w:', )
                             can.setFont('Arial', font_size)
                             can.drawString(x_center_coordinates - w/2 , int(page_height) - y_center_coordinates - (font_size/2) , value)            
-          
+
                 can.showPage()
                 can.save()
-
                 packet.seek(0)
                 new_pdf = PdfReader(packet)
                 page.merge_page(new_pdf.pages[0])
