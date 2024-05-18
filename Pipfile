@@ -59,7 +59,6 @@ zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
 
 [dev-packages]
 # Linting
-black = "*"
 pre-commit = "*"
 ruff = "*"
 # Testing

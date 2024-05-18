@@ -222,10 +222,13 @@ class MailDocumentParser(DocumentParser):
 
             self.log.debug("Merging email text and HTML content into single PDF")
 
-            with GotenbergClient(
-                host=settings.TIKA_GOTENBERG_ENDPOINT,
-                timeout=settings.CELERY_TASK_TIME_LIMIT,
-            ) as client, client.merge.merge() as route:
+            with (
+                GotenbergClient(
+                    host=settings.TIKA_GOTENBERG_ENDPOINT,
+                    timeout=settings.CELERY_TASK_TIME_LIMIT,
+                ) as client,
+                client.merge.merge() as route,
+            ):
                 # Configure requested PDF/A formatting, if any
                 pdf_a_format = self._settings_to_gotenberg_pdfa()
                 if pdf_a_format is not None:
@@ -310,10 +313,13 @@ class MailDocumentParser(DocumentParser):
         css_file = Path(__file__).parent / "templates" / "output.css"
         email_html_file = self.mail_to_html(mail)
 
-        with GotenbergClient(
-            host=settings.TIKA_GOTENBERG_ENDPOINT,
-            timeout=settings.CELERY_TASK_TIME_LIMIT,
-        ) as client, client.chromium.html_to_pdf() as route:
+        with (
+            GotenbergClient(
+                host=settings.TIKA_GOTENBERG_ENDPOINT,
+                timeout=settings.CELERY_TASK_TIME_LIMIT,
+            ) as client,
+            client.chromium.html_to_pdf() as route,
+        ):
             # Configure requested PDF/A formatting, if any
             pdf_a_format = self._settings_to_gotenberg_pdfa()
             if pdf_a_format is not None:
@@ -363,10 +369,13 @@ class MailDocumentParser(DocumentParser):
         html_clean_file = tempdir / "index.html"
         html_clean_file.write_text(html_clean)
 
-        with GotenbergClient(
-            host=settings.TIKA_GOTENBERG_ENDPOINT,
-            timeout=settings.CELERY_TASK_TIME_LIMIT,
-        ) as client, client.chromium.html_to_pdf() as route:
+        with (
+            GotenbergClient(
+                host=settings.TIKA_GOTENBERG_ENDPOINT,
+                timeout=settings.CELERY_TASK_TIME_LIMIT,
+            ) as client,
+            client.chromium.html_to_pdf() as route,
+        ):
             # Configure requested PDF/A formatting, if any
             pdf_a_format = self._settings_to_gotenberg_pdfa()
             if pdf_a_format is not None:

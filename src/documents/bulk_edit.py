@@ -25,7 +25,6 @@ logger = logging.getLogger("paperless.bulk_edit")
 
 
 def set_correspondent(doc_ids: list[int], correspondent):
-
     if correspondent:
         correspondent = Correspondent.objects.only("pk").get(id=correspondent)
 
@@ -81,7 +80,6 @@ def set_document_type(doc_ids: list[int], document_type):
 
 
 def add_tag(doc_ids: list[int], tag: int):
-
     qs = Document.objects.filter(Q(id__in=doc_ids) & ~Q(tags__id=tag)).only("pk")
     affected_docs = list(qs.values_list("pk", flat=True))
 
@@ -97,7 +95,6 @@ def add_tag(doc_ids: list[int], tag: int):
 
 
 def remove_tag(doc_ids: list[int], tag: int):
-
     qs = Document.objects.filter(Q(id__in=doc_ids) & Q(tags__id=tag)).only("pk")
     affected_docs = list(qs.values_list("pk", flat=True))
 

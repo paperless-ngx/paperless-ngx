@@ -151,14 +151,17 @@ class Command(BaseCommand):
 
         self._check_manifest_valid()
 
-        with disable_signal(
-            post_save,
-            receiver=update_filename_and_move_files,
-            sender=Document,
-        ), disable_signal(
-            m2m_changed,
-            receiver=update_filename_and_move_files,
-            sender=Document.tags.through,
+        with (
+            disable_signal(
+                post_save,
+                receiver=update_filename_and_move_files,
+                sender=Document,
+            ),
+            disable_signal(
+                m2m_changed,
+                receiver=update_filename_and_move_files,
+                sender=Document.tags.through,
+            ),
         ):
             if settings.AUDIT_LOG_ENABLED:
                 auditlog.unregister(Document)

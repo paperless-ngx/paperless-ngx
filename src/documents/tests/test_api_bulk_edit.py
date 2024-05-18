@@ -136,7 +136,6 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.bulk_edit.bulk_update_documents.delay")
     def test_api_add_tag(self, bulk_update_task_mock):
-
         self.assertFalse(self.doc1.tags.filter(pk=self.t1.pk).exists())
 
         response = self.client.post(
