@@ -215,9 +215,7 @@ def _parse_beat_schedule() -> dict:
             "task": "documents.tasks.empty_trash",
             "options": {
                 # 1 hour before default schedule sends again
-                "expires": 23.0
-                * 60.0
-                * 60.0,
+                "expires": 23.0 * 60.0 * 60.0,
             },
         },
     ]
