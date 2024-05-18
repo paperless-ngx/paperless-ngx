@@ -48,6 +48,7 @@ import { CsrfInterceptor } from './interceptors/csrf.interceptor'
 import { SavedViewWidgetComponent } from './components/dashboard/widgets/saved-view-widget/saved-view-widget.component'
 import { StatisticsWidgetComponent } from './components/dashboard/widgets/statistics-widget/statistics-widget.component'
 import { UploadFileWidgetComponent } from './components/dashboard/widgets/upload-file-widget/upload-file-widget.component'
+import { AiChatWidgetComponent } from './components/dashboard/widgets/ai-chat-widget/ai-chat-widget.component'
 import { WidgetFrameComponent } from './components/dashboard/widgets/widget-frame/widget-frame.component'
 import { PdfViewerModule } from 'ng2-pdf-viewer'
 import { WelcomeWidgetComponent } from './components/dashboard/widgets/welcome-widget/welcome-widget.component'
@@ -99,7 +100,7 @@ import localeSl from '@angular/common/locales/sl'
 import localeSr from '@angular/common/locales/sr'
 import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
-import localeZh from '@angular/common/locales/zh'
+import localeZh from '@angular/common/locales/zh';
 
 registerLocaleData(localeAr)
 registerLocaleData(localeBe)
@@ -188,6 +189,7 @@ function initializeApp(settings: SettingsService) {
     TasksComponent,
     MailAccountEditDialogComponent,
     MailRuleEditDialogComponent,
+    AiChatWidgetComponent,
   ],
   imports: [
     BrowserModule,
@@ -230,4 +232,4 @@ function initializeApp(settings: SettingsService) {
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

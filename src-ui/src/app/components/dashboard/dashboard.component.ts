@@ -11,7 +11,7 @@ export class DashboardComponent {
   constructor(
     public savedViewService: SavedViewService,
     public settingsService: SettingsService
-  ) {}
+  ) { }
 
   get subtitle() {
     if (this.settingsService.displayName) {

@@ -1,0 +1,19 @@
+<app-widget-frame title="Document Jarvis" i18n-title>
+    <ng-container content>
+        <div class="chat-container" #chatContainer>
+            <div *ngFor="let message of messages" class="chat-message"
+                [ngClass]="{'user-message': message.fromUser, 'bot-message': !message.fromUser}">
+                <div class="message-bubble">{{ message.text }}</div>
+            </div>
+            <div *ngIf="showTypingAnimation" class="typing-animation">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+        <form class="chat-form" (submit)="sendMessage()">
+            <input type="text" placeholder="Ask me anything" [(ngModel)]="currentMessage" name="message" />
+            <button type="submit">Send</button>
+        </form>
+    </ng-container>
+</app-widget-frame>
