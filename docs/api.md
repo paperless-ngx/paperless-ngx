@@ -6,20 +6,29 @@ provides a browsable API for most of its endpoints, which you can
 inspect at `http://<paperless-host>:<port>/api/`. This also documents
 most of the available filters and ordering fields.
 
-The API provides 7 main endpoints:
+The API provides the following main endpoints:
 
-- `/api/documents/`: Full CRUD support, except POSTing new documents.
-  See below.
 - `/api/correspondents/`: Full CRUD support.
+- `/api/custom_fields/`: Full CRUD support.
+- `/api/documents/`: Full CRUD support, except POSTing new documents.
+  See [below](#posting-documents-file-uploads).
 - `/api/document_types/`: Full CRUD support.
+- `/api/groups/`: Full CRUD support.
 - `/api/logs/`: Read-Only.
-- `/api/tags/`: Full CRUD support.
 - `/api/mail_accounts/`: Full CRUD support.
 - `/api/mail_rules/`: Full CRUD support.
+- `/api/profile/`: GET, PATCH
+- `/api/share_links/`: Full CRUD support.
+- `/api/storage_paths/`: Full CRUD support.
+- `/api/tags/`: Full CRUD support.
+- `/api/tasks/`: Read-only.
+- `/api/users/`: Full CRUD support.
+- `/api/workflows/`: Full CRUD support.
+- `/api/search/` GET, see [below](#global-search).
 
 All of these endpoints except for the logging endpoint allow you to
-fetch, edit and delete individual objects by appending their primary key
-to the path, for example `/api/documents/454/`.
+fetch (and edit and delete where appropriate) individual objects by
+appending their primary key to the path, e.g. `/api/documents/454/`.
 
 The objects served by the document endpoint contain the following
 fields:
@@ -44,6 +53,15 @@ fields:
   Read-only.
 - `archived_file_name`: Verbose filename of the archived document.
   Read-only. Null if no archived document is available.
+- `notes`: Array of notes associated with the document.
+- `set_permissions`: Allows setting document permissions. Optional,
+  write-only. See [below](#permissions).
+- `custom_fields`: Array of custom fields & values, specified as
+  `{ field: CUSTOM_FIELD_ID, value: VALUE }`
+
+!!! note
+
+    Note that all endpoint URLs must end with a `/`slash.
 
 ## Downloading documents
 
@@ -119,9 +137,15 @@ File metadata is reported as a list of objects in the following form:
 depends on the file type and the metadata available in that specific
 document. Paperless only reports PDF metadata at this point.
 
+## Documents additional endpoints
+
+- `/api/documents/<id>/notes/`: Retrieve notes for a document.
+- `/api/documents/<id>/share_links/`: Retrieve share links for a document.
+- `/api/documents/<id>/history/`: Retrieve history of changes for a document.
+
 ## Authorization
 
-The REST api provides three different forms of authentication.
+The REST api provides four different forms of authentication.
 
 1.  Basic authentication
 
@@ -142,6 +166,10 @@ The REST api provides three different forms of authentication.
 
 3.  Token authentication
 
+    You can create (or re-create) an API token by opening the "My Profile"
+    link in the user dropdown found in the web UI and clicking the circular
+    arrow button.
+
     Paperless also offers an endpoint to acquire authentication tokens.
 
     POST a username and password as a form or json string to
@@ -153,7 +181,45 @@ The REST api provides three different forms of authentication.
     Authorization: Token <token>
     ```
 
-    Tokens can be managed and revoked in the paperless admin.
+    Tokens can also be managed in the Django admin.
+
+4.  Remote User authentication
+
+    If enabled (see
+    [configuration](configuration.md#PAPERLESS_ENABLE_HTTP_REMOTE_USER_API)),
+    you can authenticate against the API using Remote User auth.
+
+## Global search
+
+A global search endpoint is available at `/api/search/` and requires a search term
+of > 2 characters e.g. `?query=foo`. This endpoint returns a maximum of 3 results
+across nearly all objects, e.g. documents, tags, saved views, mail rules, etc.
+Results are only included if the requesting user has the appropriate permissions.
+
+Results are returned in the following format:
+
+```json
+{
+  total: number
+  documents: []
+  saved_views: []
+  correspondents: []
+  document_types: []
+  storage_paths: []
+  tags: []
+  users: []
+  groups: []
+  mail_accounts: []
+  mail_rules: []
+  custom_fields: []
+  workflows: []
+}
+```
+
+Global search first searches objects by name (or title for documents) matching the query.
+If the optional `db_only` parameter is set, only document titles will be searched. Otherwise,
+if the amount of documents returned by a simple title string search is < 3, results from the
+search index will also be included.
 
 ## Searching for documents
 
@@ -162,8 +228,8 @@ specific query parameters cause the API to return full text search
 results:
 
 - `/api/documents/?query=your%20search%20query`: Search for a document
-  using a full text query. For details on the syntax, see [Basic Usage - Searching](/usage#basic-usage_searching).
-- `/api/documents/?more_like=1234`: Search for documents similar to
+  using a full text query. For details on the syntax, see [Basic Usage - Searching](usage.md#basic-usage_searching).
+- `/api/documents/?more_like_id=1234`: Search for documents similar to
   the document with id 1234.
 
 Pagination works exactly the same as it does for normal requests on this
@@ -252,13 +318,128 @@ The endpoint supports the following optional form fields:
 - `correspondent`: Specify the ID of a correspondent that the consumer
   should use for the document.
 - `document_type`: Similar to correspondent.
+- `storage_path`: Similar to correspondent.
 - `tags`: Similar to correspondent. Specify this multiple times to
   have multiple tags added to the document.
+- `archive_serial_number`: An optional archive serial number to set.
+- `custom_fields`: An array of custom field ids to assign (with an empty
+  value) to the document.
 
-The endpoint will immediately return "OK" if the document consumption
-process was started successfully. No additional status information about
-the consumption process itself is available, since that happens in a
-different process.
+The endpoint will immediately return HTTP 200 if the document consumption
+process was started successfully, with the UUID of the consumption task
+as the data. No additional status information about the consumption process
+itself is available immediately, since that happens in a different process.
+However, querying the tasks endpoint with the returned UUID e.g.
+`/api/tasks/?task_id={uuid}` will provide information on the state of the
+consumption including the ID of a created document if consumption succeeded.
+
+## Permissions
+
+All objects (documents, tags, etc.) allow setting object-level permissions
+with optional `owner` and / or a `set_permissions` parameters which are of
+the form:
+
+```
+"owner": ...,
+"set_permissions": {
+    "view": {
+        "users": [...],
+        "groups": [...],
+    },
+    "change": {
+        "users": [...],
+        "groups": [...],
+    },
+}
+```
+
+!!! note
+
+    Arrays should contain user or group ID numbers.
+
+If these parameters are supplied the object's permissions will be overwritten,
+assuming the authenticated user has permission to do so (the user must be
+the object owner or a superuser).
+
+### Retrieving full permissions
+
+By default, the API will return a truncated version of object-level
+permissions, returning `user_can_change` indicating whether the current user
+can edit the object (either because they are the object owner or have permissions
+granted). You can pass the parameter `full_perms=true` to API calls to view the
+full permissions of objects in a format that mirrors the `set_permissions`
+parameter above.
+
+## Bulk Editing
+
+The API supports various bulk-editing operations which are executed asynchronously.
+
+### Documents
+
+For bulk operations on documents, use the endpoint `/api/documents/bulk_edit/` which accepts
+a json payload of the format:
+
+```json
+{
+  "documents": [LIST_OF_DOCUMENT_IDS],
+  "method": METHOD, // see below
+  "parameters": args // see below
+}
+```
+
+The following methods are supported:
+
+- `set_correspondent`
+  - Requires `parameters`: `{ "correspondent": CORRESPONDENT_ID }`
+- `set_document_type`
+  - Requires `parameters`: `{ "document_type": DOCUMENT_TYPE_ID }`
+- `set_storage_path`
+  - Requires `parameters`: `{ "storage_path": STORAGE_PATH_ID }`
+- `add_tag`
+  - Requires `parameters`: `{ "tag": TAG_ID }`
+- `remove_tag`
+  - Requires `parameters`: `{ "tag": TAG_ID }`
+- `modify_tags`
+  - Requires `parameters`: `{ "add_tags": [LIST_OF_TAG_IDS] }` and / or `{ "remove_tags": [LIST_OF_TAG_IDS] }`
+- `delete`
+  - No `parameters` required
+- `redo_ocr`
+  - No `parameters` required
+- `set_permissions`
+  - Requires `parameters`:
+    - `"set_permissions": PERMISSIONS_OBJ` (see format [above](#permissions)) and / or
+    - `"owner": OWNER_ID or null`
+    - `"merge": true or false` (defaults to false)
+  - The `merge` flag determines if the supplied permissions will overwrite all existing permissions (including
+    removing them) or be merged with existing permissions.
+- `merge`
+  - No additional `parameters` required.
+  - The ordering of the merged document is determined by the list of IDs.
+  - Optional `parameters`:
+    - `"metadata_document_id": DOC_ID` apply metadata (tags, correspondent, etc.) from this document to the merged document.
+- `split`
+  - Requires `parameters`:
+    - `"pages": [..]` The list should be a list of pages and/or a ranges, separated by commas e.g. `"[1,2-3,4,5-7]"`
+  - The split operation only accepts a single document.
+- `rotate`
+  - Requires `parameters`:
+    - `"degrees": DEGREES`. Must be an integer i.e. 90, 180, 270
+
+### Objects
+
+Bulk editing for objects (tags, document types etc.) currently supports set permissions or delete
+operations, using the endpoint: `/api/bulk_edit_objects/`, which requires a json payload of the format:
+
+```json
+{
+  "objects": [LIST_OF_OBJECT_IDS],
+  "object_type": "tags", "correspondents", "document_types" or "storage_paths",
+  "operation": "set_permissions" or "delete",
+  "owner": OWNER_ID, // optional
+  "permissions": { "view": { "users": [] ... }, "change": { ... } }, // (see 'set_permissions' format above)
+  "merge": true / false // defaults to false, see above
+}
+```
 
 ## API Versioning
 
@@ -316,3 +497,13 @@ Initial API version.
   color to use for a specific tag, which is either black or white
   depending on the brightness of `Tag.color`.
 - Removed field `Tag.colour`.
+
+#### Version 3
+
+- Permissions endpoints have been added.
+- The format of the `/api/ui_settings/` has changed.
+
+#### Version 4
+
+- Consumption templates were refactored to workflows and API endpoints
+  changed as such.

@@ -1,30 +1,33 @@
 import dataclasses
 import email.contentmanager
-import os
 import random
 import uuid
 from collections import namedtuple
-from typing import ContextManager
-from typing import List
+from contextlib import AbstractContextManager
+from typing import Optional
 from typing import Union
 from unittest import mock
 
+import pytest
 from django.core.management import call_command
 from django.db import DatabaseError
 from django.test import TestCase
-from documents.models import Correspondent
-from documents.tests.utils import DirectoriesMixin
+from imap_tools import NOT
 from imap_tools import EmailAddress
 from imap_tools import FolderInfo
 from imap_tools import MailboxFolderSelectError
 from imap_tools import MailboxLoginError
 from imap_tools import MailMessage
 from imap_tools import MailMessageFlags
-from imap_tools import NOT
+
+from documents.models import Correspondent
+from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import FileSystemAssertsMixin
 from paperless_mail import tasks
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.mail import MailError
 from paperless_mail.mail import TagMailAction
+from paperless_mail.mail import apply_mail_action
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
@@ -49,8 +52,8 @@ class BogusFolderManager:
 
 class BogusClient:
     def __init__(self, messages):
-        self.messages: List[MailMessage] = messages
-        self.capabilities: List[str] = []
+        self.messages: list[MailMessage] = messages
+        self.capabilities: list[str] = []
 
     def __enter__(self):
         return self
@@ -74,17 +77,18 @@ class BogusClient:
                         MailMessage.flags.fget.cache_clear()
 
 
-class BogusMailBox(ContextManager):
-
+class BogusMailBox(AbstractContextManager):
     # Common values so tests don't need to remember an accepted login
     USERNAME: str = "admin"
     ASCII_PASSWORD: str = "secret"
     # Note the non-ascii characters here
     UTF_PASSWORD: str = "w57äöüw4b6huwb6nhu"
+    # A dummy access token
+    ACCESS_TOKEN = "ea7e075cd3acf2c54c48e600398d5d5a"
 
     def __init__(self):
-        self.messages: List[MailMessage] = []
-        self.messages_spam: List[MailMessage] = []
+        self.messages: list[MailMessage] = []
+        self.messages_spam: list[MailMessage] = []
         self.folder = BogusFolderManager()
         self.client = BogusClient(self.messages)
         self._host = ""
@@ -110,7 +114,11 @@ class BogusMailBox(ContextManager):
         if username != self.USERNAME or password != self.UTF_PASSWORD:
             raise MailboxLoginError("BAD", "OK")
 
-    def fetch(self, criteria, mark_seen, charset=""):
+    def xoauth2(self, username: str, access_token: str):
+        if username != self.USERNAME or access_token != self.ACCESS_TOKEN:
+            raise MailboxLoginError("BAD", "OK")
+
+    def fetch(self, criteria, mark_seen, charset="", bulk=True):
         msg = self.messages
 
         criteria = str(criteria).strip("()").split(" ")
@@ -130,12 +138,20 @@ class BogusMailBox(ContextManager):
             from_ = criteria[criteria.index("FROM") + 1].strip('"')
             msg = filter(lambda m: from_ in m.from_, msg)
 
+        if "TO" in criteria:
+            to_ = criteria[criteria.index("TO") + 1].strip('"')
+            msg = []
+            for m in self.messages:
+                for to_addrs in m.to:
+                    if to_ in to_addrs:
+                        msg.append(m)
+
         if "UNFLAGGED" in criteria:
             msg = filter(lambda m: not m.flagged, msg)
 
         if "UNKEYWORD" in criteria:
             tag = criteria[criteria.index("UNKEYWORD") + 1].strip("'")
-            msg = filter(lambda m: "processed" not in m.flags, msg)
+            msg = filter(lambda m: tag not in m.flags, msg)
 
         if "(X-GM-LABELS" in criteria:  # ['NOT', '(X-GM-LABELS', '"processed"']
             msg = filter(lambda m: "processed" not in m.flags, msg)
@@ -164,70 +180,7 @@ class BogusMailBox(ContextManager):
             )
             self.messages = list(filter(lambda m: m.uid not in uid_list, self.messages))
         else:
-            raise Exception()
-
-
-_used_uids = set()
-
-
-def create_message(
-    attachments: Union[int, List[_AttachmentDef]] = 1,
-    body: str = "",
-    subject: str = "the suject",
-    from_: str = "noone@mail.com",
-    seen: bool = False,
-    flagged: bool = False,
-    processed: bool = False,
-) -> MailMessage:
-    email_msg = email.message.EmailMessage()
-    # TODO: This does NOT set the UID
-    email_msg["Message-ID"] = str(uuid.uuid4())
-    email_msg["Subject"] = subject
-    email_msg["From"] = from_
-    email_msg.set_content(body)
-
-    # Either add some default number of attachments
-    # or the provided attachments
-    if isinstance(attachments, int):
-        for i in range(attachments):
-            attachment = _AttachmentDef(filename=f"file_{i}.pdf")
-            email_msg.add_attachment(
-                attachment.content,
-                maintype=attachment.maintype,
-                subtype=attachment.subtype,
-                disposition=attachment.disposition,
-                filename=attachment.filename,
-            )
-    else:
-        for attachment in attachments:
-            email_msg.add_attachment(
-                attachment.content,
-                maintype=attachment.maintype,
-                subtype=attachment.subtype,
-                disposition=attachment.disposition,
-                filename=attachment.filename,
-            )
-
-    # Convert the EmailMessage to an imap_tools MailMessage
-    imap_msg = MailMessage.from_bytes(email_msg.as_bytes())
-
-    # TODO: Unsure how to add a uid to the actual EmailMessage. This hacks it in,
-    #  based on how imap_tools uses regex to extract it.
-    #  This should be a large enough pool
-    uid = random.randint(1, 10000)
-    while uid in _used_uids:
-        uid = random.randint(1, 10000)
-    _used_uids.add(uid)
-
-    imap_msg._raw_uid_data = f"UID {uid}".encode()
-
-    imap_msg.seen = seen
-    imap_msg.flagged = flagged
-    if processed:
-        imap_msg._raw_flag_data.append(b"+FLAGS (processed)")
-        MailMessage.flags.fget.cache_clear()
-
-    return imap_msg
+            raise Exception
 
 
 def fake_magic_from_buffer(buffer, mime=False):
@@ -241,16 +194,23 @@ def fake_magic_from_buffer(buffer, mime=False):
 
 
 @mock.patch("paperless_mail.mail.magic.from_buffer", fake_magic_from_buffer)
-class TestMail(DirectoriesMixin, TestCase):
+class TestMail(
+    DirectoriesMixin,
+    FileSystemAssertsMixin,
+    TestCase,
+):
     def setUp(self):
+        self._used_uids = set()
+
+        self.bogus_mailbox = BogusMailBox()
+
         patcher = mock.patch("paperless_mail.mail.MailBox")
         m = patcher.start()
-        self.bogus_mailbox = BogusMailBox()
         m.return_value = self.bogus_mailbox
         self.addCleanup(patcher.stop)
 
-        patcher = mock.patch("paperless_mail.mail.consume_file.delay")
-        self.async_task = patcher.start()
+        patcher = mock.patch("paperless_mail.mail.queue_consumption_tasks")
+        self._queue_consumption_tasks_mock = patcher.start()
         self.addCleanup(patcher.stop)
 
         self.reset_bogus_mailbox()
@@ -258,13 +218,79 @@ class TestMail(DirectoriesMixin, TestCase):
         self.mail_account_handler = MailAccountHandler()
         super().setUp()
 
+    def create_message(
+        self,
+        attachments: Union[int, list[_AttachmentDef]] = 1,
+        body: str = "",
+        subject: str = "the subject",
+        from_: str = "no_one@mail.com",
+        to: Optional[list[str]] = None,
+        seen: bool = False,
+        flagged: bool = False,
+        processed: bool = False,
+    ) -> MailMessage:
+        if to is None:
+            to = ["tosomeone@somewhere.com"]
+
+        email_msg = email.message.EmailMessage()
+        # TODO: This does NOT set the UID
+        email_msg["Message-ID"] = str(uuid.uuid4())
+        email_msg["Subject"] = subject
+        email_msg["From"] = from_
+        email_msg["To"] = str(" ,".join(to))
+        email_msg.set_content(body)
+
+        # Either add some default number of attachments
+        # or the provided attachments
+        if isinstance(attachments, int):
+            for i in range(attachments):
+                attachment = _AttachmentDef(filename=f"file_{i}.pdf")
+                email_msg.add_attachment(
+                    attachment.content,
+                    maintype=attachment.maintype,
+                    subtype=attachment.subtype,
+                    disposition=attachment.disposition,
+                    filename=attachment.filename,
+                )
+        else:
+            for attachment in attachments:
+                email_msg.add_attachment(
+                    attachment.content,
+                    maintype=attachment.maintype,
+                    subtype=attachment.subtype,
+                    disposition=attachment.disposition,
+                    filename=attachment.filename,
+                )
+
+        # Convert the EmailMessage to an imap_tools MailMessage
+        imap_msg = MailMessage.from_bytes(email_msg.as_bytes())
+
+        # TODO: Unsure how to add a uid to the actual EmailMessage. This hacks it in,
+        #  based on how imap_tools uses regex to extract it.
+        #  This should be a large enough pool
+        uid = random.randint(1, 10000)
+        while uid in self._used_uids:
+            uid = random.randint(1, 10000)
+        self._used_uids.add(uid)
+
+        imap_msg._raw_uid_data = f"UID {uid}".encode()
+
+        imap_msg.seen = seen
+        imap_msg.flagged = flagged
+        if processed:
+            imap_msg._raw_flag_data.append(b"+FLAGS (processed)")
+            MailMessage.flags.fget.cache_clear()
+
+        return imap_msg
+
     def reset_bogus_mailbox(self):
         self.bogus_mailbox.messages = []
         self.bogus_mailbox.messages_spam = []
         self.bogus_mailbox.messages.append(
-            create_message(
+            self.create_message(
                 subject="Invoice 1",
                 from_="amazon@amazon.de",
+                to=["me@myselfandi.com", "helpdesk@mydomain.com"],
                 body="cables",
                 seen=True,
                 flagged=False,
@@ -272,18 +298,20 @@ class TestMail(DirectoriesMixin, TestCase):
             ),
         )
         self.bogus_mailbox.messages.append(
-            create_message(
+            self.create_message(
                 subject="Invoice 2",
                 body="from my favorite electronic store",
+                to=["invoices@mycompany.com"],
                 seen=False,
                 flagged=True,
                 processed=True,
             ),
         )
         self.bogus_mailbox.messages.append(
-            create_message(
+            self.create_message(
                 subject="Claim your $10M price now!",
                 from_="amazon@amazon-some-indian-site.org",
+                to="special@me.me",
                 seen=False,
             ),
         )
@@ -313,16 +341,16 @@ class TestMail(DirectoriesMixin, TestCase):
             name="a",
             assign_correspondent_from=MailRule.CorrespondentSource.FROM_NOTHING,
         )
-        self.assertIsNone(handler.get_correspondent(message, rule))
+        self.assertIsNone(handler._get_correspondent(message, rule))
 
         rule = MailRule(
             name="b",
             assign_correspondent_from=MailRule.CorrespondentSource.FROM_EMAIL,
         )
-        c = handler.get_correspondent(message, rule)
+        c = handler._get_correspondent(message, rule)
         self.assertIsNotNone(c)
         self.assertEqual(c.name, "someone@somewhere.com")
-        c = handler.get_correspondent(message2, rule)
+        c = handler._get_correspondent(message2, rule)
         self.assertIsNotNone(c)
         self.assertEqual(c.name, "me@localhost.com")
         self.assertEqual(c.id, me_localhost.id)
@@ -331,10 +359,10 @@ class TestMail(DirectoriesMixin, TestCase):
             name="c",
             assign_correspondent_from=MailRule.CorrespondentSource.FROM_NAME,
         )
-        c = handler.get_correspondent(message, rule)
+        c = handler._get_correspondent(message, rule)
         self.assertIsNotNone(c)
         self.assertEqual(c.name, "Someone!")
-        c = handler.get_correspondent(message2, rule)
+        c = handler._get_correspondent(message2, rule)
         self.assertIsNotNone(c)
         self.assertEqual(c.id, me_localhost.id)
 
@@ -343,7 +371,7 @@ class TestMail(DirectoriesMixin, TestCase):
             assign_correspondent_from=MailRule.CorrespondentSource.FROM_CUSTOM,
             assign_correspondent=someone_else,
         )
-        c = handler.get_correspondent(message, rule)
+        c = handler._get_correspondent(message, rule)
         self.assertEqual(c, someone_else)
 
     def test_get_title(self):
@@ -358,46 +386,46 @@ class TestMail(DirectoriesMixin, TestCase):
             name="a",
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
         )
-        self.assertEqual(handler.get_title(message, att, rule), "this_is_the_file")
+        self.assertEqual(handler._get_title(message, att, rule), "this_is_the_file")
         rule = MailRule(
             name="b",
             assign_title_from=MailRule.TitleSource.FROM_SUBJECT,
         )
-        self.assertEqual(handler.get_title(message, att, rule), "the message title")
+        self.assertEqual(handler._get_title(message, att, rule), "the message title")
+        rule = MailRule(
+            name="b",
+            assign_title_from=MailRule.TitleSource.NONE,
+        )
+        self.assertEqual(handler._get_title(message, att, rule), None)
 
     def test_handle_message(self):
-        message = create_message(
+        message = self.create_message(
             subject="the message title",
             from_="Myself",
             attachments=2,
         )
 
-        account = MailAccount()
-        account.save()
+        account = MailAccount.objects.create()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
         )
         rule.save()
 
-        result = self.mail_account_handler.handle_message(message, rule)
+        result = self.mail_account_handler._handle_message(message, rule)
 
         self.assertEqual(result, 2)
 
-        self.assertEqual(len(self.async_task.call_args_list), 2)
+        self._queue_consumption_tasks_mock.assert_called()
 
-        args1, kwargs1 = self.async_task.call_args_list[0]
-        args2, kwargs2 = self.async_task.call_args_list[1]
-
-        self.assertTrue(os.path.isfile(kwargs1["path"]), kwargs1["path"])
-
-        self.assertEqual(kwargs1["override_title"], "file_0")
-        self.assertEqual(kwargs1["override_filename"], "file_0.pdf")
-
-        self.assertTrue(os.path.isfile(kwargs2["path"]), kwargs1["path"])
-
-        self.assertEqual(kwargs2["override_title"], "file_1")
-        self.assertEqual(kwargs2["override_filename"], "file_1.pdf")
+        self.assert_queue_consumption_tasks_call_args(
+            [
+                [
+                    {"override_title": "file_0", "override_filename": "file_0.pdf"},
+                    {"override_title": "file_1", "override_filename": "file_1.pdf"},
+                ],
+            ],
+        )
 
     def test_handle_empty_message(self):
         message = namedtuple("MailMessage", [])
@@ -405,13 +433,13 @@ class TestMail(DirectoriesMixin, TestCase):
         message.attachments = []
         rule = MailRule()
 
-        result = self.mail_account_handler.handle_message(message, rule)
+        result = self.mail_account_handler._handle_message(message, rule)
 
-        self.assertFalse(self.async_task.called)
+        self._queue_consumption_tasks_mock.assert_not_called()
         self.assertEqual(result, 0)
 
     def test_handle_unknown_mime_type(self):
-        message = create_message(
+        message = self.create_message(
             attachments=[
                 _AttachmentDef(filename="f1.pdf"),
                 _AttachmentDef(
@@ -421,25 +449,26 @@ class TestMail(DirectoriesMixin, TestCase):
             ],
         )
 
-        account = MailAccount()
-        account.save()
+        account = MailAccount.objects.create()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
         )
         rule.save()
 
-        result = self.mail_account_handler.handle_message(message, rule)
+        result = self.mail_account_handler._handle_message(message, rule)
 
         self.assertEqual(result, 1)
-        self.assertEqual(self.async_task.call_count, 1)
-
-        args, kwargs = self.async_task.call_args
-        self.assertTrue(os.path.isfile(kwargs["path"]), kwargs["path"])
-        self.assertEqual(kwargs["override_filename"], "f1.pdf")
+        self.assert_queue_consumption_tasks_call_args(
+            [
+                [
+                    {"override_filename": "f1.pdf"},
+                ],
+            ],
+        )
 
     def test_handle_disposition(self):
-        message = create_message(
+        message = self.create_message(
             attachments=[
                 _AttachmentDef(
                     filename="f1.pdf",
@@ -449,24 +478,25 @@ class TestMail(DirectoriesMixin, TestCase):
             ],
         )
 
-        account = MailAccount()
-        account.save()
+        account = MailAccount.objects.create()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
         )
         rule.save()
 
-        result = self.mail_account_handler.handle_message(message, rule)
-
+        result = self.mail_account_handler._handle_message(message, rule)
         self.assertEqual(result, 1)
-        self.assertEqual(self.async_task.call_count, 1)
-
-        args, kwargs = self.async_task.call_args
-        self.assertEqual(kwargs["override_filename"], "f2.pdf")
+        self.assert_queue_consumption_tasks_call_args(
+            [
+                [
+                    {"override_filename": "f2.pdf"},
+                ],
+            ],
+        )
 
     def test_handle_inline_files(self):
-        message = create_message(
+        message = self.create_message(
             attachments=[
                 _AttachmentDef(
                     filename="f1.pdf",
@@ -476,8 +506,7 @@ class TestMail(DirectoriesMixin, TestCase):
             ],
         )
 
-        account = MailAccount()
-        account.save()
+        account = MailAccount.objects.create()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
@@ -485,13 +514,29 @@ class TestMail(DirectoriesMixin, TestCase):
         )
         rule.save()
 
-        result = self.mail_account_handler.handle_message(message, rule)
-
+        result = self.mail_account_handler._handle_message(message, rule)
         self.assertEqual(result, 2)
-        self.assertEqual(self.async_task.call_count, 2)
+        self.assert_queue_consumption_tasks_call_args(
+            [
+                [
+                    {"override_filename": "f1.pdf"},
+                    {"override_filename": "f2.pdf"},
+                ],
+            ],
+        )
 
     def test_filename_filter(self):
-        message = create_message(
+        """
+        GIVEN:
+            - Email with multiple similar named attachments
+            - Rule with inclusive and exclusive filters
+        WHEN:
+            - Mail action filtering is checked
+        THEN:
+            - Mail action should not be performed for files excluded
+            - Mail action should be performed for files included
+        """
+        message = self.create_message(
             attachments=[
                 _AttachmentDef(filename="f1.pdf"),
                 _AttachmentDef(filename="f2.pdf"),
@@ -502,37 +547,129 @@ class TestMail(DirectoriesMixin, TestCase):
             ],
         )
 
+        @dataclasses.dataclass(frozen=True)
+        class FilterTestCase:
+            name: str
+            include_pattern: Optional[str]
+            exclude_pattern: Optional[str]
+            expected_matches: list[str]
+
         tests = [
-            ("*.pdf", ["f1.pdf", "f1.Pdf", "f2.pdf", "f3.pdf", "file.PDf"]),
-            ("f1.pdf", ["f1.pdf", "f1.Pdf"]),
-            ("f1", []),
-            ("*", ["f1.pdf", "f2.pdf", "f3.pdf", "f2.png", "f1.Pdf", "file.PDf"]),
-            ("*.png", ["f2.png"]),
+            FilterTestCase(
+                "PDF Wildcard",
+                include_pattern="*.pdf",
+                exclude_pattern=None,
+                expected_matches=["f1.pdf", "f2.pdf", "f3.pdf", "file.PDf", "f1.Pdf"],
+            ),
+            FilterTestCase(
+                "F1 PDF Only",
+                include_pattern="f1.pdf",
+                exclude_pattern=None,
+                expected_matches=["f1.pdf", "f1.Pdf"],
+            ),
+            FilterTestCase(
+                "All Files",
+                include_pattern="*",
+                exclude_pattern=None,
+                expected_matches=[
+                    "f1.pdf",
+                    "f2.pdf",
+                    "f3.pdf",
+                    "f2.png",
+                    "file.PDf",
+                    "f1.Pdf",
+                ],
+            ),
+            FilterTestCase(
+                "PNG Only",
+                include_pattern="*.png",
+                exclude_pattern=None,
+                expected_matches=["f2.png"],
+            ),
+            FilterTestCase(
+                "PDF Files without f1",
+                include_pattern="*.pdf",
+                exclude_pattern="f1*",
+                expected_matches=["f2.pdf", "f3.pdf", "file.PDf"],
+            ),
+            FilterTestCase(
+                "All Files, no PNG",
+                include_pattern="*",
+                exclude_pattern="*.png",
+                expected_matches=[
+                    "f1.pdf",
+                    "f2.pdf",
+                    "f3.pdf",
+                    "file.PDf",
+                    "f1.Pdf",
+                ],
+            ),
         ]
 
-        for (pattern, matches) in tests:
-            matches.sort()
-            self.async_task.reset_mock()
-            account = MailAccount(name=str(uuid.uuid4()))
-            account.save()
-            rule = MailRule(
-                name=str(uuid.uuid4()),
-                assign_title_from=MailRule.TitleSource.FROM_FILENAME,
-                account=account,
-                filter_attachment_filename=pattern,
-            )
-            rule.save()
+        for test_case in tests:
+            with self.subTest(msg=test_case.name):
+                self._queue_consumption_tasks_mock.reset_mock()
+                account = MailAccount(name=str(uuid.uuid4()))
+                account.save()
+                rule = MailRule(
+                    name=str(uuid.uuid4()),
+                    assign_title_from=MailRule.TitleSource.FROM_FILENAME,
+                    account=account,
+                    filter_attachment_filename_include=test_case.include_pattern,
+                    filter_attachment_filename_exclude=test_case.exclude_pattern,
+                )
+                rule.save()
 
-            result = self.mail_account_handler.handle_message(message, rule)
+                self.mail_account_handler._handle_message(message, rule)
+                self.assert_queue_consumption_tasks_call_args(
+                    [
+                        [{"override_filename": m} for m in test_case.expected_matches],
+                    ],
+                )
 
-            self.assertEqual(result, len(matches), f"Error with pattern: {pattern}")
-            filenames = sorted(
-                a[1]["override_filename"] for a in self.async_task.call_args_list
-            )
-            self.assertListEqual(filenames, matches)
+    def test_filename_filter_inline_no_consumption(self):
+        """
+        GIVEN:
+            - Rule that processes all attachments but filters by filename
+        WHEN:
+            - Given email with inline attachment that does not meet filename filter
+        THEN:
+            - Mail action should not be performed
+        """
+        message = self.create_message(
+            attachments=[
+                _AttachmentDef(
+                    filename="test.png",
+                    disposition="inline",
+                ),
+            ],
+        )
+        self.bogus_mailbox.messages.append(message)
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+        account.save()
+        rule = MailRule(
+            name=str(uuid.uuid4()),
+            assign_title_from=MailRule.TitleSource.FROM_FILENAME,
+            account=account,
+            filter_attachment_filename_include="*.pdf",
+            attachment_type=MailRule.AttachmentProcessing.EVERYTHING,
+            action=MailRule.MailAction.DELETE,
+        )
+        rule.save()
+
+        self.assertEqual(len(self.bogus_mailbox.messages), 4)
+
+        self.mail_account_handler.handle_mail_account(account)
+        self.apply_mail_actions()
+
+        self.assertEqual(len(self.bogus_mailbox.messages), 1)
 
     def test_handle_mail_account_mark_read(self):
-
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
@@ -547,15 +684,15 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        self.assertEqual(self.async_task.call_count, 0)
         self.assertEqual(len(self.bogus_mailbox.fetch("UNSEEN", False)), 2)
+
         self.mail_account_handler.handle_mail_account(account)
-        self.assertEqual(self.async_task.call_count, 2)
+        self.apply_mail_actions()
+
         self.assertEqual(len(self.bogus_mailbox.fetch("UNSEEN", False)), 0)
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
 
     def test_handle_mail_account_delete(self):
-
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
@@ -570,11 +707,34 @@ class TestMail(DirectoriesMixin, TestCase):
             filter_subject="Invoice",
         )
 
-        self.assertEqual(self.async_task.call_count, 0)
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
+
         self.mail_account_handler.handle_mail_account(account)
-        self.assertEqual(self.async_task.call_count, 2)
+        self.apply_mail_actions()
+
         self.assertEqual(len(self.bogus_mailbox.messages), 1)
+
+    def test_handle_mail_account_delete_no_filters(self):
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+
+        _ = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.DELETE,
+            maximum_age=0,
+        )
+
+        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+
+        self.mail_account_handler.handle_mail_account(account)
+        self.apply_mail_actions()
+
+        self.assertEqual(len(self.bogus_mailbox.messages), 0)
 
     def test_handle_mail_account_flag(self):
         account = MailAccount.objects.create(
@@ -592,13 +752,15 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        self.assertEqual(self.async_task.call_count, 0)
         self.assertEqual(len(self.bogus_mailbox.fetch("UNFLAGGED", False)), 2)
+
         self.mail_account_handler.handle_mail_account(account)
-        self.assertEqual(self.async_task.call_count, 1)
+        self.apply_mail_actions()
+
         self.assertEqual(len(self.bogus_mailbox.fetch("UNFLAGGED", False)), 1)
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
 
+    @pytest.mark.flaky(reruns=4)
     def test_handle_mail_account_move(self):
         account = MailAccount.objects.create(
             name="test",
@@ -615,15 +777,39 @@ class TestMail(DirectoriesMixin, TestCase):
             filter_subject="Claim",
         )
 
-        self.assertEqual(self.async_task.call_count, 0)
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
         self.assertEqual(len(self.bogus_mailbox.messages_spam), 0)
 
         self.mail_account_handler.handle_mail_account(account)
+        self.apply_mail_actions()
 
-        self.assertEqual(self.async_task.call_count, 1)
         self.assertEqual(len(self.bogus_mailbox.messages), 2)
         self.assertEqual(len(self.bogus_mailbox.messages_spam), 1)
+
+    def test_handle_mail_account_move_no_filters(self):
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+
+        _ = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.MOVE,
+            action_parameter="spam",
+            maximum_age=0,
+        )
+
+        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+        self.assertEqual(len(self.bogus_mailbox.messages_spam), 0)
+
+        self.mail_account_handler.handle_mail_account(account)
+        self.apply_mail_actions()
+
+        self.assertEqual(len(self.bogus_mailbox.messages), 0)
+        self.assertEqual(len(self.bogus_mailbox.messages_spam), 3)
 
     def test_handle_mail_account_tag(self):
         account = MailAccount.objects.create(
@@ -641,12 +827,13 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        self.assertEqual(self.async_task.call_count, 0)
         self.assertEqual(len(self.bogus_mailbox.fetch("UNKEYWORD processed", False)), 2)
+
         self.mail_account_handler.handle_mail_account(account)
-        self.assertEqual(self.async_task.call_count, 2)
-        self.assertEqual(len(self.bogus_mailbox.fetch("UNKEYWORD processed", False)), 0)
+        self.apply_mail_actions()
+
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
+        self.assertEqual(len(self.bogus_mailbox.fetch("UNKEYWORD processed", False)), 0)
 
     def test_handle_mail_account_tag_gmail(self):
         self.bogus_mailbox._host = "imap.gmail.com"
@@ -667,20 +854,21 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        self.assertEqual(self.async_task.call_count, 0)
         criteria = NOT(gmail_label="processed")
         self.assertEqual(len(self.bogus_mailbox.fetch(criteria, False)), 2)
+
         self.mail_account_handler.handle_mail_account(account)
-        self.assertEqual(self.async_task.call_count, 2)
+        self.apply_mail_actions()
+
         self.assertEqual(len(self.bogus_mailbox.fetch(criteria, False)), 0)
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
 
     def test_tag_mail_action_applemail_wrong_input(self):
-
         self.assertRaises(
             MailError,
             TagMailAction,
             "apple:black",
+            False,
         )
 
     def test_handle_mail_account_tag_applemail(self):
@@ -701,14 +889,23 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        self.assertEqual(self.async_task.call_count, 0)
         self.assertEqual(len(self.bogus_mailbox.fetch("UNFLAGGED", False)), 2)
+
         self.mail_account_handler.handle_mail_account(account)
-        self.assertEqual(self.async_task.call_count, 2)
+        self.apply_mail_actions()
+
         self.assertEqual(len(self.bogus_mailbox.fetch("UNFLAGGED", False)), 0)
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
 
     def test_error_login(self):
+        """
+        GIVEN:
+            - Account configured with incorrect password
+        WHEN:
+            - Account tried to login
+        THEN:
+            - MailError with correct message raised
+        """
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
@@ -716,12 +913,13 @@ class TestMail(DirectoriesMixin, TestCase):
             password="wrong",
         )
 
-        with self.assertRaises(MailError) as context:
+        with self.assertRaisesRegex(
+            MailError,
+            "Error while authenticating account",
+        ):
             self.mail_account_handler.handle_mail_account(account)
-            self.assertTrue(
-                str(context).startswith("Error while authenticating account"),
-            )
 
+    @pytest.mark.flaky(reruns=4)
     def test_error_skip_account(self):
         _ = MailAccount.objects.create(
             name="test",
@@ -745,12 +943,12 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         tasks.process_mail_accounts()
-        self.assertEqual(self.async_task.call_count, 1)
+        self.apply_mail_actions()
+
         self.assertEqual(len(self.bogus_mailbox.messages), 2)
         self.assertEqual(len(self.bogus_mailbox.messages_spam), 1)
 
     def test_error_skip_rule(self):
-
         account = MailAccount.objects.create(
             name="test2",
             imap_server="",
@@ -776,7 +974,8 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         self.mail_account_handler.handle_mail_account(account)
-        self.assertEqual(self.async_task.call_count, 1)
+        self.apply_mail_actions()
+
         self.assertEqual(len(self.bogus_mailbox.messages), 2)
         self.assertEqual(len(self.bogus_mailbox.messages_spam), 1)
 
@@ -811,7 +1010,7 @@ class TestMail(DirectoriesMixin, TestCase):
         self.mail_account_handler.handle_mail_account(account)
 
         self.bogus_mailbox.folder.list.assert_called_once()
-        self.assertEqual(self.async_task.call_count, 0)
+        self._queue_consumption_tasks_mock.assert_not_called()
 
     def test_error_folder_set_error_listing(self):
         """
@@ -844,9 +1043,9 @@ class TestMail(DirectoriesMixin, TestCase):
         self.mail_account_handler.handle_mail_account(account)
 
         self.bogus_mailbox.folder.list.assert_called_once()
-        self.assertEqual(self.async_task.call_count, 0)
+        self._queue_consumption_tasks_mock.assert_not_called()
 
-    @mock.patch("paperless_mail.mail.MailAccountHandler.get_correspondent")
+    @mock.patch("paperless_mail.mail.MailAccountHandler._get_correspondent")
     def test_error_skip_mail(self, m):
         def get_correspondent_fake(message, rule):
             if message.from_ == "amazon@amazon.de":
@@ -870,16 +1069,16 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         self.mail_account_handler.handle_mail_account(account)
+        self.apply_mail_actions()
 
         # test that we still consume mail even if some mails throw errors.
-        self.assertEqual(self.async_task.call_count, 2)
+        self.assertEqual(self._queue_consumption_tasks_mock.call_count, 2)
 
         # faulty mail still in inbox, untouched
         self.assertEqual(len(self.bogus_mailbox.messages), 1)
         self.assertEqual(self.bogus_mailbox.messages[0].from_, "amazon@amazon.de")
 
     def test_error_create_correspondent(self):
-
         account = MailAccount.objects.create(
             name="test2",
             imap_server="",
@@ -897,14 +1096,18 @@ class TestMail(DirectoriesMixin, TestCase):
 
         self.mail_account_handler.handle_mail_account(account)
 
-        self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
+        self._queue_consumption_tasks_mock.assert_called_once()
 
         c = Correspondent.objects.get(name="amazon@amazon.de")
-        # should work
-        self.assertEqual(kwargs["override_correspondent_id"], c.id)
+        self.assert_queue_consumption_tasks_call_args(
+            [
+                [
+                    {"override_correspondent_id": c.id},
+                ],
+            ],
+        )
 
-        self.async_task.reset_mock()
+        self._queue_consumption_tasks_mock.reset_mock()
         self.reset_bogus_mailbox()
 
         with mock.patch("paperless_mail.mail.Correspondent.objects.get_or_create") as m:
@@ -912,67 +1115,68 @@ class TestMail(DirectoriesMixin, TestCase):
 
             self.mail_account_handler.handle_mail_account(account)
 
-        args, kwargs = self.async_task.call_args
-        self.async_task.assert_called_once()
-        self.assertEqual(kwargs["override_correspondent_id"], None)
+        self.assert_queue_consumption_tasks_call_args(
+            [
+                [
+                    {"override_correspondent_id": None},
+                ],
+            ],
+        )
 
+    @pytest.mark.flaky(reruns=4)
     def test_filters(self):
-
         account = MailAccount.objects.create(
             name="test3",
             imap_server="",
             username="admin",
             password="secret",
         )
-        rule = MailRule.objects.create(
-            name="testrule3",
-            account=account,
-            action=MailRule.MailAction.DELETE,
-            filter_subject="Claim",
-        )
 
-        self.assertEqual(self.async_task.call_count, 0)
+        for f_body, f_from, f_to, f_subject, expected_mail_count in [
+            (None, None, None, "Claim", 1),
+            ("electronic", None, None, None, 1),
+            (None, "amazon", None, None, 2),
+            ("cables", "amazon", None, "Invoice", 1),
+            (None, None, "test@email.com", None, 0),
+            (None, None, "invoices@mycompany.com", None, 1),
+            ("electronic", None, "invoices@mycompany.com", None, 1),
+            (None, "amazon", "me@myselfandi.com", None, 1),
+        ]:
+            with self.subTest(f_body=f_body, f_from=f_from, f_subject=f_subject):
+                MailRule.objects.all().delete()
+                _ = MailRule.objects.create(
+                    name="testrule3",
+                    account=account,
+                    action=MailRule.MailAction.DELETE,
+                    filter_subject=f_subject,
+                    filter_body=f_body,
+                    filter_from=f_from,
+                    filter_to=f_to,
+                )
+                self.reset_bogus_mailbox()
+                self._queue_consumption_tasks_mock.reset_mock()
 
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        self.mail_account_handler.handle_mail_account(account)
-        self.assertEqual(len(self.bogus_mailbox.messages), 2)
-        self.assertEqual(self.async_task.call_count, 1)
+                self._queue_consumption_tasks_mock.assert_not_called()
+                self.assertEqual(len(self.bogus_mailbox.messages), 3)
 
-        self.reset_bogus_mailbox()
+                self.mail_account_handler.handle_mail_account(account)
+                self.apply_mail_actions()
 
-        rule.filter_subject = None
-        rule.filter_body = "electronic"
-        rule.save()
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        self.mail_account_handler.handle_mail_account(account)
-        self.assertEqual(len(self.bogus_mailbox.messages), 2)
-        self.assertEqual(self.async_task.call_count, 2)
-
-        self.reset_bogus_mailbox()
-
-        rule.filter_from = "amazon"
-        rule.filter_body = None
-        rule.save()
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        self.mail_account_handler.handle_mail_account(account)
-        self.assertEqual(len(self.bogus_mailbox.messages), 1)
-        self.assertEqual(self.async_task.call_count, 4)
-
-        self.reset_bogus_mailbox()
-
-        rule.filter_from = "amazon"
-        rule.filter_body = "cables"
-        rule.filter_subject = "Invoice"
-        rule.save()
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        self.mail_account_handler.handle_mail_account(account)
-        self.assertEqual(len(self.bogus_mailbox.messages), 2)
-        self.assertEqual(self.async_task.call_count, 5)
+                self.assertEqual(
+                    len(self.bogus_mailbox.messages),
+                    3 - expected_mail_count,
+                )
+                self.assertEqual(
+                    self._queue_consumption_tasks_mock.call_count,
+                    expected_mail_count,
+                )
 
     def test_auth_plain_fallback(self):
         """
         GIVEN:
             - Mail account with password containing non-ASCII characters
+        WHEN:
+            - Mail account is handled
         THEN:
             - Should still authenticate to the mail account
         """
@@ -991,12 +1195,13 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        self.assertEqual(self.async_task.call_count, 0)
+        self._queue_consumption_tasks_mock.assert_not_called()
         self.assertEqual(len(self.bogus_mailbox.fetch("UNSEEN", False)), 2)
 
         self.mail_account_handler.handle_mail_account(account)
+        self.apply_mail_actions()
 
-        self.assertEqual(self.async_task.call_count, 2)
+        self.assertEqual(self._queue_consumption_tasks_mock.call_count, 2)
         self.assertEqual(len(self.bogus_mailbox.fetch("UNSEEN", False)), 0)
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
 
@@ -1005,6 +1210,8 @@ class TestMail(DirectoriesMixin, TestCase):
         GIVEN:
             - Mail account with password containing non-ASCII characters
             - Incorrect password value
+        WHEN:
+            - Mail account is handled
         THEN:
             - Should raise a MailError for the account
         """
@@ -1028,6 +1235,100 @@ class TestMail(DirectoriesMixin, TestCase):
             self.mail_account_handler.handle_mail_account,
             account,
         )
+
+    def test_auth_with_valid_token(self):
+        """
+        GIVEN:
+            - Mail account configured with access token
+        WHEN:
+            - Mail account is handled
+        THEN:
+            - Should still authenticate to the mail account
+        """
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username=BogusMailBox.USERNAME,
+            # Note the non-ascii characters here
+            password=BogusMailBox.ACCESS_TOKEN,
+            is_token=True,
+        )
+
+        _ = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.MARK_READ,
+        )
+
+        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+        self.assertEqual(self._queue_consumption_tasks_mock.call_count, 0)
+        self.assertEqual(len(self.bogus_mailbox.fetch("UNSEEN", False)), 2)
+
+        self.mail_account_handler.handle_mail_account(account)
+        self.apply_mail_actions()
+
+        self.assertEqual(self._queue_consumption_tasks_mock.call_count, 2)
+        self.assertEqual(len(self.bogus_mailbox.fetch("UNSEEN", False)), 0)
+        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+
+    def assert_queue_consumption_tasks_call_args(
+        self,
+        expected_call_args: list[list[dict[str, str]]],
+    ):
+        """
+        Verifies that queue_consumption_tasks has been called with the expected arguments.
+
+        expected_call_args is the following format:
+
+        * List of calls to queue_consumption_tasks, called once per mail, where each element is:
+        * List of signatures for the consume_file task, where each element is:
+        * dictionary containing arguments that need to be present in the consume_file signature.
+
+        """
+
+        # assert number of calls to queue_consumption_tasks match
+        self.assertEqual(
+            len(self._queue_consumption_tasks_mock.call_args_list),
+            len(expected_call_args),
+        )
+
+        for (mock_args, mock_kwargs), expected_signatures in zip(
+            self._queue_consumption_tasks_mock.call_args_list,
+            expected_call_args,
+        ):
+            consume_tasks = mock_kwargs["consume_tasks"]
+
+            # assert number of consume_file tasks match
+            self.assertEqual(len(consume_tasks), len(expected_signatures))
+
+            for consume_task, expected_signature in zip(
+                consume_tasks,
+                expected_signatures,
+            ):
+                input_doc, overrides = consume_task.args
+
+                # assert the file exists
+                self.assertIsFile(input_doc.original_file)
+
+                # assert all expected arguments are present in the signature
+                for key, value in expected_signature.items():
+                    if key == "override_correspondent_id":
+                        self.assertEqual(overrides.correspondent_id, value)
+                    elif key == "override_filename":
+                        self.assertEqual(overrides.filename, value)
+                    elif key == "override_title":
+                        self.assertEqual(overrides.title, value)
+                    else:
+                        self.fail("No match for expected arg")
+
+    def apply_mail_actions(self):
+        """
+        Applies pending actions to mails by inspecting calls to the queue_consumption_tasks method.
+        """
+        for args, kwargs in self._queue_consumption_tasks_mock.call_args_list:
+            message = kwargs["message"]
+            rule = kwargs["rule"]
+            apply_mail_action([], rule.pk, message.uid, message.subject, message.date)
 
 
 class TestManagementCommand(TestCase):

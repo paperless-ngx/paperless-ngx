@@ -1,14 +1,27 @@
-<form [formGroup]="objectForm" (ngSubmit)="save()">
+<form [formGroup]="objectForm" (ngSubmit)="save()" autocomplete="off">
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
+    @if (object?.id) {
+      <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{object.id}}</span>
+    }
     <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
     </button>
   </div>
   <div class="modal-body">
-    <app-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></app-input-text>
-    <app-input-select i18n-title title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></app-input-select>
-    <app-input-text *ngIf="patternRequired" i18n-title title="Matching pattern" formControlName="match" [error]="error?.match"></app-input-text>
-    <app-input-check *ngIf="patternRequired" i18n-title title="Case insensitive" formControlName="is_insensitive" novalidate></app-input-check>
+
+    <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
+    <pngx-input-select i18n-title title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></pngx-input-select>
+    @if (patternRequired) {
+      <pngx-input-text i18n-title title="Matching pattern" formControlName="match" [error]="error?.match"></pngx-input-text>
+    }
+    @if (patternRequired) {
+      <pngx-input-check i18n-title title="Case insensitive" formControlName="is_insensitive" novalidate></pngx-input-check>
+    }
+
+    <div *pngxIfOwner="object">
+      <pngx-permissions-form [users]="users" accordion="true" formControlName="permissions_form"></pngx-permissions-form>
+    </div>
+
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>

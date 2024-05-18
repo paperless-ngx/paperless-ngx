@@ -5,7 +5,6 @@ from django.db.migrations import RunPython
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("paperless_mail", "0001_initial"),
     ]

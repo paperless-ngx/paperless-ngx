@@ -1,55 +1,54 @@
-import os
 import re
 from html import escape
-from io import BytesIO
-from io import StringIO
+from pathlib import Path
+from typing import Optional
 
-import requests
 from bleach import clean
 from bleach import linkify
 from django.conf import settings
 from django.utils.timezone import is_naive
 from django.utils.timezone import make_aware
-from documents.parsers import DocumentParser
-from documents.parsers import make_thumbnail_from_pdf
-from documents.parsers import ParseError
-from humanfriendly import format_size
+from gotenberg_client import GotenbergClient
+from gotenberg_client.options import Margin
+from gotenberg_client.options import PageSize
+from gotenberg_client.options import PdfAFormat
+from humanize import naturalsize
+from imap_tools import MailAttachment
 from imap_tools import MailMessage
-from tika import parser
+from tika_client import TikaClient
+
+from documents.parsers import DocumentParser
+from documents.parsers import ParseError
+from documents.parsers import make_thumbnail_from_pdf
 
 
 class MailDocumentParser(DocumentParser):
     """
     This parser uses imap_tools to parse .eml files, generates pdf using
-    gotenbergs and sends the html part to a local tika server for text extraction.
+    Gotenberg and sends the html part to a Tika server for text extraction.
     """
 
-    gotenberg_server = settings.TIKA_GOTENBERG_ENDPOINT
-    tika_server = settings.TIKA_ENDPOINT
-
     logging_name = "paperless.parsing.mail"
-    _parsed = None
 
-    def get_parsed(self, document_path) -> MailMessage:
-        if not self._parsed:
-            try:
-                with open(document_path, "rb") as eml:
-                    self._parsed = MailMessage.from_bytes(eml.read())
-            except Exception as err:
-                raise ParseError(
-                    f"Could not parse {document_path}: {err}",
-                )
-            if not self._parsed.from_values:
-                self._parsed = None
-                raise ParseError(
-                    f"Could not parse {document_path}: Missing 'from'",
-                )
+    @staticmethod
+    def _settings_to_gotenberg_pdfa() -> Optional[PdfAFormat]:
+        """
+        Converts our requested PDF/A output into the Gotenberg API
+        format
+        """
+        if settings.OCR_OUTPUT_TYPE in {"pdfa", "pdfa-2"}:
+            return PdfAFormat.A2b
+        elif settings.OCR_OUTPUT_TYPE == "pdfa-1":  # pragma: no cover
+            return PdfAFormat.A1a
+        elif settings.OCR_OUTPUT_TYPE == "pdfa-3":  # pragma: no cover
+            return PdfAFormat.A3b
+        return None
 
-        return self._parsed
-
-    def get_thumbnail(self, document_path, mime_type, file_name=None):
+    def get_thumbnail(self, document_path: Path, mime_type: str, file_name=None):
         if not self.archive_path:
-            self.archive_path = self.generate_pdf(document_path)
+            self.archive_path = self.generate_pdf(
+                self.parse_file_to_message(document_path),
+            )
 
         return make_thumbnail_from_pdf(
             self.archive_path,
@@ -57,20 +56,24 @@ class MailDocumentParser(DocumentParser):
             self.logging_group,
         )
 
-    def extract_metadata(self, document_path, mime_type):
+    def extract_metadata(self, document_path: Path, mime_type: str):
         result = []
 
         try:
-            mail = self.get_parsed(document_path)
+            mail = self.parse_file_to_message(document_path)
         except ParseError as e:
-            self.log(
-                "warning",
-                f"Error while fetching document metadata for " f"{document_path}: {e}",
+            self.log.warning(
+                f"Error while fetching document metadata for {document_path}: {e}",
             )
             return result
 
         for key, value in mail.headers.items():
             value = ", ".join(i for i in value)
+            try:
+                value.encode("utf-8")
+            except UnicodeEncodeError as e:  # pragma: no cover
+                self.log.debug(f"Skipping header {key}: {e}")
+                continue
 
             result.append(
                 {
@@ -88,7 +91,7 @@ class MailDocumentParser(DocumentParser):
                 "key": "attachments",
                 "value": ", ".join(
                     f"{attachment.filename}"
-                    f"({format_size(attachment.size, binary=True)})"
+                    f"({naturalsize(attachment.size, binary=True, format='%.2f')})"
                     for attachment in mail.attachments
                 ),
             },
@@ -106,104 +109,156 @@ class MailDocumentParser(DocumentParser):
         result.sort(key=lambda item: (item["prefix"], item["key"]))
         return result
 
-    def parse(self, document_path, mime_type, file_name=None):
+    def parse(self, document_path: Path, mime_type: str, file_name=None):
+        """
+        Parses the given .eml into formatted text, based on the decoded email.
+
+        """
+
         def strip_text(text: str):
+            """
+            Reduces the spacing of the given text string
+            """
             text = re.sub(r"\s+", " ", text)
             text = re.sub(r"(\n *)+", "\n", text)
             return text.strip()
 
-        mail = self.get_parsed(document_path)
+        def build_formatted_text(mail_message: MailMessage) -> str:
+            """
+            Constructs a formatted string, based on the given email.  Basically tries
+            to get most of the email content, included front matter, into a nice string
+            """
+            fmt_text = f"Subject: {mail_message.subject}\n\n"
+            fmt_text += f"From: {mail_message.from_values.full}\n\n"
+            to_list = [address.full for address in mail_message.to_values]
+            fmt_text += f"To: {', '.join(to_list)}\n\n"
+            if mail_message.cc_values:
+                fmt_text += (
+                    f"CC: {', '.join(address.full for address in mail.cc_values)}\n\n"
+                )
+            if mail_message.bcc_values:
+                fmt_text += (
+                    f"BCC: {', '.join(address.full for address in mail.bcc_values)}\n\n"
+                )
+            if mail_message.attachments:
+                att = []
+                for a in mail.attachments:
+                    attachment_size = naturalsize(a.size, binary=True, format="%.2f")
+                    att.append(
+                        f"{a.filename} ({attachment_size})",
+                    )
+                fmt_text += f"Attachments: {', '.join(att)}\n\n"
 
-        self.text = f"Subject: {mail.subject}\n\n"
-        self.text += f"From: {mail.from_values.full}\n\n"
-        self.text += f"To: {', '.join(address.full for address in mail.to_values)}\n\n"
-        if len(mail.cc_values) >= 1:
-            self.text += (
-                f"CC: {', '.join(address.full for address in mail.cc_values)}\n\n"
-            )
-        if len(mail.bcc_values) >= 1:
-            self.text += (
-                f"BCC: {', '.join(address.full for address in mail.bcc_values)}\n\n"
-            )
-        if len(mail.attachments) >= 1:
-            att = []
-            for a in mail.attachments:
-                att.append(f"{a.filename} ({format_size(a.size, binary=True)})")
+            if mail.html:
+                fmt_text += "HTML content: " + strip_text(self.tika_parse(mail.html))
 
-            self.text += f"Attachments: {', '.join(att)}\n\n"
+            fmt_text += f"\n\n{strip_text(mail.text)}"
 
-        if mail.html != "":
-            self.text += "HTML content: " + strip_text(self.tika_parse(mail.html))
+            return fmt_text
 
-        self.text += f"\n\n{strip_text(mail.text)}"
+        self.log.debug(f"Parsing file {document_path.name} into an email")
+        mail = self.parse_file_to_message(document_path)
+
+        self.log.debug("Building formatted text from email")
+        self.text = build_formatted_text(mail)
 
         if is_naive(mail.date):
             self.date = make_aware(mail.date)
         else:
             self.date = mail.date
 
-        self.archive_path = self.generate_pdf(document_path)
+        self.log.debug("Creating a PDF from the email")
+        self.archive_path = self.generate_pdf(mail)
+
+    @staticmethod
+    def parse_file_to_message(filepath: Path) -> MailMessage:
+        """
+        Parses the given .eml file into a MailMessage object
+        """
+        try:
+            with filepath.open("rb") as eml:
+                parsed = MailMessage.from_bytes(eml.read())
+                if parsed.from_values is None:
+                    raise ParseError(
+                        f"Could not parse {filepath}: Missing 'from'",
+                    )
+        except Exception as err:
+            raise ParseError(
+                f"Could not parse {filepath}: {err}",
+            ) from err
+
+        return parsed
 
     def tika_parse(self, html: str):
-        self.log("info", "Sending content to Tika server")
+        self.log.info("Sending content to Tika server")
 
         try:
-            parsed = parser.from_buffer(html, self.tika_server)
+            with TikaClient(tika_url=settings.TIKA_ENDPOINT) as client:
+                parsed = client.tika.as_text.from_buffer(html, "text/html")
+
+                if parsed.content is not None:
+                    return parsed.content.strip()
+                return ""
         except Exception as err:
             raise ParseError(
                 f"Could not parse content with tika server at "
-                f"{self.tika_server}: {err}",
-            )
-        if parsed["content"]:
-            return parsed["content"]
+                f"{settings.TIKA_ENDPOINT}: {err}",
+            ) from err
+
+    def generate_pdf(self, mail_message: MailMessage) -> Path:
+        archive_path = Path(self.tempdir) / "merged.pdf"
+
+        mail_pdf_file = self.generate_pdf_from_mail(mail_message)
+
+        # If no HTML content, create the PDF from the message
+        # Otherwise, create 2 PDFs and merge them with Gotenberg
+        if not mail_message.html:
+            archive_path.write_bytes(mail_pdf_file.read_bytes())
         else:
-            return ""
-
-    def generate_pdf(self, document_path):
-        pdf_collection = []
-        url_merge = self.gotenberg_server + "/forms/pdfengines/merge"
-        pdf_path = os.path.join(self.tempdir, "merged.pdf")
-        mail = self.get_parsed(document_path)
-
-        pdf_collection.append(("1_mail.pdf", self.generate_pdf_from_mail(mail)))
-
-        if mail.html == "":
-            with open(pdf_path, "wb") as file:
-                file.write(pdf_collection[0][1])
-                file.close()
-            return pdf_path
-        else:
-            pdf_collection.append(
-                (
-                    "2_html.pdf",
-                    self.generate_pdf_from_html(mail.html, mail.attachments),
-                ),
+            pdf_of_html_content = self.generate_pdf_from_html(
+                mail_message.html,
+                mail_message.attachments,
             )
 
-        files = {}
-        for name, content in pdf_collection:
-            files[name] = (name, BytesIO(content))
-        headers = {}
-        try:
-            response = requests.post(url_merge, files=files, headers=headers)
-            response.raise_for_status()  # ensure we notice bad responses
-        except Exception as err:
-            raise ParseError(f"Error while converting document to PDF: {err}")
+            self.log.debug("Merging email text and HTML content into single PDF")
 
-        with open(pdf_path, "wb") as file:
-            file.write(response.content)
-            file.close()
+            with (
+                GotenbergClient(
+                    host=settings.TIKA_GOTENBERG_ENDPOINT,
+                    timeout=settings.CELERY_TASK_TIME_LIMIT,
+                ) as client,
+                client.merge.merge() as route,
+            ):
+                # Configure requested PDF/A formatting, if any
+                pdf_a_format = self._settings_to_gotenberg_pdfa()
+                if pdf_a_format is not None:
+                    route.pdf_format(pdf_a_format)
 
-        return pdf_path
+                route.merge([mail_pdf_file, pdf_of_html_content])
 
-    @staticmethod
-    def mail_to_html(mail: MailMessage) -> StringIO:
-        data = {}
+                try:
+                    response = route.run()
+                    archive_path.write_bytes(response.content)
+                except Exception as err:
+                    raise ParseError(
+                        f"Error while merging email HTML into PDF: {err}",
+                    ) from err
 
-        def clean_html(text: str):
+        return archive_path
+
+    def mail_to_html(self, mail: MailMessage) -> Path:
+        """
+        Converts the given email into an HTML file, formatted
+        based on the given template
+        """
+
+        def clean_html(text: str) -> str:
+            """
+            Attempts to clean, escape and linkify the given HTML string
+            """
             if isinstance(text, list):
                 text = "\n".join([str(e) for e in text])
-            if type(text) != str:
+            if not isinstance(text, str):
                 text = str(text)
             text = escape(text)
             text = clean(text)
@@ -211,91 +266,93 @@ class MailDocumentParser(DocumentParser):
             text = text.replace("\n", "<br>")
             return text
 
+        data = {}
+
         data["subject"] = clean_html(mail.subject)
-        if data["subject"] != "":
+        if data["subject"]:
             data["subject_label"] = "Subject"
         data["from"] = clean_html(mail.from_values.full)
-        if data["from"] != "":
+        if data["from"]:
             data["from_label"] = "From"
         data["to"] = clean_html(", ".join(address.full for address in mail.to_values))
-        if data["to"] != "":
+        if data["to"]:
             data["to_label"] = "To"
         data["cc"] = clean_html(", ".join(address.full for address in mail.cc_values))
-        if data["cc"] != "":
+        if data["cc"]:
             data["cc_label"] = "CC"
         data["bcc"] = clean_html(", ".join(address.full for address in mail.bcc_values))
-        if data["bcc"] != "":
+        if data["bcc"]:
             data["bcc_label"] = "BCC"
 
         att = []
         for a in mail.attachments:
-            att.append(f"{a.filename} ({format_size(a.size, binary=True)})")
+            att.append(
+                f"{a.filename} ({naturalsize(a.size, binary=True, format='%.2f')})",
+            )
         data["attachments"] = clean_html(", ".join(att))
-        if data["attachments"] != "":
+        if data["attachments"]:
             data["attachments_label"] = "Attachments"
 
         data["date"] = clean_html(mail.date.astimezone().strftime("%Y-%m-%d %H:%M"))
         data["content"] = clean_html(mail.text.strip())
 
-        html = StringIO()
-
         from django.template.loader import render_to_string
 
-        rendered = render_to_string("email_msg_template.html", context=data)
+        html_file = Path(self.tempdir) / "email_as_html.html"
+        html_file.write_text(render_to_string("email_msg_template.html", context=data))
 
-        html.write(rendered)
-        html.seek(0)
+        return html_file
 
-        return html
+    def generate_pdf_from_mail(self, mail: MailMessage) -> Path:
+        """
+        Creates a PDF based on the given email, using the email's values in a
+        an HTML template
+        """
+        self.log.info("Converting mail to PDF")
 
-    def generate_pdf_from_mail(self, mail):
+        css_file = Path(__file__).parent / "templates" / "output.css"
+        email_html_file = self.mail_to_html(mail)
 
-        url = self.gotenberg_server + "/forms/chromium/convert/html"
-        self.log("info", "Converting mail to PDF")
-
-        css_file = os.path.join(os.path.dirname(__file__), "templates/output.css")
-
-        with open(css_file, "rb") as css_handle:
-
-            files = {
-                "html": ("index.html", self.mail_to_html(mail)),
-                "css": ("output.css", css_handle),
-            }
-            headers = {}
-            data = {
-                "marginTop": "0.1",
-                "marginBottom": "0.1",
-                "marginLeft": "0.1",
-                "marginRight": "0.1",
-                "paperWidth": "8.27",
-                "paperHeight": "11.7",
-                "scale": "1.0",
-            }
-
-            # Set the output format of the resulting PDF
-            # Valid inputs: https://gotenberg.dev/docs/modules/pdf-engines#uno
-            if settings.OCR_OUTPUT_TYPE in {"pdfa", "pdfa-2"}:
-                data["pdfFormat"] = "PDF/A-2b"
-            elif settings.OCR_OUTPUT_TYPE == "pdfa-1":
-                data["pdfFormat"] = "PDF/A-1a"
-            elif settings.OCR_OUTPUT_TYPE == "pdfa-3":
-                data["pdfFormat"] = "PDF/A-3b"
+        with (
+            GotenbergClient(
+                host=settings.TIKA_GOTENBERG_ENDPOINT,
+                timeout=settings.CELERY_TASK_TIME_LIMIT,
+            ) as client,
+            client.chromium.html_to_pdf() as route,
+        ):
+            # Configure requested PDF/A formatting, if any
+            pdf_a_format = self._settings_to_gotenberg_pdfa()
+            if pdf_a_format is not None:
+                route.pdf_format(pdf_a_format)
 
             try:
-                response = requests.post(
-                    url,
-                    files=files,
-                    headers=headers,
-                    data=data,
+                response = (
+                    route.index(email_html_file)
+                    .resource(css_file)
+                    .margins(Margin(top=0.1, bottom=0.1, left=0.1, right=0.1))
+                    .size(PageSize(height=11.7, width=8.27))
+                    .scale(1.0)
+                    .run()
                 )
-                response.raise_for_status()  # ensure we notice bad responses
             except Exception as err:
-                raise ParseError(f"Error while converting document to PDF: {err}")
+                raise ParseError(
+                    f"Error while converting email to PDF: {err}",
+                ) from err
 
-        return response.content
+        email_as_pdf_file = Path(self.tempdir) / "email_as_pdf.pdf"
+        email_as_pdf_file.write_bytes(response.content)
 
-    @staticmethod
-    def transform_inline_html(html, attachments):
+        return email_as_pdf_file
+
+    def generate_pdf_from_html(
+        self,
+        orig_html: str,
+        attachments: list[MailAttachment],
+    ) -> Path:
+        """
+        Generates a PDF file based on the HTML and attachments of the email
+        """
+
         def clean_html_script(text: str):
             compiled_open = re.compile(re.escape("<script"), re.IGNORECASE)
             text = compiled_open.sub("<div hidden ", text)
@@ -304,46 +361,67 @@ class MailDocumentParser(DocumentParser):
             text = compiled_close.sub("</div", text)
             return text
 
-        html_clean = clean_html_script(html)
-        files = []
+        self.log.info("Converting message html to PDF")
 
-        for a in attachments:
-            name_cid = "cid:" + a.content_id
-            name_clean = "".join(e for e in name_cid if e.isalnum())
-            files.append((name_clean, BytesIO(a.payload)))
-            html_clean = html_clean.replace(name_cid, name_clean)
+        tempdir = Path(self.tempdir)
 
-        files.append(("index.html", StringIO(html_clean)))
+        html_clean = clean_html_script(orig_html)
+        html_clean_file = tempdir / "index.html"
+        html_clean_file.write_text(html_clean)
 
-        return files
+        with (
+            GotenbergClient(
+                host=settings.TIKA_GOTENBERG_ENDPOINT,
+                timeout=settings.CELERY_TASK_TIME_LIMIT,
+            ) as client,
+            client.chromium.html_to_pdf() as route,
+        ):
+            # Configure requested PDF/A formatting, if any
+            pdf_a_format = self._settings_to_gotenberg_pdfa()
+            if pdf_a_format is not None:
+                route.pdf_format(pdf_a_format)
 
-    def generate_pdf_from_html(self, orig_html, attachments):
-        url = self.gotenberg_server + "/forms/chromium/convert/html"
-        self.log("info", "Converting html to PDF")
+            # Add attachments as resources, cleaning the filename and replacing
+            # it in the index file for inclusion
+            for attachment in attachments:
+                # Clean the attachment name to be valid
+                name_cid = f"cid:{attachment.content_id}"
+                name_clean = "".join(e for e in name_cid if e.isalnum())
 
-        files = {}
-        for name, file in self.transform_inline_html(orig_html, attachments):
-            files[name] = (name, file)
+                # Write attachment payload to a temp file
+                temp_file = tempdir / name_clean
+                temp_file.write_bytes(attachment.payload)
 
-        headers = {}
-        data = {
-            "marginTop": "0.1",
-            "marginBottom": "0.1",
-            "marginLeft": "0.1",
-            "marginRight": "0.1",
-            "paperWidth": "8.27",
-            "paperHeight": "11.7",
-            "scale": "1.0",
-        }
-        try:
-            response = requests.post(
-                url,
-                files=files,
-                headers=headers,
-                data=data,
-            )
-            response.raise_for_status()  # ensure we notice bad responses
-        except Exception as err:
-            raise ParseError(f"Error while converting document to PDF: {err}")
+                route.resource(temp_file)
 
-        return response.content
+                # Replace as needed the name with the clean name
+                html_clean = html_clean.replace(name_cid, name_clean)
+
+            # Now store the cleaned up HTML version
+            html_clean_file = tempdir / "index.html"
+            html_clean_file.write_text(html_clean)
+            # This is our index file, the main page basically
+            route.index(html_clean_file)
+
+            # Set page size, margins
+            route.margins(Margin(top=0.1, bottom=0.1, left=0.1, right=0.1)).size(
+                PageSize(height=11.7, width=8.27),
+            ).scale(1.0)
+
+            try:
+                response = route.run()
+
+            except Exception as err:
+                raise ParseError(
+                    f"Error while converting document to PDF: {err}",
+                ) from err
+
+        html_pdf = tempdir / "html.pdf"
+        html_pdf.write_bytes(response.content)
+        return html_pdf
+
+    def get_settings(self):
+        """
+        This parser does not implement additional settings yet
+        """
+        return None

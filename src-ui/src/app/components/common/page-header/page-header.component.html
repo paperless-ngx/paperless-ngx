@@ -1,9 +1,25 @@
-<div class="row pt-3 pb-3 pb-md-1 mb-3 border-bottom align-items-center">
+<div class="row pt-3 pb-3 pb-md-2 align-items-center">
   <div class="col-md text-truncate">
-    <p class="h2 text-truncate" style="line-height: 1.4">{{title}}</p>
-    <p *ngIf="subTitle" class="h5 text-truncate" style="line-height: 1.4">{{subTitle}}</p>
+    <h3 class="text-truncate" style="line-height: 1.4">
+      {{title}}
+      @if (subTitle) {
+        <span class="h6 mb-0 d-block d-md-inline fw-normal ms-md-3 text-truncate" style="line-height: 1.4">{{subTitle}}</span>
+      }
+      @if (info) {
+        <button class="btn btn-sm btn-link text-muted me-auto p-0 p-md-2" title="What's this?" i18n-title type="button" [ngbPopover]="infoPopover" [autoClose]="true">
+          <i-bs name="question-circle"></i-bs>
+        </button>
+        <ng-template #infoPopover>
+          <p [class.mb-0]="!infoLink" [innerHTML]="info"></p>
+          @if (infoLink) {
+            <a href="https://docs.paperless-ngx.com/{{infoLink}}" target="_blank" referrerpolicy="noopener noreferrer" i18n>Read more</a>
+            <i-bs class="ms-1" width=".8em" height=".8em" name="box-arrow-up-right"></i-bs>
+          }
+        </ng-template>
+      }
+    </h3>
   </div>
-  <div class="btn-toolbar col col-md-auto">
+  <div class="btn-toolbar col col-md-auto gap-2">
     <ng-content></ng-content>
   </div>
 </div>

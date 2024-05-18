@@ -1,0 +1,22 @@
+<form [formGroup]="objectForm" (ngSubmit)="save()" autocomplete="off">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
+      @if (object?.id) {
+        <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{object.id}}</span>
+      }
+      <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col">
+          <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
+          <pngx-permissions-select i18n-title title="Permissions" formControlName="permissions" [error]="error?.permissions"></pngx-permissions-select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>
+      <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
+    </div>
+  </form>

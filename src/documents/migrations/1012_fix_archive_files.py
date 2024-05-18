@@ -8,11 +8,12 @@ from time import sleep
 
 import pathvalidate
 from django.conf import settings
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 from django.template.defaultfilters import slugify
 
-from documents.file_handling import defaultdictNoStr, many_to_dictionary
-
+from documents.file_handling import defaultdictNoStr
+from documents.file_handling import many_to_dictionary
 
 logger = logging.getLogger("paperless.migrations")
 
@@ -29,7 +30,7 @@ def archive_path_old(doc):
     if doc.filename:
         fname = archive_name_from_filename(doc.filename)
     else:
-        fname = "{:07}.pdf".format(doc.pk)
+        fname = f"{doc.pk:07}.pdf"
 
     return os.path.join(settings.ARCHIVE_DIR, fname)
 
@@ -48,7 +49,7 @@ def source_path(doc):
     if doc.filename:
         fname = str(doc.filename)
     else:
-        fname = "{:07}{}".format(doc.pk, doc.file_type)
+        fname = f"{doc.pk:07}{doc.file_type}"
         if doc.storage_type == STORAGE_TYPE_GPG:
             fname += ".gpg"  # pragma: no cover
 
@@ -67,7 +68,9 @@ def generate_unique_filename(doc, archive_filename=False):
 
     while True:
         new_filename = generate_filename(
-            doc, counter, archive_filename=archive_filename
+            doc,
+            counter,
+            archive_filename=archive_filename,
         )
         if new_filename == old_filename:
             # still the same as before.
@@ -93,14 +96,16 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
 
             if doc.correspondent:
                 correspondent = pathvalidate.sanitize_filename(
-                    doc.correspondent.name, replacement_text="-"
+                    doc.correspondent.name,
+                    replacement_text="-",
                 )
             else:
                 correspondent = "none"
 
             if doc.document_type:
                 document_type = pathvalidate.sanitize_filename(
-                    doc.document_type.name, replacement_text="-"
+                    doc.document_type.name,
+                    replacement_text="-",
                 )
             else:
                 document_type = "none"
@@ -111,9 +116,7 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
                 document_type=document_type,
                 created=datetime.date.isoformat(doc.created),
                 created_year=doc.created.year if doc.created else "none",
-                created_month=f"{doc.created.month:02}"
-                if doc.created
-                else "none",  # NOQA: E501
+                created_month=f"{doc.created.month:02}" if doc.created else "none",
                 created_day=f"{doc.created.day:02}" if doc.created else "none",
                 added=datetime.date.isoformat(doc.added),
                 added_year=doc.added.year if doc.added else "none",
@@ -128,7 +131,7 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
     except (ValueError, KeyError, IndexError):
         logger.warning(
             f"Invalid PAPERLESS_FILENAME_FORMAT: "
-            f"{settings.FILENAME_FORMAT}, falling back to default"
+            f"{settings.FILENAME_FORMAT}, falling back to default",
         )
 
     counter_str = f"_{counter:02}" if counter else ""
@@ -158,11 +161,9 @@ def parse_wrapper(parser, path, mime_type, file_name):
 
 
 def create_archive_version(doc, retry_count=3):
-    from documents.parsers import (
-        get_parser_class_for_mime_type,
-        DocumentParser,
-        ParseError,
-    )
+    from documents.parsers import DocumentParser
+    from documents.parsers import ParseError
+    from documents.parsers import get_parser_class_for_mime_type
 
     logger.info(f"Regenerating archive document for document ID:{doc.id}")
     parser_class = get_parser_class_for_mime_type(doc.mime_type)
@@ -170,13 +171,17 @@ def create_archive_version(doc, retry_count=3):
         parser: DocumentParser = parser_class(None, None)
         try:
             parse_wrapper(
-                parser, source_path(doc), doc.mime_type, os.path.basename(doc.filename)
+                parser,
+                source_path(doc),
+                doc.mime_type,
+                os.path.basename(doc.filename),
             )
             doc.content = parser.get_text()
 
             if parser.get_archive_path() and os.path.isfile(parser.get_archive_path()):
                 doc.archive_filename = generate_unique_filename(
-                    doc, archive_filename=True
+                    doc,
+                    archive_filename=True,
                 )
                 with open(parser.get_archive_path(), "rb") as f:
                     doc.archive_checksum = hashlib.md5(f.read()).hexdigest()
@@ -186,7 +191,7 @@ def create_archive_version(doc, retry_count=3):
                 doc.archive_checksum = None
                 logger.error(
                     f"Parser did not return an archive document for document "
-                    f"ID:{doc.id}. Removing archive document."
+                    f"ID:{doc.id}. Removing archive document.",
                 )
             doc.save()
             return
@@ -195,14 +200,14 @@ def create_archive_version(doc, retry_count=3):
                 logger.exception(
                     f"Unable to regenerate archive document for ID:{doc.id}. You "
                     f"need to invoke the document_archiver management command "
-                    f"manually for that document."
+                    f"manually for that document.",
                 )
                 doc.archive_checksum = None
                 doc.save()
                 return
             else:
                 # This is mostly here for the tika parser in docker
-                # environemnts. The servers for parsing need to come up first,
+                # environments. The servers for parsing need to come up first,
                 # and the docker setup doesn't ensure that tika is running
                 # before attempting migrations.
                 logger.error("Parse error, will try again in 5 seconds...")
@@ -233,7 +238,7 @@ def move_old_to_new_locations(apps, schema_editor):
         old_path = archive_path_old(doc)
         if doc.id not in affected_document_ids and not os.path.isfile(old_path):
             raise ValueError(
-                f"Archived document ID:{doc.id} does not exist at: " f"{old_path}"
+                f"Archived document ID:{doc.id} does not exist at: {old_path}",
             )
 
     # check that we can regenerate affected archive versions
@@ -245,11 +250,10 @@ def move_old_to_new_locations(apps, schema_editor):
         if not parser_class:
             raise ValueError(
                 f"Document ID:{doc.id} has an invalid archived document, "
-                f"but no parsers are available. Cannot migrate."
+                f"but no parsers are available. Cannot migrate.",
             )
 
     for doc in Document.objects.filter(archive_checksum__isnull=False):
-
         if doc.id in affected_document_ids:
             old_path = archive_path_old(doc)
             # remove affected archive versions
@@ -260,7 +264,7 @@ def move_old_to_new_locations(apps, schema_editor):
             # Set archive path for unaffected files
             doc.archive_filename = archive_name_from_filename(doc.filename)
             Document.objects.filter(id=doc.id).update(
-                archive_filename=doc.archive_filename
+                archive_filename=doc.archive_filename,
             )
 
     # regenerate archive documents
@@ -281,13 +285,13 @@ def move_new_to_old_locations(apps, schema_editor):
             raise ValueError(
                 f"Cannot migrate: Archive file name {old_archive_path} of "
                 f"document {doc.filename} would clash with another archive "
-                f"filename."
+                f"filename.",
             )
         old_archive_paths.add(old_archive_path)
         if new_archive_path != old_archive_path and os.path.isfile(old_archive_path):
             raise ValueError(
                 f"Cannot migrate: Cannot move {new_archive_path} to "
-                f"{old_archive_path}: file already exists."
+                f"{old_archive_path}: file already exists.",
             )
 
     for doc in Document.objects.filter(archive_checksum__isnull=False):
@@ -299,7 +303,6 @@ def move_new_to_old_locations(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("documents", "1011_auto_20210101_2340"),
     ]

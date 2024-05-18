@@ -1,16 +1,23 @@
-<div class="card mb-3 shadow-sm">
+<div class="card shadow-sm bg-light" cdkDrag [cdkDragDisabled]="!draggable" cdkDragPreviewContainer="parent">
   <div class="card-header">
     <div class="d-flex justify-content-between align-items-center">
-      <h5 class="card-title mb-0">{{title}}</h5>
-      <ng-container *ngIf="loading">
+      <div class="d-flex">
+        @if (draggable) {
+          <div class="ms-n2 me-1" cdkDragHandle>
+            <i-bs name="grip-vertical"></i-bs>
+          </div>
+        }
+        <h6 class="card-title mb-0">{{title}}</h6>
+      </div>
+      @if (loading) {
         <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
         <div class="visually-hidden" i18n>Loading...</div>
-      </ng-container>
-      <ng-content select ="[header-buttons]"></ng-content>
+      }
+      <ng-content select="[header-buttons]"></ng-content>
     </div>
 
   </div>
-  <div class="card-body text-dark bg-light">
-    <ng-content select ="[content]"></ng-content>
+  <div class="card-body text-dark">
+    <ng-content select="[content]"></ng-content>
   </div>
 </div>

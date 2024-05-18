@@ -1,8 +1,12 @@
 import { Injectable } from '@angular/core'
-import { PaperlessDocument } from 'src/app/data/paperless-document'
-import { PaperlessDocumentMetadata } from 'src/app/data/paperless-document-metadata'
+import {
+  DOCUMENT_SORT_FIELDS,
+  DOCUMENT_SORT_FIELDS_FULLTEXT,
+  Document,
+} from 'src/app/data/document'
+import { DocumentMetadata } from 'src/app/data/document-metadata'
 import { AbstractPaperlessService } from './abstract-paperless-service'
-import { HttpClient, HttpParams } from '@angular/common/http'
+import { HttpClient } from '@angular/common/http'
 import { Observable } from 'rxjs'
 import { Results } from 'src/app/data/results'
 import { FilterRule } from 'src/app/data/filter-rule'
@@ -10,27 +14,17 @@ import { map, tap } from 'rxjs/operators'
 import { CorrespondentService } from './correspondent.service'
 import { DocumentTypeService } from './document-type.service'
 import { TagService } from './tag.service'
-import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions'
+import { DocumentSuggestions } from 'src/app/data/document-suggestions'
 import { queryParamsFromFilterRules } from '../../utils/query-params'
 import { StoragePathService } from './storage-path.service'
-
-export const DOCUMENT_SORT_FIELDS = [
-  { field: 'archive_serial_number', name: $localize`ASN` },
-  { field: 'correspondent__name', name: $localize`Correspondent` },
-  { field: 'title', name: $localize`Title` },
-  { field: 'document_type__name', name: $localize`Document type` },
-  { field: 'created', name: $localize`Created` },
-  { field: 'added', name: $localize`Added` },
-  { field: 'modified', name: $localize`Modified` },
-]
-
-export const DOCUMENT_SORT_FIELDS_FULLTEXT = [
-  ...DOCUMENT_SORT_FIELDS,
-  {
-    field: 'score',
-    name: $localize`:Score is a value returned by the full text search engine and specifies how well a result matches the given query:Search score`,
-  },
-]
+import {
+  PermissionAction,
+  PermissionType,
+  PermissionsService,
+} from '../permissions.service'
+import { SettingsService } from '../settings.service'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { AuditLogEntry } from 'src/app/data/auditlog-entry'
 
 export interface SelectionDataItem {
   id: number
@@ -42,34 +36,105 @@ export interface SelectionData {
   selected_correspondents: SelectionDataItem[]
   selected_tags: SelectionDataItem[]
   selected_document_types: SelectionDataItem[]
+  selected_custom_fields: SelectionDataItem[]
 }
 
 @Injectable({
   providedIn: 'root',
 })
-export class DocumentService extends AbstractPaperlessService<PaperlessDocument> {
+export class DocumentService extends AbstractPaperlessService<Document> {
   private _searchQuery: string
+
+  private _sortFields
+  get sortFields() {
+    return this._sortFields
+  }
+
+  private _sortFieldsFullText
+  get sortFieldsFullText() {
+    return this._sortFieldsFullText
+  }
 
   constructor(
     http: HttpClient,
     private correspondentService: CorrespondentService,
     private documentTypeService: DocumentTypeService,
     private tagService: TagService,
-    private storagePathService: StoragePathService
+    private storagePathService: StoragePathService,
+    private permissionsService: PermissionsService,
+    private settingsService: SettingsService
   ) {
     super(http, 'documents')
+    this.setupSortFields()
   }
 
-  addObservablesToDocument(doc: PaperlessDocument) {
-    if (doc.correspondent) {
+  private setupSortFields() {
+    this._sortFields = [...DOCUMENT_SORT_FIELDS]
+    let excludes = []
+    if (
+      !this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Correspondent
+      )
+    ) {
+      excludes.push('correspondent__name')
+    }
+    if (
+      !this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.DocumentType
+      )
+    ) {
+      excludes.push('document_type__name')
+    }
+    if (
+      !this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.User
+      )
+    ) {
+      excludes.push('owner')
+    }
+    if (!this.settingsService.get(SETTINGS_KEYS.NOTES_ENABLED)) {
+      excludes.push('num_notes')
+    }
+    this._sortFields = this._sortFields.filter(
+      (field) => !excludes.includes(field.field)
+    )
+    this._sortFieldsFullText = [
+      ...this._sortFields,
+      ...DOCUMENT_SORT_FIELDS_FULLTEXT,
+    ]
+  }
+
+  addObservablesToDocument(doc: Document) {
+    if (
+      doc.correspondent &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Correspondent
+      )
+    ) {
       doc.correspondent$ = this.correspondentService.getCached(
         doc.correspondent
       )
     }
-    if (doc.document_type) {
+    if (
+      doc.document_type &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.DocumentType
+      )
+    ) {
       doc.document_type$ = this.documentTypeService.getCached(doc.document_type)
     }
-    if (doc.tags) {
+    if (
+      doc.tags &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Tag
+      )
+    ) {
       doc.tags$ = this.tagService
         .getCachedMany(doc.tags)
         .pipe(
@@ -78,7 +143,13 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
           )
         )
     }
-    if (doc.storage_path) {
+    if (
+      doc.storage_path &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.StoragePath
+      )
+    ) {
       doc.storage_path$ = this.storagePathService.getCached(doc.storage_path)
     }
     return doc
@@ -91,7 +162,7 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     sortReverse?: boolean,
     filterRules?: FilterRule[],
     extraParams = {}
-  ): Observable<Results<PaperlessDocument>> {
+  ): Observable<Results<Document>> {
     return this.list(
       page,
       pageSize,
@@ -110,6 +181,14 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     return this.listFiltered(1, 100000, null, null, filterRules, {
       fields: 'id',
     }).pipe(map((response) => response.results.map((doc) => doc.id)))
+  }
+
+  get(id: number): Observable<Document> {
+    return this.http.get<Document>(this.getResourceUrl(id), {
+      params: {
+        full_perms: true,
+      },
+    })
   }
 
   getPreviewUrl(id: number, original: boolean = false): string {
@@ -133,9 +212,16 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     return url
   }
 
-  update(o: PaperlessDocument): Observable<PaperlessDocument> {
+  getNextAsn(): Observable<number> {
+    return this.http.get<number>(this.getResourceUrl(null, 'next_asn'))
+  }
+
+  update(o: Document): Observable<Document> {
     // we want to only set created_date
     o.created = undefined
+    o.remove_inbox_tags = !!this.settingsService.get(
+      SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS
+    )
     return super.update(o)
   }
 
@@ -147,10 +233,8 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     )
   }
 
-  getMetadata(id: number): Observable<PaperlessDocumentMetadata> {
-    return this.http.get<PaperlessDocumentMetadata>(
-      this.getResourceUrl(id, 'metadata')
-    )
+  getMetadata(id: number): Observable<DocumentMetadata> {
+    return this.http.get<DocumentMetadata>(this.getResourceUrl(id, 'metadata'))
   }
 
   bulkEdit(ids: number[], method: string, args: any) {
@@ -168,10 +252,14 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     )
   }
 
-  getSuggestions(id: number): Observable<PaperlessDocumentSuggestions> {
-    return this.http.get<PaperlessDocumentSuggestions>(
+  getSuggestions(id: number): Observable<DocumentSuggestions> {
+    return this.http.get<DocumentSuggestions>(
       this.getResourceUrl(id, 'suggestions')
     )
+  }
+
+  getHistory(id: number): Observable<AuditLogEntry[]> {
+    return this.http.get<AuditLogEntry[]>(this.getResourceUrl(id, 'history'))
   }
 
   bulkDownload(

@@ -1,7 +1,8 @@
 {
   "root": true,
   "ignorePatterns": [
-    "projects/**/*"
+    "projects/**/*",
+    "/src/app/components/common/pdf-viewer/**"
   ],
   "overrides": [
     {
@@ -24,7 +25,7 @@
           "error",
           {
             "type": "attribute",
-            "prefix": "app",
+            "prefix": "pngx",
             "style": "camelCase"
           }
         ],
@@ -32,7 +33,7 @@
           "error",
           {
             "type": "element",
-            "prefix": "app",
+            "prefix": "pngx",
             "style": "kebab-case"
           }
         ]

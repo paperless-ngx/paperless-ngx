@@ -5,28 +5,37 @@ import {
   Output,
   ViewChild,
 } from '@angular/core'
-import { PaperlessDocument } from 'src/app/data/paperless-document'
+import {
+  DEFAULT_DISPLAY_FIELDS,
+  DisplayField,
+  Document,
+} from 'src/app/data/document'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
-import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 @Component({
-  selector: 'app-document-card-large',
+  selector: 'pngx-document-card-large',
   templateUrl: './document-card-large.component.html',
-  styleUrls: [
-    './document-card-large.component.scss',
-    '../popover-preview/popover-preview.scss',
-  ],
+  styleUrls: ['./document-card-large.component.scss'],
 })
-export class DocumentCardLargeComponent {
+export class DocumentCardLargeComponent extends ComponentWithPermissions {
+  DisplayField = DisplayField
+
   constructor(
     private documentService: DocumentService,
-    private settingsService: SettingsService
-  ) {}
+    public settingsService: SettingsService
+  ) {
+    super()
+  }
 
   @Input()
   selected = false
+
+  @Input()
+  displayFields: string[] = DEFAULT_DISPLAY_FIELDS.map((f) => f.id)
 
   @Output()
   toggleSelected = new EventEmitter()
@@ -36,7 +45,10 @@ export class DocumentCardLargeComponent {
   }
 
   @Input()
-  document: PaperlessDocument
+  document: Document
+
+  @Output()
+  dblClickDocument = new EventEmitter()
 
   @Output()
   clickTag = new EventEmitter<number>()
@@ -70,18 +82,16 @@ export class DocumentCardLargeComponent {
     }
   }
 
-  get searchCommentHighlights() {
+  get searchNoteHighlights() {
     let highlights = []
     if (
       this.document['__search_hit__'] &&
-      this.document['__search_hit__'].comment_highlights
+      this.document['__search_hit__'].note_highlights
     ) {
-      // only show comments with a match
-      highlights = (
-        this.document['__search_hit__'].comment_highlights as string
-      )
+      // only show notes with a match
+      highlights = (this.document['__search_hit__'].note_highlights as string)
         .split(',')
-        .filter((higlight) => higlight.includes('<span'))
+        .filter((highlight) => highlight.includes('<span'))
     }
     return highlights
   }
@@ -129,8 +139,12 @@ export class DocumentCardLargeComponent {
 
   get contentTrimmed() {
     return (
-      this.document.content.substr(0, 500) +
+      this.document.content.substring(0, 500) +
       (this.document.content.length > 500 ? '...' : '')
     )
+  }
+
+  get notesEnabled(): boolean {
+    return this.settingsService.get(SETTINGS_KEYS.NOTES_ENABLED)
   }
 }

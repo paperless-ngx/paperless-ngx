@@ -7,31 +7,47 @@ from pathlib import Path
 from unittest import mock
 from zipfile import ZipFile
 
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.test import override_settings
+from django.db import IntegrityError
 from django.test import TestCase
+from django.test import override_settings
 from django.utils import timezone
+from guardian.models import GroupObjectPermission
+from guardian.models import UserObjectPermission
+from guardian.shortcuts import assign_perm
+
 from documents.management.commands import document_exporter
-from documents.models import Comment
 from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import Note
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import User
+from documents.models import Workflow
+from documents.models import WorkflowAction
+from documents.models import WorkflowTrigger
 from documents.sanity_checker import check_sanity
 from documents.settings import EXPORTER_FILE_NAME
 from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import paperless_environment
 
 
-class TestExportImport(DirectoriesMixin, TestCase):
+class TestExportImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def setUp(self) -> None:
-        self.target = tempfile.mkdtemp()
+        self.target = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.target)
 
         self.user = User.objects.create(username="temp_admin")
+        self.user2 = User.objects.create(username="user2")
+        self.group1 = Group.objects.create(name="group1")
 
         self.d1 = Document.objects.create(
             content="Content",
@@ -65,16 +81,28 @@ class TestExportImport(DirectoriesMixin, TestCase):
             storage_type=Document.STORAGE_TYPE_GPG,
         )
 
-        self.comment = Comment.objects.create(
-            comment="This is a comment. amaze.",
+        self.note = Note.objects.create(
+            note="This is a note. amaze.",
             document=self.d1,
             user=self.user,
         )
+
+        assign_perm("view_document", self.user2, self.d2)
+        assign_perm("view_document", self.group1, self.d3)
 
         self.t1 = Tag.objects.create(name="t")
         self.dt1 = DocumentType.objects.create(name="dt")
         self.c1 = Correspondent.objects.create(name="c")
         self.sp1 = StoragePath.objects.create(path="{created_year}-{title}")
+        self.cf1 = CustomField.objects.create(
+            name="Custom Field 1",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        self.cfi1 = CustomFieldInstance.objects.create(
+            field=self.cf1,
+            value_text="cf instance 1",
+            document=self.d1,
+        )
 
         self.d1.tags.add(self.t1)
         self.d1.correspondent = self.c1
@@ -82,6 +110,18 @@ class TestExportImport(DirectoriesMixin, TestCase):
         self.d1.save()
         self.d4.storage_path = self.sp1
         self.d4.save()
+
+        self.trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            sources=[1],
+            filter_filename="*",
+        )
+        self.action = WorkflowAction.objects.create(assign_title="new title")
+        self.workflow = Workflow.objects.create(name="Workflow 1", order="0")
+        self.workflow.triggers.add(self.trigger)
+        self.workflow.actions.add(self.action)
+        self.workflow.save()
+
         super().setUp()
 
     def _get_document_from_manifest(self, manifest, id):
@@ -137,15 +177,22 @@ class TestExportImport(DirectoriesMixin, TestCase):
             os.path.join(self.dirs.media_dir, "documents"),
         )
 
+        num_permission_objects = Permission.objects.count()
+
         manifest = self._do_export(use_filename_format=use_filename_format)
 
-        self.assertEqual(len(manifest), 11)
+        # dont include consumer or AnonymousUser users
+        self.assertEqual(
+            len(list(filter(lambda e: e["model"] == "auth.user", manifest))),
+            2,
+        )
+
         self.assertEqual(
             len(list(filter(lambda e: e["model"] == "documents.document", manifest))),
             4,
         )
 
-        self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
+        self.assertIsFile(os.path.join(self.target, "manifest.json"))
 
         self.assertEqual(
             self._get_document_from_manifest(manifest, self.d1.id)["fields"]["title"],
@@ -170,13 +217,11 @@ class TestExportImport(DirectoriesMixin, TestCase):
                     self.target,
                     element[document_exporter.EXPORTER_FILE_NAME],
                 )
-                self.assertTrue(os.path.exists(fname))
-                self.assertTrue(
-                    os.path.exists(
-                        os.path.join(
-                            self.target,
-                            element[document_exporter.EXPORTER_THUMBNAIL_NAME],
-                        ),
+                self.assertIsFile(fname)
+                self.assertIsFile(
+                    os.path.join(
+                        self.target,
+                        element[document_exporter.EXPORTER_THUMBNAIL_NAME],
                     ),
                 )
 
@@ -194,26 +239,29 @@ class TestExportImport(DirectoriesMixin, TestCase):
                         self.target,
                         element[document_exporter.EXPORTER_ARCHIVE_NAME],
                     )
-                    self.assertTrue(os.path.exists(fname))
+                    self.assertIsFile(fname)
 
                     with open(fname, "rb") as f:
                         checksum = hashlib.md5(f.read()).hexdigest()
                     self.assertEqual(checksum, element["fields"]["archive_checksum"])
 
-            elif element["model"] == "documents.comment":
-                self.assertEqual(element["fields"]["comment"], self.comment.comment)
+            elif element["model"] == "documents.note":
+                self.assertEqual(element["fields"]["note"], self.note.note)
                 self.assertEqual(element["fields"]["document"], self.d1.id)
                 self.assertEqual(element["fields"]["user"], self.user.id)
 
-        with paperless_environment() as dirs:
+        with paperless_environment():
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             Correspondent.objects.all().delete()
             DocumentType.objects.all().delete()
             Tag.objects.all().delete()
+            Permission.objects.all().delete()
+            UserObjectPermission.objects.all().delete()
+            GroupObjectPermission.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
 
-            call_command("document_importer", self.target)
+            call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)
             self.assertEqual(Tag.objects.count(), 1)
             self.assertEqual(Correspondent.objects.count(), 1)
@@ -223,6 +271,9 @@ class TestExportImport(DirectoriesMixin, TestCase):
             self.assertEqual(Document.objects.get(id=self.d2.id).title, "wow2")
             self.assertEqual(Document.objects.get(id=self.d3.id).title, "wow2")
             self.assertEqual(Document.objects.get(id=self.d4.id).title, "wow_dec")
+            self.assertEqual(GroupObjectPermission.objects.count(), 1)
+            self.assertEqual(UserObjectPermission.objects.count(), 1)
+            self.assertEqual(Permission.objects.count(), num_permission_objects)
             messages = check_sanity()
             # everything is alright after the test
             self.assertEqual(len(messages), 0)
@@ -247,29 +298,29 @@ class TestExportImport(DirectoriesMixin, TestCase):
         )
 
         self._do_export()
-        self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
+        self.assertIsFile(os.path.join(self.target, "manifest.json"))
 
         st_mtime_1 = os.stat(os.path.join(self.target, "manifest.json")).st_mtime
 
         with mock.patch(
-            "documents.management.commands.document_exporter.shutil.copy2",
+            "documents.management.commands.document_exporter.copy_file_with_basic_stats",
         ) as m:
             self._do_export()
             m.assert_not_called()
 
-        self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
+        self.assertIsFile(os.path.join(self.target, "manifest.json"))
         st_mtime_2 = os.stat(os.path.join(self.target, "manifest.json")).st_mtime
 
         Path(self.d1.source_path).touch()
 
         with mock.patch(
-            "documents.management.commands.document_exporter.shutil.copy2",
+            "documents.management.commands.document_exporter.copy_file_with_basic_stats",
         ) as m:
             self._do_export()
             self.assertEqual(m.call_count, 1)
 
         st_mtime_3 = os.stat(os.path.join(self.target, "manifest.json")).st_mtime
-        self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
+        self.assertIsFile(os.path.join(self.target, "manifest.json"))
 
         self.assertNotEqual(st_mtime_1, st_mtime_2)
         self.assertNotEqual(st_mtime_2, st_mtime_3)
@@ -283,26 +334,26 @@ class TestExportImport(DirectoriesMixin, TestCase):
 
         self._do_export()
 
-        self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
+        self.assertIsFile(os.path.join(self.target, "manifest.json"))
 
         with mock.patch(
-            "documents.management.commands.document_exporter.shutil.copy2",
+            "documents.management.commands.document_exporter.copy_file_with_basic_stats",
         ) as m:
             self._do_export()
             m.assert_not_called()
 
-        self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
+        self.assertIsFile(os.path.join(self.target, "manifest.json"))
 
         self.d2.checksum = "asdfasdgf3"
         self.d2.save()
 
         with mock.patch(
-            "documents.management.commands.document_exporter.shutil.copy2",
+            "documents.management.commands.document_exporter.copy_file_with_basic_stats",
         ) as m:
             self._do_export(compare_checksums=True)
             self.assertEqual(m.call_count, 1)
 
-        self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
+        self.assertIsFile(os.path.join(self.target, "manifest.json"))
 
     def test_update_export_deleted_document(self):
         shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
@@ -315,10 +366,8 @@ class TestExportImport(DirectoriesMixin, TestCase):
 
         self.assertTrue(len(manifest), 7)
         doc_from_manifest = self._get_document_from_manifest(manifest, self.d3.id)
-        self.assertTrue(
-            os.path.isfile(
-                os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME]),
-            ),
+        self.assertIsFile(
+            os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME]),
         )
         self.d3.delete()
 
@@ -329,17 +378,13 @@ class TestExportImport(DirectoriesMixin, TestCase):
             manifest,
             self.d3.id,
         )
-        self.assertTrue(
-            os.path.isfile(
-                os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME]),
-            ),
+        self.assertIsFile(
+            os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME]),
         )
 
         manifest = self._do_export(delete=True)
-        self.assertFalse(
-            os.path.isfile(
-                os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME]),
-            ),
+        self.assertIsNotFile(
+            os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME]),
         )
 
         self.assertTrue(len(manifest), 6)
@@ -352,25 +397,24 @@ class TestExportImport(DirectoriesMixin, TestCase):
             os.path.join(self.dirs.media_dir, "documents"),
         )
 
-        m = self._do_export(use_filename_format=True)
-        self.assertTrue(os.path.isfile(os.path.join(self.target, "wow1", "c.pdf")))
+        self._do_export(use_filename_format=True)
+        self.assertIsFile(os.path.join(self.target, "wow1", "c.pdf"))
 
-        self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
+        self.assertIsFile(os.path.join(self.target, "manifest.json"))
 
         self.d1.title = "new_title"
         self.d1.save()
         self._do_export(use_filename_format=True, delete=True)
-        self.assertFalse(os.path.isfile(os.path.join(self.target, "wow1", "c.pdf")))
-        self.assertFalse(os.path.isdir(os.path.join(self.target, "wow1")))
-        self.assertTrue(os.path.isfile(os.path.join(self.target, "new_title", "c.pdf")))
-        self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
-        self.assertTrue(os.path.isfile(os.path.join(self.target, "wow2", "none.pdf")))
-        self.assertTrue(
-            os.path.isfile(os.path.join(self.target, "wow2", "none_01.pdf")),
+        self.assertIsNotFile(os.path.join(self.target, "wow1", "c.pdf"))
+        self.assertIsNotDir(os.path.join(self.target, "wow1"))
+        self.assertIsFile(os.path.join(self.target, "new_title", "c.pdf"))
+        self.assertIsFile(os.path.join(self.target, "manifest.json"))
+        self.assertIsFile(os.path.join(self.target, "wow2", "none.pdf"))
+        self.assertIsFile(
+            os.path.join(self.target, "wow2", "none_01.pdf"),
         )
 
     def test_export_missing_files(self):
-
         target = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, target)
         Document.objects.create(
@@ -407,7 +451,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
             f"export-{timezone.localdate().isoformat()}.zip",
         )
 
-        self.assertTrue(os.path.isfile(expected_file))
+        self.assertIsFile(expected_file)
 
         with ZipFile(expected_file) as zip:
             self.assertEqual(len(zip.namelist()), 11)
@@ -444,11 +488,59 @@ class TestExportImport(DirectoriesMixin, TestCase):
             f"export-{timezone.localdate().isoformat()}.zip",
         )
 
-        self.assertTrue(os.path.isfile(expected_file))
+        self.assertIsFile(expected_file)
 
         with ZipFile(expected_file) as zip:
             # Extras are from the directories, which also appear in the listing
             self.assertEqual(len(zip.namelist()), 14)
+            self.assertIn("manifest.json", zip.namelist())
+            self.assertIn("version.json", zip.namelist())
+
+    @override_settings(PASSPHRASE="test")
+    def test_export_zipped_with_delete(self):
+        """
+        GIVEN:
+            - Request to export documents to zipfile
+            - There is one existing file in the target
+            - There is one existing directory in the target
+        WHEN:
+            - Documents are exported
+            - deletion of existing files is requested
+        THEN:
+            - Zipfile is created
+            - Zipfile contains exported files
+            - The existing file and directory in target are removed
+        """
+        shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
+        shutil.copytree(
+            os.path.join(os.path.dirname(__file__), "samples", "documents"),
+            os.path.join(self.dirs.media_dir, "documents"),
+        )
+
+        # Create stuff in target directory
+        existing_file = self.target / "test.txt"
+        existing_file.touch()
+        existing_dir = self.target / "somedir"
+        existing_dir.mkdir(parents=True)
+
+        self.assertIsFile(existing_file)
+        self.assertIsDir(existing_dir)
+
+        args = ["document_exporter", self.target, "--zip", "--delete"]
+
+        call_command(*args)
+
+        expected_file = os.path.join(
+            self.target,
+            f"export-{timezone.localdate().isoformat()}.zip",
+        )
+
+        self.assertIsFile(expected_file)
+        self.assertIsNotFile(existing_file)
+        self.assertIsNotDir(existing_dir)
+
+        with ZipFile(expected_file) as zip:
+            self.assertEqual(len(zip.namelist()), 11)
             self.assertIn("manifest.json", zip.namelist())
             self.assertIn("version.json", zip.namelist())
 
@@ -464,7 +556,6 @@ class TestExportImport(DirectoriesMixin, TestCase):
         args = ["document_exporter", "/tmp/foo/bar"]
 
         with self.assertRaises(CommandError) as e:
-
             call_command(*args)
 
             self.assertEqual("That path isn't a directory", str(e))
@@ -480,11 +571,9 @@ class TestExportImport(DirectoriesMixin, TestCase):
         """
 
         with tempfile.NamedTemporaryFile() as tmp_file:
-
             args = ["document_exporter", tmp_file.name]
 
             with self.assertRaises(CommandError) as e:
-
                 call_command(*args)
 
                 self.assertEqual("That path isn't a directory", str(e))
@@ -499,13 +588,11 @@ class TestExportImport(DirectoriesMixin, TestCase):
             - Error is raised
         """
         with tempfile.TemporaryDirectory() as tmp_dir:
-
             os.chmod(tmp_dir, 0o000)
 
             args = ["document_exporter", tmp_dir]
 
             with self.assertRaises(CommandError) as e:
-
                 call_command(*args)
 
                 self.assertEqual("That path doesn't appear to be writable", str(e))
@@ -544,11 +631,11 @@ class TestExportImport(DirectoriesMixin, TestCase):
                 )
         self.assertFalse(has_archive)
 
-        with paperless_environment() as dirs:
+        with paperless_environment():
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", self.target)
+            call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)
 
     def test_no_thumbnail(self):
@@ -587,11 +674,11 @@ class TestExportImport(DirectoriesMixin, TestCase):
                 )
         self.assertFalse(has_thumbnail)
 
-        with paperless_environment() as dirs:
+        with paperless_environment():
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", self.target)
+            call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)
 
     def test_split_manifest(self):
@@ -616,12 +703,15 @@ class TestExportImport(DirectoriesMixin, TestCase):
             has_document = has_document or element["model"] == "documents.document"
         self.assertFalse(has_document)
 
-        with paperless_environment() as dirs:
+        with paperless_environment():
             self.assertEqual(Document.objects.count(), 4)
+            self.assertEqual(CustomFieldInstance.objects.count(), 1)
             Document.objects.all().delete()
+            CustomFieldInstance.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", self.target)
+            call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)
+            self.assertEqual(CustomFieldInstance.objects.count(), 1)
 
     def test_folder_prefix(self):
         """
@@ -638,11 +728,69 @@ class TestExportImport(DirectoriesMixin, TestCase):
             os.path.join(self.dirs.media_dir, "documents"),
         )
 
-        manifest = self._do_export(use_folder_prefix=True)
+        self._do_export(use_folder_prefix=True)
 
-        with paperless_environment() as dirs:
+        with paperless_environment():
             self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             self.assertEqual(Document.objects.count(), 0)
-            call_command("document_importer", self.target)
+            call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)
+
+    def test_import_db_transaction_failed(self):
+        """
+        GIVEN:
+            - Import from manifest started
+        WHEN:
+            - Import of database fails
+        THEN:
+            - ContentType & Permission objects are not deleted, db transaction rolled back
+        """
+
+        shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
+        shutil.copytree(
+            os.path.join(os.path.dirname(__file__), "samples", "documents"),
+            os.path.join(self.dirs.media_dir, "documents"),
+        )
+
+        num_content_type_objects = ContentType.objects.count()
+        num_permission_objects = Permission.objects.count()
+
+        manifest = self._do_export()
+
+        with paperless_environment():
+            self.assertEqual(
+                len(list(filter(lambda e: e["model"] == "auth.permission", manifest))),
+                num_permission_objects,
+            )
+            # add 1 more to db to show objects are not re-created by import
+            Permission.objects.create(
+                name="test",
+                codename="test_perm",
+                content_type_id=1,
+            )
+            self.assertEqual(Permission.objects.count(), num_permission_objects + 1)
+
+            # will cause an import error
+            self.user.delete()
+            self.user = User.objects.create(username="temp_admin")
+
+            with self.assertRaises(IntegrityError):
+                call_command("document_importer", "--no-progress-bar", self.target)
+
+            self.assertEqual(ContentType.objects.count(), num_content_type_objects)
+            self.assertEqual(Permission.objects.count(), num_permission_objects + 1)
+
+    def test_exporter_with_auditlog_disabled(self):
+        shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
+        shutil.copytree(
+            os.path.join(os.path.dirname(__file__), "samples", "documents"),
+            os.path.join(self.dirs.media_dir, "documents"),
+        )
+
+        with override_settings(
+            AUDIT_LOG_ENABLED=False,
+        ):
+            manifest = self._do_export(use_filename_format=True)
+            for obj in manifest:
+                self.assertNotEqual(obj["model"], "auditlog.logentry")

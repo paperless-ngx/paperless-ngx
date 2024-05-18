@@ -1,21 +1,27 @@
+import importlib
 import shutil
 import tempfile
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Callable
-from typing import Iterable
 from typing import Union
 from unittest import mock
 
 from django.test import override_settings
+
 from documents.tests.utils import TestMigrations
+
+# https://github.com/python/cpython/issues/100950
+migration_1021_obj = importlib.import_module(
+    "documents.migrations.1021_webp_thumbnail_conversion",
+)
 
 
 @mock.patch(
-    "documents.migrations.1021_webp_thumbnail_conversion.multiprocessing.pool.Pool.map",
+    f"{__name__}.migration_1021_obj.multiprocessing.pool.Pool.map",
 )
-@mock.patch("documents.migrations.1021_webp_thumbnail_conversion.run_convert")
+@mock.patch(f"{__name__}.migration_1021_obj.run_convert")
 class TestMigrateWebPThumbnails(TestMigrations):
-
     migrate_from = "1020_merge_20220518_1839"
     migrate_to = "1021_webp_thumbnail_conversion"
     auto_migrate = False
@@ -104,13 +110,11 @@ class TestMigrateWebPThumbnails(TestMigrations):
         self.assert_file_count_by_extension("webp", dir, expected_count)
 
     def setUp(self):
-
         self.thumbnail_dir = Path(tempfile.mkdtemp()).resolve()
 
         return super().setUp()
 
     def tearDown(self) -> None:
-
         shutil.rmtree(self.thumbnail_dir)
 
         return super().tearDown()
@@ -133,7 +137,6 @@ class TestMigrateWebPThumbnails(TestMigrations):
         with override_settings(
             THUMBNAIL_DIR=self.thumbnail_dir,
         ):
-
             self.create_webp_thumbnail_files(self.thumbnail_dir, 3)
 
             self.performMigration()
@@ -188,7 +191,6 @@ class TestMigrateWebPThumbnails(TestMigrations):
         with override_settings(
             THUMBNAIL_DIR=self.thumbnail_dir,
         ):
-
             self.create_png_thumbnail_file(self.thumbnail_dir, 3)
 
             self.performMigration()
@@ -217,7 +219,6 @@ class TestMigrateWebPThumbnails(TestMigrations):
         with override_settings(
             THUMBNAIL_DIR=self.thumbnail_dir,
         ):
-
             self.create_png_thumbnail_file(self.thumbnail_dir, 3)
             self.create_webp_thumbnail_files(self.thumbnail_dir, 2, start_count=3)
 

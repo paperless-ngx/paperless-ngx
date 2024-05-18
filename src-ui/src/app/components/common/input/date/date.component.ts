@@ -1,8 +1,16 @@
-import { Component, forwardRef, Input, OnInit } from '@angular/core'
+import {
+  Component,
+  EventEmitter,
+  forwardRef,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core'
 import { NG_VALUE_ACCESSOR } from '@angular/forms'
 import {
   NgbDateAdapter,
   NgbDateParserFormatter,
+  NgbDateStruct,
 } from '@ng-bootstrap/ng-bootstrap'
 import { SettingsService } from 'src/app/services/settings.service'
 import { AbstractInputComponent } from '../abstract-input'
@@ -15,7 +23,7 @@ import { AbstractInputComponent } from '../abstract-input'
       multi: true,
     },
   ],
-  selector: 'app-input-date',
+  selector: 'pngx-input-date',
   templateUrl: './date.component.html',
   styleUrls: ['./date.component.scss'],
 })
@@ -33,6 +41,12 @@ export class DateComponent
 
   @Input()
   suggestions: string[]
+
+  @Input()
+  showFilter: boolean = false
+
+  @Output()
+  filterDocuments = new EventEmitter<NgbDateStruct[]>()
 
   getSuggestions() {
     return this.suggestions == null
@@ -76,8 +90,20 @@ export class DateComponent
   }
 
   onKeyPress(event: KeyboardEvent) {
-    if ('Enter' !== event.key && !/[0-9,\.\/-]+/.test(event.key)) {
+    if (
+      'Enter' !== event.key &&
+      !(event.altKey || event.metaKey || event.ctrlKey) &&
+      !/[0-9,\.\/-]+/.test(event.key)
+    ) {
       event.preventDefault()
     }
+  }
+
+  onFilterDocuments() {
+    this.filterDocuments.emit([this.ngbDateParserFormatter.parse(this.value)])
+  }
+
+  get filterButtonTitle() {
+    return $localize`Filter documents with this ${this.title}`
   }
 }

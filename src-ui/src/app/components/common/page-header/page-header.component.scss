@@ -1,0 +1,9 @@
+h3 {
+    min-height: calc(1.325rem + 0.9vw);
+}
+
+@media (min-width: 1200px) {
+    h3 {
+        min-height: 2.8rem;
+    }
+}

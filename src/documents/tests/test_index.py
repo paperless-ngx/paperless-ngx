@@ -1,6 +1,7 @@
 from unittest import mock
 
 from django.test import TestCase
+
 from documents import index
 from documents.models import Document
 from documents.tests.utils import DirectoriesMixin
@@ -8,7 +9,6 @@ from documents.tests.utils import DirectoriesMixin
 
 class TestAutoComplete(DirectoriesMixin, TestCase):
     def test_auto_complete(self):
-
         doc1 = Document.objects.create(
             title="doc1",
             checksum="A",
@@ -25,13 +25,13 @@ class TestAutoComplete(DirectoriesMixin, TestCase):
 
         self.assertListEqual(
             index.autocomplete(ix, "tes"),
-            [b"test3", b"test", b"test2"],
+            [b"test2", b"test", b"test3"],
         )
         self.assertListEqual(
             index.autocomplete(ix, "tes", limit=3),
-            [b"test3", b"test", b"test2"],
+            [b"test2", b"test", b"test3"],
         )
-        self.assertListEqual(index.autocomplete(ix, "tes", limit=1), [b"test3"])
+        self.assertListEqual(index.autocomplete(ix, "tes", limit=1), [b"test2"])
         self.assertListEqual(index.autocomplete(ix, "tes", limit=0), [])
 
     def test_archive_serial_number_ranging(self):

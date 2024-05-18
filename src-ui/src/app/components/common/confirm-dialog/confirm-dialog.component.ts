@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { interval, Subject, switchMap, take } from 'rxjs'
+import { interval, Subject, take } from 'rxjs'
 
 @Component({
-  selector: 'app-confirm-dialog',
+  selector: 'pngx-confirm-dialog',
   templateUrl: './confirm-dialog.component.html',
   styleUrls: ['./confirm-dialog.component.scss'],
 })
@@ -36,6 +36,12 @@ export class ConfirmDialogComponent {
 
   @Input()
   alternativeBtnCaption
+
+  @Input()
+  cancelBtnClass = 'btn-outline-secondary'
+
+  @Input()
+  cancelBtnCaption = $localize`Cancel`
 
   @Input()
   buttonsEnabled = true

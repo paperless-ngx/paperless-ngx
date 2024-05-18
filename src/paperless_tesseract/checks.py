@@ -3,8 +3,8 @@ import subprocess
 
 from django.conf import settings
 from django.core.checks import Error
-from django.core.checks import register
 from django.core.checks import Warning
+from django.core.checks import register
 
 
 def get_tesseract_langs():

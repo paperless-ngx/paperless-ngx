@@ -1,37 +1,66 @@
-<div class="mb-3 paperless-input-select">
-  <label class="form-label" [for]="inputId">{{title}}</label>
-    <div [class.input-group]="allowCreateNew">
-      <ng-select name="inputId" [(ngModel)]="value"
-        [disabled]="disabled"
-        [style.color]="textColor"
-        [style.background]="backgroundColor"
-        [clearable]="allowNull"
-        [items]="items"
-        [addTag]="allowCreateNew && addItemRef"
-        addTagText="Add item"
-        i18n-addTagText="Used for both types, correspondents, storage paths"
-        [placeholder]="placeholder"
-        bindLabel="name"
-        bindValue="id"
-        (change)="onChange(value)"
-        (search)="onSearch($event)"
-        (focus)="clearLastSearchTerm()"
-        (clear)="clearLastSearchTerm()"
-        (blur)="onBlur()">
-      </ng-select>
-      <button *ngIf="allowCreateNew" class="btn btn-outline-secondary" type="button" (click)="addItem()">
-        <svg class="buttonicon" fill="currentColor">
-          <use xlink:href="assets/bootstrap-icons.svg#plus" />
-        </svg>
-      </button>
+<div class="mb-3 paperless-input-select" [class.disabled]="disabled">
+  <div class="row">
+    <div class="d-flex align-items-center position-relative hidden-button-container" [class.col-md-3]="horizontal">
+      @if (title) {
+        <label class="form-label" [class.mb-md-0]="horizontal" [for]="inputId">{{title}}</label>
+      }
+      @if (removable) {
+        <button type="button" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
+          <i-bs  name="x"></i-bs>&nbsp;<ng-container i18n>Remove</ng-container>
+          </button>
+        }
+      </div>
+      <div [class.col-md-9]="horizontal">
+        <div [class.input-group]="allowCreateNew || showFilter" [class.is-invalid]="error">
+          <ng-select name="inputId" [(ngModel)]="value"
+            [disabled]="disabled"
+            [style.color]="textColor"
+            [style.background]="backgroundColor"
+            [class.private]="isPrivate"
+            [clearable]="allowNull"
+            [items]="items"
+            [addTag]="allowCreateNew && addItemRef"
+            addTagText="Add item"
+            i18n-addTagText="Used for both types, correspondents, storage paths"
+            [placeholder]="placeholder"
+            [notFoundText]="notFoundText"
+            [multiple]="multiple"
+            [bindLabel]="bindLabel"
+            bindValue="id"
+            (change)="onChange(value)"
+            (search)="onSearch($event)"
+            (focus)="clearLastSearchTerm()"
+            (clear)="clearLastSearchTerm()"
+            (blur)="onBlur()">
+            <ng-template ng-option-tmp let-item="item">
+                <span [title]="item[bindLabel]">{{item[bindLabel]}}</span>
+            </ng-template>
+          </ng-select>
+          @if (allowCreateNew && !hideAddButton) {
+            <button class="btn btn-outline-secondary" type="button" (click)="addItem()" [disabled]="disabled">
+              <i-bs width="1.2em" height="1.2em" name="plus"></i-bs>
+            </button>
+          }
+          @if (showFilter) {
+            <button class="btn btn-outline-secondary" type="button" (click)="onFilterDocuments()" [disabled]="isPrivate || this.value === null" title="{{ filterButtonTitle }}">
+              <i-bs width="1.2em" height="1.2em" name="filter"></i-bs>
+            </button>
+          }
+        </div>
+        <div class="invalid-feedback">
+          {{error}}
+        </div>
+        @if (hint) {
+          <small class="form-text text-muted">{{hint}}</small>
+        }
+        @if (getSuggestions().length > 0) {
+          <small>
+            <span i18n>Suggestions:</span>&nbsp;
+            @for (s of getSuggestions(); track s) {
+              <a (click)="value = s.id; onChange(value)" [routerLink]="[]">{{s.name}}</a>&nbsp;
+            }
+          </small>
+        }
+      </div>
     </div>
-  <small *ngIf="hint" class="form-text text-muted">{{hint}}</small>
-  <small *ngIf="getSuggestions().length > 0">
-    <span i18n>Suggestions:</span>&nbsp;
-    <ng-container *ngFor="let s of getSuggestions()">
-      <a (click)="value = s.id; onChange(value)" [routerLink]="[]">{{s.name}}</a>&nbsp;
-    </ng-container>
-
-
-  </small>
-</div>
+  </div>

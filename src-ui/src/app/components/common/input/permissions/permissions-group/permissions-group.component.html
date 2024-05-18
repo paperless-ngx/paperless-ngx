@@ -1,0 +1,13 @@
+<div class="paperless-input-select" [class.disabled]="disabled">
+    <div>
+      <ng-select name="inputId" [(ngModel)]="value"
+        [disabled]="disabled"
+        clearable="true"
+        [items]="groups"
+        multiple="true"
+        bindLabel="name"
+        bindValue="id"
+        (change)="onChange(value)">
+      </ng-select>
+    </div>
+</div>

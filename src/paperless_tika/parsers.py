@@ -1,13 +1,17 @@
-import os
 from pathlib import Path
 
-import dateutil.parser
-import requests
+import httpx
 from django.conf import settings
+from django.utils import timezone
+from gotenberg_client import GotenbergClient
+from gotenberg_client.options import PdfAFormat
+from tika_client import TikaClient
+
 from documents.parsers import DocumentParser
-from documents.parsers import make_thumbnail_from_pdf
 from documents.parsers import ParseError
-from tika import parser
+from documents.parsers import make_thumbnail_from_pdf
+from paperless.config import OutputTypeConfig
+from paperless.models import OutputTypeChoices
 
 
 class TikaDocumentParser(DocumentParser):
@@ -28,94 +32,96 @@ class TikaDocumentParser(DocumentParser):
         )
 
     def extract_metadata(self, document_path, mime_type):
-        tika_server = settings.TIKA_ENDPOINT
-
-        # tika does not support a PathLike, only strings
-        # ensure this is a string
-        document_path = str(document_path)
-
         try:
-            parsed = parser.from_file(document_path, tika_server)
+            with TikaClient(tika_url=settings.TIKA_ENDPOINT) as client:
+                parsed = client.metadata.from_file(document_path, mime_type)
+                return [
+                    {
+                        "namespace": "",
+                        "prefix": "",
+                        "key": key,
+                        "value": parsed.data[key],
+                    }
+                    for key in parsed.data
+                ]
         except Exception as e:
-            self.log(
-                "warning",
-                f"Error while fetching document metadata for " f"{document_path}: {e}",
+            self.log.warning(
+                f"Error while fetching document metadata for {document_path}: {e}",
             )
             return []
 
-        return [
-            {
-                "namespace": "",
-                "prefix": "",
-                "key": key,
-                "value": parsed["metadata"][key],
-            }
-            for key in parsed["metadata"]
-        ]
-
-    def parse(self, document_path: Path, mime_type, file_name=None):
-        self.log("info", f"Sending {document_path} to Tika server")
-        tika_server = settings.TIKA_ENDPOINT
-
-        # tika does not support a PathLike, only strings
-        # ensure this is a string
-        document_path = str(document_path)
+    def parse(self, document_path: Path, mime_type: str, file_name=None):
+        self.log.info(f"Sending {document_path} to Tika server")
 
         try:
-            parsed = parser.from_file(document_path, tika_server)
+            with TikaClient(tika_url=settings.TIKA_ENDPOINT) as client:
+                try:
+                    parsed = client.tika.as_text.from_file(document_path, mime_type)
+                except httpx.HTTPStatusError as err:
+                    # Workaround https://issues.apache.org/jira/browse/TIKA-4110
+                    # Tika fails with some files as multi-part form data
+                    if err.response.status_code == httpx.codes.INTERNAL_SERVER_ERROR:
+                        parsed = client.tika.as_text.from_buffer(
+                            document_path.read_bytes(),
+                            mime_type,
+                        )
+                    else:  # pragma: no cover
+                        raise
         except Exception as err:
             raise ParseError(
                 f"Could not parse {document_path} with tika server at "
-                f"{tika_server}: {err}",
+                f"{settings.TIKA_ENDPOINT}: {err}",
             ) from err
 
-        self.text = parsed["content"].strip()
+        self.text = parsed.content
+        if self.text is not None:
+            self.text = self.text.strip()
 
-        try:
-            self.date = dateutil.parser.isoparse(parsed["metadata"]["Creation-Date"])
-        except Exception as e:
-            self.log(
-                "warning",
-                f"Unable to extract date for document " f"{document_path}: {e}",
-            )
+        self.date = parsed.created
+        if self.date is not None and timezone.is_naive(self.date):
+            self.date = timezone.make_aware(self.date)
 
         self.archive_path = self.convert_to_pdf(document_path, file_name)
 
-    def convert_to_pdf(self, document_path, file_name):
-        pdf_path = os.path.join(self.tempdir, "convert.pdf")
-        gotenberg_server = settings.TIKA_GOTENBERG_ENDPOINT
-        url = gotenberg_server + "/forms/libreoffice/convert"
+    def convert_to_pdf(self, document_path: Path, file_name):
+        pdf_path = Path(self.tempdir) / "convert.pdf"
 
-        self.log("info", f"Converting {document_path} to PDF as {pdf_path}")
-        with open(document_path, "rb") as document_handle:
-            files = {
-                "files": (
-                    "convert" + os.path.splitext(document_path)[-1],
-                    document_handle,
-                ),
-            }
-            headers = {}
-            data = {}
+        self.log.info(f"Converting {document_path} to PDF as {pdf_path}")
 
+        with (
+            GotenbergClient(
+                host=settings.TIKA_GOTENBERG_ENDPOINT,
+                timeout=settings.CELERY_TASK_TIME_LIMIT,
+            ) as client,
+            client.libre_office.to_pdf() as route,
+        ):
             # Set the output format of the resulting PDF
-            # Valid inputs: https://gotenberg.dev/docs/modules/pdf-engines#uno
-            if settings.OCR_OUTPUT_TYPE in {"pdfa", "pdfa-2"}:
-                data["pdfFormat"] = "PDF/A-2b"
-            elif settings.OCR_OUTPUT_TYPE == "pdfa-1":
-                data["pdfFormat"] = "PDF/A-1a"
-            elif settings.OCR_OUTPUT_TYPE == "pdfa-3":
-                data["pdfFormat"] = "PDF/A-3b"
+            if settings.OCR_OUTPUT_TYPE in {
+                OutputTypeChoices.PDF_A,
+                OutputTypeChoices.PDF_A2,
+            }:
+                route.pdf_format(PdfAFormat.A2b)
+            elif settings.OCR_OUTPUT_TYPE == OutputTypeChoices.PDF_A1:
+                route.pdf_format(PdfAFormat.A1a)
+            elif settings.OCR_OUTPUT_TYPE == OutputTypeChoices.PDF_A3:
+                route.pdf_format(PdfAFormat.A3b)
+
+            route.convert(document_path)
 
             try:
-                response = requests.post(url, files=files, headers=headers, data=data)
-                response.raise_for_status()  # ensure we notice bad responses
+                response = route.run()
+
+                pdf_path.write_bytes(response.content)
+
+                return pdf_path
+
             except Exception as err:
                 raise ParseError(
                     f"Error while converting document to PDF: {err}",
                 ) from err
 
-        with open(pdf_path, "wb") as file:
-            file.write(response.content)
-            file.close()
-
-        return pdf_path
+    def get_settings(self) -> OutputTypeConfig:
+        """
+        This parser only uses the PDF output type configuration currently
+        """
+        return OutputTypeConfig()

@@ -1,0 +1,26 @@
+<div class="mb-3" [class.pb-3]="error">
+  <div class="row">
+    <div class="d-flex align-items-center position-relative hidden-button-container" [class.col-md-3]="horizontal">
+      <label class="form-label" [class.mb-md-0]="horizontal" [for]="inputId">{{title}}</label>
+      @if (removable) {
+        <button type="button" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
+          <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Remove</ng-container>
+        </button>
+      }
+    </div>
+    <div [class.col-md-9]="horizontal">
+      <div class="input-group" [class.is-invalid]="error">
+        <input #inputField type="url" class="form-control" [class.is-invalid]="error" placeholder="https://" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [disabled]="disabled">
+        <a class="btn btn-outline-secondary rounded-end" title="Open link" i18n-title [href]="value" target="_blank">
+          <i-bs width="1.2em" height="1.2em" name="box-arrow-up-right"></i-bs>
+        </a>
+        <div class="invalid-feedback position-absolute top-100">
+          {{error}}
+        </div>
+      </div>
+      @if (hint) {
+        <small class="form-text text-muted" [innerHTML]="hint | safeHtml"></small>
+      }
+    </div>
+  </div>
+</div>

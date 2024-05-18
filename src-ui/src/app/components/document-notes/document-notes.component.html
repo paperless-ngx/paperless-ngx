@@ -1,0 +1,33 @@
+@if (notes) {
+  <div>
+    <form [formGroup]="noteForm" class="needs-validation mt-3" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Note }" novalidate>
+      <div class="form-group">
+        <textarea class="form-control form-control-sm" [class.is-invalid]="newNoteError" rows="3" formControlName="newNote" placeholder="Enter note" i18n-placeholder (keydown)="noteFormKeydown($event)" required></textarea>
+        <div class="invalid-feedback" i18n>
+                Please enter a note.
+            </div>
+      </div>
+      <div class="form-group mt-2 d-flex justify-content-end align-items-center">
+        @if (networkActive) {
+          <div class="spinner-border spinner-border-sm fw-normal me-auto" role="status"></div>
+        }
+        <button type="button" class="btn btn-primary btn-sm" [disabled]="networkActive || addDisabled" (click)="addNote()" i18n>Add note</button>
+      </div>
+    </form>
+    <hr>
+      @for (note of notes; track note) {
+        <div class="card border mb-3">
+          <div class="card-body text-dark">
+            <p class="card-text">{{note.note}}</p>
+          </div>
+          <div class="d-flex card-footer small bg-light text-primary justify-content-between align-items-center">
+            <span>{{displayName(note)}} - {{ note.created | customDate}}</span>
+            <button type="button" class="btn btn-link btn-sm p-0 fade" title="Delete note" i18n-title (click)="deleteNote(note.id)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Note }">
+              <i-bs name="trash"></i-bs>
+              <span class="visually-hidden" i18n>Delete note</span>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }

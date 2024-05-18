@@ -8,11 +8,14 @@ import { environment } from 'src/environments/environment'
 export abstract class AbstractPaperlessService<T extends ObjectWithId> {
   protected baseUrl: string = environment.apiBaseUrl
 
-  constructor(protected http: HttpClient, private resourceName: string) {}
+  constructor(
+    protected http: HttpClient,
+    protected resourceName: string
+  ) {}
 
-  protected getResourceUrl(id?: number, action?: string): string {
+  protected getResourceUrl(id: number = null, action: string = null): string {
     let url = `${this.baseUrl}${this.resourceName}/`
-    if (id) {
+    if (id !== null) {
       url += `${id}/`
     }
     if (action) {
@@ -86,6 +89,19 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
     return this.listAll().pipe(
       map((list) => ids.map((id) => list.results.find((o) => o.id == id)))
     )
+  }
+
+  getFew(ids: number[], extraParams?): Observable<Results<T>> {
+    let httpParams = new HttpParams()
+    httpParams = httpParams.set('id__in', ids.join(','))
+    for (let extraParamKey in extraParams) {
+      if (extraParams[extraParamKey] != null) {
+        httpParams = httpParams.set(extraParamKey, extraParams[extraParamKey])
+      }
+    }
+    return this.http.get<Results<T>>(this.getResourceUrl(), {
+      params: httpParams,
+    })
   }
 
   clearCache() {

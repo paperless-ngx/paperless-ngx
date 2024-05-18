@@ -3,7 +3,7 @@ import { Title } from '@angular/platform-browser'
 import { environment } from 'src/environments/environment'
 
 @Component({
-  selector: 'app-page-header',
+  selector: 'pngx-page-header',
   templateUrl: './page-header.component.html',
   styleUrls: ['./page-header.component.scss'],
 })
@@ -24,4 +24,10 @@ export class PageHeaderComponent {
 
   @Input()
   subTitle: string = ''
+
+  @Input()
+  info: string
+
+  @Input()
+  infoLink: string
 }

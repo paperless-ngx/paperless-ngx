@@ -1,0 +1,28 @@
+::ng-deep .popover {
+    max-width: 350px;
+
+    pre {
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+}
+
+pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.result {
+    cursor: pointer;
+}
+
+.btn .spinner-border-sm {
+    width: 0.8rem;
+    height: 0.8rem;
+}
+
+@media (max-width: 575.98px) {
+    .name-col {
+        max-width: 150px;
+    }
+}

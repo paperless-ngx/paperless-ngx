@@ -5,17 +5,19 @@
 Multiple options exist for making backups of your paperless instance,
 depending on how you installed paperless.
 
-Before making backups, make sure that paperless is not running.
+Before making a backup, it's probably best to make sure that paperless is not actively
+consuming documents at that time.
 
 Options available to any installation of paperless:
 
-- Use the [document exporter](#exporter). The document exporter exports all your documents,
-  thumbnails and metadata to a specific folder. You may import your
-  documents into a fresh instance of paperless again or store your
-  documents in another DMS with this export.
-- The document exporter is also able to update an already existing
-  export. Therefore, incremental backups with `rsync` are entirely
-  possible.
+-   Use the [document exporter](#exporter). The document exporter exports all your documents,
+    thumbnails, metadata, and database contents to a specific folder. You may import your
+    documents and settings into a fresh instance of paperless again or store your
+    documents in another DMS with this export.
+
+    The document exporter is also able to update an already existing
+    export. Therefore, incremental backups with `rsync` are entirely
+    possible.
 
 !!! caution
 
@@ -25,30 +27,36 @@ Options available to any installation of paperless:
 
 Options available to docker installations:
 
-- Backup the docker volumes. These usually reside within
-  `/var/lib/docker/volumes` on the host and you need to be root in
-  order to access them.
+-   Backup the docker volumes. These usually reside within
+    `/var/lib/docker/volumes` on the host and you need to be root in
+    order to access them.
 
-  Paperless uses 4 volumes:
+    Paperless uses 4 volumes:
 
-  - `paperless_media`: This is where your documents are stored.
-  - `paperless_data`: This is where auxillary data is stored. This
-    folder also contains the SQLite database, if you use it.
-  - `paperless_pgdata`: Exists only if you use PostgreSQL and
-    contains the database.
-  - `paperless_dbdata`: Exists only if you use MariaDB and contains
-    the database.
+    -   `paperless_media`: This is where your documents are stored.
+    -   `paperless_data`: This is where auxiliary data is stored. This
+        folder also contains the SQLite database, if you use it.
+    -   `paperless_pgdata`: Exists only if you use PostgreSQL and
+        contains the database.
+    -   `paperless_dbdata`: Exists only if you use MariaDB and contains
+        the database.
 
 Options available to bare-metal and non-docker installations:
 
-- Backup the entire paperless folder. This ensures that if your
-  paperless instance crashes at some point or your disk fails, you can
-  simply copy the folder back into place and it works.
+-   Backup the entire paperless folder. This ensures that if your
+    paperless instance crashes at some point or your disk fails, you can
+    simply copy the folder back into place and it works.
 
-  When using PostgreSQL or MariaDB, you'll also have to backup the
-  database.
+    When using PostgreSQL or MariaDB, you'll also have to backup the
+    database.
 
 ### Restoring {#migrating-restoring}
+
+If you've backed-up Paperless-ngx using the [document exporter](#exporter),
+restoring can simply be done with the [document importer](#importer).
+
+Of course, other backup strategies require restoring any volumes, folders and database
+copies you created in the steps above.
 
 ## Updating Paperless {#updating}
 
@@ -59,34 +67,34 @@ you installed paperless-ngx in the first place. The releases are
 available at the [release
 page](https://github.com/paperless-ngx/paperless-ngx/releases).
 
-First of all, ensure that paperless is stopped.
+First of all, make sure no active processes (like consumption) are running, then [make a backup](#backup).
+
+After that, ensure that paperless is stopped:
 
 ```shell-session
 $ cd /path/to/paperless
-$ docker-compose down
+$ docker compose down
 ```
 
-After that, [make a backup](#backup).
+1.  If you pull the image from the docker hub, all you need to do is:
 
-1. If you pull the image from the docker hub, all you need to do is:
+    ```shell-session
+    $ docker compose pull
+    $ docker compose up
+    ```
 
-   ```shell-session
-   $ docker-compose pull
-   $ docker-compose up
-   ```
+    The Docker Compose files refer to the `latest` version, which is
+    always the latest stable release.
 
-   The docker-compose files refer to the `latest` version, which is
-   always the latest stable release.
+1.  If you built the image yourself, do the following:
 
-2. If you built the image yourself, do the following:
+    ```shell-session
+    $ git pull
+    $ docker compose build
+    $ docker compose up
+    ```
 
-   ```shell-session
-   $ git pull
-   $ docker-compose build
-   $ docker-compose up
-   ```
-
-Running `docker-compose up` will also apply any new database migrations.
+Running `docker compose up` will also apply any new database migrations.
 If you see everything working, press CTRL+C once to gracefully stop
 paperless. Then you can start paperless-ngx with `-d` to have it run in
 the background.
@@ -94,11 +102,11 @@ the background.
 !!! note
 
     In version 0.9.14, the update process was changed. In 0.9.13 and
-    earlier, the docker-compose files specified exact versions and pull
+    earlier, the Docker Compose files specified exact versions and pull
     won't automatically update to newer versions. In order to enable
     updates as described above, either get the new `docker-compose.yml`
     file from
-    [here](https://github.com/paperless-ngx/paperless-ngx/tree/master/docker/compose)
+    [here](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose)
     or edit the `docker-compose.yml` file, find the line that says
 
     ```
@@ -139,7 +147,7 @@ following:
 1.  Update dependencies. New paperless version may require additional
     dependencies. The dependencies required are listed in the section
     about
-    [bare metal installations](/setup#bare_metal).
+    [bare metal installations](setup.md#bare_metal).
 
 2.  Update python requirements. Keep in mind to activate your virtual
     environment before that, if you use one.
@@ -147,6 +155,13 @@ following:
     ```shell-session
     $ pip install -r requirements.txt
     ```
+
+    !!! note
+
+        At times, some dependencies will be removed from requirements.txt.
+        Comparing the versions and removing no longer needed dependencies
+        will keep your system or virtual environment clean and prevent
+        possible conflicts.
 
 3.  Migrate the database.
 
@@ -159,6 +174,16 @@ following:
 
     This might not actually do anything. Not every new paperless version
     comes with new database migrations.
+
+### Database Upgrades
+
+In general, paperless does not require a specific version of PostgreSQL or MariaDB and it is
+safe to update them to newer versions. However, you should always take a backup and follow
+the instructions from your database's documentation for how to upgrade between major versions.
+
+For PostgreSQL, refer to [Upgrading a PostgreSQL Cluster](https://www.postgresql.org/docs/current/upgrading.html).
+
+For MariaDB, refer to [Upgrading MariaDB](https://mariadb.com/kb/en/upgrading/)
 
 ## Downgrading Paperless {#downgrade-paperless}
 
@@ -195,11 +220,11 @@ Paperless comes with some management commands that perform various
 maintenance tasks on your paperless instance. You can invoke these
 commands in the following way:
 
-With docker-compose, while paperless is running:
+With Docker Compose, while paperless is running:
 
 ```shell-session
 $ cd /path/to/paperless
-$ docker-compose exec webserver <command> <arguments>
+$ docker compose exec webserver <command> <arguments>
 ```
 
 With docker, while paperless is running:
@@ -222,26 +247,28 @@ with the argument `--help`.
 
 ### Document exporter {#exporter}
 
-The document exporter exports all your data from paperless into a folder
-for backup or migration to another DMS.
+The document exporter exports all your data (including your settings
+and database contents) from paperless into a folder for backup or
+migration to another DMS.
 
 If you use the document exporter within a cronjob to backup your data
 you might use the `-T` flag behind exec to suppress "The input device
 is not a TTY" errors. For example:
-`docker-compose exec -T webserver document_exporter ../export`
+`docker compose exec -T webserver document_exporter ../export`
 
 ```
 document_exporter target [-c] [-d] [-f] [-na] [-nt] [-p] [-sm] [-z]
 
 optional arguments:
--c, --compare-checksums
--d, --delete
--f, --use-filename-format
+-c,  --compare-checksums
+-d,  --delete
+-f,  --use-filename-format
 -na, --no-archive
 -nt, --no-thumbnail
--p, --use-folder-prefix
+-p,  --use-folder-prefix
 -sm, --split-manifest
--z  --zip
+-z,  --zip
+-zn, --zip-name
 ```
 
 `target` is a folder to which the data gets written. This includes
@@ -269,7 +296,7 @@ other files.
 
 The filenames generated by this command follow the format
 `[date created] [correspondent] [title].[extension]`. If you want
-paperless to use `PAPERLESS_FILENAME_FORMAT` for exported filenames
+paperless to use [`PAPERLESS_FILENAME_FORMAT`](configuration.md#PAPERLESS_FILENAME_FORMAT) for exported filenames
 instead, specify `-f` or `--use-filename-format`.
 
 If `-na` or `--no-archive` is provided, no archive files will be exported,
@@ -296,8 +323,9 @@ will be placed in individual json files, instead of a single JSON file. The main
 manifest.json will still contain application wide information (e.g. tags, correspondent,
 documenttype, etc)
 
-If `-z` or `--zip` is provided, the export will be a zipfile
-in the target directory, named according to the current date.
+If `-z` or `--zip` is provided, the export will be a zip file
+in the target directory, named according to the current local date or the
+value set in `-zn` or `--zip-name`.
 
 !!! warning
 
@@ -321,10 +349,16 @@ When you use the provided docker compose script, put the export inside
 the `export` folder in your paperless source directory. Specify
 `../export` as the `source`.
 
+Note that .zip files (as can be generated from the exporter) are not supported.
+
 !!! note
 
     Importing from a previous version of Paperless may work, but for best
     results it is suggested to match the versions.
+
+!!! warning
+
+    The importer should be run against a completely empty installation (database and directories) of Paperless-ngx.
 
 ### Document retagger {#retagger}
 
@@ -334,7 +368,7 @@ currently-imported docs. This problem is common enough that there are
 tools for it.
 
 ```
-document_retagger [-h] [-c] [-T] [-t] [-i] [--use-first] [-f]
+document_retagger [-h] [-c] [-T] [-t] [-i] [--id-range] [--use-first] [-f]
 
 optional arguments:
 -c, --correspondent
@@ -342,6 +376,7 @@ optional arguments:
 -t, --document_type
 -s, --storage_path
 -i, --inbox-only
+--id-range
 --use-first
 -f, --overwrite
 ```
@@ -357,6 +392,11 @@ specify any of these options, the document retagger won't do anything.
 Specify `-i` to have the document retagger work on documents tagged with
 inbox tags only. This is useful when you don't want to mess with your
 already processed documents.
+
+Specify `--id-range 1 100` to have the document retagger work only on a
+specific range of document id´s. This can be useful if you have a lot of
+documents and want to test the matching rules only on a subset of
+documents.
 
 When multiple document types or correspondents match a single document,
 the retagger won't assign these to the document. Specify `--use-first`
@@ -374,7 +414,7 @@ that don't match a document anymore get removed as well.
 ### Managing the Automatic matching algorithm
 
 The _Auto_ matching algorithm requires a trained neural network to work.
-This network needs to be updated whenever somethings in your data
+This network needs to be updated whenever something in your data
 changes. The docker image takes care of that automatically with the task
 scheduler. You can manually renew the classifier by invoking the
 following management command:
@@ -388,6 +428,9 @@ This command takes no arguments.
 ### Document thumbnails {#thumbnails}
 
 Use this command to re-create document thumbnails. Optionally include the ` --document {id}` option to generate thumbnails for a specific document only.
+
+You may also specify `--processes` to control the number of processes used to generate new thumbnails. The default is to utilize
+a quarter of the available processors.
 
 ```
 document_thumbnails
@@ -416,7 +459,7 @@ task scheduler.
 ### Managing filenames {#renamer}
 
 If you use paperless' feature to
-[assign custom filenames to your documents](/advanced_usage#file-name-handling), you can use this command to move all your files after
+[assign custom filenames to your documents](advanced_usage.md#file-name-handling), you can use this command to move all your files after
 changing the naming scheme.
 
 !!! warning
@@ -441,19 +484,19 @@ collection for issues.
 
 The issues detected by the sanity checker are as follows:
 
-- Missing original files.
-- Missing archive files.
-- Inaccessible original files due to improper permissions.
-- Inaccessible archive files due to improper permissions.
-- Corrupted original documents by comparing their checksum against
-  what is stored in the database.
-- Corrupted archive documents by comparing their checksum against what
-  is stored in the database.
-- Missing thumbnails.
-- Inaccessible thumbnails due to improper permissions.
-- Documents without any content (warning).
-- Orphaned files in the media directory (warning). These are files
-  that are not referenced by any document im paperless.
+-   Missing original files.
+-   Missing archive files.
+-   Inaccessible original files due to improper permissions.
+-   Inaccessible archive files due to improper permissions.
+-   Corrupted original documents by comparing their checksum against
+    what is stored in the database.
+-   Corrupted archive documents by comparing their checksum against what
+    is stored in the database.
+-   Missing thumbnails.
+-   Inaccessible thumbnails due to improper permissions.
+-   Documents without any content (warning).
+-   Orphaned files in the media directory (warning). These are files
+    that are not referenced by any document in paperless.
 
 ```
 document_sanity_checker
@@ -475,12 +518,13 @@ mail_fetcher
 The command takes no arguments and processes all your mail accounts and
 rules.
 
-!!! note
+!!! tip
 
-    As of October 2022 Microsoft no longer supports IMAP authentication
-    for Exchange servers, thus Exchange is no longer supported until a
-    solution is implemented in the Python IMAP library used by Paperless.
-    See [learn.microsoft.com](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online)
+    To use OAuth access tokens for mail fetching,
+    select the box to indicate the password is actually
+    a token when creating or editing a mail account. The
+    details for creating a token depend on your email
+    provider.
 
 ### Creating archived documents {#archiver}
 
@@ -521,7 +565,7 @@ Documents can be stored in Paperless using GnuPG encryption.
 
 !!! warning
 
-    Encryption is deprecated since [paperless-ng 0.9](/changelog#paperless-ng-090) and doesn't really
+    Encryption is deprecated since [paperless-ng 0.9](changelog.md#paperless-ng-090) and doesn't really
     provide any additional security, since you have to store the passphrase
     in a configuration file on the same system as the encrypted documents
     for paperless to work. Furthermore, the entire text content of the
@@ -542,9 +586,37 @@ Enabling encryption is no longer supported.
 
 Basic usage to disable encryption of your document store:
 
-(Note: If `PAPERLESS_PASSPHRASE` isn't set already, you need to specify
+(Note: If [`PAPERLESS_PASSPHRASE`](configuration.md#PAPERLESS_PASSPHRASE) isn't set already, you need to specify
 it here)
 
 ```
 decrypt_documents [--passphrase SECR3TP4SSPHRA$E]
 ```
+
+### Detecting duplicates {#fuzzy_duplicate}
+
+Paperless already catches and prevents upload of exactly matching documents,
+however a new scan of an existing document may not produce an exact bit for bit
+duplicate. But the content should be exact or close, allowing detection.
+
+This tool does a fuzzy match over document content, looking for
+those which look close according to a given ratio.
+
+At this time, other metadata (such as correspondent or type) is not
+taken into account by the detection.
+
+```
+document_fuzzy_match [--ratio] [--processes N]
+```
+
+| Option      | Required | Default             | Description                                                                                                                    |
+| ----------- | -------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| --ratio     | No       | 85.0                | a number between 0 and 100, setting how similar a document must be for it to be reported. Higher numbers mean more similarity. |
+| --processes | No       | 1/4 of system cores | Number of processes to use for matching. Setting 1 disables multiple processes                                                 |
+| --delete    | No       | False               | If provided, one document of a matched pair above the ratio will be deleted.                                                   |
+
+!!! warning
+
+    If providing the `--delete` option, it is highly recommended to have a backup.
+    While every effort has been taken to ensure proper operation, there is always the
+    chance of deletion of a file you want to keep.

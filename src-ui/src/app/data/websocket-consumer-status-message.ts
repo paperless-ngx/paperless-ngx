@@ -6,4 +6,5 @@ export interface WebsocketConsumerStatusMessage {
   status?: string
   message?: string
   document_id: number
+  owner_id?: number
 }

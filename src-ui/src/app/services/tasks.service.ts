@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { first } from 'rxjs/operators'
+import { Subject } from 'rxjs'
+import { first, takeUntil } from 'rxjs/operators'
 import {
   PaperlessTask,
   PaperlessTaskStatus,
@@ -14,12 +15,14 @@ import { environment } from 'src/environments/environment'
 export class TasksService {
   private baseUrl: string = environment.apiBaseUrl
 
-  loading: boolean
+  public loading: boolean
 
   private fileTasks: PaperlessTask[] = []
 
+  private unsubscribeNotifer: Subject<any> = new Subject()
+
   public get total(): number {
-    return this.fileTasks?.length
+    return this.fileTasks.length
   }
 
   public get allFileTasks(): PaperlessTask[] {
@@ -51,7 +54,7 @@ export class TasksService {
 
     this.http
       .get<PaperlessTask[]>(`${this.baseUrl}tasks/`)
-      .pipe(first())
+      .pipe(takeUntil(this.unsubscribeNotifer), first())
       .subscribe((r) => {
         this.fileTasks = r.filter((t) => t.type == PaperlessTaskType.File) // they're all File tasks, for now
         this.loading = false
@@ -63,9 +66,13 @@ export class TasksService {
       .post(`${this.baseUrl}acknowledge_tasks/`, {
         tasks: [...task_ids],
       })
-      .pipe(first())
+      .pipe(takeUntil(this.unsubscribeNotifer), first())
       .subscribe((r) => {
         this.reload()
       })
+  }
+
+  public cancelPending(): void {
+    this.unsubscribeNotifer.next(true)
   }
 }

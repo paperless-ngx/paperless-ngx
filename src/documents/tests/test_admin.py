@@ -1,6 +1,7 @@
 from django.contrib.admin.sites import AdminSite
 from django.test import TestCase
 from django.utils import timezone
+
 from documents import index
 from documents.admin import DocumentAdmin
 from documents.models import Document

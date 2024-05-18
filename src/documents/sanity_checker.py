@@ -5,13 +5,14 @@ from pathlib import Path
 from typing import Final
 
 from django.conf import settings
-from documents.models import Document
 from tqdm import tqdm
+
+from documents.models import Document
 
 
 class SanityCheckMessages:
     def __init__(self):
-        self._messages = defaultdict(list)
+        self._messages: dict[int, list[dict]] = defaultdict(list)
         self.has_error = False
         self.has_warning = False
 
@@ -32,7 +33,6 @@ class SanityCheckMessages:
         if len(self._messages) == 0:
             logger.info("Sanity checker detected no issues.")
         else:
-
             # Query once
             all_docs = Document.objects.all()
 
@@ -94,7 +94,7 @@ def check_sanity(progress=False) -> SanityCheckMessages:
             except OSError as e:
                 messages.error(doc.pk, f"Cannot read original file of document: {e}")
             else:
-                if not checksum == doc.checksum:
+                if checksum != doc.checksum:
                     messages.error(
                         doc.pk,
                         "Checksum mismatch. "
@@ -127,7 +127,7 @@ def check_sanity(progress=False) -> SanityCheckMessages:
                         f"Cannot read archive file of document : {e}",
                     )
                 else:
-                    if not checksum == doc.archive_checksum:
+                    if checksum != doc.archive_checksum:
                         messages.error(
                             doc.pk,
                             "Checksum mismatch of archived document. "

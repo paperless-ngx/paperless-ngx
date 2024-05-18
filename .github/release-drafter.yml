@@ -40,7 +40,7 @@ categories:
     labels:
       - 'frontend'
       - 'backend'
-    collapse-after: 0
+    collapse-after: 1
 include-labels:
   - 'enhancement'
   - 'bug'

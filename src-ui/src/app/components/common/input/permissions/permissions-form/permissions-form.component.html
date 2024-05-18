@@ -1,0 +1,75 @@
+@if (!accordion) {
+  <h5 i18n>Permissions</h5>
+  <ng-container [ngTemplateOutlet]="permissionsForm"></ng-container>
+}
+@if (accordion) {
+  <div ngbAccordion activeIds="">
+    <div ngbAccordionItem>
+      <h2 ngbAccordionHeader>
+        <button ngbAccordionButton i18n>Edit Permissions</button>
+      </h2>
+      <div ngbAccordionCollapse>
+        <div ngbAccordionBody>
+          <ng-template>
+            <ng-container [ngTemplateOutlet]="permissionsForm"></ng-container>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<ng-template #permissionsForm>
+  <div [formGroup]="form">
+    <div class="row">
+      <div class="col-lg-3">
+        <label class="form-label d-block my-2" i18n>Owner:</label>
+      </div>
+      <div class="col-lg-9">
+        <pngx-input-select [items]="users" bindLabel="username" formControlName="owner" [allowNull]="true"></pngx-input-select>
+      </div>
+    </div>
+    <small class="form-text text-muted text-end d-block mt-n2" i18n>Objects without an owner can be viewed and edited by all users</small>
+    <div formGroupName="set_permissions">
+      <h6 class="mt-3" i18n>View</h6>
+      <div formGroupName="view" class="mb-2">
+        <div class="row mb-1">
+          <div class="col-lg-3">
+            <label class="form-label d-block my-2" i18n>Users:</label>
+          </div>
+          <div class="col-lg-9">
+            <pngx-permissions-user type="view" formControlName="users"></pngx-permissions-user>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-3">
+            <label class="form-label d-block my-2" i18n>Groups:</label>
+          </div>
+          <div class="col-lg-9">
+            <pngx-permissions-group type="view" formControlName="groups"></pngx-permissions-group>
+          </div>
+        </div>
+      </div>
+      <h6 class="mt-4" i18n>Edit</h6>
+      <div formGroupName="change">
+        <div class="row mb-1">
+          <div class="col-lg-3">
+            <label class="form-label d-block my-2" i18n>Users:</label>
+          </div>
+          <div class="col-lg-9">
+            <pngx-permissions-user type="change" formControlName="users"></pngx-permissions-user>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-3">
+            <label class="form-label d-block my-2" i18n>Groups:</label>
+          </div>
+          <div class="col-lg-9">
+            <pngx-permissions-group type="change" formControlName="groups"></pngx-permissions-group>
+          </div>
+        </div>
+        <small class="form-text text-muted text-end d-block" i18n>Edit permissions also grant viewing permissions</small>
+      </div>
+    </div>
+  </div>
+</ng-template>

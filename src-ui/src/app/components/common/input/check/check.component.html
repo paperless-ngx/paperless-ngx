@@ -1,5 +1,25 @@
-<div class="mb-3 form-check">
-  <input type="checkbox" class="form-check-input" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" (blur)="onTouched()" [disabled]="disabled">
-  <label class="form-check-label" [for]="inputId">{{title}}</label>
-  <div *ngIf="hint" class="form-text text-muted">{{hint}}</div>
-</div>
+<div class="mb-3">
+  <div class="row">
+    @if (horizontal) {
+      <div class="d-flex align-items-center position-relative hidden-button-container col-md-3">
+        <label class="form-label" [class.mb-md-0]="horizontal" [for]="inputId">{{title}}</label>
+        @if (removable) {
+          <button type="button" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
+            <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Remove</ng-container>
+            </button>
+          }
+        </div>
+      }
+      <div [ngClass]="{'col-md-9': horizontal, 'align-items-center': horizontal, 'd-flex': horizontal}">
+        <div class="form-check">
+          <input #inputField type="checkbox" class="form-check-input" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" (blur)="onTouched()" [disabled]="disabled">
+          @if (!horizontal) {
+            <label class="form-check-label" [for]="inputId">{{title}}</label>
+          }
+          @if (hint) {
+            <div class="form-text text-muted">{{hint}}</div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>

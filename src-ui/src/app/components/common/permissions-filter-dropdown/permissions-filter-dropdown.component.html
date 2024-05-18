@@ -1,0 +1,94 @@
+<div class="btn-group w-100" ngbDropdown role="group">
+  <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="isActive ? 'btn-primary' : 'btn-outline-primary'" [disabled]="disabled">
+    <i-bs name="person-fill-lock"></i-bs>
+    <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
+    <pngx-clearable-badge [selected]="isActive" (cleared)="reset()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
+  </button>
+  <div class="dropdown-menu permission-filter-dropdown shadow py-0 w-2" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
+    <div class="list-group list-group-flush">
+      <button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="setFilter(OwnerFilterType.NONE)" [disabled]="disabled">
+        <div class="selected-icon me-1">
+          @if (selectionModel.ownerFilter === OwnerFilterType.NONE) {
+            <i-bs width="1em" height="1em" name="check"></i-bs>
+          }
+        </div>
+        <div class="me-1">
+          <small i18n>All</small>
+        </div>
+      </button>
+      <button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="setFilter(OwnerFilterType.SELF)" [disabled]="disabled">
+        <div class="selected-icon me-1">
+          @if (selectionModel.ownerFilter === OwnerFilterType.SELF) {
+            <i-bs width="1em" height="1em" name="check"></i-bs>
+          }
+        </div>
+        <div class="me-1">
+          <small i18n>My documents</small>
+        </div>
+      </button>
+      <button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="setFilter(OwnerFilterType.NOT_SELF)" [disabled]="disabled">
+        <div class="selected-icon me-1">
+          @if (selectionModel.ownerFilter === OwnerFilterType.NOT_SELF) {
+            <i-bs width="1em" height="1em" name="check"></i-bs>
+          }
+        </div>
+        <div class="me-1">
+          <small i18n>Shared with me</small>
+        </div>
+      </button>
+      <button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="setFilter(OwnerFilterType.SHARED_BY_ME)" [disabled]="disabled">
+        <div class="selected-icon me-1">
+          @if (selectionModel.ownerFilter === OwnerFilterType.SHARED_BY_ME) {
+            <i-bs width="1em" height="1em" name="check"></i-bs>
+          }
+        </div>
+        <div class="me-1">
+          <small i18n>Shared by me</small>
+        </div>
+      </button>
+      <button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="setFilter(OwnerFilterType.UNOWNED)" [disabled]="disabled">
+        <div class="selected-icon me-1">
+          @if (selectionModel.ownerFilter === OwnerFilterType.UNOWNED) {
+            <i-bs width="1em" height="1em" name="check"></i-bs>
+          }
+        </div>
+        <div class="me-1">
+          <small i18n>Unowned</small>
+        </div>
+      </button>
+      <button *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.User }" class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" [disabled]="disabled">
+        <div class="selected-icon me-1">
+          @if (selectionModel.ownerFilter === OwnerFilterType.OTHERS) {
+            <i-bs width="1em" height="1em" name="check"></i-bs>
+          }
+        </div>
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.User)) {
+          <div class="me-1 w-100">
+            <ng-select
+              name="user"
+              class="user-select small"
+              [(ngModel)]="selectionModel.includeUsers"
+              [disabled]="disabled"
+              [clearable]="false"
+              [items]="users"
+              bindLabel="username"
+              multiple="true"
+              bindValue="id"
+              placeholder="Users"
+              i18n-placeholder
+              (change)="onUserSelect()">
+            </ng-select>
+          </div>
+        }
+      </button>
+      @if (selectionModel.ownerFilter === OwnerFilterType.NONE || selectionModel.ownerFilter === OwnerFilterType.NOT_SELF) {
+        <div class="list-group-item list-group-item-action d-flex align-items-center p-2 ps-3 border-bottom-0 border-start-0 border-end-0">
+          <div class="form-check form-switch w-100">
+            <input type="checkbox" class="form-check-input" id="hideUnowned" [(ngModel)]="this.selectionModel.hideUnowned" (change)="onChange()" [disabled]="disabled">
+            <label class="form-check-label w-100" for="hideUnowned"><small i18n>Hide unowned</small></label>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

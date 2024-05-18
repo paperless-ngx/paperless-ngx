@@ -1,5 +1,5 @@
 def get_parser(*args, **kwargs):
-    from .parsers import TextDocumentParser
+    from paperless_text.parsers import TextDocumentParser
 
     return TextDocumentParser(*args, **kwargs)
 

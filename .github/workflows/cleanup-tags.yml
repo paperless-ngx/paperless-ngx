@@ -12,9 +12,6 @@ on:
   push:
     paths:
       - ".github/workflows/cleanup-tags.yml"
-      - ".github/scripts/cleanup-tags.py"
-      - ".github/scripts/github.py"
-      - ".github/scripts/common.py"
 
 concurrency:
   group: registry-tags-cleanup
@@ -26,58 +23,48 @@ jobs:
     if: github.repository_owner == 'paperless-ngx'
     runs-on: ubuntu-22.04
     strategy:
+      fail-fast: false
       matrix:
-        include:
-          - primary-name: "paperless-ngx"
-            cache-name: "paperless-ngx/builder/cache/app"
-
-          - primary-name: "paperless-ngx/builder/qpdf"
-            cache-name: "paperless-ngx/builder/cache/qpdf"
-
-          - primary-name: "paperless-ngx/builder/pikepdf"
-            cache-name: "paperless-ngx/builder/cache/pikepdf"
-
-          - primary-name: "paperless-ngx/builder/jbig2enc"
-            cache-name: "paperless-ngx/builder/cache/jbig2enc"
-
-          - primary-name: "paperless-ngx/builder/psycopg2"
-            cache-name: "paperless-ngx/builder/cache/psycopg2"
+        primary-name: ["paperless-ngx", "paperless-ngx/builder/cache/app"]
     env:
       # Requires a personal access token with the OAuth scope delete:packages
       TOKEN: ${{ secrets.GHA_CONTAINER_DELETE_TOKEN }}
     steps:
       -
-        name: Checkout
-        uses: actions/checkout@v3
-      -
-        name: Login to Github Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      -
-        name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-      -
-        name: Install Python libraries
-        run: |
-          python -m pip install httpx docker
-      #
-      # Clean up primary package
-      #
-      -
-        name: Cleanup for package "${{ matrix.primary-name }}"
+        name: Clean temporary images
         if: "${{ env.TOKEN != '' }}"
-        run: |
-          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --untagged --is-manifest --delete "${{ matrix.primary-name }}"
-      #
-      # Clean up registry cache package
-      #
+        uses: stumpylog/image-cleaner-action/ephemeral@v0.6.0
+        with:
+          token: "${{ env.TOKEN }}"
+          owner: "${{ github.repository_owner }}"
+          is_org: "true"
+          package_name: "${{ matrix.primary-name }}"
+          scheme: "branch"
+          repo_name: "paperless-ngx"
+          match_regex: "(feature|fix)"
+          do_delete: "true"
+
+  cleanup-untagged-images:
+    name: Cleanup Untagged Images Tags for ${{ matrix.primary-name }}
+    if: github.repository_owner == 'paperless-ngx'
+    runs-on: ubuntu-22.04
+    needs:
+      - cleanup-images
+    strategy:
+      fail-fast: false
+      matrix:
+        primary-name: ["paperless-ngx", "paperless-ngx/builder/cache/app"]
+    env:
+      # Requires a personal access token with the OAuth scope delete:packages
+      TOKEN: ${{ secrets.GHA_CONTAINER_DELETE_TOKEN }}
+    steps:
       -
-        name: Cleanup for package "${{ matrix.cache-name }}"
+        name: Clean untagged images
         if: "${{ env.TOKEN != '' }}"
-        run: |
-          python ${GITHUB_WORKSPACE}/.github/scripts/cleanup-tags.py --untagged --delete "${{ matrix.cache-name }}"
+        uses: stumpylog/image-cleaner-action/untagged@v0.6.0
+        with:
+          token: "${{ env.TOKEN }}"
+          owner: "${{ github.repository_owner }}"
+          is_org: "true"
+          package_name: "${{ matrix.primary-name }}"
+          do_delete: "true"

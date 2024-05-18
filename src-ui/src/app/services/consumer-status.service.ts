@@ -2,11 +2,13 @@ import { Injectable } from '@angular/core'
 import { Subject } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import { WebsocketConsumerStatusMessage } from '../data/websocket-consumer-status-message'
+import { SettingsService } from './settings.service'
 
+// see ProgressStatusOptions in src/documents/plugins/helpers.py
 export enum FileStatusPhase {
   STARTED = 0,
   UPLOADING = 1,
-  PROCESSING = 2,
+  WORKING = 2,
   SUCCESS = 3,
   FAILED = 4,
 }
@@ -43,13 +45,15 @@ export class FileStatus {
 
   documentId: number
 
+  ownerId: number
+
   getProgress(): number {
     switch (this.phase) {
       case FileStatusPhase.STARTED:
         return 0.0
       case FileStatusPhase.UPLOADING:
         return (this.currentPhaseProgress / this.currentPhaseMaxProgress) * 0.2
-      case FileStatusPhase.PROCESSING:
+      case FileStatusPhase.WORKING:
         return (
           (this.currentPhaseProgress / this.currentPhaseMaxProgress) * 0.8 + 0.2
         )
@@ -80,7 +84,7 @@ export class FileStatus {
   providedIn: 'root',
 })
 export class ConsumerStatusService {
-  constructor() {}
+  constructor(private settingsService: SettingsService) {}
 
   private statusWebSocket: WebSocket
 
@@ -142,6 +146,15 @@ export class ConsumerStatusService {
     this.statusWebSocket.onmessage = (ev) => {
       let statusMessage: WebsocketConsumerStatusMessage = JSON.parse(ev['data'])
 
+      // fallback if backend didn't restrict message
+      if (
+        statusMessage.owner_id &&
+        statusMessage.owner_id !== this.settingsService.currentUser?.id &&
+        !this.settingsService.currentUser?.is_superuser
+      ) {
+        return
+      }
+
       let statusMessageGet = this.get(
         statusMessage.task_id,
         statusMessage.filename
@@ -150,7 +163,7 @@ export class ConsumerStatusService {
       let created = statusMessageGet.created
 
       status.updateProgress(
-        FileStatusPhase.PROCESSING,
+        FileStatusPhase.WORKING,
         statusMessage.current_progress,
         statusMessage.max_progress
       )
@@ -164,16 +177,25 @@ export class ConsumerStatusService {
       }
       status.documentId = statusMessage.document_id
 
-      if (created && statusMessage.status == 'STARTING') {
-        this.documentDetectedSubject.next(status)
+      if (statusMessage.status in FileStatusPhase) {
+        status.phase = FileStatusPhase[statusMessage.status]
       }
-      if (statusMessage.status == 'SUCCESS') {
-        status.phase = FileStatusPhase.SUCCESS
-        this.documentConsumptionFinishedSubject.next(status)
-      }
-      if (statusMessage.status == 'FAILED') {
-        status.phase = FileStatusPhase.FAILED
-        this.documentConsumptionFailedSubject.next(status)
+
+      switch (status.phase) {
+        case FileStatusPhase.STARTED:
+          if (created) this.documentDetectedSubject.next(status)
+          break
+
+        case FileStatusPhase.SUCCESS:
+          this.documentConsumptionFinishedSubject.next(status)
+          break
+
+        case FileStatusPhase.FAILED:
+          this.documentConsumptionFailedSubject.next(status)
+          break
+
+        default:
+          break
       }
     }
   }
@@ -208,7 +230,10 @@ export class ConsumerStatusService {
 
   dismissCompleted() {
     this.consumerStatus = this.consumerStatus.filter(
-      (status) => status.phase != FileStatusPhase.SUCCESS
+      (status) =>
+        ![FileStatusPhase.SUCCESS, FileStatusPhase.FAILED].includes(
+          status.phase
+        )
     )
   }
 

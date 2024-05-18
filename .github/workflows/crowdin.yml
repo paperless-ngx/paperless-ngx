@@ -1,0 +1,34 @@
+name: Crowdin Action
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '2 */12 * * *'
+  push:
+    paths: [
+      'src/locale/**',
+      'src-ui/messages.xlf',
+      'src-ui/src/locale/**'
+    ]
+    branches: [ dev ]
+
+jobs:
+  synchronize-with-crowdin:
+    name: Crowdin Sync
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: crowdin action
+      uses: crowdin/github-action@v1
+      with:
+        upload_translations: false
+        download_translations: true
+        crowdin_branch_name: 'dev'
+        localization_branch_name: l10n_dev
+        pull_request_labels: 'skip-changelog, translation'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
+        CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}

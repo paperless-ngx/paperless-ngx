@@ -5,14 +5,16 @@
     </button>
   </div>
   <div class="modal-body">
-    <app-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></app-input-text>
-    <app-input-check i18n-title title="Show in sidebar" formControlName="showInSideBar"></app-input-check>
-    <app-input-check i18n-title title="Show on dashboard" formControlName="showOnDashboard"></app-input-check>
-    <div *ngIf="error?.filter_rules" class="alert alert-danger" role="alert">
-      <h6 class="alert-heading" i18n>Filter rules error occurred while saving this view</h6>
-      <ng-container i18n>The error returned was</ng-container>:<br/>
-      {{ error.filter_rules }}
-    </div>
+    <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
+    <pngx-input-check i18n-title title="Show in sidebar" formControlName="showInSideBar"></pngx-input-check>
+    <pngx-input-check i18n-title title="Show on dashboard" formControlName="showOnDashboard"></pngx-input-check>
+    @if (error?.filter_rules) {
+      <div class="alert alert-danger" role="alert">
+        <h6 class="alert-heading" i18n>Filter rules error occurred while saving this view</h6>
+        <ng-container i18n>The error returned was</ng-container>:<br/>
+        {{ error.filter_rules }}
+      </div>
+    }
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-dark" (click)="cancel()" i18n [disabled]="!buttonsEnabled">Cancel</button>

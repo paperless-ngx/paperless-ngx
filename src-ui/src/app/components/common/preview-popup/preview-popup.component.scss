@@ -1,0 +1,9 @@
+.preview-popup-container > * {
+    width: 30rem !important;
+    height: 22rem !important;
+    overflow-y: scroll;
+}
+
+::ng-deep .popover.popover-preview {
+    max-width: 32rem;
+}

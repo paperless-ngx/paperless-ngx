@@ -1,8 +1,8 @@
 from factory import Faker
 from factory.django import DjangoModelFactory
 
-from ..models import Correspondent
-from ..models import Document
+from documents.models import Correspondent
+from documents.models import Document
 
 
 class CorrespondentFactory(DjangoModelFactory):

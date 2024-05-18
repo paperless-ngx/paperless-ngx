@@ -1,26 +1,17 @@
 from django.core.management.base import BaseCommand
+
+from documents.management.commands.mixins import ProgressBarMixin
 from documents.sanity_checker import check_sanity
 
 
-class Command(BaseCommand):
-
-    help = """
-        This command checks your document archive for issues.
-    """.replace(
-        "    ",
-        "",
-    )
+class Command(ProgressBarMixin, BaseCommand):
+    help = "This command checks your document archive for issues."
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--no-progress-bar",
-            default=False,
-            action="store_true",
-            help="If set, the progress bar will not be shown",
-        )
+        self.add_argument_progress_bar_mixin(parser)
 
     def handle(self, *args, **options):
-
-        messages = check_sanity(progress=not options["no_progress_bar"])
+        self.handle_progress_bar_mixin(**options)
+        messages = check_sanity(progress=self.use_progress_bar)
 
         messages.log_messages()

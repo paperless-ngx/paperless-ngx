@@ -1,0 +1,155 @@
+<pngx-page-header
+  title="File Tasks"
+  i18n-title
+  info="File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process."
+  i18n-info
+  >
+  <div class="btn-toolbar col col-md-auto align-items-center">
+    <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()" [hidden]="selectedTasks.size === 0">
+      <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
+    </button>
+    <button class="btn btn-sm btn-outline-primary me-4" (click)="dismissTasks()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }" [disabled]="tasksService.total === 0">
+      <i-bs name="check2-all"></i-bs>&nbsp;{{dismissButtonText}}
+    </button>
+    <div class="form-check form-switch mb-0">
+      <input class="form-check-input" type="checkbox" role="switch" id="autoRefreshSwitch" (click)="toggleAutoRefresh()" [attr.checked]="autoRefreshInterval">
+      <label class="form-check-label" for="autoRefreshSwitch" i18n>Auto refresh</label>
+    </div>
+  </div>
+</pngx-page-header>
+
+@if (!tasksService.completedFileTasks && tasksService.loading) {
+  <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
+  <div class="visually-hidden" i18n>Loading...</div>
+}
+
+<ng-template let-tasks="tasks" #tasksTemplate>
+  <table class="table table-striped align-middle border shadow-sm">
+    <thead>
+      <tr>
+        <th scope="col">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="all-tasks" [disabled]="currentTasks.length === 0" [(ngModel)]="togggleAll" (click)="toggleAll($event); $event.stopPropagation();">
+            <label class="form-check-label" for="all-tasks"></label>
+          </div>
+        </th>
+        <th scope="col" i18n>Name</th>
+        <th scope="col" class="d-none d-lg-table-cell" i18n>Created</th>
+        @if (activeTab !== 'started' && activeTab !== 'queued') {
+          <th scope="col" class="d-none d-lg-table-cell" i18n>Results</th>
+        }
+        <th scope="col" class="d-table-cell d-lg-none" i18n>Info</th>
+        <th scope="col" i18n>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (task of tasks | slice: (page-1) * pageSize : page * pageSize; track task) {
+        <tr (click)="toggleSelected(task, $event); $event.stopPropagation();">
+          <td>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="task{{task.id}}" [checked]="selectedTasks.has(task.id)" (click)="toggleSelected(task, $event); $event.stopPropagation();">
+              <label class="form-check-label" for="task{{task.id}}"></label>
+            </div>
+          </td>
+          <td class="overflow-auto name-col">{{ task.task_file_name }}</td>
+          <td class="d-none d-lg-table-cell">{{ task.date_created | customDate:'short' }}</td>
+          @if (activeTab !== 'started' && activeTab !== 'queued') {
+            <td class="d-none d-lg-table-cell">
+              @if (task.result?.length > 50) {
+                <div class="result" (click)="expandTask(task); $event.stopPropagation();"
+                  [ngbPopover]="resultPopover" popoverClass="shadow small mobile" triggers="mouseenter:mouseleave" container="body">
+                  <span class="small d-none d-md-inline-block font-monospace text-muted">{{ task.result | slice:0:50 }}&hellip;</span>
+                </div>
+              }
+              @if (task.result?.length <= 50) {
+                <span class="small d-none d-md-inline-block font-monospace text-muted">{{ task.result }}</span>
+              }
+              <ng-template #resultPopover>
+                <pre class="small mb-0">{{ task.result | slice:0:300 }}@if (task.result.length > 300) {
+                  &hellip;
+                }</pre>
+                @if (task.result?.length > 300) {
+                  <br/><em>(<ng-container i18n>click for full output</ng-container>)</em>
+                }
+              </ng-template>
+            </td>
+          }
+          <td class="d-lg-none">
+            <button class="btn btn-link" (click)="expandTask(task); $event.stopPropagation();">
+              <i-bs width="1.2em" height="1.2em" name="info-circle"></i-bs>
+            </button>
+          </td>
+          <td scope="row">
+            <div class="btn-group" role="group">
+              <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }">
+                <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Dismiss</ng-container>
+              </button>
+              <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+                @if (task.related_document) {
+                  <button class="btn btn-sm btn-outline-primary" (click)="dismissAndGo(task); $event.stopPropagation();">
+                    <i-bs name="file-text"></i-bs>&nbsp;<ng-container i18n>Open Document</ng-container>
+                  </button>
+                }
+              </ng-container>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="p-0" [class.border-0]="expandedTask !== task.id" colspan="5">
+            <pre #collapse="ngbCollapse" [ngbCollapse]="expandedTask !== task.id" class="small mb-0"><div class="small p-1 p-lg-3 ms-lg-3">{{ task.result }}</div></pre>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  <div class="pb-3 d-sm-flex justify-content-between align-items-center">
+    @if (tasks.length > 0) {
+      <div class="pb-2 pb-sm-0">
+        <ng-container i18n>{tasks.length, plural, =1 {One {{this.activeTabLocalized}} task} other {{{tasks.length || 0}} total {{this.activeTabLocalized}} tasks}}</ng-container>
+        @if (selectedTasks.size > 0) {
+          <ng-container i18n>&nbsp;({{selectedTasks.size}} selected)</ng-container>
+        }
+      </div>
+    }
+    @if (tasks.length > pageSize) {
+      <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="tasks.length" maxSize="8" size="sm"></ngb-pagination>
+    }
+  </div>
+</ng-template>
+
+<ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-tabs" (hidden)="duringTabChange($event)">
+  <li ngbNavItem="failed">
+    <a ngbNavLink i18n>Failed@if (tasksService.failedFileTasks.length > 0) {
+      <span class="badge bg-danger ms-2">{{tasksService.failedFileTasks.length}}</span>
+    }</a>
+    <ng-template ngbNavContent>
+      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.failedFileTasks}"></ng-container>
+    </ng-template>
+  </li>
+  <li ngbNavItem="completed">
+    <a ngbNavLink i18n>Complete@if (tasksService.completedFileTasks.length > 0) {
+      <span class="badge bg-secondary ms-2">{{tasksService.completedFileTasks.length}}</span>
+    }</a>
+    <ng-template ngbNavContent>
+      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.completedFileTasks}"></ng-container>
+    </ng-template>
+  </li>
+  <li ngbNavItem="started">
+    <a ngbNavLink i18n>Started@if (tasksService.startedFileTasks.length > 0) {
+      <span class="badge bg-secondary ms-2">{{tasksService.startedFileTasks.length}}</span>
+    }</a>
+    <ng-template ngbNavContent>
+      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.startedFileTasks}"></ng-container>
+    </ng-template>
+  </li>
+  <li ngbNavItem="queued">
+    <a ngbNavLink i18n>Queued@if (tasksService.queuedFileTasks.length > 0) {
+      <span class="badge bg-secondary ms-2">{{tasksService.queuedFileTasks.length}}</span>
+    }</a>
+    <ng-template ngbNavContent>
+      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.queuedFileTasks}"></ng-container>
+    </ng-template>
+  </li>
+</ul>
+<div [ngbNavOutlet]="nav"></div>

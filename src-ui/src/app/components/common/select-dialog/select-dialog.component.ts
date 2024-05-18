@@ -3,7 +3,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 
 @Component({
-  selector: 'app-select-dialog',
+  selector: 'pngx-select-dialog',
   templateUrl: './select-dialog.component.html',
   styleUrls: ['./select-dialog.component.scss'],
 })

@@ -9,7 +9,7 @@ following way:
 - `main` always represents the latest release and will only see
   changes when a new release is made.
 - `dev` contains the code that will be in the next release.
-- `feature-X` contain bigger changes that will be in some release, but
+- `feature-X` contains bigger changes that will be in some release, but
   not necessarily the next one.
 
 When making functional changes to Paperless-ngx, _always_ make your changes
@@ -47,7 +47,7 @@ early on.
 Once installed, hooks will run when you commit. If the formatting isn't
 quite right or a linter catches something, the commit will be rejected.
 You'll need to look at the output and fix the issue. Some hooks, such
-as the Python formatting tool `black`, will format failing
+as the Python linting and formatting tool `ruff`, will format failing
 files, so all you need to do is `git add` those files again
 and retry your commit.
 
@@ -58,10 +58,10 @@ first-time setup.
 
 !!! note
 
-    Every command is executed directly from the root folder of the project unless specified otherwise.
+      Every command is executed directly from the root folder of the project unless specified otherwise.
 
 1.  Install prerequisites + pipenv as mentioned in
-    [Bare metal route](/setup#bare_metal).
+    [Bare metal route](setup.md#bare_metal).
 
 2.  Copy `paperless.conf.example` to `paperless.conf` and enable debug
     mode within the file via `PAPERLESS_DEBUG=true`.
@@ -177,69 +177,69 @@ The front end is built using AngularJS. In order to get started, you need Node.j
 
     The following commands are all performed in the `src-ui`-directory. You will need a running back end (including an active session) to connect to the back end API. To spin it up refer to the commands under the section [above](#back-end-development).
 
-1. Install the Angular CLI. You might need sudo privileges
-   to perform this command:
+1.  Install the Angular CLI. You might need sudo privileges to perform this command:
 
-   ```bash
-   $ npm install -g @angular/cli
-   ```
+    ```bash
+    $ npm install -g @angular/cli
+    ```
 
-2. Make sure that it's on your path.
+2.  Make sure that it's on your path.
 
-3. Install all neccessary modules:
+3.  Install all necessary modules:
 
-   ```bash
-   $ npm install
-   ```
+    ```bash
+    $ npm install
+    ```
 
-4. You can launch a development server by running:
+4.  You can launch a development server by running:
 
-   ```bash
-   $ ng serve
-   ```
+    ```bash
+    $ ng serve
+    ```
 
-   This will automatically update whenever you save. However, in-place
-   compilation might fail on syntax errors, in which case you need to
-   restart it.
+    This will automatically update whenever you save. However, in-place
+    compilation might fail on syntax errors, in which case you need to
+    restart it.
 
-   By default, the development server is available on `http://localhost:4200/` and is configured to access the API at
-   `http://localhost:8000/api/`, which is the default of the backend. If you enabled `DEBUG` on the back end, several security overrides for allowed hosts, CORS and X-Frame-Options are in place so that the front end behaves exactly as in production.
+    By default, the development server is available on `http://localhost:4200/` and is configured to access the API at
+    `http://localhost:8000/api/`, which is the default of the backend. If you enabled `DEBUG` on the back end, several security overrides for allowed hosts, CORS and X-Frame-Options are in place so that the front end behaves exactly as in production.
 
 ### Testing and code style
 
-- The front end code (.ts, .html, .scss) use `prettier` for code
-  formatting via the Git `pre-commit` hooks which run automatically on
-  commit. See [above](#code-formatting-with-pre-commit-hooks) for installation instructions. You can also run this via the CLI with a
-  command such as
+The front end code (.ts, .html, .scss) use `prettier` for code
+formatting via the Git `pre-commit` hooks which run automatically on
+commit. See [above](#code-formatting-with-pre-commit-hooks) for installation instructions. You can also run this via the CLI with a
+command such as
 
-  ```bash
-  $ git ls-files -- '*.ts' | xargs pre-commit run prettier --files
-  ```
+```bash
+$ git ls-files -- '*.ts' | xargs pre-commit run prettier --files
+```
 
-- Front end testing uses jest and cypress. There is currently a need
-  for significantly more front end tests. Unit tests and e2e tests,
-  respectively, can be run non-interactively with:
+Front end testing uses Jest and Playwright. Unit tests and e2e tests,
+respectively, can be run non-interactively with:
 
-  ```bash
-  $ ng test
-  $ npm run e2e:ci
-  ```
+```bash
+$ ng test
+$ npx playwright test
+```
 
-  - Cypress also includes a UI which can be run with:
+Playwright also includes a UI which can be run with:
 
-    ```bash
-    $ ./node_modules/.bin/cypress open
-    ```
+```bash
+$ npx playwright test --ui
+```
 
-- In order to build the front end and serve it as part of Django, execute:
+### Building the frontend
 
-  ```bash
-  $ ng build --configuration production
-  ```
+In order to build the front end and serve it as part of Django, execute:
 
-  This will build the front end and put it in a location from which the
-  Django server will serve it as static content. This way, you can verify
-  that authentication is working.
+```bash
+$ ng build --configuration production
+```
+
+This will build the front end and put it in a location from which the
+Django server will serve it as static content. This way, you can verify
+that authentication is working.
 
 ## Localization
 
@@ -256,7 +256,7 @@ these parts have to be translated separately.
 - The translated strings need to be placed in the
   `src-ui/src/locale/` folder.
 - In order to extract added or changed strings from the source files,
-  call `ng xi18n --ivy`.
+  call `ng extract-i18n`.
 
 Adding new languages requires adding the translated files in the
 `src-ui/src/locale/` folder and adjusting a couple files.
@@ -277,26 +277,16 @@ Adding new languages requires adding the translated files in the
     }
     ```
 
-2.  Add the language to the available options in
+2.  Add the language to the `LANGUAGE_OPTIONS` array in
     `src-ui/src/app/services/settings.service.ts`:
 
-    ```typescript
-    getLanguageOptions(): LanguageOption[] {
-        return [
-            {code: "en-us", name: $localize`English (US)`, englishName: "English (US)", dateInputFormat: "mm/dd/yyyy"},
-            {code: "en-gb", name: $localize`English (GB)`, englishName: "English (GB)", dateInputFormat: "dd/mm/yyyy"},
-            {code: "de", name: $localize`German`, englishName: "German", dateInputFormat: "dd.mm.yyyy"},
-            {code: "nl", name: $localize`Dutch`, englishName: "Dutch", dateInputFormat: "dd-mm-yyyy"},
-            {code: "fr", name: $localize`French`, englishName: "French", dateInputFormat: "dd/mm/yyyy"},
-            {code: "pt-br", name: $localize`Portuguese (Brazil)`, englishName: "Portuguese (Brazil)", dateInputFormat: "dd/mm/yyyy"}
-            // Add your new language here
-        ]
-    }
     ```
 
     `dateInputFormat` is a special string that defines the behavior of
     the date input fields and absolutely needs to contain "dd", "mm"
     and "yyyy".
+
+    ```
 
 3.  Import and register the Angular data for this locale in
     `src-ui/src/app/app.module.ts`:
@@ -362,7 +352,7 @@ If you want to build the documentation locally, this is how you do it:
 
 3.  Serve the documentation. This will spin up a
     copy of the documentation at http://127.0.0.1:8000
-    that will automatically refresh everytime you change
+    that will automatically refresh every time you change
     something.
 
     ```bash
@@ -374,13 +364,10 @@ If you want to build the documentation locally, this is how you do it:
 The docker image is primarily built by the GitHub actions workflow, but
 it can be faster when developing to build and tag an image locally.
 
-To provide the build arguments automatically, build the image using the
-helper script `build-docker-image.sh`.
+Building the image works as with any image:
 
-Building the docker image from source:
-
-```bash
-./build-docker-image.sh Dockerfile -t <your-tag>
+```
+docker build --file Dockerfile --tag paperless:local --progress simple .
 ```
 
 ## Extending Paperless-ngx
@@ -398,7 +385,7 @@ responsible for:
 - Retrieving the content from the original
 - Creating a thumbnail
 - _optional:_ Retrieving a created date from the original
-- _optional:_ Creainge an archived document from the original
+- _optional:_ Creating an archived document from the original
 
 Custom parsers can be added to Paperless-ngx to support more file types. In
 order to do that, you need to write the parser itself and announce its

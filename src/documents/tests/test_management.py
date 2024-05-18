@@ -7,19 +7,20 @@ from pathlib import Path
 from unittest import mock
 
 from django.core.management import call_command
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
+
 from documents.file_handling import generate_filename
 from documents.models import Document
 from documents.tasks import update_document_archive_file
 from documents.tests.utils import DirectoriesMixin
-
+from documents.tests.utils import FileSystemAssertsMixin
 
 sample_file = os.path.join(os.path.dirname(__file__), "samples", "simple.pdf")
 
 
 @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
-class TestArchiver(DirectoriesMixin, TestCase):
+class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def make_models(self):
         return Document.objects.create(
             checksum="A",
@@ -29,17 +30,15 @@ class TestArchiver(DirectoriesMixin, TestCase):
         )
 
     def test_archiver(self):
-
         doc = self.make_models()
         shutil.copy(
             sample_file,
             os.path.join(self.dirs.originals_dir, f"{doc.id:07}.pdf"),
         )
 
-        call_command("document_archiver")
+        call_command("document_archiver", "--processes", "1")
 
     def test_handle_document(self):
-
         doc = self.make_models()
         shutil.copy(
             sample_file,
@@ -52,8 +51,8 @@ class TestArchiver(DirectoriesMixin, TestCase):
 
         self.assertIsNotNone(doc.checksum)
         self.assertIsNotNone(doc.archive_checksum)
-        self.assertTrue(os.path.isfile(doc.archive_path))
-        self.assertTrue(os.path.isfile(doc.source_path))
+        self.assertIsFile(doc.archive_path)
+        self.assertIsFile(doc.source_path)
         self.assertTrue(filecmp.cmp(sample_file, doc.source_path))
         self.assertEqual(doc.archive_filename, "none/A.pdf")
 
@@ -70,7 +69,7 @@ class TestArchiver(DirectoriesMixin, TestCase):
         self.assertIsNotNone(doc.checksum)
         self.assertIsNone(doc.archive_checksum)
         self.assertIsNone(doc.archive_filename)
-        self.assertTrue(os.path.isfile(doc.source_path))
+        self.assertIsFile(doc.source_path)
 
     @override_settings(FILENAME_FORMAT="{title}")
     def test_naming_priorities(self):
@@ -104,7 +103,7 @@ class TestArchiver(DirectoriesMixin, TestCase):
         self.assertEqual(doc2.archive_filename, "document_01.pdf")
 
 
-class TestDecryptDocuments(TestCase):
+class TestDecryptDocuments(FileSystemAssertsMixin, TestCase):
     @override_settings(
         ORIGINALS_DIR=os.path.join(os.path.dirname(__file__), "samples", "originals"),
         THUMBNAIL_DIR=os.path.join(os.path.dirname(__file__), "samples", "thumb"),
@@ -113,7 +112,6 @@ class TestDecryptDocuments(TestCase):
     )
     @mock.patch("documents.management.commands.decrypt_documents.input")
     def test_decrypt(self, m):
-
         media_dir = tempfile.mkdtemp()
         originals_dir = os.path.join(media_dir, "documents", "originals")
         thumb_dir = os.path.join(media_dir, "documents", "thumbnails")
@@ -161,10 +159,10 @@ class TestDecryptDocuments(TestCase):
 
         self.assertEqual(doc.storage_type, Document.STORAGE_TYPE_UNENCRYPTED)
         self.assertEqual(doc.filename, "0000004.pdf")
-        self.assertTrue(os.path.isfile(os.path.join(originals_dir, "0000004.pdf")))
-        self.assertTrue(os.path.isfile(doc.source_path))
-        self.assertTrue(os.path.isfile(os.path.join(thumb_dir, f"{doc.id:07}.webp")))
-        self.assertTrue(os.path.isfile(doc.thumbnail_path))
+        self.assertIsFile(os.path.join(originals_dir, "0000004.pdf"))
+        self.assertIsFile(doc.source_path)
+        self.assertIsFile(os.path.join(thumb_dir, f"{doc.id:07}.webp"))
+        self.assertIsFile(doc.thumbnail_path)
 
         with doc.source_file as f:
             checksum = hashlib.md5(f.read()).hexdigest()
@@ -183,7 +181,7 @@ class TestMakeIndex(TestCase):
         m.assert_called_once()
 
 
-class TestRenamer(DirectoriesMixin, TestCase):
+class TestRenamer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     @override_settings(FILENAME_FORMAT="")
     def test_rename(self):
         doc = Document.objects.create(title="test", mime_type="image/jpeg")
@@ -201,10 +199,10 @@ class TestRenamer(DirectoriesMixin, TestCase):
 
         self.assertEqual(doc2.filename, "none/test.jpg")
         self.assertEqual(doc2.archive_filename, "none/test.pdf")
-        self.assertFalse(os.path.isfile(doc.source_path))
-        self.assertFalse(os.path.isfile(doc.archive_path))
-        self.assertTrue(os.path.isfile(doc2.source_path))
-        self.assertTrue(os.path.isfile(doc2.archive_path))
+        self.assertIsNotFile(doc.source_path)
+        self.assertIsNotFile(doc.archive_path)
+        self.assertIsFile(doc2.source_path)
+        self.assertIsFile(doc2.archive_path)
 
 
 class TestCreateClassifier(TestCase):

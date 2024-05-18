@@ -1,17 +1,24 @@
 import hashlib
+import importlib
 import os
 import shutil
 from pathlib import Path
+from typing import Optional
 from unittest import mock
 
 from django.conf import settings
 from django.test import override_settings
+
 from documents.parsers import ParseError
 from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import TestMigrations
 
-
 STORAGE_TYPE_GPG = "gpg"
+
+migration_1012_obj = importlib.import_module(
+    "documents.migrations.1012_fix_archive_files",
+)
 
 
 def archive_name_from_filename(filename):
@@ -59,8 +66,8 @@ def make_test_document(
     mime_type: str,
     original: str,
     original_filename: str,
-    archive: str = None,
-    archive_filename: str = None,
+    archive: Optional[str] = None,
+    archive_filename: Optional[str] = None,
 ):
     doc = document_class()
     doc.filename = original_filename
@@ -112,8 +119,7 @@ simple_png2 = os.path.join(os.path.dirname(__file__), "examples", "no-text.png")
 
 
 @override_settings(FILENAME_FORMAT="")
-class TestMigrateArchiveFiles(DirectoriesMixin, TestMigrations):
-
+class TestMigrateArchiveFiles(DirectoriesMixin, FileSystemAssertsMixin, TestMigrations):
     migrate_from = "1011_auto_20210101_2340"
     migrate_to = "1012_fix_archive_files"
 
@@ -189,7 +195,7 @@ class TestMigrateArchiveFiles(DirectoriesMixin, TestMigrations):
         for doc in Document.objects.all():
             if doc.archive_checksum:
                 self.assertIsNotNone(doc.archive_filename)
-                self.assertTrue(os.path.isfile(archive_path_new(doc)))
+                self.assertIsFile(archive_path_new(doc))
             else:
                 self.assertIsNone(doc.archive_filename)
 
@@ -198,7 +204,7 @@ class TestMigrateArchiveFiles(DirectoriesMixin, TestMigrations):
             self.assertEqual(original_checksum, doc.checksum)
 
             if doc.archive_checksum:
-                self.assertTrue(os.path.isfile(archive_path_new(doc)))
+                self.assertIsFile(archive_path_new(doc))
                 with open(archive_path_new(doc), "rb") as f:
                     archive_checksum = hashlib.md5(f.read()).hexdigest()
                 self.assertEqual(archive_checksum, doc.archive_checksum)
@@ -281,13 +287,11 @@ def fake_parse_wrapper(parser, path, mime_type, file_name):
 
 @override_settings(FILENAME_FORMAT="")
 class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
-
     migrate_from = "1011_auto_20210101_2340"
     migrate_to = "1012_fix_archive_files"
     auto_migrate = False
 
     def test_archive_missing(self):
-
         Document = self.apps.get_model("documents", "Document")
 
         doc = make_test_document(
@@ -309,7 +313,7 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
     def test_parser_missing(self):
         Document = self.apps.get_model("documents", "Document")
 
-        doc1 = make_test_document(
+        make_test_document(
             Document,
             "document",
             "invalid/typesss768",
@@ -317,7 +321,7 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
             "document.png",
             simple_pdf,
         )
-        doc2 = make_test_document(
+        make_test_document(
             Document,
             "document",
             "invalid/typesss768",
@@ -332,7 +336,7 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
             self.performMigration,
         )
 
-    @mock.patch("documents.migrations.1012_fix_archive_files.parse_wrapper")
+    @mock.patch(f"{__name__}.migration_1012_obj.parse_wrapper")
     def test_parser_error(self, m):
         m.side_effect = ParseError()
         Document = self.apps.get_model("documents", "Document")
@@ -397,7 +401,7 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
         self.assertIsNone(doc1.archive_filename)
         self.assertIsNone(doc2.archive_filename)
 
-    @mock.patch("documents.migrations.1012_fix_archive_files.parse_wrapper")
+    @mock.patch(f"{__name__}.migration_1012_obj.parse_wrapper")
     def test_parser_no_archive(self, m):
         m.side_effect = fake_parse_wrapper
 
@@ -448,16 +452,18 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
 
 
 @override_settings(FILENAME_FORMAT="")
-class TestMigrateArchiveFilesBackwards(DirectoriesMixin, TestMigrations):
-
+class TestMigrateArchiveFilesBackwards(
+    DirectoriesMixin,
+    FileSystemAssertsMixin,
+    TestMigrations,
+):
     migrate_from = "1012_fix_archive_files"
     migrate_to = "1011_auto_20210101_2340"
 
     def setUpBeforeMigration(self, apps):
-
         Document = apps.get_model("documents", "Document")
 
-        doc_unrelated = make_test_document(
+        make_test_document(
             Document,
             "unrelated",
             "application/pdf",
@@ -466,14 +472,14 @@ class TestMigrateArchiveFilesBackwards(DirectoriesMixin, TestMigrations):
             simple_pdf2,
             "unrelated.pdf",
         )
-        doc_no_archive = make_test_document(
+        make_test_document(
             Document,
             "no_archive",
             "text/plain",
             simple_txt,
             "no_archive.txt",
         )
-        clashB = make_test_document(
+        make_test_document(
             Document,
             "clash",
             "image/jpeg",
@@ -488,13 +494,13 @@ class TestMigrateArchiveFilesBackwards(DirectoriesMixin, TestMigrations):
 
         for doc in Document.objects.all():
             if doc.archive_checksum:
-                self.assertTrue(os.path.isfile(archive_path_old(doc)))
+                self.assertIsFile(archive_path_old(doc))
             with open(source_path(doc), "rb") as f:
                 original_checksum = hashlib.md5(f.read()).hexdigest()
             self.assertEqual(original_checksum, doc.checksum)
 
             if doc.archive_checksum:
-                self.assertTrue(os.path.isfile(archive_path_old(doc)))
+                self.assertIsFile(archive_path_old(doc))
                 with open(archive_path_old(doc), "rb") as f:
                     archive_checksum = hashlib.md5(f.read()).hexdigest()
                 self.assertEqual(archive_checksum, doc.archive_checksum)
@@ -514,13 +520,11 @@ class TestMigrateArchiveFilesBackwardsWithFilenameFormat(
 
 @override_settings(FILENAME_FORMAT="")
 class TestMigrateArchiveFilesBackwardsErrors(DirectoriesMixin, TestMigrations):
-
     migrate_from = "1012_fix_archive_files"
     migrate_to = "1011_auto_20210101_2340"
     auto_migrate = False
 
     def test_filename_clash(self):
-
         Document = self.apps.get_model("documents", "Document")
 
         self.clashA = make_test_document(
@@ -549,7 +553,6 @@ class TestMigrateArchiveFilesBackwardsErrors(DirectoriesMixin, TestMigrations):
         )
 
     def test_filename_exists(self):
-
         Document = self.apps.get_model("documents", "Document")
 
         self.clashA = make_test_document(

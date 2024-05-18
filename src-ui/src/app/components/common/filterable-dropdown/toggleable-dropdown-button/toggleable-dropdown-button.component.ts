@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { MatchingModel } from 'src/app/data/matching-model'
 
 export enum ToggleableItemState {
@@ -9,7 +9,7 @@ export enum ToggleableItemState {
 }
 
 @Component({
-  selector: 'app-toggleable-dropdown-button',
+  selector: 'pngx-toggleable-dropdown-button',
   templateUrl: './toggleable-dropdown-button.component.html',
   styleUrls: ['./toggleable-dropdown-button.component.scss'],
 })
@@ -22,6 +22,12 @@ export class ToggleableDropdownButtonComponent {
 
   @Input()
   count: number
+
+  @Input()
+  disabled: boolean = false
+
+  @Input()
+  hideCount: boolean = false
 
   @Output()
   toggle = new EventEmitter()

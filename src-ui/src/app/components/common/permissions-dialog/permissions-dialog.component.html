@@ -1,0 +1,27 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-basic-title">{{title}}</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="cancelClicked()">
+  </button>
+</div>
+<div class="modal-body">
+
+  <form [formGroup]="form">
+    <div class="form-group">
+      <pngx-permissions-form [users]="users" formControlName="permissions_form"></pngx-permissions-form>
+    </div>
+    <div class="form-group mt-4">
+      <div class="offset-lg-3 row">
+        <pngx-input-switch i18n-title title="Merge with existing permissions" [horizontal]="true" [hint]="hint" formControlName="merge"></pngx-input-switch>
+      </div>
+    </div>
+  </form>
+
+</div>
+<div class="modal-footer">
+  @if (!buttonsEnabled) {
+    <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+    <span class="visually-hidden" i18n>Loading...</span>
+  }
+  <button type="button" class="btn btn-outline-primary" (click)="cancelClicked()" [disabled]="!buttonsEnabled" i18n>Cancel</button>
+  <button type="button" class="btn btn-primary" (click)="confirm()" [disabled]="!buttonsEnabled" i18n>Confirm</button>
+</div>

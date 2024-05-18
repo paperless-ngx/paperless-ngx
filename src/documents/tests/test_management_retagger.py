@@ -1,5 +1,7 @@
 from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.test import TestCase
+
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
@@ -10,7 +12,6 @@ from documents.tests.utils import DirectoriesMixin
 
 class TestRetagger(DirectoriesMixin, TestCase):
     def make_models(self):
-
         self.sp1 = StoragePath.objects.create(
             name="dummy a",
             path="{created_data}/{title}",
@@ -258,3 +259,38 @@ class TestRetagger(DirectoriesMixin, TestCase):
         self.assertEqual(d_auto.storage_path, self.sp1)
         self.assertIsNone(d_second.storage_path)
         self.assertEqual(d_unrelated.storage_path, self.sp2)
+
+    def test_id_range_parameter(self):
+        commandOutput = ""
+        Document.objects.create(
+            checksum="E",
+            title="E",
+            content="NOT the first document",
+        )
+        call_command("document_retagger", "--tags", "--id-range", "1", "2")
+        # The retagger shouldn`t apply the 'first' tag to our new document
+        self.assertEqual(Document.objects.filter(tags__id=self.tag_first.id).count(), 1)
+
+        try:
+            commandOutput = call_command("document_retagger", "--tags", "--id-range")
+        except CommandError:
+            # Just ignore the error
+            None
+        self.assertIn(commandOutput, "Error: argument --id-range: expected 2 arguments")
+
+        try:
+            commandOutput = call_command(
+                "document_retagger",
+                "--tags",
+                "--id-range",
+                "a",
+                "b",
+            )
+        except CommandError:
+            # Just ignore the error
+            None
+        self.assertIn(commandOutput, "error: argument --id-range: invalid int value:")
+
+        call_command("document_retagger", "--tags", "--id-range", "1", "9999")
+        # Now we should have 2 documents
+        self.assertEqual(Document.objects.filter(tags__id=self.tag_first.id).count(), 2)

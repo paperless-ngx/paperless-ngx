@@ -1,0 +1,10 @@
+.custom-fields-dropdown {
+    min-width: 300px;
+
+    // correct position on mobile
+    @media (max-width: 575.98px) {
+        &.show {
+            margin-left: -245px !important;
+        }
+    }
+}

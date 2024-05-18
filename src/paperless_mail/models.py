@@ -1,9 +1,11 @@
-import documents.models as document_models
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+import documents.models as document_models
 
-class MailAccount(models.Model):
+
+class MailAccount(document_models.ModelWithOwner):
     class Meta:
         verbose_name = _("mail account")
         verbose_name_plural = _("mail accounts")
@@ -35,7 +37,9 @@ class MailAccount(models.Model):
 
     username = models.CharField(_("username"), max_length=256)
 
-    password = models.CharField(_("password"), max_length=256)
+    password = models.CharField(_("password"), max_length=2048)
+
+    is_token = models.BooleanField(_("Is token authentication"), default=False)
 
     character_set = models.CharField(
         _("character set"),
@@ -51,7 +55,7 @@ class MailAccount(models.Model):
         return self.name
 
 
-class MailRule(models.Model):
+class MailRule(document_models.ModelWithOwner):
     class Meta:
         verbose_name = _("mail rule")
         verbose_name_plural = _("mail rules")
@@ -59,14 +63,17 @@ class MailRule(models.Model):
     class ConsumptionScope(models.IntegerChoices):
         ATTACHMENTS_ONLY = 1, _("Only process attachments.")
         EML_ONLY = 2, _("Process full Mail (with embedded attachments in file) as .eml")
-        EVERYTHING = 3, _(
-            "Process full Mail (with embedded attachments in file) as .eml "
-            "+ process attachments as separate documents",
+        EVERYTHING = (
+            3,
+            _(
+                "Process full Mail (with embedded attachments in file) as .eml "
+                "+ process attachments as separate documents",
+            ),
         )
 
     class AttachmentProcessing(models.IntegerChoices):
         ATTACHMENTS_ONLY = 1, _("Only process attachments.")
-        EVERYTHING = 2, _("Process all files, including 'inline' " "attachments.")
+        EVERYTHING = 2, _("Process all files, including 'inline' attachments.")
 
     class MailAction(models.IntegerChoices):
         DELETE = 1, _("Delete")
@@ -78,6 +85,7 @@ class MailRule(models.Model):
     class TitleSource(models.IntegerChoices):
         FROM_SUBJECT = 1, _("Use subject as title")
         FROM_FILENAME = 2, _("Use attachment filename as title")
+        NONE = 3, _("Do not assign title from rule")
 
     class CorrespondentSource(models.IntegerChoices):
         FROM_NOTHING = 1, _("Do not assign a correspondent")
@@ -112,12 +120,21 @@ class MailRule(models.Model):
         null=True,
         blank=True,
     )
+
+    filter_to = models.CharField(
+        _("filter to"),
+        max_length=256,
+        null=True,
+        blank=True,
+    )
+
     filter_subject = models.CharField(
         _("filter subject"),
         max_length=256,
         null=True,
         blank=True,
     )
+
     filter_body = models.CharField(
         _("filter body"),
         max_length=256,
@@ -125,13 +142,25 @@ class MailRule(models.Model):
         blank=True,
     )
 
-    filter_attachment_filename = models.CharField(
-        _("filter attachment filename"),
+    filter_attachment_filename_include = models.CharField(
+        _("filter attachment filename inclusive"),
         max_length=256,
         null=True,
         blank=True,
         help_text=_(
             "Only consume documents which entirely match this "
+            "filename if specified. Wildcards such as *.pdf or "
+            "*invoice* are allowed. Case insensitive.",
+        ),
+    )
+
+    filter_attachment_filename_exclude = models.CharField(
+        _("filter attachment filename exclusive"),
+        max_length=256,
+        null=True,
+        blank=True,
+        help_text=_(
+            "Do not consume documents which entirely match this "
             "filename if specified. Wildcards such as *.pdf or "
             "*invoice* are allowed. Case insensitive.",
         ),
@@ -212,5 +241,72 @@ class MailRule(models.Model):
         verbose_name=_("assign this correspondent"),
     )
 
+    assign_owner_from_rule = models.BooleanField(
+        _("Assign the rule owner to documents"),
+        default=True,
+    )
+
     def __str__(self):
         return f"{self.account.name}.{self.name}"
+
+
+class ProcessedMail(document_models.ModelWithOwner):
+    rule = models.ForeignKey(
+        MailRule,
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+        editable=False,
+    )
+
+    folder = models.CharField(
+        _("folder"),
+        null=False,
+        blank=False,
+        max_length=256,
+        editable=False,
+    )
+
+    uid = models.CharField(
+        _("uid"),
+        null=False,
+        blank=False,
+        max_length=256,
+        editable=False,
+    )
+
+    subject = models.CharField(
+        _("subject"),
+        null=False,
+        blank=False,
+        max_length=256,
+        editable=False,
+    )
+
+    received = models.DateTimeField(
+        _("received"),
+        null=False,
+        blank=False,
+        editable=False,
+    )
+
+    processed = models.DateTimeField(
+        _("processed"),
+        default=timezone.now,
+        editable=False,
+    )
+
+    status = models.CharField(
+        _("status"),
+        null=False,
+        blank=False,
+        max_length=256,
+        editable=False,
+    )
+
+    error = models.TextField(
+        _("error"),
+        null=True,
+        blank=True,
+        editable=False,
+    )

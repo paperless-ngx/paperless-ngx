@@ -5,6 +5,7 @@
 }
 
 .pdf-viewer-container {
+  padding-top: 10px;
   background-color: gray;
 
   pdf-viewer {
@@ -14,16 +15,12 @@
 }
 
 ::ng-deep .ng2-pdf-viewer-container .page {
-  --page-margin: 1px 0 10px;
-  width: 100% !important;
+  --page-margin: 0 auto 10px;
+  --page-border: 0;
 }
 
-::ng-deep .ng2-pdf-viewer-container .page:last-child {
-  --page-margin: 1px 0 20px;
-}
-
-::ng-deep .ng-select-taggable {
-  max-width: calc(100% - 46px); // fudge factor for ng-select button width
+::ng-deep form .ng-select-taggable {
+  max-width: calc(100% - 90px); // fudge factor for (2x) ng-select button width
 }
 
 .btn-group .dropdown-toggle-split {
@@ -40,4 +37,32 @@
 
 textarea.rtl {
   direction: rtl;
+}
+
+.form-select {
+  padding-right: 2.5em;
+}
+
+.input-group .btn-outline-secondary {
+  border-color: var(--bs-border-color);
+}
+
+.btn-group .btn.order-0 {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: var(--bs-border-radius-sm);
+  border-bottom-left-radius: var(--bs-border-radius-sm);
+}
+
+.btn-group .btn.order-3 {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: var(--bs-border-radius-sm);
+  border-bottom-right-radius: var(--bs-border-radius-sm);
+}
+
+.preview-sticky img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }

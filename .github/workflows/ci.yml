@@ -16,41 +16,47 @@ on:
 env:
   # This is the version of pipenv all the steps will use
   # If changing this, change Dockerfile
-  DEFAULT_PIP_ENV_VERSION: "2022.11.30"
-  # This is the default version of Python to use in most steps
-  # If changing this, change Dockerfile
-  DEFAULT_PYTHON_VERSION: "3.9"
+  DEFAULT_PIP_ENV_VERSION: "2023.12.1"
+  # This is the default version of Python to use in most steps which aren't specific
+  DEFAULT_PYTHON_VERSION: "3.10"
 
 jobs:
   pre-commit:
+    # We want to run on external PRs, but not on our own internal PRs as they'll be run
+    # by the push to the branch. Without this if check, checks are duplicated since
+    # internal PRs match both the push and pull_request events.
+    if:
+      github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
+      github.repository
+
     name: Linting Checks
     runs-on: ubuntu-22.04
     steps:
       -
         name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Install python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       -
         name: Check files
-        uses: pre-commit/action@v3.0.0
+        uses: pre-commit/action@v3.0.1
 
   documentation:
-    name: "Build Documentation"
+    name: "Build & Deploy Documentation"
     runs-on: ubuntu-22.04
     needs:
       - pre-commit
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Set up Python
         id: setup-python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
           cache: "pipenv"
@@ -58,7 +64,7 @@ jobs:
       -
         name: Install pipenv
         run: |
-          pip install --user pipenv==${DEFAULT_PIP_ENV_VERSION}
+          pip install --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }}
       -
         name: Install dependencies
         run: |
@@ -72,62 +78,43 @@ jobs:
         run: |
           pipenv --python ${{ steps.setup-python.outputs.python-version }} run mkdocs build --config-file ./mkdocs.yml
       -
+        name: Deploy documentation
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          echo "docs.paperless-ngx.com" > "${{ github.workspace }}/docs/CNAME"
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          pipenv --python ${{ steps.setup-python.outputs.python-version }} run mkdocs gh-deploy --force --no-history
+      -
         name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: documentation
           path: site/
-
-  documentation-deploy:
-    name: "Deploy Documentation"
-    runs-on: ubuntu-22.04
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs:
-      - documentation
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v3
-      -
-        name: Deploy docs
-        uses: mhausenblas/mkdocs-deploy-gh-pages@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CUSTOM_DOMAIN: docs.paperless-ngx.com
-          CONFIG_FILE: mkdocs.yml
-          EXTRA_PACKAGES: build-base
+          retention-days: 7
 
   tests-backend:
-    name: "Tests (${{ matrix.python-version }})"
+    name: "Backend Tests (Python ${{ matrix.python-version }})"
     runs-on: ubuntu-22.04
     needs:
       - pre-commit
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10']
+        python-version: ['3.9', '3.10', '3.11']
       fail-fast: false
-    env:
-      # Enable Tika end to end testing
-      TIKA_LIVE: 1
-      # Enable paperless_mail testing against real server
-      PAPERLESS_MAIL_TEST_HOST: ${{ secrets.TEST_MAIL_HOST }}
-      PAPERLESS_MAIL_TEST_USER: ${{ secrets.TEST_MAIL_USER }}
-      PAPERLESS_MAIL_TEST_PASSWD: ${{ secrets.TEST_MAIL_PASSWD }}
-      # Enable Gotenberg end to end testing
-      GOTENBERG_LIVE: 1
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Start containers
         run: |
-          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml pull --quiet
-          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml up --detach
+          docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml pull --quiet
+          docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml up --detach
       -
         name: Set up Python
         id: setup-python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "${{ matrix.python-version }}"
           cache: "pipenv"
@@ -135,7 +122,7 @@ jobs:
       -
         name: Install pipenv
         run: |
-          pip install --user pipenv==${DEFAULT_PIP_ENV_VERSION}
+          pip install --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }}
       -
         name: Install system dependencies
         run: |
@@ -156,129 +143,184 @@ jobs:
           pipenv --python ${{ steps.setup-python.outputs.python-version }} run pip list
       -
         name: Tests
+        env:
+          PAPERLESS_CI_TEST: 1
+          # Enable paperless_mail testing against real server
+          PAPERLESS_MAIL_TEST_HOST: ${{ secrets.TEST_MAIL_HOST }}
+          PAPERLESS_MAIL_TEST_USER: ${{ secrets.TEST_MAIL_USER }}
+          PAPERLESS_MAIL_TEST_PASSWD: ${{ secrets.TEST_MAIL_PASSWD }}
         run: |
           cd src/
           pipenv --python ${{ steps.setup-python.outputs.python-version }} run pytest -ra
       -
-        name: Upload coverage to Codecov
+        name: Upload coverage
         if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION }}
-        uses: codecov/codecov-action@v3
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-report
+          path: src/coverage.xml
+          retention-days: 7
+          if-no-files-found: warn
+      -
+        name: Stop containers
+        if: always()
+        run: |
+          docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml logs
+          docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml down
+
+  install-frontend-depedendencies:
+    name: "Install Frontend Dependencies"
+    runs-on: ubuntu-22.04
+    needs:
+      - pre-commit
+    steps:
+      - uses: actions/checkout@v4
+      -
+        name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+          cache-dependency-path: 'src-ui/package-lock.json'
+      - name: Cache frontend dependencies
+        id: cache-frontend-deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            ~/.cache
+          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/package-lock.json') }}
+      -
+        name: Install dependencies
+        if: steps.cache-frontend-deps.outputs.cache-hit != 'true'
+        run: cd src-ui && npm ci
+      -
+        name: Install Playwright
+        if: steps.cache-frontend-deps.outputs.cache-hit != 'true'
+        run: cd src-ui && npx playwright install --with-deps
+
+  tests-frontend:
+    name: "Frontend Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
+    runs-on: ubuntu-22.04
+    needs:
+      - install-frontend-depedendencies
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20.x]
+        shard-index: [1, 2, 3, 4]
+        shard-count: [4]
+    steps:
+      - uses: actions/checkout@v4
+      -
+        name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+          cache-dependency-path: 'src-ui/package-lock.json'
+      - name: Cache frontend dependencies
+        id: cache-frontend-deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            ~/.cache
+          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/package-lock.json') }}
+      - name: Re-link Angular cli
+        run: cd src-ui && npm link @angular/cli
+      -
+        name: Linting checks
+        run: cd src-ui && npm run lint
+      -
+        name: Run Jest unit tests
+        run: cd src-ui && npm run test -- --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
+      -
+        name: Upload Jest coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jest-coverage-report-${{ matrix.shard-index }}
+          path: |
+            src-ui/coverage/coverage-final.json
+            src-ui/coverage/lcov.info
+            src-ui/coverage/clover.xml
+          retention-days: 7
+          if-no-files-found: warn
+      -
+        name: Run Playwright e2e tests
+        run: cd src-ui && npx playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
+      -
+        name: Upload Playwright test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.shard-index }}
+          path: src-ui/playwright-report
+          retention-days: 7
+
+  tests-coverage-upload:
+    name: "Upload Coverage"
+    runs-on: ubuntu-22.04
+    needs:
+      - tests-backend
+      - tests-frontend
+    steps:
+      -
+        uses: actions/checkout@v4
+      -
+        name: Download frontend jest coverage
+        uses: actions/download-artifact@v4
+        with:
+          path: src-ui/coverage/
+          pattern: jest-coverage-report-*
+      -
+        name: Download frontend playwright coverage
+        uses: actions/download-artifact@v4
+        with:
+          path: src-ui/coverage/
+          pattern: playwright-report-*
+          merge-multiple: true
+      -
+        name: Upload frontend coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          # not required for public repos, but intermittently fails otherwise
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: frontend
+          directory: src-ui/coverage/
+          # dont include backend coverage files here
+          files: '!coverage.xml'
+      -
+        name: Download backend coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-coverage-report
+          path: src/
+      -
+        name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
         with:
           # not required for public repos, but intermittently fails otherwise
           token: ${{ secrets.CODECOV_TOKEN }}
           # future expansion
           flags: backend
-      -
-        name: Stop containers
-        if: always()
-        run: |
-          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml logs
-          docker compose --file ${GITHUB_WORKSPACE}/docker/compose/docker-compose.ci-test.yml down
+          directory: src/
 
-  tests-frontend:
-    name: "Tests Frontend"
-    runs-on: ubuntu-22.04
-    needs:
-      - pre-commit
-    strategy:
-      matrix:
-        node-version: [16.x]
-    steps:
-      - uses: actions/checkout@v3
-      -
-        name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-      - run: cd src-ui && npm ci
-      - run: cd src-ui && npm run lint
-      - run: cd src-ui && npm run test
-      - run: cd src-ui && npm run e2e:ci
-
-  prepare-docker-build:
-    name: Prepare Docker Pipeline Data
-    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || contains(github.ref, 'beta.rc') || startsWith(github.ref, 'refs/tags/v'))
-    runs-on: ubuntu-22.04
-    needs:
-      - documentation
-      - tests-backend
-      - tests-frontend
-    steps:
-      -
-        name: Set ghcr repository name
-        id: set-ghcr-repository
-        run: |
-          ghcr_name=$(echo "${GITHUB_REPOSITORY}" | awk '{ print tolower($0) }')
-          echo "repository=${ghcr_name}" >> $GITHUB_OUTPUT
-      -
-        name: Checkout
-        uses: actions/checkout@v3
-      -
-        name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
-      -
-        name: Setup qpdf image
-        id: qpdf-setup
-        run: |
-          build_json=$(python ${GITHUB_WORKSPACE}/.github/scripts/get-build-json.py qpdf)
-
-          echo ${build_json}
-
-          echo "qpdf-json=${build_json}" >> $GITHUB_OUTPUT
-      -
-        name: Setup psycopg2 image
-        id: psycopg2-setup
-        run: |
-          build_json=$(python ${GITHUB_WORKSPACE}/.github/scripts/get-build-json.py psycopg2)
-
-          echo ${build_json}
-
-          echo "psycopg2-json=${build_json}" >> $GITHUB_OUTPUT
-      -
-        name: Setup pikepdf image
-        id: pikepdf-setup
-        run: |
-          build_json=$(python ${GITHUB_WORKSPACE}/.github/scripts/get-build-json.py pikepdf)
-
-          echo ${build_json}
-
-          echo "pikepdf-json=${build_json}" >> $GITHUB_OUTPUT
-      -
-        name: Setup jbig2enc image
-        id: jbig2enc-setup
-        run: |
-          build_json=$(python ${GITHUB_WORKSPACE}/.github/scripts/get-build-json.py jbig2enc)
-
-          echo ${build_json}
-
-          echo "jbig2enc-json=${build_json}" >> $GITHUB_OUTPUT
-
-    outputs:
-
-      ghcr-repository: ${{ steps.set-ghcr-repository.outputs.repository }}
-
-      qpdf-json: ${{ steps.qpdf-setup.outputs.qpdf-json }}
-
-      pikepdf-json: ${{ steps.pikepdf-setup.outputs.pikepdf-json }}
-
-      psycopg2-json: ${{ steps.psycopg2-setup.outputs.psycopg2-json }}
-
-      jbig2enc-json: ${{ steps.jbig2enc-setup.outputs.jbig2enc-json}}
-
-  # build and push image to docker hub.
   build-docker-image:
+    name: Build Docker image for ${{ github.ref_name }}
     runs-on: ubuntu-22.04
+    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || startsWith(github.ref, 'refs/heads/fix-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || contains(github.ref, 'beta.rc') || startsWith(github.ref, 'refs/tags/v'))
     concurrency:
       group: ${{ github.workflow }}-build-docker-image-${{ github.ref_name }}
       cancel-in-progress: true
     needs:
-      - prepare-docker-build
+      - tests-backend
+      - tests-frontend
     steps:
       -
         name: Check pushing to Docker Hub
-        id: docker-hub
+        id: push-other-places
         # Only push to Dockerhub from the main repo AND the ref is either:
         #  main
         #  dev
@@ -286,7 +328,7 @@ jobs:
         #  a tag
         # Otherwise forks would require a Docker Hub account and secrets setup
         run: |
-          if [[ ${{ needs.prepare-docker-build.outputs.ghcr-repository }} == "paperless-ngx/paperless-ngx" && ( ${{ github.ref_name }} == "main" || ${{ github.ref_name }} == "dev" || ${{ github.ref_name }} == "beta" || ${{ startsWith(github.ref, 'refs/tags/v') }} == "true" ) ]] ; then
+          if [[ ${{ github.repository_owner }} == "paperless-ngx" && ( ${{ github.ref_name }} == "dev" || ${{ github.ref_name }} == "beta" || ${{ startsWith(github.ref, 'refs/tags/v') }} == "true" ) ]] ; then
             echo "Enabling DockerHub image push"
             echo "enable=true" >> $GITHUB_OUTPUT
           else
@@ -294,13 +336,21 @@ jobs:
             echo "enable=false" >> $GITHUB_OUTPUT
           fi
       -
+        name: Set ghcr repository name
+        id: set-ghcr-repository
+        run: |
+          ghcr_name=$(echo "${{ github.repository }}" | awk '{ print tolower($0) }')
+          echo "Name is ${ghcr_name}"
+          echo "ghcr-repository=${ghcr_name}" >> $GITHUB_OUTPUT
+      -
         name: Gather Docker metadata
         id: docker-meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: |
-            ghcr.io/${{ needs.prepare-docker-build.outputs.ghcr-repository }}
-            name=paperlessngx/paperless-ngx,enable=${{ steps.docker-hub.outputs.enable }}
+            ghcr.io/${{ steps.set-ghcr-repository.outputs.ghcr-repository }}
+            name=paperlessngx/paperless-ngx,enable=${{ steps.push-other-places.outputs.enable }}
+            name=quay.io/paperlessngx/paperless-ngx,enable=${{ steps.push-other-places.outputs.enable }}
           tags: |
             # Tag branches with branch name
             type=ref,event=branch
@@ -310,51 +360,59 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+      # If https://github.com/docker/buildx/issues/1044 is resolved,
+      # the append input with a native arm64 arch could be used to
+      # significantly speed up building
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       -
         name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
       -
-        name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         # Don't attempt to login is not pushing to Docker Hub
-        if: steps.docker-hub.outputs.enable == 'true'
+        if: steps.push-other-places.outputs.enable == 'true'
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
+        name: Login to Quay.io
+        uses: docker/login-action@v3
+        # Don't attempt to login is not pushing to Quay.io
+        if: steps.push-other-places.outputs.enable == 'true'
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_ROBOT_TOKEN }}
+      -
         name: Build and push
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm/v7,linux/arm64
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker-meta.outputs.tags }}
           labels: ${{ steps.docker-meta.outputs.labels }}
-          build-args: |
-            JBIG2ENC_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.jbig2enc-json).version }}
-            QPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).version }}
-            PIKEPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).version }}
-            PSYCOPG2_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.psycopg2-json).version }}
-          # Get cache layers from this branch, then dev, then main
+          # Get cache layers from this branch, then dev
           # This allows new branches to get at least some cache benefits, generally from dev
           cache-from: |
-            type=registry,ref=ghcr.io/${{ needs.prepare-docker-build.outputs.ghcr-repository }}/builder/cache/app:${{ github.ref_name }}
-            type=registry,ref=ghcr.io/${{ needs.prepare-docker-build.outputs.ghcr-repository }}/builder/cache/app:dev
-            type=registry,ref=ghcr.io/${{ needs.prepare-docker-build.outputs.ghcr-repository }}/builder/cache/app:main
+            type=registry,ref=ghcr.io/${{ steps.set-ghcr-repository.outputs.ghcr-repository }}/builder/cache/app:${{ github.ref_name }}
+            type=registry,ref=ghcr.io/${{ steps.set-ghcr-repository.outputs.ghcr-repository }}/builder/cache/app:dev
           cache-to: |
-            type=registry,mode=max,ref=ghcr.io/${{ needs.prepare-docker-build.outputs.ghcr-repository }}/builder/cache/app:${{ github.ref_name }}
+            type=registry,mode=max,ref=ghcr.io/${{ steps.set-ghcr-repository.outputs.ghcr-repository }}/builder/cache/app:${{ github.ref_name }}
       -
         name: Inspect image
         run: |
@@ -366,23 +424,26 @@ jobs:
           docker cp frontend-extract:/usr/src/paperless/src/documents/static/frontend src/documents/static/frontend/
       -
         name: Upload frontend artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: frontend-compiled
           path: src/documents/static/frontend/
+          retention-days: 7
 
   build-release:
+    name: "Build Release"
     needs:
       - build-docker-image
+      - documentation
     runs-on: ubuntu-22.04
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Set up Python
         id: setup-python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
           cache: "pipenv"
@@ -390,11 +451,17 @@ jobs:
       -
         name: Install pipenv + tools
         run: |
-          pip install --upgrade --user pipenv==${DEFAULT_PIP_ENV_VERSION} setuptools wheel
+          pip install --upgrade --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }} setuptools wheel
       -
         name: Install Python dependencies
         run: |
           pipenv --python ${{ steps.setup-python.outputs.python-version }} sync --dev
+      -
+        name: Patch whitenoise
+        run: |
+          curl --fail --silent --show-error --location --output 484.patch https://github.com/evansd/whitenoise/pull/484.patch
+          patch -d $(pipenv --venv)/lib/python3.10/site-packages --verbose -p2 < 484.patch
+          rm 484.patch
       -
         name: Install system dependencies
         run: |
@@ -402,13 +469,13 @@ jobs:
           sudo apt-get install -qq --no-install-recommends gettext liblept5
       -
         name: Download frontend artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: frontend-compiled
           path: src/documents/static/frontend/
       -
         name: Download documentation artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: documentation
           path: docs/_build/html/
@@ -451,7 +518,7 @@ jobs:
           do
             cp --verbose ${file_name} dist/paperless-ngx/
           done
-          mv --verbose dist/paperless-ngx/paperless.conf.example paperless.conf
+          mv --verbose dist/paperless-ngx/paperless.conf.example dist/paperless-ngx/paperless.conf
 
           echo "Copying Docker related files"
           cp --recursive docker/ dist/paperless-ngx/docker
@@ -474,12 +541,14 @@ jobs:
           tar -cJf paperless-ngx.tar.xz paperless-ngx/
       -
         name: Upload release artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: release
           path: dist/paperless-ngx.tar.xz
+          retention-days: 7
 
   publish-release:
+    name: "Publish Release"
     runs-on: ubuntu-22.04
     outputs:
       prerelease: ${{ steps.get_version.outputs.prerelease }}
@@ -491,7 +560,7 @@ jobs:
     steps:
       -
         name: Download release artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: release
           path: ./
@@ -508,7 +577,7 @@ jobs:
       -
         name: Create Release and Changelog
         id: create-release
-        uses: release-drafter/release-drafter@v5
+        uses: release-drafter/release-drafter@v6
         with:
           name: Paperless-ngx ${{ steps.get_version.outputs.version }}
           tag: ${{ steps.get_version.outputs.version }}
@@ -529,6 +598,7 @@ jobs:
           asset_content_type: application/x-xz
 
   append-changelog:
+    name: "Append Changelog"
     runs-on: ubuntu-22.04
     needs:
       - publish-release
@@ -536,12 +606,12 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: main
       -
         name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
           cache: "pipenv"
@@ -549,7 +619,7 @@ jobs:
       -
         name: Install pipenv + tools
         run: |
-          pip install --upgrade --user pipenv==${DEFAULT_PIP_ENV_VERSION} setuptools wheel
+          pip install --upgrade --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }} setuptools wheel
       -
         name: Append Changelog to docs
         id: append-Changelog
@@ -570,12 +640,12 @@ jobs:
           git push origin ${{ needs.publish-release.outputs.version }}-changelog
       -
         name: Create Pull Request
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const { repo, owner } = context.repo;
             const result = await github.rest.pulls.create({
-              title: '[Documentation] Add ${{ needs.publish-release.outputs.version }} changelog',
+              title: 'Documentation: Add ${{ needs.publish-release.outputs.version }} changelog',
               owner,
               repo,
               head: '${{ needs.publish-release.outputs.version }}-changelog',
@@ -586,5 +656,5 @@ jobs:
               owner,
               repo,
               issue_number: result.data.number,
-              labels: ['documentation']
+              labels: ['documentation', 'skip-changelog']
             });

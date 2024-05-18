@@ -3,17 +3,24 @@ import { FormControl, FormGroup } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
-import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
+import { DocumentType } from 'src/app/data/document-type'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import { UserService } from 'src/app/services/rest/user.service'
+import { SettingsService } from 'src/app/services/settings.service'
 
 @Component({
-  selector: 'app-document-type-edit-dialog',
+  selector: 'pngx-document-type-edit-dialog',
   templateUrl: './document-type-edit-dialog.component.html',
   styleUrls: ['./document-type-edit-dialog.component.scss'],
 })
-export class DocumentTypeEditDialogComponent extends EditDialogComponent<PaperlessDocumentType> {
-  constructor(service: DocumentTypeService, activeModal: NgbActiveModal) {
-    super(service, activeModal)
+export class DocumentTypeEditDialogComponent extends EditDialogComponent<DocumentType> {
+  constructor(
+    service: DocumentTypeService,
+    activeModal: NgbActiveModal,
+    userService: UserService,
+    settingsService: SettingsService
+  ) {
+    super(service, activeModal, userService, settingsService)
   }
 
   getCreateTitle() {
@@ -30,6 +37,7 @@ export class DocumentTypeEditDialogComponent extends EditDialogComponent<Paperle
       matching_algorithm: new FormControl(DEFAULT_MATCHING_ALGORITHM),
       match: new FormControl(''),
       is_insensitive: new FormControl(true),
+      permissions_form: new FormControl(null),
     })
   }
 }

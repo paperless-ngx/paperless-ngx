@@ -8,7 +8,7 @@ updates:
     target-branch: "dev"
     # Look for `package.json` and `lock` files in the `/src-ui` directory
     directory: "/src-ui"
-    # Check the npm registry for updates every month
+    open-pull-requests-limit: 10
     schedule:
       interval: "monthly"
     labels:
@@ -17,6 +17,21 @@ updates:
     # Add reviewers
     reviewers:
       - "paperless-ngx/frontend"
+    groups:
+      frontend-angular-dependencies:
+        patterns:
+          - "@angular*"
+          - "@ng-*"
+          - "ngx-*"
+          - "ng2-pdf-viewer"
+      frontend-jest-dependencies:
+        patterns:
+          - "@types/jest"
+          - "jest*"
+      frontend-eslint-dependencies:
+        patterns:
+          - "@typescript-eslint*"
+          - "eslint"
 
   # Enable version updates for Python
   - package-ecosystem: "pip"
@@ -32,8 +47,26 @@ updates:
     # Add reviewers
     reviewers:
       - "paperless-ngx/backend"
+    ignore:
+      - dependency-name: "uvicorn"
+    groups:
+      development:
+        patterns:
+          - "*pytest*"
+          - "ruff"
+          - "mkdocs-material"
+      django:
+        patterns:
+          - "*django*"
+      major-versions:
+        update-types:
+          - "major"
+      small-changes:
+        update-types:
+          - "minor"
+          - "patch"
 
-  # Enable updates for Github Actions
+  # Enable updates for GitHub Actions
   - package-ecosystem: "github-actions"
     target-branch: "dev"
     directory: "/"
@@ -46,3 +79,9 @@ updates:
     # Add reviewers
     reviewers:
       - "paperless-ngx/ci-cd"
+    groups:
+      actions:
+        update-types:
+          - "major"
+          - "minor"
+          - "patch"

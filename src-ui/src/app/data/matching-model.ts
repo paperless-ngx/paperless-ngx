@@ -1,5 +1,6 @@
 import { ObjectWithId } from './object-with-id'
 
+export const MATCH_NONE = 0
 export const MATCH_ANY = 1
 export const MATCH_ALL = 2
 export const MATCH_LITERAL = 3
@@ -9,6 +10,11 @@ export const MATCH_AUTO = 6
 export const DEFAULT_MATCHING_ALGORITHM = MATCH_AUTO
 
 export const MATCHING_ALGORITHMS = [
+  {
+    id: MATCH_AUTO,
+    shortName: $localize`Automatic`,
+    name: $localize`Auto: Learn matching automatically`,
+  },
   {
     id: MATCH_ANY,
     shortName: $localize`Any word`,
@@ -35,9 +41,9 @@ export const MATCHING_ALGORITHMS = [
     name: $localize`Fuzzy: Document contains a word similar to this word`,
   },
   {
-    id: MATCH_AUTO,
-    shortName: $localize`Automatic`,
-    name: $localize`Auto: Learn matching automatically`,
+    id: MATCH_NONE,
+    shortName: $localize`None`,
+    name: $localize`None: Disable matching`,
   },
 ]
 

@@ -1,0 +1,16 @@
+.date-dropdown {
+  white-space: nowrap;
+
+  @media(min-width: 768px) {
+    --bs-dropdown-min-width: 40rem;
+  }
+
+  .btn-link {
+    line-height: 1;
+  }
+}
+
+.selected-icon {
+  min-width: 1em;
+  min-height: 1em;
+}

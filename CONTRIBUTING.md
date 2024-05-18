@@ -11,7 +11,7 @@ If you want to implement something big:
 
 ## Python
 
-Paperless supports python 3.8 and 3.9. We format Python code with [Black](https://github.com/psf/black).
+Paperless supports python 3.9 - 3.11. We format Python code with [ruff](https://docs.astral.sh/ruff/formatter/).
 
 ## Branches
 
@@ -45,7 +45,7 @@ Examples of `non-trivial` PRs might include:
 
 - Additional features
 - Large changes to many distinct files
-- Breaking or depreciation of existing features
+- Breaking or deprecation of existing features
 
 Our community review process for `non-trivial` PRs is the following:
 
@@ -57,6 +57,13 @@ Our community review process for `non-trivial` PRs is the following:
 4. **At least two** members of the team will approve and finally merge the request into `dev` 🎉.
 
 This process might be slow as community members have different schedules and time to dedicate to the Paperless project. However it ensures community code reviews are as brilliantly thorough as they once were with @jonaswinkler.
+
+# AI-Generated Code
+
+This project does not specifically prohibit the use of AI-generated code _during the process_ of creating a PR, however:
+
+1. Any code present in the final PR that was generated using AI sources should be clearly attributed as such and must not violate copyright protections.
+2. We will not accept PRs that are entirely or mostly AI-derived.
 
 # Translating Paperless-ngx
 
@@ -87,7 +94,7 @@ The following files need to be changed:
 
 - src-ui/angular.json (under the _projects/paperless-ui/i18n/locales_ JSON key)
 - src/paperless/settings.py (in the _LANGUAGES_ array)
-- src-ui/src/app/services/settings.service.ts (inside the _getLanguageOptions_ method)
+- src-ui/src/app/services/settings.service.ts (inside the _LANGUAGE_OPTIONS_ array)
 - src-ui/src/app/app.module.ts (import locale from _angular/common/locales_ and call _registerLocaleData_)
 
 Please add the language in the correct order, alphabetically by locale.
@@ -130,3 +137,19 @@ All team members are notified when mentioned or assigned to a relevant issue or 
 We are not overly strict with inviting people to the organization. If you have read the [team permissions](#permissions) and think having additional access would enhance your contributions, please reach out to an [admin](#structure) of the team.
 
 The admins occasionally invite contributors directly if we believe having them on a team will accelerate their work.
+
+# Automatic Repository Maintenance
+
+The Paperless-ngx team appreciates all effort and interest from the community in filing bug reports, creating feature requests, sharing ideas and helping other
+community members. That said, in an effort to keep the repository organized and managebale the project uses automatic handling of certain areas:
+
+- Issues that cannot be reproduced will be marked 'stale' after 7 days of inactivity and closed after 14 further days of inactivity.
+- Issues, pull requests and discussions that are closed will be locked after 30 days of inactivity.
+- Discussions with a marked answer will be automatically closed.
+- Discussions in the 'General' or 'Support' categories will be closed after 180 days of inactivity.
+- Feature requests that do not meet the following thresholds will be closed: 5 "up-votes" after 180 days of inactivity or 10 "up-votes" after 365 days.
+
+In all cases, threads can be re-opened by project maintainers and, of course, users can always create a new discussion for related concerns.
+Finally, remember that all information remains searchable and 'closed' feature requests can still serve as inspiration for new features.
+
+Thank you all for your contributions.
