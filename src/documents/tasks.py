@@ -300,13 +300,15 @@ def update_document_archive_file(document_id):
 
 @shared_task
 def empty_trash(doc_ids=None):
-    cutoff = timezone.localtime(timezone.now()) - timedelta(
-        days=settings.EMPTY_TRASH_DELAY,
-    )
     documents = (
         Document.deleted_objects.filter(id__in=doc_ids)
         if doc_ids is not None
-        else Document.deleted_objects.filter(deleted_at__gt=cutoff)
+        else Document.deleted_objects.filter(
+            deleted_at__lt=timezone.localtime(timezone.now())
+            - timedelta(
+                days=settings.EMPTY_TRASH_DELAY,
+            ),
+        )
     )
 
     # Temporarily connect the cleanup handler (hard_delete calls delete)
