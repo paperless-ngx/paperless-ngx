@@ -5,6 +5,7 @@
 }
 
 .pdf-viewer-container {
+  padding-top: 10px;
   background-color: gray;
 
   pdf-viewer {
@@ -14,11 +15,8 @@
 }
 
 ::ng-deep .ng2-pdf-viewer-container .page {
-  --page-margin: 10px auto;
-}
-
-::ng-deep .ng2-pdf-viewer-container .page:last-child {
-  --page-margin: 10px auto 20px;
+  --page-margin: 0 auto 10px;
+  --page-border: 0;
 }
 
 ::ng-deep form .ng-select-taggable {
