@@ -86,6 +86,12 @@ body:
       description: Note there are significant differences from the official image and linuxserver.io, please check if your issue is specific to the third-party image.
     validations:
       required: true
+  - type: textarea
+    id: system-status
+    attributes:
+      label: System status
+      description: If available, copy & paste the system status output from Settings > System Status > Copy
+      render: json
   - type: input
     id: browser
     attributes:
@@ -97,11 +103,6 @@ body:
     attributes:
       label: Configuration changes
       description: Any configuration changes you made in `docker-compose.yml`, `docker-compose.env` or `paperless.conf`.
-  - type: input
-    id: other
-    attributes:
-      label: Other
-      description: Any other relevant details.
   - type: checkboxes
     id: required-checks
     attributes:
