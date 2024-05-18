@@ -421,13 +421,12 @@ to optionally attach data to documents which does not fit in the existing set of
 Paperless-ngx provides.
 
 1. First, create a custom field (under "Manage"), with a given name and data type. This could be something like "Invoice Number" or "Date Paid", with a data type of "Number", "Date", "String", etc.
-2. Once created, a field can be used with documents and data stored. To do so, use the "Custom Fields" menu on the document detail page, choose your existing field and click "Add". Once the field is visible in the form you can enter the appropriate
-   data which will be validated according to the custom field "data type".
+2. Once created, a field can be used with documents and data stored. To do so, use the "Custom Fields" menu on the document detail page, choose your existing field from the dropdown. Once the field is visible in the form you can enter the appropriate data which will be validated according to the custom field "data type".
 3. Fields can be removed by hovering over the field name revealing a "Remove" button.
 
 !!! important
 
-    Added / removed fields, as well as any data is not saved to the document until you
+    Added / removed fields, as well as any data, is not saved to the document until you
     actually hit the "Save" button, similar to other changes on the document details page.
 
 !!! note
