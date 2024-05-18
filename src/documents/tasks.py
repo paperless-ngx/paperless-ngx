@@ -117,10 +117,13 @@ def consume_file(
         ConsumerPlugin,
     ]
 
-    with ProgressManager(
-        overrides.filename or input_doc.original_file.name,
-        self.request.id,
-    ) as status_mgr, TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
+    with (
+        ProgressManager(
+            overrides.filename or input_doc.original_file.name,
+            self.request.id,
+        ) as status_mgr,
+        TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir,
+    ):
         tmp_dir = Path(tmp_dir)
         for plugin_class in plugins:
             plugin_name = plugin_class.NAME

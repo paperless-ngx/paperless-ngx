@@ -618,7 +618,6 @@ class DocumentViewSet(
 
     @action(methods=["get", "post", "delete"], detail=True)
     def notes(self, request, pk=None):
-
         currentUser = request.user
         try:
             doc = (
@@ -1337,7 +1336,6 @@ class StatisticsView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-
         user = request.user if request.user is not None else None
 
         documents = (
@@ -1533,9 +1531,9 @@ class UiSettingsView(GenericAPIView):
         if hasattr(user, "ui_settings"):
             ui_settings = user.ui_settings.settings
         if "update_checking" in ui_settings:
-            ui_settings["update_checking"][
-                "backend_setting"
-            ] = settings.ENABLE_UPDATE_CHECK
+            ui_settings["update_checking"]["backend_setting"] = (
+                settings.ENABLE_UPDATE_CHECK
+            )
         else:
             ui_settings["update_checking"] = {
                 "backend_setting": settings.ENABLE_UPDATE_CHECK,

@@ -5,7 +5,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("documents", "1044_workflow_workflowaction_workflowtrigger_and_more"),
     ]

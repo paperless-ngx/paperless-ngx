@@ -144,9 +144,12 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         # Set a correspondent and save the document
         document.correspondent = Correspondent.objects.get_or_create(name="test")[0]
 
-        with mock.patch(
-            "documents.signals.handlers.Document.objects.filter",
-        ) as m, disable_auditlog():
+        with (
+            mock.patch(
+                "documents.signals.handlers.Document.objects.filter",
+            ) as m,
+            disable_auditlog(),
+        ):
             m.side_effect = DatabaseError()
             document.save()
 
