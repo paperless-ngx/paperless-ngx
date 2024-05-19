@@ -213,10 +213,6 @@ The front end is built using AngularJS. In order to get started, you need Node.j
     By default, the development server is available on `http://localhost:4200/` and is configured to access the API at
     `http://localhost:8000/api/`, which is the default of the backend. If you enabled `DEBUG` on the back end, several security overrides for allowed hosts, CORS and X-Frame-Options are in place so that the front end behaves exactly as in production.
 
-    !!! note
-
-        Enable `DEBUG` by setting your system variable `PAPERLESS_DEBUG` to **true** in linux `export PAPERLESS_DEBUG=true` prior to starting the backend server.
-
 ### Testing and code style
 
 The front end code (.ts, .html, .scss) use `prettier` for code
