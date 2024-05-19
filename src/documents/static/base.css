@@ -7,6 +7,15 @@ body {
   --pngx-primary-active: #0c2c10;
 }
 
+.logo {
+  height: auto;
+}
+
+.byline {
+  font-size: 0.6rem;
+  letter-spacing: 0.1rem;
+}
+
 .form-control {
   --bs-body-bg: #fff;
 }
