@@ -67,6 +67,7 @@ first-time setup.
     ```
 
 2.  Install prerequisites as mentioned in [Bare metal route](setup.md#bare_metal).
+
     !!! note
 
         This includes both the dependencies for **Paperless** as well as the dependencies for **OCRmyPDF**.
