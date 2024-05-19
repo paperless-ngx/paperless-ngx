@@ -6,12 +6,16 @@ from paperless.config import GeneralConfig
 def settings(request):
     general_config = GeneralConfig()
 
-    app_title = django_settings.APP_TITLE
-    if general_config.app_title is not None and len(general_config.app_title) > 0:
-        app_title = general_config.app_title
-    app_logo = django_settings.APP_LOGO
-    if general_config.app_logo is not None and len(general_config.app_logo) > 0:
-        app_logo = general_config.app_logo
+    app_title = (
+        django_settings.APP_TITLE
+        if general_config.app_title is None or len(general_config.app_title) == 0
+        else general_config.app_title
+    )
+    app_logo = (
+        django_settings.APP_LOGO
+        if general_config.app_logo is None or len(general_config.app_logo) == 0
+        else general_config.app_logo
+    )
 
     return {
         "EMAIL_ENABLED": django_settings.EMAIL_HOST != "localhost"
