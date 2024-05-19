@@ -18,6 +18,10 @@ from PIL import Image,ImageDraw,ImageFont
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
+from pdf2image import convert_from_path
+from reportlab.lib.utils import ImageReader
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import Paragraph
 
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
@@ -197,9 +201,10 @@ class RasterisedDocumentParser(DocumentParser):
             logging.error('ocr: ', response_ocr.text)
 
         return data_ocr
+    
+
     def render_pdf_ocr(self, sidecar, mime_type, input_path, output_path):
         font_name = 'Arial'
-        c = None
         data = self.ocr_file(input_path)
         if not data:
                 return
@@ -207,6 +212,7 @@ class RasterisedDocumentParser(DocumentParser):
         with open(sidecar, "w") as txt_sidecar:
             txt_sidecar.write(data.get("content",""))
         if self.is_image(mime_type):
+            c = None
             img = Image.open(input_path)
             width, height = img.size
             c = canvas.Canvas(str(output_path), pagesize=(width, height))
@@ -222,31 +228,28 @@ class RasterisedDocumentParser(DocumentParser):
                             y2 = word["bbox"][1][1]
                             value = word["value"]
                             font_size = (y2-y1) * 72 / 96
-                            
-                            
-                            # font = ImageFont.truetype(font_path, font_size)
-                            # text = "Hello, world!"
-                            # text_width, text_height = font.textsize(text)
-                            # print(f"Text width: {text_width}, Text height: {text_height}")
                             x_center_coordinates =x2 - (x2-x1)/2
                             y_center_coordinates =y2 - (y2-y1)/2
                             w = c.stringWidth(value, font_name, font_size)
-                            self.log.debug('w:', )
                             c.setFont('Arial', font_size)
                             c.drawString(x_center_coordinates - w/2 , height - y_center_coordinates - (font_size/2) , value)            
             c.drawImage(input_path, 0, 0, width=width, height=height)
             c.save()
         else:
             shutil.copy(str(input_path), str(output_path))
-            output_pdf = PdfWriter()
-            input_pdf = PdfReader(output_path)
-            
+            # output_pdf = PdfWriter()
+            input_pdf = PdfReader(input_path)
+            # self.log.info('gia tri get number pages',input_pdf.getNumPages())
+            images = convert_from_path(input_path, first_page=1, last_page=input_pdf.getNumPages()+1)
+            can = canvas.Canvas(str(output_path), pagesize=letter)
             for page_num, page in enumerate(input_pdf.pages):
                 page_height = input_pdf.pages[page_num].mediabox[3]
                 page_width = input_pdf.pages[page_num].mediabox[2]
-                
-                packet = io.BytesIO()
-                can = canvas.Canvas(packet, pagesize=letter)
+                byte_image = io.BytesIO()
+                images[page_num].save(byte_image, format='JPEG')
+                jpg_image = byte_image.getvalue()
+                self.log.info('gia tri page height',page_height)
+                can.drawImage(ImageReader(io.BytesIO(jpg_image)), 0, 0, width=float(page_width), height=float(page_height))
                 pdfmetrics.registerFont(TTFont('Arial', font_path))
                 width_api_img = data["pages"][page_num]["dimensions"][1]
                 height_api_img = data["pages"][page_num]["dimensions"][0]
@@ -265,90 +268,15 @@ class RasterisedDocumentParser(DocumentParser):
                             y_center_coordinates =y2 - (y2-y1)/2
                             w = can.stringWidth(value, font_name, font_size)
                             can.setFont('Arial', font_size)
-                            can.drawString(x_center_coordinates - w/2 , int(page_height) - y_center_coordinates - (font_size/2) , value)            
-
+                            can.drawString(x_center_coordinates - w/2 , int(page_height) - y_center_coordinates - (font_size/3) , value)            
                 can.showPage()
-                can.save()
-                packet.seek(0)
-                new_pdf = PdfReader(packet)
-                page.merge_page(new_pdf.pages[0])
-
-                output_pdf.add_page(page)
-
-            output_pdf.write(output_path)
+            can.save()
         shutil.copyfile(str(output_path), "/home/otxtan/python/opt/paperless/pdfa.pdf")
 
-    # create pdf from image 
-    def pdf_create_layer_text(self, sidecar, input_path, output_path):
-        
-
-
-        packet = io.BytesIO()
-        # test
-        
-        c = Canvas(packet, pagesize=letter)
-
-        # get data 
-        data = self.ocr_file(input_path)
-        if not data:
-            return PdfFileReader(packet)
-        # viet text vao file
-        with open(sidecar, "w") as txt_sidecar:
-            txt_sidecar.write(data.get("content",""))
-
-        for page in data["pages"]:
-            if "blocks" in page:
-                for block in page["blocks"]:
-                    for word in block.get("words",[]):
-                        x1 = word["bbox"][0][0]
-                        y1 = word["bbox"][0][1]
-                        x2 = word["bbox"][1][0]
-                        y2 = word["bbox"][1][1]
-                        value = word["value"]
-                        c.drawString(x1, y1, value)            
-            c.showPage()
-        c.save()
-        packet.seek(0)
-        return PdfFileReader(packet)
-
-    # Tạo lớp 2 (nội dung)
-    def merge_pdfs(self, mime_type, input_path, output_path, overlay):
-        pdf = None
-        if self.is_image(mime_type):
-            packet = io.BytesIO()
-            img = Image.open(input_path)
-            width, height = img.size
-            c = canvas.Canvas(packet, pagesize=(width, height))
-            c.drawImage(input_path, 0, 0, width=width, height=height)
-            c.save()
-            packet.seek(0)
-            pdf = PdfFileReader(packet)
-        else:    
-            pdf = PdfFileReader(input_path)
-        pdf_writer = PdfFileWriter()
-
-        for page_number in range(pdf.getNumPages()):
-            page = pdf.getPage(page_number)
-            page.mergePage(overlay.getPage(page_number))
-            pdf_writer.addPage(page)
-
-        with open(output_path, 'wb') as out:
-            pdf_writer.write(out)
-        with open("/home/otxtan/python/opt/paperless/pdfa.pdf", 'wb') as f:
-            pdf_writer.write(f)
-        # 
-        pdf_writer1 = PdfFileWriter()
-        for page_num in range(pdf.numPages):
-            page = pdf.getPage(page_num)
-            pdf_writer1.addPage(page)
-
-        with open("/home/otxtan/python/opt/paperless/pdfa1.pdf", 'wb') as output_file:
-            pdf_writer1.write(output_file)
+    
             
     def ocr_img_or_pdf(self, document_path, mime_type, sidecar, output_file, **kwargs):
         self.log.info('mime_type:',mime_type)
-        # overlay_text = self.pdf_create_layer_text(sidecar, document_path, output_file)
-        # self.merge_pdfs(mime_type, input_path = document_path, output_path = output_file, overlay = overlay_text)
         self.render_pdf_ocr(sidecar, mime_type, document_path, output_file)
      
 
