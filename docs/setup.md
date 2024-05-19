@@ -756,6 +756,7 @@ performance immensely:
 - Consider setting [`PAPERLESS_ENABLE_NLTK`](configuration.md#PAPERLESS_ENABLE_NLTK) to false, to disable the
   more advanced language processing, which can take more memory and
   processing time.
+- Consider at least 2 Gigabytes of memory if needed using OCR.  
 
 For details, refer to [configuration](configuration.md).
 
