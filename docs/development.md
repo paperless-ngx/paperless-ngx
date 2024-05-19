@@ -60,19 +60,27 @@ first-time setup.
 
       Every command is executed directly from the root folder of the project unless specified otherwise.
 
-1.  Install prerequisites + pipenv as mentioned in
-    [Bare metal route](setup.md#bare_metal).
+1.  Install **pipenv**
 
-2.  Copy `paperless.conf.example` to `paperless.conf` and enable debug
+    ```bash
+      $ pip install --user pipenv
+    ```
+
+2.  Install prerequisites as mentioned in [Bare metal route](setup.md#bare_metal).
+    !!! note
+
+        This includes both the dependencies for **Paperless** as well as the dependencies for **OCRmyPDF**.
+
+3.  Copy `paperless.conf.example` to `paperless.conf` and enable debug
     mode within the file via `PAPERLESS_DEBUG=true`.
 
-3.  Create `consume` and `media` directories:
+4.  Create `consume` and `media` directories:
 
     ```bash
     $ mkdir -p consume media
     ```
 
-4.  Install the Python dependencies:
+5.  Install the Python dependencies:
 
     ```bash
     $ pipenv install --dev
@@ -86,13 +94,13 @@ first-time setup.
         [pyenv](https://github.com/pyenv/pyenv) to install a specific
         Python version.
 
-5.  Install pre-commit hooks:
+6.  Install pre-commit hooks:
 
     ```bash
     $ pre-commit install
     ```
 
-6.  Apply migrations and create a superuser for your development instance:
+7.  Apply migrations and create a superuser for your development instance:
 
     ```bash
     # src/
@@ -101,7 +109,7 @@ first-time setup.
     $ python3 manage.py createsuperuser
     ```
 
-7.  You can now either ...
+8.  You can now either ...
 
     - install redis or
 
@@ -115,7 +123,7 @@ first-time setup.
       $ docker run -d -p 6379:6379 --restart unless-stopped redis:latest
       ```
 
-8.  Continue with either back-end or front-end development – or both :-).
+9.  Continue with either back-end or front-end development – or both :-).
 
 ## Back end development
 
@@ -203,6 +211,10 @@ The front end is built using AngularJS. In order to get started, you need Node.j
 
     By default, the development server is available on `http://localhost:4200/` and is configured to access the API at
     `http://localhost:8000/api/`, which is the default of the backend. If you enabled `DEBUG` on the back end, several security overrides for allowed hosts, CORS and X-Frame-Options are in place so that the front end behaves exactly as in production.
+
+    !!! note
+
+        Enable `DEBUG` by setting your system variable `PAPERLESS_DEBUG` to **true** in linux `export PAPERLESS_DEBUG=true` prior to starting the backend server.
 
 ### Testing and code style
 
