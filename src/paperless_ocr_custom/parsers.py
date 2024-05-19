@@ -257,6 +257,7 @@ class RasterisedDocumentParser(DocumentParser):
                 rolate_width = width_api_img /page_width
                 for block in data["pages"][page_num]["blocks"]:
                     for line in block.get("lines", []):
+                        text_line = ''
                         for word in line.get("words", []):   
                             x1 = word["bbox"][0][0] / float(rolate_width)
                             y1 = word["bbox"][0][1] / float(rolate_height)
