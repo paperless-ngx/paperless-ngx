@@ -16,10 +16,6 @@ body {
   letter-spacing: 0.1rem;
 }
 
-.mt-n1 {
-  margin-top: -0.8rem;
-}
-
 .text-primary {
   color: var(--pngx-primary) !important;
 }
@@ -45,6 +41,7 @@ body {
 
 .form-accounts {
   max-width: 330px;
+  min-width: 300px;
 }
 
 .form-stacked-top input {
@@ -90,5 +87,9 @@ body {
 
   svg.logo .text {
     fill: #abb2bf !important;
+  }
+
+  .byline {
+    color: #abb2bf;
   }
 }
