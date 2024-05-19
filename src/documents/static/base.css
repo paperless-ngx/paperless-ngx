@@ -16,6 +16,14 @@ body {
   letter-spacing: 0.1rem;
 }
 
+.mt-n1 {
+  margin-top: -0.8rem;
+}
+
+.text-primary {
+  color: var(--pngx-primary) !important;
+}
+
 .form-control {
   --bs-body-bg: #fff;
 }

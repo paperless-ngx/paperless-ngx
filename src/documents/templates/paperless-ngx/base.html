@@ -20,10 +20,17 @@
         <div class="position-absolute top-50 start-50 translate-middle">
             <form class="form-accounts" method="post">
                 {% csrf_token %}
-                {% if not APP_LOGO %}
+                {% if not APP_LOGO and not APP_TITLE %}
                     {% include "paperless-ngx/snippets/svg_logo.html" with extra_attrs="width='300' class='logo mb-4'" %}
                 {% else %}
-                    <img src="{{APP_LOGO}}" width="300" class="logo mb-1" />
+                    {% if APP_LOGO %}
+                        <img src="{{APP_LOGO}}" width="300" class="logo mb-1" />
+                    {% else %}
+                        <h1 class="text-primary font-weight-normal mb-1">
+                            {% include "paperless-ngx/snippets/svg_leaf.html" with extra_attrs="width='30' class='mt-n1'" %}
+                            <span class="ms-2">{{ APP_TITLE }}</span>
+                        </h1>
+                    {% endif %}
                     <div class="d-flex flex-column align-items-end mb-4">
                         <span class="byline text-uppercase font-monospace">by Paperless-ngx</span>
                     </div>
