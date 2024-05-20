@@ -81,6 +81,7 @@ import { environment } from 'src/environments/environment'
 import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { SplitConfirmDialogComponent } from '../common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
 import { PdfViewerModule } from 'ng2-pdf-viewer'
+import { DataType } from 'src/app/data/datatype'
 
 const doc: Document = {
   id: 3,
@@ -781,10 +782,9 @@ describe('DocumentDetailComponent', () => {
     const object = {
       id: 22,
       name: 'Correspondent22',
-      last_correspondence: new Date().toISOString(),
     } as Correspondent
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    component.filterDocuments([object])
+    component.filterDocuments([object], DataType.Correspondent)
     expect(qfSpy).toHaveBeenCalledWith([
       {
         rule_type: FILTER_CORRESPONDENT,
@@ -797,7 +797,7 @@ describe('DocumentDetailComponent', () => {
     initNormally()
     const object = { id: 22, name: 'DocumentType22' } as DocumentType
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    component.filterDocuments([object])
+    component.filterDocuments([object], DataType.DocumentType)
     expect(qfSpy).toHaveBeenCalledWith([
       {
         rule_type: FILTER_DOCUMENT_TYPE,
@@ -814,7 +814,7 @@ describe('DocumentDetailComponent', () => {
       path: '/foo/bar/',
     } as StoragePath
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    component.filterDocuments([object])
+    component.filterDocuments([object], DataType.StoragePath)
     expect(qfSpy).toHaveBeenCalledWith([
       {
         rule_type: FILTER_STORAGE_PATH,
@@ -840,7 +840,7 @@ describe('DocumentDetailComponent', () => {
       text_color: '#000000',
     } as Tag
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    component.filterDocuments([object1, object2])
+    component.filterDocuments([object1, object2], DataType.Tag)
     expect(qfSpy).toHaveBeenCalledWith([
       {
         rule_type: FILTER_HAS_TAGS_ALL,
