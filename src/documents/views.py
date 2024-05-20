@@ -279,6 +279,12 @@ class CorrespondentViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             )
         return super().list(request, *args, **kwargs)
 
+    def retrieve(self, request, *args, **kwargs):
+        self.queryset = self.queryset.annotate(
+            last_correspondence=Max("documents__created"),
+        )
+        return super().retrieve(request, *args, **kwargs)
+
 
 class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = Tag

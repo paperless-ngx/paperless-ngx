@@ -98,7 +98,7 @@ class TestApiObjects(DirectoriesMixin, APITestCase):
         WHEN:
             - API is called
         THEN:
-            - Last correspondence date is returned only if requested
+            - Last correspondence date is returned only if requested for list, and for detail
         """
 
         Document.objects.create(
@@ -114,6 +114,7 @@ class TestApiObjects(DirectoriesMixin, APITestCase):
             checksum="456",
         )
 
+        # Only if requested for list
         response = self.client.get(
             "/api/correspondents/",
         )
@@ -129,6 +130,16 @@ class TestApiObjects(DirectoriesMixin, APITestCase):
         self.assertIn(
             "2022-01-02",
             results[0]["last_correspondence"],
+        )
+
+        # Included in detail by default
+        response = self.client.get(
+            f"/api/correspondents/{self.c1.id}/",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(
+            "2022-01-02",
+            response.data["last_correspondence"],
         )
 
 
