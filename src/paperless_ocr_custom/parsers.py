@@ -1,5 +1,6 @@
 import io
 import logging
+import math
 import os
 import re
 import shutil
@@ -187,19 +188,15 @@ class RasterisedDocumentParser(DocumentParser):
             logging.error('upload file: ',response_upload.status_code) 
 
         # ocr by file_id
-        # logging.debug('gia tri file id:', get_file_id)
         params = {'file_id': get_file_id}
         url_ocr_pdf_by_fileid = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_OCR_BY_FILEID"]
         response_ocr = requests.post(url_ocr_pdf_by_fileid, headers=headers, params=params)
         data_ocr = None
-        
         # logging.error('ocr: ', response_ocr.status_code)
-
         if response_ocr.status_code == 200:
             data_ocr = response_ocr.json()
         else:
             logging.error('ocr: ', response_ocr.text)
-
         return data_ocr
     
 
@@ -212,44 +209,55 @@ class RasterisedDocumentParser(DocumentParser):
         with open(sidecar, "w") as txt_sidecar:
             txt_sidecar.write(data.get("content",""))
         if self.is_image(mime_type):
-            c = None
             img = Image.open(input_path)
             width, height = img.size
             c = canvas.Canvas(str(output_path), pagesize=(width, height))
             pdfmetrics.registerFont(TTFont(font_name, font_path))
-            # viet text vao file
+            # c.drawImage(input_path, 0, 0, width=width, height=height)
             for page in data["pages"]:
                 for block in page["blocks"]:
                     for line in block.get("lines", []):
+                        y1 = line.get("bbox")[0][1]
+                        y2 = line.get("bbox")[1][1]
+                        font_size = math.floor((y2 - y1)  * 72 / 96)
+                        y_center_coordinates = y2 - (y2 - y1)/2
                         for word in line.get("words", []):   
                             x1 = word["bbox"][0][0]
-                            y1 = word["bbox"][0][1]
+                            # y1 = word["bbox"][0][1]
                             x2 = word["bbox"][1][0]
-                            y2 = word["bbox"][1][1]
+                            # y2 = word["bbox"][1][1]
                             value = word["value"]
-                            font_size = (y2-y1) * 72 / 96
+                            # font_size = math.ceil(float(y2-y1) * 72 / 96)
+                            # font_size = (y2-y1) * 72 / 96
                             x_center_coordinates =x2 - (x2-x1)/2
-                            y_center_coordinates =y2 - (y2-y1)/2
+                            # y_center_coordinates =y2 - (y2-y1)/2
                             w = c.stringWidth(value, font_name, font_size)
                             c.setFont('Arial', font_size)
-                            c.drawString(x_center_coordinates - w/2 , height - y_center_coordinates - (font_size/2) , value)            
+                            c.drawString(x_center_coordinates - w/2,
+                                         height - y_center_coordinates - (font_size/2),
+                                         value)            
             c.drawImage(input_path, 0, 0, width=width, height=height)
             c.save()
         else:
             shutil.copy(str(input_path), str(output_path))
-            # output_pdf = PdfWriter()
             input_pdf = PdfReader(input_path)
-            # self.log.info('gia tri get number pages',input_pdf.getNumPages())
-            images = convert_from_path(input_path, first_page=1, last_page=input_pdf.getNumPages()+1)
+            images = convert_from_path(input_path,
+                                       first_page=1,
+                                       last_page=input_pdf.getNumPages()+1)
             can = canvas.Canvas(str(output_path), pagesize=letter)
             for page_num, page in enumerate(input_pdf.pages):
                 page_height = input_pdf.pages[page_num].mediabox[3]
                 page_width = input_pdf.pages[page_num].mediabox[2]
+                # set size new page
+                can.setPageSize((page_width, page_height))
                 byte_image = io.BytesIO()
                 images[page_num].save(byte_image, format='JPEG')
                 jpg_image = byte_image.getvalue()
-                self.log.info('gia tri page height',page_height)
-                can.drawImage(ImageReader(io.BytesIO(jpg_image)), 0, 0, width=float(page_width), height=float(page_height))
+                # can.drawImage(ImageReader(io.BytesIO(jpg_image)),
+                #               0, 0, 
+                #               width=float(page_width),
+                #               height=float(page_height))
+                # set font size
                 pdfmetrics.registerFont(TTFont('Arial', font_path))
                 width_api_img = data["pages"][page_num]["dimensions"][1]
                 height_api_img = data["pages"][page_num]["dimensions"][0]
@@ -257,27 +265,36 @@ class RasterisedDocumentParser(DocumentParser):
                 rolate_width = width_api_img /page_width
                 for block in data["pages"][page_num]["blocks"]:
                     for line in block.get("lines", []):
-                        text_line = ''
+                        y1 = (line.get("bbox")[0][1] / float(rolate_height))
+                        y2 = (line.get("bbox")[1][1] / float(rolate_height))
+                        font_size = (y2 - y1)  * 72 / 96
+                        y_center_coordinates = y2 - (y2 - y1)/2
                         for word in line.get("words", []):   
                             x1 = word["bbox"][0][0] / float(rolate_width)
-                            y1 = word["bbox"][0][1] / float(rolate_height)
+                            # y1 = word["bbox"][0][1] / float(rolate_height)
                             x2 = word["bbox"][1][0] / float(rolate_width)
-                            y2 = word["bbox"][1][1] / float(rolate_height)
+                            # y2 = word["bbox"][1][1] / float(rolate_height)
                             value = word["value"]
-                            font_size = float(y2-y1) * 72 / 96 
-                            x_center_coordinates =x2 - (x2-x1)/2
-                            y_center_coordinates =y2 - (y2-y1)/2
+                            # font_size = float(y2-y1) * 72 / 96 
+                            x_center_coordinates = x2 - (x2-x1)/2
+                            # y_center_coordinates =y2 - (y2-y1)/2
                             w = can.stringWidth(value, font_name, font_size)
                             can.setFont('Arial', font_size)
-                            can.drawString(x_center_coordinates - w/2 , int(page_height) - y_center_coordinates - (font_size/3) , value)            
+                            can.drawString(x_center_coordinates - w/2,
+                                           int(page_height) - y_center_coordinates - (font_size/3),
+                                           value)            
+                can.drawImage(ImageReader(io.BytesIO(jpg_image)),
+                              0, 0, 
+                              width=float(page_width),
+                              height=float(page_height))
                 can.showPage()
             can.save()
-        shutil.copyfile(str(output_path), "/home/otxtan/python/opt/paperless/pdfa.pdf")
+        return
+     
 
     
             
     def ocr_img_or_pdf(self, document_path, mime_type, sidecar, output_file, **kwargs):
-        self.log.info('mime_type:',mime_type)
         self.render_pdf_ocr(sidecar, mime_type, document_path, output_file)
      
 
@@ -288,7 +305,6 @@ class RasterisedDocumentParser(DocumentParser):
     ) -> Optional[str]:
         # When re-doing OCR, the sidecar contains ONLY the new text, not
         # the whole text, so do not utilize it in that case
-        logging.info('đã vào: ',sidecar_file)  
         if (
             sidecar_file is not None
             and os.path.isfile(sidecar_file)
