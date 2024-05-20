@@ -49,7 +49,7 @@
                   }
                   @case (DisplayField.TAGS) {
                     @for (t of doc.tags$ | async; track t) {
-                      <pngx-tag [tag]="t" class="ms-1" (click)="clickTag(t.id, $event)"></pngx-tag>
+                      <pngx-tag [tag]="t" class="ms-1" (click)="clickTag(t.id, $event)" [clickable]="true"></pngx-tag>
                     }
                   }
                   @case (DisplayField.DOCUMENT_TYPE) {
