@@ -253,14 +253,7 @@ class PermissionsAwareDocumentCountMixin(PassUserMixin):
 class CorrespondentViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = Correspondent
 
-    queryset = (
-        Correspondent.objects.prefetch_related("documents")
-        .annotate(
-            last_correspondence=Max("documents__created"),
-        )
-        .select_related("owner")
-        .order_by(Lower("name"))
-    )
+    queryset = Correspondent.objects.select_related("owner").order_by(Lower("name"))
 
     serializer_class = CorrespondentSerializer
     pagination_class = StandardPagination
@@ -278,6 +271,13 @@ class CorrespondentViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         "document_count",
         "last_correspondence",
     )
+
+    def list(self, request, *args, **kwargs):
+        if request.query_params.get("last_correspondence", None):
+            self.queryset = self.queryset.annotate(
+                last_correspondence=Max("documents__created"),
+            )
+        return super().list(request, *args, **kwargs)
 
 
 class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):

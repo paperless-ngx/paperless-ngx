@@ -52,7 +52,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
   implements OnInit, OnDestroy
 {
   constructor(
-    private service: AbstractNameFilterService<T>,
+    protected service: AbstractNameFilterService<T>,
     private modalService: NgbModal,
     private editDialogComponent: any,
     private toastService: ToastService,
@@ -81,8 +81,8 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
   public isLoading: boolean = false
 
   private nameFilterDebounce: Subject<string>
-  private unsubscribeNotifier: Subject<any> = new Subject()
-  private _nameFilter: string
+  protected unsubscribeNotifier: Subject<any> = new Subject()
+  protected _nameFilter: string
 
   public selectedObjects: Set<number> = new Set()
   public togggleAll: boolean = false
