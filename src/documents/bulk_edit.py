@@ -341,6 +341,7 @@ def delete_pages(doc_ids: list[int], pages: list[int]):
             for page_num in pages:
                 pdf.pages.remove(pdf.pages[page_num - offset])
                 offset += 1  # remove() changes the index of the pages
+            pdf.remove_unreferenced_resources()
             pdf.save()
             doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
             doc.save()
