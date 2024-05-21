@@ -12,6 +12,11 @@ export interface UiSetting {
   default: any
 }
 
+export enum GlobalSearchType {
+  ADVANCED = 'advanced',
+  TITLE_CONTENT = 'title-content',
+}
+
 export const SETTINGS_KEYS = {
   LANGUAGE: 'language',
   APP_LOGO: 'app_logo',
@@ -57,6 +62,7 @@ export const SETTINGS_KEYS = {
   DOCUMENT_EDITING_REMOVE_INBOX_TAGS:
     'general-settings:document-editing:remove-inbox-tags',
   SEARCH_DB_ONLY: 'general-settings:search:db-only',
+  SEARCH_FULL_TYPE: 'general-settings:search:more-link',
 }
 
 export const SETTINGS: UiSetting[] = [
@@ -224,5 +230,10 @@ export const SETTINGS: UiSetting[] = [
     key: SETTINGS_KEYS.SEARCH_DB_ONLY,
     type: 'boolean',
     default: false,
+  },
+  {
+    key: SETTINGS_KEYS.SEARCH_FULL_TYPE,
+    type: 'string',
+    default: GlobalSearchType.ADVANCED,
   },
 ]

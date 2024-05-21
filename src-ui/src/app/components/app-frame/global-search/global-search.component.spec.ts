@@ -25,6 +25,7 @@ import {
   FILTER_HAS_DOCUMENT_TYPE_ANY,
   FILTER_HAS_STORAGE_PATH_ANY,
   FILTER_HAS_TAGS_ALL,
+  FILTER_TITLE_CONTENT,
 } from 'src/app/data/filter-rule-type'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { DocumentService } from 'src/app/services/rest/document.service'
@@ -37,6 +38,8 @@ import { ElementRef } from '@angular/core'
 import { ToastService } from 'src/app/services/toast.service'
 import { DataType } from 'src/app/data/datatype'
 import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
+import { SettingsService } from 'src/app/services/settings.service'
+import { GlobalSearchType, SETTINGS_KEYS } from 'src/app/data/ui-settings'
 
 const searchResults = {
   total: 11,
@@ -130,6 +133,7 @@ describe('GlobalSearchComponent', () => {
   let documentService: DocumentService
   let documentListViewService: DocumentListViewService
   let toastService: ToastService
+  let settingsService: SettingsService
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -150,6 +154,7 @@ describe('GlobalSearchComponent', () => {
     documentService = TestBed.inject(DocumentService)
     documentListViewService = TestBed.inject(DocumentListViewService)
     toastService = TestBed.inject(ToastService)
+    settingsService = TestBed.inject(SettingsService)
 
     fixture = TestBed.createComponent(GlobalSearchComponent)
     component = fixture.componentInstance
@@ -262,7 +267,7 @@ describe('GlobalSearchComponent', () => {
     component.searchResults = searchResults as any
     component.resultsDropdown.open()
     component.query = 'test'
-    const advancedSearchSpy = jest.spyOn(component, 'runAdvanedSearch')
+    const advancedSearchSpy = jest.spyOn(component, 'runFullSearch')
     component.searchInputKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }))
     expect(advancedSearchSpy).toHaveBeenCalled()
   })
@@ -502,7 +507,7 @@ describe('GlobalSearchComponent', () => {
   it('should support explicit advanced search', () => {
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
     component.query = 'test'
-    component.runAdvanedSearch()
+    component.runFullSearch()
     expect(qfSpy).toHaveBeenCalledWith([
       { rule_type: FILTER_FULLTEXT_QUERY, value: 'test' },
     ])
@@ -527,5 +532,24 @@ describe('GlobalSearchComponent', () => {
     const dispatchSpy = jest.spyOn(button, 'dispatchEvent')
     button.dispatchEvent(keyboardEvent)
     expect(dispatchSpy).toHaveBeenCalledTimes(2) // once for keydown, second for click
+  })
+
+  it('should support title content search and advanced search', () => {
+    const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
+    component.query = 'test'
+    component.runFullSearch()
+    expect(qfSpy).toHaveBeenCalledWith([
+      { rule_type: FILTER_FULLTEXT_QUERY, value: 'test' },
+    ])
+
+    settingsService.set(
+      SETTINGS_KEYS.SEARCH_FULL_TYPE,
+      GlobalSearchType.TITLE_CONTENT
+    )
+    component.query = 'test'
+    component.runFullSearch()
+    expect(qfSpy).toHaveBeenCalledWith([
+      { rule_type: FILTER_TITLE_CONTENT, value: 'test' },
+    ])
   })
 })
