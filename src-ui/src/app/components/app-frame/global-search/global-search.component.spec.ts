@@ -20,11 +20,11 @@ import { DocumentListViewService } from 'src/app/services/document-list-view.ser
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
-  FILTER_FULLTEXT_QUERY,
   FILTER_HAS_CORRESPONDENT_ANY,
   FILTER_HAS_DOCUMENT_TYPE_ANY,
   FILTER_HAS_STORAGE_PATH_ANY,
   FILTER_HAS_TAGS_ALL,
+  FILTER_TITLE_CONTENT,
 } from 'src/app/data/filter-rule-type'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { DocumentService } from 'src/app/services/rest/document.service'
@@ -262,9 +262,9 @@ describe('GlobalSearchComponent', () => {
     component.searchResults = searchResults as any
     component.resultsDropdown.open()
     component.query = 'test'
-    const advancedSearchSpy = jest.spyOn(component, 'runAdvanedSearch')
+    const contentsSearchSpy = jest.spyOn(component, 'runContentSearch')
     component.searchInputKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }))
-    expect(advancedSearchSpy).toHaveBeenCalled()
+    expect(contentsSearchSpy).toHaveBeenCalled()
   })
 
   it('should search on query debounce', fakeAsync(() => {
@@ -499,12 +499,12 @@ describe('GlobalSearchComponent', () => {
     expect(focusSpy).toHaveBeenCalled()
   })
 
-  it('should support explicit advanced search', () => {
+  it('should support explicit contents search', () => {
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
     component.query = 'test'
-    component.runAdvanedSearch()
+    component.runContentSearch()
     expect(qfSpy).toHaveBeenCalledWith([
-      { rule_type: FILTER_FULLTEXT_QUERY, value: 'test' },
+      { rule_type: FILTER_TITLE_CONTENT, value: 'test' },
     ])
   })
 

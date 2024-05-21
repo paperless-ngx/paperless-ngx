@@ -10,7 +10,7 @@ import { Router } from '@angular/router'
 import { NgbDropdown, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
 import { Subject, debounceTime, distinctUntilChanged, filter, map } from 'rxjs'
 import {
-  FILTER_FULLTEXT_QUERY,
+  FILTER_TITLE_CONTENT,
   FILTER_HAS_CORRESPONDENT_ANY,
   FILTER_HAS_DOCUMENT_TYPE_ANY,
   FILTER_HAS_STORAGE_PATH_ANY,
@@ -282,7 +282,7 @@ export class GlobalSearchComponent implements OnInit {
         this.primaryButtons.first.nativeElement.click()
         this.searchInput.nativeElement.blur()
       } else if (this.query?.length) {
-        this.runAdvanedSearch()
+        this.runContentSearch()
         this.reset(true)
       }
     } else if (event.key === 'Escape' && !this.resultsDropdown.isOpen()) {
@@ -378,9 +378,9 @@ export class GlobalSearchComponent implements OnInit {
     )
   }
 
-  public runAdvanedSearch() {
+  public runContentSearch() {
     this.documentListViewService.quickFilter([
-      { rule_type: FILTER_FULLTEXT_QUERY, value: this.query },
+      { rule_type: FILTER_TITLE_CONTENT, value: this.query },
     ])
     this.reset(true)
   }
