@@ -123,5 +123,6 @@ whoosh==2.7.4
 wrapt==1.16.0; python_version >= '3.6'
 zstandard==0.22.0; python_version >= '3.8'
 zxing-cpp==2.2.0; platform_machine == 'x86_64' and python_version >= '3.6'
+PyPDF2<3.0
 
 python-decouple==3.8
