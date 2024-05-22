@@ -201,7 +201,23 @@
 
         <div class="row mb-3">
           <div class="offset-md-3 col">
-            <pngx-input-check i18n-title title="Search database only (do not include advanced search results)" formControlName="searchDbOnly"></pngx-input-check>
+            <pngx-input-check i18n-title title="Do not include advanced search results" formControlName="searchDbOnly"></pngx-input-check>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <div class="row">
+              <div class="col-md-2 col-form-label pt-0">
+                <span i18n>Full search links to</span>
+              </div>
+              <div class="col">
+                <select class="form-select" formControlName="searchLink">
+                  <option [ngValue]="GlobalSearchType.TITLE_CONTENT" i18n>Title and content search</option>
+                  <option [ngValue]="GlobalSearchType.ADVANCED" i18n>Advanced search</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
 
