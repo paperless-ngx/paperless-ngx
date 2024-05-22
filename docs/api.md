@@ -424,6 +424,10 @@ The following methods are supported:
 - `rotate`
   - Requires `parameters`:
     - `"degrees": DEGREES`. Must be an integer i.e. 90, 180, 270
+- `delete_pages`
+  - Requires `parameters`:
+    - `"pages": [..]` The list should be a list of integers e.g. `"[2,3,4]"`
+  - The delete_pages operation only accepts a single document.
 
 ### Objects
 

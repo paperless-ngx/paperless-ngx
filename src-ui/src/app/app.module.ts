@@ -124,6 +124,7 @@ import { DragDropSelectComponent } from './components/common/input/drag-drop-sel
 import { CustomFieldDisplayComponent } from './components/common/custom-field-display/custom-field-display.component'
 import { GlobalSearchComponent } from './components/app-frame/global-search/global-search.component'
 import { HotkeyDialogComponent } from './components/common/hotkey-dialog/hotkey-dialog.component'
+import { DeletePagesConfirmDialogComponent } from './components/common/confirm-dialog/delete-pages-confirm-dialog/delete-pages-confirm-dialog.component'
 import {
   airplane,
   archive,
@@ -160,6 +161,7 @@ import {
   clipboardCheckFill,
   clipboardFill,
   dash,
+  dashCircle,
   diagram3,
   dice5,
   doorOpen,
@@ -174,6 +176,7 @@ import {
   fileEarmarkCheck,
   fileEarmarkFill,
   fileEarmarkLock,
+  fileEarmarkMinus,
   files,
   fileText,
   filter,
@@ -259,6 +262,7 @@ const icons = {
   clipboardCheckFill,
   clipboardFill,
   dash,
+  dashCircle,
   diagram3,
   dice5,
   doorOpen,
@@ -273,6 +277,7 @@ const icons = {
   fileEarmarkCheck,
   fileEarmarkFill,
   fileEarmarkLock,
+  fileEarmarkMinus,
   files,
   fileText,
   filter,
@@ -491,6 +496,7 @@ function initializeApp(settings: SettingsService) {
     CustomFieldDisplayComponent,
     GlobalSearchComponent,
     HotkeyDialogComponent,
+    DeletePagesConfirmDialogComponent,
   ],
   imports: [
     BrowserModule,
