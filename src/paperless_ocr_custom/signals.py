@@ -7,7 +7,7 @@ def get_parser(*args, **kwargs):
 def tesseract_consumer_declaration(sender, **kwargs):
     return {
         "parser": get_parser,
-        "weight": 0,
+        "weight": 1,
         "mime_types": {
             "application/pdf": ".pdf",
             "image/jpeg": ".jpg",

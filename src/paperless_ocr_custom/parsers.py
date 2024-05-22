@@ -9,20 +9,16 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Optional
 
-import PyPDF2
 from django.conf import settings
 import requests
-from PyPDF2 import PdfFileWriter, PdfFileReader, PdfReader, PdfWriter
+from PyPDF2 import PdfReader
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
-from PIL import Image,ImageDraw,ImageFont
-from reportlab.pdfgen.canvas import Canvas
+from PIL import Image
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from pdf2image import convert_from_path
 from reportlab.lib.utils import ImageReader
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import Paragraph
 
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
@@ -30,7 +26,7 @@ from documents.parsers import make_thumbnail_from_pdf
 from documents.utils import maybe_override_pixel_limit
 from documents.utils import run_subprocess
 from paperless.config import OcrConfig
-from paperless.models import ArchiveFileChoices
+from paperless.models import ApplicationConfiguration, ArchiveFileChoices
 from paperless.models import CleanChoices
 from paperless.models import ModeChoices
 
@@ -155,21 +151,23 @@ class RasterisedDocumentParser(DocumentParser):
     # get ocr file img/pdf
     def ocr_file(self,path_file):
         # get text from api 
-        ocr_custom_username = settings.TCGROUP_OCR_CUSTOM["ACCOUNT"]["OCR_CUSTOM_USERNAME"]
-        ocr_custom_password = settings.TCGROUP_OCR_CUSTOM["ACCOUNT"]["OCR_CUSTOM_PASSWORD"]
-        url_login = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_LOGIN"]
-        data = {
-            'username': ocr_custom_username,
-            'password': ocr_custom_password
-        }
-        response_login = requests.post(url_login, data=data)
-        access_token = ''
-        if response_login.status_code == 200:
-            response_data = response_login.json()
-            access_token = response_data.get('access_token','')
-        else:
-            logging.error('login: ', response_login.status_code)
+        # ocr_custom_username = settings.TCGROUP_OCR_CUSTOM["ACCOUNT"]["OCR_CUSTOM_USERNAME"]
+        # ocr_custom_password = settings.TCGROUP_OCR_CUSTOM["ACCOUNT"]["OCR_CUSTOM_PASSWORD"]
+        # url_login = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_LOGIN"]
+        # data = {
+        #     'username': ocr_custom_username,
+        #     'password': ocr_custom_password
+        # }
+        # response_login = requests.post(url_login, data=data)
+        # access_token = ''
+        # if response_login.status_code == 200:
+        #     response_data = response_login.json()
+        #     access_token = response_data.get('access_token','')
+        # else:
+        #     logging.error('login: ', response_login.status_code)
         
+        k = ApplicationConfiguration.objects.filter().first()
+        access_token = k.ocr_key
         # upload file
         get_file_id = ''
         url_upload_file = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_UPLOAD_FILE"]

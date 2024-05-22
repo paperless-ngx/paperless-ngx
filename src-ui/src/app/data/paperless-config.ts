@@ -167,6 +167,13 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     category: ConfigCategory.OCR,
   },
   {
+    key: 'ocr_key',
+    title: $localize`OCR Key`,
+    type: ConfigOptionType.String,
+    config_key: 'PAPERLESS_APP_TITLE',
+    category: ConfigCategory.OCR,
+  },
+  {
     key: 'app_logo',
     title: $localize`Application Logo`,
     type: ConfigOptionType.File,
@@ -196,6 +203,7 @@ export interface PaperlessConfig extends ObjectWithId {
   max_image_pixels: number
   color_conversion_strategy: ColorConvertConfig
   user_args: object
+  ocr_key: string
   app_logo: string
   app_title: string
 }

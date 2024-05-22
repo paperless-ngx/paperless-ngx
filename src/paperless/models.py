@@ -184,6 +184,13 @@ class ApplicationConfiguration(AbstractSingletonModel):
         upload_to="logo/",
     )
 
+    ocr_key = models.CharField(
+        verbose_name=_("Sets key for advanced version"),
+        null=True,
+        blank=True,
+        max_length=200,
+    )
+
     class Meta:
         verbose_name = _("paperless application settings")
 

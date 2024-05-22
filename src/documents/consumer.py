@@ -36,7 +36,7 @@ from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
-from documents.parsers import DocumentParser
+from documents.parsers import DocumentParser, custom_get_parser_class_for_mime_type
 from documents.parsers import ParseError
 from documents.parsers import get_parser_class_for_mime_type
 from documents.parsers import parse_date
@@ -557,7 +557,7 @@ class Consumer(LoggingMixin):
         self.log.debug(f"Detected mime type: {mime_type}")
 
         # Based on the mime type, get the parser for that type
-        parser_class: Optional[type[DocumentParser]] = get_parser_class_for_mime_type(
+        parser_class: Optional[type[DocumentParser]] = custom_get_parser_class_for_mime_type(
             mime_type,
         )
         if not parser_class:

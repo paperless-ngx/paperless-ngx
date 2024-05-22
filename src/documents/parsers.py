@@ -14,11 +14,13 @@ from typing import Optional
 
 from django.conf import settings
 from django.utils import timezone
+import requests
 
 from documents.loggers import LoggingMixin
 from documents.signals import document_consumer_declaration
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
+from paperless.models import ApplicationConfiguration
 
 # This regular expression will try to find dates in the document at
 # hand and will match the following formats:
@@ -129,6 +131,38 @@ def get_parser_class_for_mime_type(mime_type: str) -> Optional[type["DocumentPar
     # Return the parser with the highest weight.
     return best_parser["parser"]
 
+def custom_get_parser_class_for_mime_type(mime_type: str) -> Optional[type["DocumentParser"]]:
+    """
+    Returns the best parser (by weight) for the given mimetype or
+    None if no parser exists
+    """
+
+    options = []
+
+    for response in document_consumer_declaration.send(None):
+        parser_declaration = response[1]
+        supported_mime_types = parser_declaration["mime_types"]
+
+        if mime_type in supported_mime_types:
+            options.append(parser_declaration)
+
+    if not options:
+        return None
+    k = ApplicationConfiguration.objects.filter().first()
+    best_parser = sorted(options, key=lambda _: _["weight"], reverse=True)[1]
+    if k.ocr_key!='':
+        headers = {
+            'Authorization': f'Bearer {k.ocr_key}'
+        }
+        url_ocr_pdf_by_fileid = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_OCR_BY_FILEID"]
+        response_ocr = requests.post(url_ocr_pdf_by_fileid, headers=headers)
+        logger.debug(f'status code: {response_ocr.status_code}')
+        if response_ocr.status_code != 401:
+            best_parser = sorted(options, key=lambda _: _["weight"], reverse=True)[0]
+            logger.debug('Successful key authentication ...')
+    logger.debug('Fail key authentication ...', best_parser["parser"])
+    # Return the parser with the highest weight.
+    return best_parser["parser"]
 
 def run_convert(
     input_file,
