@@ -585,3 +585,46 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             mock_update_documents.assert_called_once()
             mock_chord.assert_called_once()
             self.assertEqual(result, "OK")
+
+    @mock.patch("documents.tasks.update_document_archive_file.delay")
+    @mock.patch("pikepdf.Pdf.save")
+    def test_delete_pages(self, mock_pdf_save, mock_update_archive_file):
+        """
+        GIVEN:
+            - Existing documents
+        WHEN:
+            - Delete pages action is called with 1 document and 2 pages
+        THEN:
+            - Save should be called once
+            - Archive file should be updated once
+        """
+        doc_ids = [self.doc2.id]
+        pages = [1, 3]
+        result = bulk_edit.delete_pages(doc_ids, pages)
+        mock_pdf_save.assert_called_once()
+        mock_update_archive_file.assert_called_once()
+        self.assertEqual(result, "OK")
+
+    @mock.patch("documents.tasks.update_document_archive_file.delay")
+    @mock.patch("pikepdf.Pdf.save")
+    def test_delete_pages_with_error(self, mock_pdf_save, mock_update_archive_file):
+        """
+        GIVEN:
+            - Existing documents
+        WHEN:
+            - Delete pages action is called with 1 document and 2 pages
+            - PikePDF raises an error
+        THEN:
+            - Save should be called once
+            - Archive file should not be updated
+        """
+        mock_pdf_save.side_effect = Exception("Error saving PDF")
+        doc_ids = [self.doc2.id]
+        pages = [1, 3]
+
+        with self.assertLogs("paperless.bulk_edit", level="ERROR") as cm:
+            bulk_edit.delete_pages(doc_ids, pages)
+            error_str = cm.output[0]
+            expected_str = "Error deleting pages from document"
+            self.assertIn(expected_str, error_str)
+            mock_update_archive_file.assert_not_called()
