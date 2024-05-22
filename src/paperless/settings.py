@@ -294,7 +294,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "paperless",
     "documents.apps.DocumentsConfig",
-    # "paperless_tesseract.apps.PaperlessTesseractConfig",
+    "paperless_tesseract.apps.PaperlessTesseractConfig",
     "paperless_ocr_custom.apps.PaperlessTesseractConfig",
     "paperless_text.apps.PaperlessTextConfig",
     "paperless_mail.apps.PaperlessMailConfig",
@@ -419,12 +419,7 @@ CHANNEL_LAYERS = {
 
 # PAPERLESS_OCR_CUSTOM
 TCGROUP_OCR_CUSTOM = {
-    "ACCOUNT": {
-        "OCR_CUSTOM_USERNAME": os.getenv("OCR_CUSTOM_USERNAME", "test"),
-        "OCR_CUSTOM_PASSWORD": os.getenv("OCR_CUSTOM_PASSWORD", "test"),
-    },
     "URL": {
-        "URL_LOGIN": os.getenv("URL_LOGIN","https://ocr-core-api.tcgroup.vn/token"),
         "URL_UPLOAD_FILE": os.getenv("URL_UPLOAD_FILE","https://ocr-core-api.tcgroup.vn/api/v1/file/upload"),
         "URL_OCR_BY_FILEID": os.getenv("URL_OCR_BY_FILEID","https://ocr-core-api.tcgroup.vn/api/v1/ocr/general"),
     }

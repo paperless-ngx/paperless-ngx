@@ -497,7 +497,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Enable</target>
+        <target state="needs-translation">Cho phép</target>
       </trans-unit>
       <trans-unit id="3823219296477075982" datatype="html">
         <source>Discard</source>
@@ -4587,7 +4587,7 @@
           <context context-type="sourcefile">src/app/components/common/input/switch/switch.component.html</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="needs-translation">Note: value has not yet been set and will not apply until explicitly changed</target>
+        <target state="needs-translation">Lưu ý: giá trị chưa được đặt và sẽ không áp dụng cho đến khi thay đổi rõ ràng</target>
       </trans-unit>
       <trans-unit id="6560126119609945418" datatype="html">
         <source>Add tag</source>
@@ -5970,7 +5970,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">724</context>
         </context-group>
-        <target state="needs-translation">Do you really want to delete document "<x id="PH" equiv-text="this.document.title"/>"?</target>
+        <target state="needs-translation">Bạn có thực sự muốn xóa tài liệu "<x id="PH" equiv-text="this.document.title"/>"?</target>
       </trans-unit>
       <trans-unit id="6691075929777935948" datatype="html">
         <source>The files for this document will be deleted permanently. This operation cannot be undone.</source>
@@ -5978,7 +5978,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">725</context>
         </context-group>
-        <target state="needs-translation">The files for this document will be deleted permanently. This operation cannot be undone.</target>
+        <target state="needs-translation">Các tập tin cho tài liệu này sẽ bị xóa vĩnh viễn. Không thể hoàn tác thao tác này</target>
       </trans-unit>
       <trans-unit id="719892092227206532" datatype="html">
         <source>Delete document</source>
@@ -5986,7 +5986,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">727</context>
         </context-group>
-        <target state="needs-translation">Delete document</target>
+        <target state="needs-translation">Xóa tài liệu</target>
       </trans-unit>
       <trans-unit id="7295637485862454066" datatype="html">
         <source>Error deleting document</source>
@@ -6724,7 +6724,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">146</context>
         </context-group>
-        <target state="needs-translation">Sort by correspondent</target>
+        <target state="needs-translation">Sắp xếp theo người biên tập</target>
       </trans-unit>
       <trans-unit id="2066713941761361709" datatype="html">
         <source>Sort by title</source>
@@ -7132,7 +7132,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">67</context>
         </context-group>
-        <target state="needs-translation">Do you really want to delete the correspondent "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="needs-translation">Bạn có thực sự muốn xóa người biên tập "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
       <trans-unit id="8384138406252790442" datatype="html">
         <source>Customize the data fields that can be attached to documents.</source>
@@ -7564,7 +7564,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">180</context>
         </context-group>
-        <target state="needs-translation">Successfully updated <x id="PH" equiv-text="this.typeName"/>.</target>
+        <target state="needs-translation">Đã cập nhật thành công<x id="PH" equiv-text="this.typeName"/>.</target>
       </trans-unit>
       <trans-unit id="6442673774206210733" datatype="html">
         <source>Error occurred while saving <x id="PH" equiv-text="this.typeName"/>.</source>
@@ -7668,7 +7668,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">53</context>
         </context-group>
-        <target state="needs-translation">Do you really want to delete the tag "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="needs-translation">Bạn có thực sự muốn xóa thẻ "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
       <trans-unit id="1229748338333965418" datatype="html">
         <source>Use workflows to customize the behavior of TC GROUP when events &apos;trigger&apos; a workflow.</source>
@@ -7932,7 +7932,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="needs-translation">General Settings</target>
+        <target state="needs-translation">Cài đặt chung</target>
       </trans-unit>
       <trans-unit id="2762851116637676072" datatype="html">
         <source>OCR Settings</source>
