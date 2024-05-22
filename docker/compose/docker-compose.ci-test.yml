@@ -3,7 +3,6 @@
 # Can be used locally or by the CI to start the necessary containers with the
 # correct networking for the tests
 
-version: "3.7"
 services:
   gotenberg:
     image: docker.io/gotenberg/gotenberg:7.10
