@@ -30,7 +30,6 @@
 # For more extensive installation and update instructions, refer to the
 # documentation.
 
-version: "3.4"
 services:
   broker:
     image: docker.io/library/redis:7
