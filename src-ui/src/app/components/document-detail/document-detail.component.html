@@ -1,5 +1,5 @@
 <pngx-page-header [(title)]="title">
-  @if (contentRenderType === ContentRenderType.PDF && !useNativePdfViewer) {
+  @if (archiveContentRenderType === ContentRenderType.PDF && !useNativePdfViewer) {
     @if (previewNumPages) {
       <div class="input-group input-group-sm d-none d-md-flex">
         <div class="input-group-text" i18n>Page</div>
@@ -53,12 +53,16 @@
         <i-bs width="1em" height="1em" name="diagram-3"></i-bs>&nbsp;<span i18n>More like this</span>
       </button>
 
-      <button ngbDropdownItem (click)="splitDocument()" [disabled]="contentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
+      <button ngbDropdownItem (click)="splitDocument()" [disabled]="archiveContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
         <i-bs width="1em" height="1em" name="scissors"></i-bs>&nbsp;<span i18n>Split</span>
       </button>
 
-      <button ngbDropdownItem (click)="rotateDocument()" [disabled]="!userIsOwner || metadata?.original_mime_type !== 'application/pdf'">
+      <button ngbDropdownItem (click)="rotateDocument()" [disabled]="!userIsOwner || originalContentRenderType !== ContentRenderType.PDF">
         <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
+      </button>
+
+      <button ngbDropdownItem (click)="deletePages()" [disabled]="!userIsOwner || originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
+        <i-bs name="file-earmark-minus"></i-bs>&nbsp;<ng-container i18n>Delete page(s)</ng-container>
       </button>
     </div>
   </div>
@@ -343,7 +347,7 @@
       </div>
     </div>
   } @else {
-    @switch (contentRenderType) {
+    @switch (archiveContentRenderType) {
       @case (ContentRenderType.PDF) {
         @if (!useNativePdfViewer) {
           <div class="preview-sticky pdf-viewer-container">

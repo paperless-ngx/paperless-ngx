@@ -68,6 +68,7 @@ import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { SplitConfirmDialogComponent } from '../common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
 import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
+import { DeletePagesConfirmDialogComponent } from '../common/confirm-dialog/delete-pages-confirm-dialog/delete-pages-confirm-dialog.component'
 import { HotKeyService } from 'src/app/services/hot-key.service'
 import { PDFDocumentProxy } from 'ng2-pdf-viewer'
 import { DataType } from 'src/app/data/datatype'
@@ -219,19 +220,27 @@ export class DocumentDetailComponent
     return this.settings.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
   }
 
-  get contentRenderType(): ContentRenderType {
-    if (!this.metadata) return ContentRenderType.Unknown
-    const contentType = this.metadata?.has_archive_version
-      ? 'application/pdf'
-      : this.metadata?.original_mime_type
+  get archiveContentRenderType(): ContentRenderType {
+    return this.getRenderType(
+      this.metadata?.has_archive_version
+        ? 'application/pdf'
+        : this.metadata?.original_mime_type
+    )
+  }
 
-    if (contentType === 'application/pdf') {
+  get originalContentRenderType(): ContentRenderType {
+    return this.getRenderType(this.metadata?.original_mime_type)
+  }
+
+  private getRenderType(mimeType: string): ContentRenderType {
+    if (!mimeType) return ContentRenderType.Unknown
+    if (mimeType === 'application/pdf') {
       return ContentRenderType.PDF
     } else if (
-      ['text/plain', 'application/csv', 'text/csv'].includes(contentType)
+      ['text/plain', 'application/csv', 'text/csv'].includes(mimeType)
     ) {
       return ContentRenderType.Text
-    } else if (contentType?.indexOf('image/') === 0) {
+    } else if (mimeType?.indexOf('image/') === 0) {
       return ContentRenderType.Image
     }
     return ContentRenderType.Other
@@ -1139,7 +1148,6 @@ export class DocumentDetailComponent
     })
     modal.componentInstance.title = $localize`Rotate confirm`
     modal.componentInstance.messageBold = $localize`This operation will permanently rotate the original version of the current document.`
-    modal.componentInstance.message = $localize`This will alter the original copy.`
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.documentID = this.document.id
     modal.componentInstance.showPDFNote = false
@@ -1168,6 +1176,43 @@ export class DocumentDetailComponent
               }
               this.toastService.showError(
                 $localize`Error executing rotate operation`,
+                error
+              )
+            },
+          })
+      })
+  }
+
+  deletePages() {
+    let modal = this.modalService.open(DeletePagesConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Delete pages confirm`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete the selected pages from the original document.`
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.documentID = this.document.id
+    modal.componentInstance.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        modal.componentInstance.buttonsEnabled = false
+        this.documentsService
+          .bulkEdit([this.document.id], 'delete_pages', {
+            pages: modal.componentInstance.pages,
+          })
+          .pipe(first(), takeUntil(this.unsubscribeNotifier))
+          .subscribe({
+            next: () => {
+              this.toastService.showInfo(
+                $localize`Delete pages operation will begin in the background. Close and re-open or reload this document after the operation has completed to see the changes.`
+              )
+              modal.close()
+            },
+            error: (error) => {
+              if (modal) {
+                modal.componentInstance.buttonsEnabled = true
+              }
+              this.toastService.showError(
+                $localize`Error executing delete pages operation`,
                 error
               )
             },

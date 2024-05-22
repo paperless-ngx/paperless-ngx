@@ -80,6 +80,7 @@ import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { environment } from 'src/environments/environment'
 import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { SplitConfirmDialogComponent } from '../common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
+import { DeletePagesConfirmDialogComponent } from '../common/confirm-dialog/delete-pages-confirm-dialog/delete-pages-confirm-dialog.component'
 import { PdfViewerModule } from 'ng2-pdf-viewer'
 import { DataType } from 'src/app/data/datatype'
 
@@ -179,6 +180,7 @@ describe('DocumentDetailComponent', () => {
         CustomFieldsDropdownComponent,
         SplitConfirmDialogComponent,
         RotateConfirmDialogComponent,
+        DeletePagesConfirmDialogComponent,
       ],
       providers: [
         DocumentTitlePipe,
@@ -1035,7 +1037,9 @@ describe('DocumentDetailComponent', () => {
     component.metadata = { has_archive_version: true }
     initNormally()
     fixture.detectChanges()
-    expect(component.contentRenderType).toEqual(component.ContentRenderType.PDF)
+    expect(component.archiveContentRenderType).toEqual(
+      component.ContentRenderType.PDF
+    )
     expect(
       fixture.debugElement.query(By.css('pdf-viewer-container'))
     ).not.toBeUndefined()
@@ -1045,7 +1049,7 @@ describe('DocumentDetailComponent', () => {
       original_mime_type: 'text/plain',
     }
     fixture.detectChanges()
-    expect(component.contentRenderType).toEqual(
+    expect(component.archiveContentRenderType).toEqual(
       component.ContentRenderType.Text
     )
     expect(
@@ -1057,7 +1061,7 @@ describe('DocumentDetailComponent', () => {
       original_mime_type: 'image/jpg',
     }
     fixture.detectChanges()
-    expect(component.contentRenderType).toEqual(
+    expect(component.archiveContentRenderType).toEqual(
       component.ContentRenderType.Image
     )
     expect(
@@ -1070,7 +1074,7 @@ describe('DocumentDetailComponent', () => {
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     }
     fixture.detectChanges()
-    expect(component.contentRenderType).toEqual(
+    expect(component.archiveContentRenderType).toEqual(
       component.ContentRenderType.Other
     )
     expect(
@@ -1121,6 +1125,31 @@ describe('DocumentDetailComponent', () => {
       documents: [doc.id],
       method: 'rotate',
       parameters: { degrees: 90 },
+    })
+    req.error(new ProgressEvent('failed'))
+    modal.componentInstance.confirm()
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    req.flush(true)
+  })
+
+  it('should support delete pages', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    initNormally()
+    component.deletePages()
+    expect(modal).not.toBeUndefined()
+    modal.componentInstance.documentID = doc.id
+    modal.componentInstance.pages = [1, 2]
+    modal.componentInstance.confirm()
+    let req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    expect(req.request.body).toEqual({
+      documents: [doc.id],
+      method: 'delete_pages',
+      parameters: { pages: [1, 2] },
     })
     req.error(new ProgressEvent('failed'))
     modal.componentInstance.confirm()

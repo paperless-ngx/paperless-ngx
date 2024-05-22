@@ -944,6 +944,7 @@ class BulkEditSerializer(
             "rotate",
             "merge",
             "split",
+            "delete_pages",
         ],
         label="Method",
         write_only=True,
@@ -1000,6 +1001,8 @@ class BulkEditSerializer(
             return bulk_edit.merge
         elif method == "split":
             return bulk_edit.split
+        elif method == "delete_pages":
+            return bulk_edit.delete_pages
         else:
             raise serializers.ValidationError("Unsupported method.")
 
@@ -1128,6 +1131,14 @@ class BulkEditSerializer(
         except ValueError:
             raise serializers.ValidationError("invalid pages specified")
 
+    def _validate_parameters_delete_pages(self, parameters):
+        if "pages" not in parameters:
+            raise serializers.ValidationError("pages not specified")
+        if not isinstance(parameters["pages"], list):
+            raise serializers.ValidationError("pages must be a list")
+        if not all(isinstance(i, int) for i in parameters["pages"]):
+            raise serializers.ValidationError("pages must be a list of integers")
+
     def validate(self, attrs):
         method = attrs["method"]
         parameters = attrs["parameters"]
@@ -1154,6 +1165,12 @@ class BulkEditSerializer(
                     "Split method only supports one document",
                 )
             self._validate_parameters_split(parameters)
+        elif method == bulk_edit.delete_pages:
+            if len(attrs["documents"]) > 1:
+                raise serializers.ValidationError(
+                    "Delete pages method only supports one document",
+                )
+            self._validate_parameters_delete_pages(parameters)
 
         return attrs
 

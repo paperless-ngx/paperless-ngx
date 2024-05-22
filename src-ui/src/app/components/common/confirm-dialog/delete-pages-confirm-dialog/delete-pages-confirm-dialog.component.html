@@ -1,0 +1,54 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{title}}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="cancel()">
+    </button>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col">
+            <div class="btn-toolbar flex-nowrap">
+                <div class="input-group input-group-sm">
+                    <div class="input-group-text" i18n>Page</div>
+                    <input class="form-control mw-60" type="number" min="1" [(ngModel)]="currentPage" />
+                    <div class="input-group-text" i18n>of {{totalPages}}</div>
+                </div>
+                <div class="input-group input-group-sm ms-auto">
+                    <span class="input-group-text" i18n>Pages to remove</span>
+                    <input [ngModel]="pagesString" class="form-control" disabled />
+                </div>
+            </div>
+            <div class="pdf-viewer-container w-100 mt-3">
+                <pdf-viewer #pdfViewer [src]="pdfSrc" [(page)]="currentPage"
+                [original-size]="false"
+                [zoom]="1"
+                zoom-scale="page-fit"
+                [render-text]="false"
+                (pagerendered)="pageRendered($event)"
+                (after-load-complete)="pdfPreviewLoaded($event)">
+                </pdf-viewer>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer flex-nowrap">
+    <div>
+        @if (message) {
+            <p [innerHTML]="message | safeHtml"></p>
+        }
+        @if (messageBold) {
+            <p class="mb-0 small"><b [innerHTML]="messageBold | safeHtml"></b></p>
+        }
+    </div>
+    <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">
+            <span class="d-inline-block" style="padding-bottom: 1px;">{{cancelBtnCaption}}</span>
+        </button>
+    <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled">
+        {{btnCaption}}
+    </button>
+</div>
+
+<ng-template #pageCheckOverlay let-page="page" let-pages="pages">
+    <div class="position-absolute top-0 start-0 w-100 h-100 p-2" (click)="pageCheckChanged(page)">
+        <input type="checkbox" class="form-check-input" />
+    </div>
+</ng-template>
