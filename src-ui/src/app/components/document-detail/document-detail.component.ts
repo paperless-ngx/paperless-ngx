@@ -71,6 +71,7 @@ import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-co
 import { DeletePagesConfirmDialogComponent } from '../common/confirm-dialog/delete-pages-confirm-dialog/delete-pages-confirm-dialog.component'
 import { HotKeyService } from 'src/app/services/hot-key.service'
 import { PDFDocumentProxy } from 'ng2-pdf-viewer'
+import { DataType } from 'src/app/data/datatype'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -170,6 +171,8 @@ export class DocumentDetailComponent
   public readonly CustomFieldDataType = CustomFieldDataType
 
   public readonly ContentRenderType = ContentRenderType
+
+  public readonly DataType = DataType
 
   @ViewChild('nav') nav: NgbNav
   @ViewChild('pdfPreview') set pdfPreview(element) {
@@ -998,7 +1001,7 @@ export class DocumentDetailComponent
     )
   }
 
-  filterDocuments(items: ObjectWithId[] | NgbDateStruct[]) {
+  filterDocuments(items: ObjectWithId[] | NgbDateStruct[], type?: DataType) {
     const filterRules: FilterRule[] = items.flatMap((i) => {
       if (i.hasOwnProperty('year')) {
         const isoDateAdapter = new ISODateAdapter()
@@ -1017,30 +1020,28 @@ export class DocumentDetailComponent
             value: dateBefore.toISOString().substring(0, 10),
           },
         ]
-      } else if (i.hasOwnProperty('last_correspondence')) {
-        // Correspondent
-        return {
-          rule_type: FILTER_CORRESPONDENT,
-          value: (i as Correspondent).id.toString(),
-        }
-      } else if (i.hasOwnProperty('path')) {
-        // Storage Path
-        return {
-          rule_type: FILTER_STORAGE_PATH,
-          value: (i as StoragePath).id.toString(),
-        }
-      } else if (i.hasOwnProperty('is_inbox_tag')) {
-        // Tag
-        return {
-          rule_type: FILTER_HAS_TAGS_ALL,
-          value: (i as Tag).id.toString(),
-        }
-      } else {
-        // Document Type, has no specific props
-        return {
-          rule_type: FILTER_DOCUMENT_TYPE,
-          value: (i as DocumentType).id.toString(),
-        }
+      }
+      switch (type) {
+        case DataType.Correspondent:
+          return {
+            rule_type: FILTER_CORRESPONDENT,
+            value: (i as Correspondent).id.toString(),
+          }
+        case DataType.DocumentType:
+          return {
+            rule_type: FILTER_DOCUMENT_TYPE,
+            value: (i as DocumentType).id.toString(),
+          }
+        case DataType.StoragePath:
+          return {
+            rule_type: FILTER_STORAGE_PATH,
+            value: (i as StoragePath).id.toString(),
+          }
+        case DataType.Tag:
+          return {
+            rule_type: FILTER_HAS_TAGS_ALL,
+            value: (i as Tag).id.toString(),
+          }
       }
     })
 
