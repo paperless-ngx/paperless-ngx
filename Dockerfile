@@ -83,7 +83,6 @@ ARG RUNTIME_PACKAGES="\
   icc-profiles-free \
   imagemagick \
   # PostgreSQL
-  libpq5 \
   postgresql-client \
   # MySQL / MariaDB
   mariadb-client \
