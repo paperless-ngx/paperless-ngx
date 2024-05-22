@@ -462,15 +462,16 @@ Paperless-ngx added the ability to create shareable links to files in version 2.
 
 ## PDF Actions
 
-Paperless-ngx supports 3 basic editing operations for PDFs (these operations cannot be performed on non-PDF files):
+Paperless-ngx supports four basic editing operations for PDFs (these operations currently cannot be performed on non-PDF files):
 
-- Merging documents: available when selecting multiple documents for 'bulk editing'
+- Merging documents: available when selecting multiple documents for 'bulk editing'.
 - Rotating documents: available when selecting multiple documents for 'bulk editing' and from an individual document's details page.
-- Splitting documents: available from an individual document's details page
+- Splitting documents: available from an individual document's details page.
+- Deleting pages: available from an individual document's details page.
 
 !!! important
 
-    Note that rotation alters the Paperless-ngx _original_ file, which would, for example, invalidate a digital signature.
+    Note that rotation and deleting pages alter the Paperless-ngx _original_ file, which would, for example, invalidate a digital signature.
 
 ## Document History
 
