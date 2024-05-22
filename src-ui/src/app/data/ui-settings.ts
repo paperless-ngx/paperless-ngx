@@ -234,6 +234,6 @@ export const SETTINGS: UiSetting[] = [
   {
     key: SETTINGS_KEYS.SEARCH_FULL_TYPE,
     type: 'string',
-    default: GlobalSearchType.ADVANCED,
+    default: GlobalSearchType.TITLE_CONTENT,
   },
 ]

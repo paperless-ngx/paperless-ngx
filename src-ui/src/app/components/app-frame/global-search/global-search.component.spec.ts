@@ -504,15 +504,6 @@ describe('GlobalSearchComponent', () => {
     expect(focusSpy).toHaveBeenCalled()
   })
 
-  it('should support explicit advanced search', () => {
-    const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    component.query = 'test'
-    component.runFullSearch()
-    expect(qfSpy).toHaveBeenCalledWith([
-      { rule_type: FILTER_FULLTEXT_QUERY, value: 'test' },
-    ])
-  })
-
   it('should support open in new window', () => {
     const openSpy = jest.spyOn(window, 'open')
     const event = new Event('click')
@@ -539,17 +530,17 @@ describe('GlobalSearchComponent', () => {
     component.query = 'test'
     component.runFullSearch()
     expect(qfSpy).toHaveBeenCalledWith([
-      { rule_type: FILTER_FULLTEXT_QUERY, value: 'test' },
+      { rule_type: FILTER_TITLE_CONTENT, value: 'test' },
     ])
 
     settingsService.set(
       SETTINGS_KEYS.SEARCH_FULL_TYPE,
-      GlobalSearchType.TITLE_CONTENT
+      GlobalSearchType.ADVANCED
     )
     component.query = 'test'
     component.runFullSearch()
     expect(qfSpy).toHaveBeenCalledWith([
-      { rule_type: FILTER_TITLE_CONTENT, value: 'test' },
+      { rule_type: FILTER_FULLTEXT_QUERY, value: 'test' },
     ])
   })
 })
