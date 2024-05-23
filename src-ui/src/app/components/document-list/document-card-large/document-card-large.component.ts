@@ -54,6 +54,9 @@ export class DocumentCardLargeComponent extends ComponentWithPermissions {
   clickStoragePath = new EventEmitter<number>()
 
   @Output()
+  clickWarehouse = new EventEmitter<number>()
+
+  @Output()
   clickMoreLike = new EventEmitter()
 
   @ViewChild('popover') popover: NgbPopover

@@ -588,6 +588,7 @@ describe('DocumentListComponent', () => {
     component.clickCorrespondent(2)
     component.clickDocumentType(3)
     component.clickStoragePath(4)
+    component.clickWarehouse(5)
   })
 
   it('should support quick filter on document more like', () => {

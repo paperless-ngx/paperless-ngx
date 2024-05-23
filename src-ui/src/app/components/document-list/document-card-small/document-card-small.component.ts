@@ -50,6 +50,9 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
   @Output()
   clickStoragePath = new EventEmitter<number>()
 
+  @Output()
+  clickWarehouse = new EventEmitter<number>()
+
   moreTags: number = null
 
   @ViewChild('popover') popover: NgbPopover

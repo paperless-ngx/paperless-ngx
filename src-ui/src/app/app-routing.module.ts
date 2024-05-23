@@ -9,6 +9,7 @@ import { DocumentTypeListComponent } from './components/manage/document-type-lis
 import { LogsComponent } from './components/admin/logs/logs.component'
 import { SettingsComponent } from './components/admin/settings/settings.component'
 import { TagListComponent } from './components/manage/tag-list/tag-list.component'
+import { WarehouseListComponent } from './components/manage/warehouse-list/warehouse-list.component'
 import { NotFoundComponent } from './components/not-found/not-found.component'
 import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
 import { DirtyFormGuard } from './guards/dirty-form.guard'
@@ -100,6 +101,17 @@ export const routes: Routes = [
           requiredPermission: {
             action: PermissionAction.View,
             type: PermissionType.Tag,
+          },
+        },
+      },
+      {
+        path: 'warehouses',
+        component: WarehouseListComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Warehouse,
           },
         },
       },

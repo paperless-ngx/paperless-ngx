@@ -29,6 +29,7 @@ import {
   FILTER_CORRESPONDENT,
   FILTER_DOCUMENT_TYPE,
   FILTER_STORAGE_PATH,
+  FILTER_WAREHOUSE,
   FILTER_HAS_TAGS_ALL,
   FILTER_CREATED_AFTER,
   FILTER_CREATED_BEFORE,
@@ -37,6 +38,7 @@ import { Correspondent } from 'src/app/data/correspondent'
 import { Document } from 'src/app/data/document'
 import { DocumentType } from 'src/app/data/document-type'
 import { StoragePath } from 'src/app/data/storage-path'
+import { Warehouse } from 'src/app/data/warehouse'
 import { Tag } from 'src/app/data/tag'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
@@ -52,6 +54,7 @@ import { CorrespondentService } from 'src/app/services/rest/correspondent.servic
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { WarehouseService } from 'src/app/services/rest/warehouse.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -59,6 +62,7 @@ import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.
 import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
 import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import { WarehouseEditDialogComponent } from '../common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
 import { DateComponent } from '../common/input/date/date.component'
 import { NumberComponent } from '../common/input/number/number.component'
 import { PermissionsFormComponent } from '../common/input/permissions/permissions-form/permissions-form.component'
@@ -165,6 +169,7 @@ describe('DocumentDetailComponent', () => {
         DocumentTypeEditDialogComponent,
         CorrespondentEditDialogComponent,
         StoragePathEditDialogComponent,
+        WarehouseEditDialogComponent,
         IfOwnerDirective,
         PermissionsFormComponent,
         SafeHtmlPipe,
@@ -215,6 +220,20 @@ describe('DocumentDetailComponent', () => {
                   {
                     id: 31,
                     name: 'StoragePath31',
+                  },
+                ],
+              }),
+          },
+        },
+        {
+          provide: WarehouseService,
+          useValue: {
+            listAll: () =>
+              of({
+                results: [
+                  {
+                    id: 41,
+                    name: 'Warehouse41',
                   },
                 ],
               }),
@@ -366,6 +385,7 @@ describe('DocumentDetailComponent', () => {
     expect(component.correspondents).toBeUndefined()
     expect(component.documentTypes).toBeUndefined()
     expect(component.storagePaths).toBeUndefined()
+    expect(component.warehouses).toBeUndefined()
     expect(component.users).toBeUndefined()
     httpTestingController.expectNone(`${environment.apiBaseUrl}documents/tags/`)
     httpTestingController.expectNone(
@@ -376,6 +396,9 @@ describe('DocumentDetailComponent', () => {
     )
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}documents/storage_paths/`
+    )
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/warehouses/`
     )
     currentUserCan = true
   })
@@ -417,6 +440,20 @@ describe('DocumentDetailComponent', () => {
       name: 'NewStoragePath12',
     })
     expect(component.documentForm.get('storage_path').value).toEqual(12)
+  })
+
+  it('should support creating warehouse', () => {
+    initNormally()
+    let openModal: NgbModalRef
+    modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
+    const modalSpy = jest.spyOn(modalService, 'open')
+    component.createWarehouse('NewWarehouse12')
+    expect(modalSpy).toHaveBeenCalled()
+    openModal.componentInstance.succeeded.next({
+      id: 12,
+      name: 'NewWarehouse12',
+    })
+    expect(component.documentForm.get('warehouse').value).toEqual(12)
   })
 
   it('should allow dischard changes', () => {
@@ -814,6 +851,24 @@ describe('DocumentDetailComponent', () => {
     expect(qfSpy).toHaveBeenCalledWith([
       {
         rule_type: FILTER_STORAGE_PATH,
+        value: object.id.toString(),
+      },
+    ])
+  })
+
+  it('should support quick filtering by warehouse', () => {
+    initNormally()
+    const object = {
+      id: 22,
+      name: 'Warehouse22',
+      type: 'Warehouse',
+      parent_warehouse: 22,
+    } as Warehouse
+    const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
+    component.filterDocuments([object])
+    expect(qfSpy).toHaveBeenCalledWith([
+      {
+        rule_type: FILTER_WAREHOUSE,
         value: object.id.toString(),
       },
     ])

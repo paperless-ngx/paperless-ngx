@@ -192,6 +192,15 @@
               (sort)="onSort($event)"
             i18n>Storage path</th>
           }
+          @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.Warehouse)) {
+            <th class="d-none d-xl-table-cell"
+              pngxSortable="warehouse__name"
+              title="Sort by warehouse" i18n-title
+              [currentSortField]="list.sortField"
+              [currentSortReverse]="list.sortReverse"
+              (sort)="onSort($event)"
+            i18n>Warehouse</th>
+          }
           <th
             pngxSortable="created"
             title="Sort by created date" i18n-title
@@ -257,6 +266,13 @@
                 <td class="d-none d-xl-table-cell">
                   @if (d.storage_path) {
                     <a (click)="clickStoragePath(d.storage_path);$event.stopPropagation()" title="Filter by storage path" i18n-title>{{(d.storage_path$ | async)?.name}}</a>
+                  }
+                </td>
+              }
+              @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.Warehouse)) {
+                <td class="d-none d-xl-table-cell">
+                  @if (d.warehouses) {
+                    <a (click)="clickWarehouse(d.warehouses);$event.stopPropagation()" title="Filter by warehouse" i18n-title>{{(d.warehouses$ | async)?.name}}</a>
                   }
                 </td>
               }

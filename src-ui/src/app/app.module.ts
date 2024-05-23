@@ -12,6 +12,7 @@ import { DocumentListComponent } from './components/document-list/document-list.
 import { DocumentDetailComponent } from './components/document-detail/document-detail.component'
 import { DashboardComponent } from './components/dashboard/dashboard.component'
 import { TagListComponent } from './components/manage/tag-list/tag-list.component'
+import { WarehouseListComponent } from './components/manage/warehouse-list/warehouse-list.component'
 import { DocumentTypeListComponent } from './components/manage/document-type-list/document-type-list.component'
 import { CorrespondentListComponent } from './components/manage/correspondent-list/correspondent-list.component'
 import { LogsComponent } from './components/admin/logs/logs.component'
@@ -22,6 +23,7 @@ import { NotFoundComponent } from './components/not-found/not-found.component'
 import { ConfirmDialogComponent } from './components/common/confirm-dialog/confirm-dialog.component'
 import { CorrespondentEditDialogComponent } from './components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { TagEditDialogComponent } from './components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
+import { WarehouseEditDialogComponent } from './components/common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from './components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
 import { TagComponent } from './components/common/tag/tag.component'
 import { ClearableBadgeComponent } from './components/common/clearable-badge/clearable-badge.component'
@@ -388,6 +390,7 @@ function initializeApp(settings: SettingsService) {
     DocumentTypeListComponent,
     CorrespondentListComponent,
     StoragePathListComponent,
+    WarehouseListComponent,
     LogsComponent,
     SettingsComponent,
     NotFoundComponent,
@@ -396,6 +399,7 @@ function initializeApp(settings: SettingsService) {
     TagEditDialogComponent,
     DocumentTypeEditDialogComponent,
     StoragePathEditDialogComponent,
+    WarehouseEditDialogComponent,
     TagComponent,
     ClearableBadgeComponent,
     PageHeaderComponent,

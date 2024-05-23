@@ -49,6 +49,10 @@ export const FILTER_SHARED_BY_USER = 37
 
 export const FILTER_CUSTOM_FIELDS = 36
 
+export const FILTER_WAREHOUSE = 50
+export const FILTER_HAS_WAREHOUSE_ANY = 51
+export const FILTER_DOES_NOT_HAVE_WAREHOUSE = 52
+
 export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
     id: FILTER_TITLE,
@@ -106,6 +110,25 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     id: FILTER_DOES_NOT_HAVE_STORAGE_PATH,
     filtervar: 'storage_path__id__none',
     datatype: 'storage_path',
+    multi: true,
+  },
+  {
+    id: FILTER_WAREHOUSE,
+    filtervar: 'warehouses__id',
+    isnull_filtervar: 'warehouses__isnull',
+    datatype: 'warehouse',
+    multi: false,
+  },
+  {
+    id: FILTER_HAS_WAREHOUSE_ANY,
+    filtervar: 'warehouses__id__in',
+    datatype: 'warehouse',
+    multi: true,
+  },
+  {
+    id: FILTER_DOES_NOT_HAVE_WAREHOUSE,
+    filtervar: 'warehouses__id__none',
+    datatype: 'warehouse',
     multi: true,
   },
   {

@@ -336,7 +336,7 @@ class DocumentViewSet(
         ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = DocumentFilterSet
-    search_fields = ("title", "correspondent__name", "content")
+    search_fields = ("title", "correspondent__name", "content", "warehouses")
     ordering_fields = (
         "id",
         "title",
@@ -1519,9 +1519,18 @@ class BulkEditObjectsView(PassUserMixin):
                     "Error performing bulk permissions edit, check logs for more detail.",
                 )
 
+        elif operation == "delete" and object_type == "warehouses":
+            
+            documents = Document.objects.filter(warehouses__in=object_ids)
+            documents.delete()
+            objs.delete()
+            
         elif operation == "delete":
+        
             objs.delete()
 
+        
+            
         return Response({"result": "OK"})
 
 

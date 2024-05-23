@@ -191,6 +191,8 @@ class DocumentFilterSet(FilterSet):
     document_type__id__none = ObjectFilter(field_name="document_type", exclude=True)
 
     storage_path__id__none = ObjectFilter(field_name="storage_path", exclude=True)
+    
+    warehouses__id__none = ObjectFilter(field_name="warehouses", exclude=True)
 
     is_in_inbox = InboxFilter()
 
@@ -225,6 +227,9 @@ class DocumentFilterSet(FilterSet):
             "storage_path": ["isnull"],
             "storage_path__id": ID_KWARGS,
             "storage_path__name": CHAR_KWARGS,
+            "warehouses": ["isnull"],
+            "warehouses__id": ID_KWARGS,
+            "warehouses__name": CHAR_KWARGS,
             "owner": ["isnull"],
             "owner__id": ID_KWARGS,
             "custom_fields": ["icontains"],

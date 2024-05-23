@@ -11,10 +11,12 @@ import {
 import { Tag } from 'src/app/data/tag'
 import { Correspondent } from 'src/app/data/correspondent'
 import { DocumentType } from 'src/app/data/document-type'
+import { Warehouse } from 'src/app/data/warehouse'
 import { Subject, Subscription } from 'rxjs'
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { TagService } from 'src/app/services/rest/tag.service'
+import { WarehouseService } from 'src/app/services/rest/warehouse.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { FilterRule } from 'src/app/data/filter-rule'
 import { filterRulesDiffer } from 'src/app/utils/filter-rules'
@@ -35,15 +37,18 @@ import {
   FILTER_TITLE,
   FILTER_TITLE_CONTENT,
   FILTER_HAS_STORAGE_PATH_ANY,
+  FILTER_HAS_WAREHOUSE_ANY,
   FILTER_ASN_ISNULL,
   FILTER_ASN_GT,
   FILTER_ASN_LT,
   FILTER_DOES_NOT_HAVE_CORRESPONDENT,
   FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
   FILTER_DOES_NOT_HAVE_STORAGE_PATH,
+  FILTER_DOES_NOT_HAVE_WAREHOUSE,
   FILTER_DOCUMENT_TYPE,
   FILTER_CORRESPONDENT,
   FILTER_STORAGE_PATH,
+  FILTER_WAREHOUSE,
   FILTER_OWNER,
   FILTER_OWNER_DOES_NOT_INCLUDE,
   FILTER_OWNER_ISNULL,
@@ -188,6 +193,16 @@ export class FilterEditorComponent
           } else {
             return $localize`Without document type`
           }
+        
+        case FILTER_WAREHOUSE:
+        case FILTER_HAS_WAREHOUSE_ANY:
+          if (rule.value) {
+            return $localize`Warehouse: ${this.warehouses.find(
+              (w) => w.id == +rule.value
+            )?.name}`
+          } else {
+            return $localize`Without warehouse`
+          }
 
         case FILTER_STORAGE_PATH:
         case FILTER_HAS_STORAGE_PATH_ANY:
@@ -231,6 +246,7 @@ export class FilterEditorComponent
   constructor(
     private documentTypeService: DocumentTypeService,
     private tagService: TagService,
+    private warehouseService: WarehouseService,
     private correspondentService: CorrespondentService,
     private documentService: DocumentService,
     private storagePathService: StoragePathService,
@@ -246,11 +262,13 @@ export class FilterEditorComponent
   correspondents: Correspondent[] = []
   documentTypes: DocumentType[] = []
   storagePaths: StoragePath[] = []
+  warehouses: Warehouse[] = []
 
   tagDocumentCounts: SelectionDataItem[]
   correspondentDocumentCounts: SelectionDataItem[]
   documentTypeDocumentCounts: SelectionDataItem[]
   storagePathDocumentCounts: SelectionDataItem[]
+  warehouseDocumentCounts: SelectionDataItem[]
 
   _textFilter = ''
   _moreLikeId: number
@@ -288,6 +306,8 @@ export class FilterEditorComponent
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
   storagePathSelectionModel = new FilterableDropdownSelectionModel()
+  warehouseSelectionModel = new FilterableDropdownSelectionModel()
+  
 
   dateCreatedBefore: string
   dateCreatedAfter: string
@@ -320,6 +340,7 @@ export class FilterEditorComponent
 
     this.documentTypeSelectionModel.clear(false)
     this.storagePathSelectionModel.clear(false)
+    this.warehouseSelectionModel.clear(false)
     this.tagSelectionModel.clear(false)
     this.correspondentSelectionModel.clear(false)
     this._textFilter = null
@@ -465,6 +486,24 @@ export class FilterEditorComponent
         case FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE:
           this.documentTypeSelectionModel.intersection = Intersection.Exclude
           this.documentTypeSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Excluded,
+            false
+          )
+          break
+        case FILTER_WAREHOUSE:
+        case FILTER_HAS_WAREHOUSE_ANY:
+          this.warehouseSelectionModel.logicalOperator = LogicalOperator.Or
+          this.warehouseSelectionModel.intersection = Intersection.Include
+          this.warehouseSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Selected,
+            false
+          )
+          break
+        case FILTER_DOES_NOT_HAVE_WAREHOUSE:
+          this.warehouseSelectionModel.intersection = Intersection.Exclude
+          this.warehouseSelectionModel.set(
             rule.value ? +rule.value : null,
             ToggleableItemState.Excluded,
             false
@@ -683,6 +722,26 @@ export class FilterEditorComponent
           })
         })
     }
+    if (this.warehouseSelectionModel.isNoneSelected()) {
+      filterRules.push({ rule_type: FILTER_WAREHOUSE, value: null })
+    } else {
+      this.warehouseSelectionModel
+        .getSelectedItems()
+        .forEach((warehouse) => {
+          filterRules.push({
+            rule_type: FILTER_HAS_WAREHOUSE_ANY,
+            value: warehouse.id?.toString(),
+          })
+        })
+      this.warehouseSelectionModel
+        .getExcludedItems()
+        .forEach((warehouse) => {
+          filterRules.push({
+            rule_type: FILTER_DOES_NOT_HAVE_WAREHOUSE,
+            value: warehouse.id?.toString(),
+          })
+        })
+    }
     if (this.storagePathSelectionModel.isNoneSelected()) {
       filterRules.push({ rule_type: FILTER_STORAGE_PATH, value: null })
     } else {
@@ -845,6 +904,8 @@ export class FilterEditorComponent
       selectionData?.selected_correspondents ?? null
     this.storagePathDocumentCounts =
       selectionData?.selected_storage_paths ?? null
+    this.warehouseDocumentCounts =
+      selectionData?.selected_warehouses ?? null
   }
 
   rulesModified: boolean = false
@@ -898,6 +959,16 @@ export class FilterEditorComponent
     if (
       this.permissionsService.currentUserCan(
         PermissionAction.View,
+        PermissionType.Warehouse
+      )
+    ) {
+      this.warehouseService
+        .listAll()
+        .subscribe((result) => (this.warehouses = result.results))
+    }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
         PermissionType.StoragePath
       )
     ) {
@@ -941,6 +1012,10 @@ export class FilterEditorComponent
     this.documentTypeSelectionModel.toggle(documentTypeId)
   }
 
+  toggleWarehouse(warehouseId: number) {
+    this.warehouseSelectionModel.toggle(warehouseId)
+  }
+
   toggleStoragePath(storagePathID: number) {
     this.storagePathSelectionModel.toggle(storagePathID)
   }
@@ -955,6 +1030,10 @@ export class FilterEditorComponent
 
   onDocumentTypeDropdownOpen() {
     this.documentTypeSelectionModel.apply()
+  }
+
+  onWarehouseDropdownOpen() {
+    this.warehouseSelectionModel.apply()
   }
 
   onStoragePathDropdownOpen() {

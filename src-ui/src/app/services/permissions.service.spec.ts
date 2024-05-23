@@ -264,6 +264,10 @@ describe('PermissionsService', () => {
         'change_applicationconfiguration',
         'delete_applicationconfiguration',
         'view_applicationconfiguration',
+        'change_warehouse',
+        'view_warehouse',
+        'add_warehouse',
+        'delete_warehouse',
       ],
       {
         username: 'testuser',

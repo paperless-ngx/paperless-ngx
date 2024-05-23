@@ -7,5 +7,7 @@ export interface DocumentSuggestions {
 
   storage_paths?: number[]
 
+  warehouses?: number[]
+
   dates?: string[] // ISO-formatted date string e.g. 2022-11-03
 }
