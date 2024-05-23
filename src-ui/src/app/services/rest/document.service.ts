@@ -13,6 +13,8 @@ import { TagService } from './tag.service'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
 import { queryParamsFromFilterRules } from '../../utils/query-params'
 import { StoragePathService } from './storage-path.service'
+import { WarehouseService } from './warehouse.service'
+
 import {
   PermissionAction,
   PermissionType,
@@ -26,6 +28,7 @@ export const DOCUMENT_SORT_FIELDS = [
   { field: 'correspondent__name', name: $localize`Correspondent` },
   { field: 'title', name: $localize`Title` },
   { field: 'document_type__name', name: $localize`Document type` },
+  { field: 'warehouses__name', name: $localize`Warehouse` },
   { field: 'created', name: $localize`Created` },
   { field: 'added', name: $localize`Added` },
   { field: 'modified', name: $localize`Modified` },
@@ -51,6 +54,8 @@ export interface SelectionData {
   selected_correspondents: SelectionDataItem[]
   selected_tags: SelectionDataItem[]
   selected_document_types: SelectionDataItem[]
+  selected_warehouses: SelectionDataItem[]
+
 }
 
 @Injectable({
@@ -65,6 +70,7 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     private documentTypeService: DocumentTypeService,
     private tagService: TagService,
     private storagePathService: StoragePathService,
+    private warehouseService: WarehouseService,
     private permissionsService: PermissionsService,
     private settingsService: SettingsService
   ) {
@@ -115,6 +121,15 @@ export class DocumentService extends AbstractPaperlessService<Document> {
       )
     ) {
       doc.storage_path$ = this.storagePathService.getCached(doc.storage_path)
+    }
+    if (
+      doc.warehouses &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Warehouse
+      )
+    ) {
+      doc.warehouses$ = this.warehouseService.getCached(doc.warehouses)
     }
     return doc
   }

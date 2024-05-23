@@ -3,6 +3,7 @@ import { Tag } from './tag'
 import { DocumentType } from './document-type'
 import { Observable } from 'rxjs'
 import { StoragePath } from './storage-path'
+import { Warehouse } from './warehouse'
 import { ObjectWithPermissions } from './object-with-permissions'
 import { DocumentNote } from './document-note'
 import { CustomFieldInstance } from './custom-field-instance'
@@ -27,6 +28,10 @@ export interface Document extends ObjectWithPermissions {
   storage_path$?: Observable<StoragePath>
 
   storage_path?: number
+
+  warehouses$?: Observable<Warehouse>
+
+  warehouses?: number
 
   title?: string
 

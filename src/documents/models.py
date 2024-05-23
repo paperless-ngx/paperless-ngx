@@ -129,7 +129,7 @@ class StoragePath(MatchingModel):
         verbose_name = _("storage path")
         verbose_name_plural = _("storage paths")
 
-class Warehouse(ModelWithOwner):
+class Warehouse(MatchingModel):
        
     WAREHOUSE = "Warehouse"
     SHELF = "Shelf"
@@ -140,13 +140,12 @@ class Warehouse(ModelWithOwner):
         (BOXCASE, _("Boxcase")),
     )
     
-    name = models.CharField(_("name"), max_length=256, unique=True)
     type = models.CharField(max_length=20, null=True, blank=True, 
                                       choices=TYPE_WAREHOUSE,
                                       default=WAREHOUSE,)
-    parent_warehouse = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name="parent_warehouses" )
+    parent_warehouse = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True )
     
-    class Meta: 
+    class Meta(MatchingModel.Meta): 
         verbose_name = _("warehouse")
         verbose_name_plural = _("warehouses")
     

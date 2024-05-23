@@ -291,6 +291,11 @@ export class DocumentListComponent
     this.filterEditor.toggleStoragePath(storagePathID)
   }
 
+  clickWarehouse(warehouseID: number) {
+    this.list.selectNone()
+    this.filterEditor.toggleWarehouse(warehouseID)
+  }
+
   clickMoreLike(documentID: number) {
     this.list.quickFilter([
       { rule_type: FILTER_FULLTEXT_MORELIKE, value: documentID.toString() },

@@ -24,6 +24,7 @@ import {
   DocumentService,
 } from 'src/app/services/rest/document.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { WarehouseService } from 'src/app/services/rest/warehouse.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -49,9 +50,11 @@ import { Tag } from 'src/app/data/tag'
 import { Correspondent } from 'src/app/data/correspondent'
 import { DocumentType } from 'src/app/data/document-type'
 import { StoragePath } from 'src/app/data/storage-path'
+import { Warehouse } from 'src/app/data/warehouse'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
 import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import { WarehouseEditDialogComponent } from '../../common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
 import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
 import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
@@ -82,6 +85,7 @@ describe('BulkEditorComponent', () => {
   let correspondentsService: CorrespondentService
   let documentTypeService: DocumentTypeService
   let storagePathService: StoragePathService
+  let warehouseService: WarehouseService
   let httpTestingController: HttpTestingController
 
   beforeEach(async () => {
@@ -148,6 +152,18 @@ describe('BulkEditorComponent', () => {
               }),
           },
         },
+        {
+          provide: WarehouseService,
+          useValue: {
+            listAll: () =>
+              of({
+                results: [
+                  { id: 88, name: 'warehouse88' },
+                  { id: 77, name: 'warehouse77' },
+                ],
+              }),
+          },
+        },
         FilterPipe,
         SettingsService,
         {
@@ -189,6 +205,7 @@ describe('BulkEditorComponent', () => {
     correspondentsService = TestBed.inject(CorrespondentService)
     documentTypeService = TestBed.inject(DocumentTypeService)
     storagePathService = TestBed.inject(StoragePathService)
+    warehouseService = TestBed.inject(WarehouseService)
     httpTestingController = TestBed.inject(HttpTestingController)
 
     fixture = TestBed.createComponent(BulkEditorComponent)
@@ -260,6 +277,22 @@ describe('BulkEditorComponent', () => {
       .mockReturnValue(of(selectionData))
     component.openStoragePathDropdown()
     expect(component.storagePathsSelectionModel.selectionSize()).toEqual(1)
+  })
+
+  it('should apply selection data to warehouse menu', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    fixture.detectChanges()
+    expect(
+      component.warehousesSelectionModel.getSelectedItems()
+    ).toHaveLength(0)
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([3, 5, 7]))
+    jest
+      .spyOn(documentService, 'getSelectionData')
+      .mockReturnValue(of(selectionData))
+    component.openWarehouseDropdown()
+    expect(component.warehousesSelectionModel.selectionSize()).toEqual(1)
   })
 
   it('should execute modify tags bulk operation', () => {
@@ -679,6 +712,105 @@ describe('BulkEditorComponent', () => {
     )
   })
 
+  it('should execute modify warehouse bulk operation', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue([{ id: 3 }, { id: 4 }])
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([3, 4]))
+    jest
+      .spyOn(permissionsService, 'currentUserHasObjectPermissions')
+      .mockReturnValue(true)
+    component.showConfirmationDialogs = false
+    fixture.detectChanges()
+    component.setWarehouses({
+      itemsToAdd: [{ id: 101 }],
+      itemsToRemove: [],
+    })
+    let req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    req.flush(true)
+    expect(req.request.body).toEqual({
+      documents: [3, 4],
+      method: 'set_warehouse',
+      parameters: { warehouse: 101 },
+    })
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
+    ) // list reload
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
+    ) // listAllFilteredIds
+  })
+
+  it('should execute modify warehouse bulk operation with confirmation dialog if enabled', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue([{ id: 3 }, { id: 4 }])
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([3, 4]))
+    jest
+      .spyOn(permissionsService, 'currentUserHasObjectPermissions')
+      .mockReturnValue(true)
+    component.showConfirmationDialogs = true
+    fixture.detectChanges()
+    component.setWarehouses({
+      itemsToAdd: [{ id: 101 }],
+      itemsToRemove: [],
+    })
+    expect(modal).not.toBeUndefined()
+    modal.componentInstance.confirm()
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}documents/bulk_edit/`)
+      .flush(true)
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
+    ) // list reload
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
+    ) // listAllFilteredIds
+  })
+
+  it('should set modal dialog text accordingly for warehouse edit confirmation', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue([{ id: 3 }, { id: 4 }])
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([3, 4]))
+    jest
+      .spyOn(permissionsService, 'currentUserHasObjectPermissions')
+      .mockReturnValue(true)
+    component.showConfirmationDialogs = true
+    fixture.detectChanges()
+    component.setWarehouses({
+      itemsToAdd: [],
+      itemsToRemove: [{ id: 101, name: 'Warehouse 101' }],
+    })
+    expect(modal.componentInstance.message).toEqual(
+      'This operation will remove the warehouse from 2 selected document(s).'
+    )
+    modal.close()
+    component.setWarehouses({
+      itemsToAdd: [{ id: 101, name: 'Warehouse 101' }],
+      itemsToRemove: [],
+    })
+    expect(modal.componentInstance.message).toEqual(
+      'This operation will assign the storage path "Warehouse 101" to 2 selected document(s).'
+    )
+  })
+
+
   it('should only execute bulk operations when changes are detected', () => {
     component.setTags({
       itemsToAdd: [],
@@ -693,6 +825,10 @@ describe('BulkEditorComponent', () => {
       itemsToRemove: [],
     })
     component.setStoragePaths({
+      itemsToAdd: [],
+      itemsToRemove: [],
+    })
+    component.setWarehouses({
       itemsToAdd: [],
       itemsToRemove: [],
     })
@@ -988,6 +1124,7 @@ describe('BulkEditorComponent', () => {
     expect(component.correspondents).toBeUndefined()
     expect(component.documentTypes).toBeUndefined()
     expect(component.storagePaths).toBeUndefined()
+    expect(component.warehouses).toBeUndefined()
     httpTestingController.expectNone(`${environment.apiBaseUrl}documents/tags/`)
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}documents/correspondents/`
@@ -997,6 +1134,9 @@ describe('BulkEditorComponent', () => {
     )
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}documents/storage_paths/`
+    )
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/warehouses/`
     )
   })
 
@@ -1174,5 +1314,49 @@ describe('BulkEditorComponent', () => {
       newStoragePath.id
     )
     expect(component.storagePaths).toEqual(storagePaths.results)
+  })
+
+  it('should support create new warehouse', () => {
+    const name = 'New Warehouse'
+    const newWarehouse = { id: 101, name: 'New Warehouse' }
+    const warehouses: Results<Warehouse> = {
+      results: [
+        { id: 1, name: 'Warehouse 1' },
+        { id: 2, name: 'Warehouse 2' },
+      ],
+      count: 2,
+      all: [1, 2],
+    }
+
+    const modalInstance = {
+      componentInstance: {
+        dialogMode: EditDialogMode.CREATE,
+        object: { name },
+        succeeded: of(newWarehouse),
+      },
+    }
+    const warehousesListAllSpy = jest.spyOn(warehouseService, 'listAll')
+    warehousesListAllSpy.mockReturnValue(of(warehouses))
+
+    const warehousesSelectionModelToggleSpy = jest.spyOn(
+      component.warehousesSelectionModel,
+      'toggle'
+    )
+
+    const modalServiceOpenSpy = jest.spyOn(modalService, 'open')
+    modalServiceOpenSpy.mockReturnValue(modalInstance as any)
+
+    component.createWarehouse(name)
+
+    expect(modalServiceOpenSpy).toHaveBeenCalledWith(
+      WarehouseEditDialogComponent,
+      { backdrop: 'static' }
+    )
+    expect(warehousesListAllSpy).toHaveBeenCalled()
+
+    expect(warehousesSelectionModelToggleSpy).toHaveBeenCalledWith(
+      newWarehouse.id
+    )
+    expect(component.warehouses).toEqual(warehouses.results)
   })
 })

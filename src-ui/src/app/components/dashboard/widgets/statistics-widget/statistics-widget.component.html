@@ -84,6 +84,14 @@
           </a>
         }
       </ng-container>
+      <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Warehouse }">
+        @if (statistics?.warehouse_count > 0) {
+          <a class="list-group-item d-flex justify-content-between align-items-center" routerLink="/warehouses/">
+            <ng-container i18n>Warehouses</ng-container>:
+            <span class="badge bg-secondary text-light rounded-pill">{{statistics?.warehouse_count | number}}</span>
+          </a>
+        }
+      </ng-container>
     </div>
   </ng-container>
 </pngx-widget-frame>

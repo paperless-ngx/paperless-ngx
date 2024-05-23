@@ -83,6 +83,12 @@
                   <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="archive"></i-bs><small>{{(document.storage_path$ | async)?.name}}</small>
                 </button>
               }
+              @if (document.warehouses) {
+                <button type="button" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2 d-flex align-items-center" title="Filter by warehouse" i18n-title
+                  (click)="clickWarehouse.emit(document.warehouses);$event.stopPropagation()">
+                  <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="archive"></i-bs><small>{{(document.warehouses$ | async)?.name}}</small>
+                </button>
+              }
               @if (document.archive_serial_number | isNumber) {
                 <div class="list-group-item me-2 bg-light text-dark p-1 border-0 d-flex align-items-center">
                   <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="upc-scan"></i-bs><small>#{{document.archive_serial_number}}</small>

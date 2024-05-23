@@ -44,10 +44,14 @@ import {
   FILTER_FULLTEXT_MORELIKE,
   FILTER_HAS_TAGS_ALL,
   FILTER_STORAGE_PATH,
+  FILTER_WAREHOUSE,
 } from 'src/app/data/filter-rule-type'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { StoragePath } from 'src/app/data/storage-path'
 import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import { WarehouseService } from 'src/app/services/rest/warehouse.service'
+import { Warehouse } from 'src/app/data/warehouse'
+import { WarehouseEditDialogComponent } from '../common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import {
   PermissionAction,
@@ -134,6 +138,8 @@ export class DocumentDetailComponent
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
   storagePaths: StoragePath[]
+  warehouses: Warehouse[]
+
 
   documentForm: FormGroup = new FormGroup({
     title: new FormControl(''),
@@ -142,6 +148,7 @@ export class DocumentDetailComponent
     correspondent: new FormControl(),
     document_type: new FormControl(),
     storage_path: new FormControl(),
+    warehouses: new FormControl(),
     archive_serial_number: new FormControl(),
     tags: new FormControl([]),
     permissions_form: new FormControl(null),
@@ -197,6 +204,7 @@ export class DocumentDetailComponent
     private toastService: ToastService,
     private settings: SettingsService,
     private storagePathService: StoragePathService,
+    private warehouseService: WarehouseService,
     private permissionsService: PermissionsService,
     private userService: UserService,
     private customFieldsService: CustomFieldsService,
@@ -284,6 +292,17 @@ export class DocumentDetailComponent
         .listAll()
         .pipe(first(), takeUntil(this.unsubscribeNotifier))
         .subscribe((result) => (this.storagePaths = result.results))
+    }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Warehouse
+      )
+    ) {
+      this.warehouseService
+        .listAll()
+        .pipe(first(), takeUntil(this.unsubscribeNotifier))
+        .subscribe((result) => (this.warehouses = result.results))
     }
     if (
       this.permissionsService.currentUserCan(
@@ -408,6 +427,7 @@ export class DocumentDetailComponent
             correspondent: doc.correspondent,
             document_type: doc.document_type,
             storage_path: doc.storage_path,
+            warehouses: doc.warehouses,
             archive_serial_number: doc.archive_serial_number,
             tags: [...doc.tags],
             permissions_form: {
@@ -599,6 +619,27 @@ export class DocumentDetailComponent
       .subscribe(({ newStoragePath, storagePaths }) => {
         this.storagePaths = storagePaths.results
         this.documentForm.get('storage_path').setValue(newStoragePath.id)
+      })
+  }
+
+  createWarehouse(newName: string) {
+    var modal = this.modalService.open(WarehouseEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    if (newName) modal.componentInstance.object = { name: newName }
+    modal.componentInstance.succeeded
+      .pipe(
+        switchMap((newWarehouse) => {
+          return this.warehouseService
+            .listAll()
+            .pipe(map((warehouses) => ({ newWarehouse, warehouses })))
+        })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ newWarehouse, warehouses }) => {
+        this.warehouses = warehouses.results
+        this.documentForm.get('warehouses').setValue(newWarehouse.id)
       })
   }
 
@@ -967,6 +1008,12 @@ export class DocumentDetailComponent
         return {
           rule_type: FILTER_STORAGE_PATH,
           value: (i as StoragePath).id.toString(),
+        }
+      } else if (i.hasOwnProperty('type')) {
+        // Warehouse
+        return {
+          rule_type: FILTER_WAREHOUSE,
+          value: (i as Warehouse).id.toString(),
         }
       } else if (i.hasOwnProperty('is_inbox_tag')) {
         // Tag

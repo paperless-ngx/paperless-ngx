@@ -24,6 +24,8 @@ import { ToastService } from 'src/app/services/toast.service'
 import { saveAs } from 'file-saver'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { StoragePath } from 'src/app/data/storage-path'
+import { WarehouseService } from 'src/app/services/rest/warehouse.service'
+import { Warehouse } from 'src/app/data/warehouse'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
@@ -39,6 +41,7 @@ import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
 import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import { WarehouseEditDialogComponent } from '../../common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
 import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
 
@@ -55,15 +58,19 @@ export class BulkEditorComponent
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
   storagePaths: StoragePath[]
+  warehouses: Warehouse[]
+
 
   tagSelectionModel = new FilterableDropdownSelectionModel()
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
   storagePathsSelectionModel = new FilterableDropdownSelectionModel()
+  warehousesSelectionModel = new FilterableDropdownSelectionModel()
   tagDocumentCounts: SelectionDataItem[]
   correspondentDocumentCounts: SelectionDataItem[]
   documentTypeDocumentCounts: SelectionDataItem[]
   storagePathDocumentCounts: SelectionDataItem[]
+  warehouseDocumentCounts: SelectionDataItem[]
   awaitingDownload: boolean
 
   unsubscribeNotifier: Subject<any> = new Subject()
@@ -85,6 +92,7 @@ export class BulkEditorComponent
     private settings: SettingsService,
     private toastService: ToastService,
     private storagePathService: StoragePathService,
+    private warehouseService: WarehouseService,
     private permissionService: PermissionsService
   ) {
     super()
@@ -165,6 +173,17 @@ export class BulkEditorComponent
         .listAll()
         .pipe(first())
         .subscribe((result) => (this.storagePaths = result.results))
+    }
+    if (
+      this.permissionService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Warehouse
+      )
+    ) {
+      this.warehouseService
+        .listAll()
+        .pipe(first())
+        .subscribe((result) => (this.warehouses = result.results))
     }
 
     this.downloadForm
@@ -293,6 +312,19 @@ export class BulkEditorComponent
         this.applySelectionData(
           s.selected_storage_paths,
           this.storagePathsSelectionModel
+        )
+      })
+  }
+
+  openWarehouseDropdown() {
+    this.documentService
+      .getSelectionData(Array.from(this.list.selected))
+      .pipe(first())
+      .subscribe((s) => {
+        this.warehouseDocumentCounts = s.selected_warehouses
+        this.applySelectionData(
+          s.selected_warehouses,
+          this.warehousesSelectionModel
         )
       })
   }
@@ -495,6 +527,44 @@ export class BulkEditorComponent
     }
   }
 
+  setWarehouses(changedDocumentPaths: ChangedItems) {
+    if (
+      changedDocumentPaths.itemsToAdd.length == 0 &&
+      changedDocumentPaths.itemsToRemove.length == 0
+    )
+      return
+
+    let warehouse =
+      changedDocumentPaths.itemsToAdd.length > 0
+        ? changedDocumentPaths.itemsToAdd[0]
+        : null
+
+    if (this.showConfirmationDialogs) {
+      let modal = this.modalService.open(ConfirmDialogComponent, {
+        backdrop: 'static',
+      })
+      modal.componentInstance.title = $localize`Confirm warehouse assignment`
+      if (warehouse) {
+        modal.componentInstance.message = $localize`This operation will assign the warehouse "${warehouse.name}" to ${this.list.selected.size} selected document(s).`
+      } else {
+        modal.componentInstance.message = $localize`This operation will remove the warehouse from ${this.list.selected.size} selected document(s).`
+      }
+      modal.componentInstance.btnClass = 'btn-warning'
+      modal.componentInstance.btnCaption = $localize`Confirm`
+      modal.componentInstance.confirmClicked
+        .pipe(takeUntil(this.unsubscribeNotifier))
+        .subscribe(() => {
+          this.executeBulkOperation(modal, 'set_warehouse', {
+            warehouse: warehouse ? warehouse.id : null,
+          })
+        })
+    } else {
+      this.executeBulkOperation(null, 'set_warehouse', {
+        warehouse: warehouse ? warehouse.id : null,
+      })
+    }
+  }
+
   createTag(name: string) {
     let modal = this.modalService.open(TagEditDialogComponent, {
       backdrop: 'static',
@@ -578,6 +648,27 @@ export class BulkEditorComponent
       .subscribe(({ newStoragePath, storagePaths }) => {
         this.storagePaths = storagePaths.results
         this.storagePathsSelectionModel.toggle(newStoragePath.id)
+      })
+  }
+
+  createWarehouse(name: string) {
+    let modal = this.modalService.open(WarehouseEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    modal.componentInstance.object = { name }
+    modal.componentInstance.succeeded
+      .pipe(
+        switchMap((newWarehouse) => {
+          return this.warehouseService
+            .listAll()
+            .pipe(map((warehouses) => ({ newWarehouse, warehouses })))
+        })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ newWarehouse, warehouses }) => {
+        this.warehouses = warehouses.results
+        this.warehousesSelectionModel.toggle(newWarehouse.id)
       })
   }
 
