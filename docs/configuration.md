@@ -616,6 +616,8 @@ parsing documents.
     Keep in mind that Tesseract uses much more CPU time with multiple
     languages enabled.
 
+    If you are including languages that are not installed by default, you will need to also set [`PAPERLESS_OCR_LANGUAGES`](configuration.md#PAPERLESS_OCR_LANGUAGES) for docker deployments or install the tesseract language packages manually for bare metal installations.
+
     Defaults to "eng".
 
     !!! note
