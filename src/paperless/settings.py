@@ -613,7 +613,7 @@ def _parse_db_settings() -> dict:
             }
 
         else:  # Default to PostgresDB
-            engine = "django.db.backends.postgresql_psycopg2"
+            engine = "django.db.backends.postgresql"
             options = {
                 "sslmode": os.getenv("PAPERLESS_DBSSLMODE", "prefer"),
                 "sslrootcert": os.getenv("PAPERLESS_DBSSLROOTCERT", None),
