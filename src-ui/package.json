@@ -11,7 +11,7 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/cdk": "^17.3.9",
+    "@angular/cdk": "^17.3.10",
     "@angular/common": "~17.3.9",
     "@angular/compiler": "~17.3.9",
     "@angular/core": "~17.3.9",
