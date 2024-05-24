@@ -56,6 +56,7 @@ whitenoise = "~=6.6"
 whoosh="~=2.7"
 zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
 PyPDF2 = "3.0.1"
+requests = "2.32.2"
 
 [dev-packages]
 # Linting
