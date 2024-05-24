@@ -300,8 +300,17 @@ supported.
     - `libatlas-base-dev`
     - `libxslt1-dev`
 
-    You will also need `build-essential`, `python3-setuptools` and
-    `python3-wheel` for installing some of the python dependencies.
+    You will also need these for installing some of the python dependencies:
+
+    - `build-essential`
+    - `python3-setuptools`
+    - `python3-wheel`
+
+    Use this list for your preferred package management:
+
+    ```
+    build-essential python3-setuptools python3-wheel
+    ```
 
 2.  Install `redis` >= 6.0 and configure it to start automatically.
 
