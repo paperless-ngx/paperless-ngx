@@ -55,7 +55,7 @@ watchdog = "~=4.0"
 whitenoise = "~=6.6"
 whoosh="~=2.7"
 zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
-PyPDF2 = "3.0.1"
+PyPDF2 = "2.11.2"
 requests = "2.32.2"
 
 [dev-packages]
