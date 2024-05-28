@@ -6,6 +6,7 @@ import re
 import shutil
 import tempfile
 from pathlib import Path
+import time
 from typing import TYPE_CHECKING
 from typing import Optional
 
@@ -148,24 +149,37 @@ class RasterisedDocumentParser(DocumentParser):
         except Exception as e:
             self.log.warning(f"Error while calculating DPI for image {image}: {e}")
             return None
+        
+    # call api 
+    def call_ocr_api_with_retries(self,url, headers, params, max_retries=5, delay=5, timeout=100):
+        retries = 0
+        data_ocr = None
+        
+        while retries < max_retries:
+            try:
+                response_ocr = requests.post(url, headers=headers, params=params, timeout=timeout)
+                if response_ocr.status_code == 200:
+                    data_ocr = response_ocr.json()
+                    return data_ocr
+                else:
+                    logging.error('OCR error response: %s', response_ocr.text)
+                    retries += 1
+                    time.sleep(delay)
+            except requests.exceptions.Timeout:
+                logging.warning('OCR request timed out. Retrying...')
+                retries += 1
+                time.sleep(delay)
+            except requests.exceptions.RequestException as e:
+                logging.error('OCR request failed: %s', e)
+                retries += 1
+                time.sleep(delay)
+    
+        logging.error('Max retries reached. OCR request failed.')
+        return None
+    
     # get ocr file img/pdf
     def ocr_file(self,path_file):
-        # get text from api 
-        # ocr_custom_username = settings.TCGROUP_OCR_CUSTOM["ACCOUNT"]["OCR_CUSTOM_USERNAME"]
-        # ocr_custom_password = settings.TCGROUP_OCR_CUSTOM["ACCOUNT"]["OCR_CUSTOM_PASSWORD"]
-        # url_login = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_LOGIN"]
-        # data = {
-        #     'username': ocr_custom_username,
-        #     'password': ocr_custom_password
-        # }
-        # response_login = requests.post(url_login, data=data)
-        # access_token = ''
-        # if response_login.status_code == 200:
-        #     response_data = response_login.json()
-        #     access_token = response_data.get('access_token','')
-        # else:
-        #     logging.error('login: ', response_login.status_code)
-        
+
         k = ApplicationConfiguration.objects.filter().first()
         access_token = k.ocr_key
         # upload file
@@ -179,7 +193,6 @@ class RasterisedDocumentParser(DocumentParser):
             pdf_data = file.read()
         
         response_upload = requests.post(url_upload_file, files={'file': (str(path_file).split("/")[-1], pdf_data)}, headers=headers)
-        # logging.debug('pdf file',response_upload)
         if response_upload.status_code == 200:
             get_file_id = response_upload.json().get('file_id','')
         else:
@@ -188,13 +201,15 @@ class RasterisedDocumentParser(DocumentParser):
         # ocr by file_id
         params = {'file_id': get_file_id}
         url_ocr_pdf_by_fileid = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_OCR_BY_FILEID"]
-        response_ocr = requests.post(url_ocr_pdf_by_fileid, headers=headers, params=params)
-        data_ocr = None
-        # logging.error('ocr: ', response_ocr.status_code)
-        if response_ocr.status_code == 200:
-            data_ocr = response_ocr.json()
-        else:
-            logging.error('ocr: ', response_ocr.text)
+        data_ocr = self.call_ocr_api_with_retries(url_ocr_pdf_by_fileid, headers, params, 5, 5, 100)
+        # response_ocr = requests.post(url_ocr_pdf_by_fileid, headers=headers, params=params)
+        # data_ocr = None
+        # # logging.error('ocr: ', response_ocr.status_code)
+        # if response_ocr.status_code == 200:
+        #     data_ocr = response_ocr.json()
+        # else:
+        #     logging.error('ocr: ', response_ocr.text)
+
         return data_ocr
     
 
@@ -530,7 +545,6 @@ class RasterisedDocumentParser(DocumentParser):
         try:
             self.log.debug(f"Calling OCRmyPDF with args: {args}")
             # ocrmypdf.ocr(**args)
-            self.log.info("gia tri document_path: ", document_path)
             self.ocr_img_or_pdf(document_path, mime_type,**args)
             if self.settings.skip_archive_file != ArchiveFileChoices.ALWAYS:
                 self.archive_path = archive_path
