@@ -12,7 +12,7 @@ from typing import Optional
 
 from django.conf import settings
 import requests
-from PyPDF2 import PdfReader
+from PyPDF2 import PdfReader, PdfWriter
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from PIL import Image
@@ -217,7 +217,7 @@ class RasterisedDocumentParser(DocumentParser):
         font_name = 'Arial'
         data = self.ocr_file(input_path)
         if not data:
-                return
+            return
         font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts', 'arial-font/arial.ttf')            
         with open(sidecar, "w") as txt_sidecar:
             txt_sidecar.write(data.get("content",""))
@@ -258,9 +258,10 @@ class RasterisedDocumentParser(DocumentParser):
                                        first_page=1,
                                        last_page=input_pdf.getNumPages()+1)
             can = canvas.Canvas(str(output_path), pagesize=letter)
-            for page_num, page in enumerate(input_pdf.pages):
-                page_height = input_pdf.pages[page_num].mediabox[3]
-                page_width = input_pdf.pages[page_num].mediabox[2]
+            for page_num, image in enumerate(images):
+                page_width, page_height = image.size
+                # page_height = input_pdf.pages[page_num].mediabox[3]
+                # page_width = input_pdf.pages[page_num].mediabox[2]
                 # set size new page
                 can.setPageSize((page_width, page_height))
                 byte_image = io.BytesIO()
@@ -274,13 +275,14 @@ class RasterisedDocumentParser(DocumentParser):
                 pdfmetrics.registerFont(TTFont('Arial', font_path))
                 width_api_img = data["pages"][page_num]["dimensions"][1]
                 height_api_img = data["pages"][page_num]["dimensions"][0]
+                # print(f'kich thuoc goc: height{page_height}, width{page_width}, kich thuoc api: height{height_api_img} width{width_api_img}')
                 rolate_height =  height_api_img /page_height
                 rolate_width = width_api_img /page_width
                 for block in data["pages"][page_num]["blocks"]:
                     for line in block.get("lines", []):
                         y1 = (line.get("bbox")[0][1] / float(rolate_height))
                         y2 = (line.get("bbox")[1][1] / float(rolate_height))
-                        font_size = (y2 - y1)  * 72 / 96
+                        font_size = math.floor((y2 - y1)  * 72 / 96)-2
                         y_center_coordinates = y2 - (y2 - y1)/2
                         for word in line.get("words", []):   
                             x1 = word["bbox"][0][0] / float(rolate_width)
@@ -294,7 +296,7 @@ class RasterisedDocumentParser(DocumentParser):
                             w = can.stringWidth(value, font_name, font_size)
                             can.setFont('Arial', font_size)
                             can.drawString(x_center_coordinates - w/2,
-                                           int(page_height) - y_center_coordinates - (font_size/3),
+                                           int(page_height) - y_center_coordinates - (font_size/2),
                                            value)            
                 can.drawImage(ImageReader(io.BytesIO(jpg_image)),
                               0, 0, 
