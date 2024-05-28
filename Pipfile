@@ -46,7 +46,7 @@ python-magic = "*"
 pyzbar = "*"
 rapidfuzz = "*"
 redis = {extras = ["hiredis"], version = "*"}
-scikit-learn = "~=1.4"
+scikit-learn = "~=1.5"
 setproctitle = "*"
 tika-client = "*"
 tqdm = "*"
