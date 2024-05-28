@@ -504,7 +504,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="187187500641108332" datatype="html">
-        <source><x id="INTERPOLATION" equiv-text="ategory}}"/></source>
+        <source><x id="INTERPOLATION" equiv-text="category}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">14,15</context>
