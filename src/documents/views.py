@@ -562,12 +562,18 @@ class DocumentViewSet(
     def thumb(self, request, pk=None):
         try:
             doc = Document.objects.get(id=pk)
-            if request.user is not None and not has_perms_owner_aware(
-                request.user,
-                "view_document",
-                doc,
-            ):
+            # Allow all users to view thumbnails
+            if request.user is None:
                 return HttpResponseForbidden("Insufficient permissions")
+            
+            # Original 
+            # if request.user is not None and not has_perms_owner_aware(
+            #     request.user,
+            #     "view_document",
+            #     doc,
+            # ):
+            #     return HttpResponseForbidden("Insufficient permissions")
+
             if doc.storage_type == Document.STORAGE_TYPE_GPG:
                 handle = GnuPG.decrypted(doc.thumbnail_file)
             else:
