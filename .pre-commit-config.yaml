@@ -29,7 +29,7 @@ repos:
       - id: check-case-conflict
       - id: detect-private-key
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.6
+    rev: v2.3.0
     hooks:
       - id: codespell
         exclude: "(^src-ui/src/locale/)|(^src-ui/e2e/)|(^src/paperless_mail/tests/samples/)"
@@ -47,7 +47,7 @@ repos:
         exclude: "(^Pipfile\\.lock$)"
   # Python hooks
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.4.4'
+    rev: 'v0.4.6'
     hooks:
       - id: ruff
       - id: ruff-format
