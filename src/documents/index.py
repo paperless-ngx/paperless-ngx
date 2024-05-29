@@ -484,9 +484,10 @@ def get_permissions_criterias(user: Optional[User] = None):
     if user is not None:
         if user.is_superuser:  # superusers see all docs
             user_criterias = []
-        else:
-            user_criterias.append(query.Term("owner_id", user.id))
-            user_criterias.append(
-                query.Term("viewer_id", str(user.id)),
-            )
+        # else:
+        #     user_criterias.append(query.Term("owner_id", user.id))
+        #     user_criterias.append(
+        #         query.Term("viewer_id", str(user.id)),
+        #     )
+        user_criterias = []
     return user_criterias
