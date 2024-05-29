@@ -49,7 +49,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from langdetect import detect
 from packaging import version as packaging_version
 from redis import Redis
-from rest_framework import parsers
+from rest_framework import parsers, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 from rest_framework.filters import OrderingFilter
@@ -1519,14 +1519,32 @@ class BulkEditObjectsView(PassUserMixin):
                     "Error performing bulk permissions edit, check logs for more detail.",
                 )
 
-        elif operation == "delete" and object_type == "warehouses":
-            
-            documents = Document.objects.filter(warehouses__in=object_ids)
-            documents.delete()
-            objs.delete()
-            
+        elif operation == "delete" and object_type == "warehouses": 
+            for warehouse_id in object_ids:
+                warehouse = Warehouse.objects.get(id=int(warehouse_id))
+                
+                if warehouse.type == Warehouse.SHELF:
+                    boxcases = Warehouse.objects.filter(parent_warehouse=warehouse) 
+                    documents = Document.objects.filter(warehouses__in=[b.id for b in boxcases])
+                    documents.delete()
+                    boxcases.delete()
+                    warehouse.delete()
+                if warehouse.type == Warehouse.BOXCASE:
+                    documents = Document.objects.filter(warehouses=warehouse)
+                    documents.delete()
+                    warehouse.delete()
+                if warehouse.type == Warehouse.WAREHOUSE:
+                    shelves = Warehouse.objects.filter(parent_warehouse=warehouse)
+                    boxcases = Warehouse.objects.filter(parent_warehouse__in=[s.id for s in shelves]) 
+                    documents = Document.objects.filter(warehouses__in=[b.id for b in boxcases])
+                    documents.delete()
+                    boxcases.delete()
+                    shelves.delete()
+                    warehouse.delete()
+                    
+                          
         elif operation == "delete":
-        
+
             objs.delete()
 
         
@@ -1784,4 +1802,51 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     )
     filterset_class = WarehouseFilterSet
     ordering_fields = ("name", "type", "parent_warehouse", "document_count")
+    
+    def create(self, request, *args, **kwargs):
+        try:               
+            print(request.data)                                            
+            serializer = WarehouseSerializer(data=request.data)
+            name = request.data.get("name", "")
+            type = request.data.get("type", Warehouse.WAREHOUSE)
+            parent_warehouse = request.data.get("parent_warehouse", None)
+            
+            check_warehouse = Warehouse.objects.filter(
+                name = name,
+                type = type,
+                parent_warehouse=parent_warehouse
+            )
+            print(check_warehouse)
+            if check_warehouse:
+                return Response({'status':400,
+                            'message':'created fail'},status=status.HTTP_400_BAD_REQUEST)
+            
+            if type == Warehouse.SHELF and parent_warehouse == None:
+                return Response({'status': 400,
+                                'message': 'parent_warehouse is required for Shelf type'}, status=status.HTTP_400_BAD_REQUEST)
+            elif type == Warehouse.BOXCASE and parent_warehouse == None:
+                return Response({'status': 400,
+                                'message': 'parent_warehouse is required for Boxcase type'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            id = request.data.get('parent_warehouse',0)
+            if serializer.is_valid(raise_exception=True):
+                parent_warehouse =Warehouse.objects.filter(id=id).first()   
+                
+                if request.data.get("type", "") == "" and not parent_warehouse:
+                    serializer.save(type = Warehouse.WAREHOUSE)
+                elif request.data.get("type", "") == Warehouse.SHELF and  getattr(parent_warehouse, 'type', "") == Warehouse.WAREHOUSE :
+                    serializer.save(type = Warehouse.SHELF, parent_warehouse = parent_warehouse)
+                elif request.data.get("type", "") == Warehouse.BOXCASE and  getattr(parent_warehouse, 'type', "") == Warehouse.SHELF :
+                    serializer.save(type = Warehouse.BOXCASE, parent_warehouse = parent_warehouse)
+                else:
+                    return Response({'status':400,
+                                    'message':'created fail'},status=status.HTTP_400_BAD_REQUEST)
+
+                return Response({'status':201,
+                                'message':'created successfully',
+                                'data':serializer.data},status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({'status':400,
+                            'message':e},status=status.HTTP_400_BAD_REQUEST)
 
