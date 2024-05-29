@@ -1813,16 +1813,19 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         try:               
             print(request.data)                                            
             serializer = WarehouseSerializer(data=request.data)
-            name = request.data.get("name", "")
-            type = request.data.get("type", Warehouse.WAREHOUSE)
-            parent_warehouse = request.data.get("parent_warehouse", None)
-            
+            name = ""
+            type = Warehouse.WAREHOUSE
+            parent_warehouse = None
+            if serializer.is_valid():
+                name = serializer.validated_data.get("name", "")
+                type = serializer.validated_data.get("type", Warehouse.WAREHOUSE)
+                parent_warehouse = serializer.validated_data.get('parent_warehouse',None)
             check_warehouse = Warehouse.objects.filter(
                 name = name,
                 type = type,
                 parent_warehouse=parent_warehouse
             )
-            print(check_warehouse)
+          
             if check_warehouse:
                 return Response({'status':400,
                             'message':'created fail'},status=status.HTTP_400_BAD_REQUEST)
@@ -1834,15 +1837,14 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 return Response({'status': 400,
                                 'message': 'parent_warehouse is required for Boxcase type'}, status=status.HTTP_400_BAD_REQUEST)
             
-            id = request.data.get('parent_warehouse',0)
             if serializer.is_valid(raise_exception=True):
-                parent_warehouse =Warehouse.objects.filter(id=id).first()   
+                parent_warehouse = Warehouse.objects.filter(id=parent_warehouse.id if parent_warehouse else 0).first()   
                 
-                if request.data.get("type", "") == "" and not parent_warehouse:
+                if serializer.validated_data.get("type", "") == "" and not parent_warehouse:
                     serializer.save(type = Warehouse.WAREHOUSE)
-                elif request.data.get("type", "") == Warehouse.SHELF and  getattr(parent_warehouse, 'type', "") == Warehouse.WAREHOUSE :
+                elif serializer.validated_data.get("type", "") == Warehouse.SHELF and  getattr(parent_warehouse, 'type', "") == Warehouse.WAREHOUSE :
                     serializer.save(type = Warehouse.SHELF, parent_warehouse = parent_warehouse)
-                elif request.data.get("type", "") == Warehouse.BOXCASE and  getattr(parent_warehouse, 'type', "") == Warehouse.SHELF :
+                elif serializer.validated_data.get("type", "") == Warehouse.BOXCASE and  getattr(parent_warehouse, 'type', "") == Warehouse.SHELF :
                     serializer.save(type = Warehouse.BOXCASE, parent_warehouse = parent_warehouse)
                 else:
                     return Response({'status':400,
