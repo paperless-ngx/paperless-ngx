@@ -258,11 +258,14 @@ class RasterisedDocumentParser(DocumentParser):
                                        first_page=1,
                                        last_page=input_pdf.getNumPages()+1)
             can = canvas.Canvas(str(output_path), pagesize=letter)
-            for page_num, image in enumerate(images):
-                page_width, page_height = image.size
-                # page_height = input_pdf.pages[page_num].mediabox[3]
-                # page_width = input_pdf.pages[page_num].mediabox[2]
+            for page_num, page in enumerate(input_pdf.pages):
+                page_height = page.mediabox.getHeight()
+                page_width = page.mediabox.getWidth()
+                width_api_img = data["pages"][page_num]["dimensions"][1]
+                height_api_img = data["pages"][page_num]["dimensions"][0]
                 # set size new page
+                if width_api_img < height_api_img and page_height < page_width:
+                    page_height,page_width = page_width,page_height
                 can.setPageSize((page_width, page_height))
                 byte_image = io.BytesIO()
                 images[page_num].save(byte_image, format='JPEG')
@@ -273,8 +276,6 @@ class RasterisedDocumentParser(DocumentParser):
                 #               height=float(page_height))
                 # set font size
                 pdfmetrics.registerFont(TTFont('Arial', font_path))
-                width_api_img = data["pages"][page_num]["dimensions"][1]
-                height_api_img = data["pages"][page_num]["dimensions"][0]
                 # print(f'kich thuoc goc: height{page_height}, width{page_width}, kich thuoc api: height{height_api_img} width{width_api_img}')
                 rolate_height =  height_api_img /page_height
                 rolate_width = width_api_img /page_width
@@ -282,7 +283,7 @@ class RasterisedDocumentParser(DocumentParser):
                     for line in block.get("lines", []):
                         y1 = (line.get("bbox")[0][1] / float(rolate_height))
                         y2 = (line.get("bbox")[1][1] / float(rolate_height))
-                        font_size = math.floor((y2 - y1)  * 72 / 96)-2
+                        font_size = math.floor((y2 - y1)  * 72 / 96)-1
                         y_center_coordinates = y2 - (y2 - y1)/2
                         for word in line.get("words", []):   
                             x1 = word["bbox"][0][0] / float(rolate_width)
