@@ -1018,13 +1018,6 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("has this correspondent"),
     )
 
-    filter_has_group = models.ManyToManyField(
-        Group,
-        null=True,
-        blank=True,
-        verbose_name=_("has these groups"),
-    )
-
     class Meta:
         verbose_name = _("workflow trigger")
         verbose_name_plural = _("workflow triggers")
