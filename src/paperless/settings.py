@@ -256,7 +256,10 @@ TRASH_DIR = os.getenv("PAPERLESS_TRASH_DIR")
 # threads.
 MEDIA_LOCK = MEDIA_ROOT / "media.lock"
 INDEX_DIR = DATA_DIR / "index"
-MODEL_FILE = DATA_DIR / "classification_model.pickle"
+MODEL_FILE = __get_path(
+    "PAPERLESS_MODEL_FILE",
+    DATA_DIR / "classification_model.pickle",
+)
 
 LOGGING_DIR = __get_path("PAPERLESS_LOGGING_DIR", DATA_DIR / "log")
 
