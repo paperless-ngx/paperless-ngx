@@ -1810,51 +1810,50 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     ordering_fields = ("name", "type", "parent_warehouse", "document_count")
     
     def create(self, request, *args, **kwargs):
-        try:               
-            print(request.data)                                            
-            serializer = WarehouseSerializer(data=request.data)
-            name = ""
-            type = Warehouse.WAREHOUSE
-            parent_warehouse = None
-            if serializer.is_valid():
-                name = serializer.validated_data.get("name", "")
-                type = serializer.validated_data.get("type", Warehouse.WAREHOUSE)
-                parent_warehouse = serializer.validated_data.get('parent_warehouse',None)
-            check_warehouse = Warehouse.objects.filter(
-                name = name,
-                type = type,
-                parent_warehouse=parent_warehouse
-            )
-          
-            if check_warehouse:
-                return Response({'status':400,
-                            'message':'created fail'},status=status.HTTP_400_BAD_REQUEST)
-            
-            if type == Warehouse.SHELF and parent_warehouse == None:
-                return Response({'status': 400,
-                                'message': 'parent_warehouse is required for Shelf type'}, status=status.HTTP_400_BAD_REQUEST)
-            elif type == Warehouse.BOXCASE and parent_warehouse == None:
-                return Response({'status': 400,
-                                'message': 'parent_warehouse is required for Boxcase type'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            if serializer.is_valid(raise_exception=True):
-                parent_warehouse = Warehouse.objects.filter(id=parent_warehouse.id if parent_warehouse else 0).first()   
-                
-                if serializer.validated_data.get("type", "") == "" and not parent_warehouse:
-                    serializer.save(type = Warehouse.WAREHOUSE)
-                elif serializer.validated_data.get("type", "") == Warehouse.SHELF and  getattr(parent_warehouse, 'type', "") == Warehouse.WAREHOUSE :
-                    serializer.save(type = Warehouse.SHELF, parent_warehouse = parent_warehouse)
-                elif serializer.validated_data.get("type", "") == Warehouse.BOXCASE and  getattr(parent_warehouse, 'type', "") == Warehouse.SHELF :
-                    serializer.save(type = Warehouse.BOXCASE, parent_warehouse = parent_warehouse)
-                else:
-                    return Response({'status':400,
-                                    'message':'created fail'},status=status.HTTP_400_BAD_REQUEST)
-
-                return Response({'status':201,
-                                'message':'created successfully',
-                                'data':serializer.data},status=status.HTTP_201_CREATED)
-
-        except Exception as e:
+        # try:                                                          
+        serializer = WarehouseSerializer(data=request.data)
+        name = None
+        type = None
+        parent_warehouse = None
+        if serializer.is_valid(raise_exception=True):
+            name = serializer.validated_data.get("name", "")
+            type = serializer.validated_data.get("type", Warehouse.WAREHOUSE)
+            parent_warehouse = serializer.validated_data.get('parent_warehouse',None)
+        # check_warehouse = Warehouse.objects.filter(
+        #     name = name,
+        #     type = type,
+        #     parent_warehouse=parent_warehouse
+        # )
+        
+        # if check_warehouse:
+        #     return Response({'status':400,
+        #                 'message':'created fail'},status=status.HTTP_400_BAD_REQUEST)
+        
+        # if type == Warehouse.SHELF and parent_warehouse == None:
+        #     return Response({'status': 400,
+        #                     'message': 'parent_warehouse is required for Shelf type'}, status=status.HTTP_400_BAD_REQUEST)
+        # elif type == Warehouse.BOXCASE and parent_warehouse == None:
+        #     return Response({'status': 400,
+        #                     'message': 'parent_warehouse is required for Boxcase type'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # if serializer.is_valid(raise_exception=True):
+        parent_warehouse = Warehouse.objects.filter(id=parent_warehouse.id if parent_warehouse else 0).first()   
+        
+        if serializer.validated_data.get("type") == Warehouse.WAREHOUSE and not parent_warehouse:
+            serializer.save()
+        elif serializer.validated_data.get("type", "") == Warehouse.SHELF and  getattr(parent_warehouse, 'type', "") == Warehouse.WAREHOUSE :
+            serializer.save(type = Warehouse.SHELF, parent_warehouse = parent_warehouse)
+        elif serializer.validated_data.get("type", "") == Warehouse.BOXCASE and  getattr(parent_warehouse, 'type', "") == Warehouse.SHELF :
+            serializer.save(type = Warehouse.BOXCASE, parent_warehouse = parent_warehouse)
+        else:
             return Response({'status':400,
-                            'message':e},status=status.HTTP_400_BAD_REQUEST)
+                            'message':'misplaced'},status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'status':201,
+                        'message':'created successfully',
+                        'data':serializer.data},status=status.HTTP_201_CREATED)
+
+        # except Exception as e:
+        #     return Response({'status':400,
+        #                     'message':e},status=status.HTTP_400_BAD_REQUEST)
 
