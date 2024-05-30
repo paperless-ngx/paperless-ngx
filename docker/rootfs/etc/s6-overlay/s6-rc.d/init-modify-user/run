@@ -1,0 +1,22 @@
+#!/command/with-contenv /usr/bin/bash
+# shellcheck shell=bash
+declare -r log_prefix="[init-user]"
+
+declare -r usermap_original_uid=$(id -u paperless)
+declare -r usermap_original_gid=$(id -g paperless)
+declare -r usermap_new_uid=${USERMAP_UID:-$usermap_original_uid}
+declare -r usermap_new_gid=${USERMAP_GID:-${usermap_original_gid:-$usermap_new_uid}}
+
+if [[ ${usermap_new_uid} != "${usermap_original_uid}" ]]; then
+	echo "${log_prefix} Mapping UID for paperless to $usermap_new_uid"
+	usermod --non-unique --uid "${usermap_new_uid}" paperless
+else
+	echo "${log_prefix} No UID changes for paperless"
+fi
+
+if [[ ${usermap_new_gid} != "${usermap_original_gid}" ]]; then
+	echo "${log_prefix} Mapping GID for paperless to $usermap_new_gid"
+	groupmod --non-unique --gid "${usermap_new_gid}" paperless
+else
+	echo "${log_prefix} No GID changes for paperless"
+fi

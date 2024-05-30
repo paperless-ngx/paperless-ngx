@@ -1596,9 +1596,11 @@ started by the container.
 
 #### [`PAPERLESS_SUPERVISORD_WORKING_DIR=<defined>`](#PAPERLESS_SUPERVISORD_WORKING_DIR) {#PAPERLESS_SUPERVISORD_WORKING_DIR}
 
-: If this environment variable is defined, the `supervisord.log` and `supervisord.pid` file will be created under the specified path in `PAPERLESS_SUPERVISORD_WORKING_DIR`. Setting `PAPERLESS_SUPERVISORD_WORKING_DIR=/tmp` and `PYTHONPYCACHEPREFIX=/tmp/pycache` would allow paperless to work on a read-only filesystem.
+!!! warning
 
-    Please take note that the `PAPERLESS_DATA_DIR` and `PAPERLESS_MEDIA_ROOT` paths still have to be writable, just like the `PAPERLESS_SUPERVISORD_WORKING_DIR`. The can be archived by using bind or volume mounts. Only works in the container is run as user *paperless*
+        This option is deprecated and has no effect.  For read only file system support,
+        see [S6_READ_ONLY_ROOT](https://github.com/just-containers/s6-overlay#customizing-s6-overlay-behaviour)
+        from s6-overlay.
 
 ## Frontend Settings
 

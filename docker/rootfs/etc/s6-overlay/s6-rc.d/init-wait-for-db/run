@@ -1,0 +1,70 @@
+#!/command/with-contenv /usr/bin/bash
+# shellcheck shell=bash
+
+declare -r log_prefix="[init-db-wait]"
+
+wait_for_postgres() {
+	local attempt_num=1
+	local -r max_attempts=5
+
+	echo "${log_prefix} Waiting for PostgreSQL to start..."
+
+	local -r host="${PAPERLESS_DBHOST:-localhost}"
+	local -r port="${PAPERLESS_DBPORT:-5432}"
+	local -r user="${PAPERLESS_DBUSER:-paperless}"
+
+	# Disable warning, host and port can't have spaces
+	# shellcheck disable=SC2086
+	while [ ! "$(pg_isready -h ${host} -p ${port} --username ${user})" ]; do
+
+		if [ $attempt_num -eq $max_attempts ]; then
+			echo "${log_prefix} Unable to connect to database."
+			exit 1
+		else
+			echo "${log_prefix} Attempt $attempt_num failed! Trying again in 5 seconds..."
+		fi
+
+		attempt_num=$(("$attempt_num" + 1))
+		sleep 5
+	done
+	# Extra in case this is a first start
+	sleep 5
+	echo "Connected to PostgreSQL"
+}
+
+wait_for_mariadb() {
+	echo "${log_prefix} Waiting for MariaDB to start..."
+
+	local -r host="${PAPERLESS_DBHOST:=localhost}"
+	local -r port="${PAPERLESS_DBPORT:=3306}"
+
+	local attempt_num=1
+	local -r max_attempts=5
+
+	# Disable warning, host and port can't have spaces
+	# shellcheck disable=SC2086
+	while ! true > /dev/tcp/$host/$port; do
+
+		if [ $attempt_num -eq $max_attempts ]; then
+			echo "${log_prefix} Unable to connect to database."
+			exit 1
+		else
+			echo "${log_prefix} Attempt $attempt_num failed! Trying again in 5 seconds..."
+
+		fi
+
+		attempt_num=$(("$attempt_num" + 1))
+		sleep 5
+	done
+	echo "Connected to MariaDB"
+}
+
+if [[ "${PAPERLESS_DBENGINE}" == "mariadb" ]]; then
+	echo "${log_prefix} Waiting for MariaDB to report ready"
+	wait_for_mariadb
+elif [[ -n "${PAPERLESS_DBHOST}" ]]; then
+	echo "${log_prefix} Waiting for postgresql to report ready"
+	wait_for_postgres
+fi
+
+	echo "${log_prefix} Database is ready"
