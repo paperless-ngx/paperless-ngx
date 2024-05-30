@@ -1,0 +1,44 @@
+#!/command/with-contenv /usr/bin/bash
+# shellcheck shell=bash
+
+declare -r log_prefix="[custom-init]"
+
+# Mostly borrowed from the LinuxServer.io base image
+# https://github.com/linuxserver/docker-baseimage-ubuntu/tree/bionic/root/etc/cont-init.d
+declare -r custom_script_dir="/custom-cont-init.d"
+
+# Tamper checking.
+# Don't run files which are owned by anyone except root
+# Don't run files which are writeable by others
+if [ -d "${custom_script_dir}" ]; then
+	if [ -n "$(/usr/bin/find "${custom_script_dir}" -maxdepth 1 ! -user root)" ]; then
+		echo "${log_prefix} **** Potential tampering with custom scripts detected ****"
+		echo "${log_prefix} **** The folder '${custom_script_dir}' must be owned by root ****"
+		exit 0
+	fi
+	if [ -n "$(/usr/bin/find "${custom_script_dir}" -maxdepth 1 -perm -o+w)" ]; then
+		echo "${log_prefix} **** The folder '${custom_script_dir}' or some of contents have write permissions for others, which is a security risk. ****"
+		echo "${log_prefix} **** Please review the permissions and their contents to make sure they are owned by root, and can only be modified by root. ****"
+		exit 0
+	fi
+
+	# Make sure custom init directory has files in it
+	if [ -n "$(/bin/ls --almost-all "${custom_script_dir}" 2>/dev/null)" ]; then
+		echo "${log_prefix} files found in ${custom_script_dir} executing"
+		# Loop over files in the directory
+		for SCRIPT in "${custom_script_dir}"/*; do
+			NAME="$(basename "${SCRIPT}")"
+			if [ -f "${SCRIPT}" ]; then
+				echo "${log_prefix} ${NAME}: executing..."
+				/command/with-contenv /bin/bash "${SCRIPT}"
+				echo "${log_prefix} ${NAME}: exited $?"
+			elif [ ! -f "${SCRIPT}" ]; then
+				echo "${log_prefix} ${NAME}: is not a file"
+			fi
+		done
+	else
+		echo "${log_prefix} no custom files found exiting..."
+	fi
+else
+	echo "${log_prefix} ${custom_script_dir} doesn't exist, nothing to do"
+fi

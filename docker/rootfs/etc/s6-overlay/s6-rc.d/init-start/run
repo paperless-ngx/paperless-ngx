@@ -1,0 +1,19 @@
+#!/command/with-contenv /usr/bin/bash
+# shellcheck shell=bash
+
+declare -r log_prefix="[init-start]"
+
+echo "${log_prefix} paperless-ngx docker container starting..."
+
+# Set some directories into environment for other steps to access via environment
+# Sort of like variables for later
+printf "/usr/src/paperless/src" > /var/run/s6/container_environment/PAPERLESS_SRC_DIR
+echo $(date +%s) > /var/run/s6/container_environment/PAPERLESS_START_TIME_S
+
+# Check if we're starting as a non-root user
+if [ $(id -u) == $(id -u paperless) ]; then
+	printf "true" > /var/run/s6/container_environment/USER_IS_NON_ROOT
+	echo "${log_prefix}  paperless-ngx docker container running under a user"
+else
+	echo "${log_prefix}  paperless-ngx docker container starting init as root"
+fi

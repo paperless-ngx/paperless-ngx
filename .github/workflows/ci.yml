@@ -131,7 +131,7 @@ jobs:
       -
         name: Configure ImageMagick
         run: |
-          sudo cp docker/imagemagick-policy.xml /etc/ImageMagick-6/policy.xml
+          sudo cp docker/rootfs/etc/ImageMagick-6/paperless-policy.xml /etc/ImageMagick-6/policy.xml
       -
         name: Install Python dependencies
         run: |
