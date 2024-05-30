@@ -961,7 +961,7 @@ describe('BulkEditorComponent', () => {
       .mockReturnValue(true)
     component.showConfirmationDialogs = true
     fixture.detectChanges()
-    component.redoOcrSelected()
+    component.reprocessSelected()
     expect(modal).not.toBeUndefined()
     modal.componentInstance.confirm()
     let req = httpTestingController.expectOne(
@@ -970,7 +970,7 @@ describe('BulkEditorComponent', () => {
     req.flush(true)
     expect(req.request.body).toEqual({
       documents: [3, 4],
-      method: 'redo_ocr',
+      method: 'reprocess',
       parameters: {},
     })
     httpTestingController.match(

@@ -403,7 +403,7 @@ The following methods are supported:
   - Requires `parameters`: `{ "add_tags": [LIST_OF_TAG_IDS] }` and / or `{ "remove_tags": [LIST_OF_TAG_IDS] }`
 - `delete`
   - No `parameters` required
-- `redo_ocr`
+- `reprocess`
   - No `parameters` required
 - `set_permissions`
   - Requires `parameters`:
