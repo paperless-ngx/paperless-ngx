@@ -2258,16 +2258,8 @@
           <context context-type="linenumber">166</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">821</context>
-        </context-group>
-        <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">714</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">753</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.ts</context>
@@ -5428,8 +5420,8 @@
           <context context-type="linenumber">36</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="8312409092917397847" datatype="html">
-        <source>Redo OCR</source>
+      <trans-unit id="2696010339872056565" datatype="html">
+        <source>Reprocess</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">49</context>
@@ -5901,8 +5893,8 @@
           <context context-type="linenumber">799</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="7362691899087997122" datatype="html">
-        <source>Redo OCR confirm</source>
+      <trans-unit id="619486176823357521" datatype="html">
+        <source>Reprocess confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">819</context>
@@ -5912,15 +5904,22 @@
           <context context-type="linenumber">751</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="9197453786953646058" datatype="html">
-        <source>This operation will permanently redo OCR for this document.</source>
+      <trans-unit id="2951161989614003846" datatype="html">
+        <source>This operation will permanently recreate the archive file for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">820</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="5729001209753056399" datatype="html">
-        <source>Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
+      <trans-unit id="302054111564709516" datatype="html">
+        <source>The archive file will be re-generated with the current settings.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+          <context context-type="linenumber">821</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1192507664585066165" datatype="html">
+        <source>Reprocess operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">831</context>
@@ -6372,11 +6371,18 @@
           <context context-type="linenumber">716</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="8968869182645922415" datatype="html">
-        <source>This operation will permanently redo OCR for <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
+      <trans-unit id="8585195717323764335" datatype="html">
+        <source>This operation will permanently recreate the archive files for <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">752</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7366623494074776040" datatype="html">
+        <source>The archive files will be re-generated with the current settings.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">753</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6390006284731990222" datatype="html">
