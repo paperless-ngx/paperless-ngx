@@ -156,10 +156,6 @@ class DirectoriesMixin:
     they are cleaned up on exit
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.dirs = None
-
     def setUp(self) -> None:
         self.dirs = setup_directories()
         super().setUp()
@@ -203,11 +199,11 @@ class FileSystemAssertsMixin:
     def assertFileCountInDir(self, path: Union[PathLike, str], count: int):
         path = Path(path).resolve()
         self.assertTrue(path.is_dir(), f"Path {path} is not a directory")
-        file_count = len([x for x in path.iterdir() if x.is_file()])
+        files = [x for x in path.iterdir() if x.is_file()]
         self.assertEqual(
-            file_count,
+            len(files),
             count,
-            f"Path {path} contains {file_count} files instead of {count} file",
+            f"Path {path} contains {len(files)} files instead of {count} files",
         )
 
 

@@ -826,3 +826,17 @@ class TestExportImport(
 
         # Manifest and version files only should be present in the exported directory
         self.assertFileCountInDir(self.target, 2)
+        self.assertIsFile(self.target / "manifest.json")
+        self.assertIsFile(self.target / "version.json")
+
+        shutil.rmtree(self.dirs.media_dir / "documents")
+        Document.objects.all().delete()
+
+        call_command(
+            "document_importer",
+            "--no-progress-bar",
+            "--data-only",
+            self.target,
+        )
+
+        self.assertEqual(Document.objects.all().count(), 4)

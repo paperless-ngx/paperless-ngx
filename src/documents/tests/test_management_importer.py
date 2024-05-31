@@ -14,9 +14,15 @@ from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
+from documents.tests.utils import SampleDirMixin
 
 
-class TestCommandImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
+class TestCommandImport(
+    DirectoriesMixin,
+    FileSystemAssertsMixin,
+    SampleDirMixin,
+    TestCase,
+):
     def test_check_manifest_exists(self):
         """
         GIVEN:

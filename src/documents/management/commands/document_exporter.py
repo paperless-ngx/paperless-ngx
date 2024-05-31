@@ -299,88 +299,21 @@ class Command(BaseCommand):
             document = document_map[document_dict["pk"]]
 
             # 3.2. generate a unique filename
-            filename_counter = 0
-            while True:
-                if self.use_filename_format:
-                    base_name = generate_filename(
-                        document,
-                        counter=filename_counter,
-                        append_gpg=False,
-                    )
-                else:
-                    base_name = document.get_public_filename(counter=filename_counter)
-
-                if base_name not in self.exported_files:
-                    self.exported_files.add(base_name)
-                    break
-                else:
-                    filename_counter += 1
+            base_name = self.generate_base_name(document)
 
             # 3.3. write filenames into manifest
-            original_name = base_name
-            if self.use_folder_prefix:
-                original_name = os.path.join("originals", original_name)
-            original_target = (self.target / Path(original_name)).resolve()
-            document_dict[EXPORTER_FILE_NAME] = original_name
-
-            if not self.no_thumbnail:
-                thumbnail_name = base_name + "-thumbnail.webp"
-                if self.use_folder_prefix:
-                    thumbnail_name = os.path.join("thumbnails", thumbnail_name)
-                thumbnail_target = (self.target / Path(thumbnail_name)).resolve()
-                document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
-            else:
-                thumbnail_target = None
-
-            if not self.no_archive and document.has_archive_version:
-                archive_name = base_name + "-archive.pdf"
-                if self.use_folder_prefix:
-                    archive_name = os.path.join("archive", archive_name)
-                archive_target = (self.target / Path(archive_name)).resolve()
-                document_dict[EXPORTER_ARCHIVE_NAME] = archive_name
-            else:
-                archive_target = None
+            original_target, thumbnail_target, archive_target = (
+                self.generate_document_targets(document, base_name, document_dict)
+            )
 
             # 3.4. write files to target folder
-            if document.storage_type == Document.STORAGE_TYPE_GPG:
-                t = int(time.mktime(document.created.timetuple()))
-
-                original_target.parent.mkdir(parents=True, exist_ok=True)
-                with document.source_file as out_file:
-                    original_target.write_bytes(GnuPG.decrypted(out_file))
-                    os.utime(original_target, times=(t, t))
-
-                if thumbnail_target:
-                    thumbnail_target.parent.mkdir(parents=True, exist_ok=True)
-                    with document.thumbnail_file as out_file:
-                        thumbnail_target.write_bytes(GnuPG.decrypted(out_file))
-                        os.utime(thumbnail_target, times=(t, t))
-
-                if archive_target:
-                    archive_target.parent.mkdir(parents=True, exist_ok=True)
-                    if TYPE_CHECKING:
-                        assert isinstance(document.archive_path, Path)
-                    with document.archive_path as out_file:
-                        archive_target.write_bytes(GnuPG.decrypted(out_file))
-                        os.utime(archive_target, times=(t, t))
-            else:
-                self.check_and_copy(
-                    document.source_path,
-                    document.checksum,
+            if not self.data_only:
+                self.copy_document_files(
+                    document,
                     original_target,
+                    thumbnail_target,
+                    archive_target,
                 )
-
-                if thumbnail_target:
-                    self.check_and_copy(document.thumbnail_path, None, thumbnail_target)
-
-                if archive_target:
-                    if TYPE_CHECKING:
-                        assert isinstance(document.archive_path, Path)
-                    self.check_and_copy(
-                        document.archive_path,
-                        document.archive_checksum,
-                        archive_target,
-                    )
 
             if self.split_manifest:
                 manifest_name = Path(base_name + "-manifest.json")
@@ -457,6 +390,115 @@ class Command(BaseCommand):
                     else:
                         item.unlink()
 
+    def generate_base_name(self, document: Document) -> str:
+        """
+        Generates a unique name for the document, one which hasn't already been exported (or will be)
+        """
+        filename_counter = 0
+        while True:
+            if self.use_filename_format:
+                base_name = generate_filename(
+                    document,
+                    counter=filename_counter,
+                    append_gpg=False,
+                )
+            else:
+                base_name = document.get_public_filename(counter=filename_counter)
+
+            if base_name not in self.exported_files:
+                self.exported_files.add(base_name)
+                break
+            else:
+                filename_counter += 1
+        return base_name
+
+    def generate_document_targets(
+        self,
+        document: Document,
+        base_name: str,
+        document_dict: dict,
+    ) -> tuple[Path, Optional[Path], Optional[Path]]:
+        """
+        Generates the targets for a given document, including the original file, archive file and thumbnail (depending on settings).
+        """
+        original_name = base_name
+        if self.use_folder_prefix:
+            original_name = os.path.join("originals", original_name)
+        original_target = (self.target / Path(original_name)).resolve()
+        document_dict[EXPORTER_FILE_NAME] = original_name
+
+        if not self.no_thumbnail:
+            thumbnail_name = base_name + "-thumbnail.webp"
+            if self.use_folder_prefix:
+                thumbnail_name = os.path.join("thumbnails", thumbnail_name)
+            thumbnail_target = (self.target / Path(thumbnail_name)).resolve()
+            document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
+        else:
+            thumbnail_target = None
+
+        if not self.no_archive and document.has_archive_version:
+            archive_name = base_name + "-archive.pdf"
+            if self.use_folder_prefix:
+                archive_name = os.path.join("archive", archive_name)
+            archive_target = (self.target / Path(archive_name)).resolve()
+            document_dict[EXPORTER_ARCHIVE_NAME] = archive_name
+        else:
+            archive_target = None
+
+        return original_target, thumbnail_target, archive_target
+
+    def copy_document_files(
+        self,
+        document: Document,
+        original_target: Path,
+        thumbnail_target: Optional[Path],
+        archive_target: Optional[Path],
+    ) -> None:
+        """
+        Copies files from the document storage location to the specified target location.
+
+        If the document is encrypted, the files are decrypted before copying them to the target location.
+        """
+        if document.storage_type == Document.STORAGE_TYPE_GPG:
+            t = int(time.mktime(document.created.timetuple()))
+
+            original_target.parent.mkdir(parents=True, exist_ok=True)
+            with document.source_file as out_file:
+                original_target.write_bytes(GnuPG.decrypted(out_file))
+                os.utime(original_target, times=(t, t))
+
+            if thumbnail_target:
+                thumbnail_target.parent.mkdir(parents=True, exist_ok=True)
+                with document.thumbnail_file as out_file:
+                    thumbnail_target.write_bytes(GnuPG.decrypted(out_file))
+                    os.utime(thumbnail_target, times=(t, t))
+
+            if archive_target:
+                archive_target.parent.mkdir(parents=True, exist_ok=True)
+                if TYPE_CHECKING:
+                    assert isinstance(document.archive_path, Path)
+                with document.archive_path as out_file:
+                    archive_target.write_bytes(GnuPG.decrypted(out_file))
+                    os.utime(archive_target, times=(t, t))
+        else:
+            self.check_and_copy(
+                document.source_path,
+                document.checksum,
+                original_target,
+            )
+
+            if thumbnail_target:
+                self.check_and_copy(document.thumbnail_path, None, thumbnail_target)
+
+            if archive_target:
+                if TYPE_CHECKING:
+                    assert isinstance(document.archive_path, Path)
+                self.check_and_copy(
+                    document.archive_path,
+                    document.archive_checksum,
+                    archive_target,
+                )
+
     def check_and_copy(
         self,
         source: Path,
@@ -467,8 +509,6 @@ class Command(BaseCommand):
         Copies the source to the target, if target doesn't exist or the target doesn't seem to match
         the source attributes
         """
-        if self.data_only:
-            return
 
         target = target.resolve()
         if target in self.files_in_export_dir:

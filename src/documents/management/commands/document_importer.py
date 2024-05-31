@@ -72,12 +72,6 @@ class Command(BaseCommand):
             help="If set, only the database will be exported, not files",
         )
 
-    def __init__(self, *args, **kwargs):
-        BaseCommand.__init__(self, *args, **kwargs)
-        self.source = None
-        self.manifest = None
-        self.version = None
-
     def pre_check(self) -> None:
         """
         Runs some initial checks against the source directory, including looking for
@@ -162,7 +156,8 @@ class Command(BaseCommand):
         else:
             self.stdout.write(self.style.NOTICE("No version.json file located"))
 
-        self._check_manifest_valid()
+        if not self.data_only:
+            self._check_manifest_valid()
 
         with (
             disable_signal(
@@ -214,8 +209,7 @@ class Command(BaseCommand):
                     raise e
 
             if not self.data_only:
-                self._import_files_from_manifest(options["no_progress_bar"])
-
+                self._import_files_from_manifest()
             else:
                 self.stdout.write(self.style.NOTICE("Data only import completed"))
 
@@ -223,7 +217,7 @@ class Command(BaseCommand):
         call_command(
             "document_index",
             "reindex",
-            no_progress_bar=options["no_progress_bar"],
+            no_progress_bar=self.no_progress_bar,
         )
 
     @staticmethod
@@ -257,8 +251,8 @@ class Command(BaseCommand):
                     "appear to be in the source directory.",
                 )
             try:
-                with doc_path.open(mode="rb") as infile:
-                    infile.read(1)
+                with doc_path.open(mode="rb"):
+                    pass
             except Exception as e:
                 raise CommandError(
                     f"Failed to read from original file {doc_path}",
@@ -273,14 +267,14 @@ class Command(BaseCommand):
                         f"does not appear to be in the source directory.",
                     )
                 try:
-                    with doc_archive_path.open(mode="rb") as infile:
-                        infile.read(1)
+                    with doc_archive_path.open(mode="rb"):
+                        pass
                 except Exception as e:
                     raise CommandError(
                         f"Failed to read from archive file {doc_archive_path}",
                     ) from e
 
-    def _import_files_from_manifest(self, progress_bar_disable):
+    def _import_files_from_manifest(self):
         settings.ORIGINALS_DIR.mkdir(parents=True, exist_ok=True)
         settings.THUMBNAIL_DIR.mkdir(parents=True, exist_ok=True)
         settings.ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
@@ -291,7 +285,7 @@ class Command(BaseCommand):
             filter(lambda r: r["model"] == "documents.document", self.manifest),
         )
 
-        for record in tqdm.tqdm(manifest_documents, disable=progress_bar_disable):
+        for record in tqdm.tqdm(manifest_documents, disable=self.no_progress_bar):
             document = Document.objects.get(pk=record["pk"])
 
             doc_file = record[EXPORTER_FILE_NAME]
