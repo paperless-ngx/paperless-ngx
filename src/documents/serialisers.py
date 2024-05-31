@@ -795,6 +795,8 @@ class DocumentSerializer(
             "custom_fields",
             "remove_inbox_tags",
         )
+        
+    
 
 
 class SavedViewFilterRuleSerializer(serializers.ModelSerializer):
@@ -1796,11 +1798,33 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
 
 class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
+    document_count = serializers.SerializerMethodField()
     
     class Meta:
         model = Warehouse
         fields = '__all__'
-        
+    
+    def get_document_count(self, obj):
+        return self.get_total_document_count(obj)
+
+    def get_total_document_count(self, warehouse):
+        if warehouse.type == Warehouse.BOXCASE:
+            return Document.objects.filter(warehouse=warehouse).count()
+        elif warehouse.type == Warehouse.SHELF:
+            child_warehouses = Warehouse.objects.filter(parent_warehouse=warehouse)
+            total_count = 0
+            for child_warehouse in child_warehouses:
+                total_count += self.get_total_document_count(child_warehouse)
+            return total_count
+        elif warehouse.type == Warehouse.WAREHOUSE:
+            child_warehouses = Warehouse.objects.filter(parent_warehouse=warehouse)
+            total_count = 0
+            for child_warehouse in child_warehouses:
+                total_count += self.get_total_document_count(child_warehouse)
+            return total_count
+        else:
+            return 0
+    
     
     
     
