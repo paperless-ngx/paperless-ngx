@@ -45,8 +45,8 @@
       <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
-      <button ngbDropdownItem (click)="redoOcr()" [disabled]="!userCanEdit">
-        <i-bs width="1em" height="1em" name="arrow-counterclockwise"></i-bs>&nbsp;<span i18n>Redo OCR</span>
+      <button ngbDropdownItem (click)="reprocess()" [disabled]="!userCanEdit">
+        <i-bs width="1em" height="1em" name="arrow-counterclockwise"></i-bs>&nbsp;<span i18n>Reprocess</span>
       </button>
 
       <button ngbDropdownItem (click)="moreLike()">

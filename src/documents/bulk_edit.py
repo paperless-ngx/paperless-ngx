@@ -165,7 +165,7 @@ def delete(doc_ids: list[int]):
     return "OK"
 
 
-def redo_ocr(doc_ids: list[int]):
+def reprocess(doc_ids: list[int]):
     for document_id in doc_ids:
         update_document_archive_file.delay(
             document_id=document_id,

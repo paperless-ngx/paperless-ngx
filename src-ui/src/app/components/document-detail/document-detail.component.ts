@@ -812,23 +812,23 @@ export class DocumentDetailComponent
     ])
   }
 
-  redoOcr() {
+  reprocess() {
     let modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.title = $localize`Redo OCR confirm`
-    modal.componentInstance.messageBold = $localize`This operation will permanently redo OCR for this document.`
-    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.title = $localize`Reprocess confirm`
+    modal.componentInstance.messageBold = $localize`This operation will permanently recreate the archive file for this document.`
+    modal.componentInstance.message = $localize`The archive file will be re-generated with the current settings.`
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.confirmClicked.subscribe(() => {
       modal.componentInstance.buttonsEnabled = false
       this.documentsService
-        .bulkEdit([this.document.id], 'redo_ocr', {})
+        .bulkEdit([this.document.id], 'reprocess', {})
         .subscribe({
           next: () => {
             this.toastService.showInfo(
-              $localize`Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.`
+              $localize`Reprocess operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.`
             )
             if (modal) {
               modal.close()
