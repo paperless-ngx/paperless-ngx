@@ -93,7 +93,6 @@ class Command(BaseCommand):
         # Skip this check if operating only on the database
         # We can data to exist
         if not self.data_only:
-
             for document_dir in [settings.ORIGINALS_DIR, settings.ARCHIVE_DIR]:
                 if document_dir.exists() and document_dir.is_dir():
                     for entry in document_dir.glob("**/*"):
@@ -218,7 +217,6 @@ class Command(BaseCommand):
                 self._import_files_from_manifest(options["no_progress_bar"])
 
             else:
-
                 self.stdout.write(self.style.NOTICE("Data only import completed"))
 
         self.stdout.write("Updating search index...")

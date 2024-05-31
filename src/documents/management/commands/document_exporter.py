@@ -5,6 +5,8 @@ import shutil
 import tempfile
 import time
 from pathlib import Path
+from typing import TYPE_CHECKING
+from typing import Optional
 
 import tqdm
 from django.conf import settings
@@ -20,6 +22,9 @@ from django.utils import timezone
 from filelock import FileLock
 from guardian.models import GroupObjectPermission
 from guardian.models import UserObjectPermission
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
@@ -49,6 +54,13 @@ from paperless.db import GnuPG
 from paperless.models import ApplicationConfiguration
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+
+
+class Manifest:
+    primary: list
+    documents: dict
+    split: list
+    version: dict
 
 
 class Command(BaseCommand):
@@ -160,20 +172,6 @@ class Command(BaseCommand):
             help="If set, the progress bar will not be shown",
         )
 
-    def __init__(self, *args, **kwargs):
-        BaseCommand.__init__(self, *args, **kwargs)
-        self.target: Path = None
-        self.split_manifest = False
-        self.files_in_export_dir: set[Path] = set()
-        self.exported_files: list[Path] = []
-        self.compare_checksums = False
-        self.use_filename_format = False
-        self.use_folder_prefix = False
-        self.delete = False
-        self.no_archive = False
-        self.no_thumbnail = False
-        self.data_only = False
-
     def handle(self, *args, **options):
         self.target = Path(options["target"]).resolve()
         self.split_manifest: bool = options["split_manifest"]
@@ -186,6 +184,9 @@ class Command(BaseCommand):
         self.zip_export: bool = options["zip"]
         self.data_only: bool = options["data_only"]
         self.no_progress_bar: bool = options["no_progress_bar"]
+
+        self.files_in_export_dir: set[Path] = set()
+        self.exported_files: set[str] = set()
 
         # If zipping, save the original target for later and
         # get a temporary directory for the target instead
@@ -209,12 +210,13 @@ class Command(BaseCommand):
             raise CommandError("That path doesn't appear to be writable")
 
         try:
+            # Prevent any ongoing changes in the documents
             with FileLock(settings.MEDIA_LOCK):
                 self.dump()
 
                 # We've written everything to the temporary directory in this case,
                 # now make an archive in the original target, with all files stored
-                if self.zip_export:
+                if self.zip_export and temp_dir is not None:
                     shutil.make_archive(
                         os.path.join(
                             self.original_target,
@@ -237,113 +239,53 @@ class Command(BaseCommand):
 
         # 2. Create manifest, containing all correspondents, types, tags, storage paths
         # note, documents and ui_settings
+        manifest_key_to_object_query: dict[str, QuerySet] = {
+            "correspondents": Correspondent.objects.all(),
+            "tags": Tag.objects.all(),
+            "document_types": DocumentType.objects.all(),
+            "storage_paths": StoragePath.objects.all(),
+            "mail_accounts": MailAccount.objects.all(),
+            "mail_rules": MailRule.objects.all(),
+            "saved_views": SavedView.objects.all(),
+            "saved_view_filter_rules": SavedViewFilterRule.objects.all(),
+            "groups": Group.objects.all(),
+            "users": User.objects.exclude(
+                username__in=["consumer", "AnonymousUser"],
+            ).all(),
+            "ui_settings": UiSettings.objects.all(),
+            "content_types": ContentType.objects.all(),
+            "permissions": Permission.objects.all(),
+            "user_object_permissions": UserObjectPermission.objects.all(),
+            "group_object_permissions": GroupObjectPermission.objects.all(),
+            "workflow_triggers": WorkflowTrigger.objects.all(),
+            "workflow_actions": WorkflowAction.objects.all(),
+            "workflows": Workflow.objects.all(),
+            "custom_fields": CustomField.objects.all(),
+            "custom_field_instances": CustomFieldInstance.objects.all(),
+            "app_configs": ApplicationConfiguration.objects.all(),
+            "notes": Note.objects.all(),
+            "documents": Document.objects.order_by("id").all(),
+        }
+
+        if settings.AUDIT_LOG_ENABLED:
+            manifest_key_to_object_query["log_entries"] = LogEntry.objects.all()
+
         with transaction.atomic():
-            manifest = json.loads(
-                serializers.serialize("json", Correspondent.objects.all()),
-            )
+            manifest_dict = {}
 
-            manifest += json.loads(serializers.serialize("json", Tag.objects.all()))
-
-            manifest += json.loads(
-                serializers.serialize("json", DocumentType.objects.all()),
-            )
-
-            manifest += json.loads(
-                serializers.serialize("json", StoragePath.objects.all()),
-            )
-
-            manifest += json.loads(
-                serializers.serialize("json", MailAccount.objects.all()),
-            )
-
-            manifest += json.loads(
-                serializers.serialize("json", MailRule.objects.all()),
-            )
-
-            manifest += json.loads(
-                serializers.serialize("json", SavedView.objects.all()),
-            )
-
-            manifest += json.loads(
-                serializers.serialize("json", SavedViewFilterRule.objects.all()),
-            )
-
-            manifest += json.loads(serializers.serialize("json", Group.objects.all()))
-
-            manifest += json.loads(
-                serializers.serialize(
-                    "json",
-                    User.objects.exclude(username__in=["consumer", "AnonymousUser"]),
-                ),
-            )
-
-            manifest += json.loads(
-                serializers.serialize("json", UiSettings.objects.all()),
-            )
-
-            manifest += json.loads(
-                serializers.serialize("json", ContentType.objects.all()),
-            )
-
-            manifest += json.loads(
-                serializers.serialize("json", Permission.objects.all()),
-            )
-
-            manifest += json.loads(
-                serializers.serialize("json", UserObjectPermission.objects.all()),
-            )
-
-            manifest += json.loads(
-                serializers.serialize("json", GroupObjectPermission.objects.all()),
-            )
-
-            manifest += json.loads(
-                serializers.serialize("json", WorkflowTrigger.objects.all()),
-            )
-
-            manifest += json.loads(
-                serializers.serialize("json", WorkflowAction.objects.all()),
-            )
-
-            manifest += json.loads(
-                serializers.serialize("json", Workflow.objects.all()),
-            )
-
-            manifest += json.loads(
-                serializers.serialize("json", CustomField.objects.all()),
-            )
-
-            manifest += json.loads(
-                serializers.serialize("json", ApplicationConfiguration.objects.all()),
-            )
-
-            if settings.AUDIT_LOG_ENABLED:
-                manifest += json.loads(
-                    serializers.serialize("json", LogEntry.objects.all()),
+            # Build an overall manifest
+            for key in manifest_key_to_object_query:
+                manifest_dict[key] = json.loads(
+                    serializers.serialize("json", manifest_key_to_object_query[key]),
                 )
 
             # These are treated specially and included in the per-document manifest
             # if that setting is enabled.  Otherwise, they are just exported to the bulk
             # manifest
-            documents = Document.objects.order_by("id")
-            document_map: dict[int, Document] = {d.pk: d for d in documents}
-            document_manifest = json.loads(serializers.serialize("json", documents))
-
-            notes = json.loads(
-                serializers.serialize("json", Note.objects.all()),
-            )
-
-            custom_field_instances = json.loads(
-                serializers.serialize("json", CustomFieldInstance.objects.all()),
-            )
-            if not self.split_manifest:
-                manifest += document_manifest
-                manifest += notes
-                manifest += custom_field_instances
-
-        if self.data_only:
-            self.stdout.write(self.style.NOTICE("Data only export completed"))
-            return
+            document_map: dict[int, Document] = {
+                d.pk: d for d in manifest_key_to_object_query["documents"]
+            }
+            document_manifest = manifest_dict["documents"]
 
         # 3. Export files from each document
         for index, document_dict in tqdm.tqdm(
@@ -369,7 +311,7 @@ class Command(BaseCommand):
                     base_name = document.get_public_filename(counter=filename_counter)
 
                 if base_name not in self.exported_files:
-                    self.exported_files.append(base_name)
+                    self.exported_files.add(base_name)
                     break
                 else:
                     filename_counter += 1
@@ -416,6 +358,8 @@ class Command(BaseCommand):
 
                 if archive_target:
                     archive_target.parent.mkdir(parents=True, exist_ok=True)
+                    if TYPE_CHECKING:
+                        assert isinstance(document.archive_path, Path)
                     with document.archive_path as out_file:
                         archive_target.write_bytes(GnuPG.decrypted(out_file))
                         os.utime(archive_target, times=(t, t))
@@ -430,6 +374,8 @@ class Command(BaseCommand):
                     self.check_and_copy(document.thumbnail_path, None, thumbnail_target)
 
                 if archive_target:
+                    if TYPE_CHECKING:
+                        assert isinstance(document.archive_path, Path)
                     self.check_and_copy(
                         document.archive_path,
                         document.archive_checksum,
@@ -437,22 +383,22 @@ class Command(BaseCommand):
                     )
 
             if self.split_manifest:
-                manifest_name = base_name + "-manifest.json"
+                manifest_name = Path(base_name + "-manifest.json")
                 if self.use_folder_prefix:
-                    manifest_name = os.path.join("json", manifest_name)
-                manifest_name = (self.target / Path(manifest_name)).resolve()
+                    manifest_name = Path("json") / manifest_name
+                manifest_name = (self.target / manifest_name).resolve()
                 manifest_name.parent.mkdir(parents=True, exist_ok=True)
                 content = [document_manifest[index]]
                 content += list(
                     filter(
                         lambda d: d["fields"]["document"] == document_dict["pk"],
-                        notes,
+                        manifest_dict["notes"],
                     ),
                 )
                 content += list(
                     filter(
                         lambda d: d["fields"]["document"] == document_dict["pk"],
-                        custom_field_instances,
+                        manifest_dict["custom_field_instances"],
                     ),
                 )
                 manifest_name.write_text(
@@ -462,8 +408,17 @@ class Command(BaseCommand):
                 if manifest_name in self.files_in_export_dir:
                     self.files_in_export_dir.remove(manifest_name)
 
-        # 4.1 write manifest to target folder
-        manifest_path = (self.target / Path("manifest.json")).resolve()
+        # These were exported already
+        if self.split_manifest:
+            del manifest_dict["documents"]
+            del manifest_dict["notes"]
+            del manifest_dict["custom_field_instances"]
+
+        # 4.1 write primary manifest to target folder
+        manifest = []
+        for key in manifest_dict:
+            manifest.extend(manifest_dict[key])
+        manifest_path = (self.target / "manifest.json").resolve()
         manifest_path.write_text(
             json.dumps(manifest, indent=2, ensure_ascii=False),
             encoding="utf-8",
@@ -472,7 +427,7 @@ class Command(BaseCommand):
             self.files_in_export_dir.remove(manifest_path)
 
         # 4.2 write version information to target folder
-        version_path = (self.target / Path("version.json")).resolve()
+        version_path = (self.target / "version.json").resolve()
         version_path.write_text(
             json.dumps(
                 {"version": version.__full_version_str__},
@@ -502,7 +457,20 @@ class Command(BaseCommand):
                     else:
                         item.unlink()
 
-    def check_and_copy(self, source, source_checksum, target: Path):
+    def check_and_copy(
+        self,
+        source: Path,
+        source_checksum: Optional[str],
+        target: Path,
+    ):
+        """
+        Copies the source to the target, if target doesn't exist or the target doesn't seem to match
+        the source attributes
+        """
+        if self.data_only:
+            return
+
+        target = target.resolve()
         if target in self.files_in_export_dir:
             self.files_in_export_dir.remove(target)
 
