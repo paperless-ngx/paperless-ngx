@@ -185,7 +185,7 @@ For PostgreSQL, refer to [Upgrading a PostgreSQL Cluster](https://www.postgresql
 
 For MariaDB, refer to [Upgrading MariaDB](https://mariadb.com/kb/en/upgrading/)
 
-You may also use the exporter and importer with the `--data-only` flag.
+You may also use the exporter and importer with the `--data-only` flag, after creating a new database with the updated version of PostgreSQL or MariaDB.
 
 !!! warning
 
