@@ -85,7 +85,7 @@ class Command(BaseCommand):
             raise CommandError("That path doesn't appear to be readable")
 
         # Skip this check if operating only on the database
-        # We can data to exist
+        # We can expect data to exist in that case
         if not self.data_only:
             for document_dir in [settings.ORIGINALS_DIR, settings.ARCHIVE_DIR]:
                 if document_dir.exists() and document_dir.is_dir():
@@ -157,7 +157,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.NOTICE("No version.json file located"))
 
         if not self.data_only:
-            self._check_manifest_valid()
+            self._check_manifest_files_valid()
 
         with (
             disable_signal(
@@ -227,7 +227,7 @@ class Command(BaseCommand):
                 "That directory doesn't appear to contain a manifest.json file.",
             )
 
-    def _check_manifest_valid(self):
+    def _check_manifest_files_valid(self):
         """
         Attempts to verify the manifest is valid.  Namely checking the files
         referred to exist and the files can be read from
@@ -244,7 +244,7 @@ class Command(BaseCommand):
                 )
 
             doc_file = record[EXPORTER_FILE_NAME]
-            doc_path = self.source / doc_file
+            doc_path: Path = self.source / doc_file
             if not doc_path.exists():
                 raise CommandError(
                     f'The manifest file refers to "{doc_file}" which does not '
@@ -260,7 +260,7 @@ class Command(BaseCommand):
 
             if EXPORTER_ARCHIVE_NAME in record:
                 archive_file = record[EXPORTER_ARCHIVE_NAME]
-                doc_archive_path = self.source / archive_file
+                doc_archive_path: Path = self.source / archive_file
                 if not doc_archive_path.exists():
                     raise CommandError(
                         f"The manifest file refers to {archive_file} which "

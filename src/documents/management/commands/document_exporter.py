@@ -56,13 +56,6 @@ from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
 
-class Manifest:
-    primary: list
-    documents: dict
-    split: list
-    version: dict
-
-
 class Command(BaseCommand):
     help = (
         "Decrypt and rename all files in our collection into a given target "

@@ -336,7 +336,7 @@ in the target directory, named according to the current local date or the
 value set in `-zn` or `--zip-name`.
 
 If `--data-only` is provided, only the database will be exported. This option is intended
-to facilitate database upgrades with needing to clean documents and thumbnails.
+to facilitate database upgrades without needing to clean documents and thumbnails from the media directory.
 
 !!! warning
 
@@ -352,7 +352,7 @@ exporter](#exporter) and imports it into paperless.
 The importer works just like the exporter. You point it at a directory,
 and the script does the rest of the work:
 
-```
+```shell
 document_importer source
 ```
 
