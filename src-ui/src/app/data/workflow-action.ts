@@ -17,7 +17,7 @@ export interface WorkflowAction extends ObjectWithId {
 
   assign_storage_path?: number // StoragePath.id
 
-  assign_warehouses?: number // Warehouse.id
+  assign_warehouse?: number // Warehouse.id
 
   assign_owner?: number // User.id
 

@@ -104,6 +104,7 @@ from documents.filters import WarehouseFilterSet
 from documents.matching import match_correspondents
 from documents.matching import match_document_types
 from documents.matching import match_storage_paths
+from documents.matching import match_warehouses
 from documents.matching import match_tags
 from documents.models import Correspondent
 from documents.models import CustomField
@@ -336,7 +337,7 @@ class DocumentViewSet(
         ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = DocumentFilterSet
-    search_fields = ("title", "correspondent__name", "content", "warehouses")
+    search_fields = ("title", "correspondent__name", "content", "warehouse")
     ordering_fields = (
         "id",
         "title",
@@ -354,7 +355,7 @@ class DocumentViewSet(
         return (
             Document.objects.distinct()
             .annotate(num_notes=Count("notes"))
-            .select_related("correspondent", "storage_path", "document_type", "owner")
+            .select_related("correspondent", "storage_path", "document_type","warehouse", "owner")
             .prefetch_related("tags", "custom_fields", "notes")
         )
 
@@ -528,6 +529,9 @@ class DocumentViewSet(
         resp_data = {
             "correspondents": [
                 c.id for c in match_correspondents(doc, classifier, request.user)
+            ],
+            "warehouses": [
+                wh.id for wh in match_warehouses(doc, classifier, request.user)
             ],
             "tags": [t.id for t in match_tags(doc, classifier, request.user)],
             "document_types": [
@@ -749,6 +753,7 @@ class SearchResultSerializer(DocumentSerializer, PassUserMixin):
                 "correspondent",
                 "storage_path",
                 "document_type",
+                "warehouse"
                 "owner",
             )
             .prefetch_related("tags", "custom_fields", "notes")
@@ -937,6 +942,7 @@ class PostDocumentView(GenericAPIView):
         correspondent_id = serializer.validated_data.get("correspondent")
         document_type_id = serializer.validated_data.get("document_type")
         storage_path_id = serializer.validated_data.get("storage_path")
+        warehouse_id = serializer.validated_data.get("warehouse")
         tag_ids = serializer.validated_data.get("tags")
         title = serializer.validated_data.get("title")
         created = serializer.validated_data.get("created")
@@ -965,6 +971,7 @@ class PostDocumentView(GenericAPIView):
             correspondent_id=correspondent_id,
             document_type_id=document_type_id,
             storage_path_id=storage_path_id,
+            warehouse_id=warehouse_id,
             tag_ids=tag_ids,
             created=created,
             asn=archive_serial_number,
@@ -1014,6 +1021,12 @@ class SelectionDataView(GenericAPIView):
                 Case(When(documents__id__in=ids, then=1), output_field=IntegerField()),
             ),
         )
+        
+        warehouses = Warehouse.objects.annotate(
+            document_count=Count(
+                Case(When(documents__id__in=ids, then=1), output_field=IntegerField()),
+            ),
+        )
 
         r = Response(
             {
@@ -1026,6 +1039,9 @@ class SelectionDataView(GenericAPIView):
                 ],
                 "selected_document_types": [
                     {"id": t.id, "document_count": t.document_count} for t in types
+                ],
+                "selected_warehouses": [
+                    {"id": t.id, "document_count": t.document_count} for t in warehouses
                 ],
                 "selected_storage_paths": [
                     {"id": t.id, "document_count": t.document_count}
@@ -1111,6 +1127,17 @@ class StatisticsView(APIView):
                 ),
             )
         )
+        warehouse_count = (
+            Warehouse.objects.count()
+            if user is None
+            else len(
+                get_objects_for_user_owner_aware(
+                    user,
+                    "documents.view_warehouse",
+                    Warehouse,
+                ),
+            )
+        )
         storage_path_count = (
             StoragePath.objects.count()
             if user is None
@@ -1160,6 +1187,7 @@ class StatisticsView(APIView):
                 "correspondent_count": correspondent_count,
                 "document_type_count": document_type_count,
                 "storage_path_count": storage_path_count,
+                "warehouse_count": warehouse_count,
             },
         )
 
@@ -1531,18 +1559,18 @@ class BulkEditObjectsView(PassUserMixin):
                 
                 if warehouse.type == Warehouse.SHELF:
                     boxcases = Warehouse.objects.filter(parent_warehouse=warehouse) 
-                    documents = Document.objects.filter(warehouses__in=[b.id for b in boxcases])
+                    documents = Document.objects.filter(warehouse__in=[b.id for b in boxcases])
                     documents.delete()
                     boxcases.delete()
                     warehouse.delete()
                 if warehouse.type == Warehouse.BOXCASE:
-                    documents = Document.objects.filter(warehouses=warehouse)
+                    documents = Document.objects.filter(warehouse=warehouse)
                     documents.delete()
                     warehouse.delete()
                 if warehouse.type == Warehouse.WAREHOUSE:
                     shelves = Warehouse.objects.filter(parent_warehouse=warehouse)
                     boxcases = Warehouse.objects.filter(parent_warehouse__in=[s.id for s in shelves]) 
-                    documents = Document.objects.filter(warehouses__in=[b.id for b in boxcases])
+                    documents = Document.objects.filter(warehouse__in=[b.id for b in boxcases])
                     documents.delete()
                     boxcases.delete()
                     shelves.delete()
@@ -1718,6 +1746,9 @@ class SystemStatusView(PassUserMixin):
                         or Correspondent.objects.filter(
                             matching_algorithm=Tag.MATCH_AUTO,
                         ).exists()
+                        or Warehouse.objects.filter(
+                            matching_algorithm=Tag.MATCH_AUTO,
+                        ).exists()
                         or StoragePath.objects.filter(
                             matching_algorithm=Tag.MATCH_AUTO,
                         ).exists()
@@ -1812,31 +1843,10 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     def create(self, request, *args, **kwargs):
         # try:                                                          
         serializer = WarehouseSerializer(data=request.data)
-        name = None
-        type = None
         parent_warehouse = None
         if serializer.is_valid(raise_exception=True):
-            name = serializer.validated_data.get("name", "")
-            type = serializer.validated_data.get("type", Warehouse.WAREHOUSE)
             parent_warehouse = serializer.validated_data.get('parent_warehouse',None)
-        # check_warehouse = Warehouse.objects.filter(
-        #     name = name,
-        #     type = type,
-        #     parent_warehouse=parent_warehouse
-        # )
-        
-        # if check_warehouse:
-        #     return Response({'status':400,
-        #                 'message':'created fail'},status=status.HTTP_400_BAD_REQUEST)
-        
-        # if type == Warehouse.SHELF and parent_warehouse == None:
-        #     return Response({'status': 400,
-        #                     'message': 'parent_warehouse is required for Shelf type'}, status=status.HTTP_400_BAD_REQUEST)
-        # elif type == Warehouse.BOXCASE and parent_warehouse == None:
-        #     return Response({'status': 400,
-        #                     'message': 'parent_warehouse is required for Boxcase type'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # if serializer.is_valid(raise_exception=True):
+       
         parent_warehouse = Warehouse.objects.filter(id=parent_warehouse.id if parent_warehouse else 0).first()   
         
         if serializer.validated_data.get("type") == Warehouse.WAREHOUSE and not parent_warehouse:
@@ -1853,7 +1863,27 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                         'message':'created successfully',
                         'data':serializer.data},status=status.HTTP_201_CREATED)
 
-        # except Exception as e:
-        #     return Response({'status':400,
-        #                     'message':e},status=status.HTTP_400_BAD_REQUEST)
+        
+    def destroy(self, request, pk, *args, **kwargs):
+        warehouse = Warehouse.objects.get(id=pk)
+        if warehouse.type == Warehouse.SHELF:
+            boxcases = Warehouse.objects.filter(parent_warehouse=warehouse) 
+            documents = Document.objects.filter(warehouse__in=[b.id for b in boxcases])
+            documents.delete()
+            boxcases.delete()
+            warehouse.delete()
+        if warehouse.type == Warehouse.BOXCASE:
+            documents = Document.objects.filter(warehouse=warehouse)
+            documents.delete()
+            warehouse.delete()
+        if warehouse.type == Warehouse.WAREHOUSE:
+            shelves = Warehouse.objects.filter(parent_warehouse=warehouse)
+            boxcases = Warehouse.objects.filter(parent_warehouse__in=[s.id for s in shelves]) 
+            documents = Document.objects.filter(warehouse__in=[b.id for b in boxcases])
+            documents.delete()
+            boxcases.delete()
+            shelves.delete()
+            warehouse.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
