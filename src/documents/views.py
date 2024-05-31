@@ -1850,18 +1850,51 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         parent_warehouse = Warehouse.objects.filter(id=parent_warehouse.id if parent_warehouse else 0).first()   
         
         if serializer.validated_data.get("type") == Warehouse.WAREHOUSE and not parent_warehouse:
-            serializer.save()
+            warehouse = serializer.save()
+            warehouse.path = str(warehouse.id)
+            warehouse.save()
         elif serializer.validated_data.get("type", "") == Warehouse.SHELF and  getattr(parent_warehouse, 'type', "") == Warehouse.WAREHOUSE :
-            serializer.save(type = Warehouse.SHELF, parent_warehouse = parent_warehouse)
+            warehouse = serializer.save(type=Warehouse.SHELF, parent_warehouse=parent_warehouse)
+            warehouse.path = f"{parent_warehouse.path}/{warehouse.id}"
+            warehouse.save()
         elif serializer.validated_data.get("type", "") == Warehouse.BOXCASE and  getattr(parent_warehouse, 'type', "") == Warehouse.SHELF :
-            serializer.save(type = Warehouse.BOXCASE, parent_warehouse = parent_warehouse)
+            warehouse = serializer.save(type=Warehouse.BOXCASE, parent_warehouse=parent_warehouse)
+            warehouse.path = f"{parent_warehouse.path}/{warehouse.id}"
+            warehouse.save()
         else:
-            return Response({'status':400,
-                            'message':'misplaced'},status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'status':201,
-                        'message':'created successfully',
-                        'data':serializer.data},status=status.HTTP_201_CREATED)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+
+       
+        old_parent_warehouse = instance.parent_warehouse
+
+        self.perform_update(serializer)
+
+        if old_parent_warehouse != instance.parent_warehouse:
+           
+            if instance.type == Warehouse.SHELF:
+                instance.path = f"{instance.parent_warehouse.path}/{instance.id}"
+            elif instance.type == Warehouse.BOXCASE:
+                instance.path = f"{instance.parent_warehouse.path}/{instance.id}"
+            else:
+
+                instance.path = str(instance.id)
+            instance.save()
+            
+            boxcase_warehouses = Warehouse.objects.filter(type=Warehouse.BOXCASE, parent_warehouse=instance)
+            for boxcase_warehouse in boxcase_warehouses:
+                boxcase_warehouse.path = f"{instance.path}/{boxcase_warehouse.id}"
+                boxcase_warehouse.save()
+
+
+        return Response(serializer.data)
 
         
     def destroy(self, request, pk, *args, **kwargs):
