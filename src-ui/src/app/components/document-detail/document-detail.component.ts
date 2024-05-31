@@ -148,7 +148,7 @@ export class DocumentDetailComponent
     correspondent: new FormControl(),
     document_type: new FormControl(),
     storage_path: new FormControl(),
-    warehouses: new FormControl(),
+    warehouse: new FormControl(),
     archive_serial_number: new FormControl(),
     tags: new FormControl([]),
     permissions_form: new FormControl(null),
@@ -274,6 +274,17 @@ export class DocumentDetailComponent
     if (
       this.permissionsService.currentUserCan(
         PermissionAction.View,
+        PermissionType.Warehouse
+      )
+    ) {
+      this.warehouseService
+        .listAll()
+        .pipe(first(), takeUntil(this.unsubscribeNotifier))
+        .subscribe((result) => (this.warehouses = result.results))
+    }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
         PermissionType.DocumentType
       )
     ) {
@@ -292,17 +303,6 @@ export class DocumentDetailComponent
         .listAll()
         .pipe(first(), takeUntil(this.unsubscribeNotifier))
         .subscribe((result) => (this.storagePaths = result.results))
-    }
-    if (
-      this.permissionsService.currentUserCan(
-        PermissionAction.View,
-        PermissionType.Warehouse
-      )
-    ) {
-      this.warehouseService
-        .listAll()
-        .pipe(first(), takeUntil(this.unsubscribeNotifier))
-        .subscribe((result) => (this.warehouses = result.results))
     }
     if (
       this.permissionsService.currentUserCan(
@@ -427,7 +427,7 @@ export class DocumentDetailComponent
             correspondent: doc.correspondent,
             document_type: doc.document_type,
             storage_path: doc.storage_path,
-            warehouses: doc.warehouses,
+            warehouse: doc.warehouse,
             archive_serial_number: doc.archive_serial_number,
             tags: [...doc.tags],
             permissions_form: {
@@ -639,7 +639,7 @@ export class DocumentDetailComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(({ newWarehouse, warehouses }) => {
         this.warehouses = warehouses.results
-        this.documentForm.get('warehouses').setValue(newWarehouse.id)
+        this.documentForm.get('warehouse').setValue(newWarehouse.id)
       })
   }
 

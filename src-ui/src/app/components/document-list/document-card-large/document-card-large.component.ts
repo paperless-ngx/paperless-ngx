@@ -48,13 +48,13 @@ export class DocumentCardLargeComponent extends ComponentWithPermissions {
   clickCorrespondent = new EventEmitter<number>()
 
   @Output()
+  clickWarehouse = new EventEmitter<number>()
+
+  @Output()
   clickDocumentType = new EventEmitter<number>()
 
   @Output()
   clickStoragePath = new EventEmitter<number>()
-
-  @Output()
-  clickWarehouse = new EventEmitter<number>()
 
   @Output()
   clickMoreLike = new EventEmitter()

@@ -28,7 +28,7 @@ export const DOCUMENT_SORT_FIELDS = [
   { field: 'correspondent__name', name: $localize`Correspondent` },
   { field: 'title', name: $localize`Title` },
   { field: 'document_type__name', name: $localize`Document type` },
-  { field: 'warehouses__name', name: $localize`Warehouse` },
+  { field: 'warehouse__name', name: $localize`Warehouse` },
   { field: 'created', name: $localize`Created` },
   { field: 'added', name: $localize`Added` },
   { field: 'modified', name: $localize`Modified` },
@@ -123,13 +123,13 @@ export class DocumentService extends AbstractPaperlessService<Document> {
       doc.storage_path$ = this.storagePathService.getCached(doc.storage_path)
     }
     if (
-      doc.warehouses &&
+      doc.warehouse &&
       this.permissionsService.currentUserCan(
         PermissionAction.View,
         PermissionType.Warehouse
       )
     ) {
-      doc.warehouses$ = this.warehouseService.getCached(doc.warehouses)
+      doc.warehouse$ = this.warehouseService.getCached(doc.warehouse)
     }
     return doc
   }

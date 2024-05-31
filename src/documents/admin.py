@@ -13,6 +13,7 @@ from documents.models import SavedView
 from documents.models import SavedViewFilterRule
 from documents.models import ShareLink
 from documents.models import StoragePath
+from documents.models import Warehouse
 from documents.models import Tag
 
 if settings.AUDIT_LOG_ENABLED:
@@ -38,6 +39,10 @@ class DocumentTypeAdmin(GuardedModelAdmin):
     list_filter = ("matching_algorithm",)
     list_editable = ("match", "matching_algorithm")
 
+class WarehouseAdmin(GuardedModelAdmin):
+    list_display = ("name", "type", "path", "parent_warehouse", "match", "matching_algorithm")
+    list_filter = ("matching_algorithm",)
+    list_editable = ("match", "matching_algorithm")
 
 class DocumentAdmin(GuardedModelAdmin):
     search_fields = ("correspondent__name", "title", "content", "tags__name")
@@ -188,6 +193,7 @@ class CustomFieldInstancesAdmin(GuardedModelAdmin):
 admin.site.register(Correspondent, CorrespondentAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(DocumentType, DocumentTypeAdmin)
+admin.site.register(Warehouse, WarehouseAdmin)
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(SavedView, SavedViewAdmin)
 admin.site.register(StoragePath, StoragePathAdmin)

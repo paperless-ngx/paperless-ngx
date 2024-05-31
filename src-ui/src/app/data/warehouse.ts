@@ -5,4 +5,6 @@ export interface Warehouse extends MatchingModel {
   type?: string
 
   parent_warehouse?: number
+
+  path?: string
 }
