@@ -676,24 +676,37 @@ commands as well.
 1.  Stop and remove the paperless container
 2.  If using an external database, stop the container
 3.  Update Redis configuration
-    a) If `REDIS_URL` is already set, change it to [`PAPERLESS_REDIS`](configuration.md#PAPERLESS_REDIS)
-    and continue to step 4.
-    b) Otherwise, in the `docker-compose.yml` add a new service for
-    Redis, following [the example compose
-    files](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose)
-    c) Set the environment variable [`PAPERLESS_REDIS`](configuration.md#PAPERLESS_REDIS) so it points to
-    the new Redis container
+
+    1. If `REDIS_URL` is already set, change it to [`PAPERLESS_REDIS`](configuration.md#PAPERLESS_REDIS)
+       and continue to step 4.
+
+    1. Otherwise, in the `docker-compose.yml` add a new service for
+       Redis, following [the example compose
+       files](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose)
+
+    1. Set the environment variable [`PAPERLESS_REDIS`](configuration.md#PAPERLESS_REDIS) so it points to
+       the new Redis container
+
 4.  Update user mapping
-    a) If set, change the environment variable `PUID` to `USERMAP_UID`
-    b) If set, change the environment variable `PGID` to `USERMAP_GID`
+
+    1. If set, change the environment variable `PUID` to `USERMAP_UID`
+
+    1. If set, change the environment variable `PGID` to `USERMAP_GID`
+
 5.  Update configuration paths
-    a) Set the environment variable [`PAPERLESS_DATA_DIR`](configuration.md#PAPERLESS_DATA_DIR) to `/config`
+
+    1. Set the environment variable [`PAPERLESS_DATA_DIR`](configuration.md#PAPERLESS_DATA_DIR) to `/config`
+
 6.  Update media paths
-    a) Set the environment variable [`PAPERLESS_MEDIA_ROOT`](configuration.md#PAPERLESS_MEDIA_ROOT) to
-    `/data/media`
+
+    1. Set the environment variable [`PAPERLESS_MEDIA_ROOT`](configuration.md#PAPERLESS_MEDIA_ROOT) to
+       `/data/media`
+
 7.  Update timezone
-    a) Set the environment variable [`PAPERLESS_TIME_ZONE`](configuration.md#PAPERLESS_TIME_ZONE) to the same
-    value as `TZ`
+
+    1. Set the environment variable [`PAPERLESS_TIME_ZONE`](configuration.md#PAPERLESS_TIME_ZONE) to the same
+       value as `TZ`
+
 8.  Modify the `image:` to point to
     `ghcr.io/paperless-ngx/paperless-ngx:latest` or a specific version
     if preferred.

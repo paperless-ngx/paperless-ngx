@@ -11,7 +11,7 @@ The API provides the following main endpoints:
 - `/api/correspondents/`: Full CRUD support.
 - `/api/custom_fields/`: Full CRUD support.
 - `/api/documents/`: Full CRUD support, except POSTing new documents.
-  See [below](#posting-documents-file-uploads).
+  See [below](#file-uploads).
 - `/api/document_types/`: Full CRUD support.
 - `/api/groups/`: Full CRUD support.
 - `/api/logs/`: Read-Only.
