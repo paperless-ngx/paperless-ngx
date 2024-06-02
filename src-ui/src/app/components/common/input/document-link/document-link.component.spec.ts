@@ -66,6 +66,20 @@ describe('DocumentLinkComponent', () => {
     expect(getSpy).toHaveBeenCalled()
   })
 
+  it('shoud maintain ordering of selected documents', () => {
+    const getSpy = jest.spyOn(documentService, 'getFew')
+    getSpy.mockImplementation((ids) => {
+      const docs = documents.filter((d) => ids.includes(d.id))
+      return of({
+        count: docs.length,
+        all: docs.map((d) => d.id),
+        results: docs,
+      })
+    })
+    component.writeValue([12, 1])
+    expect(component.selectedDocuments).toEqual([documents[1], documents[0]])
+  })
+
   it('should search API on select text input', () => {
     const listSpy = jest.spyOn(documentService, 'listFiltered')
     listSpy.mockImplementation(
