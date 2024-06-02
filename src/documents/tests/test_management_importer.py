@@ -14,9 +14,15 @@ from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
+from documents.tests.utils import SampleDirMixin
 
 
-class TestCommandImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
+class TestCommandImport(
+    DirectoriesMixin,
+    FileSystemAssertsMixin,
+    SampleDirMixin,
+    TestCase,
+):
     def test_check_manifest_exists(self):
         """
         GIVEN:
@@ -120,14 +126,14 @@ class TestCommandImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                 },
             ]
             with self.assertRaises(CommandError) as cm:
-                cmd._check_manifest_valid()
+                cmd._check_manifest_files_valid()
                 self.assertInt("Failed to read from original file", str(cm.exception))
 
             original_path.chmod(0o444)
             archive_path.chmod(0o222)
 
             with self.assertRaises(CommandError) as cm:
-                cmd._check_manifest_valid()
+                cmd._check_manifest_files_valid()
                 self.assertInt("Failed to read from archive file", str(cm.exception))
 
     def test_import_source_not_existing(self):
