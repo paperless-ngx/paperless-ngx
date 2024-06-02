@@ -185,6 +185,13 @@ For PostgreSQL, refer to [Upgrading a PostgreSQL Cluster](https://www.postgresql
 
 For MariaDB, refer to [Upgrading MariaDB](https://mariadb.com/kb/en/upgrading/)
 
+You may also use the exporter and importer with the `--data-only` flag, after creating a new database with the updated version of PostgreSQL or MariaDB.
+
+!!! warning
+
+    You should not change any settings, especially paths, when doing this or there is a
+    risk of data loss
+
 ## Downgrading Paperless {#downgrade-paperless}
 
 Downgrades are possible. However, some updates also contain database
@@ -269,6 +276,7 @@ optional arguments:
 -sm, --split-manifest
 -z,  --zip
 -zn, --zip-name
+--data-only
 ```
 
 `target` is a folder to which the data gets written. This includes
@@ -327,6 +335,9 @@ If `-z` or `--zip` is provided, the export will be a zip file
 in the target directory, named according to the current local date or the
 value set in `-zn` or `--zip-name`.
 
+If `--data-only` is provided, only the database will be exported. This option is intended
+to facilitate database upgrades without needing to clean documents and thumbnails from the media directory.
+
 !!! warning
 
     If exporting with the file name format, there may be errors due to
@@ -341,9 +352,14 @@ exporter](#exporter) and imports it into paperless.
 The importer works just like the exporter. You point it at a directory,
 and the script does the rest of the work:
 
-```
+```shell
 document_importer source
 ```
+
+| Option      | Required | Default | Description                                                               |
+| ----------- | -------- | ------- | ------------------------------------------------------------------------- |
+| source      | Yes      | N/A     | The directory containing an export                                        |
+| --data-only | No       | False   | If provided, only import data, do not import document files or thumbnails |
 
 When you use the provided docker compose script, put the export inside
 the `export` folder in your paperless source directory. Specify
