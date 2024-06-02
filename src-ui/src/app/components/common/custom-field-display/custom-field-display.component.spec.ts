@@ -18,7 +18,7 @@ const document: Document = {
   custom_fields: [
     { field: 1, document: 1, created: null, value: 'Text value' },
     { field: 2, document: 1, created: null, value: 'USD100' },
-    { field: 3, document: 1, created: null, value: '1,2,3' },
+    { field: 3, document: 1, created: null, value: [1, 2, 3] },
   ],
 }
 
