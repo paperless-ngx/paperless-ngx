@@ -155,7 +155,7 @@ class Command(BaseCommand):
             "--data-only",
             default=False,
             action="store_true",
-            help="If set, only the database will be exported, not files",
+            help="If set, only the database will be imported, not files",
         )
 
         parser.add_argument(
