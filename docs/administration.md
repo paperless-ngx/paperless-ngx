@@ -192,35 +192,6 @@ You may also use the exporter and importer with the `--data-only` flag, after cr
     You should not change any settings, especially paths, when doing this or there is a
     risk of data loss
 
-## Downgrading Paperless {#downgrade-paperless}
-
-Downgrades are possible. However, some updates also contain database
-migrations (these change the layout of the database and may move data).
-In order to move back from a version that applied database migrations,
-you'll have to revert the database migration _before_ downgrading, and
-then downgrade paperless.
-
-This table lists the compatible versions for each database migration
-number.
-
-| Migration number | Version range   |
-| ---------------- | --------------- |
-| 1011             | 1.0.0           |
-| 1012             | 1.1.0 - 1.2.1   |
-| 1014             | 1.3.0 - 1.3.1   |
-| 1016             | 1.3.2 - current |
-
-Execute the following management command to migrate your database:
-
-```shell-session
-$ python3 manage.py migrate documents <migration number>
-```
-
-!!! note
-
-    Some migrations cannot be undone. The command will issue errors if that
-    happens.
-
 ## Management utilities {#management-commands}
 
 Paperless comes with some management commands that perform various
@@ -602,7 +573,7 @@ Enabling encryption is no longer supported.
 
 Basic usage to disable encryption of your document store:
 
-(Note: If [`PAPERLESS_PASSPHRASE`](configuration.md#PAPERLESS_PASSPHRASE) isn't set already, you need to specify
+(Note: If `PAPERLESS_PASSPHRASE` isn't set already, you need to specify
 it here)
 
 ```
