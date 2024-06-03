@@ -1574,7 +1574,6 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
     assign_tags = TagsField(many=True, allow_null=True, required=False)
     assign_document_type = DocumentTypeField(allow_null=True, required=False)
     assign_storage_path = StoragePathField(allow_null=True, required=False)
-    assign_warehouse = WarehouseField(allow_null =True, required=False)
     
 
     class Meta:
@@ -1587,7 +1586,6 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
             "assign_correspondent",
             "assign_document_type",
             "assign_storage_path",
-            "assign_warehouse"
             "assign_owner",
             "assign_view_users",
             "assign_view_groups",
@@ -1602,8 +1600,6 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
             "remove_document_types",
             "remove_all_storage_paths",
             "remove_storage_paths",
-            "remove_all_warehouses",
-            "remove_warehouses",
             "remove_custom_fields",
             "remove_all_custom_fields",
             "remove_all_owners",
@@ -1697,7 +1693,6 @@ class WorkflowSerializer(serializers.ModelSerializer):
                 remove_correspondents = action.pop("remove_correspondents", None)
                 remove_document_types = action.pop("remove_document_types", None)
                 remove_storage_paths = action.pop("remove_storage_paths", None)
-                remove_warehouses = action.pop("remove_warehouses", None)
                 remove_custom_fields = action.pop("remove_custom_fields", None)
                 remove_owners = action.pop("remove_owners", None)
                 remove_view_users = action.pop("remove_view_users", None)
@@ -1730,8 +1725,6 @@ class WorkflowSerializer(serializers.ModelSerializer):
                     action_instance.remove_document_types.set(remove_document_types)
                 if remove_storage_paths is not None:
                     action_instance.remove_storage_paths.set(remove_storage_paths)
-                if remove_warehouses is not None:
-                    action_instance.remove_warehouses.set(remove_warehouses)
                 if remove_custom_fields is not None:
                     action_instance.remove_custom_fields.set(remove_custom_fields)
                 if remove_owners is not None:
