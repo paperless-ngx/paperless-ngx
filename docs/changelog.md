@@ -11,7 +11,6 @@
 - Enhancement: only include correspondent 'last_correspondence' if requested [@shamoon](https://github.com/shamoon) ([#6792](https://github.com/paperless-ngx/paperless-ngx/pull/6792))
 - Enhancement: delete pages PDF action [@shamoon](https://github.com/shamoon) ([#6772](https://github.com/paperless-ngx/paperless-ngx/pull/6772))
 - Enhancement: support custom logo / title on login page [@shamoon](https://github.com/shamoon) ([#6775](https://github.com/paperless-ngx/paperless-ngx/pull/6775))
-- Feature: Allow a data only export/import cycle [@stumpylog](https://github.com/stumpylog) ([#6871](https://github.com/paperless-ngx/paperless-ngx/pull/6871))
 
 ### Bug Fixes
 
