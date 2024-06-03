@@ -58,7 +58,7 @@
     "eslint": "^8.57.0",
     "jest": "29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "jest-preset-angular": "^14.0.0",
+    "jest-preset-angular": "^14.1.0",
     "jest-websocket-mock": "^2.5.0",
     "patch-package": "^8.0.0",
     "ts-node": "~10.9.1",
