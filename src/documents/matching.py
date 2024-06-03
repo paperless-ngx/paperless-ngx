@@ -380,16 +380,7 @@ def existing_document_matches_workflow(
         )
         trigger_matched = False
         
-    # Document warehouse vs trigger has_warehouse
-    if (
-        trigger.filter_has_warehouse is not None
-        and document.warehouse != trigger.filter_has_warehouse
-    ):
-        reason = (
-            f"Document warehouse {document.warehouse} does not match {trigger.filter_has_warehouse}",
-        )
-        trigger_matched = False
-
+    
     # Document document_type vs trigger has_document_type
     if (
         trigger.filter_has_document_type is not None
