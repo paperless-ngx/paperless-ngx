@@ -25,6 +25,7 @@ from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.loggers import LoggingMixin
 from documents.matching import document_matches_workflow
+from documents.matching import approval_matches_workflow
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance

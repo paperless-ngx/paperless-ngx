@@ -17,9 +17,13 @@ import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { MailRule } from 'src/app/data/mail-rule'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { CustomField } from 'src/app/data/custom-field'
+import { GroupService } from 'src/app/services/rest/group.service'
+import { Group } from 'src/app/data/group'
 import {
   DocumentSource,
   WorkflowTrigger,
+  WorkflowTriggerAccessType,
+  WorkflowTriggerStatus,
   WorkflowTriggerType,
 } from 'src/app/data/workflow-trigger'
 import {
@@ -32,6 +36,8 @@ import {
   MATCH_AUTO,
   MATCH_NONE,
 } from 'src/app/data/matching-model'
+import { ContentType } from 'src/app/data/content-type'
+import { ContentTypeService } from 'src/app/services/rest/content-type.service'
 
 export const DOCUMENT_SOURCE_OPTIONS = [
   {
@@ -61,6 +67,48 @@ export const WORKFLOW_TYPE_OPTIONS = [
     id: WorkflowTriggerType.DocumentUpdated,
     name: $localize`Document Updated`,
   },
+  {
+    id: WorkflowTriggerType.ApprovalAdded,
+    name: $localize`Approval Added`,
+  },
+  {
+    id: WorkflowTriggerType.ApprovalUpdated,
+    name: $localize`Approval Updated`,
+  },
+]
+
+export const WORKFLOW_STATUS_OPTIONS = [
+  {
+    id: WorkflowTriggerStatus.Pending,
+    name: $localize`Pending`,
+  },
+  {
+    id: WorkflowTriggerStatus.Success,
+    name: $localize`Success`,
+  },
+  {
+    id: WorkflowTriggerStatus.Failure,
+    name: $localize`Failure`,
+  },
+  {
+    id: WorkflowTriggerStatus.Revoked,
+    name: $localize`Revoked`,
+  },
+]
+
+export const WORKFLOW_ACCESS_TYPES_OPTIONS = [
+  {
+    id: WorkflowTriggerAccessType.Owner,
+    name: $localize`Owner`,
+  },
+  {
+    id: WorkflowTriggerAccessType.Edit,
+    name: $localize`Edit`,
+  },
+  {
+    id: WorkflowTriggerAccessType.View,
+    name: $localize`View`,
+  },
 ]
 
 export const WORKFLOW_ACTION_OPTIONS = [
@@ -71,6 +119,14 @@ export const WORKFLOW_ACTION_OPTIONS = [
   {
     id: WorkflowActionType.Removal,
     name: $localize`Removal`,
+  },
+  {
+    id: WorkflowActionType.Assignment_with_approval,
+    name: $localize`Assignment with approval`,
+  },
+  {
+    id: WorkflowActionType.Removal_with_approval,
+    name: $localize`Removal with approval`,
   },
 ]
 
@@ -96,6 +152,9 @@ export class WorkflowEditDialogComponent
   storagePaths: StoragePath[]
   mailRules: MailRule[]
   customFields: CustomField[]
+  groups: Group[]
+  contentTypes: ContentType[]
+
 
   expandedItem: number = null
 
@@ -108,7 +167,9 @@ export class WorkflowEditDialogComponent
     mailRuleService: MailRuleService,
     userService: UserService,
     settingsService: SettingsService,
-    customFieldsService: CustomFieldsService
+    customFieldsService: CustomFieldsService,
+    groupService: GroupService,
+    contentTypeService: ContentTypeService
   ) {
     super(service, activeModal, userService, settingsService)
 
@@ -136,6 +197,17 @@ export class WorkflowEditDialogComponent
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.customFields = result.results))
+    
+    groupService
+      .listAll()
+      .pipe(first())
+      .subscribe((result) => (this.groups = result.results))
+
+    contentTypeService
+      .listAll()
+      .pipe(first())
+      .subscribe((result) => (this.contentTypes = result))
+    console.log(contentTypeService)
   }
 
   getCreateTitle() {
@@ -314,6 +386,10 @@ export class WorkflowEditDialogComponent
         filter_has_document_type: new FormControl(
           trigger.filter_has_document_type
         ),
+        filter_has_groups: new FormControl(trigger.filter_has_groups),
+        filter_has_status: new FormControl(trigger.filter_has_status),
+        filter_has_content_type: new FormControl(trigger.filter_has_content_type),
+        filter_has_access_type: new FormControl(trigger.filter_has_access_type),
       }),
       { emitEvent }
     )
@@ -327,6 +403,7 @@ export class WorkflowEditDialogComponent
       new FormGroup({
         id: new FormControl(action.id),
         type: new FormControl(action.type),
+        assign_content_type: new FormControl(action.assign_content_type),
         assign_title: new FormControl(action.assign_title),
         assign_tags: new FormControl(action.assign_tags),
         assign_owner: new FormControl(action.assign_owner),
@@ -388,8 +465,24 @@ export class WorkflowEditDialogComponent
     return WORKFLOW_TYPE_OPTIONS
   }
 
+  get triggerStatusOptions() {
+    return WORKFLOW_STATUS_OPTIONS
+  }
+
+  get triggerAccesTypesOptions() {
+    return WORKFLOW_ACCESS_TYPES_OPTIONS
+  }
+
   getTriggerTypeOptionName(type: WorkflowTriggerType): string {
     return this.triggerTypeOptions.find((t) => t.id === type)?.name ?? ''
+  }
+
+  getTriggerStatusOptionName(status: WorkflowTriggerStatus): string {
+    return this.triggerStatusOptions.find((t) => t.id === status)?.name ?? ''
+  }
+
+  getTriggerAccessTypesOptionName(access_types: WorkflowTriggerAccessType): string {
+    return this.triggerAccesTypesOptions.find((t) => t.id === access_types)?.name ?? ''
   }
 
   addTrigger() {
@@ -408,6 +501,10 @@ export class WorkflowEditDialogComponent
       matching_algorithm: MATCH_NONE,
       match: '',
       is_insensitive: true,
+      filter_has_groups: [],
+      filter_has_status: WorkflowTriggerStatus.Pending,
+      filter_has_content_type: null,
+      filter_has_access_type: WorkflowTriggerAccessType.View
     }
     this.object.triggers.push(trigger)
     this.createTriggerField(trigger)
@@ -427,6 +524,7 @@ export class WorkflowEditDialogComponent
     }
     const action: WorkflowAction = {
       type: WorkflowActionType.Assignment,
+      assign_content_type: null,
       assign_title: null,
       assign_tags: [],
       assign_document_type: null,

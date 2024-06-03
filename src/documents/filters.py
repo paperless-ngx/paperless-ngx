@@ -11,7 +11,7 @@ from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
 from rest_framework_guardian.filters import ObjectPermissionsFilter
 
-from documents.models import Correspondent
+from documents.models import Approval, Correspondent
 from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
@@ -276,3 +276,11 @@ class WarehouseFilterSet(FilterSet):
             "type": CHAR_KWARGS,
             "parent_warehouse": ID_KWARGS,
         }
+
+# class ApprovalFilterSet(FilterSet):
+#     class Meta:
+#         model = Approval
+#         fields = {
+#             "id": ID_KWARGS,
+#             "ctype": CHAR_KWARGS,
+#         }
