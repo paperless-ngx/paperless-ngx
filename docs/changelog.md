@@ -11,8 +11,7 @@
 - Enhancement: only include correspondent 'last_correspondence' if requested [@shamoon](https://github.com/shamoon) ([#6792](https://github.com/paperless-ngx/paperless-ngx/pull/6792))
 - Enhancement: delete pages PDF action [@shamoon](https://github.com/shamoon) ([#6772](https://github.com/paperless-ngx/paperless-ngx/pull/6772))
 - Enhancement: support custom logo / title on login page [@shamoon](https://github.com/shamoon) ([#6775](https://github.com/paperless-ngx/paperless-ngx/pull/6775))
-- Chore: Change the code formatter to Ruff [@stumpylog](https://github.com/stumpylog) ([#6756](https://github.com/paperless-ngx/paperless-ngx/pull/6756))
-- Chore: Backend updates [@stumpylog](https://github.com/stumpylog) ([#6755](https://github.com/paperless-ngx/paperless-ngx/pull/6755))
+- Feature: Allow a data only export/import cycle [@stumpylog](https://github.com/stumpylog) ([#6871](https://github.com/paperless-ngx/paperless-ngx/pull/6871))
 
 ### Bug Fixes
 
@@ -20,13 +19,10 @@
 - Fix: Don't allow the workflow save to override other process updates [@stumpylog](https://github.com/stumpylog) ([#6849](https://github.com/paperless-ngx/paperless-ngx/pull/6849))
 - Fix: consistently use created_date for doc display [@shamoon](https://github.com/shamoon) ([#6758](https://github.com/paperless-ngx/paperless-ngx/pull/6758))
 
-### Documentation
-
-- Documentation: Cleanup a few sections [@stumpylog](https://github.com/stumpylog) ([#6883](https://github.com/paperless-ngx/paperless-ngx/pull/6883))
-- Feature: Allow a data only export/import cycle [@stumpylog](https://github.com/stumpylog) ([#6871](https://github.com/paperless-ngx/paperless-ngx/pull/6871))
-
 ### Maintenance
 
+- Chore: Change the code formatter to Ruff [@stumpylog](https://github.com/stumpylog) ([#6756](https://github.com/paperless-ngx/paperless-ngx/pull/6756))
+- Chore: Backend updates [@stumpylog](https://github.com/stumpylog) ([#6755](https://github.com/paperless-ngx/paperless-ngx/pull/6755))
 - Chore(deps): Bump crowdin/github-action from 1 to 2 in the actions group [@dependabot](https://github.com/dependabot) ([#6881](https://github.com/paperless-ngx/paperless-ngx/pull/6881))
 
 ### Dependencies
