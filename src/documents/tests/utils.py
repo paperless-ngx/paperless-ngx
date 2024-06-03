@@ -156,10 +156,6 @@ class DirectoriesMixin:
     they are cleaned up on exit
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.dirs = None
-
     def setUp(self) -> None:
         self.dirs = setup_directories()
         super().setUp()
@@ -199,6 +195,16 @@ class FileSystemAssertsMixin:
         hash2 = hashlib.sha256(path2.read_bytes()).hexdigest()
 
         self.assertEqual(hash1, hash2, "File SHA256 mismatch")
+
+    def assertFileCountInDir(self, path: Union[PathLike, str], count: int):
+        path = Path(path).resolve()
+        self.assertTrue(path.is_dir(), f"Path {path} is not a directory")
+        files = [x for x in path.iterdir() if x.is_file()]
+        self.assertEqual(
+            len(files),
+            count,
+            f"Path {path} contains {len(files)} files instead of {count} files",
+        )
 
 
 class ConsumerProgressMixin:

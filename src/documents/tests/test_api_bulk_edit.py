@@ -136,7 +136,6 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.bulk_edit.bulk_update_documents.delay")
     def test_api_add_tag(self, bulk_update_task_mock):
-
         self.assertFalse(self.doc1.tags.filter(pk=self.t1.pk).exists())
 
         response = self.client.post(
@@ -1066,3 +1065,95 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(b"Split method only supports one document", response.content)
+
+    @mock.patch("documents.serialisers.bulk_edit.delete_pages")
+    def test_delete_pages(self, m):
+        m.return_value = "OK"
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "delete_pages",
+                    "parameters": {"pages": [1, 2, 3, 4]},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertCountEqual(args[0], [self.doc2.id])
+        self.assertEqual(kwargs["pages"], [1, 2, 3, 4])
+
+    def test_delete_pages_invalid_params(self):
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [
+                        self.doc1.id,
+                        self.doc2.id,
+                    ],  # only one document supported
+                    "method": "delete_pages",
+                    "parameters": {
+                        "pages": [1, 2, 3, 4],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(
+            b"Delete pages method only supports one document",
+            response.content,
+        )
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "delete_pages",
+                    "parameters": {},  # pages not specified
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"pages not specified", response.content)
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "delete_pages",
+                    "parameters": {"pages": "1-3"},  # not a list
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"pages must be a list", response.content)
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "delete_pages",
+                    "parameters": {"pages": ["1-3"]},  # not ints
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"pages must be a list of integers", response.content)

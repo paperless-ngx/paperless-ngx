@@ -71,7 +71,7 @@ test('should show a mobile preview', async ({ page }) => {
   await page.setViewportSize({ width: 400, height: 1000 })
   await expect(page.getByRole('tab', { name: 'Preview' })).toBeVisible()
   await page.getByRole('tab', { name: 'Preview' }).click()
-  await page.waitForSelector('pngx-pdf-viewer')
+  await page.waitForSelector('pdf-viewer')
 })
 
 test('should show a list of notes', async ({ page }) => {

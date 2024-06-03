@@ -105,7 +105,9 @@ export class CustomFieldDisplayComponent implements OnInit, OnDestroy {
       .getFew(this.value, { fields: 'id,title' })
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((result: Results<Document>) => {
-        this.docLinkDocuments = result.results
+        this.docLinkDocuments = this.value.map((id) =>
+          result.results.find((d) => d.id === id)
+        )
       })
   }
 

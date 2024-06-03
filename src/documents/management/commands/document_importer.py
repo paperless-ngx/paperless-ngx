@@ -57,6 +57,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("source")
+
         parser.add_argument(
             "--no-progress-bar",
             default=False,
@@ -64,11 +65,12 @@ class Command(BaseCommand):
             help="If set, the progress bar will not be shown",
         )
 
-    def __init__(self, *args, **kwargs):
-        BaseCommand.__init__(self, *args, **kwargs)
-        self.source = None
-        self.manifest = None
-        self.version = None
+        parser.add_argument(
+            "--data-only",
+            default=False,
+            action="store_true",
+            help="If set, only the database will be exported, not files",
+        )
 
     def pre_check(self) -> None:
         """
@@ -82,17 +84,20 @@ class Command(BaseCommand):
         if not os.access(self.source, os.R_OK):
             raise CommandError("That path doesn't appear to be readable")
 
-        for document_dir in [settings.ORIGINALS_DIR, settings.ARCHIVE_DIR]:
-            if document_dir.exists() and document_dir.is_dir():
-                for entry in document_dir.glob("**/*"):
-                    if entry.is_dir():
-                        continue
-                    self.stdout.write(
-                        self.style.WARNING(
-                            f"Found file {entry.relative_to(document_dir)}, this might indicate a non-empty installation",
-                        ),
-                    )
-                    break
+        # Skip this check if operating only on the database
+        # We can expect data to exist in that case
+        if not self.data_only:
+            for document_dir in [settings.ORIGINALS_DIR, settings.ARCHIVE_DIR]:
+                if document_dir.exists() and document_dir.is_dir():
+                    for entry in document_dir.glob("**/*"):
+                        if entry.is_dir():
+                            continue
+                        self.stdout.write(
+                            self.style.WARNING(
+                                f"Found file {entry.relative_to(document_dir)}, this might indicate a non-empty installation",
+                            ),
+                        )
+                        break
         if (
             User.objects.exclude(username__in=["consumer", "AnonymousUser"]).count()
             != 0
@@ -113,6 +118,8 @@ class Command(BaseCommand):
         logging.getLogger().handlers[0].level = logging.ERROR
 
         self.source = Path(options["source"]).resolve()
+        self.data_only: bool = options["data_only"]
+        self.no_progress_bar: bool = options["no_progress_bar"]
 
         self.pre_check()
 
@@ -149,16 +156,20 @@ class Command(BaseCommand):
         else:
             self.stdout.write(self.style.NOTICE("No version.json file located"))
 
-        self._check_manifest_valid()
+        if not self.data_only:
+            self._check_manifest_files_valid()
 
-        with disable_signal(
-            post_save,
-            receiver=update_filename_and_move_files,
-            sender=Document,
-        ), disable_signal(
-            m2m_changed,
-            receiver=update_filename_and_move_files,
-            sender=Document.tags.through,
+        with (
+            disable_signal(
+                post_save,
+                receiver=update_filename_and_move_files,
+                sender=Document,
+            ),
+            disable_signal(
+                m2m_changed,
+                receiver=update_filename_and_move_files,
+                sender=Document.tags.through,
+            ),
         ):
             if settings.AUDIT_LOG_ENABLED:
                 auditlog.unregister(Document)
@@ -197,13 +208,16 @@ class Command(BaseCommand):
                     )
                     raise e
 
-            self._import_files_from_manifest(options["no_progress_bar"])
+            if not self.data_only:
+                self._import_files_from_manifest()
+            else:
+                self.stdout.write(self.style.NOTICE("Data only import completed"))
 
         self.stdout.write("Updating search index...")
         call_command(
             "document_index",
             "reindex",
-            no_progress_bar=options["no_progress_bar"],
+            no_progress_bar=self.no_progress_bar,
         )
 
     @staticmethod
@@ -213,7 +227,7 @@ class Command(BaseCommand):
                 "That directory doesn't appear to contain a manifest.json file.",
             )
 
-    def _check_manifest_valid(self):
+    def _check_manifest_files_valid(self):
         """
         Attempts to verify the manifest is valid.  Namely checking the files
         referred to exist and the files can be read from
@@ -230,15 +244,15 @@ class Command(BaseCommand):
                 )
 
             doc_file = record[EXPORTER_FILE_NAME]
-            doc_path = self.source / doc_file
+            doc_path: Path = self.source / doc_file
             if not doc_path.exists():
                 raise CommandError(
                     f'The manifest file refers to "{doc_file}" which does not '
                     "appear to be in the source directory.",
                 )
             try:
-                with doc_path.open(mode="rb") as infile:
-                    infile.read(1)
+                with doc_path.open(mode="rb"):
+                    pass
             except Exception as e:
                 raise CommandError(
                     f"Failed to read from original file {doc_path}",
@@ -246,21 +260,21 @@ class Command(BaseCommand):
 
             if EXPORTER_ARCHIVE_NAME in record:
                 archive_file = record[EXPORTER_ARCHIVE_NAME]
-                doc_archive_path = self.source / archive_file
+                doc_archive_path: Path = self.source / archive_file
                 if not doc_archive_path.exists():
                     raise CommandError(
                         f"The manifest file refers to {archive_file} which "
                         f"does not appear to be in the source directory.",
                     )
                 try:
-                    with doc_archive_path.open(mode="rb") as infile:
-                        infile.read(1)
+                    with doc_archive_path.open(mode="rb"):
+                        pass
                 except Exception as e:
                     raise CommandError(
                         f"Failed to read from archive file {doc_archive_path}",
                     ) from e
 
-    def _import_files_from_manifest(self, progress_bar_disable):
+    def _import_files_from_manifest(self):
         settings.ORIGINALS_DIR.mkdir(parents=True, exist_ok=True)
         settings.THUMBNAIL_DIR.mkdir(parents=True, exist_ok=True)
         settings.ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
@@ -271,7 +285,7 @@ class Command(BaseCommand):
             filter(lambda r: r["model"] == "documents.document", self.manifest),
         )
 
-        for record in tqdm.tqdm(manifest_documents, disable=progress_bar_disable):
+        for record in tqdm.tqdm(manifest_documents, disable=self.no_progress_bar):
             document = Document.objects.get(pk=record["pk"])
 
             doc_file = record[EXPORTER_FILE_NAME]
