@@ -1537,7 +1537,6 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             "filter_has_tags",
             "filter_has_correspondent",
             "filter_has_document_type",
-            "filter_has_warehouse",
         ]
 
     def validate(self, attrs):
