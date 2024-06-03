@@ -19,7 +19,7 @@
         @for (action of PermissionAction | keyvalue; track action) {
           <div class="col form-check form-check-inline" [ngbPopover]="inheritedWarning" [disablePopover]="!isInherited(type, action.key)" placement="left" triggers="mouseenter:mouseleave">
             <input type="checkbox" class="form-check-input" id="{{type}}_{{action.key}}" formControlName="{{action.key}}">
-            <label class="form-check-label visually-hidden" for="{{type}}_{{action.key}}" i18n>{{action.key}}</label>
+            <label class="form-check-label visually-hidden" for="{{type}}_{{action.key}}">{{action.key}}</label>
           </div>
         }
       </li>

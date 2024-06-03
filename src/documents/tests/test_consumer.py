@@ -425,7 +425,6 @@ class TestConsumer(
         self._assert_first_last_send_progress()
 
     def testOverrideTitle(self):
-
         with self.get_consumer(
             self.get_test_file(),
             DocumentMetadataOverrides(title="Override Title"),
@@ -441,7 +440,6 @@ class TestConsumer(
 
     def testOverrideTitleInvalidPlaceholders(self):
         with self.assertLogs("paperless.consumer", level="ERROR") as cm:
-
             with self.get_consumer(
                 self.get_test_file(),
                 DocumentMetadataOverrides(title="Override {correspondent]"),
@@ -546,7 +544,6 @@ class TestConsumer(
         self._assert_first_last_send_progress()
 
     def testOverrideAsn(self):
-
         with self.get_consumer(
             self.get_test_file(),
             DocumentMetadataOverrides(asn=123),
@@ -614,7 +611,6 @@ class TestConsumer(
         self._assert_first_last_send_progress()
 
     def testNotAFile(self):
-
         with self.get_consumer(Path("non-existing-file")) as consumer:
             with self.assertRaisesMessage(ConsumerError, "File not found"):
                 consumer.run()
@@ -725,7 +721,6 @@ class TestConsumer(
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
     def testFilenameHandling(self):
-
         with self.get_consumer(
             self.get_test_file(),
             DocumentMetadataOverrides(title="new docs"),
@@ -1055,7 +1050,6 @@ class PreConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
     @override_settings(PRE_CONSUME_SCRIPT="does-not-exist")
     def test_pre_consume_script_not_found(self, m):
         with self.get_consumer(self.test_file) as c:
-
             self.assertRaises(ConsumerError, c.run)
             m.assert_not_called()
 
@@ -1254,7 +1248,6 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
             os.chmod(script.name, st.st_mode | stat.S_IEXEC)
 
             with override_settings(POST_CONSUME_SCRIPT=script.name):
-
                 doc = Document.objects.create(title="Test", mime_type="application/pdf")
                 with self.get_consumer(self.test_file) as consumer:
                     with self.assertRaisesRegex(

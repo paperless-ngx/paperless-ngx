@@ -10,7 +10,6 @@ from documents.parsers import parse_date_generator
 
 
 class TestDate(TestCase):
-
     def test_date_format_1(self):
         text = "lorem ipsum 130218 lorem ipsum"
         self.assertEqual(parse_date("", text), None)

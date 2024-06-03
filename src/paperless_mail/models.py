@@ -63,9 +63,12 @@ class MailRule(document_models.ModelWithOwner):
     class ConsumptionScope(models.IntegerChoices):
         ATTACHMENTS_ONLY = 1, _("Only process attachments.")
         EML_ONLY = 2, _("Process full Mail (with embedded attachments in file) as .eml")
-        EVERYTHING = 3, _(
-            "Process full Mail (with embedded attachments in file) as .eml "
-            "+ process attachments as separate documents",
+        EVERYTHING = (
+            3,
+            _(
+                "Process full Mail (with embedded attachments in file) as .eml "
+                "+ process attachments as separate documents",
+            ),
         )
 
     class AttachmentProcessing(models.IntegerChoices):

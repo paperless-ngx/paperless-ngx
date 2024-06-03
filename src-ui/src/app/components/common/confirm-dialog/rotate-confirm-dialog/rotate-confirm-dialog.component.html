@@ -21,21 +21,19 @@
             </button>
         </div>
     </div>
-    <div class="row mt-4">
-        <div class="col">
-            @if (messageBold) {
-              <p><b>{{messageBold}}</b></p>
-            }
-            @if (message) {
-              <p class="mb-0" [innerHTML]="message | safeHtml"></p>
-            }
-        </div>
-    </div>
     @if (showPDFNote) {
         <p class="small text-muted fst-italic mt-4" i18n>Note that only PDFs will be rotated.</p>
     }
 </div>
-<div class="modal-footer">
+<div class="modal-footer flex-nowrap">
+    <div class="col">
+        @if (message) {
+            <p [innerHTML]="message | safeHtml"></p>
+        }
+        @if (messageBold) {
+          <p class="mb-0 small"><b [innerHTML]="messageBold | safeHtml"></b></p>
+        }
+    </div>
     <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">
         <span class="d-inline-block" style="padding-bottom: 1px;">{{cancelBtnCaption}}</span>
     </button>

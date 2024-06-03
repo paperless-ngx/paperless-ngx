@@ -12,6 +12,7 @@ import { CorrespondentService } from 'src/app/services/rest/correspondent.servic
 import { ToastService } from 'src/app/services/toast.service'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { ManagementListComponent } from '../management-list/management-list.component'
+import { takeUntil } from 'rxjs'
 
 @Component({
   selector: 'pngx-correspondent-list',
@@ -61,6 +62,26 @@ export class CorrespondentListComponent extends ManagementListComponent<Correspo
         },
       ]
     )
+  }
+
+  public reloadData(): void {
+    this.isLoading = true
+    this.service
+      .listFiltered(
+        this.page,
+        null,
+        this.sortField,
+        this.sortReverse,
+        this._nameFilter,
+        true,
+        { last_correspondence: true }
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((c) => {
+        this.data = c.results
+        this.collectionSize = c.count
+        this.isLoading = false
+      })
   }
 
   getDeleteMessage(object: Correspondent) {

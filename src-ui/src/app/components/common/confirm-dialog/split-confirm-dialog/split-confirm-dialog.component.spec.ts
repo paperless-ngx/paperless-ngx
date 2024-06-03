@@ -6,7 +6,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { DocumentService } from 'src/app/services/rest/document.service'
-import { PdfViewerComponent } from '../../pdf-viewer/pdf-viewer.component'
+import { PdfViewerModule } from 'ng2-pdf-viewer'
 
 describe('SplitConfirmDialogComponent', () => {
   let component: SplitConfirmDialogComponent
@@ -15,13 +15,14 @@ describe('SplitConfirmDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [SplitConfirmDialogComponent, PdfViewerComponent],
+      declarations: [SplitConfirmDialogComponent],
       providers: [NgbActiveModal],
       imports: [
         HttpClientTestingModule,
         NgxBootstrapIconsModule.pick(allIcons),
         ReactiveFormsModule,
         FormsModule,
+        PdfViewerModule,
       ],
     }).compileComponents()
 

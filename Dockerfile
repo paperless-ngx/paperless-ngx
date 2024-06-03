@@ -53,7 +53,7 @@ ARG TARGETARCH
 # Can be workflow provided, defaults set for manual building
 ARG JBIG2ENC_VERSION=0.29
 ARG QPDF_VERSION=11.9.0
-ARG GS_VERSION=10.02.1
+ARG GS_VERSION=10.03.1
 
 # Set Python environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -83,7 +83,6 @@ ARG RUNTIME_PACKAGES="\
   icc-profiles-free \
   imagemagick \
   # PostgreSQL
-  libpq5 \
   postgresql-client \
   # MySQL / MariaDB
   mariadb-client \
@@ -129,17 +128,17 @@ RUN set -eux \
         && dpkg --install ./qpdf_${QPDF_VERSION}-1_${TARGETARCH}.deb \
       && echo "Installing Ghostscript ${GS_VERSION}" \
         && curl --fail --silent --show-error --location \
-          --output libgs10_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
-          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
+          --output libgs10_${GS_VERSION}.dfsg.git20240518-1_${TARGETARCH}.deb \
+          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10_${GS_VERSION}.dfsg.git20240518-1_${TARGETARCH}.deb \
         && curl --fail --silent --show-error --location \
-          --output ghostscript_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
-          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
+          --output ghostscript_${GS_VERSION}.dfsg.git20240518-1_${TARGETARCH}.deb \
+          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/ghostscript_${GS_VERSION}.dfsg.git20240518-1_${TARGETARCH}.deb \
         && curl --fail --silent --show-error --location \
-          --output libgs10-common_${GS_VERSION}.dfsg-2_all.deb \
-          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
-        && dpkg --install ./libgs10-common_${GS_VERSION}.dfsg-2_all.deb \
-        && dpkg --install ./libgs10_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
-        && dpkg --install ./ghostscript_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
+          --output libgs10-common_${GS_VERSION}.dfsg.git20240518-1_all.deb \
+          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10-common_${GS_VERSION}.dfsg.git20240518-1_all.deb \
+        && dpkg --install ./libgs10-common_${GS_VERSION}.dfsg.git20240518-1_all.deb \
+        && dpkg --install ./libgs10_${GS_VERSION}.dfsg.git20240518-1_${TARGETARCH}.deb \
+        && dpkg --install ./ghostscript_${GS_VERSION}.dfsg.git20240518-1_${TARGETARCH}.deb \
       && echo "Installing jbig2enc" \
         && curl --fail --silent --show-error --location \
           --output jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
@@ -223,7 +222,13 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
     && python3 -m pip install --no-cache-dir --upgrade wheel \
   && echo "Installing Python requirements" \
-    && python3 -m pip install --default-timeout=1000 --requirement requirements.txt \
+    && curl --fail --silent --show-error --location \
+    --output psycopg_c-3.1.19-cp311-cp311-linux_x86_64.whl \
+    https://github.com/paperless-ngx/builder/releases/download/psycopg-3.1.19/psycopg_c-3.1.19-cp311-cp311-linux_x86_64.whl \
+    && curl --fail --silent --show-error --location \
+    --output psycopg_c-3.1.19-cp311-cp311-linux_aarch64.whl  \
+    https://github.com/paperless-ngx/builder/releases/download/psycopg-3.1.19/psycopg_c-3.1.19-cp311-cp311-linux_aarch64.whl \
+    && python3 -m pip install --default-timeout=1000 --find-links . --requirement requirements.txt \
   && echo "Patching whitenoise for compression speedup" \
     && curl --fail --silent --show-error --location --output 484.patch https://github.com/evansd/whitenoise/pull/484.patch \
     && patch -d /usr/local/lib/python3.11/site-packages --verbose -p2 < 484.patch \
@@ -236,6 +241,7 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
     && apt-get --yes purge ${BUILD_PACKAGES} \
     && apt-get --yes autoremove --purge \
     && apt-get clean --yes \
+    && rm --recursive --force --verbose *.whl \
     && rm --recursive --force --verbose /var/lib/apt/lists/* \
     && rm --recursive --force --verbose /tmp/* \
     && rm --recursive --force --verbose /var/tmp/* \
