@@ -14,7 +14,7 @@ from django.views.static import serve
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
-from documents.views import AcknowledgeTasksView
+from documents.views import AcknowledgeTasksView, ApprovalViewSet
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
@@ -43,7 +43,7 @@ from documents.views import WorkflowViewSet
 from documents.views import WarehouseViewSet
 from documents.views import FolderViewSet
 from paperless.consumers import StatusConsumer
-from paperless.views import ApplicationConfigurationViewSet
+from paperless.views import ApplicationConfigurationViewSet, ContentTypeViewSet
 from paperless.views import DisconnectSocialAccountView
 from paperless.views import FaviconView
 from paperless.views import GenerateAuthTokenView
@@ -78,6 +78,8 @@ api_router.register(r"config", ApplicationConfigurationViewSet)
 api_router.register(r"warehouses", WarehouseViewSet)
 api_router.register(r"folders", FolderViewSet)
 
+api_router.register(r"approvals", ApprovalViewSet)
+api_router.register(r"content_types", ContentTypeViewSet, basename="content_types")
 
 urlpatterns = [
     

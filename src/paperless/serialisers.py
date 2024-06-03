@@ -4,6 +4,7 @@ from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from rest_framework import serializers
 
 from paperless.models import ApplicationConfiguration
@@ -22,6 +23,10 @@ class ObfuscatedUserPasswordField(serializers.Field):
     def to_internal_value(self, data):
         return data
 
+class ContentTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContentType
+        fields = "__all__"
 
 class UserSerializer(serializers.ModelSerializer):
     password = ObfuscatedUserPasswordField(required=False)

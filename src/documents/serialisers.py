@@ -29,7 +29,7 @@ from rest_framework.fields import SerializerMethodField
 
 from documents import bulk_edit
 from documents.data_models import DocumentSource
-from documents.models import Correspondent
+from documents.models import Approval, Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
@@ -1404,6 +1404,10 @@ class TasksViewSerializer(serializers.ModelSerializer):
 
         return result
 
+class ApprovalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Approval
+        fields = "__all__"
 
 class AcknowledgeTasksViewSerializer(serializers.Serializer):
     tasks = serializers.ListField(
@@ -1578,6 +1582,10 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             "filter_has_tags",
             "filter_has_correspondent",
             "filter_has_document_type",
+            "filter_has_groups",
+            "filter_has_status",
+            "filter_has_content_type",
+            "filter_has_access_type",
         ]
 
     def validate(self, attrs):
@@ -1621,6 +1629,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "type",
+            "assign_content_type",
             "assign_title",
             "assign_tags",
             "assign_correspondent",
@@ -1713,12 +1722,15 @@ class WorkflowSerializer(serializers.ModelSerializer):
         if triggers is not None:
             for trigger in triggers:
                 filter_has_tags = trigger.pop("filter_has_tags", None)
+                filter_has_groups = trigger.pop("filter_has_groups", None)
                 trigger_instance, _ = WorkflowTrigger.objects.update_or_create(
                     id=trigger.get("id"),
                     defaults=trigger,
                 )
                 if filter_has_tags is not None:
                     trigger_instance.filter_has_tags.set(filter_has_tags)
+                if filter_has_groups is not None:
+                    trigger_instance.filter_has_groups.set(filter_has_groups)
                 set_triggers.append(trigger_instance)
 
         if actions is not None:

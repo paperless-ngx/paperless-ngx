@@ -8,11 +8,13 @@ from celery.signals import before_task_publish
 from celery.signals import task_failure
 from celery.signals import task_postrun
 from celery.signals import task_prerun
+from django.apps import apps
 from django.conf import settings
 from django.contrib.admin.models import ADDITION
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import Permission
 from django.db import DatabaseError
 from django.db import close_old_connections
 from django.db import models
@@ -29,7 +31,7 @@ from documents.consumer import parse_doc_title_w_placeholders
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_unique_filename
-from documents.models import CustomFieldInstance
+from documents.models import Approval, CustomFieldInstance
 from documents.models import Document
 from documents.models import MatchingModel
 from documents.models import PaperlessTask
@@ -625,11 +627,25 @@ def run_workflow_added(sender, document: Document, logging_group=None, **kwargs)
         logging_group,
     )
 
+def run_workflow_approval_added(sender, approval: Approval, logging_group=None, **kwargs):
+    run_workflow_approval(
+        WorkflowTrigger.WorkflowTriggerType.APPROVAL_ADDED,
+        approval,
+        logging_group,
+    )
+
 
 def run_workflow_updated(sender, document: Document, logging_group=None, **kwargs):
     run_workflow(
         WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
         document,
+        logging_group,
+    )
+
+def run_workflow_approval_updated(sender, approval: Approval, logging_group=None, **kwargs):
+    run_workflow_approval(
+        WorkflowTrigger.WorkflowTriggerType.APPROVAL_ADDED,
+        approval,
         logging_group,
     )
 
@@ -866,6 +882,110 @@ def run_workflow(
                         ).delete()
 
             document.save()
+        
+def run_workflow_approval(
+        trigger_type: WorkflowTrigger.WorkflowTriggerType,
+        approval: Approval,
+        logging_group=None,
+):
+    for workflow in (
+        Workflow.objects.filter(
+            enabled=True,
+            triggers__type=trigger_type,
+        )
+        .prefetch_related("actions")
+        .prefetch_related("actions__assign_view_users")
+        .prefetch_related("actions__assign_view_groups")
+        .prefetch_related("actions__assign_change_users")
+        .prefetch_related("actions__assign_change_groups")
+        .prefetch_related("actions__remove_owners")
+        .prefetch_related("triggers")
+        .order_by("order")
+    ):
+        if matching.approval_matches_workflow(
+            approval,
+            workflow,
+            trigger_type,
+        ):
+            model_name = approval.ctype.name
+            print('model_class',apps.get_model(approval.ctype.app_label, model_name))
+            model_class = apps.get_model(approval.ctype.app_label, model_name)
+            all_permissions = Permission.objects.filter(content_type=approval.ctype)
+            # obj assign
+            obj = model_class.objects.filter(pk = approval.object_pk).first()
+
+            action: WorkflowAction
+            for action in workflow.actions.all():
+                logger.info(
+                    f"Applying {action} from {workflow}",
+                    extra={"group":logging_group}
+                )
+                if action.type == WorkflowAction.WorkflowActionType.ASSIGNMENT_WITH_APPROVAL:
+                    if (action.assign_content_type is not None 
+                    and action.assign_content_type == approval.ctype):
+                        permissions = {}
+                        match approval.access_type:
+                            case "OWNER":
+                                obj.owner = approval.submitted_by
+                            case "EDIT":
+                                permissions["view"] = {
+                                    "change": {
+                                        "users": all_permissions.exclude(codename__startswith='view_').values_list("id",)
+                                        or [],
+                                        "groups": approval.submitted_by_group.id
+                                        or [],
+                                        }
+                                }
+                            case "VIEW":
+                                permissions["view"] = {
+                                    "users": [approval.submitted_by.id]
+                                    or [],
+                                    "groups": approval.submitted_by_group.values_list('id',)
+                                    or [],
+                                }
+                                
+                        set_permissions_for_object(
+                            permissions=permissions,
+                            object=obj,
+                            merge=True,
+                        )
+                elif action.type == WorkflowAction.WorkflowActionType.REMOVAL_WITH_APPROVAL:
+                    
+                    if (action.assign_content_type is not None 
+                    and action.assign_content_type == approval.ctype):
+                        
+                        if action.remove_all_permissions:
+                            permissions = {
+                                "view": {
+                                    "users": [],
+                                    "groups": [],
+                                },
+                                "change": {
+                                    "users": [],
+                                    "groups": [],
+                                },
+                            }
+                            set_permissions_for_object(
+                                permissions=permissions,
+                                object=obj,
+                                merge=False,
+                            )
+                        else:
+                            match approval.access_type:
+                                case "OWNER":
+                                    obj.owner = None
+                                case "EDIT":
+                                    remove_perm(f"change_{model_name}", approval.submitted_by, obj)
+                                    remove_perm(f"add_{model_name}", approval.submitted_by, obj)
+                                    remove_perm(f"delete_{model_name}", approval.submitted_by, obj)
+                                    remove_perm(f"change_{model_name}", approval.submitted_by_group, obj)
+                                    remove_perm(f"add_{model_name}", approval.submitted_by_group, obj)
+                                    remove_perm(f"delete_{model_name}", approval.submitted_by_group, obj)
+                                case "VIEW":
+                                    remove_perm(f"view_{model_name}", approval.submitted_by, obj)
+                                    remove_perm(f"view_{model_name}", approval.submitted_by_group, obj)
+            obj.save()
+                        
 
 
 @before_task_publish.connect
