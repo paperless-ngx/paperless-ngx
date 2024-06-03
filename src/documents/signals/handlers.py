@@ -598,7 +598,6 @@ def run_workflow(
         .prefetch_related("actions__assign_custom_fields")
         .prefetch_related("actions__remove_tags")
         .prefetch_related("actions__remove_correspondents")
-        .prefetch_related("actions__remove_warehouses")
         .prefetch_related("actions__remove_document_types")
         .prefetch_related("actions__remove_storage_paths")
         .prefetch_related("actions__remove_custom_fields")
@@ -754,16 +753,6 @@ def run_workflow(
                         )
                     ):
                         document.correspondent = None
-                    
-                    if action.remove_all_warehouses or (
-                        document.warehouse
-                        and (
-                            action.remove_warehouses.filter(
-                                pk=document.warehouse.pk,
-                            ).exists()
-                        )
-                    ):
-                        document.warehouse = None
 
                     if action.remove_all_document_types or (
                         document.document_type
