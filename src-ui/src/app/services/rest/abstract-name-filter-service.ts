@@ -17,9 +17,10 @@ export abstract class AbstractNameFilterService<
     sortField?: string,
     sortReverse?: boolean,
     nameFilter?: string,
-    fullPerms?: boolean
+    fullPerms?: boolean,
+    extraParams?: { [key: string]: any }
   ) {
-    let params = {}
+    let params = extraParams ?? {}
     if (nameFilter) {
       params['name__icontains'] = nameFilter
     }

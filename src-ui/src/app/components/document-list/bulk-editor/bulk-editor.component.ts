@@ -744,20 +744,20 @@ export class BulkEditorComponent
       })
   }
 
-  redoOcrSelected() {
+  reprocessSelected() {
     let modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.title = $localize`Redo OCR confirm`
-    modal.componentInstance.messageBold = $localize`This operation will permanently redo OCR for ${this.list.selected.size} selected document(s).`
-    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.title = $localize`Reprocess confirm`
+    modal.componentInstance.messageBold = $localize`This operation will permanently recreate the archive files for ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.message = $localize`The archive files will be re-generated with the current settings.`
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         modal.componentInstance.buttonsEnabled = false
-        this.executeBulkOperation(modal, 'redo_ocr', {})
+        this.executeBulkOperation(modal, 'reprocess', {})
       })
   }
 

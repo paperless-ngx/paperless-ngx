@@ -11,7 +11,7 @@ The API provides the following main endpoints:
 - `/api/correspondents/`: Full CRUD support.
 - `/api/custom_fields/`: Full CRUD support.
 - `/api/documents/`: Full CRUD support, except POSTing new documents.
-  See [below](#posting-documents-file-uploads).
+  See [below](#file-uploads).
 - `/api/document_types/`: Full CRUD support.
 - `/api/groups/`: Full CRUD support.
 - `/api/logs/`: Read-Only.
@@ -403,7 +403,7 @@ The following methods are supported:
   - Requires `parameters`: `{ "add_tags": [LIST_OF_TAG_IDS] }` and / or `{ "remove_tags": [LIST_OF_TAG_IDS] }`
 - `delete`
   - No `parameters` required
-- `redo_ocr`
+- `reprocess`
   - No `parameters` required
 - `set_permissions`
   - Requires `parameters`:
@@ -424,6 +424,10 @@ The following methods are supported:
 - `rotate`
   - Requires `parameters`:
     - `"degrees": DEGREES`. Must be an integer i.e. 90, 180, 270
+- `delete_pages`
+  - Requires `parameters`:
+    - `"pages": [..]` The list should be a list of integers e.g. `"[2,3,4]"`
+  - The delete_pages operation only accepts a single document.
 
 ### Objects
 

@@ -6,7 +6,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("documents", "1046_workflowaction_remove_all_correspondents_and_more"),
     ]

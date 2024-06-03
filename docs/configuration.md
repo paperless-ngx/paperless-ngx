@@ -288,6 +288,12 @@ this folder is no longer needed and can be removed manually.
 
 Defaults to `/usr/share/nltk_data`
 
+#### [`PAPERLESS_MODEL_FILE=<path>`](#PAPERLESS_MODEL_FILE) {#PAPERLESS_MODEL_FILE}
+
+: This is where paperless will store the classification model.
+
+    Defaults to `PAPERLESS_DATA_DIR/classification_model.pickle`.
+
 ## Logging
 
 #### [`PAPERLESS_LOGROTATE_MAX_SIZE=<num>`](#PAPERLESS_LOGROTATE_MAX_SIZE) {#PAPERLESS_LOGROTATE_MAX_SIZE}

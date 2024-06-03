@@ -25,7 +25,6 @@ logger = logging.getLogger("paperless.bulk_edit")
 
 
 def set_correspondent(doc_ids: list[int], correspondent):
-
     if correspondent:
         correspondent = Correspondent.objects.only("pk").get(id=correspondent)
 
@@ -81,7 +80,6 @@ def set_document_type(doc_ids: list[int], document_type):
 
 
 def add_tag(doc_ids: list[int], tag: int):
-
     qs = Document.objects.filter(Q(id__in=doc_ids) & ~Q(tags__id=tag)).only("pk")
     affected_docs = list(qs.values_list("pk", flat=True))
 
@@ -97,7 +95,6 @@ def add_tag(doc_ids: list[int], tag: int):
 
 
 def remove_tag(doc_ids: list[int], tag: int):
-
     qs = Document.objects.filter(Q(id__in=doc_ids) & Q(tags__id=tag)).only("pk")
     affected_docs = list(qs.values_list("pk", flat=True))
 
@@ -168,7 +165,7 @@ def delete(doc_ids: list[int]):
     return "OK"
 
 
-def redo_ocr(doc_ids: list[int]):
+def reprocess(doc_ids: list[int]):
     for document_id in doc_ids:
         update_document_archive_file.delay(
             document_id=document_id,
@@ -326,5 +323,31 @@ def split(doc_ids: list[int], pages: list[list[int]]):
                 )
     except Exception as e:
         logger.exception(f"Error splitting document {doc.id}: {e}")
+
+    return "OK"
+
+
+def delete_pages(doc_ids: list[int], pages: list[int]):
+    logger.info(
+        f"Attempting to delete pages {pages} from {len(doc_ids)} documents",
+    )
+    doc = Document.objects.get(id=doc_ids[0])
+    pages = sorted(pages)  # sort pages to avoid index issues
+    import pikepdf
+
+    try:
+        with pikepdf.open(doc.source_path, allow_overwriting_input=True) as pdf:
+            offset = 1  # pages are 1-indexed
+            for page_num in pages:
+                pdf.pages.remove(pdf.pages[page_num - offset])
+                offset += 1  # remove() changes the index of the pages
+            pdf.remove_unreferenced_resources()
+            pdf.save()
+            doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
+            doc.save()
+            update_document_archive_file.delay(document_id=doc.id)
+            logger.info(f"Deleted pages {pages} from document {doc.id}")
+    except Exception as e:
+        logger.exception(f"Error deleting pages from document {doc.id}: {e}")
 
     return "OK"
