@@ -624,9 +624,6 @@ def run_workflow(
                     if action.assign_correspondent is not None:
                         document.correspondent = action.assign_correspondent
                     
-                    if action.assign_warehouse is not None:
-                        document.warehouse = action.assign_warehouse
-
                     if action.assign_document_type is not None:
                         document.document_type = action.assign_document_type
 
@@ -648,11 +645,6 @@ def run_workflow(
                                 (
                                     document.document_type.name
                                     if document.document_type is not None
-                                    else ""
-                                ),
-                                (
-                                    document.warehouse.name
-                                    if document.warehouse is not None
                                     else ""
                                 ),
                                 (

@@ -67,7 +67,7 @@ export interface MailRule extends ObjectWithPermissions {
 
   assign_document_type?: number // PaperlessDocumentType.id
 
-  assign_warehouse?: number // PaperlessWarehouse.id
+  // assign_warehouse?: number // PaperlessWarehouse.id
 
   assign_correspondent_from?: MailMetadataCorrespondentOption
 

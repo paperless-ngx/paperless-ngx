@@ -111,10 +111,6 @@ class WorkflowTriggerPlugin(
                             action_overrides.document_type_id = (
                                 action.assign_document_type.pk
                             )
-                        if action.assign_warehouse is not None:
-                            action_overrides.warehouse_id = (
-                                action.assign_warehouse.pk
-                            )
                         if action.assign_storage_path is not None:
                             action_overrides.storage_path_id = (
                                 action.assign_storage_path.pk
