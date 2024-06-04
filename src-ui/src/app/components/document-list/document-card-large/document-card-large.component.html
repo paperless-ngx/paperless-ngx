@@ -83,10 +83,10 @@
                   <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="archive"></i-bs><small>{{(document.storage_path$ | async)?.name}}</small>
                 </button>
               }
-              @if (document.warehouses) {
+              @if (document.warehouse) {
                 <button type="button" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2 d-flex align-items-center" title="Filter by warehouse" i18n-title
-                  (click)="clickWarehouse.emit(document.warehouses);$event.stopPropagation()">
-                  <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="archive"></i-bs><small>{{(document.warehouses$ | async)?.name}}</small>
+                  (click)="clickWarehouse.emit(document.warehouse);$event.stopPropagation()">
+                  <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="archive"></i-bs><small>{{(document.warehouse$ | async)?.name}}</small>
                 </button>
               }
               @if (document.archive_serial_number | isNumber) {

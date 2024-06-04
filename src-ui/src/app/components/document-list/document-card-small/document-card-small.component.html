@@ -54,11 +54,11 @@
             <small>{{(document.storage_path$ | async)?.name ?? privateName}}</small>
           </button>
         }
-        @if (document.warehouses) {
+        @if (document.warehouse) {
           <button type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0" title="Toggle warehouse filter" i18n-title
-            (click)="clickWarehouse.emit(document.warehouses);$event.stopPropagation()">
+            (click)="clickWarehouse.emit(document.warehouse);$event.stopPropagation()">
             <i-bs width="1em" height="1em" class="me-2 text-muted" name="folder"></i-bs>
-            <small>{{(document.warehouses$ | async)?.name ?? privateName}}</small>
+            <small>{{(document.warehouse$ | async)?.name ?? privateName}}</small>
           </button>
         }
         <div class="list-group-item bg-transparent p-0 border-0 d-flex flex-wrap-reverse justify-content-between">

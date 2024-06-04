@@ -33,6 +33,7 @@ from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
+from documents.models import Warehouse
 from documents.models import Tag
 from documents.parsers import DocumentParser
 from documents.parsers import get_parser_class_for_mime_type
@@ -73,6 +74,7 @@ def train_classifier():
         not Tag.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
         and not DocumentType.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
         and not Correspondent.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
+        and not Warehouse.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
         and not StoragePath.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
     ):
         logger.info("No automatic matching items, not training")
@@ -170,6 +172,7 @@ def consume_file(
         override_correspondent_id=overrides.correspondent_id,
         override_document_type_id=overrides.document_type_id,
         override_tag_ids=overrides.tag_ids,
+        override_warehouse_id=overrides.warehouse_id,
         override_storage_path_id=overrides.storage_path_id,
         override_created=overrides.created,
         override_asn=overrides.asn,

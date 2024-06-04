@@ -29,9 +29,9 @@ export interface Document extends ObjectWithPermissions {
 
   storage_path?: number
 
-  warehouses$?: Observable<Warehouse>
+  warehouse$?: Observable<Warehouse>
 
-  warehouses?: number
+  warehouse?: number
 
   title?: string
 

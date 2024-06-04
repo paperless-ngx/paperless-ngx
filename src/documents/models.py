@@ -205,6 +205,7 @@ class Warehouse(MatchingModel):
                                       choices=TYPE_WAREHOUSE,
                                       default=WAREHOUSE,)
     parent_warehouse = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True )
+    path = models.TextField(_("path"), null=True, blank=True)
     
     class Meta(MatchingModel.Meta): 
         verbose_name = _("warehouse")
@@ -238,6 +239,15 @@ class Document(ModelWithOwner):
         on_delete=models.SET_NULL,
         verbose_name=_("storage path"),
     )
+    
+    warehouse = models.ForeignKey(
+        Warehouse,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL,
+        verbose_name=_("warehouse"),
+    )
 
     title = models.CharField(_("title"), max_length=128, blank=True, db_index=True)
 
@@ -268,15 +278,6 @@ class Document(ModelWithOwner):
         verbose_name=_("tags"),
     )
     
-    warehouses = models.ForeignKey(
-        Warehouse,
-        blank=True,
-        null=True,
-        related_name="documents",
-        on_delete=models.SET_NULL,
-        verbose_name=_("warehouses"),
-    )
-
     checksum = models.CharField(
         _("checksum"),
         max_length=32,

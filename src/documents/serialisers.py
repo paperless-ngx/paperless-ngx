@@ -428,7 +428,7 @@ class TagsField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         return Tag.objects.all()
 
-class WarehousesField(serializers.PrimaryKeyRelatedField):
+class WarehouseField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         return Warehouse.objects.all()
 
@@ -656,7 +656,7 @@ class DocumentSerializer(
 ):
     correspondent = CorrespondentField(allow_null=True)
     tags = TagsField(many=True)
-    warehouses = WarehousesField(allow_null=True)
+    warehouse = WarehouseField(allow_null=True)
     document_type = DocumentTypeField(allow_null=True)
     storage_path = StoragePathField(allow_null=True)
 
@@ -766,7 +766,7 @@ class DocumentSerializer(
             kwargs["full_perms"] = True
 
         super().__init__(*args, **kwargs)
-
+    
     class Meta:
         model = Document
         depth = 1
@@ -775,10 +775,10 @@ class DocumentSerializer(
             "correspondent",
             "document_type",
             "storage_path",
+            "warehouse",
             "title",
             "content",
             "tags",
-            "warehouses",
             "created",
             "created_date",
             "modified",
@@ -794,8 +794,8 @@ class DocumentSerializer(
             "notes",
             "custom_fields",
             "remove_inbox_tags",
-        )
-
+        ) 
+    
 
 class SavedViewFilterRuleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -882,6 +882,7 @@ class BulkEditSerializer(
             "set_correspondent",
             "set_document_type",
             "set_storage_path",
+            "set_warehouse"
             "add_tag",
             "remove_tag",
             "modify_tags",
@@ -916,6 +917,8 @@ class BulkEditSerializer(
             return bulk_edit.set_document_type
         elif method == "set_storage_path":
             return bulk_edit.set_storage_path
+        elif method == "set_warehouse":
+            return bulk_edit.set_warehouse
         elif method == "add_tag":
             return bulk_edit.add_tag
         elif method == "remove_tag":
@@ -971,6 +974,17 @@ class BulkEditSerializer(
                 raise serializers.ValidationError("Correspondent does not exist")
         else:
             raise serializers.ValidationError("correspondent not specified")
+    def _validate_parameters_warehouse(self, parameters):
+        if "warehouse" in parameters:
+            warehouse_id = parameters["warehouse"]
+            if warehouse_id is None:
+                return
+            try:
+                Warehouse.objects.get(id=warehouse_id)
+            except Warehouse.DoesNotExist:
+                raise serializers.ValidationError("Warehouse does not exist")
+        else:
+            raise serializers.ValidationError("warehouse not specified")
 
     def _validate_storage_path(self, parameters):
         if "storage_path" in parameters:
@@ -1059,6 +1073,8 @@ class BulkEditSerializer(
             self._validate_parameters_modify_tags(parameters)
         elif method == bulk_edit.set_storage_path:
             self._validate_storage_path(parameters)
+        elif method == bulk_edit.set_warehouse:
+            self._validate_parameters_warehouse(parameters)    
         elif method == bulk_edit.set_permissions:
             self._validate_parameters_set_permissions(parameters)
         elif method == bulk_edit.rotate:
@@ -1103,6 +1119,14 @@ class PostDocumentSerializer(serializers.Serializer):
     document_type = serializers.PrimaryKeyRelatedField(
         queryset=DocumentType.objects.all(),
         label="Document type",
+        allow_null=True,
+        write_only=True,
+        required=False,
+    )
+    
+    warehouse = serializers.PrimaryKeyRelatedField(
+        queryset=Warehouse.objects.all(),
+        label="Warehouse",
         allow_null=True,
         write_only=True,
         required=False,
@@ -1166,6 +1190,12 @@ class PostDocumentSerializer(serializers.Serializer):
     def validate_storage_path(self, storage_path):
         if storage_path:
             return storage_path.id
+        else:
+            return None
+        
+    def validate_warehouse(self, warehouse):
+        if warehouse:
+            return warehouse.id
         else:
             return None
 
@@ -1232,6 +1262,7 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
                 title="title",
                 correspondent="correspondent",
                 document_type="document_type",
+                warehouse="warehouse",
                 created="created",
                 created_year="created_year",
                 created_year_short="created_year_short",
@@ -1583,6 +1614,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
     assign_tags = TagsField(many=True, allow_null=True, required=False)
     assign_document_type = DocumentTypeField(allow_null=True, required=False)
     assign_storage_path = StoragePathField(allow_null=True, required=False)
+    
 
     class Meta:
         model = WorkflowAction
@@ -1804,21 +1836,33 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
 class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     document_count = serializers.SerializerMethodField()
-    def get_document_count(self,obj):
-        document = Document.objects.filter(warehouses=obj).count()
-        return document
     
     class Meta:
         model = Warehouse
         fields = '__all__'
-        
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        if instance.parent_warehouse: 
-            data['parent_warehouse'] = WarehouseSerializer(instance.parent_warehouse).data
+    
+    def get_document_count(self, obj):
+        return self.get_total_document_count(obj)
+
+    def get_total_document_count(self, warehouse):
+        if warehouse.type == Warehouse.BOXCASE:
+            return Document.objects.filter(warehouse=warehouse).count()
+        elif warehouse.type == Warehouse.SHELF:
+            child_warehouses = Warehouse.objects.filter(parent_warehouse=warehouse)
+            total_count = 0
+            for child_warehouse in child_warehouses:
+                total_count += self.get_total_document_count(child_warehouse)
+            return total_count
+        elif warehouse.type == Warehouse.WAREHOUSE:
+            child_warehouses = Warehouse.objects.filter(parent_warehouse=warehouse)
+            total_count = 0
+            for child_warehouse in child_warehouses:
+                total_count += self.get_total_document_count(child_warehouse)
+            return total_count
         else:
-            data['parent_warehouse'] = None
-        return data
+            return 0
+    
+    
     
     
     

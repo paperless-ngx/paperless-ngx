@@ -75,7 +75,7 @@
             </pngx-filterable-dropdown>
           }
           @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.Warehouse)) {
-            <pngx-filterable-dropdown title="Warehouses" icon="warehouse-fill" i18n-title
+            <pngx-filterable-dropdown title="Warehouse" icon="warehouse-fill" i18n-title
               filterPlaceholder="Filter warehouses" i18n-filterPlaceholder
               [items]="warehouses"
               [disabled]="!userCanEditAll"
@@ -83,7 +83,7 @@
               [manyToOne]="true"
               [applyOnClose]="applyOnClose"
               [createRef]="createWarehouse.bind(this)"
-              (opened)="openWarehousesDropdown()"
+              (opened)="openWarehouseDropdown()"
               [(selectionModel)]="warehouseSelectionModel"
               [documentCounts]="warehouseDocumentCounts"
               (apply)="setWarehouses($event)">

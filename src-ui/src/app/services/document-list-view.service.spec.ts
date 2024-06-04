@@ -29,6 +29,7 @@ const documents = [
     correspondent: 11,
     document_type: 3,
     storage_path: 8,
+    warehouse: 14,
   },
   {
     id: 2,

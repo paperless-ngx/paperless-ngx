@@ -125,7 +125,7 @@
     @if (displayMode === 'largeCards') {
       <div>
         @for (d of list.documents; track trackByDocumentId($index, d)) {
-          <pngx-document-card-large [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" (dblClickDocument)="openDocumentDetail(d)" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)" (clickStoragePath)="clickStoragePath($event)" (clickMoreLike)="clickMoreLike(d.id)">
+          <pngx-document-card-large [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" (dblClickDocument)="openDocumentDetail(d)" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)" (clickStoragePath)="clickStoragePath($event)" (clickWarehouse)="clickWarehouse($event)" (clickMoreLike)="clickMoreLike(d.id)">
           </pngx-document-card-large>
         }
       </div>
@@ -271,8 +271,8 @@
               }
               @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.Warehouse)) {
                 <td class="d-none d-xl-table-cell">
-                  @if (d.warehouses) {
-                    <a (click)="clickWarehouse(d.warehouses);$event.stopPropagation()" title="Filter by warehouse" i18n-title>{{(d.warehouses$ | async)?.name}}</a>
+                  @if (d.warehouse) {
+                    <a (click)="clickWarehouse(d.warehouse);$event.stopPropagation()" title="Filter by warehouse" i18n-title>{{(d.warehouse$ | async)?.name}}</a>
                   }
                 </td>
               }
