@@ -1463,10 +1463,10 @@ class TasksViewSet(ReadOnlyModelViewSet):
         return queryset
 
 class ApprovalViewSet(ModelViewSet):
-    permission_classes = ()
+    permission_classes = (IsAuthenticated,)
 
     serializer_class = ApprovalSerializer
-    pagination_class = StandardPagination
+    # pagination_class = StandardPagination
 
     def get_queryset(self):
         queryset = (
@@ -1478,6 +1478,10 @@ class ApprovalViewSet(ModelViewSet):
         # task_id = self.request.query_params.get("")
         # if task_id is not None:
         #     queryset = PaperlessTask.objects.filter(task_id=task_id)
+        user = self.request.user
+        # print('gia tri document_ids',user)
+        document_ids = Document.objects.filter(owner=user).values_list("id")
+        queryset = queryset.filter(object_pk__in=document_ids)
         return queryset
 
     model = Approval
