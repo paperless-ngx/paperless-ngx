@@ -123,6 +123,7 @@ from documents.models import WorkflowTrigger
 from documents.parsers import get_parser_class_for_mime_type
 from documents.parsers import parse_date_generator
 from documents.permissions import PaperlessAdminPermissions
+from documents.permissions import PaperlessNotePermissions
 from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
@@ -622,7 +623,11 @@ class DocumentViewSet(
             .order_by("-created")
         ]
 
-    @action(methods=["get", "post", "delete"], detail=True)
+    @action(
+        methods=["get", "post", "delete"],
+        detail=True,
+        permission_classes=[PaperlessNotePermissions],
+    )
     def notes(self, request, pk=None):
         currentUser = request.user
         try:
