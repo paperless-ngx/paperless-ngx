@@ -766,7 +766,7 @@ class DocumentSerializer(
             kwargs["full_perms"] = True
 
         super().__init__(*args, **kwargs)
-
+    
     class Meta:
         model = Document
         depth = 1
@@ -794,10 +794,8 @@ class DocumentSerializer(
             "notes",
             "custom_fields",
             "remove_inbox_tags",
-        )
-        
+        ) 
     
-
 
 class SavedViewFilterRuleSerializer(serializers.ModelSerializer):
     class Meta:
