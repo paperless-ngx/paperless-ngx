@@ -745,6 +745,30 @@ class DocumentViewSet(
             ]
             return Response(links)
 
+    def get_queryset(self):
+        queryset = self.queryset
+        warehouse_id = self.request.query_params.get('warehouse_id', None)
+        if warehouse_id is not None:
+            queryset = self.get_warehouse(warehouse_id)
+        return queryset
+
+    def get_warehouse(self, warehouse_id):
+        warehouse = Warehouse.objects.get(id=int(warehouse_id))
+        return self.get_warehouse_documents(warehouse)
+
+    def get_warehouse_documents(self, warehouse):
+        if warehouse.type == Warehouse.BOXCASE:
+            return Document.objects.filter(warehouse=warehouse)
+        elif warehouse.type == Warehouse.SHELF:
+            boxcases = Warehouse.objects.filter(parent_warehouse=warehouse)
+            return Document.objects.filter(warehouse__in=[b.id for b in boxcases])
+        elif warehouse.type == Warehouse.WAREHOUSE:
+            shelves = Warehouse.objects.filter(parent_warehouse=warehouse)
+            boxcases = Warehouse.objects.filter(parent_warehouse__in=[s.id for s in shelves])
+            return Document.objects.filter(warehouse__in=[b.id for b in boxcases])
+        else:
+            return Document.objects.none()
+
 
 class SearchResultSerializer(DocumentSerializer, PassUserMixin):
     def to_representation(self, instance):
@@ -753,7 +777,7 @@ class SearchResultSerializer(DocumentSerializer, PassUserMixin):
                 "correspondent",
                 "storage_path",
                 "document_type",
-                "warehouse"
+                "warehouse",
                 "owner",
             )
             .prefetch_related("tags", "custom_fields", "notes")
