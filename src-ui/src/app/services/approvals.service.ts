@@ -51,9 +51,6 @@ export class ApprovalsService {
 
   public reload() {
     this.loading = true
-    console.log(this.http
-      .get<PaperlessApproval[]>(`${this.baseUrl}approvals/`))
-    
     this.http
     .get<PaperlessApproval[]>(`${this.baseUrl}approvals/`)
     .pipe(takeUntil(this.unsubscribeNotifer), first())
@@ -63,10 +60,10 @@ export class ApprovalsService {
     })
   }
 
-  public dismissApprovals(id: Set<number>) {
+  public updateApprovals(id: Set<number>,status: String) {
     this.http
-      .post(`${this.baseUrl}approvals/`, {
-        approvals: [...id],
+      .post(`${this.baseUrl}update_approvals/`, {
+        approvals: [...id],status: status
       })
       .pipe(takeUntil(this.unsubscribeNotifer), first())
       .subscribe((r) => {
