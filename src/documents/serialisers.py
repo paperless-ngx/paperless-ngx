@@ -1336,9 +1336,42 @@ class TasksViewSerializer(serializers.ModelSerializer):
 class ApprovalSerializer(serializers.ModelSerializer):
     submitted_by = serializers.ReadOnlyField(source='submitted_by.username')
     ctype = serializers.ReadOnlyField(source='ctype.model')
+    submitted_by_id = serializers.PrimaryKeyRelatedField(source='submitted_by', queryset=User.objects.all(), write_only=True)
+    ctype_id = serializers.PrimaryKeyRelatedField(source='ctype', queryset=ContentType.objects.all(), write_only=True)
     class Meta:
         model = Approval
         fields = "__all__"
+
+class ApprovalViewSerializer(serializers.Serializer):
+    approvals = serializers.ListField(
+        required=True,
+        label="approvals",
+        write_only=True,
+        child=serializers.IntegerField(),
+    )
+    status = serializers.CharField(required=True)
+
+    def _validate_approval_id_list(self, approvals, name="approvals"):
+        if not isinstance(approvals, list):
+            raise serializers.ValidationError(f"{name} must be a list")
+        if not all(isinstance(i, int) for i in approvals):
+            raise serializers.ValidationError(f"{name} must be a list of integers")
+        count = PaperlessTask.objects.filter(id__in=approvals).count()
+        if not count == len(approvals):
+            raise serializers.ValidationError(
+                f"Some tasks in {name} don't exist or were specified twice.",
+            )
+
+    def validate_approvals(self, approvals):
+        self._validate_approval_id_list(approvals)
+        return approvals
+
+    def validate_status(self, status):
+        valid_statuses = ["PENDING", "SUCCESS", "FAILURE", "REVOKED"]
+        if status not in valid_statuses:
+            raise serializers.ValidationError(
+                f"status must be one of: {', '.join(valid_statuses)}")
+        return status
 
 class AcknowledgeTasksViewSerializer(serializers.Serializer):
     tasks = serializers.ListField(

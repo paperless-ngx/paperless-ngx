@@ -128,7 +128,7 @@ from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
-from documents.serialisers import AcknowledgeTasksViewSerializer, ApprovalSerializer
+from documents.serialisers import AcknowledgeTasksViewSerializer, ApprovalSerializer, ApprovalViewSerializer
 from documents.serialisers import BulkDownloadSerializer
 from documents.serialisers import BulkEditObjectsSerializer
 from documents.serialisers import BulkEditSerializer
@@ -1435,7 +1435,32 @@ class ApprovalViewSet(ModelViewSet):
         )
 
         return response
+    
+class ApprovalUpdateMutipleView(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ApprovalViewSerializer
 
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        approvals = serializer.validated_data.get("approvals")
+        status = serializer.validated_data.get("status")
+
+        try:
+            approvals_match = Approval.objects.filter(id__in=approvals)
+            result = approvals_match.update(
+                status=status,
+            )
+            for approval in approvals_match:
+                approval_updated.send(
+                    sender=self.__class__,
+                    approval=approval,
+                )
+            return Response({"result": result})
+        except Exception:
+            return HttpResponseBadRequest()
+        
 class AcknowledgeTasksView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = AcknowledgeTasksViewSerializer

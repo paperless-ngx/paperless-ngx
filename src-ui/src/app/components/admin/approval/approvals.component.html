@@ -8,9 +8,17 @@
     <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()" [hidden]="selectedApprovals.size === 0">
       <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
     </button>
-    <button class="btn btn-sm btn-outline-primary me-4" (click)="dismissApprovals()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }" [disabled]="approvalsService.total === 0">
-      <i-bs name="check2-all"></i-bs>&nbsp;{{dismissButtonText}}
+    
+    <!-- <button class="btn btn-sm btn-outline-primary me-4" (click)="updateApprovals()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }" [disabled]="approvalsService.total === 0">
+      <i-bs name="check2-all"></i-bs>&nbsp;{{rejectButtonText}}
     </button>
+    <button class="btn btn-sm btn-outline-primary me-4" (click)="updateApprovals()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }" [disabled]="approvalsService.total === 0">
+      <i-bs name="check2-all"></i-bs>&nbsp;{{approveButtonText}}
+    </button>
+    <button class="btn btn-sm btn-outline-primary me-4" (click)="updateApprovals()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }" [disabled]="approvalsService.total === 0">
+      <i-bs name="check2-all"></i-bs>&nbsp;{{revokeButtonText}}
+    </button> -->
+    
     <div class="form-check form-switch mb-0">
       <input class="form-check-input" type="checkbox" role="switch" id="autoRefreshSwitch" (click)="toggleAutoRefresh()" [attr.checked]="autoRefreshInterval">
       <label class="form-check-label" for="autoRefreshSwitch" i18n>Auto refresh</label>
@@ -65,22 +73,22 @@
           <td scope="row">
             <div class="btn-group" role="group">
               @if (approval.status == 'PENDING'){
-                <button class="btn btn-sm btn-outline-secondary" (click)="dismissApproval(approval); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }">
+                <button class="btn btn-sm btn-outline-secondary" (click)="updateApproval(approval,'SUCCESS'); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }">
                   <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Approve</ng-container>
                 </button>
-                <button class="btn btn-sm btn-outline-secondary" (click)="dismissApproval(approval); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }">
+                <button class="btn btn-sm btn-outline-secondary" (click)="updateApproval(approval,'FAILURE'); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }">
                   <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Reject</ng-container>
                 </button>
               }
               @if (approval.status == 'SUCCESS'){
-                <button class="btn btn-sm btn-outline-secondary" (click)="dismissApproval(approval); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }">
+                <button class="btn btn-sm btn-outline-secondary" (click)="updateApproval(approval,'REVOKED'); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }">
                   <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Revoked</ng-container>
                 </button>
               }
 
               <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
-                @if (approval.related_document) {
-                  <button class="btn btn-sm btn-outline-primary" (click)="dismissAndGo(approval); $event.stopPropagation();">
+                @if (approval.ctype=="document") {
+                  <button class="btn btn-sm btn-outline-primary" (click)="goDocument(approval); $event.stopPropagation();">
                     <i-bs name="file-text"></i-bs>&nbsp;<ng-container i18n>Open Document</ng-container>
                   </button>
                 }
