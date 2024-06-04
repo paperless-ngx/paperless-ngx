@@ -80,6 +80,7 @@ import { StoragePathListComponent } from './components/manage/storage-path-list/
 import { StoragePathEditDialogComponent } from './components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { SettingsService } from './services/settings.service'
 import { TasksComponent } from './components/admin/tasks/tasks.component'
+import { ApprovalsComponent } from './components/admin/approval/approvals.component'
 import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { UserEditDialogComponent } from './components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
 import { GroupEditDialogComponent } from './components/common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
@@ -441,6 +442,7 @@ function initializeApp(settings: SettingsService) {
     DocumentAsnComponent,
     DocumentNotesComponent,
     TasksComponent,
+    ApprovalsComponent,
     UserEditDialogComponent,
     GroupEditDialogComponent,
     PermissionsSelectComponent,

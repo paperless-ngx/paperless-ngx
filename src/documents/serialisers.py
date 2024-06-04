@@ -1334,6 +1334,8 @@ class TasksViewSerializer(serializers.ModelSerializer):
         return result
 
 class ApprovalSerializer(serializers.ModelSerializer):
+    submitted_by = serializers.ReadOnlyField(source='submitted_by.username')
+    ctype = serializers.ReadOnlyField(source='ctype.model')
     class Meta:
         model = Approval
         fields = "__all__"
