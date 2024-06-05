@@ -4,6 +4,7 @@ import re
 import zoneinfo
 from decimal import Decimal
 
+from django.apps import apps
 import magic
 from celery import states
 from django.conf import settings
@@ -1369,6 +1370,16 @@ class ApprovalSerializer(serializers.ModelSerializer):
     ctype = serializers.ReadOnlyField(source='ctype.model')
     submitted_by_id = serializers.PrimaryKeyRelatedField(source='submitted_by', queryset=User.objects.all(), write_only=True)
     ctype_id = serializers.PrimaryKeyRelatedField(source='ctype', queryset=ContentType.objects.all(), write_only=True)
+    name = serializers.SerializerMethodField(read_only=True)
+
+    def get_name(self, obj):
+        if obj.ctype:
+            model_name = obj.ctype.name
+            model_class = apps.get_model(obj.ctype.app_label, model_name)
+            if model_class == Document:
+                return model_class.objects.get(id=int(obj.object_pk)).title
+        
+        return None
     class Meta:
         model = Approval
         fields = "__all__"

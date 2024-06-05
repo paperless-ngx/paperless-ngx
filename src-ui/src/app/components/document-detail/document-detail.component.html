@@ -287,6 +287,17 @@
           </li>
         }
 
+        @if (notesEnabled) {
+          <li [ngbNavItem]="DocumentDetailNavIDs.Notes">
+            <a class="text-nowrap" ngbNavLink i18n>Notes @if (document?.notes.length) {
+              <span class="badge text-bg-secondary ms-1">{{document.notes.length}}</span>
+            }</a>
+            <ng-template ngbNavContent>
+              <pngx-document-approvals [documentId]="documentId" [notes]="document?.notes" [addDisabled]="!userCanEdit" (updated)="notesUpdated($event)"></pngx-document-approvals>
+            </ng-template>
+          </li>
+        }
+
         @if (showPermissions) {
           <li [ngbNavItem]="DocumentDetailNavIDs.Permissions">
             <a ngbNavLink i18n>Permissions</a>
