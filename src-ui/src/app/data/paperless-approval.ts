@@ -34,4 +34,6 @@ export interface PaperlessApproval extends ObjectWithId {
   ctype?: string
 
   submitted_by_group?: number
+
+  name?: string
 }

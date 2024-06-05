@@ -125,6 +125,13 @@ class Approval(models.Model):
         verbose_name=_("content type"),
     )
 
+    expiration = models.DateTimeField(
+        _("expiration"),
+        blank=True,
+        null=True,
+        db_index=True,
+    )
+
     status = models.CharField(
         max_length=30,
         default=states.PENDING,

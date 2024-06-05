@@ -41,12 +41,23 @@
             <label class="form-check-label" for="all-approvals"></label>
           </div>
         </th>
+        <th scope="col" class="d-table-cell d-lg-cell" i18n>Name</th>
+        <th scope="col" class="d-table-cell d-lg-cell" i18n>Content type</th>
+        <th scope="col" class="d-table-cell d-lg-cell" i18n>Submmit by</th>
         <th scope="col" class="d-none d-lg-table-cell" i18n>Created</th>
+        <th scope="col" class="d-none d-lg-table-cell" i18n>Expires</th>
+        @if (activeTab == 'success') {
+          <th scope="col" class="d-none d-lg-table-cell" i18n>Approve at</th>
+        }
+        @else if (activeTab == 'failure') {
+          <th scope="col" class="d-none d-lg-table-cell" i18n>Reject at</th>
+        }
+        @else if (activeTab == 'revoked') {
+          <th scope="col" class="d-none d-lg-table-cell" i18n>Revoked at</th>
+        }
         <!-- @if (activeTab !== 'pending' && activeTab !== 'revoked') {
         } -->
         <th scope="col" class="d-none d-lg-table-cell" i18n>Method</th>
-        <th scope="col" class="d-table-cell d-lg-cell" i18n>Submmit by</th>
-        <th scope="col" class="d-table-cell d-lg-cell" i18n>Content type</th>
         <th scope="col" i18n>Actions</th>
       </tr>
     </thead>
@@ -59,10 +70,18 @@
               <label class="form-check-label" for="approval{{approval.id}}"></label>
             </div>
           </td>
-          <td class="overflow-auto name-col">{{ approval.created | customDate:'short' }}</td>
-          <td class="d-none d-lg-table-cell">{{ approval.access_type }}</td>
-          <td class="d-none d-lg-table-cell">{{ approval.submitted_by }}</td>
+          <td class="d-none d-lg-table-cell">{{ approval.name }}</td>
           <td class="d-none d-lg-table-cell">{{ approval.ctype }}</td>
+          <td class="d-none d-lg-table-cell">{{ approval.submitted_by }}</td>
+          <td class="overflow-auto name-col">{{ approval.created | customDate:'short' }}</td>
+          @if (approval.expiration==null){
+            <td class="overflow-auto name-col">Unlimited</td>
+          }
+          @if (approval.expiration!=null){
+            <td class="overflow-auto name-col">{{ approval.expiration | customDate:'short' }}</td>
+          }
+          <td class="overflow-auto name-col">{{ approval.modified | customDate:'short' }}</td>
+          <td class="d-none d-lg-table-cell">{{ approval.access_type }}</td>
 
           
           <td class="d-lg-none">
@@ -73,15 +92,15 @@
           <td scope="row">
             <div class="btn-group" role="group">
               @if (approval.status == 'PENDING'){
-                <button class="btn btn-sm btn-outline-secondary" (click)="updateApproval(approval,'SUCCESS'); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }">
+                <button class="btn btn-sm btn-outline-success" (click)="updateApproval(approval,'SUCCESS'); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }">
                   <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Approve</ng-container>
                 </button>
-                <button class="btn btn-sm btn-outline-secondary" (click)="updateApproval(approval,'FAILURE'); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }">
+                <button class="btn btn-sm btn-outline-danger" (click)="updateApproval(approval,'FAILURE'); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }">
                   <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Reject</ng-container>
                 </button>
               }
               @if (approval.status == 'SUCCESS'){
-                <button class="btn btn-sm btn-outline-secondary" (click)="updateApproval(approval,'REVOKED'); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }">
+                <button class="btn btn-sm btn-outline-danger" (click)="updateApproval(approval,'REVOKED'); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }">
                   <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Revoked</ng-container>
                 </button>
               }
