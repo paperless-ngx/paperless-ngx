@@ -47,8 +47,12 @@ from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.settings import EXPORTER_ARCHIVE_NAME
+from documents.settings import EXPORTER_CRYPTO_ALGO_NAME
+from documents.settings import EXPORTER_CRYPTO_KEY_ITERATIONS_NAME
+from documents.settings import EXPORTER_CRYPTO_KEY_SIZE_NAME
+from documents.settings import EXPORTER_CRYPTO_SALT_NAME
+from documents.settings import EXPORTER_CRYPTO_SETTINGS_NAME
 from documents.settings import EXPORTER_FILE_NAME
-from documents.settings import EXPORTER_SALT_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
 from documents.utils import copy_file_with_basic_stats
 from paperless import version
@@ -364,11 +368,19 @@ class Command(SecurityMixin, BaseCommand):
 
         # 4.2 write version information to target folder
         extra_metadata_path = (self.target / "metadata.json").resolve()
-        metadata = {"version": version.__full_version_str__}
+        metadata: dict[str, str | int | dict[str, str | int]] = {
+            "version": version.__full_version_str__,
+        }
 
-        # 4.2.1 If needed, write the salt value into the metadata
+        # 4.2.1 If needed, write the crypto values into the metadata
+        # Django stores most of these in the field itself, we store them once here
         if self.passphrase:
-            metadata[EXPORTER_SALT_NAME] = self.salt
+            metadata[EXPORTER_CRYPTO_SETTINGS_NAME] = {
+                EXPORTER_CRYPTO_ALGO_NAME: self.kdf_algorithm,
+                EXPORTER_CRYPTO_KEY_ITERATIONS_NAME: self.key_iterations,
+                EXPORTER_CRYPTO_SALT_NAME: self.salt,
+                EXPORTER_CRYPTO_KEY_SIZE_NAME: self.key_size,
+            }
         extra_metadata_path.write_text(
             json.dumps(
                 metadata,
@@ -544,11 +556,13 @@ class Command(SecurityMixin, BaseCommand):
             copy_file_with_basic_stats(source, target)
 
     def encrypt_secret_fields(self, manifest: dict) -> None:
-        """ """
+        """
+        Encrypts certain fields in the export.  Currently limited to the mail account password
+        """
         if self.passphrase:
-            self.setup_crypto()
+            self.setup_crypto(passphrase=self.passphrase)
 
             for mail_account_record in manifest["mail_accounts"]:
-                mail_account_record["password"] = self.encrypt_field(
-                    mail_account_record["password"],
+                mail_account_record["password"] = self.encrypt_string(
+                    value=mail_account_record["password"],
                 )

@@ -1,7 +1,6 @@
 import base64
 import os
 from argparse import ArgumentParser
-from typing import Final
 from typing import Optional
 
 from cryptography.fernet import Fernet
@@ -51,41 +50,70 @@ class ProgressBarMixin:
 
 class SecurityMixin:
     """
+    Fully based on:
     https://cryptography.io/en/latest/fernet/#using-passwords-with-fernet
+
+    To encrypt:
+      1. Call setup_crypto providing the user provided passphrase
+      2. Call encrypt_string with a value
+      3. Store the returned hexadecimal representation of the value
+
+    To decrypt:
+      1. Load the required parameters:
+        a. key iterations
+        b. key size
+        c. key algorithm
+      2. Call setup_crypto providing the user provided passphrase and stored salt
+      3. Call decrypt_string with a value
+      4. Use the returned value
+
     """
 
     # This matches to Django's default for now
     # https://github.com/django/django/blob/adae61942/django/contrib/auth/hashers.py#L315
-    KEY_ITERATIONS: Final[int] = 1_000_000
 
-    def setup_crypto(self, salt: Optional[str]):
-        self.salt = salt or os.urandom(16).hex()
-        self.fernet = self.get_fernet(self.passphrase, self.salt)
+    # Set the defaults to be used during export
+    # During import, these are overridden from the loaded values to ensure decryption is possible
+    key_iterations = 1_000_000
+    salt_size = 16
+    key_size = 32
+    kdf_algorithm = "pbkdf2_sha256"
 
-    def get_fernet(self, passphrase: str, salt: str) -> Fernet:
+    def setup_crypto(self, *, passphrase: str, salt: Optional[str] = None):
         """
         Constructs a class for encryption or decryption using the specified passphrase and salt
 
-        Salt is assumed to be a hexadecimal representation of a cryptographically secure random byte string
+        Salt is assumed to be a hexadecimal representation of a cryptographically secure random byte string.
+        If not provided, it will be derived from the system secure random
         """
+        self.salt = salt or os.urandom(self.salt_size).hex()
 
-        kdf = PBKDF2HMAC(
-            algorithm=hashes.SHA256(),
-            length=32,
-            salt=bytes.fromhex(salt),
-            iterations=480000,
-        )
+        # Derive the KDF based on loaded settings
+        if self.kdf_algorithm == "pbkdf2_sha256":
+            kdf = PBKDF2HMAC(
+                algorithm=hashes.SHA256(),
+                length=self.key_size,
+                salt=bytes.fromhex(self.salt),
+                iterations=self.key_iterations,
+            )
+        else:
+            raise CommandError(
+                f"{self.kdf_algorithm} is an unknown key derivation function",
+            )
+
         key = base64.urlsafe_b64encode(kdf.derive(passphrase.encode()))
-        return Fernet(key)
 
-    def encrypt_field(self, value: str) -> str:
+        self.fernet = Fernet(key)
+
+    def encrypt_string(self, *, value: str) -> str:
         """
-        Given a string field value, encrypts it and returns the hexadecimal representation of the encrypted token
+        Given a string value, encrypts it and returns the hexadecimal representation of the encrypted token
+
         """
         return self.fernet.encrypt(value.encode("utf-8")).hex()
 
-    def decrypt_field(self, value: str) -> str:
+    def decrypt_string(self, *, value: str) -> str:
         """
-        Given a string field value, decrypts it and returns the original value of the field
+        Given a string value, decrypts it and returns the original value of the field
         """
         return self.fernet.decrypt(bytes.fromhex(value)).decode("utf-8")

@@ -840,3 +840,6 @@ class TestExportImport(
         )
 
         self.assertEqual(Document.objects.all().count(), 4)
+
+    def test_export_passphrase(self):
+        pass

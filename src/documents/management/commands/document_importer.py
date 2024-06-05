@@ -32,8 +32,10 @@ from documents.models import Note
 from documents.models import Tag
 from documents.parsers import run_convert
 from documents.settings import EXPORTER_ARCHIVE_NAME
+from documents.settings import EXPORTER_CRYPTO_ALGO_NAME
+from documents.settings import EXPORTER_CRYPTO_SALT_NAME
+from documents.settings import EXPORTER_CRYPTO_SETTINGS_NAME
 from documents.settings import EXPORTER_FILE_NAME
-from documents.settings import EXPORTER_SALT_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
 from documents.signals.handlers import update_filename_and_move_files
 from documents.utils import copy_file_with_basic_stats
@@ -173,12 +175,24 @@ class Command(SecurityMixin, BaseCommand):
             with metadata_path.open() as infile:
                 data = json.load(infile)
                 self.version = data["version"]
-                if not self.passphrase and EXPORTER_SALT_NAME in data:
+                if not self.passphrase and EXPORTER_CRYPTO_SETTINGS_NAME in data:
                     raise CommandError(
                         "No passphrase was given, but this export contains encrypted fields",
                     )
-                elif EXPORTER_SALT_NAME in data:
-                    self.salt = data[EXPORTER_SALT_NAME]
+                elif EXPORTER_CRYPTO_SETTINGS_NAME in data:
+                    # Load up the values for setting up decryption
+                    self.kdf_algorithm = data[EXPORTER_CRYPTO_SETTINGS_NAME][
+                        EXPORTER_CRYPTO_ALGO_NAME
+                    ]
+                    self.key_iterations = data[EXPORTER_CRYPTO_SETTINGS_NAME][
+                        EXPORTER_CRYPTO_ALGO_NAME
+                    ]
+                    self.key_size = data[EXPORTER_CRYPTO_SETTINGS_NAME][
+                        EXPORTER_CRYPTO_ALGO_NAME
+                    ]
+                    self.salt = data[EXPORTER_CRYPTO_SETTINGS_NAME][
+                        EXPORTER_CRYPTO_SALT_NAME
+                    ]
 
         if self.version and self.version != version.__full_version_str__:
             self.stdout.write(
@@ -323,20 +337,12 @@ class Command(SecurityMixin, BaseCommand):
                         f"Failed to read from archive file {doc_archive_path}",
                     ) from e
 
-        def check_acount_account_valid(mail_account_record: dict):
-            if EXPORTER_SALT_NAME in mail_account_record and not self.passphrase:
-                raise CommandError(
-                    "The manifest file contains encrypted mail account passwords, but no passphrase was provided",
-                )
-
         self.stdout.write("Checking the manifest")
         for record in self.manifest:
             # Only check if the document files exist if this is not data only
             # We don't care about documents for a data only import
             if not self.data_only and record["model"] == "documents.document":
                 check_document_validity(record)
-            elif record["model"] == "paperless_mail.mailaccount":
-                check_acount_account_valid(record)
 
     def _import_files_from_manifest(self):
         settings.ORIGINALS_DIR.mkdir(parents=True, exist_ok=True)
@@ -405,11 +411,13 @@ class Command(SecurityMixin, BaseCommand):
             document.save()
 
     def decrypt_secret_fields(self) -> None:
-        """ """
+        """
+        The converse decryption of some fields out of the export before importing to database
+        """
         if self.passphrase:
             # Salt has been loaded from metadata.json at this point, so it cannot be None
-            self.setup_crypto(self.salt)
+            self.setup_crypto(passphrase=self.passphrase, salt=self.salt)
 
             for record in self.manifest:
                 if record["model"] == "paperless_mail.mailaccount":
-                    record["password"] = self.decrypt_field(record["password"])
+                    record["password"] = self.decrypt_string(value=record["password"])
