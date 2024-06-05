@@ -126,14 +126,14 @@ class TestCommandImport(
                 },
             ]
             with self.assertRaises(CommandError) as cm:
-                cmd._check_manifest_files_valid()
+                cmd.check_manifest_validity()
                 self.assertInt("Failed to read from original file", str(cm.exception))
 
             original_path.chmod(0o444)
             archive_path.chmod(0o222)
 
             with self.assertRaises(CommandError) as cm:
-                cmd._check_manifest_files_valid()
+                cmd.check_manifest_validity()
                 self.assertInt("Failed to read from archive file", str(cm.exception))
 
     def test_import_source_not_existing(self):

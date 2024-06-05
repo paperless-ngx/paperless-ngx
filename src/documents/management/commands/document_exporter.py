@@ -31,6 +31,7 @@ if settings.AUDIT_LOG_ENABLED:
 
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_filename
+from documents.management.commands.mixins import SecurityMixin
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -47,6 +48,7 @@ from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
+from documents.settings import EXPORTER_SALT_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
 from documents.utils import copy_file_with_basic_stats
 from paperless import version
@@ -56,7 +58,7 @@ from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
 
-class Command(BaseCommand):
+class Command(SecurityMixin, BaseCommand):
     help = (
         "Decrypt and rename all files in our collection into a given target "
         "directory.  And include a manifest file containing document data for "
@@ -165,6 +167,11 @@ class Command(BaseCommand):
             help="If set, the progress bar will not be shown",
         )
 
+        parser.add_argument(
+            "--passphrase",
+            help="If provided, is used to encrypt mail account passwords in the export",
+        )
+
     def handle(self, *args, **options):
         self.target = Path(options["target"]).resolve()
         self.split_manifest: bool = options["split_manifest"]
@@ -177,6 +184,7 @@ class Command(BaseCommand):
         self.zip_export: bool = options["zip"]
         self.data_only: bool = options["data_only"]
         self.no_progress_bar: bool = options["no_progress_bar"]
+        self.passphrase: Optional[str] = options.get("passphrase")
 
         self.files_in_export_dir: set[Path] = set()
         self.exported_files: set[str] = set()
@@ -272,6 +280,8 @@ class Command(BaseCommand):
                     serializers.serialize("json", manifest_key_to_object_query[key]),
                 )
 
+            self.encrypt_secret_fields(manifest_dict)
+
             # These are treated specially and included in the per-document manifest
             # if that setting is enabled.  Otherwise, they are just exported to the bulk
             # manifest
@@ -353,17 +363,22 @@ class Command(BaseCommand):
             self.files_in_export_dir.remove(manifest_path)
 
         # 4.2 write version information to target folder
-        version_path = (self.target / "version.json").resolve()
-        version_path.write_text(
+        extra_metadata_path = (self.target / "metadata.json").resolve()
+        metadata = {"version": version.__full_version_str__}
+
+        # 4.2.1 If needed, write the salt value into the metadata
+        if self.passphrase:
+            metadata[EXPORTER_SALT_NAME] = self.salt
+        extra_metadata_path.write_text(
             json.dumps(
-                {"version": version.__full_version_str__},
+                metadata,
                 indent=2,
                 ensure_ascii=False,
             ),
             encoding="utf-8",
         )
-        if version_path in self.files_in_export_dir:
-            self.files_in_export_dir.remove(version_path)
+        if extra_metadata_path in self.files_in_export_dir:
+            self.files_in_export_dir.remove(extra_metadata_path)
 
         if self.delete:
             # 5. Remove files which we did not explicitly export in this run
@@ -527,3 +542,13 @@ class Command(BaseCommand):
         if perform_copy:
             target.parent.mkdir(parents=True, exist_ok=True)
             copy_file_with_basic_stats(source, target)
+
+    def encrypt_secret_fields(self, manifest: dict) -> None:
+        """ """
+        if self.passphrase:
+            self.setup_crypto()
+
+            for mail_account_record in manifest["mail_accounts"]:
+                mail_account_record["password"] = self.encrypt_field(
+                    mail_account_record["password"],
+                )
