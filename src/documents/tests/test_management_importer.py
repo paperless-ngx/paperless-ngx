@@ -125,6 +125,7 @@ class TestCommandImport(
                     EXPORTER_ARCHIVE_NAME: "archive.pdf",
                 },
             ]
+            cmd.data_only = False
             with self.assertRaises(CommandError) as cm:
                 cmd.check_manifest_validity()
                 self.assertInt("Failed to read from original file", str(cm.exception))

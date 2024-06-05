@@ -466,7 +466,7 @@ class TestExportImport(
         with ZipFile(expected_file) as zip:
             self.assertEqual(len(zip.namelist()), 11)
             self.assertIn("manifest.json", zip.namelist())
-            self.assertIn("version.json", zip.namelist())
+            self.assertIn("metadata.json", zip.namelist())
 
     @override_settings(PASSPHRASE="test")
     def test_export_zipped_format(self):
@@ -504,7 +504,7 @@ class TestExportImport(
             # Extras are from the directories, which also appear in the listing
             self.assertEqual(len(zip.namelist()), 14)
             self.assertIn("manifest.json", zip.namelist())
-            self.assertIn("version.json", zip.namelist())
+            self.assertIn("metadata.json", zip.namelist())
 
     @override_settings(PASSPHRASE="test")
     def test_export_zipped_with_delete(self):
@@ -552,7 +552,7 @@ class TestExportImport(
         with ZipFile(expected_file) as zip:
             self.assertEqual(len(zip.namelist()), 11)
             self.assertIn("manifest.json", zip.namelist())
-            self.assertIn("version.json", zip.namelist())
+            self.assertIn("metadata.json", zip.namelist())
 
     def test_export_target_not_exists(self):
         """
@@ -827,7 +827,7 @@ class TestExportImport(
         # Manifest and version files only should be present in the exported directory
         self.assertFileCountInDir(self.target, 2)
         self.assertIsFile(self.target / "manifest.json")
-        self.assertIsFile(self.target / "version.json")
+        self.assertIsFile(self.target / "metadata.json")
 
         shutil.rmtree(self.dirs.media_dir / "documents")
         Document.objects.all().delete()
