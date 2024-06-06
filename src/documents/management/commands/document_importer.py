@@ -22,7 +22,7 @@ from django.db.models.signals import post_save
 from filelock import FileLock
 
 from documents.file_handling import create_source_path_directory
-from documents.management.commands.mixins import SecurityMixin
+from documents.management.commands.mixins import CryptMixin
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -32,10 +32,6 @@ from documents.models import Note
 from documents.models import Tag
 from documents.parsers import run_convert
 from documents.settings import EXPORTER_ARCHIVE_NAME
-from documents.settings import EXPORTER_CRYPTO_ALGO_NAME
-from documents.settings import EXPORTER_CRYPTO_KEY_ITERATIONS_NAME
-from documents.settings import EXPORTER_CRYPTO_KEY_SIZE_NAME
-from documents.settings import EXPORTER_CRYPTO_SALT_NAME
 from documents.settings import EXPORTER_CRYPTO_SETTINGS_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
@@ -56,7 +52,7 @@ def disable_signal(sig, receiver, sender):
         sig.connect(receiver=receiver, sender=sender)
 
 
-class Command(SecurityMixin, BaseCommand):
+class Command(CryptMixin, BaseCommand):
     help = (
         "Using a manifest.json file, load the data from there, and import the "
         "documents it refers to."
@@ -182,19 +178,7 @@ class Command(SecurityMixin, BaseCommand):
                         "No passphrase was given, but this export contains encrypted fields",
                     )
                 elif EXPORTER_CRYPTO_SETTINGS_NAME in data:
-                    # Load up the values for setting up decryption
-                    self.kdf_algorithm: str = data[EXPORTER_CRYPTO_SETTINGS_NAME][
-                        EXPORTER_CRYPTO_ALGO_NAME
-                    ]
-                    self.key_iterations: int = data[EXPORTER_CRYPTO_SETTINGS_NAME][
-                        EXPORTER_CRYPTO_KEY_ITERATIONS_NAME
-                    ]
-                    self.key_size: int = data[EXPORTER_CRYPTO_SETTINGS_NAME][
-                        EXPORTER_CRYPTO_KEY_SIZE_NAME
-                    ]
-                    self.salt: str = data[EXPORTER_CRYPTO_SETTINGS_NAME][
-                        EXPORTER_CRYPTO_SALT_NAME
-                    ]
+                    self.load_crypt_params(data)
 
         if self.version and self.version != version.__full_version_str__:
             self.stdout.write(

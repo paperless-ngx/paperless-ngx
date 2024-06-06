@@ -39,6 +39,7 @@ from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import SampleDirMixin
 from documents.tests.utils import paperless_environment
+from paperless_mail.models import MailAccount
 
 
 class TestExportImport(
@@ -841,5 +842,47 @@ class TestExportImport(
 
         self.assertEqual(Document.objects.all().count(), 4)
 
+
+class TestCryptExportImport(
+    DirectoriesMixin,
+    FileSystemAssertsMixin,
+    TestCase,
+):
+    def setUp(self) -> None:
+        self.target = Path(tempfile.mkdtemp())
+        return super().setUp()
+
+    def tearDown(self) -> None:
+        shutil.rmtree(self.target, ignore_errors=True)
+        return super().tearDown()
+
     def test_export_passphrase(self):
-        pass
+        MailAccount.objects.create(
+            name="Test Account",
+            imap_server="test.imap.com",
+            username="myusername",
+            password="mypassword",
+        )
+
+        call_command(
+            "document_exporter",
+            "--no-progress-bar",
+            "--passphrase",
+            "securepassword",
+            self.target,
+        )
+
+        self.assertIsFile(self.target / "metadata.json")
+        self.assertIsFile(self.target / "manifest.json")
+
+        data = json.loads((self.target / "manifest.json").read_text())
+
+        mail_accounts = list(
+            filter(lambda r: r["model"] == "paperless_mail.mailaccount", data),
+        )
+
+        self.assertEqual(len(mail_accounts), 1)
+
+        mail_account_data = mail_accounts[0]
+
+        self.assertNotEqual(mail_account_data["fields"]["password"], "mypassword")

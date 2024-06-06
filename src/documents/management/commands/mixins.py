@@ -2,11 +2,18 @@ import base64
 import os
 from argparse import ArgumentParser
 from typing import Optional
+from typing import Union
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from django.core.management import CommandError
+
+from documents.settings import EXPORTER_CRYPTO_ALGO_NAME
+from documents.settings import EXPORTER_CRYPTO_KEY_ITERATIONS_NAME
+from documents.settings import EXPORTER_CRYPTO_KEY_SIZE_NAME
+from documents.settings import EXPORTER_CRYPTO_SALT_NAME
+from documents.settings import EXPORTER_CRYPTO_SETTINGS_NAME
 
 
 class MultiProcessMixin:
@@ -48,7 +55,7 @@ class ProgressBarMixin:
         self.use_progress_bar = not self.no_progress_bar
 
 
-class SecurityMixin:
+class CryptMixin:
     """
     Fully based on:
     https://cryptography.io/en/latest/fernet/#using-passwords-with-fernet
@@ -78,6 +85,31 @@ class SecurityMixin:
     salt_size = 16
     key_size = 32
     kdf_algorithm = "pbkdf2_sha256"
+
+    def get_crypt_params(self) -> dict[str, dict[str, Union[str, int]]]:
+        return {
+            EXPORTER_CRYPTO_SETTINGS_NAME: {
+                EXPORTER_CRYPTO_ALGO_NAME: self.kdf_algorithm,
+                EXPORTER_CRYPTO_KEY_ITERATIONS_NAME: self.key_iterations,
+                EXPORTER_CRYPTO_KEY_SIZE_NAME: self.key_size,
+                EXPORTER_CRYPTO_SALT_NAME: self.salt,
+            },
+        }
+
+    def load_crypt_params(self, metadata: dict):
+        # Load up the values for setting up decryption
+        self.kdf_algorithm: str = metadata[EXPORTER_CRYPTO_SETTINGS_NAME][
+            EXPORTER_CRYPTO_ALGO_NAME
+        ]
+        self.key_iterations: int = metadata[EXPORTER_CRYPTO_SETTINGS_NAME][
+            EXPORTER_CRYPTO_KEY_ITERATIONS_NAME
+        ]
+        self.key_size: int = metadata[EXPORTER_CRYPTO_SETTINGS_NAME][
+            EXPORTER_CRYPTO_KEY_SIZE_NAME
+        ]
+        self.salt: str = metadata[EXPORTER_CRYPTO_SETTINGS_NAME][
+            EXPORTER_CRYPTO_SALT_NAME
+        ]
 
     def setup_crypto(self, *, passphrase: str, salt: Optional[str] = None):
         """

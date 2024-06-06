@@ -31,7 +31,7 @@ if settings.AUDIT_LOG_ENABLED:
 
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_filename
-from documents.management.commands.mixins import SecurityMixin
+from documents.management.commands.mixins import CryptMixin
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -47,11 +47,6 @@ from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.settings import EXPORTER_ARCHIVE_NAME
-from documents.settings import EXPORTER_CRYPTO_ALGO_NAME
-from documents.settings import EXPORTER_CRYPTO_KEY_ITERATIONS_NAME
-from documents.settings import EXPORTER_CRYPTO_KEY_SIZE_NAME
-from documents.settings import EXPORTER_CRYPTO_SALT_NAME
-from documents.settings import EXPORTER_CRYPTO_SETTINGS_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
 from documents.utils import copy_file_with_basic_stats
@@ -62,7 +57,7 @@ from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
 
-class Command(SecurityMixin, BaseCommand):
+class Command(CryptMixin, BaseCommand):
     help = (
         "Decrypt and rename all files in our collection into a given target "
         "directory.  And include a manifest file containing document data for "
@@ -375,12 +370,7 @@ class Command(SecurityMixin, BaseCommand):
         # 4.2.1 If needed, write the crypto values into the metadata
         # Django stores most of these in the field itself, we store them once here
         if self.passphrase:
-            metadata[EXPORTER_CRYPTO_SETTINGS_NAME] = {
-                EXPORTER_CRYPTO_ALGO_NAME: self.kdf_algorithm,
-                EXPORTER_CRYPTO_KEY_ITERATIONS_NAME: self.key_iterations,
-                EXPORTER_CRYPTO_KEY_SIZE_NAME: self.key_size,
-                EXPORTER_CRYPTO_SALT_NAME: self.salt,
-            }
+            metadata.update(self.get_crypt_params())
         extra_metadata_path.write_text(
             json.dumps(
                 metadata,
