@@ -206,7 +206,7 @@ class Command(CryptMixin, BaseCommand):
             if (
                 self.version is not None
                 and self.version != version.__full_version_str__
-            ):
+            ):  # pragma: no cover
                 self.stdout.write(
                     self.style.ERROR(
                         "Version mismatch: "
@@ -235,9 +235,9 @@ class Command(CryptMixin, BaseCommand):
 
         self.pre_check()
 
-        self.load_manifest_files()
-
         self.load_metadata()
+
+        self.load_manifest_files()
 
         self.check_manifest_validity()
 
@@ -404,8 +404,18 @@ class Command(CryptMixin, BaseCommand):
             # Salt has been loaded from metadata.json at this point, so it cannot be None
             self.setup_crypto(passphrase=self.passphrase, salt=self.salt)
 
-            for record in self.manifest:
+            had_an_account = False
+
+            for index, record in enumerate(self.manifest):
                 if record["model"] == "paperless_mail.mailaccount":
                     record["fields"]["password"] = self.decrypt_string(
                         value=record["fields"]["password"],
                     )
+                    self.manifest[index] = record
+                    had_an_account = True
+            if had_an_account:
+                # It's annoying, but the DB is loaded from the JSON directly
+                # Maybe could change that in the future?
+                (self.source / "manifest.json").write_text(
+                    json.dumps(self.manifest, indent=2, ensure_ascii=False),
+                )

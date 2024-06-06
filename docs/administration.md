@@ -248,6 +248,7 @@ optional arguments:
 -z,  --zip
 -zn, --zip-name
 --data-only
+--passphrase
 ```
 
 `target` is a folder to which the data gets written. This includes
@@ -309,6 +310,9 @@ value set in `-zn` or `--zip-name`.
 If `--data-only` is provided, only the database will be exported. This option is intended
 to facilitate database upgrades without needing to clean documents and thumbnails from the media directory.
 
+If `--passphrase` is provided, it will be used to encrypt certain fields in the export. This value
+must be provided to import. If this value is lost, the export cannot be imported.
+
 !!! warning
 
     If exporting with the file name format, there may be errors due to
@@ -327,16 +331,18 @@ and the script does the rest of the work:
 document_importer source
 ```
 
-| Option      | Required | Default | Description                                                               |
-| ----------- | -------- | ------- | ------------------------------------------------------------------------- |
-| source      | Yes      | N/A     | The directory containing an export                                        |
-| --data-only | No       | False   | If provided, only import data, do not import document files or thumbnails |
+| Option       | Required | Default | Description                                                               |
+| ------------ | -------- | ------- | ------------------------------------------------------------------------- |
+| source       | Yes      | N/A     | The directory containing an export                                        |
+| --data-only  | No       | False   | If provided, only import data, do not import document files or thumbnails |
+| --passphrase | No       | N/A     | If your export was encrypted with a passphrase, must be provided          |
 
 When you use the provided docker compose script, put the export inside
 the `export` folder in your paperless source directory. Specify
 `../export` as the `source`.
 
-Note that .zip files (as can be generated from the exporter) are not supported.
+Note that .zip files (as can be generated from the exporter) are not supported. You must unzip them into
+the target directory first.
 
 !!! note
 

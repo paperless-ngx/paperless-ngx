@@ -886,3 +886,38 @@ class TestCryptExportImport(
         mail_account_data = mail_accounts[0]
 
         self.assertNotEqual(mail_account_data["fields"]["password"], "mypassword")
+
+        MailAccount.objects.all().delete()
+
+        call_command(
+            "document_importer",
+            "--no-progress-bar",
+            "--passphrase",
+            "securepassword",
+            self.target,
+        )
+
+        account = MailAccount.objects.first()
+
+        self.assertIsNotNone(account)
+        self.assertEqual(account.password, "mypassword")
+
+    def test_import_crypt_no_passphrase(self):
+        call_command(
+            "document_exporter",
+            "--no-progress-bar",
+            "--passphrase",
+            "securepassword",
+            self.target,
+        )
+
+        with self.assertRaises(CommandError) as err:
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                self.target,
+            )
+            self.assertEqual(
+                err.msg,
+                "No passphrase was given, but this export contains encrypted fields",
+            )

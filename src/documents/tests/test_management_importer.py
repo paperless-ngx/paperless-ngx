@@ -279,3 +279,43 @@ class TestCommandImport(
             "Found existing documents(s), this might indicate a non-empty installation",
             str(stdout.read()),
         )
+
+    def test_import_no_metadata_or_version_file(self):
+        stdout = StringIO()
+
+        (self.dirs.scratch_dir / "manifest.json").touch()
+
+        # We're not building a manifest, so it fails, but this test doesn't care
+        with self.assertRaises(json.decoder.JSONDecodeError):
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                str(self.dirs.scratch_dir),
+                stdout=stdout,
+            )
+        stdout.seek(0)
+        stdout_str = str(stdout.read())
+
+        self.assertIn("No version.json or metadata.json file located", stdout_str)
+
+    def test_import_version_file(self):
+        stdout = StringIO()
+
+        (self.dirs.scratch_dir / "manifest.json").touch()
+        (self.dirs.scratch_dir / "version.json").write_text(
+            json.dumps({"version": "2.8.1"}),
+        )
+
+        # We're not building a manifest, so it fails, but this test doesn't care
+        with self.assertRaises(json.decoder.JSONDecodeError):
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                str(self.dirs.scratch_dir),
+                stdout=stdout,
+            )
+        stdout.seek(0)
+        stdout_str = str(stdout.read())
+
+        self.assertIn("Version mismatch:", stdout_str)
+        self.assertIn("importing 2.8.1", stdout_str)
