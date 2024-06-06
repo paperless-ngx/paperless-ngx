@@ -331,11 +331,11 @@ and the script does the rest of the work:
 document_importer source
 ```
 
-| Option       | Required | Default | Description                                                               |
-| ------------ | -------- | ------- | ------------------------------------------------------------------------- |
-| source       | Yes      | N/A     | The directory containing an export                                        |
-| --data-only  | No       | False   | If provided, only import data, do not import document files or thumbnails |
-| --passphrase | No       | N/A     | If your export was encrypted with a passphrase, must be provided          |
+| Option         | Required | Default | Description                                                               |
+| -------------- | -------- | ------- | ------------------------------------------------------------------------- |
+| source         | Yes      | N/A     | The directory containing an export                                        |
+| `--data-only`  | No       | False   | If provided, only import data, do not import document files or thumbnails |
+| `--passphrase` | No       | N/A     | If your export was encrypted with a passphrase, must be provided          |
 
 When you use the provided docker compose script, put the export inside
 the `export` folder in your paperless source directory. Specify
@@ -352,6 +352,7 @@ the target directory first.
 !!! warning
 
     The importer should be run against a completely empty installation (database and directories) of Paperless-ngx.
+    If using a data only import, only the database must be empty.
 
 ### Document retagger {#retagger}
 
