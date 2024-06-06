@@ -101,7 +101,7 @@ class SecurityMixin:
                 f"{self.kdf_algorithm} is an unknown key derivation function",
             )
 
-        key = base64.urlsafe_b64encode(kdf.derive(passphrase.encode()))
+        key = base64.urlsafe_b64encode(kdf.derive(passphrase.encode("utf-8")))
 
         self.fernet = Fernet(key)
 

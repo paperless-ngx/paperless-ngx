@@ -33,6 +33,8 @@ from documents.models import Tag
 from documents.parsers import run_convert
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_CRYPTO_ALGO_NAME
+from documents.settings import EXPORTER_CRYPTO_KEY_ITERATIONS_NAME
+from documents.settings import EXPORTER_CRYPTO_KEY_SIZE_NAME
 from documents.settings import EXPORTER_CRYPTO_SALT_NAME
 from documents.settings import EXPORTER_CRYPTO_SETTINGS_NAME
 from documents.settings import EXPORTER_FILE_NAME
@@ -181,16 +183,16 @@ class Command(SecurityMixin, BaseCommand):
                     )
                 elif EXPORTER_CRYPTO_SETTINGS_NAME in data:
                     # Load up the values for setting up decryption
-                    self.kdf_algorithm = data[EXPORTER_CRYPTO_SETTINGS_NAME][
+                    self.kdf_algorithm: str = data[EXPORTER_CRYPTO_SETTINGS_NAME][
                         EXPORTER_CRYPTO_ALGO_NAME
                     ]
-                    self.key_iterations = data[EXPORTER_CRYPTO_SETTINGS_NAME][
-                        EXPORTER_CRYPTO_ALGO_NAME
+                    self.key_iterations: int = data[EXPORTER_CRYPTO_SETTINGS_NAME][
+                        EXPORTER_CRYPTO_KEY_ITERATIONS_NAME
                     ]
-                    self.key_size = data[EXPORTER_CRYPTO_SETTINGS_NAME][
-                        EXPORTER_CRYPTO_ALGO_NAME
+                    self.key_size: int = data[EXPORTER_CRYPTO_SETTINGS_NAME][
+                        EXPORTER_CRYPTO_KEY_SIZE_NAME
                     ]
-                    self.salt = data[EXPORTER_CRYPTO_SETTINGS_NAME][
+                    self.salt: str = data[EXPORTER_CRYPTO_SETTINGS_NAME][
                         EXPORTER_CRYPTO_SALT_NAME
                     ]
 
@@ -420,4 +422,6 @@ class Command(SecurityMixin, BaseCommand):
 
             for record in self.manifest:
                 if record["model"] == "paperless_mail.mailaccount":
-                    record["password"] = self.decrypt_string(value=record["password"])
+                    record["fields"]["password"] = self.decrypt_string(
+                        value=record["fields"]["password"],
+                    )

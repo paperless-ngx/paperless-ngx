@@ -378,8 +378,8 @@ class Command(SecurityMixin, BaseCommand):
             metadata[EXPORTER_CRYPTO_SETTINGS_NAME] = {
                 EXPORTER_CRYPTO_ALGO_NAME: self.kdf_algorithm,
                 EXPORTER_CRYPTO_KEY_ITERATIONS_NAME: self.key_iterations,
-                EXPORTER_CRYPTO_SALT_NAME: self.salt,
                 EXPORTER_CRYPTO_KEY_SIZE_NAME: self.key_size,
+                EXPORTER_CRYPTO_SALT_NAME: self.salt,
             }
         extra_metadata_path.write_text(
             json.dumps(
@@ -563,6 +563,6 @@ class Command(SecurityMixin, BaseCommand):
             self.setup_crypto(passphrase=self.passphrase)
 
             for mail_account_record in manifest["mail_accounts"]:
-                mail_account_record["password"] = self.encrypt_string(
-                    value=mail_account_record["password"],
+                mail_account_record["fields"]["password"] = self.encrypt_string(
+                    value=mail_account_record["fields"]["password"],
                 )
