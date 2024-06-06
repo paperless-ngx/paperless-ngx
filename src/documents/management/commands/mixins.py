@@ -128,7 +128,7 @@ class CryptMixin:
                 salt=bytes.fromhex(self.salt),
                 iterations=self.key_iterations,
             )
-        else:
+        else:  # pragma: no cover
             raise CommandError(
                 f"{self.kdf_algorithm} is an unknown key derivation function",
             )
