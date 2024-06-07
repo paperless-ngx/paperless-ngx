@@ -234,7 +234,11 @@ def rotate(doc_ids: list[int], degrees: int):
     return "OK"
 
 
-def merge(doc_ids: list[int], metadata_document_id: Optional[int] = None):
+def merge(
+    doc_ids: list[int],
+    metadata_document_id: Optional[int] = None,
+    delete_originals: bool = False,
+):
     logger.info(
         f"Attempting to merge {len(doc_ids)} documents into a single document.",
     )
@@ -285,7 +289,18 @@ def merge(doc_ids: list[int], metadata_document_id: Optional[int] = None):
         overrides,
     )
 
+    if delete_originals:
+        logger.info("Removing original documents after merge")
+        delete(affected_docs)
+
     return "OK"
+
+
+def merge_and_delete_originals(
+    doc_ids: list[int],
+    metadata_document_id: Optional[int] = None,
+):
+    return merge(doc_ids, metadata_document_id, True)
 
 
 def split(doc_ids: list[int], pages: list[list[int]]):

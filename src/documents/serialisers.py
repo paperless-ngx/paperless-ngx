@@ -943,6 +943,7 @@ class BulkEditSerializer(
             "set_permissions",
             "rotate",
             "merge",
+            "merge_and_delete_originals",
             "split",
             "delete_pages",
         ],
@@ -999,6 +1000,8 @@ class BulkEditSerializer(
             return bulk_edit.rotate
         elif method == "merge":
             return bulk_edit.merge
+        elif method == "merge_and_delete_originals":
+            return bulk_edit.merge_and_delete_originals
         elif method == "split":
             return bulk_edit.split
         elif method == "delete_pages":

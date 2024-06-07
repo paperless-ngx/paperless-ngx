@@ -412,11 +412,14 @@ The following methods are supported:
     - `"merge": true or false` (defaults to false)
   - The `merge` flag determines if the supplied permissions will overwrite all existing permissions (including
     removing them) or be merged with existing permissions.
-- `merge`
+- `merge` and `merge_and_delete_originals`
   - No additional `parameters` required.
   - The ordering of the merged document is determined by the list of IDs.
   - Optional `parameters`:
     - `"metadata_document_id": DOC_ID` apply metadata (tags, correspondent, etc.) from this document to the merged document.
+  - As the name implies, `merge_and_delete_originals` deletes the original
+    documents after merging. This requires the calling user being the owner of
+    all documents that are merged.
 - `split`
   - Requires `parameters`:
     - `"pages": [..]` The list should be a list of pages and/or a ranges, separated by commas e.g. `"[1,2-3,4,5-7]"`

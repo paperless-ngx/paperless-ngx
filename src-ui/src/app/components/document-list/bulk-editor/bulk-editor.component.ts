@@ -814,7 +814,12 @@ export class BulkEditorComponent
           args['metadata_document_id'] = mergeDialog.metadataDocumentID
         }
         mergeDialog.buttonsEnabled = false
-        this.executeBulkOperation(modal, 'merge', args, mergeDialog.documentIDs)
+        this.executeBulkOperation(
+          modal,
+          mergeDialog.deleteOriginals ? 'merge_and_delete_originals' : 'merge',
+          args,
+          mergeDialog.documentIDs
+        )
         this.toastService.showInfo(
           $localize`Merged document will be queued for consumption.`
         )

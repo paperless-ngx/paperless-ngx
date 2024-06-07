@@ -2970,11 +2970,18 @@
           <context context-type="linenumber">24</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="2519605321077387027" datatype="html">
+        <source> Delete original documents after merge </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component.html</context>
+          <context context-type="linenumber">32,34</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="5138283234724909648" datatype="html">
         <source>Note that only PDFs will be included.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component.html</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">36</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8157388568390631653" datatype="html">
@@ -6417,7 +6424,7 @@
         <source>Merged document will be queued for consumption.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">819</context>
+          <context context-type="linenumber">824</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2784168796433474565" datatype="html">
