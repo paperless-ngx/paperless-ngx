@@ -755,11 +755,10 @@ class DocumentViewSet(
     def get_queryset(self):
         queryset = self.queryset
         warehouse_id = self.request.query_params.get('warehouse_id', None)
-        # folder_id = self.request.query_param.get('folder_id', None)
+
         if warehouse_id is not None:
             queryset = self.get_warehouse(warehouse_id)
-        # if folder_id is not None:
-        #     queryset = self.get_folder(folder_id)
+    
         return queryset
 
     def get_warehouse(self, warehouse_id):
@@ -779,7 +778,32 @@ class DocumentViewSet(
         else:
             return Document.objects.none()
 
+    # def get_queryset(self):
+    #     queryset = self.queryset
+    #     folder_id = self.request.query_params.get('folder_id', None)
 
+    #     if folder_id is not None:
+    #         queryset = self.get_folder(folder_id)
+    #         return queryset
+
+    #     return queryset
+
+    # def get_folder(self, folder_id):
+    #     folder = Folder.objects.get(id=int(folder_id))
+    #     return self.get_folder_documents(folder)
+
+    # def get_folder_documents(self, folder):
+    #     documents = Document.objects.filter(folder=folder) 
+    #     child_folders = Folder.objects.filter(parent_folder=folder)
+        
+    #     return documents 
+
+
+   
+    
+    
+            
+    
 class SearchResultSerializer(DocumentSerializer, PassUserMixin):
     def to_representation(self, instance):
         doc = (
