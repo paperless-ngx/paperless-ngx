@@ -8,6 +8,7 @@ from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentSource
 from documents.models import Correspondent
 from documents.models import Warehouse
+from documents.models import Folder
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
@@ -54,6 +55,29 @@ def match_correspondents(document: Document, classifier: DocumentClassifier, use
             lambda o: matches(o, document)
             or (o.pk == pred_id and o.matching_algorithm == MatchingModel.MATCH_AUTO),
             correspondents,
+        ),
+    )
+    
+def match_folders(document: Document, classifier: DocumentClassifier, user=None):
+    pred_id = classifier.predict_folder(document.content) if classifier else None
+
+    if user is None and document.owner is not None:
+        user = document.owner
+
+    if user is not None:
+        folders = get_objects_for_user_owner_aware(
+            user,
+            "documents.view_folder",
+            Folder,
+        )
+    else:
+        folders = Folder.objects.all()
+
+    return list(
+        filter(
+            lambda o: matches(o, document)
+            or (o.pk == pred_id and o.matching_algorithm == MatchingModel.MATCH_AUTO),
+            folders,
         ),
     )
 

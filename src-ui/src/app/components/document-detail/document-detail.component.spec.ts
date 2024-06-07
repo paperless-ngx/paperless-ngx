@@ -88,6 +88,7 @@ const doc: Document = {
   correspondent: 11,
   document_type: 21,
   storage_path: 31,
+  warehouse: 51,
   tags: [41, 42, 43],
   content: 'text content',
   added: new Date('May 4, 2014 03:24:00'),
@@ -232,7 +233,7 @@ describe('DocumentDetailComponent', () => {
               of({
                 results: [
                   {
-                    id: 41,
+                    id: 51,
                     name: 'Warehouse41',
                   },
                 ],
@@ -862,7 +863,8 @@ describe('DocumentDetailComponent', () => {
       id: 22,
       name: 'Warehouse22',
       type: 'Warehouse',
-      parent_warehouse: 22,
+      parent_warehouse: 23,
+      path: '345/346/347',
     } as Warehouse
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
     component.filterDocuments([object])
