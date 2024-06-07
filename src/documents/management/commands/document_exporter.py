@@ -549,13 +549,19 @@ class Command(CryptMixin, BaseCommand):
         """
         Encrypts certain fields in the export.  Currently limited to the mail account password
         """
+
         if self.passphrase:
             self.setup_crypto(passphrase=self.passphrase)
 
-            for mail_account_record in manifest["mail_accounts"]:
-                mail_account_record["fields"]["password"] = self.encrypt_string(
-                    value=mail_account_record["fields"]["password"],
-                )
+            for crypt_config in self.CRYPT_FIELDS:
+                exporter_key = crypt_config["exporter_key"]
+                crypt_fields = crypt_config["fields"]
+                for manifest_record in manifest[exporter_key]:
+                    for field in crypt_fields:
+                        manifest_record["fields"][field] = self.encrypt_string(
+                            value=manifest_record["fields"][field],
+                        )
+
         elif MailAccount.objects.count() > 0:
             self.stdout.write(
                 self.style.NOTICE(

@@ -2,6 +2,7 @@ import base64
 import os
 from argparse import ArgumentParser
 from typing import Optional
+from typing import TypedDict
 from typing import Union
 
 from cryptography.fernet import Fernet
@@ -14,6 +15,12 @@ from documents.settings import EXPORTER_CRYPTO_KEY_ITERATIONS_NAME
 from documents.settings import EXPORTER_CRYPTO_KEY_SIZE_NAME
 from documents.settings import EXPORTER_CRYPTO_SALT_NAME
 from documents.settings import EXPORTER_CRYPTO_SETTINGS_NAME
+
+
+class CryptFields(TypedDict):
+    exporter_key: str
+    model_name: str
+    fields: list[str]
 
 
 class MultiProcessMixin:
@@ -85,6 +92,16 @@ class CryptMixin:
     salt_size = 16
     key_size = 32
     kdf_algorithm = "pbkdf2_sha256"
+
+    CRYPT_FIELDS: CryptFields = [
+        {
+            "exporter_key": "mail_accounts",
+            "model_name": "paperless_mail.mailaccount",
+            "fields": [
+                "password",
+            ],
+        },
+    ]
 
     def get_crypt_params(self) -> dict[str, dict[str, Union[str, int]]]:
         return {

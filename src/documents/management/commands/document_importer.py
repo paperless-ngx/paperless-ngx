@@ -404,16 +404,22 @@ class Command(CryptMixin, BaseCommand):
             # Salt has been loaded from metadata.json at this point, so it cannot be None
             self.setup_crypto(passphrase=self.passphrase, salt=self.salt)
 
-            had_an_account = False
+            had_at_least_one_record = False
 
-            for index, record in enumerate(self.manifest):
-                if record["model"] == "paperless_mail.mailaccount":
-                    record["fields"]["password"] = self.decrypt_string(
-                        value=record["fields"]["password"],
-                    )
-                    self.manifest[index] = record
-                    had_an_account = True
-            if had_an_account:
+            for crypt_config in self.CRYPT_FIELDS:
+                importer_model = crypt_config["model_name"]
+                crypt_fields = crypt_config["fields"]
+                for record in filter(
+                    lambda x: x["model"] == importer_model,
+                    self.manifest,
+                ):
+                    had_at_least_one_record = True
+                    for field in crypt_fields:
+                        record["fields"][field] = self.decrypt_string(
+                            value=record["fields"][field],
+                        )
+
+            if had_at_least_one_record:
                 # It's annoying, but the DB is loaded from the JSON directly
                 # Maybe could change that in the future?
                 (self.source / "manifest.json").write_text(
