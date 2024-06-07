@@ -175,14 +175,6 @@ def generate_filename(
             else:
                 document_type = no_value_default
                 
-            if doc.warehouse:
-                warehouse = pathvalidate.sanitize_filename(
-                    doc.warehouse.name,
-                    replacement_text="-",
-                )
-            else:
-                warehouse = no_value_default
-
             if doc.archive_serial_number:
                 asn = str(doc.archive_serial_number)
             else:
@@ -207,7 +199,6 @@ def generate_filename(
                 title=pathvalidate.sanitize_filename(doc.title, replacement_text="-"),
                 correspondent=correspondent,
                 document_type=document_type,
-                warehouse=warehouse,
                 created=local_created.isoformat(),
                 created_year=local_created.strftime("%Y"),
                 created_year_short=local_created.strftime("%y"),
