@@ -73,6 +73,7 @@ import { ColorSliderModule } from 'ngx-color/slider'
 import { ColorComponent } from './components/common/input/color/color.component'
 import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
 import { DocumentNotesComponent } from './components/document-notes/document-notes.component'
+import { DocumentApprovalsComponent } from './components/document-approvals/document-approvals.component'
 import { PermissionsGuard } from './guards/permissions.guard'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
@@ -441,6 +442,7 @@ function initializeApp(settings: SettingsService) {
     ColorComponent,
     DocumentAsnComponent,
     DocumentNotesComponent,
+    DocumentApprovalsComponent,
     TasksComponent,
     ApprovalsComponent,
     UserEditDialogComponent,

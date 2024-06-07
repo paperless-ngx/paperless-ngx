@@ -73,6 +73,7 @@ import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service
 import { PDFDocumentProxy } from '../common/pdf-viewer/typings'
 import { SplitConfirmDialogComponent } from '../common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
 import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
+import { DocumentApproval } from 'src/app/data/document-approval'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -81,6 +82,7 @@ enum DocumentDetailNavIDs {
   Preview = 4,
   Notes = 5,
   Permissions = 6,
+  Approvals = 7
 }
 
 enum ContentRenderType {
@@ -943,8 +945,22 @@ export class DocumentDetailComponent
     )
   }
 
+  get approvalsEnabled(): boolean {
+    return (
+      this.settings.get(SETTINGS_KEYS.APPROVALS_ENABLED) &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Approval
+      )
+    )
+  }
+
   notesUpdated(notes: DocumentNote[]) {
     this.document.notes = notes
+    this.openDocumentService.refreshDocument(this.documentId)
+  }
+  approvalsUpdated(approvals: DocumentApproval[]) {
+    this.document.approvals = approvals 
     this.openDocumentService.refreshDocument(this.documentId)
   }
 

@@ -44,6 +44,7 @@
         <th scope="col" class="d-table-cell d-lg-cell" i18n>Name</th>
         <th scope="col" class="d-table-cell d-lg-cell" i18n>Content type</th>
         <th scope="col" class="d-table-cell d-lg-cell" i18n>Submmit by</th>
+        <th scope="col" class="d-table-cell d-lg-cell" i18n>Submmit by group</th>
         <th scope="col" class="d-none d-lg-table-cell" i18n>Created</th>
         <th scope="col" class="d-none d-lg-table-cell" i18n>Expires</th>
         @if (activeTab == 'success') {
@@ -72,7 +73,8 @@
           </td>
           <td class="d-none d-lg-table-cell">{{ approval.name }}</td>
           <td class="d-none d-lg-table-cell">{{ approval.ctype }}</td>
-          <td class="d-none d-lg-table-cell">{{ approval.submitted_by }}</td>
+          <td class="d-none d-lg-table-cell">{{ displayName(approval) }}</td>
+          <td class="d-none d-lg-table-cell">{{ displayGroup(approval) }}</td>
           <td class="overflow-auto name-col">{{ approval.created | customDate:'short' }}</td>
           @if (approval.expiration==null){
             <td class="overflow-auto name-col">Unlimited</td>

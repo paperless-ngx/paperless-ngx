@@ -19,6 +19,7 @@ import pathvalidate
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.db import connections
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
@@ -717,6 +718,109 @@ class DocumentViewSet(
 
             return Response(self.getNotes(doc))
 
+        return Response(
+            {
+                "error": "error",
+            },
+        )
+    
+    def get_approvals(self, doc:Document):
+        approvals = Approval.objects.get(id=doc.pk)
+
+        return approvals
+    
+    @action(methods=["get", "post"], detail=True)
+    def approvals(self, request, pk=None):
+        currentUser = request.user
+        try:
+            doc = Document.objects.get(pk=pk)
+            if currentUser is not None and not has_perms_owner_aware(
+                currentUser,
+                "view_document",
+                doc,
+            ):
+                return HttpResponseForbidden("Insufficient permissions to view approvals")
+        except Document.DoesNotExist:
+            raise Http404
+
+        if request.method == "GET":
+            try:
+                return Response(self.get_approvals(doc))
+            except Exception as e:
+                logger.warning(f"An error occurred retrieving approvals: {e!s}")
+                return Response(
+                    {"error": "Error retrieving approvals, check logs for more detail."},
+                )
+        elif request.method == "POST":
+            try:
+                if currentUser is not None and not has_perms_owner_aware(
+                    currentUser,
+                    "change_document",
+                    doc,
+                ):
+                    return HttpResponseForbidden(
+                        "Insufficient permissions to create notes",
+                    )
+                serializer = ApprovalSerializer(data=request.data)
+                existing_approval = False
+                if serializer.is_valid(raise_exception=True):
+                
+                    existing_approval = Approval.objects.filter(
+                        object_pk=serializer.validated_data.get("object_pk"),
+                        access_type=serializer.validated_data.get("access_type"),
+                        ctype=serializer.validated_data.get("ctype"),
+                        submitted_by=serializer.validated_data.get("submitted_by")
+                    )
+
+                    submitted_by_groups = serializer.validated_data.get("submitted_by_group", None)
+                    if submitted_by_groups:
+                        existing_approval = existing_approval.filter(
+                            Q(submitted_by_group__in=submitted_by_groups)
+                        ).exists()
+
+                if existing_approval:
+                    return Response({'status':400,
+                                    'message':'Objects exist'},status=status.HTTP_400_BAD_REQUEST)
+                content_type_id = ContentType.objects.get(app_label="documents",model='document').pk
+
+                a = Approval.objects.create(
+                    submitted_by=currentUser,
+                    object_pk=str(doc.pk),
+                    ctype_id=content_type_id,
+                    access_type="VIEW",
+                    expiration=serializer.validated_data.get("expiration"),
+                    submitted_by_group=serializer.validated_data.get("submitted_by_group", None)
+                )
+                a.save()
+                # If audit log is enabled make an entry in the log
+                # about this note change
+                if settings.AUDIT_LOG_ENABLED:
+                    LogEntry.objects.log_create(
+                        instance=doc,
+                        changes=json.dumps(
+                            {
+                                "Approval Added": ["None", a.id],
+                            },
+                        ),
+                        action=LogEntry.Action.UPDATE,
+                    )
+
+                # doc.modified = timezone.now()
+                doc.save()
+
+                from documents import index
+
+                index.add_or_update_document(self.get_object())
+
+                return Response(self.getNotes(doc))
+            except Exception as e:
+                logger.warning(f"An error occurred saving approval: {e!s}")
+                return Response(
+                    {
+                        "error": "Error saving approval, check logs for more detail.",
+                    },
+                )
+        
         return Response(
             {
                 "error": "error",

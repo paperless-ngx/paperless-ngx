@@ -1,4 +1,6 @@
+import { Group } from './group'
 import { ObjectWithId } from './object-with-id'
+import { User } from './user'
 
 export enum PaperlessApprovalAccessType {
   // just file tasks, for now
@@ -15,7 +17,7 @@ export enum PaperlessApprovalStatus {
   Revoked = 'REVOKED',
 }
 
-export interface PaperlessApproval extends ObjectWithId {
+export interface DocumentApproval extends ObjectWithId {
   
   access_type: PaperlessApprovalAccessType
 
@@ -30,6 +32,8 @@ export interface PaperlessApproval extends ObjectWithId {
   created: Date
 
   modified?: Date
+
+  expiration?: Date
 
   ctype?: string
 

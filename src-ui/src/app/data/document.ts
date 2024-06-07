@@ -7,6 +7,7 @@ import { Warehouse } from './warehouse'
 import { ObjectWithPermissions } from './object-with-permissions'
 import { DocumentNote } from './document-note'
 import { CustomFieldInstance } from './custom-field-instance'
+import { DocumentApproval } from './document-approval'
 
 export interface SearchHit {
   score?: number
@@ -64,6 +65,8 @@ export interface Document extends ObjectWithPermissions {
   archive_serial_number?: number
 
   notes?: DocumentNote[]
+  
+  approvals?: DocumentApproval[]
 
   __search_hit__?: SearchHit
 
