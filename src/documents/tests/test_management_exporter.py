@@ -3,6 +3,7 @@ import json
 import os
 import shutil
 import tempfile
+from io import StringIO
 from pathlib import Path
 from unittest import mock
 from zipfile import ZipFile
@@ -857,6 +858,15 @@ class TestCryptExportImport(
         return super().tearDown()
 
     def test_export_passphrase(self):
+        """
+        GIVEN:
+            - A mail account exists
+        WHEN:
+            - Export command is called
+            - Passphrase is provided
+        THEN:
+            - Output password is not plaintext
+        """
         MailAccount.objects.create(
             name="Test Account",
             imap_server="test.imap.com",
@@ -903,6 +913,17 @@ class TestCryptExportImport(
         self.assertEqual(account.password, "mypassword")
 
     def test_import_crypt_no_passphrase(self):
+        """
+        GIVEN:
+            - A mail account exists
+        WHEN:
+            - Export command is called
+            - Passphrase is provided
+            - Import command is called
+            - No passphrase is given
+        THEN:
+            - An error is raised for the issue
+        """
         call_command(
             "document_exporter",
             "--no-progress-bar",
@@ -921,3 +942,39 @@ class TestCryptExportImport(
                 err.msg,
                 "No passphrase was given, but this export contains encrypted fields",
             )
+
+    def test_export_warn_plaintext(self):
+        """
+        GIVEN:
+            - A mail account exists
+        WHEN:
+            - Export command is called
+            - No passphrase is provided
+        THEN:
+            - Output password is plaintext
+            - Warning is output
+        """
+        MailAccount.objects.create(
+            name="Test Account",
+            imap_server="test.imap.com",
+            username="myusername",
+            password="mypassword",
+        )
+
+        stdout = StringIO()
+
+        call_command(
+            "document_exporter",
+            "--no-progress-bar",
+            str(self.target),
+            stdout=stdout,
+        )
+        stdout.seek(0)
+        self.assertIn(
+            (
+                "You have configured mail accounts, "
+                "but have no passphrase was given. "
+                "Passwords will be in plaintext"
+            ),
+            stdout.read(),
+        )

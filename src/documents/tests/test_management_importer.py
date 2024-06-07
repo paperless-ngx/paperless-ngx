@@ -241,7 +241,7 @@ class TestCommandImport(
         stdout.seek(0)
         self.assertIn(
             "Found existing user(s), this might indicate a non-empty installation",
-            str(stdout.read()),
+            stdout.read(),
         )
 
     def test_import_with_documents_exists(self):
@@ -281,6 +281,14 @@ class TestCommandImport(
         )
 
     def test_import_no_metadata_or_version_file(self):
+        """
+        GIVEN:
+            - A source directory with a manifest file only
+        WHEN:
+            - An import is attempted
+        THEN:
+            - Warning about the missing files is output
+        """
         stdout = StringIO()
 
         (self.dirs.scratch_dir / "manifest.json").touch()
@@ -299,6 +307,14 @@ class TestCommandImport(
         self.assertIn("No version.json or metadata.json file located", stdout_str)
 
     def test_import_version_file(self):
+        """
+        GIVEN:
+            - A source directory with a manifest file and version file
+        WHEN:
+            - An import is attempted
+        THEN:
+            - Warning about the the version mismatch is output
+        """
         stdout = StringIO()
 
         (self.dirs.scratch_dir / "manifest.json").touch()

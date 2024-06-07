@@ -556,3 +556,11 @@ class Command(CryptMixin, BaseCommand):
                 mail_account_record["fields"]["password"] = self.encrypt_string(
                     value=mail_account_record["fields"]["password"],
                 )
+        elif MailAccount.objects.count() > 0:
+            self.stdout.write(
+                self.style.NOTICE(
+                    "You have configured mail accounts, "
+                    "but have no passphrase was given. "
+                    "Passwords will be in plaintext",
+                ),
+            )
