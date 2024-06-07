@@ -994,6 +994,52 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertCountEqual(args[0], [self.doc2.id, self.doc3.id])
         self.assertEqual(kwargs["metadata_document_id"], self.doc3.id)
 
+    @mock.patch("documents.serialisers.bulk_edit.merge")
+    def test_merge_and_delete_insufficient_permissions(self, m):
+        self.doc1.owner = User.objects.get(username="temp_admin")
+        self.doc1.save()
+        user1 = User.objects.create(username="user1")
+        self.client.force_authenticate(user=user1)
+
+        m.return_value = "OK"
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id, self.doc2.id],
+                    "method": "merge",
+                    "parameters": {
+                        "metadata_document_id": self.doc2.id,
+                        "delete_originals": True,
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        m.assert_not_called()
+        self.assertEqual(response.content, b"Insufficient permissions")
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id, self.doc3.id],
+                    "method": "merge",
+                    "parameters": {
+                        "metadata_document_id": self.doc2.id,
+                        "delete_originals": True,
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        m.assert_called_once()
+
     @mock.patch("documents.serialisers.bulk_edit.split")
     def test_split(self, m):
         m.return_value = "OK"
