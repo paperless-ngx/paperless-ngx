@@ -1040,6 +1040,36 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
 
+    @mock.patch("documents.serialisers.bulk_edit.merge")
+    def test_merge_and_delete_broken_parameters(self, m):
+        """
+        GIVEN:
+            - API data for merging documents is called
+            - The parameters are invalid
+        WHEN:
+            - API is called
+        THEN:
+            - The API fails with a correct error code
+        """
+        m.return_value = "OK"
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id, self.doc2.id],
+                    "method": "merge",
+                    "parameters": {
+                        "delete_originals": "not_boolean",
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        m.assert_not_called()
+
     @mock.patch("documents.serialisers.bulk_edit.split")
     def test_split(self, m):
         m.return_value = "OK"
