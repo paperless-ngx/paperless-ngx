@@ -530,6 +530,13 @@ HTTP header/value expected by Django, eg `'["HTTP_X_FORWARDED_PROTO", "https"]'`
     Settings this value has security implications.  Read the Django documentation
     and be sure you understand its usage before setting it.
 
+#### [`PAPERLESS_X_FRAME_OPTIONS=<str>`](#PAPERLESS_X_FRAME_OPTIONS) {#PAPERLESS_X_FRAME_OPTIONS}
+
+: Configures the Django setting [X_FRAME_OPTIONS](https://docs.djangoproject.com/en/4.2/ref/settings/#x-frame-options)
+which may be needed for embedding within an iframe.
+
+    Defaults to "SAMEORIGIN".
+
 #### [`PAPERLESS_EMAIL_CERTIFICATE_LOCATION=<path>`](#PAPERLESS_EMAIL_CERTIFICATE_LOCATION) {#PAPERLESS_EMAIL_CERTIFICATE_LOCATION}
 
 : Configures an additional SSL certificate file containing a [certificate](https://docs.python.org/3/library/ssl.html#certificates)
