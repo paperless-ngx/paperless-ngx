@@ -854,7 +854,6 @@ def run_workflow_approval(
             trigger_type,
         ):
             model_name = approval.ctype.name
-            print('model_class',apps.get_model(approval.ctype.app_label, model_name))
             model_class = apps.get_model(approval.ctype.app_label, model_name)
             all_permissions = Permission.objects.filter(content_type=approval.ctype)
             # obj assign

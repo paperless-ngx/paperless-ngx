@@ -48,7 +48,7 @@ from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.models import Warehouse
 from documents.parsers import is_mime_type_supported
-from documents.permissions import get_groups_with_only_permission
+from documents.permissions import get_groups_with_only_permission, has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
 from documents.validators import uri_validator
 
@@ -423,8 +423,7 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 class CorrespondentField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         return Correspondent.objects.all()
-
-
+    
 class TagsField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         return Tag.objects.all()
@@ -655,6 +654,7 @@ class DocumentSerializer(
     NestedUpdateMixin,
     DynamicFieldsModelSerializer,
 ):
+    approvals = serializers.SerializerMethodField(read_only=True)
     correspondent = CorrespondentField(allow_null=True)
     tags = TagsField(many=True)
     warehouse = WarehouseField(allow_null=True)
@@ -683,6 +683,19 @@ class DocumentSerializer(
         allow_null=True,
         required=False,
     )
+
+    def get_approvals(self, obj):
+        doc = Document.objects.get(pk=obj.pk)
+        currentUser = self.context.get("request").user
+        if currentUser is not None and not has_perms_owner_aware(
+            currentUser,
+            "view_document",
+            doc,
+        ):
+            return None
+        approvals = Approval.objects.filter(object_pk=obj.pk, status="SUCCESS")
+        serializer = ApprovalSerializer(approvals, many=True)
+        return serializer.data
 
     def get_original_file_name(self, obj):
         return obj.original_filename
@@ -773,6 +786,7 @@ class DocumentSerializer(
         depth = 1
         fields = (
             "id",
+            "approvals",
             "correspondent",
             "document_type",
             "storage_path",
@@ -1366,9 +1380,9 @@ class TasksViewSerializer(serializers.ModelSerializer):
         return result
 
 class ApprovalSerializer(serializers.ModelSerializer):
-    submitted_by = serializers.ReadOnlyField(source='submitted_by.username')
+    # submitted_by = serializers.ReadOnlyField(source='submitted_by.username')
     ctype = serializers.ReadOnlyField(source='ctype.model')
-    submitted_by_id = serializers.PrimaryKeyRelatedField(source='submitted_by', queryset=User.objects.all(), write_only=True)
+    # submitted_by_id = serializers.PrimaryKeyRelatedField(source='submitted_by', queryset=User.objects.all(), write_only=True, allow_null=True)
     ctype_id = serializers.PrimaryKeyRelatedField(source='ctype', queryset=ContentType.objects.all(), write_only=True)
     name = serializers.SerializerMethodField(read_only=True)
 

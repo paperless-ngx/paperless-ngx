@@ -6,6 +6,10 @@ import { PaperlessApproval } from 'src/app/data/paperless-approval'
 import { ApprovalsService } from 'src/app/services/approvals.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { User } from 'src/app/data/user'
+import { Group } from 'src/app/data/group'
+import { UserService } from 'src/app/services/rest/user.service'
+import { GroupService } from 'src/app/services/rest/group.service'
 
 @Component({
   selector: 'pngx-approvals',
@@ -16,7 +20,8 @@ export class ApprovalsComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy
 {
-  
+  users: User[]
+  groups: Group[]
   public activeTab: string
   public selectedApprovals: Set<number> = new Set()
   public togggleAll: boolean = false
@@ -51,9 +56,21 @@ export class ApprovalsComponent
   constructor(
     public approvalsService: ApprovalsService,
     private modalService: NgbModal,
-    private readonly router: Router
+    private readonly router: Router,
+    private userService: UserService,
+    private groupService: GroupService
   ) {
     super()
+    this.groupService.listAll().subscribe({
+      next: (groups) => {
+        this.groups = groups.results
+      },
+    })
+    this.userService.listAll().subscribe({
+      next: (users) => {
+        this.users = users.results
+      },
+    })
   }
 
   ngOnInit() {
@@ -61,7 +78,21 @@ export class ApprovalsComponent
     this.toggleAutoRefresh()
     // console.log(approvals)
   }
-
+  
+  displayName(approval: PaperlessApproval): string {
+    if (!approval.submitted_by) return '';
+      if (!approval.submitted_by) return ''
+      const user_id = typeof approval.submitted_by === 'number' ? approval.submitted_by : approval.submitted_by
+      const user = this.users?.find((u) => u.id === user_id)
+      if (!user) return ''
+      return user.username
+  }
+  
+  displayGroup(approval: PaperlessApproval): string {
+    if (!approval.submitted_by_group) return ''
+    const nameArray = this.groups?.filter(obj => approval.submitted_by_group.includes(obj.id)).map(obj => obj.name);
+    return nameArray?.toString()
+  }
   ngOnDestroy() {
     this.approvalsService.cancelPending()
     clearInterval(this.autoRefreshInterval)
