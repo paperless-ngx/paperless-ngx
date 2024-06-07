@@ -943,7 +943,6 @@ class BulkEditSerializer(
             "set_permissions",
             "rotate",
             "merge",
-            "merge_and_delete_originals",
             "split",
             "delete_pages",
         ],
@@ -1000,8 +999,6 @@ class BulkEditSerializer(
             return bulk_edit.rotate
         elif method == "merge":
             return bulk_edit.merge
-        elif method == "merge_and_delete_originals":
-            return bulk_edit.merge_and_delete_originals
         elif method == "split":
             return bulk_edit.split
         elif method == "delete_pages":
@@ -1142,6 +1139,13 @@ class BulkEditSerializer(
         if not all(isinstance(i, int) for i in parameters["pages"]):
             raise serializers.ValidationError("pages must be a list of integers")
 
+    def _validate_parameters_merge(self, parameters):
+        if "delete_originals" in parameters:
+            if not isinstance(parameters["delete_originals"], bool):
+                raise serializers.ValidationError("delete_originals must be a boolean")
+        else:
+            parameters["delete_originals"] = False
+
     def validate(self, attrs):
         method = attrs["method"]
         parameters = attrs["parameters"]
@@ -1174,6 +1178,8 @@ class BulkEditSerializer(
                     "Delete pages method only supports one document",
                 )
             self._validate_parameters_delete_pages(parameters)
+        elif method == bulk_edit.merge:
+            self._validate_parameters_merge(parameters)
 
         return attrs
 

@@ -514,7 +514,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         """
         doc_ids = [self.doc1_delete_after_merge.id, self.doc2_delete_after_merge.id]
 
-        result = bulk_edit.merge_and_delete_originals(doc_ids)
+        result = bulk_edit.merge(doc_ids, delete_originals=True)
         self.assertEqual(result, "OK")
 
         expected_filename = (

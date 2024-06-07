@@ -296,13 +296,6 @@ def merge(
     return "OK"
 
 
-def merge_and_delete_originals(
-    doc_ids: list[int],
-    metadata_document_id: Optional[int] = None,
-):
-    return merge(doc_ids, metadata_document_id, True)
-
-
 def split(doc_ids: list[int], pages: list[list[int]]):
     logger.info(
         f"Attempting to split document {doc_ids[0]} into {len(pages)} documents",
