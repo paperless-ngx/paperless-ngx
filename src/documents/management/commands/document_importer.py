@@ -77,7 +77,7 @@ class Command(CryptMixin, BaseCommand):
 
         parser.add_argument(
             "--passphrase",
-            help="If provided, is used to decrypt mail account passwords in the export",
+            help="If provided, is used to sensitive fields in the export",
         )
 
     def pre_check(self) -> None:
