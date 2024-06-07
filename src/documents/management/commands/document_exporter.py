@@ -168,7 +168,7 @@ class Command(CryptMixin, BaseCommand):
 
         parser.add_argument(
             "--passphrase",
-            help="If provided, is used to encrypt mail account passwords in the export",
+            help="If provided, is used to encrypt sensitive data in the export",
         )
 
     def handle(self, *args, **options):
@@ -560,7 +560,7 @@ class Command(CryptMixin, BaseCommand):
             self.stdout.write(
                 self.style.NOTICE(
                     "You have configured mail accounts, "
-                    "but have no passphrase was given. "
+                    "but no passphrase was given. "
                     "Passwords will be in plaintext",
                 ),
             )

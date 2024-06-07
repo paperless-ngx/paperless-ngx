@@ -973,7 +973,7 @@ class TestCryptExportImport(
         self.assertIn(
             (
                 "You have configured mail accounts, "
-                "but have no passphrase was given. "
+                "but no passphrase was given. "
                 "Passwords will be in plaintext"
             ),
             stdout.read(),
