@@ -4,6 +4,7 @@ import logging
 import os
 from typing import Optional
 
+from celery import chain
 from celery import chord
 from django.conf import settings
 from django.db.models import Q
@@ -19,6 +20,7 @@ from documents.models import StoragePath
 from documents.permissions import set_permissions_for_object
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
+from documents.tasks import delete_documents
 from documents.tasks import update_document_archive_file
 
 logger = logging.getLogger("paperless.bulk_edit")
@@ -281,7 +283,8 @@ def merge(
         overrides = DocumentMetadataOverrides()
 
     logger.info("Adding merged document to the task queue.")
-    consume_file.delay(
+
+    consume_task = consume_file.s(
         ConsumableDocument(
             source=DocumentSource.ConsumeFolder,
             original_file=filepath,
@@ -290,8 +293,10 @@ def merge(
     )
 
     if delete_originals:
-        logger.info("Removing original documents after merge")
-        delete(affected_docs)
+        logger.info("Removing original documents after consumption of merged document")
+        chain(consume_task, delete_documents.si(affected_docs)).delay()
+    else:
+        consume_task.delay()
 
     return "OK"
 

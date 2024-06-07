@@ -292,3 +292,14 @@ def update_document_archive_file(document_id):
         )
     finally:
         parser.cleanup()
+
+
+@shared_task
+def delete_documents(doc_ids: list[int]):
+    Document.objects.filter(id__in=doc_ids).delete()
+
+    from documents import index
+
+    with index.open_index_writer() as writer:
+        for id in doc_ids:
+            index.remove_document_by_id(writer, id)

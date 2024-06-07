@@ -376,45 +376,6 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             / "0000003.pdf",
             sample3,
         )
-
-        sample4 = self.dirs.scratch_dir / "sample4.pdf"
-        shutil.copy(
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000001.pdf",
-            sample4,
-        )
-        sample4_archive = self.dirs.archive_dir / "sample4_archive.pdf"
-        shutil.copy(
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000001.pdf",
-            sample4_archive,
-        )
-
-        sample5 = self.dirs.scratch_dir / "sample5.pdf"
-        shutil.copy(
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000002.pdf",
-            sample5,
-        )
-        sample5_archive = self.dirs.archive_dir / "sample5_archive.pdf"
-        shutil.copy(
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000002.pdf",
-            sample5_archive,
-        )
-
         self.doc1 = Document.objects.create(
             checksum="A",
             title="A",
@@ -449,25 +410,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             mime_type="image/jpeg",
         )
 
-        self.doc1_delete_after_merge = Document.objects.create(
-            checksum="Ad",
-            title="Adelete",
-            filename=sample4,
-            mime_type="application/pdf",
-        )
-        self.doc1_delete_after_merge.archive_filename = sample4_archive
-        self.doc1_delete_after_merge.save()
-
-        self.doc2_delete_after_merge = Document.objects.create(
-            checksum="Bd",
-            title="Bdelete",
-            filename=sample5,
-            mime_type="application/pdf",
-        )
-        self.doc2_delete_after_merge.archive_filename = sample5_archive
-        self.doc2_delete_after_merge.save()
-
-    @mock.patch("documents.tasks.consume_file.delay")
+    @mock.patch("documents.tasks.consume_file.s")
     def test_merge(self, mock_consume_file):
         """
         GIVEN:
@@ -501,18 +444,25 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
         self.assertEqual(result, "OK")
 
-    @mock.patch("documents.tasks.consume_file.delay")
-    def test_merge_and_delete_originals(self, mock_consume_file):
+    @mock.patch("documents.tasks.delete_documents.si")
+    @mock.patch("documents.tasks.consume_file.s")
+    @mock.patch("documents.bulk_edit.chain")
+    def test_merge_and_delete_originals(
+        self,
+        mock_chain,
+        mock_consume_file,
+        mock_delete_documents,
+    ):
         """
         GIVEN:
             - Existing documents
         WHEN:
-            - Merge action with deleting documents is called with 2 documents
+            - Merge action with deleting documents is called with 3 documents
         THEN:
-            - Consume file should be called
-            - Documents should be deleted
+            - Consume file task should be called
+            - Document deletion task should be called
         """
-        doc_ids = [self.doc1_delete_after_merge.id, self.doc2_delete_after_merge.id]
+        doc_ids = [self.doc1.id, self.doc2.id, self.doc3.id]
 
         result = bulk_edit.merge(doc_ids, delete_originals=True)
         self.assertEqual(result, "OK")
@@ -522,6 +472,8 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         )
 
         mock_consume_file.assert_called()
+        mock_delete_documents.assert_called()
+        mock_chain.assert_called_once()
 
         consume_file_args, _ = mock_consume_file.call_args
         self.assertEqual(
@@ -530,11 +482,11 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         )
         self.assertEqual(consume_file_args[1].title, None)
 
-        with self.assertRaises(Document.DoesNotExist):
-            Document.objects.get(id=self.doc1_delete_after_merge.id)
-
-        with self.assertRaises(Document.DoesNotExist):
-            Document.objects.get(id=self.doc2_delete_after_merge.id)
+        delete_documents_args, _ = mock_delete_documents.call_args
+        self.assertEqual(
+            delete_documents_args[0],
+            doc_ids,
+        )
 
     @mock.patch("documents.tasks.consume_file.delay")
     @mock.patch("pikepdf.open")
