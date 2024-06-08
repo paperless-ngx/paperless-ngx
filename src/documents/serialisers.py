@@ -1131,6 +1131,12 @@ class BulkEditSerializer(
         except ValueError:
             raise serializers.ValidationError("invalid pages specified")
 
+        if "delete_originals" in parameters:
+            if not isinstance(parameters["delete_originals"], bool):
+                raise serializers.ValidationError("delete_originals must be a boolean")
+        else:
+            parameters["delete_originals"] = False
+
     def _validate_parameters_delete_pages(self, parameters):
         if "pages" not in parameters:
             raise serializers.ValidationError("pages not specified")
@@ -1138,6 +1144,13 @@ class BulkEditSerializer(
             raise serializers.ValidationError("pages must be a list")
         if not all(isinstance(i, int) for i in parameters["pages"]):
             raise serializers.ValidationError("pages must be a list of integers")
+
+    def _validate_parameters_merge(self, parameters):
+        if "delete_originals" in parameters:
+            if not isinstance(parameters["delete_originals"], bool):
+                raise serializers.ValidationError("delete_originals must be a boolean")
+        else:
+            parameters["delete_originals"] = False
 
     def validate(self, attrs):
         method = attrs["method"]
@@ -1171,6 +1184,8 @@ class BulkEditSerializer(
                     "Delete pages method only supports one document",
                 )
             self._validate_parameters_delete_pages(parameters)
+        elif method == bulk_edit.merge:
+            self._validate_parameters_merge(parameters)
 
         return attrs
 

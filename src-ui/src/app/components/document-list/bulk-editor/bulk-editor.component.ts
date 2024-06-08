@@ -813,6 +813,9 @@ export class BulkEditorComponent
         if (mergeDialog.metadataDocumentID > -1) {
           args['metadata_document_id'] = mergeDialog.metadataDocumentID
         }
+        if (mergeDialog.deleteOriginals) {
+          args['delete_originals'] = true
+        }
         mergeDialog.buttonsEnabled = false
         this.executeBulkOperation(modal, 'merge', args, mergeDialog.documentIDs)
         this.toastService.showInfo(
