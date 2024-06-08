@@ -6,6 +6,7 @@ from typing import Optional
 
 from celery import chain
 from celery import chord
+from celery import group
 from django.conf import settings
 from django.db.models import Q
 
@@ -293,7 +294,9 @@ def merge(
     )
 
     if delete_originals:
-        logger.info("Queueing removal of original documents after consumption of merged document")
+        logger.info(
+            "Queueing removal of original documents after consumption of merged document",
+        )
         chain(consume_task, delete_documents.si(affected_docs)).delay()
     else:
         consume_task.delay()
@@ -301,12 +304,14 @@ def merge(
     return "OK"
 
 
-def split(doc_ids: list[int], pages: list[list[int]]):
+def split(doc_ids: list[int], pages: list[list[int]], delete_originals: bool = False):
     logger.info(
         f"Attempting to split document {doc_ids[0]} into {len(pages)} documents",
     )
     doc = Document.objects.get(id=doc_ids[0])
     import pikepdf
+
+    consume_tasks = []
 
     try:
         with pikepdf.open(doc.source_path) as pdf:
@@ -327,13 +332,24 @@ def split(doc_ids: list[int], pages: list[list[int]]):
                 logger.info(
                     f"Adding split document with pages {split_doc} to the task queue.",
                 )
-                consume_file.delay(
-                    ConsumableDocument(
-                        source=DocumentSource.ConsumeFolder,
-                        original_file=filepath,
+                consume_tasks.append(
+                    consume_file.s(
+                        ConsumableDocument(
+                            source=DocumentSource.ConsumeFolder,
+                            original_file=filepath,
+                        ),
+                        overrides,
                     ),
-                    overrides,
                 )
+
+            if delete_originals:
+                logger.info(
+                    "Queueing removal of original document after consumption of the split documents",
+                )
+                chord(header=consume_tasks, body=delete_documents.si([doc.id])).delay()
+            else:
+                group(consume_tasks).delay()
+
     except Exception as e:
         logger.exception(f"Error splitting document {doc.id}: {e}")
 

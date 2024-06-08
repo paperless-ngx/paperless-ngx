@@ -5,6 +5,7 @@ import { DocumentService } from 'src/app/services/rest/document.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop'
 import { Subject, takeUntil } from 'rxjs'
+import { tap } from 'rxjs/operators'
 import { Document } from 'src/app/data/document'
 
 @Component({

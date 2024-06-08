@@ -984,7 +984,7 @@ class BulkEditView(PassUserMixin):
             )
 
             if (
-                method == bulk_edit.merge
+                method in [bulk_edit.merge, bulk_edit.split]
                 and parameters["delete_originals"]
                 and not user_is_owner_of_all_documents
             ):

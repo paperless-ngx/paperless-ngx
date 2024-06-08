@@ -1,7 +1,9 @@
 import { Component } from '@angular/core'
 import { ConfirmDialogComponent } from '../confirm-dialog.component'
+import { Document } from 'src/app/data/document'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { DocumentService } from 'src/app/services/rest/document.service'
+import { PermissionsService } from 'src/app/services/permissions.service'
 import { PDFDocumentProxy } from 'ng2-pdf-viewer'
 
 @Component({
@@ -31,17 +33,19 @@ export class SplitConfirmDialogComponent extends ConfirmDialogComponent {
 
   private pages: Set<number> = new Set()
 
-  public documentID: number
+  public document: Document
   public page: number = 1
   public totalPages: number
+  public deleteOriginal: boolean = false
 
   public get pdfSrc(): string {
-    return this.documentService.getPreviewUrl(this.documentID)
+    return this.documentService.getPreviewUrl(this.document.id)
   }
 
   constructor(
     activeModal: NgbActiveModal,
-    private documentService: DocumentService
+    private documentService: DocumentService,
+    private permissionService: PermissionsService
   ) {
     super(activeModal)
     this.confirmButtonEnabled = this.pages.size > 0
@@ -62,5 +66,9 @@ export class SplitConfirmDialogComponent extends ConfirmDialogComponent {
     let page = Array.from(this.pages)[Math.min(i, this.pages.size - 1)]
     this.pages.delete(page)
     this.confirmButtonEnabled = this.pages.size > 0
+  }
+
+  get userOwnsDocument(): boolean {
+    return this.permissionService.currentUserOwnsObject(this.document)
   }
 }

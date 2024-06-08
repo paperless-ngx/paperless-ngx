@@ -1131,6 +1131,12 @@ class BulkEditSerializer(
         except ValueError:
             raise serializers.ValidationError("invalid pages specified")
 
+        if "delete_originals" in parameters:
+            if not isinstance(parameters["delete_originals"], bool):
+                raise serializers.ValidationError("delete_originals must be a boolean")
+        else:
+            parameters["delete_originals"] = False
+
     def _validate_parameters_delete_pages(self, parameters):
         if "pages" not in parameters:
             raise serializers.ValidationError("pages not specified")

@@ -1112,7 +1112,7 @@ export class DocumentDetailComponent
     modal.componentInstance.title = $localize`Split confirm`
     modal.componentInstance.messageBold = $localize`This operation will split the selected document(s) into new documents.`
     modal.componentInstance.btnCaption = $localize`Proceed`
-    modal.componentInstance.documentID = this.document.id
+    modal.componentInstance.document = this.document
     modal.componentInstance.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
@@ -1120,14 +1120,23 @@ export class DocumentDetailComponent
         this.documentsService
           .bulkEdit([this.document.id], 'split', {
             pages: modal.componentInstance.pagesString,
+            delete_originals: modal.componentInstance.deleteOriginal,
           })
           .pipe(first(), takeUntil(this.unsubscribeNotifier))
           .subscribe({
             next: () => {
-              this.toastService.showInfo(
-                $localize`Split operation will begin in the background.`
-              )
-              modal.close()
+              if (modal.componentInstance.deleteOriginal) {
+                this.toastService.showInfo(
+                  $localize`Split operation will begin in the background. After its completion, the document will be deleted.`
+                )
+                modal.close()
+                this.close()
+              } else {
+                this.toastService.showInfo(
+                  $localize`Split operation will begin in the background.`
+                )
+                modal.close()
+              }
             },
             error: (error) => {
               if (modal) {
