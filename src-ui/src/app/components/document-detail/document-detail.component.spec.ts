@@ -1099,7 +1099,7 @@ describe('DocumentDetailComponent', () => {
     expect(req.request.body).toEqual({
       documents: [doc.id],
       method: 'split',
-      parameters: { pages: '1-2,3-5' },
+      parameters: { pages: '1-2,3-5', delete_originals: false },
     })
     req.error(new ProgressEvent('failed'))
     modal.componentInstance.confirm()
