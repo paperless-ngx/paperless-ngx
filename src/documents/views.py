@@ -47,7 +47,6 @@ from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
-from guardian.core import ObjectPermissionChecker
 from langdetect import detect
 from packaging import version as packaging_version
 from redis import Redis
@@ -2058,7 +2057,7 @@ class SystemStatusView(PassUserMixin):
 
 
 class TrashView(ListModelMixin, PassUserMixin):
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    permission_classes = (IsAuthenticated,)
     serializer_class = TrashSerializer
     filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
     pagination_class = StandardPagination
@@ -2081,10 +2080,8 @@ class TrashView(ListModelMixin, PassUserMixin):
             if doc_ids is not None
             else Document.deleted_objects.all()
         )
-        checker = ObjectPermissionChecker(request.user)
-        checker.prefetch_perms(docs)
         for doc in docs:
-            if not checker.has_perm("delete_document", doc):
+            if not has_perms_owner_aware(request.user, "delete_document", doc):
                 return HttpResponseForbidden("Insufficient permissions")
         action = serializer.validated_data.get("action")
         if action == "restore":

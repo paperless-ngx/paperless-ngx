@@ -100,9 +100,9 @@ class TestTrashAPI(APITestCase):
     def test_api_trash_insufficient_permissions(self):
         """
         GIVEN:
-            - Existing document with owner in trash
+            - Existing document with owner = user2 in trash
         WHEN:
-            - API request to empty trash
+            - user 1 makes API request to empty document from trash
         THEN:
             - 403 Forbidden
         """
