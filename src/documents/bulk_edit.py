@@ -293,7 +293,7 @@ def merge(
     )
 
     if delete_originals:
-        logger.info("Removing original documents after consumption of merged document")
+        logger.info("Queueing removal of original documents after consumption of merged document")
         chain(consume_task, delete_documents.si(affected_docs)).delay()
     else:
         consume_task.delay()
