@@ -1125,18 +1125,10 @@ export class DocumentDetailComponent
           .pipe(first(), takeUntil(this.unsubscribeNotifier))
           .subscribe({
             next: () => {
-              if (modal.componentInstance.deleteOriginal) {
-                this.toastService.showInfo(
-                  $localize`Split operation will begin in the background. After its completion, the document will be deleted.`
-                )
-                modal.close()
-                this.close()
-              } else {
-                this.toastService.showInfo(
-                  $localize`Split operation will begin in the background.`
-                )
-                modal.close()
-              }
+              this.toastService.showInfo(
+                $localize`Split operation will begin in the background.`
+              )
+              modal.close()
             },
             error: (error) => {
               if (modal) {
