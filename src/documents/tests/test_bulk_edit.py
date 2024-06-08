@@ -444,7 +444,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
         self.assertEqual(result, "OK")
 
-    @mock.patch("documents.tasks.delete_documents.si")
+    @mock.patch("documents.bulk_edit.delete.si")
     @mock.patch("documents.tasks.consume_file.s")
     @mock.patch("documents.bulk_edit.chain")
     def test_merge_and_delete_originals(
@@ -513,7 +513,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
         mock_consume_file.assert_not_called()
 
-    @mock.patch("documents.tasks.consume_file.delay")
+    @mock.patch("documents.tasks.consume_file.s")
     def test_split(self, mock_consume_file):
         """
         GIVEN:
@@ -531,6 +531,44 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertEqual(consume_file_args[1].title, "B (split 2)")
 
         self.assertEqual(result, "OK")
+
+    @mock.patch("documents.bulk_edit.delete.si")
+    @mock.patch("documents.tasks.consume_file.s")
+    @mock.patch("documents.bulk_edit.chord")
+    def test_split_and_delete_originals(
+        self,
+        mock_chord,
+        mock_consume_file,
+        mock_delete_documents,
+    ):
+        """
+        GIVEN:
+            - Existing documents
+        WHEN:
+            - Split action with deleting documents is called with 1 document and 2 page groups
+            - delete_originals is set to True
+        THEN:
+            - Consume file should be called twice
+            - Document deletion task should be called
+        """
+        doc_ids = [self.doc2.id]
+        pages = [[1, 2], [3]]
+
+        result = bulk_edit.split(doc_ids, pages, delete_originals=True)
+        self.assertEqual(result, "OK")
+
+        self.assertEqual(mock_consume_file.call_count, 2)
+        consume_file_args, _ = mock_consume_file.call_args
+        self.assertEqual(consume_file_args[1].title, "B (split 2)")
+
+        mock_delete_documents.assert_called()
+        mock_chord.assert_called_once()
+
+        delete_documents_args, _ = mock_delete_documents.call_args
+        self.assertEqual(
+            delete_documents_args[0],
+            doc_ids,
+        )
 
     @mock.patch("documents.tasks.consume_file.delay")
     @mock.patch("pikepdf.Pdf.save")

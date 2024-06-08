@@ -15,7 +15,6 @@ from django.db.models.signals import post_save
 from filelock import FileLock
 from whoosh.writing import AsyncWriter
 
-from documents import bulk_edit
 from documents import index
 from documents import sanity_checker
 from documents.barcodes import BarcodePlugin
@@ -293,8 +292,3 @@ def update_document_archive_file(document_id):
         )
     finally:
         parser.cleanup()
-
-
-@shared_task
-def delete_documents(doc_ids: list[int]):
-    bulk_edit.delete(doc_ids)

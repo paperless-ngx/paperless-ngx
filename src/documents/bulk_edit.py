@@ -7,6 +7,7 @@ from typing import Optional
 from celery import chain
 from celery import chord
 from celery import group
+from celery import shared_task
 from django.conf import settings
 from django.db.models import Q
 
@@ -21,7 +22,6 @@ from documents.models import StoragePath
 from documents.permissions import set_permissions_for_object
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
-from documents.tasks import delete_documents
 from documents.tasks import update_document_archive_file
 
 logger = logging.getLogger("paperless.bulk_edit")
@@ -156,6 +156,7 @@ def modify_custom_fields(doc_ids: list[int], add_custom_fields, remove_custom_fi
     return "OK"
 
 
+@shared_task
 def delete(doc_ids: list[int]):
     Document.objects.filter(id__in=doc_ids).delete()
 
@@ -297,7 +298,7 @@ def merge(
         logger.info(
             "Queueing removal of original documents after consumption of merged document",
         )
-        chain(consume_task, delete_documents.si(affected_docs)).delay()
+        chain(consume_task, delete.si(affected_docs)).delay()
     else:
         consume_task.delay()
 
@@ -346,7 +347,7 @@ def split(doc_ids: list[int], pages: list[list[int]], delete_originals: bool = F
                 logger.info(
                     "Queueing removal of original document after consumption of the split documents",
                 )
-                chord(header=consume_tasks, body=delete_documents.si([doc.id])).delay()
+                chord(header=consume_tasks, body=delete.si([doc.id])).delay()
             else:
                 group(consume_tasks).delay()
 
