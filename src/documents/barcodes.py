@@ -154,7 +154,8 @@ class BarcodePlugin(ConsumeTaskPlugin):
             and (located_asn := self.asn) is not None
         ):
             logger.info(f"Found ASN in barcode: {located_asn}")
-            self.metadata.asn = located_asn
+            if not settings.CONSUMER_ENABLE_ASN0_SPLITTING or located_asn > 0:
+                self.metadata.asn = located_asn
 
     def cleanup(self) -> None:
         self.temp_dir.cleanup()
