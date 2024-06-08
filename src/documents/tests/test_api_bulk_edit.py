@@ -1041,7 +1041,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         m.assert_called_once()
 
     @mock.patch("documents.serialisers.bulk_edit.merge")
-    def test_merge_and_delete_broken_parameters(self, m):
+    def test_merge_invalid_parameters(self, m):
         """
         GIVEN:
             - API data for merging documents is called
@@ -1141,6 +1141,24 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(b"Split method only supports one document", response.content)
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "split",
+                    "parameters": {
+                        "pages": "1",
+                        "delete_originals": "notabool",
+                    },  # not a bool
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"delete_originals must be a boolean", response.content)
 
     @mock.patch("documents.serialisers.bulk_edit.delete_pages")
     def test_delete_pages(self, m):
