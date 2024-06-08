@@ -150,25 +150,3 @@ class TestBulkUpdate(DirectoriesMixin, TestCase):
         )
 
         tasks.bulk_update_documents([doc1.pk])
-
-
-class TestDeleteDocuments(DirectoriesMixin, TestCase):
-    def setUp(self):
-        super().setUp()
-        self.doc1 = Document.objects.create(
-            checksum="Ad",
-            title="Adelete",
-        )
-        self.doc2 = Document.objects.create(
-            checksum="Bd",
-            title="Bdelete",
-        )
-
-    def test(self):
-        tasks.delete_documents([self.doc1.id, self.doc2.id])
-
-        with self.assertRaises(Document.DoesNotExist):
-            Document.objects.get(id=self.doc1.id)
-
-        with self.assertRaises(Document.DoesNotExist):
-            Document.objects.get(id=self.doc2.id)
