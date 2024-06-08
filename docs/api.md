@@ -422,6 +422,9 @@ The following methods are supported:
 - `split`
   - Requires `parameters`:
     - `"pages": [..]` The list should be a list of pages and/or a ranges, separated by commas e.g. `"[1,2-3,4,5-7]"`
+  - Optional `parameters`:
+    - `"delete_originals": true` to delete the original document after consumption. This requires the calling user being the owner of
+      the document.
   - The split operation only accepts a single document.
 - `rotate`
   - Requires `parameters`:
