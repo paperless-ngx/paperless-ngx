@@ -6,7 +6,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("paperless", "0002_applicationconfiguration_app_logo_and_more"),
     ]

@@ -4,7 +4,10 @@ import logging
 import os
 from typing import Optional
 
+from celery import chain
 from celery import chord
+from celery import group
+from celery import shared_task
 from django.conf import settings
 from django.db.models import Q
 
@@ -25,7 +28,6 @@ logger = logging.getLogger("paperless.bulk_edit")
 
 
 def set_correspondent(doc_ids: list[int], correspondent):
-
     if correspondent:
         correspondent = Correspondent.objects.only("pk").get(id=correspondent)
 
@@ -81,7 +83,6 @@ def set_document_type(doc_ids: list[int], document_type):
 
 
 def add_tag(doc_ids: list[int], tag: int):
-
     qs = Document.objects.filter(Q(id__in=doc_ids) & ~Q(tags__id=tag)).only("pk")
     affected_docs = list(qs.values_list("pk", flat=True))
 
@@ -97,7 +98,6 @@ def add_tag(doc_ids: list[int], tag: int):
 
 
 def remove_tag(doc_ids: list[int], tag: int):
-
     qs = Document.objects.filter(Q(id__in=doc_ids) & Q(tags__id=tag)).only("pk")
     affected_docs = list(qs.values_list("pk", flat=True))
 
@@ -156,6 +156,7 @@ def modify_custom_fields(doc_ids: list[int], add_custom_fields, remove_custom_fi
     return "OK"
 
 
+@shared_task
 def delete(doc_ids: list[int]):
     Document.objects.filter(id__in=doc_ids).delete()
 
@@ -168,7 +169,7 @@ def delete(doc_ids: list[int]):
     return "OK"
 
 
-def redo_ocr(doc_ids: list[int]):
+def reprocess(doc_ids: list[int]):
     for document_id in doc_ids:
         update_document_archive_file.delay(
             document_id=document_id,
@@ -237,7 +238,11 @@ def rotate(doc_ids: list[int], degrees: int):
     return "OK"
 
 
-def merge(doc_ids: list[int], metadata_document_id: Optional[int] = None):
+def merge(
+    doc_ids: list[int],
+    metadata_document_id: Optional[int] = None,
+    delete_originals: bool = False,
+):
     logger.info(
         f"Attempting to merge {len(doc_ids)} documents into a single document.",
     )
@@ -280,7 +285,8 @@ def merge(doc_ids: list[int], metadata_document_id: Optional[int] = None):
         overrides = DocumentMetadataOverrides()
 
     logger.info("Adding merged document to the task queue.")
-    consume_file.delay(
+
+    consume_task = consume_file.s(
         ConsumableDocument(
             source=DocumentSource.ConsumeFolder,
             original_file=filepath,
@@ -288,15 +294,25 @@ def merge(doc_ids: list[int], metadata_document_id: Optional[int] = None):
         overrides,
     )
 
+    if delete_originals:
+        logger.info(
+            "Queueing removal of original documents after consumption of merged document",
+        )
+        chain(consume_task, delete.si(affected_docs)).delay()
+    else:
+        consume_task.delay()
+
     return "OK"
 
 
-def split(doc_ids: list[int], pages: list[list[int]]):
+def split(doc_ids: list[int], pages: list[list[int]], delete_originals: bool = False):
     logger.info(
         f"Attempting to split document {doc_ids[0]} into {len(pages)} documents",
     )
     doc = Document.objects.get(id=doc_ids[0])
     import pikepdf
+
+    consume_tasks = []
 
     try:
         with pikepdf.open(doc.source_path) as pdf:
@@ -317,14 +333,51 @@ def split(doc_ids: list[int], pages: list[list[int]]):
                 logger.info(
                     f"Adding split document with pages {split_doc} to the task queue.",
                 )
-                consume_file.delay(
-                    ConsumableDocument(
-                        source=DocumentSource.ConsumeFolder,
-                        original_file=filepath,
+                consume_tasks.append(
+                    consume_file.s(
+                        ConsumableDocument(
+                            source=DocumentSource.ConsumeFolder,
+                            original_file=filepath,
+                        ),
+                        overrides,
                     ),
-                    overrides,
                 )
+
+            if delete_originals:
+                logger.info(
+                    "Queueing removal of original document after consumption of the split documents",
+                )
+                chord(header=consume_tasks, body=delete.si([doc.id])).delay()
+            else:
+                group(consume_tasks).delay()
+
     except Exception as e:
         logger.exception(f"Error splitting document {doc.id}: {e}")
+
+    return "OK"
+
+
+def delete_pages(doc_ids: list[int], pages: list[int]):
+    logger.info(
+        f"Attempting to delete pages {pages} from {len(doc_ids)} documents",
+    )
+    doc = Document.objects.get(id=doc_ids[0])
+    pages = sorted(pages)  # sort pages to avoid index issues
+    import pikepdf
+
+    try:
+        with pikepdf.open(doc.source_path, allow_overwriting_input=True) as pdf:
+            offset = 1  # pages are 1-indexed
+            for page_num in pages:
+                pdf.pages.remove(pdf.pages[page_num - offset])
+                offset += 1  # remove() changes the index of the pages
+            pdf.remove_unreferenced_resources()
+            pdf.save()
+            doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
+            doc.save()
+            update_document_archive_file.delay(document_id=doc.id)
+            logger.info(f"Deleted pages {pages} from document {doc.id}")
+    except Exception as e:
+        logger.exception(f"Error deleting pages from document {doc.id}: {e}")
 
     return "OK"

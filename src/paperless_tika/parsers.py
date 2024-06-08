@@ -88,10 +88,13 @@ class TikaDocumentParser(DocumentParser):
 
         self.log.info(f"Converting {document_path} to PDF as {pdf_path}")
 
-        with GotenbergClient(
-            host=settings.TIKA_GOTENBERG_ENDPOINT,
-            timeout=settings.CELERY_TASK_TIME_LIMIT,
-        ) as client, client.libre_office.to_pdf() as route:
+        with (
+            GotenbergClient(
+                host=settings.TIKA_GOTENBERG_ENDPOINT,
+                timeout=settings.CELERY_TASK_TIME_LIMIT,
+            ) as client,
+            client.libre_office.to_pdf() as route,
+        ):
             # Set the output format of the resulting PDF
             if settings.OCR_OUTPUT_TYPE in {
                 OutputTypeChoices.PDF_A,

@@ -259,6 +259,10 @@ a.btn-link:focus-visible,
 
     .ng-select-container .ng-value-container .ng-input {
       top: 7px;
+
+      input {
+        min-width: 10px;
+      }
     }
 
     .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {

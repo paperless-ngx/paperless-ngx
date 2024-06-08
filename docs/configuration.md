@@ -288,6 +288,12 @@ this folder is no longer needed and can be removed manually.
 
 Defaults to `/usr/share/nltk_data`
 
+#### [`PAPERLESS_MODEL_FILE=<path>`](#PAPERLESS_MODEL_FILE) {#PAPERLESS_MODEL_FILE}
+
+: This is where paperless will store the classification model.
+
+    Defaults to `PAPERLESS_DATA_DIR/classification_model.pickle`.
+
 ## Logging
 
 #### [`PAPERLESS_LOGROTATE_MAX_SIZE=<num>`](#PAPERLESS_LOGROTATE_MAX_SIZE) {#PAPERLESS_LOGROTATE_MAX_SIZE}
@@ -615,6 +621,8 @@ parsing documents.
     in which case Tesseract will use whatever language matches best.
     Keep in mind that Tesseract uses much more CPU time with multiple
     languages enabled.
+
+    If you are including languages that are not installed by default, you will need to also set [`PAPERLESS_OCR_LANGUAGES`](configuration.md#PAPERLESS_OCR_LANGUAGES) for docker deployments or install the tesseract language packages manually for bare metal installations.
 
     Defaults to "eng".
 

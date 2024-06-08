@@ -123,6 +123,7 @@ from documents.models import WorkflowTrigger
 from documents.parsers import get_parser_class_for_mime_type
 from documents.parsers import parse_date_generator
 from documents.permissions import PaperlessAdminPermissions
+from documents.permissions import PaperlessNotePermissions
 from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
@@ -253,14 +254,7 @@ class PermissionsAwareDocumentCountMixin(PassUserMixin):
 class CorrespondentViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = Correspondent
 
-    queryset = (
-        Correspondent.objects.prefetch_related("documents")
-        .annotate(
-            last_correspondence=Max("documents__created"),
-        )
-        .select_related("owner")
-        .order_by(Lower("name"))
-    )
+    queryset = Correspondent.objects.select_related("owner").order_by(Lower("name"))
 
     serializer_class = CorrespondentSerializer
     pagination_class = StandardPagination
@@ -278,6 +272,19 @@ class CorrespondentViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         "document_count",
         "last_correspondence",
     )
+
+    def list(self, request, *args, **kwargs):
+        if request.query_params.get("last_correspondence", None):
+            self.queryset = self.queryset.annotate(
+                last_correspondence=Max("documents__created"),
+            )
+        return super().list(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        self.queryset = self.queryset.annotate(
+            last_correspondence=Max("documents__created"),
+        )
+        return super().retrieve(request, *args, **kwargs)
 
 
 class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
@@ -616,9 +623,12 @@ class DocumentViewSet(
             .order_by("-created")
         ]
 
-    @action(methods=["get", "post", "delete"], detail=True)
+    @action(
+        methods=["get", "post", "delete"],
+        detail=True,
+        permission_classes=[PaperlessNotePermissions],
+    )
     def notes(self, request, pk=None):
-
         currentUser = request.user
         try:
             doc = (
@@ -955,15 +965,30 @@ class BulkEditView(PassUserMixin):
             document_objs = Document.objects.select_related("owner").filter(
                 pk__in=documents,
             )
+            user_is_owner_of_all_documents = all(
+                (doc.owner == user or doc.owner is None) for doc in document_objs
+            )
+
             has_perms = (
-                all((doc.owner == user or doc.owner is None) for doc in document_objs)
+                user_is_owner_of_all_documents
                 if method
-                in [bulk_edit.set_permissions, bulk_edit.delete, bulk_edit.rotate]
+                in [
+                    bulk_edit.set_permissions,
+                    bulk_edit.delete,
+                    bulk_edit.rotate,
+                ]
                 else all(
                     has_perms_owner_aware(user, "change_document", doc)
                     for doc in document_objs
                 )
             )
+
+            if (
+                method in [bulk_edit.merge, bulk_edit.split]
+                and parameters["delete_originals"]
+                and not user_is_owner_of_all_documents
+            ):
+                has_perms = False
 
             if not has_perms:
                 return HttpResponseForbidden("Insufficient permissions")
@@ -1337,7 +1362,6 @@ class StatisticsView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-
         user = request.user if request.user is not None else None
 
         documents = (
@@ -1533,9 +1557,9 @@ class UiSettingsView(GenericAPIView):
         if hasattr(user, "ui_settings"):
             ui_settings = user.ui_settings.settings
         if "update_checking" in ui_settings:
-            ui_settings["update_checking"][
-                "backend_setting"
-            ] = settings.ENABLE_UPDATE_CHECK
+            ui_settings["update_checking"]["backend_setting"] = (
+                settings.ENABLE_UPDATE_CHECK
+            )
         else:
             ui_settings["update_checking"] = {
                 "backend_setting": settings.ENABLE_UPDATE_CHECK,

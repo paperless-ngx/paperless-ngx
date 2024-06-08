@@ -339,11 +339,12 @@ class TestDBSettings(TestCase):
         ):
             databases = _parse_db_settings()
 
-            self.assertDictContainsSubset(
-                {
+            self.assertDictEqual(
+                databases["default"]["OPTIONS"],
+                databases["default"]["OPTIONS"]
+                | {
                     "connect_timeout": 10.0,
                 },
-                databases["default"]["OPTIONS"],
             )
             self.assertDictEqual(
                 {
