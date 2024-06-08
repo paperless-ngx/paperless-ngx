@@ -965,15 +965,30 @@ class BulkEditView(PassUserMixin):
             document_objs = Document.objects.select_related("owner").filter(
                 pk__in=documents,
             )
+            user_is_owner_of_all_documents = all(
+                (doc.owner == user or doc.owner is None) for doc in document_objs
+            )
+
             has_perms = (
-                all((doc.owner == user or doc.owner is None) for doc in document_objs)
+                user_is_owner_of_all_documents
                 if method
-                in [bulk_edit.set_permissions, bulk_edit.delete, bulk_edit.rotate]
+                in [
+                    bulk_edit.set_permissions,
+                    bulk_edit.delete,
+                    bulk_edit.rotate,
+                ]
                 else all(
                     has_perms_owner_aware(user, "change_document", doc)
                     for doc in document_objs
                 )
             )
+
+            if (
+                method in [bulk_edit.merge, bulk_edit.split]
+                and parameters["delete_originals"]
+                and not user_is_owner_of_all_documents
+            ):
+                has_perms = False
 
             if not has_perms:
                 return HttpResponseForbidden("Insufficient permissions")

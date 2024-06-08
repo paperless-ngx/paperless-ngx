@@ -1120,6 +1120,7 @@ export class DocumentDetailComponent
         this.documentsService
           .bulkEdit([this.document.id], 'split', {
             pages: modal.componentInstance.pagesString,
+            delete_originals: modal.componentInstance.deleteOriginal,
           })
           .pipe(first(), takeUntil(this.unsubscribeNotifier))
           .subscribe({
