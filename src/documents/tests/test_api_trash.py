@@ -126,3 +126,30 @@ class TestTrashAPI(APITestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Document.global_objects.count(), 1)
+
+    def test_api_trash_invalid_params(self):
+        """
+        GIVEN:
+            - Existing documents
+        WHEN:
+            - API request to trash with invalid params
+        THEN:
+            - 400 Bad Request
+        """
+
+        document = Document.objects.create(
+            title="Title",
+            content="content",
+            checksum="checksum",
+            mime_type="application/pdf",
+        )
+
+        self.client.force_login(user=self.user)
+
+        # document isn't in trash
+        resp = self.client.post(
+            "/api/trash/",
+            {"action": "restore", "documents": [document.pk]},
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("have not yet been deleted", resp.data["documents"][0])
