@@ -1112,7 +1112,7 @@ export class DocumentDetailComponent
     modal.componentInstance.title = $localize`Split confirm`
     modal.componentInstance.messageBold = $localize`This operation will split the selected document(s) into new documents.`
     modal.componentInstance.btnCaption = $localize`Proceed`
-    modal.componentInstance.document = this.document
+    modal.componentInstance.documentID = this.document.id
     modal.componentInstance.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
