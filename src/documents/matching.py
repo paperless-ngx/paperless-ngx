@@ -569,13 +569,5 @@ def existing_approval_matches_workflow(
         )
         trigger_matched = False
 
-    if(
-        trigger.filter_has_access_type is not None
-        and approval.access_type != trigger.filter_has_access_type
-    ):
-        reason = (
-            f"Approval status {approval.access_type} does not match {trigger.filter_has_access_type}",
-        )
-        trigger_matched = False
 
     return (trigger_matched, reason)
