@@ -49,20 +49,28 @@
             <a class="btn btn-sm btn-outline-secondary" (click)="clickMoreLike.emit()">
               <i-bs name="diagram-3"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>More like this</span>
             </a>
-            <a routerLink="/documents/{{document.id}}" class="btn btn-sm btn-outline-secondary" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-              <i-bs name="pencil"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Edit</span>
-            </a>
-            <a class="btn btn-sm btn-outline-secondary" target="_blank" [href]="previewUrl"
-              [ngbPopover]="previewContent" [popoverTitle]="document.title | documentTitle"
-              autoClose="true" popoverClass="shadow popover-preview" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">
-              <i-bs name="eye"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>View</span>
-            </a>
-            <ng-template #previewContent>
-              <pngx-preview-popup [document]="document"></pngx-preview-popup>
-            </ng-template>
-            <a class="btn btn-sm btn-outline-secondary" [href]="getDownloadUrl()">
-              <i-bs name="download"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Download</span>
+            @if (document.exploit==1) {
+
+              <a routerLink="/documents/{{document.id}}" class="btn btn-sm btn-outline-secondary" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
+                <i-bs name="pencil"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Edit</span>
               </a>
+              <a class="btn btn-sm btn-outline-secondary" target="_blank" [href]="previewUrl"
+                [ngbPopover]="previewContent" [popoverTitle]="document.title | documentTitle"
+                autoClose="true" popoverClass="shadow popover-preview" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">
+                <i-bs name="eye"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>View</span>
+              </a>
+              <ng-template #previewContent>
+                <pngx-preview-popup [document]="document"></pngx-preview-popup>
+              </ng-template>
+              <a class="btn btn-sm btn-outline-secondary" [href]="getDownloadUrl()">
+                <i-bs name="download"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Download</span>
+                </a>
+            }
+            @else if (document.exploit==2) {
+              <button *pngxIfPermissions="{ action: PermissionAction.Add}" class="btn btn-sm btn-outline-secondary" type="button" (click)="editField()">
+                <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Mining requirements</ng-container>
+              </button>
+            }
             </div>
 
             <div class="list-group list-group-horizontal border-0 card-info ms-md-auto mt-2 mt-md-0">

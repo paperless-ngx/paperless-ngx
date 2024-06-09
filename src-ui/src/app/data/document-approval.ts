@@ -27,15 +27,13 @@ export interface DocumentApproval extends ObjectWithId {
 
   object_pk: string
 
-  task_file_name: string
-
   created: Date
 
   modified?: Date
 
   expiration?: Date
 
-  ctype?: string
+  ctype?: number
 
   submitted_by_group?: number[]
 

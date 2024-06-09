@@ -1560,7 +1560,7 @@ class ApprovalViewSet(ModelViewSet):
         serializer = ApprovalSerializer(data=request.data)
         existing_approval = False
         if serializer.is_valid(raise_exception=True):
-          
+            serializer.validated_data['submitted_by'] = request.user
             existing_approval = Approval.objects.filter(
                 object_pk=serializer.validated_data.get("object_pk"),
                 access_type=serializer.validated_data.get("access_type"),
