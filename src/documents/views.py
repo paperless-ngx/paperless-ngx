@@ -1604,7 +1604,7 @@ class ApprovalUpdateMutipleView(GenericAPIView):
         status = serializer.validated_data.get("status")
 
         try:
-            approvals_match = Approval.objects.filter(id__in=approvals)
+            approvals_match = Approval.objects.filter(id__in=approvals).prefetch_related('submitted_by_group')
             result = approvals_match.update(
                 status=status,
             )
