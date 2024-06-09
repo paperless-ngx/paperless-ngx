@@ -690,6 +690,23 @@ class DocumentSerializer(
         required=False,
     )
 
+    exploit = serializers.SerializerMethodField(read_only=True)
+
+    def get_exploit(self, obj):
+        doc = Document.objects.get(pk=obj.pk)
+        current_user = self.context.get("request").user
+        
+        if current_user is not None and has_perms_owner_aware(
+            current_user,
+            "view_document",
+            doc,
+        ):
+            return 1
+        elif Approval.objects.filter(object_pk=obj.pk, status="PENDING", submitted_by=current_user):
+            return 2
+        
+    
+
     def get_approvals(self, obj):
         doc = Document.objects.get(pk=obj.pk)
         currentUser = self.context.get("request").user
@@ -815,6 +832,7 @@ class DocumentSerializer(
             "set_permissions",
             "notes",
             "custom_fields",
+            "exploit",
             "remove_inbox_tags",
         ) 
     

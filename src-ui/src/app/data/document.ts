@@ -74,4 +74,6 @@ export interface Document extends ObjectWithPermissions {
 
   // write-only field
   remove_inbox_tags?: boolean
+
+  exploit?: number
 }

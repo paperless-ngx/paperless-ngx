@@ -1,4 +1,4 @@
-<form  (ngSubmit)="save()" autocomplete="off">
+<form [formGroup]="objectForm"  (ngSubmit)="save()" autocomplete="off">
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
     @if (object?.id) {
@@ -8,9 +8,16 @@
     </button>
   </div>
   <div class="modal-body">
-    <!-- <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text> -->
-    <!-- <pngx-input-select i18n-title title="Data type" [items]="getDataTypes()" formControlName="data_type"></pngx-input-select> -->
-    
+    <pngx-input-select i18n-title title="Groups" [items]="groups" multiple="true" formControlName="submitted_by_group"></pngx-input-select>
+    <pngx-input-select i18n-title title="Access type" [items]="APPROVAL_ACCESS_TYPES_OPTIONS" [multiple]="false" formControlName="access_type"></pngx-input-select>
+    <div class="input-group input-group-sm w-100 mt-2">
+      <label class="input-group-text" for="addLink"><ng-container i18n>Expires</ng-container>:</label>
+      <select class="form-select form-select-sm" formControlName="expiration">
+        @for (option of EXPIRATION_OPTIONS; track option) {
+          <option [ngValue]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>

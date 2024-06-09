@@ -108,6 +108,7 @@ import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
 import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { CustomFieldsDropdownComponent } from './components/common/custom-fields-dropdown/custom-fields-dropdown.component'
+import { ApprovalEditDialogComponent } from './components/common/edit-dialog/approval-edit-dialog/approval-edit-dialog.component'
 import { ProfileEditDialogComponent } from './components/common/profile-edit-dialog/profile-edit-dialog.component'
 import { PdfViewerComponent } from './components/common/pdf-viewer/pdf-viewer.component'
 import { DocumentLinkComponent } from './components/common/input/document-link/document-link.component'
@@ -469,6 +470,7 @@ function initializeApp(settings: SettingsService) {
     CustomFieldsComponent,
     CustomFieldEditDialogComponent,
     CustomFieldsDropdownComponent,
+    ApprovalEditDialogComponent,
     ProfileEditDialogComponent,
     PdfViewerComponent,
     DocumentLinkComponent,
