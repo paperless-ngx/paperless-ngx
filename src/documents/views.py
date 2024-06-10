@@ -755,7 +755,7 @@ class DocumentViewSet(
     def get_queryset(self):
         queryset = self.queryset
         warehouse_id = self.request.query_params.get('warehouse_id', None)
-
+ 
         if warehouse_id is not None:
             queryset = self.get_warehouse(warehouse_id)
     
@@ -777,31 +777,6 @@ class DocumentViewSet(
             return Document.objects.filter(warehouse__in=[b.id for b in boxcases])
         else:
             return Document.objects.none()
-
-    # def get_queryset(self):
-    #     queryset = self.queryset
-    #     folder_id = self.request.query_params.get('folder_id', None)
-
-    #     if folder_id is not None:
-    #         queryset = self.get_folder(folder_id)
-    #         return queryset
-
-    #     return queryset
-
-    # def get_folder(self, folder_id):
-    #     folder = Folder.objects.get(id=int(folder_id))
-    #     return self.get_folder_documents(folder)
-
-    # def get_folder_documents(self, folder):
-    #     documents = Document.objects.filter(folder=folder) 
-    #     child_folders = Folder.objects.filter(parent_folder=folder)
-        
-    #     return documents 
-
-
-   
-    
-    
             
     
 class SearchResultSerializer(DocumentSerializer, PassUserMixin):
@@ -1944,6 +1919,44 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     filterset_class = WarehouseFilterSet
     ordering_fields = ("name", "type", "parent_warehouse", "document_count")
     
+    def getWarehouseDoc(self, wareh):
+        
+        if wareh.type == Warehouse.BOXCASE:
+            return list(Document.objects.filter(warehouse=wareh).order_by("-created").values())
+        elif wareh.type == Warehouse.SHELF:
+            boxcases = Warehouse.objects.filter(parent_warehouse=wareh)
+            return list(Document.objects.filter(warehouse__in=[b.id for b in boxcases]).order_by("-created").values())
+        elif wareh.type == Warehouse.WAREHOUSE:
+            shelves = Warehouse.objects.filter(parent_warehouse=wareh)
+            boxcases = Warehouse.objects.filter(parent_warehouse__in=[s.id for s in shelves])
+            return list(Document.objects.filter(warehouse__in=[b.id for b in boxcases]).order_by("-created").values())
+        else:
+            return list(Document.objects.none())
+    
+    @action(methods=["get"], detail=True)
+    def documents(self, request, pk=None):
+        currentUser = request.user
+        try:
+            wareh= Warehouse.objects.get(pk=pk)
+            if currentUser is not None and not has_perms_owner_aware(
+                currentUser,
+                "view_warehouse",
+                wareh,
+            ):
+                return HttpResponseForbidden("Insufficient permissions to view warehouses")
+        except Warehouse.DoesNotExist:
+            raise Http404
+
+        if request.method == "GET":
+            try:
+                return Response(self.getWarehouseDoc(wareh))
+            except Exception as e:
+                logger.warning(f"An error occurred retrieving warehouses: {e!s}")
+                return Response(
+                    {"error": "Error retrieving warehouses, check logs for more detail."},
+                )
+    
+    
     def create(self, request, *args, **kwargs):
         # try:                                                          
         serializer = WarehouseSerializer(data=request.data)
@@ -2074,6 +2087,40 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     )
     filterset_class = FolderFilterSet
     ordering_fields = ("name", "path", "parent_folder", "document_count")
+    
+    
+    def getFolderDoc(self, fol):
+        
+        documents = list(Document.objects.filter(folder=fol).order_by("-created").values())
+        folders = list(Folder.objects.filter(parent_folder=fol).order_by("name").values())
+        return {
+            "documents": documents,
+            "folders": folders,
+        }
+    
+    @action(methods=["get"], detail=True)
+    def folders_documents(self, request, pk=None):
+        currentUser = request.user
+        try:
+            fol = Folder.objects.get(pk=pk)
+            if currentUser is not None and not has_perms_owner_aware(
+                currentUser,
+                "view_folder",
+                fol,
+            ):
+                return HttpResponseForbidden("Insufficient permissions to view folders")
+        except Folder.DoesNotExist:
+            raise Http404
+
+        if request.method == "GET":
+            try:
+                return Response(self.getFolderDoc(fol))
+            except Exception as e:
+                logger.warning(f"An error occurred retrieving folders: {e!s}")
+                return Response(
+                    {"error": "Error retrieving folders, check logs for more detail."},
+                )
+    
     
     def create(self, request, *args, **kwargs):
         # try:                                                          
