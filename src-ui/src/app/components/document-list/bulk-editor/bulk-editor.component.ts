@@ -705,20 +705,24 @@ export class BulkEditorComponent
   }
 
   applyDelete() {
-    let modal = this.modalService.open(ConfirmDialogComponent, {
-      backdrop: 'static',
-    })
-    modal.componentInstance.title = $localize`Confirm`
-    modal.componentInstance.messageBold = $localize`Move ${this.list.selected.size} selected document(s) to the trash?`
-    modal.componentInstance.message = $localize`Documents can be restored prior to permanent deletion.`
-    modal.componentInstance.btnClass = 'btn-danger'
-    modal.componentInstance.btnCaption = $localize`Move to trash`
-    modal.componentInstance.confirmClicked
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(() => {
-        modal.componentInstance.buttonsEnabled = false
-        this.executeBulkOperation(modal, 'delete', {})
+    if (this.showConfirmationDialogs) {
+      let modal = this.modalService.open(ConfirmDialogComponent, {
+        backdrop: 'static',
       })
+      modal.componentInstance.title = $localize`Confirm`
+      modal.componentInstance.messageBold = $localize`Move ${this.list.selected.size} selected document(s) to the trash?`
+      modal.componentInstance.message = $localize`Documents can be restored prior to permanent deletion.`
+      modal.componentInstance.btnClass = 'btn-danger'
+      modal.componentInstance.btnCaption = $localize`Move to trash`
+      modal.componentInstance.confirmClicked
+        .pipe(takeUntil(this.unsubscribeNotifier))
+        .subscribe(() => {
+          modal.componentInstance.buttonsEnabled = false
+          this.executeBulkOperation(modal, 'delete', {})
+        })
+    } else {
+      this.executeBulkOperation(null, 'delete', {})
+    }
   }
 
   downloadSelected() {
