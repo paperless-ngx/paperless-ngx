@@ -5,6 +5,7 @@ import uuid
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Optional
+from datetime import datetime, timedelta
 
 import tqdm
 from celery import Task
@@ -29,7 +30,7 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
-from documents.models import Correspondent
+from documents.models import Approval, Correspondent
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
@@ -49,6 +50,29 @@ if settings.AUDIT_LOG_ENABLED:
 
     from auditlog.models import LogEntry
 logger = logging.getLogger("paperless.tasks")
+
+def revoke_permission():
+    logger.debug('run')
+    # today = date.today()
+    # approvals = Approval.objects.filter(
+    #     status="SUCCESS",
+    #     expiration__date=today
+    # )
+    # approvals.update(status="REVOKED")
+    # for approval in approvals:
+    #     approvals.send(
+    #         sender=Document,
+    #         approval=approval,
+    #     )
+    # logger.info('Check all expired approvals')
+    # thirty_days_ago = datetime.now() - timedelta(days=30)
+
+    # approvals_reject = Approval.objects.filter(
+    #     status__in=["REJECT", "REVOKED"],
+    #     expiration__lte=thirty_days_ago
+        
+    # ).delete()
+
 
 
 @shared_task

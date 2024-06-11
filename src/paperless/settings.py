@@ -307,6 +307,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "django_apscheduler",
     *env_apps,
 ]
 
@@ -850,6 +851,10 @@ THREADS_PER_WORKER = os.getenv(
     "PAPERLESS_THREADS_PER_WORKER",
     default_threads_per_worker(CELERY_WORKER_CONCURRENCY),
 )
+
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"  # Default
+
+SCHEDULER_DEFAULT = True
 
 ###############################################################################
 # Paperless Specific Settings                                                 #
