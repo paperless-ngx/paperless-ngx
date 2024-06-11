@@ -1654,7 +1654,7 @@ class RemoteVersionView(GenericAPIView):
 
 
 class TasksViewSet(ReadOnlyModelViewSet):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     serializer_class = TasksViewSerializer
 
     def get_queryset(self):
