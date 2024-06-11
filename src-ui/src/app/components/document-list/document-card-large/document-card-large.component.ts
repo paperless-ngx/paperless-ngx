@@ -11,6 +11,12 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { DocumentApproval } from 'src/app/data/document-approval'
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { ApprovalEditDialogComponent } from '../../common/edit-dialog/approval-edit-dialog/approval-edit-dialog.component'
+import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
+import { Subject, takeUntil } from 'rxjs'
+import { ToastService } from 'src/app/services/toast.service'
 
 @Component({
   selector: 'pngx-document-card-large',
@@ -18,9 +24,12 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
   styleUrls: ['./document-card-large.component.scss'],
 })
 export class DocumentCardLargeComponent extends ComponentWithPermissions {
+  private unsubscribeNotifier: Subject<any> = new Subject()
   constructor(
     private documentService: DocumentService,
-    public settingsService: SettingsService
+    public settingsService: SettingsService,
+    private modalService: NgbModal,
+    private toastService: ToastService
   ) {
     super()
   }
@@ -34,7 +43,8 @@ export class DocumentCardLargeComponent extends ComponentWithPermissions {
   get selectable() {
     return this.toggleSelected.observers.length > 0
   }
-
+  @Input()
+  documentApproval: DocumentApproval
   @Input()
   document: Document
 
@@ -140,5 +150,36 @@ export class DocumentCardLargeComponent extends ComponentWithPermissions {
 
   get notesEnabled(): boolean {
     return this.settingsService.get(SETTINGS_KEYS.NOTES_ENABLED)
+  }
+  editField() {
+    this.documentApproval = {
+      id: undefined,
+      access_type: null,
+      status: undefined,
+      submitted_by: null,
+      object_pk: this.document.id.toString(),
+      created: undefined,
+      modified: undefined,
+      expiration: null,
+      ctype: 14,
+      submitted_by_group: [],
+      name: undefined,
+    }
+
+    const modal = this.modalService.open(ApprovalEditDialogComponent)
+    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    modal.componentInstance.object = this.documentApproval
+    modal.componentInstance.succeeded
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((newField) => {
+        this.toastService.showInfo($localize`Successfully sent mining request to "${newField.name}".`)
+        // this.documentService.clearCache()
+        // this.reload()
+      })
+    modal.componentInstance.failed
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((e) => {
+        this.toastService.showError($localize`Error saving fieldSubmitted mining request failed.`, e)
+      })
   }
 }

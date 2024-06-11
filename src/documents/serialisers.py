@@ -698,6 +698,8 @@ class DocumentSerializer(
             return 1
         elif Approval.objects.filter(object_pk=obj.pk, status="PENDING", submitted_by=current_user):
             return 2
+        else:
+            return 3
         
     
 
