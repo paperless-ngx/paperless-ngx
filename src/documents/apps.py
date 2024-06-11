@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 
@@ -39,5 +40,9 @@ class DocumentsConfig(AppConfig):
         document_updated.connect(run_workflow_updated)
         approval_added.connect(run_workflow_approval_added)
         approval_updated.connect(run_workflow_approval_updated)
+
+        if settings.SCHEDULER_DEFAULT:
+            from paperless import operator
+            operator.start()
 
         AppConfig.ready(self)
