@@ -482,9 +482,10 @@ as "System".
 
 When you first delete a document it is moved to the 'trash' until either it is explicitly deleted or it is automatically removed after a set amount of time has passed.
 You can set how long documents remain in the trash before being automatically deleted with [`EMPTY_TRASH_DELAY`](configuration.md#EMPTY_TRASH_DELAY), which defaults
-to 30 days. Additionally you may configure a directory where deleted files are moved to when they are finally deleted (e.g. the trash is emptied) with
-[`PAPERLESS_EMPTY_TRASH_DIR`](configuration.md#PAPERLESS_EMPTY_TRASH_DIR). Note that the empty trash directory only stores the original file, the archive file and all database
-information is permanently removed once a document is fully deleted.
+to 30 days. Until the file is actually deleted (e.g. the trash is emptied), all files and database content remains intact and can be restored at any point up until that time.
+
+Additionally you may configure a directory where deleted files are moved to when they the trash is emptied with [`PAPERLESS_EMPTY_TRASH_DIR`](configuration.md#PAPERLESS_EMPTY_TRASH_DIR).
+Note that the empty trash directory only stores the original file, the archive file and all database information is permanently removed once a document is fully deleted.
 
 ## Best practices {#basic-searching}
 
