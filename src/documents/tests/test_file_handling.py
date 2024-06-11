@@ -186,7 +186,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
     @override_settings(
         FILENAME_FORMAT="{correspondent}/{correspondent}",
-        TRASH_DIR=tempfile.mkdtemp(),
+        EMPTY_TRASH_DIR=tempfile.mkdtemp(),
     )
     def test_document_delete_trash_dir(self):
         document = Document()
@@ -203,15 +203,15 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         Path(document.source_path).touch()
 
         # Ensure file was moved to trash after delete
-        self.assertIsNotFile(os.path.join(settings.TRASH_DIR, "none", "none.pdf"))
+        self.assertIsNotFile(os.path.join(settings.EMPTY_TRASH_DIR, "none", "none.pdf"))
         document.delete()
         empty_trash([document.pk])
         self.assertIsNotFile(
             os.path.join(settings.ORIGINALS_DIR, "none", "none.pdf"),
         )
         self.assertIsNotDir(os.path.join(settings.ORIGINALS_DIR, "none"))
-        self.assertIsFile(os.path.join(settings.TRASH_DIR, "none.pdf"))
-        self.assertIsNotFile(os.path.join(settings.TRASH_DIR, "none_01.pdf"))
+        self.assertIsFile(os.path.join(settings.EMPTY_TRASH_DIR, "none.pdf"))
+        self.assertIsNotFile(os.path.join(settings.EMPTY_TRASH_DIR, "none_01.pdf"))
 
         # Create an identical document and ensure it is trashed under a new name
         document = Document()
@@ -224,7 +224,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         Path(document.source_path).touch()
         document.delete()
         empty_trash([document.pk])
-        self.assertIsFile(os.path.join(settings.TRASH_DIR, "none_01.pdf"))
+        self.assertIsFile(os.path.join(settings.EMPTY_TRASH_DIR, "none_01.pdf"))
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_document_delete_nofile(self):
