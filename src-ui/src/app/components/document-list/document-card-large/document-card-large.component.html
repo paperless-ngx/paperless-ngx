@@ -67,7 +67,12 @@
                 </a>
             }
             @else if (document.exploit==2) {
-              <button *pngxIfPermissions="{ action: PermissionAction.Add}" class="btn btn-sm btn-outline-secondary" type="button" (click)="editField()">
+              <button class="btn btn-sm btn-outline-secondary" type="button" (click)="editField()">
+                <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Mining requirements</ng-container>
+              </button>
+            }
+            @else if (document.exploit==3) {
+              <button class="btn btn-sm btn-outline-secondary" type="button" (click)="editField()">
                 <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Mining requirements</ng-container>
               </button>
             }

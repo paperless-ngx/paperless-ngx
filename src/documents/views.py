@@ -1597,27 +1597,29 @@ class ApprovalViewSet(ModelViewSet):
         existing_approval = False
         if serializer.is_valid(raise_exception=True):
             serializer.validated_data['submitted_by'] = request.user
+            
             existing_approval = Approval.objects.filter(
                 object_pk=serializer.validated_data.get("object_pk"),
                 access_type=serializer.validated_data.get("access_type"),
                 ctype=serializer.validated_data.get("ctype"),
-                submitted_by=serializer.validated_data.get("submitted_by")
+                submitted_by=serializer.validated_data.get("submitted_by"),
+                status__in=["SUCCESS", "PENDING"]
             )
 
             submitted_by_groups = serializer.validated_data.get("submitted_by_group", None)
+            group_names = ''
             if submitted_by_groups:
                 existing_approval = existing_approval.filter(
                     Q(submitted_by_group__in=submitted_by_groups)
-                ).exists()
+                ).prefetch_related('submitted_by_group').values_list('submitted_by_group__name',flat=True)
+                group_names = ', '.join(group for group in existing_approval)
 
-        if existing_approval:
-            return Response({'status':400,
-                            'message':'Objects exist'},status=status.HTTP_400_BAD_REQUEST)
+            if existing_approval:
+                return Response({'status':400, 'message':f'{group_names} already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
-        response = super().create(request, *args, **kwargs)
-        
-        return response
-       
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            
     def update(self, request, *args, **kwargs):
         response = super().update(request, *args, **kwargs)
         
