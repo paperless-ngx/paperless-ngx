@@ -87,6 +87,7 @@ class DocumentClassifier:
         self.tags_classifier = None
         self.correspondent_classifier = None
         self.warehouse_classifier = None
+        self.folder_classifier = None
         self.document_type_classifier = None
         self.storage_path_classifier = None
 
@@ -114,6 +115,7 @@ class DocumentClassifier:
                         self.tags_classifier = pickle.load(f)
                         self.correspondent_classifier = pickle.load(f)
                         self.warehouse_classifier = pickle.load(f)
+                        self.folder_classifier = pickle.load(f)
                         self.document_type_classifier = pickle.load(f)
                         self.storage_path_classifier = pickle.load(f)
                     except Exception as err:
@@ -151,6 +153,7 @@ class DocumentClassifier:
 
             pickle.dump(self.correspondent_classifier, f)
             pickle.dump(self.warehouse_classifier, f)
+            pickle.dump(self.folder_classifier, f)
             pickle.dump(self.document_type_classifier, f)
             pickle.dump(self.storage_path_classifier, f)
 
@@ -169,6 +172,7 @@ class DocumentClassifier:
         labels_tags = []
         labels_correspondent = []
         labels_warehouse = []
+        labels_folder = []
         labels_document_type = []
         labels_storage_path = []
 
@@ -189,6 +193,13 @@ class DocumentClassifier:
                 y = cor.pk
             hasher.update(y.to_bytes(4, "little", signed=True))
             labels_correspondent.append(y)
+            
+            y = -1
+            fo = doc.folder
+            if fo and fo.matching_algorithm == MatchingModel.MATCH_AUTO:
+                y = fo.pk
+            hasher.update(y.to_bytes(4, "little", signed=True))
+            labels_folder.append(y)
             
             y = -1
             wh = doc.warehouse
@@ -246,10 +257,11 @@ class DocumentClassifier:
         num_correspondents = len(set(labels_correspondent) | {-1}) - 1
         num_document_types = len(set(labels_document_type) | {-1}) - 1
         num_warehouses = len(set(labels_warehouse) | {-1}) - 1
+        num_folders = len(set(labels_folder) | {-1}) - 1
         num_storage_paths = len(set(labels_storage_path) | {-1}) - 1
 
         logger.debug(
-            f"{docs_queryset.count()} documents, {num_tags} tag(s), {num_correspondents} correspondent(s), {num_warehouses} warehouse(s) "
+            f"{docs_queryset.count()} documents, {num_tags} tag(s), {num_correspondents} correspondent(s), {num_warehouses} warehouse(s), {num_folders} folder(s), "
             f"{num_document_types} document type(s). {num_storage_paths} storage path(es)",
         )
 
@@ -313,6 +325,17 @@ class DocumentClassifier:
             self.correspondent_classifier = None
             logger.debug(
                 "There are no correspondents. Not training correspondent "
+                "classifier.",
+            )
+        
+        if num_folders > 0:
+            logger.debug("Training folder classifier...")
+            self.folder_classifier = MLPClassifier(tol=0.01)
+            self.folder_classifier.fit(data_vectorized, labels_folder)
+        else:
+            self.folder_classifier = None
+            logger.debug(
+                "There are no folders. Not training folder "
                 "classifier.",
             )
 
@@ -433,6 +456,17 @@ class DocumentClassifier:
             correspondent_id = self.correspondent_classifier.predict(X)
             if correspondent_id != -1:
                 return correspondent_id
+            else:
+                return None
+        else:
+            return None
+    
+    def predict_folder(self, content: str) -> Optional[int]:
+        if self.folder_classifier:
+            X = self.data_vectorizer.transform([self.preprocess_content(content)])
+            folder_id = self.folder_classifier.predict(X)
+            if folder_id != -1:
+                return folder_id
             else:
                 return None
         else:

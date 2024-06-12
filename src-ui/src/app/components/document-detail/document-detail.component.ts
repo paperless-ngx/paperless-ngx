@@ -1025,7 +1025,7 @@ export class DocumentDetailComponent
           rule_type: FILTER_STORAGE_PATH,
           value: (i as StoragePath).id.toString(),
         }
-      } else if (i.hasOwnProperty('type')) {
+      } else if (i.hasOwnProperty('path')) {
         // Warehouse
         return {
           rule_type: FILTER_WAREHOUSE,

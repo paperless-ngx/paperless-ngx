@@ -131,6 +131,60 @@ def set_correspondent(
 
             document.correspondent = selected
             document.save(update_fields=("correspondent",))
+            
+def set_folder(
+    sender,
+    document: Document,
+    logging_group=None,
+    classifier: Optional[DocumentClassifier] = None,
+    replace=False,
+    use_first=True,
+    suggest=False,
+    base_url=None,
+    stdout=None,
+    style_func=None,
+    **kwargs,
+):
+    if document.folder and not replace:
+        return
+
+    potential_folders = matching.match_folders(document, classifier)
+
+    potential_count = len(potential_folders)
+    selected = potential_folders[0] if potential_folders else None
+    if potential_count > 1:
+        if use_first:
+            logger.debug(
+                f"Detected {potential_count} potential folders, "
+                f"so we've opted for {selected}",
+                extra={"group": logging_group},
+            )
+        else:
+            logger.debug(
+                f"Detected {potential_count} potential folders, "
+                f"not assigning any folder",
+                extra={"group": logging_group},
+            )
+            return
+
+    if selected or replace:
+        if suggest:
+            _suggestion_printer(
+                stdout,
+                style_func,
+                "folder",
+                document,
+                selected,
+                base_url,
+            )
+        else:
+            logger.info(
+                f"Assigning folder {selected} to {document}",
+                extra={"group": logging_group},
+            )
+
+            document.folder = selected
+            document.save(update_fields=("folder",))
 
 def set_warehouse(
     sender,

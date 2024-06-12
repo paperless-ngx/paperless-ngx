@@ -16,6 +16,7 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Warehouse
+from documents.models import Folder
 from documents.permissions import set_permissions_for_object
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
@@ -46,6 +47,22 @@ def set_storage_path(doc_ids, storage_path):
     )
     affected_docs = [doc.id for doc in qs]
     qs.update(storage_path=storage_path)
+
+    bulk_update_documents.delay(
+        document_ids=affected_docs,
+    )
+
+    return "OK"
+
+def set_folder(doc_ids, folder):
+    if folder:
+        folder = Folder.objects.get(id=folder)
+
+    qs = Document.objects.filter(
+        Q(id__in=doc_ids) & ~Q(folder=folder),
+    )
+    affected_docs = [doc.id for doc in qs]
+    qs.update(folder=folder)
 
     bulk_update_documents.delay(
         document_ids=affected_docs,

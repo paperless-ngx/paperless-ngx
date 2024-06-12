@@ -20,6 +20,7 @@ from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import Warehouse
+from documents.models import Folder
 
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]
@@ -193,6 +194,8 @@ class DocumentFilterSet(FilterSet):
     storage_path__id__none = ObjectFilter(field_name="storage_path", exclude=True)
     
     warehouse__id__none = ObjectFilter(field_name="warehouse", exclude=True)
+    
+    folder__id__none = ObjectFilter(field_name="folder", exclude=True)
 
     is_in_inbox = InboxFilter()
 
@@ -230,6 +233,9 @@ class DocumentFilterSet(FilterSet):
             "warehouse": ["isnull"],
             "warehouse__id": ID_KWARGS,
             "warehouse__name": CHAR_KWARGS,
+            "folder": ["isnull"],
+            "folder__id": ID_KWARGS,
+            "folder__name": CHAR_KWARGS,
             "owner": ["isnull"],
             "owner__id": ID_KWARGS,
             "custom_fields": ["icontains"],
@@ -283,4 +289,15 @@ class WarehouseFilterSet(FilterSet):
 #         fields = {
 #             "id": ID_KWARGS,
 #             "ctype": CHAR_KWARGS,
+#             "path": CHAR_KWARGS,
 #         }
+        
+class FolderFilterSet(FilterSet):
+    class Meta:
+        model = Folder
+        fields = {
+            "id": ID_KWARGS,
+            "name": CHAR_KWARGS,
+            "parent_folder": ID_KWARGS,
+            "path": CHAR_KWARGS,
+        }

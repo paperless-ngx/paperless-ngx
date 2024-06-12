@@ -220,7 +220,25 @@ class Warehouse(MatchingModel):
     
     def __str__(self):
         return self.name
+    
+class Folder(MatchingModel):
+    parent_folder = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True )
+    path = models.TextField(_("path"), null=True, blank=True)
+    checksum = models.CharField(
+        _("checksum"),
+        max_length=32,
+        editable=False,
+        unique=True,
+        null=True,
+        help_text=_("The checksum of the original folder."),
+    )
 
+    class Meta(MatchingModel.Meta):
+        verbose_name = _("folder")
+        verbose_name_plural = _("folders")
+    def __str__(self): 
+        return self.name
+    
 class Document(ModelWithOwner):
     STORAGE_TYPE_UNENCRYPTED = "unencrypted"
     STORAGE_TYPE_GPG = "gpg"
@@ -245,6 +263,15 @@ class Document(ModelWithOwner):
         related_name="documents",
         on_delete=models.SET_NULL,
         verbose_name=_("storage path"),
+    )
+    
+    folder = models.ForeignKey(
+        Folder,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL,
+        verbose_name=_("folder"),
     )
     
     warehouse = models.ForeignKey(

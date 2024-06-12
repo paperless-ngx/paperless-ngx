@@ -34,6 +34,7 @@ from documents.models import DocumentType
 from documents.models import FileInfo
 from documents.models import StoragePath
 from documents.models import Warehouse
+from documents.models import Folder
 from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowAction
@@ -301,6 +302,7 @@ class Consumer(LoggingMixin):
         self.override_title = None
         self.override_correspondent_id = None
         self.override_warehouse_id = None
+        self.override_folder_id = None
         self.override_tag_ids = None
         self.override_document_type_id = None
         self.override_asn = None
@@ -498,6 +500,7 @@ class Consumer(LoggingMixin):
         override_document_type_id=None,
         override_tag_ids=None,
         override_warehouse_id=None,
+        override_folder_id=None,
         override_storage_path_id=None,
         task_id=None,
         override_created=None,
@@ -520,6 +523,7 @@ class Consumer(LoggingMixin):
         self.override_document_type_id = override_document_type_id
         self.override_tag_ids = override_tag_ids
         self.override_warehouse_id = override_warehouse_id
+        self.override_folder_id = override_folder_id
         self.override_storage_path_id = override_storage_path_id
         self.task_id = task_id or str(uuid.uuid4())
         self.override_created = override_created
@@ -877,6 +881,11 @@ class Consumer(LoggingMixin):
         if self.override_storage_path_id:
             document.storage_path = StoragePath.objects.get(
                 pk=self.override_storage_path_id,
+            )
+        
+        if self.override_folder_id:
+            document.folder = Folder.objects.get(
+                pk=self.override_folder_id,
             )
         
         if self.override_warehouse_id:

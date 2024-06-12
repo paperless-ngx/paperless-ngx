@@ -19,6 +19,7 @@ class DocumentsConfig(AppConfig):
         from documents.signals.handlers import run_workflow_updated
         from documents.signals.handlers import set_correspondent
         from documents.signals.handlers import set_warehouse
+        from documents.signals.handlers import set_folder
         from documents.signals.handlers import set_document_type
         from documents.signals.handlers import set_log_entry
         from documents.signals.handlers import set_storage_path
@@ -28,6 +29,7 @@ class DocumentsConfig(AppConfig):
 
         document_consumption_finished.connect(add_inbox_tags)
         document_consumption_finished.connect(set_correspondent)
+        document_consumption_finished.connect(set_folder)
         document_consumption_finished.connect(set_warehouse)
         document_consumption_finished.connect(set_document_type)
         document_consumption_finished.connect(set_tags)

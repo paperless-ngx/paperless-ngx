@@ -47,6 +47,7 @@ from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.models import Warehouse
+from documents.models import Folder
 from documents.parsers import is_mime_type_supported
 from documents.permissions import get_groups_with_only_permission, has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
@@ -432,6 +433,10 @@ class WarehouseField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         return Warehouse.objects.all()
 
+class FolderField(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        return Folder.objects.all()
+
 class DocumentTypeField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         return DocumentType.objects.all()
@@ -658,6 +663,7 @@ class DocumentSerializer(
     correspondent = CorrespondentField(allow_null=True)
     tags = TagsField(many=True)
     warehouse = WarehouseField(allow_null=True)
+    folder = FolderField(allow_null=True)
     document_type = DocumentTypeField(allow_null=True)
     storage_path = StoragePathField(allow_null=True)
 
@@ -810,6 +816,7 @@ class DocumentSerializer(
             "document_type",
             "storage_path",
             "warehouse",
+            "folder",
             "title",
             "content",
             "tags",
@@ -918,6 +925,7 @@ class BulkEditSerializer(
             "set_document_type",
             "set_storage_path",
             "set_warehouse"
+            "set_folder",
             "add_tag",
             "remove_tag",
             "modify_tags",
@@ -954,6 +962,8 @@ class BulkEditSerializer(
             return bulk_edit.set_storage_path
         elif method == "set_warehouse":
             return bulk_edit.set_warehouse
+        elif method == "set_folder":
+            return bulk_edit.set_folder
         elif method == "add_tag":
             return bulk_edit.add_tag
         elif method == "remove_tag":
@@ -1009,6 +1019,7 @@ class BulkEditSerializer(
                 raise serializers.ValidationError("Correspondent does not exist")
         else:
             raise serializers.ValidationError("correspondent not specified")
+        
     def _validate_parameters_warehouse(self, parameters):
         if "warehouse" in parameters:
             warehouse_id = parameters["warehouse"]
@@ -1020,7 +1031,19 @@ class BulkEditSerializer(
                 raise serializers.ValidationError("Warehouse does not exist")
         else:
             raise serializers.ValidationError("warehouse not specified")
-
+    
+    def _validate_parameters_folder(self, parameters):
+        if "folder" in parameters:
+            folder_id = parameters["folder"]
+            if folder_id is None:
+                return
+            try:
+                Folder.objects.get(id=folder_id)
+            except Folder.DoesNotExist:
+                raise serializers.ValidationError("Folder does not exist")
+        else:
+            raise serializers.ValidationError("folder not specified")
+    
     def _validate_storage_path(self, parameters):
         if "storage_path" in parameters:
             storage_path_id = parameters["storage_path"]
@@ -1109,7 +1132,9 @@ class BulkEditSerializer(
         elif method == bulk_edit.set_storage_path:
             self._validate_storage_path(parameters)
         elif method == bulk_edit.set_warehouse:
-            self._validate_parameters_warehouse(parameters)    
+            self._validate_parameters_warehouse(parameters)
+        elif method == bulk_edit.set_folder:
+            self._validate_parameters_folder(parameters)
         elif method == bulk_edit.set_permissions:
             self._validate_parameters_set_permissions(parameters)
         elif method == bulk_edit.rotate:
@@ -1154,6 +1179,14 @@ class PostDocumentSerializer(serializers.Serializer):
     document_type = serializers.PrimaryKeyRelatedField(
         queryset=DocumentType.objects.all(),
         label="Document type",
+        allow_null=True,
+        write_only=True,
+        required=False,
+    )
+    
+    folder = serializers.PrimaryKeyRelatedField(
+        queryset=Folder.objects.all(),
+        label="Folder",
         allow_null=True,
         write_only=True,
         required=False,
@@ -1227,6 +1260,12 @@ class PostDocumentSerializer(serializers.Serializer):
             return storage_path.id
         else:
             return None
+    
+    def validate_folder(self, folder):
+        if folder:
+            return folder.id
+        else:
+            return None
         
     def validate_warehouse(self, warehouse):
         if warehouse:
@@ -1297,6 +1336,7 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
                 title="title",
                 correspondent="correspondent",
                 document_type="document_type",
+                folder="folder",
                 warehouse="warehouse",
                 created="created",
                 created_year="created_year",
@@ -1506,6 +1546,7 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
             "document_types",
             "storage_paths",
             "warehouses",
+            "folders",
         ],
         label="Object Type",
         write_only=True,
@@ -1552,6 +1593,8 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
             object_class = StoragePath
         elif object_type == "warehouses":
             object_class = Warehouse
+        elif object_type == "folders":
+            object_class = Folder
         return object_class
 
     def _validate_objects(self, objects, object_type):
@@ -1908,6 +1951,10 @@ class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             return 0
     
     
-    
-    
+class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
+        
+    class Meta:
+        model = Folder
+        fields = '__all__'   
+
     

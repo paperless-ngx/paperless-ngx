@@ -41,6 +41,7 @@ from documents.views import WorkflowActionViewSet
 from documents.views import WorkflowTriggerViewSet
 from documents.views import WorkflowViewSet
 from documents.views import WarehouseViewSet
+from documents.views import FolderViewSet
 from paperless.consumers import StatusConsumer
 from paperless.views import ApplicationConfigurationViewSet, ContentTypeViewSet
 from paperless.views import DisconnectSocialAccountView
@@ -77,6 +78,8 @@ api_router.register(r"config", ApplicationConfigurationViewSet)
 api_router.register(r"warehouses", WarehouseViewSet)
 api_router.register(r"approvals", ApprovalViewSet)
 api_router.register(r"content_types", ContentTypeViewSet, basename="content_types")
+api_router.register(r"folders", FolderViewSet)
+
 
 urlpatterns = [
     
