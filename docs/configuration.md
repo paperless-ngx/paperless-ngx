@@ -399,7 +399,9 @@ If you do change it, be sure to include the trailing slash.
 
         When hosting paperless behind a reverse proxy like Traefik or Nginx
         at a subpath e.g. example.com/paperlessngx you will also need to set
-        `PAPERLESS_FORCE_SCRIPT_NAME` (see above).
+        `PAPERLESS_FORCE_SCRIPT_NAME` (see above). Normally it is sufficient
+        to set that, `PAPERLESS_STATIC_URL` is based on it and the default is
+        fine then.
 
 #### [`PAPERLESS_AUTO_LOGIN_USERNAME=<username>`](#PAPERLESS_AUTO_LOGIN_USERNAME) {#PAPERLESS_AUTO_LOGIN_USERNAME}
 
