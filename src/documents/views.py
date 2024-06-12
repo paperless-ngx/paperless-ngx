@@ -1,3 +1,4 @@
+import hashlib
 import itertools
 import json
 import logging
@@ -2128,6 +2129,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     
     @action(methods=["get"], detail=True)
     def folders_documents_by_id(self, request, pk=None):
+        print("dkljfskljf")
         currentUser = request.user
         try:
             fol = Folder.objects.get(pk=pk)
@@ -2164,11 +2166,13 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             folder = serializer.save()
             folder.path = str(folder.id)
             folder.owner = currentUser
+            folder.checksum = hashlib.md5(f'{folder.id}.{folder.name}'.encode()).hexdigest()
             folder.save()
         elif parent_folder:
             folder = serializer.save(parent_folder=parent_folder)
             folder.path = f"{parent_folder.path}/{folder.id}"
             folder.owner = currentUser
+            folder.checksum = hashlib.md5(f'{folder.id}.{folder.name}'.encode()).hexdigest()
             folder.save()
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -2199,7 +2203,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         if old_parent_folder != instance.parent_folder:
             if instance.parent_folder:
                 instance.path = f"{instance.parent_folder.path}/{instance.id}"
-            
+                
             else:
                 instance.path = f"{instance.id}"
             instance.save()
