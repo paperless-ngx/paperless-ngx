@@ -156,6 +156,14 @@ class Warehouse(MatchingModel):
 class Folder(MatchingModel):
     parent_folder = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True )
     path = models.TextField(_("path"), null=True, blank=True)
+    checksum = models.CharField(
+        _("checksum"),
+        max_length=32,
+        editable=False,
+        unique=True,
+        null=True,
+        help_text=_("The checksum of the original folder."),
+    )
 
     class Meta(MatchingModel.Meta):
         verbose_name = _("folder")
