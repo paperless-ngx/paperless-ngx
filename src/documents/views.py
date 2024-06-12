@@ -19,7 +19,6 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
 from django.db import connections
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
@@ -106,7 +105,6 @@ from documents.matching import match_storage_paths
 from documents.matching import match_tags
 from documents.models import Correspondent
 from documents.models import CustomField
-from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
@@ -799,15 +797,14 @@ class DocumentViewSet(
                     else None
                 ),
             }
-            for entry in LogEntry.objects.filter(object_pk=doc.pk).select_related(
+            for entry in LogEntry.objects.get_for_object(doc).select_related(
                 "actor",
             )
         ]
 
         # custom fields
-        for entry in LogEntry.objects.filter(
-            object_pk__in=list(doc.custom_fields.values_list("id", flat=True)),
-            content_type=ContentType.objects.get_for_model(CustomFieldInstance),
+        for entry in LogEntry.objects.get_for_objects(
+            doc.custom_fields.all(),
         ).select_related("actor"):
             entries.append(
                 {
