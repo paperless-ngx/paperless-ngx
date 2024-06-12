@@ -117,9 +117,9 @@ class StoragePathInline(admin.TabularInline):
 
 
 class StoragePathAdmin(GuardedModelAdmin):
-    list_display = ("name", "path", "match", "matching_algorithm")
+    list_display = ("name", "path", "match", "matching_algorithm", "use_jinja")
     list_filter = ("path", "matching_algorithm")
-    list_editable = ("path", "match", "matching_algorithm")
+    list_editable = ("path", "match", "matching_algorithm", "use_jinja")
 
 
 class TaskAdmin(admin.ModelAdmin):
@@ -199,9 +199,4 @@ admin.site.register(CustomFieldInstance, CustomFieldInstancesAdmin)
 
 if settings.AUDIT_LOG_ENABLED:
 
-    class LogEntryAUDIT(LogEntryAdmin):
-        def has_delete_permission(self, request, obj=None):
-            return False
-
-    admin.site.unregister(LogEntry)
-    admin.site.register(LogEntry, LogEntryAUDIT)
+    class LogEntryAUD

@@ -124,10 +124,17 @@ class StoragePath(MatchingModel):
         _("path"),
         max_length=512,
     )
+    use_jinja = models.BooleanField(
+        _("use jinja"),
+        default=False,
+    )
 
     class Meta(MatchingModel.Meta):
         verbose_name = _("storage path")
         verbose_name_plural = _("storage paths")
+
+    def __str__(self):
+        return f"{self.name} (Jinja: {'Yes' if self.use_jinja else 'No'})"
 
 
 class Document(ModelWithOwner):

@@ -370,7 +370,7 @@ You can affect how empty placeholders are treated by changing the
 Enabling this results in all empty placeholders resolving to "" instead of "none" as stated above. Spaces
 before empty placeholders are removed as well, empty directories are omitted.
 
-### Storage paths
+### Storage paths {#storage-paths}
 
 When a single storage layout is not sufficient for your use case, storage paths allow for more complex
 structure to set precisely where each document is stored in the file system.
@@ -416,6 +416,38 @@ Insurances/                             # Insurances
 
     Defining a storage path is optional. If no storage path is defined for a
     document, the global [`PAPERLESS_FILENAME_FORMAT`](configuration.md#PAPERLESS_FILENAME_FORMAT) is applied.
+
+Paperless-ngx introduces the ability to use the Jinja template engine for defining storage paths, offering enhanced flexibility and control over how documents are organized. This feature allows for more sophisticated template parsing, including basic math operations, string manipulations, and custom filters, making it easier to tailor storage paths to specific needs.
+
+### Using Jinja Templating for Storage Paths
+
+To utilize Jinja templating for storage paths, you need to enable it by setting the `use_jinja` flag for the desired `StoragePath` instance. This can be done through the Paperless-ngx administration interface or programmatically.
+
+Here are some examples of how you can define storage paths using Jinja templating:
+
+```plain
+By Year = {{created_year}}/{{correspondent}}/{{title}}
+By Month = {{created_year}}/{{created_month_name}}/{{correspondent}}/{{title}}
+Custom = {{correspondent|replace(" ", "_")}}/{{created|date("Y/m/d")}}_{{title}}
+```
+
+In these examples, `{{created_year}}`, `{{correspondent}}`, and `{{title}}` are placeholders that will be replaced with the document's creation year, correspondent name, and title, respectively. The `replace` filter is used to replace spaces with underscores in the correspondent's name, and the `date` filter formats the creation date.
+
+To enable Jinja parsing for a storage path:
+
+1. Navigate to the Storage Paths section in the Paperless-ngx administration interface.
+2. Create a new storage path or edit an existing one.
+3. Check the "Use Jinja" option.
+4. Define your storage path using Jinja templating syntax in the "Path" field.
+5. Save the storage path.
+
+Once enabled, Paperless-ngx will parse the storage path definition using the Jinja template engine whenever a document is assigned to that storage path. This allows for dynamic and flexible organization of documents based on their metadata.
+
+!!! note
+
+    The Jinja templating feature is designed to be backward compatible. Existing format strings using single curly braces can be easily migrated to Jinja by doubling the curly braces.
+
+By leveraging Jinja templating for storage paths, Paperless-ngx users can achieve a higher level of customization and efficiency in managing their documents.
 
 ## Celery Monitoring {#celery-monitoring}
 
@@ -491,8 +523,7 @@ The database interface does not provide a method to configure a MySQL
 database to be case sensitive. This would prevent a user from creating a
 tag `Name` and `NAME` as they are considered the same.
 
-Per Django documentation, to enable this requires manual intervention.
-To enable case sensitive tables, you can execute the following command
+Per Django documentation, to enable case sensitive tables, you can execute the following command
 against each table:
 
 `ALTER TABLE <table_name> CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;`

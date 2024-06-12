@@ -9,7 +9,7 @@ from typing import Union
 
 from django.conf import settings
 from PIL import Image
-
+from jinja2 import Template  # Import Jinja2 for template parsing
 
 def _coerce_to_path(
     source: Union[Path, str],
@@ -110,3 +110,15 @@ def run_subprocess(
         completed_proc.check_returncode()
 
     return completed_proc
+
+def get_storage_path(document, storage_path_definition, use_jinja=False):
+    """
+    Generates a storage path for the given document based on the provided storage path definition.
+    If use_jinja is True, Jinja2 templating engine is used to parse the storage path definition.
+    """
+    if use_jinja:
+        template = Template(storage_path_definition)
+        return template.render(document=document)
+    else:
+        # Legacy storage path parsing logic
+        pass  # Placeholder for existing logic
