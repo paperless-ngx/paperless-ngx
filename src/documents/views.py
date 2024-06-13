@@ -1923,16 +1923,16 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     ordering_fields = ("name", "type", "parent_warehouse", "document_count")
     
     def getWarehouseDoc(self, wareh):
-        
+        currentUser = self.request.user
         if wareh.type == Warehouse.BOXCASE:
-            return list(Document.objects.filter(warehouse=wareh).order_by("-created").values())
+            return list(Document.objects.filter(warehouse=wareh, owner=currentUser).order_by("-created").values())
         elif wareh.type == Warehouse.SHELF:
             boxcases = Warehouse.objects.filter(parent_warehouse=wareh)
-            return list(Document.objects.filter(warehouse__in=[b.id for b in boxcases]).order_by("-created").values())
+            return list(Document.objects.filter(warehouse__in=[b.id for b in boxcases], owner=currentUser).order_by("-created").values())
         elif wareh.type == Warehouse.WAREHOUSE:
             shelves = Warehouse.objects.filter(parent_warehouse=wareh)
             boxcases = Warehouse.objects.filter(parent_warehouse__in=[s.id for s in shelves])
-            return list(Document.objects.filter(warehouse__in=[b.id for b in boxcases]).order_by("-created").values())
+            return list(Document.objects.filter(warehouse__in=[b.id for b in boxcases], owner=currentUser).order_by("-created").values())
         else:
             return list(Document.objects.none())
     
@@ -2124,7 +2124,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         child_folders = list(Folder.objects.filter(parent_folder=fol).order_by("name").values())
         return {
             "documents": documents,
-            "child_folders": child_folders,
+            "folders": child_folders,
         }
     
     @action(methods=["get"], detail=True)
