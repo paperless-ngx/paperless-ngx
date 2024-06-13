@@ -250,9 +250,14 @@ a minimal installation of Debian/Buster, which is the current stable
 release at the time of writing. Windows is not and will never be
 supported.
 
+Paperless requires Python 3. At this time, 3.9 - 3.11 are supported and known to be working.
+Newer version may work, but some dependencies may not yet support or fully support newer versions.
+Support for older Python versions may be dropped as they reach end of life or as newer versions
+are released, dependency support is confirmed, etc.
+
 1.  Install dependencies. Paperless requires the following packages.
 
-    - `python3` - 3.9 - 3.11 are supported
+    - `python3`
     - `python3-pip`
     - `python3-dev`
     - `default-libmysqlclient-dev` for MariaDB
@@ -410,8 +415,7 @@ supported.
     sudo chown paperless:paperless /opt/paperless/consume
     ```
 
-8.  Install python requirements from the `requirements.txt` file. It is
-    up to you if you wish to use a virtual environment or not. First you should update your pip, so it gets the actual packages.
+8.  Install python requirements from the `requirements.txt` file.
 
     ```shell-session
     sudo -Hu paperless pip3 install -r requirements.txt
@@ -419,6 +423,12 @@ supported.
 
     This will install all python dependencies in the home directory of
     the new paperless user.
+
+    !!! tip
+
+        It is up to you if you wish to use a virtual environment or not for the Python
+        dependencies.  This is an alternative to the above and may require adjusting
+        the example scripts to utilize.
 
 9.  Go to `/opt/paperless/src`, and execute the following commands:
 
