@@ -432,13 +432,18 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
 
         resp_data = response.json()
 
-        self.assertNotIn("permissions", resp_data["results"][0])
-        self.assertIn("user_can_change", resp_data["results"][0])
-        self.assertTrue(resp_data["results"][0]["user_can_change"])  # doc1
-        self.assertFalse(resp_data["results"][0]["is_shared_by_requester"])  # doc1
-        self.assertFalse(resp_data["results"][1]["user_can_change"])  # doc2
-        self.assertTrue(resp_data["results"][2]["user_can_change"])  # doc3
-        self.assertTrue(resp_data["results"][3]["is_shared_by_requester"])  # doc4
+        # The response will contain the documents in reversed order of creation
+        # due to #6982, but previously this code relied on implicit ordering
+        # so let's ensure the order is as expected:
+        results = resp_data["results"][::-1]
+
+        self.assertNotIn("permissions", results[0])
+        self.assertIn("user_can_change", results[0])
+        self.assertTrue(results[0]["user_can_change"])  # doc1
+        self.assertFalse(results[0]["is_shared_by_requester"])  # doc1
+        self.assertFalse(results[1]["user_can_change"])  # doc2
+        self.assertTrue(results[2]["user_can_change"])  # doc3
+        self.assertTrue(results[3]["is_shared_by_requester"])  # doc4
 
         response = self.client.get(
             "/api/documents/?full_perms=true",
@@ -449,9 +454,12 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
 
         resp_data = response.json()
 
-        self.assertIn("permissions", resp_data["results"][0])
-        self.assertNotIn("user_can_change", resp_data["results"][0])
-        self.assertNotIn("is_shared_by_requester", resp_data["results"][0])
+        # See above about response ordering
+        results = resp_data["results"][::-1]
+
+        self.assertIn("permissions", results[0])
+        self.assertNotIn("user_can_change", results[0])
+        self.assertNotIn("is_shared_by_requester", results[0])
 
 
 class TestApiUser(DirectoriesMixin, APITestCase):
