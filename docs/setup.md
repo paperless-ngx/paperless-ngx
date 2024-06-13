@@ -250,8 +250,8 @@ a minimal installation of Debian/Buster, which is the current stable
 release at the time of writing. Windows is not and will never be
 supported.
 
-Paperless requires Python 3. At this time, 3.9 - 3.11 are supported and known to be working.
-Newer version may work, but some dependencies may not yet support or fully support newer versions.
+Paperless requires Python 3. At this time, 3.9 - 3.11 are tested versions.
+Newer versions may work, but some dependencies may not fully support newer versions.
 Support for older Python versions may be dropped as they reach end of life or as newer versions
 are released, dependency support is confirmed, etc.
 
@@ -428,7 +428,7 @@ are released, dependency support is confirmed, etc.
 
         It is up to you if you wish to use a virtual environment or not for the Python
         dependencies.  This is an alternative to the above and may require adjusting
-        the example scripts to utilize.
+        the example scripts to utilize the virtual environment paths
 
 9.  Go to `/opt/paperless/src`, and execute the following commands:
 
