@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common'
 import {
-  HttpClientTestingModule,
   HttpTestingController,
+  provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import {
   ComponentFixture,
@@ -83,6 +83,7 @@ import { SplitConfirmDialogComponent } from '../common/confirm-dialog/split-conf
 import { DeletePagesConfirmDialogComponent } from '../common/confirm-dialog/delete-pages-confirm-dialog/delete-pages-confirm-dialog.component'
 import { PdfViewerModule } from 'ng2-pdf-viewer'
 import { DataType } from 'src/app/data/datatype'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const doc: Document = {
   id: 3,
@@ -182,6 +183,16 @@ describe('DocumentDetailComponent', () => {
         RotateConfirmDialogComponent,
         DeletePagesConfirmDialogComponent,
       ],
+      imports: [
+        RouterModule.forRoot(routes),
+        NgbModule,
+        NgSelectModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NgbModalModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+        PdfViewerModule,
+      ],
       providers: [
         DocumentTitlePipe,
         {
@@ -257,17 +268,8 @@ describe('DocumentDetailComponent', () => {
         PermissionsGuard,
         CustomDatePipe,
         DatePipe,
-      ],
-      imports: [
-        RouterModule.forRoot(routes),
-        HttpClientTestingModule,
-        NgbModule,
-        NgSelectModule,
-        FormsModule,
-        ReactiveFormsModule,
-        NgbModalModule,
-        NgxBootstrapIconsModule.pick(allIcons),
-        PdfViewerModule,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 

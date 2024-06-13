@@ -1,4 +1,4 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
@@ -14,6 +14,7 @@ import { TextComponent } from '../../input/text/text.component'
 import { EditDialogMode } from '../edit-dialog.component'
 import { TagEditDialogComponent } from './tag-edit-dialog.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('TagEditDialogComponent', () => {
   let component: TagEditDialogComponent
@@ -32,14 +33,18 @@ describe('TagEditDialogComponent', () => {
         ColorComponent,
         CheckComponent,
       ],
-      providers: [NgbActiveModal, SettingsService],
       imports: [
-        HttpClientTestingModule,
         FormsModule,
         ReactiveFormsModule,
         NgSelectModule,
         NgbModule,
         NgxBootstrapIconsModule.pick(allIcons),
+      ],
+      providers: [
+        NgbActiveModal,
+        SettingsService,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 

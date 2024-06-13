@@ -1,6 +1,6 @@
 import {
   HttpTestingController,
-  HttpClientTestingModule,
+  provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -58,6 +58,7 @@ import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-c
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const selectionData: SelectionData = {
   selected_tags: [
@@ -111,6 +112,14 @@ describe('BulkEditorComponent', () => {
         RotateConfirmDialogComponent,
         IsNumberPipe,
         MergeConfirmDialogComponent,
+      ],
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgbModule,
+        NgbModalModule,
+        NgSelectModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
         PermissionsService,
@@ -188,15 +197,8 @@ describe('BulkEditorComponent', () => {
               }),
           },
         },
-      ],
-      imports: [
-        HttpClientTestingModule,
-        FormsModule,
-        ReactiveFormsModule,
-        NgbModule,
-        NgbModalModule,
-        NgSelectModule,
-        NgxBootstrapIconsModule.pick(allIcons),
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 
