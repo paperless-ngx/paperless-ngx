@@ -311,10 +311,15 @@ def empty_trash(doc_ids=None):
         )
     )
 
-    # Temporarily connect the cleanup handler (hard_delete calls delete)
-    models.signals.post_delete.connect(cleanup_document_deletion, sender=Document)
-
-    for doc in documents:
-        doc.hard_delete()
-
-    models.signals.post_delete.disconnect(cleanup_document_deletion, sender=Document)
+    try:
+        # Temporarily connect the cleanup handler (hard_delete calls delete)
+        models.signals.post_delete.connect(cleanup_document_deletion, sender=Document)
+        for doc in documents:
+            doc.hard_delete()
+    except Exception as e:  # pragma: no cover
+        logger.exception(f"Error while emptying trash: {e}")
+    finally:
+        models.signals.post_delete.disconnect(
+            cleanup_document_deletion,
+            sender=Document,
+        )
