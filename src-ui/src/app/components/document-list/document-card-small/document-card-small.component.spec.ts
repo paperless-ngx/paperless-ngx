@@ -20,8 +20,11 @@ import { DocumentCardSmallComponent } from './document-card-small.component'
 import { of } from 'rxjs'
 import { By } from '@angular/platform-browser'
 import { TagComponent } from '../../common/tag/tag.component'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { Tag } from 'src/app/data/tag'
 import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
+import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.component'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { CustomFieldDisplayComponent } from '../../common/custom-field-display/custom-field-display.component'
 
 const doc = {
   id: 10,
@@ -64,6 +67,8 @@ describe('DocumentCardSmallComponent', () => {
         SafeUrlPipe,
         TagComponent,
         IsNumberPipe,
+        PreviewPopupComponent,
+        CustomFieldDisplayComponent,
       ],
       providers: [DatePipe],
       imports: [
@@ -72,6 +77,7 @@ describe('DocumentCardSmallComponent', () => {
         NgbPopoverModule,
         NgbTooltipModule,
         NgbProgressbarModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 
@@ -87,10 +93,7 @@ describe('DocumentCardSmallComponent', () => {
       fixture.debugElement.queryAll(By.directive(TagComponent))
     ).toHaveLength(5)
     component.document.tags = [1, 2]
-    component.document.tags$ = of([
-      { id: 1 } as PaperlessTag,
-      { id: 2 } as PaperlessTag,
-    ])
+    component.document.tags$ = of([{ id: 1 } as Tag, { id: 2 } as Tag])
     fixture.detectChanges()
     expect(
       fixture.debugElement.queryAll(By.directive(TagComponent))

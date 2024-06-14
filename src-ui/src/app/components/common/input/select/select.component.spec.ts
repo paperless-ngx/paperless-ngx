@@ -10,7 +10,7 @@ import {
   NG_VALUE_ACCESSOR,
 } from '@angular/forms'
 import { SelectComponent } from './select.component'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { Tag } from 'src/app/data/tag'
 import {
   DEFAULT_MATCHING_ALGORITHM,
   MATCH_ALL,
@@ -18,7 +18,7 @@ import {
 import { NgSelectModule } from '@ng-select/ng-select'
 import { RouterTestingModule } from '@angular/router/testing'
 
-const items: PaperlessTag[] = [
+const items: Tag[] = [
   {
     id: 1,
     name: 'Tag1',
@@ -118,4 +118,18 @@ describe('SelectComponent', () => {
     tick(3000)
     expect(clearSpy).toHaveBeenCalled()
   }))
+
+  it('should emit filtered documents', () => {
+    component.value = 10
+    component.items = items
+    const emitSpy = jest.spyOn(component.filterDocuments, 'emit')
+    component.onFilterDocuments()
+    expect(emitSpy).toHaveBeenCalledWith([items[2]])
+  })
+
+  it('should return the correct filter button title', () => {
+    component.title = 'Tag'
+    const expectedTitle = `Filter documents with this ${component.title}`
+    expect(component.filterButtonTitle).toEqual(expectedTitle)
+  })
 })

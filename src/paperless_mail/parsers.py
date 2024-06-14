@@ -69,6 +69,11 @@ class MailDocumentParser(DocumentParser):
 
         for key, value in mail.headers.items():
             value = ", ".join(i for i in value)
+            try:
+                value.encode("utf-8")
+            except UnicodeEncodeError as e:  # pragma: no cover
+                self.log.debug(f"Skipping header {key}: {e}")
+                continue
 
             result.append(
                 {
@@ -215,10 +220,15 @@ class MailDocumentParser(DocumentParser):
                 mail_message.attachments,
             )
 
-            with GotenbergClient(
-                host=settings.TIKA_GOTENBERG_ENDPOINT,
-                timeout=settings.CELERY_TASK_TIME_LIMIT,
-            ) as client, client.merge.merge() as route:
+            self.log.debug("Merging email text and HTML content into single PDF")
+
+            with (
+                GotenbergClient(
+                    host=settings.TIKA_GOTENBERG_ENDPOINT,
+                    timeout=settings.CELERY_TASK_TIME_LIMIT,
+                ) as client,
+                client.merge.merge() as route,
+            ):
                 # Configure requested PDF/A formatting, if any
                 pdf_a_format = self._settings_to_gotenberg_pdfa()
                 if pdf_a_format is not None:
@@ -303,10 +313,13 @@ class MailDocumentParser(DocumentParser):
         css_file = Path(__file__).parent / "templates" / "output.css"
         email_html_file = self.mail_to_html(mail)
 
-        with GotenbergClient(
-            host=settings.TIKA_GOTENBERG_ENDPOINT,
-            timeout=settings.CELERY_TASK_TIME_LIMIT,
-        ) as client, client.chromium.html_to_pdf() as route:
+        with (
+            GotenbergClient(
+                host=settings.TIKA_GOTENBERG_ENDPOINT,
+                timeout=settings.CELERY_TASK_TIME_LIMIT,
+            ) as client,
+            client.chromium.html_to_pdf() as route,
+        ):
             # Configure requested PDF/A formatting, if any
             pdf_a_format = self._settings_to_gotenberg_pdfa()
             if pdf_a_format is not None:
@@ -348,7 +361,7 @@ class MailDocumentParser(DocumentParser):
             text = compiled_close.sub("</div", text)
             return text
 
-        self.log.info("Converting html to PDF")
+        self.log.info("Converting message html to PDF")
 
         tempdir = Path(self.tempdir)
 
@@ -356,10 +369,13 @@ class MailDocumentParser(DocumentParser):
         html_clean_file = tempdir / "index.html"
         html_clean_file.write_text(html_clean)
 
-        with GotenbergClient(
-            host=settings.TIKA_GOTENBERG_ENDPOINT,
-            timeout=settings.CELERY_TASK_TIME_LIMIT,
-        ) as client, client.chromium.html_to_pdf() as route:
+        with (
+            GotenbergClient(
+                host=settings.TIKA_GOTENBERG_ENDPOINT,
+                timeout=settings.CELERY_TASK_TIME_LIMIT,
+            ) as client,
+            client.chromium.html_to_pdf() as route,
+        ):
             # Configure requested PDF/A formatting, if any
             pdf_a_format = self._settings_to_gotenberg_pdfa()
             if pdf_a_format is not None:
@@ -403,3 +419,9 @@ class MailDocumentParser(DocumentParser):
         html_pdf = tempdir / "html.pdf"
         html_pdf.write_bytes(response.content)
         return html_pdf
+
+    def get_settings(self):
+        """
+        This parser does not implement additional settings yet
+        """
+        return None

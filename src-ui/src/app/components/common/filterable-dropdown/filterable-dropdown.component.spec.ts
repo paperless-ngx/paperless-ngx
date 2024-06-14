@@ -13,7 +13,7 @@ import {
 } from './filterable-dropdown.component'
 import { FilterPipe } from 'src/app/pipes/filter.pipe'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { Tag } from 'src/app/data/tag'
 import {
   DEFAULT_MATCHING_ALGORITHM,
   MATCH_ALL,
@@ -25,8 +25,10 @@ import {
 import { TagComponent } from '../tag/tag.component'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { HotKeyService } from 'src/app/services/hot-key.service'
 
-const items: PaperlessTag[] = [
+const items: Tag[] = [
   {
     id: 1,
     name: 'Tag1',
@@ -52,6 +54,7 @@ let selectionModel: FilterableDropdownSelectionModel
 describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () => {
   let component: FilterableDropdownComponent
   let fixture: ComponentFixture<FilterableDropdownComponent>
+  let hotkeyService: HotKeyService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -63,9 +66,15 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
         ClearableBadgeComponent,
       ],
       providers: [FilterPipe],
-      imports: [NgbModule, FormsModule, ReactiveFormsModule],
+      imports: [
+        NgbModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+      ],
     }).compileComponents()
 
+    hotkeyService = TestBed.inject(HotKeyService)
     fixture = TestBed.createComponent(FilterableDropdownComponent)
     component = fixture.componentInstance
     selectionModel = new FilterableDropdownSelectionModel()
@@ -215,6 +224,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   it('should apply changes and close when apply button clicked', () => {
     component.items = items
+    component.icon = 'tag-fill'
     component.editing = true
     component.selectionModel = selectionModel
     fixture.nativeElement
@@ -236,6 +246,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   it('should apply on close if enabled', () => {
     component.items = items
+    component.icon = 'tag-fill'
     component.editing = true
     component.applyOnClose = true
     component.selectionModel = selectionModel
@@ -253,6 +264,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   it('should focus text filter on open, support filtering, clear on close', fakeAsync(() => {
     component.items = items
+    component.icon = 'tag-fill'
     fixture.nativeElement
       .querySelector('button')
       .dispatchEvent(new MouseEvent('click')) // open
@@ -279,6 +291,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   it('should toggle & close on enter inside filter field if 1 item remains', fakeAsync(() => {
     component.items = items
+    component.icon = 'tag-fill'
     expect(component.selectionModel.getSelectedItems()).toEqual([])
     fixture.nativeElement
       .querySelector('button')
@@ -298,6 +311,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   it('should apply & close on enter inside filter field if 1 item remains if editing', fakeAsync(() => {
     component.items = items
+    component.icon = 'tag-fill'
     component.editing = true
     let applyResult: ChangedItems
     component.apply.subscribe((result) => (applyResult = result))
@@ -319,6 +333,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   it('should support arrow keyboard navigation', fakeAsync(() => {
     component.items = items
+    component.icon = 'tag-fill'
     fixture.nativeElement
       .querySelector('button')
       .dispatchEvent(new MouseEvent('click')) // open
@@ -363,6 +378,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   it('should support arrow keyboard navigation after tab keyboard navigation', fakeAsync(() => {
     component.items = items
+    component.icon = 'tag-fill'
     fixture.nativeElement
       .querySelector('button')
       .dispatchEvent(new MouseEvent('click')) // open
@@ -398,6 +414,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   it('should support arrow keyboard navigation after click', fakeAsync(() => {
     component.items = items
+    component.icon = 'tag-fill'
     fixture.nativeElement
       .querySelector('button')
       .dispatchEvent(new MouseEvent('click')) // open
@@ -422,6 +439,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   it('should toggle logical operator', fakeAsync(() => {
     component.items = items
+    component.icon = 'tag-fill'
     component.manyToOne = true
     selectionModel.set(items[0].id, ToggleableItemState.Selected)
     selectionModel.set(items[1].id, ToggleableItemState.Selected)
@@ -450,6 +468,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   it('should toggle intersection include / exclude', fakeAsync(() => {
     component.items = items
+    component.icon = 'tag-fill'
     selectionModel.set(items[0].id, ToggleableItemState.Selected)
     selectionModel.set(items[1].id, ToggleableItemState.Selected)
     component.selectionModel = selectionModel
@@ -477,11 +496,98 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     expect(changedResult.getExcludedItems()).toEqual(items)
   }))
 
-  it('FilterableDropdownSelectionModel should sort items by state', () => {
-    component.items = items
+  it('selection model should sort items by state', () => {
+    component.items = items.concat([{ id: null, name: 'Null B' }])
     component.selectionModel = selectionModel
     selectionModel.toggle(items[1].id)
     selectionModel.apply()
-    expect(selectionModel.itemsSorted).toEqual([nullItem, items[1], items[0]])
+    expect(selectionModel.itemsSorted).toEqual([
+      nullItem,
+      { id: null, name: 'Null B' },
+      items[1],
+      items[0],
+    ])
+  })
+
+  it('should set support create, keep open model and call createRef method', fakeAsync(() => {
+    component.items = items
+    component.icon = 'tag-fill'
+    component.selectionModel = selectionModel
+    fixture.nativeElement
+      .querySelector('button')
+      .dispatchEvent(new MouseEvent('click')) // open
+    fixture.detectChanges()
+    tick(100)
+
+    component.filterText = 'Test Filter Text'
+    component.createRef = jest.fn()
+    component.createClicked()
+    expect(component.creating).toBeTruthy()
+    expect(component.createRef).toHaveBeenCalledWith('Test Filter Text')
+    const openSpy = jest.spyOn(component.dropdown, 'open')
+    component.dropdownOpenChange(false)
+    expect(openSpy).toHaveBeenCalled() // should keep open
+  }))
+
+  it('should call create on enter inside filter field if 0 items remain while editing', fakeAsync(() => {
+    component.items = items
+    component.icon = 'tag-fill'
+    component.editing = true
+    component.createRef = jest.fn()
+    const createSpy = jest.spyOn(component, 'createClicked')
+    expect(component.selectionModel.getSelectedItems()).toEqual([])
+    fixture.nativeElement
+      .querySelector('button')
+      .dispatchEvent(new MouseEvent('click')) // open
+    fixture.detectChanges()
+    tick(100)
+    component.filterText = 'FooBar'
+    fixture.detectChanges()
+    component.listFilterTextInput.nativeElement.dispatchEvent(
+      new KeyboardEvent('keyup', { key: 'Enter' })
+    )
+    expect(component.selectionModel.getSelectedItems()).toEqual([])
+    tick(300)
+    expect(createSpy).toHaveBeenCalled()
+  }))
+
+  it('should exclude item and trigger change event', () => {
+    const id = 1
+    const state = ToggleableItemState.Selected
+    component.selectionModel = selectionModel
+    component.manyToOne = true
+    component.selectionModel.singleSelect = true
+    component.selectionModel.intersection = Intersection.Include
+    component.selectionModel['temporarySelectionStates'].set(id, state)
+    const changedSpy = jest.spyOn(component.selectionModel.changed, 'next')
+    component.selectionModel.exclude(id)
+    expect(component.selectionModel.temporaryLogicalOperator).toBe(
+      LogicalOperator.And
+    )
+    expect(component.selectionModel['temporarySelectionStates'].get(id)).toBe(
+      ToggleableItemState.Excluded
+    )
+    expect(component.selectionModel['temporarySelectionStates'].size).toBe(1)
+    expect(changedSpy).toHaveBeenCalled()
+  })
+
+  it('should initialize selection states and apply changes', () => {
+    selectionModel.items = items
+    const map = new Map<number, ToggleableItemState>()
+    map.set(1, ToggleableItemState.Selected)
+    map.set(2, ToggleableItemState.Excluded)
+    selectionModel.init(map)
+    expect(selectionModel.getSelectedItems()).toEqual([items[0]])
+    expect(selectionModel.getExcludedItems()).toEqual([items[1]])
+  })
+
+  it('should support shortcut keys', () => {
+    component.items = items
+    component.icon = 'tag-fill'
+    component.shortcutKey = 't'
+    fixture.detectChanges()
+    const openSpy = jest.spyOn(component.dropdown, 'open')
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 't' }))
+    expect(openSpy).toHaveBeenCalled()
   })
 })

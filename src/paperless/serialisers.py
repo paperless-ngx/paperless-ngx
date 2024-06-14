@@ -1,7 +1,14 @@
+import logging
+
+from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from rest_framework import serializers
+
+from paperless.models import ApplicationConfiguration
+
+logger = logging.getLogger("paperless.settings")
 
 
 class ObfuscatedUserPasswordField(serializers.Field):
@@ -20,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
     password = ObfuscatedUserPasswordField(required=False)
     user_permissions = serializers.SlugRelatedField(
         many=True,
-        queryset=Permission.objects.all(),
+        queryset=Permission.objects.exclude(content_type__app_label="admin"),
         slug_field="codename",
         required=False,
     )
@@ -86,7 +93,7 @@ class UserSerializer(serializers.ModelSerializer):
 class GroupSerializer(serializers.ModelSerializer):
     permissions = serializers.SlugRelatedField(
         many=True,
-        queryset=Permission.objects.all(),
+        queryset=Permission.objects.exclude(content_type__app_label="admin"),
         slug_field="codename",
     )
 
@@ -97,3 +104,62 @@ class GroupSerializer(serializers.ModelSerializer):
             "name",
             "permissions",
         )
+
+
+class SocialAccountSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SocialAccount
+        fields = (
+            "id",
+            "provider",
+            "name",
+        )
+
+    def get_name(self, obj):
+        return obj.get_provider_account().to_str()
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(allow_null=False)
+    password = ObfuscatedUserPasswordField(required=False, allow_null=False)
+    auth_token = serializers.SlugRelatedField(read_only=True, slug_field="key")
+    social_accounts = SocialAccountSerializer(
+        many=True,
+        read_only=True,
+        source="socialaccount_set",
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            "email",
+            "password",
+            "first_name",
+            "last_name",
+            "auth_token",
+            "social_accounts",
+            "has_usable_password",
+        )
+
+
+class ApplicationConfigurationSerializer(serializers.ModelSerializer):
+    user_args = serializers.JSONField(binary=True, allow_null=True)
+
+    def run_validation(self, data):
+        # Empty strings treated as None to avoid unexpected behavior
+        if "user_args" in data and data["user_args"] == "":
+            data["user_args"] = None
+        if "language" in data and data["language"] == "":
+            data["language"] = None
+        return super().run_validation(data)
+
+    def update(self, instance, validated_data):
+        if instance.app_logo and "app_logo" in validated_data:
+            instance.app_logo.delete()
+        return super().update(instance, validated_data)
+
+    class Meta:
+        model = ApplicationConfiguration
+        fields = "__all__"

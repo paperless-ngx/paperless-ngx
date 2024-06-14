@@ -109,7 +109,7 @@ process.
 
 ### Mobile upload {#usage-mobile_upload}
 
-Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Affiliated-Projects) for a user-maintained list of affiliated projects and
+Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Related-Projects) for a user-maintained list of related projects and
 software (e.g. for mobile devices) that is compatible with Paperless-ngx.
 
 ### IMAP (Email) {#usage-email}
@@ -149,7 +149,7 @@ different means. These are as follows:
 - **Flag:** Sets the 'important' flag on mails with consumed
   documents. Paperless will not consume flagged mails.
 - **Move to folder:** Moves consumed mails out of the way so that
-  paperless wont consume them again.
+  paperless won't consume them again.
 - **Add custom Tag:** Adds a custom tag to mails with consumed
   documents (the IMAP standard calls these "keywords"). Paperless
   will not consume mails already tagged. Not all mail servers support
@@ -206,12 +206,12 @@ for details.
 
 ## Permissions
 
-As of version 1.14.0 Paperless-ngx added core support for user / group permissions. Permissions is
-based around 'global' permissions as well as 'object-level' permissions. Global permissions designate
-which parts of the application a user can access (e.g. Documents, Tags, Settings) and object-level
-determine which objects are visible or editable. All objects have an 'owner' and 'view' and 'edit'
-permissions which can be granted to other users or groups. The paperless-ngx permissions system uses
-the built-in user model of the backend framework, Django.
+Permissions in Paperless-ngx are based around ['global' permissions](#global-permissions) as well as
+['object-level' permissions](#object-permissions). Global permissions determine which parts of the
+application a user can access (e.g. Documents, Tags, Settings) and object-level determine which
+objects are visible or editable. All objects have an 'owner' and 'view' and 'edit' permissions which
+can be granted to other users or groups. The paperless-ngx permissions system uses the built-in user
+model of the backend framework, Django.
 
 !!! tip
 
@@ -219,86 +219,166 @@ the built-in user model of the backend framework, Django.
     for a Tag will _not_ affect the permissions of documents that have the Tag.
 
 Permissions can be set using the new "Permissions" tab when editing documents, or bulk-applied
-in the UI by selecting documents and choosing the "Permissions" button. Owner can also optionally
-be set for documents uploaded via the API. Documents consumed via the consumption dir currently
-do not have an owner set.
-
-!!! note
-
-    After migration to version 1.14.0 all existing documents, tags etc. will have no explicit owner
-    set which means they will be visible / editable by all users. Once an object has an owner set,
-    only the owner can explicitly grant / revoke permissions.
-
-!!! note
-
-    When first migrating to permissions it is recommended to use a 'superuser' account (which
-    would usually have been setup during installation) to ensure you have full permissions.
-
-    Note that superusers have access to all objects.
+in the UI by selecting documents and choosing the "Permissions" button.
 
 ### Default permissions
 
-Default permissions for documents can be set using consumption templates.
+[Workflows](#workflows) provide advanced ways to control permissions.
 
 For objects created via the web UI (tags, doc types, etc.) the default is to set the current user
-as owner and no extra permissions, but you explicitly set these under Settings > Permissions.
+as owner and no extra permissions, but you can explicitly set these under Settings > Permissions.
+
+Documents consumed via the consumption directory do not have an owner or additional permissions set by default, but again, can be controlled with [Workflows](#workflows).
 
 ### Users and Groups
 
-Paperless-ngx versions after 1.14.0 allow creating and editing users and groups via the 'frontend' UI.
-These can be found under Settings > Users & Groups, assuming the user has access. If a user is designated
+Paperless-ngx supports editing users and groups via the 'frontend' UI, which can be found under
+Settings > Users & Groups, assuming the user has access. If a user is designated
 as a member of a group those permissions will be inherited and this is reflected in the UI. Explicit
 permissions can be granted to limit access to certain parts of the UI (and corresponding API endpoints).
+
+!!! note
+
+    Superusers can access all parts of the front and backend application as well as any and all objects.
+
+#### Admin Status
+
+Admin status (Django 'staff status') grants access to viewing the paperless logs and the system status dialog
+as well as accessing the Django backend.
+
+#### Detailed Explanation of Global Permissions {#global-permissions}
+
+Global permissions define what areas of the app and API endpoints the user can access. For example, they
+determine if a user can create, edit, delete or view _any_ documents, but individual documents themselves
+still have "object-level" permissions.
+
+| Type          | Details                                                                                                                                                                                             |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AppConfig     | _Change_ or higher permissions grants access to the "Application Configuration" area.                                                                                                               |
+| Correspondent | Grants global permissions to add, edit, delete or view Correspondents.                                                                                                                              |
+| CustomField   | Grants global permissions to add, edit, delete or view Custom Fields.                                                                                                                               |
+| Document      | Grants global permissions to add, edit, delete or view Documents.                                                                                                                                   |
+| DocumentType  | Grants global permissions to add, edit, delete or view Document Types.                                                                                                                              |
+| Group         | Grants global permissions to add, edit, delete or view Groups.                                                                                                                                      |
+| MailAccount   | Grants global permissions to add, edit, delete or view Mail Accounts.                                                                                                                               |
+| MailRule      | Grants global permissions to add, edit, delete or view Mail Rules.                                                                                                                                  |
+| Note          | Grants global permissions to add, edit, delete or view Notes.                                                                                                                                       |
+| PaperlessTask | Grants global permissions to view or dismiss (_Change_) File Tasks.                                                                                                                                 |
+| SavedView     | Grants global permissions to add, edit, delete or view Saved Views.                                                                                                                                 |
+| ShareLink     | Grants global permissions to add, delete or view Share Links.                                                                                                                                       |
+| StoragePath   | Grants global permissions to add, edit, delete or view Storage Paths.                                                                                                                               |
+| Tag           | Grants global permissions to add, edit, delete or view Tags.                                                                                                                                        |
+| UISettings    | Grants global permissions to add, edit, delete or view the UI settings that are used by the web app.<br/>Users expected to access the web UI should usually be granted at least _View_ permissions. |
+| User          | Grants global permissions to add, edit, delete or view Users.                                                                                                                                       |
+| Workflow      | Grants global permissions to add, edit, delete or view Workflows.<br/>Note that Workflows are global, in other words all users who can access workflows have access to the same set of them.        |
+
+#### Detailed Explanation of Object Permissions {#object-permissions}
+
+| Type  | Details                                                                                                                                                                                                                                                                                                                                  |
+| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Owner | By default objects are only visible and editable by their owner.<br/>Only the object owner can grant permissions to other users or groups.<br/>Additionally, only document owners can create share links and add / remove custom fields.<br/>For backwards compatibility objects can have no owner which makes them visible to any user. |
+| View  | Confers the ability to view (not edit) a document, tag, etc.<br/>Users without 'view' (or higher) permissions will be shown _'Private'_ in place of the object name for example when viewing a document with a tag for which the user doesn't have permissions.                                                                          |
+| Edit  | Confers the ability to edit (and view) a document, tag, etc.                                                                                                                                                                                                                                                                             |
 
 ### Password reset
 
 In order to enable the password reset feature you will need to setup an SMTP backend, see
-[`PAPERLESS_EMAIL_HOST`](configuration.md#PAPERLESS_EMAIL_HOST)
+[`PAPERLESS_EMAIL_HOST`](configuration.md#PAPERLESS_EMAIL_HOST). If your installation does not have
+[`PAPERLESS_URL`](configuration.md#PAPERLESS_URL) set, the reset link included in emails will use the server host.
 
-## Consumption templates
+## Workflows
 
-Consumption templates were introduced in v2.0 and allow for finer control over what metadata (tags, doc
-types) and permissions (owner, privileges) are assigned to documents during consumption. In general,
-templates are applied sequentially (by sort order) but subsequent templates will never override an
-assignment from a preceding template. The same is true for mail rules, e.g. if you set the correspondent
-in a mail rule any subsequent consumption templates that are applied _will not_ overwrite this. The
-exception to this is assignments that can be multiple e.g. tags and permissions, which will be merged.
+!!! note
 
-Consumption templates allow you to filter by:
+    v2.3 added "Workflows" and existing "Consumption Templates" were converted automatically to the new more powerful format.
+
+Workflows allow hooking into the Paperless-ngx document pipeline, for example to alter what metadata (tags, doc types) and
+permissions (owner, privileges) are assigned to documents. Workflows can have multiple 'triggers' and 'actions'. Triggers
+are events (with optional filtering rules) that will cause the workflow to be run and actions are the set of sequential
+actions to apply.
+
+In general, workflows and any actions they contain are applied sequentially by sort order. For "assignment" actions, subsequent
+workflow actions will override previous assignments, except for assignments that accept multiple items e.g. tags, custom
+fields and permissions, which will be merged.
+
+### Workflow Triggers
+
+Currently, there are three events that correspond to workflow trigger 'types':
+
+1. **Consumption Started**: _before_ a document is consumed, so events can include filters by source (mail, consumption
+   folder or API), file path, file name, mail rule
+2. **Document Added**: _after_ a document is added. At this time, file path and source information is no longer available,
+   but the document content has been extracted and metadata such as document type, tags, etc. have been set, so these can now
+   be used for filtering.
+3. **Document Updated**: when a document is updated. Similar to 'added' events, triggers can include filtering by content matching,
+   tags, doc type, or correspondent.
+
+The following flow diagram illustrates the three trigger types:
+
+```mermaid
+flowchart TD
+    consumption{"Matching
+    'Consumption'
+    trigger(s)"}
+
+    added{"Matching
+    'Added'
+    trigger(s)"}
+
+    updated{"Matching
+    'Updated'
+    trigger(s)"}
+
+    A[New Document] --> consumption
+    consumption --> |Yes| C[Workflow Actions Run]
+    consumption --> |No| D
+    C --> D[Document Added]
+    D -- Paperless-ngx 'matching' of tags, etc. --> added
+    added --> |Yes| F[Workflow Actions Run]
+    added --> |No| G
+    F --> G[Document Finalized]
+    H[Existing Document Changed] --> updated
+    updated --> |Yes| J[Workflow Actions Run]
+    updated --> |No| K
+    J --> K[Document Saved]
+```
+
+#### Filters {#workflow-trigger-filters}
+
+Workflows allow you to filter by:
 
 - Source, e.g. documents uploaded via consume folder, API (& the web UI) and mail fetch
 - File name, including wildcards e.g. \*.pdf will apply to all pdfs
 - File path, including wildcards. Note that enabling `PAPERLESS_CONSUMER_RECURSIVE` would allow, for
   example, automatically assigning documents to different owners based on the upload directory.
-- Mail rule. Choosing this option will force 'mail fetch' to be the template source.
+- Mail rule. Choosing this option will force 'mail fetch' to be the workflow source.
+- Content matching (`Added` and `Updated` triggers only). Filter document content using the matching settings.
+- Tags (`Added` and `Updated` triggers only). Filter for documents with any of the specified tags
+- Document type (`Added` and `Updated` triggers only). Filter documents with this doc type
+- Correspondent (`Added` and `Updated` triggers only). Filter documents with this correspondent
 
-!!! note
+### Workflow Actions
 
-    You must include a file name filter, a path filter or a mail rule filter. Use * for either to apply
-    to all files.
+There are currently two types of workflow actions, "Assignment", which can assign:
 
-Consumption templates can assign:
-
-- Title, see [title placeholders](usage.md#title_placeholders) below
-- Tags, correspondent, document types
+- Title, see [title placeholders](usage.md#title-placeholders) below
+- Tags, correspondent, document type and storage path
 - Document owner
 - View and / or edit permissions to users or groups
+- Custom fields. Note that no value for the field will be set
 
-### Consumption template permissions
+and "Removal" actions, which can remove either all of or specific sets of the following:
 
-All users who have application permissions for editing consumption templates can see the same set
-of templates. In other words, templates themselves intentionally do not have an owner or permissions.
+- Tags, correspondents, document types or storage paths
+- Document owner
+- View and / or edit permissions
+- Custom fields
 
-Given their potentially far-reaching capabilities, you may want to restrict access to templates.
+#### Title placeholders
 
-Upon migration, existing installs will grant access to consumption templates to users who can add
-documents (and superusers who can always access all parts of the app).
-
-### Title placeholders
-
-Consumption template titles can include placeholders, _only for items that are assigned within the template_.
-This is because at the time of consumption (when the title is to be set), no automatic tags etc. have been
-applied. You can use the following placeholders:
+Workflow titles can include placeholders but the available options differ depending on the type of
+workflow trigger. This is because at the time of consumption (when the title is to be set), no automatic tags etc. have been
+applied. You can use the following placeholders with any trigger type:
 
 - `{correspondent}`: assigned correspondent name
 - `{document_type}`: assigned document type name
@@ -310,6 +390,29 @@ applied. You can use the following placeholders:
 - `{added_month_name}`: added month name
 - `{added_month_name_short}`: added month short name
 - `{added_day}`: added day
+- `{added_time}`: added time in HH:MM format
+- `{original_filename}`: original file name without extension
+
+The following placeholders are only available for "added" or "updated" triggers
+
+- `{created}`: created datetime
+- `{created_year}`: created year
+- `{created_year_short}`: created year
+- `{created_month}`: created month
+- `{created_month_name}`: created month name
+- `{created_month_name_short}`: created month short name
+- `{created_day}`: created day
+- `{created_time}`: created time in HH:MM format
+
+### Workflow permissions
+
+All users who have application permissions for editing workflows can see the same set
+of workflows. In other words, workflows themselves intentionally do not have an owner or permissions.
+
+Given their potentially far-reaching capabilities, you may want to restrict access to workflows.
+
+Upon migration, existing installs will grant access to workflows to users who can add
+documents (and superusers who can always access all parts of the app).
 
 ## Custom Fields {#custom-fields}
 
@@ -318,13 +421,12 @@ to optionally attach data to documents which does not fit in the existing set of
 Paperless-ngx provides.
 
 1. First, create a custom field (under "Manage"), with a given name and data type. This could be something like "Invoice Number" or "Date Paid", with a data type of "Number", "Date", "String", etc.
-2. Once created, a field can be used with documents and data stored. To do so, use the "Custom Fields" menu on the document detail page, choose your existing field and click "Add". Once the field is visible in the form you can enter the appropriate
-   data which will be validated according to the custom field "data type".
+2. Once created, a field can be used with documents and data stored. To do so, use the "Custom Fields" menu on the document detail page, choose your existing field from the dropdown. Once the field is visible in the form you can enter the appropriate data which will be validated according to the custom field "data type".
 3. Fields can be removed by hovering over the field name revealing a "Remove" button.
 
 !!! important
 
-    Added / removed fields, as well as any data is not saved to the document until you
+    Added / removed fields, as well as any data, is not saved to the document until you
     actually hit the "Save" button, similar to other changes on the document details page.
 
 !!! note
@@ -341,11 +443,12 @@ The following custom field types are supported:
 - `URL`: a valid url
 - `Integer`: integer number e.g. 12
 - `Number`: float number e.g. 12.3456
-- `Monetary`: float number with exactly two decimals, e.g. 12.30
+- `Monetary`: [ISO 4217 currency code](https://en.wikipedia.org/wiki/ISO_4217#List_of_ISO_4217_currency_codes) and a number with exactly two decimals, e.g. USD12.30
+- `Document Link`: reference(s) to other document(s) displayed as links, automatically creates a symmetrical link in reverse
 
 ## Share Links
 
-Paperless-ngx added the abiltiy to create shareable links to files in version 2.0. You can find the button for this on the document detail screen.
+Paperless-ngx added the ability to create shareable links to files in version 2.0. You can find the button for this on the document detail screen.
 
 - Share links do not require a user to login and thus link directly to a file.
 - Links are unique and are of the form `{paperless-url}/share/{randomly-generated-slug}`.
@@ -355,6 +458,25 @@ Paperless-ngx added the abiltiy to create shareable links to files in version 2.
 !!! tip
 
     If your paperless-ngx instance is behind a reverse-proxy you may want to create an exception to bypass any authentication layers that are part of your setup in order to make links truly publicly-accessible. Of course, do so with caution.
+
+## PDF Actions
+
+Paperless-ngx supports four basic editing operations for PDFs (these operations currently cannot be performed on non-PDF files):
+
+- Merging documents: available when selecting multiple documents for 'bulk editing'.
+- Rotating documents: available when selecting multiple documents for 'bulk editing' and from an individual document's details page.
+- Splitting documents: available from an individual document's details page.
+- Deleting pages: available from an individual document's details page.
+
+!!! important
+
+    Note that rotation and deleting pages alter the Paperless-ngx _original_ file, which would, for example, invalidate a digital signature.
+
+## Document History
+
+As of version 2.7, Paperless-ngx automatically records all changes to a document and records this in an audit log. The feature requires [`PAPERLESS_AUDIT_LOG_ENABLED`](configuration.md#PAPERLESS_AUDIT_LOG_ENABLED) be enabled, which it is by default as of version 2.7.
+Changes to documents are visible under the "History" tab. Note that certain changes such as those made by workflows, record the 'actor'
+as "System".
 
 ## Best practices {#basic-searching}
 
@@ -428,6 +550,16 @@ collection.
 
 ## Searching {#basic-usage_searching}
 
+### Global search
+
+The top search bar in the web UI performs a "global" search of the various
+objects Paperless-ngx uses, including documents, tags, workflows, etc. Only
+objects for which the user has appropriate permissions are returned. For
+documents, if there are < 3 results, "advanced" search results (which use
+the document index) will also be included. This can be disabled under settings.
+
+### Document searches
+
 Paperless offers an extensive searching mechanism that is designed to
 allow you to quickly find a document you're looking for (for example,
 that thing that just broke and you bought a couple months ago, that
@@ -482,6 +614,12 @@ Whoosh's default query language. Head over to [Whoosh query
 language](https://whoosh.readthedocs.io/en/latest/querylang.html). For
 details on what date parsing utilities are available, see [Date
 parsing](https://whoosh.readthedocs.io/en/latest/dates.html#parsing-date-queries).
+
+## Keyboard shortcuts / hotkeys
+
+A list of available hotkeys can be shown on any page using <kbd>Shift</kbd> +
+<kbd>?</kbd>. The help dialog shows only the keys that are currently available
+based on which area of Paperless-ngx you are using.
 
 ## The recommended workflow {#usage-recommended-workflow}
 

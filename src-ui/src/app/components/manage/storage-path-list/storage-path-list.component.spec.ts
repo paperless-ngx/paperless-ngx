@@ -9,6 +9,7 @@ import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { StoragePathListComponent } from './storage-path-list.component'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 describe('StoragePathListComponent', () => {
   let component: StoragePathListComponent
@@ -29,6 +30,7 @@ describe('StoragePathListComponent', () => {
         NgbPaginationModule,
         FormsModule,
         ReactiveFormsModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 
@@ -58,7 +60,7 @@ describe('StoragePathListComponent', () => {
     fixture.detectChanges()
   })
 
-  // Tests are included in management-list.compontent.spec.ts
+  // Tests are included in management-list.component.spec.ts
 
   it('should use correct delete message', () => {
     expect(component.getDeleteMessage({ id: 1, name: 'StoragePath1' })).toEqual(

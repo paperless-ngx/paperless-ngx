@@ -4,7 +4,7 @@ import { environment } from 'src/environments/environment'
 import { WebsocketConsumerStatusMessage } from '../data/websocket-consumer-status-message'
 import { SettingsService } from './settings.service'
 
-// see ConsumerFilePhase in src/documents/consumer.py
+// see ProgressStatusOptions in src/documents/plugins/helpers.py
 export enum FileStatusPhase {
   STARTED = 0,
   UPLOADING = 1,
@@ -146,7 +146,7 @@ export class ConsumerStatusService {
     this.statusWebSocket.onmessage = (ev) => {
       let statusMessage: WebsocketConsumerStatusMessage = JSON.parse(ev['data'])
 
-      // fallback if backend didnt restrict message
+      // fallback if backend didn't restrict message
       if (
         statusMessage.owner_id &&
         statusMessage.owner_id !== this.settingsService.currentUser?.id &&

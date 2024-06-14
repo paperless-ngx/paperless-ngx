@@ -13,8 +13,8 @@ import {
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
-import { PaperlessMailAccount } from 'src/app/data/paperless-mail-account'
-import { PaperlessMailRule } from 'src/app/data/paperless-mail-rule'
+import { MailAccount } from 'src/app/data/mail-account'
+import { MailRule } from 'src/app/data/mail-rule'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
@@ -40,6 +40,8 @@ import { ToastService } from 'src/app/services/toast.service'
 import { TagsComponent } from '../../common/input/tags/tags.component'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { SwitchComponent } from '../../common/input/switch/switch.component'
 
 const mailAccounts = [
   { id: 1, name: 'account1' },
@@ -81,6 +83,7 @@ describe('MailComponent', () => {
         PermissionsGroupComponent,
         PermissionsDialogComponent,
         PermissionsFormComponent,
+        SwitchComponent,
       ],
       providers: [CustomDatePipe, DatePipe, PermissionsGuard],
       imports: [
@@ -91,6 +94,7 @@ describe('MailComponent', () => {
         ReactiveFormsModule,
         NgbAlertModule,
         NgSelectModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 
@@ -118,7 +122,7 @@ describe('MailComponent', () => {
         of({
           all: mailAccounts.map((a) => a.id),
           count: mailAccounts.length,
-          results: (mailAccounts as PaperlessMailAccount[]).concat([]),
+          results: (mailAccounts as MailAccount[]).concat([]),
         })
       )
     }
@@ -127,7 +131,7 @@ describe('MailComponent', () => {
         of({
           all: mailRules.map((r) => r.id),
           count: mailRules.length,
-          results: (mailRules as PaperlessMailRule[]).concat([]),
+          results: (mailRules as MailRule[]).concat([]),
         })
       )
     }
@@ -163,7 +167,7 @@ describe('MailComponent', () => {
     completeSetup()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    component.editMailAccount(mailAccounts[0] as PaperlessMailAccount)
+    component.editMailAccount(mailAccounts[0] as MailAccount)
     let editDialog = modal.componentInstance as MailAccountEditDialogComponent
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
@@ -181,7 +185,7 @@ describe('MailComponent', () => {
     completeSetup()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    component.deleteMailAccount(mailAccounts[0] as PaperlessMailAccount)
+    component.deleteMailAccount(mailAccounts[0] as MailAccount)
     const deleteDialog = modal.componentInstance as ConfirmDialogComponent
     const deleteSpy = jest.spyOn(mailAccountService, 'delete')
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
@@ -202,7 +206,7 @@ describe('MailComponent', () => {
     completeSetup()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    component.editMailRule(mailRules[0] as PaperlessMailRule)
+    component.editMailRule(mailRules[0] as MailRule)
     const editDialog = modal.componentInstance as MailRuleEditDialogComponent
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
@@ -220,7 +224,7 @@ describe('MailComponent', () => {
     completeSetup()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    component.deleteMailRule(mailRules[0] as PaperlessMailRule)
+    component.deleteMailRule(mailRules[0] as MailRule)
     const deleteDialog = modal.componentInstance as ConfirmDialogComponent
     const deleteSpy = jest.spyOn(mailRuleService, 'delete')
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
@@ -257,7 +261,7 @@ describe('MailComponent', () => {
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const rulePatchSpy = jest.spyOn(mailRuleService, 'patch')
-    component.editPermissions(mailRules[0] as PaperlessMailRule)
+    component.editPermissions(mailRules[0] as MailRule)
     expect(modal).not.toBeUndefined()
     let dialog = modal.componentInstance as PermissionsDialogComponent
     expect(dialog.object).toEqual(mailRules[0])
@@ -265,11 +269,11 @@ describe('MailComponent', () => {
     rulePatchSpy.mockReturnValueOnce(
       throwError(() => new Error('error saving perms'))
     )
-    dialog.confirmClicked.emit(perms)
+    dialog.confirmClicked.emit({ permissions: perms, merge: true })
     expect(rulePatchSpy).toHaveBeenCalled()
     expect(toastErrorSpy).toHaveBeenCalled()
-    rulePatchSpy.mockReturnValueOnce(of(mailRules[0] as PaperlessMailRule))
-    dialog.confirmClicked.emit(perms)
+    rulePatchSpy.mockReturnValueOnce(of(mailRules[0] as MailRule))
+    dialog.confirmClicked.emit({ permissions: perms, merge: true })
     expect(toastInfoSpy).toHaveBeenCalledWith('Permissions updated')
 
     modalService.dismissAll()
@@ -293,12 +297,11 @@ describe('MailComponent', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
     const accountPatchSpy = jest.spyOn(mailAccountService, 'patch')
-    component.editPermissions(mailAccounts[0] as PaperlessMailAccount)
+    component.editPermissions(mailAccounts[0] as MailAccount)
     expect(modal).not.toBeUndefined()
     let dialog = modal.componentInstance as PermissionsDialogComponent
     expect(dialog.object).toEqual(mailAccounts[0])
-    dialog = modal.componentInstance as PermissionsDialogComponent
-    dialog.confirmClicked.emit(perms)
+    dialog.confirmClicked.emit({ permissions: perms, merge: true })
     expect(accountPatchSpy).toHaveBeenCalled()
   })
 })

@@ -44,6 +44,11 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - footnotes
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
 strict: true
 nav:
     - index.md
@@ -68,4 +73,6 @@ extra:
       link: https://matrix.to/#/#paperless:matrix.org
 plugins:
   - search
-  - glightbox
+  - glightbox:
+       skip_classes:
+         - no-lightbox

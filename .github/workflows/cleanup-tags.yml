@@ -33,7 +33,7 @@ jobs:
       -
         name: Clean temporary images
         if: "${{ env.TOKEN != '' }}"
-        uses: stumpylog/image-cleaner-action/ephemeral@v0.3.0
+        uses: stumpylog/image-cleaner-action/ephemeral@v0.7.0
         with:
           token: "${{ env.TOKEN }}"
           owner: "${{ github.repository_owner }}"
@@ -41,7 +41,7 @@ jobs:
           package_name: "${{ matrix.primary-name }}"
           scheme: "branch"
           repo_name: "paperless-ngx"
-          match_regex: "feature-"
+          match_regex: "(feature|fix)"
           do_delete: "true"
 
   cleanup-untagged-images:
@@ -61,7 +61,7 @@ jobs:
       -
         name: Clean untagged images
         if: "${{ env.TOKEN != '' }}"
-        uses: stumpylog/image-cleaner-action/untagged@v0.3.0
+        uses: stumpylog/image-cleaner-action/untagged@v0.7.0
         with:
           token: "${{ env.TOKEN }}"
           owner: "${{ github.repository_owner }}"

@@ -21,10 +21,11 @@ import {
   PermissionAction,
   PermissionType,
 } from './services/permissions.service'
-import { ConsumptionTemplatesComponent } from './components/manage/consumption-templates/consumption-templates.component'
+import { WorkflowsComponent } from './components/manage/workflows/workflows.component'
 import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
+import { ConfigComponent } from './components/admin/config/config.component'
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -140,10 +141,7 @@ export const routes: Routes = [
         component: LogsComponent,
         canActivate: [PermissionsGuard],
         data: {
-          requiredPermission: {
-            action: PermissionAction.View,
-            type: PermissionType.Admin,
-          },
+          requireAdmin: true,
         },
       },
       // redirect old paths
@@ -162,7 +160,7 @@ export const routes: Routes = [
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
-            action: PermissionAction.View,
+            action: PermissionAction.Change,
             type: PermissionType.UISettings,
           },
         },
@@ -176,6 +174,17 @@ export const routes: Routes = [
           requiredPermission: {
             action: PermissionAction.View,
             type: PermissionType.UISettings,
+          },
+        },
+      },
+      {
+        path: 'config',
+        component: ConfigComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.Change,
+            type: PermissionType.AppConfig,
           },
         },
       },
@@ -202,13 +211,13 @@ export const routes: Routes = [
         },
       },
       {
-        path: 'templates',
-        component: ConsumptionTemplatesComponent,
+        path: 'workflows',
+        component: WorkflowsComponent,
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
             action: PermissionAction.View,
-            type: PermissionType.ConsumptionTemplate,
+            type: PermissionType.Workflow,
           },
         },
       },

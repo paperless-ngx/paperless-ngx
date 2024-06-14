@@ -1,12 +1,12 @@
-import { Component, OnDestroy, OnInit } from '@angular/core'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
-import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
-import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
+import { Component, Input, OnDestroy, OnInit } from '@angular/core'
+import { Tag } from 'src/app/data/tag'
+import { Correspondent } from 'src/app/data/correspondent'
+import { DocumentType } from 'src/app/data/document-type'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
 import {
   DocumentService,
   SelectionDataItem,
@@ -23,8 +23,8 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { saveAs } from 'file-saver'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
-import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
-import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { StoragePath } from 'src/app/data/storage-path'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 import {
@@ -33,7 +33,17 @@ import {
   PermissionType,
 } from 'src/app/services/permissions.service'
 import { FormControl, FormGroup } from '@angular/forms'
-import { first, Subject, takeUntil } from 'rxjs'
+import { first, map, Subject, switchMap, takeUntil } from 'rxjs'
+import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
+import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
+import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
+import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
+import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
+import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
+import { CustomField } from 'src/app/data/custom-field'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 
 @Component({
   selector: 'pngx-bulk-editor',
@@ -44,19 +54,22 @@ export class BulkEditorComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy
 {
-  tags: PaperlessTag[]
-  correspondents: PaperlessCorrespondent[]
-  documentTypes: PaperlessDocumentType[]
-  storagePaths: PaperlessStoragePath[]
+  tags: Tag[]
+  correspondents: Correspondent[]
+  documentTypes: DocumentType[]
+  storagePaths: StoragePath[]
+  customFields: CustomField[]
 
   tagSelectionModel = new FilterableDropdownSelectionModel()
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
   storagePathsSelectionModel = new FilterableDropdownSelectionModel()
+  customFieldsSelectionModel = new FilterableDropdownSelectionModel()
   tagDocumentCounts: SelectionDataItem[]
   correspondentDocumentCounts: SelectionDataItem[]
   documentTypeDocumentCounts: SelectionDataItem[]
   storagePathDocumentCounts: SelectionDataItem[]
+  customFieldDocumentCounts: SelectionDataItem[]
   awaitingDownload: boolean
 
   unsubscribeNotifier: Subject<any> = new Subject()
@@ -66,6 +79,9 @@ export class BulkEditorComponent
     downloadFileTypeOriginals: new FormControl(false),
     downloadUseFormatting: new FormControl(false),
   })
+
+  @Input()
+  public disabled: boolean = false
 
   constructor(
     private documentTypeService: DocumentTypeService,
@@ -78,6 +94,7 @@ export class BulkEditorComponent
     private settings: SettingsService,
     private toastService: ToastService,
     private storagePathService: StoragePathService,
+    private customFieldService: CustomFieldsService,
     private permissionService: PermissionsService
   ) {
     super()
@@ -115,22 +132,61 @@ export class BulkEditorComponent
   }
 
   ngOnInit() {
-    this.tagService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.tags = result.results))
-    this.correspondentService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.correspondents = result.results))
-    this.documentTypeService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.documentTypes = result.results))
-    this.storagePathService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.storagePaths = result.results))
+    if (
+      this.permissionService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Tag
+      )
+    ) {
+      this.tagService
+        .listAll()
+        .pipe(first())
+        .subscribe((result) => (this.tags = result.results))
+    }
+    if (
+      this.permissionService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Correspondent
+      )
+    ) {
+      this.correspondentService
+        .listAll()
+        .pipe(first())
+        .subscribe((result) => (this.correspondents = result.results))
+    }
+    if (
+      this.permissionService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.DocumentType
+      )
+    ) {
+      this.documentTypeService
+        .listAll()
+        .pipe(first())
+        .subscribe((result) => (this.documentTypes = result.results))
+    }
+    if (
+      this.permissionService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.StoragePath
+      )
+    ) {
+      this.storagePathService
+        .listAll()
+        .pipe(first())
+        .subscribe((result) => (this.storagePaths = result.results))
+    }
+    if (
+      this.permissionService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.CustomField
+      )
+    ) {
+      this.customFieldService
+        .listAll()
+        .pipe(first())
+        .subscribe((result) => (this.customFields = result.results))
+    }
 
     this.downloadForm
       .get('downloadFileTypeArchive')
@@ -159,12 +215,21 @@ export class BulkEditorComponent
     this.unsubscribeNotifier.complete()
   }
 
-  private executeBulkOperation(modal, method: string, args) {
+  private executeBulkOperation(
+    modal: NgbModalRef,
+    method: string,
+    args: any,
+    overrideDocumentIDs?: number[]
+  ) {
     if (modal) {
       modal.componentInstance.buttonsEnabled = false
     }
     this.documentService
-      .bulkEdit(Array.from(this.list.selected), method, args)
+      .bulkEdit(
+        overrideDocumentIDs ?? Array.from(this.list.selected),
+        method,
+        args
+      )
       .pipe(first())
       .subscribe({
         next: () => {
@@ -249,6 +314,19 @@ export class BulkEditorComponent
         this.applySelectionData(
           s.selected_storage_paths,
           this.storagePathsSelectionModel
+        )
+      })
+  }
+
+  openCustomFieldsDropdown() {
+    this.documentService
+      .getSelectionData(Array.from(this.list.selected))
+      .pipe(first())
+      .subscribe((s) => {
+        this.customFieldDocumentCounts = s.selected_custom_fields
+        this.applySelectionData(
+          s.selected_custom_fields,
+          this.customFieldsSelectionModel
         )
       })
   }
@@ -451,6 +529,181 @@ export class BulkEditorComponent
     }
   }
 
+  setCustomFields(changedCustomFields: ChangedItems) {
+    if (
+      changedCustomFields.itemsToAdd.length == 0 &&
+      changedCustomFields.itemsToRemove.length == 0
+    )
+      return
+
+    if (this.showConfirmationDialogs) {
+      let modal = this.modalService.open(ConfirmDialogComponent, {
+        backdrop: 'static',
+      })
+      modal.componentInstance.title = $localize`Confirm custom field assignment`
+      if (
+        changedCustomFields.itemsToAdd.length == 1 &&
+        changedCustomFields.itemsToRemove.length == 0
+      ) {
+        let customField = changedCustomFields.itemsToAdd[0]
+        modal.componentInstance.message = $localize`This operation will assign the custom field "${customField.name}" to ${this.list.selected.size} selected document(s).`
+      } else if (
+        changedCustomFields.itemsToAdd.length > 1 &&
+        changedCustomFields.itemsToRemove.length == 0
+      ) {
+        modal.componentInstance.message = $localize`This operation will assign the custom fields ${this._localizeList(
+          changedCustomFields.itemsToAdd
+        )} to ${this.list.selected.size} selected document(s).`
+      } else if (
+        changedCustomFields.itemsToAdd.length == 0 &&
+        changedCustomFields.itemsToRemove.length == 1
+      ) {
+        let customField = changedCustomFields.itemsToRemove[0]
+        modal.componentInstance.message = $localize`This operation will remove the custom field "${customField.name}" from ${this.list.selected.size} selected document(s).`
+      } else if (
+        changedCustomFields.itemsToAdd.length == 0 &&
+        changedCustomFields.itemsToRemove.length > 1
+      ) {
+        modal.componentInstance.message = $localize`This operation will remove the custom fields ${this._localizeList(
+          changedCustomFields.itemsToRemove
+        )} from ${this.list.selected.size} selected document(s).`
+      } else {
+        modal.componentInstance.message = $localize`This operation will assign the custom fields ${this._localizeList(
+          changedCustomFields.itemsToAdd
+        )} and remove the custom fields ${this._localizeList(
+          changedCustomFields.itemsToRemove
+        )} on ${this.list.selected.size} selected document(s).`
+      }
+
+      modal.componentInstance.btnClass = 'btn-warning'
+      modal.componentInstance.btnCaption = $localize`Confirm`
+      modal.componentInstance.confirmClicked
+        .pipe(takeUntil(this.unsubscribeNotifier))
+        .subscribe(() => {
+          this.executeBulkOperation(modal, 'modify_custom_fields', {
+            add_custom_fields: changedCustomFields.itemsToAdd.map((f) => f.id),
+            remove_custom_fields: changedCustomFields.itemsToRemove.map(
+              (f) => f.id
+            ),
+          })
+        })
+    } else {
+      this.executeBulkOperation(null, 'modify_custom_fields', {
+        add_custom_fields: changedCustomFields.itemsToAdd.map((f) => f.id),
+        remove_custom_fields: changedCustomFields.itemsToRemove.map(
+          (f) => f.id
+        ),
+      })
+    }
+  }
+
+  createTag(name: string) {
+    let modal = this.modalService.open(TagEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    modal.componentInstance.object = { name }
+    modal.componentInstance.succeeded
+      .pipe(
+        switchMap((newTag) => {
+          return this.tagService
+            .listAll()
+            .pipe(map((tags) => ({ newTag, tags })))
+        })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ newTag, tags }) => {
+        this.tags = tags.results
+        this.tagSelectionModel.toggle(newTag.id)
+      })
+  }
+
+  createCorrespondent(name: string) {
+    let modal = this.modalService.open(CorrespondentEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    modal.componentInstance.object = { name }
+    modal.componentInstance.succeeded
+      .pipe(
+        switchMap((newCorrespondent) => {
+          return this.correspondentService
+            .listAll()
+            .pipe(
+              map((correspondents) => ({ newCorrespondent, correspondents }))
+            )
+        })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ newCorrespondent, correspondents }) => {
+        this.correspondents = correspondents.results
+        this.correspondentSelectionModel.toggle(newCorrespondent.id)
+      })
+  }
+
+  createDocumentType(name: string) {
+    let modal = this.modalService.open(DocumentTypeEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    modal.componentInstance.object = { name }
+    modal.componentInstance.succeeded
+      .pipe(
+        switchMap((newDocumentType) => {
+          return this.documentTypeService
+            .listAll()
+            .pipe(map((documentTypes) => ({ newDocumentType, documentTypes })))
+        })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ newDocumentType, documentTypes }) => {
+        this.documentTypes = documentTypes.results
+        this.documentTypeSelectionModel.toggle(newDocumentType.id)
+      })
+  }
+
+  createStoragePath(name: string) {
+    let modal = this.modalService.open(StoragePathEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    modal.componentInstance.object = { name }
+    modal.componentInstance.succeeded
+      .pipe(
+        switchMap((newStoragePath) => {
+          return this.storagePathService
+            .listAll()
+            .pipe(map((storagePaths) => ({ newStoragePath, storagePaths })))
+        })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ newStoragePath, storagePaths }) => {
+        this.storagePaths = storagePaths.results
+        this.storagePathsSelectionModel.toggle(newStoragePath.id)
+      })
+  }
+
+  createCustomField(name: string) {
+    let modal = this.modalService.open(CustomFieldEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    modal.componentInstance.object = { name }
+    modal.componentInstance.succeeded
+      .pipe(
+        switchMap((newCustomField) => {
+          return this.customFieldService
+            .listAll()
+            .pipe(map((customFields) => ({ newCustomField, customFields })))
+        })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ newCustomField, customFields }) => {
+        this.customFields = customFields.results
+        this.customFieldsSelectionModel.toggle(newCustomField.id)
+      })
+  }
+
   applyDelete() {
     let modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
@@ -491,20 +744,20 @@ export class BulkEditorComponent
       })
   }
 
-  redoOcrSelected() {
+  reprocessSelected() {
     let modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.title = $localize`Redo OCR confirm`
-    modal.componentInstance.messageBold = $localize`This operation will permanently redo OCR for ${this.list.selected.size} selected document(s).`
-    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.title = $localize`Reprocess confirm`
+    modal.componentInstance.messageBold = $localize`This operation will permanently recreate the archive files for ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.message = $localize`The archive files will be re-generated with the current settings.`
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         modal.componentInstance.buttonsEnabled = false
-        this.executeBulkOperation(modal, 'redo_ocr', {})
+        this.executeBulkOperation(modal, 'reprocess', {})
       })
   }
 
@@ -512,9 +765,62 @@ export class BulkEditorComponent
     let modal = this.modalService.open(PermissionsDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.confirmClicked.subscribe((permissions) => {
-      modal.componentInstance.buttonsEnabled = false
-      this.executeBulkOperation(modal, 'set_permissions', permissions)
+    modal.componentInstance.confirmClicked.subscribe(
+      ({ permissions, merge }) => {
+        modal.componentInstance.buttonsEnabled = false
+        this.executeBulkOperation(modal, 'set_permissions', {
+          ...permissions,
+          merge,
+        })
+      }
+    )
+  }
+
+  rotateSelected() {
+    let modal = this.modalService.open(RotateConfirmDialogComponent, {
+      backdrop: 'static',
     })
+    const rotateDialog = modal.componentInstance as RotateConfirmDialogComponent
+    rotateDialog.title = $localize`Rotate confirm`
+    rotateDialog.messageBold = $localize`This operation will permanently rotate the original version of ${this.list.selected.size} document(s).`
+    rotateDialog.message = $localize`This will alter the original copy.`
+    rotateDialog.btnClass = 'btn-danger'
+    rotateDialog.btnCaption = $localize`Proceed`
+    rotateDialog.documentID = Array.from(this.list.selected)[0]
+    rotateDialog.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        rotateDialog.buttonsEnabled = false
+        this.executeBulkOperation(modal, 'rotate', {
+          degrees: rotateDialog.degrees,
+        })
+      })
+  }
+
+  mergeSelected() {
+    let modal = this.modalService.open(MergeConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    const mergeDialog = modal.componentInstance as MergeConfirmDialogComponent
+    mergeDialog.title = $localize`Merge confirm`
+    mergeDialog.messageBold = $localize`This operation will merge ${this.list.selected.size} selected documents into a new document.`
+    mergeDialog.btnCaption = $localize`Proceed`
+    mergeDialog.documentIDs = Array.from(this.list.selected)
+    mergeDialog.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        const args = {}
+        if (mergeDialog.metadataDocumentID > -1) {
+          args['metadata_document_id'] = mergeDialog.metadataDocumentID
+        }
+        if (mergeDialog.deleteOriginals) {
+          args['delete_originals'] = true
+        }
+        mergeDialog.buttonsEnabled = false
+        this.executeBulkOperation(modal, 'merge', args, mergeDialog.documentIDs)
+        this.toastService.showInfo(
+          $localize`Merged document will be queued for consumption.`
+        )
+      })
   }
 }

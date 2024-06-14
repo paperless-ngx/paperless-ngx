@@ -5,25 +5,38 @@
         <div ngbDropdown>
           <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>{{textFilterTargetName}}</button>
           <div class="dropdown-menu shadow" ngbDropdownMenu>
-            <button *ngFor="let t of textFilterTargets" ngbDropdownItem [class.active]="textFilterTarget === t.id" (click)="changeTextFilterTarget(t.id)">{{t.name}}</button>
+            @for (t of textFilterTargets; track t) {
+              <button ngbDropdownItem [class.active]="textFilterTarget === t.id" (click)="changeTextFilterTarget(t.id)">{{t.name}}</button>
+            }
           </div>
         </div>
-        <select *ngIf="textFilterTarget === 'asn'" class="form-select flex-grow-0 w-auto" [(ngModel)]="textFilterModifier" (change)="textFilterModifierChange()">
-          <option *ngFor="let m of textFilterModifiers" ngbDropdownItem [value]="m.id">{{m.label}}</option>
-        </select>
-        <button *ngIf="_textFilter" class="btn btn-link btn-sm px-0 position-absolute top-0 end-0 z-10" (click)="resetTextField()">
-          <svg fill="currentColor" class="buttonicon-sm me-1">
-            <use xlink:href="assets/bootstrap-icons.svg#x"/>
-          </svg>
-        </button>
-        <input #textFilterInput class="form-control form-control-sm" type="text" [disabled]="textFilterModifierIsNull" [(ngModel)]="textFilter" (keyup)="textFilterKeyup($event)" [readonly]="textFilterTarget === 'fulltext-morelike'">
+        @if (textFilterTarget === 'asn') {
+          <select class="form-select flex-grow-0 w-auto" [(ngModel)]="textFilterModifier" (change)="textFilterModifierChange()">
+            @for (m of textFilterModifiers; track m) {
+              <option ngbDropdownItem [value]="m.id">{{m.label}}</option>
+            }
+          </select>
+        }
+        @if (_textFilter) {
+          <button class="btn btn-link btn-sm px-2 position-absolute top-0 end-0 z-10" (click)="resetTextField()">
+            <i-bs width="1em" height="1em" name="x"></i-bs>
+          </button>
+        }
+        <input #textFilterInput class="form-control form-control-sm" type="text"
+        [disabled]="textFilterModifierIsNull"
+        [(ngModel)]="textFilter"
+        (keyup)="textFilterKeyup($event)"
+        [ngbTypeahead]="searchAutoComplete"
+        (selectItem)="itemSelected($event)"
+        [readonly]="textFilterTarget === 'fulltext-morelike'">
       </div>
     </div>
   </div>
   <div class="col-auto">
     <div class="d-flex flex-wrap gap-3">
       <div class="d-flex flex-wrap gap-2">
-        <pngx-filterable-dropdown class="flex-fill" title="Tags" icon="tag-fill" i18n-title
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Tag)) {
+          <pngx-filterable-dropdown class="flex-fill" title="Tags" icon="tag-fill" i18n-title
           filterPlaceholder="Filter tags" i18n-filterPlaceholder
           [items]="tags"
           [manyToOne]="true"
@@ -31,59 +44,78 @@
           (selectionModelChange)="updateRules()"
           (opened)="onTagsDropdownOpen()"
           [documentCounts]="tagDocumentCounts"
-          [allowSelectNone]="true"></pngx-filterable-dropdown>
-        <pngx-filterable-dropdown class="flex-fill" title="Correspondent" icon="person-fill" i18n-title
+          [allowSelectNone]="true"
+          [disabled]="disabled"
+          shortcutKey="t"></pngx-filterable-dropdown>
+        }
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
+          <pngx-filterable-dropdown class="flex-fill" title="Correspondent" icon="person-fill" i18n-title
           filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
           [items]="correspondents"
           [(selectionModel)]="correspondentSelectionModel"
           (selectionModelChange)="updateRules()"
           (opened)="onCorrespondentDropdownOpen()"
           [documentCounts]="correspondentDocumentCounts"
-          [allowSelectNone]="true"></pngx-filterable-dropdown>
-        <pngx-filterable-dropdown class="flex-fill" title="Document type" icon="file-earmark-fill" i18n-title
-          filterPlaceholder="Filter document types" i18n-filterPlaceholder
-          [items]="documentTypes"
-          [(selectionModel)]="documentTypeSelectionModel"
-          (selectionModelChange)="updateRules()"
-          (opened)="onDocumentTypeDropdownOpen()"
-          [documentCounts]="documentTypeDocumentCounts"
-          [allowSelectNone]="true"></pngx-filterable-dropdown>
-        <pngx-filterable-dropdown class="flex-fill" title="Storage path" icon="folder-fill" i18n-title
+          [allowSelectNone]="true"
+          [disabled]="disabled"
+          shortcutKey="y"></pngx-filterable-dropdown>
+        }
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
+            <pngx-filterable-dropdown class="flex-fill" title="Document type" icon="file-earmark-fill" i18n-title
+            filterPlaceholder="Filter document types" i18n-filterPlaceholder
+            [items]="documentTypes"
+            [(selectionModel)]="documentTypeSelectionModel"
+            (selectionModelChange)="updateRules()"
+            (opened)="onDocumentTypeDropdownOpen()"
+            [documentCounts]="documentTypeDocumentCounts"
+            [allowSelectNone]="true"
+            [disabled]="disabled"
+            shortcutKey="u"></pngx-filterable-dropdown>
+        }
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.StoragePath) && storagePaths.length > 0) {
+          <pngx-filterable-dropdown class="flex-fill" title="Storage path" icon="folder-fill" i18n-title
           filterPlaceholder="Filter storage paths" i18n-filterPlaceholder
           [items]="storagePaths"
           [(selectionModel)]="storagePathSelectionModel"
           (selectionModelChange)="updateRules()"
           (opened)="onStoragePathDropdownOpen()"
           [documentCounts]="storagePathDocumentCounts"
+          [allowSelectNone]="true"
+          [disabled]="disabled"
+          shortcutKey="i"></pngx-filterable-dropdown>
+        }
+
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.CustomField) && customFields.length > 0) {
+          <pngx-filterable-dropdown class="flex-fill" title="Custom fields" icon="ui-radios" i18n-title
+          filterPlaceholder="Filter custom fields" i18n-filterPlaceholder
+          [items]="customFields"
+          [manyToOne]="true"
+          [(selectionModel)]="customFieldSelectionModel"
+          (selectionModelChange)="updateRules()"
+          (opened)="onCustomFieldsDropdownOpen()"
+          [documentCounts]="customFieldDocumentCounts"
           [allowSelectNone]="true"></pngx-filterable-dropdown>
-      </div>
-      <div class="d-flex flex-wrap gap-2">
-        <pngx-date-dropdown
-          title="Created" i18n-title
+        }
+        <pngx-dates-dropdown
+          title="Dates" i18n-title
           (datesSet)="updateRules()"
-          [(dateBefore)]="dateCreatedBefore"
-          [(dateAfter)]="dateCreatedAfter"
-          [(relativeDate)]="dateCreatedRelativeDate"></pngx-date-dropdown>
-        <pngx-date-dropdown
-          title="Added" i18n-title
-          (datesSet)="updateRules()"
-          [(dateBefore)]="dateAddedBefore"
-          [(dateAfter)]="dateAddedAfter"
-          [(relativeDate)]="dateAddedRelativeDate"></pngx-date-dropdown>
-      </div>
-      <div class="d-flex flex-wrap">
+          [(createdDateBefore)]="dateCreatedBefore"
+          [(createdDateAfter)]="dateCreatedAfter"
+          [(createdRelativeDate)]="dateCreatedRelativeDate"
+          [(addedDateBefore)]="dateAddedBefore"
+          [(addedDateAfter)]="dateAddedAfter"
+          [(addedRelativeDate)]="dateAddedRelativeDate">
+        </pngx-dates-dropdown>
         <pngx-permissions-filter-dropdown
           title="Permissions" i18n-title
           (ownerFilterSet)="updateRules()"
-          [(selectionModel)]="permissionsSelectionModel"></pngx-permissions-filter-dropdown>
+        [(selectionModel)]="permissionsSelectionModel"></pngx-permissions-filter-dropdown>
       </div>
       <div class="d-flex flex-wrap d-none d-sm-inline-block">
         <button class="btn btn-outline-secondary btn-sm" [disabled]="!rulesModified" (click)="resetSelected()">
-          <svg class="toolbaricon ms-n1" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#x"></use>
-          </svg><ng-container i18n>Reset filters</ng-container>
-        </button>
+          <i-bs class="ms-n1" name="x"></i-bs><ng-container i18n>Reset filters</ng-container>
+          </button>
+        </div>
       </div>
     </div>
   </div>
-</div>

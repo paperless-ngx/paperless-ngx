@@ -13,6 +13,7 @@ import { SelectComponent } from '../../input/select/select.component'
 import { TextComponent } from '../../input/text/text.component'
 import { EditDialogMode } from '../edit-dialog.component'
 import { TagEditDialogComponent } from './tag-edit-dialog.component'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 describe('TagEditDialogComponent', () => {
   let component: TagEditDialogComponent
@@ -38,6 +39,7 @@ describe('TagEditDialogComponent', () => {
         ReactiveFormsModule,
         NgSelectModule,
         NgbModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 

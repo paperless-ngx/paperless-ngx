@@ -1,5 +1,8 @@
 import { DatePipe } from '@angular/common'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing'
 import {
   ComponentFixture,
   TestBed,
@@ -9,8 +12,12 @@ import {
 } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
-import { Router, ActivatedRoute, convertToParamMap } from '@angular/router'
-import { RouterTestingModule } from '@angular/router/testing'
+import {
+  Router,
+  ActivatedRoute,
+  convertToParamMap,
+  RouterModule,
+} from '@angular/router'
 import {
   NgbModal,
   NgbModule,
@@ -19,7 +26,6 @@ import {
   NgbDateStruct,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { PdfViewerComponent } from 'ng2-pdf-viewer'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import {
@@ -31,11 +37,11 @@ import {
   FILTER_CREATED_AFTER,
   FILTER_CREATED_BEFORE,
 } from 'src/app/data/filter-rule-type'
-import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
-import { PaperlessDocument } from 'src/app/data/paperless-document'
-import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
-import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { Correspondent } from 'src/app/data/correspondent'
+import { Document } from 'src/app/data/document'
+import { DocumentType } from 'src/app/data/document-type'
+import { StoragePath } from 'src/app/data/storage-path'
+import { Tag } from 'src/app/data/tag'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
@@ -68,10 +74,17 @@ import { DocumentNotesComponent } from '../document-notes/document-notes.compone
 import { DocumentDetailComponent } from './document-detail.component'
 import { ShareLinksDropdownComponent } from '../common/share-links-dropdown/share-links-dropdown.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
-import { PaperlessCustomFieldDataType } from 'src/app/data/paperless-custom-field'
+import { CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { environment } from 'src/environments/environment'
+import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
+import { SplitConfirmDialogComponent } from '../common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
+import { DeletePagesConfirmDialogComponent } from '../common/confirm-dialog/delete-pages-confirm-dialog/delete-pages-confirm-dialog.component'
+import { PdfViewerModule } from 'ng2-pdf-viewer'
+import { DataType } from 'src/app/data/datatype'
 
-const doc: PaperlessDocument = {
+const doc: Document = {
   id: 3,
   title: 'Doc 3',
   correspondent: 11,
@@ -79,8 +92,9 @@ const doc: PaperlessDocument = {
   storage_path: 31,
   tags: [41, 42, 43],
   content: 'text content',
-  added: new Date(),
-  created: new Date(),
+  added: new Date('May 4, 2014 03:24:00'),
+  created: new Date('May 4, 2014 03:24:00'),
+  modified: new Date('May 4, 2014 03:24:00'),
   archive_serial_number: null,
   original_file_name: 'file.pdf',
   owner: null,
@@ -89,12 +103,12 @@ const doc: PaperlessDocument = {
     {
       created: new Date(),
       note: 'note 1',
-      user: 1,
+      user: { id: 1, username: 'user1' },
     },
     {
       created: new Date(),
       note: 'note 2',
-      user: 2,
+      user: { id: 2, username: 'user2' },
     },
   ],
   custom_fields: [
@@ -111,13 +125,13 @@ const customFields = [
   {
     id: 0,
     name: 'Field 1',
-    data_type: PaperlessCustomFieldDataType.String,
+    data_type: CustomFieldDataType.String,
     created: new Date(),
   },
   {
     id: 1,
     name: 'Custom Field 2',
-    data_type: PaperlessCustomFieldDataType.Integer,
+    data_type: CustomFieldDataType.Integer,
     created: new Date(),
   },
 ]
@@ -134,6 +148,7 @@ describe('DocumentDetailComponent', () => {
   let documentListViewService: DocumentListViewService
   let settingsService: SettingsService
   let customFieldsService: CustomFieldsService
+  let httpTestingController: HttpTestingController
 
   let currentUserCan = true
   let currentUserHasObjectPermissions = true
@@ -160,10 +175,12 @@ describe('DocumentDetailComponent', () => {
         PermissionsFormComponent,
         SafeHtmlPipe,
         ConfirmDialogComponent,
-        PdfViewerComponent,
         SafeUrlPipe,
         ShareLinksDropdownComponent,
         CustomFieldsDropdownComponent,
+        SplitConfirmDialogComponent,
+        RotateConfirmDialogComponent,
+        DeletePagesConfirmDialogComponent,
       ],
       providers: [
         DocumentTitlePipe,
@@ -242,29 +259,30 @@ describe('DocumentDetailComponent', () => {
         DatePipe,
       ],
       imports: [
-        RouterTestingModule.withRoutes(routes),
+        RouterModule.forRoot(routes),
         HttpClientTestingModule,
         NgbModule,
         NgSelectModule,
         FormsModule,
         ReactiveFormsModule,
         NgbModalModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+        PdfViewerModule,
       ],
     }).compileComponents()
 
     router = TestBed.inject(Router)
     activatedRoute = TestBed.inject(ActivatedRoute)
-    jest
-      .spyOn(activatedRoute, 'paramMap', 'get')
-      .mockReturnValue(of(convertToParamMap({ id: 3 })))
     openDocumentsService = TestBed.inject(OpenDocumentsService)
     documentService = TestBed.inject(DocumentService)
     modalService = TestBed.inject(NgbModal)
     toastService = TestBed.inject(ToastService)
     documentListViewService = TestBed.inject(DocumentListViewService)
     settingsService = TestBed.inject(SettingsService)
+    settingsService.currentUser = { id: 1 }
     customFieldsService = TestBed.inject(CustomFieldsService)
     fixture = TestBed.createComponent(DocumentDetailComponent)
+    httpTestingController = TestBed.inject(HttpTestingController)
     component = fixture.componentInstance
   })
 
@@ -293,6 +311,17 @@ describe('DocumentDetailComponent', () => {
     expect(navigateSpy).toHaveBeenCalledWith(['documents', 3, 'notes'])
   })
 
+  it('should forward id without section to details', () => {
+    const navigateSpy = jest.spyOn(router, 'navigate')
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 3 })))
+    fixture.detectChanges()
+    expect(navigateSpy).toHaveBeenCalledWith(['documents', 3, 'details'], {
+      replaceUrl: true,
+    })
+  })
+
   it('should update title after debounce', fakeAsync(() => {
     initNormally()
     component.titleInput.value = 'Foo Bar'
@@ -302,7 +331,7 @@ describe('DocumentDetailComponent', () => {
     discardPeriodicTasks()
   }))
 
-  it('should update title before doc change if wasnt updated via debounce', fakeAsync(() => {
+  it('should update title before doc change if was not updated via debounce', fakeAsync(() => {
     initNormally()
     component.titleInput.value = 'Foo Bar'
     component.titleInput.inputField.nativeElement.dispatchEvent(
@@ -318,6 +347,7 @@ describe('DocumentDetailComponent', () => {
   })
 
   it('should load already-opened document via param', () => {
+    initNormally()
     jest.spyOn(documentService, 'get').mockReturnValueOnce(of(doc))
     jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(doc)
     jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
@@ -335,6 +365,26 @@ describe('DocumentDetailComponent', () => {
     currentUserHasObjectPermissions = false
     initNormally()
     expect(component.documentForm.disabled).toBeTruthy()
+  })
+
+  it('should not attempt to retrieve objects if user does not have permissions', () => {
+    currentUserCan = false
+    initNormally()
+    expect(component.correspondents).toBeUndefined()
+    expect(component.documentTypes).toBeUndefined()
+    expect(component.storagePaths).toBeUndefined()
+    expect(component.users).toBeUndefined()
+    httpTestingController.expectNone(`${environment.apiBaseUrl}documents/tags/`)
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/correspondents/`
+    )
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/document_types/`
+    )
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/storage_paths/`
+    )
+    currentUserCan = true
   })
 
   it('should support creating document type', () => {
@@ -398,8 +448,11 @@ describe('DocumentDetailComponent', () => {
   })
 
   it('should 404 on invalid id', () => {
-    jest.spyOn(documentService, 'get').mockReturnValueOnce(of(null))
     const navigateSpy = jest.spyOn(router, 'navigate')
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 999, section: 'details' })))
+    jest.spyOn(documentService, 'get').mockReturnValueOnce(of(null))
     fixture.detectChanges()
     expect(navigateSpy).toHaveBeenCalledWith(['404'], { replaceUrl: true })
   })
@@ -599,7 +652,7 @@ describe('DocumentDetailComponent', () => {
     ])
   })
 
-  it('should support redo ocr, confirm and close modal after started', () => {
+  it('should support reprocess, confirm and close modal after started', () => {
     initNormally()
     const bulkEditSpy = jest.spyOn(documentService, 'bulkEdit')
     bulkEditSpy.mockReturnValue(of(true))
@@ -607,10 +660,10 @@ describe('DocumentDetailComponent', () => {
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
     const modalSpy = jest.spyOn(modalService, 'open')
     const toastSpy = jest.spyOn(toastService, 'showInfo')
-    component.redoOcr()
+    component.reprocess()
     const modalCloseSpy = jest.spyOn(openModal, 'close')
     openModal.componentInstance.confirmClicked.next()
-    expect(bulkEditSpy).toHaveBeenCalledWith([doc.id], 'redo_ocr', {})
+    expect(bulkEditSpy).toHaveBeenCalledWith([doc.id], 'reprocess', {})
     expect(modalSpy).toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalled()
     expect(modalCloseSpy).toHaveBeenCalled()
@@ -622,7 +675,7 @@ describe('DocumentDetailComponent', () => {
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
     const toastSpy = jest.spyOn(toastService, 'showError')
-    component.redoOcr()
+    component.reprocess()
     const modalCloseSpy = jest.spyOn(openModal, 'close')
     bulkEditSpy.mockReturnValue(throwError(() => new Error('error occurred')))
     openModal.componentInstance.confirmClicked.next()
@@ -665,6 +718,7 @@ describe('DocumentDetailComponent', () => {
 
   it('should support Enter key in password field', () => {
     initNormally()
+    component.metadata = { has_archive_version: true }
     component.onError({ name: 'PasswordException' }) // normally dispatched by pdf viewer
     fixture.detectChanges()
     expect(component.password).toBeUndefined()
@@ -680,6 +734,35 @@ describe('DocumentDetailComponent', () => {
     initNormally()
     component.pdfPreviewLoaded({ numPages: 1000 } as any)
     expect(component.previewNumPages).toEqual(1000)
+  })
+
+  it('should support zoom controls', () => {
+    initNormally()
+    component.onZoomSelect({ target: { value: '1' } } as any) // from select
+    expect(component.previewZoomSetting).toEqual('1')
+    component.increaseZoom()
+    expect(component.previewZoomSetting).toEqual('1.5')
+    component.increaseZoom()
+    expect(component.previewZoomSetting).toEqual('2')
+    component.decreaseZoom()
+    expect(component.previewZoomSetting).toEqual('1.5')
+    component.onZoomSelect({ target: { value: '1' } } as any) // from select
+    component.decreaseZoom()
+    expect(component.previewZoomSetting).toEqual('.75')
+
+    component.onZoomSelect({ target: { value: 'page-fit' } } as any) // from select
+    expect(component.previewZoomScale).toEqual('page-fit')
+    expect(component.previewZoomSetting).toEqual('1')
+    component.increaseZoom()
+    expect(component.previewZoomSetting).toEqual('1.5')
+    expect(component.previewZoomScale).toEqual('page-width')
+
+    component.onZoomSelect({ target: { value: 'page-fit' } } as any) // from select
+    expect(component.previewZoomScale).toEqual('page-fit')
+    expect(component.previewZoomSetting).toEqual('1')
+    component.decreaseZoom()
+    expect(component.previewZoomSetting).toEqual('.5')
+    expect(component.previewZoomScale).toEqual('page-width')
   })
 
   it('should support updating notes dynamically', () => {
@@ -701,10 +784,9 @@ describe('DocumentDetailComponent', () => {
     const object = {
       id: 22,
       name: 'Correspondent22',
-      last_correspondence: new Date().toISOString(),
-    } as PaperlessCorrespondent
+    } as Correspondent
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    component.filterDocuments([object])
+    component.filterDocuments([object], DataType.Correspondent)
     expect(qfSpy).toHaveBeenCalledWith([
       {
         rule_type: FILTER_CORRESPONDENT,
@@ -715,9 +797,9 @@ describe('DocumentDetailComponent', () => {
 
   it('should support quick filtering by doc type', () => {
     initNormally()
-    const object = { id: 22, name: 'DocumentType22' } as PaperlessDocumentType
+    const object = { id: 22, name: 'DocumentType22' } as DocumentType
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    component.filterDocuments([object])
+    component.filterDocuments([object], DataType.DocumentType)
     expect(qfSpy).toHaveBeenCalledWith([
       {
         rule_type: FILTER_DOCUMENT_TYPE,
@@ -732,9 +814,9 @@ describe('DocumentDetailComponent', () => {
       id: 22,
       name: 'StoragePath22',
       path: '/foo/bar/',
-    } as PaperlessStoragePath
+    } as StoragePath
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    component.filterDocuments([object])
+    component.filterDocuments([object], DataType.StoragePath)
     expect(qfSpy).toHaveBeenCalledWith([
       {
         rule_type: FILTER_STORAGE_PATH,
@@ -751,16 +833,16 @@ describe('DocumentDetailComponent', () => {
       is_inbox_tag: true,
       color: '#ff0000',
       text_color: '#000000',
-    } as PaperlessTag
+    } as Tag
     const object2 = {
       id: 23,
       name: 'Tag22',
       is_inbox_tag: true,
       color: '#ff0000',
       text_color: '#000000',
-    } as PaperlessTag
+    } as Tag
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    component.filterDocuments([object1, object2])
+    component.filterDocuments([object1, object2], DataType.Tag)
     expect(qfSpy).toHaveBeenCalledWith([
       {
         rule_type: FILTER_HAS_TAGS_ALL,
@@ -869,9 +951,9 @@ describe('DocumentDetailComponent', () => {
     fixture.detectChanges()
     expect(component.document.custom_fields).toHaveLength(initialLength - 1)
     expect(component.customFieldFormFields).toHaveLength(initialLength - 1)
-    expect(fixture.debugElement.nativeElement.textContent).not.toContain(
-      'Field 1'
-    )
+    expect(
+      fixture.debugElement.query(By.css('form')).nativeElement.textContent
+    ).not.toContain('Field 1')
     const updateSpy = jest.spyOn(documentService, 'update')
     component.save(true)
     expect(updateSpy.mock.lastCall[0].custom_fields).toHaveLength(
@@ -905,7 +987,211 @@ describe('DocumentDetailComponent', () => {
     expect(refreshSpy).toHaveBeenCalled()
   })
 
+  it('should get suggestions', () => {
+    const suggestionsSpy = jest.spyOn(documentService, 'getSuggestions')
+    suggestionsSpy.mockReturnValue(of({ tags: [1, 2] }))
+    initNormally()
+    expect(suggestionsSpy).toHaveBeenCalled()
+    expect(component.suggestions).toEqual({ tags: [1, 2] })
+  })
+
+  it('should show error if needed for get suggestions', () => {
+    const suggestionsSpy = jest.spyOn(documentService, 'getSuggestions')
+    const errorSpy = jest.spyOn(toastService, 'showError')
+    suggestionsSpy.mockImplementationOnce(() =>
+      throwError(() => new Error('failed to get suggestions'))
+    )
+    initNormally()
+    expect(suggestionsSpy).toHaveBeenCalled()
+    expect(errorSpy).toHaveBeenCalled()
+  })
+
+  it('should warn when open document does not match doc retrieved from backend on init', () => {
+    let openModal: NgbModalRef
+    modalService.activeInstances.subscribe((modals) => (openModal = modals[0]))
+    const modalSpy = jest.spyOn(modalService, 'open')
+    const openDoc = Object.assign({}, doc)
+    // simulate a document being modified elsewhere and db updated
+    doc.modified = new Date()
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
+    jest.spyOn(documentService, 'get').mockReturnValueOnce(of(doc))
+    jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(openDoc)
+    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+      of({
+        count: customFields.length,
+        all: customFields.map((f) => f.id),
+        results: customFields,
+      })
+    )
+    fixture.detectChanges() // calls ngOnInit
+    expect(modalSpy).toHaveBeenCalledWith(ConfirmDialogComponent)
+    const closeSpy = jest.spyOn(openModal, 'close')
+    const confirmDialog = openModal.componentInstance as ConfirmDialogComponent
+    confirmDialog.confirmClicked.next(confirmDialog)
+    expect(closeSpy).toHaveBeenCalled()
+  })
+
+  it('should change preview element by render type', () => {
+    component.metadata = { has_archive_version: true }
+    initNormally()
+    fixture.detectChanges()
+    expect(component.archiveContentRenderType).toEqual(
+      component.ContentRenderType.PDF
+    )
+    expect(
+      fixture.debugElement.query(By.css('pdf-viewer-container'))
+    ).not.toBeUndefined()
+
+    component.metadata = {
+      has_archive_version: false,
+      original_mime_type: 'text/plain',
+    }
+    fixture.detectChanges()
+    expect(component.archiveContentRenderType).toEqual(
+      component.ContentRenderType.Text
+    )
+    expect(
+      fixture.debugElement.query(By.css('div.preview-sticky'))
+    ).not.toBeUndefined()
+
+    component.metadata = {
+      has_archive_version: false,
+      original_mime_type: 'image/jpg',
+    }
+    fixture.detectChanges()
+    expect(component.archiveContentRenderType).toEqual(
+      component.ContentRenderType.Image
+    )
+    expect(
+      fixture.debugElement.query(By.css('.preview-sticky img'))
+    ).not.toBeUndefined()
+
+    component.metadata = {
+      has_archive_version: false,
+      original_mime_type:
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    }
+    fixture.detectChanges()
+    expect(component.archiveContentRenderType).toEqual(
+      component.ContentRenderType.Other
+    )
+    expect(
+      fixture.debugElement.query(By.css('object.preview-sticky'))
+    ).not.toBeUndefined()
+  })
+
+  it('should support split', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    initNormally()
+    component.splitDocument()
+    expect(modal).not.toBeUndefined()
+    modal.componentInstance.documentID = doc.id
+    modal.componentInstance.totalPages = 5
+    modal.componentInstance.page = 2
+    modal.componentInstance.addSplit()
+    modal.componentInstance.confirm()
+    let req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    expect(req.request.body).toEqual({
+      documents: [doc.id],
+      method: 'split',
+      parameters: { pages: '1-2,3-5', delete_originals: false },
+    })
+    req.error(new ProgressEvent('failed'))
+    modal.componentInstance.confirm()
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    req.flush(true)
+  })
+
+  it('should support rotate', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    initNormally()
+    component.rotateDocument()
+    expect(modal).not.toBeUndefined()
+    modal.componentInstance.documentID = doc.id
+    modal.componentInstance.rotate()
+    modal.componentInstance.confirm()
+    let req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    expect(req.request.body).toEqual({
+      documents: [doc.id],
+      method: 'rotate',
+      parameters: { degrees: 90 },
+    })
+    req.error(new ProgressEvent('failed'))
+    modal.componentInstance.confirm()
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    req.flush(true)
+  })
+
+  it('should support delete pages', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    initNormally()
+    component.deletePages()
+    expect(modal).not.toBeUndefined()
+    modal.componentInstance.documentID = doc.id
+    modal.componentInstance.pages = [1, 2]
+    modal.componentInstance.confirm()
+    let req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    expect(req.request.body).toEqual({
+      documents: [doc.id],
+      method: 'delete_pages',
+      parameters: { pages: [1, 2] },
+    })
+    req.error(new ProgressEvent('failed'))
+    modal.componentInstance.confirm()
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    req.flush(true)
+  })
+
+  it('should support keyboard shortcuts', () => {
+    initNormally()
+
+    jest.spyOn(component, 'hasNext').mockReturnValue(true)
+    const nextSpy = jest.spyOn(component, 'nextDoc')
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'arrowright', ctrlKey: true })
+    )
+    expect(nextSpy).toHaveBeenCalled()
+
+    jest.spyOn(component, 'hasPrevious').mockReturnValue(true)
+    const prevSpy = jest.spyOn(component, 'previousDoc')
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'arrowleft', ctrlKey: true })
+    )
+    expect(prevSpy).toHaveBeenCalled()
+
+    jest.spyOn(openDocumentsService, 'isDirty').mockReturnValue(true)
+    const saveSpy = jest.spyOn(component, 'save')
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 's', ctrlKey: true })
+    )
+    expect(saveSpy).toHaveBeenCalled()
+
+    const closeSpy = jest.spyOn(component, 'close')
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'escape' }))
+    expect(closeSpy).toHaveBeenCalled()
+  })
+
   function initNormally() {
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
     jest
       .spyOn(documentService, 'get')
       .mockReturnValueOnce(of(Object.assign({}, doc)))

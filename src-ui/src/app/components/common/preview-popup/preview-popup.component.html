@@ -1,0 +1,26 @@
+<div class="preview-popup-container">
+  @if (error) {
+    <div class="w-100 h-100 position-relative">
+      <p class="fst-italic position-absolute top-50 start-50 translate-middle" i18n>Error loading preview</p>
+    </div>
+  } @else {
+    @if (renderAsObject) {
+      <object [data]="previewURL | safeUrl" width="100%" class="bg-light" [class.p-2]="!isPdf"></object>
+    } @else {
+      @if (requiresPassword) {
+        <div class="w-100 h-100 position-relative">
+          <i-bs width="2em" height="2em" class="position-absolute top-50 start-50 translate-middle" name="file-earmark-lock"></i-bs>
+        </div>
+      }
+      @if (!requiresPassword) {
+        <pdf-viewer
+          [src]="previewURL"
+          [original-size]="false"
+          [show-borders]="false"
+          [show-all]="true"
+          (error)="onError($event)">
+        </pdf-viewer>
+      }
+    }
+  }
+</div>

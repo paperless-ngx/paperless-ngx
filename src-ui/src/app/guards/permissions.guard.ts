@@ -23,10 +23,12 @@ export class PermissionsGuard {
     state: RouterStateSnapshot
   ): boolean | UrlTree {
     if (
-      !this.permissionsService.currentUserCan(
-        route.data.requiredPermission.action,
-        route.data.requiredPermission.type
-      )
+      (route.data.requireAdmin && !this.permissionsService.isAdmin()) ||
+      (route.data.requiredPermission &&
+        !this.permissionsService.currentUserCan(
+          route.data.requiredPermission.action,
+          route.data.requiredPermission.type
+        ))
     ) {
       // Check if tour is running 1 = TourState.ON
       if (this.tourService.getStatus() !== 1) {

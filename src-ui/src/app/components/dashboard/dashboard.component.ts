@@ -3,15 +3,15 @@ import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
-import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
+import { SavedView } from 'src/app/data/saved-view'
 import { ToastService } from 'src/app/services/toast.service'
-import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 import {
   CdkDragDrop,
   CdkDragEnd,
   CdkDragStart,
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
+import { environment } from 'src/environments/environment'
 
 @Component({
   selector: 'pngx-dashboard',
@@ -19,7 +19,7 @@ import {
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent extends ComponentWithPermissions {
-  public dashboardViews: PaperlessSavedView[] = []
+  public dashboardViews: SavedView[] = []
   constructor(
     public settingsService: SettingsService,
     public savedViewService: SavedViewService,
@@ -35,9 +35,9 @@ export class DashboardComponent extends ComponentWithPermissions {
 
   get subtitle() {
     if (this.settingsService.displayName) {
-      return $localize`Hello ${this.settingsService.displayName}, welcome to Paperless-ngx`
+      return $localize`Hello ${this.settingsService.displayName}, welcome to ${environment.appTitle}`
     } else {
-      return $localize`Welcome to Paperless-ngx`
+      return $localize`Welcome to ${environment.appTitle}`
     }
   }
 
@@ -57,7 +57,7 @@ export class DashboardComponent extends ComponentWithPermissions {
     this.settingsService.globalDropzoneEnabled = true
   }
 
-  onDrop(event: CdkDragDrop<PaperlessSavedView[]>) {
+  onDrop(event: CdkDragDrop<SavedView[]>) {
     moveItemInArray(
       this.dashboardViews,
       event.previousIndex,

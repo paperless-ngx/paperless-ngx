@@ -12,7 +12,7 @@ COPY ./src-ui /src/src-ui
 WORKDIR /src/src-ui
 RUN set -eux \
   && npm update npm -g \
-  && npm ci --omit=optional
+  && npm ci
 RUN set -eux \
   && ./node_modules/.bin/ng build --configuration production
 
@@ -29,7 +29,7 @@ COPY Pipfile* ./
 
 RUN set -eux \
   && echo "Installing pipenv" \
-    && python3 -m pip install --no-cache-dir --upgrade pipenv==2023.10.24 \
+    && python3 -m pip install --no-cache-dir --upgrade pipenv==2023.12.1 \
   && echo "Generating requirement.txt" \
     && pipenv requirements > requirements.txt
 
@@ -52,8 +52,15 @@ ARG TARGETARCH
 
 # Can be workflow provided, defaults set for manual building
 ARG JBIG2ENC_VERSION=0.29
-ARG QPDF_VERSION=11.6.3
-ARG GS_VERSION=10.02.0
+ARG QPDF_VERSION=11.9.0
+ARG GS_VERSION=10.03.1
+
+# Set Python environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    # Ignore warning from Whitenoise
+    PYTHONWARNINGS="ignore:::django.http.response:517" \
+    PNGX_CONTAINERIZED=1
 
 #
 # Begin installation and configuration
@@ -76,7 +83,6 @@ ARG RUNTIME_PACKAGES="\
   icc-profiles-free \
   imagemagick \
   # PostgreSQL
-  libpq5 \
   postgresql-client \
   # MySQL / MariaDB
   mariadb-client \
@@ -122,17 +128,17 @@ RUN set -eux \
         && dpkg --install ./qpdf_${QPDF_VERSION}-1_${TARGETARCH}.deb \
       && echo "Installing Ghostscript ${GS_VERSION}" \
         && curl --fail --silent --show-error --location \
-          --output libgs10_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
-          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
+          --output libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
+          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
         && curl --fail --silent --show-error --location \
-          --output ghostscript_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
-          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/ghostscript_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
+          --output ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
+          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
         && curl --fail --silent --show-error --location \
-          --output libgs10-common_${GS_VERSION}.dfsg-2_all.deb \
-          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10-common_${GS_VERSION}.dfsg-2_all.deb \
-        && dpkg --install ./libgs10-common_${GS_VERSION}.dfsg-2_all.deb \
-        && dpkg --install ./libgs10_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
-        && dpkg --install ./ghostscript_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
+          --output libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
+          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
+        && dpkg --install ./libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
+        && dpkg --install ./libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
+        && dpkg --install ./ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
       && echo "Installing jbig2enc" \
         && curl --fail --silent --show-error --location \
           --output jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
@@ -187,7 +193,7 @@ RUN set -eux \
     && chmod 755 /usr/local/bin/paperless_cmd.sh \
     && mv flower-conditional.sh /usr/local/bin/flower-conditional.sh \
     && chmod 755 /usr/local/bin/flower-conditional.sh \
-  && echo "Installing managment commands" \
+  && echo "Installing management commands" \
     && chmod +x install_management_commands.sh \
     && ./install_management_commands.sh
 
@@ -216,7 +222,13 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
     && python3 -m pip install --no-cache-dir --upgrade wheel \
   && echo "Installing Python requirements" \
-    && python3 -m pip install --default-timeout=1000 --requirement requirements.txt \
+    && curl --fail --silent --show-error --location \
+    --output psycopg_c-3.1.19-cp311-cp311-linux_x86_64.whl \
+    https://github.com/paperless-ngx/builder/releases/download/psycopg-3.1.19/psycopg_c-3.1.19-cp311-cp311-linux_x86_64.whl \
+    && curl --fail --silent --show-error --location \
+    --output psycopg_c-3.1.19-cp311-cp311-linux_aarch64.whl  \
+    https://github.com/paperless-ngx/builder/releases/download/psycopg-3.1.19/psycopg_c-3.1.19-cp311-cp311-linux_aarch64.whl \
+    && python3 -m pip install --default-timeout=1000 --find-links . --requirement requirements.txt \
   && echo "Patching whitenoise for compression speedup" \
     && curl --fail --silent --show-error --location --output 484.patch https://github.com/evansd/whitenoise/pull/484.patch \
     && patch -d /usr/local/lib/python3.11/site-packages --verbose -p2 < 484.patch \
@@ -229,6 +241,7 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
     && apt-get --yes purge ${BUILD_PACKAGES} \
     && apt-get --yes autoremove --purge \
     && apt-get clean --yes \
+    && rm --recursive --force --verbose *.whl \
     && rm --recursive --force --verbose /var/lib/apt/lists/* \
     && rm --recursive --force --verbose /tmp/* \
     && rm --recursive --force --verbose /var/tmp/* \
@@ -268,3 +281,5 @@ ENTRYPOINT ["/sbin/docker-entrypoint.sh"]
 EXPOSE 8000
 
 CMD ["/usr/local/bin/paperless_cmd.sh"]
+
+HEALTHCHECK --interval=30s --timeout=10s --retries=5 CMD [ "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000" ]

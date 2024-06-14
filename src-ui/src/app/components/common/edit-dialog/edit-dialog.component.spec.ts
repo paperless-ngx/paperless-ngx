@@ -23,8 +23,8 @@ import {
   MATCH_NONE,
   MATCH_ALL,
 } from 'src/app/data/matching-model'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
-import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { Tag } from 'src/app/data/tag'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -38,7 +38,7 @@ import { EditDialogComponent, EditDialogMode } from './edit-dialog.component'
     </div>
   `,
 })
-class TestComponent extends EditDialogComponent<PaperlessTag> {
+class TestComponent extends EditDialogComponent<Tag> {
   constructor(
     service: TagService,
     activeModal: NgbActiveModal,
@@ -131,6 +131,7 @@ describe('EditDialogComponent', () => {
   })
 
   it('should interpolate object permissions', () => {
+    component.getMatchingAlgorithms() // coverage
     component.object = tag
     component.dialogMode = EditDialogMode.EDIT
     component.ngOnInit()

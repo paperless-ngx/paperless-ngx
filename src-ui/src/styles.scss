@@ -11,6 +11,9 @@ $grid-breakpoints: (
   xxxl: 2400px
 );
 
+$form-file-button-bg: var(--bs-body-bg);
+$form-file-button-hover-bg: var(--pngx-bg-alt);
+
 @import "node_modules/bootstrap/scss/bootstrap";
 @import "theme";
 @import "~@ng-select/ng-select/themes/default.theme.css";
@@ -84,7 +87,7 @@ table .btn-link {
   color: var(--pngx-primary-text-contrast) !important;
 }
 
-.navbar .dropdown .btn {
+.navbar .dropdown > .btn {
   color: var(--pngx-primary-text-contrast) !important;
 }
 
@@ -134,10 +137,6 @@ table .btn-link {
   &:hover {
     color: var(--bs-light);
   }
-}
-
-.nav-item .sidebaricon {
-  color: var(--bs-secondary);
 }
 
 .btn:focus,
@@ -251,7 +250,7 @@ a.btn-link:focus-visible,
     position: relative;
     flex: 1 1 auto;
     margin-bottom: 0;
-    min-height: calc(1.5em + 0.75rem + 5px);
+    min-height: calc(1em + 0.75rem + 5px);
     line-height: 1.5;
 
     .ng-select-container {
@@ -260,6 +259,10 @@ a.btn-link:focus-visible,
 
     .ng-select-container .ng-value-container .ng-input {
       top: 7px;
+
+      input {
+        min-width: 10px;
+      }
     }
 
     .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
@@ -269,7 +272,13 @@ a.btn-link:focus-visible,
 
     .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected,
     .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected.ng-option-marked {
-      background: none;
+      font-weight: bold;
+      background-color: var(--pngx-bg-alt2) !important;
+    }
+
+    &.ng-select-multiple .ng-select-container .ng-value-container .ng-placeholder,
+    .ng-select-container .ng-value-container .ng-placeholder {
+      top: 7px;
     }
   }
 
@@ -321,6 +330,25 @@ textarea,
     background-color: var(--pngx-bg-darker);
     color: var(--bs-body-color);
   }
+
+  @media(max-width: 768px) {
+    font-size: 1rem;
+  }
+}
+
+@media(max-width: 768px) {
+  .input-group-sm .btn-sm {
+    // accommodate larger font size on mobile
+    padding-top: .35rem;
+    padding-bottom: .35rem;
+  }
+}
+
+.input-group .form-control-sm {
+  // accommodate larger font size on mobile
+  padding-top: .15rem;
+  padding-bottom: .15rem;
+  min-height: calc(1.3em + 0.5rem + calc(var(--bs-border-width) * 2)) !important;
 }
 
 .input-group .btn-outline-secondary {
@@ -462,44 +490,6 @@ ul.pagination {
   overflow: hidden;
 }
 
-// icons
-.toolbaricon {
-  width: 1.2em;
-  height: 1.2em;
-}
-
-.buttonicon {
-  width: 1.2em;
-  height: 1.2em;
-}
-
-.buttonicon-sm {
-  width: 1em;
-  height: 1em;
-}
-
-.buttonicon-xs {
-  width: 0.8em;
-  height: 0.8em;
-}
-
-.sidebaricon {
-  width: 16px;
-  height: 16px;
-  vertical-align: text-bottom;
-}
-
-.sidebaricon-sm {
-  width: 12px;
-  height: 12px;
-}
-
-.metadata-icon {
-  width: 0.9rem;
-  height: 0.9rem;
-  padding: 0.05rem;
-}
-
 table.table {
   --bs-table-color: var(--bs-body-color);
   --bs-table-bg: var(--bs-light-rgb);
@@ -553,6 +543,11 @@ table.table {
     border-color: var(--bs-border-color);
     color: var(--bs-body-color);
   }
+}
+
+.popover-hidden .popover {
+    opacity: 0;
+    pointer-events: none;
 }
 
 // Tour
@@ -642,8 +637,6 @@ code {
 }
 
 .accordion {
-  --bs-accordion-btn-padding-x: 0.75rem;
-  --bs-accordion-btn-padding-y: 0.375rem;
   --bs-accordion-btn-bg: var(--bs-light);
   --bs-accordion-btn-color: var(--bs-primary);
   --bs-accordion-color: var(--bs-body-color);

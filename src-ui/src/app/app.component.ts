@@ -1,5 +1,5 @@
 import { SettingsService } from './services/settings.service'
-import { SETTINGS_KEYS } from './data/paperless-uisettings'
+import { SETTINGS_KEYS } from './data/ui-settings'
 import { Component, OnDestroy, OnInit, Renderer2 } from '@angular/core'
 import { Router } from '@angular/router'
 import { Subscription, first } from 'rxjs'
@@ -12,6 +12,7 @@ import {
   PermissionsService,
   PermissionType,
 } from './services/permissions.service'
+import { HotKeyService } from './services/hot-key.service'
 
 @Component({
   selector: 'pngx-root',
@@ -31,7 +32,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private tasksService: TasksService,
     public tourService: TourService,
     private renderer: Renderer2,
-    private permissionsService: PermissionsService
+    private permissionsService: PermissionsService,
+    private hotKeyService: HotKeyService
   ) {
     let anyWindow = window as any
     anyWindow.pdfWorkerSrc = 'assets/js/pdf.worker.min.js'
@@ -125,6 +127,36 @@ export class AppComponent implements OnInit, OnDestroy {
         }
       })
 
+    this.hotKeyService
+      .addShortcut({ keys: 'h', description: $localize`Dashboard` })
+      .subscribe(() => {
+        this.router.navigate(['/dashboard'])
+      })
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Document
+      )
+    ) {
+      this.hotKeyService
+        .addShortcut({ keys: 'd', description: $localize`Documents` })
+        .subscribe(() => {
+          this.router.navigate(['/documents'])
+        })
+    }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.Change,
+        PermissionType.UISettings
+      )
+    ) {
+      this.hotKeyService
+        .addShortcut({ keys: 's', description: $localize`Settings` })
+        .subscribe(() => {
+          this.router.navigate(['/settings'])
+        })
+    }
+
     const prevBtnTitle = $localize`Prev`
     const nextBtnTitle = $localize`Next`
     const endBtnTitle = $localize`End`
@@ -178,9 +210,9 @@ export class AppComponent implements OnInit, OnDestroy {
           },
         },
         {
-          anchorId: 'tour.consumption-templates',
-          content: $localize`Consumption templates give you finer control over the document ingestion process.`,
-          route: '/templates',
+          anchorId: 'tour.workflows',
+          content: $localize`Workflows give you more control over the document pipeline.`,
+          route: '/workflows',
           backdropConfig: {
             offset: 0,
           },

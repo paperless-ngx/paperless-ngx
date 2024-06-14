@@ -1,0 +1,43 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{title}}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="cancel()">
+    </button>
+</div>
+<div class="modal-body">
+    <p>{{message}}</p>
+    <div class="form-group">
+        <label class="form-label" for="metadataDocumentID" i18n>Documents:</label>
+        <ul class="list-group"
+            cdkDropList
+            (cdkDropListDropped)="onDrop($event)">
+            @for (documentID of documentIDs; track documentID) {
+                <li class="list-group-item" cdkDrag>
+                    <i-bs name="grip-vertical" class="me-2"></i-bs>
+                    {{getDocument(documentID)?.title}}
+                </li>
+            }
+        </ul>
+        </div>
+    <div class="form-group mt-4">
+        <label class="form-label" for="metadataDocumentID" i18n>Use metadata from:</label>
+        <select class="form-select" [(ngModel)]="metadataDocumentID">
+            <option [ngValue]="-1" i18n>Regenerate all metadata</option>
+            @for (document of documents; track document.id) {
+              <option [ngValue]="document.id">{{document.title}}</option>
+            }
+        </select>
+    </div>
+    <div class="form-check form-switch mt-4">
+      <input class="form-check-input" type="checkbox" role="switch" id="deleteOriginalsSwitch" [(ngModel)]="deleteOriginals" [disabled]="!userOwnsAllDocuments">
+      <label class="form-check-label" for="deleteOriginalsSwitch" i18n>Delete original documents after successful merge</label>
+    </div>
+    <p class="small text-muted fst-italic mt-4" i18n>Note that only PDFs will be included.</p>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">
+        <span class="d-inline-block" style="padding-bottom: 1px;">{{cancelBtnCaption}}</span>
+    </button>
+    <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled">
+        {{btnCaption}}
+    </button>
+</div>

@@ -1,0 +1,59 @@
+<pngx-page-header
+    title="Application Configuration"
+    i18n-title
+    info="Global app configuration options which apply to <strong>every</strong> user of this install of Paperless-ngx. Options can also be set using environment variables or the configuration file but the value here will always take precedence."
+    i18n-info
+    infoLink="configuration">
+</pngx-page-header>
+
+<form [formGroup]="configForm" (ngSubmit)="saveConfig()" class="pb-4">
+
+    <ul ngbNav #nav="ngbNav" class="nav-tabs">
+        @for (category of optionCategories; track category) {
+            <li [ngbNavItem]="category">
+                <a ngbNavLink>{{category}}</a>
+                <ng-template ngbNavContent>
+                    <div class="p-3">
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
+                            @for (option of getCategoryOptions(category); track option.key) {
+                                <div class="col">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <div class="card-title">
+                                                <h6>
+                                                    {{option.title}}
+                                                    <a class="btn btn-sm btn-link" title="Read the documentation about this setting" i18n-title [href]="getDocsUrl(option.config_key)" target="_blank" referrerpolicy="no-referrer">
+                                                        <i-bs  name="info-circle"></i-bs>
+                                                    </a>
+                                                </h6>
+                                            </div>
+                                            <div class="mb-n3">
+                                                @switch (option.type) {
+                                                    @case (ConfigOptionType.Select) { <pngx-input-select [formControlName]="option.key" [error]="errors[option.key]" [items]="option.choices" [allowNull]="true"></pngx-input-select> }
+                                                    @case (ConfigOptionType.Number) { <pngx-input-number [formControlName]="option.key" [error]="errors[option.key]" [showAdd]="false"></pngx-input-number> }
+                                                    @case (ConfigOptionType.Boolean) { <pngx-input-switch [formControlName]="option.key" [error]="errors[option.key]" [showUnsetNote]="true" [horizontal]="true" title="Enable" i18n-title></pngx-input-switch> }
+                                                    @case (ConfigOptionType.String) { <pngx-input-text [formControlName]="option.key" [error]="errors[option.key]"></pngx-input-text> }
+                                                    @case (ConfigOptionType.JSON) { <pngx-input-text [formControlName]="option.key" [error]="errors[option.key]"></pngx-input-text> }
+                                                    @case (ConfigOptionType.File) { <pngx-input-file [formControlName]="option.key" (upload)="uploadFile($event, option.key)" [error]="errors[option.key]"></pngx-input-file> }
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </ng-template>
+            </li>
+        }
+    </ul>
+    <div [ngbNavOutlet]="nav" class="border-start border-end border-bottom p-3 mb-3 shadow-sm"></div>
+    <div class="btn-toolbar" role="toolbar">
+        <div class="btn-group me-2">
+            <button type="button" (click)="discardChanges()" class="btn btn-secondary" [disabled]="loading || (isDirty$ | async) === false" i18n>Discard</button>
+        </div>
+        <div class="btn-group">
+            <button type="submit" class="btn btn-primary" [disabled]="loading || !configForm.valid || (isDirty$ | async) === false" i18n>Save</button>
+        </div>
+    </div>
+</form>

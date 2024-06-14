@@ -8,6 +8,13 @@ physical documents into a searchable online archive so you can keep, well, _less
 [Get started](setup.md){ .md-button .md-button--primary .index-callout }
 [Demo](https://demo.paperless-ngx.com){ .md-button .md-button--secondary target=\_blank }
 
+<div style="display: flex; justify-content: end; margin-top: -1.5rem;">
+  <a href="https://m.do.co/c/8d70b916d462" target="_blank">
+    <img src="https://opensource.nyc3.cdn.digitaloceanspaces.com/attribution/assets/PoweredByDO/DO_Powered_by_Badge_white.svg#only-dark" class="no-lightbox" width="150px">
+    <img src="https://opensource.nyc3.cdn.digitaloceanspaces.com/attribution/assets/PoweredByDO/DO_Powered_by_Badge_black.svg#only-light" class="no-lightbox" width="150px">
+  </a>
+</div>
+
 </div>
 <div class="grid-right" markdown>
 ![image](assets/screenshots/documents-smallcards.png#only-light){.index-screenshot}
@@ -18,6 +25,7 @@ physical documents into a searchable online archive so you can keep, well, _less
 ## Features
 
 -   **Organize and index** your scanned documents with tags, correspondents, types, and more.
+-   _Your_ data is stored locally on _your_ server and is never transmitted or shared in any way.
 -   Performs **OCR** on your documents, adding searchable and selectable text, even to documents scanned with only images.
 -   Utilizes the open-source Tesseract engine to recognize more than 100 languages.
 -   Documents are saved as PDF/A format which is designed for long term storage, alongside the unaltered originals.
@@ -41,7 +49,7 @@ physical documents into a searchable online archive so you can keep, well, _less
     -   Configure multiple accounts and rules for each account.
     -   After processing, paperless can perform actions on the messages such as marking as read, deleting and more.
 -   A built-in robust **multi-user permissions** system that supports 'global' permissions as well as per document or object.
--   A powerful templating system that gives you more control over the consumption pipeline.
+-   A powerful workflow system that gives you even more control.
 -   **Optimized** for multi core systems: Paperless-ngx consumes multiple documents in parallel.
 -   The integrated sanity checker makes sure that your document archive is in good health.
 
@@ -156,9 +164,9 @@ Tag, correspondent, document type and storage path editing.
 
 </div>
 <div class="grid-half-right" markdown>
-  Consumption templates provide finer control over the document pipeline.
+  Workflows provide finer control over the document pipeline and trigger actions.
 
-![image](assets/screenshots/consumption_template.png)
+![image](assets/screenshots/workflow.png)
 
 </div>
 <div class="clear"></div>

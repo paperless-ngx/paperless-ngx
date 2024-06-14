@@ -9,7 +9,11 @@ import {
 } from '@angular/core'
 import { FormGroup, FormControl } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
-import { NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
+import {
+  NgbModal,
+  NgbModalRef,
+  NgbNavChangeEvent,
+} from '@ng-bootstrap/ng-bootstrap'
 import { DirtyComponent, dirtyCheck } from '@ngneat/dirty-check-forms'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 import {
@@ -21,10 +25,10 @@ import {
   takeUntil,
   tap,
 } from 'rxjs'
-import { PaperlessGroup } from 'src/app/data/paperless-group'
-import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
-import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
-import { PaperlessUser } from 'src/app/data/paperless-user'
+import { Group } from 'src/app/data/group'
+import { SavedView } from 'src/app/data/saved-view'
+import { GlobalSearchType, SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { User } from 'src/app/data/user'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
   PermissionsService,
@@ -40,12 +44,25 @@ import {
 } from 'src/app/services/settings.service'
 import { ToastService, Toast } from 'src/app/services/toast.service'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { SystemStatusDialogComponent } from '../../common/system-status-dialog/system-status-dialog.component'
+import { SystemStatusService } from 'src/app/services/system-status.service'
+import {
+  SystemStatusItemStatus,
+  SystemStatus,
+} from 'src/app/data/system-status'
+import { DisplayMode } from 'src/app/data/document'
 
 enum SettingsNavIDs {
   General = 1,
   Permissions = 2,
   Notifications = 3,
   SavedViews = 4,
+}
+
+const systemLanguage = { code: '', name: $localize`Use system language` }
+const systemDateFormat = {
+  code: '',
+  name: $localize`Use date format of display language`,
 }
 
 @Component({
@@ -57,8 +74,8 @@ export class SettingsComponent
   extends ComponentWithPermissions
   implements OnInit, AfterViewInit, OnDestroy, DirtyComponent
 {
-  SettingsNavIDs = SettingsNavIDs
   activeNavID: number
+  DisplayMode = DisplayMode
 
   savedViewGroup = new FormGroup({})
 
@@ -82,6 +99,9 @@ export class SettingsComponent
     defaultPermsViewGroups: new FormControl(null),
     defaultPermsEditUsers: new FormControl(null),
     defaultPermsEditGroups: new FormControl(null),
+    documentEditingRemoveInboxTags: new FormControl(null),
+    searchDbOnly: new FormControl(null),
+    searchLink: new FormControl(null),
 
     notificationsConsumerNewDocument: new FormControl(null),
     notificationsConsumerSuccess: new FormControl(null),
@@ -92,7 +112,11 @@ export class SettingsComponent
     savedViews: this.savedViewGroup,
   })
 
-  savedViews: PaperlessSavedView[]
+  savedViews: SavedView[]
+  SettingsNavIDs = SettingsNavIDs
+  get displayFields() {
+    return this.settings.allDisplayFields
+  }
 
   store: BehaviorSubject<any>
   storeSub: Subscription
@@ -101,8 +125,22 @@ export class SettingsComponent
   unsubscribeNotifier: Subject<any> = new Subject()
   savePending: boolean = false
 
-  users: PaperlessUser[]
-  groups: PaperlessGroup[]
+  users: User[]
+  groups: Group[]
+
+  public systemStatus: SystemStatus
+
+  public readonly GlobalSearchType = GlobalSearchType
+
+  get systemStatusHasErrors(): boolean {
+    return (
+      this.systemStatus.database.status === SystemStatusItemStatus.ERROR ||
+      this.systemStatus.tasks.redis_status === SystemStatusItemStatus.ERROR ||
+      this.systemStatus.tasks.celery_status === SystemStatusItemStatus.ERROR ||
+      this.systemStatus.tasks.index_status === SystemStatusItemStatus.ERROR ||
+      this.systemStatus.tasks.classifier_status === SystemStatusItemStatus.ERROR
+    )
+  }
 
   get computedDateLocale(): string {
     return (
@@ -124,7 +162,9 @@ export class SettingsComponent
     private usersService: UserService,
     private groupsService: GroupService,
     private router: Router,
-    public permissionsService: PermissionsService
+    public permissionsService: PermissionsService,
+    private modalService: NgbModal,
+    private systemStatusService: SystemStatusService
   ) {
     super()
     this.settings.settingsSaved.subscribe(() => {
@@ -265,6 +305,11 @@ export class SettingsComponent
       defaultPermsEditGroups: this.settings.get(
         SETTINGS_KEYS.DEFAULT_PERMS_EDIT_GROUPS
       ),
+      documentEditingRemoveInboxTags: this.settings.get(
+        SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS
+      ),
+      searchDbOnly: this.settings.get(SETTINGS_KEYS.SEARCH_DB_ONLY),
+      searchLink: this.settings.get(SETTINGS_KEYS.SEARCH_FULL_TYPE),
       savedViews: {},
     }
   }
@@ -306,6 +351,9 @@ export class SettingsComponent
           name: view.name,
           show_on_dashboard: view.show_on_dashboard,
           show_in_sidebar: view.show_in_sidebar,
+          page_size: view.page_size,
+          display_mode: view.display_mode,
+          display_fields: view.display_fields,
         }
         this.savedViewGroup.addControl(
           view.id.toString(),
@@ -314,6 +362,9 @@ export class SettingsComponent
             name: new FormControl(null),
             show_on_dashboard: new FormControl(null),
             show_in_sidebar: new FormControl(null),
+            page_size: new FormControl(null),
+            display_mode: new FormControl(null),
+            display_fields: new FormControl([]),
           })
         )
       }
@@ -350,6 +401,12 @@ export class SettingsComponent
       // prevents loss of unsaved changes
       this.settingsForm.patchValue(currentFormValue)
     }
+
+    if (this.permissionsService.isAdmin()) {
+      this.systemStatusService.get().subscribe((status) => {
+        this.systemStatus = status
+      })
+    }
   }
 
   private emptyGroup(group: FormGroup) {
@@ -357,12 +414,12 @@ export class SettingsComponent
   }
 
   ngOnDestroy() {
-    if (this.isDirty) this.settings.updateAppearanceSettings() // in case user changed appearance but didnt save
+    if (this.isDirty) this.settings.updateAppearanceSettings() // in case user changed appearance but didn't save
     this.storeSub && this.storeSub.unsubscribe()
     this.settings.organizingSidebarSavedViews = false
   }
 
-  deleteSavedView(savedView: PaperlessSavedView) {
+  deleteSavedView(savedView: SavedView) {
     this.savedViewService.delete(savedView).subscribe(() => {
       this.savedViewGroup.removeControl(savedView.id.toString())
       this.savedViews.splice(this.savedViews.indexOf(savedView), 1)
@@ -416,7 +473,7 @@ export class SettingsComponent
     )
     this.settings.set(
       SETTINGS_KEYS.THEME_COLOR,
-      this.settingsForm.value.themeColor.toString()
+      this.settingsForm.value.themeColor
     )
     this.settings.set(
       SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER,
@@ -478,6 +535,18 @@ export class SettingsComponent
       SETTINGS_KEYS.DEFAULT_PERMS_EDIT_GROUPS,
       this.settingsForm.value.defaultPermsEditGroups
     )
+    this.settings.set(
+      SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS,
+      this.settingsForm.value.documentEditingRemoveInboxTags
+    )
+    this.settings.set(
+      SETTINGS_KEYS.SEARCH_DB_ONLY,
+      this.settingsForm.value.searchDbOnly
+    )
+    this.settings.set(
+      SETTINGS_KEYS.SEARCH_FULL_TYPE,
+      this.settingsForm.value.searchLink
+    )
     this.settings.setLanguage(this.settingsForm.value.displayLanguage)
     this.settings
       .storeSettings()
@@ -486,8 +555,8 @@ export class SettingsComponent
       .subscribe({
         next: () => {
           this.store.next(this.settingsForm.value)
-          this.documentListViewService.updatePageSize()
           this.settings.updateAppearanceSettings()
+          this.settings.initializeDisplayFields()
           let savedToast: Toast = {
             content: $localize`Settings were saved successfully.`,
             delay: 5000,
@@ -512,15 +581,11 @@ export class SettingsComponent
   }
 
   get displayLanguageOptions(): LanguageOption[] {
-    return [{ code: '', name: $localize`Use system language` }].concat(
-      this.settings.getLanguageOptions()
-    )
+    return [systemLanguage].concat(this.settings.getLanguageOptions())
   }
 
   get dateLocaleOptions(): LanguageOption[] {
-    return [
-      { code: '', name: $localize`Use date format of display language` },
-    ].concat(this.settings.getDateLocaleOptions())
+    return [systemDateFormat].concat(this.settings.getDateLocaleOptions())
   }
 
   get today() {
@@ -529,7 +594,7 @@ export class SettingsComponent
 
   saveSettings() {
     // only patch views that have actually changed
-    const changed: PaperlessSavedView[] = []
+    const changed: SavedView[] = []
     Object.values(this.savedViewGroup.controls)
       .filter((g: FormGroup) => !g.pristine)
       .forEach((group: FormGroup) => {
@@ -552,7 +617,21 @@ export class SettingsComponent
     }
   }
 
+  reset() {
+    this.settingsForm.patchValue(this.store.getValue())
+  }
+
   clearThemeColor() {
     this.settingsForm.get('themeColor').patchValue('')
+  }
+
+  showSystemStatus() {
+    const modal: NgbModalRef = this.modalService.open(
+      SystemStatusDialogComponent,
+      {
+        size: 'xl',
+      }
+    )
+    modal.componentInstance.status = this.systemStatus
   }
 }

@@ -10,6 +10,7 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { TagListComponent } from './tag-list.component'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 describe('TagListComponent', () => {
   let component: TagListComponent
@@ -31,6 +32,7 @@ describe('TagListComponent', () => {
         NgbPaginationModule,
         FormsModule,
         ReactiveFormsModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 
@@ -60,7 +62,7 @@ describe('TagListComponent', () => {
     fixture.detectChanges()
   })
 
-  // Tests are included in management-list.compontent.spec.ts
+  // Tests are included in management-list.component.spec.ts
 
   it('should use correct delete message', () => {
     expect(component.getDeleteMessage({ id: 1, name: 'Tag1' })).toEqual(

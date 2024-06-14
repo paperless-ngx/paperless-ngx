@@ -1,21 +1,16 @@
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import {
   FormsModule,
   ReactiveFormsModule,
   NG_VALUE_ACCESSOR,
 } from '@angular/forms'
 import { TagsComponent } from './tags.component'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { Tag } from 'src/app/data/tag'
 import {
   DEFAULT_MATCHING_ALGORITHM,
   MATCH_ALL,
 } from 'src/app/data/matching-model'
-import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
+import { NgSelectModule } from '@ng-select/ng-select'
 import { RouterTestingModule } from '@angular/router/testing'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { of } from 'rxjs'
@@ -32,13 +27,12 @@ import { CheckComponent } from '../check/check.component'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { TextComponent } from '../text/text.component'
 import { ColorComponent } from '../color/color.component'
-import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsFormComponent } from '../permissions/permissions-form/permissions-form.component'
 import { SelectComponent } from '../select/select.component'
-import { ColorSliderModule } from 'ngx-color/slider'
-import { By } from '@angular/platform-browser'
+import { SettingsService } from 'src/app/services/settings.service'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
-const tags: PaperlessTag[] = [
+const tags: Tag[] = [
   {
     id: 1,
     name: 'Tag1',
@@ -63,8 +57,8 @@ const tags: PaperlessTag[] = [
 describe('TagsComponent', () => {
   let component: TagsComponent
   let fixture: ComponentFixture<TagsComponent>
-  let input: HTMLInputElement
   let modalService: NgbModal
+  let settingsService: SettingsService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -106,10 +100,12 @@ describe('TagsComponent', () => {
         NgbModalModule,
         NgbAccordionModule,
         NgbPopoverModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 
     modalService = TestBed.inject(NgbModal)
+    settingsService = TestBed.inject(SettingsService)
     fixture = TestBed.createComponent(TagsComponent)
     fixture.debugElement.injector.get(NG_VALUE_ACCESSOR)
     component = fixture.componentInstance
@@ -139,6 +135,7 @@ describe('TagsComponent', () => {
   })
 
   it('should support create new using last search term and open a modal', () => {
+    settingsService.currentUser = { id: 1 }
     let activeInstances: NgbModalRef[]
     modalService.activeInstances.subscribe((v) => (activeInstances = v))
     component.select.searchTerm = 'foobar'
@@ -171,5 +168,13 @@ describe('TagsComponent', () => {
     component.tags = tags
     expect(component.getTag(2)).toEqual(tags[1])
     expect(component.getTag(4)).toBeUndefined()
+  })
+
+  it('should emit filtered documents', () => {
+    component.value = [10]
+    component.tags = tags
+    const emitSpy = jest.spyOn(component.filterDocuments, 'emit')
+    component.onFilterDocuments()
+    expect(emitSpy).toHaveBeenCalledWith([tags[2]])
   })
 })

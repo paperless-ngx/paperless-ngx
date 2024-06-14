@@ -2,16 +2,16 @@ import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { combineLatest, Observable } from 'rxjs'
 import { tap } from 'rxjs/operators'
-import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
+import { SavedView } from 'src/app/data/saved-view'
 import { PermissionsService } from '../permissions.service'
 import { AbstractPaperlessService } from './abstract-paperless-service'
 import { SettingsService } from '../settings.service'
-import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 
 @Injectable({
   providedIn: 'root',
 })
-export class SavedViewService extends AbstractPaperlessService<PaperlessSavedView> {
+export class SavedViewService extends AbstractPaperlessService<SavedView> {
   loading: boolean
 
   constructor(
@@ -35,13 +35,13 @@ export class SavedViewService extends AbstractPaperlessService<PaperlessSavedVie
     })
   }
 
-  private savedViews: PaperlessSavedView[] = []
+  private savedViews: SavedView[] = []
 
   get allViews() {
     return this.savedViews
   }
 
-  get sidebarViews(): PaperlessSavedView[] {
+  get sidebarViews(): SavedView[] {
     const sidebarViews = this.savedViews.filter((v) => v.show_in_sidebar)
 
     const sorted: number[] = this.settingsService.get(
@@ -56,7 +56,7 @@ export class SavedViewService extends AbstractPaperlessService<PaperlessSavedVie
       : [...sidebarViews]
   }
 
-  get dashboardViews(): PaperlessSavedView[] {
+  get dashboardViews(): SavedView[] {
     const dashboardViews = this.savedViews.filter((v) => v.show_on_dashboard)
 
     const sorted: number[] = this.settingsService.get(
@@ -71,21 +71,21 @@ export class SavedViewService extends AbstractPaperlessService<PaperlessSavedVie
       : [...dashboardViews]
   }
 
-  create(o: PaperlessSavedView) {
+  create(o: SavedView) {
     return super.create(o).pipe(tap(() => this.reload()))
   }
 
-  update(o: PaperlessSavedView) {
+  update(o: SavedView) {
     return super.update(o).pipe(tap(() => this.reload()))
   }
 
-  patchMany(objects: PaperlessSavedView[]): Observable<PaperlessSavedView[]> {
+  patchMany(objects: SavedView[]): Observable<SavedView[]> {
     return combineLatest(objects.map((o) => super.patch(o))).pipe(
       tap(() => this.reload())
     )
   }
 
-  delete(o: PaperlessSavedView) {
+  delete(o: SavedView) {
     return super.delete(o).pipe(tap(() => this.reload()))
   }
 }

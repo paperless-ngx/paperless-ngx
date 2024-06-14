@@ -26,7 +26,6 @@
 # For more extensive installation and update instructions, refer to the
 # documentation.
 
-version: "3.4"
 services:
   broker:
     image: docker.io/library/redis:7
@@ -35,7 +34,7 @@ services:
       - redisdata:/data
 
   db:
-    image: docker.io/library/postgres:15
+    image: docker.io/library/postgres:16
     restart: unless-stopped
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -52,11 +51,6 @@ services:
       - broker
     ports:
       - "8000:8000"
-    healthcheck:
-      test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
     volumes:
       - data:/usr/src/paperless/data
       - media:/usr/src/paperless/media
@@ -66,7 +60,6 @@ services:
     environment:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_DBHOST: db
-
 
 volumes:
   data:

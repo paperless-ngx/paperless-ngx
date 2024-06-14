@@ -11,6 +11,7 @@ import { of, throwError } from 'rxjs'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { NgbModule, NgbNavLink } from '@ng-bootstrap/ng-bootstrap'
 import { BrowserModule, By } from '@angular/platform-browser'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 const paperless_logs = [
   '[2023-05-29 03:05:01,224] [DEBUG] [paperless.tasks] Training data unchanged.',
@@ -37,7 +38,12 @@ describe('LogsComponent', () => {
     TestBed.configureTestingModule({
       declarations: [LogsComponent, PageHeaderComponent],
       providers: [],
-      imports: [HttpClientTestingModule, BrowserModule, NgbModule],
+      imports: [
+        HttpClientTestingModule,
+        BrowserModule,
+        NgbModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+      ],
     }).compileComponents()
 
     logService = TestBed.inject(LogService)

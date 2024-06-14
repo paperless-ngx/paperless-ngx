@@ -5,7 +5,7 @@ import { environment } from 'src/environments/environment'
 import { commonAbstractPaperlessServiceTests } from './abstract-paperless-service.spec'
 import { SavedViewService } from './saved-view.service'
 import { SettingsService } from '../settings.service'
-import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 
 let httpTestingController: HttpTestingController
 let service: SavedViewService

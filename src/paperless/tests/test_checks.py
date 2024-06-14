@@ -259,9 +259,6 @@ class TestAuditLogChecks(TestCase):
                 msg = msgs[0]
 
                 self.assertIn(
-                    (
-                        "auditlog table was found but PAPERLESS_AUDIT_LOG_ENABLED"
-                        " is not active."
-                    ),
+                    ("auditlog table was found but audit log is disabled."),
                     msg.msg,
                 )

@@ -2,30 +2,30 @@ import hashlib
 import logging
 import shutil
 import uuid
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Optional
 
 import tqdm
-from asgiref.sync import async_to_sync
 from celery import Task
 from celery import shared_task
-from channels.layers import get_channel_layer
 from django.conf import settings
 from django.db import transaction
 from django.db.models.signals import post_save
 from filelock import FileLock
-from redis.exceptions import ConnectionError
 from whoosh.writing import AsyncWriter
 
 from documents import index
 from documents import sanity_checker
-from documents.barcodes import BarcodeReader
+from documents.barcodes import BarcodePlugin
+from documents.caching import clear_document_caches
 from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
-from documents.consumer import Consumer
-from documents.consumer import ConsumerError
+from documents.consumer import ConsumerPlugin
+from documents.consumer import WorkflowTriggerPlugin
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
-from documents.double_sided import collate
+from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.models import Correspondent
@@ -35,7 +35,12 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.parsers import DocumentParser
 from documents.parsers import get_parser_class_for_mime_type
+from documents.plugins.base import ConsumeTaskPlugin
+from documents.plugins.base import ProgressManager
+from documents.plugins.base import StopConsumeTaskError
+from documents.plugins.helpers import ProgressStatusOptions
 from documents.sanity_checker import SanityCheckFailedException
+from documents.signals import document_updated
 
 if settings.AUDIT_LOG_ENABLED:
     import json
@@ -101,94 +106,66 @@ def consume_file(
     input_doc: ConsumableDocument,
     overrides: Optional[DocumentMetadataOverrides] = None,
 ):
-    def send_progress(status="SUCCESS", message="finished"):
-        payload = {
-            "filename": overrides.filename or input_doc.original_file.name,
-            "task_id": None,
-            "current_progress": 100,
-            "max_progress": 100,
-            "status": status,
-            "message": message,
-        }
-        try:
-            async_to_sync(get_channel_layer().group_send)(
-                "status_updates",
-                {"type": "status_update", "data": payload},
-            )
-        except ConnectionError as e:
-            logger.warning(f"ConnectionError on status send: {e!s}")
-
     # Default no overrides
     if overrides is None:
         overrides = DocumentMetadataOverrides()
 
-    # Handle collation of double-sided documents scanned in two parts
-    if settings.CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED and (
-        settings.CONSUMER_COLLATE_DOUBLE_SIDED_SUBDIR_NAME
-        in input_doc.original_file.parts
+    plugins: list[type[ConsumeTaskPlugin]] = [
+        CollatePlugin,
+        BarcodePlugin,
+        WorkflowTriggerPlugin,
+        ConsumerPlugin,
+    ]
+
+    with (
+        ProgressManager(
+            overrides.filename or input_doc.original_file.name,
+            self.request.id,
+        ) as status_mgr,
+        TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir,
     ):
-        try:
-            msg = collate(input_doc)
-            send_progress(message=msg)
-            return msg
-        except ConsumerError as e:
-            send_progress(status="FAILURE", message=e.args[0])
-            raise e
+        tmp_dir = Path(tmp_dir)
+        for plugin_class in plugins:
+            plugin_name = plugin_class.NAME
 
-    # read all barcodes in the current document
-    if settings.CONSUMER_ENABLE_BARCODES or settings.CONSUMER_ENABLE_ASN_BARCODE:
-        with BarcodeReader(input_doc.original_file, input_doc.mime_type) as reader:
-            if settings.CONSUMER_ENABLE_BARCODES and reader.separate(
-                input_doc.source,
-                overrides.filename,
-            ):
-                # notify the sender, otherwise the progress bar
-                # in the UI stays stuck
-                send_progress()
-                # consuming stops here, since the original document with
-                # the barcodes has been split and will be consumed separately
-                input_doc.original_file.unlink()
-                return "File successfully split"
+            plugin = plugin_class(
+                input_doc,
+                overrides,
+                status_mgr,
+                tmp_dir,
+                self.request.id,
+            )
 
-            # try reading the ASN from barcode
-            if settings.CONSUMER_ENABLE_ASN_BARCODE and reader.asn is not None:
-                # Note this will take precedence over an API provided ASN
-                # But it's from a physical barcode, so that's good
-                overrides.asn = reader.asn
-                logger.info(f"Found ASN in barcode: {overrides.asn}")
+            if not plugin.able_to_run:
+                logger.debug(f"Skipping plugin {plugin_name}")
+                continue
 
-    template_overrides = Consumer().get_template_overrides(
-        input_doc=input_doc,
-    )
+            try:
+                logger.debug(f"Executing plugin {plugin_name}")
+                plugin.setup()
 
-    overrides.update(template_overrides)
+                msg = plugin.run()
 
-    # continue with consumption if no barcode was found
-    document = Consumer().try_consume_file(
-        input_doc.original_file,
-        override_filename=overrides.filename,
-        override_title=overrides.title,
-        override_correspondent_id=overrides.correspondent_id,
-        override_document_type_id=overrides.document_type_id,
-        override_tag_ids=overrides.tag_ids,
-        override_storage_path_id=overrides.storage_path_id,
-        override_created=overrides.created,
-        override_asn=overrides.asn,
-        override_owner_id=overrides.owner_id,
-        override_view_users=overrides.view_users,
-        override_view_groups=overrides.view_groups,
-        override_change_users=overrides.change_users,
-        override_change_groups=overrides.change_groups,
-        task_id=self.request.id,
-    )
+                if msg is not None:
+                    logger.info(f"{plugin_name} completed with: {msg}")
+                else:
+                    logger.info(f"{plugin_name} completed with no message")
 
-    if document:
-        return f"Success. New document id {document.pk} created"
-    else:
-        raise ConsumerError(
-            "Unknown error: Returned document was null, but "
-            "no error message was given.",
-        )
+                overrides = plugin.metadata
+
+            except StopConsumeTaskError as e:
+                logger.info(f"{plugin_name} requested task exit: {e.message}")
+                return e.message
+
+            except Exception as e:
+                logger.exception(f"{plugin_name} failed: {e}")
+                status_mgr.send_progress(ProgressStatusOptions.FAILED, f"{e}", 100, 100)
+                raise
+
+            finally:
+                plugin.cleanup()
+
+    return msg
 
 
 @shared_task
@@ -214,6 +191,12 @@ def bulk_update_documents(document_ids):
     ix = index.open_index()
 
     for doc in documents:
+        clear_document_caches(doc.pk)
+        document_updated.send(
+            sender=None,
+            document=doc,
+            logging_group=uuid.uuid4(),
+        )
         post_save.send(Document, instance=doc, created=False)
 
     with AsyncWriter(ix) as writer:
@@ -300,6 +283,8 @@ def update_document_archive_file(document_id):
 
             with index.open_index_writer() as writer:
                 index.update_document(writer, document)
+
+            clear_document_caches(document.pk)
 
     except Exception:
         logger.exception(

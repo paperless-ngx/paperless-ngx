@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-10 09:02-0800\n"
-"PO-Revision-Date: 2023-11-13 01:31\n"
+"POT-Creation-Date: 2024-05-19 11:07-0700\n"
+"PO-Revision-Date: 2024-05-20 16:41\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -21,52 +21,52 @@ msgstr ""
 msgid "Documents"
 msgstr "Documentos"
 
-#: documents/models.py:36 documents/models.py:734
+#: documents/models.py:36 documents/models.py:783
 msgid "owner"
 msgstr "proprietário"
 
-#: documents/models.py:53
+#: documents/models.py:53 documents/models.py:946
 msgid "None"
 msgstr "Nenhum"
 
-#: documents/models.py:54
+#: documents/models.py:54 documents/models.py:947
 msgid "Any word"
 msgstr "Qualquer palavra"
 
-#: documents/models.py:55
+#: documents/models.py:55 documents/models.py:948
 msgid "All words"
 msgstr "Todas as palavras"
 
-#: documents/models.py:56
+#: documents/models.py:56 documents/models.py:949
 msgid "Exact match"
 msgstr "Correspondência exata"
 
-#: documents/models.py:57
+#: documents/models.py:57 documents/models.py:950
 msgid "Regular expression"
 msgstr "Expressão regular"
 
-#: documents/models.py:58
+#: documents/models.py:58 documents/models.py:951
 msgid "Fuzzy word"
-msgstr "Palavra difusa (fuzzy)"
+msgstr ""
 
 #: documents/models.py:59
 msgid "Automatic"
 msgstr "Automático"
 
-#: documents/models.py:62 documents/models.py:402 documents/models.py:752
-#: paperless_mail/models.py:18 paperless_mail/models.py:93
+#: documents/models.py:62 documents/models.py:416 documents/models.py:1267
+#: paperless_mail/models.py:18 paperless_mail/models.py:96
 msgid "name"
 msgstr "nome"
 
-#: documents/models.py:64
+#: documents/models.py:64 documents/models.py:1007
 msgid "match"
 msgstr "correspondência"
 
-#: documents/models.py:67
+#: documents/models.py:67 documents/models.py:1010
 msgid "matching algorithm"
 msgstr "algoritmo de correspondência"
 
-#: documents/models.py:72
+#: documents/models.py:72 documents/models.py:1015
 msgid "is insensitive"
 msgstr "diferencia maiúsculas de minúsculas"
 
@@ -130,7 +130,7 @@ msgstr "Encriptado com GNU Privacy Guard"
 msgid "title"
 msgstr "título"
 
-#: documents/models.py:171 documents/models.py:648
+#: documents/models.py:171 documents/models.py:697
 msgid "content"
 msgstr "conteúdo"
 
@@ -158,8 +158,8 @@ msgstr "Soma de verificação de arquivamento."
 msgid "The checksum of the archived document."
 msgstr "A soma de verificação do documento arquivado."
 
-#: documents/models.py:205 documents/models.py:385 documents/models.py:654
-#: documents/models.py:692 documents/models.py:895 documents/models.py:932
+#: documents/models.py:205 documents/models.py:385 documents/models.py:703
+#: documents/models.py:741 documents/models.py:811 documents/models.py:848
 msgid "created"
 msgstr "criado"
 
@@ -207,7 +207,7 @@ msgstr "número de sério de arquivamento"
 msgid "The position of this document in your physical document archive."
 msgstr "A posição deste documento no seu arquivamento físico."
 
-#: documents/models.py:279 documents/models.py:665 documents/models.py:719
+#: documents/models.py:279 documents/models.py:714 documents/models.py:768
 msgid "document"
 msgstr "documento"
 
@@ -227,7 +227,7 @@ msgstr "informação"
 msgid "warning"
 msgstr "aviso"
 
-#: documents/models.py:371 paperless_mail/models.py:293
+#: documents/models.py:371 paperless_mail/models.py:308
 msgid "error"
 msgstr "erro"
 
@@ -255,751 +255,1201 @@ msgstr "log"
 msgid "logs"
 msgstr "logs"
 
-#: documents/models.py:399 documents/models.py:464
-msgid "saved view"
-msgstr "visualização"
+#: documents/models.py:398
+msgid "Table"
+msgstr ""
+
+#: documents/models.py:399
+msgid "Small Cards"
+msgstr ""
 
 #: documents/models.py:400
-msgid "saved views"
-msgstr "visualizações"
+msgid "Large Cards"
+msgstr ""
+
+#: documents/models.py:403
+msgid "Title"
+msgstr ""
+
+#: documents/models.py:404
+msgid "Created"
+msgstr ""
 
 #: documents/models.py:405
+msgid "Added"
+msgstr ""
+
+#: documents/models.py:406
+msgid "Tags"
+msgstr ""
+
+#: documents/models.py:407
+msgid "Correspondent"
+msgstr ""
+
+#: documents/models.py:408
+msgid "Document Type"
+msgstr "Tipo de documento"
+
+#: documents/models.py:409
+msgid "Storage Path"
+msgstr "Caminho de armazenamento"
+
+#: documents/models.py:410
+msgid "Note"
+msgstr ""
+
+#: documents/models.py:411
+msgid "Owner"
+msgstr ""
+
+#: documents/models.py:412
+msgid "Shared"
+msgstr ""
+
+#: documents/models.py:413
+msgid "ASN"
+msgstr ""
+
+#: documents/models.py:419
 msgid "show on dashboard"
 msgstr "exibir no painel de controle"
 
-#: documents/models.py:408
+#: documents/models.py:422
 msgid "show in sidebar"
 msgstr "exibir no painel lateral"
 
-#: documents/models.py:412
+#: documents/models.py:426
 msgid "sort field"
 msgstr "ordenar campo"
 
-#: documents/models.py:417
+#: documents/models.py:431
 msgid "sort reverse"
 msgstr "odernar reverso"
 
-#: documents/models.py:422
-msgid "title contains"
-msgstr "título contém"
-
-#: documents/models.py:423
-msgid "content contains"
-msgstr "conteúdo contém"
-
-#: documents/models.py:424
-msgid "ASN is"
-msgstr "NSA é"
-
-#: documents/models.py:425
-msgid "correspondent is"
-msgstr "correspondente é"
-
-#: documents/models.py:426
-msgid "document type is"
-msgstr "tipo de documento é"
-
-#: documents/models.py:427
-msgid "is in inbox"
-msgstr "é caixa de entrada"
-
-#: documents/models.py:428
-msgid "has tag"
-msgstr "contém etiqueta"
-
-#: documents/models.py:429
-msgid "has any tag"
-msgstr "contém qualquer etiqueta"
-
-#: documents/models.py:430
-msgid "created before"
-msgstr "criado antes de"
-
-#: documents/models.py:431
-msgid "created after"
-msgstr "criado depois de"
-
-#: documents/models.py:432
-msgid "created year is"
-msgstr "ano de criação é"
-
-#: documents/models.py:433
-msgid "created month is"
-msgstr "mês de criação é"
-
 #: documents/models.py:434
-msgid "created day is"
-msgstr "dia de criação é"
-
-#: documents/models.py:435
-msgid "added before"
-msgstr "adicionado antes de"
-
-#: documents/models.py:436
-msgid "added after"
-msgstr "adicionado depois de"
-
-#: documents/models.py:437
-msgid "modified before"
-msgstr "modificado antes de"
-
-#: documents/models.py:438
-msgid "modified after"
-msgstr "modificado depois de"
-
-#: documents/models.py:439
-msgid "does not have tag"
-msgstr "não tem etiqueta"
-
-#: documents/models.py:440
-msgid "does not have ASN"
-msgstr "não tem NSA"
-
-#: documents/models.py:441
-msgid "title or content contains"
-msgstr "título ou conteúdo contém"
+msgid "View page size"
+msgstr ""
 
 #: documents/models.py:442
-msgid "fulltext query"
-msgstr "pesquisa de texto completo"
-
-#: documents/models.py:443
-msgid "more like this"
-msgstr "mais como este"
-
-#: documents/models.py:444
-msgid "has tags in"
-msgstr "contém etiquetas em"
-
-#: documents/models.py:445
-msgid "ASN greater than"
-msgstr "NSA maior que"
-
-#: documents/models.py:446
-msgid "ASN less than"
-msgstr "NSA menor que"
-
-#: documents/models.py:447
-msgid "storage path is"
-msgstr "caminho de armazenamento é"
-
-#: documents/models.py:448
-msgid "has correspondent in"
+msgid "View display mode"
 msgstr ""
 
 #: documents/models.py:449
-msgid "does not have correspondent in"
+msgid "Document display fields"
 msgstr ""
 
-#: documents/models.py:450
-msgid "has document type in"
-msgstr ""
-
-#: documents/models.py:451
-msgid "does not have document type in"
-msgstr ""
-
-#: documents/models.py:452
-msgid "has storage path in"
-msgstr ""
-
-#: documents/models.py:453
-msgid "does not have storage path in"
-msgstr ""
-
-#: documents/models.py:454
-msgid "owner is"
-msgstr ""
-
-#: documents/models.py:455
-msgid "has owner in"
-msgstr ""
-
-#: documents/models.py:456
-msgid "does not have owner"
-msgstr ""
+#: documents/models.py:456 documents/models.py:513
+msgid "saved view"
+msgstr "visualização"
 
 #: documents/models.py:457
-msgid "does not have owner in"
-msgstr ""
+msgid "saved views"
+msgstr "visualizações"
+
+#: documents/models.py:465
+msgid "title contains"
+msgstr "título contém"
+
+#: documents/models.py:466
+msgid "content contains"
+msgstr "conteúdo contém"
 
 #: documents/models.py:467
+msgid "ASN is"
+msgstr "NSA é"
+
+#: documents/models.py:468
+msgid "correspondent is"
+msgstr "correspondente é"
+
+#: documents/models.py:469
+msgid "document type is"
+msgstr "tipo de documento é"
+
+#: documents/models.py:470
+msgid "is in inbox"
+msgstr "é caixa de entrada"
+
+#: documents/models.py:471
+msgid "has tag"
+msgstr "contém etiqueta"
+
+#: documents/models.py:472
+msgid "has any tag"
+msgstr "contém qualquer etiqueta"
+
+#: documents/models.py:473
+msgid "created before"
+msgstr "criado antes de"
+
+#: documents/models.py:474
+msgid "created after"
+msgstr "criado depois de"
+
+#: documents/models.py:475
+msgid "created year is"
+msgstr "ano de criação é"
+
+#: documents/models.py:476
+msgid "created month is"
+msgstr "mês de criação é"
+
+#: documents/models.py:477
+msgid "created day is"
+msgstr "dia de criação é"
+
+#: documents/models.py:478
+msgid "added before"
+msgstr "adicionado antes de"
+
+#: documents/models.py:479
+msgid "added after"
+msgstr "adicionado depois de"
+
+#: documents/models.py:480
+msgid "modified before"
+msgstr "modificado antes de"
+
+#: documents/models.py:481
+msgid "modified after"
+msgstr "modificado depois de"
+
+#: documents/models.py:482
+msgid "does not have tag"
+msgstr "não tem etiqueta"
+
+#: documents/models.py:483
+msgid "does not have ASN"
+msgstr "não tem NSA"
+
+#: documents/models.py:484
+msgid "title or content contains"
+msgstr "título ou conteúdo contém"
+
+#: documents/models.py:485
+msgid "fulltext query"
+msgstr "pesquisa de texto completo"
+
+#: documents/models.py:486
+msgid "more like this"
+msgstr ""
+
+#: documents/models.py:487
+msgid "has tags in"
+msgstr "contém etiquetas em"
+
+#: documents/models.py:488
+msgid "ASN greater than"
+msgstr "NSA maior que"
+
+#: documents/models.py:489
+msgid "ASN less than"
+msgstr "NSA menor que"
+
+#: documents/models.py:490
+msgid "storage path is"
+msgstr "caminho de armazenamento é"
+
+#: documents/models.py:491
+msgid "has correspondent in"
+msgstr "tem correspondente em"
+
+#: documents/models.py:492
+msgid "does not have correspondent in"
+msgstr "não tem correspondente em"
+
+#: documents/models.py:493
+msgid "has document type in"
+msgstr "possui categoria de documento em"
+
+#: documents/models.py:494
+msgid "does not have document type in"
+msgstr "não possui categoria de documento em"
+
+#: documents/models.py:495
+msgid "has storage path in"
+msgstr "possui caminho de armazenamento em"
+
+#: documents/models.py:496
+msgid "does not have storage path in"
+msgstr "não possui caminho de armazenamento em"
+
+#: documents/models.py:497
+msgid "owner is"
+msgstr "o proprietário é"
+
+#: documents/models.py:498
+msgid "has owner in"
+msgstr "tem proprietário em"
+
+#: documents/models.py:499
+msgid "does not have owner"
+msgstr "não tem proprietário"
+
+#: documents/models.py:500
+msgid "does not have owner in"
+msgstr "não tem proprietário em"
+
+#: documents/models.py:501
+msgid "has custom field value"
+msgstr ""
+
+#: documents/models.py:502
+msgid "is shared by me"
+msgstr "compartilhado por mim"
+
+#: documents/models.py:503
+msgid "has custom fields"
+msgstr ""
+
+#: documents/models.py:504
+msgid "has custom field in"
+msgstr ""
+
+#: documents/models.py:505
+msgid "does not have custom field in"
+msgstr ""
+
+#: documents/models.py:506
+msgid "does not have custom field"
+msgstr ""
+
+#: documents/models.py:516
 msgid "rule type"
 msgstr "tipo de regra"
 
-#: documents/models.py:469
+#: documents/models.py:518
 msgid "value"
 msgstr "valor"
 
-#: documents/models.py:472
+#: documents/models.py:521
 msgid "filter rule"
 msgstr "regra de filtragem"
 
-#: documents/models.py:473
+#: documents/models.py:522
 msgid "filter rules"
 msgstr "regras de filtragem"
 
-#: documents/models.py:584
+#: documents/models.py:633
 msgid "Task ID"
 msgstr "ID da tarefa"
 
-#: documents/models.py:585
+#: documents/models.py:634
 msgid "Celery ID for the Task that was run"
 msgstr "ID da Celery para a tarefa que foi executada"
 
-#: documents/models.py:590
+#: documents/models.py:639
 msgid "Acknowledged"
 msgstr "Confirmado"
 
-#: documents/models.py:591
+#: documents/models.py:640
 msgid "If the task is acknowledged via the frontend or API"
 msgstr "Se a tarefa é reconhecida através do frontend ou API"
 
-#: documents/models.py:597
+#: documents/models.py:646
 msgid "Task Filename"
 msgstr "Nome do arquivo da tarefa"
 
-#: documents/models.py:598
+#: documents/models.py:647
 msgid "Name of the file which the Task was run for"
 msgstr "Nome do arquivo para o qual a tarefa foi executada"
 
-#: documents/models.py:604
+#: documents/models.py:653
 msgid "Task Name"
 msgstr "Nome da tarefa"
 
-#: documents/models.py:605
+#: documents/models.py:654
 msgid "Name of the Task which was run"
 msgstr "Nome da tarefa executada"
 
-#: documents/models.py:612
+#: documents/models.py:661
 msgid "Task State"
 msgstr "Estado da tarefa"
 
-#: documents/models.py:613
+#: documents/models.py:662
 msgid "Current state of the task being run"
 msgstr "Estado atual da tarefa sendo executada"
 
-#: documents/models.py:618
+#: documents/models.py:667
 msgid "Created DateTime"
 msgstr "Data/Hora de criação"
 
-#: documents/models.py:619
+#: documents/models.py:668
 msgid "Datetime field when the task result was created in UTC"
 msgstr "Campo Data/Hora quando o resultado da tarefa foi criado, em UTC"
 
-#: documents/models.py:624
+#: documents/models.py:673
 msgid "Started DateTime"
 msgstr "Data/Hora de início"
 
-#: documents/models.py:625
+#: documents/models.py:674
 msgid "Datetime field when the task was started in UTC"
 msgstr "Campo Data/Hora quando a tarefa começou, em UTC"
 
-#: documents/models.py:630
+#: documents/models.py:679
 msgid "Completed DateTime"
 msgstr "Data/Hora de conclusão"
 
-#: documents/models.py:631
+#: documents/models.py:680
 msgid "Datetime field when the task was completed in UTC"
 msgstr "Campo Data/Hora quando a tarefa foi concluída, em UTC"
 
-#: documents/models.py:636
+#: documents/models.py:685
 msgid "Result Data"
 msgstr "Dados de Resultado"
 
-#: documents/models.py:638
+#: documents/models.py:687
 msgid "The data returned by the task"
 msgstr "Os dados retornados pela tarefa"
 
-#: documents/models.py:650
+#: documents/models.py:699
 msgid "Note for the document"
-msgstr ""
+msgstr "Nota para o documento"
 
-#: documents/models.py:674
+#: documents/models.py:723
 msgid "user"
 msgstr "usuário"
 
-#: documents/models.py:679
+#: documents/models.py:728
 msgid "note"
-msgstr ""
+msgstr "nota"
 
-#: documents/models.py:680
+#: documents/models.py:729
 msgid "notes"
 msgstr "notas"
 
-#: documents/models.py:688
+#: documents/models.py:737
 msgid "Archive"
-msgstr ""
+msgstr "Arquivo"
 
-#: documents/models.py:689
+#: documents/models.py:738
 msgid "Original"
-msgstr ""
-
-#: documents/models.py:700
-msgid "expiration"
-msgstr ""
-
-#: documents/models.py:707
-msgid "slug"
-msgstr ""
-
-#: documents/models.py:739
-msgid "share link"
-msgstr ""
-
-#: documents/models.py:740
-msgid "share links"
-msgstr ""
-
-#: documents/models.py:748
-msgid "Consume Folder"
-msgstr ""
+msgstr "Original"
 
 #: documents/models.py:749
+msgid "expiration"
+msgstr "validade"
+
+#: documents/models.py:756
+msgid "slug"
+msgstr "slug"
+
+#: documents/models.py:788
+msgid "share link"
+msgstr "compartilhar link"
+
+#: documents/models.py:789
+msgid "share links"
+msgstr "compartilhar link"
+
+#: documents/models.py:801
+msgid "String"
+msgstr "Texto"
+
+#: documents/models.py:802
+msgid "URL"
+msgstr "URL"
+
+#: documents/models.py:803
+msgid "Date"
+msgstr "Data"
+
+#: documents/models.py:804
+msgid "Boolean"
+msgstr "Booleano"
+
+#: documents/models.py:805
+msgid "Integer"
+msgstr "Número inteiro"
+
+#: documents/models.py:806
+msgid "Float"
+msgstr "Ponto flutuante"
+
+#: documents/models.py:807
+msgid "Monetary"
+msgstr "Unidade monetária"
+
+#: documents/models.py:808
+msgid "Document Link"
+msgstr "Link do documento"
+
+#: documents/models.py:820
+msgid "data type"
+msgstr "tipo de dados"
+
+#: documents/models.py:828
+msgid "custom field"
+msgstr "campo personalizado"
+
+#: documents/models.py:829
+msgid "custom fields"
+msgstr "campos personalizados"
+
+#: documents/models.py:891
+msgid "custom field instance"
+msgstr "instância de campo personalizado"
+
+#: documents/models.py:892
+msgid "custom field instances"
+msgstr "instâncias de campo personalizadas"
+
+#: documents/models.py:954
+msgid "Consumption Started"
+msgstr ""
+
+#: documents/models.py:955
+msgid "Document Added"
+msgstr "Documento Adicionado"
+
+#: documents/models.py:956
+msgid "Document Updated"
+msgstr "Documento Atualizado"
+
+#: documents/models.py:959
+msgid "Consume Folder"
+msgstr "Pasta de Consumo"
+
+#: documents/models.py:960
 msgid "Api Upload"
-msgstr ""
+msgstr "Envio por API"
 
-#: documents/models.py:750
+#: documents/models.py:961
 msgid "Mail Fetch"
+msgstr "Busca em e-mail"
+
+#: documents/models.py:964
+msgid "Workflow Trigger Type"
 msgstr ""
 
-#: documents/models.py:754 paperless_mail/models.py:95
-msgid "order"
-msgstr "ordem"
-
-#: documents/models.py:763
+#: documents/models.py:976
 msgid "filter path"
-msgstr ""
+msgstr "filtro de caminho"
 
-#: documents/models.py:768
+#: documents/models.py:981
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
 msgstr ""
 
-#: documents/models.py:775
+#: documents/models.py:988
 msgid "filter filename"
 msgstr ""
 
-#: documents/models.py:780 paperless_mail/models.py:148
+#: documents/models.py:993 paperless_mail/models.py:151
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "Consumir somente documentos que correspondem a este nome de arquivo se especificado.\n"
 "Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsculas e minúsculas."
 
-#: documents/models.py:791
+#: documents/models.py:1004
 msgid "filter documents from this mail rule"
 msgstr ""
 
-#: documents/models.py:795
+#: documents/models.py:1020
+msgid "has these tag(s)"
+msgstr ""
+
+#: documents/models.py:1028
+msgid "has this document type"
+msgstr ""
+
+#: documents/models.py:1036
+msgid "has this correspondent"
+msgstr ""
+
+#: documents/models.py:1040
+msgid "workflow trigger"
+msgstr ""
+
+#: documents/models.py:1041
+msgid "workflow triggers"
+msgstr ""
+
+#: documents/models.py:1051
+msgid "Assignment"
+msgstr ""
+
+#: documents/models.py:1055
+msgid "Removal"
+msgstr ""
+
+#: documents/models.py:1059
+msgid "Workflow Action Type"
+msgstr ""
+
+#: documents/models.py:1065
 msgid "assign title"
-msgstr ""
+msgstr "atribuir título"
 
-#: documents/models.py:800
+#: documents/models.py:1070
 msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr ""
+msgstr "Atribuir um título de documento, pode incluir alguns espaços reservados, consulta a documentação."
 
-#: documents/models.py:808 paperless_mail/models.py:204
+#: documents/models.py:1079 paperless_mail/models.py:219
 msgid "assign this tag"
 msgstr "atribuir esta etiqueta"
 
-#: documents/models.py:816 paperless_mail/models.py:212
+#: documents/models.py:1088 paperless_mail/models.py:227
 msgid "assign this document type"
 msgstr "atribuir este tipo de documento"
 
-#: documents/models.py:824 paperless_mail/models.py:226
+#: documents/models.py:1097 paperless_mail/models.py:241
 msgid "assign this correspondent"
 msgstr "atribuir este correspondente"
 
-#: documents/models.py:832
+#: documents/models.py:1106
 msgid "assign this storage path"
-msgstr ""
+msgstr "atribuir este caminho de armazenamento"
 
-#: documents/models.py:841
+#: documents/models.py:1115
 msgid "assign this owner"
-msgstr ""
+msgstr "atribuir este proprietário"
 
-#: documents/models.py:848
+#: documents/models.py:1122
 msgid "grant view permissions to these users"
 msgstr ""
 
-#: documents/models.py:855
+#: documents/models.py:1129
 msgid "grant view permissions to these groups"
 msgstr ""
 
-#: documents/models.py:862
+#: documents/models.py:1136
 msgid "grant change permissions to these users"
 msgstr ""
 
-#: documents/models.py:869
+#: documents/models.py:1143
 msgid "grant change permissions to these groups"
 msgstr ""
 
-#: documents/models.py:873
-msgid "consumption template"
+#: documents/models.py:1150
+msgid "assign these custom fields"
+msgstr "atribuir estes campos personalizados"
+
+#: documents/models.py:1157
+msgid "remove these tag(s)"
 msgstr ""
 
-#: documents/models.py:874
-msgid "consumption templates"
+#: documents/models.py:1162
+msgid "remove all tags"
 msgstr ""
 
-#: documents/models.py:886
-msgid "String"
+#: documents/models.py:1169
+msgid "remove these document type(s)"
 msgstr ""
 
-#: documents/models.py:887
-msgid "URL"
+#: documents/models.py:1174
+msgid "remove all document types"
 msgstr ""
 
-#: documents/models.py:888
-msgid "Date"
+#: documents/models.py:1181
+msgid "remove these correspondent(s)"
 msgstr ""
 
-#: documents/models.py:889
-msgid "Boolean"
+#: documents/models.py:1186
+msgid "remove all correspondents"
 msgstr ""
 
-#: documents/models.py:890
-msgid "Integer"
+#: documents/models.py:1193
+msgid "remove these storage path(s)"
 msgstr ""
 
-#: documents/models.py:891
-msgid "Float"
+#: documents/models.py:1198
+msgid "remove all storage paths"
 msgstr ""
 
-#: documents/models.py:892
-msgid "Monetary"
+#: documents/models.py:1205
+msgid "remove these owner(s)"
 msgstr ""
 
-#: documents/models.py:904
-msgid "data type"
+#: documents/models.py:1210
+msgid "remove all owners"
 msgstr ""
 
-#: documents/models.py:912
-msgid "custom field"
+#: documents/models.py:1217
+msgid "remove view permissions for these users"
 msgstr ""
 
-#: documents/models.py:913
-msgid "custom fields"
+#: documents/models.py:1224
+msgid "remove view permissions for these groups"
 msgstr ""
 
-#: documents/models.py:973
-msgid "custom field instance"
+#: documents/models.py:1231
+msgid "remove change permissions for these users"
 msgstr ""
 
-#: documents/models.py:974
-msgid "custom field instances"
+#: documents/models.py:1238
+msgid "remove change permissions for these groups"
 msgstr ""
 
-#: documents/serialisers.py:102
+#: documents/models.py:1243
+msgid "remove all permissions"
+msgstr ""
+
+#: documents/models.py:1250
+msgid "remove these custom fields"
+msgstr ""
+
+#: documents/models.py:1255
+msgid "remove all custom fields"
+msgstr ""
+
+#: documents/models.py:1259
+msgid "workflow action"
+msgstr ""
+
+#: documents/models.py:1260
+msgid "workflow actions"
+msgstr ""
+
+#: documents/models.py:1269 paperless_mail/models.py:98
+msgid "order"
+msgstr "ordem"
+
+#: documents/models.py:1275
+msgid "triggers"
+msgstr "gatilhos"
+
+#: documents/models.py:1282
+msgid "actions"
+msgstr "ações"
+
+#: documents/models.py:1285
+msgid "enabled"
+msgstr ""
+
+#: documents/serialisers.py:119
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Expressão regular inválida: %(error)s"
 
-#: documents/serialisers.py:377
+#: documents/serialisers.py:422
 msgid "Invalid color."
 msgstr "Cor inválida."
 
-#: documents/serialisers.py:841
+#: documents/serialisers.py:1234
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Tipo de arquivo %(type)s não suportado"
 
-#: documents/serialisers.py:938
+#: documents/serialisers.py:1343
 msgid "Invalid variable detected."
 msgstr "Variável inválida detectada."
 
-#: documents/templates/index.html:79
-msgid "Paperless-ngx is loading..."
-msgstr "Paperless-ngx está carregando..."
+#: documents/templates/account/email/base_message.txt:1
+#, python-format
+msgid "Hello from %(site_name)s!"
+msgstr ""
 
-#: documents/templates/index.html:80
-msgid "Still here?! Hmm, something might be wrong."
-msgstr "Ainda aqui?! Hmm, algo pode estar errado."
+#: documents/templates/account/email/base_message.txt:5
+#, python-format
+msgid "Thank you for using %(site_name)s!\n"
+"%(site_domain)s"
+msgstr ""
 
-#: documents/templates/index.html:80
-msgid "Here's a link to the docs."
-msgstr "Aqui está um link para a documentação."
-
-#: documents/templates/registration/logged_out.html:14
-msgid "Paperless-ngx signed out"
-msgstr "Paperless-ngx saiu"
-
-#: documents/templates/registration/logged_out.html:40
-msgid "You have been successfully logged out. Bye!"
-msgstr "Sua sessão foi encerrada com sucesso. Até mais!"
-
-#: documents/templates/registration/logged_out.html:41
-msgid "Sign in again"
-msgstr "Entre novamente"
-
-#: documents/templates/registration/login.html:14
+#: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
 msgstr "Entrar no Paperless-ngx"
 
-#: documents/templates/registration/login.html:41
+#: documents/templates/account/login.html:10
 msgid "Please sign in."
 msgstr "Por favor, entre na sua conta"
 
-#: documents/templates/registration/login.html:44
-msgid "Your username and password didn't match. Please try again."
-msgstr "Seu usuário e senha estão incorretos. Por favor, tente novamente."
-
-#: documents/templates/registration/login.html:48
-msgid "Share link was not found."
+#: documents/templates/account/login.html:12
+#, python-format
+msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
 msgstr ""
 
-#: documents/templates/registration/login.html:52
-msgid "Share link has expired."
-msgstr ""
-
-#: documents/templates/registration/login.html:55
+#: documents/templates/account/login.html:19
+#: documents/templates/account/signup.html:15
+#: documents/templates/socialaccount/signup.html:13
 msgid "Username"
 msgstr "Usuário"
 
-#: documents/templates/registration/login.html:56
+#: documents/templates/account/login.html:20
+#: documents/templates/account/signup.html:17
 msgid "Password"
 msgstr "Senha"
 
-#: documents/templates/registration/login.html:66
+#: documents/templates/account/login.html:30
 msgid "Sign in"
 msgstr "Entrar"
 
-#: documents/templates/registration/login.html:70
+#: documents/templates/account/login.html:34
 msgid "Forgot your password?"
+msgstr "Esqueceu sua senha?"
+
+#: documents/templates/account/login.html:45
+#: documents/templates/account/signup.html:49
+msgid "or sign in via"
+msgstr "ou conecte-se com"
+
+#: documents/templates/account/password_reset.html:5
+msgid "Paperless-ngx reset password request"
 msgstr ""
 
-#: documents/templates/registration/password_reset_complete.html:14
+#: documents/templates/account/password_reset.html:9
+msgid "Enter your email address below, and we'll email instructions for setting a new one."
+msgstr ""
+
+#: documents/templates/account/password_reset.html:12
+msgid "An error occurred. Please try again."
+msgstr "Ocorreu um erro. Tente novamente."
+
+#: documents/templates/account/password_reset.html:15
+msgid "Email"
+msgstr "E-mail"
+
+#: documents/templates/account/password_reset.html:21
+msgid "Send me instructions!"
+msgstr "Envie-me instruções!"
+
+#: documents/templates/account/password_reset_done.html:5
+msgid "Paperless-ngx reset password sent"
+msgstr ""
+
+#: documents/templates/account/password_reset_done.html:9
+msgid "Check your inbox."
+msgstr "Verifique sua caixa de entrada."
+
+#: documents/templates/account/password_reset_done.html:13
+msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
+msgstr "Nós enviamos as instruções para definir sua senha. Você receberá o e-mail em breve!"
+
+#: documents/templates/account/password_reset_from_key.html:5
+msgid "Paperless-ngx reset password confirmation"
+msgstr "Confirmação de redefinição de senha para Paperless-ngx"
+
+#: documents/templates/account/password_reset_from_key.html:9
+msgid "Set a new password."
+msgstr "Defina a nova senha."
+
+#: documents/templates/account/password_reset_from_key.html:15
+msgid "request a new password reset"
+msgstr "solicitar uma nova redefinição de senha"
+
+#: documents/templates/account/password_reset_from_key.html:17
+msgid "New Password"
+msgstr "Nova Senha"
+
+#: documents/templates/account/password_reset_from_key.html:18
+msgid "Confirm Password"
+msgstr "Confirme a Senha"
+
+#: documents/templates/account/password_reset_from_key.html:28
+msgid "Change my password"
+msgstr "Alterar minha senha"
+
+#: documents/templates/account/password_reset_from_key_done.html:5
 msgid "Paperless-ngx reset password complete"
-msgstr ""
+msgstr "Redefinição de senha completada para Paperless-ngx"
 
-#: documents/templates/registration/password_reset_complete.html:40
+#: documents/templates/account/password_reset_from_key_done.html:9
 msgid "Password reset complete."
-msgstr ""
+msgstr "Redefinição de senha concluída."
 
-#: documents/templates/registration/password_reset_complete.html:42
+#: documents/templates/account/password_reset_from_key_done.html:14
 #, python-format
 msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
 msgstr ""
 
-#: documents/templates/registration/password_reset_confirm.html:14
-msgid "Paperless-ngx reset password confirmation"
+#: documents/templates/account/signup.html:5
+msgid "Paperless-ngx sign up"
+msgstr "Registrar-se no Paperless-ngx"
+
+#: documents/templates/account/signup.html:10
+#, python-format
+msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
 msgstr ""
 
-#: documents/templates/registration/password_reset_confirm.html:42
-msgid "Set a new password."
+#: documents/templates/account/signup.html:16
+#: documents/templates/socialaccount/signup.html:14
+msgid "Email (optional)"
 msgstr ""
 
-#: documents/templates/registration/password_reset_confirm.html:46
-msgid "Passwords did not match or too weak. Try again."
+#: documents/templates/account/signup.html:18
+msgid "Password (again)"
 msgstr ""
 
-#: documents/templates/registration/password_reset_confirm.html:49
-msgid "New Password"
+#: documents/templates/account/signup.html:36
+#: documents/templates/socialaccount/signup.html:27
+msgid "Sign up"
 msgstr ""
 
-#: documents/templates/registration/password_reset_confirm.html:50
-msgid "Confirm Password"
+#: documents/templates/index.html:61
+msgid "Paperless-ngx is loading..."
+msgstr "Paperless-ngx está carregando..."
+
+#: documents/templates/index.html:62
+msgid "Still here?! Hmm, something might be wrong."
+msgstr "Ainda aqui?! Hmm, algo pode estar errado."
+
+#: documents/templates/index.html:62
+msgid "Here's a link to the docs."
+msgstr "Aqui está um link para a documentação."
+
+#: documents/templates/paperless-ngx/base.html:55
+msgid "Share link was not found."
+msgstr "Link de compartilhamento não encontrado."
+
+#: documents/templates/paperless-ngx/base.html:59
+msgid "Share link has expired."
+msgstr "O link de compartilhamento expirou."
+
+#: documents/templates/socialaccount/authentication_error.html:5
+#: documents/templates/socialaccount/login.html:5
+msgid "Paperless-ngx social account sign in"
 msgstr ""
 
-#: documents/templates/registration/password_reset_confirm.html:61
-msgid "Change my password"
+#: documents/templates/socialaccount/authentication_error.html:10
+#, python-format
+msgid "An error occurred while attempting to login via your social network account. Back to the <a href=\"%(login_url)s\">login page</a>"
 msgstr ""
 
-#: documents/templates/registration/password_reset_confirm.html:65
-msgid "request a new password reset"
+#: documents/templates/socialaccount/login.html:10
+#, python-format
+msgid "You are about to connect a new third-party account from %(provider)s."
 msgstr ""
 
-#: documents/templates/registration/password_reset_done.html:14
-msgid "Paperless-ngx reset password sent"
+#: documents/templates/socialaccount/login.html:13
+msgid "Continue"
 msgstr ""
 
-#: documents/templates/registration/password_reset_done.html:40
-msgid "Check your inbox."
+#: documents/templates/socialaccount/signup.html:5
+msgid "Paperless-ngx social account sign up"
 msgstr ""
 
-#: documents/templates/registration/password_reset_done.html:41
-msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
+#: documents/templates/socialaccount/signup.html:10
+#, python-format
+msgid "You are about to use your %(provider_name)s account to login."
 msgstr ""
 
-#: documents/templates/registration/password_reset_form.html:14
-msgid "Paperless-ngx reset password request"
+#: documents/templates/socialaccount/signup.html:11
+msgid "As a final step, please complete the following form:"
 msgstr ""
 
-#: documents/templates/registration/password_reset_form.html:41
-msgid "Enter your email address below, and we'll email instructions for setting a new one."
+#: documents/validators.py:17
+#, python-brace-format
+msgid "Unable to parse URI {value}, missing scheme"
 msgstr ""
 
-#: documents/templates/registration/password_reset_form.html:44
-msgid "An error occurred. Please try again."
+#: documents/validators.py:22
+#, python-brace-format
+msgid "Unable to parse URI {value}, missing net location or path"
 msgstr ""
 
-#: documents/templates/registration/password_reset_form.html:47
-msgid "Email"
-msgstr "E-mail"
-
-#: documents/templates/registration/password_reset_form.html:54
-msgid "Send me instructions!"
+#: documents/validators.py:27
+#, python-brace-format
+msgid "Unable to parse URI {value}"
 msgstr ""
 
 #: paperless/apps.py:10
 msgid "Paperless"
 msgstr "Paperless"
 
-#: paperless/settings.py:586
+#: paperless/models.py:26
+msgid "pdf"
+msgstr "pdf"
+
+#: paperless/models.py:27
+msgid "pdfa"
+msgstr "pdfa"
+
+#: paperless/models.py:28
+msgid "pdfa-1"
+msgstr "pdfa-1"
+
+#: paperless/models.py:29
+msgid "pdfa-2"
+msgstr "pdfa-2"
+
+#: paperless/models.py:30
+msgid "pdfa-3"
+msgstr "pdfa-3"
+
+#: paperless/models.py:39
+msgid "skip"
+msgstr ""
+
+#: paperless/models.py:40
+msgid "redo"
+msgstr "refazer"
+
+#: paperless/models.py:41
+msgid "force"
+msgstr ""
+
+#: paperless/models.py:42
+msgid "skip_noarchive"
+msgstr ""
+
+#: paperless/models.py:50
+msgid "never"
+msgstr ""
+
+#: paperless/models.py:51
+msgid "with_text"
+msgstr ""
+
+#: paperless/models.py:52
+msgid "always"
+msgstr ""
+
+#: paperless/models.py:60
+msgid "clean"
+msgstr ""
+
+#: paperless/models.py:61
+msgid "clean-final"
+msgstr ""
+
+#: paperless/models.py:62
+msgid "none"
+msgstr "nenhum"
+
+#: paperless/models.py:70
+msgid "LeaveColorUnchanged"
+msgstr ""
+
+#: paperless/models.py:71
+msgid "RGB"
+msgstr "RGB"
+
+#: paperless/models.py:72
+msgid "UseDeviceIndependentColor"
+msgstr ""
+
+#: paperless/models.py:73
+msgid "Gray"
+msgstr "Cinza"
+
+#: paperless/models.py:74
+msgid "CMYK"
+msgstr "CMYK"
+
+#: paperless/models.py:83
+msgid "Sets the output PDF type"
+msgstr "Define o tipo de PDF de saída"
+
+#: paperless/models.py:95
+msgid "Do OCR from page 1 to this value"
+msgstr "Faça OCR da página 1 a este valor"
+
+#: paperless/models.py:101
+msgid "Do OCR using these languages"
+msgstr "Faça OCR usando estes idiomas"
+
+#: paperless/models.py:108
+msgid "Sets the OCR mode"
+msgstr "Define o modo OCR"
+
+#: paperless/models.py:116
+msgid "Controls the generation of an archive file"
+msgstr ""
+
+#: paperless/models.py:124
+msgid "Sets image DPI fallback value"
+msgstr ""
+
+#: paperless/models.py:131
+msgid "Controls the unpaper cleaning"
+msgstr ""
+
+#: paperless/models.py:138
+msgid "Enables deskew"
+msgstr ""
+
+#: paperless/models.py:141
+msgid "Enables page rotation"
+msgstr ""
+
+#: paperless/models.py:146
+msgid "Sets the threshold for rotation of pages"
+msgstr ""
+
+#: paperless/models.py:152
+msgid "Sets the maximum image size for decompression"
+msgstr ""
+
+#: paperless/models.py:158
+msgid "Sets the Ghostscript color conversion strategy"
+msgstr ""
+
+#: paperless/models.py:166
+msgid "Adds additional user arguments for OCRMyPDF"
+msgstr "Adiciona argumentos adicionais para o OCRMyPDF"
+
+#: paperless/models.py:171
+msgid "Application title"
+msgstr "Título do aplicativo"
+
+#: paperless/models.py:178
+msgid "Application logo"
+msgstr "Logo do aplicativo"
+
+#: paperless/models.py:188
+msgid "paperless application settings"
+msgstr "configurações do aplicativo paperless"
+
+#: paperless/settings.py:660
 msgid "English (US)"
 msgstr "Inglês (EUA)"
 
-#: paperless/settings.py:587
+#: paperless/settings.py:661
 msgid "Arabic"
 msgstr "Árabe"
 
-#: paperless/settings.py:588
+#: paperless/settings.py:662
 msgid "Afrikaans"
-msgstr ""
+msgstr "Africanês"
 
-#: paperless/settings.py:589
+#: paperless/settings.py:663
 msgid "Belarusian"
 msgstr "Bielorrusso"
 
-#: paperless/settings.py:590
+#: paperless/settings.py:664
 msgid "Bulgarian"
-msgstr ""
+msgstr "Búlgaro"
 
-#: paperless/settings.py:591
+#: paperless/settings.py:665
 msgid "Catalan"
 msgstr "Catalão"
 
-#: paperless/settings.py:592
+#: paperless/settings.py:666
 msgid "Czech"
 msgstr "Tcheco"
 
-#: paperless/settings.py:593
+#: paperless/settings.py:667
 msgid "Danish"
 msgstr "Dinamarquês"
 
-#: paperless/settings.py:594
+#: paperless/settings.py:668
 msgid "German"
 msgstr "Alemão"
 
-#: paperless/settings.py:595
+#: paperless/settings.py:669
 msgid "Greek"
-msgstr ""
+msgstr "Grego"
 
-#: paperless/settings.py:596
+#: paperless/settings.py:670
 msgid "English (GB)"
 msgstr "Inglês (GB)"
 
-#: paperless/settings.py:597
+#: paperless/settings.py:671
 msgid "Spanish"
 msgstr "Espanhol"
 
-#: paperless/settings.py:598
+#: paperless/settings.py:672
 msgid "Finnish"
 msgstr "Finlandês"
 
-#: paperless/settings.py:599
+#: paperless/settings.py:673
 msgid "French"
 msgstr "Francês"
 
-#: paperless/settings.py:600
+#: paperless/settings.py:674
 msgid "Hungarian"
-msgstr ""
+msgstr "Húngaro"
 
-#: paperless/settings.py:601
+#: paperless/settings.py:675
 msgid "Italian"
 msgstr "Italiano"
 
-#: paperless/settings.py:602
+#: paperless/settings.py:676
+msgid "Japanese"
+msgstr "Japonês"
+
+#: paperless/settings.py:677
 msgid "Luxembourgish"
 msgstr "Luxemburguês"
 
-#: paperless/settings.py:603
+#: paperless/settings.py:678
 msgid "Norwegian"
-msgstr ""
+msgstr "Norueguês"
 
-#: paperless/settings.py:604
+#: paperless/settings.py:679
 msgid "Dutch"
 msgstr "Holandês"
 
-#: paperless/settings.py:605
+#: paperless/settings.py:680
 msgid "Polish"
 msgstr "Polonês"
 
-#: paperless/settings.py:606
+#: paperless/settings.py:681
 msgid "Portuguese (Brazil)"
 msgstr "Português (Brasil)"
 
-#: paperless/settings.py:607
+#: paperless/settings.py:682
 msgid "Portuguese"
 msgstr "Português"
 
-#: paperless/settings.py:608
+#: paperless/settings.py:683
 msgid "Romanian"
 msgstr "Romeno"
 
-#: paperless/settings.py:609
+#: paperless/settings.py:684
 msgid "Russian"
 msgstr "Russo"
 
-#: paperless/settings.py:610
+#: paperless/settings.py:685
 msgid "Slovak"
 msgstr "Eslovaco"
 
-#: paperless/settings.py:611
+#: paperless/settings.py:686
 msgid "Slovenian"
 msgstr "Esloveno"
 
-#: paperless/settings.py:612
+#: paperless/settings.py:687
 msgid "Serbian"
 msgstr "Sérvio"
 
-#: paperless/settings.py:613
+#: paperless/settings.py:688
 msgid "Swedish"
 msgstr "Sueco"
 
-#: paperless/settings.py:614
+#: paperless/settings.py:689
 msgid "Turkish"
 msgstr "Turco"
 
-#: paperless/settings.py:615
+#: paperless/settings.py:690
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ucraniano"
 
-#: paperless/settings.py:616
+#: paperless/settings.py:691
 msgid "Chinese Simplified"
 msgstr "Chinês Simplificado"
 
-#: paperless/urls.py:186
+#: paperless/urls.py:236
 msgid "Paperless-ngx administration"
 msgstr "Administração do Paperless-ngx"
 
-#: paperless_mail/admin.py:41
+#: paperless_mail/admin.py:39
 msgid "Authentication"
 msgstr "Autenticação"
 
-#: paperless_mail/admin.py:44
+#: paperless_mail/admin.py:42
 msgid "Advanced settings"
 msgstr "Configurações avançadas"
 
-#: paperless_mail/admin.py:60
+#: paperless_mail/admin.py:58
 msgid "Filter"
 msgstr "Filtro"
 
-#: paperless_mail/admin.py:63
+#: paperless_mail/admin.py:61
 msgid "Paperless will only process mails that match ALL of the filters given below."
 msgstr "Paperless processará somente e-mails que se encaixem em TODOS os filtros abaixo."
 
-#: paperless_mail/admin.py:79
+#: paperless_mail/admin.py:78
 msgid "Actions"
 msgstr "Ações"
 
-#: paperless_mail/admin.py:82
+#: paperless_mail/admin.py:81
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
 msgstr "A ação aplicada ao e-mail. Essa ação só é executada quando o corpo do e-mail ou anexos forem consumidos."
 
-#: paperless_mail/admin.py:90
+#: paperless_mail/admin.py:89
 msgid "Metadata"
 msgstr "Metadados"
 
-#: paperless_mail/admin.py:93
+#: paperless_mail/admin.py:92
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
 msgstr "Atribua metadados aos documentos consumidos por esta regra automaticamente. Se você não atribuir etiquetas, tipos ou correspondentes aqui, Paperless ainda sim processará todas as regras de correspondência que você definiu."
 
@@ -1071,7 +1521,7 @@ msgstr "regra de e-mail"
 msgid "mail rules"
 msgstr "regras de e-mail"
 
-#: paperless_mail/models.py:64 paperless_mail/models.py:72
+#: paperless_mail/models.py:64 paperless_mail/models.py:75
 msgid "Only process attachments."
 msgstr "Processar somente anexos."
 
@@ -1079,155 +1529,163 @@ msgstr "Processar somente anexos."
 msgid "Process full Mail (with embedded attachments in file) as .eml"
 msgstr "Processar e-mail completo (com anexos incorporados no arquivo) como .eml"
 
-#: paperless_mail/models.py:67
+#: paperless_mail/models.py:69
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
 msgstr "Processar e-mail completo (com anexos incorporados no arquivo) como .eml + processar anexos como documentos separados"
 
-#: paperless_mail/models.py:73
+#: paperless_mail/models.py:76
 msgid "Process all files, including 'inline' attachments."
 msgstr "Processar todos os arquivos, incluindo anexos 'inline'."
 
-#: paperless_mail/models.py:76
+#: paperless_mail/models.py:79
 msgid "Delete"
 msgstr "Excluir"
 
-#: paperless_mail/models.py:77
+#: paperless_mail/models.py:80
 msgid "Move to specified folder"
 msgstr "Mover para pasta especificada"
 
-#: paperless_mail/models.py:78
+#: paperless_mail/models.py:81
 msgid "Mark as read, don't process read mails"
 msgstr "Marcar como lido, não processar e-mails lidos"
 
-#: paperless_mail/models.py:79
+#: paperless_mail/models.py:82
 msgid "Flag the mail, don't process flagged mails"
 msgstr "Sinalizar o e-mail, não processar e-mails sinalizados"
 
-#: paperless_mail/models.py:80
+#: paperless_mail/models.py:83
 msgid "Tag the mail with specified tag, don't process tagged mails"
 msgstr "Marcar o e-mail com a etiqueta especificada, não processar e-mails marcados"
 
-#: paperless_mail/models.py:83
+#: paperless_mail/models.py:86
 msgid "Use subject as title"
 msgstr "Usar assunto como título"
 
-#: paperless_mail/models.py:84
+#: paperless_mail/models.py:87
 msgid "Use attachment filename as title"
 msgstr "Usar nome do arquivo anexo como título"
 
-#: paperless_mail/models.py:85
+#: paperless_mail/models.py:88
 msgid "Do not assign title from rule"
 msgstr ""
 
-#: paperless_mail/models.py:88
+#: paperless_mail/models.py:91
 msgid "Do not assign a correspondent"
 msgstr "Não atribuir um correspondente"
 
-#: paperless_mail/models.py:89
+#: paperless_mail/models.py:92
 msgid "Use mail address"
 msgstr "Usar endereço de e-mail"
 
-#: paperless_mail/models.py:90
+#: paperless_mail/models.py:93
 msgid "Use name (or mail address if not available)"
 msgstr "Usar nome (ou endereço de e-mail se não disponível)"
 
-#: paperless_mail/models.py:91
+#: paperless_mail/models.py:94
 msgid "Use correspondent selected below"
 msgstr "Usar correspondente selecionado abaixo"
 
-#: paperless_mail/models.py:101
+#: paperless_mail/models.py:104
 msgid "account"
 msgstr "conta"
 
-#: paperless_mail/models.py:105 paperless_mail/models.py:248
+#: paperless_mail/models.py:108 paperless_mail/models.py:263
 msgid "folder"
 msgstr "pasta"
 
-#: paperless_mail/models.py:109
+#: paperless_mail/models.py:112
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
 msgstr "Subpastas devem ser separadas por um delimitador, muitas vezes um ponto ('.') ou uma barra ('/'), mas varia de acordo com o servidor de e-mail."
 
-#: paperless_mail/models.py:115
+#: paperless_mail/models.py:118
 msgid "filter from"
 msgstr "filtrar de"
 
-#: paperless_mail/models.py:122
+#: paperless_mail/models.py:125
 msgid "filter to"
 msgstr ""
 
-#: paperless_mail/models.py:129
+#: paperless_mail/models.py:132
 msgid "filter subject"
 msgstr "filtrar assunto"
 
-#: paperless_mail/models.py:136
+#: paperless_mail/models.py:139
 msgid "filter body"
 msgstr "filtrar corpo"
 
-#: paperless_mail/models.py:143
-msgid "filter attachment filename"
-msgstr "filtrar nome do arquivo anexo"
+#: paperless_mail/models.py:146
+msgid "filter attachment filename inclusive"
+msgstr ""
 
-#: paperless_mail/models.py:155
+#: paperless_mail/models.py:158
+msgid "filter attachment filename exclusive"
+msgstr ""
+
+#: paperless_mail/models.py:163
+msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr ""
+
+#: paperless_mail/models.py:170
 msgid "maximum age"
 msgstr "idade máxima"
 
-#: paperless_mail/models.py:157
+#: paperless_mail/models.py:172
 msgid "Specified in days."
 msgstr "Especificada em dias."
 
-#: paperless_mail/models.py:161
+#: paperless_mail/models.py:176
 msgid "attachment type"
 msgstr "tipo de anexo"
 
-#: paperless_mail/models.py:165
+#: paperless_mail/models.py:180
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
 msgstr "Anexos inline incluem imagens inseridas, por isso é melhor combinar essa opção com um filtro de nome de arquivo."
 
-#: paperless_mail/models.py:171
+#: paperless_mail/models.py:186
 msgid "consumption scope"
 msgstr "escopo do consumo"
 
-#: paperless_mail/models.py:177
+#: paperless_mail/models.py:192
 msgid "action"
 msgstr "ação"
 
-#: paperless_mail/models.py:183
+#: paperless_mail/models.py:198
 msgid "action parameter"
 msgstr "parâmetro da ação"
 
-#: paperless_mail/models.py:188
+#: paperless_mail/models.py:203
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
 msgstr "Parâmetro adicional para a ação selecionada acima, por exemplo: a pasta de destino da ação de mover pasta. Subpastas devem ser separadas por pontos."
 
-#: paperless_mail/models.py:196
+#: paperless_mail/models.py:211
 msgid "assign title from"
 msgstr "atribuir título de"
 
-#: paperless_mail/models.py:216
+#: paperless_mail/models.py:231
 msgid "assign correspondent from"
 msgstr "atribuir correspondente de"
 
-#: paperless_mail/models.py:230
+#: paperless_mail/models.py:245
 msgid "Assign the rule owner to documents"
 msgstr ""
 
-#: paperless_mail/models.py:256
+#: paperless_mail/models.py:271
 msgid "uid"
 msgstr "uid"
 
-#: paperless_mail/models.py:264
+#: paperless_mail/models.py:279
 msgid "subject"
 msgstr "assunto"
 
-#: paperless_mail/models.py:272
+#: paperless_mail/models.py:287
 msgid "received"
 msgstr "recebido"
 
-#: paperless_mail/models.py:279
+#: paperless_mail/models.py:294
 msgid "processed"
 msgstr "processado"
 
-#: paperless_mail/models.py:285
+#: paperless_mail/models.py:300
 msgid "status"
 msgstr "status"
 

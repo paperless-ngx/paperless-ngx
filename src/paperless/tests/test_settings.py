@@ -5,9 +5,11 @@ from unittest import mock
 
 from celery.schedules import crontab
 
+from paperless.settings import _parse_base_paths
 from paperless.settings import _parse_beat_schedule
 from paperless.settings import _parse_db_settings
 from paperless.settings import _parse_ignore_dates
+from paperless.settings import _parse_paperless_url
 from paperless.settings import _parse_redis_url
 from paperless.settings import default_threads_per_worker
 
@@ -337,11 +339,12 @@ class TestDBSettings(TestCase):
         ):
             databases = _parse_db_settings()
 
-            self.assertDictContainsSubset(
-                {
+            self.assertDictEqual(
+                databases["default"]["OPTIONS"],
+                databases["default"]["OPTIONS"]
+                | {
                     "connect_timeout": 10.0,
                 },
-                databases["default"]["OPTIONS"],
             )
             self.assertDictEqual(
                 {
@@ -349,3 +352,82 @@ class TestDBSettings(TestCase):
                 },
                 databases["sqlite"]["OPTIONS"],
             )
+
+
+class TestPaperlessURLSettings(TestCase):
+    def test_paperless_url(self):
+        """
+        GIVEN:
+            - PAPERLESS_URL is set
+        WHEN:
+            - The URL is parsed
+        THEN:
+            - The URL is returned and present in related settings
+        """
+        with mock.patch.dict(
+            os.environ,
+            {
+                "PAPERLESS_URL": "https://example.com",
+            },
+        ):
+            url = _parse_paperless_url()
+            self.assertEqual("https://example.com", url)
+            from django.conf import settings
+
+            self.assertIn(url, settings.CSRF_TRUSTED_ORIGINS)
+            self.assertIn(url, settings.CORS_ALLOWED_ORIGINS)
+
+
+class TestPathSettings(TestCase):
+    def test_default_paths(self):
+        """
+        GIVEN:
+            - PAPERLESS_FORCE_SCRIPT_NAME is not set
+        WHEN:
+            - Settings are parsed
+        THEN:
+            - Paths are as expected
+        """
+        base_paths = _parse_base_paths()
+        self.assertEqual(None, base_paths[0])  # FORCE_SCRIPT_NAME
+        self.assertEqual("/", base_paths[1])  # BASE_URL
+        self.assertEqual("/accounts/login/", base_paths[2])  # LOGIN_URL
+        self.assertEqual("/dashboard", base_paths[3])  # LOGIN_REDIRECT_URL
+        self.assertEqual("/", base_paths[4])  # LOGOUT_REDIRECT_URL
+
+    @mock.patch("os.environ", {"PAPERLESS_FORCE_SCRIPT_NAME": "/paperless"})
+    def test_subpath(self):
+        """
+        GIVEN:
+            - PAPERLESS_FORCE_SCRIPT_NAME is set
+        WHEN:
+            - Settings are parsed
+        THEN:
+            - The path is returned and present in related settings
+        """
+        base_paths = _parse_base_paths()
+        self.assertEqual("/paperless", base_paths[0])  # FORCE_SCRIPT_NAME
+        self.assertEqual("/paperless/", base_paths[1])  # BASE_URL
+        self.assertEqual("/paperless/accounts/login/", base_paths[2])  # LOGIN_URL
+        self.assertEqual("/paperless/dashboard", base_paths[3])  # LOGIN_REDIRECT_URL
+        self.assertEqual("/paperless/", base_paths[4])  # LOGOUT_REDIRECT_URL
+
+    @mock.patch(
+        "os.environ",
+        {
+            "PAPERLESS_FORCE_SCRIPT_NAME": "/paperless",
+            "PAPERLESS_LOGOUT_REDIRECT_URL": "/foobar/",
+        },
+    )
+    def test_subpath_with_explicit_logout_url(self):
+        """
+        GIVEN:
+            - PAPERLESS_FORCE_SCRIPT_NAME is set and so is PAPERLESS_LOGOUT_REDIRECT_URL
+        WHEN:
+            - Settings are parsed
+        THEN:
+            - The correct logout redirect URL is returned
+        """
+        base_paths = _parse_base_paths()
+        self.assertEqual("/paperless/", base_paths[1])  # BASE_URL
+        self.assertEqual("/foobar/", base_paths[4])  # LOGOUT_REDIRECT_URL

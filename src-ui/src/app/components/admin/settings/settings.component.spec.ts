@@ -9,12 +9,14 @@ import {
   NgbModule,
   NgbAlertModule,
   NgbNavLink,
+  NgbModal,
+  NgbModalModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
-import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
-import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
+import { SavedView } from 'src/app/data/saved-view'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
@@ -37,6 +39,17 @@ import { TextComponent } from '../../common/input/text/text.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { SettingsComponent } from './settings.component'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
+import { SystemStatusDialogComponent } from '../../common/system-status-dialog/system-status-dialog.component'
+import { SystemStatusService } from 'src/app/services/system-status.service'
+import {
+  SystemStatus,
+  InstallType,
+  SystemStatusItemStatus,
+} from 'src/app/data/system-status'
+import { DragDropSelectComponent } from '../../common/input/drag-drop-select/drag-drop-select.component'
+import { DragDropModule } from '@angular/cdk/drag-drop'
 
 const savedViews = [
   { id: 1, name: 'view1', show_in_sidebar: true, show_on_dashboard: true },
@@ -63,6 +76,8 @@ describe('SettingsComponent', () => {
   let userService: UserService
   let permissionsService: PermissionsService
   let groupService: GroupService
+  let modalService: NgbModal
+  let systemStatusService: SystemStatusService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -82,6 +97,8 @@ describe('SettingsComponent', () => {
         PermissionsUserComponent,
         PermissionsGroupComponent,
         IfOwnerDirective,
+        ConfirmButtonComponent,
+        DragDropSelectComponent,
       ],
       providers: [CustomDatePipe, DatePipe, PermissionsGuard],
       imports: [
@@ -92,6 +109,9 @@ describe('SettingsComponent', () => {
         ReactiveFormsModule,
         NgbAlertModule,
         NgSelectModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+        NgbModalModule,
+        DragDropModule,
       ],
     }).compileComponents()
 
@@ -103,6 +123,8 @@ describe('SettingsComponent', () => {
     settingsService.currentUser = users[0]
     userService = TestBed.inject(UserService)
     permissionsService = TestBed.inject(PermissionsService)
+    modalService = TestBed.inject(NgbModal)
+    systemStatusService = TestBed.inject(SystemStatusService)
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     jest
       .spyOn(permissionsService, 'currentUserHasObjectPermissions')
@@ -138,7 +160,7 @@ describe('SettingsComponent', () => {
         of({
           all: savedViews.map((v) => v.id),
           count: savedViews.length,
-          results: (savedViews as PaperlessSavedView[]).concat([]),
+          results: (savedViews as SavedView[]).concat([]),
         })
       )
     }
@@ -226,9 +248,7 @@ describe('SettingsComponent', () => {
     savedViewPatchSpy.mockClear()
 
     // succeed saved views
-    savedViewPatchSpy.mockReturnValueOnce(
-      of(savedViews as PaperlessSavedView[])
-    )
+    savedViewPatchSpy.mockReturnValueOnce(of(savedViews as SavedView[]))
     component.saveSettings()
     expect(toastErrorSpy).not.toHaveBeenCalled()
     expect(savedViewPatchSpy).toHaveBeenCalled()
@@ -289,7 +309,7 @@ describe('SettingsComponent', () => {
     expect(toastErrorSpy).toHaveBeenCalled()
     expect(storeSpy).toHaveBeenCalled()
     expect(appearanceSettingsSpy).not.toHaveBeenCalled()
-    expect(setSpy).toHaveBeenCalledTimes(24)
+    expect(setSpy).toHaveBeenCalledTimes(27)
 
     // succeed
     storeSpy.mockReturnValueOnce(of(true))
@@ -307,10 +327,15 @@ describe('SettingsComponent', () => {
     component.store.getValue()['displayLanguage'] = 'en-US'
     component.store.getValue()['updateCheckingEnabled'] = false
     component.settingsForm.value.displayLanguage = 'en-GB'
-    component.settingsForm.value.updateCheckingEnabled = true
-    jest.spyOn(settingsService, 'storeSettings').mockReturnValueOnce(of(true))
+    jest.spyOn(settingsService, 'storeSettings').mockReturnValue(of(true))
     component.saveSettings()
     expect(toast.actionName).toEqual('Reload now')
+
+    component.settingsForm.value.updateCheckingEnabled = true
+    component.saveSettings()
+
+    expect(toast.actionName).toEqual('Reload now')
+    toast.action()
   })
 
   it('should allow setting theme color, visually apply change immediately but not save', () => {
@@ -335,7 +360,7 @@ describe('SettingsComponent', () => {
     const toastSpy = jest.spyOn(toastService, 'showInfo')
     const deleteSpy = jest.spyOn(savedViewService, 'delete')
     deleteSpy.mockReturnValue(of(true))
-    component.deleteSavedView(savedViews[0] as PaperlessSavedView)
+    component.deleteSavedView(savedViews[0] as SavedView)
     expect(deleteSpy).toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalledWith(
       `Saved view "${savedViews[0].name}" deleted.`
@@ -364,5 +389,63 @@ describe('SettingsComponent', () => {
     completeSetup(groupService)
     fixture.detectChanges()
     expect(toastErrorSpy).toBeCalled()
+  })
+
+  it('should load system status on initialize, show errors if needed', () => {
+    const status: SystemStatus = {
+      pngx_version: '2.4.3',
+      server_os: 'macOS-14.1.1-arm64-arm-64bit',
+      install_type: InstallType.BareMetal,
+      storage: { total: 494384795648, available: 13573525504 },
+      database: {
+        type: 'sqlite',
+        url: '/paperless-ngx/data/db.sqlite3',
+        status: SystemStatusItemStatus.ERROR,
+        error: null,
+        migration_status: {
+          latest_migration: 'socialaccount.0006_alter_socialaccount_extra_data',
+          unapplied_migrations: [],
+        },
+      },
+      tasks: {
+        redis_url: 'redis://localhost:6379',
+        redis_status: SystemStatusItemStatus.ERROR,
+        redis_error:
+          'Error 61 connecting to localhost:6379. Connection refused.',
+        celery_status: SystemStatusItemStatus.ERROR,
+        index_status: SystemStatusItemStatus.OK,
+        index_last_modified: new Date().toISOString(),
+        index_error: null,
+        classifier_status: SystemStatusItemStatus.OK,
+        classifier_last_trained: new Date().toISOString(),
+        classifier_error: null,
+      },
+    }
+    jest.spyOn(systemStatusService, 'get').mockReturnValue(of(status))
+    jest.spyOn(permissionsService, 'isAdmin').mockReturnValue(true)
+    completeSetup()
+    expect(component['systemStatus']).toEqual(status) // private
+    expect(component.systemStatusHasErrors).toBeTruthy()
+    // coverage
+    component['systemStatus'].database.status = SystemStatusItemStatus.OK
+    component['systemStatus'].tasks.redis_status = SystemStatusItemStatus.OK
+    component['systemStatus'].tasks.celery_status = SystemStatusItemStatus.OK
+    expect(component.systemStatusHasErrors).toBeFalsy()
+  })
+
+  it('should open system status dialog', () => {
+    const modalOpenSpy = jest.spyOn(modalService, 'open')
+    completeSetup()
+    component.showSystemStatus()
+    expect(modalOpenSpy).toHaveBeenCalledWith(SystemStatusDialogComponent, {
+      size: 'xl',
+    })
+  })
+
+  it('should support reset', () => {
+    completeSetup()
+    component.settingsForm.get('themeColor').setValue('#ff0000')
+    component.reset()
+    expect(component.settingsForm.get('themeColor').value).toEqual('')
   })
 })

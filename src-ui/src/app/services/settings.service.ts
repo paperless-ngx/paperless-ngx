@@ -17,15 +17,17 @@ import {
   hexToHsl,
 } from 'src/app/utils/color'
 import { environment } from 'src/environments/environment'
+import { UiSettings, SETTINGS, SETTINGS_KEYS } from '../data/ui-settings'
+import { User } from '../data/user'
 import {
-  PaperlessUiSettings,
-  SETTINGS,
-  SETTINGS_KEYS,
-} from '../data/paperless-uisettings'
-import { PaperlessUser } from '../data/paperless-user'
-import { PermissionsService } from './permissions.service'
+  PermissionAction,
+  PermissionType,
+  PermissionsService,
+} from './permissions.service'
 import { ToastService } from './toast.service'
-import { PaperlessSavedView } from '../data/paperless-saved-view'
+import { SavedView } from '../data/saved-view'
+import { CustomFieldsService } from './rest/custom-fields.service'
+import { DEFAULT_DISPLAY_FIELDS, DisplayField } from '../data/document'
 
 export interface LanguageOption {
   code: string
@@ -38,6 +40,207 @@ export interface LanguageOption {
   dateInputFormat?: string
 }
 
+const LANGUAGE_OPTIONS = [
+  {
+    code: 'en-us',
+    name: $localize`English (US)`,
+    englishName: 'English (US)',
+    dateInputFormat: 'mm/dd/yyyy',
+  },
+  {
+    code: 'af-za',
+    name: $localize`Afrikaans`,
+    englishName: 'Afrikaans',
+    dateInputFormat: 'yyyy-mm-dd',
+  },
+  {
+    code: 'ar-ar',
+    name: $localize`Arabic`,
+    englishName: 'Arabic',
+    dateInputFormat: 'yyyy-mm-dd',
+  },
+  {
+    code: 'be-by',
+    name: $localize`Belarusian`,
+    englishName: 'Belarusian',
+    dateInputFormat: 'dd.mm.yyyy',
+  },
+  {
+    code: 'bg-bg',
+    name: $localize`Bulgarian`,
+    englishName: 'Bulgarian',
+    dateInputFormat: 'dd.mm.yyyy',
+  },
+  {
+    code: 'ca-es',
+    name: $localize`Catalan`,
+    englishName: 'Catalan',
+    dateInputFormat: 'dd/mm/yyyy',
+  },
+  {
+    code: 'cs-cz',
+    name: $localize`Czech`,
+    englishName: 'Czech',
+    dateInputFormat: 'dd.mm.yyyy',
+  },
+  {
+    code: 'da-dk',
+    name: $localize`Danish`,
+    englishName: 'Danish',
+    dateInputFormat: 'dd.mm.yyyy',
+  },
+  {
+    code: 'de-de',
+    name: $localize`German`,
+    englishName: 'German',
+    dateInputFormat: 'dd.mm.yyyy',
+  },
+  {
+    code: 'el-gr',
+    name: $localize`Greek`,
+    englishName: 'Greek',
+    dateInputFormat: 'dd/mm/yyyy',
+  },
+  {
+    code: 'en-gb',
+    name: $localize`English (GB)`,
+    englishName: 'English (GB)',
+    dateInputFormat: 'dd/mm/yyyy',
+  },
+  {
+    code: 'es-es',
+    name: $localize`Spanish`,
+    englishName: 'Spanish',
+    dateInputFormat: 'dd/mm/yyyy',
+  },
+  {
+    code: 'fi-fi',
+    name: $localize`Finnish`,
+    englishName: 'Finnish',
+    dateInputFormat: 'dd.mm.yyyy',
+  },
+  {
+    code: 'fr-fr',
+    name: $localize`French`,
+    englishName: 'French',
+    dateInputFormat: 'dd/mm/yyyy',
+  },
+  {
+    code: 'hu-hu',
+    name: $localize`Hungarian`,
+    englishName: 'Hungarian',
+    dateInputFormat: 'yyyy.mm.dd',
+  },
+  {
+    code: 'it-it',
+    name: $localize`Italian`,
+    englishName: 'Italian',
+    dateInputFormat: 'dd/mm/yyyy',
+  },
+  {
+    code: 'ja-jp',
+    name: $localize`Japanese`,
+    englishName: 'Japanese',
+    dateInputFormat: 'yyyy/mm/dd',
+  },
+  {
+    code: 'lb-lu',
+    name: $localize`Luxembourgish`,
+    englishName: 'Luxembourgish',
+    dateInputFormat: 'dd.mm.yyyy',
+  },
+  {
+    code: 'nl-nl',
+    name: $localize`Dutch`,
+    englishName: 'Dutch',
+    dateInputFormat: 'dd-mm-yyyy',
+  },
+  {
+    code: 'no-no',
+    name: $localize`Norwegian`,
+    englishName: 'Norwegian',
+    dateInputFormat: 'dd.mm.yyyy',
+  },
+  {
+    code: 'pl-pl',
+    name: $localize`Polish`,
+    englishName: 'Polish',
+    dateInputFormat: 'dd.mm.yyyy',
+  },
+  {
+    code: 'pt-br',
+    name: $localize`Portuguese (Brazil)`,
+    englishName: 'Portuguese (Brazil)',
+    dateInputFormat: 'dd/mm/yyyy',
+  },
+  {
+    code: 'pt-pt',
+    name: $localize`Portuguese`,
+    englishName: 'Portuguese',
+    dateInputFormat: 'dd/mm/yyyy',
+  },
+  {
+    code: 'ro-ro',
+    name: $localize`Romanian`,
+    englishName: 'Romanian',
+    dateInputFormat: 'dd.mm.yyyy',
+  },
+  {
+    code: 'ru-ru',
+    name: $localize`Russian`,
+    englishName: 'Russian',
+    dateInputFormat: 'dd.mm.yyyy',
+  },
+  {
+    code: 'sk-sk',
+    name: $localize`Slovak`,
+    englishName: 'Slovak',
+    dateInputFormat: 'dd.mm.yyyy',
+  },
+  {
+    code: 'sl-si',
+    name: $localize`Slovenian`,
+    englishName: 'Slovenian',
+    dateInputFormat: 'dd.mm.yyyy',
+  },
+  {
+    code: 'sr-cs',
+    name: $localize`Serbian`,
+    englishName: 'Serbian',
+    dateInputFormat: 'dd.mm.yyyy',
+  },
+  {
+    code: 'sv-se',
+    name: $localize`Swedish`,
+    englishName: 'Swedish',
+    dateInputFormat: 'yyyy-mm-dd',
+  },
+  {
+    code: 'tr-tr',
+    name: $localize`Turkish`,
+    englishName: 'Turkish',
+    dateInputFormat: 'yyyy-mm-dd',
+  },
+  {
+    code: 'uk-ua',
+    name: $localize`Ukrainian`,
+    englishName: 'Ukrainian',
+    dateInputFormat: 'dd.mm.yyyy',
+  },
+  {
+    code: 'zh-cn',
+    name: $localize`Chinese Simplified`,
+    englishName: 'Chinese Simplified',
+    dateInputFormat: 'yyyy-mm-dd',
+  },
+]
+
+const ISO_LANGUAGE_OPTION: LanguageOption = {
+  code: 'iso-8601',
+  name: $localize`ISO 8601`,
+  dateInputFormat: 'yyyy-mm-dd',
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -45,7 +248,7 @@ export class SettingsService {
   protected baseUrl: string = environment.apiBaseUrl + 'ui_settings/'
 
   private settings: Object = {}
-  currentUser: PaperlessUser
+  currentUser: User
 
   public settingsSaved: EventEmitter<any> = new EventEmitter()
 
@@ -60,6 +263,13 @@ export class SettingsService {
   public globalDropzoneActive: boolean = false
   public organizingSidebarSavedViews: boolean = false
 
+  private _allDisplayFields: Array<{ id: DisplayField; name: string }> =
+    DEFAULT_DISPLAY_FIELDS
+  public get allDisplayFields(): Array<{ id: DisplayField; name: string }> {
+    return this._allDisplayFields
+  }
+  public displayFieldsInitialized: boolean = false
+
   constructor(
     rendererFactory: RendererFactory2,
     @Inject(DOCUMENT) private document,
@@ -68,17 +278,21 @@ export class SettingsService {
     @Inject(LOCALE_ID) private localeId: string,
     protected http: HttpClient,
     private toastService: ToastService,
-    private permissionsService: PermissionsService
+    private permissionsService: PermissionsService,
+    private customFieldsService: CustomFieldsService
   ) {
     this._renderer = rendererFactory.createRenderer(null, null)
   }
 
   // this is called by the app initializer in app.module
-  public initializeSettings(): Observable<PaperlessUiSettings> {
-    return this.http.get<PaperlessUiSettings>(this.baseUrl).pipe(
+  public initializeSettings(): Observable<UiSettings> {
+    return this.http.get<UiSettings>(this.baseUrl).pipe(
       first(),
       tap((uisettings) => {
         Object.assign(this.settings, uisettings.settings)
+        if (this.get(SETTINGS_KEYS.APP_TITLE)?.length) {
+          environment.appTitle = this.get(SETTINGS_KEYS.APP_TITLE)
+        }
         this.maybeMigrateSettings()
         // to update lang cookie
         if (this.settings['language']?.length)
@@ -88,8 +302,71 @@ export class SettingsService {
           uisettings.permissions,
           this.currentUser
         )
+
+        this.initializeDisplayFields()
       })
     )
+  }
+
+  public initializeDisplayFields() {
+    this._allDisplayFields = DEFAULT_DISPLAY_FIELDS
+
+    this._allDisplayFields = this._allDisplayFields
+      ?.map((field) => {
+        if (
+          field.id === DisplayField.NOTES &&
+          !this.get(SETTINGS_KEYS.NOTES_ENABLED)
+        ) {
+          return null
+        }
+
+        if (
+          [
+            DisplayField.TITLE,
+            DisplayField.CREATED,
+            DisplayField.ADDED,
+            DisplayField.ASN,
+            DisplayField.SHARED,
+          ].includes(field.id)
+        ) {
+          return field
+        }
+
+        let type: PermissionType = Object.values(PermissionType).find((t) =>
+          t.includes(field.id)
+        )
+        if (field.id === DisplayField.OWNER) {
+          type = PermissionType.User
+        }
+        return this.permissionsService.currentUserCan(
+          PermissionAction.View,
+          type
+        )
+          ? field
+          : null
+      })
+      .filter((f) => f)
+
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.CustomField
+      )
+    ) {
+      this.customFieldsService.listAll().subscribe((r) => {
+        this._allDisplayFields = this._allDisplayFields.concat(
+          r.results.map((field) => {
+            return {
+              id: `${DisplayField.CUSTOM_FIELD}${field.id}` as any,
+              name: field.name,
+            }
+          })
+        )
+        this.displayFieldsInitialized = true
+      })
+    } else {
+      this.displayFieldsInitialized = true
+    }
   }
 
   get displayName(): string {
@@ -143,216 +420,22 @@ export class SettingsService {
         `${hsl.l * 100}%`
       )
     } else {
+      this._renderer.removeClass(this.document.body, 'primary-dark')
+      this._renderer.removeClass(this.document.body, 'primary-light')
       document.documentElement.style.removeProperty('--pngx-primary')
       document.documentElement.style.removeProperty('--pngx-primary-lightness')
     }
   }
 
   getLanguageOptions(): LanguageOption[] {
-    const languages = [
-      {
-        code: 'en-us',
-        name: $localize`English (US)`,
-        englishName: 'English (US)',
-        dateInputFormat: 'mm/dd/yyyy',
-      },
-      {
-        code: 'af-za',
-        name: $localize`Afrikaans`,
-        englishName: 'Afrikaans',
-        dateInputFormat: 'yyyy-mm-dd',
-      },
-      {
-        code: 'ar-ar',
-        name: $localize`Arabic`,
-        englishName: 'Arabic',
-        dateInputFormat: 'yyyy-mm-dd',
-      },
-      {
-        code: 'be-by',
-        name: $localize`Belarusian`,
-        englishName: 'Belarusian',
-        dateInputFormat: 'dd.mm.yyyy',
-      },
-      {
-        code: 'bg-bg',
-        name: $localize`Bulgarian`,
-        englishName: 'Bulgarian',
-        dateInputFormat: 'dd.mm.yyyy',
-      },
-      {
-        code: 'ca-es',
-        name: $localize`Catalan`,
-        englishName: 'Catalan',
-        dateInputFormat: 'dd/mm/yyyy',
-      },
-      {
-        code: 'cs-cz',
-        name: $localize`Czech`,
-        englishName: 'Czech',
-        dateInputFormat: 'dd.mm.yyyy',
-      },
-      {
-        code: 'da-dk',
-        name: $localize`Danish`,
-        englishName: 'Danish',
-        dateInputFormat: 'dd.mm.yyyy',
-      },
-      {
-        code: 'de-de',
-        name: $localize`German`,
-        englishName: 'German',
-        dateInputFormat: 'dd.mm.yyyy',
-      },
-      {
-        code: 'el-gr',
-        name: $localize`Greek`,
-        englishName: 'Greek',
-        dateInputFormat: 'dd/mm/yyyy',
-      },
-      {
-        code: 'en-gb',
-        name: $localize`English (GB)`,
-        englishName: 'English (GB)',
-        dateInputFormat: 'dd/mm/yyyy',
-      },
-      {
-        code: 'es-es',
-        name: $localize`Spanish`,
-        englishName: 'Spanish',
-        dateInputFormat: 'dd/mm/yyyy',
-      },
-      {
-        code: 'fi-fi',
-        name: $localize`Finnish`,
-        englishName: 'Finnish',
-        dateInputFormat: 'dd.mm.yyyy',
-      },
-      {
-        code: 'fr-fr',
-        name: $localize`French`,
-        englishName: 'French',
-        dateInputFormat: 'dd/mm/yyyy',
-      },
-      {
-        code: 'hu-hu',
-        name: $localize`Hungarian`,
-        englishName: 'Hungarian',
-        dateInputFormat: 'yyyy.mm.dd',
-      },
-      {
-        code: 'it-it',
-        name: $localize`Italian`,
-        englishName: 'Italian',
-        dateInputFormat: 'dd/mm/yyyy',
-      },
-      {
-        code: 'lb-lu',
-        name: $localize`Luxembourgish`,
-        englishName: 'Luxembourgish',
-        dateInputFormat: 'dd.mm.yyyy',
-      },
-      {
-        code: 'nl-nl',
-        name: $localize`Dutch`,
-        englishName: 'Dutch',
-        dateInputFormat: 'dd-mm-yyyy',
-      },
-      {
-        code: 'no-no',
-        name: $localize`Norwegian`,
-        englishName: 'Norwegian',
-        dateInputFormat: 'dd.mm.yyyy',
-      },
-      {
-        code: 'pl-pl',
-        name: $localize`Polish`,
-        englishName: 'Polish',
-        dateInputFormat: 'dd.mm.yyyy',
-      },
-      {
-        code: 'pt-br',
-        name: $localize`Portuguese (Brazil)`,
-        englishName: 'Portuguese (Brazil)',
-        dateInputFormat: 'dd/mm/yyyy',
-      },
-      {
-        code: 'pt-pt',
-        name: $localize`Portuguese`,
-        englishName: 'Portuguese',
-        dateInputFormat: 'dd/mm/yyyy',
-      },
-      {
-        code: 'ro-ro',
-        name: $localize`Romanian`,
-        englishName: 'Romanian',
-        dateInputFormat: 'dd.mm.yyyy',
-      },
-      {
-        code: 'ru-ru',
-        name: $localize`Russian`,
-        englishName: 'Russian',
-        dateInputFormat: 'dd.mm.yyyy',
-      },
-      {
-        code: 'sk-sk',
-        name: $localize`Slovak`,
-        englishName: 'Slovak',
-        dateInputFormat: 'dd.mm.yyyy',
-      },
-      {
-        code: 'sl-si',
-        name: $localize`Slovenian`,
-        englishName: 'Slovenian',
-        dateInputFormat: 'dd.mm.yyyy',
-      },
-      {
-        code: 'sr-cs',
-        name: $localize`Serbian`,
-        englishName: 'Serbian',
-        dateInputFormat: 'dd.mm.yyyy',
-      },
-      {
-        code: 'sv-se',
-        name: $localize`Swedish`,
-        englishName: 'Swedish',
-        dateInputFormat: 'yyyy-mm-dd',
-      },
-      {
-        code: 'tr-tr',
-        name: $localize`Turkish`,
-        englishName: 'Turkish',
-        dateInputFormat: 'yyyy-mm-dd',
-      },
-      {
-        code: 'uk-ua',
-        name: $localize`Ukrainian`,
-        englishName: 'Ukrainian',
-        dateInputFormat: 'dd.mm.yyyy',
-      },
-      {
-        code: 'zh-cn',
-        name: $localize`Chinese Simplified`,
-        englishName: 'Chinese Simplified',
-        dateInputFormat: 'yyyy-mm-dd',
-      },
-    ]
-
     // Sort languages by localized name at runtime
-    languages.sort((a, b) => {
+    return LANGUAGE_OPTIONS.sort((a, b) => {
       return a.name < b.name ? -1 : 1
     })
-
-    return languages
   }
 
   getDateLocaleOptions(): LanguageOption[] {
-    let isoOption: LanguageOption = {
-      code: 'iso-8601',
-      name: $localize`ISO 8601`,
-      dateInputFormat: 'yyyy-mm-dd',
-    }
-    return [isoOption].concat(this.getLanguageOptions())
+    return [ISO_LANGUAGE_OPTION].concat(this.getLanguageOptions())
   }
 
   private getLanguageCookieName() {
@@ -545,16 +628,14 @@ export class SettingsService {
     }
   }
 
-  updateDashboardViewsSort(
-    dashboardViews: PaperlessSavedView[]
-  ): Observable<any> {
+  updateDashboardViewsSort(dashboardViews: SavedView[]): Observable<any> {
     this.set(SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER, [
       ...new Set(dashboardViews.map((v) => v.id)),
     ])
     return this.storeSettings()
   }
 
-  updateSidebarViewsSort(sidebarViews: PaperlessSavedView[]): Observable<any> {
+  updateSidebarViewsSort(sidebarViews: SavedView[]): Observable<any> {
     this.set(SETTINGS_KEYS.SIDEBAR_VIEWS_SORT_ORDER, [
       ...new Set(sidebarViews.map((v) => v.id)),
     ])

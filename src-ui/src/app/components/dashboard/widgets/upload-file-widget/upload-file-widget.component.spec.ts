@@ -26,6 +26,25 @@ import { UploadDocumentsService } from 'src/app/services/upload-documents.servic
 import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
 import { UploadFileWidgetComponent } from './upload-file-widget.component'
 import { DragDropModule } from '@angular/cdk/drag-drop'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+
+const FAILED_STATUSES = [new FileStatus()]
+const WORKING_STATUSES = [new FileStatus(), new FileStatus()]
+const STARTED_STATUSES = [new FileStatus(), new FileStatus(), new FileStatus()]
+const SUCCESS_STATUSES = [
+  new FileStatus(),
+  new FileStatus(),
+  new FileStatus(),
+  new FileStatus(),
+]
+const DEFAULT_STATUSES = [
+  new FileStatus(),
+  new FileStatus(),
+  new FileStatus(),
+  new FileStatus(),
+  new FileStatus(),
+  new FileStatus(),
+]
 
 describe('UploadFileWidgetComponent', () => {
   let component: UploadFileWidgetComponent
@@ -55,6 +74,7 @@ describe('UploadFileWidgetComponent', () => {
         RouterTestingModule.withRoutes(routes),
         NgbAlertModule,
         DragDropModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 
@@ -99,6 +119,8 @@ describe('UploadFileWidgetComponent', () => {
     const processingStatus = new FileStatus()
     processingStatus.phase = FileStatusPhase.WORKING
     expect(component.getStatusColor(processingStatus)).toEqual('primary')
+    processingStatus.phase = FileStatusPhase.UPLOADING
+    expect(component.getStatusColor(processingStatus)).toEqual('primary')
     const failedStatus = new FileStatus()
     failedStatus.phase = FileStatusPhase.FAILED
     expect(component.getStatusColor(failedStatus)).toEqual('danger')
@@ -127,14 +149,18 @@ describe('UploadFileWidgetComponent', () => {
     expect(dismissSpy).toHaveBeenCalled()
   })
 
-  it('should allow dismissing all alerts', fakeAsync(() => {
+  it('should allow dismissing completed alerts', fakeAsync(() => {
     mockConsumerStatuses(consumerStatusService)
+    component.alertsExpanded = true
     fixture.detectChanges()
+    jest
+      .spyOn(component, 'getStatusCompleted')
+      .mockImplementation(() => SUCCESS_STATUSES)
     const dismissSpy = jest.spyOn(consumerStatusService, 'dismiss')
     component.dismissCompleted()
     tick(1000)
     fixture.detectChanges()
-    expect(dismissSpy).toHaveBeenCalledTimes(6)
+    expect(dismissSpy).toHaveBeenCalledTimes(4)
   }))
 })
 
@@ -150,41 +176,22 @@ function mockConsumerStatuses(consumerStatusService) {
     .mockImplementation((phase) => {
       switch (phase) {
         case FileStatusPhase.FAILED:
-          return [new FileStatus()]
+          return FAILED_STATUSES
         case FileStatusPhase.WORKING:
-          return [new FileStatus(), new FileStatus()]
+          return WORKING_STATUSES
         case FileStatusPhase.STARTED:
-          return [new FileStatus(), new FileStatus(), new FileStatus()]
+          return STARTED_STATUSES
         case FileStatusPhase.SUCCESS:
-          return [
-            new FileStatus(),
-            new FileStatus(),
-            new FileStatus(),
-            new FileStatus(),
-          ]
+          return SUCCESS_STATUSES
         case FileStatusPhase.UPLOADING:
           return [partialUpload1, partialUpload2]
         default:
-          return [
-            new FileStatus(),
-            new FileStatus(),
-            new FileStatus(),
-            new FileStatus(),
-            new FileStatus(),
-            new FileStatus(),
-          ]
+          return DEFAULT_STATUSES
       }
     })
   jest
     .spyOn(consumerStatusService, 'getConsumerStatusNotCompleted')
     .mockImplementation(() => {
-      return [
-        new FileStatus(),
-        new FileStatus(),
-        new FileStatus(),
-        new FileStatus(),
-        new FileStatus(),
-        new FileStatus(),
-      ]
+      return DEFAULT_STATUSES
     })
 }

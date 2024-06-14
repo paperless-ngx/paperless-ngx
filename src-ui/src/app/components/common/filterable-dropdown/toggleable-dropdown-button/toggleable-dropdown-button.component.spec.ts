@@ -4,7 +4,7 @@ import {
   ToggleableItemState,
 } from './toggleable-dropdown-button.component'
 import { TagComponent } from '../../tag/tag.component'
-import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { Tag } from 'src/app/data/tag'
 
 describe('ToggleableDropdownButtonComponent', () => {
   let component: ToggleableDropdownButtonComponent
@@ -26,7 +26,7 @@ describe('ToggleableDropdownButtonComponent', () => {
       id: 1,
       name: 'Test Tag',
       is_inbox_tag: false,
-    } as PaperlessTag
+    } as Tag
 
     fixture.detectChanges()
     expect(component.isTag).toBeTruthy()

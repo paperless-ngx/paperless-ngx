@@ -3,7 +3,6 @@ import re
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Final
 from typing import Optional
 
 from django.conf import settings
@@ -14,9 +13,14 @@ from pikepdf import Pdf
 from PIL import Image
 
 from documents.converters import convert_from_tiff_to_pdf
-from documents.data_models import DocumentSource
+from documents.data_models import ConsumableDocument
+from documents.models import Tag
+from documents.plugins.base import ConsumeTaskPlugin
+from documents.plugins.base import StopConsumeTaskError
+from documents.plugins.helpers import ProgressStatusOptions
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
+from documents.utils import maybe_override_pixel_limit
 
 logger = logging.getLogger("paperless.barcodes")
 
@@ -24,7 +28,7 @@ logger = logging.getLogger("paperless.barcodes")
 @dataclass(frozen=True)
 class Barcode:
     """
-    Holds the information about a single barcode and its location
+    Holds the information about a single barcode and its location in a document
     """
 
     page: int
@@ -47,73 +51,131 @@ class Barcode:
         return self.value.startswith(settings.CONSUMER_ASN_BARCODE_PREFIX)
 
 
-class BarcodeReader:
-    def __init__(self, filepath: Path, mime_type: str) -> None:
-        self.file: Final[Path] = filepath
-        self.mime: Final[str] = mime_type
-        self.pdf_file: Path = self.file
-        self.barcodes: list[Barcode] = []
-        self.temp_dir: Optional[tempfile.TemporaryDirectory] = None
+class BarcodePlugin(ConsumeTaskPlugin):
+    NAME: str = "BarcodePlugin"
 
+    @property
+    def able_to_run(self) -> bool:
+        """
+        Able to run if:
+          - ASN from barcode detection is enabled or
+          - Barcode support is enabled and the mime type is supported
+        """
         if settings.CONSUMER_BARCODE_TIFF_SUPPORT:
-            self.SUPPORTED_FILE_MIMES = {"application/pdf", "image/tiff"}
+            supported_mimes = {"application/pdf", "image/tiff"}
         else:
-            self.SUPPORTED_FILE_MIMES = {"application/pdf"}
+            supported_mimes = {"application/pdf"}
 
-    def __enter__(self):
-        if self.supported_mime_type:
-            self.temp_dir = tempfile.TemporaryDirectory(prefix="paperless-barcodes")
-        return self
+        return (
+            settings.CONSUMER_ENABLE_ASN_BARCODE
+            or settings.CONSUMER_ENABLE_BARCODES
+            or settings.CONSUMER_ENABLE_TAG_BARCODE
+        ) and self.input_doc.mime_type in supported_mimes
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.temp_dir is not None:
-            self.temp_dir.cleanup()
-            self.temp_dir = None
+    def setup(self):
+        self.temp_dir = tempfile.TemporaryDirectory(
+            dir=self.base_tmp_dir,
+            prefix="barcode",
+        )
+        self.pdf_file = self.input_doc.original_file
+        self._tiff_conversion_done = False
+        self.barcodes: list[Barcode] = []
 
-    @property
-    def supported_mime_type(self) -> bool:
-        """
-        Return True if the given mime type is supported for barcodes, false otherwise
-        """
-        return self.mime in self.SUPPORTED_FILE_MIMES
+    def run(self) -> Optional[str]:
+        # Some operations may use PIL, override pixel setting if needed
+        maybe_override_pixel_limit()
 
-    @property
-    def asn(self) -> Optional[int]:
-        """
-        Search the parsed barcodes for any ASNs.
-        The first barcode that starts with CONSUMER_ASN_BARCODE_PREFIX
-        is considered the ASN to be used.
-        Returns the detected ASN (or None)
-        """
-        asn = None
+        # Maybe do the conversion of TIFF to PDF
+        self.convert_from_tiff_to_pdf()
 
-        # Ensure the barcodes have been read
+        # Locate any barcodes in the files
         self.detect()
 
-        # get the first barcode that starts with CONSUMER_ASN_BARCODE_PREFIX
-        asn_text = next(
-            (x.value for x in self.barcodes if x.is_asn),
-            None,
+        # try reading tags from barcodes
+        if (
+            settings.CONSUMER_ENABLE_TAG_BARCODE
+            and (tags := self.tags) is not None
+            and len(tags) > 0
+        ):
+            if self.metadata.tag_ids:
+                self.metadata.tag_ids += tags
+            else:
+                self.metadata.tag_ids = tags
+            logger.info(f"Found tags in barcode: {tags}")
+
+        # Lastly attempt to split documents
+        if settings.CONSUMER_ENABLE_BARCODES and (
+            separator_pages := self.get_separation_pages()
+        ):
+            # We have pages to split against
+
+            # Note this does NOT use the base_temp_dir, as that will be removed
+            tmp_dir = Path(
+                tempfile.mkdtemp(
+                    dir=settings.SCRATCH_DIR,
+                    prefix="paperless-barcode-split-",
+                ),
+            ).resolve()
+
+            from documents import tasks
+
+            # Create the split document tasks
+            for new_document in self.separate_pages(separator_pages):
+                copy_file_with_basic_stats(new_document, tmp_dir / new_document.name)
+
+                task = tasks.consume_file.delay(
+                    ConsumableDocument(
+                        # Same source, for templates
+                        source=self.input_doc.source,
+                        mailrule_id=self.input_doc.mailrule_id,
+                        # Can't use same folder or the consume might grab it again
+                        original_file=(tmp_dir / new_document.name).resolve(),
+                    ),
+                    # All the same metadata
+                    self.metadata,
+                )
+                logger.info(f"Created new task {task.id} for {new_document.name}")
+
+            # This file is now two or more files
+            self.input_doc.original_file.unlink()
+
+            msg = "Barcode splitting complete!"
+
+            # Update the progress to complete
+            self.status_mgr.send_progress(ProgressStatusOptions.SUCCESS, msg, 100, 100)
+
+            # Request the consume task stops
+            raise StopConsumeTaskError(msg)
+
+        # Update/overwrite an ASN if possible
+        # After splitting, as otherwise each split document gets the same ASN
+        if (
+            settings.CONSUMER_ENABLE_ASN_BARCODE
+            and (located_asn := self.asn) is not None
+        ):
+            logger.info(f"Found ASN in barcode: {located_asn}")
+            self.metadata.asn = located_asn
+
+    def cleanup(self) -> None:
+        self.temp_dir.cleanup()
+
+    def convert_from_tiff_to_pdf(self):
+        """
+        May convert a TIFF image into a PDF, if the input is a TIFF and
+        the TIFF has not been made into a PDF
+        """
+        # Nothing to do, pdf_file is already assigned correctly
+        if self.input_doc.mime_type != "image/tiff" or self._tiff_conversion_done:
+            return
+
+        self.pdf_file = convert_from_tiff_to_pdf(
+            self.input_doc.original_file,
+            Path(self.temp_dir.name),
         )
-
-        if asn_text:
-            logger.debug(f"Found ASN Barcode: {asn_text}")
-            # remove the prefix and remove whitespace
-            asn_text = asn_text[len(settings.CONSUMER_ASN_BARCODE_PREFIX) :].strip()
-
-            # remove non-numeric parts of the remaining string
-            asn_text = re.sub("[^0-9]", "", asn_text)
-
-            # now, try parsing the ASN number
-            try:
-                asn = int(asn_text)
-            except ValueError as e:
-                logger.warning(f"Failed to parse ASN number because: {e}")
-
-        return asn
+        self._tiff_conversion_done = True
 
     @staticmethod
-    def read_barcodes_zxing(image: Image) -> list[str]:
+    def read_barcodes_zxing(image: Image.Image) -> list[str]:
         barcodes = []
 
         import zxingcpp
@@ -129,7 +191,7 @@ class BarcodeReader:
         return barcodes
 
     @staticmethod
-    def read_barcodes_pyzbar(image: Image) -> list[str]:
+    def read_barcodes_pyzbar(image: Image.Image) -> list[str]:
         barcodes = []
 
         from pyzbar import pyzbar
@@ -148,16 +210,6 @@ class BarcodeReader:
 
         return barcodes
 
-    def convert_from_tiff_to_pdf(self):
-        """
-        May convert a TIFF image into a PDF, if the input is a TIFF
-        """
-        # Nothing to do, pdf_file is already assigned correctly
-        if self.mime != "image/tiff":
-            return
-
-        self.pdf_file = convert_from_tiff_to_pdf(self.file, Path(self.temp_dir.name))
-
     def detect(self) -> None:
         """
         Scan all pages of the PDF as images, updating barcodes and the pages
@@ -166,6 +218,9 @@ class BarcodeReader:
         # Bail if barcodes already exist
         if self.barcodes:
             return
+
+        # No op if not a TIFF
+        self.convert_from_tiff_to_pdf()
 
         # Choose the library for reading
         if settings.CONSUMER_BARCODE_SCANNER == "PYZBAR":
@@ -211,6 +266,88 @@ class BarcodeReader:
                 f"Exception during barcode scanning: {e}",
             )
 
+    @property
+    def asn(self) -> Optional[int]:
+        """
+        Search the parsed barcodes for any ASNs.
+        The first barcode that starts with CONSUMER_ASN_BARCODE_PREFIX
+        is considered the ASN to be used.
+        Returns the detected ASN (or None)
+        """
+        asn = None
+
+        # Ensure the barcodes have been read
+        self.detect()
+
+        # get the first barcode that starts with CONSUMER_ASN_BARCODE_PREFIX
+        asn_text = next(
+            (x.value for x in self.barcodes if x.is_asn),
+            None,
+        )
+
+        if asn_text:
+            logger.debug(f"Found ASN Barcode: {asn_text}")
+            # remove the prefix and remove whitespace
+            asn_text = asn_text[len(settings.CONSUMER_ASN_BARCODE_PREFIX) :].strip()
+
+            # remove non-numeric parts of the remaining string
+            asn_text = re.sub(r"\D", "", asn_text)
+
+            # now, try parsing the ASN number
+            try:
+                asn = int(asn_text)
+            except ValueError as e:
+                logger.warning(f"Failed to parse ASN number because: {e}")
+
+        return asn
+
+    @property
+    def tags(self) -> Optional[list[int]]:
+        """
+        Search the parsed barcodes for any tags.
+        Returns the detected tag ids (or empty list)
+        """
+        tags = []
+
+        # Ensure the barcodes have been read
+        self.detect()
+
+        for x in self.barcodes:
+            tag_texts = x.value
+
+            for raw in tag_texts.split(","):
+                try:
+                    tag = None
+                    for regex in settings.CONSUMER_TAG_BARCODE_MAPPING:
+                        if re.match(regex, raw, flags=re.IGNORECASE):
+                            sub = settings.CONSUMER_TAG_BARCODE_MAPPING[regex]
+                            tag = (
+                                re.sub(regex, sub, raw, flags=re.IGNORECASE)
+                                if sub
+                                else raw
+                            )
+                            break
+
+                    if tag:
+                        tag, _ = Tag.objects.get_or_create(
+                            name__iexact=tag,
+                            defaults={"name": tag},
+                        )
+
+                        logger.debug(
+                            f"Found Tag Barcode '{raw}', substituted "
+                            f"to '{tag}' and mapped to "
+                            f"tag #{tag.pk}.",
+                        )
+                        tags.append(tag.pk)
+
+                except Exception as e:
+                    logger.error(
+                        f"Failed to find or create TAG '{raw}' because: {e}",
+                    )
+
+        return tags
+
     def get_separation_pages(self) -> dict[int, bool]:
         """
         Search the parsed barcodes for separators and returns a dict of page
@@ -240,7 +377,7 @@ class BarcodeReader:
         """
 
         document_paths = []
-        fname = self.file.with_suffix("").name
+        fname = self.input_doc.original_file.stem
         with Pdf.open(self.pdf_file) as input_pdf:
             # Start with an empty document
             current_document: list[Page] = []
@@ -281,62 +418,8 @@ class BarcodeReader:
                 with open(savepath, "wb") as out:
                     dst.save(out)
 
-                copy_basic_file_stats(self.file, savepath)
+                copy_basic_file_stats(self.input_doc.original_file, savepath)
 
                 document_paths.append(savepath)
 
             return document_paths
-
-    def separate(
-        self,
-        source: DocumentSource,
-        override_name: Optional[str] = None,
-    ) -> bool:
-        """
-        Separates the document, based on barcodes and configuration, creating new
-        documents as required in the appropriate location.
-
-        Returns True if a split happened, False otherwise
-        """
-        # Do nothing
-        if not self.supported_mime_type:
-            logger.warning(f"Unsupported file format for barcode reader: {self.mime}")
-            return False
-
-        # Does nothing unless needed
-        self.convert_from_tiff_to_pdf()
-
-        # Actually read the codes, if any
-        self.detect()
-
-        separator_pages = self.get_separation_pages()
-
-        # Also do nothing
-        if not separator_pages:
-            logger.warning("No pages to split on!")
-            return False
-
-        # Create the split documents
-        doc_paths = self.separate_pages(separator_pages)
-
-        # Save the new documents to correct folder
-        if source != DocumentSource.ConsumeFolder:
-            # The given file is somewhere in SCRATCH_DIR,
-            # and new documents must be moved to the CONSUMPTION_DIR
-            # for the consumer to notice them
-            save_to_dir = settings.CONSUMPTION_DIR
-        else:
-            # The given file is somewhere in CONSUMPTION_DIR,
-            # and may be some levels down for recursive tagging
-            # so use the file's parent to preserve any metadata
-            save_to_dir = self.file.parent
-
-        for idx, document_path in enumerate(doc_paths):
-            if override_name is not None:
-                newname = f"{idx}_{override_name}"
-                dest = save_to_dir / newname
-            else:
-                dest = save_to_dir
-            logger.info(f"Saving {document_path} to {dest}")
-            copy_file_with_basic_stats(document_path, dest)
-        return True

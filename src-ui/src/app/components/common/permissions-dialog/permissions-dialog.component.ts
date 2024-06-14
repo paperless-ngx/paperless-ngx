@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
-import { PaperlessUser } from 'src/app/data/paperless-user'
+import { User } from 'src/app/data/user'
 import { UserService } from 'src/app/services/rest/user.service'
 
 @Component({
@@ -11,7 +11,7 @@ import { UserService } from 'src/app/services/rest/user.service'
   styleUrls: ['./permissions-dialog.component.scss'],
 })
 export class PermissionsDialogComponent {
-  users: PaperlessUser[]
+  users: User[]
   private o: ObjectWithPermissions = undefined
 
   constructor(
@@ -32,6 +32,7 @@ export class PermissionsDialogComponent {
     this.o = o
     this.title = $localize`Edit permissions for ` + o['name']
     this.form.patchValue({
+      merge: true,
       permissions_form: {
         owner: o.owner,
         set_permissions: o.permissions,
@@ -43,8 +44,9 @@ export class PermissionsDialogComponent {
     return this.o
   }
 
-  form = new FormGroup({
+  public form = new FormGroup({
     permissions_form: new FormControl(),
+    merge: new FormControl(true),
   })
 
   buttonsEnabled: boolean = true
@@ -52,16 +54,35 @@ export class PermissionsDialogComponent {
   get permissions() {
     return {
       owner: this.form.get('permissions_form').value?.owner ?? null,
-      set_permissions:
-        this.form.get('permissions_form').value?.set_permissions ?? null,
+      set_permissions: this.form.get('permissions_form').value
+        ?.set_permissions ?? {
+        view: {
+          users: [],
+          groups: [],
+        },
+        change: {
+          users: [],
+          groups: [],
+        },
+      },
     }
   }
 
-  @Input()
-  message =
-    $localize`Note that permissions set here will override any existing permissions`
+  get hint(): string {
+    if (this.object) return null
+    return this.form.get('merge').value
+      ? $localize`Existing owner, user and group permissions will be merged with these settings.`
+      : $localize`Any and all existing owner, user and group permissions will be replaced.`
+  }
 
   cancelClicked() {
     this.activeModal.close()
+  }
+
+  confirm() {
+    this.confirmClicked.emit({
+      permissions: this.permissions,
+      merge: this.form.get('merge').value,
+    })
   }
 }

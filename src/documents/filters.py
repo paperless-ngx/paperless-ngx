@@ -1,10 +1,18 @@
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import CharField
+from django.db.models import Count
+from django.db.models import OuterRef
 from django.db.models import Q
+from django.db.models.functions import Cast
 from django_filters.rest_framework import BooleanFilter
 from django_filters.rest_framework import Filter
 from django_filters.rest_framework import FilterSet
+from guardian.utils import get_group_obj_perms_model
+from guardian.utils import get_user_obj_perms_model
 from rest_framework_guardian.filters import ObjectPermissionsFilter
 
 from documents.models import Correspondent
+from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Log
@@ -101,6 +109,50 @@ class TitleContentFilter(Filter):
             return qs
 
 
+class SharedByUser(Filter):
+    def filter(self, qs, value):
+        ctype = ContentType.objects.get_for_model(self.model)
+        UserObjectPermission = get_user_obj_perms_model()
+        GroupObjectPermission = get_group_obj_perms_model()
+        # see https://github.com/paperless-ngx/paperless-ngx/issues/5392, we limit subqueries
+        # to 1 because Postgres doesn't like returning > 1 row, but all we care about is > 0
+        return (
+            qs.filter(
+                owner_id=value,
+            )
+            .annotate(
+                num_shared_users=Count(
+                    UserObjectPermission.objects.filter(
+                        content_type=ctype,
+                        object_pk=Cast(OuterRef("pk"), CharField()),
+                    ).values("user_id")[:1],
+                ),
+            )
+            .annotate(
+                num_shared_groups=Count(
+                    GroupObjectPermission.objects.filter(
+                        content_type=ctype,
+                        object_pk=Cast(OuterRef("pk"), CharField()),
+                    ).values("group_id")[:1],
+                ),
+            )
+            .filter(
+                Q(num_shared_users__gt=0) | Q(num_shared_groups__gt=0),
+            )
+            if value is not None
+            else qs
+        )
+
+
+class CustomFieldFilterSet(FilterSet):
+    class Meta:
+        model = CustomField
+        fields = {
+            "id": ID_KWARGS,
+            "name": CHAR_KWARGS,
+        }
+
+
 class CustomFieldsFilter(Filter):
     def filter(self, qs, value):
         if value:
@@ -109,8 +161,11 @@ class CustomFieldsFilter(Filter):
                 | qs.filter(custom_fields__value_text__icontains=value)
                 | qs.filter(custom_fields__value_bool__icontains=value)
                 | qs.filter(custom_fields__value_int__icontains=value)
+                | qs.filter(custom_fields__value_float__icontains=value)
                 | qs.filter(custom_fields__value_date__icontains=value)
                 | qs.filter(custom_fields__value_url__icontains=value)
+                | qs.filter(custom_fields__value_monetary__icontains=value)
+                | qs.filter(custom_fields__value_document_ids__icontains=value)
             )
         else:
             return qs
@@ -143,6 +198,27 @@ class DocumentFilterSet(FilterSet):
     owner__id__none = ObjectFilter(field_name="owner", exclude=True)
 
     custom_fields__icontains = CustomFieldsFilter()
+
+    custom_fields__id__all = ObjectFilter(field_name="custom_fields__field")
+
+    custom_fields__id__none = ObjectFilter(
+        field_name="custom_fields__field",
+        exclude=True,
+    )
+
+    custom_fields__id__in = ObjectFilter(
+        field_name="custom_fields__field",
+        in_list=True,
+    )
+
+    has_custom_fields = BooleanFilter(
+        label="Has custom field",
+        field_name="custom_fields",
+        lookup_expr="isnull",
+        exclude=True,
+    )
+
+    shared_by__id = SharedByUser()
 
     class Meta:
         model = Document

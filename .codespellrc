@@ -1,0 +1,3 @@
+[codespell]
+write-changes = True
+ignore-words-list = criterias,afterall,valeu,ureue,equest,ure,assertIn

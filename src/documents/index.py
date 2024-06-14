@@ -3,10 +3,14 @@ import math
 import os
 from collections import Counter
 from contextlib import contextmanager
+from datetime import datetime
+from datetime import timezone
+from shutil import rmtree
+from typing import Optional
 
 from dateutil.parser import isoparse
 from django.conf import settings
-from django.utils import timezone
+from django.utils import timezone as django_timezone
 from guardian.shortcuts import get_users_with_perms
 from whoosh import classify
 from whoosh import highlight
@@ -25,12 +29,14 @@ from whoosh.index import open_dir
 from whoosh.qparser import MultifieldParser
 from whoosh.qparser import QueryParser
 from whoosh.qparser.dateparse import DateParserPlugin
+from whoosh.qparser.dateparse import English
+from whoosh.qparser.plugins import FieldsPlugin
 from whoosh.scoring import TF_IDF
 from whoosh.searching import ResultsPage
 from whoosh.searching import Searcher
+from whoosh.util.times import timespan
 from whoosh.writing import AsyncWriter
 
-# from documents.models import CustomMetadata
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import Note
@@ -64,12 +70,15 @@ def get_schema():
         num_notes=NUMERIC(sortable=True, signed=False),
         custom_fields=TEXT(),
         custom_field_count=NUMERIC(sortable=True, signed=False),
+        has_custom_fields=BOOLEAN(),
+        custom_fields_id=KEYWORD(commas=True),
         owner=TEXT(),
         owner_id=NUMERIC(),
         has_owner=BOOLEAN(),
         viewer_id=KEYWORD(commas=True),
         checksum=TEXT(),
         original_filename=TEXT(sortable=True),
+        is_shared=BOOLEAN(),
     )
 
 
@@ -80,8 +89,11 @@ def open_index(recreate=False) -> FileIndex:
     except Exception:
         logger.exception("Error while opening the index, recreating.")
 
-    if not os.path.isdir(settings.INDEX_DIR):
-        os.makedirs(settings.INDEX_DIR, exist_ok=True)
+    # create_in doesn't handle corrupted indexes very well, remove the directory entirely first
+    if os.path.isdir(settings.INDEX_DIR):
+        rmtree(settings.INDEX_DIR)
+    settings.INDEX_DIR.mkdir(parents=True, exist_ok=True)
+
     return create_in(settings.INDEX_DIR, get_schema())
 
 
@@ -114,6 +126,9 @@ def update_document(writer: AsyncWriter, doc: Document):
     notes = ",".join([str(c.note) for c in Note.objects.filter(document=doc)])
     custom_fields = ",".join(
         [str(c) for c in CustomFieldInstance.objects.filter(document=doc)],
+    )
+    custom_fields_ids = ",".join(
+        [str(f.field.id) for f in CustomFieldInstance.objects.filter(document=doc)],
     )
     asn = doc.archive_serial_number
     if asn is not None and (
@@ -156,12 +171,15 @@ def update_document(writer: AsyncWriter, doc: Document):
         num_notes=len(notes),
         custom_fields=custom_fields,
         custom_field_count=len(doc.custom_fields.all()),
+        has_custom_fields=len(custom_fields) > 0,
+        custom_fields_id=custom_fields_ids if custom_fields_ids else None,
         owner=doc.owner.username if doc.owner else None,
         owner_id=doc.owner.id if doc.owner else None,
         has_owner=doc.owner is not None,
         viewer_id=viewer_ids if viewer_ids else None,
         checksum=doc.checksum,
         original_filename=doc.original_filename,
+        is_shared=len(viewer_ids) > 0,
     )
 
 
@@ -189,12 +207,16 @@ class DelayedQuery:
         "document_type": ("type", ["id", "id__in", "id__none", "isnull"]),
         "storage_path": ("path", ["id", "id__in", "id__none", "isnull"]),
         "owner": ("owner", ["id", "id__in", "id__none", "isnull"]),
+        "shared_by": ("shared_by", ["id"]),
         "tags": ("tag", ["id__all", "id__in", "id__none"]),
         "added": ("added", ["date__lt", "date__gt"]),
         "created": ("created", ["date__lt", "date__gt"]),
         "checksum": ("checksum", ["icontains", "istartswith"]),
         "original_filename": ("original_filename", ["icontains", "istartswith"]),
-        "custom_fields": ("custom_fields", ["icontains", "istartswith"]),
+        "custom_fields": (
+            "custom_fields",
+            ["icontains", "istartswith", "id__all", "id__in", "id__none"],
+        ),
     }
 
     def _get_query(self):
@@ -206,6 +228,12 @@ class DelayedQuery:
             # is_tagged is a special case
             if key == "is_tagged":
                 criterias.append(query.Term("has_tag", self.evalBoolean(value)))
+                continue
+
+            if key == "has_custom_fields":
+                criterias.append(
+                    query.Term("has_custom_fields", self.evalBoolean(value)),
+                )
                 continue
 
             # Don't process query params without a filter
@@ -228,7 +256,11 @@ class DelayedQuery:
                 continue
 
             if query_filter == "id":
-                criterias.append(query.Term(f"{field}_id", value))
+                if param == "shared_by":
+                    criterias.append(query.Term("is_shared", True))
+                    criterias.append(query.Term("owner_id", value))
+                else:
+                    criterias.append(query.Term(f"{field}_id", value))
             elif query_filter == "id__in":
                 in_filter = []
                 for object_id in value.split(","):
@@ -356,6 +388,22 @@ class DelayedQuery:
         return page
 
 
+class LocalDateParser(English):
+    def reverse_timezone_offset(self, d):
+        return (d.replace(tzinfo=django_timezone.get_current_timezone())).astimezone(
+            timezone.utc,
+        )
+
+    def date_from(self, *args, **kwargs):
+        d = super().date_from(*args, **kwargs)
+        if isinstance(d, timespan):
+            d.start = self.reverse_timezone_offset(d.start)
+            d.end = self.reverse_timezone_offset(d.end)
+        elif isinstance(d, datetime):
+            d = self.reverse_timezone_offset(d)
+        return d
+
+
 class DelayedFullTextQuery(DelayedQuery):
     def _get_query(self):
         q_str = self.query_params["query"]
@@ -371,7 +419,12 @@ class DelayedFullTextQuery(DelayedQuery):
             ],
             self.searcher.ixreader.schema,
         )
-        qp.add_plugin(DateParserPlugin(basedate=timezone.now()))
+        qp.add_plugin(
+            DateParserPlugin(
+                basedate=django_timezone.now(),
+                dateparser=LocalDateParser(),
+            ),
+        )
         q = qp.parse(q_str)
 
         corrected = self.searcher.correct_query(q, q_str)
@@ -402,7 +455,12 @@ class DelayedMoreLikeThisQuery(DelayedQuery):
         return q, mask
 
 
-def autocomplete(ix: FileIndex, term: str, limit: int = 10, user: User = None):
+def autocomplete(
+    ix: FileIndex,
+    term: str,
+    limit: int = 10,
+    user: Optional[User] = None,
+):
     """
     Mimics whoosh.reading.IndexReader.most_distinctive_terms with permissions
     and without scoring
@@ -411,6 +469,9 @@ def autocomplete(ix: FileIndex, term: str, limit: int = 10, user: User = None):
 
     with ix.searcher(weighting=TF_IDF()) as s:
         qp = QueryParser("content", schema=ix.schema)
+        # Don't let searches with a query that happen to match a field override the
+        # content field query instead and return bogus, not text data
+        qp.remove_plugin_class(FieldsPlugin)
         q = qp.parse(f"{term.lower()}*")
         user_criterias = get_permissions_criterias(user)
 
@@ -423,14 +484,18 @@ def autocomplete(ix: FileIndex, term: str, limit: int = 10, user: User = None):
         termCounts = Counter()
         if results.has_matched_terms():
             for hit in results:
-                for _, term in hit.matched_terms():
-                    termCounts[term] += 1
+                for _, match in hit.matched_terms():
+                    termCounts[match] += 1
             terms = [t for t, _ in termCounts.most_common(limit)]
+
+        term_encoded = term.encode("UTF-8")
+        if term_encoded in terms:
+            terms.insert(0, terms.pop(terms.index(term_encoded)))
 
     return terms
 
 
-def get_permissions_criterias(user: User = None):
+def get_permissions_criterias(user: Optional[User] = None):
     user_criterias = [query.Term("has_owner", False)]
     if user is not None:
         if user.is_superuser:  # superusers see all docs

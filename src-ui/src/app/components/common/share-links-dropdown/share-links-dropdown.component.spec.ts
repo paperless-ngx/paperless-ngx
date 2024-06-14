@@ -10,15 +10,14 @@ import {
 } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { of, throwError } from 'rxjs'
-import {
-  PaperlessFileVersion,
-  PaperlessShareLink,
-} from 'src/app/data/paperless-share-link'
+import { FileVersion, ShareLink } from 'src/app/data/share-link'
 import { ShareLinkService } from 'src/app/services/rest/share-link.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ShareLinksDropdownComponent } from './share-links-dropdown.component'
 import { Clipboard } from '@angular/cdk/clipboard'
+import { By } from '@angular/platform-browser'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 describe('ShareLinksDropdownComponent', () => {
   let component: ShareLinksDropdownComponent
@@ -31,7 +30,12 @@ describe('ShareLinksDropdownComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [ShareLinksDropdownComponent],
-      imports: [HttpClientTestingModule, FormsModule, ReactiveFormsModule],
+      imports: [
+        HttpClientTestingModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+      ],
     })
 
     fixture = TestBed.createComponent(ShareLinksDropdownComponent)
@@ -59,7 +63,7 @@ describe('ShareLinksDropdownComponent', () => {
           slug: '1234slug',
           created: now.toISOString(),
           document: 99,
-          file_version: PaperlessFileVersion.Archive,
+          file_version: FileVersion.Archive,
           expiration: expiration7days.toISOString(),
         },
         {
@@ -67,7 +71,7 @@ describe('ShareLinksDropdownComponent', () => {
           slug: '1234slug',
           created: now.toISOString(),
           document: 99,
-          file_version: PaperlessFileVersion.Original,
+          file_version: FileVersion.Original,
           expiration: null,
         },
       ])
@@ -88,7 +92,7 @@ describe('ShareLinksDropdownComponent', () => {
       .mockReturnValueOnce(throwError(() => new Error('Unable to get links')))
     component.documentId = 99
 
-    component.refresh()
+    component.ngOnInit()
     fixture.detectChanges()
     expect(toastSpy).toHaveBeenCalled()
   })
@@ -97,12 +101,13 @@ describe('ShareLinksDropdownComponent', () => {
     const createSpy = jest.spyOn(shareLinkService, 'createLinkForDocument')
     component.documentId = 99
     component.expirationDays = 7
-    component.archiveVersion = false
+    component.useArchiveVersion = false
 
     const expiration = new Date()
     expiration.setDate(expiration.getDate() + 7)
 
     const copySpy = jest.spyOn(clipboard, 'copy')
+    copySpy.mockReturnValue(true)
     const refreshSpy = jest.spyOn(component, 'refresh')
 
     component.createLink()
@@ -117,8 +122,10 @@ describe('ShareLinksDropdownComponent', () => {
     fixture.detectChanges()
     tick(3000)
 
-    expect(copySpy).toHaveBeenCalled()
     expect(refreshSpy).toHaveBeenCalled()
+    expect(copySpy).toHaveBeenCalled()
+    expect(component.copied).toEqual(1)
+    tick(100) // copy timeout
   }))
 
   it('should show error on link creation if needed', () => {
@@ -148,7 +155,7 @@ describe('ShareLinksDropdownComponent', () => {
     deleteSpy.mockReturnValue(of(true))
     const refreshSpy = jest.spyOn(component, 'refresh')
 
-    component.delete({ id: 12 } as PaperlessShareLink)
+    component.delete({ id: 12 } as ShareLink)
     fixture.detectChanges()
     expect(deleteSpy).toHaveBeenCalledWith({ id: 12 })
     expect(refreshSpy).toHaveBeenCalled()
@@ -174,18 +181,18 @@ describe('ShareLinksDropdownComponent', () => {
     expect(
       component.getDaysRemaining({
         expiration: expiration7days.toISOString(),
-      } as PaperlessShareLink)
+      } as ShareLink)
     ).toEqual('7 days')
     expect(
       component.getDaysRemaining({
         expiration: expiration1day.toISOString(),
-      } as PaperlessShareLink)
+      } as ShareLink)
     ).toEqual('1 day')
   })
 
   // coverage
   it('should support share', () => {
-    const link = { slug: '12345slug' } as PaperlessShareLink
+    const link = { slug: '12345slug' } as ShareLink
     if (!('share' in navigator))
       Object.defineProperty(navigator, 'share', { value: (obj: any) => {} })
     // const navigatorSpy = jest.spyOn(navigator, 'share')
@@ -211,5 +218,17 @@ describe('ShareLinksDropdownComponent', () => {
     expect(component.getShareUrl({ slug: '123abc123' } as any)).toEqual(
       'http://example.domainwithapiinit.com:1234/subpath/share/123abc123'
     )
+  })
+
+  it('should disable archive switch & option if no archive available', () => {
+    component.hasArchiveVersion = false
+    component.ngOnInit()
+    fixture.detectChanges()
+    expect(component.useArchiveVersion).toBeFalsy()
+    expect(
+      fixture.debugElement.query(By.css("input[type='checkbox']")).attributes[
+        'ng-reflect-is-disabled'
+      ]
+    ).toBeTruthy()
   })
 })

@@ -7,6 +7,7 @@ import {
 import { ColorComponent } from './color.component'
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
 import { ColorSliderModule } from 'ngx-color/slider'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 describe('ColorComponent', () => {
   let component: ColorComponent
@@ -22,6 +23,7 @@ describe('ColorComponent', () => {
         ReactiveFormsModule,
         NgbPopoverModule,
         ColorSliderModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
     }).compileComponents()
 
