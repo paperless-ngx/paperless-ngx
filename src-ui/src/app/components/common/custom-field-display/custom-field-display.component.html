@@ -24,6 +24,12 @@
                     }
                 </div>
             }
+            @case (CustomFieldDataType.Boolean) {
+                <div class="d-flex flex-row align-items-center">
+                    <span>{{field.name}}:</span>
+                    <input type="checkbox" id="{{field.name}}" name="{{field.name}}" [checked]="value" value="" class="form-check-input ms-2 mt-0 pe-none">
+                </div>
+            }
             @default {
               <span [ngbTooltip]="nameTooltip">{{value}}</span>
             }
