@@ -1437,7 +1437,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">77</context>
+          <context context-type="linenumber">80</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.html</context>
@@ -2153,7 +2153,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">73</context>
+          <context context-type="linenumber">74</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
@@ -2179,7 +2179,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">78</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
@@ -2221,35 +2221,35 @@
         <source>This operation will permanently delete the selected documents.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">76</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6804051092296228130" datatype="html">
         <source>This operation will permanently delete all documents in the trash.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">77</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6996183233986182894" datatype="html">
         <source>Document(s) deleted</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">84</context>
+          <context context-type="linenumber">87</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7534569062269274401" datatype="html">
         <source>Document restored</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">93</context>
+          <context context-type="linenumber">97</context>
         </context-group>
       </trans-unit>
       <trans-unit id="960063472770266304" datatype="html">
         <source>Document(s) restored</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">106</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8119815638230251386" datatype="html">

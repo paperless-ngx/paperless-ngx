@@ -61,6 +61,7 @@ export class TrashComponent implements OnDestroy {
         modal.componentInstance.buttonsEnabled = false
         this.trashService.emptyTrash([document.id]).subscribe(() => {
           this.toastService.showInfo($localize`Document deleted`)
+          modal.close()
           this.reload()
         })
       })
@@ -85,6 +86,7 @@ export class TrashComponent implements OnDestroy {
           .subscribe(() => {
             this.toastService.showInfo($localize`Document(s) deleted`)
             this.allToggled = false
+            modal.close()
             this.reload()
           })
       })
