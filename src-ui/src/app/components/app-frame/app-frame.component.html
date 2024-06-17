@@ -15,7 +15,7 @@
 <!--    </svg>-->
 
 
-    <img style='height:32px' src='assets/Logo_White.svg'>
+    <img style='height:32px' src='assets/Logo_White.png'>
 
     <div class="ms-2 ms-md-3 d-inline-block" [class.d-md-none]="slimSidebarEnabled">
       @if (customAppTitle?.length) {
@@ -63,8 +63,8 @@
         <a ngbDropdownItem class="nav-link d-flex" href="accounts/logout/" (click)="onLogout()">
           <i-bs class="me-2" name="door-open"></i-bs><ng-container i18n>Logout</ng-container>
         </a>
-        <div class="dropdown-divider"></div>
-        <!-- <a ngbDropdownItem class="nav-link" target="_blank" rel="noopener noreferrer"
+        <!-- <div class="dropdown-divider"></div>
+        <a ngbDropdownItem class="nav-link" target="_blank" rel="noopener noreferrer"
           href="https://docs.paperless-ngx.com">
           <i-bs class="me-2" name="question-circle"></i-bs><ng-container i18n>Documentation</ng-container>
         </a> -->

@@ -1027,7 +1027,7 @@ msgstr "Đăng ký"
 
 #: documents/templates/index.html:61
 msgid "Paperless-ngx is loading..."
-msgstr "TC GROUP đang tải..."
+msgstr "NIAD đang tải..."
 
 #: documents/templates/index.html:62
 msgid "Still here?! Hmm, something might be wrong."
