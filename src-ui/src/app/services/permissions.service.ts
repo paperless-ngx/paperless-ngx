@@ -13,6 +13,7 @@ export enum PermissionType {
   Document = '%s_document',
   Tag = '%s_tag',
   Warehouse = '%s_warehouse',
+  KhoVatLy = '%s_khovatly',
   Correspondent = '%s_correspondent',
   DocumentType = '%s_documenttype',
   StoragePath = '%s_storagepath',
@@ -28,6 +29,7 @@ export enum PermissionType {
   ShareLink = '%s_sharelink',
   CustomField = '%s_customfield',
   Workflow = '%s_workflow',
+  Box = '%s_box',
 }
 
 @Injectable({

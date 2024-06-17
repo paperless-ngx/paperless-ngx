@@ -13,7 +13,8 @@ import { TagService } from './tag.service'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
 import { queryParamsFromFilterRules } from '../../utils/query-params'
 import { StoragePathService } from './storage-path.service'
-import { WarehouseService } from './warehouse.service'
+
+
 
 import {
   PermissionAction,
@@ -22,6 +23,7 @@ import {
 } from '../permissions.service'
 import { SettingsService } from '../settings.service'
 import { SETTINGS, SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { WarehouseService } from './warehouse.service'
 
 export const DOCUMENT_SORT_FIELDS = [
   { field: 'archive_serial_number', name: $localize`ASN` },
@@ -123,13 +125,13 @@ export class DocumentService extends AbstractPaperlessService<Document> {
       doc.storage_path$ = this.storagePathService.getCached(doc.storage_path)
     }
     if (
-      doc.warehouses &&
+      doc.warehouse &&
       this.permissionsService.currentUserCan(
         PermissionAction.View,
         PermissionType.Warehouse
       )
     ) {
-      doc.warehouses$ = this.warehouseService.getCached(doc.warehouses)
+      doc.warehouse$ = this.warehouseService.getCached(doc.warehouse)
     }
     return doc
   }

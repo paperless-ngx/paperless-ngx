@@ -238,6 +238,7 @@ def _parse_beat_schedule() -> dict:
 
 # NEVER RUN WITH DEBUG IN PRODUCTION.
 DEBUG = config("PAPERLESS_DEBUG", default=True, cast=bool)
+print(DEBUG)
 
 ###############################################################################
 # Directories                                                                 #

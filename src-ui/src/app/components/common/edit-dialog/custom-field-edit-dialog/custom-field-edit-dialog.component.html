@@ -9,10 +9,20 @@
   </div>
   <div class="modal-body">
     <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
-    <pngx-input-select i18n-title title="Data type" [items]="getDataTypes()" formControlName="data_type"></pngx-input-select>
-    @if (typeFieldDisabled) {
-      <small class="d-block mt-n2" i18n>Data type cannot be changed after a field is created</small>
+    <!-- <pngx-input-text i18n-title title="Type" formControlName="type" [error]="error?.type" autocomplete="off"></pngx-input-text> -->
+    <!-- <pngx-input-text i18n-title title="Parent Warehouse" formControlName="parent_warehouse" [error]="error?.parent_warehouse" autocomplete="off"></pngx-input-text>
+    <pngx-input-select i18n-title title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></pngx-input-select>
+    @if (patternRequired) {
+      <pngx-input-text i18n-title title="Matching pattern" formControlName="match" [error]="error?.match"></pngx-input-text>
+    } -->
+    @if (patternRequired) {
+      <pngx-input-check i18n-title title="Case insensitive" formControlName="is_insensitive"></pngx-input-check>
     }
+
+    <div *pngxIfOwner="object">
+      <pngx-permissions-form [users]="users" accordion="true" formControlName="permissions_form"></pngx-permissions-form>
+    </div>
+
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>

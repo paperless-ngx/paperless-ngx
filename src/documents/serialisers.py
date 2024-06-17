@@ -1756,22 +1756,12 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
 
 class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
-    document_count = serializers.SerializerMethodField()
-    def get_document_count(self,obj):
-        document = Document.objects.filter(warehouses=obj).count()
-        return document
+   
     
     class Meta:
         model = Warehouse
         fields = '__all__'
         
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        if instance.parent_warehouse: 
-            data['parent_warehouse'] = WarehouseSerializer(instance.parent_warehouse).data
-        else:
-            data['parent_warehouse'] = None
-        return data
-    
+   
     
     

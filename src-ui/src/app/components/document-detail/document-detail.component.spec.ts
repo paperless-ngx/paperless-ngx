@@ -54,7 +54,7 @@ import { CorrespondentService } from 'src/app/services/rest/correspondent.servic
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
-import { WarehouseService } from 'src/app/services/rest/warehouse.service'
+import WarehouseService from 'src/app/services/rest/warehouse.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -317,7 +317,7 @@ describe('DocumentDetailComponent', () => {
     component.nav.navChange.next({
       activeId: 1,
       nextId: 5,
-      preventDefault: () => {},
+      preventDefault: () => { },
     })
     fixture.detectChanges()
     expect(navigateSpy).toHaveBeenCalledWith(['documents', 3, 'notes'])

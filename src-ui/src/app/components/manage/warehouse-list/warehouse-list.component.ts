@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type'
+import { FILTER_HAS_WAREHOUSE_ANY } from 'src/app/data/filter-rule-type'
 import { Warehouse } from 'src/app/data/warehouse'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
@@ -32,7 +32,7 @@ export class WarehouseListComponent extends ManagementListComponent<Warehouse> {
       toastService,
       documentListViewService,
       permissionsService,
-      FILTER_HAS_TAGS_ALL,
+      FILTER_HAS_WAREHOUSE_ANY,
       $localize`warehouse`,
       $localize`warehouses`,
       PermissionType.Warehouse,
@@ -52,4 +52,5 @@ export class WarehouseListComponent extends ManagementListComponent<Warehouse> {
   getDeleteMessage(object: Warehouse) {
     return $localize`Do you really want to delete the warehouse "${object.name}"?`
   }
+
 }

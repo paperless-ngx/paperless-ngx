@@ -4,12 +4,13 @@ import { AbstractPaperlessService } from './abstract-paperless-service'
 import { Observable } from 'rxjs'
 import { CustomField } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
+import { AbstractNameFilterService } from './abstract-name-filter-service'
 
 @Injectable({
   providedIn: 'root',
 })
-export class CustomFieldsService extends AbstractPaperlessService<CustomField> {
+export class CustomFieldsService extends AbstractNameFilterService<CustomField> {
   constructor(http: HttpClient) {
-    super(http, 'custom_fields')
+    super(http, 'warehouses')
   }
 }

@@ -16,8 +16,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 })
 export class UserEditDialogComponent
   extends EditDialogComponent<User>
-  implements OnInit
-{
+  implements OnInit {
   groups: Group[]
   passwordIsSet: boolean = false
 

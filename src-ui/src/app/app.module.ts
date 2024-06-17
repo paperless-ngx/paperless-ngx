@@ -340,6 +340,10 @@ import localeTr from '@angular/common/locales/tr'
 import localeUk from '@angular/common/locales/uk'
 import localeZh from '@angular/common/locales/zh'
 import localeVi from '@angular/common/locales/vi'
+import { KhoVatLyComponent } from './components/manage/kho-vat-ly/KhoVatLyComponent'
+import { BoxEditDialogComponent } from './components/common/edit-dialog/box-edit-dialog/box-edit-dialog.component'
+import { BoxFieldsComponent } from './components/manage/box-fields/box-fields.component'
+
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -382,6 +386,9 @@ function initializeApp(settings: SettingsService) {
 
 @NgModule({
   declarations: [
+    //BoxListComponent,
+    BoxEditDialogComponent,
+    KhoVatLyComponent,
     AppComponent,
     DocumentListComponent,
     DocumentDetailComponent,
@@ -463,6 +470,7 @@ function initializeApp(settings: SettingsService) {
     UsersAndGroupsComponent,
     FileDropComponent,
     CustomFieldsComponent,
+    BoxFieldsComponent,
     CustomFieldEditDialogComponent,
     CustomFieldsDropdownComponent,
     ProfileEditDialogComponent,
@@ -524,4 +532,4 @@ function initializeApp(settings: SettingsService) {
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

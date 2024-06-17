@@ -8,7 +8,6 @@
     <label class="form-check-label" for="autoRefreshSwitch" i18n>Auto refresh</label>
   </div>
 </pngx-page-header>
-
 <ul ngbNav #nav="ngbNav" [(activeId)]="activeLog" (activeIdChange)="reloadLogs()" class="nav-tabs">
   @for (logFile of logFiles; track logFile) {
     <li [ngbNavItem]="logFile">

@@ -1,95 +1,57 @@
 import { Component, OnInit } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Subject, takeUntil } from 'rxjs'
-import { DATA_TYPE_LABELS, CustomField } from 'src/app/data/custom-field'
-import { PermissionsService } from 'src/app/services/permissions.service'
+import { PermissionType, PermissionsService } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { CustomField } from 'src/app/data/custom-field'
+import { ManagementListComponent } from '../management-list/management-list.component'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { FILTER_HAS_CUSTOM_FIELDS_ANY } from 'src/app/data/filter-rule-type'
+import { CustomListComponent } from '../custom-list/custom-list.component'
 
 @Component({
   selector: 'pngx-custom-fields',
-  templateUrl: './custom-fields.component.html',
-  styleUrls: ['./custom-fields.component.scss'],
+  templateUrl: './../custom-list/custom-list.component.html',
+  styleUrls: ['./../custom-list/custom-list.component.scss'],
 })
-export class CustomFieldsComponent
-  extends ComponentWithPermissions
-  implements OnInit
-{
-  public fields: CustomField[] = []
-
-  private unsubscribeNotifier: Subject<any> = new Subject()
+export class CustomFieldsComponent extends CustomListComponent<CustomField> {
   constructor(
-    private customFieldsService: CustomFieldsService,
-    public permissionsService: PermissionsService,
-    private modalService: NgbModal,
-    private toastService: ToastService
+    customfieldsService: CustomFieldsService,
+    modalService: NgbModal,
+    toastService: ToastService,
+    documentListViewService: DocumentListViewService,
+    permissionsService: PermissionsService
   ) {
-    super()
-  }
-
-  ngOnInit() {
-    this.reload()
-  }
-
-  reload() {
-    this.customFieldsService
-      .listAll()
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((r) => {
-        this.fields = r.results
-      })
-  }
-
-  editField(field: CustomField) {
-    const modal = this.modalService.open(CustomFieldEditDialogComponent)
-    modal.componentInstance.dialogMode = field
-      ? EditDialogMode.EDIT
-      : EditDialogMode.CREATE
-    modal.componentInstance.object = field
-    modal.componentInstance.succeeded
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((newField) => {
-        this.toastService.showInfo($localize`Saved field "${newField.name}".`)
-        this.customFieldsService.clearCache()
-        this.reload()
-      })
-    modal.componentInstance.failed
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((e) => {
-        this.toastService.showError($localize`Error saving field.`, e)
-      })
-  }
-
-  deleteField(field: CustomField) {
-    const modal = this.modalService.open(ConfirmDialogComponent, {
-      backdrop: 'static',
-    })
-    modal.componentInstance.title = $localize`Confirm delete field`
-    modal.componentInstance.messageBold = $localize`This operation will permanently delete this field.`
-    modal.componentInstance.message = $localize`This operation cannot be undone.`
-    modal.componentInstance.btnClass = 'btn-danger'
-    modal.componentInstance.btnCaption = $localize`Proceed`
-    modal.componentInstance.confirmClicked.subscribe(() => {
-      modal.componentInstance.buttonsEnabled = false
-      this.customFieldsService.delete(field).subscribe({
-        next: () => {
-          modal.close()
-          this.toastService.showInfo($localize`Deleted field`)
-          this.customFieldsService.clearCache()
-          this.reload()
+    super(
+      customfieldsService,
+      modalService,
+      CustomFieldEditDialogComponent,
+      toastService,
+      documentListViewService,
+      permissionsService,
+      FILTER_HAS_CUSTOM_FIELDS_ANY,
+      $localize`customField`,
+      $localize`customFields`,
+      PermissionType.CustomField,
+      [
+        {
+          key: 'type',
+          name: $localize`Type`,
+          rendersHtml: true,
+          valueFn: (c: CustomField) => {
+            return c.type
+          },
         },
-        error: (e) => {
-          this.toastService.showError($localize`Error deleting field.`, e)
-        },
-      })
-    })
+      ]
+    )
   }
 
-  getDataType(field: CustomField): string {
-    return DATA_TYPE_LABELS.find((l) => l.id === field.data_type).name
+  getDeleteMessage(object: CustomField) {
+    return $localize`Do you really want to delete the CustomField "${object.name}"?`
   }
 }

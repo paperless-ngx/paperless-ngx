@@ -17,6 +17,7 @@ export interface SearchHit {
 }
 
 export interface Document extends ObjectWithPermissions {
+  [x: string]: any
   correspondent$?: Observable<Correspondent>
 
   correspondent?: number
@@ -29,9 +30,9 @@ export interface Document extends ObjectWithPermissions {
 
   storage_path?: number
 
-  warehouses$?: Observable<Warehouse>
+  warehouse$?: Observable<Warehouse>
 
-  warehouses?: number
+  warehouse?: number
 
   title?: string
 

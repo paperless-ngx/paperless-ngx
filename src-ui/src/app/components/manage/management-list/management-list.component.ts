@@ -49,8 +49,7 @@ export interface ManagementListColumn {
 @Directive()
 export abstract class ManagementListComponent<T extends ObjectWithId>
   extends ComponentWithPermissions
-  implements OnInit, OnDestroy
-{
+  implements OnInit, OnDestroy {
   constructor(
     private service: AbstractNameFilterService<T>,
     private modalService: NgbModal,
@@ -116,9 +115,8 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     } else if (o.matching_algorithm == MATCH_NONE) {
       return $localize`None`
     } else if (o.match && o.match.length > 0) {
-      return `${
-        MATCHING_ALGORITHMS.find((a) => a.id == o.matching_algorithm).shortName
-      }: ${o.match}`
+      return `${MATCHING_ALGORITHMS.find((a) => a.id == o.matching_algorithm).shortName
+        }: ${o.match}`
     } else {
       return '-'
     }
