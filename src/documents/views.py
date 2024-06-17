@@ -142,12 +142,14 @@ from documents.serialisers import StoragePathSerializer
 from documents.serialisers import TagSerializer
 from documents.serialisers import TagSerializerVersion1
 from documents.serialisers import TasksViewSerializer
+from documents.serialisers import TrashSerializer
 from documents.serialisers import UiSettingsViewSerializer
 from documents.serialisers import WorkflowActionSerializer
 from documents.serialisers import WorkflowSerializer
 from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_updated
 from documents.tasks import consume_file
+from documents.tasks import empty_trash
 from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import GeneralConfig
@@ -1557,6 +1559,8 @@ class UiSettingsView(GenericAPIView):
                 "backend_setting": settings.ENABLE_UPDATE_CHECK,
             }
 
+        ui_settings["trash_delay"] = settings.EMPTY_TRASH_DELAY
+
         general_config = GeneralConfig()
 
         ui_settings["app_title"] = settings.APP_TITLE
@@ -2050,3 +2054,41 @@ class SystemStatusView(PassUserMixin):
                 },
             },
         )
+
+
+class TrashView(ListModelMixin, PassUserMixin):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = TrashSerializer
+    filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
+    pagination_class = StandardPagination
+
+    model = Document
+
+    queryset = Document.deleted_objects.all()
+
+    def get(self, request, format=None):
+        self.serializer_class = DocumentSerializer
+        return self.list(request, format)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        doc_ids = serializer.validated_data.get("documents")
+        docs = (
+            Document.global_objects.filter(id__in=doc_ids)
+            if doc_ids is not None
+            else Document.deleted_objects.all()
+        )
+        for doc in docs:
+            if not has_perms_owner_aware(request.user, "delete_document", doc):
+                return HttpResponseForbidden("Insufficient permissions")
+        action = serializer.validated_data.get("action")
+        if action == "restore":
+            for doc in Document.deleted_objects.filter(id__in=doc_ids).all():
+                doc.restore(strict=False)
+        elif action == "empty":
+            if doc_ids is None:
+                doc_ids = [doc.id for doc in docs]
+            empty_trash(doc_ids=doc_ids)
+        return Response({"result": "OK", "doc_ids": doc_ids})
