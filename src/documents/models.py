@@ -149,6 +149,7 @@ class Warehouse(MatchingModel):
     class Meta(MatchingModel.Meta): 
         verbose_name = _("warehouse")
         verbose_name_plural = _("warehouses")
+        constraints = []
     
     def __str__(self):
         return self.name
@@ -166,8 +167,10 @@ class Folder(MatchingModel):
     )
 
     class Meta(MatchingModel.Meta):
+        
         verbose_name = _("folder")
         verbose_name_plural = _("folders")
+        constraints = []
     def __str__(self): 
         return self.name
     
