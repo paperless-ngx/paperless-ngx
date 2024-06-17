@@ -1941,10 +1941,6 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         if serializer.is_valid(raise_exception=True):
             parent_warehouse = serializer.validated_data.get('parent_warehouse',None)
             
-            existing_warehouse = Warehouse.objects.filter(name=serializer.validated_data['name'], owner=request.user).first()
-            if existing_warehouse:
-                return Response({'error': 'A warehouse with the same name already exists.'}, status=status.HTTP_400_BAD_REQUEST)
-        
         parent_warehouse = Warehouse.objects.filter(id=parent_warehouse.id if parent_warehouse else 0).first()   
         
         if serializer.validated_data.get("type") == Warehouse.WAREHOUSE and not parent_warehouse:
@@ -2133,10 +2129,6 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         if serializer.is_valid(raise_exception=True):
             parent_folder = serializer.validated_data.get('parent_folder',None)
             
-            existing_folder = Folder.objects.filter(name=serializer.validated_data['name'], owner=request.user).first()
-            if existing_folder:
-                return Response({'error': 'A folder with the same name already exists.'}, status=status.HTTP_400_BAD_REQUEST)
-        
         parent_folder = Folder.objects.filter(id=parent_folder.id if parent_folder else 0).first()   
         
         if parent_folder == None:

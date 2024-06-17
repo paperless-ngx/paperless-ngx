@@ -1828,11 +1828,19 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
 class AdjustedNameField(serializers.CharField): 
     def to_internal_value(self, data): 
-        model = self.parent.Meta.model 
-         
+        model = self.parent.Meta.model
+        print(data) 
         if hasattr(model, 'name'): 
-
-            existing_names = model.objects.filter(name__startswith=data).values_list('name', flat=True) 
+            parent_folder = self.parent.initial_data.get('parent_folder')
+            type = self.parent.initial_data.get('type')
+            
+            if type: 
+                existing_names = model.objects.filter(type=type).values_list('name', flat=True) 
+            elif parent_folder: 
+                existing_names = model.objects.filter(parent_folder=parent_folder).values_list('name', flat=True) 
+            
+            else: 
+                existing_names = model.objects.filter(name__startswith=data).values_list('name', flat=True) 
              
             if data in existing_names: 
                 data = self.generate_unique_name(data, existing_names) 
