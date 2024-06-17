@@ -389,8 +389,8 @@ msgid "Sign in again"
 msgstr ""
 
 #: documents/templates/registration/login.html:15
-msgid "Paperless-ng sign in"
-msgstr "TC GROUP sign in"
+msgid "Paperless-ngx sign in"
+msgstr "EDMS sign in"
 
 #: documents/templates/registration/login.html:47
 msgid "Please sign in."

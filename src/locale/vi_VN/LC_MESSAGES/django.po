@@ -885,8 +885,8 @@ msgstr ""
 "%(site_domain)s"
 
 #: documents/templates/account/login.html:5
-msgid "TC GROUP sign in"
-msgstr "TC GROUP đăng nhập"
+msgid "Paperless-ngx sign in"
+msgstr "NIAD đăng nhập"
 
 #: documents/templates/account/login.html:10
 msgid "Please sign in."
@@ -1695,5 +1695,3 @@ msgstr "đã xử lý"
 msgid "status"
 msgstr "trạng thái"
 
-#~ msgid "Paperless-ngx sign in"
-#~ msgstr "Đăng nhập TC GROUP"
