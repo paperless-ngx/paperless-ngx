@@ -1826,13 +1826,32 @@ class WorkflowSerializer(serializers.ModelSerializer):
         return instance
 
 
+class AdjustedNameField(serializers.CharField): 
+    def to_internal_value(self, data): 
+        model = self.parent.Meta.model 
+         
+        if hasattr(model, 'name'): 
 
+            existing_names = model.objects.filter(name__startswith=data).values_list('name', flat=True) 
+             
+            if data in existing_names: 
+                data = self.generate_unique_name(data, existing_names) 
+         
+        return data 
+     
+    def generate_unique_name(self, name, existing_names): 
+        i = 1 
+        new_name = name 
+        while new_name in existing_names: 
+            new_name = f"{name}({i})" 
+            i += 1 
+        return new_name
 
 
 
 class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     document_count = serializers.SerializerMethodField()
-    
+    name = AdjustedNameField()
     class Meta:
         model = Warehouse
         fields = '__all__'
@@ -1860,7 +1879,7 @@ class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     
     
 class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
-        
+    name = AdjustedNameField()
     class Meta:
         model = Folder
         fields = '__all__'   
