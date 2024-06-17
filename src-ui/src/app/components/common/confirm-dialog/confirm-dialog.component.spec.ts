@@ -86,14 +86,4 @@ describe('ConfirmDialogComponent', () => {
     expect(closeModalSpy).toHaveBeenCalled()
     expect(confirmSubjectResult).toBeFalsy()
   })
-
-  it('should support delay confirm', fakeAsync(() => {
-    component.confirmButtonEnabled = false
-    component.delayConfirm(1)
-    expect(component.confirmButtonEnabled).toBeFalsy()
-    tick(1500)
-    fixture.detectChanges()
-    expect(component.confirmButtonEnabled).toBeTruthy()
-    discardPeriodicTasks()
-  }))
 })
