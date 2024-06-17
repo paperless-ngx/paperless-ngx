@@ -753,33 +753,7 @@ class DocumentViewSet(
             ]
             return Response(links)
 
-    def get_queryset(self):
-        queryset = self.queryset
-        warehouse_id = self.request.query_params.get('warehouse_id', None)
- 
-        if warehouse_id is not None:
-            queryset = self.get_warehouse(warehouse_id)
-    
-        return queryset
-
-    def get_warehouse(self, warehouse_id):
-        warehouse = Warehouse.objects.get(id=int(warehouse_id))
-        return self.get_warehouse_documents(warehouse)
-
-    def get_warehouse_documents(self, warehouse):
-        if warehouse.type == Warehouse.BOXCASE:
-            return Document.objects.filter(warehouse=warehouse)
-        elif warehouse.type == Warehouse.SHELF:
-            boxcases = Warehouse.objects.filter(parent_warehouse=warehouse)
-            return Document.objects.filter(warehouse__in=[b.id for b in boxcases])
-        elif warehouse.type == Warehouse.WAREHOUSE:
-            shelves = Warehouse.objects.filter(parent_warehouse=warehouse)
-            boxcases = Warehouse.objects.filter(parent_warehouse__in=[s.id for s in shelves])
-            return Document.objects.filter(warehouse__in=[b.id for b in boxcases])
-        else:
-            return Document.objects.none()
             
-    
 class SearchResultSerializer(DocumentSerializer, PassUserMixin):
     def to_representation(self, instance):
         doc = (
@@ -1961,29 +1935,29 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     
     
     def create(self, request, *args, **kwargs):
-        # try:  
-        currentUser = request.user                                                                                                                  
+        # try:                                                                                                                    
         serializer = WarehouseSerializer(data=request.data)
         parent_warehouse = None
         if serializer.is_valid(raise_exception=True):
             parent_warehouse = serializer.validated_data.get('parent_warehouse',None)
-       
+            
+            existing_warehouse = Warehouse.objects.filter(name=serializer.validated_data['name'], owner=request.user).first()
+            if existing_warehouse:
+                return Response({'error': 'A warehouse with the same name already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+        
         parent_warehouse = Warehouse.objects.filter(id=parent_warehouse.id if parent_warehouse else 0).first()   
         
         if serializer.validated_data.get("type") == Warehouse.WAREHOUSE and not parent_warehouse:
-            warehouse = serializer.save()
+            warehouse = serializer.save(owner=request.user)
             warehouse.path = str(warehouse.id)
-            warehouse.owner = currentUser
             warehouse.save()
         elif serializer.validated_data.get("type", "") == Warehouse.SHELF and  getattr(parent_warehouse, 'type', "") == Warehouse.WAREHOUSE :
-            warehouse = serializer.save(type=Warehouse.SHELF, parent_warehouse=parent_warehouse)
+            warehouse = serializer.save(type=Warehouse.SHELF, parent_warehouse=parent_warehouse,owner=request.user)
             warehouse.path = f"{parent_warehouse.path}/{warehouse.id}"
-            warehouse.owner = currentUser
             warehouse.save()
         elif serializer.validated_data.get("type", "") == Warehouse.BOXCASE and  getattr(parent_warehouse, 'type', "") == Warehouse.SHELF :
-            warehouse = serializer.save(type=Warehouse.BOXCASE, parent_warehouse=parent_warehouse)
+            warehouse = serializer.save(type=Warehouse.BOXCASE, parent_warehouse=parent_warehouse,owner=request.user)
             warehouse.path = f"{parent_warehouse.path}/{warehouse.id}"
-            warehouse.owner = currentUser
             warehouse.save()
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -2153,25 +2127,26 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     
     
     def create(self, request, *args, **kwargs):
-        # try:
-        currentUser = request.user                                                          
+        # try:                                                          
         serializer = FolderSerializer(data=request.data)
         parent_folder = None
         if serializer.is_valid(raise_exception=True):
             parent_folder = serializer.validated_data.get('parent_folder',None)
-       
+            
+            existing_folder = Folder.objects.filter(name=serializer.validated_data['name'], owner=request.user).first()
+            if existing_folder:
+                return Response({'error': 'A folder with the same name already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+        
         parent_folder = Folder.objects.filter(id=parent_folder.id if parent_folder else 0).first()   
         
         if parent_folder == None:
-            folder = serializer.save()
+            folder = serializer.save(owner=request.user)
             folder.path = str(folder.id)
-            folder.owner = currentUser
             folder.checksum = hashlib.md5(f'{folder.id}.{folder.name}'.encode()).hexdigest()
             folder.save()
         elif parent_folder:
-            folder = serializer.save(parent_folder=parent_folder)
+            folder = serializer.save(parent_folder=parent_folder,owner=request.user)
             folder.path = f"{parent_folder.path}/{folder.id}"
-            folder.owner = currentUser
             folder.checksum = hashlib.md5(f'{folder.id}.{folder.name}'.encode()).hexdigest()
             folder.save()
         else:
