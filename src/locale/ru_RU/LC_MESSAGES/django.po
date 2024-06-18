@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-19 11:07-0700\n"
-"PO-Revision-Date: 2024-05-20 16:41\n"
+"PO-Revision-Date: 2024-06-03 12:10\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -257,15 +257,15 @@ msgstr "логи"
 
 #: documents/models.py:398
 msgid "Table"
-msgstr ""
+msgstr "Таблица"
 
 #: documents/models.py:399
 msgid "Small Cards"
-msgstr ""
+msgstr "Маленькие карточки"
 
 #: documents/models.py:400
 msgid "Large Cards"
-msgstr ""
+msgstr "Большие карточки"
 
 #: documents/models.py:403
 msgid "Title"
@@ -277,11 +277,11 @@ msgstr ""
 
 #: documents/models.py:405
 msgid "Added"
-msgstr ""
+msgstr "Добавлено"
 
 #: documents/models.py:406
 msgid "Tags"
-msgstr ""
+msgstr "Теги"
 
 #: documents/models.py:407
 msgid "Correspondent"
@@ -289,7 +289,7 @@ msgstr ""
 
 #: documents/models.py:408
 msgid "Document Type"
-msgstr ""
+msgstr "Тип документа"
 
 #: documents/models.py:409
 msgid "Storage Path"
@@ -297,11 +297,11 @@ msgstr ""
 
 #: documents/models.py:410
 msgid "Note"
-msgstr ""
+msgstr "Заметка"
 
 #: documents/models.py:411
 msgid "Owner"
-msgstr ""
+msgstr "Владелец"
 
 #: documents/models.py:412
 msgid "Shared"
@@ -861,7 +861,7 @@ msgstr ""
 
 #: documents/models.py:1210
 msgid "remove all owners"
-msgstr ""
+msgstr "удалить всех владельцев"
 
 #: documents/models.py:1217
 msgid "remove view permissions for these users"
@@ -881,7 +881,7 @@ msgstr ""
 
 #: documents/models.py:1243
 msgid "remove all permissions"
-msgstr ""
+msgstr "удалить все разрешения"
 
 #: documents/models.py:1250
 msgid "remove these custom fields"
@@ -1052,7 +1052,7 @@ msgstr "Ваш новый пароль был установлен. Теперь
 
 #: documents/templates/account/signup.html:5
 msgid "Paperless-ngx sign up"
-msgstr ""
+msgstr "Войти в Paperless-ngx"
 
 #: documents/templates/account/signup.html:10
 #, python-format
@@ -1066,7 +1066,7 @@ msgstr ""
 
 #: documents/templates/account/signup.html:18
 msgid "Password (again)"
-msgstr ""
+msgstr "Пароль (ещё раз)"
 
 #: documents/templates/account/signup.html:36
 #: documents/templates/socialaccount/signup.html:27

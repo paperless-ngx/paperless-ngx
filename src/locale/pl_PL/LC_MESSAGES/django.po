@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-19 11:07-0700\n"
-"PO-Revision-Date: 2024-05-20 16:41\n"
+"PO-Revision-Date: 2024-06-10 12:10\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -501,19 +501,19 @@ msgstr "jest udostępniony przeze mnie"
 
 #: documents/models.py:503
 msgid "has custom fields"
-msgstr ""
+msgstr "posiada pola dodatkowe"
 
 #: documents/models.py:504
 msgid "has custom field in"
-msgstr ""
+msgstr "ma dodatkowe pole w"
 
 #: documents/models.py:505
 msgid "does not have custom field in"
-msgstr ""
+msgstr "nie ma dodatkowego pola w"
 
 #: documents/models.py:506
 msgid "does not have custom field"
-msgstr ""
+msgstr "nie ma pola dodatkowego"
 
 #: documents/models.py:516
 msgid "rule type"

@@ -7,6 +7,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { PdfViewerModule } from 'ng2-pdf-viewer'
+import { of } from 'rxjs'
 
 describe('SplitConfirmDialogComponent', () => {
   let component: SplitConfirmDialogComponent
@@ -30,6 +31,14 @@ describe('SplitConfirmDialogComponent', () => {
     documentService = TestBed.inject(DocumentService)
     component = fixture.componentInstance
     fixture.detectChanges()
+  })
+
+  it('should load document on init', () => {
+    const getSpy = jest.spyOn(documentService, 'get')
+    component.documentID = 1
+    getSpy.mockReturnValue(of({ id: 1 } as any))
+    component.ngOnInit()
+    expect(documentService.get).toHaveBeenCalledWith(1)
   })
 
   it('should update pagesString when pages are added', () => {
