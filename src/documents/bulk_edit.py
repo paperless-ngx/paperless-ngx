@@ -4,7 +4,10 @@ import logging
 import os
 from typing import Optional
 
+from celery import chain
 from celery import chord
+from celery import group
+from celery import shared_task
 from django.conf import settings
 from django.db.models import Q
 
@@ -153,6 +156,7 @@ def modify_custom_fields(doc_ids: list[int], add_custom_fields, remove_custom_fi
     return "OK"
 
 
+@shared_task
 def delete(doc_ids: list[int]):
     Document.objects.filter(id__in=doc_ids).delete()
 
@@ -234,7 +238,11 @@ def rotate(doc_ids: list[int], degrees: int):
     return "OK"
 
 
-def merge(doc_ids: list[int], metadata_document_id: Optional[int] = None):
+def merge(
+    doc_ids: list[int],
+    metadata_document_id: Optional[int] = None,
+    delete_originals: bool = False,
+):
     logger.info(
         f"Attempting to merge {len(doc_ids)} documents into a single document.",
     )
@@ -277,7 +285,8 @@ def merge(doc_ids: list[int], metadata_document_id: Optional[int] = None):
         overrides = DocumentMetadataOverrides()
 
     logger.info("Adding merged document to the task queue.")
-    consume_file.delay(
+
+    consume_task = consume_file.s(
         ConsumableDocument(
             source=DocumentSource.ConsumeFolder,
             original_file=filepath,
@@ -285,15 +294,25 @@ def merge(doc_ids: list[int], metadata_document_id: Optional[int] = None):
         overrides,
     )
 
+    if delete_originals:
+        logger.info(
+            "Queueing removal of original documents after consumption of merged document",
+        )
+        chain(consume_task, delete.si(affected_docs)).delay()
+    else:
+        consume_task.delay()
+
     return "OK"
 
 
-def split(doc_ids: list[int], pages: list[list[int]]):
+def split(doc_ids: list[int], pages: list[list[int]], delete_originals: bool = False):
     logger.info(
         f"Attempting to split document {doc_ids[0]} into {len(pages)} documents",
     )
     doc = Document.objects.get(id=doc_ids[0])
     import pikepdf
+
+    consume_tasks = []
 
     try:
         with pikepdf.open(doc.source_path) as pdf:
@@ -314,13 +333,24 @@ def split(doc_ids: list[int], pages: list[list[int]]):
                 logger.info(
                     f"Adding split document with pages {split_doc} to the task queue.",
                 )
-                consume_file.delay(
-                    ConsumableDocument(
-                        source=DocumentSource.ConsumeFolder,
-                        original_file=filepath,
+                consume_tasks.append(
+                    consume_file.s(
+                        ConsumableDocument(
+                            source=DocumentSource.ConsumeFolder,
+                            original_file=filepath,
+                        ),
+                        overrides,
                     ),
-                    overrides,
                 )
+
+            if delete_originals:
+                logger.info(
+                    "Queueing removal of original document after consumption of the split documents",
+                )
+                chord(header=consume_tasks, body=delete.si([doc.id])).delay()
+            else:
+                group(consume_tasks).delay()
+
     except Exception as e:
         logger.exception(f"Error splitting document {doc.id}: {e}")
 

@@ -485,56 +485,65 @@ class ConsumerPlugin(
         Return the document object if it was successfully created.
         """
 
-        self._send_progress(
-            0,
-            100,
-            ProgressStatusOptions.STARTED,
-            ConsumerStatusShortMessage.NEW_FILE,
-        )
+        tempdir = None
 
-        # Make sure that preconditions for consuming the file are met.
-
-        self.pre_check_file_exists()
-        self.pre_check_directories()
-        self.pre_check_duplicate()
-        self.pre_check_asn_value()
-
-        self.log.info(f"Consuming {self.filename}")
-
-        # For the actual work, copy the file into a tempdir
-        tempdir = tempfile.TemporaryDirectory(
-            prefix="paperless-ngx",
-            dir=settings.SCRATCH_DIR,
-        )
-        self.working_copy = Path(tempdir.name) / Path(self.filename)
-        copy_file_with_basic_stats(self.input_doc.original_file, self.working_copy)
-
-        # Determine the parser class.
-
-        mime_type = magic.from_file(self.working_copy, mime=True)
-
-        self.log.debug(f"Detected mime type: {mime_type}")
-
-        # Based on the mime type, get the parser for that type
-        parser_class: Optional[type[DocumentParser]] = get_parser_class_for_mime_type(
-            mime_type,
-        )
-        if not parser_class:
-            tempdir.cleanup()
-            self._fail(
-                ConsumerStatusShortMessage.UNSUPPORTED_TYPE,
-                f"Unsupported mime type {mime_type}",
+        try:
+            self._send_progress(
+                0,
+                100,
+                ProgressStatusOptions.STARTED,
+                ConsumerStatusShortMessage.NEW_FILE,
             )
 
-        # Notify all listeners that we're going to do some work.
+            # Make sure that preconditions for consuming the file are met.
 
-        document_consumption_started.send(
-            sender=self.__class__,
-            filename=self.working_copy,
-            logging_group=self.logging_group,
-        )
+            self.pre_check_file_exists()
+            self.pre_check_directories()
+            self.pre_check_duplicate()
+            self.pre_check_asn_value()
 
-        self.run_pre_consume_script()
+            self.log.info(f"Consuming {self.filename}")
+
+            # For the actual work, copy the file into a tempdir
+            tempdir = tempfile.TemporaryDirectory(
+                prefix="paperless-ngx",
+                dir=settings.SCRATCH_DIR,
+            )
+            self.working_copy = Path(tempdir.name) / Path(self.filename)
+            copy_file_with_basic_stats(self.input_doc.original_file, self.working_copy)
+
+            # Determine the parser class.
+
+            mime_type = magic.from_file(self.working_copy, mime=True)
+
+            self.log.debug(f"Detected mime type: {mime_type}")
+
+            # Based on the mime type, get the parser for that type
+            parser_class: Optional[type[DocumentParser]] = (
+                get_parser_class_for_mime_type(
+                    mime_type,
+                )
+            )
+            if not parser_class:
+                tempdir.cleanup()
+                self._fail(
+                    ConsumerStatusShortMessage.UNSUPPORTED_TYPE,
+                    f"Unsupported mime type {mime_type}",
+                )
+
+            # Notify all listeners that we're going to do some work.
+
+            document_consumption_started.send(
+                sender=self.__class__,
+                filename=self.working_copy,
+                logging_group=self.logging_group,
+            )
+
+            self.run_pre_consume_script()
+        except:
+            if tempdir:
+                tempdir.cleanup()
+            raise
 
         def progress_callback(current_progress, max_progress):  # pragma: no cover
             # recalculate progress to be within 20 and 80
@@ -593,6 +602,9 @@ class ConsumerPlugin(
             archive_path = document_parser.get_archive_path()
 
         except ParseError as e:
+            document_parser.cleanup()
+            if tempdir:
+                tempdir.cleanup()
             self._fail(
                 str(e),
                 f"Error occurred while consuming document {self.filename}: {e}",
@@ -601,7 +613,8 @@ class ConsumerPlugin(
             )
         except Exception as e:
             document_parser.cleanup()
-            tempdir.cleanup()
+            if tempdir:
+                tempdir.cleanup()
             self._fail(
                 str(e),
                 f"Unexpected error while consuming document {self.filename}: {e}",
