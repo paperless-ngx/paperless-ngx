@@ -273,11 +273,11 @@
         <source>Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">85</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">92</context>
+          <context context-type="linenumber">94</context>
         </context-group>
         <target state="final">Dokument <x id="PH" equiv-text="status.filename"/> wurde zu Paperless-ngx hinzugefügt.</target>
       </trans-unit>
@@ -285,7 +285,7 @@
         <source>Open document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">87</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
@@ -309,7 +309,7 @@
         <source>Could not add <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">107</context>
+          <context context-type="linenumber">109</context>
         </context-group>
         <target state="final">Konnte <x id="PH" equiv-text="status.filename"/> nicht hinzufügen: <x id="PH_1" equiv-text="status.message"/></target>
       </trans-unit>
@@ -317,7 +317,7 @@
         <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by Paperless-ngx.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">122</context>
+          <context context-type="linenumber">124</context>
         </context-group>
         <target state="final">Dokument <x id="PH" equiv-text="status.filename"/> wird von Paperless-ngx verarbeitet.</target>
       </trans-unit>
@@ -325,7 +325,7 @@
         <source>Dashboard</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">129</context>
+          <context context-type="linenumber">131</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -345,7 +345,7 @@
         <source>Documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">140</context>
+          <context context-type="linenumber">142</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -381,7 +381,7 @@
         <source>Settings</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">152</context>
+          <context context-type="linenumber">154</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
@@ -409,7 +409,7 @@
         <source>Prev</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">158</context>
+          <context context-type="linenumber">160</context>
         </context-group>
         <target state="final">Zurück</target>
       </trans-unit>
@@ -417,7 +417,7 @@
         <source>Next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">159</context>
+          <context context-type="linenumber">161</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -429,7 +429,7 @@
         <source>End</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">160</context>
+          <context context-type="linenumber">162</context>
         </context-group>
         <target state="final">Ende</target>
       </trans-unit>
@@ -437,7 +437,7 @@
         <source>The dashboard can be used to show saved views, such as an &apos;Inbox&apos;. Those settings are found under Settings &gt; Saved Views once you have created some.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">166</context>
+          <context context-type="linenumber">168</context>
         </context-group>
         <target state="final">Das Dashboard kann zum Anzeigen von gespeicherten Ansichten verwendet werden, wie zum Beispiel einem „Posteingang“. Diese Option finden Sie unter Einstellungen &gt; Gespeicherte Ansichten, sobald Sie mindestens eine eigene Ansicht erstellt haben.</target>
       </trans-unit>
@@ -445,7 +445,7 @@
         <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">173</context>
+          <context context-type="linenumber">175</context>
         </context-group>
         <target state="final">Ziehen Sie Dokumente hier hinein, um mit dem Hochladen zu beginnen oder kopieren Sie Dateien in den Importordner („consume“). Sie können auch Dokumente per drag-and-drop auf alle anderen Seiten der Anwendung ziehen. Wenn Sie dies tun, beginnt Paperless-ngx seine Algorithmen für maschinelles Lernen zu trainieren.</target>
       </trans-unit>
@@ -453,7 +453,7 @@
         <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">178</context>
+          <context context-type="linenumber">180</context>
         </context-group>
         <target state="final">Die Dokumentenliste zeigt alle Ihre Dokumente an und ermöglicht das Filtern sowie die Massenbearbeitung von mehreren Dokumenten. Es gibt drei verschiedene Ansichtsstile: Liste, kleine Karten und große Karten. In der Seitenleiste werden aktuell geöffnete Dokumente aufgelistet.</target>
       </trans-unit>
@@ -461,7 +461,7 @@
         <source>The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">185</context>
+          <context context-type="linenumber">187</context>
         </context-group>
         <target state="final">Mit den Filterwerkzeugen können Sie schnell Dokumente finden, die verschiedene Datumsbereiche, Tags und andere Suchbegriffe enthalten.</target>
       </trans-unit>
@@ -469,7 +469,7 @@
         <source>Any combination of filters can be saved as a &apos;view&apos; which can then be displayed on the dashboard and / or sidebar.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">191</context>
+          <context context-type="linenumber">193</context>
         </context-group>
         <target state="final">Jede Kombination von Filterkriterien kann als „Ansicht“ gespeichert werden, die dann auf der Startseite und/oder der Seitenleiste angezeigt werden können.</target>
       </trans-unit>
@@ -477,7 +477,7 @@
         <source>Tags, correspondents, document types and storage paths can all be managed using these pages. They can also be created from the document edit view.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">196</context>
+          <context context-type="linenumber">198</context>
         </context-group>
         <target state="final">Tags, Korrespondenten, Dokumententypen und Speicherpfade können über diese Seiten verwaltet werden. Sie können auch beim Bearbeiten von Dokumenten erstellt werden.</target>
       </trans-unit>
@@ -485,7 +485,7 @@
         <source>Manage e-mail accounts and rules for automatically importing documents.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">204</context>
+          <context context-type="linenumber">206</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
@@ -497,7 +497,7 @@
         <source>Workflows give you more control over the document pipeline.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">212</context>
+          <context context-type="linenumber">214</context>
         </context-group>
         <target state="final">Arbeitsabläufe geben Ihnen mehr Kontrolle über die Dokumentenverarbeitung.</target>
       </trans-unit>
@@ -505,7 +505,7 @@
         <source>File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">220</context>
+          <context context-type="linenumber">222</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
@@ -517,7 +517,7 @@
         <source>Check out the settings for various tweaks to the web app and toggle settings for saved views.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">228</context>
+          <context context-type="linenumber">230</context>
         </context-group>
         <target state="final">Überprüfen Sie die Einstellungen für diverse Verbesserung der Webanwendung und ändern Sie die Einstellungen für gespeicherte Ansichten.</target>
       </trans-unit>
@@ -525,7 +525,7 @@
         <source>Thank you! 🙏</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">236</context>
+          <context context-type="linenumber">238</context>
         </context-group>
         <target state="final">Vielen Dank! 🙏</target>
       </trans-unit>
@@ -533,7 +533,7 @@
         <source>There are &lt;em&gt;tons&lt;/em&gt; more features and info we didn&apos;t cover here, but this should get you started. Check out the documentation or visit the project on GitHub to learn more or to report issues.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">238</context>
+          <context context-type="linenumber">240</context>
         </context-group>
         <target state="final">Es gibt noch &lt;em&gt;erheblich&lt;/em&gt; mehr Funktionen und Informationen, die mit der Tour nicht abgedeckt wurden. Nach der Tour sollten Sie jedoch direkt loslegen können. Schauen Sie sich die Dokumentation an oder besuchen Sie das Projekt auf GitHub, um mehr zu erfahren oder Probleme zu melden.</target>
       </trans-unit>
@@ -541,7 +541,7 @@
         <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">240</context>
+          <context context-type="linenumber">242</context>
         </context-group>
         <target state="final">Wir bedanken uns im Namen aller Mitwirkenden dieses gemeinschaftlich unterstützten Projekts, dass Sie Paperless-ngx verwenden!</target>
       </trans-unit>
@@ -559,7 +559,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="final">Globale Anwendungskonfigurationsoptionen, welche für &lt;strong&gt;jeden&lt;/strong&gt; Benutzer dieser Paperless-ngx-Instanz gelten. Optionen können auch mithilfe von Umgebungsvariablen oder der Konfigurationsdatei gesetzt werden, jedoch haben die Werte hier immer Vorrang.</target>
+        <target state="final">Globale Anwendungskonfigurationsoptionen, welche für &lt;strong&gt;jeden&lt;/strong&gt; Benutzer dieser Paperless-ngx-Instanz gelten. Optionen können auch mithilfe von Umgebungsvariablen oder der Konfigurationsdatei gesetzt werden, jedoch haben die Werte auf dieser Seite immer Vorrang.</target>
       </trans-unit>
       <trans-unit id="7991430199894172363" datatype="html" approved="yes">
         <source>Read the documentation about this setting</source>
@@ -754,6 +754,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">23</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
+          <context context-type="linenumber">45</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.html</context>
@@ -1081,14 +1085,6 @@
         </context-group>
         <target state="final">Bestätigungsdialoge anzeigen</target>
       </trans-unit>
-      <trans-unit id="6906812245033969309" datatype="html" approved="yes">
-        <source>Deleting documents will always ask for confirmation.</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-          <context context-type="linenumber">195</context>
-        </context-group>
-        <target state="final">Beim Löschen von Dokumenten wird immer nach einer Bestätigung gefragt.</target>
-      </trans-unit>
       <trans-unit id="290238406234356122" datatype="html" approved="yes">
         <source>Apply on close</source>
         <context-group purpose="location">
@@ -1415,7 +1411,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">327</context>
         </context-group>
-        <target state="final">Benachrichtigungen anzeigen, wenn die Verarbeitung des Dokuments fehlschlägt</target>
+        <target state="final">Benachrichtigungen anzeigen, wenn die Dokumentenverarbeitung fehlgeschlagen ist</target>
       </trans-unit>
       <trans-unit id="6838309441164918531" datatype="html" approved="yes">
         <source>Suppress notifications on dashboard</source>
@@ -1500,6 +1496,10 @@
           <context context-type="linenumber">42</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
@@ -1558,6 +1558,22 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">369</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
+          <context context-type="linenumber">76</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+          <context context-type="linenumber">80</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.html</context>
@@ -1924,6 +1940,10 @@
           <context context-type="linenumber">9</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">3</context>
         </context-group>
@@ -1946,6 +1966,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">36</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
+          <context context-type="linenumber">35</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.html</context>
@@ -2225,6 +2249,206 @@
         </context-group>
         <target state="final">fehlgeschlagen</target>
       </trans-unit>
+      <trans-unit id="3418677553313974490" datatype="html" approved="yes">
+        <source>Trash</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">271</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">274</context>
+        </context-group>
+        <target state="final">Papierkorb</target>
+      </trans-unit>
+      <trans-unit id="3818027200170621545" datatype="html">
+        <source>Manage trashed documents that are pending deletion.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <target state="translated">Dokumente im Papierkorb verwalten, die noch nicht gelöscht wurden.</target>
+      </trans-unit>
+      <trans-unit id="3186604097120837257" datatype="html" approved="yes">
+        <source>Restore selected</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <target state="final">Ausgewählte wiederherstellen</target>
+      </trans-unit>
+      <trans-unit id="8831459317888986184" datatype="html" approved="yes">
+        <source>Delete selected</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+        <target state="final">Ausgewählte löschen</target>
+      </trans-unit>
+      <trans-unit id="8597030111956627342" datatype="html" approved="yes">
+        <source>Empty trash</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <target state="final">Papierkorb leeren</target>
+      </trans-unit>
+      <trans-unit id="991066160113599649" datatype="html" approved="yes">
+        <source>Remaining</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+        <target state="final">Verbleibend</target>
+      </trans-unit>
+      <trans-unit id="7494361412465596264" datatype="html" approved="yes">
+        <source><x id="INTERPOLATION" equiv-text="{{ getDaysRemaining(document) }}"/> days</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+        <target state="final"><x id="INTERPOLATION" equiv-text="{{ getDaysRemaining(document) }}"/> Tage</target>
+      </trans-unit>
+      <trans-unit id="6770769801335635194" datatype="html" approved="yes">
+        <source>Restore</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
+          <context context-type="linenumber">66</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+        <target state="final">Wiederherstellen</target>
+      </trans-unit>
+      <trans-unit id="2308646316372333720" datatype="html" approved="yes">
+        <source>{VAR_PLURAL, plural, =1 {One document in trash} other {<x id="INTERPOLATION"/> total documents in trash}}</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
+          <context context-type="linenumber">89</context>
+        </context-group>
+        <target state="final">{VAR_PLURAL, plural, =1 {Ein Dokument im Papierkorb} other {Insgesamt <x id="INTERPOLATION"/> Dokumente im Papierkorb}}</target>
+      </trans-unit>
+      <trans-unit id="9021887951960049161" datatype="html" approved="yes">
+        <source>Confirm delete</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+          <context context-type="linenumber">74</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
+          <context context-type="linenumber">203</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
+          <context context-type="linenumber">320</context>
+        </context-group>
+        <target state="final">Löschen bestätigen</target>
+      </trans-unit>
+      <trans-unit id="1373208150912772963" datatype="html" approved="yes">
+        <source>This operation will permanently delete this document.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+        <target state="final">Dieser Vorgang wird dieses Dokument unwiderruflich löschen.</target>
+      </trans-unit>
+      <trans-unit id="5641451190833696892" datatype="html" approved="yes">
+        <source>This operation cannot be undone.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
+          <context context-type="linenumber">116</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
+          <context context-type="linenumber">166</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.ts</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
+          <context context-type="linenumber">114</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
+          <context context-type="linenumber">173</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
+          <context context-type="linenumber">322</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
+          <context context-type="linenumber">97</context>
+        </context-group>
+        <target state="final">Dieser Vorgang kann nicht rückgängig gemacht werden.</target>
+      </trans-unit>
+      <trans-unit id="1980187861066369604" datatype="html" approved="yes">
+        <source>Document deleted</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+        <target state="final">Dokument gelöscht</target>
+      </trans-unit>
+      <trans-unit id="7266264608936522311" datatype="html" approved="yes">
+        <source>This operation will permanently delete the selected documents.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+          <context context-type="linenumber">76</context>
+        </context-group>
+        <target state="final">Dieser Vorgang wird die ausgewählten Dokumente unwiderruflich löschen.</target>
+      </trans-unit>
+      <trans-unit id="6804051092296228130" datatype="html" approved="yes">
+        <source>This operation will permanently delete all documents in the trash.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+          <context context-type="linenumber">77</context>
+        </context-group>
+        <target state="final">Dieser Vorgang wird alle Dokumente im Papierkorb unwiderruflich löschen.</target>
+      </trans-unit>
+      <trans-unit id="6996183233986182894" datatype="html" approved="yes">
+        <source>Document(s) deleted</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+        <target state="final">Dokument(e) gelöscht</target>
+      </trans-unit>
+      <trans-unit id="7534569062269274401" datatype="html" approved="yes">
+        <source>Document restored</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+          <context context-type="linenumber">97</context>
+        </context-group>
+        <target state="final">Dokument wiederhergestellt</target>
+      </trans-unit>
+      <trans-unit id="960063472770266304" datatype="html" approved="yes">
+        <source>Document(s) restored</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+          <context context-type="linenumber">106</context>
+        </context-group>
+        <target state="final">Dokument(e) wiederhergestellt</target>
+      </trans-unit>
       <trans-unit id="8119815638230251386" datatype="html" approved="yes">
         <source>Users &amp; Groups</source>
         <context-group purpose="location">
@@ -2439,43 +2663,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">115</context>
         </context-group>
-        <target state="final">Dieser Vorgang wird dieses Benutzerkonto dauerhaft löschen.</target>
-      </trans-unit>
-      <trans-unit id="5641451190833696892" datatype="html" approved="yes">
-        <source>This operation cannot be undone.</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">116</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-          <context context-type="linenumber">166</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">714</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.ts</context>
-          <context context-type="linenumber">73</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">114</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">173</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">322</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
-          <context context-type="linenumber">97</context>
-        </context-group>
-        <target state="final">Dieser Vorgang kann nicht rückgängig gemacht werden.</target>
+        <target state="final">Dieser Vorgang wird dieses Benutzerkonto unwiderruflich löschen.</target>
       </trans-unit>
       <trans-unit id="1181910457994920507" datatype="html" approved="yes">
         <source>Proceed</source>
@@ -2497,23 +2685,23 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1151</context>
+          <context context-type="linenumber">1152</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1192</context>
+          <context context-type="linenumber">1193</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">755</context>
+          <context context-type="linenumber">758</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">788</context>
+          <context context-type="linenumber">791</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">807</context>
+          <context context-type="linenumber">810</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.ts</context>
@@ -2583,7 +2771,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">165</context>
         </context-group>
-        <target state="final">Dieser Vorgang wird diese Benutzergruppe dauerhaft löschen.</target>
+        <target state="final">Dieser Vorgang wird diese Benutzergruppe unwiderruflich löschen.</target>
       </trans-unit>
       <trans-unit id="6834066329827670963" datatype="html" approved="yes">
         <source>Deleted group</source>
@@ -2641,11 +2829,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">272</context>
+          <context context-type="linenumber">279</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">275</context>
+          <context context-type="linenumber">282</context>
         </context-group>
         <target state="final">Dokumentation</target>
       </trans-unit>
@@ -2833,7 +3021,7 @@
         <source>GitHub</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">282</context>
+          <context context-type="linenumber">289</context>
         </context-group>
         <target state="final">GitHub</target>
       </trans-unit>
@@ -2841,7 +3029,7 @@
         <source>is available.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">291,292</context>
+          <context context-type="linenumber">298,299</context>
         </context-group>
         <target state="final">ist verfügbar.</target>
       </trans-unit>
@@ -2849,7 +3037,7 @@
         <source>Click to view.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">292</context>
+          <context context-type="linenumber">299</context>
         </context-group>
         <target state="final">Zum Anzeigen klicken.</target>
       </trans-unit>
@@ -2857,7 +3045,7 @@
         <source>Paperless-ngx can automatically check for updates</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">296</context>
+          <context context-type="linenumber">303</context>
         </context-group>
         <target state="final">Paperless-ngx kann automatisch auf Aktualisierungen überprüfen</target>
       </trans-unit>
@@ -2865,7 +3053,7 @@
         <source> How does this work? </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">303,305</context>
+          <context context-type="linenumber">310,312</context>
         </context-group>
         <target state="final"> Wie funktioniert das? </target>
       </trans-unit>
@@ -2873,7 +3061,7 @@
         <source>Update available</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">316</context>
+          <context context-type="linenumber">323</context>
         </context-group>
         <target state="final">Aktualisierung verfügbar</target>
       </trans-unit>
@@ -3140,6 +3328,10 @@
           <context context-type="linenumber">26</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+          <context context-type="linenumber">776</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">401</context>
         </context-group>
@@ -3158,6 +3350,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">579</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">712</context>
         </context-group>
         <target state="final">Bestätigen</target>
       </trans-unit>
@@ -3229,11 +3425,19 @@
         </context-group>
         <target state="final">Metadaten neu generieren</target>
       </trans-unit>
+      <trans-unit id="5612366187076076264" datatype="html" approved="yes">
+        <source>Delete original documents after successful merge</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+        <target state="final">Originaldokumente nach erfolgreicher Zusammenführung löschen</target>
+      </trans-unit>
       <trans-unit id="5138283234724909648" datatype="html" approved="yes">
         <source>Note that only PDFs will be included.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component.html</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">34</context>
         </context-group>
         <target state="final">Beachten Sie, dass nur PDFs miteinbezogen werden.</target>
       </trans-unit>
@@ -3252,6 +3456,14 @@
           <context context-type="linenumber">28</context>
         </context-group>
         <target state="final">Teilung hinzufügen</target>
+      </trans-unit>
+      <trans-unit id="492847770415850840" datatype="html" approved="yes">
+        <source>Delete original document after successful split</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component.html</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+        <target state="final">Originaldokument nach erfolgreicher Teilung löschen</target>
       </trans-unit>
       <trans-unit id="2509141182388535183" datatype="html" approved="yes">
         <source>View</source>
@@ -5978,7 +6190,7 @@
         </context-group>
         <target state="final">Original herunterladen</target>
       </trans-unit>
-      <trans-unit id="2696010339872056565" datatype="html">
+      <trans-unit id="2696010339872056565" datatype="html" approved="yes">
         <source>Reprocess</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -5988,7 +6200,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">111</context>
         </context-group>
-        <target state="translated">Erneut verarbeiten</target>
+        <target state="final">Erneut verarbeiten</target>
       </trans-unit>
       <trans-unit id="1418444397960583910" datatype="html" approved="yes">
         <source>More like this</source>
@@ -6038,7 +6250,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1169</context>
+          <context context-type="linenumber">1170</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
@@ -6454,45 +6666,37 @@
         </context-group>
         <target state="final">Fehler beim Speichern des Dokuments</target>
       </trans-unit>
-      <trans-unit id="9021887951960049161" datatype="html" approved="yes">
-        <source>Confirm delete</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">776</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">203</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">320</context>
-        </context-group>
-        <target state="final">Löschen bestätigen</target>
-      </trans-unit>
-      <trans-unit id="5382975254277698192" datatype="html" approved="yes">
-        <source>Do you really want to delete document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;?</source>
+      <trans-unit id="8410796510716511826" datatype="html" approved="yes">
+        <source>Do you really want to move the document &quot;<x id="PH" equiv-text="this.document.title"/>&quot; to the trash?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">777</context>
         </context-group>
-        <target state="final">Möchten Sie das Dokument „<x id="PH" equiv-text="this.document.title"/>“ wirklich löschen?</target>
+        <target state="final">Möchten sie das Dokument „<x id="PH" equiv-text="this.document.title"/>“ wirklich in den Papierkorb verschieben?</target>
       </trans-unit>
-      <trans-unit id="6691075929777935948" datatype="html" approved="yes">
-        <source>The files for this document will be deleted permanently. This operation cannot be undone.</source>
+      <trans-unit id="282586936710748252" datatype="html" approved="yes">
+        <source>Documents can be restored prior to permanent deletion.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">778</context>
         </context-group>
-        <target state="final">Die Dateien dieses Dokuments werden permanent gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">714</context>
+        </context-group>
+        <target state="final">Dokumente können wiederhergestellt werden, bevor sie unwiderruflich gelöscht werden.</target>
       </trans-unit>
-      <trans-unit id="719892092227206532" datatype="html" approved="yes">
-        <source>Delete document</source>
+      <trans-unit id="2048798344356757326" datatype="html" approved="yes">
+        <source>Move to trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">780</context>
         </context-group>
-        <target state="final">Dokument löschen</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">716</context>
+        </context-group>
+        <target state="final">In den Papierkorb verschieben</target>
       </trans-unit>
       <trans-unit id="7295637485862454066" datatype="html" approved="yes">
         <source>Error deleting document</source>
@@ -6502,7 +6706,7 @@
         </context-group>
         <target state="final">Fehler beim Löschen des Dokuments</target>
       </trans-unit>
-      <trans-unit id="619486176823357521" datatype="html">
+      <trans-unit id="619486176823357521" datatype="html" approved="yes">
         <source>Reprocess confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
@@ -6510,33 +6714,33 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">751</context>
+          <context context-type="linenumber">754</context>
         </context-group>
-        <target state="translated">Erneut verarbeiten bestätigen</target>
+        <target state="final">Erneut verarbeiten bestätigen</target>
       </trans-unit>
-      <trans-unit id="2951161989614003846" datatype="html">
+      <trans-unit id="2951161989614003846" datatype="html" approved="yes">
         <source>This operation will permanently recreate the archive file for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">820</context>
         </context-group>
-        <target state="translated">Dieser Vorgang wird die Archivdatei dieses Dokuments permanent neu erstellen.</target>
+        <target state="final">Dieser Vorgang wird die Archivdatei dieses Dokuments unwiderruflich neu erstellen.</target>
       </trans-unit>
-      <trans-unit id="302054111564709516" datatype="html">
+      <trans-unit id="302054111564709516" datatype="html" approved="yes">
         <source>The archive file will be re-generated with the current settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">821</context>
         </context-group>
-        <target state="translated">Die Archivdatei wird mit den aktuellen Einstellungen neu generiert.</target>
+        <target state="final">Die Archivdatei wird mit den aktuellen Einstellungen neu generiert.</target>
       </trans-unit>
-      <trans-unit id="1192507664585066165" datatype="html">
+      <trans-unit id="1192507664585066165" datatype="html" approved="yes">
         <source>Reprocess operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">831</context>
         </context-group>
-        <target state="translated">Verarbeitung wird im Hintergrund ausgeführt. Schließe oder lade das Dokument neu, um Neuigkeiten zu sehen.</target>
+        <target state="final">Die erneute Verarbeitung wird im Hintergrund gestartet. Schließen und öffnen Sie dieses Dokument nach Abschluss des Vorgangs erneut oder laden Sie es neu, um neue Inhalte anzuzeigen.</target>
       </trans-unit>
       <trans-unit id="4409560272830824468" datatype="html" approved="yes">
         <source>Error executing operation</source>
@@ -6574,7 +6778,7 @@
         <source>Split operation will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1128</context>
+          <context context-type="linenumber">1129</context>
         </context-group>
         <target state="final">Teilungsvorgang wird im Hintergrund gestartet.</target>
       </trans-unit>
@@ -6582,7 +6786,7 @@
         <source>Error executing split operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1137</context>
+          <context context-type="linenumber">1138</context>
         </context-group>
         <target state="final">Fehler beim Ausführen des Teilungsvorgangs</target>
       </trans-unit>
@@ -6590,11 +6794,11 @@
         <source>Rotate confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1149</context>
+          <context context-type="linenumber">1150</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">784</context>
+          <context context-type="linenumber">787</context>
         </context-group>
         <target state="final">Rotieren bestätigen</target>
       </trans-unit>
@@ -6602,15 +6806,15 @@
         <source>This operation will permanently rotate the original version of the current document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1150</context>
+          <context context-type="linenumber">1151</context>
         </context-group>
-        <target state="final">Dieser Vorgang wird die Originalversion des aktuellen Dokuments permanent rotieren.</target>
+        <target state="final">Dieser Vorgang wird die Originalversion des aktuellen Dokuments unwiderruflich rotieren.</target>
       </trans-unit>
       <trans-unit id="4069543875319587651" datatype="html" approved="yes">
         <source>Rotation will begin in the background. Close and re-open the document after the operation has completed to see the changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1166</context>
+          <context context-type="linenumber">1167</context>
         </context-group>
         <target state="final">Der Rotationsvorgang wird im Hintergrund gestartet. Schließen und öffnen Sie das Dokument nach Abschluss des Vorgangs erneut, um die Änderungen zu sehen.</target>
       </trans-unit>
@@ -6618,7 +6822,7 @@
         <source>Error executing rotate operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1178</context>
+          <context context-type="linenumber">1179</context>
         </context-group>
         <target state="final">Fehler beim Ausführen des Rotationsvorgangs</target>
       </trans-unit>
@@ -6626,7 +6830,7 @@
         <source>Delete pages confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1190</context>
+          <context context-type="linenumber">1191</context>
         </context-group>
         <target state="final">Seiten löschen bestätigen</target>
       </trans-unit>
@@ -6634,15 +6838,15 @@
         <source>This operation will permanently delete the selected pages from the original document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1191</context>
+          <context context-type="linenumber">1192</context>
         </context-group>
-        <target state="final">Dieser Vorgang wird die ausgewählten Seiten dauerhaft aus dem Originaldokument löschen.</target>
+        <target state="final">Dieser Vorgang wird die ausgewählten Seiten unwiderruflich aus dem Originaldokument löschen.</target>
       </trans-unit>
       <trans-unit id="8617528702531167646" datatype="html" approved="yes">
         <source>Delete pages operation will begin in the background. Close and re-open or reload this document after the operation has completed to see the changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1206</context>
+          <context context-type="linenumber">1207</context>
         </context-group>
         <target state="final">Der Vorgang „Seiten löschen“ wird im Hintergrund ausgeführt. Schließen und öffnen Sie dieses Dokument nach Abschluss der Operation erneut oder laden Sie es neu, um neue Inhalte anzuzeigen.</target>
       </trans-unit>
@@ -6650,7 +6854,7 @@
         <source>Error executing delete pages operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1215</context>
+          <context context-type="linenumber">1216</context>
         </context-group>
         <target state="final">Fehler beim Ausführen des Vorgangs „Seiten löschen“</target>
       </trans-unit>
@@ -6846,7 +7050,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">371</context>
         </context-group>
-        <target state="final">Diese Aktion wird <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten das Tag „<x id="PH" equiv-text="tag.name"/>“ hinzufügen.</target>
+        <target state="final">Dieser Vorgang wird <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten das Tag „<x id="PH" equiv-text="tag.name"/>“ hinzufügen.</target>
       </trans-unit>
       <trans-unit id="1894412783609570695" datatype="html" approved="yes">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -6854,7 +7058,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">376,378</context>
         </context-group>
-        <target state="final">Diese Aktion wird die Tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> zu <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten hinzufügen.</target>
+        <target state="final">Dieser Vorgang wird die Tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> zu <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten hinzufügen.</target>
       </trans-unit>
       <trans-unit id="7181166515756808573" datatype="html" approved="yes">
         <source>This operation will remove the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -6862,7 +7066,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">384</context>
         </context-group>
-        <target state="final">Diese Aktion wird das Tag „<x id="PH" equiv-text="tag.name"/>“ von <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten entfernen.</target>
+        <target state="final">Dieser Vorgang wird das Tag „<x id="PH" equiv-text="tag.name"/>“ von <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten entfernen.</target>
       </trans-unit>
       <trans-unit id="3819792277998068944" datatype="html" approved="yes">
         <source>This operation will remove the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -6870,7 +7074,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">389,391</context>
         </context-group>
-        <target state="final">Diese Aktion wird die Tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> von <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten entfernen.</target>
+        <target state="final">Dieser Vorgang wird die Tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> von <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten entfernen.</target>
       </trans-unit>
       <trans-unit id="2739066218579571288" datatype="html" approved="yes">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -6894,7 +7098,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">436</context>
         </context-group>
-        <target state="final">Diese Aktion wird <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten den Korrespondenten „<x id="PH" equiv-text="correspondent.name"/>“ zuweisen.</target>
+        <target state="final">Dieser Vorgang wird <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten den Korrespondenten „<x id="PH" equiv-text="correspondent.name"/>“ zuweisen.</target>
       </trans-unit>
       <trans-unit id="1257522660364398440" datatype="html" approved="yes">
         <source>This operation will remove the correspondent from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -6902,7 +7106,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">438</context>
         </context-group>
-        <target state="final">Diese Aktion wird bei <x id="PH" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten den Korrespondent entfernen.</target>
+        <target state="final">Dieser Vorgang wird bei <x id="PH" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten den Korrespondent entfernen.</target>
       </trans-unit>
       <trans-unit id="5393409374423140648" datatype="html" approved="yes">
         <source>Confirm document type assignment</source>
@@ -6918,7 +7122,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">474</context>
         </context-group>
-        <target state="final">Diese Aktion wird <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten den Dokumenttyp „<x id="PH" equiv-text="documentType.name"/>“ zuweisen.</target>
+        <target state="final">Dieser Vorgang wird <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten den Dokumenttyp „<x id="PH" equiv-text="documentType.name"/>“ zuweisen.</target>
       </trans-unit>
       <trans-unit id="2236642492594872779" datatype="html" approved="yes">
         <source>This operation will remove the document type from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -6926,7 +7130,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">476</context>
         </context-group>
-        <target state="final">Diese Aktion wird den Dokumenttyp von <x id="PH" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten entfernen.</target>
+        <target state="final">Dieser Vorgang wird den Dokumenttyp von <x id="PH" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten entfernen.</target>
       </trans-unit>
       <trans-unit id="6386555513013840736" datatype="html" approved="yes">
         <source>Confirm storage path assignment</source>
@@ -6942,7 +7146,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">512</context>
         </context-group>
-        <target state="final">Diese Aktion wird <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten den Speicherpfad „<x id="PH" equiv-text="storagePath.name"/>“ zuweisen.</target>
+        <target state="final">Dieser Vorgang wird <x id="PH_1" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten den Speicherpfad „<x id="PH" equiv-text="storagePath.name"/>“ zuweisen.</target>
       </trans-unit>
       <trans-unit id="60728365335056946" datatype="html" approved="yes">
         <source>This operation will remove the storage path from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -6950,7 +7154,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">514</context>
         </context-group>
-        <target state="final">Diese Aktion wird den Speicherpfad von <x id="PH" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten entfernen.</target>
+        <target state="final">Dieser Vorgang wird den Speicherpfad von <x id="PH" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten entfernen.</target>
       </trans-unit>
       <trans-unit id="4187352575310415704" datatype="html" approved="yes">
         <source>Confirm custom field assignment</source>
@@ -7000,51 +7204,35 @@
         </context-group>
         <target state="final">Dieser Vorgang wird <x id="PH_2" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten die benutzerdefinierten Felder <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> zuweisen und die benutzerdefinierten Felder <x id="PH_1" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> entfernen.</target>
       </trans-unit>
-      <trans-unit id="749430623564850405" datatype="html" approved="yes">
-        <source>Delete confirm</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">712</context>
-        </context-group>
-        <target state="final">Löschen bestätigen</target>
-      </trans-unit>
-      <trans-unit id="4303174930844518780" datatype="html" approved="yes">
-        <source>This operation will permanently delete <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
+      <trans-unit id="8615059324209654051" datatype="html" approved="yes">
+        <source>Move <x id="PH" equiv-text="this.list.selected.size"/> selected document(s) to the trash?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">713</context>
         </context-group>
-        <target state="final">Diese Aktion wird <x id="PH" equiv-text="this.list.selected.size"/> ausgewählte(s) Dokument(e) unwiderruflich löschen.</target>
+        <target state="final"><x id="PH" equiv-text="this.list.selected.size"/> ausgewählte Dokumente in den Papierkorb verschieben?</target>
       </trans-unit>
-      <trans-unit id="6734339521247847366" datatype="html" approved="yes">
-        <source>Delete document(s)</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">716</context>
-        </context-group>
-        <target state="final">Dokument(e) löschen</target>
-      </trans-unit>
-      <trans-unit id="8585195717323764335" datatype="html">
+      <trans-unit id="8585195717323764335" datatype="html" approved="yes">
         <source>This operation will permanently recreate the archive files for <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">752</context>
+          <context context-type="linenumber">755</context>
         </context-group>
-        <target state="translated">Diese Aktion wird dauerhaft das/die Archiv(e) von <x id="PH" equiv-text="this.list.selected.size"/> verändern.</target>
+        <target state="final">Dieser Vorgang wird die Archivdateien von <x id="PH" equiv-text="this.list.selected.size"/> ausgewählten Dokumenten unwiderruflich neu erstellen.</target>
       </trans-unit>
-      <trans-unit id="7366623494074776040" datatype="html">
+      <trans-unit id="7366623494074776040" datatype="html" approved="yes">
         <source>The archive files will be re-generated with the current settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">753</context>
+          <context context-type="linenumber">756</context>
         </context-group>
-        <target state="translated">Das Archiv wird mit den aktuellen Einstellungen neu generiert.</target>
+        <target state="final">Die Archivdateien werden wird mit den aktuellen Einstellungen neu generiert.</target>
       </trans-unit>
       <trans-unit id="6390006284731990222" datatype="html" approved="yes">
         <source>This operation will permanently rotate the original version of <x id="PH" equiv-text="this.list.selected.size"/> document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">785</context>
+          <context context-type="linenumber">788</context>
         </context-group>
         <target state="final">Dieser Vorgang wird die Originalversion von <x id="PH" equiv-text="this.list.selected.size"/> Dokument(en) permanent rotieren.</target>
       </trans-unit>
@@ -7052,7 +7240,7 @@
         <source>This will alter the original copy.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">786</context>
+          <context context-type="linenumber">789</context>
         </context-group>
         <target state="final">Dies wird die Originaldatei verändern.</target>
       </trans-unit>
@@ -7060,7 +7248,7 @@
         <source>Merge confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">805</context>
+          <context context-type="linenumber">808</context>
         </context-group>
         <target state="final">Zusammenführen bestätigen</target>
       </trans-unit>
@@ -7068,7 +7256,7 @@
         <source>This operation will merge <x id="PH" equiv-text="this.list.selected.size"/> selected documents into a new document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">806</context>
+          <context context-type="linenumber">809</context>
         </context-group>
         <target state="final">Dieser Vorgang wird <x id="PH" equiv-text="this.list.selected.size"/> ausgewählte Dokumente zu einem neuen Dokument zusammenführen.</target>
       </trans-unit>
@@ -7076,7 +7264,7 @@
         <source>Merged document will be queued for consumption.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">819</context>
+          <context context-type="linenumber">825</context>
         </context-group>
         <target state="final">Das zusammengeführte Dokument wird zur Verarbeitung in die Warteschlange eingereiht.</target>
       </trans-unit>
@@ -7842,7 +8030,7 @@
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.ts</context>
           <context context-type="linenumber">72</context>
         </context-group>
-        <target state="final">Diese Aktion wird dieses Feld dauerhaft löschen.</target>
+        <target state="final">Dieser Vorgang wird dieses Feld unwiderruflich löschen.</target>
       </trans-unit>
       <trans-unit id="5137089475515834162" datatype="html" approved="yes">
         <source>Deleted field</source>
@@ -7994,7 +8182,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">113</context>
         </context-group>
-        <target state="final">Dieser Vorgang wird dieses E-Mail-Konto dauerhaft löschen.</target>
+        <target state="final">Dieser Vorgang wird dieses E-Mail-Konto unwiderruflich löschen.</target>
       </trans-unit>
       <trans-unit id="4233826387148482123" datatype="html" approved="yes">
         <source>Deleted mail account</source>
@@ -8042,7 +8230,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">172</context>
         </context-group>
-        <target state="final">Dieser Vorgang wird diese E-Mail-Regel dauerhaft löschen.</target>
+        <target state="final">Dieser Vorgang wird diese E-Mail-Regel unwiderruflich löschen.</target>
       </trans-unit>
       <trans-unit id="9077981247971516916" datatype="html" approved="yes">
         <source>Deleted mail rule</source>
@@ -8266,7 +8454,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">321</context>
         </context-group>
-        <target state="final">Dieser Vorgang wird alle Objekte permanent löschen.</target>
+        <target state="final">Dieser Vorgang wird alle Objekte unwiderruflich löschen.</target>
       </trans-unit>
       <trans-unit id="5897787932098828336" datatype="html" approved="yes">
         <source>Objects deleted successfully</source>
@@ -8394,7 +8582,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="final">Dieser Vorgang wird diesen Arbeitsablauf dauerhaft löschen.</target>
+        <target state="final">Dieser Vorgang wird diesen Arbeitsablauf unwiderruflich löschen.</target>
       </trans-unit>
       <trans-unit id="1848226135059921165" datatype="html" approved="yes">
         <source>Deleted workflow</source>

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-19 11:07-0700\n"
-"PO-Revision-Date: 2024-05-24 12:09\n"
+"PO-Revision-Date: 2024-06-18 12:10\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -1519,7 +1519,7 @@ msgstr "norma e-mail"
 
 #: paperless_mail/models.py:61
 msgid "mail rules"
-msgstr "normes e-mail"
+msgstr "normes correu"
 
 #: paperless_mail/models.py:64 paperless_mail/models.py:75
 msgid "Only process attachments."
