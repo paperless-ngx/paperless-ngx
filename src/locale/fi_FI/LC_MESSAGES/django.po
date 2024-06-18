@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-19 11:07-0700\n"
-"PO-Revision-Date: 2024-05-20 16:40\n"
+"PO-Revision-Date: 2024-06-09 12:09\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -47,11 +47,11 @@ msgstr "Säännöllinen lauseke (regex)"
 
 #: documents/models.py:58 documents/models.py:951
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Sumea sana"
 
 #: documents/models.py:59
 msgid "Automatic"
-msgstr ""
+msgstr "Automaattinen"
 
 #: documents/models.py:62 documents/models.py:416 documents/models.py:1267
 #: paperless_mail/models.py:18 paperless_mail/models.py:96
@@ -261,11 +261,11 @@ msgstr ""
 
 #: documents/models.py:399
 msgid "Small Cards"
-msgstr ""
+msgstr "Pienet kortit"
 
 #: documents/models.py:400
 msgid "Large Cards"
-msgstr ""
+msgstr "Suuret kortit"
 
 #: documents/models.py:403
 msgid "Title"
@@ -273,15 +273,15 @@ msgstr ""
 
 #: documents/models.py:404
 msgid "Created"
-msgstr ""
+msgstr "Luotu"
 
 #: documents/models.py:405
 msgid "Added"
-msgstr ""
+msgstr "Lisätty"
 
 #: documents/models.py:406
 msgid "Tags"
-msgstr ""
+msgstr "Tunnisteet"
 
 #: documents/models.py:407
 msgid "Correspondent"
@@ -289,7 +289,7 @@ msgstr ""
 
 #: documents/models.py:408
 msgid "Document Type"
-msgstr ""
+msgstr "Asiakirjan tyyppi"
 
 #: documents/models.py:409
 msgid "Storage Path"
@@ -301,11 +301,11 @@ msgstr ""
 
 #: documents/models.py:411
 msgid "Owner"
-msgstr ""
+msgstr "Omistaja"
 
 #: documents/models.py:412
 msgid "Shared"
-msgstr ""
+msgstr "Jaettu"
 
 #: documents/models.py:413
 msgid "ASN"
@@ -313,7 +313,7 @@ msgstr ""
 
 #: documents/models.py:419
 msgid "show on dashboard"
-msgstr "näytä etusivulla"
+msgstr "näytä koontinäytöllä"
 
 #: documents/models.py:422
 msgid "show in sidebar"
@@ -329,7 +329,7 @@ msgstr "lajittele käänteisesti"
 
 #: documents/models.py:434
 msgid "View page size"
-msgstr ""
+msgstr "Näytä sivun koko"
 
 #: documents/models.py:442
 msgid "View display mode"
@@ -661,7 +661,7 @@ msgstr ""
 
 #: documents/models.py:805
 msgid "Integer"
-msgstr ""
+msgstr "Kokonaisluku"
 
 #: documents/models.py:806
 msgid "Float"
@@ -829,15 +829,15 @@ msgstr ""
 
 #: documents/models.py:1162
 msgid "remove all tags"
-msgstr ""
+msgstr "poista kaikki tunnisteet"
 
 #: documents/models.py:1169
 msgid "remove these document type(s)"
-msgstr ""
+msgstr "poista nämä asiakirjatyypit"
 
 #: documents/models.py:1174
 msgid "remove all document types"
-msgstr ""
+msgstr "poista kaikki asiakirjatyypit"
 
 #: documents/models.py:1181
 msgid "remove these correspondent(s)"
