@@ -1,5 +1,72 @@
 # Changelog
 
+## paperless-ngx 2.10.0
+
+### Features
+
+- Feature: documents trash aka soft delete [@shamoon](https://github.com/shamoon) ([#6944](https://github.com/paperless-ngx/paperless-ngx/pull/6944))
+- Enhancement: better boolean custom field display [@shamoon](https://github.com/shamoon) ([#7001](https://github.com/paperless-ngx/paperless-ngx/pull/7001))
+- Feature: Allow encrypting sensitive fields in export [@stumpylog](https://github.com/stumpylog) ([#6927](https://github.com/paperless-ngx/paperless-ngx/pull/6927))
+- Enhancement: allow consumption of odg files [@daniel-boehme](https://github.com/daniel-boehme) ([#6940](https://github.com/paperless-ngx/paperless-ngx/pull/6940))
+
+### Bug Fixes
+
+- Fix: Document history could include extra fields [@stumpylog](https://github.com/stumpylog) ([#6989](https://github.com/paperless-ngx/paperless-ngx/pull/6989))
+- Fix: use local pdf worker js [@shamoon](https://github.com/shamoon) ([#6990](https://github.com/paperless-ngx/paperless-ngx/pull/6990))
+- Fix: Revert masking the content field from auditlog [@tribut](https://github.com/tribut) ([#6981](https://github.com/paperless-ngx/paperless-ngx/pull/6981))
+- Fix: respect model permissions for tasks API endpoint [@shamoon](https://github.com/shamoon) ([#6958](https://github.com/paperless-ngx/paperless-ngx/pull/6958))
+- Fix: Make the logging of an email message to be something useful [@stumpylog](https://github.com/stumpylog) ([#6901](https://github.com/paperless-ngx/paperless-ngx/pull/6901))
+
+### Documentation
+
+- Documentation: Corrections and clarifications for Python support [@stumpylog](https://github.com/stumpylog) ([#6995](https://github.com/paperless-ngx/paperless-ngx/pull/6995))
+
+### Maintenance
+
+- Chore(deps): Bump stumpylog/image-cleaner-action from 0.6.0 to 0.7.0 in the actions group [@dependabot](https://github.com/dependabot) ([#6968](https://github.com/paperless-ngx/paperless-ngx/pull/6968))
+- Chore: Configures dependabot to ignore djangorestframework [@stumpylog](https://github.com/stumpylog) ([#6967](https://github.com/paperless-ngx/paperless-ngx/pull/6967))
+
+### Dependencies
+
+<details>
+<summary>10 changes</summary>
+
+- Chore(deps): Bump pipenv from 2023.12.1 to 2024.0.1 [@stumpylog](https://github.com/stumpylog) ([#7019](https://github.com/paperless-ngx/paperless-ngx/pull/7019))
+- Chore(deps): Bump the small-changes group with 2 updates [@dependabot](https://github.com/dependabot) ([#7013](https://github.com/paperless-ngx/paperless-ngx/pull/7013))
+- Chore(deps-dev): Bump the development group with 2 updates [@dependabot](https://github.com/dependabot) ([#7012](https://github.com/paperless-ngx/paperless-ngx/pull/7012))
+- Chore(deps-dev): Bump ws from 8.15.1 to 8.17.1 in /src-ui [@dependabot](https://github.com/dependabot) ([#7015](https://github.com/paperless-ngx/paperless-ngx/pull/7015))
+- Chore(deps): Bump urllib3 from 2.2.1 to 2.2.2 [@dependabot](https://github.com/dependabot) ([#7014](https://github.com/paperless-ngx/paperless-ngx/pull/7014))
+- Chore: update packages used by mail parser html template [@shamoon](https://github.com/shamoon) ([#6970](https://github.com/paperless-ngx/paperless-ngx/pull/6970))
+- Chore(deps): Bump stumpylog/image-cleaner-action from 0.6.0 to 0.7.0 in the actions group [@dependabot](https://github.com/dependabot) ([#6968](https://github.com/paperless-ngx/paperless-ngx/pull/6968))
+- Chore(deps-dev): Bump the development group with 3 updates [@dependabot](https://github.com/dependabot) ([#6953](https://github.com/paperless-ngx/paperless-ngx/pull/6953))
+- Chore: Updates to latest Trixie version of Ghostscript 10.03.1 [@stumpylog](https://github.com/stumpylog) ([#6956](https://github.com/paperless-ngx/paperless-ngx/pull/6956))
+- Chore(deps): Bump tornado from 6.4 to 6.4.1 [@dependabot](https://github.com/dependabot) ([#6930](https://github.com/paperless-ngx/paperless-ngx/pull/6930))
+</details>
+
+### All App Changes
+
+<details>
+<summary>17 changes</summary>
+
+- Chore(deps): Bump the small-changes group with 2 updates [@dependabot](https://github.com/dependabot) ([#7013](https://github.com/paperless-ngx/paperless-ngx/pull/7013))
+- Chore(deps-dev): Bump the development group with 2 updates [@dependabot](https://github.com/dependabot) ([#7012](https://github.com/paperless-ngx/paperless-ngx/pull/7012))
+- Chore(deps-dev): Bump ws from 8.15.1 to 8.17.1 in /src-ui [@dependabot](https://github.com/dependabot) ([#7015](https://github.com/paperless-ngx/paperless-ngx/pull/7015))
+- Feature: documents trash aka soft delete [@shamoon](https://github.com/shamoon) ([#6944](https://github.com/paperless-ngx/paperless-ngx/pull/6944))
+- Enhancement: better boolean custom field display [@shamoon](https://github.com/shamoon) ([#7001](https://github.com/paperless-ngx/paperless-ngx/pull/7001))
+- Fix: default order of documents gets lost in QuerySet pipeline [@madduck](https://github.com/madduck) ([#6982](https://github.com/paperless-ngx/paperless-ngx/pull/6982))
+- Fix: Document history could include extra fields [@stumpylog](https://github.com/stumpylog) ([#6989](https://github.com/paperless-ngx/paperless-ngx/pull/6989))
+- Fix: use local pdf worker js [@shamoon](https://github.com/shamoon) ([#6990](https://github.com/paperless-ngx/paperless-ngx/pull/6990))
+- Fix: Revert masking the content field from auditlog [@tribut](https://github.com/tribut) ([#6981](https://github.com/paperless-ngx/paperless-ngx/pull/6981))
+- Chore: update packages used by mail parser html template [@shamoon](https://github.com/shamoon) ([#6970](https://github.com/paperless-ngx/paperless-ngx/pull/6970))
+- Chore(deps-dev): Bump the development group with 3 updates [@dependabot](https://github.com/dependabot) ([#6953](https://github.com/paperless-ngx/paperless-ngx/pull/6953))
+- Fix: respect model permissions for tasks API endpoint [@shamoon](https://github.com/shamoon) ([#6958](https://github.com/paperless-ngx/paperless-ngx/pull/6958))
+- Feature: Allow encrypting sensitive fields in export [@stumpylog](https://github.com/stumpylog) ([#6927](https://github.com/paperless-ngx/paperless-ngx/pull/6927))
+- Enhancement: allow consumption of odg files [@daniel-boehme](https://github.com/daniel-boehme) ([#6940](https://github.com/paperless-ngx/paperless-ngx/pull/6940))
+- Enhancement: use note model permissions for notes [@shamoon](https://github.com/shamoon) ([#6913](https://github.com/paperless-ngx/paperless-ngx/pull/6913))
+- Chore: Resolves test issues with Python 3.12 [@stumpylog](https://github.com/stumpylog) ([#6902](https://github.com/paperless-ngx/paperless-ngx/pull/6902))
+- Fix: Make the logging of an email message to be something useful [@stumpylog](https://github.com/stumpylog) ([#6901](https://github.com/paperless-ngx/paperless-ngx/pull/6901))
+</details>
+
 ## paperless-ngx 2.9.0
 
 ### Features
