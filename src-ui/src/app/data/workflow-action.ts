@@ -17,7 +17,7 @@ export interface WorkflowAction extends ObjectWithId {
 
   assign_storage_path?: number // StoragePath.id
 
-  assign_warehouses?: number // Warehouse.id
+  
 
   assign_owner?: number // User.id
 
@@ -46,10 +46,6 @@ export interface WorkflowAction extends ObjectWithId {
   remove_storage_paths?: number[] // [StoragePath.id]
 
   remove_all_storage_paths?: boolean
-
-  remove_warehouses?: number[] // [Warehouse.id]
-
-  remove_all_warehouses?: boolean
 
   remove_owners?: number[] // [User.id]
 

@@ -1,3 +1,4 @@
+import hashlib
 import itertools
 import json
 import logging
@@ -100,10 +101,13 @@ from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
 from documents.filters import WarehouseFilterSet
+from documents.filters import FolderFilterSet
 
 from documents.matching import match_correspondents
 from documents.matching import match_document_types
 from documents.matching import match_storage_paths
+from documents.matching import match_warehouses
+from documents.matching import match_folders
 from documents.matching import match_tags
 from documents.models import Correspondent
 from documents.models import CustomField
@@ -120,6 +124,7 @@ from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.models import Warehouse
+from documents.models import Folder
 
 from documents.parsers import get_parser_class_for_mime_type
 from documents.parsers import parse_date_generator
@@ -149,6 +154,7 @@ from documents.serialisers import WorkflowActionSerializer
 from documents.serialisers import WorkflowSerializer
 from documents.serialisers import WorkflowTriggerSerializer
 from documents.serialisers import WarehouseSerializer
+from documents.serialisers import FolderSerializer
 
 from documents.signals import document_updated
 from documents.tasks import consume_file
@@ -336,7 +342,7 @@ class DocumentViewSet(
         ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = DocumentFilterSet
-    search_fields = ("title", "correspondent__name", "content", "warehouses")
+    search_fields = ("title", "correspondent__name", "content", "warehouse", "folder")
     ordering_fields = (
         "id",
         "title",
@@ -354,7 +360,7 @@ class DocumentViewSet(
         return (
             Document.objects.distinct()
             .annotate(num_notes=Count("notes"))
-            .select_related("correspondent", "storage_path", "document_type", "owner")
+            .select_related("correspondent", "storage_path", "document_type","warehouse", "folder", "owner")
             .prefetch_related("tags", "custom_fields", "notes")
         )
 
@@ -528,6 +534,12 @@ class DocumentViewSet(
         resp_data = {
             "correspondents": [
                 c.id for c in match_correspondents(doc, classifier, request.user)
+            ],
+            "warehouses": [
+                wh.id for wh in match_warehouses(doc, classifier, request.user)
+            ],
+            "folders": [
+                f.id for f in match_folders(doc, classifier, request.user)
             ],
             "tags": [t.id for t in match_tags(doc, classifier, request.user)],
             "document_types": [
@@ -741,7 +753,7 @@ class DocumentViewSet(
             ]
             return Response(links)
 
-
+            
 class SearchResultSerializer(DocumentSerializer, PassUserMixin):
     def to_representation(self, instance):
         doc = (
@@ -749,6 +761,8 @@ class SearchResultSerializer(DocumentSerializer, PassUserMixin):
                 "correspondent",
                 "storage_path",
                 "document_type",
+                "warehouse",
+                "folder",
                 "owner",
             )
             .prefetch_related("tags", "custom_fields", "notes")
@@ -937,6 +951,8 @@ class PostDocumentView(GenericAPIView):
         correspondent_id = serializer.validated_data.get("correspondent")
         document_type_id = serializer.validated_data.get("document_type")
         storage_path_id = serializer.validated_data.get("storage_path")
+        warehouse_id = serializer.validated_data.get("warehouse")
+        folder_id = serializer.validated_data.get("folder")
         tag_ids = serializer.validated_data.get("tags")
         title = serializer.validated_data.get("title")
         created = serializer.validated_data.get("created")
@@ -965,6 +981,8 @@ class PostDocumentView(GenericAPIView):
             correspondent_id=correspondent_id,
             document_type_id=document_type_id,
             storage_path_id=storage_path_id,
+            warehouse_id=warehouse_id,
+            folder_id=folder_id,
             tag_ids=tag_ids,
             created=created,
             asn=archive_serial_number,
@@ -1014,6 +1032,18 @@ class SelectionDataView(GenericAPIView):
                 Case(When(documents__id__in=ids, then=1), output_field=IntegerField()),
             ),
         )
+        
+        warehouses = Warehouse.objects.annotate(
+            document_count=Count(
+                Case(When(documents__id__in=ids, then=1), output_field=IntegerField()),
+            ),
+        )
+        
+        folders = Folder.objects.annotate(
+            document_count=Count(
+                Case(When(documents__id__in=ids, then=1), output_field=IntegerField()),
+            ),
+        )
 
         r = Response(
             {
@@ -1026,6 +1056,12 @@ class SelectionDataView(GenericAPIView):
                 ],
                 "selected_document_types": [
                     {"id": t.id, "document_count": t.document_count} for t in types
+                ],
+                "selected_warehouses": [
+                    {"id": t.id, "document_count": t.document_count} for t in warehouses
+                ],
+                "selected_folders": [
+                    {"id": t.id, "document_count": t.document_count} for t in folders
                 ],
                 "selected_storage_paths": [
                     {"id": t.id, "document_count": t.document_count}
@@ -1111,6 +1147,30 @@ class StatisticsView(APIView):
                 ),
             )
         )
+        warehouse_count = (
+            Warehouse.objects.count()
+            if user is None
+            else len(
+                get_objects_for_user_owner_aware(
+                    user,
+                    "documents.view_warehouse",
+                    Warehouse,
+                ),
+            )
+        )
+        
+        folder_count = (
+            Folder.objects.count()
+            if user is None
+            else len(
+                get_objects_for_user_owner_aware(
+                    user,
+                    "documents.view_folder",
+                    Folder,
+                ),
+            )
+        )
+        
         storage_path_count = (
             StoragePath.objects.count()
             if user is None
@@ -1160,6 +1220,8 @@ class StatisticsView(APIView):
                 "correspondent_count": correspondent_count,
                 "document_type_count": document_type_count,
                 "storage_path_count": storage_path_count,
+                "warehouse_count": warehouse_count,
+                "folder_count": folder_count,
             },
         )
 
@@ -1531,23 +1593,42 @@ class BulkEditObjectsView(PassUserMixin):
                 
                 if warehouse.type == Warehouse.SHELF:
                     boxcases = Warehouse.objects.filter(parent_warehouse=warehouse) 
-                    documents = Document.objects.filter(warehouses__in=[b.id for b in boxcases])
+                    documents = Document.objects.filter(warehouse__in=[b.id for b in boxcases])
                     documents.delete()
                     boxcases.delete()
                     warehouse.delete()
                 if warehouse.type == Warehouse.BOXCASE:
-                    documents = Document.objects.filter(warehouses=warehouse)
+                    documents = Document.objects.filter(warehouse=warehouse)
                     documents.delete()
                     warehouse.delete()
                 if warehouse.type == Warehouse.WAREHOUSE:
                     shelves = Warehouse.objects.filter(parent_warehouse=warehouse)
                     boxcases = Warehouse.objects.filter(parent_warehouse__in=[s.id for s in shelves]) 
-                    documents = Document.objects.filter(warehouses__in=[b.id for b in boxcases])
+                    documents = Document.objects.filter(warehouse__in=[b.id for b in boxcases])
                     documents.delete()
                     boxcases.delete()
                     shelves.delete()
                     warehouse.delete()
                     
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        
+        elif operation == "delete" and object_type == "folders":
+            for folder_id in object_ids:
+                folder = Folder.objects.get(id=int(folder_id))
+                
+                def delete_folder_hierarchy(folder_instance):
+                    documents = Document.objects.filter(folder=folder_instance)
+                    documents.delete()
+                    
+                    child_folders = Folder.objects.filter(parent_folder=folder_instance)
+                    for child_folder in child_folders:
+                        delete_folder_hierarchy(child_folder)
+                    
+                    folder_instance.delete()
+                
+                delete_folder_hierarchy(folder)
+            
+            return Response(status=status.HTTP_204_NO_CONTENT)            
                           
         elif operation == "delete":
 
@@ -1718,6 +1799,12 @@ class SystemStatusView(PassUserMixin):
                         or Correspondent.objects.filter(
                             matching_algorithm=Tag.MATCH_AUTO,
                         ).exists()
+                        or Warehouse.objects.filter(
+                            matching_algorithm=Tag.MATCH_AUTO,
+                        ).exists()
+                        or Folder.objects.filter(
+                            matching_algorithm=Tag.MATCH_AUTO,
+                        ).exists()
                         or StoragePath.objects.filter(
                             matching_algorithm=Tag.MATCH_AUTO,
                         ).exists()
@@ -1809,51 +1896,346 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     filterset_class = WarehouseFilterSet
     ordering_fields = ("name", "type", "parent_warehouse", "document_count")
     
+    def getWarehouseDoc(self, wareh):
+        currentUser = self.request.user
+        if wareh.type == Warehouse.BOXCASE:
+            return list(Document.objects.filter(warehouse=wareh, owner=currentUser).order_by("-created").values())
+        elif wareh.type == Warehouse.SHELF:
+            boxcases = Warehouse.objects.filter(parent_warehouse=wareh)
+            return list(Document.objects.filter(warehouse__in=[b.id for b in boxcases], owner=currentUser).order_by("-created").values())
+        elif wareh.type == Warehouse.WAREHOUSE:
+            shelves = Warehouse.objects.filter(parent_warehouse=wareh)
+            boxcases = Warehouse.objects.filter(parent_warehouse__in=[s.id for s in shelves])
+            return list(Document.objects.filter(warehouse__in=[b.id for b in boxcases], owner=currentUser).order_by("-created").values())
+        else:
+            return list(Document.objects.none())
+    
+    @action(methods=["get"], detail=True)
+    def documents(self, request, pk=None):
+        currentUser = request.user
+        try:
+            wareh= Warehouse.objects.get(pk=pk)
+            if currentUser is not None and not has_perms_owner_aware(
+                currentUser,
+                "view_warehouse",
+                wareh,
+            ):
+                return HttpResponseForbidden("Insufficient permissions to view warehouses")
+        except Warehouse.DoesNotExist:
+            raise Http404
+
+        if request.method == "GET":
+            try:
+                return Response(self.getWarehouseDoc(wareh))
+            except Exception as e:
+                logger.warning(f"An error occurred retrieving warehouses: {e!s}")
+                return Response(
+                    {"error": "Error retrieving warehouses, check logs for more detail."},
+                )
+    
+    
     def create(self, request, *args, **kwargs):
-        # try:                                                          
+        # try:                                                                                                                    
         serializer = WarehouseSerializer(data=request.data)
-        name = None
-        type = None
         parent_warehouse = None
         if serializer.is_valid(raise_exception=True):
-            name = serializer.validated_data.get("name", "")
-            type = serializer.validated_data.get("type", Warehouse.WAREHOUSE)
             parent_warehouse = serializer.validated_data.get('parent_warehouse',None)
-        # check_warehouse = Warehouse.objects.filter(
-        #     name = name,
-        #     type = type,
-        #     parent_warehouse=parent_warehouse
-        # )
-        
-        # if check_warehouse:
-        #     return Response({'status':400,
-        #                 'message':'created fail'},status=status.HTTP_400_BAD_REQUEST)
-        
-        # if type == Warehouse.SHELF and parent_warehouse == None:
-        #     return Response({'status': 400,
-        #                     'message': 'parent_warehouse is required for Shelf type'}, status=status.HTTP_400_BAD_REQUEST)
-        # elif type == Warehouse.BOXCASE and parent_warehouse == None:
-        #     return Response({'status': 400,
-        #                     'message': 'parent_warehouse is required for Boxcase type'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # if serializer.is_valid(raise_exception=True):
+            
         parent_warehouse = Warehouse.objects.filter(id=parent_warehouse.id if parent_warehouse else 0).first()   
         
         if serializer.validated_data.get("type") == Warehouse.WAREHOUSE and not parent_warehouse:
-            serializer.save()
+            warehouse = serializer.save(owner=request.user)
+            warehouse.path = str(warehouse.id)
+            warehouse.save()
         elif serializer.validated_data.get("type", "") == Warehouse.SHELF and  getattr(parent_warehouse, 'type', "") == Warehouse.WAREHOUSE :
-            serializer.save(type = Warehouse.SHELF, parent_warehouse = parent_warehouse)
+            warehouse = serializer.save(type=Warehouse.SHELF, parent_warehouse=parent_warehouse,owner=request.user)
+            warehouse.path = f"{parent_warehouse.path}/{warehouse.id}"
+            warehouse.save()
         elif serializer.validated_data.get("type", "") == Warehouse.BOXCASE and  getattr(parent_warehouse, 'type', "") == Warehouse.SHELF :
-            serializer.save(type = Warehouse.BOXCASE, parent_warehouse = parent_warehouse)
+            warehouse = serializer.save(type=Warehouse.BOXCASE, parent_warehouse=parent_warehouse,owner=request.user)
+            warehouse.path = f"{parent_warehouse.path}/{warehouse.id}"
+            warehouse.save()
         else:
-            return Response({'status':400,
-                            'message':'misplaced'},status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'status':201,
-                        'message':'created successfully',
-                        'data':serializer.data},status=status.HTTP_201_CREATED)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
 
-        # except Exception as e:
-        #     return Response({'status':400,
-        #                     'message':e},status=status.HTTP_400_BAD_REQUEST)
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
 
+       
+        old_parent_warehouse = instance.parent_warehouse
+
+        self.perform_update(serializer)
+
+        if old_parent_warehouse != instance.parent_warehouse:
+           
+            if instance.type == Warehouse.SHELF and getattr(instance.parent_warehouse, 'type', "") == Warehouse.WAREHOUSE :
+                instance.path = f"{instance.parent_warehouse.path}/{instance.id}"
+            elif instance.type == Warehouse.BOXCASE and  getattr(instance.parent_warehouse, 'type', "") == Warehouse.SHELF :
+                instance.path = f"{instance.parent_warehouse.path}/{instance.id}"
+            elif instance.type == Warehouse.WAREHOUSE and not instance.parent_warehouse:
+                instance.path = str(instance.id)
+            else: 
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            instance.save()
+            
+            boxcase_warehouses = Warehouse.objects.filter(type=Warehouse.BOXCASE, parent_warehouse=instance)
+            for boxcase_warehouse in boxcase_warehouses:
+                boxcase_warehouse.path = f"{instance.path}/{boxcase_warehouse.id}"
+                boxcase_warehouse.save()
+
+
+        return Response(serializer.data)
+
+    def partial_update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', True)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+
+       
+        old_parent_warehouse = instance.parent_warehouse
+
+        self.perform_update(serializer)
+
+        if old_parent_warehouse != instance.parent_warehouse:
+           
+            if instance.type == Warehouse.SHELF and getattr(instance.parent_warehouse, 'type', "") == Warehouse.WAREHOUSE :
+                instance.path = f"{instance.parent_warehouse.path}/{instance.id}"
+            elif instance.type == Warehouse.BOXCASE and  getattr(instance.parent_warehouse, 'type', "") == Warehouse.SHELF :
+                instance.path = f"{instance.parent_warehouse.path}/{instance.id}"
+            elif instance.type == Warehouse.WAREHOUSE and not instance.parent_warehouse:
+                instance.path = str(instance.id)
+            else: 
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            instance.save()
+            
+            boxcase_warehouses = Warehouse.objects.filter(type=Warehouse.BOXCASE, parent_warehouse=instance)
+            for boxcase_warehouse in boxcase_warehouses:
+                boxcase_warehouse.path = f"{instance.path}/{boxcase_warehouse.id}"
+                boxcase_warehouse.save()
+
+
+        return Response(serializer.data)
+        
+    def destroy(self, request, pk, *args, **kwargs):
+        warehouse = Warehouse.objects.get(id=pk)
+        if warehouse.type == Warehouse.SHELF:
+            boxcases = Warehouse.objects.filter(parent_warehouse=warehouse) 
+            documents = Document.objects.filter(warehouse__in=[b.id for b in boxcases])
+            documents.delete()
+            boxcases.delete()
+            warehouse.delete()
+        if warehouse.type == Warehouse.BOXCASE:
+            documents = Document.objects.filter(warehouse=warehouse)
+            documents.delete()
+            warehouse.delete()
+        if warehouse.type == Warehouse.WAREHOUSE:
+            shelves = Warehouse.objects.filter(parent_warehouse=warehouse)
+            boxcases = Warehouse.objects.filter(parent_warehouse__in=[s.id for s in shelves]) 
+            documents = Document.objects.filter(warehouse__in=[b.id for b in boxcases])
+            documents.delete()
+            boxcases.delete()
+            shelves.delete()
+            warehouse.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
+    model = Folder
+
+    queryset = Folder.objects.select_related("owner").order_by(
+        Lower("name"),
+    )
+
+    serializer_class = FolderSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
+    filterset_class = FolderFilterSet
+    ordering_fields = ("name", "path", "parent_folder", "document_count")
+
+        
+    def getFolderDoc(self, request):
+        currentUser = request.user
+        documents = list(Document.objects.filter(folder=None, owner=currentUser).order_by("-created").values())
+        folders = list(Folder.objects.filter(parent_folder=None, owner=currentUser).order_by("name").values())
+        return {
+            "documents": documents,
+            "folders": folders,
+        }    
+        
+    @action(methods=["get"], detail=False)
+    def folders_documents(self, request):
+        
+        if request.method == "GET":
+            try:
+                return Response(self.getFolderDoc(request))
+            except Exception as e:
+                logger.warning(f"An error occurred retrieving folders: {e!s}")
+                return Response(
+                    {"error": "Error retrieving folders, check logs for more detail."},
+                )
+    
+    
+    def getFolderDocById(self, fol):
+        
+        documents = list(Document.objects.filter(folder=fol).order_by("-created").values())
+        child_folders = list(Folder.objects.filter(parent_folder=fol).order_by("name").values())
+        return {
+            "documents": documents,
+            "folders": child_folders,
+        }
+    
+    @action(methods=["get"], detail=True)
+    def folders_documents_by_id(self, request, pk=None):
+        print("dkljfskljf")
+        currentUser = request.user
+        try:
+            fol = Folder.objects.get(pk=pk)
+            if currentUser is not None and not has_perms_owner_aware(
+                currentUser,
+                "view_folder",
+                fol,
+            ):
+                return HttpResponseForbidden("Insufficient permissions to view folders")
+        except Folder.DoesNotExist:
+            raise Http404
+
+        if request.method == "GET":
+            try:
+                return Response(self.getFolderDocById(fol))
+            except Exception as e:
+                logger.warning(f"An error occurred retrieving folders: {e!s}")
+                return Response(
+                    {"error": "Error retrieving folders, check logs for more detail."},
+                )
+    
+    
+    def create(self, request, *args, **kwargs):
+        # try:                                                          
+        serializer = FolderSerializer(data=request.data)
+        parent_folder = None
+        if serializer.is_valid(raise_exception=True):
+            parent_folder = serializer.validated_data.get('parent_folder',None)
+            
+        parent_folder = Folder.objects.filter(id=parent_folder.id if parent_folder else 0).first()   
+        
+        if parent_folder == None:
+            folder = serializer.save(owner=request.user)
+            folder.path = str(folder.id)
+            folder.checksum = hashlib.md5(f'{folder.id}.{folder.name}'.encode()).hexdigest()
+            folder.save()
+        elif parent_folder:
+            folder = serializer.save(parent_folder=parent_folder,owner=request.user)
+            folder.path = f"{parent_folder.path}/{folder.id}"
+            folder.checksum = hashlib.md5(f'{folder.id}.{folder.name}'.encode()).hexdigest()
+            folder.save()
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        
+        if 'parent_folder' in request.data and int(request.data['parent_folder']) == instance.id:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+        if 'parent_folder' in request.data :
+            new_parent_folder = Folder.objects.get(id=int(request.data['parent_folder']))
+            if new_parent_folder.path.startswith(instance.path):
+                return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a folder into one of its child folders.'})
+        else:
+            request.data['parent_folder'] = None
+        
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+
+        old_parent_folder = instance.parent_folder
+
+        self.perform_update(serializer)
+
+        if old_parent_folder != instance.parent_folder:
+            if instance.parent_folder:
+                instance.path = f"{instance.parent_folder.path}/{instance.id}"
+                
+            else:
+                instance.path = f"{instance.id}"
+            instance.save()
+
+            self.update_child_folder_paths(instance)
+            
+        return Response(serializer.data)
+    
+    def partial_update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', True)
+        instance = self.get_object()
+        
+        if 'parent_folder' in request.data and int(request.data['parent_folder']) == instance.id:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+        if 'parent_folder' in request.data :
+            new_parent_folder = Folder.objects.get(id=int(request.data['parent_folder']))
+            if new_parent_folder.path.startswith(instance.path):
+                return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a folder into one of its child folders.'})
+        else:
+            request.data['parent_folder'] = None
+        
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+
+        old_parent_folder = instance.parent_folder
+
+        self.perform_update(serializer)
+
+        if old_parent_folder != instance.parent_folder:
+            if instance.parent_folder:
+                instance.path = f"{instance.parent_folder.path}/{instance.id}"
+            else:
+                instance.path = f"{instance.id}"
+            instance.save()
+
+            self.update_child_folder_paths(instance)
+
+        return Response(serializer.data)
+
+    def update_child_folder_paths(self, folder):
+        child_folders = Folder.objects.filter(parent_folder=folder)
+        for child_folder in child_folders:
+            if folder.path:
+                child_folder.path = f"{folder.path}/{child_folder.id}"
+            else:
+                child_folder.path = f"{child_folder.id}"
+            child_folder.save()
+            self.update_child_folder_paths(child_folder)
+            
+    
+    def destroy(self, request, pk, *args, **kwargs):
+        folder = Folder.objects.get(id=pk)
+        
+        def delete_folder_hierarchy(folder_instance):
+            documents = Document.objects.filter(folder=folder_instance)
+            documents.delete()
+            
+            child_folders = Folder.objects.filter(parent_folder=folder_instance)
+            for child_folder in child_folders:
+                delete_folder_hierarchy(child_folder)
+            
+            folder_instance.delete()
+        
+        delete_folder_hierarchy(folder)
+        
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    

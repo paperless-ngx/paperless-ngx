@@ -241,6 +241,9 @@ describe('FilterEditorComponent', () => {
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}documents/storage_paths/`
     )
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/warehouses/`
+    )
   })
 
   // SET filterRules
@@ -1646,6 +1649,10 @@ describe('FilterEditorComponent', () => {
         { id: 32, document_count: 1 },
         { id: 33, document_count: 0 },
       ],
+      selected_warehouses: [
+        { id: 42, document_count: 1 },
+        { id: 43, document_count: 0 },
+      ],
     }
   })
 
@@ -1703,6 +1710,24 @@ describe('FilterEditorComponent', () => {
       },
     ]
     expect(component.generateFilterName()).toEqual('Without storage path')
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_WAREHOUSE_ANY,
+        value: '42',
+      },
+    ]
+    expect(component.generateFilterName()).toEqual(
+      `Warehouse path: ${warehouses[0].name}`
+    )
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_WAREHOUSE,
+        value: null,
+      },
+    ]
+    expect(component.generateFilterName()).toEqual('Without warehouse')
 
     component.filterRules = [
       {

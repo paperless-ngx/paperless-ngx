@@ -129,7 +129,114 @@ def set_correspondent(
 
             document.correspondent = selected
             document.save(update_fields=("correspondent",))
+            
+def set_folder(
+    sender,
+    document: Document,
+    logging_group=None,
+    classifier: Optional[DocumentClassifier] = None,
+    replace=False,
+    use_first=True,
+    suggest=False,
+    base_url=None,
+    stdout=None,
+    style_func=None,
+    **kwargs,
+):
+    if document.folder and not replace:
+        return
 
+    potential_folders = matching.match_folders(document, classifier)
+
+    potential_count = len(potential_folders)
+    selected = potential_folders[0] if potential_folders else None
+    if potential_count > 1:
+        if use_first:
+            logger.debug(
+                f"Detected {potential_count} potential folders, "
+                f"so we've opted for {selected}",
+                extra={"group": logging_group},
+            )
+        else:
+            logger.debug(
+                f"Detected {potential_count} potential folders, "
+                f"not assigning any folder",
+                extra={"group": logging_group},
+            )
+            return
+
+    if selected or replace:
+        if suggest:
+            _suggestion_printer(
+                stdout,
+                style_func,
+                "folder",
+                document,
+                selected,
+                base_url,
+            )
+        else:
+            logger.info(
+                f"Assigning folder {selected} to {document}",
+                extra={"group": logging_group},
+            )
+
+            document.folder = selected
+            document.save(update_fields=("folder",))
+
+def set_warehouse(
+    sender,
+    document: Document,
+    logging_group=None,
+    classifier: Optional[DocumentClassifier] = None,
+    replace=False,
+    use_first=True,
+    suggest=False,
+    base_url=None,
+    stdout=None,
+    style_func=None,
+    **kwargs,
+):
+    if document.warehouse and not replace:
+        return
+
+    potential_warehouses = matching.match_warehouses(document, classifier)
+
+    potential_count = len(potential_warehouses)
+    selected = potential_warehouses[0] if potential_warehouses else None
+    if potential_count > 1:
+        if use_first:
+            logger.debug(
+                f"Detected {potential_count} potential warehouses, "
+                f"so we've opted for {selected}",
+                extra={"group": logging_group},
+            )
+        else:
+            logger.debug(
+                f"Detected {potential_count} potential warehouses, "
+                f"not assigning any warehouse",
+                extra={"group": logging_group},
+            )
+            return
+
+    if selected or replace:
+        if suggest:
+            _suggestion_printer(
+                stdout,
+                style_func,
+                "warehouse",
+                document,
+                selected,
+                base_url,
+            )
+        else:
+            logger.info(
+                f"Assigning warehouse {selected} to {document}",
+                extra={"group": logging_group},
+            )
+
+            document.warehouse = selected
+            document.save(update_fields=("warehouse",))
 
 def set_document_type(
     sender,
@@ -570,7 +677,7 @@ def run_workflow(
 
                     if action.assign_correspondent is not None:
                         document.correspondent = action.assign_correspondent
-
+                    
                     if action.assign_document_type is not None:
                         document.document_type = action.assign_document_type
 

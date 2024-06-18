@@ -174,7 +174,7 @@ def generate_filename(
                 )
             else:
                 document_type = no_value_default
-
+                
             if doc.archive_serial_number:
                 asn = str(doc.archive_serial_number)
             else:

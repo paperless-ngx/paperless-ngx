@@ -7,6 +7,8 @@ from documents.classifier import DocumentClassifier
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentSource
 from documents.models import Correspondent
+from documents.models import Warehouse
+from documents.models import Folder
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
@@ -55,7 +57,52 @@ def match_correspondents(document: Document, classifier: DocumentClassifier, use
             correspondents,
         ),
     )
+    
+def match_folders(document: Document, classifier: DocumentClassifier, user=None):
+    pred_id = classifier.predict_folder(document.content) if classifier else None
 
+    if user is None and document.owner is not None:
+        user = document.owner
+
+    if user is not None:
+        folders = get_objects_for_user_owner_aware(
+            user,
+            "documents.view_folder",
+            Folder,
+        )
+    else:
+        folders = Folder.objects.all()
+
+    return list(
+        filter(
+            lambda o: matches(o, document)
+            or (o.pk == pred_id and o.matching_algorithm == MatchingModel.MATCH_AUTO),
+            folders,
+        ),
+    )
+
+def match_warehouses(document: Document, classifier: DocumentClassifier, user=None):
+    pred_id = classifier.predict_warehouse(document.content) if classifier else None
+
+    if user is None and document.owner is not None:
+        user = document.owner
+
+    if user is not None:
+        warehouses = get_objects_for_user_owner_aware(
+            user,
+            "documents.view_warehouse",
+            Warehouse,
+        )
+    else:
+        warehouses = Warehouse.objects.all()
+
+    return list(
+        filter(
+            lambda o: matches(o, document)
+            or (o.pk == pred_id and o.matching_algorithm == MatchingModel.MATCH_AUTO),
+            warehouses,
+        ),
+    )
 
 def match_document_types(document: Document, classifier: DocumentClassifier, user=None):
     pred_id = classifier.predict_document_type(document.content) if classifier else None
@@ -356,7 +403,8 @@ def existing_document_matches_workflow(
             f"Document correspondent {document.correspondent} does not match {trigger.filter_has_correspondent}",
         )
         trigger_matched = False
-
+        
+    
     # Document document_type vs trigger has_document_type
     if (
         trigger.filter_has_document_type is not None

@@ -16,13 +16,15 @@ class DocumentMetadataOverrides:
     be set from content or matching.  All fields default to None,
     meaning no override is happening
     """
-
+   
     filename: Optional[str] = None
     title: Optional[str] = None
     correspondent_id: Optional[int] = None
     document_type_id: Optional[int] = None
     tag_ids: Optional[list[int]] = None
     storage_path_id: Optional[int] = None
+    warehouse_id: Optional[int] = None
+    folder_id: Optional[int] = None
     created: Optional[datetime.datetime] = None
     asn: Optional[int] = None
     owner_id: Optional[int] = None
@@ -48,6 +50,10 @@ class DocumentMetadataOverrides:
             self.document_type_id = other.document_type_id
         if other.storage_path_id is not None:
             self.storage_path_id = other.storage_path_id
+        if other.warehouse_id is not None:
+            self.warehouse_id = other.warehouse_id
+        if other.folder_id is not None:
+            self.folder_id = other.folder_id
         if other.owner_id is not None:
             self.owner_id = other.owner_id
 
@@ -100,6 +106,8 @@ class DocumentMetadataOverrides:
         overrides.correspondent_id = doc.correspondent.id if doc.correspondent else None
         overrides.document_type_id = doc.document_type.id if doc.document_type else None
         overrides.storage_path_id = doc.storage_path.id if doc.storage_path else None
+        overrides.warehouse_id = doc.warehouse.id if doc.warehouse else None
+        overrides.folder_id = doc.folder.id if doc.folder else None
         overrides.owner_id = doc.owner.id if doc.owner else None
         overrides.tag_ids = list(doc.tags.values_list("id", flat=True))
 

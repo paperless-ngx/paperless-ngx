@@ -30,7 +30,7 @@ export const DOCUMENT_SORT_FIELDS = [
   { field: 'correspondent__name', name: $localize`Correspondent` },
   { field: 'title', name: $localize`Title` },
   { field: 'document_type__name', name: $localize`Document type` },
-  { field: 'warehouses__name', name: $localize`Warehouse` },
+  { field: 'warehouse__name', name: $localize`Warehouse` },
   { field: 'created', name: $localize`Created` },
   { field: 'added', name: $localize`Added` },
   { field: 'modified', name: $localize`Modified` },

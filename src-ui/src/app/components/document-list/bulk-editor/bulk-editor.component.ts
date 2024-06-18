@@ -66,7 +66,7 @@ export class BulkEditorComponent
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
   storagePathsSelectionModel = new FilterableDropdownSelectionModel()
-  warehousesSelectionModel = new FilterableDropdownSelectionModel()
+  warehouseSelectionModel = new FilterableDropdownSelectionModel()
   tagDocumentCounts: SelectionDataItem[]
   correspondentDocumentCounts: SelectionDataItem[]
   documentTypeDocumentCounts: SelectionDataItem[]
@@ -325,7 +325,7 @@ export class BulkEditorComponent
         this.warehouseDocumentCounts = s.selected_warehouses
         this.applySelectionData(
           s.selected_warehouses,
-          this.warehousesSelectionModel
+          this.warehouseSelectionModel
         )
       })
   }
@@ -609,6 +609,27 @@ export class BulkEditorComponent
       })
   }
 
+  createWarehouse(name: string) {
+    let modal = this.modalService.open(WarehouseEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    modal.componentInstance.object = { name }
+    modal.componentInstance.succeeded
+      .pipe(
+        switchMap((newWarehouse) => {
+          return this.warehouseService
+            .listAll()
+            .pipe(map((warehouses) => ({ newWarehouse, warehouses })))
+        })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ newWarehouse, warehouses }) => {
+        this.warehouses = warehouses.results
+        this.warehouseSelectionModel.toggle(newWarehouse.id)
+      })
+  }
+
   createDocumentType(name: string) {
     let modal = this.modalService.open(DocumentTypeEditDialogComponent, {
       backdrop: 'static',
@@ -651,26 +672,6 @@ export class BulkEditorComponent
       })
   }
 
-  createWarehouse(name: string) {
-    let modal = this.modalService.open(WarehouseEditDialogComponent, {
-      backdrop: 'static',
-    })
-    modal.componentInstance.dialogMode = EditDialogMode.CREATE
-    modal.componentInstance.object = { name }
-    modal.componentInstance.succeeded
-      .pipe(
-        switchMap((newWarehouse) => {
-          return this.warehouseService
-            .listAll()
-            .pipe(map((warehouses) => ({ newWarehouse, warehouses })))
-        })
-      )
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(({ newWarehouse, warehouses }) => {
-        this.warehouses = warehouses.results
-        this.warehousesSelectionModel.toggle(newWarehouse.id)
-      })
-  }
 
   applyDelete() {
     let modal = this.modalService.open(ConfirmDialogComponent, {

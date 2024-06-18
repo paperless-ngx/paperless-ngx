@@ -144,14 +144,36 @@ class Warehouse(MatchingModel):
                                       choices=TYPE_WAREHOUSE,
                                       default=WAREHOUSE,)
     parent_warehouse = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True )
+    path = models.TextField(_("path"), null=True, blank=True)
     
     class Meta(MatchingModel.Meta): 
         verbose_name = _("warehouse")
         verbose_name_plural = _("warehouses")
+        constraints = []
     
     def __str__(self):
         return self.name
+    
+class Folder(MatchingModel):
+    parent_folder = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True )
+    path = models.TextField(_("path"), null=True, blank=True)
+    checksum = models.CharField(
+        _("checksum"),
+        max_length=32,
+        editable=False,
+        unique=True,
+        null=True,
+        help_text=_("The checksum of the original folder."),
+    )
 
+    class Meta(MatchingModel.Meta):
+        
+        verbose_name = _("folder")
+        verbose_name_plural = _("folders")
+        constraints = []
+    def __str__(self): 
+        return self.name
+    
 class Document(ModelWithOwner):
     STORAGE_TYPE_UNENCRYPTED = "unencrypted"
     STORAGE_TYPE_GPG = "gpg"
@@ -176,6 +198,24 @@ class Document(ModelWithOwner):
         related_name="documents",
         on_delete=models.SET_NULL,
         verbose_name=_("storage path"),
+    )
+    
+    folder = models.ForeignKey(
+        Folder,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL,
+        verbose_name=_("folder"),
+    )
+    
+    warehouse = models.ForeignKey(
+        Warehouse,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL,
+        verbose_name=_("warehouse"),
     )
 
     title = models.CharField(_("title"), max_length=128, blank=True, db_index=True)
@@ -207,15 +247,6 @@ class Document(ModelWithOwner):
         verbose_name=_("tags"),
     )
     
-    warehouses = models.ForeignKey(
-        Warehouse,
-        blank=True,
-        null=True,
-        related_name="documents",
-        on_delete=models.SET_NULL,
-        verbose_name=_("warehouses"),
-    )
-
     checksum = models.CharField(
         _("checksum"),
         max_length=32,
