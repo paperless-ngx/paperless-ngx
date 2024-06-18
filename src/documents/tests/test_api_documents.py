@@ -366,6 +366,16 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             data_type=CustomField.FieldDataType.STRING,
         )
         self.client.force_login(user=self.user)
+
+        # Initial response should include only document's creation
+        response = self.client.get(f"/api/documents/{doc.pk}/history/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+        self.assertIsNone(response.data[0]["actor"])
+        self.assertEqual(response.data[0]["action"], "create")
+
         self.client.patch(
             f"/api/documents/{doc.pk}/",
             data={
@@ -379,12 +389,15 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             format="json",
         )
 
+        # Second response should include custom field addition
         response = self.client.get(f"/api/documents/{doc.pk}/history/")
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[1]["actor"]["id"], self.user.id)
-        self.assertEqual(response.data[1]["action"], "create")
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]["actor"]["id"], self.user.id)
+        self.assertEqual(response.data[0]["action"], "create")
         self.assertEqual(
-            response.data[1]["changes"],
+            response.data[0]["changes"],
             {
                 "custom_fields": {
                     "type": "custom_field",
@@ -393,6 +406,8 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
                 },
             },
         )
+        self.assertIsNone(response.data[1]["actor"])
+        self.assertEqual(response.data[1]["action"], "create")
 
     @override_settings(AUDIT_LOG_ENABLED=False)
     def test_document_history_action_disabled(self):

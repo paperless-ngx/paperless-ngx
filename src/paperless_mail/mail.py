@@ -9,6 +9,7 @@ from datetime import date
 from datetime import timedelta
 from fnmatch import fnmatch
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Optional
 from typing import Union
 
@@ -584,12 +585,17 @@ class MailAccountHandler(LoggingMixin):
         total_processed_files = 0
 
         for message in messages:
+            if TYPE_CHECKING:
+                assert isinstance(message, MailMessage)
+
             if ProcessedMail.objects.filter(
                 rule=rule,
                 uid=message.uid,
                 folder=rule.folder,
             ).exists():
-                self.log.debug(f"Skipping mail {message}, already processed.")
+                self.log.debug(
+                    f"Skipping mail '{message.uid}' subject '{message.subject}' from '{message.from_}', already processed.",
+                )
                 continue
 
             try:
@@ -659,7 +665,7 @@ class MailAccountHandler(LoggingMixin):
     ):
         processed_attachments = 0
 
-        consume_tasks = list()
+        consume_tasks = []
 
         for att in message.attachments:
             if (

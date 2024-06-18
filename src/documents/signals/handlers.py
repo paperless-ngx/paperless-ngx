@@ -301,10 +301,10 @@ def set_storage_path(
             document.save(update_fields=("storage_path",))
 
 
-@receiver(models.signals.post_delete, sender=Document)
-def cleanup_document_deletion(sender, instance, using, **kwargs):
+# see empty_trash in documents/tasks.py for signal handling
+def cleanup_document_deletion(sender, instance, **kwargs):
     with FileLock(settings.MEDIA_LOCK):
-        if settings.TRASH_DIR:
+        if settings.EMPTY_TRASH_DIR:
             # Find a non-conflicting filename in case a document with the same
             # name was moved to trash earlier
             counter = 0
@@ -313,7 +313,7 @@ def cleanup_document_deletion(sender, instance, using, **kwargs):
 
             while True:
                 new_file_path = os.path.join(
-                    settings.TRASH_DIR,
+                    settings.EMPTY_TRASH_DIR,
                     old_filebase + (f"_{counter:02}" if counter else "") + old_fileext,
                 )
 
