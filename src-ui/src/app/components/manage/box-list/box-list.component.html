@@ -8,6 +8,12 @@
     <button type="button" class="btn btn-sm btn-outline-danger" (click)="delete()" [disabled]="!userCanBulkEdit(PermissionAction.Delete) || selectedObjects.size === 0">
       <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
     </button>
+<!-- 
+    <button type="button" class="btn btn-sm btn-outline-primary" (click)="shareLink()" [disabled]="!userCanBulkEdit(PermissionAction.Share) || selectedObjects.size === 0">
+  <i-bs name="share"></i-bs>&nbsp;<ng-container i18n>Share Link</ng-container>
+</button> -->
+
+
     <button type="button" class="btn btn-sm btn-outline-primary ms-md-5" (click)="openCreateDialog()" *pngxIfPermissions="{ action: PermissionAction.Add, type: permissionType }">
       <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Create</ng-container>
     </button>
