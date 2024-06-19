@@ -773,11 +773,11 @@ export class DocumentDetailComponent
     let modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.title = $localize`Confirm delete`
-    modal.componentInstance.messageBold = $localize`Do you really want to delete document "${this.document.title}"?`
-    modal.componentInstance.message = $localize`The files for this document will be deleted permanently. This operation cannot be undone.`
+    modal.componentInstance.title = $localize`Confirm`
+    modal.componentInstance.messageBold = $localize`Do you really want to move the document "${this.document.title}" to the trash?`
+    modal.componentInstance.message = $localize`Documents can be restored prior to permanent deletion.`
     modal.componentInstance.btnClass = 'btn-danger'
-    modal.componentInstance.btnCaption = $localize`Delete document`
+    modal.componentInstance.btnCaption = $localize`Move to trash`
     this.subscribeModalDelete(modal) // so can be re-subscribed if error
   }
 

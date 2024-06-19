@@ -10,6 +10,7 @@ from django.utils import timezone
 
 from documents.models import Correspondent
 from documents.models import Document
+from documents.tasks import empty_trash
 
 
 class TestDocument(TestCase):
@@ -43,8 +44,37 @@ class TestDocument(TestCase):
 
         with mock.patch("documents.signals.handlers.os.unlink") as mock_unlink:
             document.delete()
+            empty_trash([document.pk])
             mock_unlink.assert_any_call(file_path)
             mock_unlink.assert_any_call(thumb_path)
+            self.assertEqual(mock_unlink.call_count, 2)
+
+    def test_document_soft_delete(self):
+        document = Document.objects.create(
+            correspondent=Correspondent.objects.create(name="Test0"),
+            title="Title",
+            content="content",
+            checksum="checksum",
+            mime_type="application/pdf",
+        )
+
+        file_path = document.source_path
+        thumb_path = document.thumbnail_path
+
+        Path(file_path).touch()
+        Path(thumb_path).touch()
+
+        with mock.patch("documents.signals.handlers.os.unlink") as mock_unlink:
+            document.delete()
+            self.assertEqual(mock_unlink.call_count, 0)
+
+            self.assertEqual(Document.objects.count(), 0)
+
+            document.restore(strict=False)
+            self.assertEqual(Document.objects.count(), 1)
+
+            document.delete()
+            empty_trash([document.pk])
             self.assertEqual(mock_unlink.call_count, 2)
 
     def test_file_name(self):
