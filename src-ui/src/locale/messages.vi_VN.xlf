@@ -5505,7 +5505,7 @@
         <target state="needs-translation">, </target>
       </trans-unit>
       <trans-unit id="7915903586014997661" datatype="html">
-        <source>TC GROUP is running!</source>
+        <source>Paperless is running! :)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">2</context>
