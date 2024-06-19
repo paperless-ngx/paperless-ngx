@@ -6,6 +6,7 @@ from typing import Union
 from documents.classifier import DocumentClassifier
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentSource
+from documents.models import Approval
 from documents.models import Correspondent
 from documents.models import Warehouse
 from documents.models import Folder

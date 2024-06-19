@@ -281,8 +281,16 @@ class WarehouseFilterSet(FilterSet):
             "name": CHAR_KWARGS,
             "type": CHAR_KWARGS,
             "parent_warehouse": ID_KWARGS,
-            "path": CHAR_KWARGS,
         }
+
+# class ApprovalFilterSet(FilterSet):
+#     class Meta:
+#         model = Approval
+#         fields = {
+#             "id": ID_KWARGS,
+#             "ctype": CHAR_KWARGS,
+#             "path": CHAR_KWARGS,
+#         }
         
 class FolderFilterSet(FilterSet):
     class Meta:

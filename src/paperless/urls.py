@@ -76,6 +76,8 @@ api_router.register(r"workflows", WorkflowViewSet)
 api_router.register(r"custom_fields", CustomFieldViewSet)
 api_router.register(r"config", ApplicationConfigurationViewSet)
 api_router.register(r"warehouses", WarehouseViewSet)
+api_router.register(r"approvals", ApprovalViewSet)
+api_router.register(r"content_types", ContentTypeViewSet, basename="content_types")
 api_router.register(r"folders", FolderViewSet)
 
 api_router.register(r"approvals", ApprovalViewSet)
