@@ -149,9 +149,6 @@ export const routes: Routes = [
         path: 'trash',
         component: TrashComponent,
         canActivate: [PermissionsGuard],
-        data: {
-          requireAdmin: true,
-        },
       },
       // redirect old paths
       {
