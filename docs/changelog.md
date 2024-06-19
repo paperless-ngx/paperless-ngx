@@ -2,6 +2,10 @@
 
 ## paperless-ngx 2.10.1
 
+### Bug Fixes
+
+- Fix: dont require admin perms to view trash on frontend @shamoon ([#7028](https://github.com/paperless-ngx/paperless-ngx/pull/7028))
+
 ## paperless-ngx 2.10.0
 
 ### Features
