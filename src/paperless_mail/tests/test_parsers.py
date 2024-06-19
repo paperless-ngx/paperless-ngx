@@ -3,7 +3,6 @@ from pathlib import Path
 from unittest import mock
 
 import httpx
-from django.conf import settings
 from django.test import TestCase
 
 from documents.parsers import ParseError
@@ -342,10 +341,7 @@ class TestTikaHtmlParse(HttpxMockMixin, BaseMailParserTestCase):
         )
         parsed = self.parser.tika_parse(html)
         self.assertEqual(expected_text, parsed.strip())
-        self.assertIn(
-            f"{settings.TIKA_ENDPOINT}",
-            str(self.httpx_mock.get_request().url),
-        )
+        self.assertIn("http://localhost:9998", str(self.httpx_mock.get_request().url))
 
     def test_tika_parse_exception(self):
         """
@@ -512,7 +508,7 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
         """
 
         self.httpx_mock.add_response(
-            url=f"{settings.TIKA_GOTENBERG_ENDPOINT}/forms/chromium/convert/html",
+            url="http://localhost:3000/forms/chromium/convert/html",
             method="POST",
             content=(self.SAMPLE_DIR / "simple_text.eml.pdf").read_bytes(),
         )
@@ -533,7 +529,7 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
             - Archive file is generated
         """
         self.httpx_mock.add_response(
-            url=f"{settings.TIKA_ENDPOINT}/tika/text",
+            url="http://localhost:9998/tika/text",
             method="PUT",
             json={
                 "Content-Type": "text/html",
@@ -542,12 +538,12 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
             },
         )
         self.httpx_mock.add_response(
-            url=f"{settings.TIKA_GOTENBERG_ENDPOINT}/forms/chromium/convert/html",
+            url="http://localhost:3000/forms/chromium/convert/html",
             method="POST",
             content=(self.SAMPLE_DIR / "html.eml.pdf").read_bytes(),
         )
         self.httpx_mock.add_response(
-            url=f"{settings.TIKA_GOTENBERG_ENDPOINT}/forms/pdfengines/merge",
+            url="http://localhost:3000/forms/pdfengines/merge",
             method="POST",
             content=b"Pretend merged PDF content",
         )
@@ -566,7 +562,7 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
             - ParseError is raised
         """
         self.httpx_mock.add_response(
-            url=f"{settings.TIKA_ENDPOINT}/tika/text",
+            url="http://localhost:9998/tika/text",
             method="PUT",
             json={
                 "Content-Type": "text/html",
@@ -575,12 +571,12 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
             },
         )
         self.httpx_mock.add_response(
-            url=f"{settings.TIKA_GOTENBERG_ENDPOINT}/forms/chromium/convert/html",
+            url="http://localhost:3000/forms/chromium/convert/html",
             method="POST",
             content=(self.SAMPLE_DIR / "html.eml.pdf").read_bytes(),
         )
         self.httpx_mock.add_response(
-            url=f"{settings.TIKA_GOTENBERG_ENDPOINT}/forms/chromium/convert/html",
+            url="http://localhost:3000/forms/chromium/convert/html",
             method="POST",
             status_code=httpx.codes.INTERNAL_SERVER_ERROR,
         )
@@ -598,7 +594,7 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
             - ParseError is raised
         """
         self.httpx_mock.add_response(
-            url=f"{settings.TIKA_ENDPOINT}/tika/text",
+            url="http://localhost:9998/tika/text",
             method="PUT",
             json={
                 "Content-Type": "text/html",
@@ -607,12 +603,12 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
             },
         )
         self.httpx_mock.add_response(
-            url=f"{settings.TIKA_GOTENBERG_ENDPOINT}/forms/chromium/convert/html",
+            url="http://localhost:3000/forms/chromium/convert/html",
             method="POST",
             content=(self.SAMPLE_DIR / "html.eml.pdf").read_bytes(),
         )
         self.httpx_mock.add_response(
-            url=f"{settings.TIKA_GOTENBERG_ENDPOINT}/forms/pdfengines/merge",
+            url="http://localhost:3000/forms/pdfengines/merge",
             method="POST",
             status_code=httpx.codes.INTERNAL_SERVER_ERROR,
         )
@@ -657,5 +653,5 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
 
         self.assertEqual(
             str(request.url),
-            f"{settings.TIKA_GOTENBERG_ENDPOINT}/forms/chromium/convert/html",
+            "http://localhost:3000/forms/chromium/convert/html",
         )
