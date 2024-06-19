@@ -57,9 +57,27 @@
 		}
 	  },
 	  {
+		"label": "compile frontend",
+		"type": "shell",
+		"command": "npm ci && ./node_modules/.bin/ng build --configuration production",
+		"group": "none",
+		"presentation": {
+			"echo": true,
+			"reveal": "always",
+			"focus": true,
+			"panel": "shared",
+			"showReuseMessage": false,
+			"clear": true,
+			"revealProblems": "onProblem"
+		},
+		"options": {
+			"cwd": "${workspaceFolder}/src-ui"
+		}
+	  },
+	  {
 		"label": "Maintenance: recreate .venv",
 		"type": "shell",
-		"command": "rm -R -v .venv/* && pipenv install --dev",
+		"command": "rm -R -v .venv/* || pipenv install --dev",
 		"group": "none",
 		"presentation": {
 			"echo": true,

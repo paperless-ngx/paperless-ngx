@@ -1,23 +1,5 @@
 # syntax=docker/dockerfile:1
-# https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md
 
-# Stage: compile-frontend
-# Purpose: Compiles the frontend
-# Notes:
-#  - Does NPM stuff with Typescript and such
-FROM --platform=$BUILDPLATFORM docker.io/node:20-bookworm-slim AS compile-frontend
-
-COPY ./src-ui /src/src-ui
-
-WORKDIR /src/src-ui
-RUN set -eux \
-  && npm update npm -g \
-  && npm ci
-RUN set -eux \
-  && ./node_modules/.bin/ng build --configuration production
-
-# Stage: main-app
-# Purpose: The final image
 FROM --platform=$BUILDPLATFORM docker.io/node:20-bookworm-slim as main-app
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -178,10 +160,8 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
     && apt-get update \
     && apt-get install --yes --quiet ${BUILD_PACKAGES}
 
-WORKDIR /usr/src/paperless/paperless-ngx/
-
-# copy frontend
-COPY --from=compile-frontend --chown=1000:1000 /src/src/documents/static ./src/documents/static
+RUN set -eux \
+  && npm update npm -g
 
 # add users, setup scripts
 # Mount the compiled frontend to expected location

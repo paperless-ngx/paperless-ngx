@@ -69,7 +69,7 @@ services:
       PAPERLESS_DEBUG: true
 
     # Overrides default command so things don't shut down after the process ends.
-    command: /bin/sh -c "while sleep 1000; do :; done"
+    command: /bin/sh -c "chown -R paperless:paperless /usr/src/paperless/paperless-ngx/src/documents/static/frontend && while sleep 1000; do :; done"
 
   gotenberg:
     image: docker.io/gotenberg/gotenberg:7.8
