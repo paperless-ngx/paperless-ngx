@@ -53,7 +53,7 @@ services:
       - ..:/usr/src/paperless/paperless-ngx:delegated
       - ../.devcontainer/vscode:/usr/src/paperless/paperless-ngx/.vscode:delegated # vscode config files
       - pipenv:/usr/src/paperless/paperless-ngx/.venv # pipenv environment persisted in volume
-      - /usr/src/paperless/paperless-ngx/static/frontend # static frontend files exist only in container
+      - /usr/src/paperless/paperless-ngx/src/documents/static/frontend # static frontend files exist only in container
       - /usr/src/paperless/paperless-ngx/src/.pytest_cache
       - /usr/src/paperless/paperless-ngx/.ruff_cache
       - /usr/src/paperless/paperless-ngx/htmlcov

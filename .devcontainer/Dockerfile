@@ -181,7 +181,7 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
 WORKDIR /usr/src/paperless/paperless-ngx/
 
 # copy frontend
-COPY --from=compile-frontend --chown=1000:1000 /src/src/documents/static ./static
+COPY --from=compile-frontend --chown=1000:1000 /src/src/documents/static ./src/documents/static
 
 # add users, setup scripts
 # Mount the compiled frontend to expected location
@@ -190,6 +190,7 @@ RUN set -eux \
     && groupmod --new-name paperless node \
     && usermod --login paperless --home /usr/src/paperless node \
     && usermod -s /bin/bash paperless \
+    && echo "paperless ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
   && echo "Creating volume directories" \
     && mkdir --parents --verbose /usr/src/paperless/paperless-ngx/data \
     && mkdir --parents --verbose /usr/src/paperless/paperless-ngx/media \
