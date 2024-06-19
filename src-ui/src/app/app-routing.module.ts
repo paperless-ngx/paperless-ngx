@@ -150,7 +150,10 @@ export const routes: Routes = [
         component: TrashComponent,
         canActivate: [PermissionsGuard],
         data: {
-          requireAdmin: true,
+          requiredPermission: {
+            action: PermissionAction.Delete,
+            type: PermissionType.Document,
+          },
         },
       },
       // redirect old paths
