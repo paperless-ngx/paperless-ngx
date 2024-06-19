@@ -1472,7 +1472,7 @@ class ApprovalViewSerializer(serializers.Serializer):
             raise serializers.ValidationError(f"{name} must be a list")
         if not all(isinstance(i, int) for i in approvals):
             raise serializers.ValidationError(f"{name} must be a list of integers")
-        count = PaperlessTask.objects.filter(id__in=approvals).count()
+        count = Approval.objects.filter(id__in=approvals).count()
         if not count == len(approvals):
             raise serializers.ValidationError(
                 f"Some tasks in {name} don't exist or were specified twice.",

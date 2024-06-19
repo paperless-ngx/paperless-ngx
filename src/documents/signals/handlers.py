@@ -909,10 +909,8 @@ def run_workflow_approval(
         ):
             model_name = approval.ctype.name
             model_class = apps.get_model(approval.ctype.app_label, model_name)
-            all_permissions = Permission.objects.filter(content_type=approval.ctype)
             # obj assign
             obj = model_class.objects.filter(pk = approval.object_pk).first()
-            logger.debug('GIA TRI',(approval.submitted_by_group.values_list('id',)))
             groups = approval.submitted_by_group.all()
             action: WorkflowAction
             for action in workflow.actions.all():
