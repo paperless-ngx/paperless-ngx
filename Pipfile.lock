@@ -602,12 +602,12 @@
         },
         "gotenberg-client": {
             "hashes": [
-                "sha256:097151c959d9ad9c6292694dac454a07a511489a353086df924f489190084425",
-                "sha256:3d6c0449fd1afb82206bfdc2edacfe1d7d98e9de7207332b696b97a3d4dfba6b"
+                "sha256:94e12d1e2ebaaf8552008c95553f5c635c6b8beef401c65cee6ba0d73bbb146b",
+                "sha256:b0829ae666ee75fc2bd61cf055c2dea9877f73d52a3b4e1998eea4cee14923f5"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==0.5.0"
+            "version": "==0.6.0"
         },
         "gunicorn": {
             "hashes": [
