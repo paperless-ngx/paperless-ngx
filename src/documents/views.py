@@ -2069,10 +2069,11 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     def getFolderDoc(self, request):
         currentUser = request.user
         documents = list(Document.objects.filter(folder=None, owner=currentUser).order_by("-created").values())
-        folders = list(Folder.objects.filter(parent_folder=None, owner=currentUser).order_by("name").values())
+        folders = list(Folder.objects.filter(parent_folder=None, owner=currentUser).order_by("name"))
+        folders_serialisers = FolderSerializer(folders,many=True)
         return {
             "documents": documents,
-            "folders": folders,
+            "folders": folders_serialisers.data,
         }    
         
     @action(methods=["get"], detail=False)
@@ -2089,17 +2090,17 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     
     
     def getFolderDocById(self, fol):
-        
-        documents = list(Document.objects.filter(folder=fol).order_by("-created").values())
-        child_folders = list(Folder.objects.filter(parent_folder=fol).order_by("name").values())
+        currentUser = self.request.user
+        documents = list(Document.objects.filter(folder=fol, owner=currentUser).order_by("-created").values())
+        child_folders = list(Folder.objects.filter(parent_folder=fol, owner=currentUser).order_by("name").values())
+        folders_serialisers = FolderSerializer(child_folders, many=True)
         return {
             "documents": documents,
-            "folders": child_folders,
+            "folders": folders_serialisers.data,
         }
     
     @action(methods=["get"], detail=True)
     def folders_documents_by_id(self, request, pk=None):
-        print("dkljfskljf")
         currentUser = request.user
         try:
             fol = Folder.objects.get(pk=pk)
@@ -2150,10 +2151,14 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         
+        # if 'name' in request.data and request.data['name'] == instance.name:
+        #     request.data['name'] == instance.name
+        # print("doncc", request.data, instance)
+        
         if 'parent_folder' in request.data and int(request.data['parent_folder']) == instance.id:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         
-        if 'parent_folder' in request.data :
+        elif 'parent_folder' in request.data:
             new_parent_folder = Folder.objects.get(id=int(request.data['parent_folder']))
             if new_parent_folder.path.startswith(instance.path):
                 return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a folder into one of its child folders.'})
@@ -2179,6 +2184,8 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             
         return Response(serializer.data)
     
+    
+
     def partial_update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', True)
         instance = self.get_object()
@@ -2186,7 +2193,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         if 'parent_folder' in request.data and int(request.data['parent_folder']) == instance.id:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         
-        if 'parent_folder' in request.data :
+        elif 'parent_folder' in request.data :
             new_parent_folder = Folder.objects.get(id=int(request.data['parent_folder']))
             if new_parent_folder.path.startswith(instance.path):
                 return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a folder into one of its child folders.'})
