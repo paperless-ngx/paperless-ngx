@@ -14,6 +14,7 @@ export enum PermissionType {
   Tag = '%s_tag',
   Warehouse = '%s_warehouse',
   Correspondent = '%s_correspondent',
+  Viewallforder = '%s_viewallforder',
   DocumentType = '%s_documenttype',
   StoragePath = '%s_storagepath',
   SavedView = '%s_savedview',

@@ -27,6 +27,7 @@ import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
 import { ConfigComponent } from './components/admin/config/config.component'
+import { ViewallForderComponent } from './components/folder-management/viewall-forder/viewall-forder.component'
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -112,6 +113,17 @@ export const routes: Routes = [
           requiredPermission: {
             action: PermissionAction.View,
             type: PermissionType.Warehouse,
+          },
+        },
+      },
+      {
+        path: 'Viewallforder',
+        component: ViewallForderComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Viewallforder,
           },
         },
       },

@@ -1,0 +1,224 @@
+.viewforder-header {
+    width: 100%;
+  }
+  
+  .search-new {
+    width: 100%;
+    height: 100px;
+    margin: 5px;
+    display: flex;
+    align-items: center;
+  
+    .myform {
+      margin-top: 10px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+  
+      button {
+        padding: 10px 15px;
+        cursor: pointer;
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+  
+        &:active {
+          cursor: progress;
+        }
+      }
+  
+      input {
+        padding: 10px 10px;
+        width: 400px;
+        margin-left: -6px;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+      }
+    }
+  }
+  
+  .add-viewforder {
+    margin-top: 10px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+  
+  .viewforder-header .addforder {
+    padding: 10px 10px;
+    margin-left: 50px;
+    color: aliceblue;
+    background-color: rgb(236, 72, 72);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  
+    &:active {
+      cursor: progress;
+    }
+  }
+  
+  .fa-folder-plus {
+    padding: 0 5px;
+  }
+  
+  .conten {
+    width: 100%;
+    height: auto;
+    margin-top: 20px;
+    display: flex;
+    gap: 1em;
+    flex-wrap: wrap;
+    margin-left: 10px;
+    position: relative;
+    cursor: pointer;
+  
+    .product-forder {
+      width: 200px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 10px;
+      padding: 0 10px;
+      height: 50px;
+      cursor: pointer;
+      background-color: rgba(128, 128, 128, 0.585);
+  
+      p {
+        margin-left: -40%;
+      }
+  
+      &:active {
+        cursor: progress;
+      }
+    }
+  
+    .fa-ellipsis-vertical {
+      cursor: wait;
+      padding: 3px 3px;
+    }
+  
+    .submenu {
+      position: absolute;
+      width: 100px;
+      height: auto;
+      margin-left: 190px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, transform 0.3s;
+      transform: translateY(-100%);
+  
+      ul li {
+        list-style-type: none;
+        padding: 5px 5px;
+        border: 1px solid gray;
+        background-color: rgba(0, 0, 0, 0.804);
+  
+        a {
+          color: aliceblue;
+          text-decoration: none;
+  
+          &:hover {
+            border-bottom: 1px solid white;
+          }
+        }
+      }
+  
+      &.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0%);
+      }
+  
+      .product-forder & {
+        transform-origin: top;
+      }
+  
+      .product-forder ul {
+        transform-origin: bottom;
+      }
+    }
+  }
+  
+  .titel {
+    display: flex;
+    align-items: center;
+  }
+  
+  #showSelect {
+    padding: 5px 5px;
+  }
+  .conten-tailieu{
+    width: 100%;
+    margin-top: 10px;
+    height: auto;
+    background-color: rgb(204, 202, 202);
+}
+.conten-tailieu {
+    width: 100%;
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        
+        th, td { 
+            padding: 8px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2; 
+            position: relative;
+        }
+        
+        td:first-child {
+            width: 50%; 
+        }
+        
+        td:nth-child(2),
+        td:nth-child(3) {
+            text-align: right; 
+        }
+        th:nth-child(2),
+        th:nth-child(3) {
+            text-align: center; 
+        }
+        tbody th:nth-child(2),
+        tbody th:nth-child(3),
+        tbody td:nth-child(2),
+        tbody td:nth-child(3) {
+            text-align: center;
+        }
+    }
+}
+.selected {
+    background-color: lightblue;
+}
+.fa-arrow-right-long {
+    display: inline-block;
+    transform: rotate(90deg); 
+    
+    padding: 0 15px;
+}
+.conten-tailieu-submenu{
+    position: fixed;
+    display: none;
+    z-index: 10000;
+    right: 0;
+    top: 40%;
+    width: 40px;
+    height: auto;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 1px 0px 1px 1px black;
+}
+.conten-tailieu-submenu ul li{
+    list-style-type: none;
+}
+.conten-tailieu-submenu .fa-solid{
+    padding: 5px 12px;
+    font-size: 18px;
+}
