@@ -149,18 +149,20 @@ def custom_get_parser_class_for_mime_type(mime_type: str) -> Optional[type["Docu
     if not options:
         return None
     k = ApplicationConfiguration.objects.filter().first()
-    best_parser = sorted(options, key=lambda _: _["weight"], reverse=True)[1]
-    if k.ocr_key!='':
-        headers = {
-            'Authorization': f'Bearer {k.ocr_key}'
-        }
-        url_ocr_pdf_by_fileid = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_OCR_BY_FILEID"]
-        response_ocr = requests.post(url_ocr_pdf_by_fileid, headers=headers)
-        logger.debug(f'status code: {response_ocr.status_code}')
-        if response_ocr.status_code != 401:
-            best_parser = sorted(options, key=lambda _: _["weight"], reverse=True)[0]
-            logger.debug('Successful key authentication ...')
-    logger.debug('Fail key authentication ...', best_parser["parser"])
+    best_parser = sorted(options, key=lambda _: _["weight"], reverse=True)[0]
+    if len(best_parser)>1:
+        best_parser = sorted(options, key=lambda _: _["weight"], reverse=True)[1]
+        if k.ocr_key!='':
+            headers = {
+                'Authorization': f'Bearer {k.ocr_key}'
+            }
+            url_ocr_pdf_by_fileid = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_OCR_BY_FILEID"]
+            response_ocr = requests.post(url_ocr_pdf_by_fileid, params={"file_id":0}, headers=headers)
+            logger.debug(f'status code: {response_ocr.status_code}')
+            if response_ocr.status_code == 404:
+                best_parser = sorted(options, key=lambda _: _["weight"], reverse=True)[0]
+                logger.debug('Successful key authentication ...')
+        logger.debug('Fail key authentication ...', best_parser["parser"])
     # Return the parser with the highest weight.
     return best_parser["parser"]
 
