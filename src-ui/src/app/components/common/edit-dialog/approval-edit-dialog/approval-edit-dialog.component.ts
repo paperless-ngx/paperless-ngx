@@ -26,16 +26,16 @@ export class ApprovalEditDialogComponent
 {
   APPROVAL_ACCESS_TYPES_OPTIONS = [
     {
-      id: PaperlessApprovalAccessType.Owner,
-      name: $localize`Owner`,
+      label: $localize`Owner`,
+      value: PaperlessApprovalAccessType.Owner,
     },
     {
-      id: PaperlessApprovalAccessType.Edit,
-      name: $localize`Edit`,
+      label: $localize`Edit`,
+      value: PaperlessApprovalAccessType.Edit,
     },
     {
-      id: PaperlessApprovalAccessType.View,
-      name: $localize`View`,
+      label: $localize`View`,
+      value: PaperlessApprovalAccessType.View,
     },
   ]
 

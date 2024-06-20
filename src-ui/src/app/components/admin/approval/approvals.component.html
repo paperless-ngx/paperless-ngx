@@ -42,9 +42,10 @@
           </div>
         </th>
         <th scope="col" class="d-table-cell d-lg-cell" i18n>Name</th>
-        <th scope="col" class="d-table-cell d-lg-cell" i18n>Content type</th>
-        <th scope="col" class="d-table-cell d-lg-cell" i18n>Submmit by</th>
-        <th scope="col" class="d-table-cell d-lg-cell" i18n>Submmit by group</th>
+        <th scope="col" class="d-table-cell d-lg-none" i18n>Info</th>
+        <th scope="col" class="d-none d-lg-table-cell" i18n>Content type</th>
+        <th scope="col" class="d-none d-lg-table-cell" i18n>Submmit by</th>
+        <th scope="col" class="d-none d-lg-table-cell" i18n>Submmit by group</th>
         <th scope="col" class="d-none d-lg-table-cell" i18n>Created</th>
         <th scope="col" class="d-none d-lg-table-cell" i18n>Expires</th>
         @if (activeTab == 'success') {
@@ -56,8 +57,6 @@
         @else if (activeTab == 'revoked') {
           <th scope="col" class="d-none d-lg-table-cell" i18n>Revoked at</th>
         }
-        <!-- @if (activeTab !== 'pending' && activeTab !== 'revoked') {
-        } -->
         <th scope="col" class="d-none d-lg-table-cell" i18n>Method</th>
         <th scope="col" i18n>Actions</th>
       </tr>
@@ -71,18 +70,18 @@
               <label class="form-check-label" for="approval{{approval.id}}"></label>
             </div>
           </td>
-          <td class="d-none d-lg-table-cell">{{ approval.name }}</td>
+          <td class="overflow-auto name-col">{{ approval.name }}</td>
           <td class="d-none d-lg-table-cell">{{ approval.ctype }}</td>
           <td class="d-none d-lg-table-cell">{{ displayName(approval) }}</td>
           <td class="d-none d-lg-table-cell">{{ displayGroup(approval) }}</td>
-          <td class="overflow-auto name-col">{{ approval.created | customDate:'short' }}</td>
+          <td class="d-none d-lg-table-cell">{{ approval.created | customDate:'short' }}</td>
           @if (approval.expiration==null){
-            <td class="overflow-auto name-col">Unlimited</td>
+            <td class="d-none d-lg-table-cell">Unlimited</td>
           }
           @if (approval.expiration!=null){
-            <td class="overflow-auto name-col">{{ approval.expiration | customDate:'short' }}</td>
+            <td class="d-none d-lg-table-cell">{{ approval.expiration | customDate:'short' }}</td>
           }
-          <td class="overflow-auto name-col">{{ approval.modified | customDate:'short' }}</td>
+          <td class="d-none d-lg-table-cell">{{ approval.modified | customDate:'short' }}</td>
           <td class="d-none d-lg-table-cell">{{ approval.access_type }}</td>
 
           
@@ -119,7 +118,58 @@
         </tr>
         <tr>
           <td class="p-0" [class.border-0]="expandedApproval !== approval.id" colspan="5">
-            <pre #collapse="ngbCollapse" [ngbCollapse]="expandedApproval !== approval.id" class="small mb-0"><div class="small p-1 p-lg-3 ms-lg-3">{{ approval.result }}</div></pre>
+            <table #collapse="ngbCollapse" [ngbCollapse]="expandedApproval !== approval.id" class="small mb-0">
+              <tr>
+                <td>Name</td>
+                <td>{{ approval.name }}</td>
+              </tr>
+              <tr>
+                <td>Content type</td>
+                <td>{{ approval.ctype }}</td>
+              </tr>
+              <tr>
+                <td>Submmit by</td>
+                <td>{{ displayName(approval) }}</td>
+              </tr>
+              <tr>
+                <td>Submmit by group</td>
+                <td>{{ displayGroup(approval) }}</td>
+              </tr>
+              <tr>
+                <td>Created</td>
+                <td>{{ approval.created | customDate:'short' }}</td>
+              </tr>
+              <tr>
+                <td>Created</td>
+                <td>{{ approval.created | customDate:'short' }}</td>
+              </tr>
+              <tr>
+                <td>Expires</td>
+                @if (approval.expiration==null){
+                  <td class="">Unlimited</td>
+                }
+                @if (approval.expiration!=null){
+                  <td class="">{{ approval.expiration | customDate:'short' }}</td>
+                }
+              </tr>
+              <tr>
+                @if (activeTab == 'success') {
+                  <td class="" i18n>Approve at</td>
+                }
+                @else if (activeTab == 'failure') {
+                  <td i18n>Reject at</td>
+                }
+                @else if (activeTab == 'revoked') {
+                  <td i18n>Revoked at</td>
+                }
+                <td class="">{{ approval.modified | customDate:'short' }}</td>
+              </tr>
+              <tr>
+                <td  i18n>Method</td>
+                <td class="">{{ approval.access_type }}</td>
+              </tr>
+
+            </table>
           </td>
         </tr>
       }
