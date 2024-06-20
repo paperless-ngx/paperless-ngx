@@ -25,14 +25,14 @@ export class ApprovalEditDialogComponent
   implements OnInit
 {
   APPROVAL_ACCESS_TYPES_OPTIONS = [
-    {
-      label: $localize`Owner`,
-      value: PaperlessApprovalAccessType.Owner,
-    },
-    {
-      label: $localize`Edit`,
-      value: PaperlessApprovalAccessType.Edit,
-    },
+    // {
+    //   label: $localize`Owner`,
+    //   value: PaperlessApprovalAccessType.Owner,
+    // },
+    // {
+    //   label: $localize`Edit`,
+    //   value: PaperlessApprovalAccessType.Edit,
+    // },
     {
       label: $localize`View`,
       value: PaperlessApprovalAccessType.View,
@@ -45,6 +45,7 @@ export class ApprovalEditDialogComponent
     { label: $localize`30 days`, value: 30 },
     { label: $localize`Never`, value: null },
   ]
+  defaultAccessType = PaperlessApprovalAccessType.View;
   expiration: number = 7
   groups: Group[]
   constructor(
@@ -79,7 +80,7 @@ export class ApprovalEditDialogComponent
       object_pk: new FormControl(this.object?.object_pk),
       expiration: new FormControl(null),
       ctype_id: new FormControl(this.object?.ctype),
-      access_type: new FormControl(null),
+      access_type: new FormControl(this.defaultAccessType),
       submitted_by_group: new FormControl([]),
     })
   }

@@ -15,7 +15,7 @@
       <label class="input-group-text" ><ng-container i18n>Access type</ng-container>:</label>
       <select class="form-select form-select-sm" formControlName="access_type">
         @for (option of APPROVAL_ACCESS_TYPES_OPTIONS; track option) {
-          <option [ngValue]="option.value">{{ option.label }}</option>
+          <option [ngValue]="option.value" >{{ option.label }}</option>
         }
       </select>
     </div>
