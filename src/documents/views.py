@@ -2092,7 +2092,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     def getFolderDocById(self, fol):
         currentUser = self.request.user
         documents = list(Document.objects.filter(folder=fol, owner=currentUser).order_by("-created").values())
-        child_folders = list(Folder.objects.filter(parent_folder=fol, owner=currentUser).order_by("name").values())
+        child_folders = list(Folder.objects.filter(parent_folder=fol, owner=currentUser).order_by("name"))
         folders_serialisers = FolderSerializer(child_folders, many=True)
         return {
             "documents": documents,
