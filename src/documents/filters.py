@@ -7,6 +7,7 @@ from django.db.models.functions import Cast
 from django_filters.rest_framework import BooleanFilter
 from django_filters.rest_framework import Filter
 from django_filters.rest_framework import FilterSet
+from django_filters import CharFilter, NumberFilter
 from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
 from rest_framework_guardian.filters import ObjectPermissionsFilter
@@ -206,6 +207,28 @@ class DocumentFilterSet(FilterSet):
     custom_fields__icontains = CustomFieldsFilter()
 
     shared_by__id = SharedByUser()
+    
+    warehouse__id = NumberFilter(method='filter_by_warehouse')
+
+    def filter_by_warehouse(self, queryset, name, value):
+        warehouse = Warehouse.objects.get(id=value)
+        return self.get_warehouse_documents(warehouse)
+
+    def get_warehouse_documents(self, warehouse):
+        if warehouse.type == Warehouse.BOXCASE:
+            return Document.objects.filter(warehouse=warehouse)
+        elif warehouse.type == Warehouse.SHELF:
+            boxcases = Warehouse.objects.filter(parent_warehouse=warehouse)
+            return Document.objects.filter(warehouse__in=[b.id for b in boxcases])
+        elif warehouse.type == Warehouse.WAREHOUSE:
+            shelves = Warehouse.objects.filter(parent_warehouse=warehouse)
+            boxcases = Warehouse.objects.filter(parent_warehouse__in=[s.id for s in shelves])
+            return Document.objects.filter(warehouse__in=[b.id for b in boxcases])
+        else:
+            return Document.objects.none()
+
+    
+    
 
     class Meta:
         model = Document

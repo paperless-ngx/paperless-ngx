@@ -1,3 +1,4 @@
+import hashlib
 import itertools
 import json
 import logging
@@ -752,33 +753,7 @@ class DocumentViewSet(
             ]
             return Response(links)
 
-    def get_queryset(self):
-        queryset = self.queryset
-        warehouse_id = self.request.query_params.get('warehouse_id', None)
- 
-        if warehouse_id is not None:
-            queryset = self.get_warehouse(warehouse_id)
-    
-        return queryset
-
-    def get_warehouse(self, warehouse_id):
-        warehouse = Warehouse.objects.get(id=int(warehouse_id))
-        return self.get_warehouse_documents(warehouse)
-
-    def get_warehouse_documents(self, warehouse):
-        if warehouse.type == Warehouse.BOXCASE:
-            return Document.objects.filter(warehouse=warehouse)
-        elif warehouse.type == Warehouse.SHELF:
-            boxcases = Warehouse.objects.filter(parent_warehouse=warehouse)
-            return Document.objects.filter(warehouse__in=[b.id for b in boxcases])
-        elif warehouse.type == Warehouse.WAREHOUSE:
-            shelves = Warehouse.objects.filter(parent_warehouse=warehouse)
-            boxcases = Warehouse.objects.filter(parent_warehouse__in=[s.id for s in shelves])
-            return Document.objects.filter(warehouse__in=[b.id for b in boxcases])
-        else:
-            return Document.objects.none()
             
-    
 class SearchResultSerializer(DocumentSerializer, PassUserMixin):
     def to_representation(self, instance):
         doc = (
@@ -1634,6 +1609,8 @@ class BulkEditObjectsView(PassUserMixin):
                     boxcases.delete()
                     shelves.delete()
                     warehouse.delete()
+                    
+            return Response(status=status.HTTP_204_NO_CONTENT)
         
         elif operation == "delete" and object_type == "folders":
             for folder_id in object_ids:
@@ -1651,7 +1628,7 @@ class BulkEditObjectsView(PassUserMixin):
                 
                 delete_folder_hierarchy(folder)
             
-            return Response(status=status.HTTP_200_OK)            
+            return Response(status=status.HTTP_204_NO_CONTENT)            
                           
         elif operation == "delete":
 
@@ -1920,16 +1897,16 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     ordering_fields = ("name", "type", "parent_warehouse", "document_count")
     
     def getWarehouseDoc(self, wareh):
-        
+        currentUser = self.request.user
         if wareh.type == Warehouse.BOXCASE:
-            return list(Document.objects.filter(warehouse=wareh).order_by("-created").values())
+            return list(Document.objects.filter(warehouse=wareh, owner=currentUser).order_by("-created").values())
         elif wareh.type == Warehouse.SHELF:
             boxcases = Warehouse.objects.filter(parent_warehouse=wareh)
-            return list(Document.objects.filter(warehouse__in=[b.id for b in boxcases]).order_by("-created").values())
+            return list(Document.objects.filter(warehouse__in=[b.id for b in boxcases], owner=currentUser).order_by("-created").values())
         elif wareh.type == Warehouse.WAREHOUSE:
             shelves = Warehouse.objects.filter(parent_warehouse=wareh)
             boxcases = Warehouse.objects.filter(parent_warehouse__in=[s.id for s in shelves])
-            return list(Document.objects.filter(warehouse__in=[b.id for b in boxcases]).order_by("-created").values())
+            return list(Document.objects.filter(warehouse__in=[b.id for b in boxcases], owner=currentUser).order_by("-created").values())
         else:
             return list(Document.objects.none())
     
@@ -1958,24 +1935,24 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     
     
     def create(self, request, *args, **kwargs):
-        # try:                                                          
+        # try:                                                                                                                    
         serializer = WarehouseSerializer(data=request.data)
         parent_warehouse = None
         if serializer.is_valid(raise_exception=True):
             parent_warehouse = serializer.validated_data.get('parent_warehouse',None)
-       
+            
         parent_warehouse = Warehouse.objects.filter(id=parent_warehouse.id if parent_warehouse else 0).first()   
         
         if serializer.validated_data.get("type") == Warehouse.WAREHOUSE and not parent_warehouse:
-            warehouse = serializer.save()
+            warehouse = serializer.save(owner=request.user)
             warehouse.path = str(warehouse.id)
             warehouse.save()
         elif serializer.validated_data.get("type", "") == Warehouse.SHELF and  getattr(parent_warehouse, 'type', "") == Warehouse.WAREHOUSE :
-            warehouse = serializer.save(type=Warehouse.SHELF, parent_warehouse=parent_warehouse)
+            warehouse = serializer.save(type=Warehouse.SHELF, parent_warehouse=parent_warehouse,owner=request.user)
             warehouse.path = f"{parent_warehouse.path}/{warehouse.id}"
             warehouse.save()
         elif serializer.validated_data.get("type", "") == Warehouse.BOXCASE and  getattr(parent_warehouse, 'type', "") == Warehouse.SHELF :
-            warehouse = serializer.save(type=Warehouse.BOXCASE, parent_warehouse=parent_warehouse)
+            warehouse = serializer.save(type=Warehouse.BOXCASE, parent_warehouse=parent_warehouse,owner=request.user)
             warehouse.path = f"{parent_warehouse.path}/{warehouse.id}"
             warehouse.save()
         else:
@@ -2087,19 +2064,42 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     )
     filterset_class = FolderFilterSet
     ordering_fields = ("name", "path", "parent_folder", "document_count")
-    
-    
-    def getFolderDoc(self, fol):
+
         
-        documents = list(Document.objects.filter(folder=fol).order_by("-created").values())
-        folders = list(Folder.objects.filter(parent_folder=fol).order_by("name").values())
+    def getFolderDoc(self, request):
+        currentUser = request.user
+        documents = list(Document.objects.filter(folder=None, owner=currentUser).order_by("-created").values())
+        folders = list(Folder.objects.filter(parent_folder=None, owner=currentUser).order_by("name").values())
         return {
             "documents": documents,
             "folders": folders,
+        }    
+        
+    @action(methods=["get"], detail=False)
+    def folders_documents(self, request):
+        
+        if request.method == "GET":
+            try:
+                return Response(self.getFolderDoc(request))
+            except Exception as e:
+                logger.warning(f"An error occurred retrieving folders: {e!s}")
+                return Response(
+                    {"error": "Error retrieving folders, check logs for more detail."},
+                )
+    
+    
+    def getFolderDocById(self, fol):
+        
+        documents = list(Document.objects.filter(folder=fol).order_by("-created").values())
+        child_folders = list(Folder.objects.filter(parent_folder=fol).order_by("name").values())
+        return {
+            "documents": documents,
+            "folders": child_folders,
         }
     
     @action(methods=["get"], detail=True)
-    def folders_documents(self, request, pk=None):
+    def folders_documents_by_id(self, request, pk=None):
+        print("dkljfskljf")
         currentUser = request.user
         try:
             fol = Folder.objects.get(pk=pk)
@@ -2114,7 +2114,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
         if request.method == "GET":
             try:
-                return Response(self.getFolderDoc(fol))
+                return Response(self.getFolderDocById(fol))
             except Exception as e:
                 logger.warning(f"An error occurred retrieving folders: {e!s}")
                 return Response(
@@ -2128,16 +2128,18 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         parent_folder = None
         if serializer.is_valid(raise_exception=True):
             parent_folder = serializer.validated_data.get('parent_folder',None)
-       
+            
         parent_folder = Folder.objects.filter(id=parent_folder.id if parent_folder else 0).first()   
         
         if parent_folder == None:
-            folder = serializer.save()
+            folder = serializer.save(owner=request.user)
             folder.path = str(folder.id)
+            folder.checksum = hashlib.md5(f'{folder.id}.{folder.name}'.encode()).hexdigest()
             folder.save()
         elif parent_folder:
-            folder = serializer.save(parent_folder=parent_folder)
+            folder = serializer.save(parent_folder=parent_folder,owner=request.user)
             folder.path = f"{parent_folder.path}/{folder.id}"
+            folder.checksum = hashlib.md5(f'{folder.id}.{folder.name}'.encode()).hexdigest()
             folder.save()
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -2147,6 +2149,17 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
+        
+        if 'parent_folder' in request.data and int(request.data['parent_folder']) == instance.id:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+        if 'parent_folder' in request.data :
+            new_parent_folder = Folder.objects.get(id=int(request.data['parent_folder']))
+            if new_parent_folder.path.startswith(instance.path):
+                return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a folder into one of its child folders.'})
+        else:
+            request.data['parent_folder'] = None
+        
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
 
@@ -2157,17 +2170,29 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         if old_parent_folder != instance.parent_folder:
             if instance.parent_folder:
                 instance.path = f"{instance.parent_folder.path}/{instance.id}"
+                
             else:
                 instance.path = f"{instance.id}"
             instance.save()
 
             self.update_child_folder_paths(instance)
-
+            
         return Response(serializer.data)
     
     def partial_update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', True)
         instance = self.get_object()
+        
+        if 'parent_folder' in request.data and int(request.data['parent_folder']) == instance.id:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+        if 'parent_folder' in request.data :
+            new_parent_folder = Folder.objects.get(id=int(request.data['parent_folder']))
+            if new_parent_folder.path.startswith(instance.path):
+                return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a folder into one of its child folders.'})
+        else:
+            request.data['parent_folder'] = None
+        
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
 
@@ -2212,5 +2237,5 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         
         delete_folder_hierarchy(folder)
         
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
     
