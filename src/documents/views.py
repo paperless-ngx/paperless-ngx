@@ -2151,10 +2151,6 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         
-        # if 'name' in request.data and request.data['name'] == instance.name:
-        #     request.data['name'] == instance.name
-        # print("doncc", request.data, instance)
-        
         if 'parent_folder' in request.data and int(request.data['parent_folder']) == instance.id:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         
