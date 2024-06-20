@@ -166,10 +166,7 @@ class Command(CryptMixin, BaseCommand):
             )
             return
 
-        if version_path.exists():
-            with version_path.open() as infile:
-                self.version = json.load(infile)["version"]
-        elif metadata_path.exists():
+        if metadata_path.exists():
             with metadata_path.open() as infile:
                 data = json.load(infile)
                 self.version = data["version"]
@@ -179,6 +176,9 @@ class Command(CryptMixin, BaseCommand):
                     )
                 elif EXPORTER_CRYPTO_SETTINGS_NAME in data:
                     self.load_crypt_params(data)
+        elif version_path.exists():
+            with version_path.open() as infile:
+                self.version = json.load(infile)["version"]
 
         if self.version and self.version != version.__full_version_str__:
             self.stdout.write(
