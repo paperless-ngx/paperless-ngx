@@ -46,6 +46,7 @@ export class ApprovalEditDialogComponent
     { label: $localize`Never`, value: null },
   ]
   defaultAccessType = PaperlessApprovalAccessType.View;
+  defaultExpiration: number = null
   expiration: number = 7
   groups: Group[]
   constructor(
@@ -78,7 +79,7 @@ export class ApprovalEditDialogComponent
   getForm(): FormGroup {
     return new FormGroup({
       object_pk: new FormControl(this.object?.object_pk),
-      expiration: new FormControl(null),
+      expiration: new FormControl(this.defaultExpiration),
       ctype_id: new FormControl(this.object?.ctype),
       access_type: new FormControl(this.defaultAccessType),
       submitted_by_group: new FormControl([]),
