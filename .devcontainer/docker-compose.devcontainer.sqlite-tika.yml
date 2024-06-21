@@ -1,9 +1,9 @@
-# docker-compose file for running paperless from the docker container registry.
-# This file contains everything paperless needs to run.
-# Paperless supports amd64, arm and arm64 hardware.
-# All compose files of paperless configure paperless in the following way:
+# Docker Compose file for developing Paperless NGX in VSCode DevContainers.
+# This file contains everything Paperless NGX needs to run.
+# Paperless supports amd64, arm, and arm64 hardware.
+# All compose files of Paperless configure it in the following way:
 #
-# - Paperless is (re)started on system boot, if it was running before shutdown.
+# - Paperless is (re)started on system boot if it was running before shutdown.
 # - Docker volumes for storing data are managed by Docker.
 # - Folders for importing and exporting files are created in the same directory
 #   as this file and mounted to the correct folders inside the container.
@@ -11,24 +11,16 @@
 #
 # SQLite is used as the database. The SQLite file is stored in the data volume.
 #
-# In addition to that, this docker-compose file adds the following optional
+# In addition, this Docker Compose file adds the following optional
 # configurations:
 #
-# - Apache Tika and Gotenberg servers are started with paperless and paperless
+# - Apache Tika and Gotenberg servers are started with Paperless NGX and Paperless
 #   is configured to use these services. These provide support for consuming
-#   Office documents (Word, Excel, Power Point and their LibreOffice counter-
-#   parts.
+#   Office documents (Word, Excel, PowerPoint, and their LibreOffice counterparts).
 #
-# To install and update paperless with this file, do the following:
-#
-# - Copy this file as 'docker-compose.yml' and the files 'docker-compose.env'
-#   and '.env' into a folder.
-# - Run 'docker-compose pull'.
-# - Run 'docker-compose run --rm webserver createsuperuser' to create a user.
-# - Run 'docker-compose up -d'.
-#
-# For more extensive installation and update instructions, refer to the
-# documentation.
+# This file is intended only to be used through VSCOde devcontainers. See README.md
+# in the folder .devcontainer.
+
 
 version: "3.4"
 services:
@@ -38,11 +30,11 @@ services:
     volumes:
       - redisdata:/data
 
-  # No ports need to be exposed, the vscode devcontainer plugin manages them.
+  # No ports need to be exposed; the VSCode DevContainer plugin manages them.
   paperless-development:
     image: paperless-ngx
     build:
-      context: ../    # Dockerfile can not access files from parent directories if context is not set.
+      context: ../    # Dockerfile cannot access files from parent directories if context is not set.
       dockerfile: ./.devcontainer/Dockerfile
     restart: unless-stopped
     depends_on:
@@ -51,9 +43,9 @@ services:
       - tika
     volumes:
       - ..:/usr/src/paperless/paperless-ngx:delegated
-      - ../.devcontainer/vscode:/usr/src/paperless/paperless-ngx/.vscode:delegated # vscode config files
-      - pipenv:/usr/src/paperless/paperless-ngx/.venv # pipenv environment persisted in volume
-      - /usr/src/paperless/paperless-ngx/src/documents/static/frontend # static frontend files exist only in container
+      - ../.devcontainer/vscode:/usr/src/paperless/paperless-ngx/.vscode:delegated # VSCode config files
+      - pipenv:/usr/src/paperless/paperless-ngx/.venv # Pipenv environment persisted in volume
+      - /usr/src/paperless/paperless-ngx/src/documents/static/frontend # Static frontend files exist only in container
       - /usr/src/paperless/paperless-ngx/src/.pytest_cache
       - /usr/src/paperless/paperless-ngx/.ruff_cache
       - /usr/src/paperless/paperless-ngx/htmlcov
@@ -69,14 +61,14 @@ services:
       PAPERLESS_DEBUG: true
 
     # Overrides default command so things don't shut down after the process ends.
-    command: /bin/sh -c "chown -R paperless:paperless /usr/src/paperless/paperless-ngx/src/documents/static/frontend && chown -R paperless:paperless /usr/src/paperless/paperless-ngx/.ruff_cache &&while sleep 1000; do :; done"
+    command: /bin/sh -c "chown -R paperless:paperless /usr/src/paperless/paperless-ngx/src/documents/static/frontend && chown -R paperless:paperless /usr/src/paperless/paperless-ngx/.ruff_cache && while sleep 1000; do :; done"
 
   gotenberg:
     image: docker.io/gotenberg/gotenberg:7.8
     restart: unless-stopped
 
-    # The gotenberg chromium route is used to convert .eml files. We do not
-    # want to allow external content like tracking pixels or even javascript.
+    # The Gotenberg Chromium route is used to convert .eml files. We do not
+    # want to allow external content like tracking pixels or even JavaScript.
     command:
       - "gotenberg"
       - "--chromium-disable-javascript=true"
