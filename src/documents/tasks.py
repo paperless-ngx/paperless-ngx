@@ -285,6 +285,10 @@ def update_document_archive_file(document_id):
                     shutil.move(parser.get_archive_path(), document.archive_path)
                     shutil.move(thumbnail, document.thumbnail_path)
 
+            document.refresh_from_db()
+            logger.info(
+                f"Updating index for document {document_id} ({document.archive_checksum})",
+            )
             with index.open_index_writer() as writer:
                 index.update_document(writer, document)
 
