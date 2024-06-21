@@ -858,7 +858,7 @@ describe('BulkEditorComponent', () => {
     )
   })
 
-  it('should support bulk delete with confirmation', () => {
+  it('should support bulk delete with confirmation or without', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[0]))
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
@@ -891,6 +891,13 @@ describe('BulkEditorComponent', () => {
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     ) // listAllFilteredIds
+
+    component.showConfirmationDialogs = false
+    fixture.detectChanges()
+    component.applyDelete()
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
   })
 
   it('should not be accessible with insufficient global permissions', () => {

@@ -19,7 +19,6 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
 from django.db import connections
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
@@ -106,7 +105,6 @@ from documents.matching import match_storage_paths
 from documents.matching import match_tags
 from documents.models import Correspondent
 from documents.models import CustomField
-from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
@@ -144,12 +142,14 @@ from documents.serialisers import StoragePathSerializer
 from documents.serialisers import TagSerializer
 from documents.serialisers import TagSerializerVersion1
 from documents.serialisers import TasksViewSerializer
+from documents.serialisers import TrashSerializer
 from documents.serialisers import UiSettingsViewSerializer
 from documents.serialisers import WorkflowActionSerializer
 from documents.serialisers import WorkflowSerializer
 from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_updated
 from documents.tasks import consume_file
+from documents.tasks import empty_trash
 from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import GeneralConfig
@@ -364,6 +364,7 @@ class DocumentViewSet(
     def get_queryset(self):
         return (
             Document.objects.distinct()
+            .order_by("-created")
             .annotate(num_notes=Count("notes"))
             .select_related("correspondent", "storage_path", "document_type", "owner")
             .prefetch_related("tags", "custom_fields", "notes")
@@ -799,15 +800,14 @@ class DocumentViewSet(
                     else None
                 ),
             }
-            for entry in LogEntry.objects.filter(object_pk=doc.pk).select_related(
+            for entry in LogEntry.objects.get_for_object(doc).select_related(
                 "actor",
             )
         ]
 
         # custom fields
-        for entry in LogEntry.objects.filter(
-            object_pk__in=list(doc.custom_fields.values_list("id", flat=True)),
-            content_type=ContentType.objects.get_for_model(CustomFieldInstance),
+        for entry in LogEntry.objects.get_for_objects(
+            doc.custom_fields.all(),
         ).select_related("actor"):
             entries.append(
                 {
@@ -1559,6 +1559,8 @@ class UiSettingsView(GenericAPIView):
                 "backend_setting": settings.ENABLE_UPDATE_CHECK,
             }
 
+        ui_settings["trash_delay"] = settings.EMPTY_TRASH_DELAY
+
         general_config = GeneralConfig()
 
         ui_settings["app_title"] = settings.APP_TITLE
@@ -2052,3 +2054,41 @@ class SystemStatusView(PassUserMixin):
                 },
             },
         )
+
+
+class TrashView(ListModelMixin, PassUserMixin):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = TrashSerializer
+    filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
+    pagination_class = StandardPagination
+
+    model = Document
+
+    queryset = Document.deleted_objects.all()
+
+    def get(self, request, format=None):
+        self.serializer_class = DocumentSerializer
+        return self.list(request, format)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        doc_ids = serializer.validated_data.get("documents")
+        docs = (
+            Document.global_objects.filter(id__in=doc_ids)
+            if doc_ids is not None
+            else Document.deleted_objects.all()
+        )
+        for doc in docs:
+            if not has_perms_owner_aware(request.user, "delete_document", doc):
+                return HttpResponseForbidden("Insufficient permissions")
+        action = serializer.validated_data.get("action")
+        if action == "restore":
+            for doc in Document.deleted_objects.filter(id__in=doc_ids).all():
+                doc.restore(strict=False)
+        elif action == "empty":
+            if doc_ids is None:
+                doc_ids = [doc.id for doc in docs]
+            empty_trash(doc_ids=doc_ids)
+        return Response({"result": "OK", "doc_ids": doc_ids})

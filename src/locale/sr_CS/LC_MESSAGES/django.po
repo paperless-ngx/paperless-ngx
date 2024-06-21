@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-19 11:07-0700\n"
-"PO-Revision-Date: 2024-05-28 00:24\n"
+"PO-Revision-Date: 2024-06-04 12:10\n"
 "Last-Translator: \n"
 "Language-Team: Serbian (Latin)\n"
 "Language: sr_CS\n"
@@ -47,11 +47,11 @@ msgstr "Regularni izraz"
 
 #: documents/models.py:58 documents/models.py:951
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Nejasna reč"
 
 #: documents/models.py:59
 msgid "Automatic"
-msgstr ""
+msgstr "Automatski"
 
 #: documents/models.py:62 documents/models.py:416 documents/models.py:1267
 #: paperless_mail/models.py:18 paperless_mail/models.py:96
@@ -257,55 +257,55 @@ msgstr "logovi"
 
 #: documents/models.py:398
 msgid "Table"
-msgstr ""
+msgstr "Tabela"
 
 #: documents/models.py:399
 msgid "Small Cards"
-msgstr ""
+msgstr "Male kartice"
 
 #: documents/models.py:400
 msgid "Large Cards"
-msgstr ""
+msgstr "Velike kartice"
 
 #: documents/models.py:403
 msgid "Title"
-msgstr ""
+msgstr "Naslov"
 
 #: documents/models.py:404
 msgid "Created"
-msgstr ""
+msgstr "Kreirano"
 
 #: documents/models.py:405
 msgid "Added"
-msgstr ""
+msgstr "Dodato"
 
 #: documents/models.py:406
 msgid "Tags"
-msgstr ""
+msgstr "Oznake"
 
 #: documents/models.py:407
 msgid "Correspondent"
-msgstr ""
+msgstr "Korespondent"
 
 #: documents/models.py:408
 msgid "Document Type"
-msgstr ""
+msgstr "Tip dokumenta"
 
 #: documents/models.py:409
 msgid "Storage Path"
-msgstr ""
+msgstr "Putanje skladišta"
 
 #: documents/models.py:410
 msgid "Note"
-msgstr ""
+msgstr "Beleška"
 
 #: documents/models.py:411
 msgid "Owner"
-msgstr ""
+msgstr "Vlasnik"
 
 #: documents/models.py:412
 msgid "Shared"
-msgstr ""
+msgstr "Deljeno"
 
 #: documents/models.py:413
 msgid "ASN"
@@ -329,7 +329,7 @@ msgstr "obrnuto sortiranje"
 
 #: documents/models.py:434
 msgid "View page size"
-msgstr ""
+msgstr "Veličinа stranice za prikaz"
 
 #: documents/models.py:442
 msgid "View display mode"
@@ -337,7 +337,7 @@ msgstr ""
 
 #: documents/models.py:449
 msgid "Document display fields"
-msgstr ""
+msgstr "Polja prikaza dokumenta"
 
 #: documents/models.py:456 documents/models.py:513
 msgid "saved view"
@@ -433,7 +433,7 @@ msgstr "upit za ceo tekst"
 
 #: documents/models.py:486
 msgid "more like this"
-msgstr ""
+msgstr "više ovakvih"
 
 #: documents/models.py:487
 msgid "has tags in"
@@ -453,15 +453,15 @@ msgstr "putanja skladišta je"
 
 #: documents/models.py:491
 msgid "has correspondent in"
-msgstr ""
+msgstr "postoji korespondent"
 
 #: documents/models.py:492
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "ne postoji korespondent"
 
 #: documents/models.py:493
 msgid "has document type in"
-msgstr ""
+msgstr "postoji tip dokumenta"
 
 #: documents/models.py:494
 msgid "does not have document type in"
