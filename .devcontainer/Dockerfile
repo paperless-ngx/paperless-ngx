@@ -124,9 +124,6 @@ WORKDIR /usr/src/paperless/src/docker/
 
 COPY [ \
   "docker/imagemagick-policy.xml", \
-  "docker/wait-for-redis.py", \
-  "docker/env-from-file.sh", \
-  "docker/flower-conditional.sh", \
   "./" \
 ]
 
