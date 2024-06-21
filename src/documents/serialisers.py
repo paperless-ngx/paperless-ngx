@@ -1835,10 +1835,21 @@ class AdjustedNameField(serializers.CharField):
             type = self.parent.initial_data.get('type')
             
             if type: 
-                existing_names = model.objects.filter(type=type).values_list('name', flat=True) 
+                existing_names = model.objects.filter(type=type).values_list('name', flat=True)
+                if getattr(self.parent,'instance') is None:
+                    pass
+                elif data == getattr(self.parent.instance,'name'):
+                    print('passs')
+                    return data 
+                
             elif parent_folder: 
                 existing_names = model.objects.filter(parent_folder=parent_folder).values_list('name', flat=True) 
-            
+                if getattr(self.parent,'instance') is None:
+                    pass
+                elif data == getattr(self.parent.instance,'name'):
+                    print('passs')
+                    return data
+                    
             else: 
                 existing_names = model.objects.filter(name__startswith=data).values_list('name', flat=True)
                  
@@ -1907,7 +1918,7 @@ class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     name = AdjustedNameField()
     document_count = serializers.SerializerMethodField()
-    child_folder_count = serializers.SerializerMethodField(read_only=True)
+    child_folder_count = serializers.SerializerMethodField()
     
     def get_document_count(self, obj):
         return Document.objects.filter(folder=obj).count()
