@@ -129,14 +129,7 @@ COPY [ \
 
 RUN set -eux \
   && echo "Configuring ImageMagick" \
-    && mv imagemagick-policy.xml /etc/ImageMagick-6/policy.xml \
-  && echo "Setting up Docker scripts" \
-    && mv wait-for-redis.py /sbin/wait-for-redis.py \
-    && chmod 755 /sbin/wait-for-redis.py \
-    && mv env-from-file.sh /sbin/env-from-file.sh \
-    && chmod 755 /sbin/env-from-file.sh \
-    && mv flower-conditional.sh /usr/local/bin/flower-conditional.sh \
-    && chmod 755 /usr/local/bin/flower-conditional.sh
+    && mv imagemagick-policy.xml /etc/ImageMagick-6/policy.xml
 
 # Packages needed only for building a few quick Python
 # dependencies
