@@ -2,7 +2,7 @@
 	"version": "2.0.0",
 	"tasks": [
 	{
-		"label": "Document Consumer",
+		"label": "manage.py document_consumer",
 		"type": "shell",
 		"command": "pipenv run python manage.py document_consumer",
 		"group": "build",
@@ -20,8 +20,27 @@
 		}
 
 		},
+		{
+			"label": "manage.py runserver",
+			"type": "shell",
+			"command": "pipenv run python manage.py runserver",
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": false,
+				"clear": true,
+				"revealProblems": "onProblem"
+			},
+			"options": {
+				"cwd": "${workspaceFolder}/src"
+			}
+
+			},
 	  {
-		"label": "Maintenance: Migrate",
+		"label": "Maintenance: manage.py migrate",
 		"type": "shell",
 		"command": "pipenv run python manage.py migrate",
 		"group": "none",
@@ -39,7 +58,7 @@
 		}
 	  },
 	  {
-		"label": "Maintenance: createsuperuser",
+		"label": "Maintenance: manage.py createsuperuser",
 		"type": "shell",
 		"command": "pipenv run python manage.py createsuperuser",
 		"group": "none",
