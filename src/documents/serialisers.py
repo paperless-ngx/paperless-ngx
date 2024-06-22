@@ -1829,22 +1829,32 @@ class WorkflowSerializer(serializers.ModelSerializer):
 class AdjustedNameField(serializers.CharField): 
     def to_internal_value(self, data): 
         model = self.parent.Meta.model
-        print(data) 
+         
         if hasattr(model, 'name'): 
             parent_folder = self.parent.initial_data.get('parent_folder')
             type = self.parent.initial_data.get('type')
             
             if type: 
-                existing_names = model.objects.filter(type=type).values_list('name', flat=True) 
+                existing_names = model.objects.filter(type=type).values_list('name', flat=True)
+                if getattr(self.parent,'instance') is None:
+                    pass
+                elif data == getattr(self.parent.instance,'name'):
+                    print('passs')
+                    return data 
+                
             elif parent_folder: 
                 existing_names = model.objects.filter(parent_folder=parent_folder).values_list('name', flat=True) 
-            
+                if getattr(self.parent,'instance') is None:
+                    pass
+                elif data == getattr(self.parent.instance,'name'):
+                    print('passs')
+                    return data
+                    
             else: 
-                existing_names = model.objects.filter(name__startswith=data).values_list('name', flat=True) 
-             
+                existing_names = model.objects.filter(name__startswith=data).values_list('name', flat=True)
+                 
             if data in existing_names: 
                 data = self.generate_unique_name(data, existing_names) 
-         
         return data 
      
     def generate_unique_name(self, name, existing_names): 
@@ -1860,6 +1870,25 @@ class AdjustedNameField(serializers.CharField):
 class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     document_count = serializers.SerializerMethodField()
     name = AdjustedNameField()
+    
+    def validate(self, data):
+        owner = (
+            data["owner"]
+            if "owner" in data
+            else self.user if hasattr(self, "user") else None
+        )
+        pk = self.instance.pk if hasattr(self.instance, "pk") else None
+        if ("owner" in data) and self.Meta.model.objects.filter(
+            owner=owner,
+        ).exclude(pk=pk).exists():
+            raise serializers.ValidationError(
+                {"error": "Object violates owner "},
+            )
+        return data
+    
+    def update(self, instance, validated_data):
+        return super().update(instance, validated_data)
+    
     class Meta:
         model = Warehouse
         fields = '__all__'
@@ -1888,8 +1917,35 @@ class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     
 class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     name = AdjustedNameField()
+    document_count = serializers.SerializerMethodField()
+    child_folder_count = serializers.SerializerMethodField()
+    
+    def get_document_count(self, obj):
+        return Document.objects.filter(folder=obj).count()
+    
+    def get_child_folder_count(self, obj):
+        return Folder.objects.filter(parent_folder=obj).count()
+    
+    def validate(self, data):
+        owner = (
+            data["owner"]
+            if "owner" in data
+            else self.user if hasattr(self, "user") else None
+        )
+        pk = self.instance.pk if hasattr(self.instance, "pk") else None
+        if ("owner" in data) and self.Meta.model.objects.filter(
+            owner=owner,
+        ).exclude(pk=pk).exists():
+            raise serializers.ValidationError(
+                {"error": "Object violates owner "},
+            )
+        return data
+    
+    def update(self, instance, validated_data):
+        return super().update(instance, validated_data)
+    
     class Meta:
         model = Folder
-        fields = '__all__'   
+        fields = '__all__'
 
     
