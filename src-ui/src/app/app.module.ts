@@ -12,7 +12,6 @@ import { DocumentListComponent } from './components/document-list/document-list.
 import { DocumentDetailComponent } from './components/document-detail/document-detail.component'
 import { DashboardComponent } from './components/dashboard/dashboard.component'
 import { TagListComponent } from './components/manage/tag-list/tag-list.component'
-import { WarehouseListComponent } from './components/manage/warehouse-list/warehouse-list.component'
 import { DocumentTypeListComponent } from './components/manage/document-type-list/document-type-list.component'
 import { CorrespondentListComponent } from './components/manage/correspondent-list/correspondent-list.component'
 import { LogsComponent } from './components/admin/logs/logs.component'
@@ -23,7 +22,6 @@ import { NotFoundComponent } from './components/not-found/not-found.component'
 import { ConfirmDialogComponent } from './components/common/confirm-dialog/confirm-dialog.component'
 import { CorrespondentEditDialogComponent } from './components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { TagEditDialogComponent } from './components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
-import { WarehouseEditDialogComponent } from './components/common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from './components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
 import { TagComponent } from './components/common/tag/tag.component'
 import { ClearableBadgeComponent } from './components/common/clearable-badge/clearable-badge.component'
@@ -104,7 +102,6 @@ import { UsersAndGroupsComponent } from './components/admin/users-groups/users-g
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
-import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { CustomFieldsDropdownComponent } from './components/common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { ProfileEditDialogComponent } from './components/common/profile-edit-dialog/profile-edit-dialog.component'
 import { PdfViewerComponent } from './components/common/pdf-viewer/pdf-viewer.component'
@@ -340,10 +337,13 @@ import localeTr from '@angular/common/locales/tr'
 import localeUk from '@angular/common/locales/uk'
 import localeZh from '@angular/common/locales/zh'
 import localeVi from '@angular/common/locales/vi'
+import { CustomShelfEditDialogComponent } from './components/common/custom-shelf-edit-dialog/custom-shelf-edit-dialog.component'
 import { KhoVatLyComponent } from './components/manage/kho-vat-ly/KhoVatLyComponent'
-import { BoxEditDialogComponent } from './components/common/edit-dialog/box-edit-dialog/box-edit-dialog.component'
 import { BoxFieldsComponent } from './components/manage/box-fields/box-fields.component'
-
+import { WarehouseEditDialogComponent } from './components/common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
+import { WarehouseListComponent } from './components/manage/warehouse-list/warehouse-list.component'
+import { BoxEditDialogComponent } from './components/common/edit-dialog/box-edit-dialog/box-edit-dialog.component'
+import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -386,6 +386,8 @@ function initializeApp(settings: SettingsService) {
 
 @NgModule({
   declarations: [
+    CustomFieldEditDialogComponent,
+    CustomFieldsComponent,
     //BoxListComponent,
     BoxEditDialogComponent,
     KhoVatLyComponent,
@@ -471,7 +473,7 @@ function initializeApp(settings: SettingsService) {
     FileDropComponent,
     CustomFieldsComponent,
     BoxFieldsComponent,
-    CustomFieldEditDialogComponent,
+    CustomShelfEditDialogComponent,
     CustomFieldsDropdownComponent,
     ProfileEditDialogComponent,
     PdfViewerComponent,
@@ -486,6 +488,7 @@ function initializeApp(settings: SettingsService) {
     RotateConfirmDialogComponent,
     MergeConfirmDialogComponent,
     SplitConfirmDialogComponent,
+
   ],
   imports: [
     BrowserModule,

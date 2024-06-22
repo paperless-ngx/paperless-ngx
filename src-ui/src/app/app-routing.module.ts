@@ -25,11 +25,14 @@ import {
 import { WorkflowsComponent } from './components/manage/workflows/workflows.component'
 import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
-import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
 import { ConfigComponent } from './components/admin/config/config.component'
 import { KhoVatLyComponent } from './components/manage/kho-vat-ly/KhoVatLyComponent'
 import { WarehouseListComponent } from './components/manage/warehouse-list/warehouse-list.component'
 import { BoxFieldsComponent } from './components/manage/box-fields/box-fields.component'
+
+
+import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
+
 
 
 
@@ -120,7 +123,7 @@ export const routes: Routes = [
 
 
       {
-        path: 'box/:id',
+        path: 'warehouse/:id',
         component: BoxFieldsComponent,
         canActivate: [PermissionsGuard],
         data: {
@@ -131,7 +134,7 @@ export const routes: Routes = [
         },
       },
       {
-        path: 'customfields/:id',
+        path: 'warehouses/:id',
         component: CustomFieldsComponent,
         canActivate: [PermissionsGuard],
         data: {
@@ -152,6 +155,28 @@ export const routes: Routes = [
           },
         },
       },
+      // {
+      //   path: 'customfields',
+      //   component: CustomFieldsComponent,
+      //   canActivate: [PermissionsGuard],
+      //   data: {
+      //     requiredPermission: {
+      //       action: PermissionAction.View,
+      //       type: PermissionType.CustomField,
+      //     },
+      //   },
+      // },
+      // {
+      //   path: 'warehouses/:id',
+      //   component: WarehouseListComponent,
+      //   canActivate: [PermissionsGuard],
+      //   data: {
+      //     requiredPermission: {
+      //       action: PermissionAction.View,
+      //       type: PermissionType.Warehouse,
+      //     },
+      //   },
+      // },
       {
         path: 'khovatly',
         component: KhoVatLyComponent,

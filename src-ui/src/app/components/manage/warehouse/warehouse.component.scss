@@ -1,0 +1,12 @@
+// hide caret on mobile dropdown
+.d-block.d-sm-none .dropdown-toggle::after {
+    display: none;
+}
+
+tbody tr:last-child td {
+    border-bottom: none !important;
+}
+
+.form-check {
+    min-height: 0;
+}

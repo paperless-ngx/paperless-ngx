@@ -3739,6 +3739,102 @@
         </context-group>
         <target state="translated">Tạo đường dẫn lưu mới</target>
       </trans-unit>
+      <trans-unit id="8400800728372350862" datatype="html">
+        <source>Create new warehouse</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component.ts</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+        <target state="translated">Tạo đường dẫn lưu mới</target>
+      </trans-unit>
+      <trans-unit id="7228808031515481112" datatype="html">
+        <source>Edit warehouse</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+        <target state="translated">Sửa đường dẫn lưu</target>
+      </trans-unit>
+      <trans-unit id="8618345666238432801" datatype="html">
+        <source>Warehouse</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">216</context>
+        </context-group>
+      <target state="translated">Kho vật lý</target>
+      </trans-unit>
+      <trans-unit id="3780468104925816143" datatype="html">
+        <source>warehouses</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/warehouse-list/warehouse-list.component.ts</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+       <target state="translated">Kho</target>
+      </trans-unit>
+       <trans-unit id="7228808031515481112" datatype="html">
+        <source>Edit warehouse</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      <target state="translated">Sửa kho</target>
+      </trans-unit>
+      <trans-unit id="6324378446258388918" datatype="html">
+        <source>customFields</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/custom-fields/CustomFieldsComponent.ts</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+        <target state="translated">Giá/Kệ</target>
+      </trans-unit>
+      <trans-unit id="8803951544152718270" datatype="html">
+        <source>Create new customfield</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.ts</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+        <target state="translated">Tạo mới đường dẫn</target>
+      </trans-unit>
+      <trans-unit id="1650725767581008683" datatype="html">
+        <source>Edit customfield</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      <target state="translated">Sửa đường dẫn</target>
+      </trans-unit>
+      <trans-unit id="7598704097190677888" datatype="html">
+        <source>boxcases</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/box-fields/box-fields.component.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      <target state="translated">Hộp/Cặp</target>
+      </trans-unit>
+      <trans-unit id="8050052091236410085" datatype="html">
+        <source>Create new Boxcase</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/box-edit-dialog/box-edit-dialog.component.ts</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+      <target state="translated">Tạo mới đường dẫn</target>
+      </trans-unit>
+      <trans-unit id="3852279067551495091" datatype="html">
+        <source>Edit Boxcase</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/box-edit-dialog/box-edit-dialog.component.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      <target state="translated">Sửa đường dẫn</target>
+      </trans-unit>
+      <trans-unit id="894965666917873756" datatype="html">
+        <source>Document</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">104</context>
+        </context-group>
+        <target state="translated">Tài liệu</target>
+      </trans-unit>
       <trans-unit id="3754859110054016570" datatype="html">
         <source>Edit storage path</source>
         <context-group purpose="location">

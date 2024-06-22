@@ -5,11 +5,11 @@ import { CustomField } from 'src/app/data/custom-field';
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component';
-import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component';
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component';
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component';
 import { KhoVatLyService } from 'src/app/services/rest/kho-vat-ly.service';
 import { CustomFields, DATA_TYPE_LABELS } from 'src/app/data/customfields';
+import { CustomShelfEditDialogComponent } from '../../common/custom-shelf-edit-dialog/custom-shelf-edit-dialog.component';
 
 
 @Component({
@@ -46,7 +46,7 @@ export class KhoVatLyComponent
     }
 
     editField(field: CustomFields) {
-        const modal = this.modalService.open(CustomFieldEditDialogComponent);
+        const modal = this.modalService.open(CustomShelfEditDialogComponent);
         modal.componentInstance.dialogMode = field
             ? EditDialogMode.EDIT
             : EditDialogMode.CREATE;

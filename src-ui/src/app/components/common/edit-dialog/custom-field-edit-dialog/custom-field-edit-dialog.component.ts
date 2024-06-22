@@ -15,7 +15,7 @@ import { EditCustomfieldComponent } from '../edit-customfield/edit-customfield.c
   styleUrls: ['./custom-field-edit-dialog.component.scss'],
 })
 
-export class CustomFieldEditDialogComponent extends EditCustomfieldComponent<CustomField> {
+export class CustomFieldEditDialogComponent extends EditDialogComponent<CustomField> {
   constructor(
     service: CustomFieldsService,
     activeModal: NgbActiveModal,
@@ -37,7 +37,7 @@ export class CustomFieldEditDialogComponent extends EditCustomfieldComponent<Cus
     return new FormGroup({
       name: new FormControl(''),
       type: new FormControl('Shelf'),
-      parent_customfield: new FormControl(''),
+      parent_warehouse: new FormControl(''),
       matching_algorithm: new FormControl(DEFAULT_MATCHING_ALGORITHM),
       match: new FormControl(''),
       is_insensitive: new FormControl(true),

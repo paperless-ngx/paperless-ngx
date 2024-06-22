@@ -1,3 +1,5 @@
+
+
 import {
   Directive,
   OnDestroy,
@@ -50,7 +52,7 @@ export interface ManagementListColumn {
 }
 
 @Directive()
-export abstract class ManagementListComponent<T extends ObjectWithId>
+export abstract class WarehouseComponent<T extends ObjectWithId>
   extends ComponentWithPermissions
   implements OnInit, OnDestroy {
   [x: string]: any

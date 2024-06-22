@@ -1,9 +1,8 @@
-import { Component } from '@angular/core'
+import { Component, OnInit } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { Warehouse } from 'src/app/data/warehouse'
-
 
 import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
 import { UserService } from 'src/app/services/rest/user.service'
@@ -23,11 +22,12 @@ export class WarehouseEditDialogComponent extends EditDialogComponent<Warehouse>
     settingsService: SettingsService
   ) {
     super(service, activeModal, userService, settingsService)
-  }
 
+  }
   getCreateTitle() {
     return $localize`Create new warehouse`
   }
+
 
   getEditTitle() {
     return $localize`Edit warehouse`

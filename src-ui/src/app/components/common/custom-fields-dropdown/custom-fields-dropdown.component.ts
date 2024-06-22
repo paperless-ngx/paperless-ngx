@@ -9,14 +9,16 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Subject, first, takeUntil } from 'rxjs'
 import { CustomField } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+
 import {
   PermissionAction,
   PermissionType,
   PermissionsService,
 } from 'src/app/services/permissions.service'
+import { CustomShelfEditDialogComponent } from '../custom-shelf-edit-dialog/custom-shelf-edit-dialog.component'
+import { CustomFields } from 'src/app/data/customfields'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 
 @Component({
   selector: 'pngx-custom-fields-dropdown',
@@ -112,7 +114,7 @@ export class CustomFieldsDropdownComponent implements OnDestroy {
   }
 
   createField(newName: string = null) {
-    const modal = this.modalService.open(CustomFieldEditDialogComponent)
+    const modal = this.modalService.open(CustomShelfEditDialogComponent)
     if (newName) modal.componentInstance.object = { name: newName }
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))

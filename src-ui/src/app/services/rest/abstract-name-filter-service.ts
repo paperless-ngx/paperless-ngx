@@ -6,11 +6,10 @@ import { Observable } from 'rxjs'
 export enum BulkEditObjectOperation {
   SetPermissions = 'set_permissions',
   Delete = 'delete',
+  Share = "Share",
 }
 
-export abstract class AbstractNameFilterService<
-  T extends ObjectWithId,
-> extends AbstractPaperlessService<T> {
+export abstract class AbstractNameFilterService<T extends ObjectWithId,> extends AbstractPaperlessService<T> {
   listFiltered(
     page?: number,
     pageSize?: number,
@@ -87,4 +86,13 @@ export abstract class AbstractNameFilterService<
     }
     return this.http.post<string>(`${this.baseUrl}bulk_edit_objects/`, params)
   }
+
+  // getDocuments(id: any): Observable<any> {
+
+  //   return this.http.get<any>(`${this.baseUrl}warehouses/?parent_warehouse=${id}`, {});
+  // }
+
+
+
+
 }

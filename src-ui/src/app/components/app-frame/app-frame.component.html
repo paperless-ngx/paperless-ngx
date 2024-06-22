@@ -209,7 +209,6 @@
          
 
 
-        <!-- Kho -->
         <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Warehouse }">
             <a class="nav-link" (click)="toggleKho()" routerLink="warehouses" ngbPopover="Warehouses" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
                 container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
@@ -218,7 +217,13 @@
             </a>
         </li>
 
-            
+         <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }">
+              <a class="nav-link" routerLink="customfields" routerLinkActive="active" (click)="closeMenu()"
+                ngbPopover="Custom Fields" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
+                container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+                <i-bs class="me-1" name="ui-radios"></i-bs><span>&nbsp;<ng-container i18n>CustomFields</ng-container></span>
+              </a>
+            </li>
             
 
 

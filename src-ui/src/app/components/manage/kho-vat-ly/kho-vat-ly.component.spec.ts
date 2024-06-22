@@ -20,7 +20,7 @@ import { PageHeaderComponent } from '../../common/page-header/page-header.compon
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { KhoVatLyComponent } from './KhoVatLyComponent'
-import { CustomFieldsComponent } from '../custom-fields/custom-fields.component'
+import { CustomFieldsComponent } from '../warehouseid/CustomFieldsComponent'
 import { KhoVatLyService } from 'src/app/services/rest/kho-vat-ly.service'
 
 const fields: CustomField[] = [

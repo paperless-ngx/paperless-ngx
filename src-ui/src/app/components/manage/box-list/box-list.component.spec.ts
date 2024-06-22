@@ -12,7 +12,6 @@ import { PageHeaderComponent } from '../../common/page-header/page-header.compon
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { CustomFieldsComponent } from '../custom-fields/custom-fields.component'
 import { BoxFieldsComponent } from '../box-fields/box-fields.component'
 import { BoxService } from 'src/app/services/rest/box.service'
 

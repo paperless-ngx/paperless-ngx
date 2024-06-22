@@ -36,6 +36,8 @@ import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dial
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
+import { CustomService } from 'src/app/services/common-service/service-custom'
+import { ActivatedRoute } from '@angular/router'
 
 export interface ManagementListColumn {
   key: string
@@ -51,6 +53,8 @@ export interface ManagementListColumn {
 export abstract class CustomListComponent<T extends ObjectWithId>
   extends ComponentWithPermissions
   implements OnInit, OnDestroy {
+  documents: any[] = [];
+  id: any;
   constructor(
     private service: AbstractNameFilterService<T>,
     private modalService: NgbModal,
@@ -62,7 +66,9 @@ export abstract class CustomListComponent<T extends ObjectWithId>
     public typeName: string,
     public typeNamePlural: string,
     public permissionType: PermissionType,
-    public extraColumns: ManagementListColumn[]
+    public extraColumns: ManagementListColumn[],
+    private customService: CustomService,
+    private route: ActivatedRoute
   ) {
     super()
   }
@@ -103,6 +109,24 @@ export abstract class CustomListComponent<T extends ObjectWithId>
         this.page = 1
         this.reloadData()
       })
+    //
+    this.route.params.subscribe(params => {
+      this.id = +params['id'];
+      this.getDocuments(this.id);
+    });
+
+  }
+
+  getDocuments(id: any) {
+    this.customService.getDocuments(id).subscribe(
+      data => {
+        this.documents = data.results;
+        console.log('Documents:', this.documents);
+      },
+      error => {
+        console.error('Đã xảy ra lỗi!', error);
+      }
+    );
   }
 
   ngOnDestroy() {
