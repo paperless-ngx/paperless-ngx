@@ -63,7 +63,7 @@ export const SETTINGS_KEYS = {
     'general-settings:document-editing:remove-inbox-tags',
   SEARCH_DB_ONLY: 'general-settings:search:db-only',
   SEARCH_FULL_TYPE: 'general-settings:search:more-link',
-  EMPTY_TRASH_DELAY: 'general-settings:trash:empty-trash-delay',
+  EMPTY_TRASH_DELAY: 'trash_delay',
 }
 
 export const SETTINGS: UiSetting[] = [
