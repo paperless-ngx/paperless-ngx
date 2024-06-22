@@ -173,11 +173,11 @@
           </h6>
           <ul class="nav flex-column mb-2">
             <li class="nav-item app-link"
-            *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Viewallforder }">
-            <a class="nav-link" routerLink="Viewallforder" routerLinkActive="active" (click)="closeMenu()"
-              ngbPopover="viewallforder" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
+            *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Viewallfolder }">
+            <a class="nav-link" routerLink="viewallfolder" routerLinkActive="active" (click)="closeMenu()"
+              ngbPopover="viewallfolder" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
               container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-              <i-bs class="me-1" name="Personal"></i-bs><span>&nbsp;<ng-container i18n>Personal document</ng-container></span>
+              <i class="fa-regular fa-folder-open"></i><span>&nbsp;<ng-container i18n>Personal document</ng-container></span>
             </a>
           </li>
             <li class="nav-item app-link"

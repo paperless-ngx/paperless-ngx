@@ -340,6 +340,8 @@ import localeTr from '@angular/common/locales/tr'
 import localeUk from '@angular/common/locales/uk'
 import localeZh from '@angular/common/locales/zh'
 import localeVi from '@angular/common/locales/vi'
+import { CommonModule } from '@angular/common';
+import { ViewallForderComponent } from './components/folder-management/viewall-forder/viewall-forder.component'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -382,6 +384,7 @@ function initializeApp(settings: SettingsService) {
 
 @NgModule({
   declarations: [
+    ViewallForderComponent,
     AppComponent,
     DocumentListComponent,
     DocumentDetailComponent,
@@ -493,6 +496,7 @@ function initializeApp(settings: SettingsService) {
     DragDropModule,
     NgxBootstrapIconsModule.pick(icons),
     NgxFilesizeModule,
+    CommonModule,
   ],
   providers: [
     {

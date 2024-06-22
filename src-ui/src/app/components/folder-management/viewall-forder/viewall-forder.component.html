@@ -1,156 +1,68 @@
-<div class="viewforder-header">
-    <div class="search-new">
-        <form class="myform" action="">
-            <button><i class="fa-solid fa-magnifying-glass"></i></button>
-            <input type="text" placeholder="Search">
-        </form>       
-        <div class="add-viewforder">
-            <button class="addforder"><i class="fa-solid fa-folder-plus"></i> Tạo thư mục mới</button>
-        </div>
+<div class="folder-container">
+    <div class="sub-folder-container">
+
     </div>
-    <div class="titel">
-        <p>Show</p>
-        <select name="Show" id="showSelect">
-            <option value="16" >16</option>
-            <option value="36">36</option>
-            <option value="66">66</option>
-        </select>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const defaultOption = document.querySelector('#showSelect option[selected]');
-                if (defaultOption) {
-                    defaultOption.textContent = 'Show ' + defaultOption.value;
-                }
-            });
-        </script>
-        <h1 style="margin-left: 10px;">Forder</h1>
-    </div>
-    <div class="conten">
-        <div *ngFor="let folder of folders" class="product-forder">
-            <i class="fa-solid fa-folder"></i>
-            <p>{{ folder.name }}</p>
-            <i class="fa-solid fa-ellipsis-vertical" onclick="toggleDropdown(this)"></i>
-            <div class="submenu">
-                <ul>
-                    <li><a href="#">Delete</a></li>
-                    <li><a href="#">Reaname</a></li>
-                </ul>
+    <div class="folder-left" id="folderLeft">
+        <div class="folder-left-1">
+            <div class="folder-left-search">
+                <button class="search"><i class="fa-solid fa-magnifying-glass"></i></button>
+                <input placeholder="Tìm Kiếm" class="serch" type="text">
             </div>
         </div>
-        <script>
-            document.addEventListener('click', function(event) {
-                const submenus = document.querySelectorAll('.submenu');
-                const dropdownIcons = document.querySelectorAll('.fa-ellipsis-vertical');
-                
-                for (let i = 0; i < submenus.length; i++) {
-                    const submenu = submenus[i];
-                    const dropdownIcon = dropdownIcons[i];
-
-                    const isClickInside = dropdownIcon.contains(event.target);
-                    
-                    if (!isClickInside) {
-                        submenu.classList.remove('active');
-                    }
-                }
-            });
-
-            function toggleDropdown(icon) {
-                const submenu = icon.nextElementSibling;
-                submenu.classList.toggle('active');
-                event.stopPropagation(); 
-            }
-
-        </script>
+        <div id="folders-container" class="folder">
+            <!-- Folders and Documents will be added dynamically here -->
+        </div>  
+        <div id="documents-container" class="documents">
+        </div>        
+        <div class="resize-handle"></div>
     </div>
-    <div style="margin-top: 20px;" class="titel">
-        <p>Show</p>
-        <select name="Show" id="showSelect">
-            <option value="16" >16</option>
-            <option value="36">36</option>
-            <option value="66">66</option>
-        </select>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const defaultOption = document.querySelector('#showSelect option[selected]');
-                if (defaultOption) {
-                    defaultOption.textContent = 'Show ' + defaultOption.value;
-                }
-            });
-        </script>
-        <h2 style="margin-left: 10px;">Documents</h2>
-    </div>
-    <div class="conten-tailieu">
-        <div style="display: none;" class="conten-tailieu-submenu">
-            <ul>
-                <li><a href="#"><i class="fa-solid fa-folder"></i></a></li>
-                <li><a href="#"><i class="fa-solid fa-trash"></i></a></li>
-            </ul>
+    <div class="folder-right">
+        <div class="folder-search">
+            <div class="folder-right-tim"></div>
+            <div class="folder-right-search">
+                <button> <i class="fa-solid fa-magnifying-glass"></i>   </button>
+                <input type="text">
+            </div>
         </div>
-        <table id="myTable">
-            <thead>
-                <tr>
-                    <th>Document name</th>
-                    <th>Last modified <i class="fa-solid fa-caret-down"></i><i class="fa-solid fa-arrow-right-long"></i></th>
-                    <th>File size</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let document of documents">
-                    <td>{{ document.original_filename }}</td>
-                    <td>{{ document.modified | date:'medium' }}</td>
-                    <td>{{ calculateFileSize(document.archive_checksum) }}</td>
-                  </tr>
-            </tbody>
-        </table>
-        <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const table = document.getElementById('myTable');
-    let selectedRows = [];
-
-    table.addEventListener('click', function(event) {
-        const target = event.target.closest('tr'); // Find closest parent <tr>
-        if (!target) return;
-
-        const isCtrlPressed = event.ctrlKey || event.metaKey; // Check if Ctrl or Cmd key is pressed
-
-        if (isCtrlPressed) {
-            if (selectedRows.includes(target)) {
-                // Deselect row
-                selectedRows = selectedRows.filter(row => row !== target);
-                target.classList.remove('selected');
-            } else {
-                // Select row
-                selectedRows.push(target);
-                target.classList.add('selected');
-            }
-        } else {
-            // Clear all selections
-            selectedRows.forEach(row => row.classList.remove('selected'));
-            selectedRows = [target];
-            target.classList.add('selected');
-        }
-
-        // Show or hide .conten-tailieu-submenu based on selection
-        const submenu = document.querySelector('.conten-tailieu-submenu');
-        if (selectedRows.length > 0) {
-            submenu.style.display = 'block';
-        } else {
-            submenu.style.display = 'none';
-        }
-    });
-
-    // Hide submenu if user clicks outside
-    document.addEventListener('click', function(event) {
-        if (!event.target.closest('.conten-tailieu-submenu') && !event.target.closest('table')) {
-            // Clear all selections and hide submenu
-            selectedRows.forEach(row => row.classList.remove('selected'));
-            selectedRows = [];
-            const submenu = document.querySelector('.conten-tailieu-submenu');
-            submenu.style.display = 'none';
-        }
-    });
-});
-        </script>
+        <div class="folder-right-conten">
+            <table>
+                <thead>
+                    <tr>
+                        <td>Name</td>
+                        <td>Data modified</td>
+                        <td>Type</td>
+                        <td>Size</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <i class="fa-solid fa-folder"></i>
+                            <p>Folder 1</p>
+                        </td>
+                        <td>11/10/2002</td>
+                        <td>
+                            <p>File Folder</p>
+                        </td>
+                        <td>
+                            <p>2 KB</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa-solid fa-file"></i>
+                            <p>Document</p>
+                        </td>
+                        <td>11/10/2002</td>
+                        <td>
+                            <p>txt</p>
+                        </td>
+                        <td>
+                            <p>2 KB</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-    
 </div>

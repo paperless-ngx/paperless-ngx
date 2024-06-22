@@ -117,13 +117,13 @@ export const routes: Routes = [
         },
       },
       {
-        path: 'Viewallforder',
+        path: 'viewallfolder',
         component: ViewallForderComponent,
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
             action: PermissionAction.View,
-            type: PermissionType.Viewallforder,
+            type: PermissionType.Viewallfolder,
           },
         },
       },

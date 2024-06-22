@@ -2069,10 +2069,11 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     def getFolderDoc(self, request):
         currentUser = request.user
         documents = list(Document.objects.filter(folder=None, owner=currentUser).order_by("-created").values())
-        folders = list(Folder.objects.filter(parent_folder=None, owner=currentUser).order_by("name").values())
+        folders = list(Folder.objects.filter(parent_folder=None, owner=currentUser).order_by("name"))
+        folders_serialisers = FolderSerializer(folders, many = True)
         return {
             "documents": documents,
-            "folders": folders,
+            "folders": folders_serialisers.data,
         }    
         
     @action(methods=["get"], detail=False)
@@ -2089,12 +2090,13 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     
     
     def getFolderDocById(self, fol):
-        
-        documents = list(Document.objects.filter(folder=fol).order_by("-created").values())
-        child_folders = list(Folder.objects.filter(parent_folder=fol).order_by("name").values())
+        currentUser = self.request.user
+        documents = list(Document.objects.filter(folder=fol, owner=currentUser).order_by("-created").values())
+        child_folders = list(Folder.objects.filter(parent_folder=fol, owner=currentUser).order_by("name"))
+        folders_serialisers = FolderSerializer(child_folders, many=True)
         return {
             "documents": documents,
-            "folders": child_folders,
+            "folders": folders_serialisers.data,
         }
     
     @action(methods=["get"], detail=True)
