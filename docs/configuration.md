@@ -1366,7 +1366,7 @@ processing. This only has an effect if
 
 ## Trash
 
-#### [`EMPTY_TRASH_DELAY=<num>`](#EMPTY_TRASH_DELAY) {#EMPTY_TRASH_DELAY}
+#### [`PAPERLESS_EMPTY_TRASH_DELAY=<num>`](#PAPERLESS_EMPTY_TRASH_DELAY) {#PAPERLESS_EMPTY_TRASH_DELAY}
 
 : Sets how long in days documents remain in the 'trash' before they are permanently deleted.
 
