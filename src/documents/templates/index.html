@@ -65,7 +65,7 @@
 		<script type="text/javascript">{# Pass Django messages to Angular frontend #}
 			window.DJANGO_MESSAGES = [
 				{% for message in messages %}
-					{ level: "{{ message.level_tag | escapejs }}", message: "{{ message | escapejs }}" },
+					{ level: "{{ message.level_tag | escapejs }}", message: "{{ message.level_tag | escapejs }}" },
 				{% endfor %}
 			]
 		</script>

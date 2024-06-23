@@ -374,11 +374,11 @@ msgstr ""
 
 #: documents/templates/index.html:22
 msgid "Paperless-ng is loading..."
-msgstr "TC GROUP is loading"
+msgstr "NIAD is loading"
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ng signed out"
-msgstr "TC GROUP signed out"
+msgstr "NIAD signed out"
 
 #: documents/templates/registration/logged_out.html:45
 msgid "You have been successfully logged out. Bye!"

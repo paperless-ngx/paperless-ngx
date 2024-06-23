@@ -23,7 +23,12 @@
                 {% include "paperless-ngx/snippets/svg_logo.html" with extra_attrs="width='300' class='logo mb-4'" %}
                 {% for message in messages %}
                     <div class="alert alert-{{ message.level_tag }}" role="alert">
-                    {{ message }}
+                        {% if message.tags == 'success' %}
+                            {% translate 'You have signed out.' %}
+                        {% else %}
+                            {{ message }}
+                        {% endif %}
+
                     </div>
                 {% endfor %}
                 {% block form_top_content %}
