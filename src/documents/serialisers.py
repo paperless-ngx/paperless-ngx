@@ -93,7 +93,9 @@ class MatchingModelSerializer(serializers.ModelSerializer):
         owner = (
             data["owner"]
             if "owner" in data
-            else self.user if hasattr(self, "user") else None
+            else self.user
+            if hasattr(self, "user")
+            else None
         )
         pk = self.instance.pk if hasattr(self.instance, "pk") else None
         if ("name" in data or "owner" in data) and self.Meta.model.objects.filter(
@@ -289,7 +291,7 @@ class OwnedObjectSerializer(
 
 
 class CorrespondentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
-    last_correspondence = serializers.DateTimeField(read_only=True)
+    last_correspondence = serializers.DateTimeField(read_only=True, required=False)
 
     class Meta:
         model = Correspondent
@@ -784,6 +786,7 @@ class DocumentSerializer(
             "created_date",
             "modified",
             "added",
+            "deleted_at",
             "archive_serial_number",
             "original_file_name",
             "archived_file_name",
@@ -937,11 +940,12 @@ class BulkEditSerializer(
             "modify_tags",
             "modify_custom_fields",
             "delete",
-            "redo_ocr",
+            "reprocess",
             "set_permissions",
             "rotate",
             "merge",
             "split",
+            "delete_pages",
         ],
         label="Method",
         write_only=True,
@@ -988,8 +992,8 @@ class BulkEditSerializer(
             return bulk_edit.modify_custom_fields
         elif method == "delete":
             return bulk_edit.delete
-        elif method == "redo_ocr":
-            return bulk_edit.redo_ocr
+        elif method == "redo_ocr" or method == "reprocess":
+            return bulk_edit.reprocess
         elif method == "set_permissions":
             return bulk_edit.set_permissions
         elif method == "rotate":
@@ -998,6 +1002,8 @@ class BulkEditSerializer(
             return bulk_edit.merge
         elif method == "split":
             return bulk_edit.split
+        elif method == "delete_pages":
+            return bulk_edit.delete_pages
         else:
             raise serializers.ValidationError("Unsupported method.")
 
@@ -1126,6 +1132,27 @@ class BulkEditSerializer(
         except ValueError:
             raise serializers.ValidationError("invalid pages specified")
 
+        if "delete_originals" in parameters:
+            if not isinstance(parameters["delete_originals"], bool):
+                raise serializers.ValidationError("delete_originals must be a boolean")
+        else:
+            parameters["delete_originals"] = False
+
+    def _validate_parameters_delete_pages(self, parameters):
+        if "pages" not in parameters:
+            raise serializers.ValidationError("pages not specified")
+        if not isinstance(parameters["pages"], list):
+            raise serializers.ValidationError("pages must be a list")
+        if not all(isinstance(i, int) for i in parameters["pages"]):
+            raise serializers.ValidationError("pages must be a list of integers")
+
+    def _validate_parameters_merge(self, parameters):
+        if "delete_originals" in parameters:
+            if not isinstance(parameters["delete_originals"], bool):
+                raise serializers.ValidationError("delete_originals must be a boolean")
+        else:
+            parameters["delete_originals"] = False
+
     def validate(self, attrs):
         method = attrs["method"]
         parameters = attrs["parameters"]
@@ -1152,6 +1179,14 @@ class BulkEditSerializer(
                     "Split method only supports one document",
                 )
             self._validate_parameters_split(parameters)
+        elif method == bulk_edit.delete_pages:
+            if len(attrs["documents"]) > 1:
+                raise serializers.ValidationError(
+                    "Delete pages method only supports one document",
+                )
+            self._validate_parameters_delete_pages(parameters)
+        elif method == bulk_edit.merge:
+            self._validate_parameters_merge(parameters)
 
         return attrs
 
@@ -1829,3 +1864,26 @@ class WorkflowSerializer(serializers.ModelSerializer):
         self.prune_triggers_and_actions()
 
         return instance
+
+
+class TrashSerializer(SerializerWithPerms):
+    documents = serializers.ListField(
+        required=False,
+        label="Documents",
+        write_only=True,
+        child=serializers.IntegerField(),
+    )
+
+    action = serializers.ChoiceField(
+        choices=["restore", "empty"],
+        label="Action",
+        write_only=True,
+    )
+
+    def validate_documents(self, documents):
+        count = Document.deleted_objects.filter(id__in=documents).count()
+        if not count == len(documents):
+            raise serializers.ValidationError(
+                "Some documents in the list have not yet been deleted.",
+            )
+        return documents

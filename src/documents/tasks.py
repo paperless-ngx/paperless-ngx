@@ -2,6 +2,7 @@ import hashlib
 import logging
 import shutil
 import uuid
+from datetime import timedelta
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Optional
@@ -10,8 +11,10 @@ import tqdm
 from celery import Task
 from celery import shared_task
 from django.conf import settings
+from django.db import models
 from django.db import transaction
 from django.db.models.signals import post_save
+from django.utils import timezone
 from filelock import FileLock
 from whoosh.writing import AsyncWriter
 
@@ -41,6 +44,7 @@ from documents.plugins.base import StopConsumeTaskError
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated
+from documents.signals.handlers import cleanup_document_deletion
 
 if settings.AUDIT_LOG_ENABLED:
     import json
@@ -117,10 +121,13 @@ def consume_file(
         ConsumerPlugin,
     ]
 
-    with ProgressManager(
-        overrides.filename or input_doc.original_file.name,
-        self.request.id,
-    ) as status_mgr, TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
+    with (
+        ProgressManager(
+            overrides.filename or input_doc.original_file.name,
+            self.request.id,
+        ) as status_mgr,
+        TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir,
+    ):
         tmp_dir = Path(tmp_dir)
         for plugin_class in plugins:
             plugin_name = plugin_class.NAME
@@ -278,6 +285,10 @@ def update_document_archive_file(document_id):
                     shutil.move(parser.get_archive_path(), document.archive_path)
                     shutil.move(thumbnail, document.thumbnail_path)
 
+            document.refresh_from_db()
+            logger.info(
+                f"Updating index for document {document_id} ({document.archive_checksum})",
+            )
             with index.open_index_writer() as writer:
                 index.update_document(writer, document)
 
@@ -289,3 +300,29 @@ def update_document_archive_file(document_id):
         )
     finally:
         parser.cleanup()
+
+
+@shared_task
+def empty_trash(doc_ids=None):
+    documents = (
+        Document.deleted_objects.filter(id__in=doc_ids)
+        if doc_ids is not None
+        else Document.deleted_objects.filter(
+            deleted_at__lt=timezone.localtime(timezone.now())
+            - timedelta(
+                days=settings.EMPTY_TRASH_DELAY,
+            ),
+        )
+    )
+
+    try:
+        # Temporarily connect the cleanup handler
+        models.signals.post_delete.connect(cleanup_document_deletion, sender=Document)
+        documents.delete()  # this is effectively a hard delete
+    except Exception as e:  # pragma: no cover
+        logger.exception(f"Error while emptying trash: {e}")
+    finally:
+        models.signals.post_delete.disconnect(
+            cleanup_document_deletion,
+            sender=Document,
+        )

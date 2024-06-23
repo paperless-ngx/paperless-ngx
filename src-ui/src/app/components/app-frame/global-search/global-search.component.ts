@@ -14,7 +14,8 @@ import {
   FILTER_HAS_CORRESPONDENT_ANY,
   FILTER_HAS_DOCUMENT_TYPE_ANY,
   FILTER_HAS_STORAGE_PATH_ANY,
-  FILTER_HAS_TAGS_ANY,
+  FILTER_HAS_TAGS_ALL,
+  FILTER_TITLE_CONTENT,
 } from 'src/app/data/filter-rule-type'
 import { DataType } from 'src/app/data/datatype'
 import { ObjectWithId } from 'src/app/data/object-with-id'
@@ -41,6 +42,9 @@ import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog
 import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
 import { WorkflowEditDialogComponent } from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
 import { HotKeyService } from 'src/app/services/hot-key.service'
+import { paramsFromViewState } from 'src/app/utils/query-params'
+import { SettingsService } from 'src/app/services/settings.service'
+import { GlobalSearchType, SETTINGS_KEYS } from 'src/app/data/ui-settings'
 
 @Component({
   selector: 'pngx-global-search',
@@ -62,6 +66,13 @@ export class GlobalSearchComponent implements OnInit {
   @ViewChildren('primaryButton') primaryButtons: QueryList<ElementRef>
   @ViewChildren('secondaryButton') secondaryButtons: QueryList<ElementRef>
 
+  get useAdvancedForFullSearch(): boolean {
+    return (
+      this.settingsService.get(SETTINGS_KEYS.SEARCH_FULL_TYPE) ===
+      GlobalSearchType.ADVANCED
+    )
+  }
+
   constructor(
     public searchService: SearchService,
     private router: Router,
@@ -70,7 +81,8 @@ export class GlobalSearchComponent implements OnInit {
     private documentListViewService: DocumentListViewService,
     private permissionsService: PermissionsService,
     private toastService: ToastService,
-    private hotkeyService: HotKeyService
+    private hotkeyService: HotKeyService,
+    private settingsService: SettingsService
   ) {
     this.queryDebounce = new Subject<string>()
 
@@ -87,7 +99,7 @@ export class GlobalSearchComponent implements OnInit {
       })
   }
 
-  ngOnInit() {
+  public ngOnInit() {
     this.hotkeyService
       .addShortcut({ keys: '/', description: $localize`Global search` })
       .subscribe(() => {
@@ -104,17 +116,22 @@ export class GlobalSearchComponent implements OnInit {
     })
   }
 
-  public primaryAction(type: string, object: ObjectWithId) {
+  public primaryAction(
+    type: string,
+    object: ObjectWithId,
+    event: PointerEvent = null
+  ) {
+    const newWindow = event?.metaKey || event?.ctrlKey
     this.reset(true)
     let filterRuleType: number
     let editDialogComponent: any
     let size: string = 'md'
     switch (type) {
       case DataType.Document:
-        this.router.navigate(['/documents', object.id])
+        this.navigateOrOpenInNewWindow(['/documents', object.id], newWindow)
         return
       case DataType.SavedView:
-        this.router.navigate(['/view', object.id])
+        this.navigateOrOpenInNewWindow(['/view', object.id], newWindow)
         return
       case DataType.Correspondent:
         filterRuleType = FILTER_HAS_CORRESPONDENT_ANY
@@ -126,7 +143,7 @@ export class GlobalSearchComponent implements OnInit {
         filterRuleType = FILTER_HAS_STORAGE_PATH_ANY
         break
       case DataType.Tag:
-        filterRuleType = FILTER_HAS_TAGS_ANY
+        filterRuleType = FILTER_HAS_TAGS_ALL
         break
       case DataType.User:
         editDialogComponent = UserEditDialogComponent
@@ -154,9 +171,17 @@ export class GlobalSearchComponent implements OnInit {
     }
 
     if (filterRuleType) {
-      this.documentListViewService.quickFilter([
-        { rule_type: filterRuleType, value: object.id.toString() },
-      ])
+      let params = paramsFromViewState({
+        filterRules: [
+          { rule_type: filterRuleType, value: object.id.toString() },
+        ],
+        currentPage: 1,
+        sortField: this.documentListViewService.sortField ?? 'created',
+        sortReverse: this.documentListViewService.sortReverse,
+      })
+      this.navigateOrOpenInNewWindow(['/documents'], newWindow, {
+        queryParams: params,
+      })
     } else if (editDialogComponent) {
       const modalRef: NgbModalRef = this.modalService.open(
         editDialogComponent,
@@ -213,6 +238,7 @@ export class GlobalSearchComponent implements OnInit {
 
   private reset(close: boolean = false) {
     this.queryDebounce.next(null)
+    this.query = null
     this.searchResults = null
     this.currentItemIndex = -1
     if (close) {
@@ -233,7 +259,7 @@ export class GlobalSearchComponent implements OnInit {
     item.nativeElement.focus()
   }
 
-  onItemHover(event: MouseEvent) {
+  public onItemHover(event: MouseEvent) {
     const item: ElementRef = this.resultItems
       .toArray()
       .find((item) => item.nativeElement === event.currentTarget)
@@ -241,7 +267,7 @@ export class GlobalSearchComponent implements OnInit {
     this.setCurrentItem()
   }
 
-  onButtonHover(event: MouseEvent) {
+  public onButtonHover(event: MouseEvent) {
     ;(event.currentTarget as HTMLElement).focus()
   }
 
@@ -262,19 +288,14 @@ export class GlobalSearchComponent implements OnInit {
       event.preventDefault()
       this.currentItemIndex = this.searchResults.total - 1
       this.setCurrentItem()
-    } else if (
-      event.key === 'Enter' &&
-      this.searchResults?.total === 1 &&
-      this.resultsDropdown.isOpen()
-    ) {
-      this.primaryButtons.first.nativeElement.click()
-      this.searchInput.nativeElement.blur()
-    } else if (
-      event.key === 'Enter' &&
-      this.searchResults?.total &&
-      !this.resultsDropdown.isOpen()
-    ) {
-      this.resultsDropdown.open()
+    } else if (event.key === 'Enter') {
+      if (this.searchResults?.total === 1 && this.resultsDropdown.isOpen()) {
+        this.primaryButtons.first.nativeElement.click()
+        this.searchInput.nativeElement.blur()
+      } else if (this.query?.length) {
+        this.runFullSearch()
+        this.reset(true)
+      }
     } else if (event.key === 'Escape' && !this.resultsDropdown.isOpen()) {
       if (this.query?.length) {
         this.reset(true)
@@ -284,7 +305,7 @@ export class GlobalSearchComponent implements OnInit {
     }
   }
 
-  dropdownKeyDown(event: KeyboardEvent) {
+  public dropdownKeyDown(event: KeyboardEvent) {
     if (
       this.searchResults?.total &&
       this.resultsDropdown.isOpen() &&
@@ -327,14 +348,9 @@ export class GlobalSearchComponent implements OnInit {
     }
   }
 
-  onButtonKeyDown(event: KeyboardEvent) {
-    // prevents ngBootstrap issue with keydown events
-    if (
-      !['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft', 'Escape'].includes(
-        event.key
-      )
-    ) {
-      event.stopImmediatePropagation()
+  public onButtonKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
+      event.target.dispatchEvent(new MouseEvent('click', { ctrlKey: true }))
     }
   }
 
@@ -373,10 +389,28 @@ export class GlobalSearchComponent implements OnInit {
     )
   }
 
-  runAdvanedSearch() {
+  public runFullSearch() {
+    const ruleType = this.useAdvancedForFullSearch
+      ? FILTER_FULLTEXT_QUERY
+      : FILTER_TITLE_CONTENT
     this.documentListViewService.quickFilter([
-      { rule_type: FILTER_FULLTEXT_QUERY, value: this.query },
+      { rule_type: ruleType, value: this.query },
     ])
     this.reset(true)
+  }
+
+  private navigateOrOpenInNewWindow(
+    commands: any,
+    newWindow: boolean = false,
+    extras: Object = {}
+  ) {
+    if (newWindow) {
+      const url = this.router.serializeUrl(
+        this.router.createUrlTree(commands, extras)
+      )
+      window.open(url, '_blank')
+    } else {
+      this.router.navigate(commands, extras)
+    }
   }
 }

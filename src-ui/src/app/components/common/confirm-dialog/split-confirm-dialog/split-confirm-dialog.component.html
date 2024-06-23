@@ -13,12 +13,12 @@
                 <div class="input-group-text" i18n>of {{totalPages}}</div>
             </div>
             <div class="pdf-viewer-container w-100 mt-3">
-                <pngx-pdf-viewer [src]="pdfSrc" [(page)]="page"
+                <pdf-viewer [src]="pdfSrc" [(page)]="page"
                 [original-size]="false"
                 [zoom]="1"
                 zoom-scale="page-fit"
                 (after-load-complete)="pdfPreviewLoaded($event)">
-                </pngx-pdf-viewer>
+                </pdf-viewer>
             </div>
         </div>
         <div class="col-4">
@@ -44,6 +44,10 @@
             </ul>
         </div>
     </div>
+    <div class="form-check form-switch mt-4">
+       <input class="form-check-input" type="checkbox" role="switch" id="deleteOriginalSwitch" [(ngModel)]="deleteOriginal" [disabled]="!userOwnsDocument">
+       <label class="form-check-label" for="deleteOriginalSwitch" i18n>Delete original document after successful split</label>
+     </div>
 </div>
 <div class="modal-footer">
     <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">

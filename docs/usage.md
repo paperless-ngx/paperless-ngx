@@ -421,13 +421,12 @@ to optionally attach data to documents which does not fit in the existing set of
 Paperless-ngx provides.
 
 1. First, create a custom field (under "Manage"), with a given name and data type. This could be something like "Invoice Number" or "Date Paid", with a data type of "Number", "Date", "String", etc.
-2. Once created, a field can be used with documents and data stored. To do so, use the "Custom Fields" menu on the document detail page, choose your existing field and click "Add". Once the field is visible in the form you can enter the appropriate
-   data which will be validated according to the custom field "data type".
+2. Once created, a field can be used with documents and data stored. To do so, use the "Custom Fields" menu on the document detail page, choose your existing field from the dropdown. Once the field is visible in the form you can enter the appropriate data which will be validated according to the custom field "data type".
 3. Fields can be removed by hovering over the field name revealing a "Remove" button.
 
 !!! important
 
-    Added / removed fields, as well as any data is not saved to the document until you
+    Added / removed fields, as well as any data, is not saved to the document until you
     actually hit the "Save" button, similar to other changes on the document details page.
 
 !!! note
@@ -462,21 +461,31 @@ Paperless-ngx added the ability to create shareable links to files in version 2.
 
 ## PDF Actions
 
-Paperless-ngx supports 3 basic editing operations for PDFs (these operations cannot be performed on non-PDF files):
+Paperless-ngx supports four basic editing operations for PDFs (these operations currently cannot be performed on non-PDF files):
 
-- Merging documents: available when selecting multiple documents for 'bulk editing'
+- Merging documents: available when selecting multiple documents for 'bulk editing'.
 - Rotating documents: available when selecting multiple documents for 'bulk editing' and from an individual document's details page.
-- Splitting documents: available from an individual document's details page
+- Splitting documents: available from an individual document's details page.
+- Deleting pages: available from an individual document's details page.
 
 !!! important
 
-    Note that rotation alters the Paperless-ngx _original_ file, which would, for example, invalidate a digital signature.
+    Note that rotation and deleting pages alter the Paperless-ngx _original_ file, which would, for example, invalidate a digital signature.
 
 ## Document History
 
 As of version 2.7, Paperless-ngx automatically records all changes to a document and records this in an audit log. The feature requires [`PAPERLESS_AUDIT_LOG_ENABLED`](configuration.md#PAPERLESS_AUDIT_LOG_ENABLED) be enabled, which it is by default as of version 2.7.
 Changes to documents are visible under the "History" tab. Note that certain changes such as those made by workflows, record the 'actor'
 as "System".
+
+## Document Trash
+
+When you first delete a document it is moved to the 'trash' until either it is explicitly deleted or it is automatically removed after a set amount of time has passed.
+You can set how long documents remain in the trash before being automatically deleted with [`EMPTY_TRASH_DELAY`](configuration.md#EMPTY_TRASH_DELAY), which defaults
+to 30 days. Until the file is actually deleted (e.g. the trash is emptied), all files and database content remains intact and can be restored at any point up until that time.
+
+Additionally you may configure a directory where deleted files are moved to when they the trash is emptied with [`PAPERLESS_EMPTY_TRASH_DIR`](configuration.md#PAPERLESS_EMPTY_TRASH_DIR).
+Note that the empty trash directory only stores the original file, the archive file and all database information is permanently removed once a document is fully deleted.
 
 ## Best practices {#basic-searching}
 

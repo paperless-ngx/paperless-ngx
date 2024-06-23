@@ -49,11 +49,14 @@ updates:
       - "paperless-ngx/backend"
     ignore:
       - dependency-name: "uvicorn"
+      - dependency-name: "djangorestframework"
+        versions:
+          - "3.15.0"
+          - "3.15.1"
     groups:
       development:
         patterns:
           - "*pytest*"
-          - "black"
           - "ruff"
           - "mkdocs-material"
       django:

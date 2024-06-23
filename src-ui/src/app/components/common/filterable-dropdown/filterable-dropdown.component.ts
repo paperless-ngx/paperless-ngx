@@ -320,10 +320,7 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
     }
   }
 
-  itemsSorted(
-    items: MatchingModel[],
-    isEditModeActive: boolean = true
-  ): MatchingModel[] {
+  itemsSorted(items: MatchingModel[]): MatchingModel[] {
     const isUnassignedElement = (a) => a.id == null
     const getSelectionCount = (a) =>
       this._documentCounts?.find((c) => c.id === a.id)?.document_count || 0
@@ -368,15 +365,7 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
           }
         }
       })
-      .filter(
-        (a: SelectionDataItem) =>
-          isEditModeActive ||
-          getSelectionCount(a) ||
-          isUnassignedElement(a) ||
-          this.selectionModel.getNonTemporary(a.id) !=
-            ToggleableItemState.NotSelected ||
-          this.selectionModel.temporarySelectionStates.get(a.id)
-      )
+      .filter((a: SelectionDataItem) => true)
   }
 
   get items(): MatchingModel[] {

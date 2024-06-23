@@ -185,34 +185,12 @@ For PostgreSQL, refer to [Upgrading a PostgreSQL Cluster](https://www.postgresql
 
 For MariaDB, refer to [Upgrading MariaDB](https://mariadb.com/kb/en/upgrading/)
 
-## Downgrading Paperless {#downgrade-paperless}
+You may also use the exporter and importer with the `--data-only` flag, after creating a new database with the updated version of PostgreSQL or MariaDB.
 
-Downgrades are possible. However, some updates also contain database
-migrations (these change the layout of the database and may move data).
-In order to move back from a version that applied database migrations,
-you'll have to revert the database migration _before_ downgrading, and
-then downgrade paperless.
+!!! warning
 
-This table lists the compatible versions for each database migration
-number.
-
-| Migration number | Version range   |
-| ---------------- | --------------- |
-| 1011             | 1.0.0           |
-| 1012             | 1.1.0 - 1.2.1   |
-| 1014             | 1.3.0 - 1.3.1   |
-| 1016             | 1.3.2 - current |
-
-Execute the following management command to migrate your database:
-
-```shell-session
-$ python3 manage.py migrate documents <migration number>
-```
-
-!!! note
-
-    Some migrations cannot be undone. The command will issue errors if that
-    happens.
+    You should not change any settings, especially paths, when doing this or there is a
+    risk of data loss
 
 ## Management utilities {#management-commands}
 
@@ -269,6 +247,8 @@ optional arguments:
 -sm, --split-manifest
 -z,  --zip
 -zn, --zip-name
+--data-only
+--passphrase
 ```
 
 `target` is a folder to which the data gets written. This includes
@@ -327,6 +307,12 @@ If `-z` or `--zip` is provided, the export will be a zip file
 in the target directory, named according to the current local date or the
 value set in `-zn` or `--zip-name`.
 
+If `--data-only` is provided, only the database will be exported. This option is intended
+to facilitate database upgrades without needing to clean documents and thumbnails from the media directory.
+
+If `--passphrase` is provided, it will be used to encrypt certain fields in the export. This value
+must be provided to import. If this value is lost, the export cannot be imported.
+
 !!! warning
 
     If exporting with the file name format, there may be errors due to
@@ -341,15 +327,22 @@ exporter](#exporter) and imports it into paperless.
 The importer works just like the exporter. You point it at a directory,
 and the script does the rest of the work:
 
-```
+```shell
 document_importer source
 ```
+
+| Option         | Required | Default | Description                                                               |
+| -------------- | -------- | ------- | ------------------------------------------------------------------------- |
+| source         | Yes      | N/A     | The directory containing an export                                        |
+| `--data-only`  | No       | False   | If provided, only import data, do not import document files or thumbnails |
+| `--passphrase` | No       | N/A     | If your export was encrypted with a passphrase, must be provided          |
 
 When you use the provided docker compose script, put the export inside
 the `export` folder in your paperless source directory. Specify
 `../export` as the `source`.
 
-Note that .zip files (as can be generated from the exporter) are not supported.
+Note that .zip files (as can be generated from the exporter) are not supported. You must unzip them into
+the target directory first.
 
 !!! note
 
@@ -359,6 +352,7 @@ Note that .zip files (as can be generated from the exporter) are not supported.
 !!! warning
 
     The importer should be run against a completely empty installation (database and directories) of Paperless-ngx.
+    If using a data only import, only the database must be empty.
 
 ### Document retagger {#retagger}
 
@@ -586,7 +580,7 @@ Enabling encryption is no longer supported.
 
 Basic usage to disable encryption of your document store:
 
-(Note: If [`PAPERLESS_PASSPHRASE`](configuration.md#PAPERLESS_PASSPHRASE) isn't set already, you need to specify
+(Note: If `PAPERLESS_PASSPHRASE` isn't set already, you need to specify
 it here)
 
 ```

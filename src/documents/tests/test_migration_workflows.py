@@ -5,9 +5,7 @@ from documents.tests.utils import TestMigrations
 class TestMigrateWorkflow(TestMigrations):
     migrate_from = "1043_alter_savedviewfilterrule_rule_type"
     migrate_to = "1044_workflow_workflowaction_workflowtrigger_and_more"
-    dependencies = (
-        ("paperless_mail", "0023_remove_mailrule_filter_attachment_filename_and_more"),
-    )
+    dependencies = (("paperless_mail", "0024_alter_mailrule_name_and_more"),)
 
     def setUpBeforeMigration(self, apps):
         User = apps.get_model("auth", "User")

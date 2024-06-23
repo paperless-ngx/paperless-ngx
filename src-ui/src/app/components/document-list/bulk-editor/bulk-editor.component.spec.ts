@@ -858,7 +858,7 @@ describe('BulkEditorComponent', () => {
     )
   })
 
-  it('should support bulk delete with confirmation', () => {
+  it('should support bulk delete with confirmation or without', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[0]))
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
@@ -891,6 +891,13 @@ describe('BulkEditorComponent', () => {
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     ) // listAllFilteredIds
+
+    component.showConfirmationDialogs = false
+    fixture.detectChanges()
+    component.applyDelete()
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
   })
 
   it('should not be accessible with insufficient global permissions', () => {
@@ -961,7 +968,7 @@ describe('BulkEditorComponent', () => {
       .mockReturnValue(true)
     component.showConfirmationDialogs = true
     fixture.detectChanges()
-    component.redoOcrSelected()
+    component.reprocessSelected()
     expect(modal).not.toBeUndefined()
     modal.componentInstance.confirm()
     let req = httpTestingController.expectOne(
@@ -970,7 +977,7 @@ describe('BulkEditorComponent', () => {
     req.flush(true)
     expect(req.request.body).toEqual({
       documents: [3, 4],
-      method: 'redo_ocr',
+      method: 'reprocess',
       parameters: {},
     })
     httpTestingController.match(
@@ -1049,6 +1056,25 @@ describe('BulkEditorComponent', () => {
       documents: [3, 4],
       method: 'merge',
       parameters: { metadata_document_id: 3 },
+    })
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
+    ) // list reload
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
+    ) // listAllFilteredIds
+
+    // Test with Delete Originals enabled
+    modal.componentInstance.deleteOriginals = true
+    modal.componentInstance.confirm()
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    req.flush(true)
+    expect(req.request.body).toEqual({
+      documents: [3, 4],
+      method: 'merge',
+      parameters: { metadata_document_id: 3, delete_originals: true },
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`

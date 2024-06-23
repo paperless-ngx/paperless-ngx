@@ -29,7 +29,6 @@ class TestCustomAccountAdapter(TestCase):
         with context.request_context(request):
             adapter = get_adapter()
             with override_settings(ALLOWED_HOSTS=["*"]):
-
                 # True because request host is same
                 url = "https://example.com"
                 self.assertTrue(adapter.is_safe_url(url))

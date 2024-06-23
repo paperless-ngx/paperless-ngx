@@ -301,10 +301,10 @@ def set_storage_path(
             document.save(update_fields=("storage_path",))
 
 
-@receiver(models.signals.post_delete, sender=Document)
-def cleanup_document_deletion(sender, instance, using, **kwargs):
+# see empty_trash in documents/tasks.py for signal handling
+def cleanup_document_deletion(sender, instance, **kwargs):
     with FileLock(settings.MEDIA_LOCK):
-        if settings.TRASH_DIR:
+        if settings.EMPTY_TRASH_DIR:
             # Find a non-conflicting filename in case a document with the same
             # name was moved to trash earlier
             counter = 0
@@ -313,7 +313,7 @@ def cleanup_document_deletion(sender, instance, using, **kwargs):
 
             while True:
                 new_file_path = os.path.join(
-                    settings.TRASH_DIR,
+                    settings.EMPTY_TRASH_DIR,
                     old_filebase + (f"_{counter:02}" if counter else "") + old_fileext,
                 )
 
@@ -363,24 +363,22 @@ class CannotMoveFilesException(Exception):
     pass
 
 
-def validate_move(instance, old_path, new_path):
-    if not os.path.isfile(old_path):
-        # Can't do anything if the old file does not exist anymore.
-        logger.fatal(f"Document {instance!s}: File {old_path} has gone.")
-        raise CannotMoveFilesException
-
-    if os.path.isfile(new_path):
-        # Can't do anything if the new file already exists. Skip updating file.
-        logger.warning(
-            f"Document {instance!s}: Cannot rename file "
-            f"since target path {new_path} already exists.",
-        )
-        raise CannotMoveFilesException
-
-
 @receiver(models.signals.m2m_changed, sender=Document.tags.through)
 @receiver(models.signals.post_save, sender=Document)
 def update_filename_and_move_files(sender, instance: Document, **kwargs):
+    def validate_move(instance, old_path, new_path):
+        if not os.path.isfile(old_path):
+            # Can't do anything if the old file does not exist anymore.
+            msg = f"Document {instance!s}: File {old_path} doesn't exist."
+            logger.fatal(msg)
+            raise CannotMoveFilesException(msg)
+
+        if os.path.isfile(new_path):
+            # Can't do anything if the new file already exists. Skip updating file.
+            msg = f"Document {instance!s}: Cannot rename file since target path {new_path} already exists."
+            logger.warning(msg)
+            raise CannotMoveFilesException(msg)
+
     if not instance.filename:
         # Can't update the filename if there is no filename to begin with
         # This happens when the consumer creates a new document.
@@ -420,7 +418,10 @@ def update_filename_and_move_files(sender, instance: Document, **kwargs):
                 move_archive = False
 
             if not move_original and not move_archive:
-                # Don't do anything if filenames did not change.
+                # Just update modified. Also, don't save() here to prevent infinite recursion.
+                Document.objects.filter(pk=instance.pk).update(
+                    modified=timezone.now(),
+                )
                 return
 
             if move_original:
@@ -532,6 +533,196 @@ def run_workflow(
     document: Document,
     logging_group=None,
 ):
+    def assignment_action():
+        if action.assign_tags.all().count() > 0:
+            document.tags.add(*action.assign_tags.all())
+
+        if action.assign_correspondent is not None:
+            document.correspondent = action.assign_correspondent
+
+        if action.assign_document_type is not None:
+            document.document_type = action.assign_document_type
+
+        if action.assign_storage_path is not None:
+            document.storage_path = action.assign_storage_path
+
+        if action.assign_owner is not None:
+            document.owner = action.assign_owner
+
+        if action.assign_title is not None:
+            try:
+                document.title = parse_doc_title_w_placeholders(
+                    action.assign_title,
+                    (
+                        document.correspondent.name
+                        if document.correspondent is not None
+                        else ""
+                    ),
+                    (
+                        document.document_type.name
+                        if document.document_type is not None
+                        else ""
+                    ),
+                    (document.owner.username if document.owner is not None else ""),
+                    timezone.localtime(document.added),
+                    (
+                        document.original_filename
+                        if document.original_filename is not None
+                        else ""
+                    ),
+                    timezone.localtime(document.created),
+                )
+            except Exception:
+                logger.exception(
+                    f"Error occurred parsing title assignment '{action.assign_title}', falling back to original",
+                    extra={"group": logging_group},
+                )
+
+        if (
+            (
+                action.assign_view_users is not None
+                and action.assign_view_users.count() > 0
+            )
+            or (
+                action.assign_view_groups is not None
+                and action.assign_view_groups.count() > 0
+            )
+            or (
+                action.assign_change_users is not None
+                and action.assign_change_users.count() > 0
+            )
+            or (
+                action.assign_change_groups is not None
+                and action.assign_change_groups.count() > 0
+            )
+        ):
+            permissions = {
+                "view": {
+                    "users": action.assign_view_users.all().values_list(
+                        "id",
+                    )
+                    or [],
+                    "groups": action.assign_view_groups.all().values_list(
+                        "id",
+                    )
+                    or [],
+                },
+                "change": {
+                    "users": action.assign_change_users.all().values_list(
+                        "id",
+                    )
+                    or [],
+                    "groups": action.assign_change_groups.all().values_list(
+                        "id",
+                    )
+                    or [],
+                },
+            }
+            set_permissions_for_object(
+                permissions=permissions,
+                object=document,
+                merge=True,
+            )
+
+        if action.assign_custom_fields is not None:
+            for field in action.assign_custom_fields.all():
+                if (
+                    CustomFieldInstance.objects.filter(
+                        field=field,
+                        document=document,
+                    ).count()
+                    == 0
+                ):
+                    # can be triggered on existing docs, so only add the field if it doesn't already exist
+                    CustomFieldInstance.objects.create(
+                        field=field,
+                        document=document,
+                    )
+
+    def removal_action():
+        if action.remove_all_tags:
+            document.tags.clear()
+        else:
+            for tag in action.remove_tags.filter(
+                pk__in=list(document.tags.values_list("pk", flat=True)),
+            ).all():
+                document.tags.remove(tag.pk)
+
+        if action.remove_all_correspondents or (
+            document.correspondent
+            and (
+                action.remove_correspondents.filter(
+                    pk=document.correspondent.pk,
+                ).exists()
+            )
+        ):
+            document.correspondent = None
+
+        if action.remove_all_document_types or (
+            document.document_type
+            and (
+                action.remove_document_types.filter(
+                    pk=document.document_type.pk,
+                ).exists()
+            )
+        ):
+            document.document_type = None
+
+        if action.remove_all_storage_paths or (
+            document.storage_path
+            and (
+                action.remove_storage_paths.filter(
+                    pk=document.storage_path.pk,
+                ).exists()
+            )
+        ):
+            document.storage_path = None
+
+        if action.remove_all_owners or (
+            document.owner
+            and (action.remove_owners.filter(pk=document.owner.pk).exists())
+        ):
+            document.owner = None
+
+        if action.remove_all_permissions:
+            permissions = {
+                "view": {
+                    "users": [],
+                    "groups": [],
+                },
+                "change": {
+                    "users": [],
+                    "groups": [],
+                },
+            }
+            set_permissions_for_object(
+                permissions=permissions,
+                object=document,
+                merge=False,
+            )
+        elif (
+            (action.remove_view_users.all().count() > 0)
+            or (action.remove_view_groups.all().count() > 0)
+            or (action.remove_change_users.all().count() > 0)
+            or (action.remove_change_groups.all().count() > 0)
+        ):
+            for user in action.remove_view_users.all():
+                remove_perm("view_document", user, document)
+            for user in action.remove_change_users.all():
+                remove_perm("change_document", user, document)
+            for group in action.remove_view_groups.all():
+                remove_perm("view_document", group, document)
+            for group in action.remove_change_groups.all():
+                remove_perm("change_document", group, document)
+
+        if action.remove_all_custom_fields:
+            CustomFieldInstance.objects.filter(document=document).delete()
+        elif action.remove_custom_fields.all().count() > 0:
+            CustomFieldInstance.objects.filter(
+                field__in=action.remove_custom_fields.all(),
+                document=document,
+            ).delete()
+
     for workflow in (
         Workflow.objects.filter(
             enabled=True,
@@ -552,6 +743,10 @@ def run_workflow(
         .prefetch_related("triggers")
         .order_by("order")
     ):
+        # This can be called from bulk_update_documents, which may be running multiple times
+        # Refresh this so the matching data is fresh and instance fields are re-freshed
+        # Otherwise, this instance might be behind and overwrite the work another process did
+        document.refresh_from_db()
         if matching.document_matches_workflow(
             document,
             workflow,
@@ -565,198 +760,10 @@ def run_workflow(
                 )
 
                 if action.type == WorkflowAction.WorkflowActionType.ASSIGNMENT:
-                    if action.assign_tags.all().count() > 0:
-                        document.tags.add(*action.assign_tags.all())
-
-                    if action.assign_correspondent is not None:
-                        document.correspondent = action.assign_correspondent
-
-                    if action.assign_document_type is not None:
-                        document.document_type = action.assign_document_type
-
-                    if action.assign_storage_path is not None:
-                        document.storage_path = action.assign_storage_path
-
-                    if action.assign_owner is not None:
-                        document.owner = action.assign_owner
-
-                    if action.assign_title is not None:
-                        try:
-                            document.title = parse_doc_title_w_placeholders(
-                                action.assign_title,
-                                (
-                                    document.correspondent.name
-                                    if document.correspondent is not None
-                                    else ""
-                                ),
-                                (
-                                    document.document_type.name
-                                    if document.document_type is not None
-                                    else ""
-                                ),
-                                (
-                                    document.owner.username
-                                    if document.owner is not None
-                                    else ""
-                                ),
-                                timezone.localtime(document.added),
-                                (
-                                    document.original_filename
-                                    if document.original_filename is not None
-                                    else ""
-                                ),
-                                timezone.localtime(document.created),
-                            )
-                        except Exception:
-                            logger.exception(
-                                f"Error occurred parsing title assignment '{action.assign_title}', falling back to original",
-                                extra={"group": logging_group},
-                            )
-
-                    if (
-                        (
-                            action.assign_view_users is not None
-                            and action.assign_view_users.count() > 0
-                        )
-                        or (
-                            action.assign_view_groups is not None
-                            and action.assign_view_groups.count() > 0
-                        )
-                        or (
-                            action.assign_change_users is not None
-                            and action.assign_change_users.count() > 0
-                        )
-                        or (
-                            action.assign_change_groups is not None
-                            and action.assign_change_groups.count() > 0
-                        )
-                    ):
-                        permissions = {
-                            "view": {
-                                "users": action.assign_view_users.all().values_list(
-                                    "id",
-                                )
-                                or [],
-                                "groups": action.assign_view_groups.all().values_list(
-                                    "id",
-                                )
-                                or [],
-                            },
-                            "change": {
-                                "users": action.assign_change_users.all().values_list(
-                                    "id",
-                                )
-                                or [],
-                                "groups": action.assign_change_groups.all().values_list(
-                                    "id",
-                                )
-                                or [],
-                            },
-                        }
-                        set_permissions_for_object(
-                            permissions=permissions,
-                            object=document,
-                            merge=True,
-                        )
-
-                    if action.assign_custom_fields is not None:
-                        for field in action.assign_custom_fields.all():
-                            if (
-                                CustomFieldInstance.objects.filter(
-                                    field=field,
-                                    document=document,
-                                ).count()
-                                == 0
-                            ):
-                                # can be triggered on existing docs, so only add the field if it doesn't already exist
-                                CustomFieldInstance.objects.create(
-                                    field=field,
-                                    document=document,
-                                )
+                    assignment_action()
 
                 elif action.type == WorkflowAction.WorkflowActionType.REMOVAL:
-                    if action.remove_all_tags:
-                        document.tags.clear()
-                    else:
-                        for tag in action.remove_tags.filter(
-                            pk__in=list(document.tags.values_list("pk", flat=True)),
-                        ).all():
-                            document.tags.remove(tag.pk)
-
-                    if action.remove_all_correspondents or (
-                        document.correspondent
-                        and (
-                            action.remove_correspondents.filter(
-                                pk=document.correspondent.pk,
-                            ).exists()
-                        )
-                    ):
-                        document.correspondent = None
-
-                    if action.remove_all_document_types or (
-                        document.document_type
-                        and (
-                            action.remove_document_types.filter(
-                                pk=document.document_type.pk,
-                            ).exists()
-                        )
-                    ):
-                        document.document_type = None
-
-                    if action.remove_all_storage_paths or (
-                        document.storage_path
-                        and (
-                            action.remove_storage_paths.filter(
-                                pk=document.storage_path.pk,
-                            ).exists()
-                        )
-                    ):
-                        document.storage_path = None
-
-                    if action.remove_all_owners or (
-                        document.owner
-                        and (action.remove_owners.filter(pk=document.owner.pk).exists())
-                    ):
-                        document.owner = None
-
-                    if action.remove_all_permissions:
-                        permissions = {
-                            "view": {
-                                "users": [],
-                                "groups": [],
-                            },
-                            "change": {
-                                "users": [],
-                                "groups": [],
-                            },
-                        }
-                        set_permissions_for_object(
-                            permissions=permissions,
-                            object=document,
-                            merge=False,
-                        )
-                    elif (
-                        (action.remove_view_users.all().count() > 0)
-                        or (action.remove_view_groups.all().count() > 0)
-                        or (action.remove_change_users.all().count() > 0)
-                        or (action.remove_change_groups.all().count() > 0)
-                    ):
-                        for user in action.remove_view_users.all():
-                            remove_perm("view_document", user, document)
-                        for user in action.remove_change_users.all():
-                            remove_perm("change_document", user, document)
-                        for group in action.remove_view_groups.all():
-                            remove_perm("view_document", group, document)
-                        for group in action.remove_change_groups.all():
-                            remove_perm("change_document", group, document)
-
-                    if action.remove_all_custom_fields:
-                        CustomFieldInstance.objects.filter(document=document).delete()
-                    elif action.remove_custom_fields.all().count() > 0:
-                        CustomFieldInstance.objects.filter(
-                            field__in=action.remove_custom_fields.all(),
-                            document=document,
-                        ).delete()
+                    removal_action()
 
             document.save()
 

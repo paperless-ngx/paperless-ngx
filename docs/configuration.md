@@ -219,10 +219,10 @@ database, classification model, etc).
 
     Defaults to "../data/", relative to the "src" directory.
 
-#### [`PAPERLESS_TRASH_DIR=<path>`](#PAPERLESS_TRASH_DIR) {#PAPERLESS_TRASH_DIR}
+#### [`PAPERLESS_EMPTY_TRASH_DIR=<path>`](#PAPERLESS_EMPTY_TRASH_DIR) {#PAPERLESS_EMPTY_TRASH_DIR}
 
-: Instead of removing deleted documents, they are moved to this
-directory.
+: When documents are deleted (e.g. after emptying the trash) the original files will be moved here
+instead of being removed from the filesystem. Only the original version is kept.
 
     This must be writeable by the user running paperless. When running
     inside docker, ensure that this path is within a permanent volume
@@ -230,7 +230,9 @@ directory.
 
     Note that the directory must exist prior to using this setting.
 
-    Defaults to empty (i.e. really delete documents).
+    Defaults to empty (i.e. really delete files).
+
+    This setting was previously named PAPERLESS_TRASH_DIR.
 
 #### [`PAPERLESS_MEDIA_ROOT=<path>`](#PAPERLESS_MEDIA_ROOT) {#PAPERLESS_MEDIA_ROOT}
 
@@ -287,6 +289,12 @@ Unless you are using this in a bare metal install or other setup,
 this folder is no longer needed and can be removed manually.
 
 Defaults to `/usr/share/nltk_data`
+
+#### [`PAPERLESS_MODEL_FILE=<path>`](#PAPERLESS_MODEL_FILE) {#PAPERLESS_MODEL_FILE}
+
+: This is where paperless will store the classification model.
+
+    Defaults to `PAPERLESS_DATA_DIR/classification_model.pickle`.
 
 ## Logging
 
@@ -615,6 +623,8 @@ parsing documents.
     in which case Tesseract will use whatever language matches best.
     Keep in mind that Tesseract uses much more CPU time with multiple
     languages enabled.
+
+    If you are including languages that are not installed by default, you will need to also set [`PAPERLESS_OCR_LANGUAGES`](configuration.md#PAPERLESS_OCR_LANGUAGES) for docker deployments or install the tesseract language packages manually for bare metal installations.
 
     Defaults to "eng".
 
@@ -1353,6 +1363,20 @@ processing. This only has an effect if
 `PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED` has been enabled.
 
     Defaults to false.
+
+## Trash
+
+#### [`EMPTY_TRASH_DELAY=<num>`](#EMPTY_TRASH_DELAY) {#EMPTY_TRASH_DELAY}
+
+: Sets how long in days documents remain in the 'trash' before they are permanently deleted.
+
+    Defaults to 30 days, minimum of 1 day.
+
+#### [`PAPERLESS_EMPTY_TRASH_TASK_CRON=<cron expression>`](#PAPERLESS_EMPTY_TRASH_TASK_CRON) {#PAPERLESS_EMPTY_TRASH_TASK_CRON}
+
+: Configures the schedule to empty the trash of expired deleted documents.
+
+    Defaults to `0 1 * * *`, once per day.
 
 ## Binaries
 

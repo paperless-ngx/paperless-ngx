@@ -259,6 +259,10 @@ a.btn-link:focus-visible,
 
     .ng-select-container .ng-value-container .ng-input {
       top: 7px;
+
+      input {
+        min-width: 10px;
+      }
     }
 
     .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
@@ -329,6 +333,14 @@ textarea,
 
   @media(max-width: 768px) {
     font-size: 1rem;
+  }
+}
+
+@media(max-width: 768px) {
+  .input-group-sm .btn-sm {
+    // accommodate larger font size on mobile
+    padding-top: .35rem;
+    padding-bottom: .35rem;
   }
 }
 

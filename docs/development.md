@@ -47,7 +47,7 @@ early on.
 Once installed, hooks will run when you commit. If the formatting isn't
 quite right or a linter catches something, the commit will be rejected.
 You'll need to look at the output and fix the issue. Some hooks, such
-as the Python formatting tool `black`, will format failing
+as the Python linting and formatting tool `ruff`, will format failing
 files, so all you need to do is `git add` those files again
 and retry your commit.
 
@@ -81,10 +81,6 @@ first-time setup.
     !!! note
 
         Using a virtual environment is highly recommended. You can spawn one via `pipenv shell`.
-        Make sure you're using Python 3.10.x or lower. Otherwise you might
-        get issues with building dependencies. You can use
-        [pyenv](https://github.com/pyenv/pyenv) to install a specific
-        Python version.
 
 5.  Install pre-commit hooks:
 

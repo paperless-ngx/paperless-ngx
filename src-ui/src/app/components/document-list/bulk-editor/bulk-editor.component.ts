@@ -705,21 +705,24 @@ export class BulkEditorComponent
   }
 
   applyDelete() {
-    let modal = this.modalService.open(ConfirmDialogComponent, {
-      backdrop: 'static',
-    })
-    modal.componentInstance.delayConfirm(5)
-    modal.componentInstance.title = $localize`Delete confirm`
-    modal.componentInstance.messageBold = $localize`This operation will permanently delete ${this.list.selected.size} selected document(s).`
-    modal.componentInstance.message = $localize`This operation cannot be undone.`
-    modal.componentInstance.btnClass = 'btn-danger'
-    modal.componentInstance.btnCaption = $localize`Delete document(s)`
-    modal.componentInstance.confirmClicked
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(() => {
-        modal.componentInstance.buttonsEnabled = false
-        this.executeBulkOperation(modal, 'delete', {})
+    if (this.showConfirmationDialogs) {
+      let modal = this.modalService.open(ConfirmDialogComponent, {
+        backdrop: 'static',
       })
+      modal.componentInstance.title = $localize`Confirm`
+      modal.componentInstance.messageBold = $localize`Move ${this.list.selected.size} selected document(s) to the trash?`
+      modal.componentInstance.message = $localize`Documents can be restored prior to permanent deletion.`
+      modal.componentInstance.btnClass = 'btn-danger'
+      modal.componentInstance.btnCaption = $localize`Move to trash`
+      modal.componentInstance.confirmClicked
+        .pipe(takeUntil(this.unsubscribeNotifier))
+        .subscribe(() => {
+          modal.componentInstance.buttonsEnabled = false
+          this.executeBulkOperation(modal, 'delete', {})
+        })
+    } else {
+      this.executeBulkOperation(null, 'delete', {})
+    }
   }
 
   downloadSelected() {
@@ -744,20 +747,20 @@ export class BulkEditorComponent
       })
   }
 
-  redoOcrSelected() {
+  reprocessSelected() {
     let modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.title = $localize`Redo OCR confirm`
-    modal.componentInstance.messageBold = $localize`This operation will permanently redo OCR for ${this.list.selected.size} selected document(s).`
-    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.title = $localize`Reprocess confirm`
+    modal.componentInstance.messageBold = $localize`This operation will permanently recreate the archive files for ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.message = $localize`The archive files will be re-generated with the current settings.`
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         modal.componentInstance.buttonsEnabled = false
-        this.executeBulkOperation(modal, 'redo_ocr', {})
+        this.executeBulkOperation(modal, 'reprocess', {})
       })
   }
 
@@ -812,6 +815,9 @@ export class BulkEditorComponent
         const args = {}
         if (mergeDialog.metadataDocumentID > -1) {
           args['metadata_document_id'] = mergeDialog.metadataDocumentID
+        }
+        if (mergeDialog.deleteOriginals) {
+          args['delete_originals'] = true
         }
         mergeDialog.buttonsEnabled = false
         this.executeBulkOperation(modal, 'merge', args, mergeDialog.documentIDs)

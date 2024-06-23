@@ -23,6 +23,8 @@ from multiselectfield import MultiSelectField
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
 
+from django_softdelete.models import SoftDeleteModel
+
 from documents.data_models import DocumentSource
 from documents.parsers import get_default_file_extension
 
@@ -130,7 +132,7 @@ class StoragePath(MatchingModel):
         verbose_name_plural = _("storage paths")
 
 
-class Document(ModelWithOwner):
+class Document(SoftDeleteModel, ModelWithOwner):
     STORAGE_TYPE_UNENCRYPTED = "unencrypted"
     STORAGE_TYPE_GPG = "gpg"
     STORAGE_TYPES = (
@@ -929,7 +931,6 @@ if settings.AUDIT_LOG_ENABLED:
     auditlog.register(
         Document,
         m2m_fields={"tags"},
-        mask_fields=["content"],
         exclude_fields=["modified"],
     )
     auditlog.register(Correspondent)

@@ -34,7 +34,7 @@
           </h5>
         </div>
         <p class="card-text">
-          @if (document.__search_hit__?.score && document.__search_hit__.highlights) {
+          @if (document.__search_hit__ && document.__search_hit__.highlights) {
             <span [innerHtml]="document.__search_hit__.highlights"></span>
           }
           @for (highlight of searchNoteHighlights; track highlight) {
@@ -72,7 +72,7 @@
             <div class="list-group list-group-horizontal border-0 card-info ms-md-auto mt-2 mt-md-0">
               @if (displayFields.includes(DisplayField.NOTES) && notesEnabled && document.notes.length) {
                 <button routerLink="/documents/{{document.id}}/notes" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2 d-flex align-items-center" title="View notes" i18n-title>
-                  <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="chat-left-text"></i-bs><small i18n>{{document.notes.length}} Notes</small>
+                  <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="chat-left-text"></i-bs><small>{{document.notes.length}} Notes</small>
                 </button>
               }
               @if (displayFields.includes(DisplayField.DOCUMENT_TYPE) && document.document_type) {
@@ -95,7 +95,7 @@
               @if (displayFields.includes(DisplayField.CREATED) || displayFields.includes(DisplayField.ADDED)) {
                 <ng-template #dateTooltip>
                   <div class="d-flex flex-column text-light">
-                    <span i18n>Created: {{ document.created | customDate }}</span>
+                    <span i18n>Created: {{ document.created_date | customDate }}</span>
                     <span i18n>Added: {{ document.added | customDate }}</span>
                     <span i18n>Modified: {{ document.modified | customDate }}</span>
                   </div>
