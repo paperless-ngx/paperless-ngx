@@ -28,7 +28,6 @@
                         {% else %}
                             {{ message }}
                         {% endif %}
-
                     </div>
                 {% endfor %}
                 {% block form_top_content %}
@@ -37,7 +36,7 @@
                     <div class="alert alert-danger" role="alert">
                         {% for field, errors in form.errors.items %}
                             {% for error in errors %}
-                                {{ error }}
+                                {% translate error %}
                             {% endfor %}
                         {% endfor %}
                     </div>
