@@ -23,7 +23,6 @@ export class ViewallForderComponent implements OnInit {
         this.initializeFolders();
         this.initializeDocuments();
         this.addEventListeners();
-        this.setupEventListeners();
       },
       error: error => {
         console.error('Error fetching data:', error);
@@ -37,118 +36,6 @@ export class ViewallForderComponent implements OnInit {
       },
       error: error => {
         console.error('Error fetching results:', error);
-      }
-    });
-  }
-  setupEventListeners(): void {
-    document.addEventListener("DOMContentLoaded", () => {
-      const folderLeft = document.getElementById('folderLeft');
-      const folderright = document.getElementById('folderrightt');
-      const folderContainer = document.querySelector('.folder-container');
-      const zoom = document.getElementById("zoomImg");
-      const contextMenu = document.getElementById("contextMenu");
-      const toggleButton = document.getElementById("toggleButton");
-      const amButton = document.getElementById("am");
-      const subFolderContainer = document.querySelector('.sub-folder-container') as HTMLElement;
-
-      let eventsEnabled = false;
-
-      amButton.addEventListener("click", () => {
-        subFolderContainer.style.display = "block";
-        contextMenu.style.display = "none";
-
-        const inputInSubFolder = subFolderContainer.querySelector('input[type="text"]') as HTMLElement;
-        if (inputInSubFolder) {
-          inputInSubFolder.focus();
-        }
-
-        const allInputs = document.querySelectorAll('input');
-        allInputs.forEach((input) => {
-          if (input !== inputInSubFolder) {
-            input.blur();
-          }
-        });
-      });
-
-      document.getElementById('sss').addEventListener('click', () => {
-        const contextMenu1 = document.querySelector('.sub-folder-container') as HTMLElement;
-        if (contextMenu1) {
-          contextMenu1.style.display = 'none';
-        }
-      });
-
-      folderLeft.addEventListener('click', () => {
-        hideContextMenu();
-      });
-
-      folderLeft.addEventListener('contextmenu', (event) => {
-        event.preventDefault();
-        showContextMenu(event.clientX, event.clientY);
-      });
-
-      document.addEventListener('mousedown', (event) => {
-        const targetElement = event.target as HTMLElement;
-
-        const clickedInsideContextMenu = contextMenu.contains(targetElement);
-        const clickedInsideFolderContainer = folderContainer.contains(targetElement);
-        const clickedInsideAddFolder = targetElement.classList.contains('addfolder') || targetElement.closest('.addfolder');
-        const clickedInsideAm = targetElement.id === 'am' || targetElement.closest('#am');
-
-        if (!clickedInsideContextMenu && !clickedInsideAddFolder && !clickedInsideAm) {
-          hideContextMenu();
-        }
-
-        if (clickedInsideAm) {
-          event.preventDefault();
-        }
-      });
-
-      toggleButton.addEventListener("click", () => {
-        toggleEvents();
-      });
-
-      function showContextMenu(x: number, y: number) {
-        if (contextMenu) {
-          contextMenu.style.display = "block";
-          contextMenu.style.left = x + "px";
-          contextMenu.style.top = y + "px";
-        }
-      }
-
-      function hideContextMenu() {
-        if (contextMenu) {
-          contextMenu.style.display = "none";
-        }
-      }
-
-      function toggleEvents() {
-        eventsEnabled = !eventsEnabled;
-        if (eventsEnabled) {
-          if (zoom) {
-            zoom.addEventListener("contextmenu", handleContextMenu);
-          }
-        } else {
-          if (zoom) {
-            zoom.removeEventListener("contextmenu", handleContextMenu);
-          }
-        }
-      }
-
-      function handleContextMenu(e: MouseEvent) {
-        e.preventDefault();
-        showContextMenu(e.clientX, e.clientY);
-      }
-
-      if (zoom) {
-        zoom.onmouseup = () => {
-          if (eventsEnabled) {
-            hideContextMenu();
-          }
-        };
-
-        zoom.onmousemove = (e: MouseEvent) => {
-          // Additional handling if needed
-        };
       }
     });
   }
@@ -411,49 +298,42 @@ export class ViewallForderComponent implements OnInit {
     childrenContainer.style.display = 'none';
     folderDiv.appendChild(childrenContainer);
 
-    // Function to log folder chain recursively
-    const logFolderChainRecursive = (currentFolder: Folders, chain: string[] = []) => {
-        chain.unshift(currentFolder.id.toString()); // Prepend current folder id to the chain
-
-        if (currentFolder.parent_folder) {
-            const parentFolder = this.findFolderById(currentFolder.parent_folder);
-            if (parentFolder) {
-                logFolderChainRecursive(parentFolder, chain); // Recursive call to log parent folder
-            }
-        } else {
-            console.log(`Clicked folder ${chain.join(' > ')}`); // Log the chain when reached the root folder
-        }
-    };
+    // Variable to store the logged folder id
+    let loggedFolderId: number | null = null;
 
     this.renderer.listen(folderHeader, 'click', () => {
-        logFolderChainRecursive(folder); // Start logging from the clicked folder
-        this.displayFolderContents(folder.id);
+      // Check and log folder id when clicking on folderHeader
+      const clickedFolderId = folder.id;
+      if (clickedFolderId !== loggedFolderId) {
+        if (loggedFolderId !== null) {
+          console.log(`Removed log for folder ${loggedFolderId}`);
+        }
+        console.log(`Clicked folder ${clickedFolderId}`);
+        loggedFolderId = clickedFolderId;
+      }      
+
+      // Display contents of the folder in the tbody
+      this.displayFolderContents(clickedFolderId);
     });
 
     this.renderer.listen(folderIcon, 'click', (event: Event) => {
-        event.stopPropagation();
-        if (childrenContainer.style.display === 'none') {
-            childrenContainer.style.display = 'block';
-            folderIcon.style.transform = 'rotate(90deg)';
-            folderIconFolder.classList.replace('fa-folder', 'fa-folder-open');
-        } else {
-            childrenContainer.style.display = 'none';
-            folderIcon.style.transform = '';
-            folderIconFolder.classList.replace('fa-folder-open', 'fa-folder');
-        }
-    });
+      // Prevent folderHeader click event when clicking on folderIcon
+      event.stopPropagation();
 
-    // Recursively create HTML for child folders
-    const childFolders = this.folders.filter(f => f.parent_folder === folder.id);
-    childFolders.forEach(childFolder => {
-        const childFolderHTML = this.createFolderHTML(childFolder);
-        childrenContainer.appendChild(childFolderHTML);
+      // Toggle display of childrenContainer
+      if (childrenContainer.style.display === 'none') {
+        childrenContainer.style.display = 'block';
+        folderIcon.style.transform = 'rotate(90deg)';
+        folderIconFolder.classList.replace('fa-folder', 'fa-folder-open');
+      } else {
+        childrenContainer.style.display = 'none';
+        folderIcon.style.transform = '';
+        folderIconFolder.classList.replace('fa-folder-open', 'fa-folder');
+      }
     });
 
     return folderDiv;
-}
-
-
+  }
 
   createDocumentHTML(doc: Document): HTMLElement {
     const documentDiv = document.createElement('div');

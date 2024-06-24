@@ -1,68 +1,74 @@
-<div class="folder-container">
-    <div class="sub-folder-container">
-
+<div class="folder-container" id="folderLeft">
+    <div style="display: none;" class="sub-folder-container">
+        <form action="">
+            <input type="text">
+            <button>UpLoad File</button>
+        </form>
     </div>
-    <div class="folder-left" id="folderLeft">
-        <div class="folder-left-1">
-            <div class="folder-left-search">
-                <button class="search"><i class="fa-solid fa-magnifying-glass"></i></button>
-                <input placeholder="Tìm Kiếm" class="serch" type="text">
+    <div id="contextMenu" class="addfolder">
+        <ul>
+            <li id="am"><a >New file...</a></li>
+            <li><a >New folder...</a></li>
+            <li style="border: 1px solid black;"><a >Rename...</a></li>
+            <li style="border: 1px solid black;"><a >Delete...</a></li>
+        </ul>
+    </div>
+  <div class="folder-left" id="sss">
+      <div class="folder-left-1">
+          <div class="folder-left-search">
+              <button class="search"><i class="fa-solid fa-magnifying-glass"></i></button>
+              <input placeholder="Tìm Kiếm" class="serch" type="text">
+          </div>
+      </div>
+      <div id="folders-container" class="folder">
+          <!-- Folders and Documents will be added dynamically here -->
+      </div>  
+      <div id="documents-container" class="documents">
+      </div>        
+      <div class="resize-handle"></div>
+  </div>
+  <div class="folder-right"  id="sss">
+      <div class="folder-search">
+        <div class="folder-right-tim">
+            <div class="logo-folder">
+                <i class="fa-solid fa-folder"></i> <i class="fa-solid fa-chevron-right"></i>
             </div>
-        </div>
-        <div id="folders-container" class="folder">
-            <!-- Folders and Documents will be added dynamically here -->
-        </div>  
-        <div id="documents-container" class="documents">
+            <div class="ten-folder">
+                <p>Folder 1</p>
+                <i class="fa-solid fa-chevron-right"></i>
+            </div>
+            <div class="ten-folder">
+                <p>Folder 2</p>
+                <i class="fa-solid fa-chevron-right"></i>
+            </div>
+            <div class="ten-folder">
+                <p>Folder 3</p>
+                <i class="fa-solid fa-chevron-right"></i>
+            </div>
+            <div class="ten-folder">
+                <p>Folder 4</p>
+                <i class="fa-solid fa-chevron-right"></i>
+            </div>
         </div>        
-        <div class="resize-handle"></div>
-    </div>
-    <div class="folder-right">
-        <div class="folder-search">
-            <div class="folder-right-tim"></div>
-            <div class="folder-right-search">
-                <button> <i class="fa-solid fa-magnifying-glass"></i>   </button>
-                <input type="text">
-            </div>
-        </div>
-        <div class="folder-right-conten">
-            <table>
-                <thead>
-                    <tr>
-                        <td>Name</td>
-                        <td>Data modified</td>
-                        <td>Type</td>
-                        <td>Size</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <i class="fa-solid fa-folder"></i>
-                            <p>Folder 1</p>
-                        </td>
-                        <td>11/10/2002</td>
-                        <td>
-                            <p>File Folder</p>
-                        </td>
-                        <td>
-                            <p>2 KB</p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <i class="fa-solid fa-file"></i>
-                            <p>Document</p>
-                        </td>
-                        <td>11/10/2002</td>
-                        <td>
-                            <p>txt</p>
-                        </td>
-                        <td>
-                            <p>2 KB</p>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+          <div class="folder-right-search">
+              <button> <i class="fa-solid fa-magnifying-glass"></i>   </button>
+              <input type="text">
+          </div>
+      </div>
+      <div class="folder-right-conten">
+          <table class="folder-contents">
+              <thead>
+                  <tr>
+                      <td>Name</td>
+                      <td>Data modified</td>
+                      <td>Type</td>
+                      <td>Size</td>
+                  </tr>
+              </thead>
+              <tbody>
+
+              </tbody>
+          </table>
+      </div>
+  </div>
 </div>

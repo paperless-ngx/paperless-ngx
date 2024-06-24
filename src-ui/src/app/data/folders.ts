@@ -10,7 +10,17 @@ export interface Folders extends MatchingModel {
   match: string;
   matching_algorithm: number;
   is_insensitive: boolean;
-  parent_folder_id: number | null;
+  parent_folder: number | null;
+  path: string;
+}
+export interface Results{
+  id: number;
+  owner_id: number;
+  name: string;
+  match: string;
+  matching_algorithm: number;
+  is_insensitive: boolean;
+  parent_folder: number | null;
   path: string;
 }
 
