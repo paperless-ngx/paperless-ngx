@@ -418,7 +418,10 @@ def update_filename_and_move_files(sender, instance: Document, **kwargs):
                 move_archive = False
 
             if not move_original and not move_archive:
-                # Don't do anything if filenames did not change.
+                # Just update modified. Also, don't save() here to prevent infinite recursion.
+                Document.objects.filter(pk=instance.pk).update(
+                    modified=timezone.now(),
+                )
                 return
 
             if move_original:

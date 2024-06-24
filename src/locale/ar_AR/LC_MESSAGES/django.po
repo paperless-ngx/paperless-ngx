@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-19 11:07-0700\n"
-"PO-Revision-Date: 2024-06-18 12:10\n"
+"PO-Revision-Date: 2024-06-24 00:27\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -88,7 +88,7 @@ msgstr "علامة علبة الوارد"
 
 #: documents/models.py:106
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr "ضع علامة على هذه السمة كعلامة علبة الوارد: سيتم وضع علامة على جميع المستندات المستهلكة حديثا مع علامات صندوق الواردات."
+msgstr "ضع علامة على هذه العلامة كعلامة علبة الوارد : سيتم وضع علامة على جميع المستندات المستهلكة حديثا مع علامات صندوق الواردات."
 
 #: documents/models.py:112
 msgid "tag"
@@ -140,7 +140,7 @@ msgstr "بيانات النص الخام من المستند. يستخدم هذ�
 
 #: documents/models.py:179
 msgid "mime type"
-msgstr "mime type"
+msgstr "نوع الـ mime"
 
 #: documents/models.py:189
 msgid "checksum"
@@ -269,7 +269,7 @@ msgstr "بطاقات كبيرة"
 
 #: documents/models.py:403
 msgid "Title"
-msgstr "عنوان"
+msgstr "العنوان"
 
 #: documents/models.py:404
 msgid "Created"

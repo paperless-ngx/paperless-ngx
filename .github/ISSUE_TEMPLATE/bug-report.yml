@@ -9,7 +9,7 @@ body:
         ### ⚠️ Please remember: issues are for *bugs*
         That is, something you believe affects every single user of Paperless-ngx, not just you. If you're not sure, start with one of the other options below.
 
-        Also, note that **Paperless-ngx does not perform OCR itself**, that is handled by other tools. Problems with OCR of specific files should likely be raised 'upstream', see https://github.com/ocrmypdf/OCRmyPDF/issues or https://github.com/tesseract-ocr/tesseract/issues
+        Also, note that **Paperless-ngx does not perform OCR or archive file creation itself**, those are handled by other tools. Problems with OCR or archive versions of specific files should likely be raised 'upstream', see https://github.com/ocrmypdf/OCRmyPDF/issues or https://github.com/tesseract-ocr/tesseract/issues
   - type: markdown
     attributes:
       value: |

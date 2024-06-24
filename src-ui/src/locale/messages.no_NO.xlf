@@ -2143,7 +2143,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">109</context>
         </context-group>
-        <target state="translated">{VAR_PLURAL, plural, =1 {En <x id="INTERPOLATION"/> oppgave} other {<x id="INTERPOLATION_1"/> totalt<x id="INTERPOLATION"/> oppgaver}}}"/&gt;</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {En <x id="INTERPOLATION"/> oppgave} other {<x id="INTERPOLATION_1"/> totalt <x id="INTERPOLATION"/> oppgaver}}</target>
       </trans-unit>
       <trans-unit id="1943508481059904274" datatype="html">
         <source> (<x id="INTERPOLATION" equiv-text="{{selectedTasks.size}}"/> selected)</source>
