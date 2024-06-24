@@ -1,5 +1,27 @@
 # Changelog
 
+## paperless-ngx 2.10.2
+
+### Bug Fixes
+
+- Fix: always update document modified property on bulk edit operations [@shamoon](https://github.com/shamoon) ([#7079](https://github.com/paperless-ngx/paperless-ngx/pull/7079))
+- Fix: correct frontend retrieval of trash delay setting [@shamoon](https://github.com/shamoon) ([#7067](https://github.com/paperless-ngx/paperless-ngx/pull/7067))
+- Fix: index fresh document data after update archive file [@shamoon](https://github.com/shamoon) ([#7057](https://github.com/paperless-ngx/paperless-ngx/pull/7057))
+- Fix: Safari browser PDF viewer not loading in 2.10.x [@shamoon](https://github.com/shamoon) ([#7056](https://github.com/paperless-ngx/paperless-ngx/pull/7056))
+- Fix: Prefer the exporter metadata JSON file over the version JSON file [@stumpylog](https://github.com/stumpylog) ([#7048](https://github.com/paperless-ngx/paperless-ngx/pull/7048))
+
+### All App Changes
+
+<details>
+<summary>5 changes</summary>
+
+- Fix: always update document modified property on bulk edit operations [@shamoon](https://github.com/shamoon) ([#7079](https://github.com/paperless-ngx/paperless-ngx/pull/7079))
+- Fix: correct frontend retrieval of trash delay setting [@shamoon](https://github.com/shamoon) ([#7067](https://github.com/paperless-ngx/paperless-ngx/pull/7067))
+- Fix: index fresh document data after update archive file [@shamoon](https://github.com/shamoon) ([#7057](https://github.com/paperless-ngx/paperless-ngx/pull/7057))
+- Fix: Safari browser PDF viewer not loading in 2.10.x [@shamoon](https://github.com/shamoon) ([#7056](https://github.com/paperless-ngx/paperless-ngx/pull/7056))
+- Fix: Prefer the exporter metadata JSON file over the version JSON file [@stumpylog](https://github.com/stumpylog) ([#7048](https://github.com/paperless-ngx/paperless-ngx/pull/7048))
+</details>
+
 ## paperless-ngx 2.10.1
 
 ### Bug Fixes
