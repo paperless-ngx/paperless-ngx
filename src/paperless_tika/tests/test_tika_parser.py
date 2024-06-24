@@ -124,9 +124,10 @@ class TestTikaParser(HttpxMockMixin, TestCase):
                 request = self.httpx_mock.get_request()
                 found = False
                 for field in request.stream.fields:
-                    if isinstance(field, DataField) and field.name == "pdfFormat":
+                    if isinstance(field, DataField) and field.name == "pdfa":
                         self.assertEqual(field.value, expected_key)
                         found = True
+                        break
                 self.assertTrue(found)
 
                 self.httpx_mock.reset(assert_all_responses_were_requested=False)

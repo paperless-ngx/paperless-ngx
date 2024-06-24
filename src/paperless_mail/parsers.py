@@ -22,6 +22,7 @@ from tika_client import TikaClient
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
+from paperless.models import OutputTypeChoices
 
 
 class MailDocumentParser(DocumentParser):
@@ -37,12 +38,17 @@ class MailDocumentParser(DocumentParser):
         Converts our requested PDF/A output into the Gotenberg API
         format
         """
-        if settings.OCR_OUTPUT_TYPE in {"pdfa", "pdfa-2"}:
+        if settings.OCR_OUTPUT_TYPE in {
+            OutputTypeChoices.PDF_A,
+            OutputTypeChoices.PDF_A2,
+        }:
             return PdfAFormat.A2b
-        elif settings.OCR_OUTPUT_TYPE == "pdfa-1":  # pragma: no cover
-            self.log.warn("Gotenberg does not support PDF/A-1a, choosing PDF/A-2b")
+        elif settings.OCR_OUTPUT_TYPE == OutputTypeChoices.PDF_A1:  # pragma: no cover
+            self.log.warn(
+                "Gotenberg does not support PDF/A-1a, choosing PDF/A-2b instead",
+            )
             return PdfAFormat.A2b
-        elif settings.OCR_OUTPUT_TYPE == "pdfa-3":  # pragma: no cover
+        elif settings.OCR_OUTPUT_TYPE == OutputTypeChoices.PDF_A3:  # pragma: no cover
             return PdfAFormat.A3b
         return None
 
