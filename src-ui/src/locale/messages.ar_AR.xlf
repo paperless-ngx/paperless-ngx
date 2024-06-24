@@ -479,7 +479,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">198</context>
         </context-group>
-        <target state="translated">يمكن إدارة جميع العلامات والمراسلين وأنواع الوثائق ومسارات التخزين باستخدام هذه الصفحات. ويمكن أيضا إنشاؤها من تعديل عرض المستند.</target>
+        <target state="translated">يمكن إدارة جميع الوسوم وجهات التراسل وأنواع المستندات ومسارات التخزين باستخدام هذه الصفحات. ويمكن إنشاؤها أيضاً من تعديل عرض المستند.</target>
       </trans-unit>
       <trans-unit id="7851939076947092983" datatype="html">
         <source>Manage e-mail accounts and rules for automatically importing documents.</source>
@@ -1067,7 +1067,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">187</context>
         </context-group>
-        <target state="translated">إزالة وسم أو وسوم البريد الوارد تلقائياً عند الحفظ</target>
+        <target state="translated">إزالة وسم (وسوم) صندوق الوارد تلقائياً عند الحفظ</target>
       </trans-unit>
       <trans-unit id="8508424367627989968" datatype="html">
         <source>Bulk editing</source>
@@ -1243,7 +1243,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">243,245</context>
         </context-group>
-        <target state="translated"> تنطبق الإعدادات على حساب المستخدم هذا للعناصر (قواعد البريد، إلخ) التي تم إنشاؤها عبر واجهة المستخدم </target>
+        <target state="translated"> تطبق الإعدادات لحساب المستخدم هذا للأشياء (الوسوم وقواعد البريد، إلخ) التي تم إنشاؤها عبر واجهة المستخدم </target>
       </trans-unit>
       <trans-unit id="4292903881380648974" datatype="html">
         <source>Default Owner</source>
@@ -2879,7 +2879,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">72</context>
         </context-group>
-        <target state="translated">مراسلون</target>
+        <target state="translated">جهات التراسل</target>
       </trans-unit>
       <trans-unit id="7886570921510760899" datatype="html" approved="yes">
         <source>Tags</source>
@@ -3683,7 +3683,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component.ts</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="translated">إنشاء مراسل جديد</target>
+        <target state="translated">إنشاء جهة تراسل جديدة</target>
       </trans-unit>
       <trans-unit id="2059822531169388684" datatype="html">
         <source>Edit correspondent</source>
@@ -3691,7 +3691,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="translated">تعديل المراسل</target>
+        <target state="translated">تعديل جهة التراسل</target>
       </trans-unit>
       <trans-unit id="4894226280476434291" datatype="html">
         <source>Data type</source>
@@ -4091,7 +4091,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="translated">تعيين مراسل من</target>
+        <target state="translated">تعيين جهة تراسل من</target>
       </trans-unit>
       <trans-unit id="4875491778188965469" datatype="html">
         <source>Assign correspondent</source>
@@ -4103,7 +4103,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">163</context>
         </context-group>
-        <target state="translated">تعيين مراسل</target>
+        <target state="translated">تعيين جهة تراسل</target>
       </trans-unit>
       <trans-unit id="5232720756589450549" datatype="html">
         <source>Assign owner from rule</source>
@@ -4227,7 +4227,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="translated">لا تعيّن مراسل</target>
+        <target state="translated">لا تعيّن جهة تراسل</target>
       </trans-unit>
       <trans-unit id="3567746385454588269" datatype="html">
         <source>Use mail address</source>
@@ -4251,7 +4251,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="translated">استخدم المراسل المحدد أدناه</target>
+        <target state="translated">استخدم جهة التراسل المحددة أدناه</target>
       </trans-unit>
       <trans-unit id="3147349817770432927" datatype="html">
         <source>Create new mail rule</source>
@@ -4355,7 +4355,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="translated">إنشاء علامة جديدة</target>
+        <target state="translated">إنشاء وسم جديد</target>
       </trans-unit>
       <trans-unit id="5872175735754226507" datatype="html">
         <source>Edit tag</source>
@@ -4363,7 +4363,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component.ts</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="translated">تعديل العلامة</target>
+        <target state="translated">تحرير الوسم</target>
       </trans-unit>
       <trans-unit id="4768749765465246664" datatype="html">
         <source>Email</source>
@@ -5221,7 +5221,7 @@
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="translated">إضافة علامة</target>
+        <target state="translated">إضافة وسم</target>
       </trans-unit>
       <trans-unit id="3392754525167799121" datatype="html">
         <source>Remove tag</source>
@@ -5925,7 +5925,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">275</context>
         </context-group>
-        <target state="translated">تصفية حسب المراسل</target>
+        <target state="translated">تصفية حسب جهة التراسل</target>
       </trans-unit>
       <trans-unit id="78870852467682010" datatype="html">
         <source>Filter by document type</source>
@@ -6340,7 +6340,7 @@
           <context context-type="sourcefile">src/app/data/document.ts</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="translated">مراسل</target>
+        <target state="translated">جهة التراسل</target>
       </trans-unit>
       <trans-unit id="5066119607229701477" datatype="html" approved="yes">
         <source>Document type</source>
@@ -6904,7 +6904,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">53</context>
         </context-group>
-        <target state="translated">تصفية المراسلين</target>
+        <target state="translated">تصفية جهات التراسل</target>
       </trans-unit>
       <trans-unit id="2947613869920454977" datatype="html">
         <source>Filter document types</source>
@@ -7090,7 +7090,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">434</context>
         </context-group>
-        <target state="translated">تأكيد تعيين المراسل</target>
+        <target state="translated">تأكيد تعيين جهة التراسل</target>
       </trans-unit>
       <trans-unit id="6900893559485781849" datatype="html">
         <source>This operation will assign the correspondent &quot;<x id="PH" equiv-text="correspondent.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -7098,7 +7098,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">436</context>
         </context-group>
-        <target state="translated">هذه العملية ستعين المراسل"<x id="PH" equiv-text="correspondent.name"/>" إلى <x id="PH_1" equiv-text="this.list.selected.size"/> مستند (مستندات) مختارة.</target>
+        <target state="translated">ستقوم هذه العملية بتعيين جهة التراسل "<x id="PH" equiv-text="correspondent.name"/>" للمستند (المستندات) المحددة <x id="PH_1" equiv-text="this.list.selected.size"/>.</target>
       </trans-unit>
       <trans-unit id="1257522660364398440" datatype="html">
         <source>This operation will remove the correspondent from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -7106,7 +7106,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">438</context>
         </context-group>
-        <target state="translated">هذه العملية ستزيل المراسل من <x id="PH" equiv-text="this.list.selected.size"/> مستند (مستندات) مختارة.</target>
+        <target state="translated">هذه العملية ستزيل جهة التراسل <x id="PH" equiv-text="this.list.selected.size"/> من المستند أو المستندات المحددة.</target>
       </trans-unit>
       <trans-unit id="5393409374423140648" datatype="html">
         <source>Confirm document type assignment</source>
@@ -7370,7 +7370,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="translated">تبديل تصفية العلامة</target>
+        <target state="translated">تبديل لعامل تصفية الوسم</target>
       </trans-unit>
       <trans-unit id="4648526799630820486" datatype="html">
         <source>Toggle correspondent filter</source>
@@ -7378,7 +7378,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="translated">تبديل تصفية المراسل</target>
+        <target state="translated">تبديل لعامل تصفية جهة التراسل</target>
       </trans-unit>
       <trans-unit id="5319701482646590642" datatype="html">
         <source>Toggle document type filter</source>
@@ -8502,7 +8502,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="translated">علامة</target>
+        <target state="translated">الوسم</target>
       </trans-unit>
       <trans-unit id="4975748273657042999" datatype="html">
         <source>tags</source>
