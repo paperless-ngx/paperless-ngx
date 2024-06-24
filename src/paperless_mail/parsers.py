@@ -9,7 +9,9 @@ from django.conf import settings
 from django.utils.timezone import is_naive
 from django.utils.timezone import make_aware
 from gotenberg_client import GotenbergClient
-from gotenberg_client.options import Margin
+from gotenberg_client.options import MarginType
+from gotenberg_client.options import MarginUnitType
+from gotenberg_client.options import PageMarginsType
 from gotenberg_client.options import PageSize
 from gotenberg_client.options import PdfAFormat
 from humanize import naturalsize
@@ -329,7 +331,14 @@ class MailDocumentParser(DocumentParser):
                 response = (
                     route.index(email_html_file)
                     .resource(css_file)
-                    .margins(Margin(top=0.1, bottom=0.1, left=0.1, right=0.1))
+                    .margins(
+                        PageMarginsType(
+                            top=MarginType(0.1, MarginUnitType.Inches),
+                            bottom=MarginType(0.1, MarginUnitType.Inches),
+                            left=MarginType(0.1, MarginUnitType.Inches),
+                            right=MarginType(0.1, MarginUnitType.Inches),
+                        ),
+                    )
                     .size(PageSize(height=11.7, width=8.27))
                     .scale(1.0)
                     .run()
@@ -404,7 +413,14 @@ class MailDocumentParser(DocumentParser):
             route.index(html_clean_file)
 
             # Set page size, margins
-            route.margins(Margin(top=0.1, bottom=0.1, left=0.1, right=0.1)).size(
+            route.margins(
+                PageMarginsType(
+                    top=MarginType(0.1, MarginUnitType.Inches),
+                    bottom=MarginType(0.1, MarginUnitType.Inches),
+                    left=MarginType(0.1, MarginUnitType.Inches),
+                    right=MarginType(0.1, MarginUnitType.Inches),
+                ),
+            ).size(
                 PageSize(height=11.7, width=8.27),
             ).scale(1.0)
 
