@@ -19,8 +19,8 @@ import {
 } from 'src/app/data/system-status'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { NgxFilesizeModule } from 'ngx-filesize'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { FileSizePipe } from 'src/app/pipes/file-size.pipe'
 
 const status: SystemStatus = {
   pngx_version: '2.4.3',
@@ -58,12 +58,11 @@ describe('SystemStatusDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [SystemStatusDialogComponent],
+      declarations: [SystemStatusDialogComponent, FileSizePipe],
       imports: [
         NgbModalModule,
         ClipboardModule,
         NgxBootstrapIconsModule.pick(allIcons),
-        NgxFilesizeModule,
         NgbPopoverModule,
         NgbProgressbarModule,
       ],

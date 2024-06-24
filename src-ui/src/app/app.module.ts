@@ -119,7 +119,6 @@ import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { ConfirmButtonComponent } from './components/common/confirm-button/confirm-button.component'
 import { MonetaryComponent } from './components/common/input/monetary/monetary.component'
 import { SystemStatusDialogComponent } from './components/common/system-status-dialog/system-status-dialog.component'
-import { NgxFilesizeModule } from 'ngx-filesize'
 import { RotateConfirmDialogComponent } from './components/common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { MergeConfirmDialogComponent } from './components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
 import { SplitConfirmDialogComponent } from './components/common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
@@ -518,7 +517,6 @@ function initializeApp(settings: SettingsService) {
     TourNgBootstrapModule,
     DragDropModule,
     NgxBootstrapIconsModule.pick(icons),
-    NgxFilesizeModule,
   ],
   providers: [
     {

@@ -32,7 +32,6 @@
     "ngx-color": "^9.0.0",
     "ngx-cookie-service": "^18.0.0",
     "ngx-file-drop": "^16.0.0",
-    "ngx-filesize": "^3.0.3",
     "ngx-ui-tour-ng-bootstrap": "^14.0.3",
     "rxjs": "^7.8.1",
     "tslib": "^2.6.2",
