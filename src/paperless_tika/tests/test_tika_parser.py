@@ -109,7 +109,7 @@ class TestTikaParser(HttpxMockMixin, TestCase):
         for setting, expected_key in [
             ("pdfa", "PDF/A-2b"),
             ("pdfa-2", "PDF/A-2b"),
-            ("pdfa-1", "PDF/A-1a"),
+            ("pdfa-1", "PDF/A-2b"),
             ("pdfa-3", "PDF/A-3b"),
         ]:
             with override_settings(OCR_OUTPUT_TYPE=setting):

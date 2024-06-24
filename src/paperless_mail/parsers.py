@@ -32,8 +32,7 @@ class MailDocumentParser(DocumentParser):
 
     logging_name = "paperless.parsing.mail"
 
-    @staticmethod
-    def _settings_to_gotenberg_pdfa() -> Optional[PdfAFormat]:
+    def _settings_to_gotenberg_pdfa(self) -> Optional[PdfAFormat]:
         """
         Converts our requested PDF/A output into the Gotenberg API
         format
@@ -41,7 +40,8 @@ class MailDocumentParser(DocumentParser):
         if settings.OCR_OUTPUT_TYPE in {"pdfa", "pdfa-2"}:
             return PdfAFormat.A2b
         elif settings.OCR_OUTPUT_TYPE == "pdfa-1":  # pragma: no cover
-            return PdfAFormat.A1a
+            self.log.warn("Gotenberg does not support PDF/A-1a, choosing PDF/A-2b")
+            return PdfAFormat.A2b
         elif settings.OCR_OUTPUT_TYPE == "pdfa-3":  # pragma: no cover
             return PdfAFormat.A3b
         return None
