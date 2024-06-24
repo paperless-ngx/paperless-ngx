@@ -573,7 +573,19 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
     @override_settings(FILENAME_FORMAT="{title}")
     @mock.patch("documents.signals.handlers.Document.objects.filter")
-    def test_no_update_without_change(self, m):
+    @mock.patch("documents.signals.handlers.shutil.move")
+    def test_no_move_only_save(self, mock_move, mock_filter):
+        """
+        GIVEN:
+            - A document with a filename
+            - The document is saved
+            - The filename is not changed
+        WHEN:
+            - The document is saved
+        THEN:
+            - The document modified date is updated
+            - The document is not moved
+        """
         with disable_auditlog():
             doc = Document.objects.create(
                 title="document",
@@ -583,12 +595,16 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                 archive_checksum="B",
                 mime_type="application/pdf",
             )
+            original_modified = doc.modified
             Path(doc.source_path).touch()
             Path(doc.archive_path).touch()
 
             doc.save()
+            doc.refresh_from_db()
 
-            m.assert_not_called()
+            mock_filter.assert_called()
+            self.assertNotEqual(original_modified, doc.modified)
+            mock_move.assert_not_called()
 
 
 class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
