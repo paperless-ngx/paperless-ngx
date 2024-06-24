@@ -519,7 +519,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">230</context>
         </context-group>
-        <target state="final">Überprüfen Sie die Einstellungen für diverse Verbesserung der Webanwendung und ändern Sie die Einstellungen für gespeicherte Ansichten.</target>
+        <target state="final">Überprüfen Sie die Einstellungen für diverse Anpassungen der Webanwendung und ändern Sie die Einstellungen für gespeicherte Ansichten.</target>
       </trans-unit>
       <trans-unit id="7172877665285340082" datatype="html" approved="yes">
         <source>Thank you! 🙏</source>
@@ -2265,13 +2265,13 @@
         </context-group>
         <target state="final">Papierkorb</target>
       </trans-unit>
-      <trans-unit id="3818027200170621545" datatype="html">
+      <trans-unit id="3818027200170621545" datatype="html" approved="yes">
         <source>Manage trashed documents that are pending deletion.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="translated">Dokumente im Papierkorb verwalten, die noch nicht gelöscht wurden.</target>
+        <target state="final">Dokumente im Papierkorb verwalten, die noch nicht endgültig gelöscht wurden.</target>
       </trans-unit>
       <trans-unit id="3186604097120837257" datatype="html" approved="yes">
         <source>Restore selected</source>
