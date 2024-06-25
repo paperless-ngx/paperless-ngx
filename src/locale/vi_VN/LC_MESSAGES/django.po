@@ -19,7 +19,7 @@ msgstr ""
 
 #: documents/apps.py:8
 msgid "Documents"
-msgstr "Tài liệu"
+msgstr ""
 
 #: documents/models.py:36 documents/models.py:798
 msgid "owner"
@@ -254,11 +254,11 @@ msgstr "Vị trí của tài liệu này trong lưu trữ tài liệu vật lý 
 
 #: documents/models.py:338 documents/models.py:729 documents/models.py:783
 msgid "document"
-msgstr "tài liệu"
+msgstr ""
 
 #: documents/models.py:339
 msgid "documents"
-msgstr "tài liệu"
+msgstr ""
 
 #: documents/models.py:427
 msgid "debug"

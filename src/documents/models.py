@@ -1145,7 +1145,7 @@ class WorkflowTrigger(models.Model):
         ('OWNER', _('Owner')),
         ('EDIT', _('Edit')),
         ('VIEW', _('View')),
-]
+    ]
     filter_has_access_type = models.CharField(
         max_length=30,
         choices=APPROVAL_ACCESS_CHOICES,
