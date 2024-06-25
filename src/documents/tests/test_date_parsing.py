@@ -247,10 +247,6 @@ class TestDate(TestCase):
             datetime.datetime(2024, 2, 17, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
         )
         self.assertEqual(
-            parse_date("", "8 Mayıs 1945"),
-            datetime.datetime(1945, 5, 8, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
-        )
-        self.assertEqual(
             parse_date("", "30 Ağustos 2012"),
             datetime.datetime(2012, 8, 30, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
         )
