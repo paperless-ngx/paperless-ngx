@@ -224,7 +224,7 @@ class TestDate(TestCase):
         )
         self.assertEqual(
             parse_date("", "15. února 1985"),
-            datetime.datetime(1985, 6, 15, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+            datetime.datetime(1985, 2, 15, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
         )
         self.assertEqual(
             parse_date("", "30. září 2011"),
