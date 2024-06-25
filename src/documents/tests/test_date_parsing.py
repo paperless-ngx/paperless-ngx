@@ -192,14 +192,76 @@ class TestDate(TestCase):
             datetime.datetime(2019, 9, 25, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
         )
 
-    def test_crazy_date_past(self, *args):
+    def test_crazy_date_past(self):
         self.assertIsNone(parse_date("", "01-07-0590 00:00:00"))
 
-    def test_crazy_date_future(self, *args):
+    def test_crazy_date_future(self):
         self.assertIsNone(parse_date("", "01-07-2350 00:00:00"))
 
-    def test_crazy_date_with_spaces(self, *args):
+    def test_crazy_date_with_spaces(self):
         self.assertIsNone(parse_date("", "20 408000l 2475"))
+
+    def test_utf_month_names(self):
+        self.assertEqual(
+            parse_date("", "13 décembre 2023"),
+            datetime.datetime(2023, 12, 13, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+        self.assertEqual(
+            parse_date("", "13 août 2022"),
+            datetime.datetime(2022, 8, 13, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+        self.assertEqual(
+            parse_date("", "11 März 2020"),
+            datetime.datetime(2020, 3, 11, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+        self.assertEqual(
+            parse_date("", "28 nëntori 1912"),
+            datetime.datetime(1912, 11, 28, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+        self.assertEqual(
+            parse_date("", "17. ožujka 2018."),
+            datetime.datetime(2018, 3, 17, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+        self.assertEqual(
+            parse_date("", "1. veljače 2016."),
+            datetime.datetime(2016, 2, 1, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+        self.assertEqual(
+            parse_date("", "15. února 1985"),
+            datetime.datetime(1985, 6, 15, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+        self.assertEqual(
+            parse_date("", "30. září 2011"),
+            datetime.datetime(2011, 9, 30, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+        self.assertEqual(
+            parse_date("", "28. května 1990"),
+            datetime.datetime(1990, 5, 28, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+        self.assertEqual(
+            parse_date("", "1. grudzień 1997"),
+            datetime.datetime(1997, 12, 1, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+        self.assertEqual(
+            parse_date("", "17 Şubat 2024"),
+            datetime.datetime(2024, 2, 17, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+        self.assertEqual(
+            parse_date("", "8 Mayıs 1945"),
+            datetime.datetime(1945, 5, 8, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+        self.assertEqual(
+            parse_date("", "30 Ağustos 2012"),
+            datetime.datetime(2012, 8, 30, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+        self.assertEqual(
+            parse_date("", "17 Eylül 2000"),
+            datetime.datetime(2000, 9, 17, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+        self.assertEqual(
+            parse_date("", "5. október 1992"),
+            datetime.datetime(1992, 10, 5, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
 
     def test_multiple_dates(self):
         text = """This text has multiple dates.
