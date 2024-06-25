@@ -1590,44 +1590,22 @@ class BulkEditObjectsView(PassUserMixin):
         elif operation == "delete" and object_type == "warehouses": 
             for warehouse_id in object_ids:
                 warehouse = Warehouse.objects.get(id=int(warehouse_id))
+                warehouses = Warehouse.objects.filter(path__startswith=warehouse.path)
+                documents = Document.objects.filter(warehouse__in=warehouses)
+                documents.delete()
+                warehouses.delete()
                 
-                if warehouse.type == Warehouse.SHELF:
-                    boxcases = Warehouse.objects.filter(parent_warehouse=warehouse) 
-                    documents = Document.objects.filter(warehouse__in=[b.id for b in boxcases])
-                    documents.delete()
-                    boxcases.delete()
-                    warehouse.delete()
-                if warehouse.type == Warehouse.BOXCASE:
-                    documents = Document.objects.filter(warehouse=warehouse)
-                    documents.delete()
-                    warehouse.delete()
-                if warehouse.type == Warehouse.WAREHOUSE:
-                    shelves = Warehouse.objects.filter(parent_warehouse=warehouse)
-                    boxcases = Warehouse.objects.filter(parent_warehouse__in=[s.id for s in shelves]) 
-                    documents = Document.objects.filter(warehouse__in=[b.id for b in boxcases])
-                    documents.delete()
-                    boxcases.delete()
-                    shelves.delete()
-                    warehouse.delete()
                     
             return Response(status=status.HTTP_204_NO_CONTENT)
         
         elif operation == "delete" and object_type == "folders":
             for folder_id in object_ids:
                 folder = Folder.objects.get(id=int(folder_id))
+                folders = Folder.objects.filter(path__startswith=folder.path)
+                documents = Document.objects.filter(folder__in=folders)
+                documents.delete()
+                folders.delete()
                 
-                def delete_folder_hierarchy(folder_instance):
-                    documents = Document.objects.filter(folder=folder_instance)
-                    documents.delete()
-                    
-                    child_folders = Folder.objects.filter(parent_folder=folder_instance)
-                    for child_folder in child_folders:
-                        delete_folder_hierarchy(child_folder)
-                    
-                    folder_instance.delete()
-                
-                delete_folder_hierarchy(folder)
-            
             return Response(status=status.HTTP_204_NO_CONTENT)            
                           
         elif operation == "delete":
@@ -2024,24 +2002,10 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         
     def destroy(self, request, pk, *args, **kwargs):
         warehouse = Warehouse.objects.get(id=pk)
-        if warehouse.type == Warehouse.SHELF:
-            boxcases = Warehouse.objects.filter(parent_warehouse=warehouse) 
-            documents = Document.objects.filter(warehouse__in=[b.id for b in boxcases])
-            documents.delete()
-            boxcases.delete()
-            warehouse.delete()
-        if warehouse.type == Warehouse.BOXCASE:
-            documents = Document.objects.filter(warehouse=warehouse)
-            documents.delete()
-            warehouse.delete()
-        if warehouse.type == Warehouse.WAREHOUSE:
-            shelves = Warehouse.objects.filter(parent_warehouse=warehouse)
-            boxcases = Warehouse.objects.filter(parent_warehouse__in=[s.id for s in shelves]) 
-            documents = Document.objects.filter(warehouse__in=[b.id for b in boxcases])
-            documents.delete()
-            boxcases.delete()
-            shelves.delete()
-            warehouse.delete()
+        warehouses = Warehouse.objects.filter(path__startswith=warehouse.path)
+        documents = Document.objects.filter(warehouse__in=warehouses)
+        documents.delete()
+        warehouses.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -2227,18 +2191,10 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     
     def destroy(self, request, pk, *args, **kwargs):
         folder = Folder.objects.get(id=pk)
-        
-        def delete_folder_hierarchy(folder_instance):
-            documents = Document.objects.filter(folder=folder_instance)
-            documents.delete()
-            
-            child_folders = Folder.objects.filter(parent_folder=folder_instance)
-            for child_folder in child_folders:
-                delete_folder_hierarchy(child_folder)
-            
-            folder_instance.delete()
-        
-        delete_folder_hierarchy(folder)
+        folders = Folder.objects.filter(path__startswith=folder.path)
+        documents = Document.objects.filter(folder__in=folders)
+        documents.delete()
+        folders.delete()
         
         return Response(status=status.HTTP_204_NO_CONTENT)
     
