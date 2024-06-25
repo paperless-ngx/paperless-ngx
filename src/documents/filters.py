@@ -208,24 +208,31 @@ class DocumentFilterSet(FilterSet):
 
     shared_by__id = SharedByUser()
     
-    warehouse__id = NumberFilter(method='filter_by_warehouse')
+    warehouse__id__in = NumberFilter(method='filter_by_warehouse')
 
+    warehouse__id = NumberFilter(method='filter_by_warehouse')
+    
+    folder__id__in = NumberFilter(method='filter_by_folder')
+    
+    folder__id = NumberFilter(method='filter_by_folder')
+    
+    def filter_by_folder(self, queryset, name, value):
+        folder = Folder.objects.get(id=value)
+        return self.get_folder_documents(folder)
+    
+    def get_folder_documents(self, folder):
+        folders = Folder.objects.filter(path__startswith=folder.path)
+        return Document.objects.filter(folder__in=folders)
+        
+            
+        
     def filter_by_warehouse(self, queryset, name, value):
         warehouse = Warehouse.objects.get(id=value)
         return self.get_warehouse_documents(warehouse)
 
     def get_warehouse_documents(self, warehouse):
-        if warehouse.type == Warehouse.BOXCASE:
-            return Document.objects.filter(warehouse=warehouse)
-        elif warehouse.type == Warehouse.SHELF:
-            boxcases = Warehouse.objects.filter(parent_warehouse=warehouse)
-            return Document.objects.filter(warehouse__in=[b.id for b in boxcases])
-        elif warehouse.type == Warehouse.WAREHOUSE:
-            shelves = Warehouse.objects.filter(parent_warehouse=warehouse)
-            boxcases = Warehouse.objects.filter(parent_warehouse__in=[s.id for s in shelves])
-            return Document.objects.filter(warehouse__in=[b.id for b in boxcases])
-        else:
-            return Document.objects.none()
+        warehouses = Warehouse.objects.filter(path__startswith=warehouse.path)
+        return Document.objects.filter(warehouse__in=warehouses)
 
     
     
