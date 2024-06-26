@@ -5,6 +5,7 @@ from pathlib import Path
 import httpx
 import pytest
 from django.test.html import parse_html
+from pytest_django.fixtures import SettingsWrapper
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
 
@@ -328,7 +329,11 @@ class TestTikaHtmlParse:
         with pytest.raises(ParseError):
             mail_parser.tika_parse(html)
 
-    def test_tika_parse_unreachable(self, mail_parser: MailDocumentParser):
+    def test_tika_parse_unreachable(
+        self,
+        settings: SettingsWrapper,
+        mail_parser: MailDocumentParser,
+    ):
         """
         GIVEN:
             - Fresh start
@@ -341,7 +346,7 @@ class TestTikaHtmlParse:
 
         # Check if exception is raised when Tika cannot be reached.
         with pytest.raises(ParseError):
-            mail_parser.tika_server = ""
+            settings.TIKA_ENDPOINT = "http://does-not-exist:9998"
             mail_parser.tika_parse(html)
 
 
