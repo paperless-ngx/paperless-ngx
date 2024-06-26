@@ -48,7 +48,7 @@
                                     @if (change.key === 'content') {
                                         <code class="text-primary">{{ change.value[1]?.substring(0,100) }}...</code>
                                     } @else {
-                                        <code class="text-primary">{{ change.value[1] }}</code>
+                                        <code class="text-primary">{{ getPrettyName(change.key, change.value[1]) | async }}</code>
                                     }
                                 </li>
                             }
