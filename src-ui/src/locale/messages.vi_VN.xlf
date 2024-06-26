@@ -845,7 +845,7 @@
                <context context-type="sourcefile">src/app/components/document-approvals/document-approvals.component.html</context>
                <context context-type="linenumber">9</context>
             </context-group>
-            <target state="needs-translation">Phê duyệt tại</target>
+            <target state="needs-translation">Phê duyệt lúc</target>
          </trans-unit>
          <trans-unit id="9081905271931649318" datatype="html">
             <source>Reject at</source>
@@ -857,7 +857,7 @@
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
                <context context-type="linenumber">160</context>
             </context-group>
-            <target state="needs-translation">Từ chối tại</target>
+            <target state="needs-translation">Từ chối lúc</target>
          </trans-unit>
          <trans-unit id="3098567260654808782" datatype="html">
             <source>Revoked at</source>
@@ -869,7 +869,7 @@
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
                <context context-type="linenumber">163</context>
             </context-group>
-            <target state="needs-translation">Đã huỷ tại</target>
+            <target state="needs-translation">Đã thu hồi lúc</target>
          </trans-unit>
          <trans-unit id="8864288285279476751" datatype="html">
             <source>Method</source>
@@ -993,7 +993,7 @@
                <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
                <context context-type="linenumber">95</context>
             </context-group>
-            <target state="needs-translation">Đã huỷ</target>
+            <target state="needs-translation">Đã thu hồi</target>
          </trans-unit>
          <trans-unit id="2134950584701094962" datatype="html">
             <source>Open Document</source>
@@ -1097,7 +1097,7 @@
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
                <context context-type="linenumber">220,222</context>
             </context-group>
-            <target state="needs-translation">Đã huỷ</target>
+            <target state="needs-translation">Đã thu hồi</target>
          </trans-unit>
          <trans-unit id="5404910960991552159" datatype="html">
             <source>Dismiss selected</source>
@@ -1161,7 +1161,7 @@
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
                <context context-type="linenumber">53</context>
             </context-group>
-            <target state="needs-translation">Huỷ đã chọn</target>
+            <target state="needs-translation">Thu hồi đã chọn</target>
          </trans-unit>
          <trans-unit id="3297056827948046782" datatype="html">
             <source>Revoke all</source>
@@ -1237,7 +1237,7 @@
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
                <context context-type="linenumber">140</context>
             </context-group>
-            <target state="needs-translation">Huỷ</target>
+            <target state="needs-translation">Thu hồi</target>
          </trans-unit>
          <trans-unit id="8986421314427632087" datatype="html">
             <source>pending</source>
@@ -1269,7 +1269,7 @@
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
                <context context-type="linenumber">215</context>
             </context-group>
-            <target state="needs-translation">Đã huỷ</target>
+            <target state="needs-translation">Đã thu hồi</target>
          </trans-unit>
          <trans-unit id="9063918187161876141" datatype="html">
             <source>Application Configuration</source>
@@ -6033,7 +6033,7 @@
                <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
                <context context-type="linenumber">38</context>
             </context-group>
-            <target state="translated">Xin chào</target>
+            <target state="needs-translation">Xin chào <x id="PH" equiv-text="this.settingsService.displayName"/>, chào mừng bạn đến với <x id="PH_1" equiv-text="environment.appTitle"/></target>
          </trans-unit>
          <trans-unit id="2901300640157872718" datatype="html">
             <source>
