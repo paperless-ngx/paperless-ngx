@@ -193,7 +193,7 @@
 
 <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-tabs" (hidden)="duringTabChange($event)">
   <li ngbNavItem="failure">
-    <a ngbNavLink ><span i18n>Failure</span>@if (approvalsService.failureApprovals.length > 0) {
+    <a ngbNavLink i18n>Failure@if (approvalsService.failureApprovals.length > 0) {
       <span class="badge bg-danger ms-2">{{approvalsService.failureApprovals.length}}</span>
     }</a>
     <ng-template ngbNavContent>
@@ -201,7 +201,7 @@
     </ng-template>
   </li>
   <li ngbNavItem="success">
-    <a ngbNavLink><span i18n>Success</span>@if (approvalsService.successApprovals.length > 0) {
+    <a ngbNavLink i18n>Success@if (approvalsService.successApprovals.length > 0) {
       <span class="badge bg-secondary ms-2">{{approvalsService.successApprovals.length}}</span>
     }</a>
     <ng-template ngbNavContent>
@@ -209,7 +209,7 @@
     </ng-template>
   </li>
   <li ngbNavItem="pending">
-    <a ngbNavLink ><span i18n>Pending</span>@if (approvalsService.pendingApprovals.length > 0) {
+    <a ngbNavLink i18n>Pending@if (approvalsService.pendingApprovals.length > 0) {
       <span class="badge bg-secondary ms-2">{{approvalsService.pendingApprovals.length}}</span>
     }</a>
     <ng-template ngbNavContent>
@@ -217,7 +217,7 @@
     </ng-template>
   </li>
   <li ngbNavItem="revoked">
-    <a ngbNavLink ><span i18n>Revoked</span>@if (approvalsService.revokedApprovals.length > 0) {
+    <a ngbNavLink i18n>Revoked@if (approvalsService.revokedApprovals.length > 0) {
       <span class="badge bg-secondary ms-2">{{approvalsService.revokedApprovals.length}}</span>
     }</a>
     <ng-template ngbNavContent>
