@@ -1,7 +1,7 @@
 <pngx-page-header
-  title=" Approvals"
+  title="Approvals"
   i18n-title
-  info=" Approvals shows you documents that have been consumed, are waiting to be, or may have failure during the process."
+  info="Approvals shows you documents that have been consumed, are waiting to be, or may have failure during the process."
   i18n-info
   >
   <div class="btn-toolbar col col-md-auto align-items-center">
@@ -193,7 +193,7 @@
 
 <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-tabs" (hidden)="duringTabChange($event)">
   <li ngbNavItem="failure">
-    <a ngbNavLink i18n>Failure@if (approvalsService.failureApprovals.length > 0) {
+    <a ngbNavLink ><span i18n>Failure</span>@if (approvalsService.failureApprovals.length > 0) {
       <span class="badge bg-danger ms-2">{{approvalsService.failureApprovals.length}}</span>
     }</a>
     <ng-template ngbNavContent>
@@ -201,7 +201,7 @@
     </ng-template>
   </li>
   <li ngbNavItem="success">
-    <a ngbNavLink i18n>Success@if (approvalsService.successApprovals.length > 0) {
+    <a ngbNavLink><span i18n>Success</span>@if (approvalsService.successApprovals.length > 0) {
       <span class="badge bg-secondary ms-2">{{approvalsService.successApprovals.length}}</span>
     }</a>
     <ng-template ngbNavContent>
@@ -209,7 +209,7 @@
     </ng-template>
   </li>
   <li ngbNavItem="pending">
-    <a ngbNavLink i18n>Pending@if (approvalsService.pendingApprovals.length > 0) {
+    <a ngbNavLink ><span i18n>Pending</span>@if (approvalsService.pendingApprovals.length > 0) {
       <span class="badge bg-secondary ms-2">{{approvalsService.pendingApprovals.length}}</span>
     }</a>
     <ng-template ngbNavContent>
@@ -217,7 +217,7 @@
     </ng-template>
   </li>
   <li ngbNavItem="revoked">
-    <a ngbNavLink i18n>Revoked@if (approvalsService.revokedApprovals.length > 0) {
+    <a ngbNavLink ><span i18n>Revoked</span>@if (approvalsService.revokedApprovals.length > 0) {
       <span class="badge bg-secondary ms-2">{{approvalsService.revokedApprovals.length}}</span>
     }</a>
     <ng-template ngbNavContent>

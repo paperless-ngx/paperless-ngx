@@ -120,7 +120,7 @@
 
 <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-tabs" (hidden)="duringTabChange($event)">
   <li ngbNavItem="failed">
-    <a ngbNavLink i18n>Failed@if (tasksService.failedFileTasks.length > 0) {
+    <a ngbNavLink ><span i18n>Failed</span>@if (tasksService.failedFileTasks.length > 0) {
       <span class="badge bg-danger ms-2">{{tasksService.failedFileTasks.length}}</span>
     }</a>
     <ng-template ngbNavContent>
@@ -128,7 +128,7 @@
     </ng-template>
   </li>
   <li ngbNavItem="completed">
-    <a ngbNavLink i18n>Complete@if (tasksService.completedFileTasks.length > 0) {
+    <a ngbNavLink ><span i18n>Complete</span>@if (tasksService.completedFileTasks.length > 0) {
       <span class="badge bg-secondary ms-2">{{tasksService.completedFileTasks.length}}</span>
     }</a>
     <ng-template ngbNavContent>
@@ -136,7 +136,7 @@
     </ng-template>
   </li>
   <li ngbNavItem="started">
-    <a ngbNavLink i18n>Started@if (tasksService.startedFileTasks.length > 0) {
+    <a ngbNavLink ><span i18n>Started</span>@if (tasksService.startedFileTasks.length > 0) {
       <span class="badge bg-secondary ms-2">{{tasksService.startedFileTasks.length}}</span>
     }</a>
     <ng-template ngbNavContent>
@@ -144,7 +144,7 @@
     </ng-template>
   </li>
   <li ngbNavItem="queued">
-    <a ngbNavLink i18n>Queued@if (tasksService.queuedFileTasks.length > 0) {
+    <a ngbNavLink ><span i18n>Queued</span>@if (tasksService.queuedFileTasks.length > 0) {
       <span class="badge bg-secondary ms-2">{{tasksService.queuedFileTasks.length}}</span>
     }</a>
     <ng-template ngbNavContent>
