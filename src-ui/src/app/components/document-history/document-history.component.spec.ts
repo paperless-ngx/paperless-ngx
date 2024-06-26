@@ -70,7 +70,7 @@ describe('DocumentHistoryComponent', () => {
   })
 
   it('getPrettyName should return the correspondent name', () => {
-    const correspondentId = 1
+    const correspondentId = '1'
     const correspondentName = 'John Doe'
     const getCachedSpy = jest
       .spyOn(correspondentService, 'getCached')
@@ -80,7 +80,7 @@ describe('DocumentHistoryComponent', () => {
       .subscribe((result) => {
         expect(result).toBe(correspondentName)
       })
-    expect(getCachedSpy).toHaveBeenCalledWith(correspondentId)
+    expect(getCachedSpy).toHaveBeenCalledWith(parseInt(correspondentId))
     // no correspondent found
     getCachedSpy.mockReturnValue(of(null))
     component
@@ -91,7 +91,7 @@ describe('DocumentHistoryComponent', () => {
   })
 
   it('getPrettyName should return the document type name', () => {
-    const documentTypeId = 1
+    const documentTypeId = '1'
     const documentTypeName = 'Invoice'
     const getCachedSpy = jest
       .spyOn(documentTypeService, 'getCached')
@@ -101,7 +101,7 @@ describe('DocumentHistoryComponent', () => {
       .subscribe((result) => {
         expect(result).toBe(documentTypeName)
       })
-    expect(getCachedSpy).toHaveBeenCalledWith(documentTypeId)
+    expect(getCachedSpy).toHaveBeenCalledWith(parseInt(documentTypeId))
     // no document type found
     getCachedSpy.mockReturnValue(of(null))
     component
@@ -112,7 +112,7 @@ describe('DocumentHistoryComponent', () => {
   })
 
   it('getPrettyName should return the storage path path', () => {
-    const storagePathId = 1
+    const storagePathId = '1'
     const storagePath = '/path/to/storage'
     const getCachedSpy = jest
       .spyOn(storagePathService, 'getCached')
@@ -122,7 +122,7 @@ describe('DocumentHistoryComponent', () => {
       .subscribe((result) => {
         expect(result).toBe(storagePath)
       })
-    expect(getCachedSpy).toHaveBeenCalledWith(storagePathId)
+    expect(getCachedSpy).toHaveBeenCalledWith(parseInt(storagePathId))
     // no storage path found
     getCachedSpy.mockReturnValue(of(null))
     component
@@ -133,7 +133,7 @@ describe('DocumentHistoryComponent', () => {
   })
 
   it('getPrettyName should return the owner username', () => {
-    const ownerId = 1
+    const ownerId = '1'
     const ownerUsername = 'user1'
     const getCachedSpy = jest
       .spyOn(userService, 'getCached')
@@ -141,7 +141,7 @@ describe('DocumentHistoryComponent', () => {
     component.getPrettyName('owner', ownerId).subscribe((result) => {
       expect(result).toBe(ownerUsername)
     })
-    expect(getCachedSpy).toHaveBeenCalledWith(ownerId)
+    expect(getCachedSpy).toHaveBeenCalledWith(parseInt(ownerId))
     // no user found
     getCachedSpy.mockReturnValue(of(null))
     component.getPrettyName('owner', ownerId).subscribe((result) => {
@@ -150,9 +150,9 @@ describe('DocumentHistoryComponent', () => {
   })
 
   it('getPrettyName should return the value as is for other types', () => {
-    const value = 'Some value'
-    component.getPrettyName('other', value).subscribe((result) => {
-      expect(result).toBe(value)
+    const id = '123'
+    component.getPrettyName('other', id).subscribe((result) => {
+      expect(result).toBe(id)
     })
   })
 })

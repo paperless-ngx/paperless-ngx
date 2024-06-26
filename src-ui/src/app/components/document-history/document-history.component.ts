@@ -46,30 +46,30 @@ export class DocumentHistoryComponent implements OnInit {
     }
   }
 
-  getPrettyName(type: DataType | string, value: any): Observable<string> {
+  getPrettyName(type: DataType | string, id: string): Observable<string> {
     switch (type) {
       case DataType.Correspondent:
-        return this.correspondentService.getCached(value).pipe(
+        return this.correspondentService.getCached(parseInt(id, 10)).pipe(
           first(),
-          map((correspondent) => correspondent?.name ?? value)
+          map((correspondent) => correspondent?.name ?? id)
         )
       case DataType.DocumentType:
-        return this.documentTypeService.getCached(value).pipe(
+        return this.documentTypeService.getCached(parseInt(id, 10)).pipe(
           first(),
-          map((documentType) => documentType?.name ?? value)
+          map((documentType) => documentType?.name ?? id)
         )
       case DataType.StoragePath:
-        return this.storagePathService.getCached(value).pipe(
+        return this.storagePathService.getCached(parseInt(id, 10)).pipe(
           first(),
-          map((storagePath) => storagePath?.path ?? value)
+          map((storagePath) => storagePath?.path ?? id)
         )
       case 'owner':
-        return this.userService.getCached(value).pipe(
+        return this.userService.getCached(parseInt(id, 10)).pipe(
           first(),
-          map((user) => user?.username ?? value)
+          map((user) => user?.username ?? id)
         )
       default:
-        return of(value)
+        return of(id)
     }
   }
 }
