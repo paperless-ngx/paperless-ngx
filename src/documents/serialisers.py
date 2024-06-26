@@ -1890,18 +1890,6 @@ class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     name = AdjustedNameField()
     
     def validate(self, data):
-        # owner = (
-        #     data["owner"]
-        #     if "owner" in data
-        #     else self.user if hasattr(self, "user") else None
-        # )
-        # pk = self.instance.pk if hasattr(self.instance, "pk") else None
-        # if ("owner" in data) and self.Meta.model.objects.filter(
-        #     owner=owner,
-        # ).exclude(pk=pk).exists():
-        #     raise serializers.ValidationError(
-        #         {"error": "Object violates owner "},
-        #     )
         return data
     
     def update(self, instance, validated_data):
@@ -1956,18 +1944,6 @@ class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         return Folder.objects.filter(parent_folder=obj).count()
     
     def validate(self, data):
-        # owner = (
-        #     data["owner"]
-        #     if "owner" in data
-        #     else self.user if hasattr(self, "user") else None
-        # )
-        # pk = self.instance.pk if hasattr(self.instance, "pk") else None
-        # if ("owner" in data) and self.Meta.model.objects.filter(
-        #     owner=owner,
-        # ).exclude(pk=pk).exists():
-        #     raise serializers.ValidationError(
-        #         {"error": "Object violates owner "},
-        #     )
         return data
     
     def update(self, instance, validated_data):
