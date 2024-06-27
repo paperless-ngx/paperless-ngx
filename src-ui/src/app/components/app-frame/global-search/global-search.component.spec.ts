@@ -17,7 +17,7 @@ import {
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
   FILTER_FULLTEXT_QUERY,
@@ -40,6 +40,7 @@ import { DataType } from 'src/app/data/datatype'
 import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
 import { SettingsService } from 'src/app/services/settings.service'
 import { GlobalSearchType, SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const searchResults = {
   total: 11,
@@ -139,12 +140,15 @@ describe('GlobalSearchComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [GlobalSearchComponent],
       imports: [
-        HttpClientTestingModule,
         NgbModalModule,
         NgbDropdownModule,
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+      ],
+      providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 

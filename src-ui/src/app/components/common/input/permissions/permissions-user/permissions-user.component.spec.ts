@@ -5,11 +5,12 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { PermissionsUserComponent } from './permissions-user.component'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { of } from 'rxjs'
 import { UserService } from 'src/app/services/rest/user.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('PermissionsUserComponent', () => {
   let component: PermissionsUserComponent
@@ -20,12 +21,11 @@ describe('PermissionsUserComponent', () => {
   beforeEach(async () => {
     TestBed.configureTestingModule({
       declarations: [PermissionsUserComponent],
-      providers: [UserService],
-      imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        HttpClientTestingModule,
-        NgSelectModule,
+      imports: [FormsModule, ReactiveFormsModule, NgSelectModule],
+      providers: [
+        UserService,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 

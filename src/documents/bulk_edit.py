@@ -2,6 +2,7 @@ import hashlib
 import itertools
 import logging
 import os
+import tempfile
 from typing import Optional
 
 from celery import chain
@@ -270,7 +271,7 @@ def merge(
         return "OK"
 
     filepath = os.path.join(
-        settings.SCRATCH_DIR,
+        tempfile.mkdtemp(dir=settings.SCRATCH_DIR),
         f"{'_'.join([str(doc_id) for doc_id in doc_ids])[:100]}_merged.pdf",
     )
     merged_pdf.remove_unreferenced_resources()
@@ -322,7 +323,7 @@ def split(doc_ids: list[int], pages: list[list[int]], delete_originals: bool = F
                 for page in split_doc:
                     dst.pages.append(pdf.pages[page - 1])
                 filepath = os.path.join(
-                    settings.SCRATCH_DIR,
+                    tempfile.mkdtemp(dir=settings.SCRATCH_DIR),
                     f"{doc.id}_{split_doc[0]}-{split_doc[-1]}.pdf",
                 )
                 dst.remove_unreferenced_resources()
