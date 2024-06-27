@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { DocumentListComponent } from './document-list.component'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { RouterTestingModule } from '@angular/router/testing'
 import { routes } from 'src/app/app-routing.module'
 import { FilterEditorComponent } from './filter-editor/filter-editor.component'
@@ -60,7 +60,11 @@ import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component'
 import { TextComponent } from '../common/input/text/text.component'
 import { CheckComponent } from '../common/input/check/check.component'
-import { HttpErrorResponse } from '@angular/common/http'
+import {
+  HttpErrorResponse,
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { SettingsService } from 'src/app/services/settings.service'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
@@ -134,17 +138,7 @@ describe('DocumentListComponent', () => {
         SafeHtmlPipe,
         IsNumberPipe,
       ],
-      providers: [
-        FilterPipe,
-        CustomDatePipe,
-        DatePipe,
-        DocumentTitlePipe,
-        UsernamePipe,
-        SafeHtmlPipe,
-        PermissionsGuard,
-      ],
       imports: [
-        HttpClientTestingModule,
         RouterTestingModule.withRoutes(routes),
         FormsModule,
         ReactiveFormsModule,
@@ -155,6 +149,17 @@ describe('DocumentListComponent', () => {
         NgxBootstrapIconsModule.pick(allIcons),
         NgSelectModule,
         NgbTypeaheadModule,
+      ],
+      providers: [
+        FilterPipe,
+        CustomDatePipe,
+        DatePipe,
+        DocumentTitlePipe,
+        UsernamePipe,
+        SafeHtmlPipe,
+        PermissionsGuard,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 

@@ -5,7 +5,7 @@ import {
   tick,
 } from '@angular/core/testing'
 import { CustomFieldsDropdownComponent } from './custom-fields-dropdown.component'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ToastService } from 'src/app/services/toast.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { of } from 'rxjs'
@@ -22,6 +22,7 @@ import {
 import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { By } from '@angular/platform-browser'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const fields: CustomField[] = [
   {
@@ -47,13 +48,16 @@ describe('CustomFieldsDropdownComponent', () => {
     TestBed.configureTestingModule({
       declarations: [CustomFieldsDropdownComponent, SelectComponent],
       imports: [
-        HttpClientTestingModule,
         NgSelectModule,
         FormsModule,
         ReactiveFormsModule,
         NgbModalModule,
         NgbDropdownModule,
         NgxBootstrapIconsModule.pick(allIcons),
+      ],
+      providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     })
     customFieldService = TestBed.inject(CustomFieldsService)

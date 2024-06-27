@@ -1,11 +1,12 @@
 import {
-  HttpClientTestingModule,
   HttpTestingController,
+  provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import { AbstractPaperlessService } from './abstract-paperless-service'
 import { Subscription } from 'rxjs'
 import { TestBed } from '@angular/core/testing'
 import { environment } from 'src/environments/environment'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 let httpTestingController: HttpTestingController
 let service: AbstractPaperlessService<any>
@@ -115,9 +116,13 @@ export const commonAbstractPaperlessServiceTests = (endpoint, ServiceClass) => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ServiceClass],
-      imports: [HttpClientTestingModule],
       teardown: { destroyAfterEach: true },
+      imports: [],
+      providers: [
+        ServiceClass,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
     })
 
     httpTestingController = TestBed.inject(HttpTestingController)

@@ -1,4 +1,4 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import {
   FormsModule,
@@ -10,6 +10,7 @@ import { of, throwError } from 'rxjs'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { DocumentLinkComponent } from './document-link.component'
 import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const documents = [
   {
@@ -38,11 +39,10 @@ describe('DocumentLinkComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [DocumentLinkComponent],
-      imports: [
-        HttpClientTestingModule,
-        NgSelectModule,
-        FormsModule,
-        ReactiveFormsModule,
+      imports: [NgSelectModule, FormsModule, ReactiveFormsModule],
+      providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     })
     documentService = TestBed.inject(DocumentService)

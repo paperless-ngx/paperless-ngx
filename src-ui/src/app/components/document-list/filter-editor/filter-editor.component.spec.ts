@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common'
 import {
-  HttpClientTestingModule,
   HttpTestingController,
+  provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import {
   ComponentFixture,
@@ -94,6 +94,7 @@ import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { RouterModule } from '@angular/router'
 import { SearchService } from 'src/app/services/rest/search.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const tags: Tag[] = [
   {
@@ -181,6 +182,15 @@ describe('FilterEditorComponent', () => {
         DatesDropdownComponent,
         CustomDatePipe,
       ],
+      imports: [
+        RouterModule,
+        NgbDropdownModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NgbDatepickerModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+        NgbTypeaheadModule,
+      ],
       providers: [
         FilterPipe,
         CustomDatePipe,
@@ -222,16 +232,8 @@ describe('FilterEditorComponent', () => {
           },
         },
         SettingsService,
-      ],
-      imports: [
-        HttpClientTestingModule,
-        RouterModule,
-        NgbDropdownModule,
-        FormsModule,
-        ReactiveFormsModule,
-        NgbDatepickerModule,
-        NgxBootstrapIconsModule.pick(allIcons),
-        NgbTypeaheadModule,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 
