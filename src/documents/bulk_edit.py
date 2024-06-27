@@ -10,6 +10,7 @@ from celery import chord
 from celery import group
 from celery import shared_task
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.db.models import Q
 
 from documents.data_models import ConsumableDocument
@@ -243,6 +244,7 @@ def merge(
     doc_ids: list[int],
     metadata_document_id: Optional[int] = None,
     delete_originals: bool = False,
+    user: User = None,
 ):
     logger.info(
         f"Attempting to merge {len(doc_ids)} documents into a single document.",
@@ -285,6 +287,9 @@ def merge(
     else:
         overrides = DocumentMetadataOverrides()
 
+    if user is not None:
+        overrides.owner_id = user.id
+
     logger.info("Adding merged document to the task queue.")
 
     consume_task = consume_file.s(
@@ -306,7 +311,12 @@ def merge(
     return "OK"
 
 
-def split(doc_ids: list[int], pages: list[list[int]], delete_originals: bool = False):
+def split(
+    doc_ids: list[int],
+    pages: list[list[int]],
+    delete_originals: bool = False,
+    user: User = None,
+):
     logger.info(
         f"Attempting to split document {doc_ids[0]} into {len(pages)} documents",
     )
@@ -331,6 +341,8 @@ def split(doc_ids: list[int], pages: list[list[int]], delete_originals: bool = F
 
                 overrides = DocumentMetadataOverrides().from_document(doc)
                 overrides.title = f"{doc.title} (split {idx + 1})"
+                if user is not None:
+                    overrides.owner_id = user.id
                 logger.info(
                     f"Adding split document with pages {split_doc} to the task queue.",
                 )

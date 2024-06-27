@@ -20,6 +20,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         super().setUp()
 
         user = User.objects.create_superuser(username="temp_admin")
+        self.user = user
         self.client.force_authenticate(user=user)
 
         patcher = mock.patch("documents.bulk_edit.bulk_update_documents.delay")
@@ -993,6 +994,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         args, kwargs = m.call_args
         self.assertCountEqual(args[0], [self.doc2.id, self.doc3.id])
         self.assertEqual(kwargs["metadata_document_id"], self.doc3.id)
+        self.assertEqual(kwargs["user"], self.user)
 
     @mock.patch("documents.serialisers.bulk_edit.merge")
     def test_merge_and_delete_insufficient_permissions(self, m):
@@ -1092,6 +1094,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         args, kwargs = m.call_args
         self.assertCountEqual(args[0], [self.doc2.id])
         self.assertEqual(kwargs["pages"], [[1], [2, 3, 4], [5, 6], [7]])
+        self.assertEqual(kwargs["user"], self.user)
 
     def test_split_invalid_params(self):
         response = self.client.post(
