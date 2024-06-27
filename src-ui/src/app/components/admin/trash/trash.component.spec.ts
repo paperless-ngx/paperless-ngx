@@ -11,10 +11,11 @@ import {
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { TrashService } from 'src/app/services/trash.service'
-import { of } from 'rxjs'
+import { of, throwError } from 'rxjs'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { By } from '@angular/platform-browser'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
+import { ToastService } from 'src/app/services/toast.service'
 
 const documentsInTrash = [
   {
@@ -36,6 +37,7 @@ describe('TrashComponent', () => {
   let fixture: ComponentFixture<TrashComponent>
   let trashService: TrashService
   let modalService: NgbModal
+  let toastService: ToastService
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -58,6 +60,7 @@ describe('TrashComponent', () => {
     fixture = TestBed.createComponent(TrashComponent)
     trashService = TestBed.inject(TrashService)
     modalService = TestBed.inject(NgbModal)
+    toastService = TestBed.inject(ToastService)
     component = fixture.componentInstance
     fixture.detectChanges()
   })
@@ -76,12 +79,20 @@ describe('TrashComponent', () => {
     expect(component.documentsInTrash).toEqual(documentsInTrash)
   })
 
-  it('should support delete document', () => {
+  it('should support delete document, show error if needed', () => {
     const trashSpy = jest.spyOn(trashService, 'emptyTrash')
     let modal
     modalService.activeInstances.subscribe((instances) => {
       modal = instances[0]
     })
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+
+    // fail first
+    trashSpy.mockReturnValue(throwError(() => 'Error'))
+    component.delete(documentsInTrash[0])
+    modal.componentInstance.confirmClicked.next()
+    expect(toastErrorSpy).toHaveBeenCalled()
+
     trashSpy.mockReturnValue(of('OK'))
     component.delete(documentsInTrash[0])
     expect(modal).toBeDefined()
@@ -89,12 +100,20 @@ describe('TrashComponent', () => {
     expect(trashSpy).toHaveBeenCalled()
   })
 
-  it('should support empty trash', () => {
+  it('should support empty trash, show error if needed', () => {
     const trashSpy = jest.spyOn(trashService, 'emptyTrash')
     let modal
     modalService.activeInstances.subscribe((instances) => {
       modal = instances[instances.length - 1]
     })
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+
+    // fail first
+    trashSpy.mockReturnValue(throwError(() => 'Error'))
+    component.emptyTrash()
+    modal.componentInstance.confirmClicked.next()
+    expect(toastErrorSpy).toHaveBeenCalled()
+
     trashSpy.mockReturnValue(of('OK'))
     component.emptyTrash()
     expect(modal).toBeDefined()
@@ -106,18 +125,34 @@ describe('TrashComponent', () => {
     expect(trashSpy).toHaveBeenCalledWith([1, 2])
   })
 
-  it('should support restore document', () => {
+  it('should support restore document, show error if needed', () => {
     const restoreSpy = jest.spyOn(trashService, 'restoreDocuments')
     const reloadSpy = jest.spyOn(component, 'reload')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+
+    // fail first
+    restoreSpy.mockReturnValue(throwError(() => 'Error'))
+    component.restore(documentsInTrash[0])
+    expect(toastErrorSpy).toHaveBeenCalled()
+    expect(reloadSpy).not.toHaveBeenCalled()
+
     restoreSpy.mockReturnValue(of('OK'))
     component.restore(documentsInTrash[0])
     expect(restoreSpy).toHaveBeenCalledWith([documentsInTrash[0].id])
     expect(reloadSpy).toHaveBeenCalled()
   })
 
-  it('should support restore all documents', () => {
+  it('should support restore all documents, show error if needed', () => {
     const restoreSpy = jest.spyOn(trashService, 'restoreDocuments')
     const reloadSpy = jest.spyOn(component, 'reload')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+
+    // fail first
+    restoreSpy.mockReturnValue(throwError(() => 'Error'))
+    component.restoreAll()
+    expect(toastErrorSpy).toHaveBeenCalled()
+    expect(reloadSpy).not.toHaveBeenCalled()
+
     restoreSpy.mockReturnValue(of('OK'))
     component.restoreAll()
     expect(restoreSpy).toHaveBeenCalled()

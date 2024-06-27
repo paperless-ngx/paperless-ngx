@@ -276,3 +276,17 @@ class ObjectOwnedOrGrantedPermissionsFilter(ObjectPermissionsFilter):
         objects_owned = queryset.filter(owner=request.user)
         objects_unowned = queryset.filter(owner__isnull=True)
         return objects_with_perms | objects_owned | objects_unowned
+
+
+class ObjectOwnedPermissionsFilter(ObjectPermissionsFilter):
+    """
+    A filter backend that limits results to those where the requesting user
+    owns the objects or objects without an owner (for backwards compat)
+    """
+
+    def filter_queryset(self, request, queryset, view):
+        if request.user.is_superuser:
+            return queryset
+        objects_owned = queryset.filter(owner=request.user)
+        objects_unowned = queryset.filter(owner__isnull=True)
+        return objects_owned | objects_unowned
