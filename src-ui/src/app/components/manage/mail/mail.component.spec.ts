@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { MailComponent } from './mail.component'
 import { DatePipe } from '@angular/common'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { RouterTestingModule } from '@angular/router/testing'
 import {
   NgbModule,
@@ -42,6 +42,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { SwitchComponent } from '../../common/input/switch/switch.component'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const mailAccounts = [
   { id: 1, name: 'account1' },
@@ -85,16 +86,21 @@ describe('MailComponent', () => {
         PermissionsFormComponent,
         SwitchComponent,
       ],
-      providers: [CustomDatePipe, DatePipe, PermissionsGuard],
       imports: [
         NgbModule,
-        HttpClientTestingModule,
         RouterTestingModule.withRoutes(routes),
         FormsModule,
         ReactiveFormsModule,
         NgbAlertModule,
         NgSelectModule,
         NgxBootstrapIconsModule.pick(allIcons),
+      ],
+      providers: [
+        CustomDatePipe,
+        DatePipe,
+        PermissionsGuard,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 

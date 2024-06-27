@@ -2,10 +2,11 @@ import { TestBed } from '@angular/core/testing'
 
 import { ProfileService } from './profile.service'
 import {
-  HttpClientTestingModule,
   HttpTestingController,
+  provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import { environment } from 'src/environments/environment'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('ProfileService', () => {
   let httpTestingController: HttpTestingController
@@ -13,8 +14,12 @@ describe('ProfileService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ProfileService],
-      imports: [HttpClientTestingModule],
+      imports: [],
+      providers: [
+        ProfileService,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
     })
 
     httpTestingController = TestBed.inject(HttpTestingController)

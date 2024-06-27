@@ -2,8 +2,8 @@ import { TestBed } from '@angular/core/testing'
 import { StatisticsWidgetComponent } from './statistics-widget.component'
 import { ComponentFixture } from '@angular/core/testing'
 import {
-  HttpClientTestingModule,
   HttpTestingController,
+  provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
@@ -18,6 +18,7 @@ import {
 } from 'src/app/services/consumer-status.service'
 import { Subject } from 'rxjs'
 import { DragDropModule } from '@angular/cdk/drag-drop'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('StatisticsWidgetComponent', () => {
   let component: StatisticsWidgetComponent
@@ -33,12 +34,15 @@ describe('StatisticsWidgetComponent', () => {
         WidgetFrameComponent,
         IfPermissionsDirective,
       ],
-      providers: [PermissionsGuard],
       imports: [
-        HttpClientTestingModule,
         NgbModule,
         RouterTestingModule.withRoutes(routes),
         DragDropModule,
+      ],
+      providers: [
+        PermissionsGuard,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 
