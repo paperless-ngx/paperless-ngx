@@ -109,7 +109,7 @@ class TestTikaParser(HttpxMockMixin, TestCase):
         for setting, expected_key in [
             ("pdfa", "PDF/A-2b"),
             ("pdfa-2", "PDF/A-2b"),
-            ("pdfa-1", "PDF/A-1a"),
+            ("pdfa-1", "PDF/A-2b"),
             ("pdfa-3", "PDF/A-3b"),
         ]:
             with override_settings(OCR_OUTPUT_TYPE=setting):
@@ -124,9 +124,10 @@ class TestTikaParser(HttpxMockMixin, TestCase):
                 request = self.httpx_mock.get_request()
                 found = False
                 for field in request.stream.fields:
-                    if isinstance(field, DataField) and field.name == "pdfFormat":
+                    if isinstance(field, DataField) and field.name == "pdfa":
                         self.assertEqual(field.value, expected_key)
                         found = True
+                        break
                 self.assertTrue(found)
 
                 self.httpx_mock.reset(assert_all_responses_were_requested=False)
