@@ -1,74 +1,69 @@
-// import { DatePipe } from '@angular/common'
-// import { HttpClientTestingModule } from '@angular/common/http/testing'
-// import { ComponentFixture, TestBed } from '@angular/core/testing'
-// import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-// import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
-// import { of } from 'rxjs'
-// import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-// import { SortableDirective } from 'src/app/directives/sortable.directive'
-// import { WarehouseService } from 'src/app/services/rest/warehouse.service'
-// import { PageHeaderComponent } from '../../common/page-header/page-header.component'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-// import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
-// import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-// import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-// import { CustomFieldsComponent } from './CustomFieldsComponent'
 
-// describe('CustomFieldsComponent', () => {
-//   let component: CustomFieldsComponent
-//   let fixture: ComponentFixture<CustomFieldsComponent>
-//   let customfieldsService: CustomFieldsService
+import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgSelectModule } from '@ng-select/ng-select'
+import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
+import { SettingsService } from 'src/app/services/settings.service'
+import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { SelectComponent } from '../../common/input/select/select.component'
+import { TextComponent } from '../../common/input/text/text.component'
+import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 
-//   beforeEach(async () => {
-//     TestBed.configureTestingModule({
-//       declarations: [
-//         CustomFieldsComponent,
-//         SortableDirective,
-//         PageHeaderComponent,
-//         IfPermissionsDirective,
-//         SafeHtmlPipe,
-//       ],
-//       providers: [DatePipe],
-//       imports: [
-//         HttpClientTestingModule,
-//         NgbPaginationModule,
-//         FormsModule,
-//         ReactiveFormsModule,
-//         NgxBootstrapIconsModule.pick(allIcons),
-//       ],
-//     }).compileComponents()
 
-//     customfieldsService = TestBed.inject(CustomFieldsService)
-//     jest.spyOn(customfieldsService, 'listFiltered').mockReturnValue(
-//       of({
-//         count: 3,
-//         all: [1, 2, 3],
-//         results: [
-//           {
-//             id: 1,
-//             name: 'Warehouse1',
-//           },
-//           {
-//             id: 2,
-//             name: 'Warehouse2',
-//           },
-//           {
-//             id: 3,
-//             name: 'Warehouse3',
-//           },
-//         ],
-//       })
-//     )
-//     fixture = TestBed.createComponent(CustomFieldsComponent)
-//     component = fixture.componentInstance
-//     fixture.detectChanges()
-//   })
+describe('CustomFieldEditDialogComponent', () => {
+    let component: CustomFieldEditDialogComponent
+    let settingsService: SettingsService
+    let fixture: ComponentFixture<CustomFieldEditDialogComponent>
 
-//   // Tests are included in management-list.component.spec.ts
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            declarations: [
+                CustomFieldEditDialogComponent,
+                IfPermissionsDirective,
+                IfOwnerDirective,
+                SelectComponent,
+                TextComponent,
+                SafeHtmlPipe,
+            ],
+            providers: [NgbActiveModal],
+            imports: [
+                HttpClientTestingModule,
+                FormsModule,
+                ReactiveFormsModule,
+                NgSelectModule,
+                NgbModule,
+            ],
+        }).compileComponents()
 
-//   it('should use correct delete message', () => {
-//     expect(component.getDeleteMessage({ id: 1, name: 'Warehouse1' })).toEqual(
-//       'Do you really want to delete the warehouse "Warehouse1"?'
-//     )
-//   })
-// })
+        fixture = TestBed.createComponent(CustomFieldEditDialogComponent)
+        settingsService = TestBed.inject(SettingsService)
+        settingsService.currentUser = { id: 99, username: 'user99' }
+        component = fixture.componentInstance
+
+        fixture.detectChanges()
+    })
+
+    it('should support create and edit modes', () => {
+        component.dialogMode = EditDialogMode.CREATE
+        const createTitleSpy = jest.spyOn(component, 'getCreateTitle')
+        const editTitleSpy = jest.spyOn(component, 'getEditTitle')
+        fixture.detectChanges()
+        expect(createTitleSpy).toHaveBeenCalled()
+        expect(editTitleSpy).not.toHaveBeenCalled()
+        component.dialogMode = EditDialogMode.EDIT
+        fixture.detectChanges()
+        expect(editTitleSpy).toHaveBeenCalled()
+    })
+
+    it('should disable data type select on edit', () => {
+        component.dialogMode = EditDialogMode.EDIT
+        fixture.detectChanges()
+        component.ngOnInit()
+        expect(component.objectForm.get('data_type').disabled).toBeTruthy()
+    })
+})

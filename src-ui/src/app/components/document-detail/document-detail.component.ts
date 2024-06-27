@@ -66,14 +66,14 @@ import { EditDialogMode } from '../common/edit-dialog/edit-dialog.component'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { FilterRule } from 'src/app/data/filter-rule'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
-import { CustomField } from 'src/app/data/custom-field'
+import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { PDFDocumentProxy } from '../common/pdf-viewer/typings'
 import { SplitConfirmDialogComponent } from '../common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
 import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { WarehouseService } from 'src/app/services/rest/warehouse.service'
-import { CustomFieldDataType } from 'src/app/data/customfields'
+
 
 enum DocumentDetailNavIDs {
   Details = 1,

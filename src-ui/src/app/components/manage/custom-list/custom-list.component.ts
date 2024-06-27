@@ -36,8 +36,11 @@ import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dial
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
-import { CustomService } from 'src/app/services/common-service/service-custom'
+
 import { ActivatedRoute } from '@angular/router'
+
+import { CustomService } from 'src/app/services/common-service/service-shelf'
+import { EditCustomShelfdMode } from '../../common/edit-dialog/edit-customshelf/edit-customshelf.component'
 
 export interface ManagementListColumn {
   key: string
@@ -94,7 +97,7 @@ export abstract class CustomListComponent<T extends ObjectWithId>
   public togggleAll: boolean = false
 
   ngOnInit(): void {
-    this.reloadData()
+    ///this.reloadData()
 
     this.nameFilterDebounce = new Subject<string>()
 
@@ -107,7 +110,8 @@ export abstract class CustomListComponent<T extends ObjectWithId>
       .subscribe((title) => {
         this._nameFilter = title
         this.page = 1
-        this.reloadData()
+        //this.reloadData()
+
       })
     //
     this.route.params.subscribe(params => {
@@ -117,17 +121,33 @@ export abstract class CustomListComponent<T extends ObjectWithId>
 
   }
 
+
   getDocuments(id: any) {
-    this.customService.getDocuments(id).subscribe(
+    this.customService.getDocuments(id,
+      this.page,
+      null,
+      this.sortField,
+      this.sortReverse,
+    ).subscribe(
       data => {
-        this.documents = data.results;
-        console.log('Documents:', this.documents);
+        if (data.results && data.results.length > 0) {
+          this.data = data.results;
+          this.collectionSize = data.count;
+        } else {
+          this.data = [];
+          this.collectionSize = 0;
+          this.toastService.showInfo('No display data');//thông báo khi không có dữ liệu
+        }
+        this.isLoading = false;
       },
       error => {
-        console.error('Đã xảy ra lỗi!', error);
+        console.error('Error! An error occurred. Please try again later!', error);
+        this.isLoading = false;
       }
     );
   }
+
+
 
   ngOnDestroy() {
     this.unsubscribeNotifier.next(true)
@@ -150,7 +170,6 @@ export abstract class CustomListComponent<T extends ObjectWithId>
   onSort(event: SortEvent) {
     this.sortField = event.column
     this.sortReverse = event.reverse
-    this.reloadData()
   }
 
   reloadData() {
@@ -176,9 +195,10 @@ export abstract class CustomListComponent<T extends ObjectWithId>
     var activeModal = this.modalService.open(this.editDialogComponent, {
       backdrop: 'static',
     })
-    activeModal.componentInstance.dialogMode = EditDialogMode.CREATE
+    activeModal.componentInstance.object = { parent_warehouse: this.id }
+    activeModal.componentInstance.dialogMode = EditCustomShelfdMode.CREATE
     activeModal.componentInstance.succeeded.subscribe(() => {
-      this.reloadData()
+      this.getDocuments(this.id);
       this.toastService.showInfo(
         $localize`Successfully created ${this.typeName}.`
       )
@@ -196,9 +216,9 @@ export abstract class CustomListComponent<T extends ObjectWithId>
       backdrop: 'static',
     })
     activeModal.componentInstance.object = object
-    activeModal.componentInstance.dialogMode = EditDialogMode.EDIT
+    activeModal.componentInstance.dialogMode = EditCustomShelfdMode.EDIT
     activeModal.componentInstance.succeeded.subscribe(() => {
-      this.reloadData()
+      this.getDocuments(this.id);
       this.toastService.showInfo(
         $localize`Successfully updated ${this.typeName}.`
       )
@@ -236,7 +256,8 @@ export abstract class CustomListComponent<T extends ObjectWithId>
         .subscribe({
           next: () => {
             activeModal.close()
-            this.reloadData()
+            this.getDocuments(this.id);
+            //this.reloadData()
           },
           error: (error) => {
             activeModal.componentInstance.buttonsEnabled = true
@@ -322,7 +343,8 @@ export abstract class CustomListComponent<T extends ObjectWithId>
               this.toastService.showInfo(
                 $localize`Permissions updated successfully`
               )
-              this.reloadData()
+              this.getDocuments(this.id);
+              //this.reloadData()
             },
             error: (error) => {
               modal.componentInstance.buttonsEnabled = true
@@ -356,7 +378,8 @@ export abstract class CustomListComponent<T extends ObjectWithId>
           next: () => {
             modal.close()
             this.toastService.showInfo($localize`Objects deleted successfully`)
-            this.reloadData()
+            this.getDocuments(this.id);
+            //this.reloadData()
           },
           error: (error) => {
             modal.componentInstance.buttonsEnabled = true

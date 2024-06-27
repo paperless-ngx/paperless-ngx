@@ -85,8 +85,7 @@ const TRIGGER_MATCHING_ALGORITHMS = MATCHING_ALGORITHMS.filter(
 })
 export class WorkflowEditDialogComponent
   extends EditDialogComponent<Workflow>
-  implements OnInit
-{
+  implements OnInit {
   public WorkflowTriggerType = WorkflowTriggerType
   public WorkflowActionType = WorkflowActionType
 

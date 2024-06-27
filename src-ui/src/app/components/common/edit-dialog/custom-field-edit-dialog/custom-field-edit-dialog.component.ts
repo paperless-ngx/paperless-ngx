@@ -1,21 +1,20 @@
 import { Component, OnInit } from '@angular/core'
 import { FormGroup, FormControl } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { CustomField } from 'src/app/data/custom-field'
+import { DATA_TYPE_LABELS, CustomField } from 'src/app/data/custom-field'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { EditDialogComponent, EditDialogMode } from '../edit-dialog.component'
-import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
-import { EditCustomfieldComponent } from '../edit-customfield/edit-customfield.component'
 
 @Component({
   selector: 'pngx-custom-field-edit-dialog',
   templateUrl: './custom-field-edit-dialog.component.html',
   styleUrls: ['./custom-field-edit-dialog.component.scss'],
 })
-
-export class CustomFieldEditDialogComponent extends EditDialogComponent<CustomField> {
+export class CustomFieldEditDialogComponent
+  extends EditDialogComponent<CustomField>
+  implements OnInit {
   constructor(
     service: CustomFieldsService,
     activeModal: NgbActiveModal,
@@ -25,24 +24,33 @@ export class CustomFieldEditDialogComponent extends EditDialogComponent<CustomFi
     super(service, activeModal, userService, settingsService)
   }
 
+  ngOnInit(): void {
+    super.ngOnInit()
+    if (this.typeFieldDisabled) {
+      this.objectForm.get('data_type').disable()
+    }
+  }
+
   getCreateTitle() {
-    return $localize`Create new customfield`
+    return $localize`Create new custom field`
   }
 
   getEditTitle() {
-    return $localize`Edit customfield`
+    return $localize`Edit custom field`
   }
 
   getForm(): FormGroup {
     return new FormGroup({
-      name: new FormControl(''),
-      type: new FormControl('Shelf'),
-      parent_warehouse: new FormControl(''),
-      matching_algorithm: new FormControl(DEFAULT_MATCHING_ALGORITHM),
-      match: new FormControl(''),
-      is_insensitive: new FormControl(true),
-      permissions_form: new FormControl(null),
+      name: new FormControl(null),
+      data_type: new FormControl(null),
     })
   }
-}
 
+  getDataTypes() {
+    return DATA_TYPE_LABELS
+  }
+
+  get typeFieldDisabled(): boolean {
+    return this.dialogMode === EditDialogMode.EDIT
+  }
+}

@@ -61,6 +61,11 @@ export const FILTER_BOX = 56
 export const FILTER_HAS_BOX_ANY = 57
 export const FILTER_DOES_NOT_HAVE_BOX = 58
 
+//export const Shelf= 36
+export const FILTER_CUSTOM_SHELF = 59
+export const FILTER_HAS_CUSTOM_SHELF_ANY = 60
+export const FILTER_DOES_NOT_HAVE_CUSTOM_SHELF = 61
+
 export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
     id: FILTER_TITLE,
@@ -177,6 +182,26 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     id: FILTER_DOES_NOT_HAVE_BOX,
     filtervar: 'boxs__id__none',
     datatype: 'box',
+    multi: true,
+  },
+  //Shelf
+  {
+    id: FILTER_CUSTOM_SHELF,
+    filtervar: 'shelfs__id',
+    isnull_filtervar: 'shelfs__isnull',
+    datatype: 'shelf',
+    multi: false,
+  },
+  {
+    id: FILTER_HAS_CUSTOM_SHELF_ANY,
+    filtervar: 'shelfs__id__in',
+    datatype: 'shelf',
+    multi: true,
+  },
+  {
+    id: FILTER_DOES_NOT_HAVE_CUSTOM_SHELF,
+    filtervar: 'shelfs__id__none',
+    datatype: 'shelf',
     multi: true,
   },
 

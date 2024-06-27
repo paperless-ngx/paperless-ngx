@@ -207,6 +207,10 @@ class DocumentFilterSet(FilterSet):
     custom_fields__icontains = CustomFieldsFilter()
 
     shared_by__id = SharedByUser()
+
+    warehouse__id__in = NumberFilter(method='filter_by_warehouse')
+    shelfs__id__in = NumberFilter(method='filter_by_warehouse')
+    boxs__id__in = NumberFilter(method='filter_by_warehouse')
     
     warehouse__id = NumberFilter(method='filter_by_warehouse')
 

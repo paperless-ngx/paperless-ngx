@@ -39,7 +39,7 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 import { ShareLink } from 'src/app/data/share-link'
 import { environment } from 'src/environments/environment'
-import { Router } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 
 export interface ManagementListColumn {
   key: string
@@ -55,7 +55,8 @@ export interface ManagementListColumn {
 export abstract class WarehouseComponent<T extends ObjectWithId>
   extends ComponentWithPermissions
   implements OnInit, OnDestroy {
-  [x: string]: any
+  documents: any[] = [];
+  id: any;
   constructor(
     private service: AbstractNameFilterService<T>,
     private modalService: NgbModal,
@@ -91,7 +92,7 @@ export abstract class WarehouseComponent<T extends ObjectWithId>
 
   public selectedObjects: Set<number> = new Set()
   public togggleAll: boolean = false
-  public shareLinks: ShareLink[]
+
 
 
   ngOnInit(): void {
@@ -111,6 +112,8 @@ export abstract class WarehouseComponent<T extends ObjectWithId>
         this.reloadData()
       })
   }
+
+
 
   ngOnDestroy() {
     this.unsubscribeNotifier.next(true)
@@ -351,12 +354,4 @@ export abstract class WarehouseComponent<T extends ObjectWithId>
         })
     })
   }
-  // getShareUrl(link: ShareLink): string {
-  //   const apiURL = new URL(environment.apiBaseUrl)
-  //   return `${apiURL.origin}${apiURL.pathname.replace(/\/api\/$/, '/share/')}${link.slug
-  //     }`
-  // }
-  // share(link: ShareLink) {
-  //   navigator.share({ url: this.getShareUrl(link) })
-  // }
 }

@@ -7,6 +7,7 @@ import { Box } from "src/app/data/box";
     providedIn: 'root',
 })
 export class BoxService extends AbstractNameFilterService<Box> {
+    [x: string]: any;
     constructor(http: HttpClient) {
         super(http, 'warehouses')
     }

@@ -101,8 +101,8 @@ import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
-import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
-import { CustomFieldsDropdownComponent } from './components/common/custom-fields-dropdown/custom-fields-dropdown.component'
+//import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
+//import { CustomFieldsDropdownComponent } from './components/common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { ProfileEditDialogComponent } from './components/common/profile-edit-dialog/profile-edit-dialog.component'
 import { PdfViewerComponent } from './components/common/pdf-viewer/pdf-viewer.component'
 import { DocumentLinkComponent } from './components/common/input/document-link/document-link.component'
@@ -337,13 +337,14 @@ import localeTr from '@angular/common/locales/tr'
 import localeUk from '@angular/common/locales/uk'
 import localeZh from '@angular/common/locales/zh'
 import localeVi from '@angular/common/locales/vi'
-import { CustomShelfEditDialogComponent } from './components/common/custom-shelf-edit-dialog/custom-shelf-edit-dialog.component'
-import { KhoVatLyComponent } from './components/manage/kho-vat-ly/KhoVatLyComponent'
 import { BoxFieldsComponent } from './components/manage/box-fields/box-fields.component'
 import { WarehouseEditDialogComponent } from './components/common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
 import { WarehouseListComponent } from './components/manage/warehouse-list/warehouse-list.component'
 import { BoxEditDialogComponent } from './components/common/edit-dialog/box-edit-dialog/box-edit-dialog.component'
 import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { CustomShelfComponent } from './components/manage/custom-shelf/custom-shelf.component'
+import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
+import { CustomShelfEditDialogComponent } from './components/common/edit-dialog/custom-shelf-edit-dialog/custom-shelf-edit-dialog.component'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -389,8 +390,8 @@ function initializeApp(settings: SettingsService) {
     CustomFieldEditDialogComponent,
     CustomFieldsComponent,
     //BoxListComponent,
+    CustomShelfComponent,
     BoxEditDialogComponent,
-    KhoVatLyComponent,
     AppComponent,
     DocumentListComponent,
     DocumentDetailComponent,
@@ -474,7 +475,7 @@ function initializeApp(settings: SettingsService) {
     CustomFieldsComponent,
     BoxFieldsComponent,
     CustomShelfEditDialogComponent,
-    CustomFieldsDropdownComponent,
+    //CustomFieldsDropdownComponent,
     ProfileEditDialogComponent,
     PdfViewerComponent,
     DocumentLinkComponent,

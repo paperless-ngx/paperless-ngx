@@ -12,6 +12,7 @@ import { ToastService } from 'src/app/services/toast.service'
 import { WarehouseEditDialogComponent } from '../../common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
 import { ManagementListComponent } from '../management-list/management-list.component'
 import { WarehouseComponent } from '../warehouse/warehouse.component'
+import { ActivatedRoute } from '@angular/router'
 
 @Component({
   selector: 'app-warehouse-list',

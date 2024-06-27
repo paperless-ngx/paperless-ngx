@@ -8,6 +8,8 @@ import { Box } from 'src/app/data/box';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { BoxEditDialogComponent } from '../../common/edit-dialog/box-edit-dialog/box-edit-dialog.component';
 import { FILTER_HAS_BOX_ANY } from 'src/app/data/filter-rule-type';
+import { BoxsServices } from 'src/app/services/common-service/service-box';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'pngx-box-fields',
@@ -20,7 +22,9 @@ export class BoxFieldsComponent extends BoxListComponent<Box> {
     modalService: NgbModal,
     toastService: ToastService,
     documentListViewService: DocumentListViewService,
-    permissionsService: PermissionsService
+    permissionsService: PermissionsService,
+    boxsService: BoxsServices,
+    route: ActivatedRoute
   ) {
     super(
       boxService,
@@ -42,7 +46,9 @@ export class BoxFieldsComponent extends BoxListComponent<Box> {
             return c.type
           },
         },
-      ]
+      ],
+      boxsService,
+      route
     )
   }
 
