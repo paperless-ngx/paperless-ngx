@@ -30,7 +30,8 @@ export enum PermissionType {
   CustomField = '%s_customfield',
   Workflow = '%s_workflow',
   Box = '%s_box',
-  Shelf = '%s_shelf'
+  Shelf = '%s_shelf',
+  Approval = '%s_approval',
 }
 
 @Injectable({

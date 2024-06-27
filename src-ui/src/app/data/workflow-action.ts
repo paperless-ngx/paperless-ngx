@@ -3,9 +3,13 @@ import { ObjectWithId } from './object-with-id'
 export enum WorkflowActionType {
   Assignment = 1,
   Removal = 2,
+  Assignment_with_approval = 3,
+  Removal_with_approval = 4
 }
 export interface WorkflowAction extends ObjectWithId {
   type: WorkflowActionType
+
+  assign_content_type?: number
 
   assign_title?: string
 

@@ -6,6 +6,7 @@ import re
 import zoneinfo
 from decimal import Decimal
 
+from django.apps import apps
 import magic
 from celery import states
 from django.conf import settings
@@ -31,7 +32,7 @@ from rest_framework.fields import SerializerMethodField
 
 from documents import bulk_edit
 from documents.data_models import DocumentSource
-from documents.models import Correspondent
+from documents.models import Approval, Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
@@ -50,7 +51,7 @@ from documents.models import WorkflowTrigger
 from documents.models import Warehouse
 from documents.models import Folder
 from documents.parsers import is_mime_type_supported
-from documents.permissions import get_groups_with_only_permission
+from documents.permissions import get_groups_with_only_permission, has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
 from documents.validators import uri_validator
 from documents.parsers import get_parser_class_for_mime_type
@@ -427,8 +428,7 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 class CorrespondentField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         return Correspondent.objects.all()
-
-
+    
 class TagsField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         return Tag.objects.all()
@@ -663,6 +663,7 @@ class DocumentSerializer(
     NestedUpdateMixin,
     DynamicFieldsModelSerializer,
 ):
+    approvals = serializers.SerializerMethodField(read_only=True)
     correspondent = CorrespondentField(allow_null=True)
     tags = TagsField(many=True)
     warehouse = WarehouseField(allow_null=True)
@@ -706,6 +707,39 @@ class DocumentSerializer(
     #     else: 
     #         return f"{file_size / (1024 * 1024 * 1024):.2f} GB"
     
+
+    exploit = serializers.SerializerMethodField(read_only=True)
+
+    def get_exploit(self, obj):
+        doc = Document.objects.get(pk=obj.pk)
+        current_user = self.context.get("request").user
+        
+        if current_user is not None and has_perms_owner_aware(
+            current_user,
+            "view_document",
+            doc,
+        ):
+            return 1
+        elif Approval.objects.filter(object_pk=obj.pk, status="PENDING", submitted_by=current_user):
+            return 2
+        else:
+            return 3
+        
+    
+
+    def get_approvals(self, obj):
+        doc = Document.objects.get(pk=obj.pk)
+        currentUser = self.context.get("request").user
+        if currentUser is not None and not has_perms_owner_aware(
+            currentUser,
+            "view_document",
+            doc,
+        ):
+            return None
+        approvals = Approval.objects.filter(object_pk=obj.pk, status="SUCCESS")
+        serializer = ApprovalSerializer(approvals, many=True)
+        return serializer.data
+
     def get_original_file_name(self, obj):
         return obj.original_filename
 
@@ -795,6 +829,7 @@ class DocumentSerializer(
         depth = 1
         fields = (
             "id",
+            "approvals",
             "correspondent",
             "document_type",
             "storage_path",
@@ -817,6 +852,7 @@ class DocumentSerializer(
             "set_permissions",
             "notes",
             "custom_fields",
+            "exploit",
             "remove_inbox_tags",
             
         ) 
@@ -1422,6 +1458,55 @@ class TasksViewSerializer(serializers.ModelSerializer):
 
         return result
 
+class ApprovalSerializer(serializers.ModelSerializer):
+    # submitted_by = serializers.ReadOnlyField(source='submitted_by.username')
+    ctype = serializers.ReadOnlyField(source='ctype.model')
+    # submitted_by_id = serializers.PrimaryKeyRelatedField(source='submitted_by', queryset=User.objects.all(), write_only=True, allow_null=True)
+    ctype_id = serializers.PrimaryKeyRelatedField(source='ctype', queryset=ContentType.objects.all(), write_only=True)
+    name = serializers.SerializerMethodField(read_only=True)
+
+    def get_name(self, obj):
+        if obj.ctype:
+            model_name = obj.ctype.name
+            model_class = apps.get_model(obj.ctype.app_label, model_name)
+            if model_class == Document:
+                return model_class.objects.get(id=int(obj.object_pk)).title
+        
+        return None
+    class Meta:
+        model = Approval
+        fields = "__all__"
+
+class ApprovalViewSerializer(serializers.Serializer):
+    approvals = serializers.ListField(
+        required=True,
+        label="approvals",
+        write_only=True,
+        child=serializers.IntegerField(),
+    )
+    status = serializers.CharField(required=True)
+
+    def _validate_approval_id_list(self, approvals, name="approvals"):
+        if not isinstance(approvals, list):
+            raise serializers.ValidationError(f"{name} must be a list")
+        if not all(isinstance(i, int) for i in approvals):
+            raise serializers.ValidationError(f"{name} must be a list of integers")
+        count = Approval.objects.filter(id__in=approvals).count()
+        if not count == len(approvals):
+            raise serializers.ValidationError(
+                f"Some tasks in {name} don't exist or were specified twice.",
+            )
+
+    def validate_approvals(self, approvals):
+        self._validate_approval_id_list(approvals)
+        return approvals
+
+    def validate_status(self, status):
+        valid_statuses = ["PENDING", "SUCCESS", "FAILURE", "REVOKED"]
+        if status not in valid_statuses:
+            raise serializers.ValidationError(
+                f"status must be one of: {', '.join(valid_statuses)}")
+        return status
 
 class AcknowledgeTasksViewSerializer(serializers.Serializer):
     tasks = serializers.ListField(
@@ -1596,6 +1681,10 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             "filter_has_tags",
             "filter_has_correspondent",
             "filter_has_document_type",
+            "filter_has_groups",
+            "filter_has_status",
+            "filter_has_content_type",
+            "filter_has_access_type",
         ]
 
     def validate(self, attrs):
@@ -1639,6 +1728,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "type",
+            "assign_content_type",
             "assign_title",
             "assign_tags",
             "assign_correspondent",
@@ -1731,12 +1821,15 @@ class WorkflowSerializer(serializers.ModelSerializer):
         if triggers is not None:
             for trigger in triggers:
                 filter_has_tags = trigger.pop("filter_has_tags", None)
+                filter_has_groups = trigger.pop("filter_has_groups", None)
                 trigger_instance, _ = WorkflowTrigger.objects.update_or_create(
                     id=trigger.get("id"),
                     defaults=trigger,
                 )
                 if filter_has_tags is not None:
                     trigger_instance.filter_has_tags.set(filter_has_tags)
+                if filter_has_groups is not None:
+                    trigger_instance.filter_has_groups.set(filter_has_groups)
                 set_triggers.append(trigger_instance)
 
         if actions is not None:

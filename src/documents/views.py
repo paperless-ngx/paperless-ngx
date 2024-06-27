@@ -14,11 +14,13 @@ from time import mktime
 from unicodedata import normalize
 from urllib.parse import quote
 from urllib.parse import urlparse
+import pandas as pd
 
 import pathvalidate
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.db import connections
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
@@ -109,7 +111,7 @@ from documents.matching import match_storage_paths
 from documents.matching import match_warehouses
 from documents.matching import match_folders
 from documents.matching import match_tags
-from documents.models import Correspondent
+from documents.models import Approval, Correspondent, CustomFieldInstance
 from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
@@ -133,7 +135,7 @@ from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
-from documents.serialisers import AcknowledgeTasksViewSerializer
+from documents.serialisers import AcknowledgeTasksViewSerializer, ApprovalSerializer, ApprovalViewSerializer
 from documents.serialisers import BulkDownloadSerializer
 from documents.serialisers import BulkEditObjectsSerializer
 from documents.serialisers import BulkEditSerializer
@@ -157,6 +159,7 @@ from documents.serialisers import WarehouseSerializer
 from documents.serialisers import FolderSerializer
 
 from documents.signals import document_updated
+from documents.signals import approval_updated
 from documents.tasks import consume_file
 from paperless import version
 from paperless.celery import app as celery_app
@@ -601,6 +604,39 @@ class DocumentViewSet(
             return self.file_response(pk, request, "attachment")
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404
+        
+    @action(methods=["get"], detail=True)
+    def export_excel(self, request, pk=None):
+        try:
+           
+            document = Document.objects.get(pk=pk)
+            fields = CustomFieldInstance.objects.filter(document=pk)
+
+            # Tạo DataFrame từ dữ liệu
+            data = {
+                'Tiêu đề': [document.title],
+                'Nội dung': [document.content],
+                'Ngày tạo': [document.created.strftime('%d-%m-%Y')],
+            }
+
+            for f in fields:
+                data[f.field.name] = [f.value_text]
+
+            df = pd.DataFrame(data)
+
+            # Tên file Excel sẽ được tạo
+            excel_file_name = f"{document.title}.xlsx"
+
+            # Tạo response để trả về file Excel
+            response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = f'attachment; filename="{excel_file_name}"'
+
+            # Ghi DataFrame vào response dưới dạng Excel
+            df.to_excel(response, index=False)
+
+            return response
+        except (FileNotFoundError, Document.DoesNotExist):
+            raise Http404
 
     def getNotes(self, doc):
         return [
@@ -716,6 +752,109 @@ class DocumentViewSet(
 
             return Response(self.getNotes(doc))
 
+        return Response(
+            {
+                "error": "error",
+            },
+        )
+    
+    def get_approvals(self, doc:Document):
+        approvals = Approval.objects.get(id=doc.pk)
+
+        return approvals
+    
+    @action(methods=["get", "post"], detail=True)
+    def approvals(self, request, pk=None):
+        currentUser = request.user
+        try:
+            doc = Document.objects.get(pk=pk)
+            if currentUser is not None and not has_perms_owner_aware(
+                currentUser,
+                "view_document",
+                doc,
+            ):
+                return HttpResponseForbidden("Insufficient permissions to view approvals")
+        except Document.DoesNotExist:
+            raise Http404
+
+        if request.method == "GET":
+            try:
+                return Response(self.get_approvals(doc))
+            except Exception as e:
+                logger.warning(f"An error occurred retrieving approvals: {e!s}")
+                return Response(
+                    {"error": "Error retrieving approvals, check logs for more detail."},
+                )
+        elif request.method == "POST":
+            try:
+                if currentUser is not None and not has_perms_owner_aware(
+                    currentUser,
+                    "change_document",
+                    doc,
+                ):
+                    return HttpResponseForbidden(
+                        "Insufficient permissions to create notes",
+                    )
+                serializer = ApprovalSerializer(data=request.data)
+                existing_approval = False
+                if serializer.is_valid(raise_exception=True):
+                
+                    existing_approval = Approval.objects.filter(
+                        object_pk=serializer.validated_data.get("object_pk"),
+                        access_type=serializer.validated_data.get("access_type"),
+                        ctype=serializer.validated_data.get("ctype"),
+                        submitted_by=serializer.validated_data.get("submitted_by")
+                    )
+
+                    submitted_by_groups = serializer.validated_data.get("submitted_by_group", None)
+                    if submitted_by_groups:
+                        existing_approval = existing_approval.filter(
+                            Q(submitted_by_group__in=submitted_by_groups)
+                        ).exists()
+
+                if existing_approval:
+                    return Response({'status':400,
+                                    'message':'Objects exist'},status=status.HTTP_400_BAD_REQUEST)
+                content_type_id = ContentType.objects.get(app_label="documents",model='document').pk
+
+                a = Approval.objects.create(
+                    submitted_by=currentUser,
+                    object_pk=str(doc.pk),
+                    ctype_id=content_type_id,
+                    access_type="VIEW",
+                    expiration=serializer.validated_data.get("expiration"),
+                    submitted_by_group=serializer.validated_data.get("submitted_by_group", None)
+                )
+                a.save()
+                # If audit log is enabled make an entry in the log
+                # about this note change
+                if settings.AUDIT_LOG_ENABLED:
+                    LogEntry.objects.log_create(
+                        instance=doc,
+                        changes=json.dumps(
+                            {
+                                "Approval Added": ["None", a.id],
+                            },
+                        ),
+                        action=LogEntry.Action.UPDATE,
+                    )
+
+                # doc.modified = timezone.now()
+                doc.save()
+
+                from documents import index
+
+                index.add_or_update_document(self.get_object())
+
+                return Response(self.getNotes(doc))
+            except Exception as e:
+                logger.warning(f"An error occurred saving approval: {e!s}")
+                return Response(
+                    {
+                        "error": "Error saving approval, check logs for more detail.",
+                    },
+                )
+        
         return Response(
             {
                 "error": "error",
@@ -1435,7 +1574,95 @@ class TasksViewSet(ReadOnlyModelViewSet):
             queryset = PaperlessTask.objects.filter(task_id=task_id)
         return queryset
 
+class ApprovalViewSet(ModelViewSet):
+    permission_classes = (IsAuthenticated,)
 
+    serializer_class = ApprovalSerializer
+    # pagination_class = StandardPagination
+
+    def get_queryset(self):
+        queryset = (
+            Approval.objects.filter(
+            )
+            .order_by("created")
+            .reverse()
+        )
+        # task_id = self.request.query_params.get("")
+        # if task_id is not None:
+        #     queryset = PaperlessTask.objects.filter(task_id=task_id)
+        user = self.request.user
+        # print('gia tri document_ids',user)
+        document_ids = Document.objects.filter(owner=user).values_list("id")
+        queryset = queryset.filter(object_pk__in=document_ids)
+        return queryset
+
+    model = Approval
+
+    queryset = Approval.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        serializer = ApprovalSerializer(data=request.data)
+        existing_approval = False
+        if serializer.is_valid(raise_exception=True):
+            serializer.validated_data['submitted_by'] = request.user
+            
+            existing_approval = Approval.objects.filter(
+                object_pk=serializer.validated_data.get("object_pk"),
+                access_type=serializer.validated_data.get("access_type"),
+                ctype=serializer.validated_data.get("ctype"),
+                submitted_by=serializer.validated_data.get("submitted_by"),
+                status__in=["SUCCESS", "PENDING"]
+            )
+
+            submitted_by_groups = serializer.validated_data.get("submitted_by_group", None)
+            group_names = ''
+            if submitted_by_groups:
+                existing_approval = existing_approval.filter(
+                    Q(submitted_by_group__in=submitted_by_groups)
+                ).prefetch_related('submitted_by_group').values_list('submitted_by_group__name',flat=True)
+                group_names = ', '.join(group for group in existing_approval)
+
+            if existing_approval:
+                return Response({'status':400, 'message':f'{group_names} already exists'}, status=status.HTTP_400_BAD_REQUEST)
+
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            
+    def update(self, request, *args, **kwargs):
+        response = super().update(request, *args, **kwargs)
+        
+        approval_updated.send(
+            sender=self.__class__,
+            approval=self.get_object(),
+        )
+
+        return response
+    
+class ApprovalUpdateMutipleView(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ApprovalViewSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        approvals = serializer.validated_data.get("approvals")
+        status = serializer.validated_data.get("status")
+
+        try:
+            approvals_match = Approval.objects.filter(id__in=approvals).prefetch_related('submitted_by_group')
+            result = approvals_match.update(
+                status=status,
+            )
+            for approval in approvals_match:
+                approval_updated.send(
+                    sender=self.__class__,
+                    approval=approval,
+                )
+            return Response({"result": result})
+        except Exception:
+            return HttpResponseBadRequest()
+        
 class AcknowledgeTasksView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = AcknowledgeTasksViewSerializer

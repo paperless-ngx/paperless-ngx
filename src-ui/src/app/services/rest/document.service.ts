@@ -192,6 +192,10 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     }
     return url
   }
+  getDownloadExcel(id: number): string {
+    let url = this.getResourceUrl(id, 'export_excel')
+    return url
+  }
 
   getNextAsn(): Observable<number> {
     return this.http.get<number>(this.getResourceUrl(null, 'next_asn'))

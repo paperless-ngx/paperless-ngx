@@ -5,7 +5,7 @@
 <html lang="en" data-bs-theme="auto">
 <head>
 	<meta charset="utf-8">
-	<title>TC GROUP</title>
+	<title>NIAD</title>
 	<base href="{% url 'base' %}">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="cookie_prefix" content="{{cookie_prefix}}">
@@ -65,7 +65,7 @@
 		<script type="text/javascript">{# Pass Django messages to Angular frontend #}
 			window.DJANGO_MESSAGES = [
 				{% for message in messages %}
-					{ level: "{{ message.level_tag | escapejs }}", message: "{{ message | escapejs }}" },
+					{ level: "{{ message.level_tag | escapejs }}", message: "{% if message.level_tag == 'success' %} {% translate 'Successfully signed in as'%} {{request.user}} {% else %} {{ message | escapejs }}{% endif %}" },
 				{% endfor %}
 			]
 		</script>

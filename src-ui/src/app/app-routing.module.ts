@@ -26,6 +26,7 @@ import { WorkflowsComponent } from './components/manage/workflows/workflows.comp
 import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 import { ConfigComponent } from './components/admin/config/config.component'
+import { ApprovalsComponent } from './components/admin/approval/approvals.component'
 
 import { WarehouseListComponent } from './components/manage/warehouse-list/warehouse-list.component'
 import { BoxFieldsComponent } from './components/manage/box-fields/box-fields.component'
@@ -311,7 +312,28 @@ export const routes: Routes = [
           },
         },
       },
-
+      {
+        path: 'approvals',
+        component: ApprovalsComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Approval,
+          },
+        },
+      },
+      {
+        path: 'customfields',
+        component: CustomFieldsComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.CustomField,
+          },
+        },
+      },
       {
         path: 'workflows',
         component: WorkflowsComponent,

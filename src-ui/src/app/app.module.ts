@@ -71,6 +71,7 @@ import { ColorSliderModule } from 'ngx-color/slider'
 import { ColorComponent } from './components/common/input/color/color.component'
 import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
 import { DocumentNotesComponent } from './components/document-notes/document-notes.component'
+import { DocumentApprovalsComponent } from './components/document-approvals/document-approvals.component'
 import { PermissionsGuard } from './guards/permissions.guard'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
@@ -78,6 +79,7 @@ import { StoragePathListComponent } from './components/manage/storage-path-list/
 import { StoragePathEditDialogComponent } from './components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { SettingsService } from './services/settings.service'
 import { TasksComponent } from './components/admin/tasks/tasks.component'
+import { ApprovalsComponent } from './components/admin/approval/approvals.component'
 import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { UserEditDialogComponent } from './components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
 import { GroupEditDialogComponent } from './components/common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
@@ -103,6 +105,10 @@ import { DragDropModule } from '@angular/cdk/drag-drop'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
 //import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
 //import { CustomFieldsDropdownComponent } from './components/common/custom-fields-dropdown/custom-fields-dropdown.component'
+// import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
+// import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { CustomFieldsDropdownComponent } from './components/common/custom-fields-dropdown/custom-fields-dropdown.component'
+import { ApprovalEditDialogComponent } from './components/common/edit-dialog/approval-edit-dialog/approval-edit-dialog.component'
 import { ProfileEditDialogComponent } from './components/common/profile-edit-dialog/profile-edit-dialog.component'
 import { PdfViewerComponent } from './components/common/pdf-viewer/pdf-viewer.component'
 import { DocumentLinkComponent } from './components/common/input/document-link/document-link.component'
@@ -450,7 +456,9 @@ function initializeApp(settings: SettingsService) {
     ColorComponent,
     DocumentAsnComponent,
     DocumentNotesComponent,
+    DocumentApprovalsComponent,
     TasksComponent,
+    ApprovalsComponent,
     UserEditDialogComponent,
     GroupEditDialogComponent,
     PermissionsSelectComponent,
@@ -475,7 +483,9 @@ function initializeApp(settings: SettingsService) {
     CustomFieldsComponent,
     BoxFieldsComponent,
     CustomShelfEditDialogComponent,
-    //CustomFieldsDropdownComponent,
+    CustomFieldEditDialogComponent,
+    CustomFieldsDropdownComponent,
+    ApprovalEditDialogComponent,
     ProfileEditDialogComponent,
     PdfViewerComponent,
     DocumentLinkComponent,

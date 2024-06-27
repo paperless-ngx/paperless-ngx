@@ -74,6 +74,7 @@ import { SplitConfirmDialogComponent } from '../common/confirm-dialog/split-conf
 import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { WarehouseService } from 'src/app/services/rest/warehouse.service'
 
+import { DocumentApproval } from 'src/app/data/document-approval'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -82,6 +83,7 @@ enum DocumentDetailNavIDs {
   Preview = 4,
   Notes = 5,
   Permissions = 6,
+  Approvals = 7
 }
 
 enum ContentRenderType {
@@ -134,6 +136,7 @@ export class DocumentDetailComponent
   previewText: string
   downloadUrl: string
   downloadOriginalUrl: string
+  downloadExcel: string
 
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
@@ -353,6 +356,9 @@ export class DocumentDetailComponent
           this.downloadOriginalUrl = this.documentsService.getDownloadUrl(
             this.documentId,
             true
+          )
+          this.downloadExcel = this.documentsService.getDownloadExcel(
+            this.documentId,
           )
           this.suggestions = null
           const openDocument = this.openDocumentService.getOpenDocument(
@@ -942,8 +948,22 @@ export class DocumentDetailComponent
     )
   }
 
+  get approvalsEnabled(): boolean {
+    return (
+      this.settings.get(SETTINGS_KEYS.APPROVALS_ENABLED) &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Approval
+      )
+    )
+  }
+
   notesUpdated(notes: DocumentNote[]) {
     this.document.notes = notes
+    this.openDocumentService.refreshDocument(this.documentId)
+  }
+  approvalsUpdated(approvals: DocumentApproval[]) {
+    this.document.approvals = approvals 
     this.openDocumentService.refreshDocument(this.documentId)
   }
 
