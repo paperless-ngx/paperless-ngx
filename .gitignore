@@ -66,6 +66,8 @@ target/
 .vscode
 /src-ui/.vscode
 /docs/.vscode
+.vscode-server
+*CommandMarker
 
 # Other stuff that doesn't belong
 .virtualenv
