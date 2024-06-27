@@ -232,10 +232,11 @@ class PermissionsAwareDocumentCountMixin(PassUserMixin):
 
     def get_queryset(self):
         filter = (
-            None
+            Q(documents__deleted_at__isnull=True)
             if self.request.user is None or self.request.user.is_superuser
             else (
                 Q(
+                    documents__deleted_at__isnull=True,
                     documents__id__in=get_objects_for_user_owner_aware(
                         self.request.user,
                         "documents.view_document",
