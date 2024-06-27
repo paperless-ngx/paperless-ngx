@@ -18,7 +18,7 @@ django-filter = "~=24.2"
 django-guardian = "*"
 django-multiselectfield = "*"
 django-soft-delete = "*"
-djangorestframework = "==3.14.0"
+djangorestframework = "==3.15.2"
 djangorestframework-guardian = "*"
 drf-writable-nested = "*"
 bleach = "*"
@@ -54,7 +54,7 @@ tqdm = "*"
 # See https://github.com/paperless-ngx/paperless-ngx/issues/5494
 uvicorn = {extras = ["standard"], version = "==0.25.0"}
 watchdog = "~=4.0"
-whitenoise = "~=6.6"
+whitenoise = "~=6.7"
 whoosh="~=2.7"
 zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
 
