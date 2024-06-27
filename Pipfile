@@ -58,6 +58,7 @@ whoosh="~=2.7"
 zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
 PyPDF2 = "2.11.2"
 requests = "2.32.2"
+pandas = "2.2.2"
 
 [dev-packages]
 # Linting

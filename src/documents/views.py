@@ -14,6 +14,7 @@ from time import mktime
 from unicodedata import normalize
 from urllib.parse import quote
 from urllib.parse import urlparse
+import pandas as pd
 
 import pathvalidate
 from django.apps import apps
@@ -110,7 +111,7 @@ from documents.matching import match_storage_paths
 from documents.matching import match_warehouses
 from documents.matching import match_folders
 from documents.matching import match_tags
-from documents.models import Approval, Correspondent
+from documents.models import Approval, Correspondent, CustomFieldInstance
 from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
@@ -601,6 +602,39 @@ class DocumentViewSet(
     def download(self, request, pk=None):
         try:
             return self.file_response(pk, request, "attachment")
+        except (FileNotFoundError, Document.DoesNotExist):
+            raise Http404
+        
+    @action(methods=["get"], detail=True)
+    def export_excel(self, request, pk=None):
+        try:
+           
+            document = Document.objects.get(pk=pk)
+            fields = CustomFieldInstance.objects.filter(document=pk)
+
+            # Tạo DataFrame từ dữ liệu
+            data = {
+                'Tiêu đề': [document.title],
+                'Nội dung': [document.content],
+                'Ngày tạo': [document.created.strftime('%d-%m-%Y')],
+            }
+
+            for f in fields:
+                data[f.field.name] = [f.value_text]
+
+            df = pd.DataFrame(data)
+
+            # Tên file Excel sẽ được tạo
+            excel_file_name = f"{document.title}.xlsx"
+
+            # Tạo response để trả về file Excel
+            response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = f'attachment; filename="{excel_file_name}"'
+
+            # Ghi DataFrame vào response dưới dạng Excel
+            df.to_excel(response, index=False)
+
+            return response
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404
 

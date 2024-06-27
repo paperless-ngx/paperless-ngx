@@ -186,6 +186,12 @@ urlpatterns = [
                     ),
                 ),
                 re_path(
+                    r"^doc/(?P<pk>\d+)$",
+                    RedirectView.as_view(
+                        url=settings.BASE_URL + "api/documents/%(pk)s/export_excel/",
+                    ),
+                ),
+                re_path(
                     r"^thumb/(?P<pk>\d+)$",
                     RedirectView.as_view(
                         url=settings.BASE_URL + "api/documents/%(pk)s/thumb/",

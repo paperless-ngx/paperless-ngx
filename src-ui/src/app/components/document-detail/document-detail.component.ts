@@ -136,6 +136,7 @@ export class DocumentDetailComponent
   previewText: string
   downloadUrl: string
   downloadOriginalUrl: string
+  downloadExcel: string
 
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
@@ -356,6 +357,9 @@ export class DocumentDetailComponent
           this.downloadOriginalUrl = this.documentsService.getDownloadUrl(
             this.documentId,
             true
+          )
+          this.downloadExcel = this.documentsService.getDownloadExcel(
+            this.documentId,
           )
           this.suggestions = null
           const openDocument = this.openDocumentService.getOpenDocument(
