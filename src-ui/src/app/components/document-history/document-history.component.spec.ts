@@ -4,11 +4,12 @@ import { DocumentHistoryComponent } from './document-history.component'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { of } from 'rxjs'
 import { AuditLogAction } from 'src/app/data/auditlog-entry'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DatePipe } from '@angular/common'
 import { NgbCollapseModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
@@ -27,12 +28,15 @@ describe('DocumentHistoryComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [DocumentHistoryComponent, CustomDatePipe],
-      providers: [DatePipe],
       imports: [
-        HttpClientTestingModule,
         NgbCollapseModule,
         NgxBootstrapIconsModule.pick(allIcons),
         NgbTooltipModule,
+      ],
+      providers: [
+        DatePipe,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 

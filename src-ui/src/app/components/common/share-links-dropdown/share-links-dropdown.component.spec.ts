@@ -1,6 +1,6 @@
 import {
   HttpTestingController,
-  HttpClientTestingModule,
+  provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import {
   ComponentFixture,
@@ -18,6 +18,7 @@ import { ShareLinksDropdownComponent } from './share-links-dropdown.component'
 import { Clipboard } from '@angular/cdk/clipboard'
 import { By } from '@angular/platform-browser'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('ShareLinksDropdownComponent', () => {
   let component: ShareLinksDropdownComponent
@@ -31,10 +32,13 @@ describe('ShareLinksDropdownComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ShareLinksDropdownComponent],
       imports: [
-        HttpClientTestingModule,
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+      ],
+      providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     })
 

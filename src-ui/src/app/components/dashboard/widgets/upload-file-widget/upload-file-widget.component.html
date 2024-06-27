@@ -39,7 +39,7 @@
                         <a [routerLink]="[]" (click)="alertsExpanded = !alertsExpanded" aria-controls="hiddenAlerts" [attr.aria-expanded]="alertsExpanded" i18n>Show all</a>
                       </p>
                     }
-                    <div #hiddenAlerts="ngbCollapse" [(ngbCollapse)]="!alertsExpanded">
+                    <div #hiddenAlerts="ngbCollapse" [ngbCollapse]="!alertsExpanded" (ngbCollapseChange)="alertsExpanded = $event">
                       @for (status of getStatusHidden(); track status) {
                         <div>
                           <ng-container [ngTemplateOutlet]="consumerAlert" [ngTemplateOutletContext]="{ $implicit: status }"></ng-container>

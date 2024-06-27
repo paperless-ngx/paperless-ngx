@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { CorrespondentListComponent } from './correspondent-list.component'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { DatePipe } from '@angular/common'
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
@@ -10,6 +10,7 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { of } from 'rxjs'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('CorrespondentListComponent', () => {
   let component: CorrespondentListComponent
@@ -24,13 +25,16 @@ describe('CorrespondentListComponent', () => {
         PageHeaderComponent,
         IfPermissionsDirective,
       ],
-      providers: [DatePipe],
       imports: [
-        HttpClientTestingModule,
         NgbPaginationModule,
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+      ],
+      providers: [
+        DatePipe,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
     correspondentsService = TestBed.inject(CorrespondentService)

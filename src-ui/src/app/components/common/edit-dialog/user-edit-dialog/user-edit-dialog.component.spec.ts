@@ -1,4 +1,4 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import {
   FormsModule,
@@ -19,6 +19,7 @@ import { TextComponent } from '../../input/text/text.component'
 import { PermissionsSelectComponent } from '../../permissions-select/permissions-select.component'
 import { EditDialogMode } from '../edit-dialog.component'
 import { UserEditDialogComponent } from './user-edit-dialog.component'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('UserEditDialogComponent', () => {
   let component: UserEditDialogComponent
@@ -37,6 +38,7 @@ describe('UserEditDialogComponent', () => {
         PermissionsFormComponent,
         PermissionsSelectComponent,
       ],
+      imports: [FormsModule, ReactiveFormsModule, NgSelectModule, NgbModule],
       providers: [
         NgbActiveModal,
         {
@@ -54,13 +56,8 @@ describe('UserEditDialogComponent', () => {
           },
         },
         SettingsService,
-      ],
-      imports: [
-        HttpClientTestingModule,
-        FormsModule,
-        ReactiveFormsModule,
-        NgSelectModule,
-        NgbModule,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 

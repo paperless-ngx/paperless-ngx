@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { PermissionsDialogComponent } from './permissions-dialog.component'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { UserService } from 'src/app/services/rest/user.service'
 import { of } from 'rxjs'
@@ -12,6 +12,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { PermissionsUserComponent } from '../input/permissions/permissions-user/permissions-user.component'
 import { PermissionsGroupComponent } from '../input/permissions/permissions-group/permissions-group.component'
 import { SwitchComponent } from '../input/switch/switch.component'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const set_permissions = {
   owner: 10,
@@ -43,6 +44,7 @@ describe('PermissionsDialogComponent', () => {
         PermissionsUserComponent,
         PermissionsGroupComponent,
       ],
+      imports: [NgSelectModule, FormsModule, ReactiveFormsModule, NgbModule],
       providers: [
         NgbActiveModal,
         {
@@ -63,13 +65,8 @@ describe('PermissionsDialogComponent', () => {
               }),
           },
         },
-      ],
-      imports: [
-        HttpClientTestingModule,
-        NgSelectModule,
-        FormsModule,
-        ReactiveFormsModule,
-        NgbModule,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 
