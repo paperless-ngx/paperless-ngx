@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import shutil
+import time
 from typing import Optional
 
 from celery import states
@@ -798,31 +799,7 @@ def run_workflow(
                                     field=field,
                                     document=document,
                                 )
-                                fields = CustomFieldInstance.objects.filter(
-                                    document=document,
-                                )
 
-                                url = "https://ocr-general-api.tcgroup.vn/home/api/v1/extract-by-rule"
-
-                                payload = json.dumps({
-                                "request_id": "abf61b34-1a6f-433c-ae13-a1632eff2ac4",
-                                "list_form_code": [
-                                    "so_xay_dung_hai_phong"
-                                ]
-                                })
-                                headers = {
-                                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzIxMzYzNjUxLCJpYXQiOjE3MTg3NzE2NTEsImp0aSI6ImI3OGZmMDNjYmRhZTQ0YzdhNWUyNTIxYmU2MzEzMjk0IiwidXNlcl9pZCI6MSwicm9sZSI6IkFkbWluIGhcdTFlYzcgdGhcdTFlZDFuZyJ9.oOGdwaK7p-bOoBobhxHua3JRLcJIZmDLAka5bbM1WIA',
-                                'Content-Type': 'application/json'
-                                }
-                                dict_data = {}
-                                response = requests.request("POST", url, headers=headers, data=payload)
-                                # logger.info(response.json()[0].get("fields"))
-                                if (response.status_code==200):
-                                    for r in response.json()[0].get("fields"):
-                                        dict_data[r.get("name")] = r.get("values")[0].get("value") 
-                                    for f in fields:
-                                        f.value_text = dict_data.get(f.field.name,None)
-                                    CustomFieldInstance.objects.bulk_update(fields, ['value_text'])
 
                 elif action.type == WorkflowAction.WorkflowActionType.REMOVAL:
                     if action.remove_all_tags:

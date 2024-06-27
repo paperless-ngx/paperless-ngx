@@ -609,7 +609,7 @@ class Consumer(LoggingMixin):
         date = None
         thumbnail = None
         archive_path = None
-
+        data_ocr_fields = None
         try:
             self._send_progress(
                 20,
@@ -618,7 +618,7 @@ class Consumer(LoggingMixin):
                 ConsumerStatusShortMessage.PARSING_DOCUMENT,
             )
             self.log.debug(f"Parsing {self.filename}...")
-            document_parser.parse(self.working_copy, mime_type, self.filename)
+            data_ocr_fields = document_parser.parse(self.working_copy, mime_type, self.filename)
 
             self.log.debug(f"Generating thumbnail for {self.filename}...")
             self._send_progress(
@@ -685,13 +685,30 @@ class Consumer(LoggingMixin):
 
                 # If we get here, it was successful. Proceed with post-consume
                 # hooks. If they fail, nothing will get changed.
-
                 document_consumption_finished.send(
                     sender=self.__class__,
                     document=document,
                     logging_group=self.logging_group,
                     classifier=classifier,
                 )
+                # update custom field by document_id
+                fields = CustomFieldInstance.objects.filter(
+                                    document=document,
+                                )
+                dict_data = {}                
+                for r in data_ocr_fields[0].get("fields"):
+                    dict_data[r.get("name")] = r.get("values")[0].get("value") 
+                map_fields = {
+                    "Tiêu đề": dict_data.get("title"),
+                    "Số văn bản": dict_data.get("Số hiệu"),
+                    "Kính gửi": dict_data.get("Kính gửi"),
+                    # "Ngày phát hành": dict_data.get("Thời gian tạo"),
+                    "Người ký văn bản": dict_data.get("Chữ ký"),
+                    "Ngày phát hành": dict_data.get("datetime")
+                }
+                for f in fields:
+                    f.value_text = map_fields.get(f.field.name,None)
+                CustomFieldInstance.objects.bulk_update(fields, ['value_text'])
 
                 # After everything is in the database, copy the files into
                 # place. If this fails, we'll also rollback the transaction.

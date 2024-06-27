@@ -424,6 +424,7 @@ TCGROUP_OCR_CUSTOM = {
     "URL": {
         "URL_UPLOAD_FILE": os.getenv("URL_UPLOAD_FILE","https://ocr-core-api.tcgroup.vn/api/v1/file/upload"),
         "URL_OCR_BY_FILEID": os.getenv("URL_OCR_BY_FILEID","https://ocr-core-api.tcgroup.vn/api/v1/ocr/general"),
+        "URL_OCR_CUSTOM_FIELD_BY_FILEID": os.getenv("URL_OCR_CUSTOM_FIELD_BY_FILEID","https://ocr-general-api.tcgroup.vn/home/api/v1/extract-by-rule"),
     }
 }
 

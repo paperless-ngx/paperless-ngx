@@ -162,7 +162,8 @@ def custom_get_parser_class_for_mime_type(mime_type: str) -> Optional[type["Docu
             if response_ocr.status_code == 404:
                 best_parser = sorted(options, key=lambda _: _["weight"], reverse=True)[0]
                 logger.debug('Successful key authentication ...')
-        logger.debug('Fail key authentication ...', best_parser["parser"])
+        else:
+            logger.debug('Fail key authentication ...', best_parser["parser"])
     # Return the parser with the highest weight.
     return best_parser["parser"]
 

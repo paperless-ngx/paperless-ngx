@@ -8,8 +8,8 @@ def start():
     scheduler.add_jobstore(DjangoJobStore(), 'djangojobstore')
     register_events(scheduler)
 
-    @scheduler.scheduled_job('interval', minutes=1, name='revoke_permission')
-    def auto_revoke_permission():
-        revoke_permission()
+    # @scheduler.scheduled_job('interval', minutes=1, name='revoke_permission')
+    # def auto_revoke_permission():
+    #     revoke_permission()
 
     scheduler.start()
