@@ -14,6 +14,7 @@ import { TrashService } from 'src/app/services/trash.service'
 import { of } from 'rxjs'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { By } from '@angular/platform-browser'
+import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 
 const documentsInTrash = [
   {
@@ -42,6 +43,7 @@ describe('TrashComponent', () => {
         TrashComponent,
         PageHeaderComponent,
         ConfirmDialogComponent,
+        SafeHtmlPipe,
       ],
       imports: [
         HttpClientTestingModule,
