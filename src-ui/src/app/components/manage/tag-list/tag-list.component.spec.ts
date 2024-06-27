@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
@@ -11,6 +11,7 @@ import { PageHeaderComponent } from '../../common/page-header/page-header.compon
 import { TagListComponent } from './tag-list.component'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('TagListComponent', () => {
   let component: TagListComponent
@@ -26,13 +27,16 @@ describe('TagListComponent', () => {
         IfPermissionsDirective,
         SafeHtmlPipe,
       ],
-      providers: [DatePipe],
       imports: [
-        HttpClientTestingModule,
         NgbPaginationModule,
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+      ],
+      providers: [
+        DatePipe,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 

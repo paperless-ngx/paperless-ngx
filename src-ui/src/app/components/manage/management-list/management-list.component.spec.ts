@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import {
   ComponentFixture,
   TestBed,
@@ -41,6 +41,7 @@ import { MATCH_LITERAL } from 'src/app/data/matching-model'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { BulkEditObjectOperation } from 'src/app/services/rest/abstract-name-filter-service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const tags: Tag[] = [
   {
@@ -81,15 +82,19 @@ describe('ManagementListComponent', () => {
         ConfirmDialogComponent,
         PermissionsDialogComponent,
       ],
-      providers: [DatePipe, PermissionsGuard],
       imports: [
-        HttpClientTestingModule,
         NgbPaginationModule,
         FormsModule,
         ReactiveFormsModule,
         NgbModalModule,
         RouterTestingModule.withRoutes(routes),
         NgxBootstrapIconsModule.pick(allIcons),
+      ],
+      providers: [
+        DatePipe,
+        PermissionsGuard,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 

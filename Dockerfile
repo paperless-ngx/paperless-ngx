@@ -13,6 +13,16 @@ WORKDIR /src/src-ui
 RUN set -eux \
   && npm update npm -g \
   && npm ci
+
+ARG PNGX_TAG_VERSION=
+# Add the tag to the environment file if its a tagged dev build
+RUN set -eux && \
+case "${PNGX_TAG_VERSION}" in \
+  dev|fix*|feature*) \
+    sed -i -E "s/version: '([0-9\.]+)'/version: '\1 #${PNGX_TAG_VERSION}'/g" /src/src-ui/src/environments/environment.prod.ts \
+    ;; \
+esac
+
 RUN set -eux \
   && ./node_modules/.bin/ng build --configuration production
 
@@ -21,7 +31,7 @@ RUN set -eux \
 # Comments:
 #  - pipenv dependencies are not left in the final image
 #  - pipenv can't touch the final image somehow
-FROM --platform=$BUILDPLATFORM docker.io/python:3.11-alpine as pipenv-base
+FROM --platform=$BUILDPLATFORM docker.io/python:3.11-alpine AS pipenv-base
 
 WORKDIR /usr/src/pipenv
 
@@ -37,7 +47,7 @@ RUN set -eux \
 # Purpose: The final image
 # Comments:
 #  - Don't leave anything extra in here
-FROM docker.io/python:3.11-slim-bookworm as main-app
+FROM docker.io/python:3.11-slim-bookworm AS main-app
 
 LABEL org.opencontainers.image.authors="paperless-ngx team <hello@paperless-ngx.com>"
 LABEL org.opencontainers.image.documentation="https://docs.paperless-ngx.com/"
