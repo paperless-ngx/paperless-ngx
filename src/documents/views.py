@@ -961,6 +961,11 @@ class BulkEditView(PassUserMixin):
         method = serializer.validated_data.get("method")
         parameters = serializer.validated_data.get("parameters")
         documents = serializer.validated_data.get("documents")
+        if method in [
+            bulk_edit.split,
+            bulk_edit.merge,
+        ]:
+            parameters["user"] = user
 
         if not user.is_superuser:
             document_objs = Document.objects.select_related("owner").filter(
