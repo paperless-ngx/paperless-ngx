@@ -285,6 +285,8 @@ class ObjectOwnedPermissionsFilter(ObjectPermissionsFilter):
     """
 
     def filter_queryset(self, request, queryset, view):
+        if request.user.is_superuser:
+            return queryset
         objects_owned = queryset.filter(owner=request.user)
         objects_unowned = queryset.filter(owner__isnull=True)
         return objects_owned | objects_unowned
