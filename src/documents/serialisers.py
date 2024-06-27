@@ -1,5 +1,7 @@
 import datetime
+import logging
 import math
+import os
 import re
 import zoneinfo
 from decimal import Decimal
@@ -51,7 +53,9 @@ from documents.parsers import is_mime_type_supported
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import set_permissions_for_object
 from documents.validators import uri_validator
+from documents.parsers import get_parser_class_for_mime_type
 
+logger = logging.getLogger("paperless.api")
 
 # https://www.django-rest-framework.org/api-guide/serializers/#example
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
@@ -668,6 +672,8 @@ class DocumentSerializer(
 
     original_file_name = SerializerMethodField()
     archived_file_name = SerializerMethodField()
+    
+    
     created_date = serializers.DateField(required=False)
 
     custom_fields = CustomFieldInstanceSerializer(
@@ -688,7 +694,18 @@ class DocumentSerializer(
         allow_null=True,
         required=False,
     )
-
+    
+    
+    
+    # def get_filesize(self, obj):
+    #     file_size = len(obj.archive_filename)
+    #     if file_size < 1024 * 1024:
+    #         return f"{file_size / 1024:.2f} KB"
+    #     elif file_size < 1024 * 1024 * 1024:
+    #         return f"{file_size / (1024 * 1024):.2f} MB"
+    #     else: 
+    #         return f"{file_size / (1024 * 1024 * 1024):.2f} GB"
+    
     def get_original_file_name(self, obj):
         return obj.original_filename
 
@@ -801,6 +818,7 @@ class DocumentSerializer(
             "notes",
             "custom_fields",
             "remove_inbox_tags",
+            
         ) 
     
 
@@ -1872,18 +1890,6 @@ class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     name = AdjustedNameField()
     
     def validate(self, data):
-        # owner = (
-        #     data["owner"]
-        #     if "owner" in data
-        #     else self.user if hasattr(self, "user") else None
-        # )
-        # pk = self.instance.pk if hasattr(self.instance, "pk") else None
-        # if ("owner" in data) and self.Meta.model.objects.filter(
-        #     owner=owner,
-        # ).exclude(pk=pk).exists():
-        #     raise serializers.ValidationError(
-        #         {"error": "Object violates owner "},
-        #     )
         return data
     
     def update(self, instance, validated_data):
@@ -1919,6 +1925,17 @@ class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     name = AdjustedNameField()
     document_count = serializers.SerializerMethodField()
     child_folder_count = serializers.SerializerMethodField()
+    filesize = serializers.SerializerMethodField()
+    
+    def get_filesize(self, obj):
+        folder = Folder.objects.get(id=int(obj.id))
+        return self.get_folder_filesize(folder)
+    
+    def get_folder_filesize(self, folder):
+        folders = Folder.objects.filter(path__startswith=folder.path)
+        documents = Document.objects.filter(folder__in=folders)
+        total_size_bytes = sum(os.path.getsize(doc.source_path) for doc in documents)
+        return total_size_bytes
     
     def get_document_count(self, obj):
         return Document.objects.filter(folder=obj).count()
@@ -1927,18 +1944,6 @@ class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         return Folder.objects.filter(parent_folder=obj).count()
     
     def validate(self, data):
-        owner = (
-            data["owner"]
-            if "owner" in data
-            else self.user if hasattr(self, "user") else None
-        )
-        pk = self.instance.pk if hasattr(self.instance, "pk") else None
-        if ("owner" in data) and self.Meta.model.objects.filter(
-            owner=owner,
-        ).exclude(pk=pk).exists():
-            raise serializers.ValidationError(
-                {"error": "Object violates owner "},
-            )
         return data
     
     def update(self, instance, validated_data):
