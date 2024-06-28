@@ -140,7 +140,6 @@ jobs:
       -
         name: List installed Python dependencies
         run: |
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} run pip install pytest_mock
           pipenv --python ${{ steps.setup-python.outputs.python-version }} run pip list
       -
         name: Tests
