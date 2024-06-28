@@ -361,24 +361,26 @@ class TestDate:
                   For example 02.02.2018, 22 July 2022 and December 2021.
                   But not 24-12-9999 because it's in the future..."""
         dates = list(parse_date_generator("", text))
-        assert len(dates) == 3
-        assert dates[0] == datetime.datetime(2018, 2, 2, 0, 0, tzinfo=settings_timezone)
-        assert dates[1] == datetime.datetime(
-            2022,
-            7,
-            22,
-            0,
-            0,
-            tzinfo=settings_timezone,
-        )
-        assert dates[2] == datetime.datetime(
-            2021,
-            12,
-            1,
-            0,
-            0,
-            tzinfo=settings_timezone,
-        )
+
+        assert dates == [
+            datetime.datetime(2018, 2, 2, 0, 0, tzinfo=settings_timezone),
+            datetime.datetime(
+                2022,
+                7,
+                22,
+                0,
+                0,
+                tzinfo=settings_timezone,
+            ),
+            datetime.datetime(
+                2021,
+                12,
+                1,
+                0,
+                0,
+                tzinfo=settings_timezone,
+            ),
+        ]
 
     def test_filename_date_parse_valid_ymd(
         self,
