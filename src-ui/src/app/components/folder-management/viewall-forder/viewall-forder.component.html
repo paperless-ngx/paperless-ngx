@@ -1,74 +1,86 @@
-<div class="folder-container" id="folderLeft">
-    <div style="display: none;" class="sub-folder-container">
-        <form action="">
-            <input type="text">
-            <button>UpLoad File</button>
+<div class="khumm" pngxPreventRightClick>
+    <div class="folder-container" id="folderLeft" pngxPreventRightClick>
+      <div id="sub-folder-container" style="display: none;" class="sub-folder-container">
+        <form (submit)="onAddFolder()">
+          <input type="text" placeholder="Enter folder name..." [(ngModel)]="folderName" name="folderName">
+          <button type="submit">Add Folder</button>
         </form>
-    </div>
-    <div id="contextMenu" class="addfolder">
+      </div>
+      
+      <div id="sub-reanamefile-container" style="display: none;" class="sub-folder-container">
+        <form (submit)="onRenameFile($event)">
+          <input type="text" name="Renamefile" [value]="renameFileName" [(ngModel)]="renameFileName">
+          <button type="submit">Rename File</button>
+        </form>
+      </div>
+      
+      <div id="sub-reanmefolder-container" style="display: none;" class="sub-folder-container">
+        <form (submit)="onRenameFolder($event)">
+          <input type="text" name="Renamefolder" [value]="renameFolderName" [(ngModel)]="renameFolderName">
+          <button type="submit">Rename Folder</button>
+        </form>
+      </div>
+      
+      <div id="contextMenu" style="display:none" class="addfolder">
         <ul>
-            <li id="am"><a >New file...</a></li>
-            <li><a >New folder...</a></li>
-            <li style="border: 1px solid black;"><a >Rename...</a></li>
-            <li style="border: 1px solid black;"><a >Delete...</a></li>
+          <li class="id" add=""><a>New file...</a></li>
+          <li class="id" add="" (click)="showInput($event)"><a>New folder...</a></li>
+          <li class="id f" chua="" (click)="showRenameFile($event)" style="border: 1px solid greenyellow;display: none;"><a>Rename File...</a></li>
+          <li class="id c" add="" (click)="showRenameFolder($event)" style="border: 1px solid greenyellow; display: none;"><a>Rename Folder...</a></li>
+          <li class="id" add="" (click)="deleteMultipleItems($event)" (click)="deleteItem($event)"  add2="" style="border: 1px solid greenyellow;"><a>Delete...</a></li>
+          <li class="id c"  add="" style="border: 1px solid greenyellow; display: none; "  (click)="onCutClick()" #cutElement><a>cut...</a></li>
+          <li class="id c"   add="" style="border: 1px solid greenyellow; display: none;" (click)="onPasteClick()" #pasteElement><a>Past...</a></li>
+          <li class="f"  chua="" style="border: 1px solid greenyellow; display: none; " (click)="onCutClickf($event)" #cutElementf><a>cutfile...</a></li>
+          <li class="id f c"  add="" chua="" style="border: 1px solid greenyellow; display: none;" (click)="onPasteClickf($event)" #pasteElementf><a>Pastfile...</a></li>
         </ul>
+      </div>
+          
+          
+      <div class="folder-left" id="sss" pngxPreventRightClick>
+          <div class="folder-left-1">
+              <div class="folder-left-search">
+                <div _ngcontent-ng-c1405531498="" class="form-inline d-flex align-items-center">
+                  <input _ngcontent-ng-c1405531498="" type="text" autofocus="" placeholder="Name" class="form-control form-control-sm flex-fill w-auto ng-pristine ng-valid ng-touched">
+                </div>
+              </div>
+          </div>
+          <div id="folders-container" class="folder" pngxPreventRightClick>
+              <!-- Folders and Documents will be added dynamically here -->
+          </div>  
+          <div id="documents-container" class="documents " pngxPreventRightClick>
+          </div>        
+          <div class="resize-handle"></div>
+      </div>
+      <div class="folder-right"  id="sss" pngxPreventRightClick>
+          <div class="folder-search">
+            <div class="folder-right-tim">
+    
+            </div>        
+              <div class="folder-right-search">
+                <div _ngcontent-ng-c1405531498="" class="form-inline d-flex align-items-center">
+                  <input _ngcontent-ng-c1405531498="" type="text" autofocus="" placeholder="Name" class="form-control form-control-sm flex-fill w-auto ng-pristine ng-valid ng-touched">
+                </div>
+              </div>
+          </div>
+          <div #folderRightContent id="folderDropArea" id-khai="" class="folder-right-conten" (drop)="onDrop($event)" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)">
+              <table class="folder-contents table table-striped align-middle border shadow-sm " pngxPreventRightClick>
+                  <thead>
+                      <tr >
+                          <td>Name</td>
+                          <td>Data modified</td>
+                          <td>Type</td>
+                          <td>Size</td>
+                      </tr>
+                  </thead>
+                  <tbody>
+    
+                  </tbody>
+              </table>
+              <div class="setting">
+                <div class="anne" (click)="removeGridStyles()"><i class="fa-solid fa-table"></i></div>
+                <div class="hienne" (click)="addGridStyles()"><i class="fa-solid fa-image"></i></div>
+              </div>
+          </div>
+      </div>
     </div>
-  <div class="folder-left" id="sss">
-      <div class="folder-left-1">
-          <div class="folder-left-search">
-              <button class="search"><i class="fa-solid fa-magnifying-glass"></i></button>
-              <input placeholder="Tìm Kiếm" class="serch" type="text">
-          </div>
-      </div>
-      <div id="folders-container" class="folder">
-          <!-- Folders and Documents will be added dynamically here -->
-      </div>  
-      <div id="documents-container" class="documents">
-      </div>        
-      <div class="resize-handle"></div>
   </div>
-  <div class="folder-right"  id="sss">
-      <div class="folder-search">
-        <div class="folder-right-tim">
-            <div class="logo-folder">
-                <i class="fa-solid fa-folder"></i> <i class="fa-solid fa-chevron-right"></i>
-            </div>
-            <div class="ten-folder">
-                <p>Folder 1</p>
-                <i class="fa-solid fa-chevron-right"></i>
-            </div>
-            <div class="ten-folder">
-                <p>Folder 2</p>
-                <i class="fa-solid fa-chevron-right"></i>
-            </div>
-            <div class="ten-folder">
-                <p>Folder 3</p>
-                <i class="fa-solid fa-chevron-right"></i>
-            </div>
-            <div class="ten-folder">
-                <p>Folder 4</p>
-                <i class="fa-solid fa-chevron-right"></i>
-            </div>
-        </div>        
-          <div class="folder-right-search">
-              <button> <i class="fa-solid fa-magnifying-glass"></i>   </button>
-              <input type="text">
-          </div>
-      </div>
-      <div class="folder-right-conten">
-          <table class="folder-contents">
-              <thead>
-                  <tr>
-                      <td>Name</td>
-                      <td>Data modified</td>
-                      <td>Type</td>
-                      <td>Size</td>
-                  </tr>
-              </thead>
-              <tbody>
-
-              </tbody>
-          </table>
-      </div>
-  </div>
-</div>

@@ -342,6 +342,7 @@ import localeZh from '@angular/common/locales/zh'
 import localeVi from '@angular/common/locales/vi'
 import { CommonModule } from '@angular/common';
 import { ViewallForderComponent } from './components/folder-management/viewall-forder/viewall-forder.component'
+import { PreventRightClickDirective } from './services/prevent-right-click.directive'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -481,6 +482,7 @@ function initializeApp(settings: SettingsService) {
     RotateConfirmDialogComponent,
     MergeConfirmDialogComponent,
     SplitConfirmDialogComponent,
+    PreventRightClickDirective,
   ],
   imports: [
     BrowserModule,

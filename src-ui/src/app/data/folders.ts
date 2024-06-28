@@ -23,16 +23,21 @@ export interface Results{
   parent_folder: number | null;
   path: string;
 }
-
+export interface SRC {
+  documents: Document[];
+  folders: Folders[];
+  // Thêm các thuộc tính khác nếu có
+}
 export interface Document {
   id: number;
   owner_id: number;
   correspondent_id: number | null;
   storage_path_id: number | null;
-  folder_id: number | null;
+  folder: number | null;
   warehouse_id: number | null;
   title: string;
   document_type_id: number | null;
+  document: File;
   content: string;
   mime_type: string;
   checksum: string;
