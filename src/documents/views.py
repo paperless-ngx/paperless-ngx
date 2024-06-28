@@ -612,9 +612,8 @@ class DocumentViewSet(
             document = Document.objects.get(pk=pk)
             fields = CustomFieldInstance.objects.filter(document=pk)
 
-            # Tạo DataFrame từ dữ liệu
             data = {
-                'Tiêu đề': [document.title],
+                'Tên file': document.title,
                 'Nội dung': [document.content],
                 'Ngày tạo': [document.created.strftime('%d-%m-%Y')],
             }
@@ -1407,7 +1406,45 @@ class BulkDownloadView(GenericAPIView):
             )
 
             return response
+        
+class BulkExportExcelView(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = BulkDownloadSerializer
+    parser_classes = (parsers.JSONParser,)
 
+    def post(self, request, format=None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        ids = serializer.validated_data.get("documents")
+    
+        try:
+           
+            documents = Document.objects.filter(id__in=ids)
+            # fields = CustomFieldInstance.objects.filter(document__in=ids)
+            data = []
+            for document in documents:
+                fields = CustomFieldInstance.objects.filter(document=document.pk)
+                row_data = {
+                    'Tên file': document.title,
+                    'Nội dung': document.content,
+                    'Ngày tạo': document.created.strftime('%d-%m-%Y'),
+                }
+                for f in fields:
+                    row_data[f.field.name] = f.value_text
+                data.append(row_data)
+
+            df = pd.DataFrame(data)
+            excel_file_name = f"download.xlsx"
+            # Tạo response để trả về file Excel
+            response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = f'attachment; filename="{excel_file_name}"'
+
+            df.to_excel(response, index=False)
+
+            return response
+        except (FileNotFoundError, Document.DoesNotExist):
+            raise Http404
 
 class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = StoragePath

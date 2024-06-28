@@ -14,7 +14,7 @@ from django.views.static import serve
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
-from documents.views import AcknowledgeTasksView, ApprovalUpdateMutipleView, ApprovalViewSet
+from documents.views import AcknowledgeTasksView, ApprovalUpdateMutipleView, ApprovalViewSet, BulkExportExcelView
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
@@ -121,6 +121,11 @@ urlpatterns = [
                     "^documents/bulk_download/",
                     BulkDownloadView.as_view(),
                     name="bulk_download",
+                ),
+                re_path(
+                    "^documents/bulk_export_excel/",
+                    BulkExportExcelView.as_view(),
+                    name="bulk_export_excel",
                 ),
                 re_path(
                     "^remote_version/",

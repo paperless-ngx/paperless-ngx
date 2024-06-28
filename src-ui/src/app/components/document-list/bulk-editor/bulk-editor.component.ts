@@ -712,6 +712,18 @@ export class BulkEditorComponent
         this.awaitingDownload = false
       })
   }
+  exportToExcelSelectedSelected() {
+    this.awaitingDownload = true
+    this.documentService
+      .bulkExportExcels(
+        Array.from(this.list.selected)
+      )
+      .pipe(first())
+      .subscribe((result: any) => {
+        saveAs(result, 'download.xlsx')
+        this.awaitingDownload = false
+      })
+  }
 
   redoOcrSelected() {
     let modal = this.modalService.open(ConfirmDialogComponent, {
