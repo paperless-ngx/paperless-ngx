@@ -106,7 +106,7 @@ class TestEmailMetadataExtraction:
             - A log warning should be generated
         """
         # Validate if warning is logged when parsing fails
-        assert [] == mail_parser.extract_metadata("na", "message/rfc822")
+        assert mail_parser.extract_metadata("na", "message/rfc822") == []
 
         assert len(caplog.records) == 1
         record = caplog.records[0]
