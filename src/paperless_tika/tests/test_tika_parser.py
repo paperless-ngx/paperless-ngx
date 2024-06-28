@@ -96,8 +96,8 @@ class TestTikaParser:
         ("setting_value", "expected_form_value"),
         [
             ("pdfa", "PDF/A-2b"),
+            ("pdfa-1", "PDF/A-2b"),
             ("pdfa-2", "PDF/A-2b"),
-            ("pdfa-1", "PDF/A-1a"),
             ("pdfa-3", "PDF/A-3b"),
         ],
     )
