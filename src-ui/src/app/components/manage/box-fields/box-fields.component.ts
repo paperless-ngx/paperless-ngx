@@ -53,6 +53,6 @@ export class BoxFieldsComponent extends BoxListComponent<Box> {
   }
 
   getDeleteMessage(object: Box) {
-    return $localize`Do you really want to delete the CustomField "${object.name}"?`
+    return $localize`Do you really want to delete the Boxcase "${object.name}"?`
   }
 }

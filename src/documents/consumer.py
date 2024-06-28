@@ -697,7 +697,7 @@ class Consumer(LoggingMixin):
                                 )
                 dict_data = {}                
                 for r in data_ocr_fields[0].get("fields"):
-                    dict_data[r.get("name")] = r.get("values")[0].get("value") 
+                    dict_data[r.get("name")] = r.get("values")[0].get("value") if r.get("values") else None
                 map_fields = {
                     "Tiêu đề": dict_data.get("title"),
                     "Số văn bản": dict_data.get("Số hiệu"),
