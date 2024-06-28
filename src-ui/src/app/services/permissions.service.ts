@@ -15,6 +15,7 @@ export enum PermissionType {
   Warehouse = '%s_warehouse',
   KhoVatLy = '%s_khovatly',
   Correspondent = '%s_correspondent',
+  Viewallfolder = '%s_viewallfolder',
   DocumentType = '%s_documenttype',
   StoragePath = '%s_storagepath',
   SavedView = '%s_savedview',

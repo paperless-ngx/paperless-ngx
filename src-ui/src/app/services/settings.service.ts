@@ -1,4 +1,3 @@
-import { DOCUMENT } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import {
   EventEmitter,
@@ -22,6 +21,7 @@ import { User } from '../data/user'
 import { PermissionsService } from './permissions.service'
 import { ToastService } from './toast.service'
 import { SavedView } from '../data/saved-view'
+import { DOCUMENT } from '@angular/common'
 
 export interface LanguageOption {
   code: string

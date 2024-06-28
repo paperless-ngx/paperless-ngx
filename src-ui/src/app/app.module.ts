@@ -351,6 +351,9 @@ import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/
 import { CustomShelfComponent } from './components/manage/custom-shelf/custom-shelf.component'
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
 import { CustomShelfEditDialogComponent } from './components/common/edit-dialog/custom-shelf-edit-dialog/custom-shelf-edit-dialog.component'
+import { CommonModule } from '@angular/common';
+import { ViewallForderComponent } from './components/folder-management/viewall-forder/viewall-forder.component'
+import { PreventRightClickDirective } from './services/prevent-right-click.directive'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -398,6 +401,7 @@ function initializeApp(settings: SettingsService) {
     //BoxListComponent,
     CustomShelfComponent,
     BoxEditDialogComponent,
+    ViewallForderComponent,
     AppComponent,
     DocumentListComponent,
     DocumentDetailComponent,
@@ -499,7 +503,7 @@ function initializeApp(settings: SettingsService) {
     RotateConfirmDialogComponent,
     MergeConfirmDialogComponent,
     SplitConfirmDialogComponent,
-
+    PreventRightClickDirective,
   ],
   imports: [
     BrowserModule,
@@ -515,6 +519,7 @@ function initializeApp(settings: SettingsService) {
     DragDropModule,
     NgxBootstrapIconsModule.pick(icons),
     NgxFilesizeModule,
+    CommonModule,
   ],
   providers: [
     {

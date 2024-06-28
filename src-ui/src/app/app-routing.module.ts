@@ -35,14 +35,8 @@ import { BoxFieldsComponent } from './components/manage/box-fields/box-fields.co
 //import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
 import { CustomShelfComponent } from './components/manage/custom-shelf/custom-shelf.component'
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
-
-
-
-
-
-
-
-
+import { ConfigComponent } from './components/admin/config/config.component'
+import { ViewallForderComponent } from './components/folder-management/viewall-forder/viewall-forder.component'
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -169,7 +163,6 @@ export const routes: Routes = [
           },
         },
       },
-      {
         //   path: 'warehouses/:id',
         //   component: WarehouseListComponent,
         //   canActivate: [PermissionsGuard],
@@ -216,7 +209,17 @@ export const routes: Routes = [
         //   ],
         // },
 
-
+{
+        path: 'viewallfolder',
+        component: ViewallForderComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Viewallfolder,
+          },
+        },
+      },{
         path: 'documenttypes',
         component: DocumentTypeListComponent,
         canActivate: [PermissionsGuard],
