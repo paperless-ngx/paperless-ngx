@@ -59,6 +59,7 @@ zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
 PyPDF2 = "2.11.2"
 requests = "2.32.2"
 pandas = "2.2.2"
+openpyxl = "3.1.5"
 
 [dev-packages]
 # Linting
