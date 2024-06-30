@@ -205,28 +205,32 @@
                 <i-bs class="me-1" name="folder"></i-bs><span>&nbsp;<ng-container i18n>Storage Paths</ng-container></span>
               </a>
             </li>
-       
-         
 
-
-        <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Warehouse }">
-            <a class="nav-link" (click)="toggleKho()" routerLink="warehouses" ngbPopover="Warehouses" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
+            <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }">
+              <a class="nav-link" routerLink="folders" routerLinkActive="active" (click)="closeMenu()"
+                ngbPopover="Folder" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
                 container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-1" name="folder"></i-bs>
-                <span>&nbsp;<ng-container i18n>Warehouse</ng-container></span>
-            </a>
-        </li>
-
-         <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }">
-              <a class="nav-link" routerLink="customfields" routerLinkActive="active" (click)="closeMenu()"
-                ngbPopover="Custom Fields" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
-                container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-1" name="ui-radios"></i-bs><span>&nbsp;<ng-container i18n>Custom Fields</ng-container></span>
+                <i-bs class="me-1" name="folder"></i-bs><span>&nbsp;<ng-container i18n>Folder</ng-container></span>
               </a>
             </li>
-            
+       
+
+            <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Warehouse }">
+                <a class="nav-link" (click)="toggleKho()" routerLink="warehouses" ngbPopover="Warehouses" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
+                    container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+                    <i-bs class="me-1" name="folder"></i-bs>
+                    <span>&nbsp;<ng-container i18n>Warehouse</ng-container></span>
+                </a>
+            </li>
 
 
+            <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }">
+                  <a class="nav-link" routerLink="customfields" routerLinkActive="active" (click)="closeMenu()"
+                    ngbPopover="Custom Fields" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
+                    container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+                    <i-bs class="me-1" name="ui-radios"></i-bs><span>&nbsp;<ng-container i18n>Custom Fields</ng-container></span>
+                  </a>
+                </li>
             
             <li class="nav-item app-link"
               *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Workflow }"

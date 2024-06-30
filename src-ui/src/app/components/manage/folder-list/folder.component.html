@@ -1,0 +1,42 @@
+<pngx-page-header
+  title="Folders"
+  i18n-title
+  info="Customize the data folders that can be attached to documents."
+  i18n-info
+  >
+  <button type="button" class="btn btn-sm btn-outline-primary" (click)="editFolder()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Folder }">
+    <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Folder</ng-container>
+  </button>
+</pngx-page-header>
+
+<ul class="list-group">
+
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col" i18n>Name</div>
+      <div class="col" i18n>Data Type</div>
+      <div class="col" i18n>Actions</div>
+    </div>
+  </li>
+
+  @for (folder of folders; track folder) {
+    <li class="list-group-item">
+      <div class="row">
+        <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editFolder(folder)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.Folder)">{{folder.name}}</button></div>
+        <div class="col">
+          <div class="btn-group">
+            <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Folder }" class="btn btn-sm btn-outline-secondary" type="button" (click)="editFolder(folder)">
+              <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
+            </button>
+            <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Folder }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteFolder(folder)">
+              <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+            </button>
+          </div>
+        </div>
+      </div>
+    </li>
+  }
+  @if (folders.length === 0) {
+    <li class="list-group-item" i18n>No folders defined.</li>
+  }
+</ul>

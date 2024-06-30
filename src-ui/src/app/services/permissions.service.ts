@@ -32,6 +32,7 @@ export enum PermissionType {
   Box = '%s_box',
   Shelf = '%s_shelf',
   Approval = '%s_approval',
+  Folder = '%s_folder'
 }
 
 @Injectable({

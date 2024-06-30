@@ -102,11 +102,17 @@ import { WorkflowEditDialogComponent } from './components/common/edit-dialog/wor
 import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 import { DragDropModule } from '@angular/cdk/drag-drop'
+import { FolderEditDialogComponent } from './components/common/edit-dialog/folder-edit-dialog/folder-edit-dialog.component'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
-//import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
-//import { CustomFieldsDropdownComponent } from './components/common/custom-fields-dropdown/custom-fields-dropdown.component'
-// import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
-// import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
+import { FoldersComponent } from './components/manage/folder-list/folder.component'
+import { BoxFieldsComponent } from './components/manage/box-fields/box-fields.component'
+import { WarehouseEditDialogComponent } from './components/common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
+import { WarehouseListComponent } from './components/manage/warehouse-list/warehouse-list.component'
+import { BoxEditDialogComponent } from './components/common/edit-dialog/box-edit-dialog/box-edit-dialog.component'
+import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { CustomShelfComponent } from './components/manage/custom-shelf/custom-shelf.component'
+import { CustomShelfEditDialogComponent } from './components/common/edit-dialog/custom-shelf-edit-dialog/custom-shelf-edit-dialog.component'
 import { CustomFieldsDropdownComponent } from './components/common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { ApprovalEditDialogComponent } from './components/common/edit-dialog/approval-edit-dialog/approval-edit-dialog.component'
 import { ProfileEditDialogComponent } from './components/common/profile-edit-dialog/profile-edit-dialog.component'
@@ -343,14 +349,6 @@ import localeTr from '@angular/common/locales/tr'
 import localeUk from '@angular/common/locales/uk'
 import localeZh from '@angular/common/locales/zh'
 import localeVi from '@angular/common/locales/vi'
-import { BoxFieldsComponent } from './components/manage/box-fields/box-fields.component'
-import { WarehouseEditDialogComponent } from './components/common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
-import { WarehouseListComponent } from './components/manage/warehouse-list/warehouse-list.component'
-import { BoxEditDialogComponent } from './components/common/edit-dialog/box-edit-dialog/box-edit-dialog.component'
-import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
-import { CustomShelfComponent } from './components/manage/custom-shelf/custom-shelf.component'
-import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
-import { CustomShelfEditDialogComponent } from './components/common/edit-dialog/custom-shelf-edit-dialog/custom-shelf-edit-dialog.component'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -393,8 +391,6 @@ function initializeApp(settings: SettingsService) {
 
 @NgModule({
   declarations: [
-    CustomFieldEditDialogComponent,
-    CustomFieldsComponent,
     //BoxListComponent,
     CustomShelfComponent,
     BoxEditDialogComponent,
@@ -402,6 +398,8 @@ function initializeApp(settings: SettingsService) {
     DocumentListComponent,
     DocumentDetailComponent,
     DashboardComponent,
+    FoldersComponent,
+    FolderEditDialogComponent,
     TagListComponent,
     DocumentTypeListComponent,
     CorrespondentListComponent,
