@@ -263,7 +263,11 @@ class OwnedObjectSerializer(
 
     def create(self, validated_data):
         # default to current user if not set
-        if "owner" not in validated_data and self.user:
+        request = self.context.get("request")
+        if (
+            "owner" not in validated_data
+            or (request is not None and "owner" not in request.data)
+        ) and self.user:
             validated_data["owner"] = self.user
         permissions = None
         if "set_permissions" in validated_data:
