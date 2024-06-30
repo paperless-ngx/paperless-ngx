@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient , HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AbstractNameFilterService } from './abstract-name-filter-service';
 import { Folders, Document, Results,SRC  } from 'src/app/data/folders';
@@ -43,6 +43,9 @@ export class FoldersService extends AbstractNameFilterService<Document> {
   deleteFolder(id: number): Observable<void> {
     return this.http.delete<void>(`${environment.apiBaseUrl}folders/${id}/`);
   }
+  deleteFileById(id: number): Observable<void> {
+    return this.http.delete<void>(`${environment.apiBaseUrl}documents/${id}/`);
+  }
   bulkDeleteFolders(ids: number[]): Observable<void> {
     const payload = {
       objects: ids,
@@ -55,8 +58,10 @@ export class FoldersService extends AbstractNameFilterService<Document> {
     return this.http.get<{ documents: Document[], folders: Folders[] }>(`${environment.apiBaseUrl}folders/${folderId}/folders_documents_by_id/`);
   }
   uploadDocument(formData: FormData): Observable<Document> {
-    return this.http.post<Document>(`${environment.apiBaseUrl}/api/documents/post_document/`, formData);
+    return this.http.post<Document>(`${environment.apiBaseUrl}documents/post_document/`, formData);
   }
-  
-  
+  searchFolders(searchTerm: string): Observable<{ results: Results[] }> {
+    const params = new HttpParams().set('name__icontains', searchTerm);
+    return this.http.get<{ results: Results[] }>(`${environment.apiBaseUrl}folders/`, { params });
+  }  
 }

@@ -67,6 +67,17 @@ export const routes: Routes = [
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
+            action: 'view',
+            type: 'document',
+          },
+        },
+      },
+      {
+        path: 'documents/:id',
+        component: DocumentDetailComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
             action: PermissionAction.View,
             type: PermissionType.Document,
           },

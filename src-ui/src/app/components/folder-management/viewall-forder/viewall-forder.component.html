@@ -23,26 +23,32 @@
       
       <div id="contextMenu" style="display:none" class="addfolder">
         <ul>
-          <li class="id" add=""><a>New file...</a></li>
+          <li class="id f" chau="" add="" (click)="deleteFile($event)"><a>delete file...</a></li>
           <li class="id" add="" (click)="showInput($event)"><a>New folder...</a></li>
           <li class="id f" chua="" (click)="showRenameFile($event)" style="border: 1px solid greenyellow;display: none;"><a>Rename File...</a></li>
           <li class="id c" add="" (click)="showRenameFolder($event)" style="border: 1px solid greenyellow; display: none;"><a>Rename Folder...</a></li>
           <li class="id" add="" (click)="deleteMultipleItems($event)" (click)="deleteItem($event)"  add2="" style="border: 1px solid greenyellow;"><a>Delete...</a></li>
-          <li class="id c"  add="" style="border: 1px solid greenyellow; display: none; "  (click)="onCutClick()" #cutElement><a>cut...</a></li>
-          <li class="id c"   add="" style="border: 1px solid greenyellow; display: none;" (click)="onPasteClick()" #pasteElement><a>Past...</a></li>
+          <li class="id c" id="cutfolder"  add="" style="border: 1px solid greenyellow; display: none; "  (click)="onCutClick()" #cutElement><a>cut...</a></li>
+          <li class="id c" id="pastfolder"  add="" style="border: 1px solid greenyellow;" (click)="onPasteClick($event)" #pasteElement><a>Past...</a></li>
           <li class="f"  chua="" style="border: 1px solid greenyellow; display: none; " (click)="onCutClickf($event)" #cutElementf><a>cutfile...</a></li>
-          <li class="id f c"  add="" chua="" style="border: 1px solid greenyellow; display: none;" (click)="onPasteClickf($event)" #pasteElementf><a>Pastfile...</a></li>
+          <li class="id f c"  add="" chua="" style="border: 1px solid greenyellow; " (click)="onPasteClickf($event)" #pasteElementf><a>Pastfile...</a></li>
         </ul>
       </div>
           
           
       <div class="folder-left" id="sss" pngxPreventRightClick>
           <div class="folder-left-1">
-              <div class="folder-left-search">
-                <div _ngcontent-ng-c1405531498="" class="form-inline d-flex align-items-center">
-                  <input _ngcontent-ng-c1405531498="" type="text" autofocus="" placeholder="Name" class="form-control form-control-sm flex-fill w-auto ng-pristine ng-valid ng-touched">
-                </div>
+            <div class="folder-left-search">
+              <div class="form-inline d-flex align-items-center">
+                <input
+                  type="text"
+                  autofocus
+                  placeholder="Name"
+                  class="form-control form-control-sm flex-fill w-auto"
+                  (input)="onSearch($event)"
+                />
               </div>
+            </div>            
           </div>
           <div id="folders-container" class="folder" pngxPreventRightClick>
               <!-- Folders and Documents will be added dynamically here -->
@@ -57,12 +63,18 @@
     
             </div>        
               <div class="folder-right-search">
-                <div _ngcontent-ng-c1405531498="" class="form-inline d-flex align-items-center">
-                  <input _ngcontent-ng-c1405531498="" type="text" autofocus="" placeholder="Name" class="form-control form-control-sm flex-fill w-auto ng-pristine ng-valid ng-touched">
+                <div class="form-inline d-flex align-items-center">
+                  <input
+                    type="text"
+                    autofocus
+                    placeholder="Name"
+                    class="form-control form-control-sm flex-fill w-auto"
+                    (input)="onSearch($event)"
+                  />
                 </div>
               </div>
           </div>
-          <div #folderRightContent id="folderDropArea" id-khai="" class="folder-right-conten" (drop)="onDrop($event)" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)">
+          <div id="folderDropArea" #folderDropArea  id-khai="" class="folder-right-conten" pngxDragDrop>
               <table class="folder-contents table table-striped align-middle border shadow-sm " pngxPreventRightClick>
                   <thead>
                       <tr >

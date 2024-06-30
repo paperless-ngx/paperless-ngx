@@ -242,7 +242,6 @@ table {
     background-color: #fff;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     row-gap: 1 row;
-    margin-left: 3%;
 }
 table td{
     color: black;
@@ -302,8 +301,23 @@ form{
 .selected {
     background-color: #007bff25;
 }
-.folder tr th{
+.folder tr th:nth-child(1){
     display: flex;
+    
+}
+.document th img{
+    width: 100px;
+    height: auto;
+}
+.folder th .fa-solid{
+    float: left;
+    color: gold;
+    font-size: 30px;
+    padding:  0 10px;
+}
+.folder th  p{
+    padding:  0 10px;
+    float: left;
 }
 .document tr th{
     display: flex;
@@ -419,3 +433,26 @@ table tbody td p {
 .children-container .document-container{
     padding: 0 0 0 20px;
 }
+.folder-right-tim input{
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px; 
+}
+.folder-right-tim .error {
+    border-color: red;
+}
+.folder-right-tim input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+  
+ 
+.folder-right-tim input:hover {
+    background-color: #e9ecef;
+}
+.folder-right-conten {
+    margin-left: 2%;
+  }
+  

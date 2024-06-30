@@ -13,7 +13,7 @@ export interface Folders extends MatchingModel {
   parent_folder: number | null;
   path: string;
 }
-export interface Results{
+export interface Results {
   id: number;
   owner_id: number;
   name: string;
@@ -22,7 +22,16 @@ export interface Results{
   is_insensitive: boolean;
   parent_folder: number | null;
   path: string;
+  document_count: number;
+  slug: string;
+  user_can_change: boolean;
+  is_shared_by_requester: boolean;
+  child_folder_count: number;
+  filesize: number;
+  checksum: string;
+  owner: number;
 }
+
 export interface SRC {
   documents: Document[];
   folders: Folders[];
