@@ -9,6 +9,7 @@ import { environment } from 'src/environments/environment'
 import { Directive, HostListener } from '@angular/core';
 import { DragDropDirective } from 'src/app/services/drag-drop.directive';
 import { Router } from '@angular/router';
+import { FolderFunctionServiceService } from 'src/app/services/folder-function-service.service';
 @Component({
   selector: 'app-view-all-folder',
   templateUrl: './viewall-forder.component.html',
@@ -42,6 +43,7 @@ export class ViewallForderComponent implements OnInit {
   @ViewChild('folderDropArea') folderDropAreaRef!: ElementRef;
   private rightClickedOnFolderDropArea: boolean = false;
   @ViewChild('folderDropArea') folderDropAreaRe!: ElementRef;
+  currentFolderId: number;
 
 
 
@@ -54,10 +56,12 @@ export class ViewallForderComponent implements OnInit {
     private elementRef: ElementRef,
     private cdr: ChangeDetectorRef,
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private folderFunctionService: FolderFunctionServiceService
   ) {}
 
  ngOnInit(): void {
+  this.loadInitialData();
   this.addGridStyles();
   this.loadFolders(); 
     this.foldersService.getFoldersAndDocuments().subscribe({
@@ -67,7 +71,6 @@ export class ViewallForderComponent implements OnInit {
         this.loadFolders();
         this.initializeFolders();
         this.initializeDocuments();
-        this.addEventListeners();
         this.addEventListenerss();
       },
       error: error => {
@@ -95,10 +98,60 @@ export class ViewallForderComponent implements OnInit {
     });    
     
   }
+  loadInitialData(): void {
+    this.foldersService.getFoldersAndDocuments().subscribe({
+      next: (data: any) => {
+        this.folders = data.folders;
+        this.documents = data.documents;
+        this.initializeFolders();
+        this.initializeDocuments();
+        this.cdr.detectChanges(); // Cập nhật giao diện sau khi có dữ liệu mới
+      },
+      error: error => {
+        console.error('Error fetching data:', error);
+      }
+    });
+
+    this.foldersService.getResults().subscribe({
+      next: (data: any) => {
+        this.results = data.results.filter(result => result.parent_folder !== null);
+        this.initializeFolders();
+        this.cdr.detectChanges(); // Cập nhật giao diện sau khi có dữ liệu mới
+      },
+      error: error => {
+        console.error('Error fetching results:', error);
+      }
+    });
+
+    this.foldersService.getdocument().subscribe({
+      next: (data: any) => {
+        this.thesis = data.thesis.filter(document => document.folder !== null);
+        this.initializeFolders();
+        this.cdr.detectChanges(); // Cập nhật giao diện sau khi có dữ liệu mới
+      },
+      error: error => {
+        console.error('Error fetching documents:', error);
+      }
+    });
+  }
+
+  reloadData(): void {
+    this.foldersService.reloadFoldersData().subscribe({
+      next: () => {
+        console.log('Reloaded data successfully.');
+        this.loadInitialData(); // Gọi lại loadInitialData() để tải lại dữ liệu và cập nhật giao diện
+      },
+      error: (error) => {
+        console.error('Error reloading data:', error);
+      }
+    });
+  }
+
   navigateToDocument(id: number) {
     this.router.navigate(['/documents', id]);
   }
   loadFolderContents(folderId: number): void {
+    this.currentFolderId = folderId;
     this.foldersService.fetchfolderandDocuments(folderId).subscribe({
       next: (data: { documents: Document[], folders: Folders[] }) => {
         this.folders = data.folders;
@@ -181,7 +234,8 @@ export class ViewallForderComponent implements OnInit {
           this.foldersService.updateFile(this.cutItemIdf, updateData).subscribe(
             updatedFile => {
               console.log('Đã cập nhật file:', updatedFile);
-
+              this.loadFolderContents(newParentFileId);
+              this.reloadData();
             },
             error => {
               console.error('Lỗi khi cập nhật folder:', error);
@@ -203,7 +257,8 @@ export class ViewallForderComponent implements OnInit {
           this.foldersService.updateFile(this.cutItemIdf, updateData).subscribe(
             updatedFile => {
               console.log('Đã cập nhật file:', updatedFile);
-
+              this.loadFolderContents(newParentFileId);
+              this.reloadData();
             },
             error => {
               console.error('Lỗi khi cập nhật folder:', error);
@@ -220,29 +275,11 @@ export class ViewallForderComponent implements OnInit {
 
     this.rightClickedOnFolderDropArea = false;
   }
-  deleteFile(event: Event): void {
-    const target = event.target as HTMLElement;
-    const idAttr = target.closest('li')?.getAttribute('chua');
-    if (idAttr) {
-      const id = parseInt(idAttr, 10);
-      if (!isNaN(id)) {
-        this.foldersService.deleteFileById(id).subscribe({
-          next: () => {
-            console.log(`File with ID ${id} has been deleted.`);
-
-          },
-          error: (err) => {
-            console.error(`Error deleting file with ID ${id}:`, err);
-          }
-        });
-      } else {
-        console.error('Invalid ID');
-      }
-    } else {
-      console.error('ID not found');
-    }
+  onDeleteFile(event: Event): void {
+    this.folderFunctionService.deleteFile(event);
+    this.reloadData();
   }
-
+  
 
 onCutClick() {
   this.cutElement.nativeElement.style.display = 'none';
@@ -278,6 +315,8 @@ onPasteClick(event: MouseEvent) {
           updatedFolder => {
             folderToUpdate.parent_folder = newParentFolderId;
             this.cutItemId = null; 
+            this.loadFolderContents(newParentFolderId);
+            this.reloadData();
           },
           error => {
             console.error('Failed to update folder:', error); 
@@ -298,6 +337,8 @@ onPasteClick(event: MouseEvent) {
           updatedFolder => {
             folderToUpdate.parent_folder = newParentFolderId; 
             this.cutItemId = null; 
+            this.loadFolderContents(newParentFolderId);
+            this.reloadData();
           },
           error => {
             console.error('Failed to update folder:', error); 
@@ -326,46 +367,15 @@ onPasteClick(event: MouseEvent) {
       }
     });
   }
-  deleteMultipleItems(event: MouseEvent) {
-    const target = event.currentTarget as HTMLElement;
-    const add2Attribute = target.getAttribute('add2');
-    if (add2Attribute) {
-      const idsToDelete = add2Attribute.split(',').map(id => parseInt(id.trim(), 10));
-
-      this.foldersService.bulkDeleteFolders(idsToDelete).subscribe(
-        () => {
-
-          this.results = this.results.filter(result => !idsToDelete.includes(result.id));
-          console.log(`IDs ${idsToDelete.join(', ')} have been deleted.`);
-          this.loadFolders();
-        },
-        error => {
-          console.error('Error deleting multiple items:', error);
-        }
-      );
-    }
+  onDeleteItem(event: MouseEvent): void {
+    this.folderFunctionService.deleteItem(event, this.results, this.loadFolders.bind(this), this.loadFolderContents.bind(this), this.currentFolderId);
   }
-  deleteItem(event: MouseEvent) {
-    const target = event.currentTarget as HTMLElement;
-    const addAttribute = target.getAttribute('add');
-    if (addAttribute) {
-      const idToDelete = parseInt(addAttribute, 10);
 
-      this.foldersService.deleteFolder(idToDelete).subscribe(
-        () => {
-
-          this.results = this.results.filter(result => result.id !== idToDelete);
-          console.log(`ID ${idToDelete} has been deleted.`);
-          this.loadFolders();
-          this.loadFolderContents;
-        },
-        error => {
-          console.error('Error deleting item:', error);
-        }
-      );
-    }
+  onDeleteMultipleItems(event: MouseEvent): void {
+    this.folderFunctionService.deleteMultipleItems(event, this.results, this.loadFolders.bind(this), this.loadFolderContents.bind(this), this.currentFolderId);
   }
   showRenameFolder(event: Event): void {
+    event.preventDefault();
     const liElement = (event.currentTarget as HTMLElement).closest('li');
     if (liElement) {
       const folderId = liElement.getAttribute('add');
@@ -400,6 +410,8 @@ onPasteClick(event: MouseEvent) {
               this.results[index].name = updatedFolder.name;
               this.results[index].parent_folder = updatedFolder.parent_folder;
               this.loadFolders();
+              this.loadFolderContents(this.currentFolderId);
+              this.reloadData();
             }
           }, error => {
             console.error('Error updating folder:', error);
@@ -503,6 +515,8 @@ onPasteClick(event: MouseEvent) {
                 this.documents[index].title = updatedFile.title;
                 this.documents[index].folder = updatedFile.folder;
                 this.loadFolders();
+                this.loadFolderContents(this.currentFolderId);
+                this.reloadData();
               }
             },
             error => {
@@ -533,6 +547,7 @@ onPasteClick(event: MouseEvent) {
         }
   
         this.loadFolderContents(this.parent_folder ? this.parent_folder : response.id);
+        this.reloadData();
       });
     }
   }
@@ -887,71 +902,6 @@ onPasteClick(event: MouseEvent) {
   }
   
 
-  addEventListeners(): void {
-
-    const folderChaElements = this.elementRef.nativeElement.querySelectorAll('.folder-cha');
-    folderChaElements.forEach(item => {
-      this.renderer.listen(item, 'dblclick', (event: Event) => {
-        const target = event.currentTarget as HTMLElement;
-        const folderElement = target.closest('.folder') as HTMLElement;
-        const folderId = Number(folderElement?.dataset.folderId);
-        this.confirmDisplayFolderContents(folderId);
-      });
-    });
-  
-
-    const folderRows = this.elementRef.nativeElement.querySelectorAll('tr[data-folder-id]');
-    folderRows.forEach(row => {
- 
-      row.removeEventListener('click', this.handleRowClick);
-      
- 
-      this.renderer.listen(row, 'dblclick', (event: Event) => {
-        const target = event.currentTarget as HTMLTableRowElement;
-        const folderId = Number(target.dataset.folderId);
-        this.confirmDisplayFolderContents(folderId);
-      });
-    });
-  
-   
-    const folderLeft = this.elementRef.nativeElement.querySelector('#folderLeft');
-    if (folderLeft) {
-      const resizeHandle = folderLeft.querySelector('.resize-handle') as HTMLElement;
-      if (resizeHandle) {
-        let startX: number;
-        let startWidth: number;
-  
-        const resizeWidth = (event: MouseEvent) => {
-          const newWidth = startWidth + (event.clientX - startX);
-          folderLeft.style.width = `${newWidth}px`; 
-        
-          const folderRight = this.elementRef.nativeElement.querySelector('.folder-right') as HTMLElement;
-          if (folderRight) {
-            folderRight.style.width = `calc(100% - ${newWidth}px)`;
-          }
-        };
-        
-  
-        const stopResize = () => {
-          document.removeEventListener('mousemove', resizeWidth);
-          document.removeEventListener('mouseup', stopResize);
-        };
-  
-        this.renderer.listen(resizeHandle, 'mousedown', (event: MouseEvent) => {
-          startX = event.clientX;
-          startWidth = parseInt(window.getComputedStyle(folderLeft).width, 10);
-          document.addEventListener('mousemove', resizeWidth);
-          document.addEventListener('mouseup', stopResize);
-        });
-      }
-    }
-  }
-  
-  handleRowClick(event: Event) {
-    const target = event.currentTarget as HTMLTableRowElement;
-    const folderId = Number(target.dataset.folderId);
-  
-  }
   handleFolderRightTimClick(): void {
     const folderRightTim = this.elementRef.nativeElement.querySelector('.folder-right-tim');
     if (!folderRightTim) {
@@ -1132,108 +1082,7 @@ displayFolderPath(path: string): void {
 
 
 
-  confirmDisplayFolderContents(folderId: number): void {
-    this.displayFolderContents(folderId);
-  }
 
-  displayFolderContents(folderId: number, parentRow: HTMLTableRowElement | null = null): void {
-    const tableBody = this.elementRef.nativeElement.querySelector('.folder-contents tbody');
-    if (tableBody) {
-      const rowsToRemove = parentRow
-      ? tableBody.querySelectorAll(`.child-of-folder-${folderId}`)
-      : tableBody.querySelectorAll('tr');
-      rowsToRemove.forEach(row => row.remove());
-
-      const childFolders = this.folders.filter(folder => folder.parent_folder === folderId);
-      const childResults = this.results.filter(result => result.parent_folder === folderId);
-      const allChildFolders = [...childFolders, ...childResults];
-
-      allChildFolders.forEach(folder => {
-        const row = this.createFolderRowHTML(folder, folderId);
-        if (parentRow) {
-          parentRow.insertAdjacentElement('afterend', row);
-        } else {
-          tableBody.appendChild(row);
-        }
-      });
-
-      const childDocuments = this.documents.filter(doc => doc.folder === folderId);
-      childDocuments.forEach(doc => {
-        const row = this.createDocumentRowHTML(doc, folderId);
-        if (parentRow) {
-          parentRow.insertAdjacentElement('afterend', row);
-        } else {
-          tableBody.appendChild(row);
-        }
-      });
-
-      this.addRowEventListeners();
-    }
-  }
-
-  createFolderRowHTML(folder: Folders, parentId: number): HTMLElement {
-    const row = document.createElement('tr');
-    row.classList.add(`child-of-folder-${parentId}`);
-    row.dataset.folderId = folder.id.toString();
-    this.renderer.setAttribute(row, 'pxngxPreventRightClick', '');
-
-    const nameCell = document.createElement('td');
-    row.setAttribute('pxngxPreventRightClick', '');
-    const folderIcon = document.createElement('i');
-    folderIcon.classList.add('fa-solid', 'fa-folder');
-    const folderName = document.createElement('p');
-    folderName.textContent = folder.name;
-    nameCell.appendChild(folderIcon);
-    nameCell.appendChild(folderName);
-
-    const dateCell = document.createElement('td');
-    dateCell.textContent = '11/10/2002'; 
-
-    const typeCell = document.createElement('td');
-    typeCell.textContent = 'File Folder';
-
-    const sizeCell = document.createElement('td');
-    sizeCell.textContent = '2 KB';
-
-    row.appendChild(nameCell);
-    row.appendChild(dateCell);
-    row.appendChild(typeCell);
-    row.appendChild(sizeCell);
-
-    return row;
-  }
-
-  createDocumentRowHTML(doc: Document, parentId: number): HTMLElement {
-    const row = document.createElement('tr');
-    row.classList.add(`child-of-folder-${parentId}`);
-    row.dataset.documentId = doc.id.toString();
-    this.renderer.setAttribute(row, 'pxngxPreventRightClick', '');
-
-    const nameCell = document.createElement('td');
-    row.setAttribute('pxngxPreventRightClick', '');
-    const fileIcon = document.createElement('i');
-    fileIcon.classList.add('fa-solid', 'fa-file');
-    const fileName = document.createElement('p');
-    fileName.textContent = doc.filename;
-    nameCell.appendChild(fileIcon);
-    nameCell.appendChild(fileName);
-
-    const dateCell = document.createElement('td');
-    dateCell.textContent = '11/10/2002'; 
-
-    const typeCell = document.createElement('td');
-    typeCell.textContent = 'txt'; 
-
-    const sizeCell = document.createElement('td');
-    sizeCell.textContent = '2 KB'; 
-
-    row.appendChild(nameCell);
-    row.appendChild(dateCell);
-    row.appendChild(typeCell);
-    row.appendChild(sizeCell);
-
-    return row;
-  }
   appendFoldersAndDocuments(folders: Folders[], documents: Document[], container: HTMLElement): void {
     folders.forEach(folder => {
       const folderHTML = this.createFolderHTML(folder);
@@ -1382,110 +1231,40 @@ displayFolderPath(path: string): void {
     folderRows.forEach(row => {
       row.addEventListener('click', (event) => {
         if (!event.ctrlKey) {
-
           const selectedItems = document.querySelectorAll('.selected');
           selectedItems.forEach(item => item.classList.remove('selected'));
         }
-
         row.classList.toggle('selected');
       });
-    
+  
       this.renderer.listen(row, 'dblclick', (event: Event) => {
         const target = event.currentTarget as HTMLTableRowElement;
         const folderId = Number(target.dataset.folderId);
   
-    
-        const result = this.results.find(result => result.id === folderId);
-        if (result) {
-          const folderPath = result.path;
-  
-       
-          const folderRightTim = document.querySelector('.folder-right-tim');
-          if (folderRightTim) {
-            folderRightTim.innerHTML = ''; 
-  
-         
-            const logoFolderDiv = document.createElement('div');
-            logoFolderDiv.classList.add('logo-folder');
-  
-            const folderIcon = document.createElement('i');
-            folderIcon.classList.add('fa', 'fa-solid', 'fa-folder');
-  
-            const chevronIcon = document.createElement('i');
-            chevronIcon.classList.add('fa', 'fa-regular', 'fa-folder-open');
-  
-         
-            logoFolderDiv.appendChild(folderIcon);
-            logoFolderDiv.appendChild(chevronIcon);
-  
-       
-            folderRightTim.appendChild(logoFolderDiv);
-  
-          
-            this.loggedFolderPath = folderPath;
-  
-           
-            this.confirmDisplayFolderContents(folderId);
-  
- 
-            const numberArray = folderPath.split('/').map(Number);
-  
-
-            numberArray.forEach(number => {
-
-              const folderId = parseInt(number.toString(), 10);
-              const folderName = this.getFolderNameById(folderId);
-  
-              if (folderName) {
-
-                const tenFolderDiv = document.createElement('div');
-                tenFolderDiv.classList.add('ten-folder');
-  
-
-                const folderNameElement = document.createElement('p');
-                folderNameElement.textContent = folderName;
-  
-
-                const chevronIcon = document.createElement('i');
-                chevronIcon.classList.add('fa', 'fa-solid', 'fa-chevron-right');
-  
- 
-                tenFolderDiv.appendChild(folderNameElement);
-                tenFolderDiv.appendChild(chevronIcon);
-  
-
-                folderRightTim.appendChild(tenFolderDiv);
-              }
-            });
-          }
-        } else {
-          console.warn(`Folder with id ${folderId} not found in Results array.`);
-        }
         const folderRightConten = document.querySelector('.folder-right-conten');
         if (folderRightConten) {
-            folderRightConten.setAttribute('id-khai', folderId.toString());
+          folderRightConten.setAttribute('id-khai', folderId.toString());
         }
       });
   
- 
-    document.body.addEventListener('click', (event) => {
-      const target = event.target as HTMLElement;
-      const isFolderCha = target.closest('.folder-cha');
-      const isTrElement = target.closest('tr');
-      const isDocument = target.closest('.document');
-
-      if (!isFolderCha && !isTrElement && !isDocument) {
- 
-        const selectedItems = document.querySelectorAll('.selected');
-        selectedItems.forEach(item => item.classList.remove('selected'));
-      }
-    });
-      this.renderer.listen(row, 'click', () => {
-        const clickedFolderPath = row.dataset.folderPath; 
+      document.body.addEventListener('click', (event) => {
+        const target = event.target as HTMLElement;
+        const isFolderCha = target.closest('.folder-cha');
+        const isTrElement = target.closest('tr');
+        const isDocument = target.closest('.document');
   
+        if (!isFolderCha && !isTrElement && !isDocument) {
+          const selectedItems = document.querySelectorAll('.selected');
+          selectedItems.forEach(item => item.classList.remove('selected'));
+        }
+      });
+  
+      this.renderer.listen(row, 'click', () => {
+        const clickedFolderPath = row.dataset.folderPath;
       });
     });
   }
+  
 
   appendToTable(folders: Folders[], documents: Document[], folderId: number): void {
     const tbody = document.querySelector('.folder-right-conten table tbody') as HTMLElement;
