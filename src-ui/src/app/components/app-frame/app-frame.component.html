@@ -104,6 +104,13 @@
               <i-bs class="me-1" name="files"></i-bs><span>&nbsp;<ng-container i18n>Document</ng-container></span>
             </a>
           </li>
+          <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }">
+            <a class="nav-link" routerLink="folders" routerLinkActive="active" (click)="closeMenu()"
+              ngbPopover="Folder" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
+              container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+              <i-bs class="me-1" name="folder"></i-bs><span>&nbsp;<ng-container i18n>Folder</ng-container></span>
+            </a>
+          </li>
         </ul>
 
         <div class="nav-group mt-3 mb-1" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
@@ -205,15 +212,6 @@
                 <i-bs class="me-1" name="folder"></i-bs><span>&nbsp;<ng-container i18n>Storage Paths</ng-container></span>
               </a>
             </li>
-
-            <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }">
-              <a class="nav-link" routerLink="folders" routerLinkActive="active" (click)="closeMenu()"
-                ngbPopover="Folder" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
-                container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-1" name="folder"></i-bs><span>&nbsp;<ng-container i18n>Folder</ng-container></span>
-              </a>
-            </li>
-       
 
             <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Warehouse }">
                 <a class="nav-link" (click)="toggleKho()" routerLink="warehouses" ngbPopover="Warehouses" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"

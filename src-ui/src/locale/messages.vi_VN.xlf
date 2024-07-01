@@ -379,7 +379,7 @@
                <context context-type="sourcefile">src/app/app.component.ts</context>
                <context context-type="linenumber">134</context>
             </context-group>
-            <target state="translated">Trang dashboard có thể được sử dụng để hiển thị các chế độ xem đã lưu, chẳng hạn như 'Hộp thư đến'. Những cài đặt đó được tìm thấy trong Cài đặt &amp;amp;amp;amp;amp;gt; Đã lưu Chế độ xem sau khi bạn đã tạo.</target>
+            <target state="translated">Trang dashboard có thể được sử dụng để hiển thị các chế độ xem đã lưu, chẳng hạn như 'Hộp thư đến'. Những cài đặt đó được tìm thấy trong Cài đặt &amp;amp;amp;amp;amp;amp;gt; Đã lưu Chế độ xem sau khi bạn đã tạo.</target>
          </trans-unit>
          <trans-unit id="9075755296812854717" datatype="html">
             <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
@@ -493,11 +493,11 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">254</context>
+               <context context-type="linenumber">252</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">256</context>
+               <context context-type="linenumber">254</context>
             </context-group>
             <target state="translated">Xét duyệt</target>
          </trans-unit>
@@ -1215,10 +1215,10 @@
             </context-group>
             <target state="translated">
                Thất bại
-               <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.failureApprovals.length &amp;amp;amp;amp;amp;gt; 0) {" />
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;quot;badge bg-danger ms-2&amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;gt;" />
+               <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.failureApprovals.length &amp;amp;amp;amp;amp;amp;gt; 0) {" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;amp;quot;badge bg-danger ms-2&amp;amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;amp;gt;" />
                <x id="INTERPOLATION" equiv-text="{{approvalsService.failureApprovals.length}}" />
-               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;lt;/span&amp;amp;amp;amp;amp;gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;amp;lt;/span&amp;amp;amp;amp;amp;amp;gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
             </target>
          </trans-unit>
@@ -1237,10 +1237,10 @@
             </context-group>
             <target state="translated">
                Thành công
-               <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.successApprovals.length &amp;amp;amp;amp;amp;gt; 0) {" />
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;quot;badge bg-secondary ms-2&amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;gt;" />
+               <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.successApprovals.length &amp;amp;amp;amp;amp;amp;gt; 0) {" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;amp;quot;badge bg-secondary ms-2&amp;amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;amp;gt;" />
                <x id="INTERPOLATION" equiv-text="{{approvalsService.successApprovals.length}}" />
-               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;lt;/span&amp;amp;amp;amp;amp;gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;amp;lt;/span&amp;amp;amp;amp;amp;amp;gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
             </target>
          </trans-unit>
@@ -1259,10 +1259,10 @@
             </context-group>
             <target state="translated">
                Đang chờ
-               <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.pendingApprovals.length &amp;amp;amp;amp;amp;gt; 0) {" />
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;quot;badge bg-secondary ms-2&amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;gt;" />
+               <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.pendingApprovals.length &amp;amp;amp;amp;amp;amp;gt; 0) {" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;amp;quot;badge bg-secondary ms-2&amp;amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;amp;gt;" />
                <x id="INTERPOLATION" equiv-text="{{approvalsService.pendingApprovals.length}}" />
-               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;lt;/span&amp;amp;amp;amp;amp;gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;amp;lt;/span&amp;amp;amp;amp;amp;amp;gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
             </target>
          </trans-unit>
@@ -1281,10 +1281,10 @@
             </context-group>
             <target state="translated">
                Đã thu hồi
-               <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.revokedApprovals.length &amp;amp;amp;amp;amp;gt; 0) {" />
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;quot;badge bg-secondary ms-2&amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;gt;" />
+               <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.revokedApprovals.length &amp;amp;amp;amp;amp;amp;gt; 0) {" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;amp;quot;badge bg-secondary ms-2&amp;amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;amp;gt;" />
                <x id="INTERPOLATION" equiv-text="{{approvalsService.revokedApprovals.length}}" />
-               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;lt;/span&amp;amp;amp;amp;amp;gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;amp;lt;/span&amp;amp;amp;amp;amp;amp;gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
             </target>
          </trans-unit>
@@ -1471,7 +1471,7 @@
                <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
                <context context-type="linenumber">4</context>
             </context-group>
-            <target state="translated">Global app configuration options which apply to &amp;amp;amp;amp;amp;lt;strong&amp;amp;amp;amp;amp;gt;every&amp;amp;amp;amp;amp;lt;/strong&amp;amp;amp;amp;amp;gt; user of this install of NIAD. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</target>
+            <target state="translated">Global app configuration options which apply to &amp;amp;amp;amp;amp;amp;lt;strong&amp;amp;amp;amp;amp;amp;gt;every&amp;amp;amp;amp;amp;amp;lt;/strong&amp;amp;amp;amp;amp;amp;gt; user of this install of NIAD. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</target>
          </trans-unit>
          <trans-unit id="187187500641108332" datatype="html">
             <source>
@@ -1654,11 +1654,11 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">305</context>
+               <context context-type="linenumber">303</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">308</context>
+               <context context-type="linenumber">306</context>
             </context-group>
             <target state="translated">Nhật ký</target>
          </trans-unit>
@@ -1686,11 +1686,11 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">270</context>
+               <context context-type="linenumber">268</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">272</context>
+               <context context-type="linenumber">270</context>
             </context-group>
             <target state="translated">Cài đặt</target>
          </trans-unit>
@@ -1700,7 +1700,7 @@
                <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
                <context context-type="linenumber">4</context>
             </context-group>
-            <target state="translated">Tùy chọn để tùy chỉnh giao diện, thông báo, chế độ xem đã lưu và hơn thế nữa. Cài đặt chỉ áp dụng cho &amp;amp;amp;amp;amp;lt;strong&amp;amp;amp;amp;amp;gt;người dùng hiện tại&amp;amp;amp;amp;amp;lt;/strong&amp;amp;amp;amp;amp;gt;.</target>
+            <target state="translated">Tùy chọn để tùy chỉnh giao diện, thông báo, chế độ xem đã lưu và hơn thế nữa. Cài đặt chỉ áp dụng cho &amp;amp;amp;amp;amp;amp;lt;strong&amp;amp;amp;amp;amp;amp;gt;người dùng hiện tại&amp;amp;amp;amp;amp;amp;lt;/strong&amp;amp;amp;amp;amp;amp;gt;.</target>
          </trans-unit>
          <trans-unit id="1685061484835793745" datatype="html">
             <source>Start tour</source>
@@ -2272,7 +2272,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">112</context>
+               <context context-type="linenumber">119</context>
             </context-group>
             <target state="translated">Khung nhìn đã lưu</target>
          </trans-unit>
@@ -2308,9 +2308,9 @@
                <context context-type="linenumber">332,333</context>
             </context-group>
             <target state="translated">
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;quot;visually-hidden&amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;gt;" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;amp;quot;visually-hidden&amp;amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;amp;gt;" />
                Hiển thị trên
-               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;lt;/span&amp;amp;amp;amp;amp;gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;amp;lt;/span&amp;amp;amp;amp;amp;amp;gt;" />
             </target>
          </trans-unit>
          <trans-unit id="4104807402967139762" datatype="html">
@@ -2641,11 +2641,11 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">293</context>
+               <context context-type="linenumber">291</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">295</context>
+               <context context-type="linenumber">293</context>
             </context-group>
             <target state="translated">Tác vụ tệp</target>
          </trans-unit>
@@ -2718,10 +2718,10 @@
             </context-group>
             <target state="translated">
                Thất bại
-               <x id="START_BLOCK_IF" equiv-text="@if (tasksService.failedFileTasks.length &amp;amp;amp;amp;amp;gt; 0) {" />
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;quot;badge bg-danger ms-2&amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;gt;" />
+               <x id="START_BLOCK_IF" equiv-text="@if (tasksService.failedFileTasks.length &amp;amp;amp;amp;amp;amp;gt; 0) {" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;amp;quot;badge bg-danger ms-2&amp;amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;amp;gt;" />
                <x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}" />
-               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;lt;/span&amp;amp;amp;amp;amp;gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;amp;lt;/span&amp;amp;amp;amp;amp;amp;gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
             </target>
          </trans-unit>
@@ -2740,10 +2740,10 @@
             </context-group>
             <target state="translated">
                Hoàn thành
-               <x id="START_BLOCK_IF" equiv-text="@if (tasksService.completedFileTasks.length &amp;amp;amp;amp;amp;gt; 0) {" />
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;quot;badge bg-secondary ms-2&amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;gt;" />
+               <x id="START_BLOCK_IF" equiv-text="@if (tasksService.completedFileTasks.length &amp;amp;amp;amp;amp;amp;gt; 0) {" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;amp;quot;badge bg-secondary ms-2&amp;amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;amp;gt;" />
                <x id="INTERPOLATION" equiv-text="{{tasksService.completedFileTasks.length}}" />
-               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;lt;/span&amp;amp;amp;amp;amp;gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;amp;lt;/span&amp;amp;amp;amp;amp;amp;gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
             </target>
          </trans-unit>
@@ -2762,10 +2762,10 @@
             </context-group>
             <target state="translated">
                Đã bắt đầu
-               <x id="START_BLOCK_IF" equiv-text="@if (tasksService.startedFileTasks.length &amp;amp;amp;amp;amp;gt; 0) {" />
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;quot;badge bg-secondary ms-2&amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;gt;" />
+               <x id="START_BLOCK_IF" equiv-text="@if (tasksService.startedFileTasks.length &amp;amp;amp;amp;amp;amp;gt; 0) {" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;amp;quot;badge bg-secondary ms-2&amp;amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;amp;gt;" />
                <x id="INTERPOLATION" equiv-text="{{tasksService.startedFileTasks.length}}" />
-               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;lt;/span&amp;amp;amp;amp;amp;gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;amp;lt;/span&amp;amp;amp;amp;amp;amp;gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
             </target>
          </trans-unit>
@@ -2784,10 +2784,10 @@
             </context-group>
             <target state="translated">
                Đang chờ
-               <x id="START_BLOCK_IF" equiv-text="@if (tasksService.queuedFileTasks.length &amp;amp;amp;amp;amp;gt; 0) {" />
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;quot;badge bg-secondary ms-2&amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;gt;" />
+               <x id="START_BLOCK_IF" equiv-text="@if (tasksService.queuedFileTasks.length &amp;amp;amp;amp;amp;amp;gt; 0) {" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;amp;quot;badge bg-secondary ms-2&amp;amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;amp;gt;" />
                <x id="INTERPOLATION" equiv-text="{{tasksService.queuedFileTasks.length}}" />
-               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;lt;/span&amp;amp;amp;amp;amp;gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;amp;lt;/span&amp;amp;amp;amp;amp;amp;gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
             </target>
          </trans-unit>
@@ -2851,13 +2851,13 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">284</context>
+               <context context-type="linenumber">282</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">286</context>
+               <context context-type="linenumber">284</context>
             </context-group>
-            <target state="translated">Người dùng &amp;amp;amp;amp; Nhóm</target>
+            <target state="translated">Người dùng &amp;amp;amp;amp;amp; Nhóm</target>
          </trans-unit>
          <trans-unit id="4569276013106377105" datatype="html">
             <source>Create, delete and edit users and groups.</source>
@@ -3425,11 +3425,27 @@
             </context-group>
             <target state="translated">Tài liệu</target>
          </trans-unit>
+         <trans-unit id="7046259383943324039" datatype="html">
+            <source>Folder</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+               <context context-type="linenumber">109</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+               <context context-type="linenumber">111</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
+               <context context-type="linenumber">15</context>
+            </context-group>
+            <target state="translated">Thư mục</target>
+         </trans-unit>
          <trans-unit id="6988090220128974198" datatype="html">
             <source>Open documents</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">142</context>
+               <context context-type="linenumber">149</context>
             </context-group>
             <target state="translated">Mở tài liệu</target>
          </trans-unit>
@@ -3437,11 +3453,11 @@
             <source>Close all</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">162</context>
+               <context context-type="linenumber">169</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">164</context>
+               <context context-type="linenumber">171</context>
             </context-group>
             <target state="translated">Đóng tất cả</target>
          </trans-unit>
@@ -3449,7 +3465,7 @@
             <source>MANAGE</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">173</context>
+               <context context-type="linenumber">180</context>
             </context-group>
             <target state="translated">QUẢN LÝ</target>
          </trans-unit>
@@ -3457,11 +3473,11 @@
             <source>Correspondents</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">179</context>
+               <context context-type="linenumber">186</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">181</context>
+               <context context-type="linenumber">188</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -3473,11 +3489,11 @@
             <source>Tags</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">186</context>
+               <context context-type="linenumber">193</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">189</context>
+               <context context-type="linenumber">196</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.ts</context>
@@ -3505,11 +3521,11 @@
             <source>Document Types</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">195</context>
+               <context context-type="linenumber">202</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">197</context>
+               <context context-type="linenumber">204</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -3521,11 +3537,11 @@
             <source>Storage Paths</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">203</context>
+               <context context-type="linenumber">210</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">205</context>
+               <context context-type="linenumber">212</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -3533,27 +3549,11 @@
             </context-group>
             <target state="translated">Đường dẫn lưu dữ liệu</target>
          </trans-unit>
-         <trans-unit id="7046259383943324039" datatype="html">
-            <source>Folder</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">211</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">213</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-               <context context-type="linenumber">15</context>
-            </context-group>
-            <target state="translated">Thư mục</target>
-         </trans-unit>
          <trans-unit id="3660600475579300946" datatype="html">
             <source>Warehouses</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">219</context>
+               <context context-type="linenumber">217</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -3565,7 +3565,7 @@
             <source>Warehouse</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">222</context>
+               <context context-type="linenumber">220</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/box-edit-dialog/box-edit-dialog.component.html</context>
@@ -3601,11 +3601,11 @@
             <source>Custom Fields</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">229</context>
+               <context context-type="linenumber">227</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">231</context>
+               <context context-type="linenumber">229</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.html</context>
@@ -3621,11 +3621,11 @@
             <source>Workflows</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">239</context>
+               <context context-type="linenumber">237</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">241</context>
+               <context context-type="linenumber">239</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
@@ -3637,11 +3637,11 @@
             <source>Mail</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">246</context>
+               <context context-type="linenumber">244</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">249</context>
+               <context context-type="linenumber">247</context>
             </context-group>
             <target state="translated">Mail</target>
          </trans-unit>
@@ -3649,7 +3649,7 @@
             <source>Administration</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">264</context>
+               <context context-type="linenumber">262</context>
             </context-group>
             <target state="translated">Quản trị</target>
          </trans-unit>
@@ -3657,11 +3657,11 @@
             <source>Configuration</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">277</context>
+               <context context-type="linenumber">275</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">279</context>
+               <context context-type="linenumber">277</context>
             </context-group>
             <target state="translated">Cấu hình</target>
          </trans-unit>
@@ -4593,9 +4593,9 @@
             </context-group>
             <target state="translated">
                Sẽ chỉ xử lý các thư phù hợp
-               <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&amp;amp;amp;amp;amp;lt;em&amp;amp;amp;amp;amp;gt;" />
+               <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&amp;amp;amp;amp;amp;amp;lt;em&amp;amp;amp;amp;amp;amp;gt;" />
                tất cả
-               <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&amp;amp;amp;amp;amp;lt;/em&amp;amp;amp;amp;amp;gt;" />
+               <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&amp;amp;amp;amp;amp;amp;lt;/em&amp;amp;amp;amp;amp;amp;gt;" />
                của bộ lọc xác định phía dưới
             </target>
          </trans-unit>
@@ -4925,7 +4925,7 @@
                <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
                <context context-type="linenumber">32</context>
             </context-group>
-            <target state="translated">Xem &amp;amp;amp;amp;amp;lt;a target="_blank" href="https://docs.paperless-ngx.com/advanced_usage/#file-name-handling"&amp;amp;amp;amp;amp;gt;documentation&amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;gt; để xem toàn bộ danh sách.</target>
+            <target state="translated">Xem &amp;amp;amp;amp;amp;amp;lt;a target="_blank" href="https://docs.paperless-ngx.com/advanced_usage/#file-name-handling"&amp;amp;amp;amp;amp;amp;gt;documentation&amp;amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;amp;gt; để xem toàn bộ danh sách.</target>
          </trans-unit>
          <trans-unit id="6898961890896270754" datatype="html">
             <source>Create new storage path</source>
@@ -5209,9 +5209,9 @@
             </context-group>
             <target state="translated">
                Kích hoạt cho các tài liệu khớp
-               <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&amp;amp;amp;amp;amp;lt;em&amp;amp;amp;amp;amp;gt;" />
+               <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&amp;amp;amp;amp;amp;amp;lt;em&amp;amp;amp;amp;amp;amp;gt;" />
                tất cả
-               <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&amp;amp;amp;amp;amp;lt;/em&amp;amp;amp;amp;amp;gt;" />
+               <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&amp;amp;amp;amp;amp;amp;lt;/em&amp;amp;amp;amp;amp;amp;gt;" />
                bộ lọc đã xác định phía dưới
             </target>
          </trans-unit>
@@ -5253,7 +5253,7 @@
                <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
                <context context-type="linenumber">134</context>
             </context-group>
-            <target state="translated">Áp dụng cho các tài liệu khớp với đường dẫn này. Cho phép sử dụng ký tự đại diện được chỉ định là *. Đối với việc phân biệt chữ hoa chữ thường, sẽ được chuẩn hóa.&amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;gt;</target>
+            <target state="translated">Áp dụng cho các tài liệu khớp với đường dẫn này. Cho phép sử dụng ký tự đại diện được chỉ định là *. Đối với việc phân biệt chữ hoa chữ thường, sẽ được chuẩn hóa.&amp;amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;amp;gt;</target>
          </trans-unit>
          <trans-unit id="7468453896129193641" datatype="html">
             <source>Filter mail rule</source>
@@ -5341,7 +5341,7 @@
                <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
                <context context-type="linenumber">169</context>
             </context-group>
-            <target state="translated">Có thể bao gồm một số giá trị thay thế, xem &amp;amp;amp;amp;amp;lt;a target='_blank' href='https://docs.paperless-ngx.com/usage/#workflows'&amp;amp;amp;amp;amp;gt;documentation&amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;gt;.</target>
+            <target state="translated">Có thể bao gồm một số giá trị thay thế, xem &amp;amp;amp;amp;amp;amp;lt;a target='_blank' href='https://docs.paperless-ngx.com/usage/#workflows'&amp;amp;amp;amp;amp;amp;gt;documentation&amp;amp;amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;amp;amp;gt;.</target>
          </trans-unit>
          <trans-unit id="6528897010417701530" datatype="html">
             <source>Assign tags</source>
@@ -7273,7 +7273,7 @@
             <target state="translated">
                Ghi chú
                <x id="START_BLOCK_IF" equiv-text="@if (document?.notes.length) {" />
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;quot;badge text-bg-secondary ms-1&amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;gt;" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;amp;quot;badge text-bg-secondary ms-1&amp;amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;amp;gt;" />
                <x id="INTERPOLATION" equiv-text="ngth}}" />
                <x id="CLOSE_TAG_SPAN" ctype="x-span" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
@@ -7295,7 +7295,7 @@
             <target state="translated">
                Đã xét duyệt
                <x id="START_BLOCK_IF" equiv-text="@if (document?.approvals?.length) {" />
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;quot;badge text-bg-secondary ms-1&amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;gt;" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;amp;amp;amp;amp;amp;lt;span class=&amp;amp;amp;amp;amp;amp;quot;badge text-bg-secondary ms-1&amp;amp;amp;amp;amp;amp;quot;&amp;amp;amp;amp;amp;amp;gt;" />
                <x id="INTERPOLATION" equiv-text="s.length}}" />
                <x id="CLOSE_TAG_SPAN" ctype="x-span" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
@@ -8700,7 +8700,7 @@
                <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
                <context context-type="linenumber">123</context>
             </context-group>
-            <target state="translated">Tiêu đề &amp;amp;amp;amp; nội dung</target>
+            <target state="translated">Tiêu đề &amp;amp;amp;amp;amp; nội dung</target>
          </trans-unit>
          <trans-unit id="9149498548977462220" datatype="html">
             <source>Custom fields</source>
@@ -8777,7 +8777,7 @@
             </context-group>
             <target state="translated">
                Người biên tập:
-               <x id="PH" equiv-text="this.correspondents.find((c) =&amp;amp;amp;amp;amp;gt; c.id == +rule.value)?.name" />
+               <x id="PH" equiv-text="this.correspondents.find((c) =&amp;amp;amp;amp;amp;amp;gt; c.id == +rule.value)?.name" />
             </target>
          </trans-unit>
          <trans-unit id="8170755470576301659" datatype="html">
@@ -8799,7 +8799,7 @@
             </context-group>
             <target state="translated">
                Loại tài liệu:
-               <x id="PH" equiv-text="this.documentTypes.find(               (dt) =&amp;amp;amp;amp;amp;gt; dt.id == +rule.value             )?.name" />
+               <x id="PH" equiv-text="this.documentTypes.find(               (dt) =&amp;amp;amp;amp;amp;amp;gt; dt.id == +rule.value             )?.name" />
             </target>
          </trans-unit>
          <trans-unit id="4362173610367509215" datatype="html">
@@ -8821,7 +8821,7 @@
             </context-group>
             <target state="translated">
                Kho:
-               <x id="PH" equiv-text="this.warehouses.find(               (w) =&amp;amp;amp;amp;amp;gt; w.id == +rule.value             )?.name" />
+               <x id="PH" equiv-text="this.warehouses.find(               (w) =&amp;amp;amp;amp;amp;amp;gt; w.id == +rule.value             )?.name" />
             </target>
          </trans-unit>
          <trans-unit id="4234720220218125568" datatype="html">
@@ -8843,7 +8843,7 @@
             </context-group>
             <target state="translated">
                Đường dẫn lưu trữ:
-               <x id="PH" equiv-text="this.storagePaths.find(               (sp) =&amp;amp;amp;amp;amp;gt; sp.id == +rule.value             )?.name" />
+               <x id="PH" equiv-text="this.storagePaths.find(               (sp) =&amp;amp;amp;amp;amp;amp;gt; sp.id == +rule.value             )?.name" />
             </target>
          </trans-unit>
          <trans-unit id="1562820715074533164" datatype="html">
