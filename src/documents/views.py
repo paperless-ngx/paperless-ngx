@@ -2319,6 +2319,33 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 )
             
     @action(methods=["get"], detail=True)
+    def export_excel(self, request, pk=None):
+        try:
+            folder = Folder.objects.get(pk=pk)
+            list_folders = Folder.objects.filter(path__startswith = folder.path).values_list("id")
+            folder_ids = [x[0] for x in list_folders]
+            documents = Document.objects.filter(folder__id__in = folder_ids)
+            data = []
+            for document in documents:
+                row_data = {
+                    'Tên file': document.title,
+                    'Nội dung': document.content,
+                    'Ngày tạo': document.created.strftime('%d-%m-%Y'),
+                }
+                fields = CustomFieldInstance.objects.filter(document=document)
+                for f in fields:
+                    row_data[f.field.name] = f.value_text
+                data.append(row_data)
+
+            df = pd.DataFrame(data)
+            excel_file_name = f"download.xlsx"
+            response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = f'attachment; filename="{excel_file_name}"'
+            df.to_excel(response, index=False)
+            return response
+        except (FileNotFoundError, Document.DoesNotExist):
+            raise Http404
+    @action(methods=["get"], detail=True)
     def folder_path(self, request, pk=None):
         if request.method == "GET":
             try:
