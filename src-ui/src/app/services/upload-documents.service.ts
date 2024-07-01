@@ -38,7 +38,9 @@ export class UploadDocumentsService {
     console.log(payload)
     let formData = new FormData()
     formData.append('document', file, file.name)
-    formData.append('folder',payload.folder)
+    if (payload.length > 0)
+      formData.append('folder',payload.folder)
+      
     let status = this.consumerStatusService.newFileUpload(file.name)
 
     status.message = $localize`Connecting...`
