@@ -1396,11 +1396,12 @@
                 "c"
             ],
             "hashes": [
-                "sha256:92d7b78ad82426cdcf1a0440678209faa890c6e1721361c2f8901f0dccd62961",
-                "sha256:dca5e5521c859f6606686432ae1c94e8766d29cc91f2ee595378c510cc5b0731"
+                "sha256:dc8da6dc8729dacacda3cc2f17d2c9397a70a66cf0d2b69c91065d60d5f00cb7",
+                "sha256:ece385fb413a37db332f97c49208b36cf030ff02b199d7635ed2fbd378724175"
             ],
-            "markers": "python_version >= '3.7'",
-            "version": "==3.1.19"
+            "index": "pypi",
+            "markers": "python_version >= '3.8'",
+            "version": "==3.2.1"
         },
         "psycopg-c": {
             "hashes": [
