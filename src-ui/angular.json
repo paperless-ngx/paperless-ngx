@@ -73,7 +73,9 @@
               }
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              "src/assets/css-folder/style.css"
+
             ],
             "scripts": [],
             "allowedCommonJsDependencies": [

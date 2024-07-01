@@ -23,11 +23,11 @@
       
       <div id="contextMenu" style="display:none" class="addfolder">
         <ul>
-          <li class="id f" chau="" add="" (click)="deleteFile($event)"><a>delete file...</a></li>
+          <li class="id f" chau="" add="" (click)="onDeleteFile($event)"><a>delete file...</a></li>
           <li class="id" add="" (click)="showInput($event)"><a>New folder...</a></li>
           <li class="id f" chua="" (click)="showRenameFile($event)" style="border: 1px solid greenyellow;display: none;"><a>Rename File...</a></li>
           <li class="id c" add="" (click)="showRenameFolder($event)" style="border: 1px solid greenyellow; display: none;"><a>Rename Folder...</a></li>
-          <li class="id" add="" (click)="deleteMultipleItems($event)" (click)="deleteItem($event)"  add2="" style="border: 1px solid greenyellow;"><a>Delete...</a></li>
+          <li class="id" add="" (click)="onDeleteMultipleItems($event)" (click)="onDeleteItem($event)"  add2="" style="border: 1px solid greenyellow;"><a>Delete...</a></li>
           <li class="id c" id="cutfolder"  add="" style="border: 1px solid greenyellow; display: none; "  (click)="onCutClick()" #cutElement><a>cut...</a></li>
           <li class="id c" id="pastfolder"  add="" style="border: 1px solid greenyellow;" (click)="onPasteClick($event)" #pasteElement><a>Past...</a></li>
           <li class="f"  chua="" style="border: 1px solid greenyellow; display: none; " (click)="onCutClickf($event)" #cutElementf><a>cutfile...</a></li>

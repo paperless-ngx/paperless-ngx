@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient , HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable , BehaviorSubject} from 'rxjs';
 import { AbstractNameFilterService } from './abstract-name-filter-service';
 import { Folders, Document, Results,SRC  } from 'src/app/data/folders';
 import { environment } from 'src/environments/environment';
@@ -9,8 +9,17 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class FoldersService extends AbstractNameFilterService<Document> {
+  private initialDataSubject = new BehaviorSubject<{ folders: Folders[], documents: Document[] }>({ folders: [], documents: [] });
+  initialData$ = this.initialDataSubject.asObservable();
   constructor(http: HttpClient) {
     super(http, 'documents');
+  }
+  reloadFoldersData(): Observable<{ folders: Folders[], documents: Document[] }> {
+    return this.http.get<{ folders: Folders[], documents: Document[] }>(`${environment.apiBaseUrl}folders/folders_documents/`);
+  }
+
+  setInitialData(data: { folders: Folders[], documents: Document[] }): void {
+    this.initialDataSubject.next(data);
   }
 
   getresults(id: number): Observable<SRC> {
@@ -64,4 +73,5 @@ export class FoldersService extends AbstractNameFilterService<Document> {
     const params = new HttpParams().set('name__icontains', searchTerm);
     return this.http.get<{ results: Results[] }>(`${environment.apiBaseUrl}folders/`, { params });
   }  
+  
 }
