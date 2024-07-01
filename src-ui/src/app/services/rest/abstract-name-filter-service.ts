@@ -30,6 +30,29 @@ export abstract class AbstractNameFilterService<T extends ObjectWithId,> extends
     return this.list(page, pageSize, sortField, sortReverse, params)
   }
 
+  listFolderFiltered(page?: number,
+    pageSize?: number,
+    sortField?: string,
+    sortReverse?: boolean,
+    id?: number,
+    nameFilter?: string,
+    fullPerms?: boolean) {
+    let params = {}
+    if (id) {
+      params['parent_folder__id'] = id
+    }
+    else{
+      params['parent_folder__isnull'] = true
+    }
+    if (nameFilter) {
+      params['name__icontains'] = nameFilter
+    }
+    if (fullPerms) {
+      params['full_perms'] = true
+    }
+ 
+    return this.list(page, pageSize, sortField, sortReverse, params)
+  }
 
   listGia(page?: number,
     pageSize?: number,

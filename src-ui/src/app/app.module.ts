@@ -105,7 +105,8 @@ import { DragDropModule } from '@angular/cdk/drag-drop'
 import { FolderEditDialogComponent } from './components/common/edit-dialog/folder-edit-dialog/folder-edit-dialog.component'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
-import { FoldersComponent } from './components/manage/folder-list/folder.component'
+import { FoldersComponent } from './components/manage/folder-list/folder-list.component'
+import { SubFoldersComponent } from './components/manage/subfolder-list/subfolder-list.component'
 import { BoxFieldsComponent } from './components/manage/box-fields/box-fields.component'
 import { WarehouseEditDialogComponent } from './components/common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
 import { WarehouseListComponent } from './components/manage/warehouse-list/warehouse-list.component'
@@ -399,6 +400,7 @@ function initializeApp(settings: SettingsService) {
     DocumentDetailComponent,
     DashboardComponent,
     FoldersComponent,
+    SubFoldersComponent,
     FolderEditDialogComponent,
     TagListComponent,
     DocumentTypeListComponent,

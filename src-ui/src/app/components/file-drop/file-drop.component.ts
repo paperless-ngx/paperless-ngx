@@ -1,4 +1,5 @@
 import { Component, HostListener, ViewChild } from '@angular/core'
+import { Router } from '@angular/router'
 import { NgxFileDropComponent, NgxFileDropEntry } from 'ngx-file-drop'
 import {
   PermissionsService,
@@ -20,6 +21,7 @@ export class FileDropComponent {
   hidden: boolean = true
 
   constructor(
+    private router: Router,
     private settings: SettingsService,
     private toastService: ToastService,
     private uploadDocumentsService: UploadDocumentsService,
@@ -83,7 +85,13 @@ export class FileDropComponent {
   }
 
   public dropped(files: NgxFileDropEntry[]) {
-    this.uploadDocumentsService.onNgxFileDrop(files)
+
+    let getUrl = this.router.url.split('/')
+    let payload = { folder: '' };
+    if (getUrl[1] === 'subfolders') {
+      payload.folder = getUrl[2];
+    }
+    this.uploadDocumentsService.onNgxFileDrop(files, payload);
     if (files.length > 0)
       this.toastService.showInfo($localize`Initiating upload...`, 3000)
   }

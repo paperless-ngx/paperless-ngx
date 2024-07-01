@@ -12,6 +12,9 @@ export class FolderService extends AbstractNameFilterService<Folder> {
   constructor(http: HttpClient) {
     super(http, 'folders')
   }
+  getFolderPath(id: number): Observable<Folder> {
+    return this.http.get<Folder>(this.getResourceUrl(id, 'folder_path'))
+  }
   getFolderDocument(id: number): Observable<FolderDocument> {
     return this.http.get<FolderDocument>(this.getResourceUrl(id, 'folders_documents_by_id'))
   }

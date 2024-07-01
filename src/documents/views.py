@@ -1083,6 +1083,7 @@ class PostDocumentView(GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
+        print(request.data)
         serializer.is_valid(raise_exception=True)
 
         doc_name, doc_data = serializer.validated_data.get("document")
@@ -1091,6 +1092,7 @@ class PostDocumentView(GenericAPIView):
         storage_path_id = serializer.validated_data.get("storage_path")
         warehouse_id = serializer.validated_data.get("warehouse")
         folder_id = serializer.validated_data.get("folder")
+        print(folder_id)
         tag_ids = serializer.validated_data.get("tags")
         title = serializer.validated_data.get("title")
         created = serializer.validated_data.get("created")
@@ -2310,6 +2312,29 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         if request.method == "GET":
             try:
                 return Response(self.getFolderDoc(request))
+            except Exception as e:
+                logger.warning(f"An error occurred retrieving folders: {e!s}")
+                return Response(
+                    {"error": "Error retrieving folders, check logs for more detail."},
+                )
+            
+    @action(methods=["get"], detail=True)
+    def folder_path(self, request, pk=None):
+        if request.method == "GET":
+            try:
+                fol = Folder.objects.get(pk=pk)
+                folder_path = fol.path.split('/')
+                folders = Folder.objects.filter(id__in = folder_path)
+                folders_dict = {}
+                for f in folders:
+                    folders_dict[f.id] = f
+                    # print(f)
+                new_folder_path = []
+                for p in folder_path:
+                    value = folders_dict.get(int(p))
+                    new_folder_path.append(value)
+                folders_serialisers = FolderSerializer(new_folder_path, many=True)
+                return Response({"results":folders_serialisers.data},status=status.HTTP_200_OK)
             except Exception as e:
                 logger.warning(f"An error occurred retrieving folders: {e!s}")
                 return Response(

@@ -41,7 +41,7 @@ export class FolderEditDialogComponent
   getForm(): FormGroup {
     return new FormGroup({
       name: new FormControl(null),
-      data_type: new FormControl(null),
+      permissions_form: new FormControl(null),
     })
   }
 

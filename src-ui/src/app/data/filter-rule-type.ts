@@ -66,6 +66,11 @@ export const FILTER_CUSTOM_SHELF = 59
 export const FILTER_HAS_CUSTOM_SHELF_ANY = 60
 export const FILTER_DOES_NOT_HAVE_CUSTOM_SHELF = 61
 
+export const FILTER_FOLDER = 62
+export const FILTER_HAS_FOLDER_ANY = 63
+export const FILTER_DOES_NOT_HAVE_FOLDER = 64
+export const FILTER_HAS_FOLDES_ALL = 65
+
 export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
     id: FILTER_TITLE,
@@ -142,6 +147,31 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     id: FILTER_DOES_NOT_HAVE_WAREHOUSE,
     filtervar: 'warehouse__id__none',
     datatype: 'warehouse',
+    multi: true,
+  },
+  {
+    id: FILTER_HAS_FOLDES_ALL,
+    filtervar: 'folders__id__all',
+    datatype: 'folder',
+    multi: true,
+  },
+  {
+    id: FILTER_FOLDER,
+    filtervar: 'folder__id',
+    isnull_filtervar: 'folder__isnull',
+    datatype: 'folder',
+    multi: false,
+  },
+  {
+    id: FILTER_HAS_FOLDER_ANY,
+    filtervar: 'folder__id__in',
+    datatype: 'folder',
+    multi: true,
+  },
+  {
+    id: FILTER_DOES_NOT_HAVE_FOLDER,
+    filtervar: 'folder__id__none',
+    datatype: 'folder',
     multi: true,
   },
   //Custom-field

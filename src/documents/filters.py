@@ -208,8 +208,8 @@ class DocumentFilterSet(FilterSet):
 
     shared_by__id = SharedByUser()
 
-    warehouse__id__in = NumberFilter(method='filter_by_warehouse')
     shelfs__id__in = NumberFilter(method='filter_by_warehouse')
+    
     boxs__id__in = NumberFilter(method='filter_by_warehouse')
     
     warehouse__id__in = NumberFilter(method='filter_by_warehouse')
@@ -327,14 +327,17 @@ class WarehouseFilterSet(FilterSet):
 #         }
         
 class FolderFilterSet(FilterSet):
+    parent_folder__id__none = ObjectFilter(field_name="parent_folder", exclude=True)
     class Meta:
         model = Folder
         fields = {
             "id": ID_KWARGS,
             "name": CHAR_KWARGS,
-            "parent_folder": ID_KWARGS,
+            "parent_folder__id": ID_KWARGS,
             "path": CHAR_KWARGS,
+            "parent_folder": ["isnull"],
         }
+    
 
 # class ApprovalFilterSet(FilterSet):
 #     class Meta:
