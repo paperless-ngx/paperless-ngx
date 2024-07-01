@@ -696,21 +696,21 @@ class Consumer(LoggingMixin):
                                     document=document,
                                 )
                 dict_data = {}                
-                self.log.debug('gia tri',len(data_ocr_fields))
-                if len(data_ocr_fields)>1:    
-                    for r in data_ocr_fields[0].get("fields"):
-                        dict_data[r.get("name")] = r.get("values")[0].get("value") if r.get("values") else None
-                    map_fields = {
-                        "Tiêu đề": dict_data.get("title"),
-                        "Số văn bản": dict_data.get("Số hiệu"),
-                        "Kính gửi": dict_data.get("Kính gửi"),
-                        # "Ngày phát hành": dict_data.get("Thời gian tạo"),
-                        "Người ký văn bản": dict_data.get("Chữ ký"),
-                        "Ngày phát hành": dict_data.get("datetime")
-                    }
-                    for f in fields:
-                        f.value_text = map_fields.get(f.field.name,None)
-                    CustomFieldInstance.objects.bulk_update(fields, ['value_text'])
+                if data_ocr_fields is not None:
+                    if len(data_ocr_fields)>1:    
+                        for r in data_ocr_fields[0].get("fields"):
+                            dict_data[r.get("name")] = r.get("values")[0].get("value") if r.get("values") else None
+                        map_fields = {
+                            "Tiêu đề": dict_data.get("title"),
+                            "Số văn bản": dict_data.get("Số hiệu"),
+                            "Kính gửi": dict_data.get("Kính gửi"),
+                            # "Ngày phát hành": dict_data.get("Thời gian tạo"),
+                            "Người ký văn bản": dict_data.get("Chữ ký"),
+                            "Ngày phát hành": dict_data.get("datetime")
+                        }
+                        for f in fields:
+                            f.value_text = map_fields.get(f.field.name,None)
+                        CustomFieldInstance.objects.bulk_update(fields, ['value_text'])
 
                 # After everything is in the database, copy the files into
                 # place. If this fails, we'll also rollback the transaction.
