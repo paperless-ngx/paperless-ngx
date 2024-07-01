@@ -534,11 +534,11 @@
         },
         "django-multiselectfield": {
             "hashes": [
-                "sha256:c270faa7f80588214c55f2d68cbddb2add525c2aa830c216b8a198de914eb470",
-                "sha256:d0a4c71568fb2332c71478ffac9f8708e01314a35cf923dfd7a191343452f9f9"
+                "sha256:437d72632f4c0ca416951917632529c3d1d42b62bb6c3c03e3396fa50265be94",
+                "sha256:f146ef568c823a409f4021b98781666ec2debabfceca9176116d749dc39cb8b3"
             ],
             "index": "pypi",
-            "version": "==0.1.12"
+            "version": "==0.1.13"
         },
         "django-soft-delete": {
             "hashes": [
