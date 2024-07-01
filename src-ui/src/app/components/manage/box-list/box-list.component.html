@@ -111,7 +111,7 @@
       <div>
         <ng-container i18n>{collectionSize, plural, =1 {One {{typeName}}} other {{{collectionSize || 0}} total {{typeNamePlural}}}}</ng-container>
         @if (selectedObjects.size > 0) {
-          &nbsp;({{selectedObjects.size}} selected)
+          <ng-container i18n>&nbsp;({{selectedObjects.size}} selected)</ng-container>
         }
       </div>
     }
