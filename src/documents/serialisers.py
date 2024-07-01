@@ -2031,7 +2031,10 @@ class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         return total_size_bytes
     
     def get_document_count(self, obj):
-        return Document.objects.filter(folder=obj).count()
+        folders = Folder.objects.filter(path__startswith=obj.path)
+        documents = Document.objects.filter(folder__in=folders)
+
+        return documents.count()
     
     def get_child_folder_count(self, obj):
         return Folder.objects.filter(parent_folder=obj).count()

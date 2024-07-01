@@ -2403,8 +2403,9 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        
-        if 'parent_folder' in request.data and int(request.data['parent_folder']) == instance.id:
+        if request.data.get('parent_folder') is None:
+            pass
+        elif 'parent_folder' in request.data and int(request.data['parent_folder']) == instance.id:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         
         elif 'parent_folder' in request.data:
@@ -2413,7 +2414,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a folder into one of its child folders.'})
         else:
             request.data['parent_folder'] = None
-        
+        print('pass')
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
 
