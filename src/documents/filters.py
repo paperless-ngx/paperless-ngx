@@ -84,6 +84,7 @@ class ObjectFilter(Filter):
 
         if self.in_list:
             qs = qs.filter(**{f"{self.field_name}__id__in": object_ids}).distinct()
+            print('ksdlfjs',qs)
         else:
             for obj_id in object_ids:
                 if self.exclude:
@@ -110,6 +111,41 @@ class TitleContentFilter(Filter):
             return qs.filter(Q(title__icontains=value) | Q(content__icontains=value))
         else:
             return qs
+class WarehouseFilter(Filter):
+    def __init__(self, exclude=False, in_list=False, field_name=""):
+        super().__init__()
+        self.exclude = exclude
+        self.in_list = in_list
+        self.field_name = field_name
+
+
+    def filter(self, qs, value):
+        if not value:
+            return qs
+
+        try:
+            object_ids = [int(x) for x in value.split(",")]
+        except ValueError:
+            return qs
+
+        if self.in_list:
+            
+            warehouses = Warehouse.objects.filter(id__in= object_ids)
+            for warehouse in warehouses:
+                warehouses_path = Warehouse.objects.filter(path__startswith=warehouse.path)
+                for warehouse_path in warehouses_path:
+                    qs = qs.filter(**{f"{self.field_name}__id__in": int(warehouse_path.id)}).distinct()
+            
+            print(self.field_name)
+        else:
+            for obj_id in object_ids:
+                if self.exclude:
+                    qs = qs.exclude(**{f"{self.field_name}__id": obj_id})
+                else:
+                    qs = qs.filter(**{f"{self.field_name}__id": obj_id})
+
+        return qs
+        
 
 
 class SharedByUser(Filter):
@@ -194,9 +230,14 @@ class DocumentFilterSet(FilterSet):
 
     storage_path__id__none = ObjectFilter(field_name="storage_path", exclude=True)
     
-    warehouse__id__none = ObjectFilter(field_name="warehouse", exclude=True)
+    warehouse__id__none = WarehouseFilter(field_name="warehouse", exclude=True )
+    
+    warehouse__id__in = WarehouseFilter(field_name="warehouse", in_list=True)
     
     folder__id__none = ObjectFilter(field_name="folder", exclude=True)
+    
+    folder__id__in = ObjectFilter(field_name="folder", in_list=True)
+    
 
     is_in_inbox = InboxFilter()
 
@@ -207,14 +248,7 @@ class DocumentFilterSet(FilterSet):
     custom_fields__icontains = CustomFieldsFilter()
 
     shared_by__id = SharedByUser()
-    
-    warehouse__id__in = NumberFilter(method='filter_by_warehouse')
 
-    warehouse__id = NumberFilter(method='filter_by_warehouse')
-    
-    folder__id__in = NumberFilter(method='filter_by_folder')
-    
-    folder__id = NumberFilter(method='filter_by_folder')
     
     def filter_by_folder(self, queryset, name, value):
         folder = Folder.objects.get(id=value)
@@ -224,15 +258,8 @@ class DocumentFilterSet(FilterSet):
         folders = Folder.objects.filter(path__startswith=folder.path)
         return Document.objects.filter(folder__in=folders)
         
-            
-        
-    def filter_by_warehouse(self, queryset, name, value):
-        warehouse = Warehouse.objects.get(id=value)
-        return self.get_warehouse_documents(warehouse)
+              
 
-    def get_warehouse_documents(self, warehouse):
-        warehouses = Warehouse.objects.filter(path__startswith=warehouse.path)
-        return Document.objects.filter(warehouse__in=warehouses)
 
     
     
