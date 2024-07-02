@@ -3,17 +3,15 @@ import shutil
 import subprocess
 import tempfile
 from pathlib import Path
-from unittest import mock
 
 import httpx
 import pytest
-from django.test import TestCase
 from imagehash import average_hash
 from PIL import Image
+from pytest_mock import MockerFixture
 
-from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import util_call_with_backoff
-from paperless_mail.tests.test_parsers import BaseMailParserTestCase
+from paperless_mail.parsers import MailDocumentParser
 
 
 def extract_text(pdf_path: Path) -> str:
@@ -50,7 +48,7 @@ class MailAttachmentMock:
     "PAPERLESS_CI_TEST" not in os.environ,
     reason="No Gotenberg/Tika servers to test with",
 )
-class TestUrlCanary(TestCase):
+class TestUrlCanary:
     """
     Verify certain URLs are still available so testing is valid still
     """
@@ -69,13 +67,13 @@ class TestUrlCanary(TestCase):
         whether this image stays online forever, so here we check if we can detect if is not
         available anymore.
         """
-        with self.assertRaises(httpx.HTTPStatusError) as cm:
+        with pytest.raises(httpx.HTTPStatusError) as exec_info:
             resp = httpx.get(
                 "https://upload.wikimedia.org/wikipedia/en/f/f7/nonexistent.png",
             )
             resp.raise_for_status()
 
-        self.assertEqual(cm.exception.response.status_code, httpx.codes.NOT_FOUND)
+        assert exec_info.value.response.status_code == httpx.codes.NOT_FOUND
 
     def test_is_online_image_still_available(self):
         """
@@ -100,13 +98,19 @@ class TestUrlCanary(TestCase):
     "PAPERLESS_CI_TEST" not in os.environ,
     reason="No Gotenberg/Tika servers to test with",
 )
-class TestParserLive(FileSystemAssertsMixin, BaseMailParserTestCase):
+class TestParserLive:
     @staticmethod
     def imagehash(file, hash_size=18):
         return f"{average_hash(Image.open(file), hash_size)}"
 
-    @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf")
-    def test_get_thumbnail(self, mock_generate_pdf: mock.MagicMock):
+    def test_get_thumbnail(
+        self,
+        mocker: MockerFixture,
+        mail_parser: MailDocumentParser,
+        simple_txt_email_file: Path,
+        simple_txt_email_pdf_file: Path,
+        simple_txt_email_thumbnail_file: Path,
+    ):
         """
         GIVEN:
             - Fresh start
@@ -115,22 +119,21 @@ class TestParserLive(FileSystemAssertsMixin, BaseMailParserTestCase):
         THEN:
             - The returned thumbnail image file is as expected
         """
-        mock_generate_pdf.return_value = self.SAMPLE_DIR / "simple_text.eml.pdf"
-        thumb = self.parser.get_thumbnail(
-            self.SAMPLE_DIR / "simple_text.eml",
-            "message/rfc822",
+        mock_generate_pdf = mocker.patch(
+            "paperless_mail.parsers.MailDocumentParser.generate_pdf",
         )
-        self.assertIsFile(thumb)
+        mock_generate_pdf.return_value = simple_txt_email_pdf_file
 
-        expected = self.SAMPLE_DIR / "simple_text.eml.pdf.webp"
+        thumb = mail_parser.get_thumbnail(simple_txt_email_file, "message/rfc822")
 
-        self.assertEqual(
-            self.imagehash(thumb),
-            self.imagehash(expected),
-            f"Created Thumbnail {thumb} differs from expected file {expected}",
-        )
+        assert thumb.exists()
+        assert thumb.is_file()
 
-    def test_tika_parse_successful(self):
+        assert (
+            self.imagehash(thumb) == self.imagehash(simple_txt_email_thumbnail_file)
+        ), f"Created Thumbnail {thumb} differs from expected file {simple_txt_email_thumbnail_file}"
+
+    def test_tika_parse_successful(self, mail_parser: MailDocumentParser):
         """
         GIVEN:
             - Fresh start
@@ -143,15 +146,16 @@ class TestParserLive(FileSystemAssertsMixin, BaseMailParserTestCase):
         expected_text = "Some Text"
 
         # Check successful parsing
-        parsed = self.parser.tika_parse(html)
-        self.assertEqual(expected_text, parsed.strip())
+        parsed = mail_parser.tika_parse(html)
+        assert expected_text == parsed.strip()
 
-    @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf_from_mail")
-    @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf_from_html")
     def test_generate_pdf_gotenberg_merging(
         self,
-        mock_generate_pdf_from_html: mock.MagicMock,
-        mock_generate_pdf_from_mail: mock.MagicMock,
+        mocker: MockerFixture,
+        mail_parser: MailDocumentParser,
+        html_email_file: Path,
+        merged_pdf_first: Path,
+        merged_pdf_second: Path,
     ):
         """
         GIVEN:
@@ -161,61 +165,67 @@ class TestParserLive(FileSystemAssertsMixin, BaseMailParserTestCase):
         THEN:
             - gotenberg is called to merge files and the resulting file is returned
         """
-        mock_generate_pdf_from_mail.return_value = self.SAMPLE_DIR / "first.pdf"
-        mock_generate_pdf_from_html.return_value = self.SAMPLE_DIR / "second.pdf"
-
-        msg = self.parser.parse_file_to_message(
-            self.SAMPLE_DIR / "html.eml",
+        mock_generate_pdf_from_html = mocker.patch(
+            "paperless_mail.parsers.MailDocumentParser.generate_pdf_from_html",
         )
+        mock_generate_pdf_from_mail = mocker.patch(
+            "paperless_mail.parsers.MailDocumentParser.generate_pdf_from_mail",
+        )
+        mock_generate_pdf_from_mail.return_value = merged_pdf_first
+        mock_generate_pdf_from_html.return_value = merged_pdf_second
+
+        msg = mail_parser.parse_file_to_message(html_email_file)
 
         _, pdf_path = util_call_with_backoff(
-            self.parser.generate_pdf,
+            mail_parser.generate_pdf,
             [msg],
         )
-        self.assertIsFile(pdf_path)
+        assert pdf_path.exists()
+        assert pdf_path.is_file()
 
         extracted = extract_text(pdf_path)
         expected = (
             "first   PDF   to   be   merged.\n\x0csecond PDF   to   be   merged.\n\x0c"
         )
 
-        self.assertEqual(expected, extracted)
+        assert expected == extracted
 
-    def test_generate_pdf_from_mail(self):
+    def test_generate_pdf_from_mail(
+        self,
+        mail_parser: MailDocumentParser,
+        html_email_file: Path,
+        html_email_pdf_file: Path,
+        html_email_thumbnail_file: Path,
+    ):
         """
         GIVEN:
             - Fresh start
         WHEN:
             - pdf generation from simple eml file is requested
         THEN:
-            - gotenberg is called and the resulting file is returned and look as expected.
+            - Gotenberg is called and the resulting file is returned and look as expected.
         """
 
-        util_call_with_backoff(
-            self.parser.parse,
-            [self.SAMPLE_DIR / "html.eml", "message/rfc822"],
-        )
+        util_call_with_backoff(mail_parser.parse, [html_email_file, "message/rfc822"])
 
         # Check the archive PDF
-        archive_path = self.parser.get_archive_path()
+        archive_path = mail_parser.get_archive_path()
         archive_text = extract_text(archive_path)
-        expected_archive_text = extract_text(self.SAMPLE_DIR / "html.eml.pdf")
+        expected_archive_text = extract_text(html_email_pdf_file)
 
         # Archive includes the HTML content, so use in
-        self.assertIn(expected_archive_text, archive_text)
+        assert expected_archive_text in archive_text
 
         # Check the thumbnail
-        generated_thumbnail = self.parser.get_thumbnail(
-            self.SAMPLE_DIR / "html.eml",
+        generated_thumbnail = mail_parser.get_thumbnail(
+            html_email_file,
             "message/rfc822",
         )
         generated_thumbnail_hash = self.imagehash(generated_thumbnail)
 
         # The created pdf is not reproducible. But the converted image should always look the same.
-        expected_hash = self.imagehash(self.SAMPLE_DIR / "html.eml.pdf.webp")
+        expected_hash = self.imagehash(html_email_thumbnail_file)
 
-        self.assertEqual(
-            generated_thumbnail_hash,
-            expected_hash,
-            f"PDF looks different. Check if {generated_thumbnail} looks weird.",
-        )
+        assert (
+            generated_thumbnail_hash == expected_hash
+        ), f"PDF looks different. Check if {generated_thumbnail} looks weird."

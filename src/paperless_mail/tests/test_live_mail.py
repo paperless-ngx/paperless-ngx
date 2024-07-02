@@ -1,7 +1,7 @@
 import os
+import warnings
 
 import pytest
-from django.test import TestCase
 
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.mail import MailError
@@ -16,53 +16,46 @@ from paperless_mail.models import MailRule
     or not len(os.environ["PAPERLESS_MAIL_TEST_HOST"]),
     reason="Live server testing not enabled",
 )
-class TestMailLiveServer(TestCase):
-    def setUp(self) -> None:
-        self.mail_account_handler = MailAccountHandler()
-        self.account = MailAccount.objects.create(
-            name="test",
-            imap_server=os.environ["PAPERLESS_MAIL_TEST_HOST"],
-            username=os.environ["PAPERLESS_MAIL_TEST_USER"],
-            password=os.environ["PAPERLESS_MAIL_TEST_PASSWD"],
-            imap_port=993,
-        )
-
-        return super().setUp()
-
-    def tearDown(self) -> None:
-        self.account.delete()
-        return super().tearDown()
-
-    def test_process_non_gmail_server_flag(self):
+@pytest.mark.django_db()
+class TestMailLiveServer:
+    def test_process_non_gmail_server_flag(
+        self,
+        mail_account_handler: MailAccountHandler,
+        live_mail_account: MailAccount,
+    ):
         try:
             rule1 = MailRule.objects.create(
                 name="testrule",
-                account=self.account,
+                account=live_mail_account,
                 action=MailRule.MailAction.FLAG,
             )
 
-            self.mail_account_handler.handle_mail_account(self.account)
+            mail_account_handler.handle_mail_account(live_mail_account)
 
             rule1.delete()
 
         except MailError as e:
-            self.fail(f"Failure: {e}")
-        except Exception:
-            pass
+            pytest.fail(f"Failure: {e}")
+        except Exception as e:
+            warnings.warn(f"Unhandled exception: {e}")
 
-    def test_process_non_gmail_server_tag(self):
+    def test_process_non_gmail_server_tag(
+        self,
+        mail_account_handler: MailAccountHandler,
+        live_mail_account: MailAccount,
+    ):
         try:
             rule2 = MailRule.objects.create(
                 name="testrule",
-                account=self.account,
+                account=live_mail_account,
                 action=MailRule.MailAction.TAG,
             )
 
-            self.mail_account_handler.handle_mail_account(self.account)
+            mail_account_handler.handle_mail_account(live_mail_account)
 
             rule2.delete()
 
         except MailError as e:
-            self.fail(f"Failure: {e}")
-        except Exception:
-            pass
+            pytest.fail(f"Failure: {e}")
+        except Exception as e:
+            warnings.warn(f"Unhandled exception: {e}")

@@ -1,9 +1,7 @@
 import os
 from pathlib import Path
-from typing import Final
 
 import pytest
-from django.test import TestCase
 
 from documents.tests.utils import util_call_with_backoff
 from paperless_tika.parsers import TikaDocumentParser
@@ -13,22 +11,19 @@ from paperless_tika.parsers import TikaDocumentParser
     "PAPERLESS_CI_TEST" not in os.environ,
     reason="No Gotenberg/Tika servers to test with",
 )
-class TestTikaParserAgainstServer(TestCase):
+@pytest.mark.django_db()
+class TestTikaParserAgainstServer:
     """
     This test case tests the Tika parsing against a live tika server,
     if the environment contains the correct value indicating such a server
     is available.
     """
 
-    SAMPLE_DIR: Final[Path] = (Path(__file__).parent / Path("samples")).resolve()
-
-    def setUp(self) -> None:
-        self.parser = TikaDocumentParser(logging_group=None)
-
-    def tearDown(self) -> None:
-        self.parser.cleanup()
-
-    def test_basic_parse_odt(self):
+    def test_basic_parse_odt(
+        self,
+        tika_parser: TikaDocumentParser,
+        sample_odt_file: Path,
+    ):
         """
         GIVEN:
             - An input ODT format document
@@ -38,26 +33,26 @@ class TestTikaParserAgainstServer(TestCase):
             - Document content is correct
             - Document date is correct
         """
-        test_file = self.SAMPLE_DIR / Path("sample.odt")
-
         util_call_with_backoff(
-            self.parser.parse,
-            [test_file, "application/vnd.oasis.opendocument.text"],
+            tika_parser.parse,
+            [sample_odt_file, "application/vnd.oasis.opendocument.text"],
         )
 
-        self.assertEqual(
-            self.parser.text,
-            "This is an ODT test document, created September 14, 2022",
+        assert (
+            tika_parser.text
+            == "This is an ODT test document, created September 14, 2022"
         )
-        self.assertIsNotNone(self.parser.archive_path)
-        with open(self.parser.archive_path, "rb") as f:
-            # PDFs begin with the bytes PDF-x.y
-            self.assertTrue(b"PDF-" in f.read()[:10])
+        assert tika_parser.archive_path is not None
+        assert b"PDF-" in tika_parser.archive_path.read_bytes()[:10]
 
         # TODO: Unsure what can set the Creation-Date field in a document, enable when possible
-        # self.assertEqual(self.parser.date, datetime.datetime(2022, 9, 14))
+        # self.assertEqual(tika_parser.date, datetime.datetime(2022, 9, 14))
 
-    def test_basic_parse_docx(self):
+    def test_basic_parse_docx(
+        self,
+        tika_parser: TikaDocumentParser,
+        sample_docx_file: Path,
+    ):
         """
         GIVEN:
             - An input DOCX format document
@@ -67,27 +62,29 @@ class TestTikaParserAgainstServer(TestCase):
             - Document content is correct
             - Document date is correct
         """
-        test_file = self.SAMPLE_DIR / Path("sample.docx")
-
         util_call_with_backoff(
-            self.parser.parse,
+            tika_parser.parse,
             [
-                test_file,
+                sample_docx_file,
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             ],
         )
 
-        self.assertEqual(
-            self.parser.text,
-            "This is an DOCX test document, also made September 14, 2022",
+        assert (
+            tika_parser.text
+            == "This is an DOCX test document, also made September 14, 2022"
         )
-        self.assertIsNotNone(self.parser.archive_path)
-        with open(self.parser.archive_path, "rb") as f:
-            self.assertTrue(b"PDF-" in f.read()[:10])
+        assert tika_parser.archive_path is not None
+        with open(tika_parser.archive_path, "rb") as f:
+            assert b"PDF-" in f.read()[:10]
 
-        # self.assertEqual(self.parser.date, datetime.datetime(2022, 9, 14))
+        # self.assertEqual(tika_parser.date, datetime.datetime(2022, 9, 14))
 
-    def test_basic_parse_doc(self):
+    def test_basic_parse_doc(
+        self,
+        tika_parser: TikaDocumentParser,
+        sample_doc_file: Path,
+    ):
         """
         GIVEN:
             - An input DOC format document
@@ -97,22 +94,24 @@ class TestTikaParserAgainstServer(TestCase):
             - Document content is correct
             - Document date is correct
         """
-        test_file = self.SAMPLE_DIR / "sample.doc"
-
         util_call_with_backoff(
-            self.parser.parse,
-            [test_file, "application/msword"],
+            tika_parser.parse,
+            [sample_doc_file, "application/msword"],
         )
 
-        self.assertIn(
-            "his is a test document, saved in the older .doc format",
-            self.parser.text,
+        assert (
+            "This is a test document, saved in the older .doc format"
+            in tika_parser.text
         )
-        self.assertIsNotNone(self.parser.archive_path)
-        with open(self.parser.archive_path, "rb") as f:
-            self.assertTrue(b"PDF-" in f.read()[:10])
+        assert tika_parser.archive_path is not None
+        with open(tika_parser.archive_path, "rb") as f:
+            assert b"PDF-" in f.read()[:10]
 
-    def test_tika_fails_multi_part(self):
+    def test_tika_fails_multi_part(
+        self,
+        tika_parser: TikaDocumentParser,
+        sample_broken_odt: Path,
+    ):
         """
         GIVEN:
             - An input ODT format document
@@ -125,13 +124,11 @@ class TestTikaParserAgainstServer(TestCase):
         See also:
             - https://issues.apache.org/jira/browse/TIKA-4110
         """
-        test_file = self.SAMPLE_DIR / "multi-part-broken.odt"
-
         util_call_with_backoff(
-            self.parser.parse,
-            [test_file, "application/vnd.oasis.opendocument.text"],
+            tika_parser.parse,
+            [sample_broken_odt, "application/vnd.oasis.opendocument.text"],
         )
 
-        self.assertIsNotNone(self.parser.archive_path)
-        with open(self.parser.archive_path, "rb") as f:
-            self.assertTrue(b"PDF-" in f.read()[:10])
+        assert tika_parser.archive_path is not None
+        with open(tika_parser.archive_path, "rb") as f:
+            assert b"PDF-" in f.read()[:10]
