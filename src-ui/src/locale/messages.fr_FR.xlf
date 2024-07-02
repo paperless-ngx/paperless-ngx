@@ -1573,7 +1573,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">80</context>
+          <context context-type="linenumber">86</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.html</context>
@@ -1711,7 +1711,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">386</context>
         </context-group>
-        <target state="translated">Peittes cartes</target>
+        <target state="translated">Petites cartes</target>
       </trans-unit>
       <trans-unit id="8569593958139569111" datatype="html">
         <source>Large Cards</source>
@@ -2341,7 +2341,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">80</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
@@ -2369,7 +2369,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">84</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
@@ -2405,15 +2405,27 @@
         <source>Document deleted</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">63</context>
+          <context context-type="linenumber">64</context>
         </context-group>
         <target state="translated">Document effacé</target>
+      </trans-unit>
+      <trans-unit id="7295637485862454066" datatype="html" approved="yes">
+        <source>Error deleting document</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+          <context context-type="linenumber">69</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+          <context context-type="linenumber">799</context>
+        </context-group>
+        <target state="final">Erreur lors de la suppression du document</target>
       </trans-unit>
       <trans-unit id="7266264608936522311" datatype="html">
         <source>This operation will permanently delete the selected documents.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">76</context>
+          <context context-type="linenumber">82</context>
         </context-group>
         <target state="translated">Cette action effacera définitivement les documents sélectionnés.</target>
       </trans-unit>
@@ -2421,7 +2433,7 @@
         <source>This operation will permanently delete all documents in the trash.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">77</context>
+          <context context-type="linenumber">83</context>
         </context-group>
         <target state="translated">Cette opération effacera définitivement tous les documents de la corbeille.</target>
       </trans-unit>
@@ -2429,25 +2441,49 @@
         <source>Document(s) deleted</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">87</context>
+          <context context-type="linenumber">94</context>
         </context-group>
         <target state="translated">Document(s) effacé(s)</target>
+      </trans-unit>
+      <trans-unit id="6962724852893361467" datatype="html">
+        <source>Error deleting document(s)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+          <context context-type="linenumber">101</context>
+        </context-group>
+        <target state="translated">Une erreur s'est produite lors de la suppression du/des document(s)</target>
       </trans-unit>
       <trans-unit id="7534569062269274401" datatype="html">
         <source>Document restored</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">97</context>
+          <context context-type="linenumber">113</context>
         </context-group>
         <target state="translated">Document restauré</target>
+      </trans-unit>
+      <trans-unit id="9136016619414048201" datatype="html">
+        <source>Error restoring document</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+          <context context-type="linenumber">117</context>
+        </context-group>
+        <target state="translated">Une erreur s'est produite lors de la restauration du document</target>
       </trans-unit>
       <trans-unit id="960063472770266304" datatype="html">
         <source>Document(s) restored</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">106</context>
+          <context context-type="linenumber">127</context>
         </context-group>
         <target state="translated">Document(s) restauré(s)</target>
+      </trans-unit>
+      <trans-unit id="8405416976953346141" datatype="html">
+        <source>Error restoring document(s)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+          <context context-type="linenumber">133</context>
+        </context-group>
+        <target state="translated">Une erreur s'est produite lors de la restauration du/des document(s)</target>
       </trans-unit>
       <trans-unit id="8119815638230251386" datatype="html" approved="yes">
         <source>Users &amp; Groups</source>
@@ -4659,7 +4695,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">160</context>
         </context-group>
-        <target state="translated">Peut inclure certains placeholders, voir la &lt;a target='_blank' href='https://docs.paperless-ngx.com/usage/#workflows'&gt;documentation&lt;/a&gt;.</target>
+        <target state="translated">Peut inclure certains caractères génériques, voir la &lt;a target='_blank' href='https://docs.paperless-ngx.com/usage/#workflows'&gt;documentation&lt;/a&gt;.</target>
       </trans-unit>
       <trans-unit id="6528897010417701530" datatype="html" approved="yes">
         <source>Assign tags</source>
@@ -6697,14 +6733,6 @@
           <context context-type="linenumber">716</context>
         </context-group>
         <target state="translated">Déplacer vers la corbeille</target>
-      </trans-unit>
-      <trans-unit id="7295637485862454066" datatype="html" approved="yes">
-        <source>Error deleting document</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">799</context>
-        </context-group>
-        <target state="final">Erreur lors de la suppression du document</target>
       </trans-unit>
       <trans-unit id="619486176823357521" datatype="html">
         <source>Reprocess confirm</source>
