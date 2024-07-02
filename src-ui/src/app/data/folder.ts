@@ -7,4 +7,7 @@ export interface Folder extends MatchingModel {
     path: string;
     checksum: string;
     parentFolder: number | null;
+    owner: number;
+    type: string;
+     
 }

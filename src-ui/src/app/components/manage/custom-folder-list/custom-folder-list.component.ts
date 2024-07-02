@@ -100,6 +100,9 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
 
 
   ngOnInit(): void {
+    if (localStorage.getItem('folder-list:displayMode') != null) {
+      this.displayMode = localStorage.getItem('foler-list:displayMode')
+    }
     this.reloadData()
     
     this.nameFilterDebounce = new Subject<string>()
@@ -261,7 +264,9 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
   set nameFilter(nameFilter: string) {
     this.nameFilterDebounce.next(nameFilter)
   }
-
+  trackByFolderId(index, item: Folder) {
+    return item.id
+  }
   onNameFilterKeyUp(event: KeyboardEvent) {
     if (event.code == 'Escape') this.nameFilterDebounce.next(null)
   }

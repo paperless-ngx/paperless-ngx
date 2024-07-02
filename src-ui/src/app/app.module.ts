@@ -350,6 +350,8 @@ import localeTr from '@angular/common/locales/tr'
 import localeUk from '@angular/common/locales/uk'
 import localeZh from '@angular/common/locales/zh'
 import localeVi from '@angular/common/locales/vi'
+import { FolderCardSmallComponent } from './components/manage/folder-card-small/folder-card-small.component'
+import { FolderCardLargeComponent } from './components/manage/folder-card-large/folder-card-large.component'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -393,6 +395,8 @@ function initializeApp(settings: SettingsService) {
 @NgModule({
   declarations: [
     //BoxListComponent,
+    FolderCardSmallComponent,
+    FolderCardLargeComponent,
     CustomShelfComponent,
     BoxEditDialogComponent,
     AppComponent,

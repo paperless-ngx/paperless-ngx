@@ -1,6 +1,16 @@
 <pngx-page-header title="{{ typeNamePlural | titlecase }}">
   
-
+  <div class="btn-group flex-fill" role="group">
+    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="details" (ngModelChange)="saveDisplayMode()" id="displayModeDetails" name="displayModeDetails">
+    <label for="displayModeDetails" class="btn btn-outline-primary btn-sm">
+      <i-bs name="list-ul"></i-bs>
+    </label>
+    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="smallCards" (ngModelChange)="saveDisplayMode()" id="displayModeSmall" name="displayModeSmall">
+    <label for="displayModeSmall" class="btn btn-outline-primary btn-sm">
+      <i-bs name="grid"></i-bs>
+    </label>
+   
+  </div>
   <button class="btn btn-sm btn-outline-secondary" (click)="clearSelection()" [hidden]="selectedObjects.size === 0">
     <i-bs  name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
     </button>
@@ -16,7 +26,7 @@
 </pngx-page-header>
 <div class="d-flex align-items-center">
   <a class="me" (click)="goToFolderRoot()">
-     root
+    <i-bs class="" name="folder"></i-bs>
   </a>&nbsp; > &nbsp;
   <div *ngFor="let folder of folderPath">
     <a class="me" (click)="goToFolder(folder)">
@@ -36,23 +46,23 @@
   <ngb-pagination class="col-auto" [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page" [maxSize]="5" (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
 </div>
 
-<div class="card border mb-3">
-  <table class="table table-striped align-middle shadow-sm mb-0">
+<!-- <div class="card border mb-3"> -->
+  <table class="table table-sm align-middle border shadow-sm">
     <thead>
       <tr>
-        <th scope="col">
+        <th scope="col" >
           <div class="form-check m-0 ms-2 me-n2">
             <input type="checkbox" class="form-check-input" id="all-objects" [(ngModel)]="togggleAll" [disabled]="data.length === 0" (click)="toggleAll($event); $event.stopPropagation();">
             <label class="form-check-label" for="all-objects"></label>
           </div>
         </th>
-        <th scope="col" class="fw-normal" pngxSortable="name" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name</th>
+        <th scope="col" class="w-40" pngxSortable="name" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name</th>
         <!-- <th scope="col" class="fw-normal d-none d-sm-table-cell" pngxSortable="matching_algorithm" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Matching</th> -->
-        <th scope="col" class="fw-normal" pngxSortable="document_count" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Document count</th>
+        <th scope="col" class="d-xl-table-cell" pngxSortable="document_count" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Document count</th>
         @for (column of extraColumns; track column) {
-          <th scope="col" class="fw-normal" pngxSortable="{{column.key}}" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)">{{column.name}}</th>
+          <th scope="col" class="d-xl-table-cell" pngxSortable="{{column.key}}" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)">{{column.name}}</th>
         }
-        <th scope="col" class="fw-normal" i18n>Actions</th>
+        <th scope="col" class="d-xl-table-cell" i18n>Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -72,11 +82,25 @@
               <label class="form-check-label" for="{{typeName}}{{object.id}}"></label>
             </div>
           </td>
-          <td scope="row"><button class="btn btn-link ms-0 ps-0 text-start" (click)="userCanEdit(object) ? goToFolder(object) : null; $event.stopPropagation()">{{ object.name }}</button> </td>
+          <td scope="row" class="d-md-table-cell"><button class="btn btn-link ms-0 ps-0 text-start" (click)="userCanEdit(object) ? goToFolder(object) : null; $event.stopPropagation()">
+            @if (object.type == "folder") {
+              <i-bs class="me-1" name="folder"></i-bs>&nbsp;
+            } @else {
+              <i-bs class="me-1" name="files"></i-bs>&nbsp;
+            }
+            {{ object.name }}</button> </td>
           <!-- <td scope="row" class="d-none d-sm-table-cell">{{ getMatching(object) }}</td> -->
-          <td scope="row">{{ object.document_count }}</td>
+
+          <td scope="row" class="d-md-table-cell">
+            @if (object.type == "folder") {
+              {{ object.document_count }}
+            } @else {
+              <!-- {{ object.document_count }} -->
+                
+            }
+            </td>
           @for (column of extraColumns; track column) {
-            <td scope="row">
+            <td scope="row" class="d-md-table-cell">
               @if (column.rendersHtml) {
                 <div [innerHtml]="column.valueFn.call(null, object) | safeHtml"></div>
               } @else {
@@ -84,7 +108,7 @@
               }
             </td>
           }
-          <td scope="row">
+          <td scope="row" class="d-md-table-cell">
             <div class="btn-group d-block d-sm-none">
               <div ngbDropdown class="d-inline-block">
                 <button type="button" class="btn btn-link" id="actionsMenuMobile" (click)="$event.stopPropagation()" ngbDropdownToggle>
@@ -113,6 +137,15 @@
       }
     </tbody>
   </table>
+<!-- </div> -->
+<!-- @if (displayMode === 'smallCards') {
+  
+} -->
+<div class="row row-cols-paperless-cards">
+  @for (d of data; track d) {
+
+    <pngx-folder-card-small class="p-0" (toggleSelected)="toggleSelected(d)" [folder]="d"></pngx-folder-card-small>
+  }
 </div>
 
 @if (!isLoading) {
