@@ -2164,6 +2164,9 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         
+        if request.data.get('parent_folder') is None:
+            pass
+        
         if 'parent_folder' in request.data and int(request.data['parent_folder']) == instance.id:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         
@@ -2198,6 +2201,9 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     def partial_update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', True)
         instance = self.get_object()
+        
+        if request.data.get('parent_folder') is None:
+            pass
         
         if 'parent_folder' in request.data and int(request.data['parent_folder']) == instance.id:
             return Response(status=status.HTTP_400_BAD_REQUEST)
