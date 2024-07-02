@@ -21,7 +21,7 @@ Each document has a couple of fields that you can assign to them:
   information.
 - The _correspondent_ of a document is the person, institution or
   company that a document either originates from, or is sent to.
-- A _tag_ is a label that you can assign to documents. Think of labels
+- A _tag_ is a label that you can assign to documents. Think of tags
   as more powerful folders: Multiple documents can be grouped together
   with a single tag, however, a single document can also have multiple
   tags. This is not possible with folders. The reason folders are not
