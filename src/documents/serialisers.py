@@ -261,13 +261,36 @@ class OwnedObjectSerializer(
     )
     # other methods in mixin
 
+    def validate_unique_together(self, validated_data, instance=None):
+        # workaround for https://github.com/encode/django-rest-framework/issues/9358
+        if "owner" in validated_data and "name" in self.Meta.fields:
+            name = validated_data.get("name", instance.name if instance else None)
+            objects = (
+                self.Meta.model.objects.exclude(pk=instance.pk)
+                if instance
+                else self.Meta.model.objects.all()
+            )
+            not_unique = objects.filter(
+                owner=validated_data["owner"],
+                name=name,
+            ).exists()
+            if not_unique:
+                raise serializers.ValidationError(
+                    {"error": "Object violates owner / name unique constraint"},
+                )
+
     def create(self, validated_data):
         # default to current user if not set
-        if "owner" not in validated_data and self.user:
+        request = self.context.get("request")
+        if (
+            "owner" not in validated_data
+            or (request is not None and "owner" not in request.data)
+        ) and self.user:
             validated_data["owner"] = self.user
         permissions = None
         if "set_permissions" in validated_data:
             permissions = validated_data.pop("set_permissions")
+        self.validate_unique_together(validated_data)
         instance = super().create(validated_data)
         if permissions is not None:
             self._set_permissions(permissions, instance)
@@ -276,17 +299,7 @@ class OwnedObjectSerializer(
     def update(self, instance, validated_data):
         if "set_permissions" in validated_data:
             self._set_permissions(validated_data["set_permissions"], instance)
-        if "owner" in validated_data and "name" in self.Meta.fields:
-            name = validated_data.get("name", instance.name)
-            not_unique = (
-                self.Meta.model.objects.exclude(pk=instance.pk)
-                .filter(owner=validated_data["owner"], name=name)
-                .exists()
-            )
-            if not_unique:
-                raise serializers.ValidationError(
-                    {"error": "Object violates owner / name unique constraint"},
-                )
+        self.validate_unique_together(validated_data, instance)
         return super().update(instance, validated_data)
 
 
