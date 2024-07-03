@@ -1092,7 +1092,6 @@ class PostDocumentView(GenericAPIView):
         storage_path_id = serializer.validated_data.get("storage_path")
         warehouse_id = serializer.validated_data.get("warehouse")
         folder_id = serializer.validated_data.get("folder")
-        print(folder_id)
         tag_ids = serializer.validated_data.get("tags")
         title = serializer.validated_data.get("title")
         created = serializer.validated_data.get("created")
@@ -1423,6 +1422,52 @@ class BulkExportExcelView(GenericAPIView):
         try:
            
             documents = Document.objects.filter(id__in=ids)
+            # fields = CustomFieldInstance.objects.filter(document__in=ids)
+            data = []
+            for document in documents:
+                fields = CustomFieldInstance.objects.filter(document=document.pk)
+                row_data = {
+                    'Tên file': document.title,
+                    'Nội dung': document.content,
+                    'Ngày tạo': document.created.strftime('%d-%m-%Y'),
+                }
+                for f in fields:
+                    row_data[f.field.name] = f.value_text
+                data.append(row_data)
+
+            df = pd.DataFrame(data)
+            excel_file_name = f"download.xlsx"
+            # Tạo response để trả về file Excel
+            response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = f'attachment; filename="{excel_file_name}"'
+
+            df.to_excel(response, index=False)
+
+            return response
+        except (FileNotFoundError, Document.DoesNotExist):
+            raise Http404
+        
+class BulkExportExcelFromFolderView(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = BulkDownloadSerializer
+    parser_classes = (parsers.JSONParser,)
+
+    def post(self, request, format=None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        ids = serializer.validated_data.get("folders")
+    
+        try:
+
+            folder_ids = Folder.objects.filter(id__in=ids).values_list('id',flat=True)
+            folder_ids = [x[0] for x in folder_ids]
+            if len(ids)==0:
+                folder_ids = Folder.objects.all()
+                folder_ids = [x[0] for x in folder_ids]
+            
+
+            documents = Document.objects.filter(folder__in=ids)
             # fields = CustomFieldInstance.objects.filter(document__in=ids)
             data = []
             for document in documents:
@@ -2319,7 +2364,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 )
             
     @action(methods=["get"], detail=True)
-    def export_excel(self, request, pk=None):
+    def bulk_export_excel(self, request, pk=None):
         try:
             folder = Folder.objects.get(pk=pk)
             list_folders = Folder.objects.filter(path__startswith = folder.path).values_list("id")
@@ -2441,7 +2486,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a folder into one of its child folders.'})
         else:
             request.data['parent_folder'] = None
-        print('pass')
+      
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
 

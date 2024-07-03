@@ -20,6 +20,7 @@ import { ToastService } from 'src/app/services/toast.service'
 import { DocumentApproval } from 'src/app/data/document-approval'
 import { ApprovalsComponent } from '../../admin/approval/approvals.component'
 import { Folder } from 'src/app/data/folder'
+import { PermissionType } from 'src/app/services/permissions.service'
 
 @Component({
   selector: 'pngx-folder-card-small',
@@ -32,7 +33,8 @@ export class FolderCardSmallComponent extends ComponentWithPermissions {
     private documentService: DocumentService,
     // public settingsService: SettingsService,
     private modalService: NgbModal,
-    private toastService: ToastService
+    private toastService: ToastService,
+    // public permissionType: PermissionType,
   ) {
     super()
   }
@@ -40,10 +42,26 @@ export class FolderCardSmallComponent extends ComponentWithPermissions {
 
   @Input()
   selected = false
+  @Input()
+  typeName: String
+  @Input()
+  selectedObjects: Set<number>
 
   @Output()
   toggleSelected = new EventEmitter()
-
+  @Output() 
+  filterDocuments = new EventEmitter<any>();
+  @Output() 
+  goToFolder = new EventEmitter<any>();
+  @Output() 
+  openEditDialog = new EventEmitter<any>();
+  @Output() 
+  openDeleteDialog = new EventEmitter<any>();
+  @Output() 
+  userCanEdit=new EventEmitter<any>();
+  @Output() 
+  userCanDelete=new EventEmitter<any>();
+  // @Input() permissionType: PermissionType;
   @Input()
   folder: Folder
 
@@ -56,7 +74,8 @@ export class FolderCardSmallComponent extends ComponentWithPermissions {
 
   moreTags: number = null
 
-  @ViewChild('popover') popover: NgbPopover
+  
+
 
   mouseOnPreview = false
   popoverHidden = true
@@ -71,32 +90,9 @@ export class FolderCardSmallComponent extends ComponentWithPermissions {
     return $localize`Private`
   }
 
-
-  mouseEnterPreview() {
-    this.mouseOnPreview = true
-    if (!this.popover.isOpen()) {
-      // we're going to open but hide to pre-load content during hover delay
-      this.popover.open()
-      this.popoverHidden = true
-      setTimeout(() => {
-        if (this.mouseOnPreview) {
-          // show popover
-          this.popoverHidden = false
-        } else {
-          this.popover.close()
-        }
-      }, 600)
-    }
+  getThumbUrl(object: Folder) {
+    return this.documentService.getThumbUrl(object.document_matching)
   }
-
-  mouseLeavePreview() {
-    this.mouseOnPreview = false
-  }
-
-  mouseLeaveCard() {
-    this.popover.close()
-  }
-
   // get notesEnabled(): boolean {
   //   return this.settingsService.get(SETTINGS_KEYS.NOTES_ENABLED)
   // }

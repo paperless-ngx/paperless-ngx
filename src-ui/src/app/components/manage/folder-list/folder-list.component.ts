@@ -52,6 +52,7 @@ extends CustomFolderListComponent<Folder> {
     )
   }
   
+  
   reloadData() {
     this.id = this.route.snapshot.params['id']
     console.log('load trang folder',this.router.getCurrentNavigation())

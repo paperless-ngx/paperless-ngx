@@ -113,7 +113,7 @@
                 <button ngbDropdownItem (click)="mergeSelected()" [disabled]="!userCanEditAll || list.selected.size < 2">
                   <i-bs name="journals"></i-bs>&nbsp;<ng-container i18n>Merge</ng-container>
                 </button>
-                <button ngbDropdownItem (click)="exportToExcelSelectedSelected()" [disabled]="!userCanEditAll">
+                <button ngbDropdownItem (click)="exportToExcelSelected()" [disabled]="!userCanEditAll">
                   <i-bs name="arrow-down"></i-bs>&nbsp;<ng-container i18n>Export to Excel</ng-container>
                 </button>
               </div>

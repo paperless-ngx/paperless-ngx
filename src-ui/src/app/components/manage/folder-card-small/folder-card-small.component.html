@@ -1,20 +1,32 @@
 <div class="col p-2 h-100">
   <div class="card h-100 shadow-sm document-card" [class.card-selected]="selected"
-    [class.popover-hidden]="popoverHidden" (mouseleave)="mouseLeaveCard()">
+    [class.popover-hidden]="popoverHidden" >
     <div class="border-bottom doc-img-container" [class.doc-img-background-selected]="selected"
       (click)="this.toggleSelected.emit($event)" (dblclick)="dblClickDocument.emit(this)">
-      <!-- <img class="card-img doc-img rounded-top" [class.inverted]="getIsThumbInverted()" [src]="getThumbUrl()"> -->
-      @if (folder.type == "folder") {
-        <i-bs class="me-1" name="folder"></i-bs>
-      } @else {
-        <i-bs class="me-1" name="files"></i-bs>
+      
+      @if ( folder.document_matching == null ){
+        <div class="p-5 ">
+
+          @if (folder.type == "folder") {
+            <i-bs class="me-1 d-flex justify-content-center align-items-center" name="folder" width="80%" height="80%"></i-bs>
+          } @else {
+            <!-- <i-bs class="me-1" name="files"></i-bs> -->
+            <i-bs class="me-1 d-flex justify-content-center align-items-center" name="files" width="80%" height="80%"></i-bs>
+          }
+         
+        </div>
+      }@else {
+        <img class="card-img doc-img rounded-top"  [src]="getThumbUrl(folder)">
       }
-     
+      
+       
       <div class="border-end border-bottom bg-light py-1 px-2 document-card-check">
         <div class="form-check">
-          <input type="checkbox" class="form-check-input" id="smallCardCheck{{folder.id}}" [checked]="selected"
+          <!-- <input type="checkbox" class="form-check-input" id="smallCardCheck{{folder.id}}" [checked]="selected"
             (click)="this.toggleSelected.emit($event)">
-          <label class="form-check-label" for="smallCardCheck{{folder.id}}"></label>
+          <label class="form-check-label" for="smallCardCheck{{folder.id}}"></label> -->
+          <input type="checkbox" class="form-check-input" id="{{typeName}}{{folder.id}}" [checked]="selected" id="smallCardCheck{{folder.id}}" [checked]="selectedObjects.has(folder.id)" (click)="toggleSelected.emit(folder); $event.stopPropagation();">
+                <label class="form-check-label" for="{{typeName}}{{folder.id}}"></label>
         </div>
       </div>
 
@@ -40,14 +52,25 @@
     } -->
 
     <div class="card-body bg-light p-2">
-      <p class="card-text">
-        <!-- @if (document.correspondent) {
-        <a title="Toggle correspondent filter" i18n-title
-          (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()"
-          class="fw-bold btn-link">{{(document.correspondent$ | async)?.name ?? privateName}}</a>:
-        } -->
-        {{folder.name | documentTitle}}
-      </p>
+      @if (folder.type=="folder"){
+        <a class="card-text"  (click)="this.goToFolder.emit(this.folder)">
+          <!-- @if (document.correspondent) {
+          <a title="Toggle correspondent filter" i18n-title
+            (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()"
+            class="fw-bold btn-link">{{(document.correspondent$ | async)?.name ?? privateName}}</a>:
+          } -->
+          {{folder.name | documentTitle}}
+        </a>
+      } @else {
+        <a class="card-text"  routerLink="/documents/{{this.folder.document_matching}}">
+          <!-- @if (document.correspondent) {
+          <a title="Toggle correspondent filter" i18n-title
+            (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()"
+            class="fw-bold btn-link">{{(document.correspondent$ | async)?.name ?? privateName}}</a>:
+          } -->
+          {{folder.name | documentTitle}}
+        </a>
+      }
     </div>
     <div class="card-footer pt-0 pb-2 px-2">
       <div class="list-group list-group-flush border-0 pt-1 pb-2 card-info">
@@ -145,23 +168,28 @@
       <div class="d-flex justify-content-between align-items-center">
         <div class="btn-group w-100">
           
-
-            <a routerLink="/documents/{{folder.id}}" class="btn btn-sm btn-outline-secondary" title="Edit" i18n-title
+            
+            <!-- <button class="btn btn-sm btn-outline-secondary" (click)="filterDocuments(object); $event.stopPropagation();" title="Document" i18n-title 
               *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }" i18n-title>
+              <i-bs name="filter"></i-bs>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" (click)="openEditDialog(folder);  $event.stopPropagation();" title="Edit" i18n-title
+              *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType }" autoClose="true" [disabled]="!userCanEdit(folder)" >
               <i-bs name="pencil"></i-bs>
-            </a>
-            <a [href]="" target="_blank" class="btn btn-sm btn-outline-secondary" [ngbPopover]="previewContent"
-              [popoverTitle]="folder.name | documentTitle" autoClose="true" popoverClass="shadow popover-preview"
-              (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">
-              <i-bs name="eye"></i-bs>
-            </a>
-            <ng-template #previewContent>
-              <pngx-preview-popup [document]="document"></pngx-preview-popup>
-            </ng-template>
-            <a [href]="" class="btn btn-sm btn-outline-secondary" title="Download" i18n-title
-              (click)="$event.stopPropagation()">
-              <i-bs name="download"></i-bs>
-            </a>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" (click)="openDeleteDialog(folder); $event.stopPropagation();" title="Delete" i18n-title 
+            *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType }" [disabled]="!userCanDelete(folder)">
+              <i-bs name="trash"></i-bs>
+            </button> -->
+            <button class="btn btn-sm btn-outline-secondary" (click)="this.filterDocuments.emit(this.foler); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+              <i-bs name="filter"></i-bs>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" (click)="this.openEditDialog.emit(this.folder); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType }" [disabled]="userCanEdit.emit(this.folder)">
+              <i-bs name="pencil"></i-bs>
+            </button>
+            <button class="btn btn-sm btn-outline-danger" (click)="this.openDeleteDialog.emit(this.folder); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType }" [disabled]="userCanDelete.emit(this.folder)">
+              <i-bs name="trash"></i-bs>
+            </button>
 
           
         </div>

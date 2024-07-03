@@ -255,6 +255,16 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     )
   }
 
+  bulkExportExcelsFromFolder(ids: number[]) {
+    return this.http.post(
+      this.getResourceUrl(null, 'bulk_export_excel_folder'),
+      {
+        folder: ids,
+      },
+      { responseType: 'blob' }
+    )
+  }
+
 
   bulkDownload(
     ids: number[],

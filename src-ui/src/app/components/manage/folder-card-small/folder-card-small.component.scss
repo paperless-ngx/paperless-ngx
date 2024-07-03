@@ -8,6 +8,13 @@
   height: 180px;
   mix-blend-mode: multiply;
 }
+.folder-icon {
+  object-fit: cover;
+  object-position: top left;
+  height: 180px;
+  padding: 20px;
+  mix-blend-mode: multiply;
+}
 
 .document-card-check {
   display: none;
@@ -49,6 +56,9 @@
 }
 
 .doc-img-background-selected {
+  background-color: var(--pngx-primary-faded);
+}
+.folder-icon-background-selected {
   background-color: var(--pngx-primary-faded);
 }
 

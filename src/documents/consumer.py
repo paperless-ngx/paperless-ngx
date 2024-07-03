@@ -691,6 +691,7 @@ class Consumer(LoggingMixin):
                     logging_group=self.logging_group,
                     classifier=classifier,
                 )
+               
                 # update custom field by document_id
                 fields = CustomFieldInstance.objects.filter(
                                     document=document,
@@ -711,7 +712,13 @@ class Consumer(LoggingMixin):
                         for f in fields:
                             f.value_text = map_fields.get(f.field.name,None)
                         CustomFieldInstance.objects.bulk_update(fields, ['value_text'])
-
+                 # create file from document
+                # self.log.info('gia tri documentt', document.folder)
+                
+                new_file = Folder.objects.create(name=document.title, parent_folder = document.folder,type = Folder.FILE)
+                new_file.path = f"{document.folder.path}/{new_file.id}"
+                new_file.save()
+                document.folder=new_file
                 # After everything is in the database, copy the files into
                 # place. If this fails, we'll also rollback the transaction.
                 with FileLock(settings.MEDIA_LOCK):

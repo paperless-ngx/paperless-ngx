@@ -9,5 +9,6 @@ export interface Folder extends MatchingModel {
     parentFolder: number | null;
     owner: number;
     type: string;
+    document_matching: number | null;
      
 }

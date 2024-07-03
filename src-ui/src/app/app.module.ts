@@ -103,6 +103,7 @@ import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { FolderEditDialogComponent } from './components/common/edit-dialog/folder-edit-dialog/folder-edit-dialog.component'
+import { FolderCardSmallComponent } from './components/manage/folder-card-small/folder-card-small.component'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
 import { FoldersComponent } from './components/manage/folder-list/folder-list.component'
@@ -350,8 +351,6 @@ import localeTr from '@angular/common/locales/tr'
 import localeUk from '@angular/common/locales/uk'
 import localeZh from '@angular/common/locales/zh'
 import localeVi from '@angular/common/locales/vi'
-import { FolderCardSmallComponent } from './components/manage/folder-card-small/folder-card-small.component'
-import { FolderCardLargeComponent } from './components/manage/folder-card-large/folder-card-large.component'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -396,7 +395,6 @@ function initializeApp(settings: SettingsService) {
   declarations: [
     //BoxListComponent,
     FolderCardSmallComponent,
-    FolderCardLargeComponent,
     CustomShelfComponent,
     BoxEditDialogComponent,
     AppComponent,

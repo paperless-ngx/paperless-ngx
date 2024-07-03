@@ -233,17 +233,16 @@ class Folder(MatchingModel):
         null=True,
         help_text=_("The checksum of the original folder."),
     )
-    class FieldDataType(models.TextChoices):
-        FOLDER = "folder", _("Folder")
-        FILE = "file", _("File")
 
-    type = models.CharField(
-        _("type"),
-        max_length=50,
-        choices=FieldDataType.choices,
-        default=FieldDataType.FOLDER,
-        editable=False,
+    FOLDER = "folder"
+    FILE = "file"
+    TYPE_FOLDER = (
+        (FOLDER, _("folder")),
+        (FILE, _("file")),
     )
+    type = models.CharField(max_length=20,
+                                      choices=TYPE_FOLDER,
+                                      default=FOLDER,)
 
     class Meta(MatchingModel.Meta):
         

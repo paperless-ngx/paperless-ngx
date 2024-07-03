@@ -3,11 +3,13 @@ import {
   OnDestroy,
   OnInit,
   QueryList,
+  ViewChild,
   ViewChildren,
 } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators'
+import { first } from 'rxjs'
 import {
   MatchingModel,
   MATCHING_ALGORITHMS,
@@ -40,7 +42,8 @@ import { environment } from 'src/environments/environment'
 import { Router } from '@angular/router'
 import { Folder } from 'src/app/data/folder'
 import { FolderService } from 'src/app/services/rest/folder.service'
-
+import { DocumentService } from 'src/app/services/rest/document.service'
+import { saveAs } from 'file-saver'
 export interface ManagementListColumn {
   key: string
 
@@ -70,7 +73,8 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
     public typeNamePlural: string,
     public permissionType: PermissionType,
     public extraColumns: ManagementListColumn[],
-    public folderService: FolderService
+    public folderService: FolderService,
+    
   ) {
     super()
   }
@@ -78,9 +82,9 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>
   public id: number
   public data: T[] = []
-
+  displayMode = 'details'
   public page = 1
-
+  private permissionService: PermissionsService
   public collectionSize = 0
 
   public sortField: string
@@ -96,12 +100,13 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
   public togggleAll: boolean = false
   public shareLinks: ShareLink[]
   public folderPath: Folder[] = []
- 
+  public documentService: DocumentService
 
 
   ngOnInit(): void {
     if (localStorage.getItem('folder-list:displayMode') != null) {
-      this.displayMode = localStorage.getItem('foler-list:displayMode')
+      console.log( localStorage.getItem('folder-list:displayMode'))
+      this.displayMode = localStorage.getItem('folder-list:displayMode')
     }
     this.reloadData()
     
@@ -137,7 +142,36 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
       return '-'
     }
   }
- 
+  
+  exportToExcelSelected() {
+    this.awaitingDownload = true
+    this.documentService
+      .bulkExportExcels(
+        Array.from(this.selectedObjects)
+      )
+      .pipe(first())
+      .subscribe((result: any) => {
+        saveAs(result, 'download.xlsx')
+        this.awaitingDownload = false
+      })
+  }
+  
+  userCanEditAll(): boolean {
+    let canEdit: boolean = this.permissionService.currentUserCan(
+      PermissionAction.Change,
+      PermissionType.Folder
+    )
+    if (!canEdit) return false
+
+    const folder = this.data.filter((f) => this.selectedObjects.has(f.id))
+    canEdit = folder.every((f) =>
+      this.permissionService.currentUserHasObjectPermissions(
+        this.PermissionAction.Change,
+        f
+      )
+    )
+    return canEdit
+  }
 
   onSort(event: SortEvent) {
     this.sortField = event.column
@@ -151,7 +185,7 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
       this.folderService.getFolderPath(this.id).subscribe(
         (folder) => {
           listFolderPath = folder;
-          console.log(listFolderPath)
+          // console.log(listFolderPath)
           this.folderPath = listFolderPath.results
         },)
       
@@ -226,8 +260,15 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
       { rule_type: this.filterRuleType, value: object.id.toString() },
     ])
   }
+  isSelected(object: T){
+    return this.selectedObjects.has(object.id)
+  }
+  saveDisplayMode() {
+    localStorage.setItem('folder-list:displayMode', this.displayMode)
+  }
 
   openDeleteDialog(object: T) {
+    // console.log(object)
     var activeModal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
     })
@@ -310,6 +351,10 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
     this.selectedObjects.has(object.id)
       ? this.selectedObjects.delete(object.id)
       : this.selectedObjects.add(object.id)
+  }
+  selectAll(){
+    
+    this.selectedObjects = new Set(this.data.map((o) => o.id))
   }
 
   setPermissions() {
