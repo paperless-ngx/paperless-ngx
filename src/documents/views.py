@@ -135,7 +135,7 @@ from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
-from documents.serialisers import AcknowledgeTasksViewSerializer, ApprovalSerializer, ApprovalViewSerializer
+from documents.serialisers import AcknowledgeTasksViewSerializer, ApprovalSerializer, ApprovalViewSerializer, ExportDocumentFromFolderSerializer
 from documents.serialisers import BulkDownloadSerializer
 from documents.serialisers import BulkEditObjectsSerializer
 from documents.serialisers import BulkEditSerializer
@@ -1449,8 +1449,8 @@ class BulkExportExcelView(GenericAPIView):
         
 class BulkExportExcelFromFolderView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
-    serializer_class = BulkDownloadSerializer
-    parser_classes = (parsers.JSONParser,)
+    serializer_class = ExportDocumentFromFolderSerializer
+ 
 
     def post(self, request, format=None):
         serializer = self.get_serializer(data=request.data)
@@ -1460,10 +1460,10 @@ class BulkExportExcelFromFolderView(GenericAPIView):
     
         try:
 
-            folder_ids = Folder.objects.filter(id__in=ids).values_list('id',flat=True)
+            folder_ids = Folder.objects.filter(id__in=ids).values_list('id',flat=False)
             folder_ids = [x[0] for x in folder_ids]
             if len(ids)==0:
-                folder_ids = Folder.objects.all()
+                folder_ids = Folder.objects.all().values_list('id',flat=False)
                 folder_ids = [x[0] for x in folder_ids]
             
 

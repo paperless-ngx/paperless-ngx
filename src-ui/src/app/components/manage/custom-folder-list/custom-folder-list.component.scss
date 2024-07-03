@@ -10,6 +10,9 @@ tbody tr:last-child td {
 .form-check {
     min-height: 0;
 }
+a {
+  text-decoration: none;
+}
 $paperless-card-breakpoints: (
   // 0: 2, // xs is manual for slim-sidebar
   768px: 3, //md

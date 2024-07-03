@@ -51,9 +51,9 @@
     </button>
 
 </pngx-page-header>
-<div class="d-flex align-items-center">
+<div class="form-inline d-flex align-items-center">
   <a class="me" (click)="goToFolderRoot()">
-    <i-bs class="" name="folder"></i-bs>
+    <i-bs class="" name="folder" ></i-bs>
   </a>&nbsp; > &nbsp;
   <div *ngFor="let folder of folderPath">
     <a class="me" (click)="goToFolder(folder)">

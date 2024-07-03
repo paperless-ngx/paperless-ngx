@@ -4,20 +4,20 @@
     <div class="border-bottom doc-img-container" [class.doc-img-background-selected]="selected"
       (click)="this.toggleSelected.emit($event)" (dblclick)="dblClickDocument.emit(this)">
       
-      @if ( folder.document_matching == null ){
-        <div class="p-5 ">
+      <!-- @if ( folder.document_matching == null ){ -->
+        <div class="">
 
           @if (folder.type == "folder") {
-            <i-bs class="me-1 d-flex justify-content-center align-items-center" name="folder" width="80%" height="80%"></i-bs>
+            <i-bs class="me-1 d-flex justify-content-center align-items-center" name="folder" width="30%" height="30%"></i-bs>
           } @else {
             <!-- <i-bs class="me-1" name="files"></i-bs> -->
-            <i-bs class="me-1 d-flex justify-content-center align-items-center" name="files" width="80%" height="80%"></i-bs>
+            <i-bs class="me-1 d-flex justify-content-center align-items-center" name="files" width="30%" height="30%"></i-bs>
           }
          
         </div>
-      }@else {
+      <!-- }@else {
         <img class="card-img doc-img rounded-top"  [src]="getThumbUrl(folder)">
-      }
+      } -->
       
        
       <div class="border-end border-bottom bg-light py-1 px-2 document-card-check">

@@ -28,6 +28,7 @@ export class FolderService extends AbstractNameFilterService<Folder> {
     return this.http.post(
       this.getResourceUrl(null, 'bulk_export_excel_folder'),
       {
+
         folders: ids,
       },
       { responseType: 'blob' }

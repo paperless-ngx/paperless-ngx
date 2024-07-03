@@ -133,7 +133,7 @@ urlpatterns = [
                     name="bulk_export_excel",
                 ),
                 re_path(
-                    "^documents/bulk_export_excel_folder/",
+                    "^folders/bulk_export_excel_folder/",
                     BulkExportExcelFromFolderView.as_view(),
                     name="bulk_export_excel_folder",
                 ),

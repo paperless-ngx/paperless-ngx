@@ -38,7 +38,7 @@ export class UploadDocumentsService {
     console.log(payload)
     let formData = new FormData()
     formData.append('document', file, file.name)
-    if (payload)
+    if (payload && payload.length)
       formData.append('folder',payload.folder)
       
     let status = this.consumerStatusService.newFileUpload(file.name)

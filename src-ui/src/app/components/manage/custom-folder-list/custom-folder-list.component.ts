@@ -145,7 +145,7 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
   
   exportToExcelSelected() {
     this.awaitingDownload = true
-    this.documentService
+    this.folderService
       .bulkExportExcels(
         Array.from(this.selectedObjects)
       )

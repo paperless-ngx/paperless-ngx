@@ -124,7 +124,7 @@ import { PreviewPopupComponent } from './components/common/preview-popup/preview
 import { SwitchComponent } from './components/common/input/switch/switch.component'
 import { ConfigComponent } from './components/admin/config/config.component'
 import { FileComponent } from './components/common/input/file/file.component'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { NgxBootstrapIconsModule, allIcons, ColorTheme  } from 'ngx-bootstrap-icons'
 import { ConfirmButtonComponent } from './components/common/confirm-button/confirm-button.component'
 import { MonetaryComponent } from './components/common/input/monetary/monetary.component'
 import { SystemStatusDialogComponent } from './components/common/system-status-dialog/system-status-dialog.component'
@@ -515,7 +515,12 @@ function initializeApp(settings: SettingsService) {
     ColorSliderModule,
     TourNgBootstrapModule,
     DragDropModule,
-    NgxBootstrapIconsModule.pick(icons),
+    NgxBootstrapIconsModule.pick(icons,
+      { 
+        
+        
+    }
+    ),
     NgxFilesizeModule,
   ],
   providers: [
