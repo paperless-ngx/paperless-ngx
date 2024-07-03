@@ -59,7 +59,7 @@
                                 <button type="submit" class="btn btn-secondary">{{ provider.name }}</button>
                             </form>
                         </li>
-                    {% if REDIRECT_LOGIN_TO_SSO and forloop.counter0 == 0 %}
+                    {% if REDIRECT_LOGIN_TO_SSO and forloop.counter0 == 0 and request.GET.loggedout != '1' %}
                         <script type="text/javascript">
                             const form = document.getElementById('social-login');
                             if (form) {
