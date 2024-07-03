@@ -40,7 +40,7 @@ export class CustomShelfEditDialogComponent extends EditCustomShelfComponent<She
 
       // Lấy các name của warehouse có type là 'Warehouse'
       this.warehouseNames = this.warehouses.map(warehouse => warehouse.name);
-      console.log("yuguy", this.warehouses)
+      // console.log("yuguy", this.warehouses)
     });
   }
 

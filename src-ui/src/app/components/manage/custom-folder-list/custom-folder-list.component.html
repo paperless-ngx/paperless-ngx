@@ -52,15 +52,15 @@
     </button>
 
 </pngx-page-header>
-<div class="form-inline d-flex align-items-center">
+<div class="form-inline d-flex flex-wrap align-items-center">
   <a class="me" (click)="goToFolderRoot()">
     <i-bs class="" name="folder-fill" width="2rem" 
     height="2rem" ></i-bs>
-  </a>&nbsp; > &nbsp;
-  <div *ngFor="let folder of folderPath" class="fs-4">
-    <a class="me " (click)="goToFolder(folder)">
+  </a>
+  <div *ngFor="let folder of folderPath" class="fs-5">
+    <i-bs class="" name="chevron-right" ></i-bs>&nbsp;<a class="me " (click)="goToFolder(folder)">
       {{ folder.name }} 
-    </a> > &nbsp;
+    </a>
   </div>
 </div>
 <br>
@@ -116,8 +116,8 @@
               <td scope="row" class="d-md-table-cell"><button class="btn btn-link ms-0 ps-0 text-start" (click)="userCanEdit(object) ? goToFolder(object) : null; $event.stopPropagation()">
 
                   <i-bs class="me-1" name="folder-fill" width="2rem" height="2rem"></i-bs>&nbsp;
-                
-                {{ object.name }}</button> </td>
+                </button> 
+                {{ object.name }}</td>
             }@else{
               <td scope="row" class="d-md-table-cell">
                 <button 

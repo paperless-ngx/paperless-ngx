@@ -434,11 +434,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">5</context>
+          <context context-type="linenumber">18</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">5</context>
+          <context context-type="linenumber">18</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -544,11 +544,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">63</context>
+          <context context-type="linenumber">103</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">63</context>
+          <context context-type="linenumber">103</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -671,19 +671,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">71</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">71</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">49</context>
+          <context context-type="linenumber">89</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">49</context>
+          <context context-type="linenumber">89</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -920,11 +920,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">55</context>
+          <context context-type="linenumber">27</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">55</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+          <context context-type="linenumber">95</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+          <context context-type="linenumber">95</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -1030,11 +1038,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">125</context>
+          <context context-type="linenumber">200</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">125</context>
+          <context context-type="linenumber">200</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -1730,11 +1738,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">8</context>
+          <context context-type="linenumber">45</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">8</context>
+          <context context-type="linenumber">45</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -2075,31 +2083,31 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">11</context>
+          <context context-type="linenumber">48</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">11</context>
+          <context context-type="linenumber">48</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">96</context>
+          <context context-type="linenumber">161</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">96</context>
+          <context context-type="linenumber">161</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">108</context>
+          <context context-type="linenumber">173</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">108</context>
+          <context context-type="linenumber">173</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-          <context context-type="linenumber">235</context>
+          <context context-type="linenumber">280</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -2522,19 +2530,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">95</context>
+          <context context-type="linenumber">160</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">95</context>
+          <context context-type="linenumber">160</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">105</context>
+          <context context-type="linenumber">170</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">105</context>
+          <context context-type="linenumber">170</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -2682,7 +2690,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-          <context context-type="linenumber">350</context>
+          <context context-type="linenumber">401</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -2753,7 +2761,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-          <context context-type="linenumber">352</context>
+          <context context-type="linenumber">403</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -2895,11 +2903,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">167</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">167</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -4973,11 +4981,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">14</context>
+          <context context-type="linenumber">51</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">14</context>
+          <context context-type="linenumber">51</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -5166,6 +5174,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.ts</context>
           <context context-type="linenumber">93</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/folder-card-small/folder-card-small.component.ts</context>
+          <context context-type="linenumber">91</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2504502765849142619" datatype="html">
@@ -6420,11 +6432,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-          <context context-type="linenumber">231</context>
+          <context context-type="linenumber">276</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-          <context context-type="linenumber">348</context>
+          <context context-type="linenumber">399</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -6670,6 +6682,14 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">117</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+          <context context-type="linenumber">40</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1015374532025907183" datatype="html">
@@ -7144,6 +7164,14 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="5146398958364876914" datatype="html">
         <source>Sort</source>
@@ -7613,11 +7641,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">70</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">70</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -7652,11 +7680,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">94</context>
+          <context context-type="linenumber">159</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">94</context>
+          <context context-type="linenumber">159</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -7691,11 +7719,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">122</context>
+          <context context-type="linenumber">197</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">122</context>
+          <context context-type="linenumber">197</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -7730,7 +7758,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-          <context context-type="linenumber">127</context>
+          <context context-type="linenumber">136</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -7757,7 +7785,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-          <context context-type="linenumber">129</context>
+          <context context-type="linenumber">138</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -7784,7 +7812,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-          <context context-type="linenumber">187</context>
+          <context context-type="linenumber">225</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -7807,7 +7835,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-          <context context-type="linenumber">192</context>
+          <context context-type="linenumber">230</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -7830,7 +7858,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-          <context context-type="linenumber">208</context>
+          <context context-type="linenumber">246</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -7853,7 +7881,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-          <context context-type="linenumber">213</context>
+          <context context-type="linenumber">251</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -7876,7 +7904,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-          <context context-type="linenumber">233</context>
+          <context context-type="linenumber">278</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -7899,7 +7927,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-          <context context-type="linenumber">249</context>
+          <context context-type="linenumber">294</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -7922,7 +7950,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-          <context context-type="linenumber">328</context>
+          <context context-type="linenumber">379</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -7945,7 +7973,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-          <context context-type="linenumber">335</context>
+          <context context-type="linenumber">386</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -7972,7 +8000,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-          <context context-type="linenumber">349</context>
+          <context context-type="linenumber">400</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -7995,7 +8023,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-          <context context-type="linenumber">363</context>
+          <context context-type="linenumber">414</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -8018,7 +8046,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-          <context context-type="linenumber">369</context>
+          <context context-type="linenumber">420</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -8121,11 +8149,11 @@
         <source>Document count</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">51</context>
+          <context context-type="linenumber">91</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-          <context context-type="linenumber">51</context>
+          <context context-type="linenumber">91</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -8209,7 +8237,7 @@
         <source>Do you really want to delete the folder &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">79</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/subfolder-list/subfolder-list.component.ts</context>
@@ -9324,28 +9352,28 @@
         <source>Connecting...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
-          <context context-type="linenumber">44</context>
+          <context context-type="linenumber">48</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1245343823699368872" datatype="html">
         <source>Uploading...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
-          <context context-type="linenumber">56</context>
+          <context context-type="linenumber">60</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7446520539098045935" datatype="html">
         <source>Upload complete, waiting...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
-          <context context-type="linenumber">59</context>
+          <context context-type="linenumber">63</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1405142710727603568" datatype="html">
         <source>HTTP error: <x id="PH" equiv-text="error.status"/> <x id="PH_1" equiv-text="error.statusText"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
-          <context context-type="linenumber">72</context>
+          <context context-type="linenumber">76</context>
         </context-group>
       </trans-unit>
     </body>

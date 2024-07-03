@@ -58,14 +58,14 @@ extends CustomFolderListComponent<Folder> {
   onPopState(event) {
     this.url = location.pathname.split("/")[2];
     this.id=this.url
-    console.log('Back button pressed',this.id);
+    // console.log('Back button pressed',this.id);
     super.reloadData()
   }
   reloadData() {
     
     this.id = this.route.snapshot.params['id']
    
-    console.log('load trang',this.router.url.split('/')[2])
+    // console.log('load trang',this.router.url.split('/')[2])
     super.reloadData()
   }
 

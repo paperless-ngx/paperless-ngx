@@ -379,7 +379,7 @@
                <context context-type="sourcefile">src/app/app.component.ts</context>
                <context context-type="linenumber">134</context>
             </context-group>
-            <target state="translated">Trang dashboard có thể được sử dụng để hiển thị các chế độ xem đã lưu, chẳng hạn như 'Hộp thư đến'. Những cài đặt đó được tìm thấy trong Cài đặt &gt; Đã lưu Chế độ xem sau khi bạn đã tạo.</target>
+            <target state="translated">Trang dashboard có thể được sử dụng để hiển thị các chế độ xem đã lưu, chẳng hạn như 'Hộp thư đến'. Những cài đặt đó được tìm thấy trong Cài đặt &amp;&gt; Đã lưu Chế độ xem sau khi bạn đã tạo.</target>
          </trans-unit>
          <trans-unit id="9075755296812854717" datatype="html">
             <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
@@ -525,11 +525,11 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">5</context>
+               <context context-type="linenumber">18</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">5</context>
+               <context context-type="linenumber">18</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -637,11 +637,11 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">63</context>
+               <context context-type="linenumber">103</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">63</context>
+               <context context-type="linenumber">103</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -765,19 +765,19 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">32</context>
+               <context context-type="linenumber">71</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">32</context>
+               <context context-type="linenumber">71</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">49</context>
+               <context context-type="linenumber">89</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">49</context>
+               <context context-type="linenumber">89</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -1025,11 +1025,19 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">55</context>
+               <context context-type="linenumber">27</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">55</context>
+               <context context-type="linenumber">27</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+               <context context-type="linenumber">95</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+               <context context-type="linenumber">95</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -1163,11 +1171,11 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">125</context>
+               <context context-type="linenumber">200</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">125</context>
+               <context context-type="linenumber">200</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -1215,10 +1223,10 @@
             </context-group>
             <target state="translated">
                Thất bại
-               <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.failureApprovals.length &gt; 0) {" />
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;" />
+               <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.failureApprovals.length &amp;&gt; 0) {" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;&lt;span class=&amp;quot;badge bg-danger ms-2&amp;quot;&amp;&gt;" />
                <x id="INTERPOLATION" equiv-text="{{approvalsService.failureApprovals.length}}" />
-               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;&lt;span&amp;&gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
             </target>
          </trans-unit>
@@ -1237,10 +1245,10 @@
             </context-group>
             <target state="translated">
                Thành công
-               <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.successApprovals.length &gt; 0) {" />
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-secondary ms-2&quot;&gt;" />
+               <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.successApprovals.length &amp;&gt; 0) {" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;&lt;span class=&amp;quot;badge bg-secondary ms-2&amp;quot;&amp;&gt;" />
                <x id="INTERPOLATION" equiv-text="{{approvalsService.successApprovals.length}}" />
-               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;&lt;span&amp;&gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
             </target>
          </trans-unit>
@@ -1259,10 +1267,10 @@
             </context-group>
             <target state="translated">
                Đang chờ
-               <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.pendingApprovals.length &gt; 0) {" />
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-secondary ms-2&quot;&gt;" />
+               <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.pendingApprovals.length &amp;&gt; 0) {" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;&lt;span class=&amp;quot;badge bg-secondary ms-2&amp;quot;&amp;&gt;" />
                <x id="INTERPOLATION" equiv-text="{{approvalsService.pendingApprovals.length}}" />
-               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;&lt;span&amp;&gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
             </target>
          </trans-unit>
@@ -1281,10 +1289,10 @@
             </context-group>
             <target state="translated">
                Đã thu hồi
-               <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.revokedApprovals.length &gt; 0) {" />
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-secondary ms-2&quot;&gt;" />
+               <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.revokedApprovals.length &amp;&gt; 0) {" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;&lt;span class=&amp;quot;badge bg-secondary ms-2&amp;quot;&amp;&gt;" />
                <x id="INTERPOLATION" equiv-text="{{approvalsService.revokedApprovals.length}}" />
-               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;&lt;span&amp;&gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
             </target>
          </trans-unit>
@@ -1471,7 +1479,7 @@
                <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
                <context context-type="linenumber">4</context>
             </context-group>
-            <target state="translated">Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of NIAD. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</target>
+            <target state="translated">Global app configuration options which apply to &amp;&lt;strong&amp;&gt;every&amp;&lt;strong&amp;&gt; user of this install of NIAD. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</target>
          </trans-unit>
          <trans-unit id="187187500641108332" datatype="html">
             <source>
@@ -1700,7 +1708,7 @@
                <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
                <context context-type="linenumber">4</context>
             </context-group>
-            <target state="translated">Tùy chọn để tùy chỉnh giao diện, thông báo, chế độ xem đã lưu và hơn thế nữa. Cài đặt chỉ áp dụng cho &lt;strong&gt;người dùng hiện tại&lt;/strong&gt;.</target>
+            <target state="translated">Tùy chọn để tùy chỉnh giao diện, thông báo, chế độ xem đã lưu và hơn thế nữa. Cài đặt chỉ áp dụng cho &amp;&lt;strong&amp;&gt;người dùng hiện tại&amp;&lt;strong&amp;&gt;.</target>
          </trans-unit>
          <trans-unit id="1685061484835793745" datatype="html">
             <source>Start tour</source>
@@ -2024,11 +2032,11 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">8</context>
+               <context context-type="linenumber">45</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">8</context>
+               <context context-type="linenumber">45</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -2308,9 +2316,9 @@
                <context context-type="linenumber">332,333</context>
             </context-group>
             <target state="translated">
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;&lt;span class=&amp;quot;visually-hidden&amp;quot;&amp;&gt;" />
                Hiển thị trên
-               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;&lt;span&amp;&gt;" />
             </target>
          </trans-unit>
          <trans-unit id="4104807402967139762" datatype="html">
@@ -2401,31 +2409,31 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">11</context>
+               <context context-type="linenumber">48</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">11</context>
+               <context context-type="linenumber">48</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">96</context>
+               <context context-type="linenumber">161</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">96</context>
+               <context context-type="linenumber">161</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">108</context>
+               <context context-type="linenumber">173</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">108</context>
+               <context context-type="linenumber">173</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">235</context>
+               <context context-type="linenumber">280</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -2718,10 +2726,10 @@
             </context-group>
             <target state="translated">
                Thất bại
-               <x id="START_BLOCK_IF" equiv-text="@if (tasksService.failedFileTasks.length &gt; 0) {" />
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;" />
+               <x id="START_BLOCK_IF" equiv-text="@if (tasksService.failedFileTasks.length &amp;&gt; 0) {" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;&lt;span class=&amp;quot;badge bg-danger ms-2&amp;quot;&amp;&gt;" />
                <x id="INTERPOLATION" equiv-text="{{tasksService.failedFileTasks.length}}" />
-               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;&lt;span&amp;&gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
             </target>
          </trans-unit>
@@ -2740,10 +2748,10 @@
             </context-group>
             <target state="translated">
                Hoàn thành
-               <x id="START_BLOCK_IF" equiv-text="@if (tasksService.completedFileTasks.length &gt; 0) {" />
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-secondary ms-2&quot;&gt;" />
+               <x id="START_BLOCK_IF" equiv-text="@if (tasksService.completedFileTasks.length &amp;&gt; 0) {" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;&lt;span class=&amp;quot;badge bg-secondary ms-2&amp;quot;&amp;&gt;" />
                <x id="INTERPOLATION" equiv-text="{{tasksService.completedFileTasks.length}}" />
-               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;&lt;span&amp;&gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
             </target>
          </trans-unit>
@@ -2762,10 +2770,10 @@
             </context-group>
             <target state="translated">
                Đã bắt đầu
-               <x id="START_BLOCK_IF" equiv-text="@if (tasksService.startedFileTasks.length &gt; 0) {" />
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-secondary ms-2&quot;&gt;" />
+               <x id="START_BLOCK_IF" equiv-text="@if (tasksService.startedFileTasks.length &amp;&gt; 0) {" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;&lt;span class=&amp;quot;badge bg-secondary ms-2&amp;quot;&amp;&gt;" />
                <x id="INTERPOLATION" equiv-text="{{tasksService.startedFileTasks.length}}" />
-               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;&lt;span&amp;&gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
             </target>
          </trans-unit>
@@ -2784,10 +2792,10 @@
             </context-group>
             <target state="translated">
                Đang chờ
-               <x id="START_BLOCK_IF" equiv-text="@if (tasksService.queuedFileTasks.length &gt; 0) {" />
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-secondary ms-2&quot;&gt;" />
+               <x id="START_BLOCK_IF" equiv-text="@if (tasksService.queuedFileTasks.length &amp;&gt; 0) {" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;&lt;span class=&amp;quot;badge bg-secondary ms-2&amp;quot;&amp;&gt;" />
                <x id="INTERPOLATION" equiv-text="{{tasksService.queuedFileTasks.length}}" />
-               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;&lt;span&amp;&gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
             </target>
          </trans-unit>
@@ -2967,19 +2975,19 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">95</context>
+               <context context-type="linenumber">160</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">95</context>
+               <context context-type="linenumber">160</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">105</context>
+               <context context-type="linenumber">170</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">105</context>
+               <context context-type="linenumber">170</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -3143,7 +3151,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">350</context>
+               <context context-type="linenumber">401</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -3215,7 +3223,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">352</context>
+               <context context-type="linenumber">403</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -3385,11 +3393,11 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">102</context>
+               <context context-type="linenumber">167</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">102</context>
+               <context context-type="linenumber">167</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -4593,9 +4601,9 @@
             </context-group>
             <target state="translated">
                Sẽ chỉ xử lý các thư phù hợp
-               <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;" />
+               <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&amp;&lt;em&amp;&gt;" />
                tất cả
-               <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;" />
+               <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&amp;&lt;em&amp;&gt;" />
                của bộ lọc xác định phía dưới
             </target>
          </trans-unit>
@@ -4925,7 +4933,7 @@
                <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.ts</context>
                <context context-type="linenumber">32</context>
             </context-group>
-            <target state="translated">Xem &lt;a target="_blank" href="https://docs.paperless-ngx.com/advanced_usage/#file-name-handling"&gt;documentation&lt;/a&gt; để xem toàn bộ danh sách.</target>
+            <target state="translated">Xem &amp;&lt;a target="_blank" href="https://docs.paperless-ngx.com/advanced_usage/#file-name-handling"&amp;&gt;documentation&amp;&lt;a&amp;&gt; để xem toàn bộ danh sách.</target>
          </trans-unit>
          <trans-unit id="6898961890896270754" datatype="html">
             <source>Create new storage path</source>
@@ -5209,9 +5217,9 @@
             </context-group>
             <target state="translated">
                Kích hoạt cho các tài liệu khớp
-               <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;" />
+               <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&amp;&lt;em&amp;&gt;" />
                tất cả
-               <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;" />
+               <x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&amp;&lt;em&amp;&gt;" />
                bộ lọc đã xác định phía dưới
             </target>
          </trans-unit>
@@ -5253,7 +5261,7 @@
                <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
                <context context-type="linenumber">134</context>
             </context-group>
-            <target state="translated">Áp dụng cho các tài liệu khớp với đường dẫn này. Cho phép sử dụng ký tự đại diện được chỉ định là *. Đối với việc phân biệt chữ hoa chữ thường, sẽ được chuẩn hóa.&lt;/a&gt;</target>
+            <target state="translated">Áp dụng cho các tài liệu khớp với đường dẫn này. Cho phép sử dụng ký tự đại diện được chỉ định là *. Đối với việc phân biệt chữ hoa chữ thường, sẽ được chuẩn hóa.&amp;&lt;a&amp;&gt;</target>
          </trans-unit>
          <trans-unit id="7468453896129193641" datatype="html">
             <source>Filter mail rule</source>
@@ -5341,7 +5349,7 @@
                <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
                <context context-type="linenumber">169</context>
             </context-group>
-            <target state="translated">Có thể bao gồm một số giá trị thay thế, xem &lt;a target='_blank' href='https://docs.paperless-ngx.com/usage/#workflows'&gt;documentation&lt;/a&gt;.</target>
+            <target state="translated">Có thể bao gồm một số giá trị thay thế, xem &amp;&lt;a target='_blank' href='https://docs.paperless-ngx.com/usage/#workflows'&amp;&gt;documentation&amp;&lt;a&amp;&gt;.</target>
          </trans-unit>
          <trans-unit id="6528897010417701530" datatype="html">
             <source>Assign tags</source>
@@ -5723,11 +5731,11 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">14</context>
+               <context context-type="linenumber">51</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">14</context>
+               <context context-type="linenumber">51</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -5936,6 +5944,10 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.ts</context>
                <context context-type="linenumber">93</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/folder-card-small/folder-card-small.component.ts</context>
+               <context context-type="linenumber">91</context>
             </context-group>
             <target state="translated">Private</target>
          </trans-unit>
@@ -7273,7 +7285,7 @@
             <target state="translated">
                Ghi chú
                <x id="START_BLOCK_IF" equiv-text="@if (document?.notes.length) {" />
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;&lt;span class=&amp;quot;badge text-bg-secondary ms-1&amp;quot;&amp;&gt;" />
                <x id="INTERPOLATION" equiv-text="ngth}}" />
                <x id="CLOSE_TAG_SPAN" ctype="x-span" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
@@ -7283,7 +7295,7 @@
             <source>
                Approvals
                <x id="START_BLOCK_IF" equiv-text="@if (document?.approvals?.length) {" />
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;" />
                <x id="INTERPOLATION" equiv-text="s.length}}" />
                <x id="CLOSE_TAG_SPAN" ctype="x-span" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
@@ -7295,7 +7307,7 @@
             <target state="translated">
                Đã xét duyệt
                <x id="START_BLOCK_IF" equiv-text="@if (document?.approvals?.length) {" />
-               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;&lt;span class=&amp;quot;badge text-bg-secondary ms-1&amp;quot;&amp;&gt;" />
                <x id="INTERPOLATION" equiv-text="s.length}}" />
                <x id="CLOSE_TAG_SPAN" ctype="x-span" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
@@ -7427,11 +7439,11 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">231</context>
+               <context context-type="linenumber">276</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">348</context>
+               <context context-type="linenumber">399</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -7712,6 +7724,14 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
                <context context-type="linenumber">117</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+               <context context-type="linenumber">40</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+               <context context-type="linenumber">40</context>
             </context-group>
             <target state="translated">Xuất sang Excel</target>
          </trans-unit>
@@ -8439,6 +8459,14 @@
                <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
                <context context-type="linenumber">11</context>
             </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+               <context context-type="linenumber">21</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+               <context context-type="linenumber">21</context>
+            </context-group>
             <target state="translated">Chọn tất cả</target>
          </trans-unit>
          <trans-unit id="5146398958364876914" datatype="html">
@@ -8700,7 +8728,7 @@
                <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
                <context context-type="linenumber">123</context>
             </context-group>
-            <target state="translated">Tiêu đề &amp; nội dung</target>
+            <target state="translated">Tiêu đề &amp;nội dung</target>
          </trans-unit>
          <trans-unit id="9149498548977462220" datatype="html">
             <source>Custom fields</source>
@@ -8777,7 +8805,7 @@
             </context-group>
             <target state="translated">
                Người biên tập:
-               <x id="PH" equiv-text="this.correspondents.find((c) =&gt; c.id == +rule.value)?.name" />
+               <x id="PH" equiv-text="this.correspondents.find((c) =&amp;&gt; c.id == +rule.value)?.name" />
             </target>
          </trans-unit>
          <trans-unit id="8170755470576301659" datatype="html">
@@ -8799,7 +8827,7 @@
             </context-group>
             <target state="translated">
                Loại tài liệu:
-               <x id="PH" equiv-text="this.documentTypes.find(               (dt) =&gt; dt.id == +rule.value             )?.name" />
+               <x id="PH" equiv-text="this.documentTypes.find(               (dt) =&amp;&gt; dt.id == +rule.value             )?.name" />
             </target>
          </trans-unit>
          <trans-unit id="4362173610367509215" datatype="html">
@@ -8821,7 +8849,7 @@
             </context-group>
             <target state="translated">
                Kho:
-               <x id="PH" equiv-text="this.warehouses.find(               (w) =&gt; w.id == +rule.value             )?.name" />
+               <x id="PH" equiv-text="this.warehouses.find(               (w) =&amp;&gt; w.id == +rule.value             )?.name" />
             </target>
          </trans-unit>
          <trans-unit id="4234720220218125568" datatype="html">
@@ -8843,7 +8871,7 @@
             </context-group>
             <target state="translated">
                Đường dẫn lưu trữ:
-               <x id="PH" equiv-text="this.storagePaths.find(               (sp) =&gt; sp.id == +rule.value             )?.name" />
+               <x id="PH" equiv-text="this.storagePaths.find(               (sp) =&amp;&gt; sp.id == +rule.value             )?.name" />
             </target>
          </trans-unit>
          <trans-unit id="1562820715074533164" datatype="html">
@@ -9069,11 +9097,11 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">31</context>
+               <context context-type="linenumber">70</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">31</context>
+               <context context-type="linenumber">70</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -9109,11 +9137,11 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">94</context>
+               <context context-type="linenumber">159</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">94</context>
+               <context context-type="linenumber">159</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -9157,11 +9185,11 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">122</context>
+               <context context-type="linenumber">197</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">122</context>
+               <context context-type="linenumber">197</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.html</context>
@@ -9205,7 +9233,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">127</context>
+               <context context-type="linenumber">136</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -9233,7 +9261,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">129</context>
+               <context context-type="linenumber">138</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -9265,7 +9293,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">187</context>
+               <context context-type="linenumber">225</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -9297,7 +9325,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">192</context>
+               <context context-type="linenumber">230</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -9329,7 +9357,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">208</context>
+               <context context-type="linenumber">246</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -9361,7 +9389,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">213</context>
+               <context context-type="linenumber">251</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -9389,7 +9417,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">233</context>
+               <context context-type="linenumber">278</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -9413,7 +9441,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">249</context>
+               <context context-type="linenumber">294</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -9437,7 +9465,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">328</context>
+               <context context-type="linenumber">379</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -9461,7 +9489,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">335</context>
+               <context context-type="linenumber">386</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -9489,7 +9517,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">349</context>
+               <context context-type="linenumber">400</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -9513,7 +9541,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">363</context>
+               <context context-type="linenumber">414</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -9537,7 +9565,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">369</context>
+               <context context-type="linenumber">420</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-list/custom-list.component.ts</context>
@@ -9661,11 +9689,11 @@
             <source>Document count</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">51</context>
+               <context context-type="linenumber">91</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">51</context>
+               <context context-type="linenumber">91</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -9777,7 +9805,7 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
-               <context context-type="linenumber">78</context>
+               <context context-type="linenumber">79</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/subfolder-list/subfolder-list.component.ts</context>
@@ -11088,7 +11116,7 @@
             <source>Connecting...</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
-               <context context-type="linenumber">44</context>
+               <context context-type="linenumber">48</context>
             </context-group>
             <target state="translated">Đang kết nối...</target>
          </trans-unit>
@@ -11096,7 +11124,7 @@
             <source>Uploading...</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
-               <context context-type="linenumber">56</context>
+               <context context-type="linenumber">60</context>
             </context-group>
             <target state="translated">Đang tải lên...</target>
          </trans-unit>
@@ -11104,7 +11132,7 @@
             <source>Upload complete, waiting...</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
-               <context context-type="linenumber">59</context>
+               <context context-type="linenumber">63</context>
             </context-group>
             <target state="translated">Tải lên hoàn tất, đang chờ...</target>
          </trans-unit>
@@ -11116,7 +11144,7 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
-               <context context-type="linenumber">72</context>
+               <context context-type="linenumber">76</context>
             </context-group>
             <target state="translated">Lỗi HTTP:</target>
          </trans-unit>

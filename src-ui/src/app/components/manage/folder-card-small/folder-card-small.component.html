@@ -53,23 +53,23 @@
 
     <div class="card-body bg-light p-2">
       @if (folder.type=="folder"){
-        <a class="card-text"  (click)="this.goToFolder.emit(this.folder)">
+        <span class="card-text"  (click)="this.goToFolder.emit(this.folder)">
           <!-- @if (document.correspondent) {
           <a title="Toggle correspondent filter" i18n-title
             (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()"
             class="fw-bold btn-link">{{(document.correspondent$ | async)?.name ?? privateName}}</a>:
           } -->
           {{folder.name | documentTitle}}
-        </a>
+        </span>
       } @else {
-        <a class="card-text"  routerLink="/documents/{{this.folder.document_matching}}">
+        <span class="card-text"  routerLink="/documents/{{this.folder.document_matching}}">
           <!-- @if (document.correspondent) {
           <a title="Toggle correspondent filter" i18n-title
             (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()"
             class="fw-bold btn-link">{{(document.correspondent$ | async)?.name ?? privateName}}</a>:
           } -->
           {{folder.name | documentTitle}}
-        </a>
+        </span>
       }
     </div>
     <div class="card-footer pt-0 pb-2 px-2">
