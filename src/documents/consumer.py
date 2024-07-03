@@ -716,7 +716,10 @@ class Consumer(LoggingMixin):
                 # self.log.info('gia tri documentt', document.folder)
                 
                 new_file = Folder.objects.create(name=document.title, parent_folder = document.folder,type = Folder.FILE)
-                new_file.path = f"{document.folder.path}/{new_file.id}"
+                if document.folder :
+                    new_file.path = f"{document.folder.path}/{new_file.id}"
+                else:
+                    new_file.path = f"{new_file.id}"
                 new_file.save()
                 document.folder=new_file
                 # After everything is in the database, copy the files into

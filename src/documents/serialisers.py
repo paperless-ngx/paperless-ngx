@@ -2057,4 +2057,10 @@ class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         model = Folder
         fields = '__all__'
 
-    
+class ExportDocumentFromFolderSerializer(serializers.Serializer):
+    folders = serializers.ListField(child=serializers.IntegerField())
+
+    def validate_folders(self, value):
+        if not value:
+            return Folder.objects.all().values_list('id', flat=True)
+        return value
