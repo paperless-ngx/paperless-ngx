@@ -22,5 +22,17 @@ export class FolderService extends AbstractNameFilterService<Folder> {
   getFolderDocumentById(id: number): Observable<FolderDocument> {
     return this.http.get<FolderDocument>(this.getResourceUrl(id, 'folders_documents_by_id'))
   }
+  bulkExportExcels(
+    ids: number[]
+  ) {
+    return this.http.post(
+      this.getResourceUrl(null, 'bulk_export_excel_folder'),
+      {
+
+        folders: ids,
+      },
+      { responseType: 'blob' }
+    )
+  }
   
 }

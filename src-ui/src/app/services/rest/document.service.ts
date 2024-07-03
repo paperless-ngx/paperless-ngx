@@ -255,6 +255,8 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     )
   }
 
+ 
+
 
   bulkDownload(
     ids: number[],

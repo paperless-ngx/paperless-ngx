@@ -206,7 +206,7 @@ export class WorkflowEditDialogComponent
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.contentTypes = result))
-    console.log(contentTypeService)
+    // console.log(contentTypeService)
   }
 
   getCreateTitle() {

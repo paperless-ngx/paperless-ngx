@@ -2017,6 +2017,7 @@ class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     name = AdjustedNameField()
     document_count = serializers.SerializerMethodField()
+    document_matching = serializers.SerializerMethodField()
     child_folder_count = serializers.SerializerMethodField()
     filesize = serializers.SerializerMethodField()
     
@@ -2036,6 +2037,13 @@ class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 
         return documents.count()
     
+    def get_document_matching(self, obj):
+        if obj.type == Folder.FILE:
+            document = Document.objects.filter(folder=obj).first()
+            if document:
+                return document.id
+        return None
+    
     def get_child_folder_count(self, obj):
         return Folder.objects.filter(parent_folder=obj).count()
     
@@ -2049,4 +2057,10 @@ class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         model = Folder
         fields = '__all__'
 
-    
+class ExportDocumentFromFolderSerializer(serializers.Serializer):
+    folders = serializers.ListField(child=serializers.IntegerField())
+
+    def validate_folders(self, value):
+        if not value:
+            return Folder.objects.all().values_list('id', flat=True)
+        return value

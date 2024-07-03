@@ -35,12 +35,13 @@ export class UploadDocumentsService {
   }
 
   private uploadFile(file: File, payload) {
-    console.log(payload)
     let formData = new FormData()
     formData.append('document', file, file.name)
-    if (payload)
-      
+    if (payload.folder  ){
       formData.append('folder',payload.folder)
+      // console.log(payload)
+
+    }
       
     let status = this.consumerStatusService.newFileUpload(file.name)
 

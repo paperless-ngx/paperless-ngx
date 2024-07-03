@@ -60,7 +60,7 @@ export abstract class EditCustomBoxComponent<
   objectForm: FormGroup = this.getForm()
 
   ngOnInit(): void {
-    console.log("Test", this.object)
+    // console.log("Test", this.object)
     this.loadShelf();
     if (this.object != null && this.dialogMode !== EditCustomBoxdMode.CREATE) {
       if ((this.object as ObjectWithPermissions).permissions) {

@@ -712,7 +712,7 @@ export class BulkEditorComponent
         this.awaitingDownload = false
       })
   }
-  exportToExcelSelectedSelected() {
+  exportToExcelSelected() {
     this.awaitingDownload = true
     this.documentService
       .bulkExportExcels(
