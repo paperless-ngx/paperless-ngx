@@ -1287,7 +1287,7 @@ class PostDocumentSerializer(serializers.Serializer):
             return None
         
     def validate_warehouse(self, warehouse):
-        if warehouse:
+        if warehouse.type == "Boxcase":
             return warehouse.id
         else:
             return None

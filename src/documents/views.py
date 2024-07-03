@@ -395,8 +395,13 @@ class DocumentViewSet(
 
     def destroy(self, request, *args, **kwargs):
         from documents import index
-
+        instance = self.get_object()
+        fold = instance.folder
+        instance.folder = None 
+        instance.save()
+        fold.delete()
         index.remove_document_from_index(self.get_object())
+        
         return super().destroy(request, *args, **kwargs)
 
     @staticmethod
@@ -1083,6 +1088,7 @@ class PostDocumentView(GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
+        print(request.data)
         serializer.is_valid(raise_exception=True)
 
         doc_name, doc_data = serializer.validated_data.get("document")
