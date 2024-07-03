@@ -18,7 +18,7 @@
 
     <body class="text-center">
         <div class="position-absolute top-50 start-50 translate-middle">
-            <form class="form-accounts" method="post">
+            <form class="form-accounts" id="form-account" method="post">
                 {% csrf_token %}
                 {% if not APP_LOGO and not APP_TITLE %}
                     {% include "paperless-ngx/snippets/svg_logo.html" with extra_attrs="width='300' class='logo mb-4'" %}
