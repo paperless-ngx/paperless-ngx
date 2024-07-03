@@ -17,10 +17,11 @@
   <button class="btn btn-sm btn-outline-secondary" (click)="clearSelection()" [hidden]="selectedObjects.size === 0">
     <i-bs  name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
     </button>
+    <button class="btn btn-sm btn-outline-secondary" [hidden]="selectedObjects.size > 5" (click)="selectAll();  $event.stopPropagation();" >
+      <i-bs  name="check"></i-bs>&nbsp;<ng-container i18n>Select all</ng-container>
+      </button>
     <div ngbDropdown>
-      <button class="btn btn-sm btn-outline-secondary" [hidden]="selectedObjects.size > 5" (click)="selectAll();  $event.stopPropagation();" >
-        <i-bs  name="check"></i-bs>&nbsp;<ng-container i18n>Select all</ng-container>
-        </button>
+      
       <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
         <i-bs name="three-dots"></i-bs>
         <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
