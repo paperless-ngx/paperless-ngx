@@ -21,6 +21,8 @@ import { DocumentApproval } from 'src/app/data/document-approval'
 import { ApprovalsComponent } from '../../admin/approval/approvals.component'
 import { Folder } from 'src/app/data/folder'
 import { PermissionType } from 'src/app/services/permissions.service'
+import { ColorTheme } from 'ngx-bootstrap-icons'
+
 @Component({
   selector: 'pngx-folder-card-small',
   templateUrl: './folder-card-small.component.html',
@@ -69,7 +71,7 @@ export class FolderCardSmallComponent extends ComponentWithPermissions {
 
   @Output()
   clickTag = new EventEmitter<number>()
-
+  ColorTheme = ColorTheme;
 
   moreTags: number = null
 

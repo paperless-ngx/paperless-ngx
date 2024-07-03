@@ -44,6 +44,7 @@ import { Folder } from 'src/app/data/folder'
 import { FolderService } from 'src/app/services/rest/folder.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { saveAs } from 'file-saver'
+import { NgxBootstrapIconsModule, ColorTheme } from 'ngx-bootstrap-icons';
 export interface ManagementListColumn {
   key: string
 
@@ -101,7 +102,7 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
   public shareLinks: ShareLink[]
   public folderPath: Folder[] = []
   public documentService: DocumentService
-
+  public ColorTheme : ColorTheme
 
   ngOnInit(): void {
     if (localStorage.getItem('folder-list:displayMode') != null) {

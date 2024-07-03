@@ -52,14 +52,15 @@
     </button>
 
 </pngx-page-header>
-<div class="form-inline d-flex align-items-center">
+<div class="form-inline d-flex flex-wrap align-items-center">
   <a class="me" (click)="goToFolderRoot()">
-    <i-bs class="" name="folder" ></i-bs>
-  </a>&nbsp; > &nbsp;
-  <div *ngFor="let folder of folderPath">
-    <a class="me" (click)="goToFolder(folder)">
+    <i-bs class="" name="folder-fill" width="2rem" 
+    height="2rem" ></i-bs>
+  </a>
+  <div *ngFor="let folder of folderPath" class="fs-5">
+    <i-bs class="" name="chevron-right" ></i-bs>&nbsp;<a class="me " (click)="goToFolder(folder)">
       {{ folder.name }} 
-    </a> > &nbsp;
+    </a>
   </div>
 </div>
 <br>
@@ -113,12 +114,10 @@
             </td>
             @if(object.type=='folder'){
               <td scope="row" class="d-md-table-cell"><button class="btn btn-link ms-0 ps-0 text-start" (click)="userCanEdit(object) ? goToFolder(object) : null; $event.stopPropagation()">
-                @if (object.type == "folder") {
-                  <i-bs class="me-1" name="folder"></i-bs>&nbsp;
-                } @else {
-                  <i-bs class="me-1" name="files"></i-bs>&nbsp;
-                }
-                {{ object.name }}</button> </td>
+
+                  <i-bs class="me-1" name="folder-fill" width="2rem" height="2rem"></i-bs>&nbsp;
+                </button> 
+                {{ object.name }}</td>
             }@else{
               <td scope="row" class="d-md-table-cell">
                 <button 
@@ -126,12 +125,9 @@
                   [routerLink]="userCanEdit(object) ? ['/documents', object.document_matching] : null"
                   (click)="$event.stopPropagation()">
 
-                  
-                  @if (object.type == "folder") {
-                    <i-bs class="me-1" name="folder"></i-bs>&nbsp;
-                  } @else {
-                    <i-bs class="me-1" name="files"></i-bs>&nbsp;
-                  }
+                    <i-bs class="me-1" name="file-earmark-pdf" width="2rem" 
+                    height="2rem"></i-bs>&nbsp;
+              
                   {{ object.name }}</button> </td>
               }
             <!-- <td scope="row" class="d-none d-sm-table-cell">{{ getMatching(object) }}</td> -->

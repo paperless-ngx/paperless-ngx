@@ -159,6 +159,7 @@ import {
   checkAll,
   checkCircleFill,
   checkLg,
+  chevronRight,
   chevronDoubleLeft,
   chevronDoubleRight,
   clipboard,
@@ -224,6 +225,7 @@ import {
   upcScan,
   x,
   xLg,
+  fileEarmarkPdf
 } from 'ngx-bootstrap-icons'
 
 const icons = {
@@ -253,6 +255,7 @@ const icons = {
   checkAll,
   checkCircleFill,
   checkLg,
+  chevronRight,
   chevronDoubleLeft,
   chevronDoubleRight,
   clipboard,
@@ -274,6 +277,7 @@ const icons = {
   fileEarmarkFill,
   fileEarmarkLock,
   files,
+  fileEarmarkPdf,
   fileText,
   filter,
   folder,
@@ -515,12 +519,7 @@ function initializeApp(settings: SettingsService) {
     ColorSliderModule,
     TourNgBootstrapModule,
     DragDropModule,
-    NgxBootstrapIconsModule.pick(icons,
-      { 
-        
-        
-    }
-    ),
+    NgxBootstrapIconsModule.pick(icons ),
     NgxFilesizeModule,
   ],
   providers: [

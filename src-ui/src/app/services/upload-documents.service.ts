@@ -39,7 +39,7 @@ export class UploadDocumentsService {
     formData.append('document', file, file.name)
     if (payload.folder  ){
       formData.append('folder',payload.folder)
-      console.log(payload)
+      // console.log(payload)
 
     }
       
