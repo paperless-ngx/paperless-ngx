@@ -2494,6 +2494,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
       
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
+        serializer.validated_data['updated'] = timezone.now()
 
         old_parent_folder = instance.parent_folder
 

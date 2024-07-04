@@ -1945,6 +1945,9 @@ class AdjustedNameField(serializers.CharField):
             parent_folder = self.parent.initial_data.get('parent_folder')
             type = self.parent.initial_data.get('type')
             
+            if type == 'file':
+                return data
+            
             if type: 
                 existing_names = model.objects.filter(type=type).values_list('name', flat=True)
                 if getattr(self.parent,'instance') is None:
