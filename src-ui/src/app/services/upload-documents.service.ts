@@ -28,9 +28,9 @@ export class UploadDocumentsService {
     }
   }
 
-  uploadFiles(files: FileList) {
+  uploadFiles(files: FileList, payload) {
     for (let index = 0; index < files.length; index++) {
-      this.uploadFile(files.item(index),[])
+      this.uploadFile(files.item(index),payload)
     }
   }
 

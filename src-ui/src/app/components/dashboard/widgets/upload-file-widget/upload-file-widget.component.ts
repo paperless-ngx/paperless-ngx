@@ -1,4 +1,5 @@
 import { Component, QueryList, ViewChildren } from '@angular/core'
+import { Router } from '@angular/router'
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap'
 import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
@@ -23,6 +24,7 @@ export class UploadFileWidgetComponent extends ComponentWithPermissions {
   @ViewChildren(NgbAlert) alerts: QueryList<NgbAlert>
 
   constructor(
+    private router: Router,
     private consumerStatusService: ConsumerStatusService,
     private uploadDocumentsService: UploadDocumentsService,
     public settingsService: SettingsService
@@ -121,8 +123,14 @@ export class UploadFileWidgetComponent extends ComponentWithPermissions {
   }
 
   public onFileSelected(event: Event) {
+    let getUrl = this.router.url.split('/')
+    let payload = { folder: '' };
+    if (getUrl[1] === 'subfolders') {
+      payload.folder = getUrl[2];
+    }
     this.uploadDocumentsService.uploadFiles(
-      (event.target as HTMLInputElement).files
+      (event.target as HTMLInputElement).files, 
+      payload
     )
   }
 
