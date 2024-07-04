@@ -57,7 +57,7 @@ def is_mime_type_supported(mime_type: str) -> bool:
     """
     Returns True if the mime type is supported, False otherwise
     """
-    return get_parser_class_for_mime_type(mime_type) is not None
+    return custom_get_parser_class_for_mime_type(mime_type) is not None
 
 
 @lru_cache(maxsize=8)

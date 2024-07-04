@@ -699,7 +699,6 @@ class Consumer(LoggingMixin):
                 dict_data = {}
                 
                 if data_ocr_fields is not None:
-                    self.log.debug('gia tri',data_ocr_fields)      
                     if len(data_ocr_fields)>=1:    
                         for r in data_ocr_fields[0].get("fields"):
                             dict_data[r.get("name")] = r.get("values")[0].get("value") if r.get("values") else None
