@@ -455,6 +455,7 @@ class CustomFieldSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "data_type",
+            "extra_data",
         ]
 
     def validate(self, attrs):
@@ -475,6 +476,14 @@ class CustomFieldSerializer(serializers.ModelSerializer):
         ).exists():
             raise serializers.ValidationError(
                 {"error": "Object violates name unique constraint"},
+            )
+        if (
+            "data_type" in attrs
+            and attrs["data_type"] == CustomField.FieldDataType.SELECT
+            and ("extra_data" not in attrs or not isinstance(attrs["extra_data"], list))
+        ):
+            raise serializers.ValidationError(
+                {"error": "extra_data must be a list"},
             )
         return super().validate(attrs)
 
@@ -507,6 +516,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
             CustomField.FieldDataType.FLOAT: "value_float",
             CustomField.FieldDataType.MONETARY: "value_monetary",
             CustomField.FieldDataType.DOCUMENTLINK: "value_document_ids",
+            CustomField.FieldDataType.SELECT: "value_select",
         }
         # An instance is attached to a document
         document: Document = validated_data["document"]
@@ -563,6 +573,13 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
                     )(data["value"])
             elif field.data_type == CustomField.FieldDataType.STRING:
                 MaxLengthValidator(limit_value=128)(data["value"])
+            elif field.data_type == CustomField.FieldDataType.SELECT:
+                try:
+                    field.extra_data[data["value"]]
+                except Exception:
+                    raise serializers.ValidationError(
+                        f"Value must be index of an element in {field.extra_data}",
+                    )
 
         return data
 
