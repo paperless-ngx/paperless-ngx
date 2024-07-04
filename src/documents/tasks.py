@@ -38,7 +38,7 @@ from documents.models import Warehouse
 from documents.models import Folder
 from documents.models import Tag
 from documents.parsers import DocumentParser
-from documents.parsers import get_parser_class_for_mime_type
+from documents.parsers import custom_get_parser_class_for_mime_type
 from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import ProgressManager
 from documents.plugins.base import StopConsumeTaskError
@@ -266,7 +266,7 @@ def update_document_archive_file(document_id):
 
     mime_type = document.mime_type
 
-    parser_class: type[DocumentParser] = get_parser_class_for_mime_type(mime_type)
+    parser_class: type[DocumentParser] = custom_get_parser_class_for_mime_type(mime_type)
 
     if not parser_class:
         logger.error(

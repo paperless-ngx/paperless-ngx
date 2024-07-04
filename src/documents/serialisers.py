@@ -54,7 +54,7 @@ from documents.parsers import is_mime_type_supported
 from documents.permissions import get_groups_with_only_permission, has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
 from documents.validators import uri_validator
-from documents.parsers import get_parser_class_for_mime_type
+
 
 logger = logging.getLogger("paperless.api")
 
