@@ -696,9 +696,10 @@ class Consumer(LoggingMixin):
                 fields = CustomFieldInstance.objects.filter(
                                     document=document,
                                 )
-                dict_data = {}                
+                dict_data = {}
+                
                 if data_ocr_fields is not None:
-                    if len(data_ocr_fields)>1:    
+                    if len(data_ocr_fields)>=1:    
                         for r in data_ocr_fields[0].get("fields"):
                             dict_data[r.get("name")] = r.get("values")[0].get("value") if r.get("values") else None
                         map_fields = {

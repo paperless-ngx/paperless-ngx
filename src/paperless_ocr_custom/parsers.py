@@ -378,13 +378,8 @@ class RasterisedDocumentParser(DocumentParser):
                     ],
                     logger=self.log,
                 )
-            text = self.read_file_handle_unicode_errors(Path(tmp.name))
-            
-            # data_ocr = self.ocr_file(pdf_file).get('content','')
-            # if not data_ocr:
-            #     data_ocr = ''        
+                text = self.read_file_handle_unicode_errors(Path(tmp.name))
 
-            # logging.info()    
             return post_process_text(text)
 
         except Exception:

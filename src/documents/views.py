@@ -128,7 +128,7 @@ from documents.models import WorkflowTrigger
 from documents.models import Warehouse
 from documents.models import Folder
 
-from documents.parsers import get_parser_class_for_mime_type
+from documents.parsers import custom_get_parser_class_for_mime_type
 from documents.parsers import parse_date_generator
 from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessObjectPermissions
@@ -430,7 +430,7 @@ class DocumentViewSet(
         if not os.path.isfile(file):
             return None
 
-        parser_class = get_parser_class_for_mime_type(mime_type)
+        parser_class = custom_get_parser_class_for_mime_type(mime_type)
         if parser_class:
             parser = parser_class(progress_callback=None, logging_group=None)
 
@@ -1680,7 +1680,6 @@ class ApprovalViewSet(ModelViewSet):
         # if task_id is not None:
         #     queryset = PaperlessTask.objects.filter(task_id=task_id)
         user = self.request.user
-        # print('gia tri document_ids',user)
         document_ids = Document.objects.filter(owner=user).values_list("id")
         queryset = queryset.filter(object_pk__in=document_ids)
         return queryset
