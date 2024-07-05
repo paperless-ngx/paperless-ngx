@@ -41,8 +41,8 @@ class DocumentsConfig(AppConfig):
         approval_added.connect(run_workflow_approval_added)
         approval_updated.connect(run_workflow_approval_updated)
 
-        if settings.SCHEDULER_DEFAULT:
-            from paperless import operator
-            operator.start()
+        # if settings.SCHEDULER_DEFAULT:
+        #     from paperless import operator
+        #     operator.start()
 
         AppConfig.ready(self)

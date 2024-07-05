@@ -1,5 +1,6 @@
 import hashlib
 import logging
+import os
 import shutil
 import uuid
 from pathlib import Path
@@ -191,6 +192,7 @@ def consume_file(
                 plugin.cleanup()
 
     # continue with consumption if no barcode was found
+    print(f'{input_doc.original_file}try_consume_file file exsit: {os.path.isfile(input_doc.original_file)}')
     document = Consumer().try_consume_file(
         input_doc.original_file,
         override_filename=overrides.filename,

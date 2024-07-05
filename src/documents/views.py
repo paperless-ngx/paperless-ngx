@@ -1110,7 +1110,7 @@ class PostDocumentView(GenericAPIView):
             pathvalidate.sanitize_filename(doc_name),
         )
         temp_file_path.write_bytes(doc_data)
-
+        
         os.utime(temp_file_path, times=(t, t))
         input_doc = ConsumableDocument(
             source=DocumentSource.ApiUpload,
@@ -1130,6 +1130,7 @@ class PostDocumentView(GenericAPIView):
             owner_id=request.user.id,
             custom_field_ids=custom_field_ids,
         )
+        print(f'{temp_file_path} file exsit: {os.path.isfile(input_doc.original_file)}')
 
         async_task = consume_file.delay(
             input_doc,
