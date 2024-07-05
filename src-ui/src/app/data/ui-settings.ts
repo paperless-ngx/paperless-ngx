@@ -38,6 +38,7 @@ export const SETTINGS_KEYS = {
     'general-settings:notifications:consumer-suppress-on-dashboard',
   NOTES_ENABLED: 'general-settings:notes-enabled',
   APPROVALS_ENABLED: 'general-settings:approvals-enabled',
+  FOLDERS_ENABLED: 'general-settings:folders-enabled',
   SLIM_SIDEBAR: 'general-settings:slim-sidebar',
   UPDATE_CHECKING_ENABLED: 'general-settings:update-checking:enabled',
   UPDATE_CHECKING_BACKEND_SETTING:
@@ -146,6 +147,11 @@ export const SETTINGS: UiSetting[] = [
   },
   {
     key: SETTINGS_KEYS.APPROVALS_ENABLED,
+    type: 'boolean',
+    default: true,
+  },
+  {
+    key: SETTINGS_KEYS.FOLDERS_ENABLED,
     type: 'boolean',
     default: true,
   },

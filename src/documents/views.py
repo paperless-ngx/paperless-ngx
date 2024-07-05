@@ -1130,7 +1130,7 @@ class PostDocumentView(GenericAPIView):
             owner_id=request.user.id,
             custom_field_ids=custom_field_ids,
         )
-        print(f'{temp_file_path} file exsit: {os.path.isfile(input_doc.original_file)}')
+       
 
         async_task = consume_file.delay(
             input_doc,
