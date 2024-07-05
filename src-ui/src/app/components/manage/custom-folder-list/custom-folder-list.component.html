@@ -53,24 +53,20 @@
     </button>
 
 </pngx-page-header>
-
+<div class="form-inline d-flex flex-wrap align-items-center">
+  <a class="me" (click)="goToFolderRoot()">
+    <i-bs class="" name="folder-fill" width="2rem" 
+    height="2rem" ></i-bs>
+  </a>
+  <div *ngFor="let folder of folderPath" class="fs-5">
+    <i-bs class="" name="chevron-right" ></i-bs>&nbsp;<a class="me custom-cursor " (click)="goToFolder(folder)">
+      {{ folder.name }} 
+    </a>
+  </div>
+</div>
+<br>
 <div class="row">
-
-
   <div class="col-12 col-lg-8 col-xl-9 mb-4">
-  
-    <div class="form-inline d-flex flex-wrap align-items-center">
-      <a class="me" (click)="goToFolderRoot()">
-        <i-bs class="" name="folder-fill" width="2rem" 
-        height="2rem" ></i-bs>
-      </a>
-      <div *ngFor="let folder of folderPath" class="fs-5">
-        <i-bs class="" name="chevron-right" ></i-bs>&nbsp;<a class="me custom-cursor " (click)="goToFolder(folder)">
-          {{ folder.name }} 
-        </a>
-      </div>
-    </div>
-    <br>
     <div class="row mb-3">
       <div class="col-md mb-2 mb-xl-0">
         <div class="form-inline d-flex align-items-center">
