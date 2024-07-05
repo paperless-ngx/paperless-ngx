@@ -181,6 +181,7 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
   }
 
   reloadData() {
+    this.selectedObjects.clear()
     let listFolderPath 
     if (this.id){
       this.folderService.getFolderPath(this.id).subscribe(

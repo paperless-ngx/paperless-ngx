@@ -1088,7 +1088,6 @@ class PostDocumentView(GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        print(request.data)
         serializer.is_valid(raise_exception=True)
 
         doc_name, doc_data = serializer.validated_data.get("document")
@@ -1110,11 +1109,9 @@ class PostDocumentView(GenericAPIView):
         temp_file_path = Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR)) / Path(
             pathvalidate.sanitize_filename(doc_name),
         )
-
         temp_file_path.write_bytes(doc_data)
-
+        
         os.utime(temp_file_path, times=(t, t))
-
         input_doc = ConsumableDocument(
             source=DocumentSource.ApiUpload,
             original_file=temp_file_path,
@@ -1133,6 +1130,7 @@ class PostDocumentView(GenericAPIView):
             owner_id=request.user.id,
             custom_field_ids=custom_field_ids,
         )
+       
 
         async_task = consume_file.delay(
             input_doc,

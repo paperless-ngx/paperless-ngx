@@ -307,7 +307,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-    "django_apscheduler",
+    # "django_apscheduler",
     *env_apps,
 ]
 
