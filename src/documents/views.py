@@ -2189,42 +2189,7 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     filterset_class = WarehouseFilterSet
     ordering_fields = ("name", "type", "parent_warehouse", "document_count")
     
-    def getWarehouseDoc(self, wareh):
-        currentUser = self.request.user
-        if wareh.type == Warehouse.BOXCASE:
-            return list(Document.objects.filter(warehouse=wareh, owner=currentUser).order_by("-created").values())
-        elif wareh.type == Warehouse.SHELF:
-            boxcases = Warehouse.objects.filter(parent_warehouse=wareh)
-            return list(Document.objects.filter(warehouse__in=[b.id for b in boxcases], owner=currentUser).order_by("-created").values())
-        elif wareh.type == Warehouse.WAREHOUSE:
-            shelves = Warehouse.objects.filter(parent_warehouse=wareh)
-            boxcases = Warehouse.objects.filter(parent_warehouse__in=[s.id for s in shelves])
-            return list(Document.objects.filter(warehouse__in=[b.id for b in boxcases], owner=currentUser).order_by("-created").values())
-        else:
-            return list(Document.objects.none())
     
-    @action(methods=["get"], detail=True)
-    def documents(self, request, pk=None):
-        currentUser = request.user
-        try:
-            wareh= Warehouse.objects.get(pk=pk)
-            if currentUser is not None and not has_perms_owner_aware(
-                currentUser,
-                "view_warehouse",
-                wareh,
-            ):
-                return HttpResponseForbidden("Insufficient permissions to view warehouses")
-        except Warehouse.DoesNotExist:
-            raise Http404
-
-        if request.method == "GET":
-            try:
-                return Response(self.getWarehouseDoc(wareh))
-            except Exception as e:
-                logger.warning(f"An error occurred retrieving warehouses: {e!s}")
-                return Response(
-                    {"error": "Error retrieving warehouses, check logs for more detail."},
-                )
     
     
     def create(self, request, *args, **kwargs):
