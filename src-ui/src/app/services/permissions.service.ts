@@ -13,7 +13,6 @@ export enum PermissionType {
   Document = '%s_document',
   Tag = '%s_tag',
   Warehouse = '%s_warehouse',
-  KhoVatLy = '%s_khovatly',
   Correspondent = '%s_correspondent',
   DocumentType = '%s_documenttype',
   StoragePath = '%s_storagepath',
