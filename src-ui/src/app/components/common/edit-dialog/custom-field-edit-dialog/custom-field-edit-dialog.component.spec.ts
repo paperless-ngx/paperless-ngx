@@ -13,6 +13,7 @@ import { SelectComponent } from '../../input/select/select.component'
 import { TextComponent } from '../../input/text/text.component'
 import { EditDialogMode } from '../edit-dialog.component'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { CustomFieldDataType } from 'src/app/data/custom-field'
 
 describe('CustomFieldEditDialogComponent', () => {
   let component: CustomFieldEditDialogComponent
@@ -62,6 +63,23 @@ describe('CustomFieldEditDialogComponent', () => {
     fixture.detectChanges()
     component.ngOnInit()
     expect(component.objectForm.get('data_type').disabled).toBeTruthy()
+  })
+
+  it('should initialize select options on edit', () => {
+    component.dialogMode = EditDialogMode.EDIT
+    component.object = {
+      id: 1,
+      name: 'Field 1',
+      data_type: CustomFieldDataType.Select,
+      extra_data: {
+        select_options: ['Option 1', 'Option 2', 'Option 3'],
+      },
+    }
+    fixture.detectChanges()
+    component.ngOnInit()
+    expect(
+      component.objectForm.get('extra_data').get('select_options').value.length
+    ).toBe(3)
   })
 
   it('should support add / remove select options', () => {

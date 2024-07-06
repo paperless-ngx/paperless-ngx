@@ -41,6 +41,11 @@ export class CustomFieldEditDialogComponent
     if (this.typeFieldDisabled) {
       this.objectForm.get('data_type').disable()
     }
+    if (this.object?.data_type === CustomFieldDataType.Select) {
+      this.object.extra_data.select_options.forEach((option) =>
+        this.selectOptions.push(new FormControl(option))
+      )
+    }
   }
 
   getCreateTitle() {
