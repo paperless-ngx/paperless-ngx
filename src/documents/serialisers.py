@@ -484,10 +484,15 @@ class CustomFieldSerializer(serializers.ModelSerializer):
                 "extra_data" not in attrs
                 or "select_options" not in attrs["extra_data"]
                 or not isinstance(attrs["extra_data"]["select_options"], list)
+                or len(attrs["extra_data"]["select_options"]) == 0
+                or not all(
+                    isinstance(option, str) and len(option) > 0
+                    for option in attrs["extra_data"]["select_options"]
+                )
             )
         ):
             raise serializers.ValidationError(
-                {"error": "extra_data.select_options must be a list"},
+                {"error": "extra_data.select_options must be a valid list"},
             )
         return super().validate(attrs)
 
