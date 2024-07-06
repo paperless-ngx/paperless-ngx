@@ -480,10 +480,14 @@ class CustomFieldSerializer(serializers.ModelSerializer):
         if (
             "data_type" in attrs
             and attrs["data_type"] == CustomField.FieldDataType.SELECT
-            and ("extra_data" not in attrs or not isinstance(attrs["extra_data"], list))
+            and (
+                "extra_data" not in attrs
+                or "select_options" not in attrs["extra_data"]
+                or not isinstance(attrs["extra_data"]["select_options"], list)
+            )
         ):
             raise serializers.ValidationError(
-                {"error": "extra_data must be a list"},
+                {"error": "extra_data.select_options must be a list"},
             )
         return super().validate(attrs)
 
@@ -574,11 +578,12 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
             elif field.data_type == CustomField.FieldDataType.STRING:
                 MaxLengthValidator(limit_value=128)(data["value"])
             elif field.data_type == CustomField.FieldDataType.SELECT:
+                select_options = field.extra_data["select_options"]
                 try:
-                    field.extra_data[data["value"]]
+                    select_options[data["value"]]
                 except Exception:
                     raise serializers.ValidationError(
-                        f"Value must be index of an element in {field.extra_data}",
+                        f"Value must be index of an element in {select_options}",
                     )
 
         return data

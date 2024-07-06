@@ -63,4 +63,25 @@ describe('CustomFieldEditDialogComponent', () => {
     component.ngOnInit()
     expect(component.objectForm.get('data_type').disabled).toBeTruthy()
   })
+
+  it('should support add / remove select options', () => {
+    component.dialogMode = EditDialogMode.CREATE
+    fixture.detectChanges()
+    component.ngOnInit()
+    expect(
+      component.objectForm.get('extra_data').get('select_options').value.length
+    ).toBe(0)
+    component.addSelectOption()
+    expect(
+      component.objectForm.get('extra_data').get('select_options').value.length
+    ).toBe(1)
+    component.addSelectOption()
+    expect(
+      component.objectForm.get('extra_data').get('select_options').value.length
+    ).toBe(2)
+    component.removeSelectOption(0)
+    expect(
+      component.objectForm.get('extra_data').get('select_options').value.length
+    ).toBe(1)
+  })
 })

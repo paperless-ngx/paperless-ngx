@@ -16,7 +16,9 @@ const customFields: CustomField[] = [
     id: 4,
     name: 'Field 4',
     data_type: CustomFieldDataType.Select,
-    extra_data: ['Option 1', 'Option 2', 'Option 3'],
+    extra_data: {
+      select_options: ['Option 1', 'Option 2', 'Option 3'],
+    },
   },
 ]
 const document: Document = {

@@ -55,5 +55,7 @@ export interface CustomField extends ObjectWithId {
   data_type: CustomFieldDataType
   name: string
   created?: Date
-  extra_data?: any
+  extra_data?: {
+    select_options?: string[]
+  }
 }

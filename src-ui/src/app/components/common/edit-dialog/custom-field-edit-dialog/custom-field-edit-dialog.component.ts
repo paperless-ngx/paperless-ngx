@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core'
-import { FormGroup, FormControl } from '@angular/forms'
+import { FormGroup, FormControl, FormArray } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { DATA_TYPE_LABELS, CustomField } from 'src/app/data/custom-field'
+import {
+  DATA_TYPE_LABELS,
+  CustomField,
+  CustomFieldDataType,
+} from 'src/app/data/custom-field'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -16,6 +20,13 @@ export class CustomFieldEditDialogComponent
   extends EditDialogComponent<CustomField>
   implements OnInit
 {
+  CustomFieldDataType = CustomFieldDataType
+
+  private get selectOptions(): FormArray {
+    return (this.objectForm.controls.extra_data as FormGroup).controls
+      .select_options as FormArray
+  }
+
   constructor(
     service: CustomFieldsService,
     activeModal: NgbActiveModal,
@@ -44,6 +55,9 @@ export class CustomFieldEditDialogComponent
     return new FormGroup({
       name: new FormControl(null),
       data_type: new FormControl(null),
+      extra_data: new FormGroup({
+        select_options: new FormArray([]),
+      }),
     })
   }
 
@@ -53,5 +67,13 @@ export class CustomFieldEditDialogComponent
 
   get typeFieldDisabled(): boolean {
     return this.dialogMode === EditDialogMode.EDIT
+  }
+
+  public addSelectOption() {
+    this.selectOptions.push(new FormControl(''))
+  }
+
+  public removeSelectOption(index: number) {
+    this.selectOptions.removeAt(index)
   }
 }

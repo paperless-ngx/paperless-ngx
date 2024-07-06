@@ -59,7 +59,9 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
                 {
                     "data_type": "select",
                     "name": "Select Field",
-                    "extra_data": ["Option 1", "Option 2"],
+                    "extra_data": {
+                        "select_options": ["Option 1", "Option 2"],
+                    },
                 },
             ),
             content_type="application/json",
@@ -68,7 +70,10 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
 
         data = resp.json()
 
-        self.assertCountEqual(data["extra_data"], ["Option 1", "Option 2"])
+        self.assertCountEqual(
+            data["extra_data"]["select_options"],
+            ["Option 1", "Option 2"],
+        )
 
     def test_create_custom_field_nonunique_name(self):
         """
@@ -90,6 +95,45 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
                 "data_type": "string",
                 "name": "Test Custom Field",
             },
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_custom_field_select_invalid_options(self):
+        """
+        GIVEN:
+            - Custom field does not exist
+        WHEN:
+            - API request to create custom field with invalid select options
+        THEN:
+            - HTTP 400 is returned
+        """
+
+        # Not a list
+        resp = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "data_type": "select",
+                    "name": "Select Field",
+                    "extra_data": {
+                        "select_options": "not a list",
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # No options
+        resp = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "data_type": "select",
+                    "name": "Select Field",
+                },
+            ),
+            content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -155,7 +199,9 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         custom_field_select = CustomField.objects.create(
             name="Test Custom Field Select",
             data_type=CustomField.FieldDataType.SELECT,
-            extra_data=["Option 1", "Option 2"],
+            extra_data={
+                "select_options": ["Option 1", "Option 2"],
+            },
         )
 
         date_value = date.today()
@@ -614,7 +660,9 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         custom_field_select = CustomField.objects.create(
             name="Test Custom Field SELECT",
             data_type=CustomField.FieldDataType.SELECT,
-            extra_data=["Option 1", "Option 2"],
+            extra_data={
+                "select_options": ["Option 1", "Option 2"],
+            },
         )
 
         resp = self.client.patch(
