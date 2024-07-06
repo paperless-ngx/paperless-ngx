@@ -463,7 +463,14 @@ class CustomFieldSerializer(serializers.ModelSerializer):
             "name",
             self.instance.name if hasattr(self.instance, "name") else None,
         )
-        if ("name" in attrs) and self.Meta.model.objects.filter(
+        objects = (
+            self.Meta.model.objects.exclude(
+                pk=self.instance.pk,
+            )
+            if self.instance is not None
+            else self.Meta.model.objects.all()
+        )
+        if ("name" in attrs) and objects.filter(
             name=name,
         ).exists():
             raise serializers.ValidationError(
