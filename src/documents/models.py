@@ -912,7 +912,12 @@ class CustomFieldInstance(models.Model):
         ]
 
     def __str__(self) -> str:
-        return str(self.field.name) + f" : {self.value}"
+        value = (
+            self.field.extra_data["select_options"][self.value_select]
+            if self.field.data_type == CustomField.FieldDataType.SELECT
+            else self.value
+        )
+        return str(self.field.name) + f" : {value}"
 
     @property
     def value(self):
