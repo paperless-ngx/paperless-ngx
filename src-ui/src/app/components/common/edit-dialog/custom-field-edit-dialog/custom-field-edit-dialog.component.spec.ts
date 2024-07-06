@@ -88,18 +88,18 @@ describe('CustomFieldEditDialogComponent', () => {
     component.ngOnInit()
     expect(
       component.objectForm.get('extra_data').get('select_options').value.length
-    ).toBe(0)
-    component.addSelectOption()
-    expect(
-      component.objectForm.get('extra_data').get('select_options').value.length
     ).toBe(1)
     component.addSelectOption()
     expect(
       component.objectForm.get('extra_data').get('select_options').value.length
     ).toBe(2)
+    component.addSelectOption()
+    expect(
+      component.objectForm.get('extra_data').get('select_options').value.length
+    ).toBe(3)
     component.removeSelectOption(0)
     expect(
       component.objectForm.get('extra_data').get('select_options').value.length
-    ).toBe(1)
+    ).toBe(2)
   })
 })

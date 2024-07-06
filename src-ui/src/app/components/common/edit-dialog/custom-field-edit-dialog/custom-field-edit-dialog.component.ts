@@ -42,6 +42,7 @@ export class CustomFieldEditDialogComponent
       this.objectForm.get('data_type').disable()
     }
     if (this.object?.data_type === CustomFieldDataType.Select) {
+      this.selectOptions.clear()
       this.object.extra_data.select_options.forEach((option) =>
         this.selectOptions.push(new FormControl(option))
       )
@@ -61,7 +62,7 @@ export class CustomFieldEditDialogComponent
       name: new FormControl(null),
       data_type: new FormControl(null),
       extra_data: new FormGroup({
-        select_options: new FormArray([]),
+        select_options: new FormArray([new FormControl(null)]),
       }),
     })
   }
