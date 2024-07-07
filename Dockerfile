@@ -286,6 +286,11 @@ VOLUME ["/usr/src/paperless/data", \
         "/usr/src/paperless/consume", \
         "/usr/src/paperless/export"]
 
+ENV  SUPERCRONIC=supercronic-linux-amd64
+ENV  VERSION=0.2.30
+RUN curl -fsSL -o "/usr/local/bin/supercronic" "https://github.com/aptible/supercronic/releases/download/v$VERSION/$SUPERCRONIC"
+RUN chmod a+x "/usr/local/bin/supercronic"
+
 ENTRYPOINT ["/sbin/docker-entrypoint.sh"]
 
 EXPOSE 8000

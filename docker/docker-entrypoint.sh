@@ -157,6 +157,11 @@ if [[ -n "$PAPERLESS_OCR_LANGUAGES" ]]; then
 	install_languages "$PAPERLESS_OCR_LANGUAGES"
 fi
 
+touch /etc/cron.d/export.cron
+if [[ -n "$PAPERLESS_EXPORT_CRON" ]]; then
+	echo "$PAPERLESS_EXPORT_CRON document_exporter /usr/src/paperless/export" > /etc/cron.d/export.cron
+fi
+
 initialize
 
 if [[ "$1" != "/"* ]]; then
