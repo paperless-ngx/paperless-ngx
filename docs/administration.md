@@ -257,8 +257,13 @@ all metadata from the database (correspondents, tags, etc).
 
 When you use the provided docker compose script, specify `../export` as
 the target. This path inside the container is automatically mounted on
-your host on the folder `export`.
+your host on the folder `export`. 
 
+If installed via Docker using the Installation Script, you will need to
+run document_exporter from with the ./paperless-ngx/ sub-directory.
+For example:
+`cd ./paperless-ngx/ ; docker compose exec -T webserver document_exporter ../export`
+ 
 If the target directory already exists and contains files, paperless
 will assume that the contents of the export directory are a previous
 export and will attempt to update the previous export. Paperless will
