@@ -36,7 +36,7 @@ The following algorithms are available:
 - **Regular expression:** Parses the match as a regular expression and
   tries to find a match within the document.
 - **Fuzzy match:** Uses a partial matching based on locating the tag text
-  inside the document, using a [partial ratio](https://maxbachmann.github.io/RapidFuzz/Usage/fuzz.html#partial-ratio)
+  inside the document, using a [partial ratio](https://rapidfuzz.github.io/RapidFuzz/Usage/fuzz.html#partial-ratio)
 - **Auto:** Tries to automatically match new documents. This does not
   require you to set a match. See the [notes below](#automatic-matching).
 
