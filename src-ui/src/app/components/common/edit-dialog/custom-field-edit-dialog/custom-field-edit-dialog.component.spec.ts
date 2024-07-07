@@ -14,6 +14,8 @@ import { TextComponent } from '../../input/text/text.component'
 import { EditDialogMode } from '../edit-dialog.component'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { CustomFieldDataType } from 'src/app/data/custom-field'
+import { ElementRef, QueryList } from '@angular/core'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 describe('CustomFieldEditDialogComponent', () => {
   let component: CustomFieldEditDialogComponent
@@ -30,7 +32,13 @@ describe('CustomFieldEditDialogComponent', () => {
         TextComponent,
         SafeHtmlPipe,
       ],
-      imports: [FormsModule, ReactiveFormsModule, NgSelectModule, NgbModule],
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgSelectModule,
+        NgbModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+      ],
       providers: [
         NgbActiveModal,
         provideHttpClient(withInterceptorsFromDi()),
@@ -101,5 +109,18 @@ describe('CustomFieldEditDialogComponent', () => {
     expect(
       component.objectForm.get('extra_data').get('select_options').value.length
     ).toBe(2)
+  })
+
+  it('should focus on last select option input', () => {
+    const selectOptionInputs = component[
+      'selectOptionInputs'
+    ] as QueryList<ElementRef>
+    component.dialogMode = EditDialogMode.CREATE
+    component.objectForm.get('data_type').setValue(CustomFieldDataType.Select)
+    component.ngOnInit()
+    component.ngAfterViewInit()
+    component.addSelectOption()
+    fixture.detectChanges()
+    expect(document.activeElement).toBe(selectOptionInputs.last.nativeElement)
   })
 })

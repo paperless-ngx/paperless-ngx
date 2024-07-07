@@ -1,4 +1,12 @@
-import { Component, OnInit } from '@angular/core'
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  QueryList,
+  ViewChildren,
+} from '@angular/core'
 import { FormGroup, FormControl, FormArray } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import {
@@ -10,6 +18,7 @@ import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { EditDialogComponent, EditDialogMode } from '../edit-dialog.component'
+import { Subject, takeUntil } from 'rxjs'
 
 @Component({
   selector: 'pngx-custom-field-edit-dialog',
@@ -18,9 +27,14 @@ import { EditDialogComponent, EditDialogMode } from '../edit-dialog.component'
 })
 export class CustomFieldEditDialogComponent
   extends EditDialogComponent<CustomField>
-  implements OnInit
+  implements OnInit, AfterViewInit, OnDestroy
 {
   CustomFieldDataType = CustomFieldDataType
+
+  @ViewChildren('selectOption')
+  private selectOptionInputs: QueryList<ElementRef>
+
+  private unsubscribeNotifier: Subject<any> = new Subject()
 
   private get selectOptions(): FormArray {
     return (this.objectForm.controls.extra_data as FormGroup).controls
@@ -47,6 +61,19 @@ export class CustomFieldEditDialogComponent
         this.selectOptions.push(new FormControl(option))
       )
     }
+  }
+
+  ngAfterViewInit(): void {
+    this.selectOptionInputs.changes
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        this.selectOptionInputs.last.nativeElement.focus()
+      })
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribeNotifier.next(true)
+    this.unsubscribeNotifier.complete()
   }
 
   getCreateTitle() {
