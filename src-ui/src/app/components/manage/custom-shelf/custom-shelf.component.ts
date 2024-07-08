@@ -38,7 +38,7 @@ export class CustomShelfComponent extends CustomListComponent<Shelf> {
       FILTER_HAS_CUSTOM_SHELF_ANY,
       $localize`shelf`,
       $localize`shelf`,
-      PermissionType.Shelf,
+      PermissionType.Warehouse,
       [
         {
           key: 'type',
