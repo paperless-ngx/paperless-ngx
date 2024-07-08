@@ -19,6 +19,7 @@ import {
 import { CustomShelfEditDialogComponent } from 'src/app/components/common/edit-dialog/custom-shelf-edit-dialog/custom-shelf-edit-dialog.component'
 import { CustomFields } from 'src/app/data/customfields'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 
 @Component({
   selector: 'pngx-custom-fields-dropdown',
@@ -114,7 +115,7 @@ export class CustomFieldsDropdownComponent implements OnDestroy {
   }
 
   createField(newName: string = null) {
-    const modal = this.modalService.open(CustomShelfEditDialogComponent)
+    const modal = this.modalService.open(CustomFieldEditDialogComponent)
     if (newName) modal.componentInstance.object = { name: newName }
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))

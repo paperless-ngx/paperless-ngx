@@ -1479,7 +1479,7 @@
                <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
                <context context-type="linenumber">4</context>
             </context-group>
-            <target state="translated">Global app configuration options which apply to &amp;&lt;strong&amp;&gt;every&amp;&lt;strong&amp;&gt; user of this install of NIAD. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</target>
+            <target>Các tùy chọn cấu hình ứng dụng toàn cầu áp dụng cho &lt;strong&gt;mọi&lt;/strong&gt; người dùng của bản cài đặt NIAD này. Các tùy chọn cũng có thể được đặt bằng cách sử dụng các biến môi trường hoặc tệp cấu hình, nhưng giá trị được chỉ định ở đây sẽ luôn được ưu tiên.</target>
          </trans-unit>
          <trans-unit id="187187500641108332" datatype="html">
             <source>
@@ -1676,7 +1676,7 @@
                <context context-type="sourcefile">src/app/components/admin/logs/logs.component.html</context>
                <context context-type="linenumber">4</context>
             </context-group>
-            <target state="translated">Review the log files for the application and for email checking.</target>
+            <target state="translated">Xem lại các tệp nhật ký cho ứng dụng và kiểm tra email</target>
          </trans-unit>
          <trans-unit id="4930506384627295710" datatype="html">
             <source>Settings</source>
@@ -4309,7 +4309,7 @@
                <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-shelf-edit-dialog/custom-shelf-edit-dialog.component.ts</context>
                <context context-type="linenumber">50</context>
             </context-group>
-            <target state="translated">Create new shelf</target>
+            <target state="translated">Tạo mới giá giá/kệ</target>
          </trans-unit>
          <trans-unit id="3467939874805957543" datatype="html">
             <source>Edit shelf</source>

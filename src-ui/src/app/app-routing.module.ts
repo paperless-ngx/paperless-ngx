@@ -157,7 +157,7 @@ export const routes: Routes = [
         data: {
           requiredPermission: {
             action: PermissionAction.View,
-            type: PermissionType.Box,
+            type: PermissionType.Warehouse,
           },
         },
       },
@@ -168,7 +168,7 @@ export const routes: Routes = [
         data: {
           requiredPermission: {
             action: PermissionAction.View,
-            type: PermissionType.CustomField,
+            type: PermissionType.Warehouse,
           },
         },
       },
