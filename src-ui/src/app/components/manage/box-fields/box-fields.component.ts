@@ -36,7 +36,7 @@ export class BoxFieldsComponent extends BoxListComponent<Box> {
       FILTER_HAS_BOX_ANY,
       $localize`boxcase`,
       $localize`boxcases`,
-      PermissionType.Box,
+      PermissionType.Warehouse,
       [
         {
           key: 'type',
