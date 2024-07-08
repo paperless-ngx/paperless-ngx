@@ -1679,6 +1679,7 @@ class ApprovalViewSet(ModelViewSet):
         #     queryset = PaperlessTask.objects.filter(task_id=task_id)
         user = self.request.user
         document_ids = Document.objects.filter(owner=user).values_list("id")
+        document_ids =[x[0] for x in document_ids]
         queryset = queryset.filter(object_pk__in=document_ids)
         return queryset
 

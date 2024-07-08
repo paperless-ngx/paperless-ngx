@@ -80,7 +80,7 @@ api_router.register(r"approvals", ApprovalViewSet)
 api_router.register(r"content_types", ContentTypeViewSet, basename="content_types")
 api_router.register(r"folders", FolderViewSet)
 
-api_router.register(r"approvals", ApprovalViewSet)
+# api_router.register(r"approvals", ApprovalViewSet)
 api_router.register(r"content_types", ContentTypeViewSet, basename="content_types")
 
 urlpatterns = [

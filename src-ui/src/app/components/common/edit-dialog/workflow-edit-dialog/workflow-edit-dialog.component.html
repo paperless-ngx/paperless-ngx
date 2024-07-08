@@ -119,7 +119,7 @@
   <div [formGroup]="formGroup">
     <input type="hidden" formControlName="id" />
     <pngx-input-select i18n-title title="Trigger type" [horizontal]="true" [items]="triggerTypeOptions" formControlName="type"></pngx-input-select>
-    @if (formGroup.get('type').value === WorkflowTriggerType.ApprovalAdded || formGroup.get('type').value === WorkflowActionType.ApprovalUpdated){
+    @if (formGroup.get('type').value === WorkflowTriggerType.ApprovalAdded || formGroup.get('type').value === WorkflowTriggerType.ApprovalUpdated){
       <pngx-input-select i18n-title title="Has status" [items]="triggerStatusOptions" [multiple]="false" formControlName="filter_has_status"></pngx-input-select>
       <pngx-input-select i18n-title title="Has content type" bindLabel="model" bindValue="id" [items]="contentTypes" [multiple]="false" formControlName="filter_has_content_type"></pngx-input-select>
       <pngx-input-select i18n-title title="Has access type" [items]="triggerAccesTypesOptions" [multiple]="false" formControlName="filter_has_access_type"></pngx-input-select>

@@ -11,7 +11,7 @@ export enum WorkflowTriggerType {
   DocumentAdded = 2,
   DocumentUpdated = 3,
   ApprovalAdded = 4,
-  ApprovalUpdated = 4,
+  ApprovalUpdated = 5,
 
 }
 
