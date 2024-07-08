@@ -717,7 +717,7 @@ class Consumer(LoggingMixin):
                  # create file from document
                 # self.log.info('gia tri documentt', document.folder)
                 
-                new_file = Folder.objects.create(name=document.title, parent_folder = document.folder,type = Folder.FILE)
+                new_file = Folder.objects.create(name=document.title, parent_folder = document.folder,type = Folder.FILE, owner = document.owner, created = document.created, updated = document.modified, checksum = document.checksum)
                 if document.folder :
                     new_file.path = f"{document.folder.path}/{new_file.id}"
                 else:

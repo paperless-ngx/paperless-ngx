@@ -1557,6 +1557,16 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
         write_only=True,
         child=serializers.IntegerField(),
     )
+    
+    parent_folder = serializers.ListField(
+        required=False,
+        allow_empty=True,
+        allow_null=True,
+        label="Parent_folder",
+        write_only=True,
+        child=serializers.IntegerField(),
+        default = []
+    )
 
     object_type = serializers.ChoiceField(
         choices=[
@@ -1575,6 +1585,7 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
         choices=[
             "set_permissions",
             "delete",
+            "update",
         ],
         label="Operation",
         required=True,
@@ -1628,7 +1639,20 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
                 "Some ids in objects don't exist or were specified twice.",
             )
         return objects
-
+    
+    def _validate_parent_folder(self, parent_folder, object_type):
+        if not isinstance(parent_folder, list):
+            raise serializers.ValidationError("parent_folder must be a list")
+        if not all(isinstance(i, int) for i in parent_folder):
+            raise serializers.ValidationError("parent_folder must be a list of integers")
+        object_class = self.get_object_class(object_type)
+        count = object_class.objects.filter(id__in=parent_folder).count()
+        if not count == len(parent_folder):
+            raise serializers.ValidationError(
+                "Some ids in parent_folder don't exist or were specified twice.",
+            )
+        return parent_folder
+    
     def _validate_permissions(self, permissions):
         self.validate_set_permissions(
             permissions,
@@ -1637,9 +1661,11 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
     def validate(self, attrs):
         object_type = attrs["object_type"]
         objects = attrs["objects"]
+        parent_folder = attrs["parent_folder"]
         operation = attrs.get("operation")
 
         self._validate_objects(objects, object_type)
+        self._validate_parent_folder(parent_folder, object_type)
 
         if operation == "set_permissions":
             permissions = attrs.get("permissions")
@@ -1944,6 +1970,9 @@ class AdjustedNameField(serializers.CharField):
         if hasattr(model, 'name'): 
             parent_folder = self.parent.initial_data.get('parent_folder')
             type = self.parent.initial_data.get('type')
+            
+            if type == 'file':
+                return data
             
             if type: 
                 existing_names = model.objects.filter(type=type).values_list('name', flat=True)
