@@ -410,7 +410,10 @@ class TestPathSettings(TestCase):
         self.assertEqual("/", base_paths[1])  # BASE_URL
         self.assertEqual("/accounts/login/", base_paths[2])  # LOGIN_URL
         self.assertEqual("/dashboard", base_paths[3])  # LOGIN_REDIRECT_URL
-        self.assertEqual("/", base_paths[4])  # LOGOUT_REDIRECT_URL
+        self.assertEqual(
+            "/accounts/login/?loggedout=1",
+            base_paths[4],
+        )  # LOGOUT_REDIRECT_URL
 
     @mock.patch("os.environ", {"PAPERLESS_FORCE_SCRIPT_NAME": "/paperless"})
     def test_subpath(self):
@@ -427,7 +430,10 @@ class TestPathSettings(TestCase):
         self.assertEqual("/paperless/", base_paths[1])  # BASE_URL
         self.assertEqual("/paperless/accounts/login/", base_paths[2])  # LOGIN_URL
         self.assertEqual("/paperless/dashboard", base_paths[3])  # LOGIN_REDIRECT_URL
-        self.assertEqual("/paperless/", base_paths[4])  # LOGOUT_REDIRECT_URL
+        self.assertEqual(
+            "/paperless/accounts/login/?loggedout=1",
+            base_paths[4],
+        )  # LOGOUT_REDIRECT_URL
 
     @mock.patch(
         "os.environ",
