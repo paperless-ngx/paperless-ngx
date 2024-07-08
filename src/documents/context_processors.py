@@ -21,6 +21,7 @@ def settings(request):
         "EMAIL_ENABLED": django_settings.EMAIL_HOST != "localhost"
         or django_settings.EMAIL_HOST_USER != "",
         "DISABLE_REGULAR_LOGIN": django_settings.DISABLE_REGULAR_LOGIN,
+        "REDIRECT_LOGIN_TO_SSO": django_settings.REDIRECT_LOGIN_TO_SSO,
         "ACCOUNT_ALLOW_SIGNUPS": django_settings.ACCOUNT_ALLOW_SIGNUPS,
         "domain": getattr(django_settings, "PAPERLESS_URL", request.get_host()),
         "APP_TITLE": app_title,

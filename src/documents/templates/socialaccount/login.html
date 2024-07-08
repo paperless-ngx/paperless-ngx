@@ -12,4 +12,13 @@
     <div class="d-grid mt-3">
         <button class="btn btn-lg btn-primary" type="submit">{% translate "Continue" %}</button>
     </div>
+
+    {% if REDIRECT_LOGIN_TO_SSO %}
+        <script type="text/javascript">
+            const form = document.getElementById('form-account');
+            if (form) {
+                form.submit();
+            }
+        </script>
+    {% endif %}
 {% endblock form_content %}
