@@ -52,7 +52,12 @@ class MailDocumentParser(DocumentParser):
             return PdfAFormat.A3b
         return None
 
-    def get_thumbnail(self, document_path: Path, mime_type: str, file_name=None):
+    def get_thumbnail(
+        self,
+        document_path: Path,
+        mime_type: str,
+        file_name=None,
+    ) -> Path:
         if not self.archive_path:
             self.archive_path = self.generate_pdf(
                 self.parse_file_to_message(document_path),

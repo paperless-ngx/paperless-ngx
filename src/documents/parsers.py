@@ -225,11 +225,11 @@ def make_thumbnail_from_pdf_gs_fallback(in_path, temp_dir, logging_group=None) -
         return default_thumbnail_path
 
 
-def make_thumbnail_from_pdf(in_path, temp_dir, logging_group=None) -> str:
+def make_thumbnail_from_pdf(in_path, temp_dir, logging_group=None) -> Path:
     """
     The thumbnail of a PDF is just a 500px wide image of the first page.
     """
-    out_path = os.path.join(temp_dir, "convert.webp")
+    out_path = temp_dir / "convert.webp"
 
     # Run convert to get a decent thumbnail
     try:
@@ -242,7 +242,7 @@ def make_thumbnail_from_pdf(in_path, temp_dir, logging_group=None) -> str:
             auto_orient=True,
             use_cropbox=True,
             input_file=f"{in_path}[0]",
-            output_file=out_path,
+            output_file=str(out_path),
             logging_group=logging_group,
         )
     except ParseError as e:
