@@ -34,6 +34,7 @@ class ModelWithOwner(models.Model):
         User,
         blank=True,
         null=True,
+        default=None,
         on_delete=models.SET_NULL,
         verbose_name=_("owner"),
     )
