@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="customfieldinstance",
             name="value_select",
-            field=models.IntegerField(null=True),
+            field=models.PositiveSmallIntegerField(null=True),
         ),
         migrations.AlterField(
             model_name="customfield",

@@ -898,7 +898,7 @@ class CustomFieldInstance(models.Model):
 
     value_document_ids = models.JSONField(null=True)
 
-    value_select = models.IntegerField(null=True)
+    value_select = models.PositiveSmallIntegerField(null=True)
 
     class Meta:
         ordering = ("created",)
