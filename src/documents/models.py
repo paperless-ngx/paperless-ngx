@@ -915,7 +915,10 @@ class CustomFieldInstance(models.Model):
     def __str__(self) -> str:
         value = (
             self.field.extra_data["select_options"][self.value_select]
-            if self.field.data_type == CustomField.FieldDataType.SELECT
+            if (
+                self.field.data_type == CustomField.FieldDataType.SELECT
+                and self.value_select is not None
+            )
             else self.value
         )
         return str(self.field.name) + f" : {value}"
