@@ -9,6 +9,7 @@ export enum CustomFieldDataType {
   Float = 'float',
   Monetary = 'monetary',
   DocumentLink = 'documentlink',
+  Select = 'select',
 }
 
 export const DATA_TYPE_LABELS = [
@@ -44,10 +45,17 @@ export const DATA_TYPE_LABELS = [
     id: CustomFieldDataType.DocumentLink,
     name: $localize`Document Link`,
   },
+  {
+    id: CustomFieldDataType.Select,
+    name: $localize`Select`,
+  },
 ]
 
 export interface CustomField extends ObjectWithId {
   data_type: CustomFieldDataType
   name: string
   created?: Date
+  extra_data?: {
+    select_options?: string[]
+  }
 }
