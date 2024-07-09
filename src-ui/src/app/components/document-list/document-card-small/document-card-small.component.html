@@ -106,7 +106,7 @@
             <small i18n>Shared</small>
           </div>
         }
-        @for (field of document.custom_fields; track field.id) {
+        @for (field of document.custom_fields; track field.field) {
           @if (displayFields.includes(DisplayField.CUSTOM_FIELD + field.field)) {
             <div class="ps-0 p-1 d-flex align-items-center overflow-hidden">
               <i-bs width="1em" height="1em" class="me-2 text-muted" name="ui-radios"></i-bs>
