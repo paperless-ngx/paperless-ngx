@@ -455,6 +455,7 @@ class CustomFieldSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "data_type",
+            "extra_data",
         ]
 
     def validate(self, attrs):
@@ -475,6 +476,23 @@ class CustomFieldSerializer(serializers.ModelSerializer):
         ).exists():
             raise serializers.ValidationError(
                 {"error": "Object violates name unique constraint"},
+            )
+        if (
+            "data_type" in attrs
+            and attrs["data_type"] == CustomField.FieldDataType.SELECT
+            and (
+                "extra_data" not in attrs
+                or "select_options" not in attrs["extra_data"]
+                or not isinstance(attrs["extra_data"]["select_options"], list)
+                or len(attrs["extra_data"]["select_options"]) == 0
+                or not all(
+                    isinstance(option, str) and len(option) > 0
+                    for option in attrs["extra_data"]["select_options"]
+                )
+            )
+        ):
+            raise serializers.ValidationError(
+                {"error": "extra_data.select_options must be a valid list"},
             )
         return super().validate(attrs)
 
@@ -507,6 +525,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
             CustomField.FieldDataType.FLOAT: "value_float",
             CustomField.FieldDataType.MONETARY: "value_monetary",
             CustomField.FieldDataType.DOCUMENTLINK: "value_document_ids",
+            CustomField.FieldDataType.SELECT: "value_select",
         }
         # An instance is attached to a document
         document: Document = validated_data["document"]
@@ -563,6 +582,14 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
                     )(data["value"])
             elif field.data_type == CustomField.FieldDataType.STRING:
                 MaxLengthValidator(limit_value=128)(data["value"])
+            elif field.data_type == CustomField.FieldDataType.SELECT:
+                select_options = field.extra_data["select_options"]
+                try:
+                    select_options[data["value"]]
+                except Exception:
+                    raise serializers.ValidationError(
+                        f"Value must be index of an element in {select_options}",
+                    )
 
         return data
 

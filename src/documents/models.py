@@ -808,6 +808,7 @@ class CustomField(models.Model):
         FLOAT = ("float", _("Float"))
         MONETARY = ("monetary", _("Monetary"))
         DOCUMENTLINK = ("documentlink", _("Document Link"))
+        SELECT = ("select", _("Select"))
 
     created = models.DateTimeField(
         _("created"),
@@ -823,6 +824,15 @@ class CustomField(models.Model):
         max_length=50,
         choices=FieldDataType.choices,
         editable=False,
+    )
+
+    extra_data = models.JSONField(
+        _("extra data"),
+        null=True,
+        blank=True,
+        help_text=_(
+            "Extra data for the custom field, such as select options",
+        ),
     )
 
     class Meta:
@@ -888,6 +898,8 @@ class CustomFieldInstance(models.Model):
 
     value_document_ids = models.JSONField(null=True)
 
+    value_select = models.PositiveSmallIntegerField(null=True)
+
     class Meta:
         ordering = ("created",)
         verbose_name = _("custom field instance")
@@ -900,7 +912,12 @@ class CustomFieldInstance(models.Model):
         ]
 
     def __str__(self) -> str:
-        return str(self.field.name) + f" : {self.value}"
+        value = (
+            self.field.extra_data["select_options"][self.value_select]
+            if self.field.data_type == CustomField.FieldDataType.SELECT
+            else self.value
+        )
+        return str(self.field.name) + f" : {value}"
 
     @property
     def value(self):
@@ -924,6 +941,8 @@ class CustomFieldInstance(models.Model):
             return self.value_monetary
         elif self.field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
             return self.value_document_ids
+        elif self.field.data_type == CustomField.FieldDataType.SELECT:
+            return self.value_select
         raise NotImplementedError(self.field.data_type)
 
 
