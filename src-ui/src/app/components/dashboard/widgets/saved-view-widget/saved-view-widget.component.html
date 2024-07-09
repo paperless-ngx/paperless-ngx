@@ -88,7 +88,7 @@
       </tbody>
     </table>
   } @else if (documents.length && displayMode === DisplayMode.SMALL_CARDS) {
-    <div class="row row-cols-paperless-cards my-n2">
+    <div content class="row row-cols-paperless-cards my-n2">
       @for (d of documents; track d.id) {
         <pngx-document-card-small
           class="p-0"
@@ -103,7 +103,7 @@
       }
     </div>
   } @else if (documents.length && displayMode === DisplayMode.LARGE_CARDS) {
-    <div class="row my-n2">
+    <div content class="row my-n2">
       @for (d of documents; track d.id) {
         <pngx-document-card-large
           (dblClickDocument)="openDocumentDetail(d)"
@@ -118,7 +118,7 @@
       }
     </div>
   } @else {
-    <p i18n class="text-center text-muted mb-0 fst-italic">No documents</p>
+    <p content i18n class="text-center text-muted mb-0 fst-italic">No documents</p>
   }
 
 
