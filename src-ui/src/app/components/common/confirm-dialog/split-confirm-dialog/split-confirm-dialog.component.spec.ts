@@ -92,4 +92,16 @@ describe('SplitConfirmDialogComponent', () => {
     component.pdfPreviewLoaded({ numPages: 5 } as any)
     expect(component.totalPages).toEqual(5)
   })
+
+  it('should correctly disable split button', () => {
+    component.totalPages = 5
+    component.page = 1
+    expect(component.canSplit).toBeTruthy()
+    component.page = 5
+    expect(component.canSplit).toBeFalsy()
+    component.page = 4
+    expect(component.canSplit).toBeTruthy()
+    component['pages'] = new Set([1, 2, 3, 4])
+    expect(component.canSplit).toBeFalsy()
+  })
 })
