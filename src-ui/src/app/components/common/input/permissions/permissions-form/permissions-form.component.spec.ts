@@ -9,8 +9,9 @@ import { SelectComponent } from '../../select/select.component'
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap'
 import { PermissionsGroupComponent } from '../permissions-group/permissions-group.component'
 import { PermissionsUserComponent } from '../permissions-user/permissions-user.component'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { NgSelectModule } from '@ng-select/ng-select'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('PermissionsFormComponent', () => {
   let component: PermissionsFormComponent
@@ -24,13 +25,15 @@ describe('PermissionsFormComponent', () => {
         PermissionsGroupComponent,
         PermissionsUserComponent,
       ],
-      providers: [],
       imports: [
         FormsModule,
         ReactiveFormsModule,
         NgbAccordionModule,
-        HttpClientTestingModule,
         NgSelectModule,
+      ],
+      providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 

@@ -77,7 +77,6 @@
             "scripts": [],
             "allowedCommonJsDependencies": [
               "ng2-pdf-viewer",
-              "filesize",
               "file-saver"
             ],
             "vendorChunk": true,

@@ -1,8 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { FileComponent } from './file.component'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('FileComponent', () => {
   let component: FileComponent
@@ -11,7 +12,11 @@ describe('FileComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [FileComponent],
-      imports: [FormsModule, ReactiveFormsModule, HttpClientTestingModule],
+      imports: [FormsModule, ReactiveFormsModule],
+      providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
     }).compileComponents()
 
     fixture = TestBed.createComponent(FileComponent)

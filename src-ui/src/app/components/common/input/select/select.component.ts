@@ -34,6 +34,11 @@ export class SelectComponent extends AbstractInputComponent<number> {
     if (items && this.value) this.checkForPrivateItems(this.value)
   }
 
+  @Input()
+  set itemsArray(items: any[]) {
+    this._items = items.map((item, index) => ({ id: index, name: item }))
+  }
+
   writeValue(newValue: any): void {
     if (newValue && this._items) {
       this.checkForPrivateItems(newValue)

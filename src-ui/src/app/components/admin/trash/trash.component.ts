@@ -59,10 +59,16 @@ export class TrashComponent implements OnDestroy {
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         modal.componentInstance.buttonsEnabled = false
-        this.trashService.emptyTrash([document.id]).subscribe(() => {
-          this.toastService.showInfo($localize`Document deleted`)
-          modal.close()
-          this.reload()
+        this.trashService.emptyTrash([document.id]).subscribe({
+          next: () => {
+            this.toastService.showInfo($localize`Document deleted`)
+            modal.close()
+            this.reload()
+          },
+          error: (err) => {
+            this.toastService.showError($localize`Error deleting document`, err)
+            modal.close()
+          },
         })
       })
   }
@@ -83,29 +89,51 @@ export class TrashComponent implements OnDestroy {
       .subscribe(() => {
         this.trashService
           .emptyTrash(documents ? Array.from(documents) : null)
-          .subscribe(() => {
-            this.toastService.showInfo($localize`Document(s) deleted`)
-            this.allToggled = false
-            modal.close()
-            this.reload()
+          .subscribe({
+            next: () => {
+              this.toastService.showInfo($localize`Document(s) deleted`)
+              this.allToggled = false
+              modal.close()
+              this.reload()
+            },
+            error: (err) => {
+              this.toastService.showError(
+                $localize`Error deleting document(s)`,
+                err
+              )
+              modal.close()
+            },
           })
       })
   }
 
   restore(document: Document) {
-    this.trashService.restoreDocuments([document.id]).subscribe(() => {
-      this.toastService.showInfo($localize`Document restored`)
-      this.reload()
+    this.trashService.restoreDocuments([document.id]).subscribe({
+      next: () => {
+        this.toastService.showInfo($localize`Document restored`)
+        this.reload()
+      },
+      error: (err) => {
+        this.toastService.showError($localize`Error restoring document`, err)
+      },
     })
   }
 
   restoreAll(documents: Set<number> = null) {
     this.trashService
       .restoreDocuments(documents ? Array.from(documents) : null)
-      .subscribe(() => {
-        this.toastService.showInfo($localize`Document(s) restored`)
-        this.allToggled = false
-        this.reload()
+      .subscribe({
+        next: () => {
+          this.toastService.showInfo($localize`Document(s) restored`)
+          this.allToggled = false
+          this.reload()
+        },
+        error: (err) => {
+          this.toastService.showError(
+            $localize`Error restoring document(s)`,
+            err
+          )
+        },
       })
   }
 

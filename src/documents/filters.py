@@ -156,6 +156,16 @@ class CustomFieldFilterSet(FilterSet):
 class CustomFieldsFilter(Filter):
     def filter(self, qs, value):
         if value:
+            fields_with_matching_selects = CustomField.objects.filter(
+                extra_data__icontains=value,
+            )
+            option_ids = []
+            if fields_with_matching_selects.count() > 0:
+                for field in fields_with_matching_selects:
+                    options = field.extra_data.get("select_options", [])
+                    for index, option in enumerate(options):
+                        if option.lower().find(value.lower()) != -1:
+                            option_ids.extend([index])
             return (
                 qs.filter(custom_fields__field__name__icontains=value)
                 | qs.filter(custom_fields__value_text__icontains=value)
@@ -166,6 +176,7 @@ class CustomFieldsFilter(Filter):
                 | qs.filter(custom_fields__value_url__icontains=value)
                 | qs.filter(custom_fields__value_monetary__icontains=value)
                 | qs.filter(custom_fields__value_document_ids__icontains=value)
+                | qs.filter(custom_fields__value_select__in=option_ids)
             )
         else:
             return qs
@@ -276,3 +287,17 @@ class ObjectOwnedOrGrantedPermissionsFilter(ObjectPermissionsFilter):
         objects_owned = queryset.filter(owner=request.user)
         objects_unowned = queryset.filter(owner__isnull=True)
         return objects_with_perms | objects_owned | objects_unowned
+
+
+class ObjectOwnedPermissionsFilter(ObjectPermissionsFilter):
+    """
+    A filter backend that limits results to those where the requesting user
+    owns the objects or objects without an owner (for backwards compat)
+    """
+
+    def filter_queryset(self, request, queryset, view):
+        if request.user.is_superuser:
+            return queryset
+        objects_owned = queryset.filter(owner=request.user)
+        objects_unowned = queryset.filter(owner__isnull=True)
+        return objects_owned | objects_unowned

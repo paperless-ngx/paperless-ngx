@@ -13,6 +13,23 @@
     @if (typeFieldDisabled) {
       <small class="d-block mt-n2" i18n>Data type cannot be changed after a field is created</small>
     }
+    <div [formGroup]="objectForm.controls.extra_data">
+      @switch (objectForm.get('data_type').value) {
+        @case (CustomFieldDataType.Select) {
+          <button type="button" class="btn btn-sm btn-primary my-2" (click)="addSelectOption()">
+            <span i18n>Add option</span>&nbsp;<i-bs name="plus-circle"></i-bs>
+          </button>
+          <div formArrayName="select_options">
+            @for (option of objectForm.controls.extra_data.controls.select_options.controls; track option; let i = $index) {
+              <div class="input-group input-group-sm my-2">
+                <input #selectOption type="text" class="form-control" [formControl]="option" autocomplete="off">
+                <button type="button" class="btn btn-outline-danger" (click)="removeSelectOption(i)" i18n>Delete</button>
+              </div>
+            }
+          </div>
+        }
+      }
+    </div>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>

@@ -115,6 +115,10 @@ export class CustomFieldDisplayComponent implements OnInit, OnDestroy {
     return this.docLinkDocuments?.find((d) => d.id === docId)?.title
   }
 
+  public getSelectValue(field: CustomField, index: number): string {
+    return field.extra_data.select_options[index]
+  }
+
   ngOnDestroy(): void {
     this.unsubscribeNotifier.next(true)
     this.unsubscribeNotifier.complete()

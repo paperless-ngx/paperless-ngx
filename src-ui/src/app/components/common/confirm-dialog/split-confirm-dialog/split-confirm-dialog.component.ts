@@ -42,6 +42,14 @@ export class SplitConfirmDialogComponent
   public totalPages: number
   public deleteOriginal: boolean = false
 
+  public get canSplit(): boolean {
+    return (
+      this.page < this.totalPages &&
+      this.pages.size < this.totalPages - 1 &&
+      !this.pages.has(this.page)
+    )
+  }
+
   public get pdfSrc(): string {
     return this.documentService.getPreviewUrl(this.documentID)
   }

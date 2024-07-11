@@ -585,7 +585,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">337</context>
+          <context context-type="linenumber">347</context>
         </context-group>
         <target state="translated">ละทิ้ง</target>
       </trans-unit>
@@ -605,7 +605,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
-          <context context-type="linenumber">19</context>
+          <context context-type="linenumber">36</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component.html</context>
@@ -645,7 +645,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">329</context>
+          <context context-type="linenumber">339</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
@@ -789,7 +789,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">346</context>
+          <context context-type="linenumber">356</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -797,7 +797,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
-          <context context-type="linenumber">101</context>
+          <context context-type="linenumber">105</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -1193,7 +1193,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">305</context>
+          <context context-type="linenumber">315</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -1205,11 +1205,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">39</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
-          <context context-type="linenumber">81</context>
+          <context context-type="linenumber">85</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -1525,11 +1525,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
-          <context context-type="linenumber">22</context>
+          <context context-type="linenumber">23</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
-          <context context-type="linenumber">66</context>
+          <context context-type="linenumber">69</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -1573,7 +1573,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">80</context>
+          <context context-type="linenumber">86</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.html</context>
@@ -1582,6 +1582,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.html</context>
           <context context-type="linenumber">76</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
+          <context context-type="linenumber">26</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
@@ -1617,11 +1621,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
-          <context context-type="linenumber">40</context>
+          <context context-type="linenumber">42</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
-          <context context-type="linenumber">84</context>
+          <context context-type="linenumber">88</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -1769,7 +1773,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="linenumber">35</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component.html</context>
@@ -2029,7 +2033,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
-          <context context-type="linenumber">64</context>
+          <context context-type="linenumber">66</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -2341,7 +2345,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">80</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
@@ -2369,7 +2373,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">84</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
@@ -2405,15 +2409,27 @@
         <source>Document deleted</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">63</context>
+          <context context-type="linenumber">64</context>
         </context-group>
         <target state="needs-translation">Document deleted</target>
+      </trans-unit>
+      <trans-unit id="7295637485862454066" datatype="html">
+        <source>Error deleting document</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+          <context context-type="linenumber">69</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+          <context context-type="linenumber">799</context>
+        </context-group>
+        <target state="translated">เกิดข้อผิดพลาดในการลบเอกสาร</target>
       </trans-unit>
       <trans-unit id="7266264608936522311" datatype="html">
         <source>This operation will permanently delete the selected documents.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">76</context>
+          <context context-type="linenumber">82</context>
         </context-group>
         <target state="needs-translation">This operation will permanently delete the selected documents.</target>
       </trans-unit>
@@ -2421,7 +2437,7 @@
         <source>This operation will permanently delete all documents in the trash.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">77</context>
+          <context context-type="linenumber">83</context>
         </context-group>
         <target state="needs-translation">This operation will permanently delete all documents in the trash.</target>
       </trans-unit>
@@ -2429,25 +2445,49 @@
         <source>Document(s) deleted</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">87</context>
+          <context context-type="linenumber">94</context>
         </context-group>
         <target state="needs-translation">Document(s) deleted</target>
+      </trans-unit>
+      <trans-unit id="6962724852893361467" datatype="html">
+        <source>Error deleting document(s)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+          <context context-type="linenumber">101</context>
+        </context-group>
+        <target state="needs-translation">Error deleting document(s)</target>
       </trans-unit>
       <trans-unit id="7534569062269274401" datatype="html">
         <source>Document restored</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">97</context>
+          <context context-type="linenumber">113</context>
         </context-group>
         <target state="needs-translation">Document restored</target>
+      </trans-unit>
+      <trans-unit id="9136016619414048201" datatype="html">
+        <source>Error restoring document</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+          <context context-type="linenumber">117</context>
+        </context-group>
+        <target state="needs-translation">Error restoring document</target>
       </trans-unit>
       <trans-unit id="960063472770266304" datatype="html">
         <source>Document(s) restored</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-          <context context-type="linenumber">106</context>
+          <context context-type="linenumber">127</context>
         </context-group>
         <target state="needs-translation">Document(s) restored</target>
+      </trans-unit>
+      <trans-unit id="8405416976953346141" datatype="html">
+        <source>Error restoring document(s)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+          <context context-type="linenumber">133</context>
+        </context-group>
+        <target state="needs-translation">Error restoring document(s)</target>
       </trans-unit>
       <trans-unit id="8119815638230251386" datatype="html">
         <source>Users &amp; Groups</source>
@@ -2507,6 +2547,10 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
         <target state="translated">ชื่อผู้ใช้</target>
       </trans-unit>
       <trans-unit id="5944812089887969249" datatype="html">
@@ -2561,11 +2605,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
-          <context context-type="linenumber">34</context>
+          <context context-type="linenumber">36</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">82</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -3709,11 +3753,19 @@
         </context-group>
         <target state="needs-translation">Data type cannot be changed after a field is created</target>
       </trans-unit>
+      <trans-unit id="4910631867841099191" datatype="html">
+        <source>Add option</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+        <target state="needs-translation">Add option</target>
+      </trans-unit>
       <trans-unit id="528950215505228201" datatype="html">
         <source>Create new custom field</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.ts</context>
-          <context context-type="linenumber">36</context>
+          <context context-type="linenumber">80</context>
         </context-group>
         <target state="needs-translation">Create new custom field</target>
       </trans-unit>
@@ -3721,7 +3773,7 @@
         <source>Edit custom field</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.ts</context>
-          <context context-type="linenumber">40</context>
+          <context context-type="linenumber">84</context>
         </context-group>
         <target state="needs-translation">Edit custom field</target>
       </trans-unit>
@@ -3909,7 +3961,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
-          <context context-type="linenumber">65</context>
+          <context context-type="linenumber">68</context>
         </context-group>
         <target state="translated">บัญชี</target>
       </trans-unit>
@@ -5090,7 +5142,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.ts</context>
-          <context context-type="linenumber">158</context>
+          <context context-type="linenumber">163</context>
         </context-group>
         <target state="needs-translation">Filter documents with this <x id="PH" equiv-text="this.title"/></target>
       </trans-unit>
@@ -5183,7 +5235,7 @@
         <source>Private</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.ts</context>
-          <context context-type="linenumber">57</context>
+          <context context-type="linenumber">62</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/tag/tag.component.html</context>
@@ -5203,7 +5255,7 @@
         <source>No items found</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.ts</context>
-          <context context-type="linenumber">92</context>
+          <context context-type="linenumber">97</context>
         </context-group>
         <target state="needs-translation">No items found</target>
       </trans-unit>
@@ -5568,6 +5620,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">6</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/custom-field.ts</context>
+          <context context-type="linenumber">50</context>
         </context-group>
         <target state="translated">เลือก</target>
       </trans-unit>
@@ -6398,7 +6454,7 @@
         <source>Content</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">201</context>
+          <context context-type="linenumber">211</context>
         </context-group>
         <target state="translated">เนื้อหา</target>
       </trans-unit>
@@ -6406,7 +6462,7 @@
         <source>Metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">210</context>
+          <context context-type="linenumber">220</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/metadata-collapse/metadata-collapse.component.ts</context>
@@ -6418,7 +6474,7 @@
         <source>Date modified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">217</context>
+          <context context-type="linenumber">227</context>
         </context-group>
         <target state="translated">วันที่แก้ไข</target>
       </trans-unit>
@@ -6426,7 +6482,7 @@
         <source>Date added</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">221</context>
+          <context context-type="linenumber">231</context>
         </context-group>
         <target state="translated">วันที่เพิ่ม</target>
       </trans-unit>
@@ -6434,7 +6490,7 @@
         <source>Media filename</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">225</context>
+          <context context-type="linenumber">235</context>
         </context-group>
         <target state="translated">ชื่อไฟล์สื่อ</target>
       </trans-unit>
@@ -6442,7 +6498,7 @@
         <source>Original filename</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">229</context>
+          <context context-type="linenumber">239</context>
         </context-group>
         <target state="translated">ชื่อไฟล์ต้นฉบับ</target>
       </trans-unit>
@@ -6450,7 +6506,7 @@
         <source>Original MD5 checksum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">233</context>
+          <context context-type="linenumber">243</context>
         </context-group>
         <target state="needs-translation">Original MD5 checksum</target>
       </trans-unit>
@@ -6458,7 +6514,7 @@
         <source>Original file size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">237</context>
+          <context context-type="linenumber">247</context>
         </context-group>
         <target state="translated">ขนาดไฟล์เดิม</target>
       </trans-unit>
@@ -6466,7 +6522,7 @@
         <source>Original mime type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">241</context>
+          <context context-type="linenumber">251</context>
         </context-group>
         <target state="translated">MIME Type ของไฟล์เดิม</target>
       </trans-unit>
@@ -6474,7 +6530,7 @@
         <source>Archive MD5 checksum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">246</context>
+          <context context-type="linenumber">256</context>
         </context-group>
         <target state="translated">MD5 checksum ของไฟล์เก็บถาวร</target>
       </trans-unit>
@@ -6482,7 +6538,7 @@
         <source>Archive file size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">252</context>
+          <context context-type="linenumber">262</context>
         </context-group>
         <target state="translated">ขนาดไฟล์เก็บถาวร</target>
       </trans-unit>
@@ -6490,7 +6546,7 @@
         <source>Original document metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">261</context>
+          <context context-type="linenumber">271</context>
         </context-group>
         <target state="needs-translation">Original document metadata</target>
       </trans-unit>
@@ -6498,7 +6554,7 @@
         <source>Archived document metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">264</context>
+          <context context-type="linenumber">274</context>
         </context-group>
         <target state="needs-translation">Archived document metadata</target>
       </trans-unit>
@@ -6506,7 +6562,7 @@
         <source>Preview</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">271</context>
+          <context context-type="linenumber">281</context>
         </context-group>
         <target state="translated">ตัวอย่าง</target>
       </trans-unit>
@@ -6514,7 +6570,7 @@
         <source>Notes <x id="START_BLOCK_IF" equiv-text="@if (document?.notes.length) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="ngth}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">283,286</context>
+          <context context-type="linenumber">293,296</context>
         </context-group>
         <target state="needs-translation">Notes <x id="START_BLOCK_IF" equiv-text="@if (document?.notes.length) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="ngth}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></target>
       </trans-unit>
@@ -6522,7 +6578,7 @@
         <source>History</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">294</context>
+          <context context-type="linenumber">304</context>
         </context-group>
         <target state="needs-translation">History</target>
       </trans-unit>
@@ -6530,7 +6586,7 @@
         <source>Save &amp; next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">331</context>
+          <context context-type="linenumber">341</context>
         </context-group>
         <target state="translated">บันทึก &amp; ถัดไป</target>
       </trans-unit>
@@ -6538,7 +6594,7 @@
         <source>Save &amp; close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">334</context>
+          <context context-type="linenumber">344</context>
         </context-group>
         <target state="translated">บันทึก &amp; ปิด</target>
       </trans-unit>
@@ -6546,7 +6602,7 @@
         <source>Enter Password</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">385</context>
+          <context context-type="linenumber">395</context>
         </context-group>
         <target state="translated">กรอกรหัสผ่าน</target>
       </trans-unit>
@@ -6697,14 +6753,6 @@
           <context context-type="linenumber">716</context>
         </context-group>
         <target state="needs-translation">Move to trash</target>
-      </trans-unit>
-      <trans-unit id="7295637485862454066" datatype="html">
-        <source>Error deleting document</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">799</context>
-        </context-group>
-        <target state="translated">เกิดข้อผิดพลาดในการลบเอกสาร</target>
       </trans-unit>
       <trans-unit id="619486176823357521" datatype="html">
         <source>Reprocess confirm</source>
@@ -8108,7 +8156,7 @@
         <source>No mail accounts defined.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
-          <context context-type="linenumber">48</context>
+          <context context-type="linenumber">50</context>
         </context-group>
         <target state="needs-translation">No mail accounts defined.</target>
       </trans-unit>
@@ -8116,7 +8164,7 @@
         <source>Mail rules</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
-          <context context-type="linenumber">56</context>
+          <context context-type="linenumber">58</context>
         </context-group>
         <target state="translated">กฎเมล</target>
       </trans-unit>
@@ -8124,15 +8172,23 @@
         <source>Add Rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
-          <context context-type="linenumber">58</context>
+          <context context-type="linenumber">60</context>
         </context-group>
         <target state="translated">เพิ่มกฎ</target>
+      </trans-unit>
+      <trans-unit id="2535466903620876415" datatype="html">
+        <source>Sort Order</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+        <target state="needs-translation">Sort Order</target>
       </trans-unit>
       <trans-unit id="6751234988479444294" datatype="html">
         <source>No mail rules defined.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
-          <context context-type="linenumber">92</context>
+          <context context-type="linenumber">96</context>
         </context-group>
         <target state="needs-translation">No mail rules defined.</target>
       </trans-unit>
@@ -8620,7 +8676,7 @@
         <source>Boolean</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/custom-field.ts</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">18</context>
         </context-group>
         <target state="needs-translation">Boolean</target>
       </trans-unit>
@@ -8628,7 +8684,7 @@
         <source>Date</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/custom-field.ts</context>
-          <context context-type="linenumber">21</context>
+          <context context-type="linenumber">22</context>
         </context-group>
         <target state="needs-translation">Date</target>
       </trans-unit>
@@ -8636,7 +8692,7 @@
         <source>Integer</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/custom-field.ts</context>
-          <context context-type="linenumber">25</context>
+          <context context-type="linenumber">26</context>
         </context-group>
         <target state="needs-translation">Integer</target>
       </trans-unit>
@@ -8644,7 +8700,7 @@
         <source>Number</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/custom-field.ts</context>
-          <context context-type="linenumber">29</context>
+          <context context-type="linenumber">30</context>
         </context-group>
         <target state="needs-translation">Number</target>
       </trans-unit>
@@ -8652,7 +8708,7 @@
         <source>Monetary</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/custom-field.ts</context>
-          <context context-type="linenumber">33</context>
+          <context context-type="linenumber">34</context>
         </context-group>
         <target state="needs-translation">Monetary</target>
       </trans-unit>
@@ -8660,7 +8716,7 @@
         <source>Text</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/custom-field.ts</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">38</context>
         </context-group>
         <target state="needs-translation">Text</target>
       </trans-unit>
@@ -8668,7 +8724,7 @@
         <source>Url</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/custom-field.ts</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="linenumber">42</context>
         </context-group>
         <target state="needs-translation">Url</target>
       </trans-unit>
@@ -8676,7 +8732,7 @@
         <source>Document Link</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/custom-field.ts</context>
-          <context context-type="linenumber">45</context>
+          <context context-type="linenumber">46</context>
         </context-group>
         <target state="needs-translation">Document Link</target>
       </trans-unit>

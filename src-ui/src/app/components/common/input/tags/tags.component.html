@@ -49,7 +49,7 @@
       @if (getSuggestions().length > 0) {
         <small class="position-absolute top-100">
           <span i18n>Suggestions:</span>&nbsp;
-          @for (tag of getSuggestions(); track tag) {
+          @for (tag of getSuggestions(); track tag.id) {
             <a (click)="addTag(tag.id)" [routerLink]="[]">{{tag?.name}}</a>&nbsp;
           }
         </small>

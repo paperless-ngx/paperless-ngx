@@ -30,6 +30,9 @@
                     <input type="checkbox" id="{{field.name}}" name="{{field.name}}" [checked]="value" value="" class="form-check-input ms-2 mt-0 pe-none">
                 </div>
             }
+            @case (CustomFieldDataType.Select) {
+                <span [ngbTooltip]="nameTooltip">{{getSelectValue(field, value)}}</span>
+            }
             @default {
               <span [ngbTooltip]="nameTooltip">{{value}}</span>
             }
