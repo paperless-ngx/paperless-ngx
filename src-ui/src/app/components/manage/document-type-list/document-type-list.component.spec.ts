@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { DatePipe } from '@angular/common'
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
@@ -10,6 +10,7 @@ import { of } from 'rxjs'
 import { DocumentTypeListComponent } from './document-type-list.component'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('DocumentTypeListComponent', () => {
   let component: DocumentTypeListComponent
@@ -24,13 +25,16 @@ describe('DocumentTypeListComponent', () => {
         PageHeaderComponent,
         IfPermissionsDirective,
       ],
-      providers: [DatePipe],
       imports: [
-        HttpClientTestingModule,
         NgbPaginationModule,
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+      ],
+      providers: [
+        DatePipe,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 

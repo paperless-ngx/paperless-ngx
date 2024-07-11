@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common'
 import {
-  HttpClientTestingModule,
   HttpTestingController,
+  provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import {
   ComponentFixture,
@@ -83,6 +83,8 @@ import { SplitConfirmDialogComponent } from '../common/confirm-dialog/split-conf
 import { DeletePagesConfirmDialogComponent } from '../common/confirm-dialog/delete-pages-confirm-dialog/delete-pages-confirm-dialog.component'
 import { PdfViewerModule } from 'ng2-pdf-viewer'
 import { DataType } from 'src/app/data/datatype'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { TagService } from 'src/app/services/rest/tag.service'
 
 const doc: Document = {
   id: 3,
@@ -182,8 +184,51 @@ describe('DocumentDetailComponent', () => {
         RotateConfirmDialogComponent,
         DeletePagesConfirmDialogComponent,
       ],
+      imports: [
+        RouterModule.forRoot(routes),
+        NgbModule,
+        NgSelectModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NgbModalModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+        PdfViewerModule,
+      ],
       providers: [
         DocumentTitlePipe,
+        {
+          provide: TagService,
+          useValue: {
+            listAll: () =>
+              of({
+                count: 3,
+                all: [41, 42, 43],
+                results: [
+                  {
+                    id: 41,
+                    name: 'Tag41',
+                    is_inbox_tag: true,
+                    color: '#ff0000',
+                    text_color: '#000000',
+                  },
+                  {
+                    id: 42,
+                    name: 'Tag42',
+                    is_inbox_tag: true,
+                    color: '#ff0000',
+                    text_color: '#000000',
+                  },
+                  {
+                    id: 43,
+                    name: 'Tag43',
+                    is_inbox_tag: true,
+                    color: '#ff0000',
+                    text_color: '#000000',
+                  },
+                ],
+              }),
+          },
+        },
         {
           provide: CorrespondentService,
           useValue: {
@@ -257,17 +302,8 @@ describe('DocumentDetailComponent', () => {
         PermissionsGuard,
         CustomDatePipe,
         DatePipe,
-      ],
-      imports: [
-        RouterModule.forRoot(routes),
-        HttpClientTestingModule,
-        NgbModule,
-        NgSelectModule,
-        FormsModule,
-        ReactiveFormsModule,
-        NgbModalModule,
-        NgxBootstrapIconsModule.pick(allIcons),
-        PdfViewerModule,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 
@@ -989,10 +1025,10 @@ describe('DocumentDetailComponent', () => {
 
   it('should get suggestions', () => {
     const suggestionsSpy = jest.spyOn(documentService, 'getSuggestions')
-    suggestionsSpy.mockReturnValue(of({ tags: [1, 2] }))
+    suggestionsSpy.mockReturnValue(of({ tags: [42, 43] }))
     initNormally()
     expect(suggestionsSpy).toHaveBeenCalled()
-    expect(component.suggestions).toEqual({ tags: [1, 2] })
+    expect(component.suggestions).toEqual({ tags: [42, 43] })
   })
 
   it('should show error if needed for get suggestions', () => {

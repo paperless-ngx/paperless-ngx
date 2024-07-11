@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import {
   ComponentFixture,
   TestBed,
@@ -41,6 +41,7 @@ import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service
 import { CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldDisplayComponent } from 'src/app/components/common/custom-field-display/custom-field-display.component'
 import { DisplayMode, DisplayField } from 'src/app/data/document'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const savedView: SavedView = {
   id: 1,
@@ -125,6 +126,12 @@ describe('SavedViewWidgetComponent', () => {
         PreviewPopupComponent,
         CustomFieldDisplayComponent,
       ],
+      imports: [
+        NgbModule,
+        RouterTestingModule.withRoutes(routes),
+        DragDropModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+      ],
       providers: [
         PermissionsGuard,
         DocumentService,
@@ -163,13 +170,8 @@ describe('SavedViewWidgetComponent', () => {
               }),
           },
         },
-      ],
-      imports: [
-        HttpClientTestingModule,
-        NgbModule,
-        RouterTestingModule.withRoutes(routes),
-        DragDropModule,
-        NgxBootstrapIconsModule.pick(allIcons),
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 

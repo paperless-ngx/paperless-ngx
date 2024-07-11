@@ -358,7 +358,9 @@ class ConsumerPlugin(
                 f"[{Document.ARCHIVE_SERIAL_NUMBER_MIN:,}, "
                 f"{Document.ARCHIVE_SERIAL_NUMBER_MAX:,}]",
             )
-        if Document.objects.filter(archive_serial_number=self.metadata.asn).exists():
+        if Document.global_objects.filter(
+            archive_serial_number=self.metadata.asn,
+        ).exists():
             self._fail(
                 ConsumerStatusShortMessage.ASN_ALREADY_EXISTS,
                 f"Not consuming {self.filename}: Given ASN {self.metadata.asn} already exists!",

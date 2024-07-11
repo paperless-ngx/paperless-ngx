@@ -1,6 +1,6 @@
 import {
   HttpTestingController,
-  HttpClientTestingModule,
+  provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import { TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -17,6 +17,7 @@ import { CustomFieldsService } from './rest/custom-fields.service'
 import { CustomFieldDataType } from '../data/custom-field'
 import { PermissionsService } from './permissions.service'
 import { DEFAULT_DISPLAY_FIELDS, DisplayField } from '../data/document'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const customFields = [
   {
@@ -84,14 +85,18 @@ describe('SettingsService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [],
-      providers: [SettingsService, CookieService],
       imports: [
-        HttpClientTestingModule,
         RouterTestingModule,
         NgbModule,
         FormsModule,
         ReactiveFormsModule,
         AppModule,
+      ],
+      providers: [
+        SettingsService,
+        CookieService,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     })
 
