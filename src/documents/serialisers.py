@@ -32,7 +32,7 @@ from rest_framework.fields import SerializerMethodField
 
 from documents import bulk_edit
 from documents.data_models import DocumentSource
-from documents.models import Approval, Correspondent
+from documents.models import Approval, Correspondent, Dossier
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
@@ -497,6 +497,7 @@ class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
 class CustomFieldInstanceSerializer(serializers.ModelSerializer):
     field = serializers.PrimaryKeyRelatedField(queryset=CustomField.objects.all())
     value = ReadWriteSerializerMethodField(allow_null=True)
+    match = ReadWriteSerializerMethodField(allow_null=True)
 
     def create(self, validated_data):
         type_to_data_store_name_map = {
@@ -655,6 +656,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         fields = [
             "value",
             "field",
+            "match"
         ]
 
 
@@ -1566,6 +1568,7 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
             "storage_paths",
             "warehouses",
             "folders",
+            "dossiers"
         ],
         label="Object Type",
         write_only=True,
@@ -1614,6 +1617,8 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
             object_class = Warehouse
         elif object_type == "folders":
             object_class = Folder
+        elif object_type == "dossiers":
+            object_class = Dossier
         return object_class
 
     def _validate_objects(self, objects, object_type):
@@ -2064,3 +2069,48 @@ class ExportDocumentFromFolderSerializer(serializers.Serializer):
         if not value:
             return Folder.objects.all().values_list('id', flat=True)
         return value
+
+class DossierSerializer(MatchingModelSerializer, OwnedObjectSerializer):
+    custom_fields = CustomFieldInstanceSerializer(
+        many=True,
+        allow_null=False,
+        required=False,
+    )
+    class Meta:
+        model = Dossier
+        fields = [
+            'id',
+            'document_count',
+            'slug',
+            'user_can_change',
+            'is_shared_by_requester',
+            'name',
+            'match',
+            'matching_algorithm',
+            'is_insensitive',
+            'dossier_type',
+            'path',
+            'url',
+            'key',
+            'created',
+            'is_form',
+            'owner',
+            'parent_dossier',
+            'custom_fields'
+        ]
+    def update(self, instance, validated_data):
+        custom_fields_data = validated_data.pop('custom_fields', [])
+        dossier = super().update(instance, validated_data)
+        for custom_field_data in custom_fields_data:
+            print('gia tri customfielddata',custom_field_data['field'].data_type)
+            custom_field_instance, _ = CustomFieldInstance.objects.get_or_create(
+                dossier=dossier,
+                field=custom_field_data['field']
+            )
+            custom_field_instance.match = custom_field_data['match']
+            # custom_field_data['field'].
+            # custom_field_instance.value()
+            custom_field_instance.save()
+
+        return dossier
+    

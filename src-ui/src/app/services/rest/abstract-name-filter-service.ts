@@ -54,6 +54,37 @@ export abstract class AbstractNameFilterService<T extends ObjectWithId,> extends
     return this.list(page, pageSize, sortField, sortReverse, params)
   }
 
+  listDossierFiltered(page?: number,
+    pageSize?: number,
+    sortField?: string,
+    sortReverse?: boolean,
+    id?: number,
+    isForm?: boolean,
+    nameFilter?: string,
+    fullPerms?: boolean) {
+    let params = {}
+    if (id) {
+      params['parent_dossier__id'] = id
+    }
+    else{
+      params['parent_dossier__isnull'] = true
+    }
+    if (isForm){
+      params['is_form'] = true
+    }
+    else{
+      params['is_form'] = false
+    }
+    if (nameFilter) {
+      params['name__icontains'] = nameFilter
+    }
+    if (fullPerms) {
+      params['full_perms'] = true
+    }
+ 
+    return this.list(page, pageSize, sortField, sortReverse, params)
+  }
+
   listGia(page?: number,
     pageSize?: number,
     sortField?: string,

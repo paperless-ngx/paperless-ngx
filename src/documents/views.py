@@ -94,7 +94,7 @@ from documents.conditionals import thumbnail_last_modified
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
-from documents.filters import CorrespondentFilterSet
+from documents.filters import CorrespondentFilterSet, DossierFilterSet
 from documents.filters import CustomFieldFilterSet
 from documents.filters import DocumentFilterSet
 from documents.filters import DocumentTypeFilterSet
@@ -111,7 +111,7 @@ from documents.matching import match_storage_paths
 from documents.matching import match_warehouses
 from documents.matching import match_folders
 from documents.matching import match_tags
-from documents.models import Approval, Correspondent, CustomFieldInstance
+from documents.models import Approval, Correspondent, CustomFieldInstance, Dossier
 from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
@@ -135,7 +135,7 @@ from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
-from documents.serialisers import AcknowledgeTasksViewSerializer, ApprovalSerializer, ApprovalViewSerializer, ExportDocumentFromFolderSerializer
+from documents.serialisers import AcknowledgeTasksViewSerializer, ApprovalSerializer, ApprovalViewSerializer, DossierSerializer, ExportDocumentFromFolderSerializer
 from documents.serialisers import BulkDownloadSerializer
 from documents.serialisers import BulkEditObjectsSerializer
 from documents.serialisers import BulkEditSerializer
@@ -2563,3 +2563,50 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+
+class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
+    model = Dossier
+
+    queryset = Dossier.objects.select_related("owner").order_by(
+        Lower("name"),
+    )
+
+    serializer_class = DossierSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
+    filterset_class = DossierFilterSet
+    ordering_fields = ("name", "dossier_type", "is_form")
+
+    def create(self, request, *args, **kwargs):
+        # try:                                                          
+        serializer = DossierSerializer(data=request.data)
+        parent_dossier = None
+        if serializer.is_valid(raise_exception=True):
+            parent_dossier = serializer.validated_data.get('parent_dossier',None)
+            
+        parent_dossier = Dossier.objects.filter(id=parent_dossier.id if parent_dossier else 0).first()   
+        
+        if parent_dossier == None:
+            dossier = serializer.save(owner=request.user)
+            dossier.path = str(dossier.id)
+            dossier.save()
+        elif parent_dossier:
+            dossier = serializer.save(owner=request.user)
+            if parent_dossier.is_form == True and dossier.is_form == False:
+                dossier.path = str(dossier.id)
+            elif parent_dossier.is_form == True and dossier.is_form == True:
+                dossier = serializer.save(parent_dossier=None,owner=request.user)
+                dossier.path = f"{parent_dossier.path}/{dossier.id}"
+            else:
+                dossier = serializer.save(parent_dossier=parent_dossier,owner=request.user)
+                dossier.path = f"{parent_dossier.path}/{dossier.id}"
+            dossier.save()
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
