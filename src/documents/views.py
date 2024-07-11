@@ -96,6 +96,7 @@ from documents.filters import CustomFieldFilterSet
 from documents.filters import DocumentFilterSet
 from documents.filters import DocumentTypeFilterSet
 from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
+from documents.filters import ObjectOwnedPermissionsFilter
 from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
@@ -231,10 +232,11 @@ class PermissionsAwareDocumentCountMixin(PassUserMixin):
 
     def get_queryset(self):
         filter = (
-            None
+            Q(documents__deleted_at__isnull=True)
             if self.request.user is None or self.request.user.is_superuser
             else (
                 Q(
+                    documents__deleted_at__isnull=True,
                     documents__id__in=get_objects_for_user_owner_aware(
                         self.request.user,
                         "documents.view_document",
@@ -959,6 +961,11 @@ class BulkEditView(PassUserMixin):
         method = serializer.validated_data.get("method")
         parameters = serializer.validated_data.get("parameters")
         documents = serializer.validated_data.get("documents")
+        if method in [
+            bulk_edit.split,
+            bulk_edit.merge,
+        ]:
+            parameters["user"] = user
 
         if not user.is_superuser:
             document_objs = Document.objects.select_related("owner").filter(
@@ -2059,7 +2066,7 @@ class SystemStatusView(PassUserMixin):
 class TrashView(ListModelMixin, PassUserMixin):
     permission_classes = (IsAuthenticated,)
     serializer_class = TrashSerializer
-    filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
+    filter_backends = (ObjectOwnedPermissionsFilter,)
     pagination_class = StandardPagination
 
     model = Document
@@ -2078,7 +2085,7 @@ class TrashView(ListModelMixin, PassUserMixin):
         docs = (
             Document.global_objects.filter(id__in=doc_ids)
             if doc_ids is not None
-            else Document.deleted_objects.all()
+            else self.filter_queryset(self.get_queryset()).all()
         )
         for doc in docs:
             if not has_perms_owner_aware(request.user, "delete_document", doc):

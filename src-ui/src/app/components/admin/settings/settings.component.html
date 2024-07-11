@@ -348,7 +348,7 @@
 
           @for (view of savedViews; track view) {
             <li class="list-group-item py-3">
-            <div [formGroupName]="view.id" class="row">
+            <div [formGroupName]="view.id">
               <div class="row">
                 <div class="col">
                   <pngx-input-text title="Name" formControlName="name"></pngx-input-text>

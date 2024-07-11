@@ -1,0 +1,16 @@
+{
+    "name": "Paperless Development",
+    "dockerComposeFile": "docker-compose.devcontainer.sqlite-tika.yml",
+    "service": "paperless-development",
+    "workspaceFolder": "/usr/src/paperless/paperless-ngx",
+    "postCreateCommand": "/bin/bash -c pre-commit install && pipenv install --dev",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+              "mhutchie.git-graph",
+              "ms-python.python"
+            ]
+        }
+    },
+    "remoteUser": "paperless"
+  }

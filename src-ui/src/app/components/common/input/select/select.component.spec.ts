@@ -132,4 +132,12 @@ describe('SelectComponent', () => {
     const expectedTitle = `Filter documents with this ${component.title}`
     expect(component.filterButtonTitle).toEqual(expectedTitle)
   })
+
+  it('should support setting items as a plain array', () => {
+    component.itemsArray = ['foo', 'bar']
+    expect(component.items).toEqual([
+      { id: 0, name: 'foo' },
+      { id: 1, name: 'bar' },
+    ])
+  })
 })

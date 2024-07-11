@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common'
 import {
   HttpTestingController,
-  HttpClientTestingModule,
+  provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
@@ -30,6 +30,7 @@ import { TasksComponent } from './tasks.component'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { FormsModule } from '@angular/forms'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const tasks: PaperlessTask[] = [
   {
@@ -125,6 +126,12 @@ describe('TasksComponent', () => {
         CustomDatePipe,
         ConfirmDialogComponent,
       ],
+      imports: [
+        NgbModule,
+        RouterTestingModule.withRoutes(routes),
+        NgxBootstrapIconsModule.pick(allIcons),
+        FormsModule,
+      ],
       providers: [
         {
           provide: PermissionsService,
@@ -135,13 +142,8 @@ describe('TasksComponent', () => {
         CustomDatePipe,
         DatePipe,
         PermissionsGuard,
-      ],
-      imports: [
-        NgbModule,
-        HttpClientTestingModule,
-        RouterTestingModule.withRoutes(routes),
-        NgxBootstrapIconsModule.pick(allIcons),
-        FormsModule,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 

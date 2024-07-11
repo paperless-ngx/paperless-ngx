@@ -369,7 +369,10 @@ def _parse_base_paths() -> tuple[str, str, str, str, str]:
     base_url = (script_name or "") + "/"
     login_url = base_url + "accounts/login/"
     login_redirect_url = base_url + "dashboard"
-    logout_redirect_url = os.getenv("PAPERLESS_LOGOUT_REDIRECT_URL", base_url)
+    logout_redirect_url = os.getenv(
+        "PAPERLESS_LOGOUT_REDIRECT_URL",
+        login_url + "?loggedout=1",
+    )
     return script_name, base_url, login_url, login_redirect_url, logout_redirect_url
 
 
@@ -460,6 +463,7 @@ SOCIALACCOUNT_PROVIDERS = json.loads(
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "[Paperless-ngx] "
 
 DISABLE_REGULAR_LOGIN = __get_boolean("PAPERLESS_DISABLE_REGULAR_LOGIN")
+REDIRECT_LOGIN_TO_SSO = __get_boolean("PAPERLESS_REDIRECT_LOGIN_TO_SSO")
 
 AUTO_LOGIN_USERNAME = os.getenv("PAPERLESS_AUTO_LOGIN_USERNAME")
 
@@ -522,7 +526,7 @@ if DEBUG:
     CORS_ALLOWED_ORIGINS.append("http://localhost:4200")
 
 ALLOWED_HOSTS = __get_list("PAPERLESS_ALLOWED_HOSTS", ["*"])
-if ["*"] != ALLOWED_HOSTS:
+if ALLOWED_HOSTS != ["*"]:
     # always allow localhost. Necessary e.g. for healthcheck in docker.
     ALLOWED_HOSTS.append("localhost")
 
