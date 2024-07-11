@@ -23,7 +23,7 @@
         </div>
         <div class="col-4">
             <div class="d-grid">
-                <button class="btn btn-sm btn-primary" (click)="addSplit()" [disabled]="page === totalPages">
+                <button class="btn btn-sm btn-primary" (click)="addSplit()" [disabled]="!canSplit">
                     <i-bs name="plus-circle"></i-bs>&nbsp;
                     <span i18n>Add Split</span>
                 </button>
