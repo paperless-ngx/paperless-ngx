@@ -903,7 +903,7 @@
                <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
                <context context-type="linenumber">34</context>
             </context-group>
-            <target state="translated">Đã tạo</target>
+            <target state="translated">Thời gian tạo</target>
          </trans-unit>
          <trans-unit id="8037476586059399916" datatype="html">
             <source>Expires</source>
@@ -8728,7 +8728,7 @@
                <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
                <context context-type="linenumber">123</context>
             </context-group>
-            <target state="translated">Tiêu đề &amp;nội dung</target>
+            <target state="translated">Tiêu đề &amp; nội dung</target>
          </trans-unit>
          <trans-unit id="9149498548977462220" datatype="html">
             <source>Custom fields</source>
@@ -9127,7 +9127,7 @@
                <context context-type="sourcefile">src/app/components/manage/warehouse/warehouse.component.html</context>
                <context context-type="linenumber">22</context>
             </context-group>
-            <target state="translated">Lọc theo:</target>
+            <target state="translated">Tìm kiếm:</target>
          </trans-unit>
          <trans-unit id="7376880254267897616" datatype="html">
             <source>Filter Documents</source>

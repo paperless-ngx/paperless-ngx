@@ -106,7 +106,7 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
 
   ngOnInit(): void {
     if (localStorage.getItem('folder-list:displayMode') != null) {
-      console.log( localStorage.getItem('folder-list:displayMode'))
+      // console.log( localStorage.getItem('folder-list:displayMode'))
       this.displayMode = localStorage.getItem('folder-list:displayMode')
     }
     this.reloadData()

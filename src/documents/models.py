@@ -971,7 +971,8 @@ class CustomFieldInstance(models.Model):
     )
 
     # Actual data storage
-    value_text = models.CharField(max_length=128, null=True)
+    # value_text = models.CharField(max_length=128, null=True)
+    value_text = models.TextField(null=True)
 
     value_bool = models.BooleanField(null=True)
 
