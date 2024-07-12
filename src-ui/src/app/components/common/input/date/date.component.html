@@ -12,7 +12,7 @@
         <div class="input-group" [class.is-invalid]="error">
           <input #inputField class="form-control" [class.is-invalid]="error" [placeholder]="placeholder" [id]="inputId" maxlength="10"
             (dateSelect)="onChange(value)" (change)="onChange(value)" (keypress)="onKeyPress($event)" (paste)="onPaste($event)"
-            name="dp" [(ngModel)]="value" ngbDatepicker #datePicker="ngbDatepicker" #datePickerContent="ngModel" [disabled]="disabled">
+            name="dp" [(ngModel)]="value" ngbDatepicker #datePicker="ngbDatepicker" #datePickerContent="ngModel" [disabled]="disabled" >
           <button class="btn btn-outline-secondary calendar" (click)="datePicker.toggle()" type="button" [disabled]="disabled">
             <i-bs width="1.2em" height="1.2em" name="calendar"></i-bs>
           </button>

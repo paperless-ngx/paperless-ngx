@@ -131,7 +131,7 @@ export abstract class BoxListComponent<T extends ObjectWithId>
         } else {
           this.data = [];
           this.collectionSize = 0;
-          this.toastService.showInfo('No display data'); // Thông báo khi không có dữ liệu
+          // this.toastService.showInfo('No display data'); // Thông báo khi không có dữ liệu
         }
         this.isLoading = false;
       },

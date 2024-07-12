@@ -136,7 +136,7 @@ export abstract class CustomListComponent<T extends ObjectWithId>
         } else {
           this.data = [];
           this.collectionSize = 0;
-          this.toastService.showInfo('No display data');//thông báo khi không có dữ liệu
+          // this.toastService.showInfo('No display data');//thông báo khi không có dữ liệu
         }
         this.isLoading = false;
       },
