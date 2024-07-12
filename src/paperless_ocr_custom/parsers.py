@@ -180,7 +180,13 @@ class RasterisedDocumentParser(DocumentParser):
     
     # get ocr file img/pdf
     def ocr_file(self,path_file):
-
+        page_count = 1
+        try:
+            with open(path_file, 'rb') as file:
+                pdf_reader = PdfReader(file)
+                page_count = len(pdf_reader.pages)
+        except (OSError, IOError, ValueError):
+            pass
         k = ApplicationConfiguration.objects.filter().first()
         access_token = k.ocr_key
         # upload file
@@ -203,7 +209,7 @@ class RasterisedDocumentParser(DocumentParser):
         params = {'file_id': get_file_id,
                   'parse_table':'false'}
         url_ocr_pdf_by_fileid = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_OCR_BY_FILEID"]
-        data_ocr = self.call_ocr_api_with_retries("POST",url_ocr_pdf_by_fileid, headers, params, {}, 5, 5, 100)
+        data_ocr = self.call_ocr_api_with_retries("POST",url_ocr_pdf_by_fileid, headers, params, {}, 5, page_count , 100)
         # response_ocr = requests.post(url_ocr_pdf_by_fileid, headers=headers, params=params)
         # data_ocr = None
         # # logging.error('ocr: ', response_ocr.status_code)
@@ -225,7 +231,7 @@ class RasterisedDocumentParser(DocumentParser):
         'Content-Type': 'application/json'
         }
         
-        data_ocr_fields = self.call_ocr_api_with_retries("POST",url_ocr_pdf_custom_field_by_fileid, headers, params, payload, 5, 5, 100)        
+        data_ocr_fields = self.call_ocr_api_with_retries("POST",url_ocr_pdf_custom_field_by_fileid, headers, params, payload, 5, page_count , 100)        
         return (data_ocr,data_ocr_fields)
     
 
