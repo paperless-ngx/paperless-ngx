@@ -243,6 +243,11 @@ class Folder(MatchingModel):
     type = models.CharField(max_length=20,
                                       choices=TYPE_FOLDER,
                                       default=FOLDER,)
+    
+    created = models.DateTimeField(_("created"), null=True, default=timezone.now, db_index=True)
+
+    updated = models.DateTimeField(_("updated"), null=True, default=timezone.now, editable=False, db_index=True)
+    
 
     class Meta(MatchingModel.Meta):
         

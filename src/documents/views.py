@@ -1900,7 +1900,47 @@ class BulkEditObjectsView(PassUserMixin):
                 return HttpResponseBadRequest(
                     "Error performing bulk permissions edit, check logs for more detail.",
                 )
+        
+        elif operation == "update" and object_type == "folders":
+            parent_folder_id = serializer.validated_data.get("parent_folder")[0]
+            parent_folder_obj = Folder.objects.get(pk=parent_folder_id) if parent_folder_id else None
 
+            for folder_id in object_ids:
+                folder = Folder.objects.get(id=folder_id)
+                # folder.parent_folder = parent_folder_obj
+                # folder.path = f"{folder.parent_folder.path}/{folder.id}"
+                # folder.save()
+                
+                # print(folder.id)
+                # print(int(request.data['parent_folder'][0]))
+                
+                if int(request.data['parent_folder'][0]) == folder.id:
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
+                elif 'parent_folder' in request.data:
+                    new_parent_folder = Folder.objects.get(id=int(request.data['parent_folder'][0]))
+                    if new_parent_folder.path.startswith(folder.path):
+                        return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a folder into one of its child folders.'})
+                    elif new_parent_folder.type == "file":
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    request.data['parent_folder'][0] = None
+                
+                old_parent_folder = folder.parent_folder
+                folder.parent_folder = parent_folder_obj
+                
+                if old_parent_folder != folder.parent_folder:
+                    if folder.parent_folder:
+                        folder.path = f"{folder.parent_folder.path}/{folder.id}"
+                        folder.parent_folder = parent_folder_obj
+                    
+                    else:
+                        folder.path = f"{folder.id}"
+                    folder.save()
+                    
+                    self.update_child_folder_paths(folder)
+                        
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        
         elif operation == "delete" and object_type == "warehouses": 
             for warehouse_id in object_ids:
                 warehouse = Warehouse.objects.get(id=int(warehouse_id))
@@ -1930,7 +1970,16 @@ class BulkEditObjectsView(PassUserMixin):
             
         return Response({"result": "OK"})
 
-
+    def update_child_folder_paths(self, folder):
+        child_folders = Folder.objects.filter(parent_folder=folder)
+        for child_folder in child_folders:
+            if folder.path:
+                child_folder.path = f"{folder.path}/{child_folder.id}"
+            else:
+                child_folder.path = f"{child_folder.id}"
+            child_folder.save()
+            self.update_child_folder_paths(child_folder)
+    
 class WorkflowTriggerViewSet(ModelViewSet):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
 
@@ -2188,42 +2237,7 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     filterset_class = WarehouseFilterSet
     ordering_fields = ("name", "type", "parent_warehouse", "document_count")
     
-    def getWarehouseDoc(self, wareh):
-        currentUser = self.request.user
-        if wareh.type == Warehouse.BOXCASE:
-            return list(Document.objects.filter(warehouse=wareh, owner=currentUser).order_by("-created").values())
-        elif wareh.type == Warehouse.SHELF:
-            boxcases = Warehouse.objects.filter(parent_warehouse=wareh)
-            return list(Document.objects.filter(warehouse__in=[b.id for b in boxcases], owner=currentUser).order_by("-created").values())
-        elif wareh.type == Warehouse.WAREHOUSE:
-            shelves = Warehouse.objects.filter(parent_warehouse=wareh)
-            boxcases = Warehouse.objects.filter(parent_warehouse__in=[s.id for s in shelves])
-            return list(Document.objects.filter(warehouse__in=[b.id for b in boxcases], owner=currentUser).order_by("-created").values())
-        else:
-            return list(Document.objects.none())
     
-    @action(methods=["get"], detail=True)
-    def documents(self, request, pk=None):
-        currentUser = request.user
-        try:
-            wareh= Warehouse.objects.get(pk=pk)
-            if currentUser is not None and not has_perms_owner_aware(
-                currentUser,
-                "view_warehouse",
-                wareh,
-            ):
-                return HttpResponseForbidden("Insufficient permissions to view warehouses")
-        except Warehouse.DoesNotExist:
-            raise Http404
-
-        if request.method == "GET":
-            try:
-                return Response(self.getWarehouseDoc(wareh))
-            except Exception as e:
-                logger.warning(f"An error occurred retrieving warehouses: {e!s}")
-                return Response(
-                    {"error": "Error retrieving warehouses, check logs for more detail."},
-                )
     
     
     def create(self, request, *args, **kwargs):
@@ -2487,11 +2501,14 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             new_parent_folder = Folder.objects.get(id=int(request.data['parent_folder']))
             if new_parent_folder.path.startswith(instance.path):
                 return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a folder into one of its child folders.'})
+            elif new_parent_folder.type == "file":
+                return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
             request.data['parent_folder'] = None
       
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
+        serializer.validated_data['updated'] = timezone.now()
 
         old_parent_folder = instance.parent_folder
 
@@ -2522,6 +2539,8 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             new_parent_folder = Folder.objects.get(id=int(request.data['parent_folder']))
             if new_parent_folder.path.startswith(instance.path):
                 return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a folder into one of its child folders.'})
+            elif new_parent_folder.type == "file":
+                return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
             request.data['parent_folder'] = None
         
