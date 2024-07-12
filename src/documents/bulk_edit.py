@@ -160,7 +160,8 @@ def delete(doc_ids):
         doc_folder = doc.folder
         doc.folder = None
         doc.save()
-        doc_folder.delete()
+        if doc_folder is not None:
+            doc_folder.delete()
     docs.delete()
     from documents import index
 
