@@ -61,7 +61,7 @@ export abstract class EditCustomShelfComponent<
   objectForm: FormGroup = this.getForm()
 
   ngOnInit(): void {
-    console.log(this.object)
+    // console.log(this.object)
     this.loadWarehouses();
     if (this.object != null && this.dialogMode !== EditCustomShelfdMode.CREATE) {
       if ((this.object as ObjectWithPermissions).permissions) {
