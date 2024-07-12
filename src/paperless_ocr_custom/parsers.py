@@ -200,7 +200,8 @@ class RasterisedDocumentParser(DocumentParser):
             logging.error('upload file: ',response_upload.status_code) 
 
         # ocr by file_id
-        params = {'file_id': get_file_id}
+        params = {'file_id': get_file_id,
+                  'parse_table':'false'}
         url_ocr_pdf_by_fileid = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_OCR_BY_FILEID"]
         data_ocr = self.call_ocr_api_with_retries("POST",url_ocr_pdf_by_fileid, headers, params, {}, 5, 5, 100)
         # response_ocr = requests.post(url_ocr_pdf_by_fileid, headers=headers, params=params)
