@@ -317,7 +317,7 @@ class ConsumerPlugin(
         """
         with open(self.input_doc.original_file, "rb") as f:
             checksum = hashlib.md5(f.read()).hexdigest()
-        existing_doc = Document.objects.filter(
+        existing_doc = Document.global_objects.filter(
             Q(checksum=checksum) | Q(archive_checksum=checksum),
         )
         if existing_doc.exists():
