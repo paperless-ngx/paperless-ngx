@@ -1126,6 +1126,10 @@ def _get_nltk_language_setting(ocr_lang: str) -> Optional[str]:
 
     NLTK Languages:
       - https://www.nltk.org/api/nltk.stem.snowball.html#nltk.stem.snowball.SnowballStemmer
+      - https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/tokenizers/punkt.zip
+      - https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/stopwords.zip
+
+    The common intersection between all languages in those 3 is handled here
 
     """
     ocr_lang = ocr_lang.split("+")[0]
@@ -1142,7 +1146,6 @@ def _get_nltk_language_setting(ocr_lang: str) -> Optional[str]:
         "rus": "russian",
         "spa": "spanish",
         "swe": "swedish",
-        "tur": "turkish",
     }
 
     return iso_code_to_nltk.get(ocr_lang)
