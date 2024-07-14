@@ -8,11 +8,20 @@ map_uidgid() {
 	local -r usermap_original_gid=$(id -g paperless)
 	local -r usermap_new_uid=${USERMAP_UID:-$usermap_original_uid}
 	local -r usermap_new_gid=${USERMAP_GID:-${usermap_original_gid:-$usermap_new_uid}}
-	if [[ ${usermap_new_uid} != "${usermap_original_uid}" || ${usermap_new_gid} != "${usermap_original_gid}" ]]; then
+  local -r usermap_noperm_change=${USERMAP_NOPERM_CHANGE:-false}
+	if [[  ${usermap_new_uid} != "${usermap_original_uid}" || ${usermap_new_gid} != "${usermap_original_gid}" ]]; then
 		echo "Mapping UID and GID for paperless:paperless to $usermap_new_uid:$usermap_new_gid"
+		# Avoids changing the default permissions for the root folder of paperless
+		if [[ ${usermap_noperm_change} == "true" ]]; then
+			chown root:root /usr/src/paperless
+ 		fi
 		usermod -o -u "${usermap_new_uid}" paperless
 		groupmod -o -g "${usermap_new_gid}" paperless
-	fi
+	  # Avoids changing the default permissions for the root folder of paperless
+		if [[ ${usermap_noperm_change} == "true" ]]; then
+			chown paperless:paperless /usr/src/paperless
+ 		fi
+  fi
 }
 
 map_folders() {
