@@ -841,11 +841,11 @@
         },
         "imap-tools": {
             "hashes": [
-                "sha256:1fc97a06a35e18a6d0e775d40b18198f52dae0fa46ee8b6fc6f82dbc7a701699",
-                "sha256:6f6a354a6bb95ab83a24d3321d1a8b62b299ba76ba5774e9f45f0ad2544f093b"
+                "sha256:2c8208bec28a4b47fa3146f7e94862e58ed00de77131e44325527c0cbe6124b3",
+                "sha256:bee29ab3adb21e57dffb9d7966b1169e6ffc66b5f0e7dd26bfb4bf9a95e5e028"
             ],
             "index": "pypi",
-            "version": "==1.6.0"
+            "version": "==1.7.0"
         },
         "img2pdf": {
             "hashes": [
