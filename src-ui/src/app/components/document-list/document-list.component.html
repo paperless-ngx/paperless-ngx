@@ -168,7 +168,7 @@
                 [currentSortField]="list.sortField"
                 [currentSortReverse]="list.sortReverse"
                 (sort)="onSort($event)"
-              i18n>ASN</th>
+                i18n>ASN</th>
             }
             @if (activeDisplayFields.includes(DisplayField.CORRESPONDENT) && permissionService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
               <th class="cursor-pointer"
@@ -177,7 +177,7 @@
                 [currentSortField]="list.sortField"
                 [currentSortReverse]="list.sortReverse"
                 (sort)="onSort($event)"
-              i18n>Correspondent</th>
+                i18n>Correspondent</th>
             }
             @if (activeDisplayFields.includes(DisplayField.TITLE)) {
               <th class="cursor-pointer"
@@ -187,7 +187,7 @@
                 [currentSortReverse]="list.sortReverse"
                 (sort)="onSort($event)"
                 style="min-width: 150px;"
-              i18n>Title</th>
+                i18n>Title</th>
             }
             @if (activeDisplayFields.includes(DisplayField.TAGS) && !activeDisplayFields.includes(DisplayField.TITLE)) {
               <th i18n>Tags</th>
@@ -199,7 +199,7 @@
                 [currentSortField]="list.sortField"
                 [currentSortReverse]="list.sortReverse"
                 (sort)="onSort($event)"
-              i18n>Owner</th>
+                i18n>Owner</th>
             }
             @if (activeDisplayFields.includes(DisplayField.NOTES) && notesEnabled) {
               <th class="cursor-pointer"
@@ -208,7 +208,7 @@
                 [currentSortField]="list.sortField"
                 [currentSortReverse]="list.sortReverse"
                 (sort)="onSort($event)"
-              i18n>Notes</th>
+                i18n>Notes</th>
             }
             @if (activeDisplayFields.includes(DisplayField.DOCUMENT_TYPE) && permissionService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
               <th class="cursor-pointer"
@@ -217,7 +217,7 @@
                 [currentSortField]="list.sortField"
                 [currentSortReverse]="list.sortReverse"
                 (sort)="onSort($event)"
-              i18n>Document type</th>
+                i18n>Document type</th>
             }
             @if (activeDisplayFields.includes(DisplayField.STORAGE_PATH) && permissionService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
               <th class="cursor-pointer"
@@ -226,7 +226,7 @@
                 [currentSortField]="list.sortField"
                 [currentSortReverse]="list.sortReverse"
                 (sort)="onSort($event)"
-              i18n>Storage path</th>
+                i18n>Storage path</th>
             }
             @if (activeDisplayFields.includes(DisplayField.CREATED)) {
               <th class="cursor-pointer"
@@ -235,7 +235,7 @@
                 [currentSortField]="list.sortField"
                 [currentSortReverse]="list.sortReverse"
                 (sort)="onSort($event)"
-              i18n>Created</th>
+                i18n>Created</th>
             }
             @if (activeDisplayFields.includes(DisplayField.ADDED)) {
               <th class="cursor-pointer"
@@ -244,7 +244,7 @@
                 [currentSortField]="list.sortField"
                 [currentSortReverse]="list.sortReverse"
                 (sort)="onSort($event)"
-              i18n>Added</th>
+                i18n>Added</th>
             }
             @if (activeDisplayFields.includes(DisplayField.SHARED)) {
               <th i18n>
