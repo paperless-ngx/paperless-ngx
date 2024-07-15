@@ -329,7 +329,6 @@ def parse_date_generator(filename, text) -> Iterator[datetime.datetime]:
         date_order: str,
     ) -> Optional[datetime.datetime]:
         date_string = match.group(0)
-        logger.debug('gia tri date_string', match)
 
         try:
             date = __parser(date_string, date_order)
@@ -341,7 +340,7 @@ def parse_date_generator(filename, text) -> Iterator[datetime.datetime]:
 
     def __process_content(content: str, date_order: str) -> Iterator[datetime.datetime]:
         for m in re.finditer(DATE_REGEX, content):
-            logger.debug(f'date is  , m{m}')
+            # logger.debug(f'date is  , m{m}')
             date = __process_match(m, date_order)
             if date is not None:
                 yield date
