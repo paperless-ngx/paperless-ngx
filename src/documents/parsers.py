@@ -39,13 +39,14 @@ from paperless.models import ApplicationConfiguration
 # TODO: isn't there a date parsing library for this?
 
 DATE_REGEX = re.compile(
-    r"(\b|(?!=([_-])))([0-9]{1,2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{4}|[0-9]{2})(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))([0-9]{4}|[0-9]{2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{1,2})(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))([0-9]{1,2}[\. ]+[a-zA-Z]{3,9} [0-9]{4}|[a-zA-Z]{3,9} [0-9]{1,2}, [0-9]{4})(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))([^\W\d_]{3,9} [0-9]{1,2}, ([0-9]{4}))(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))([^\W\d_]{3,9} [0-9]{4})(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))([0-9]{1,2}[^ ]{2}[\. ]+[^ ]{3,9}[ \.\/-][0-9]{4})(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))(\b[0-9]{1,2}[ \.\/-][a-zA-Z]{3}[ \.\/-][0-9]{4})(\b|(?=([_-])))",
+    # r"(\b|(?!=([_-])))([0-9]{1,2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{4}|[0-9]{2})(\b|(?=([_-])))|"
+    # r"(\b|(?!=([_-])))([0-9]{4}|[0-9]{2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{1,2})(\b|(?=([_-])))|"
+    # r"(\b|(?!=([_-])))([0-9]{1,2}[\. ]+[a-zA-Z]{3,9} [0-9]{4}|[a-zA-Z]{3,9} [0-9]{1,2}, [0-9]{4})(\b|(?=([_-])))|"
+    # r"(\b|(?!=([_-])))([^\W\d_]{3,9} [0-9]{1,2}, ([0-9]{4}))(\b|(?=([_-])))|"
+    # r"(\b|(?!=([_-])))([^\W\d_]{3,9} [0-9]{4})(\b|(?=([_-])))|"
+    # r"(\b|(?!=([_-])))([0-9]{1,2}[^ ]{2}[\. ]+[^ ]{3,9}[ \.\/-][0-9]{4})(\b|(?=([_-])))|"
+    # r"(\b|(?!=([_-])))(\b[0-9]{1,2}[ \.\/-][a-zA-Z]{3}[ \.\/-][0-9]{4})(\b|(?=([_-])))",
+    r"(?:ngày\s+(\d{1,2})\s+tháng\s+(\d{1,2})\s+năm\s+(\d{4}))|(\d{1,2})[/\-](\d{1,2})[/\-](\d{4})"
 )
 
 
@@ -150,7 +151,7 @@ def custom_get_parser_class_for_mime_type(mime_type: str) -> Optional[type["Docu
         return None
     k = ApplicationConfiguration.objects.filter().first()
     best_parser = sorted(options, key=lambda _: _["weight"], reverse=True)[0]
-    if len(best_parser)>1:
+    if len(options)>1:
         best_parser = sorted(options, key=lambda _: _["weight"], reverse=True)[1]
         if k.ocr_key!='':
             headers = {
@@ -302,7 +303,7 @@ def parse_date_generator(filename, text) -> Iterator[datetime.datetime]:
         Call dateparser.parse with a particular date ordering
         """
         import dateparser
-
+        # logger.debug('giá trị paser:',ds)
         return dateparser.parse(
             ds,
             settings={
@@ -339,6 +340,7 @@ def parse_date_generator(filename, text) -> Iterator[datetime.datetime]:
 
     def __process_content(content: str, date_order: str) -> Iterator[datetime.datetime]:
         for m in re.finditer(DATE_REGEX, content):
+            # logger.debug(f'date is  , m{m}')
             date = __process_match(m, date_order)
             if date is not None:
                 yield date

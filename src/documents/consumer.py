@@ -515,7 +515,6 @@ class Consumer(LoggingMixin):
         """
         Return the document object if it was successfully created.
         """
-        print(f'{override_filename}in try_consume_file file exsit: {os.path.isfile(path)}')
         self.original_path = Path(path).resolve()
         self.filename = override_filename or self.original_path.name
         self.override_title = override_title
