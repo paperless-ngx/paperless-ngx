@@ -193,8 +193,6 @@ variables:
 | `DOCUMENT_ORIGINAL_FILENAME` | Filename of original document                  |
 | `TASK_ID`                    | Task UUID used to import the document (if any) |
 
-[^1] If there is no owner the variable returns "None" which is likely if there is no other script / flow in place that updates the owner beforehand.
-
 The script can be in any language, A simple shell script example:
 
 ```bash title="post-consumption-example"
