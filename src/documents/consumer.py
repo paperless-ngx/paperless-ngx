@@ -450,7 +450,7 @@ class ConsumerPlugin(
             "document-thumb",
             kwargs={"pk": document.pk},
         )
-        script_env["DOCUMENT_OWNER"] = str(document.owner)
+        script_env["DOCUMENT_OWNER"] = document.owner.get_username() if document.owner else ""
         script_env["DOCUMENT_CORRESPONDENT"] = str(document.correspondent)
         script_env["DOCUMENT_TAGS"] = str(
             ",".join(document.tags.all().values_list("name", flat=True)),
