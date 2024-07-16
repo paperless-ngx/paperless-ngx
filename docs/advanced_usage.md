@@ -187,7 +187,7 @@ variables:
 | `DOCUMENT_THUMBNAIL_PATH`    | Path to the generated thumbnail                |
 | `DOCUMENT_DOWNLOAD_URL`      | URL for document download                      |
 | `DOCUMENT_THUMBNAIL_URL`     | URL for the document thumbnail                 |
-| `DOCUMENT_OWNER`             | Name of the owner of the document[^1]          |
+| `DOCUMENT_OWNER`             | Username of the document owner (or "None")     |
 | `DOCUMENT_CORRESPONDENT`     | Assigned correspondent (if any)                |
 | `DOCUMENT_TAGS`              | Comma separated list of tags applied (if any)  |
 | `DOCUMENT_ORIGINAL_FILENAME` | Filename of original document                  |
