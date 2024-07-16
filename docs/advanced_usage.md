@@ -187,11 +187,13 @@ variables:
 | `DOCUMENT_THUMBNAIL_PATH`    | Path to the generated thumbnail                |
 | `DOCUMENT_DOWNLOAD_URL`      | URL for document download                      |
 | `DOCUMENT_THUMBNAIL_URL`     | URL for the document thumbnail                 |
-| `DOCUMENT_OWNER`             | Name of the owner of the document              |
+| `DOCUMENT_OWNER`             | Name of the owner of the document[^1]          |
 | `DOCUMENT_CORRESPONDENT`     | Assigned correspondent (if any)                |
 | `DOCUMENT_TAGS`              | Comma separated list of tags applied (if any)  |
 | `DOCUMENT_ORIGINAL_FILENAME` | Filename of original document                  |
 | `TASK_ID`                    | Task UUID used to import the document (if any) |
+
+[^1] If there is no owner the variable returns "None" which is likely if there is no other script / flow in place that updates the owner beforehand.
 
 The script can be in any language, A simple shell script example:
 
