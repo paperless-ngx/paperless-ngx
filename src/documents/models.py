@@ -1008,6 +1008,7 @@ class CustomFieldInstance(models.Model):
         blank=True,
         null=True,
         on_delete=models.CASCADE,
+        related_name="custom_fields",
         editable=False,
     )
 
@@ -1020,7 +1021,9 @@ class CustomFieldInstance(models.Model):
         editable=False,
     )
 
-    match = models.JSONField(null=True)
+    match_value = models.JSONField(null=True,blank=True)
+
+    reference = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True )
 
     # Actual data storage
     value_text = models.CharField(max_length=128, null=True)

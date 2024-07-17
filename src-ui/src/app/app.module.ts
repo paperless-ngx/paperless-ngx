@@ -362,6 +362,7 @@ import { DossiersFormComponent } from './components/admin/config/dossier-form-li
 import { DossierFormEditDialogComponent } from './components/common/edit-dialog/dossier-form-edit-dialog/dossier-form-edit-dialog.component'
 import { DossierFormCardSmallComponent } from './components/admin/config/dossier-form-card-small/dossier-form-card-small.component'
 import { DossierCustomFieldFormEditDialogComponent } from './components/common/edit-dialog/dossier-instance-customfield-form-edit-dialog/dossier-instance-customfield-form-edit-dialog.component'
+import { CustomFieldSelectComponent } from './components/common/custom-field-select/custom-field-select.component'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -450,6 +451,7 @@ function initializeApp(settings: SettingsService) {
     BulkEditorComponent,
     TextComponent,
     SelectComponent,
+    CustomFieldSelectComponent,
     CheckComponent,
     UrlComponent,
     PasswordComponent,

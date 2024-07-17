@@ -5,6 +5,7 @@ export interface CustomFieldInstance extends ObjectWithId {
   field: number // CustomField
   created: Date
   value?: any
+  field_name?: string 
   dossier?: number // dossier
   match?: any;
 }

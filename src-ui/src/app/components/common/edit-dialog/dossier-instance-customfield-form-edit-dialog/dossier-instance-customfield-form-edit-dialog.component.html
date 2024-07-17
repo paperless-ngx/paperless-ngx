@@ -8,24 +8,30 @@
     </button>
   </div>
   <div class="modal-body">
-    <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
-    <pngx-input-text i18n-title title="Url" formControlName="url" [error]="error?.name" autocomplete="off"></pngx-input-text>
-    <pngx-input-text i18n-title title="Key" formControlName="key" [error]="error?.name" autocomplete="off"></pngx-input-text>
-    <div class="input-group input-group-sm w-100 mt-2">
-      <label class="input-group-text" ><ng-container i18n>Dossier type</ng-container>:</label>
-      <select class="form-select form-select-sm" formControlName="dossier_type">
-        @for (option of DOSSIER_TYPES_OPTIONS; track option) {
-          <option [ngValue]="option.value" >{{ option.label }}</option>
-        }
-      </select>
-    </div>
-    <br>
-    <!-- <pngx-input-select i18n-title title="Data type" [items]="getDataTypes()" formControlName="data_type"></pngx-input-select> -->
-    <!-- @if (typeFieldDisabled) {
-      <small class="d-block mt-n2" i18n>Data type cannot be changed after a field is created</small>
-    } -->
-    <div *pngxIfOwner="object">
-      <pngx-permissions-form [users]="users" accordion="true" formControlName="permissions_form"></pngx-permissions-form>
+    <div class="row">
+      <div class="col-md-4">
+        <pngx-input-text i18n-title title="Username" formControlName="username" [error]="error?.username"></pngx-input-text>
+        <pngx-input-text i18n-title title="Email" formControlName="email" [error]="error?.email"></pngx-input-text>
+        <pngx-input-password i18n-title title="Password" formControlName="password" [error]="error?.password"></pngx-input-password>
+        <pngx-input-text i18n-title title="First name" formControlName="first_name" [error]="error?.first_name"></pngx-input-text>
+        <pngx-input-text i18n-title title="Last name" formControlName="last_name" [error]="error?.first_name"></pngx-input-text>
+
+        <div class="mb-2 d-flex flex-column">
+          <div class="form-check form-switch form-check-inline">
+            <input type="checkbox" class="form-check-input" id="is_active" formControlName="is_active">
+            <label class="form-check-label" for="is_active" i18n>Active</label>
+          </div>
+          <div class="form-check form-switch form-check-inline">
+            <input type="checkbox" class="form-check-input" id="is_staff" formControlName="is_staff">
+            <label class="form-check-label" for="is_staff"><ng-container i18n>Admin</ng-container> <small class="form-text text-muted ms-1" i18n>Access logs, Django backend</small></label>
+          </div>
+         
+        </div>
+
+      </div>
+      <div class="col">
+       
+      </div>
     </div>
   </div>
   <div class="modal-footer">
@@ -33,48 +39,3 @@
     <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
   </div>
 </form>
-<pngx-page-header
-  title="Custom Fields"
-  i18n-title
-  info="Customize the data fields that can be attached to documents."
-  i18n-info
-  infoLink="usage/#custom-fields"
-  >
-  <button type="button" class="btn btn-sm btn-outline-primary" (click)="editField()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.CustomField }">
-    <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Field</ng-container>
-  </button>
-</pngx-page-header>
-
-<ul class="list-group">
-
-  <li class="list-group-item">
-    <div class="row">
-      <div class="col" i18n>Name</div>
-      <div class="col" i18n>Data Type</div>
-      <div class="col" i18n>Actions</div>
-    </div>
-  </li>
-
-  @for (field of fields; track field) {
-    <li class="list-group-item">
-      <div class="row">
-        <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editField(field)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.CustomField)">{{field.name}}</button></div>
-        <div class="col d-flex align-items-center">{{getDataType(field)}}</div>
-        <div class="col">
-          <div class="btn-group">
-            <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.CustomField }" class="btn btn-sm btn-outline-secondary" type="button" (click)="editField(field)">
-              <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
-            </button>
-            <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.CustomField }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteField(field)">
-              <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
-            </button>
-          </div>
-        </div>
-      </div>
-    </li>
-  }
-  @if (fields.length === 0) {
-    <li class="list-group-item" i18n>No fields defined.</li>
-  }
-</ul>
-

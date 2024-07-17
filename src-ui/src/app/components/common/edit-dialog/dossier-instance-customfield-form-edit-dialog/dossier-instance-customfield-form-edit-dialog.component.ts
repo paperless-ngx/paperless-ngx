@@ -6,26 +6,19 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { EditDialogComponent, EditDialogMode } from '../edit-dialog.component'
 import { Dossier, DossierType } from 'src/app/data/dossier'
 import { DossierService } from 'src/app/services/rest/dossier.service'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 
 @Component({
-  selector: 'pngx-dossier-form-edit-dialog',
+  selector: 'pngx-dossier-custom-form-edit-dialog',
   templateUrl: './dossier-instance-customfield-form-edit-dialog.component.html',
   styleUrls: ['./dossier-instance-customfield-form-edit-dialog.component.scss'],
 })
 export class DossierCustomFieldFormEditDialogComponent
-  extends EditDialogComponent<Dossier>
+extends EditDialogComponent<Dossier>
   implements OnInit {
-  DOSSIER_TYPES_OPTIONS = [
+  // groups: Group[]
+  passwordIsSet: boolean = false
 
-    {
-      label: $localize`Document`,
-      value: DossierType.Document,
-    },
-    {
-      label: $localize`Dossier`,
-      value: DossierType.Dossier,
-    },
-  ]
   constructor(
     service: DossierService,
     activeModal: NgbActiveModal,
@@ -35,10 +28,10 @@ export class DossierCustomFieldFormEditDialogComponent
     super(service, activeModal, userService, settingsService)
   }
 
+
   ngOnInit(): void {
     super.ngOnInit()
-    if (this.typeFieldDisabled) {
-    }
+    this.onToggleSuperUser()
   }
 
   getCreateTitle() {
@@ -46,24 +39,46 @@ export class DossierCustomFieldFormEditDialogComponent
   }
 
   getEditTitle() {
-    return $localize`Edit dossier`
+    return $localize`Edit field dossier`
   }
 
   getForm(): FormGroup {
     return new FormGroup({
-      name: new FormControl(null),
-      key: new FormControl(null),
-      url: new FormControl(null),
-      is_form: new FormControl(true),
-      dossier_type: new FormControl(DossierType.Dossier),
-      permissions_form: new FormControl(null),
-      
+      username: new FormControl(''),
+      email: new FormControl(''),
+      password: new FormControl(null),
+      first_name: new FormControl(''),
+      last_name: new FormControl(''),
+      is_active: new FormControl(true),
+      is_staff: new FormControl(true),
+      is_superuser: new FormControl(false),
+      groups: new FormControl([]),
+      user_permissions: new FormControl([]),
     })
   }
 
-  get typeFieldDisabled(): boolean {
-    return this.dialogMode === EditDialogMode.EDIT
+  onToggleSuperUser() {
+    if (this.objectForm.get('is_superuser').value) {
+      this.objectForm.get('user_permissions').disable()
+    } else {
+      this.objectForm.get('user_permissions').enable()
+    }
   }
 
-  
+  // get inheritedPermissions(): string[] {
+  //   const groupsVal: Array<number> = this.objectForm.get('groups').value
+
+  //   if (!groupsVal) return []
+  //   else
+  //     return groupsVal.flatMap(
+  //       (id) => this.groups.find((g) => g.id == id)?.permissions
+  //     )
+  // }
+
+  save(): void {
+    this.passwordIsSet =
+      this.objectForm.get('password').value?.toString().replaceAll('*', '')
+        .length > 0
+    super.save()
+  }
 }

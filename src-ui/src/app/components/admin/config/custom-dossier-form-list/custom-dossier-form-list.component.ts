@@ -47,6 +47,7 @@ import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog
 import { EditDialogMode } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { PermissionsDialogComponent } from 'src/app/components/common/permissions-dialog/permissions-dialog.component'
 import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
+import { DossierCustomFieldFormEditDialogComponent } from 'src/app/components/common/edit-dialog/dossier-instance-customfield-form-edit-dialog/dossier-instance-customfield-form-edit-dialog.component'
 export interface ManagementListColumn {
   key: string
 
@@ -240,7 +241,8 @@ export abstract class CustomDossierFormListComponent<T extends ObjectWithId>
 
   openEditDialog(object: T) {
     var activeModal = this.modalService.open(this.editDialogComponent, {
-      backdrop: 'static',
+        backdrop: 'static',
+        size: 'xl',
     })
     activeModal.componentInstance.object = object
     activeModal.componentInstance.dialogMode = EditDialogMode.EDIT
@@ -256,6 +258,33 @@ export abstract class CustomDossierFormListComponent<T extends ObjectWithId>
         e
       )
     })
+  }
+  
+  openEditCustomFieldDialog(object: T) {
+    var modal = this.modalService.open(DossierCustomFieldFormEditDialogComponent, {
+      backdrop: 'static',
+      size: 'xl',
+    })
+    modal.componentInstance.dialogMode = object
+      ? EditDialogMode.EDIT
+      : EditDialogMode.CREATE
+    modal.componentInstance.object = object
+    modal.componentInstance.succeeded
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((newDossier: Dossier) => {
+       
+          this.toastService.showInfo(
+            $localize`Saved dossier "${newDossier}".`
+          )
+          modal.close()
+          this.reloadData()
+        }
+      )
+    modal.componentInstance.failed
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((e) => {
+        this.toastService.showError($localize`Error saving dossier.`, e)
+      })
   }
 
   abstract getDeleteMessage(object: T)

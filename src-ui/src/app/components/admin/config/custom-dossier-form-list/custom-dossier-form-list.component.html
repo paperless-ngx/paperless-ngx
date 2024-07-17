@@ -66,7 +66,7 @@
 </div>
 <br>
 <div class="row">
-  <div class="col-12 col-lg-8 col-xl-9 mb-4">
+  <!-- <div class="col-12 col-lg-8 col-xl-9 mb-4"> -->
     <div class="row mb-3">
       <div class="col-md mb-2 mb-xl-0">
         <div class="form-inline d-flex align-items-center">
@@ -160,9 +160,6 @@
                     </div>
                   </div>
                   <div class="btn-group d-none d-sm-block">
-                    <button class="btn btn-sm btn-outline-secondary" (click)="filterDocuments(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
-                      <i-bs width="1em" height="1em" name="filter"></i-bs>&nbsp;<ng-container i18n>custom field</ng-container>
-                    </button>
                     <button class="btn btn-sm btn-outline-secondary" (click)="openEditDialog(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }" [disabled]="!userCanEdit(object)">
                       <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
                     </button>
@@ -204,18 +201,18 @@
       </div>
     }
   
-  </div>
+  <!-- </div> -->
   
 
-    <div class="col-auto col-lg-4 col-xl-3 col-sidebar">
+    <!-- <div class="col-auto col-lg-4 col-xl-3 col-sidebar">
      
-      <!-- <div class="row row-cols-1 g-4 mb-4 sticky-lg-top z-0">
+      <div class="row row-cols-1 g-4 mb-4 sticky-lg-top z-0">
        
         <div class="col">
           <pngx-upload-file-widget></pngx-upload-file-widget>
         </div>
-      </div> -->
-    </div>
+      </div>
+    </div> -->
 
 </div>
 
