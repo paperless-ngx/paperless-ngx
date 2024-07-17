@@ -10,6 +10,22 @@ export enum WorkflowTriggerType {
   Consumption = 1,
   DocumentAdded = 2,
   DocumentUpdated = 3,
+  ApprovalAdded = 4,
+  ApprovalUpdated = 5,
+
+}
+
+export enum WorkflowTriggerStatus {
+  Pending = "PENDING",
+  Success = "SUCCESS",
+  Revoked = "REVOKED",
+  Failure = "FAILURE",
+}
+
+export enum WorkflowTriggerAccessType {
+  Edit = "EDIT",
+  View = "VIEW",
+  Owner = "OWNER",
 }
 
 export interface WorkflowTrigger extends ObjectWithId {
@@ -35,5 +51,11 @@ export interface WorkflowTrigger extends ObjectWithId {
 
   filter_has_document_type?: number // DocumentType.id
 
+  filter_has_groups?: number[] // Group.id[]
 
+  filter_has_status?: WorkflowTriggerStatus
+
+  filter_has_access_type?: WorkflowTriggerAccessType
+
+  filter_has_content_type?: number
 }

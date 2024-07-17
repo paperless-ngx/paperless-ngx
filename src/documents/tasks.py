@@ -1,10 +1,12 @@
 import hashlib
 import logging
+import os
 import shutil
 import uuid
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Optional
+from datetime import datetime, timedelta
 
 import tqdm
 from celery import Task
@@ -29,7 +31,7 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
-from documents.models import Correspondent
+from documents.models import Approval, Correspondent
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
@@ -37,7 +39,7 @@ from documents.models import Warehouse
 from documents.models import Folder
 from documents.models import Tag
 from documents.parsers import DocumentParser
-from documents.parsers import get_parser_class_for_mime_type
+from documents.parsers import custom_get_parser_class_for_mime_type
 from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import ProgressManager
 from documents.plugins.base import StopConsumeTaskError
@@ -50,6 +52,29 @@ if settings.AUDIT_LOG_ENABLED:
 
     from auditlog.models import LogEntry
 logger = logging.getLogger("paperless.tasks")
+
+def revoke_permission():
+    logger.debug('run')
+    # today = date.today()
+    # approvals = Approval.objects.filter(
+    #     status="SUCCESS",
+    #     expiration__date=today
+    # )
+    # approvals.update(status="REVOKED")
+    # for approval in approvals:
+    #     approvals.send(
+    #         sender=Document,
+    #         approval=approval,
+    #     )
+    # logger.info('Check all expired approvals')
+    # thirty_days_ago = datetime.now() - timedelta(days=30)
+
+    # approvals_reject = Approval.objects.filter(
+    #     status__in=["REJECT", "REVOKED"],
+    #     expiration__lte=thirty_days_ago
+        
+    # ).delete()
+
 
 
 @shared_task
@@ -242,7 +267,7 @@ def update_document_archive_file(document_id):
 
     mime_type = document.mime_type
 
-    parser_class: type[DocumentParser] = get_parser_class_for_mime_type(mime_type)
+    parser_class: type[DocumentParser] = custom_get_parser_class_for_mime_type(mime_type)
 
     if not parser_class:
         logger.error(

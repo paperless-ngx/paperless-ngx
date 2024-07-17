@@ -24,7 +24,7 @@ import {
   DocumentService,
 } from 'src/app/services/rest/document.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
-import { WarehouseService } from 'src/app/services/rest/warehouse.service'
+
 import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -58,6 +58,7 @@ import { WarehouseEditDialogComponent } from '../../common/edit-dialog/warehouse
 import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
 import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
+import WarehouseService from 'src/app/services/rest/warehouse.service'
 
 const selectionData: SelectionData = {
   selected_tags: [
@@ -71,6 +72,7 @@ const selectionData: SelectionData = {
     { id: 66, document_count: 3 },
     { id: 55, document_count: 0 },
   ],
+  selected_warehouses: []
 }
 
 describe('BulkEditorComponent', () => {

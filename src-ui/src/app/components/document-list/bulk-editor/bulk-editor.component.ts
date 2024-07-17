@@ -24,7 +24,8 @@ import { ToastService } from 'src/app/services/toast.service'
 import { saveAs } from 'file-saver'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { StoragePath } from 'src/app/data/storage-path'
-import { WarehouseService } from 'src/app/services/rest/warehouse.service'
+
+
 import { Warehouse } from 'src/app/data/warehouse'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
@@ -44,6 +45,7 @@ import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage
 import { WarehouseEditDialogComponent } from '../../common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
 import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
+import { WarehouseService } from 'src/app/services/rest/warehouse.service'
 
 @Component({
   selector: 'pngx-bulk-editor',
@@ -52,8 +54,7 @@ import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-c
 })
 export class BulkEditorComponent
   extends ComponentWithPermissions
-  implements OnInit, OnDestroy
-{
+  implements OnInit, OnDestroy {
   tags: Tag[]
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
@@ -343,9 +344,8 @@ export class BulkEditorComponent
         .join(
           $localize`:this is used to separate enumerations and should probably be a comma and a whitespace in most languages:, `
         )
-      return $localize`:this is for messages like 'modify "tag1", "tag2" and "tag3"':${list} and "${
-        items[items.length - 1].name
-      }"`
+      return $localize`:this is for messages like 'modify "tag1", "tag2" and "tag3"':${list} and "${items[items.length - 1].name
+        }"`
     }
   }
 
@@ -695,7 +695,7 @@ export class BulkEditorComponent
     this.awaitingDownload = true
     let downloadFileType: string =
       this.downloadForm.get('downloadFileTypeArchive').value &&
-      this.downloadForm.get('downloadFileTypeOriginals').value
+        this.downloadForm.get('downloadFileTypeOriginals').value
         ? 'both'
         : this.downloadForm.get('downloadFileTypeArchive').value
           ? 'archive'
@@ -709,6 +709,18 @@ export class BulkEditorComponent
       .pipe(first())
       .subscribe((result: any) => {
         saveAs(result, 'documents.zip')
+        this.awaitingDownload = false
+      })
+  }
+  exportToExcelSelected() {
+    this.awaitingDownload = true
+    this.documentService
+      .bulkExportExcels(
+        Array.from(this.list.selected)
+      )
+      .pipe(first())
+      .subscribe((result: any) => {
+        saveAs(result, 'download.xlsx')
         this.awaitingDownload = false
       })
   }

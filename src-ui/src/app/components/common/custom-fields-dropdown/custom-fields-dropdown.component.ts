@@ -9,14 +9,17 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Subject, first, takeUntil } from 'rxjs'
 import { CustomField } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+
 import {
   PermissionAction,
   PermissionType,
   PermissionsService,
 } from 'src/app/services/permissions.service'
+import { CustomShelfEditDialogComponent } from 'src/app/components/common/edit-dialog/custom-shelf-edit-dialog/custom-shelf-edit-dialog.component'
+import { CustomFields } from 'src/app/data/customfields'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 
 @Component({
   selector: 'pngx-custom-fields-dropdown',

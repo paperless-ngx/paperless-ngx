@@ -9,12 +9,12 @@ from django.core.management.base import BaseCommand
 from documents.management.commands.mixins import MultiProcessMixin
 from documents.management.commands.mixins import ProgressBarMixin
 from documents.models import Document
-from documents.parsers import get_parser_class_for_mime_type
+from documents.parsers import custom_get_parser_class_for_mime_type
 
 
 def _process_document(doc_id):
     document: Document = Document.objects.get(id=doc_id)
-    parser_class = get_parser_class_for_mime_type(document.mime_type)
+    parser_class = custom_get_parser_class_for_mime_type(document.mime_type)
 
     if parser_class:
         parser = parser_class(logging_group=None)

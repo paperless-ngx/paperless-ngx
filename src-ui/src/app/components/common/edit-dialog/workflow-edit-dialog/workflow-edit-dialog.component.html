@@ -119,33 +119,42 @@
   <div [formGroup]="formGroup">
     <input type="hidden" formControlName="id" />
     <pngx-input-select i18n-title title="Trigger type" [horizontal]="true" [items]="triggerTypeOptions" formControlName="type"></pngx-input-select>
-    <p class="small" i18n>Trigger for documents that match <em>all</em> filters specified below.</p>
-    <div class="row">
-      <div class="col">
-        <pngx-input-text i18n-title title="Filter filename" formControlName="filter_filename" i18n-hint hint="Apply to documents that match this filename. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive." [error]="error?.filter_filename"></pngx-input-text>
-        @if (formGroup.get('type').value === WorkflowTriggerType.Consumption) {
-          <pngx-input-select i18n-title title="Filter sources" [items]="sourceOptions" [multiple]="true" formControlName="sources" [error]="error?.sources"></pngx-input-select>
-          <pngx-input-text i18n-title title="Filter path" formControlName="filter_path" i18n-hint hint="Apply to documents that match this path. Wildcards specified as * are allowed. Case-normalized.</a>" [error]="error?.filter_path"></pngx-input-text>
-          <pngx-input-select i18n-title title="Filter mail rule" [items]="mailRules" [allowNull]="true" formControlName="filter_mailrule" i18n-hint hint="Apply to documents consumed via this mail rule." [error]="error?.filter_mailrule"></pngx-input-select>
-        }
+    @if (formGroup.get('type').value === WorkflowTriggerType.ApprovalAdded || formGroup.get('type').value === WorkflowTriggerType.ApprovalUpdated){
+      <pngx-input-select i18n-title title="Has status" [items]="triggerStatusOptions" [multiple]="false" formControlName="filter_has_status"></pngx-input-select>
+      <pngx-input-select i18n-title title="Has content type" bindLabel="model" bindValue="id" [items]="contentTypes" [multiple]="false" formControlName="filter_has_content_type"></pngx-input-select>
+      <pngx-input-select i18n-title title="Has access type" [items]="triggerAccesTypesOptions" [multiple]="false" formControlName="filter_has_access_type"></pngx-input-select>
+    }
+    @else if(formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated || formGroup.get('type').value === WorkflowTriggerType.Consumption){
+      <p class="small" i18n>Trigger for documents that match <em>all</em> filters specified below.</p>
+      <div class="row">
+        <div class="col">
+          <pngx-input-text i18n-title title="Filter filename" formControlName="filter_filename" i18n-hint hint="Apply to documents that match this filename. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive." [error]="error?.filter_filename"></pngx-input-text>
+          @if (formGroup.get('type').value === WorkflowTriggerType.Consumption) {
+            <pngx-input-select i18n-title title="Filter sources" [items]="sourceOptions" [multiple]="true" formControlName="sources" [error]="error?.sources"></pngx-input-select>
+            <pngx-input-text i18n-title title="Filter path" formControlName="filter_path" i18n-hint hint="Apply to documents that match this path. Wildcards specified as * are allowed. Case-normalized.</a>" [error]="error?.filter_path"></pngx-input-text>
+            <pngx-input-select i18n-title title="Filter mail rule" [items]="mailRules" [allowNull]="true" formControlName="filter_mailrule" i18n-hint hint="Apply to documents consumed via this mail rule." [error]="error?.filter_mailrule"></pngx-input-select>
+          }
+          @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated) {
+            <pngx-input-select i18n-title title="Content matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></pngx-input-select>
+            @if (patternRequired) {
+              <pngx-input-text i18n-title title="Content matching pattern" formControlName="match" [error]="error?.match"></pngx-input-text>
+            }
+            @if (patternRequired) {
+              <pngx-input-check i18n-title title="Case insensitive" formControlName="is_insensitive"></pngx-input-check>
+            }
+          }
+        </div>
         @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated) {
-          <pngx-input-select i18n-title title="Content matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></pngx-input-select>
-          @if (patternRequired) {
-            <pngx-input-text i18n-title title="Content matching pattern" formControlName="match" [error]="error?.match"></pngx-input-text>
-          }
-          @if (patternRequired) {
-            <pngx-input-check i18n-title title="Case insensitive" formControlName="is_insensitive"></pngx-input-check>
-          }
+          <div class="col-md-6">
+            <pngx-input-tags [allowCreate]="false" i18n-title title="Has tags" formControlName="filter_has_tags"></pngx-input-tags>
+            <pngx-input-select i18n-title title="Has groups" [items]="groups" multiple="true" formControlName="filter_has_groups"></pngx-input-select>
+            <!-- <pngx-permissions-group type="change" i18n-title title="Has groups" formControlName="filter_has_groups"></pngx-permissions-group> -->
+            <pngx-input-select i18n-title title="Has correspondent" [items]="correspondents" [allowNull]="true" formControlName="filter_has_correspondent"></pngx-input-select>
+            <pngx-input-select i18n-title title="Has document type" [items]="documentTypes" [allowNull]="true" formControlName="filter_has_document_type"></pngx-input-select>
+          </div>
         }
       </div>
-      @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated) {
-        <div class="col-md-6">
-          <pngx-input-tags [allowCreate]="false" i18n-title title="Has tags" formControlName="filter_has_tags"></pngx-input-tags>
-          <pngx-input-select i18n-title title="Has correspondent" [items]="correspondents" [allowNull]="true" formControlName="filter_has_correspondent"></pngx-input-select>
-          <pngx-input-select i18n-title title="Has document type" [items]="documentTypes" [allowNull]="true" formControlName="filter_has_document_type"></pngx-input-select>
-        </div>
-      }
-    </div>
+    }
   </div>
 </ng-template>
 
@@ -207,6 +216,13 @@
                 <small class="form-text text-muted text-end d-block" i18n>Edit permissions also grant viewing permissions</small>
               </div>
             </div>
+          </div>
+        </div>
+      }
+      @case ( WorkflowActionType.Assignment_with_approval) {
+        <div class="row">
+          <div class="col">
+            <pngx-input-select i18n-title title="Assign to content type" bindLabel="model" bindValue="id" [multiple]="false" [items]="contentTypes" [allowNull]="true" formControlName="assign_content_type"></pngx-input-select>
           </div>
         </div>
       }
@@ -293,6 +309,13 @@
                 <small class="form-text text-muted text-end d-block" i18n>Edit permissions also grant viewing permissions</small>
               </div>
             </div>
+          </div>
+        </div>
+      }
+      @case ( WorkflowActionType.Removal_with_approval) {
+        <div class="row">
+          <div class="col">
+            <pngx-input-select i18n-title title="Assign to content type" bindLabel="model" bindValue="id" [multiple]="false" [items]="contentTypes" [allowNull]="true" formControlName="assign_content_type"></pngx-input-select>
           </div>
         </div>
       }

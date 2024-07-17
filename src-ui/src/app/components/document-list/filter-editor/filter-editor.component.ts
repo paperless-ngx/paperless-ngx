@@ -16,7 +16,6 @@ import { Subject, Subscription } from 'rxjs'
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { TagService } from 'src/app/services/rest/tag.service'
-import { WarehouseService } from 'src/app/services/rest/warehouse.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { FilterRule } from 'src/app/data/filter-rule'
 import { filterRulesDiffer } from 'src/app/utils/filter-rules'
@@ -81,6 +80,7 @@ import {
   PermissionsService,
 } from 'src/app/services/permissions.service'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { WarehouseService } from 'src/app/services/rest/warehouse.service'
 
 const TEXT_FILTER_TARGET_TITLE = 'title'
 const TEXT_FILTER_TARGET_TITLE_CONTENT = 'title-content'
@@ -168,8 +168,7 @@ const DEFAULT_TEXT_FILTER_MODIFIER_OPTIONS = [
 })
 export class FilterEditorComponent
   extends ComponentWithPermissions
-  implements OnInit, OnDestroy
-{
+  implements OnInit, OnDestroy {
   generateFilterName() {
     if (this.filterRules.length == 1) {
       let rule = this.filterRules[0]
@@ -193,7 +192,7 @@ export class FilterEditorComponent
           } else {
             return $localize`Without document type`
           }
-        
+
         case FILTER_WAREHOUSE:
         case FILTER_HAS_WAREHOUSE_ANY:
           if (rule.value) {
@@ -307,7 +306,7 @@ export class FilterEditorComponent
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
   storagePathSelectionModel = new FilterableDropdownSelectionModel()
   warehouseSelectionModel = new FilterableDropdownSelectionModel()
-  
+
 
   dateCreatedBefore: string
   dateCreatedAfter: string
@@ -812,10 +811,9 @@ export class FilterEditorComponent
       let existingRuleArgs = existingRule?.value.split(',')
       if (this.dateCreatedRelativeDate !== null) {
         queryArgs.push(
-          `created:[${
-            RELATIVE_DATE_QUERYSTRINGS.find(
-              (qS) => qS.relativeDate == this.dateCreatedRelativeDate
-            ).dateQuery
+          `created:[${RELATIVE_DATE_QUERYSTRINGS.find(
+            (qS) => qS.relativeDate == this.dateCreatedRelativeDate
+          ).dateQuery
           }]`
         )
         if (existingRule) {
@@ -826,10 +824,9 @@ export class FilterEditorComponent
       }
       if (this.dateAddedRelativeDate !== null) {
         queryArgs.push(
-          `added:[${
-            RELATIVE_DATE_QUERYSTRINGS.find(
-              (qS) => qS.relativeDate == this.dateAddedRelativeDate
-            ).dateQuery
+          `added:[${RELATIVE_DATE_QUERYSTRINGS.find(
+            (qS) => qS.relativeDate == this.dateAddedRelativeDate
+          ).dateQuery
           }]`
         )
         if (existingRule) {

@@ -12,7 +12,7 @@ from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
 from rest_framework_guardian.filters import ObjectPermissionsFilter
 
-from documents.models import Correspondent
+from documents.models import Approval, Correspondent
 from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
@@ -85,6 +85,66 @@ class ObjectFilter(Filter):
         if self.in_list:
             qs = qs.filter(**{f"{self.field_name}__id__in": object_ids}).distinct()
             print('ksdlfjs',qs)
+        else:
+            for obj_id in object_ids:
+                if self.exclude:
+                    qs = qs.exclude(**{f"{self.field_name}__id": obj_id})
+                else:
+                    qs = qs.filter(**{f"{self.field_name}__id": obj_id})
+
+        return qs
+
+class WarehouseFilter(Filter):
+    def __init__(self, exclude=False, in_list=False, field_name=""):
+        super().__init__()
+        self.exclude = exclude
+        self.in_list = in_list
+        self.field_name = field_name
+
+    def filter(self, qs, value):
+        if not value:
+            return qs
+
+        try:
+            object_ids = [int(x) for x in value.split(",")]
+        except ValueError:
+            return qs
+
+        if self.in_list:
+            warehouse_paths = Warehouse.objects.filter(id__in=object_ids).values_list("path")
+            list_warehouses = Warehouse.objects.filter(path__startswith = warehouse_paths).values_list("id")
+            new_list = [x[0] for x in list_warehouses]
+            qs = qs.filter(**{f"{self.field_name}__id__in": new_list}).distinct()
+        else:
+            for obj_id in object_ids:
+                if self.exclude:
+                    qs = qs.exclude(**{f"{self.field_name}__id": obj_id})
+                else:
+                    qs = qs.filter(**{f"{self.field_name}__id": obj_id})
+
+        return qs
+
+class FolderFilter(Filter):
+    def __init__(self, exclude=False, in_list=False, field_name=""):
+        super().__init__()
+        self.exclude = exclude
+        self.in_list = in_list
+        self.field_name = field_name
+
+    def filter(self, qs, value):
+        if not value:
+            return qs
+
+        try:
+            object_ids = [int(x) for x in value.split(",")]
+        except ValueError:
+            return qs
+
+        if self.in_list:
+            folder_paths = Folder.objects.filter(id__in=object_ids).values_list("path")
+            list_folders = Folder.objects.filter(path__startswith = folder_paths).values_list("id")
+            new_list = [x[0] for x in list_folders]
+            qs = qs.filter(**{f"{self.field_name}__id__in": new_list}).distinct()
         else:
             for obj_id in object_ids:
                 if self.exclude:
@@ -255,14 +315,13 @@ class DocumentFilterSet(FilterSet):
 
     storage_path__id__none = ObjectFilter(field_name="storage_path", exclude=True)
     
-    warehouse__id__none = WarehouseFilter(field_name="warehouse", exclude=True )
+    warehouse__id__none = WarehouseFilter(field_name="warehouse", exclude=True)
     
     warehouse__id__in = WarehouseFilter(field_name="warehouse", in_list=True)
     
     folder__id__none = FolderFilter(field_name="folder", exclude=True)
     
     folder__id__in = FolderFilter(field_name="folder", in_list=True)
-    
 
     is_in_inbox = InboxFilter()
 
@@ -273,8 +332,8 @@ class DocumentFilterSet(FilterSet):
     custom_fields__icontains = CustomFieldsFilter()
 
     shared_by__id = SharedByUser()
+ 
 
-    
     class Meta:
         model = Document
         fields = {
@@ -349,15 +408,34 @@ class WarehouseFilterSet(FilterSet):
             "name": CHAR_KWARGS,
             "type": CHAR_KWARGS,
             "parent_warehouse": ID_KWARGS,
-            "path": CHAR_KWARGS,
         }
+
+# class ApprovalFilterSet(FilterSet):
+#     class Meta:
+#         model = Approval
+#         fields = {
+#             "id": ID_KWARGS,
+#             "ctype": CHAR_KWARGS,
+#             "path": CHAR_KWARGS,
+#         }
         
 class FolderFilterSet(FilterSet):
+    parent_folder__id__none = ObjectFilter(field_name="parent_folder", exclude=True)
     class Meta:
         model = Folder
         fields = {
             "id": ID_KWARGS,
             "name": CHAR_KWARGS,
-            "parent_folder": ID_KWARGS,
+            "parent_folder__id": ID_KWARGS,
             "path": CHAR_KWARGS,
+            "parent_folder": ["isnull"],
         }
+    
+
+# class ApprovalFilterSet(FilterSet):
+#     class Meta:
+#         model = Approval
+#         fields = {
+#             "id": ID_KWARGS,
+#             "ctype": CHAR_KWARGS,
+#         }

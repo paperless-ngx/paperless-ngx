@@ -14,7 +14,7 @@ from django.views.static import serve
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
-from documents.views import AcknowledgeTasksView
+from documents.views import AcknowledgeTasksView, ApprovalUpdateMutipleView, ApprovalViewSet, BulkExportExcelFromFolderView, BulkExportExcelView
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
@@ -43,7 +43,7 @@ from documents.views import WorkflowViewSet
 from documents.views import WarehouseViewSet
 from documents.views import FolderViewSet
 from paperless.consumers import StatusConsumer
-from paperless.views import ApplicationConfigurationViewSet
+from paperless.views import ApplicationConfigurationViewSet, ContentTypeViewSet
 from paperless.views import DisconnectSocialAccountView
 from paperless.views import FaviconView
 from paperless.views import GenerateAuthTokenView
@@ -76,8 +76,12 @@ api_router.register(r"workflows", WorkflowViewSet)
 api_router.register(r"custom_fields", CustomFieldViewSet)
 api_router.register(r"config", ApplicationConfigurationViewSet)
 api_router.register(r"warehouses", WarehouseViewSet)
+api_router.register(r"approvals", ApprovalViewSet)
+api_router.register(r"content_types", ContentTypeViewSet, basename="content_types")
 api_router.register(r"folders", FolderViewSet)
 
+# api_router.register(r"approvals", ApprovalViewSet)
+api_router.register(r"content_types", ContentTypeViewSet, basename="content_types")
 
 urlpatterns = [
     
@@ -119,6 +123,21 @@ urlpatterns = [
                     name="bulk_download",
                 ),
                 re_path(
+                    "^documents/bulk_export_excel/",
+                    BulkExportExcelView.as_view(),
+                    name="bulk_export_excel",
+                ),
+                re_path(
+                    "^documents/bulk_export_excel/",
+                    BulkExportExcelView.as_view(),
+                    name="bulk_export_excel",
+                ),
+                re_path(
+                    "^folders/bulk_export_excel_folder/",
+                    BulkExportExcelFromFolderView.as_view(),
+                    name="bulk_export_excel_folder",
+                ),
+                re_path(
                     "^remote_version/",
                     RemoteVersionView.as_view(),
                     name="remoteversion",
@@ -128,6 +147,11 @@ urlpatterns = [
                     "^acknowledge_tasks/",
                     AcknowledgeTasksView.as_view(),
                     name="acknowledge_tasks",
+                ),
+                re_path(
+                    "^update_approvals/",
+                    ApprovalUpdateMutipleView.as_view(),
+                    name="update_approvals",
                 ),
                 re_path(
                     "^mail_accounts/test/",
@@ -174,6 +198,12 @@ urlpatterns = [
                     r"^doc/(?P<pk>\d+)$",
                     RedirectView.as_view(
                         url=settings.BASE_URL + "api/documents/%(pk)s/download/",
+                    ),
+                ),
+                re_path(
+                    r"^doc/(?P<pk>\d+)$",
+                    RedirectView.as_view(
+                        url=settings.BASE_URL + "api/documents/%(pk)s/export_excel/",
                     ),
                 ),
                 re_path(

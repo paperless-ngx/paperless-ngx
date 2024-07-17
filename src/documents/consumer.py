@@ -25,6 +25,7 @@ from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.loggers import LoggingMixin
 from documents.matching import document_matches_workflow
+from documents.matching import approval_matches_workflow
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -514,7 +515,6 @@ class Consumer(LoggingMixin):
         """
         Return the document object if it was successfully created.
         """
-
         self.original_path = Path(path).resolve()
         self.filename = override_filename or self.original_path.name
         self.override_title = override_title
@@ -533,7 +533,8 @@ class Consumer(LoggingMixin):
         self.override_change_users = override_change_users
         self.override_change_groups = override_change_groups
         self.override_custom_field_ids = override_custom_field_ids
-
+        
+    
         self._send_progress(
             0,
             100,
@@ -608,7 +609,7 @@ class Consumer(LoggingMixin):
         date = None
         thumbnail = None
         archive_path = None
-
+        data_ocr_fields = None
         try:
             self._send_progress(
                 20,
@@ -617,7 +618,7 @@ class Consumer(LoggingMixin):
                 ConsumerStatusShortMessage.PARSING_DOCUMENT,
             )
             self.log.debug(f"Parsing {self.filename}...")
-            document_parser.parse(self.working_copy, mime_type, self.filename)
+            data_ocr_fields = document_parser.parse(self.working_copy, mime_type, self.filename)
 
             self.log.debug(f"Generating thumbnail for {self.filename}...")
             self._send_progress(
@@ -684,14 +685,43 @@ class Consumer(LoggingMixin):
 
                 # If we get here, it was successful. Proceed with post-consume
                 # hooks. If they fail, nothing will get changed.
-
                 document_consumption_finished.send(
                     sender=self.__class__,
                     document=document,
                     logging_group=self.logging_group,
                     classifier=classifier,
                 )
-
+               
+                # update custom field by document_id
+                fields = CustomFieldInstance.objects.filter(
+                                    document=document,
+                                )
+                dict_data = {}
+                if data_ocr_fields is not None:
+                    if isinstance(data_ocr_fields,list):
+                        for r in data_ocr_fields[0].get("fields"):
+                            dict_data[r.get("name")] = r.get("values")[0].get("value") if r.get("values") else None
+                        map_fields = {
+                            "Tiêu đề": dict_data.get("title"),
+                            "Số văn bản": dict_data.get("Số hiệu"),
+                            "Kính gửi": dict_data.get("Kính gửi"),
+                            # "Ngày phát hành": dict_data.get("Thời gian tạo"),
+                            "Người ký văn bản": dict_data.get("Chữ ký"),
+                            "Ngày phát hành": dict_data.get("datetime")
+                        }
+                        for f in fields:
+                            f.value_text = map_fields.get(f.field.name,None)
+                        CustomFieldInstance.objects.bulk_update(fields, ['value_text'])
+                 # create file from document
+                # self.log.info('gia tri documentt', document.folder)
+                
+                new_file = Folder.objects.create(name=document.title, parent_folder = document.folder,type = Folder.FILE, owner = document.owner, created = document.created, updated = document.modified, checksum = document.checksum)
+                if document.folder :
+                    new_file.path = f"{document.folder.path}/{new_file.id}"
+                else:
+                    new_file.path = f"{new_file.id}"
+                new_file.save()
+                document.folder=new_file
                 # After everything is in the database, copy the files into
                 # place. If this fails, we'll also rollback the transaction.
                 with FileLock(settings.MEDIA_LOCK):

@@ -1,4 +1,5 @@
 import io
+import json
 import logging
 import math
 import os
@@ -151,13 +152,13 @@ class RasterisedDocumentParser(DocumentParser):
             return None
         
     # call api 
-    def call_ocr_api_with_retries(self,url, headers, params, max_retries=5, delay=5, timeout=100):
+    def call_ocr_api_with_retries(self, method, url, headers, params, payload, max_retries=5, delay=5, timeout=100):
         retries = 0
         data_ocr = None
         
         while retries < max_retries:
             try:
-                response_ocr = requests.post(url, headers=headers, params=params, timeout=timeout)
+                response_ocr = requests.request(method, url, headers=headers, params=params, data=payload, timeout=timeout)
                 if response_ocr.status_code == 200:
                     data_ocr = response_ocr.json()
                     return data_ocr
@@ -179,7 +180,13 @@ class RasterisedDocumentParser(DocumentParser):
     
     # get ocr file img/pdf
     def ocr_file(self,path_file):
-
+        page_count = 1
+        try:
+            with open(path_file, 'rb') as file:
+                pdf_reader = PdfReader(file)
+                page_count = len(pdf_reader.pages)
+        except (OSError, IOError, ValueError):
+            pass
         k = ApplicationConfiguration.objects.filter().first()
         access_token = k.ocr_key
         # upload file
@@ -199,9 +206,10 @@ class RasterisedDocumentParser(DocumentParser):
             logging.error('upload file: ',response_upload.status_code) 
 
         # ocr by file_id
-        params = {'file_id': get_file_id}
+        params = {'file_id': get_file_id,
+                  'parse_table':'false'}
         url_ocr_pdf_by_fileid = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_OCR_BY_FILEID"]
-        data_ocr = self.call_ocr_api_with_retries(url_ocr_pdf_by_fileid, headers, params, 5, 5, 100)
+        data_ocr = self.call_ocr_api_with_retries("POST",url_ocr_pdf_by_fileid, headers, params, {}, 5, page_count , 100)
         # response_ocr = requests.post(url_ocr_pdf_by_fileid, headers=headers, params=params)
         # data_ocr = None
         # # logging.error('ocr: ', response_ocr.status_code)
@@ -209,13 +217,27 @@ class RasterisedDocumentParser(DocumentParser):
         #     data_ocr = response_ocr.json()
         # else:
         #     logging.error('ocr: ', response_ocr.text)
+        # 
+        url_ocr_pdf_custom_field_by_fileid = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_OCR_CUSTOM_FIELD_BY_FILEID"]
 
-        return data_ocr
+        payload = json.dumps({
+        "request_id": f"{get_file_id}",
+        "list_form_code": [
+            "so_xay_dung_hai_phong"
+        ]
+        })
+        headers = {
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzIxMzYzNjUxLCJpYXQiOjE3MTg3NzE2NTEsImp0aSI6ImI3OGZmMDNjYmRhZTQ0YzdhNWUyNTIxYmU2MzEzMjk0IiwidXNlcl9pZCI6MSwicm9sZSI6IkFkbWluIGhcdTFlYzcgdGhcdTFlZDFuZyJ9.oOGdwaK7p-bOoBobhxHua3JRLcJIZmDLAka5bbM1WIA',
+        'Content-Type': 'application/json'
+        }
+        
+        data_ocr_fields = self.call_ocr_api_with_retries("POST",url_ocr_pdf_custom_field_by_fileid, headers, params, payload, 5, page_count , 100)        
+        return (data_ocr,data_ocr_fields)
     
 
-    def render_pdf_ocr(self, sidecar, mime_type, input_path, output_path):
+    def render_pdf_ocr(self, sidecar, mime_type, input_path, output_path, data_ocr):
         font_name = 'Arial'
-        data = self.ocr_file(input_path)
+        data = data_ocr
         if not data:
             return
         font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts', 'arial-font/arial.ttf')            
@@ -281,23 +303,25 @@ class RasterisedDocumentParser(DocumentParser):
                 rolate_width = width_api_img /page_width
                 for block in data["pages"][page_num]["blocks"]:
                     for line in block.get("lines", []):
-                        y1 = (line.get("bbox")[0][1] / float(rolate_height))
-                        y2 = (line.get("bbox")[1][1] / float(rolate_height))
-                        font_size = math.floor((y2 - y1)  * 72 / 96)-1
-                        y_center_coordinates = y2 - (y2 - y1)/2
+                        y1_line = (line.get("bbox")[0][1] / float(rolate_height))
+                        y2_line = (line.get("bbox")[1][1] / float(rolate_height))
+                        
+                        y_center_coordinates = y2_line - (y2_line - y1_line)/2
                         for word in line.get("words", []):   
                             x1 = word["bbox"][0][0] / float(rolate_width)
-                            # y1 = word["bbox"][0][1] / float(rolate_height)
+                            y1 = word["bbox"][0][1] / float(rolate_height)
                             x2 = word["bbox"][1][0] / float(rolate_width)
-                            # y2 = word["bbox"][1][1] / float(rolate_height)
+                            y2 = word["bbox"][1][1] / float(rolate_height)
+                            font_size = math.floor((y2 - y1)  * 72 / 96 ) 
                             value = word["value"]
                             # font_size = float(y2-y1) * 72 / 96 
                             x_center_coordinates = x2 - (x2-x1)/2
                             # y_center_coordinates =y2 - (y2-y1)/2
+                            # value=' '+value+' '
                             w = can.stringWidth(value, font_name, font_size)
                             can.setFont('Arial', font_size)
-                            can.drawString(x_center_coordinates - w/2,
-                                           int(page_height) - y_center_coordinates - (font_size/2),
+                            can.drawString(int(x_center_coordinates - w/2) ,
+                                           int(float(page_height) - y_center_coordinates - (font_size/2)  ) + 2 ,
                                            value)            
                 can.drawImage(ImageReader(io.BytesIO(jpg_image)),
                               0, 0, 
@@ -305,13 +329,15 @@ class RasterisedDocumentParser(DocumentParser):
                               height=float(page_height))
                 can.showPage()
             can.save()
-        return
+        
      
 
     
             
     def ocr_img_or_pdf(self, document_path, mime_type, sidecar, output_file, **kwargs):
-        self.render_pdf_ocr(sidecar, mime_type, document_path, output_file)
+        data_ocr,data_ocr_fields = self.ocr_file(document_path)
+        self.render_pdf_ocr(sidecar, mime_type, document_path, output_file,data_ocr)
+        return data_ocr,data_ocr_fields
      
 
     def extract_text(
@@ -359,13 +385,8 @@ class RasterisedDocumentParser(DocumentParser):
                     ],
                     logger=self.log,
                 )
-            text = self.read_file_handle_unicode_errors(Path(tmp.name))
-            
-            # data_ocr = self.ocr_file(pdf_file).get('content','')
-            # if not data_ocr:
-            #     data_ocr = ''        
+                text = self.read_file_handle_unicode_errors(Path(tmp.name))
 
-            # logging.info()    
             return post_process_text(text)
 
         except Exception:
@@ -544,11 +565,11 @@ class RasterisedDocumentParser(DocumentParser):
             archive_path,
             sidecar_file,
         )
-
+        data_ocr,data_ocr_fields = None,None
         try:
             self.log.debug(f"Calling OCRmyPDF with args: {args}")
             # ocrmypdf.ocr(**args)
-            self.ocr_img_or_pdf(document_path, mime_type,**args)
+            data_ocr,data_ocr_fields = self.ocr_img_or_pdf(document_path, mime_type,**args)
             if self.settings.skip_archive_file != ArchiveFileChoices.ALWAYS:
                 self.archive_path = archive_path
 
@@ -599,7 +620,7 @@ class RasterisedDocumentParser(DocumentParser):
             try:
                 self.log.debug(f"Fallback: Calling OCRmyPDF with args: {args}")
                 # ocrmypdf.ocr(**args)
-                self.ocr_img_or_pdf(document_path, mime_type,**args)
+                data_ocr,data_ocr_fields = self.ocr_img_or_pdf(document_path, mime_type,**args)
                 # Don't return the archived file here, since this file
                 # is bigger and blurry due to --force-ocr.
 
@@ -627,6 +648,7 @@ class RasterisedDocumentParser(DocumentParser):
                     f"be empty.",
                 )
                 self.text = ""
+        return data_ocr_fields
 
 
 def post_process_text(text):

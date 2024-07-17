@@ -16,7 +16,7 @@ export class PermissionsGuard {
     private router: Router,
     private toastService: ToastService,
     private tourService: TourService
-  ) {}
+  ) { }
 
   canActivate(
     route: ActivatedRouteSnapshot,

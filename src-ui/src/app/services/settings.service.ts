@@ -45,7 +45,7 @@ const LANGUAGE_OPTIONS = [
     code: 'vi-vn',
     name: $localize`Vietnamese`,
     englishName: 'Vietnamese',
-    dateInputFormat: 'mm/dd/yyyy',
+    dateInputFormat: 'dd/mm/yyyy',
   },
   {
     code: 'af-za',

@@ -19,24 +19,30 @@ export class UploadDocumentsService {
     private consumerStatusService: ConsumerStatusService
   ) {}
 
-  onNgxFileDrop(files: NgxFileDropEntry[]) {
+  onNgxFileDrop(files: NgxFileDropEntry[], payload) {
     for (const droppedFile of files) {
       if (droppedFile.fileEntry.isFile) {
         const fileEntry = droppedFile.fileEntry as FileSystemFileEntry
-        fileEntry.file((file: File) => this.uploadFile(file))
+        fileEntry.file((file: File) => this.uploadFile(file, payload))
       }
     }
   }
 
-  uploadFiles(files: FileList) {
+  uploadFiles(files: FileList, payload) {
     for (let index = 0; index < files.length; index++) {
-      this.uploadFile(files.item(index))
+      this.uploadFile(files.item(index),payload)
     }
   }
 
-  private uploadFile(file: File) {
+  private uploadFile(file: File, payload) {
     let formData = new FormData()
     formData.append('document', file, file.name)
+    if (payload.folder  ){
+      formData.append('folder',payload.folder)
+      // console.log(payload)
+
+    }
+      
     let status = this.consumerStatusService.newFileUpload(file.name)
 
     status.message = $localize`Connecting...`

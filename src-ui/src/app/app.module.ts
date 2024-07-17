@@ -12,7 +12,6 @@ import { DocumentListComponent } from './components/document-list/document-list.
 import { DocumentDetailComponent } from './components/document-detail/document-detail.component'
 import { DashboardComponent } from './components/dashboard/dashboard.component'
 import { TagListComponent } from './components/manage/tag-list/tag-list.component'
-import { WarehouseListComponent } from './components/manage/warehouse-list/warehouse-list.component'
 import { DocumentTypeListComponent } from './components/manage/document-type-list/document-type-list.component'
 import { CorrespondentListComponent } from './components/manage/correspondent-list/correspondent-list.component'
 import { LogsComponent } from './components/admin/logs/logs.component'
@@ -23,7 +22,6 @@ import { NotFoundComponent } from './components/not-found/not-found.component'
 import { ConfirmDialogComponent } from './components/common/confirm-dialog/confirm-dialog.component'
 import { CorrespondentEditDialogComponent } from './components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { TagEditDialogComponent } from './components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
-import { WarehouseEditDialogComponent } from './components/common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from './components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
 import { TagComponent } from './components/common/tag/tag.component'
 import { ClearableBadgeComponent } from './components/common/clearable-badge/clearable-badge.component'
@@ -73,6 +71,7 @@ import { ColorSliderModule } from 'ngx-color/slider'
 import { ColorComponent } from './components/common/input/color/color.component'
 import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
 import { DocumentNotesComponent } from './components/document-notes/document-notes.component'
+import { DocumentApprovalsComponent } from './components/document-approvals/document-approvals.component'
 import { PermissionsGuard } from './guards/permissions.guard'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
@@ -80,6 +79,7 @@ import { StoragePathListComponent } from './components/manage/storage-path-list/
 import { StoragePathEditDialogComponent } from './components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { SettingsService } from './services/settings.service'
 import { TasksComponent } from './components/admin/tasks/tasks.component'
+import { ApprovalsComponent } from './components/admin/approval/approvals.component'
 import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { UserEditDialogComponent } from './components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
 import { GroupEditDialogComponent } from './components/common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
@@ -102,10 +102,21 @@ import { WorkflowEditDialogComponent } from './components/common/edit-dialog/wor
 import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 import { DragDropModule } from '@angular/cdk/drag-drop'
+import { FolderEditDialogComponent } from './components/common/edit-dialog/folder-edit-dialog/folder-edit-dialog.component'
+import { FolderCardSmallComponent } from './components/manage/folder-card-small/folder-card-small.component'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
+import { FoldersComponent } from './components/manage/folder-list/folder-list.component'
+import { SubFoldersComponent } from './components/manage/subfolder-list/subfolder-list.component'
+import { BoxFieldsComponent } from './components/manage/box-fields/box-fields.component'
+import { WarehouseEditDialogComponent } from './components/common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
+import { WarehouseListComponent } from './components/manage/warehouse-list/warehouse-list.component'
+import { BoxEditDialogComponent } from './components/common/edit-dialog/box-edit-dialog/box-edit-dialog.component'
 import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { CustomShelfComponent } from './components/manage/custom-shelf/custom-shelf.component'
+import { CustomShelfEditDialogComponent } from './components/common/edit-dialog/custom-shelf-edit-dialog/custom-shelf-edit-dialog.component'
 import { CustomFieldsDropdownComponent } from './components/common/custom-fields-dropdown/custom-fields-dropdown.component'
+import { ApprovalEditDialogComponent } from './components/common/edit-dialog/approval-edit-dialog/approval-edit-dialog.component'
 import { ProfileEditDialogComponent } from './components/common/profile-edit-dialog/profile-edit-dialog.component'
 import { PdfViewerComponent } from './components/common/pdf-viewer/pdf-viewer.component'
 import { DocumentLinkComponent } from './components/common/input/document-link/document-link.component'
@@ -113,7 +124,7 @@ import { PreviewPopupComponent } from './components/common/preview-popup/preview
 import { SwitchComponent } from './components/common/input/switch/switch.component'
 import { ConfigComponent } from './components/admin/config/config.component'
 import { FileComponent } from './components/common/input/file/file.component'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { NgxBootstrapIconsModule, allIcons, ColorTheme  } from 'ngx-bootstrap-icons'
 import { ConfirmButtonComponent } from './components/common/confirm-button/confirm-button.component'
 import { MonetaryComponent } from './components/common/input/monetary/monetary.component'
 import { SystemStatusDialogComponent } from './components/common/system-status-dialog/system-status-dialog.component'
@@ -148,6 +159,7 @@ import {
   checkAll,
   checkCircleFill,
   checkLg,
+  chevronRight,
   chevronDoubleLeft,
   chevronDoubleRight,
   clipboard,
@@ -213,6 +225,7 @@ import {
   upcScan,
   x,
   xLg,
+  fileEarmarkPdf
 } from 'ngx-bootstrap-icons'
 
 const icons = {
@@ -242,6 +255,7 @@ const icons = {
   checkAll,
   checkCircleFill,
   checkLg,
+  chevronRight,
   chevronDoubleLeft,
   chevronDoubleRight,
   clipboard,
@@ -263,6 +277,7 @@ const icons = {
   fileEarmarkFill,
   fileEarmarkLock,
   files,
+  fileEarmarkPdf,
   fileText,
   filter,
   folder,
@@ -382,10 +397,17 @@ function initializeApp(settings: SettingsService) {
 
 @NgModule({
   declarations: [
+    //BoxListComponent,
+    FolderCardSmallComponent,
+    CustomShelfComponent,
+    BoxEditDialogComponent,
     AppComponent,
     DocumentListComponent,
     DocumentDetailComponent,
     DashboardComponent,
+    FoldersComponent,
+    SubFoldersComponent,
+    FolderEditDialogComponent,
     TagListComponent,
     DocumentTypeListComponent,
     CorrespondentListComponent,
@@ -440,7 +462,9 @@ function initializeApp(settings: SettingsService) {
     ColorComponent,
     DocumentAsnComponent,
     DocumentNotesComponent,
+    DocumentApprovalsComponent,
     TasksComponent,
+    ApprovalsComponent,
     UserEditDialogComponent,
     GroupEditDialogComponent,
     PermissionsSelectComponent,
@@ -463,8 +487,11 @@ function initializeApp(settings: SettingsService) {
     UsersAndGroupsComponent,
     FileDropComponent,
     CustomFieldsComponent,
+    BoxFieldsComponent,
+    CustomShelfEditDialogComponent,
     CustomFieldEditDialogComponent,
     CustomFieldsDropdownComponent,
+    ApprovalEditDialogComponent,
     ProfileEditDialogComponent,
     PdfViewerComponent,
     DocumentLinkComponent,
@@ -478,6 +505,7 @@ function initializeApp(settings: SettingsService) {
     RotateConfirmDialogComponent,
     MergeConfirmDialogComponent,
     SplitConfirmDialogComponent,
+
   ],
   imports: [
     BrowserModule,
@@ -491,7 +519,7 @@ function initializeApp(settings: SettingsService) {
     ColorSliderModule,
     TourNgBootstrapModule,
     DragDropModule,
-    NgxBootstrapIconsModule.pick(icons),
+    NgxBootstrapIconsModule.pick(icons ),
     NgxFilesizeModule,
   ],
   providers: [
@@ -524,4 +552,4 @@ function initializeApp(settings: SettingsService) {
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }
