@@ -52,7 +52,7 @@ export class ShareLinksDropdownComponent implements OnInit {
     private shareLinkService: ShareLinkService,
     private toastService: ToastService,
     private clipboard: Clipboard
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     if (this._documentId !== undefined) this.refresh()
@@ -82,9 +82,8 @@ export class ShareLinksDropdownComponent implements OnInit {
 
   getShareUrl(link: ShareLink): string {
     const apiURL = new URL(environment.apiBaseUrl)
-    return `${apiURL.origin}${apiURL.pathname.replace(/\/api\/$/, '/share/')}${
-      link.slug
-    }`
+    return `${apiURL.origin}${apiURL.pathname.replace(/\/api\/$/, '/share/')}${link.slug
+      }`
   }
 
   getDaysRemaining(link: ShareLink): string {

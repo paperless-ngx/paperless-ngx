@@ -45,9 +45,6 @@ import {
   FILTER_STORAGE_PATH,
   FILTER_HAS_STORAGE_PATH_ANY,
   FILTER_DOES_NOT_HAVE_STORAGE_PATH,
-  FILTER_WAREHOUSE,
-  FILTER_HAS_WAREHOUSE_ANY,
-  FILTER_DOES_NOT_HAVE_WAREHOUSE,
   FILTER_OWNER,
   FILTER_OWNER_ANY,
   FILTER_OWNER_DOES_NOT_INCLUDE,
@@ -59,7 +56,6 @@ import { Correspondent } from 'src/app/data/correspondent'
 import { DocumentType } from 'src/app/data/document-type'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
-import { Warehouse } from 'src/app/data/warehouse'
 import { User } from 'src/app/data/user'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
@@ -69,7 +65,6 @@ import { DocumentTypeService } from 'src/app/services/rest/document-type.service
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
-import { WarehouseService } from 'src/app/services/rest/warehouse.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ClearableBadgeComponent } from '../../common/clearable-badge/clearable-badge.component'
@@ -136,17 +131,6 @@ const storage_paths: StoragePath[] = [
   },
 ]
 
-const warehouses: Warehouse[] = [
-  {
-    id: 42,
-    name: 'Warehouse32',
-  },
-  {
-    id: 43,
-    name: 'Warehouse33',
-  },
-]
-
 const users: User[] = [
   {
     id: 1,
@@ -201,12 +185,6 @@ describe('FilterEditorComponent', () => {
           provide: StoragePathService,
           useValue: {
             listAll: () => of({ results: storage_paths }),
-          },
-        },
-        {
-          provide: WarehouseService,
-          useValue: {
-            listAll: () => of({ results: warehouses }),
           },
         },
         {
@@ -831,89 +809,6 @@ describe('FilterEditorComponent', () => {
     ]
   }))
 
-  it('should ingest filter rules for has warehouse', fakeAsync(() => {
-    expect(component.warehouseSelectionModel.getSelectedItems()).toHaveLength(
-      0
-    )
-    component.filterRules = [
-      {
-        rule_type: FILTER_WAREHOUSE,
-        value: '42',
-      },
-    ]
-    expect(component.warehouseSelectionModel.logicalOperator).toEqual(
-      LogicalOperator.Or
-    )
-    expect(component.warehouseSelectionModel.intersection).toEqual(
-      Intersection.Include
-    )
-    expect(component.warehouseSelectionModel.getSelectedItems()).toEqual([
-      warehouses[0],
-    ])
-    component.toggleWarehouse(42) // coverage
-  }))
-
-  it('should ingest filter rules for has any of warehouse', fakeAsync(() => {
-    expect(component.warehouseSelectionModel.getSelectedItems()).toHaveLength(
-      0
-    )
-    component.filterRules = [
-      {
-        rule_type: FILTER_HAS_WAREHOUSE_ANY,
-        value: '42',
-      },
-      {
-        rule_type: FILTER_HAS_WAREHOUSE_ANY,
-        value: '43',
-      },
-    ]
-    expect(component.warehouseSelectionModel.logicalOperator).toEqual(
-      LogicalOperator.Or
-    )
-    expect(component.warehouseSelectionModel.intersection).toEqual(
-      Intersection.Include
-    )
-    expect(component.warehouseSelectionModel.getSelectedItems()).toEqual(
-      warehouses
-    )
-    // coverage
-    component.filterRules = [
-      {
-        rule_type: FILTER_HAS_WAREHOUSE_ANY,
-        value: null,
-      },
-    ]
-  }))
-
-  it('should ingest filter rules for does not have any of warehouses', fakeAsync(() => {
-    expect(component.warehouseSelectionModel.getExcludedItems()).toHaveLength(
-      0
-    )
-    component.filterRules = [
-      {
-        rule_type: FILTER_DOES_NOT_HAVE_WAREHOUSE,
-        value: '42',
-      },
-      {
-        rule_type: FILTER_DOES_NOT_HAVE_WAREHOUSE,
-        value: '43',
-      },
-    ]
-    expect(component.warehouseSelectionModel.intersection).toEqual(
-      Intersection.Exclude
-    )
-    expect(component.warehouseSelectionModel.getExcludedItems()).toEqual(
-      warehouses
-    )
-    // coverage
-    component.filterRules = [
-      {
-        rule_type: FILTER_DOES_NOT_HAVE_WAREHOUSE,
-        value: null,
-      },
-    ]
-  }))
-
   it('should ingest filter rules for owner', fakeAsync(() => {
     expect(component.permissionsSelectionModel.ownerFilter).toEqual(
       OwnerFilterType.NONE
@@ -1425,63 +1320,6 @@ describe('FilterEditorComponent', () => {
     ])
   }))
 
-  it('should convert user input to correct filter rules on warehouse selections', fakeAsync(() => {
-    const warehouseFilterableDropdown = fixture.debugElement.queryAll(
-      By.directive(FilterableDropdownComponent)
-    )[4] // Warehouse dropdown
-    warehouseFilterableDropdown.triggerEventHandler('opened')
-    const warehouseButtons = warehouseFilterableDropdown.queryAll(
-      By.directive(ToggleableDropdownButtonComponent)
-    )
-    warehouseButtons[1].triggerEventHandler('toggle')
-    warehouseButtons[2].triggerEventHandler('toggle')
-    fixture.detectChanges()
-    expect(component.filterRules).toEqual([
-      {
-        rule_type: FILTER_HAS_WAREHOUSE_ANY,
-        value: warehouses[0].id.toString(),
-      },
-      {
-        rule_type: FILTER_HAS_WAREHOUSE_ANY,
-        value: warehouses[1].id.toString(),
-      },
-    ])
-    const toggleIntersectionButtons = warehouseFilterableDropdown.queryAll(
-      By.css('input[type=radio]')
-    )
-    toggleIntersectionButtons[1].nativeElement.checked = true
-    toggleIntersectionButtons[1].triggerEventHandler('change')
-    fixture.detectChanges()
-    expect(component.filterRules).toEqual([
-      {
-        rule_type: FILTER_DOES_NOT_HAVE_WAREHOUSE,
-        value: warehouses[0].id.toString(),
-      },
-      {
-        rule_type: FILTER_DOES_NOT_HAVE_WAREHOUSE,
-        value: warehouses[1].id.toString(),
-      },
-    ])
-  }))
-
-  it('should convert user input to correct filter rules on warehouse select not assigned', fakeAsync(() => {
-    const warehousesFilterableDropdown = fixture.debugElement.queryAll(
-      By.directive(FilterableDropdownComponent)
-    )[4]
-    warehousesFilterableDropdown.triggerEventHandler('opened')
-    const notAssignedButton = warehousesFilterableDropdown.queryAll(
-      By.directive(ToggleableDropdownButtonComponent)
-    )[0]
-    notAssignedButton.triggerEventHandler('toggle')
-    fixture.detectChanges()
-    expect(component.filterRules).toEqual([
-      {
-        rule_type: FILTER_WAREHOUSE,
-        value: null,
-      },
-    ])
-  }))
-
   it('should convert user input to correct filter rules on date created after', fakeAsync(() => {
     const dateCreatedDropdown = fixture.debugElement.queryAll(
       By.directive(DateDropdownComponent)
@@ -1792,6 +1630,7 @@ describe('FilterEditorComponent', () => {
   // The rest
 
   it('should support setting selection data', () => {
+
     component.selectionData = null
     component.selectionData = {
       selected_storage_paths: [

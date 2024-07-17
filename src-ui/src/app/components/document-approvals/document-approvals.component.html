@@ -1,0 +1,44 @@
+@if (approvals) {
+<div>
+    <table class="table table-striped align-middle border shadow-sm">
+      <thead>
+        <tr>
+          <th scope="col" class="d-table-cell d-lg-cell" i18n>User</th>
+          <th scope="col" class="d-table-cell d-lg-cell" i18n>Group</th>
+          <th scope="col" class="d-table-cell d-lg-cell" i18n>Expires</th>
+          <th scope="col" class="d-none d-lg-table-cell" i18n>Approve at</th>
+          <th scope="col" class="d-table-cell d-lg-cell" i18n>Method</th>
+          <!-- <th scope="col" i18n>Actions</th> -->
+        </tr>
+      </thead>
+      <tbody>
+        @for (approval of approvals;track approval) {
+        <tr >
+          <td class="overflow-auto name-col">{{displayName(approval)}}</td>
+          <td class="overflow-auto name-col">{{displayGroup(approval) }}</td>
+          
+          @if (approval?.expiration==null){
+            <td class="overflow-auto name-col" i18n>Unlimited</td>
+          }
+          @if (approval?.expiration!=null){
+            <td class="overflow-auto name-col">{{ approval?.expiration | customDate:'short' }}</td>
+          }
+          <td class="d-none d-lg-table-cell">{{ approval.modified | customDate:'short' }}</td>
+          <td class="overflow-auto name-col" i18n>{{ approval.access_type }}</td>
+          <!-- <td scope="row">
+            <div class="btn-group" role="group">
+              <button class="btn btn-sm btn-outline-danger"
+                *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }">
+                <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Revoked</ng-container>
+              </button>
+            </div>
+          </td> -->
+        </tr>
+        
+        }
+      </tbody>
+    </table>
+
+  
+</div>
+}

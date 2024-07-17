@@ -13,7 +13,8 @@ import { TagService } from './tag.service'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
 import { queryParamsFromFilterRules } from '../../utils/query-params'
 import { StoragePathService } from './storage-path.service'
-import { WarehouseService } from './warehouse.service'
+
+
 
 import {
   PermissionAction,
@@ -22,6 +23,7 @@ import {
 } from '../permissions.service'
 import { SettingsService } from '../settings.service'
 import { SETTINGS, SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { WarehouseService } from './warehouse.service'
 
 export const DOCUMENT_SORT_FIELDS = [
   { field: 'archive_serial_number', name: $localize`ASN` },
@@ -190,6 +192,10 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     }
     return url
   }
+  getDownloadExcel(id: number): string {
+    let url = this.getResourceUrl(id, 'export_excel')
+    return url
+  }
 
   getNextAsn(): Observable<number> {
     return this.http.get<number>(this.getResourceUrl(null, 'next_asn'))
@@ -236,6 +242,21 @@ export class DocumentService extends AbstractPaperlessService<Document> {
       this.getResourceUrl(id, 'suggestions')
     )
   }
+  
+  bulkExportExcels(
+    ids: number[]
+  ) {
+    return this.http.post(
+      this.getResourceUrl(null, 'bulk_export_excel'),
+      {
+        documents: ids,
+      },
+      { responseType: 'blob' }
+    )
+  }
+
+ 
+
 
   bulkDownload(
     ids: number[],
@@ -252,8 +273,10 @@ export class DocumentService extends AbstractPaperlessService<Document> {
       { responseType: 'blob' }
     )
   }
+  
 
   public set searchQuery(query: string) {
     this._searchQuery = query
   }
 }
+

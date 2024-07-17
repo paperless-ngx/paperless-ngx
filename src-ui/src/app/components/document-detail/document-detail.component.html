@@ -60,6 +60,11 @@
       <button ngbDropdownItem (click)="rotateDocument()" [disabled]="!userIsOwner || contentRenderType !== ContentRenderType.PDF">
         <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
       </button>
+      <!-- <button ngbDropdownItem (click)="rotateDocument()" [disabled]="!userIsOwner || contentRenderType !== ContentRenderType.PDF">
+        <i-bs name="arrow-down"></i-bs>&nbsp;<ng-container i18n>Export to excel</ng-container>
+        <a ngbDropdownItem [href]="downloadExcel" i18n>Export to excel</a>
+      </button> -->
+      <a ngbDropdownItem [href]="downloadExcel" > <i-bs name="arrow-down"></i-bs> <span i18n>Export to excel</span> </a>
     </div>
   </div>
 
@@ -283,6 +288,17 @@
             }</a>
             <ng-template ngbNavContent>
               <pngx-document-notes [documentId]="documentId" [notes]="document?.notes" [addDisabled]="!userCanEdit" (updated)="notesUpdated($event)"></pngx-document-notes>
+            </ng-template>
+          </li>
+        }
+
+        @if (approvalsEnabled) {
+          <li [ngbNavItem]="DocumentDetailNavIDs.Approvals">
+            <a class="text-nowrap" ngbNavLink i18n>Approvals @if (document?.approvals?.length) {
+              <span class="badge text-bg-secondary ms-1">{{document.approvals.length}}</span>
+            }</a>
+            <ng-template ngbNavContent>
+              <pngx-document-approvals [documentId]="documentId" [approvals]="document?.approvals" [addDisabled]="!userCanEdit" (updated)="notesUpdated($event)"></pngx-document-approvals>
             </ng-template>
           </li>
         }

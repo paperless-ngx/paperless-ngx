@@ -49,7 +49,6 @@ import {
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { StoragePath } from 'src/app/data/storage-path'
 import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
-import { WarehouseService } from 'src/app/services/rest/warehouse.service'
 import { Warehouse } from 'src/app/data/warehouse'
 import { WarehouseEditDialogComponent } from '../common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
@@ -73,6 +72,9 @@ import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service
 import { PDFDocumentProxy } from '../common/pdf-viewer/typings'
 import { SplitConfirmDialogComponent } from '../common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
 import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
+import { WarehouseService } from 'src/app/services/rest/warehouse.service'
+
+import { DocumentApproval } from 'src/app/data/document-approval'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -81,6 +83,7 @@ enum DocumentDetailNavIDs {
   Preview = 4,
   Notes = 5,
   Permissions = 6,
+  Approvals = 7
 }
 
 enum ContentRenderType {
@@ -110,8 +113,7 @@ enum ZoomSetting {
 })
 export class DocumentDetailComponent
   extends ComponentWithPermissions
-  implements OnInit, OnDestroy, DirtyComponent
-{
+  implements OnInit, OnDestroy, DirtyComponent {
   @ViewChild('inputTitle')
   titleInput: TextComponent
 
@@ -134,6 +136,7 @@ export class DocumentDetailComponent
   previewText: string
   downloadUrl: string
   downloadOriginalUrl: string
+  downloadExcel: string
 
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
@@ -343,9 +346,8 @@ export class DocumentDetailComponent
               this.previewText = res.toString()
             },
             error: (err) => {
-              this.previewText = $localize`An error occurred loading content: ${
-                err.message ?? err.toString()
-              }`
+              this.previewText = $localize`An error occurred loading content: ${err.message ?? err.toString()
+                }`
             },
           })
           this.downloadUrl = this.documentsService.getDownloadUrl(
@@ -354,6 +356,9 @@ export class DocumentDetailComponent
           this.downloadOriginalUrl = this.documentsService.getDownloadUrl(
             this.documentId,
             true
+          )
+          this.downloadExcel = this.documentsService.getDownloadExcel(
+            this.documentId,
           )
           this.suggestions = null
           const openDocument = this.openDocumentService.getOpenDocument(
@@ -382,7 +387,7 @@ export class DocumentDetailComponent
                 this.documentForm.get('permissions_form').value['owner']
               openDocument['permissions'] =
                 this.documentForm.get('permissions_form').value[
-                  'set_permissions'
+                'set_permissions'
                 ]
               delete openDocument['permissions_form']
             }
@@ -910,7 +915,7 @@ export class DocumentDetailComponent
     this.previewZoomScale = ZoomSetting.PageWidth
     this.previewZoomSetting =
       Object.values(ZoomSetting)[
-        Math.min(Object.values(ZoomSetting).length - 1, currentIndex + 1)
+      Math.min(Object.values(ZoomSetting).length - 1, currentIndex + 1)
       ]
   }
 
@@ -943,8 +948,22 @@ export class DocumentDetailComponent
     )
   }
 
+  get approvalsEnabled(): boolean {
+    return (
+      this.settings.get(SETTINGS_KEYS.APPROVALS_ENABLED) &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Approval
+      )
+    )
+  }
+
   notesUpdated(notes: DocumentNote[]) {
     this.document.notes = notes
+    this.openDocumentService.refreshDocument(this.documentId)
+  }
+  approvalsUpdated(approvals: DocumentApproval[]) {
+    this.document.approvals = approvals 
     this.openDocumentService.refreshDocument(this.documentId)
   }
 

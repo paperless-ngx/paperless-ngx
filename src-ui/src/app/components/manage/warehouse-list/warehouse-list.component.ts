@@ -11,13 +11,15 @@ import { WarehouseService } from 'src/app/services/rest/warehouse.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { WarehouseEditDialogComponent } from '../../common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
 import { ManagementListComponent } from '../management-list/management-list.component'
+import { WarehouseComponent } from '../warehouse/warehouse.component'
+import { ActivatedRoute } from '@angular/router'
 
 @Component({
-  selector: 'pngx-warehouse-list',
-  templateUrl: './../management-list/management-list.component.html',
-  styleUrls: ['./../management-list/management-list.component.scss'],
+  selector: 'app-warehouse-list',
+  templateUrl: '../warehouse/warehouse.component.html',
+  styleUrls: ['../warehouse/warehouse.component.scss']
 })
-export class WarehouseListComponent extends ManagementListComponent<Warehouse> {
+export class WarehouseListComponent extends WarehouseComponent<Warehouse> {
   constructor(
     warehouseService: WarehouseService,
     modalService: NgbModal,
@@ -52,4 +54,5 @@ export class WarehouseListComponent extends ManagementListComponent<Warehouse> {
   getDeleteMessage(object: Warehouse) {
     return $localize`Do you really want to delete the warehouse "${object.name}"?`
   }
+
 }

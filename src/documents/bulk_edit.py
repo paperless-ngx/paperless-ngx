@@ -155,8 +155,14 @@ def modify_tags(doc_ids, add_tags, remove_tags):
 
 
 def delete(doc_ids):
-    Document.objects.filter(id__in=doc_ids).delete()
-
+    docs = Document.objects.filter(id__in=doc_ids)
+    for doc in docs:
+        doc_folder = doc.folder
+        doc.folder = None
+        doc.save()
+        if doc_folder is not None:
+            doc_folder.delete()
+    docs.delete()
     from documents import index
 
     with index.open_index_writer() as writer:

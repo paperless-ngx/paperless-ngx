@@ -9,7 +9,7 @@ import { DocumentTypeListComponent } from './components/manage/document-type-lis
 import { LogsComponent } from './components/admin/logs/logs.component'
 import { SettingsComponent } from './components/admin/settings/settings.component'
 import { TagListComponent } from './components/manage/tag-list/tag-list.component'
-import { WarehouseListComponent } from './components/manage/warehouse-list/warehouse-list.component'
+
 import { NotFoundComponent } from './components/not-found/not-found.component'
 import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
 import { DirtyFormGuard } from './guards/dirty-form.guard'
@@ -25,8 +25,27 @@ import {
 import { WorkflowsComponent } from './components/manage/workflows/workflows.component'
 import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
-import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
 import { ConfigComponent } from './components/admin/config/config.component'
+import { ApprovalsComponent } from './components/admin/approval/approvals.component'
+
+import { WarehouseListComponent } from './components/manage/warehouse-list/warehouse-list.component'
+import { BoxFieldsComponent } from './components/manage/box-fields/box-fields.component'
+
+
+//import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
+import { CustomShelfComponent } from './components/manage/custom-shelf/custom-shelf.component'
+import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
+import { FoldersComponent } from './components/manage/folder-list/folder-list.component'
+import { SubFoldersComponent } from './components/manage/subfolder-list/subfolder-list.component'
+
+
+
+
+
+
+
+
+
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -36,6 +55,7 @@ export const routes: Routes = [
     canDeactivate: [DirtyDocGuard],
     children: [
       { path: 'dashboard', component: DashboardComponent },
+
       {
         path: 'documents',
         component: DocumentListComponent,
@@ -48,6 +68,7 @@ export const routes: Routes = [
           },
         },
       },
+
       {
         path: 'view/:id',
         component: DocumentListComponent,
@@ -105,6 +126,53 @@ export const routes: Routes = [
         },
       },
       {
+        path: 'folders',
+        component: FoldersComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Folder,
+          },
+        },
+      },
+      {
+        path: 'subfolders/:id',
+        component: SubFoldersComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Folder,
+          },
+        },
+      },
+
+
+
+      {
+        path: 'box/:id',
+        component: BoxFieldsComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Warehouse,
+          },
+        },
+      },
+      {
+        path: 'shelf/:id',
+        component: CustomShelfComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Warehouse,
+          },
+        },
+      },
+      {
         path: 'warehouses',
         component: WarehouseListComponent,
         canActivate: [PermissionsGuard],
@@ -116,6 +184,64 @@ export const routes: Routes = [
         },
       },
       {
+        path: 'customfields',
+        component: CustomFieldsComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.CustomField,
+          },
+        },
+      },
+      {
+        //   path: 'warehouses/:id',
+        //   component: WarehouseListComponent,
+        //   canActivate: [PermissionsGuard],
+        //   data: {
+        //     requiredPermission: {
+        //       action: PermissionAction.View,
+        //       type: PermissionType.Warehouse,
+        //     },
+        //   },
+        // },
+        // {
+        //   path: 'khovatly',
+        //   component: KhoVatLyComponent,
+        //   canActivate: [PermissionsGuard],
+        //   data: {
+        //     requiredPermission: {
+        //       action: PermissionAction.View,
+        //       type: PermissionType.KhoVatLy,
+        //     },
+        //   },
+        // },
+        // {
+        //   path: 'khovatly',
+        //   component: KhoVatLyComponent,
+        //   canActivate: [PermissionsGuard],
+        //   data: {
+        //     requiredPermission: {
+        //       action: PermissionAction.View,
+        //       type: PermissionType.KhoVatLy,
+        //     },
+        //   },
+        //   children: [
+        //     {
+        //       path: 'warehouses',
+        //       component: WarehouseListComponent,
+        //       canActivate: [PermissionsGuard],
+        //       data: {
+        //         requiredPermission: {
+        //           action: PermissionAction.View,
+        //           type: PermissionType.Warehouse,
+        //         },
+        //       },
+        //     },
+        //   ],
+        // },
+
+
         path: 'documenttypes',
         component: DocumentTypeListComponent,
         canActivate: [PermissionsGuard],
@@ -212,6 +338,17 @@ export const routes: Routes = [
         },
       },
       {
+        path: 'approvals',
+        component: ApprovalsComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Approval,
+          },
+        },
+      },
+      {
         path: 'customfields',
         component: CustomFieldsComponent,
         canActivate: [PermissionsGuard],
@@ -266,4 +403,4 @@ export const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

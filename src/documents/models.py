@@ -13,6 +13,7 @@ from celery import states
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -89,6 +90,73 @@ class MatchingModel(ModelWithOwner):
     def __str__(self):
         return self.name
 
+class Approval(models.Model):
+
+    ALL_STATES = sorted(states.ALL_STATES)
+    APPROVAL_STATE_CHOICES = sorted(zip(ALL_STATES, ALL_STATES))
+    
+    APPROVAL_ACCESS_TYPE_CHOICES = [
+        ('OWNER', _('Owner')),
+        ('EDIT', _('Edit')),
+        ('VIEW', _('View')),
+    ]
+    
+    submitted_by = models.ForeignKey(
+        User,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("submitted_by"),
+    )
+    
+    submitted_by_group = models.ManyToManyField(
+        Group,
+        blank=True,
+        verbose_name=_("submitted_by_group"),
+    )
+
+    object_pk = models.CharField(_('object ID'), max_length=255, blank=True)
+    
+    ctype = models.ForeignKey(
+        ContentType,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("content type"),
+    )
+
+    expiration = models.DateTimeField(
+        _("expiration"),
+        blank=True,
+        null=True,
+        db_index=True,
+    )
+
+    status = models.CharField(
+        max_length=30,
+        default=states.PENDING,
+        choices=APPROVAL_STATE_CHOICES,
+        verbose_name=_("Approval State"),
+        help_text=_("Current state of the task being run"),
+    )
+
+    access_type = models.CharField(
+        max_length=30,
+        choices=APPROVAL_ACCESS_TYPE_CHOICES,
+        verbose_name=_("access type"),
+        null=False,
+        blank=True
+    )
+
+    created = models.DateTimeField(_("created"), default=timezone.now, db_index=True)
+
+    modified = models.DateTimeField(
+        _("modified"),
+        auto_now=True,
+        editable=False,
+        db_index=True,
+    )
+        
 
 class Correspondent(MatchingModel):
     class Meta(MatchingModel.Meta):
@@ -165,6 +233,21 @@ class Folder(MatchingModel):
         null=True,
         help_text=_("The checksum of the original folder."),
     )
+
+    FOLDER = "folder"
+    FILE = "file"
+    TYPE_FOLDER = (
+        (FOLDER, _("folder")),
+        (FILE, _("file")),
+    )
+    type = models.CharField(max_length=20,
+                                      choices=TYPE_FOLDER,
+                                      default=FOLDER,)
+    
+    created = models.DateTimeField(_("created"), null=True, default=timezone.now, db_index=True)
+
+    updated = models.DateTimeField(_("updated"), null=True, default=timezone.now, editable=False, db_index=True)
+    
 
     class Meta(MatchingModel.Meta):
         
@@ -888,7 +971,8 @@ class CustomFieldInstance(models.Model):
     )
 
     # Actual data storage
-    value_text = models.CharField(max_length=128, null=True)
+    # value_text = models.CharField(max_length=128, null=True)
+    value_text = models.TextField(null=True)
 
     value_bool = models.BooleanField(null=True)
 
@@ -967,6 +1051,8 @@ class WorkflowTrigger(models.Model):
         CONSUMPTION = 1, _("Consumption Started")
         DOCUMENT_ADDED = 2, _("Document Added")
         DOCUMENT_UPDATED = 3, _("Document Updated")
+        APPROVAL_ADDED = 4, _("Approval Added")
+        APPROVAL_UPDATED = 5, _("Approval Updated")
 
     class DocumentSourceChoices(models.IntegerChoices):
         CONSUME_FOLDER = DocumentSource.ConsumeFolder.value, _("Consume Folder")
@@ -1048,6 +1134,44 @@ class WorkflowTrigger(models.Model):
         on_delete=models.SET_NULL,
         verbose_name=_("has this correspondent"),
     )
+    
+    filter_has_groups = models.ManyToManyField(
+        Group,
+        blank=True,
+        verbose_name=_("has these groups"),
+    )
+
+    ALL_STATES = sorted(states.ALL_STATES)
+    APPROVAL_STATE_CHOICES = sorted(zip(ALL_STATES, ALL_STATES))
+
+    filter_has_status = models.CharField(
+        max_length=30,
+        choices=APPROVAL_STATE_CHOICES,
+        verbose_name=_("approval state"),
+        null=True,
+        blank=True
+    )
+
+    filter_has_content_type = models.ForeignKey(
+        ContentType,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name=_("content type"),
+    )
+
+    APPROVAL_ACCESS_CHOICES = [
+        ('OWNER', _('Owner')),
+        ('EDIT', _('Edit')),
+        ('VIEW', _('View')),
+    ]
+    filter_has_access_type = models.CharField(
+        max_length=30,
+        choices=APPROVAL_ACCESS_CHOICES,
+        verbose_name=_("access type"),
+        null=True,
+        blank=True
+    )
 
     class Meta:
         verbose_name = _("workflow trigger")
@@ -1067,11 +1191,26 @@ class WorkflowAction(models.Model):
             2,
             _("Removal"),
         )
+        ASSIGNMENT_WITH_APPROVAL = (
+            3,
+            _("Assignment For Approval"),
+        )
+        REMOVAL_WITH_APPROVAL = (
+            4,
+            _("Removal For Approval"),
+        )
 
     type = models.PositiveIntegerField(
         _("Workflow Action Type"),
         choices=WorkflowActionType.choices,
         default=WorkflowActionType.ASSIGNMENT,
+    )
+    assign_content_type = models.ForeignKey(
+        ContentType,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name=_("assign content type"),
     )
 
     assign_title = models.CharField(

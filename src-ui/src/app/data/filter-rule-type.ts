@@ -47,11 +47,29 @@ export const FILTER_OWNER_ISNULL = 34
 export const FILTER_OWNER_DOES_NOT_INCLUDE = 35
 export const FILTER_SHARED_BY_USER = 37
 
-export const FILTER_CUSTOM_FIELDS = 36
+//export const FILTER_CUSTOM_FIELDS = 36
+export const FILTER_CUSTOM_FIELDS = 50
+export const FILTER_HAS_CUSTOM_FIELDS_ANY = 51
+export const FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS = 52
 
-export const FILTER_WAREHOUSE = 50
-export const FILTER_HAS_WAREHOUSE_ANY = 51
-export const FILTER_DOES_NOT_HAVE_WAREHOUSE = 52
+export const FILTER_WAREHOUSE = 53
+export const FILTER_HAS_WAREHOUSE_ANY = 54
+export const FILTER_DOES_NOT_HAVE_WAREHOUSE = 55
+
+//Box
+export const FILTER_BOX = 56
+export const FILTER_HAS_BOX_ANY = 57
+export const FILTER_DOES_NOT_HAVE_BOX = 58
+
+//export const Shelf= 36
+export const FILTER_CUSTOM_SHELF = 59
+export const FILTER_HAS_CUSTOM_SHELF_ANY = 60
+export const FILTER_DOES_NOT_HAVE_CUSTOM_SHELF = 61
+
+export const FILTER_FOLDER = 62
+export const FILTER_HAS_FOLDER_ANY = 63
+export const FILTER_DOES_NOT_HAVE_FOLDER = 64
+export const FILTER_HAS_FOLDES_ALL = 65
 
 export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
@@ -131,6 +149,92 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     datatype: 'warehouse',
     multi: true,
   },
+  {
+    id: FILTER_HAS_FOLDES_ALL,
+    filtervar: 'folders__id__all',
+    datatype: 'folder',
+    multi: true,
+  },
+  {
+    id: FILTER_FOLDER,
+    filtervar: 'folder__id',
+    isnull_filtervar: 'folder__isnull',
+    datatype: 'folder',
+    multi: false,
+  },
+  {
+    id: FILTER_HAS_FOLDER_ANY,
+    filtervar: 'folder__id__in',
+    datatype: 'folder',
+    multi: true,
+  },
+  {
+    id: FILTER_DOES_NOT_HAVE_FOLDER,
+    filtervar: 'folder__id__none',
+    datatype: 'folder',
+    multi: true,
+  },
+  //Custom-field
+  {
+    id: FILTER_CUSTOM_FIELDS,
+    filtervar: 'warehouses__id',
+    isnull_filtervar: 'warehouses__isnull',
+    datatype: 'warehouse',
+    multi: false,
+  },
+  {
+    id: FILTER_HAS_CUSTOM_FIELDS_ANY,
+    filtervar: 'warehouses__id__in',
+    datatype: 'warehouse',
+    multi: true,
+  },
+  {
+    id: FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
+    filtervar: 'warehouses__id__none',
+    datatype: 'warehouse',
+    multi: true,
+  },
+  //box
+  {
+    id: FILTER_BOX,
+    filtervar: 'boxs__id',
+    isnull_filtervar: 'boxs__isnull',
+    datatype: 'box',
+    multi: false,
+  },
+  {
+    id: FILTER_HAS_BOX_ANY,
+    filtervar: 'boxs__id__in',
+    datatype: 'box',
+    multi: true,
+  },
+  {
+    id: FILTER_DOES_NOT_HAVE_BOX,
+    filtervar: 'boxs__id__none',
+    datatype: 'box',
+    multi: true,
+  },
+  //Shelf
+  {
+    id: FILTER_CUSTOM_SHELF,
+    filtervar: 'shelfs__id',
+    isnull_filtervar: 'shelfs__isnull',
+    datatype: 'shelf',
+    multi: false,
+  },
+  {
+    id: FILTER_HAS_CUSTOM_SHELF_ANY,
+    filtervar: 'shelfs__id__in',
+    datatype: 'shelf',
+    multi: true,
+  },
+  {
+    id: FILTER_DOES_NOT_HAVE_CUSTOM_SHELF,
+    filtervar: 'shelfs__id__none',
+    datatype: 'shelf',
+    multi: true,
+  },
+
   {
     id: FILTER_DOCUMENT_TYPE,
     filtervar: 'document_type__id',

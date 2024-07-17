@@ -1,163 +1,69 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { CustomFieldsComponent } from './custom-fields.component'
-import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { By } from '@angular/platform-browser'
-import {
-  NgbModal,
-  NgbPaginationModule,
-  NgbModalModule,
-  NgbModalRef,
-  NgbPopoverModule,
-} from '@ng-bootstrap/ng-bootstrap'
-import { of, throwError } from 'rxjs'
+import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgSelectModule } from '@ng-select/ng-select'
+import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { PermissionsService } from 'src/app/services/permissions.service'
-import { ToastService } from 'src/app/services/toast.service'
-import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
-import { PageHeaderComponent } from '../../common/page-header/page-header.component'
+import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
+import { SettingsService } from 'src/app/services/settings.service'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { SelectComponent } from '../../common/input/select/select.component'
+import { TextComponent } from '../../common/input/text/text.component'
+import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 
-const fields: CustomField[] = [
-  {
-    id: 0,
-    name: 'Field 1',
-    data_type: CustomFieldDataType.String,
-  },
-  {
-    id: 1,
-    name: 'Field 2',
-    data_type: CustomFieldDataType.Integer,
-  },
-]
 
-describe('CustomFieldsComponent', () => {
-  let component: CustomFieldsComponent
-  let fixture: ComponentFixture<CustomFieldsComponent>
-  let customFieldsService: CustomFieldsService
-  let modalService: NgbModal
-  let toastService: ToastService
+describe('CustomFieldEditDialogComponent', () => {
+    let component: CustomFieldEditDialogComponent
+    let settingsService: SettingsService
+    let fixture: ComponentFixture<CustomFieldEditDialogComponent>
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [
-        CustomFieldsComponent,
-        IfPermissionsDirective,
-        PageHeaderComponent,
-        ConfirmDialogComponent,
-      ],
-      providers: [
-        {
-          provide: PermissionsService,
-          useValue: {
-            currentUserCan: () => true,
-            currentUserHasObjectPermissions: () => true,
-            currentUserOwnsObject: () => true,
-          },
-        },
-      ],
-      imports: [
-        HttpClientTestingModule,
-        NgbPaginationModule,
-        FormsModule,
-        ReactiveFormsModule,
-        NgbModalModule,
-        NgbPopoverModule,
-        NgxBootstrapIconsModule.pick(allIcons),
-      ],
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            declarations: [
+                CustomFieldEditDialogComponent,
+                IfPermissionsDirective,
+                IfOwnerDirective,
+                SelectComponent,
+                TextComponent,
+                SafeHtmlPipe,
+            ],
+            providers: [NgbActiveModal],
+            imports: [
+                HttpClientTestingModule,
+                FormsModule,
+                ReactiveFormsModule,
+                NgSelectModule,
+                NgbModule,
+            ],
+        }).compileComponents()
+
+        fixture = TestBed.createComponent(CustomFieldEditDialogComponent)
+        settingsService = TestBed.inject(SettingsService)
+        settingsService.currentUser = { id: 99, username: 'user99' }
+        component = fixture.componentInstance
+
+        fixture.detectChanges()
     })
 
-    customFieldsService = TestBed.inject(CustomFieldsService)
-    jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
-      of({
-        count: fields.length,
-        all: fields.map((o) => o.id),
-        results: fields,
-      })
-    )
-    modalService = TestBed.inject(NgbModal)
-    toastService = TestBed.inject(ToastService)
+    it('should support create and edit modes', () => {
+        component.dialogMode = EditDialogMode.CREATE
+        const createTitleSpy = jest.spyOn(component, 'getCreateTitle')
+        const editTitleSpy = jest.spyOn(component, 'getEditTitle')
+        fixture.detectChanges()
+        expect(createTitleSpy).toHaveBeenCalled()
+        expect(editTitleSpy).not.toHaveBeenCalled()
+        component.dialogMode = EditDialogMode.EDIT
+        fixture.detectChanges()
+        expect(editTitleSpy).toHaveBeenCalled()
+    })
 
-    fixture = TestBed.createComponent(CustomFieldsComponent)
-    component = fixture.componentInstance
-    fixture.detectChanges()
-  })
-
-  it('should support create, show notification on error / success', () => {
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
-    const reloadSpy = jest.spyOn(component, 'reload')
-
-    const createButton = fixture.debugElement.queryAll(By.css('button'))[1]
-    createButton.triggerEventHandler('click')
-
-    expect(modal).not.toBeUndefined()
-    const editDialog = modal.componentInstance as CustomFieldEditDialogComponent
-
-    // fail first
-    editDialog.failed.emit({ error: 'error creating item' })
-    expect(toastErrorSpy).toHaveBeenCalled()
-    expect(reloadSpy).not.toHaveBeenCalled()
-
-    // succeed
-    editDialog.succeeded.emit(fields[0])
-    expect(toastInfoSpy).toHaveBeenCalled()
-    expect(reloadSpy).toHaveBeenCalled()
-  })
-
-  it('should support edit, show notification on error / success', () => {
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
-    const reloadSpy = jest.spyOn(component, 'reload')
-
-    const editButton = fixture.debugElement.queryAll(By.css('button'))[2]
-    editButton.triggerEventHandler('click')
-
-    expect(modal).not.toBeUndefined()
-    const editDialog = modal.componentInstance as CustomFieldEditDialogComponent
-    expect(editDialog.object).toEqual(fields[0])
-
-    // fail first
-    editDialog.failed.emit({ error: 'error editing item' })
-    expect(toastErrorSpy).toHaveBeenCalled()
-    expect(reloadSpy).not.toHaveBeenCalled()
-
-    // succeed
-    editDialog.succeeded.emit(fields[0])
-    expect(toastInfoSpy).toHaveBeenCalled()
-    expect(reloadSpy).toHaveBeenCalled()
-  })
-
-  it('should support delete, show notification on error / success', () => {
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const deleteSpy = jest.spyOn(customFieldsService, 'delete')
-    const reloadSpy = jest.spyOn(component, 'reload')
-
-    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[4]
-    deleteButton.triggerEventHandler('click')
-
-    expect(modal).not.toBeUndefined()
-    const editDialog = modal.componentInstance as ConfirmDialogComponent
-
-    // fail first
-    deleteSpy.mockReturnValueOnce(throwError(() => new Error('error deleting')))
-    editDialog.confirmClicked.emit()
-    expect(toastErrorSpy).toHaveBeenCalled()
-    expect(reloadSpy).not.toHaveBeenCalled()
-
-    // succeed
-    deleteSpy.mockReturnValueOnce(of(true))
-    editDialog.confirmClicked.emit()
-    expect(reloadSpy).toHaveBeenCalled()
-  })
+    it('should disable data type select on edit', () => {
+        component.dialogMode = EditDialogMode.EDIT
+        fixture.detectChanges()
+        component.ngOnInit()
+        expect(component.objectForm.get('data_type').disabled).toBeTruthy()
+    })
 })

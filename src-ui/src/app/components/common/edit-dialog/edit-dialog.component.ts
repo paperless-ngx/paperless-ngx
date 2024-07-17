@@ -24,14 +24,13 @@ export enum EditDialogMode {
 @Directive()
 export abstract class EditDialogComponent<
   T extends ObjectWithPermissions | ObjectWithId,
-> implements OnInit
-{
+> implements OnInit {
   constructor(
     protected service: AbstractPaperlessService<T>,
     private activeModal: NgbActiveModal,
     private userService: UserService,
     private settingsService: SettingsService
-  ) {}
+  ) { }
 
   users: User[]
 

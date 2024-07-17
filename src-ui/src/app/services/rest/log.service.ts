@@ -7,7 +7,7 @@ import { environment } from 'src/environments/environment'
   providedIn: 'root',
 })
 export class LogService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   list(): Observable<string[]> {
     return this.http.get<string[]>(`${environment.apiBaseUrl}logs/`)

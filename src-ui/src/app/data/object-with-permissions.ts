@@ -12,6 +12,7 @@ export interface PermissionsObject {
 }
 
 export interface ObjectWithPermissions extends ObjectWithId {
+  [x: string]: any
   owner?: number
 
   permissions?: PermissionsObject

@@ -8,9 +8,10 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { WarehouseService } from 'src/app/services/rest/warehouse.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
-import { WarehouseListComponent } from './warehouse-list.component'
+
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { WarehouseListComponent } from './warehouse-list.component'
 
 describe('WarehouseListComponent', () => {
   let component: WarehouseListComponent

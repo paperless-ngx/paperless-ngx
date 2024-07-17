@@ -35,6 +35,9 @@ import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dial
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
+import { ShareLink } from 'src/app/data/share-link'
+import { environment } from 'src/environments/environment'
+import { Router } from '@angular/router'
 
 export interface ManagementListColumn {
   key: string
@@ -49,8 +52,8 @@ export interface ManagementListColumn {
 @Directive()
 export abstract class ManagementListComponent<T extends ObjectWithId>
   extends ComponentWithPermissions
-  implements OnInit, OnDestroy
-{
+  implements OnInit, OnDestroy {
+  [x: string]: any
   constructor(
     private service: AbstractNameFilterService<T>,
     private modalService: NgbModal,
@@ -86,6 +89,8 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
 
   public selectedObjects: Set<number> = new Set()
   public togggleAll: boolean = false
+  public shareLinks: ShareLink[]
+
 
   ngOnInit(): void {
     this.reloadData()
@@ -116,9 +121,8 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     } else if (o.matching_algorithm == MATCH_NONE) {
       return $localize`None`
     } else if (o.match && o.match.length > 0) {
-      return `${
-        MATCHING_ALGORITHMS.find((a) => a.id == o.matching_algorithm).shortName
-      }: ${o.match}`
+      return `${MATCHING_ALGORITHMS.find((a) => a.id == o.matching_algorithm).shortName
+        }: ${o.match}`
     } else {
       return '-'
     }
@@ -345,4 +349,12 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
         })
     })
   }
+  // getShareUrl(link: ShareLink): string {
+  //   const apiURL = new URL(environment.apiBaseUrl)
+  //   return `${apiURL.origin}${apiURL.pathname.replace(/\/api\/$/, '/share/')}${link.slug
+  //     }`
+  // }
+  // share(link: ShareLink) {
+  //   navigator.share({ url: this.getShareUrl(link) })
+  // }
 }
