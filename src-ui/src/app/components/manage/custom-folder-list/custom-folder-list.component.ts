@@ -103,6 +103,8 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
   public folderPath: Folder[] = []
   public documentService: DocumentService
   public ColorTheme : ColorTheme
+  public folderCut: number[] = []
+  public isFolderCutClicked = false;
 
   ngOnInit(): void {
     if (localStorage.getItem('folder-list:displayMode') != null) {
@@ -143,7 +145,9 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
       return '-'
     }
   }
-  
+  getSelectedObjects() {
+    return this.selectedObjects
+  }
   exportToExcelSelected() {
     this.awaitingDownload = true
     this.folderService
@@ -367,8 +371,9 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
       ({ permissions, merge }) => {
         modal.componentInstance.buttonsEnabled = false
         this.service
-          .bulk_edit_objects(
+          .bulk_edit_folders(
             Array.from(this.selectedObjects),
+            null,
             BulkEditObjectOperation.SetPermissions,
             permissions,
             merge
@@ -405,8 +410,9 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
     modal.componentInstance.confirmClicked.subscribe(() => {
       modal.componentInstance.buttonsEnabled = false
       this.service
-        .bulk_edit_objects(
+        .bulk_edit_folders(
           Array.from(this.selectedObjects),
+          null,
           BulkEditObjectOperation.Delete
         )
         .subscribe({
@@ -419,6 +425,88 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
             modal.componentInstance.buttonsEnabled = true
             this.toastService.showError(
               $localize`Error deleting objects`,
+              error
+            )
+          },
+        })
+    })
+  }
+
+  cutFolder() {
+    this.folderCut = Array.from(this.selectedObjects)
+    this.isFolderCutClicked = true;
+    // console.log("folder cut :", this.folderCut)
+    return this.folderCut
+  }
+
+  cancelFolder() {
+    this.reloadData()
+
+    if (this.router.url.includes('/subfolders/')) {
+      this.id = this.route.snapshot.params['id'];
+      this.router.navigate(['/subfolders/', this.id], {
+        queryParams: {}
+      });
+    } 
+  
+    else {
+      this.router.navigate(['/folders/'], {
+        queryParams: {}
+      });
+    }
+  }
+  setCutFolder(){
+    let folderIds
+    this.route.queryParams.subscribe(params => {
+      folderIds = params['folderIds'];
+    });
+    console.log("gia tri folder",folderIds)
+    const parts = folderIds.split(',');
+    this.folderCut = parts.map(part => parseInt(part, 10));
+    return this.folderCut
+  }
+
+
+  update() {
+    this.id = this.route.snapshot.params['id']
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Confirm update`
+    modal.componentInstance.messageBold = $localize`This operation will permanently update all objects.`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      this.service
+        .bulk_edit_folders(
+          Array.from(this.setCutFolder()),
+          Number(this.id),
+          BulkEditObjectOperation.Update
+        )
+        .subscribe({
+          next: () => {
+            modal.close()
+            this.toastService.showInfo($localize`Objects update successfully`)
+            this.reloadData()
+
+            if (this.router.url.includes('/subfolders/')) {
+              this.router.navigate(['/subfolders/', this.id], {
+                queryParams: {}
+              });
+            } 
+            else {
+              this.router.navigate(['/folders/'], {
+                queryParams: {}
+              });
+            }
+            
+          },
+          error: (error) => {
+            modal.componentInstance.buttonsEnabled = true
+            this.toastService.showError(
+              $localize`Error updating objects`,
               error
             )
           },

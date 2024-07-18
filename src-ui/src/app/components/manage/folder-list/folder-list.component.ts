@@ -27,6 +27,10 @@ extends CustomFolderListComponent<Folder> {
   folderUnsubscribeNotifier: Subject<any> = new Subject();
   folder_nameFilter: string;
   MyunsubscribeNotifier: Subject<any> = new Subject()
+
+  public selectedObjects: Set<number> = new Set()
+  
+  
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -53,6 +57,7 @@ extends CustomFolderListComponent<Folder> {
   }
   
   
+  
   reloadData() {
     this.id = this.route.snapshot.params['id']
     // console.log('load trang folder',this.router.getCurrentNavigation())
@@ -60,18 +65,52 @@ extends CustomFolderListComponent<Folder> {
   }
 
   goToFolder(object: Folder) {
-    // this.id = this.route.snapshot.params['id'];
-    this.id = object?.id
-    // console.log('trang moi',this.route.snapshot.params['id'])
-    this.router.navigate(['/subfolders/', object.id]);
-    super.reloadData()
-
+    let folderId = this.route.snapshot.queryParams['folderIds'];
+    let getQueryParams: { folderIds?: string };
     
-   
+    if (this.isFolderCutClicked) {
+      getQueryParams = {
+        folderIds: Array.from(this.folderCut).join(',')
+      };
+    } else if (folderId) {
+      getQueryParams = {
+        folderIds: Array.from(folderId).join('')
+      };
+    } else {
+      getQueryParams = {};
+    }
+
+    this.id = object?.id
+    this.router.navigate(['/subfolders/', object.id],
+      {
+        queryParams: getQueryParams
+      }
+    );
+    super.reloadData()
+    
   }
+
   goToFolderRoot() {
-      super.reloadData()
-      this.router.navigate(['/folders/',]);
+    let folderId = this.route.snapshot.queryParams['folderIds'];
+    let getQueryParams: { folderIds?: string };
+
+    if (this.isFolderCutClicked) {
+      getQueryParams = {
+        folderIds: Array.from(this.folderCut).join(',')
+      };
+    } else if (folderId) {
+      getQueryParams = {
+        folderIds: Array.from(folderId).join('')
+      };
+    } else {
+      getQueryParams = {};
+    }
+
+    this.router.navigate(['/folders/',], {
+      queryParams: getQueryParams
+    });
+    
+    super.reloadData()
     
   }
     

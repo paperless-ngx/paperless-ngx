@@ -140,7 +140,7 @@ export const routes: Routes = [
       },
       {
         path: 'subfolders/:id',
-        component: SubFoldersComponent,
+        component: FoldersComponent,
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {

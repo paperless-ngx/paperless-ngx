@@ -12,8 +12,10 @@
    
   </div>
   
-
   
+  <button class="btn btn-sm btn-outline-secondary" (click)="cutFolder()" [hidden]="selectedObjects.size === 0">
+    <i-bs  name="x"></i-bs>&nbsp;<ng-container i18n>Cut</ng-container>
+    </button>
 
   <button class="btn btn-sm btn-outline-secondary" (click)="clearSelection()" [hidden]="selectedObjects.size === 0">
     <i-bs  name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
@@ -48,21 +50,36 @@
     <button type="button" class="btn btn-sm btn-outline-danger" (click)="delete()" [disabled]="!userCanBulkEdit(PermissionAction.Delete) || selectedObjects.size === 0">
       <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
     </button>
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="update()" [disabled]="!userCanBulkEdit(PermissionAction.Update) || selectedObjects.size > 0 ">
+      <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Paste</ng-container>
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="cancelFolder()"  >
+      <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Cancel</ng-container>
+    </button>
     <button type="button" class="btn btn-sm btn-outline-primary ms-md-5" (click)="openCreateDialog()" *pngxIfPermissions="{ action: PermissionAction.Add, type: permissionType }">
       <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Create</ng-container>
     </button>
 
 </pngx-page-header>
-<div class="form-inline d-flex flex-wrap align-items-center">
+<div class="form-inline d-flex align-items-center">
   <a class="me" (click)="goToFolderRoot()">
     <i-bs class="" name="folder-fill" width="2rem" 
     height="2rem" ></i-bs>
   </a>
-  <div *ngFor="let folder of folderPath" class="fs-5">
-    <i-bs class="" name="chevron-right" ></i-bs>&nbsp;<a class="me custom-cursor " (click)="goToFolder(folder)">
-      {{ folder.name }} 
-    </a>
+  
+  <div *ngFor="let folder of folderPath; let i = index" class="fs-5" style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center;">
+    <ng-container *ngIf="i >= folderPath.length - 3 || i < 3">
+      <i-bs class="" name="chevron-right"></i-bs>&nbsp;<a class="me custom-cursor" (click)="goToFolder(folder)">
+        {{ folder.name }}
+      </a>
+    </ng-container>
+    <ng-container *ngIf="i === 2&&folderPath.length>i+1 " >
+      <i-bs class="" name="chevron-right"></i-bs>&nbsp;<a class="me custom-cursor" (click)="goToFolder(folder)">
+        ...
+      </a>
+    </ng-container>
   </div>
+
 </div>
 <br>
 <div class="row">

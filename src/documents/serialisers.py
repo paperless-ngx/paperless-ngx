@@ -1635,14 +1635,12 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
         child=serializers.IntegerField(),
     )
     
-    parent_folder = serializers.ListField(
+    parent_folder = serializers.IntegerField(
         required=False,
-        allow_empty=True,
         allow_null=True,
         label="Parent_folder",
         write_only=True,
-        child=serializers.IntegerField(),
-        default = []
+        default=None
     )
 
     object_type = serializers.ChoiceField(
@@ -1721,15 +1719,12 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
         return objects
     
     def _validate_parent_folder(self, parent_folder, object_type):
-        if not isinstance(parent_folder, list):
-            raise serializers.ValidationError("parent_folder must be a list")
-        if not all(isinstance(i, int) for i in parent_folder):
-            raise serializers.ValidationError("parent_folder must be a list of integers")
+        if parent_folder is not None and not isinstance(parent_folder, int):
+            raise serializers.ValidationError("parent_folder must be an integer")
         object_class = self.get_object_class(object_type)
-        count = object_class.objects.filter(id__in=parent_folder).count()
-        if not count == len(parent_folder):
+        if parent_folder is not None and not object_class.objects.filter(id=parent_folder).exists():
             raise serializers.ValidationError(
-                "Some ids in parent_folder don't exist or were specified twice.",
+                "The parent_folder id doesn't exist.",
             )
         return parent_folder
     
