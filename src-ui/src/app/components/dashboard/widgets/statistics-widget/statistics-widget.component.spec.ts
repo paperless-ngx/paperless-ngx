@@ -75,7 +75,7 @@ describe('StatisticsWidgetComponent', () => {
     const mockStats = {
       documents_total: 200,
       documents_inbox: 18,
-      inbox_tag: 10,
+      inbox_tags: [10],
     }
 
     const req = httpTestingController.expectOne(
@@ -100,7 +100,7 @@ describe('StatisticsWidgetComponent', () => {
     const mockStats = {
       documents_total: 200,
       documents_inbox: 18,
-      inbox_tag: 10,
+      inbox_tags: [10],
       document_file_type_counts: [
         {
           mime_type: 'application/pdf',

@@ -954,7 +954,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["documents_total"], 3)
         self.assertEqual(response.data["documents_inbox"], 1)
-        self.assertEqual(response.data["inbox_tag"], tag_inbox.pk)
+        self.assertEqual(response.data["inbox_tags"], [tag_inbox.pk])
         self.assertEqual(
             response.data["document_file_type_counts"][0]["mime_type_count"],
             2,
@@ -975,7 +975,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         response = self.client.get("/api/statistics/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["documents_inbox"], None)
-        self.assertEqual(response.data["inbox_tag"], None)
+        self.assertEqual(response.data["inbox_tags"], None)
 
     def test_statistics_multiple_users(self):
         """
