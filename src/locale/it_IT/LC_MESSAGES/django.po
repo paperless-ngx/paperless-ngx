@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-09 11:27-0700\n"
-"PO-Revision-Date: 2024-07-09 18:28\n"
+"PO-Revision-Date: 2024-07-20 12:09\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -257,7 +257,7 @@ msgstr "log"
 
 #: documents/models.py:401
 msgid "Table"
-msgstr ""
+msgstr "Tabella"
 
 #: documents/models.py:402
 msgid "Small Cards"
@@ -297,7 +297,7 @@ msgstr "Percorso archiviazione"
 
 #: documents/models.py:413
 msgid "Note"
-msgstr ""
+msgstr "Nota"
 
 #: documents/models.py:414
 msgid "Owner"
@@ -305,7 +305,7 @@ msgstr "Proprietario"
 
 #: documents/models.py:415
 msgid "Shared"
-msgstr ""
+msgstr "Condiviso"
 
 #: documents/models.py:416
 msgid "ASN"
@@ -329,7 +329,7 @@ msgstr "ordine invertito"
 
 #: documents/models.py:437
 msgid "View page size"
-msgstr ""
+msgstr "Visualizza dimensione pagina"
 
 #: documents/models.py:445
 msgid "View display mode"
@@ -709,7 +709,7 @@ msgstr "istanze campo personalizzato"
 
 #: documents/models.py:978
 msgid "Consumption Started"
-msgstr ""
+msgstr "Elaborazione avviata"
 
 #: documents/models.py:979
 msgid "Document Added"
@@ -841,15 +841,15 @@ msgstr ""
 
 #: documents/models.py:1186
 msgid "remove all tags"
-msgstr ""
+msgstr "rimuovi tutte le etichette"
 
 #: documents/models.py:1193
 msgid "remove these document type(s)"
-msgstr ""
+msgstr "rimuovi questi tipi di documento"
 
 #: documents/models.py:1198
 msgid "remove all document types"
-msgstr ""
+msgstr "rimuovi tutti i tipi di documento"
 
 #: documents/models.py:1205
 msgid "remove these correspondent(s)"
@@ -948,13 +948,14 @@ msgstr "Variabile non valida rilevata."
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
-msgstr ""
+msgstr "Ciao da %(site_name)s!"
 
 #: documents/templates/account/email/base_message.txt:5
 #, python-format
 msgid "Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
-msgstr ""
+msgstr "Grazie per aver usato %(site_name)s!\n"
+"%(site_domain)s"
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
@@ -967,7 +968,7 @@ msgstr "Accedi"
 #: documents/templates/account/login.html:12
 #, python-format
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
-msgstr ""
+msgstr "Non hai ancora un account? <a href=\"%(signup_url)s\">Registrati</a>"
 
 #: documents/templates/account/login.html:19
 #: documents/templates/account/signup.html:15
@@ -991,7 +992,7 @@ msgstr "Hai dimenticato la password?"
 #: documents/templates/account/login.html:45
 #: documents/templates/account/signup.html:49
 msgid "or sign in via"
-msgstr ""
+msgstr "oppure accedi con"
 
 #: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
@@ -1064,12 +1065,12 @@ msgstr "La tua nuova password è stata impostata. Ora puoi effettuare il <a href
 
 #: documents/templates/account/signup.html:5
 msgid "Paperless-ngx sign up"
-msgstr ""
+msgstr "Registrati a Paperless-ngx"
 
 #: documents/templates/account/signup.html:10
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
-msgstr ""
+msgstr "Hai già un account? <a href=\"%(login_url)s\">Accedi</a>"
 
 #: documents/templates/account/signup.html:16
 #: documents/templates/socialaccount/signup.html:14
@@ -1108,17 +1109,17 @@ msgstr "Il link di condivisione è scaduto."
 #: documents/templates/socialaccount/authentication_error.html:5
 #: documents/templates/socialaccount/login.html:5
 msgid "Paperless-ngx social account sign in"
-msgstr ""
+msgstr "Accedi con un account social"
 
 #: documents/templates/socialaccount/authentication_error.html:10
 #, python-format
 msgid "An error occurred while attempting to login via your social network account. Back to the <a href=\"%(login_url)s\">login page</a>"
-msgstr ""
+msgstr "Si è verificato un errore durante il tentativo di accedere tramite il tuo account di social network. Torna alla <a href=\"%(login_url)s\">pagina di login</a>"
 
 #: documents/templates/socialaccount/login.html:10
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
-msgstr ""
+msgstr "Stai per connettere un nuovo account di terze parti da %(provider)s."
 
 #: documents/templates/socialaccount/login.html:13
 msgid "Continue"
@@ -1126,16 +1127,16 @@ msgstr "Continua"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
-msgstr ""
+msgstr "Registrati con un account social"
 
 #: documents/templates/socialaccount/signup.html:10
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
-msgstr ""
+msgstr "Stai per utilizzare il tuo account %(provider_name)s per effettuare il login."
 
 #: documents/templates/socialaccount/signup.html:11
 msgid "As a final step, please complete the following form:"
-msgstr ""
+msgstr "Come ultimo passo, compila il seguente modulo:"
 
 #: documents/validators.py:17
 #, python-brace-format
@@ -1254,7 +1255,7 @@ msgstr "Imposta la modalità OCR"
 
 #: paperless/models.py:116
 msgid "Controls the generation of an archive file"
-msgstr ""
+msgstr "Controlla la creazione di un file archivio"
 
 #: paperless/models.py:124
 msgid "Sets image DPI fallback value"
@@ -1266,7 +1267,7 @@ msgstr ""
 
 #: paperless/models.py:138
 msgid "Enables deskew"
-msgstr ""
+msgstr "Abilita raddrizzamento"
 
 #: paperless/models.py:141
 msgid "Enables page rotation"
