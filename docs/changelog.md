@@ -1,5 +1,36 @@
 # Changelog
 
+## paperless-ngx 2.11.1
+
+### Features
+
+- Enhancement: include owner username in post-consumption variables [@Freddy-0](https://github.com/Freddy-0) ([#7270](https://github.com/paperless-ngx/paperless-ngx/pull/7270))
+
+### Bug Fixes
+
+- Fix: support multiple inbox tags from stats widget [@shamoon](https://github.com/shamoon) ([#7281](https://github.com/paperless-ngx/paperless-ngx/pull/7281))
+- Fix: Removes Turkish from the NLTK languages [@stumpylog](https://github.com/stumpylog) ([#7246](https://github.com/paperless-ngx/paperless-ngx/pull/7246))
+- Fix: include trashed docs in existing doc check [@shamoon](https://github.com/shamoon) ([#7229](https://github.com/paperless-ngx/paperless-ngx/pull/7229))
+
+### Dependencies
+
+- Chore(deps-dev): Bump the development group with 2 updates [@dependabot](https://github.com/dependabot) ([#7261](https://github.com/paperless-ngx/paperless-ngx/pull/7261))
+- Chore(deps): Bump the small-changes group across 1 directory with 2 updates [@dependabot](https://github.com/dependabot) ([#7266](https://github.com/paperless-ngx/paperless-ngx/pull/7266))
+
+### All App Changes
+
+<details>
+<summary>7 changes</summary>
+
+- Fix: support multiple inbox tags from stats widget [@shamoon](https://github.com/shamoon) ([#7281](https://github.com/paperless-ngx/paperless-ngx/pull/7281))
+- Chore(deps-dev): Bump the development group with 2 updates [@dependabot](https://github.com/dependabot) ([#7261](https://github.com/paperless-ngx/paperless-ngx/pull/7261))
+- Chore(deps): Bump the small-changes group across 1 directory with 2 updates [@dependabot](https://github.com/dependabot) ([#7266](https://github.com/paperless-ngx/paperless-ngx/pull/7266))
+- Enhancement: include owner username in post-consumption variables [@Freddy-0](https://github.com/Freddy-0) ([#7270](https://github.com/paperless-ngx/paperless-ngx/pull/7270))
+- Chore: Squash older automatic migrations [@stumpylog](https://github.com/stumpylog) ([#7267](https://github.com/paperless-ngx/paperless-ngx/pull/7267))
+- Fix: Removes Turkish from the NLTK languages [@stumpylog](https://github.com/stumpylog) ([#7246](https://github.com/paperless-ngx/paperless-ngx/pull/7246))
+- Fix: include trashed docs in existing doc check [@shamoon](https://github.com/shamoon) ([#7229](https://github.com/paperless-ngx/paperless-ngx/pull/7229))
+</details>
+
 ## paperless-ngx 2.11.0
 
 ### Breaking Changes
