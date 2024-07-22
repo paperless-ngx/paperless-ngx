@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { Observable, Subscription } from 'rxjs'
-import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type'
+import { FILTER_HAS_TAGS_ANY } from 'src/app/data/filter-rule-type'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { environment } from 'src/environments/environment'
@@ -11,7 +11,7 @@ import { ComponentWithPermissions } from 'src/app/components/with-permissions/wi
 export interface Statistics {
   documents_total?: number
   documents_inbox?: number
-  inbox_tag?: number
+  inbox_tags?: number[]
   document_file_type_counts?: DocumentFileType[]
   character_count?: number
   tag_count?: number
@@ -110,8 +110,10 @@ export class StatisticsWidgetComponent
   goToInbox() {
     this.documentListViewService.quickFilter([
       {
-        rule_type: FILTER_HAS_TAGS_ALL,
-        value: this.statistics.inbox_tag.toString(),
+        rule_type: FILTER_HAS_TAGS_ANY,
+        value: this.statistics.inbox_tags
+          .map((tagID) => tagID.toString())
+          .join(','),
       },
     ])
   }

@@ -1418,13 +1418,11 @@ class StatisticsView(APIView):
 
         documents_total = documents.count()
 
-        inbox_tag = tags.filter(is_inbox_tag=True)
+        inbox_tags = tags.filter(is_inbox_tag=True)
 
         documents_inbox = (
-            documents.filter(tags__is_inbox_tag=True, tags__id__in=tags)
-            .distinct()
-            .count()
-            if inbox_tag.exists()
+            documents.filter(tags__id__in=inbox_tags).distinct().count()
+            if inbox_tags.exists()
             else None
         )
 
@@ -1454,7 +1452,12 @@ class StatisticsView(APIView):
             {
                 "documents_total": documents_total,
                 "documents_inbox": documents_inbox,
-                "inbox_tag": inbox_tag.first().pk if inbox_tag.exists() else None,
+                "inbox_tag": inbox_tags.first().pk
+                if inbox_tags.exists()
+                else None,  # backwards compatibility
+                "inbox_tags": [tag.pk for tag in inbox_tags]
+                if inbox_tags.exists()
+                else None,
                 "document_file_type_counts": document_file_type_counts,
                 "character_count": character_count,
                 "tag_count": len(tags),
