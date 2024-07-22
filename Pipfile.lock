@@ -1986,12 +1986,12 @@
         },
         "tika-client": {
             "hashes": [
-                "sha256:b4271a82f1416a1a62ed9100640b3bc16b1014c244ee787b4be5becd0fdcd304",
-                "sha256:f719fbf20f9ef47d12132b38c5848024b260e79c5f0b9ae5ff95c0b2fe3ba350"
+                "sha256:647f528860aa639d87516ecff0fb25797b4edaa973fe60b320c56c5bd7cb6a88",
+                "sha256:7fcd12d991fa155b2f94fcadb25ecee472c437e757b6737930f924a81feca60b"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==0.5.0"
+            "version": "==0.6.0"
         },
         "tornado": {
             "hashes": [
