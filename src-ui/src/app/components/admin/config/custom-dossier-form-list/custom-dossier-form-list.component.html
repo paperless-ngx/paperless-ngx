@@ -54,10 +54,10 @@
 
 </pngx-page-header>
 <div class="form-inline d-flex flex-wrap align-items-center">
-  <a class="me" (click)="goToDossierDocumentRoot()">
-    <i-bs class="" name="dossier-fill" width="2rem" 
+  <!-- <a class="me" (click)="goToDossierDocumentRoot()">
+    <i-bs class="" name="archive" width="2rem" 
     height="2rem" ></i-bs>
-  </a>
+  </a> -->
   <div *ngFor="let dossier of dossierPath" class="fs-5">
     <i-bs class="" name="chevron-right" ></i-bs>&nbsp;<a class="me custom-cursor " (click)="goToDossierDocument(dossier)">
       {{ dossier.name }} 
@@ -131,10 +131,10 @@
                   }
                
                 <td scope="row" class="d-md-table-cell">
-                      <span class="custom-cursor" >   {{ object.url }}</span>
+                      <span class="custom-cursor" >{{ object.url }}</span>
                 </td>
                 <td scope="row" class="d-md-table-cell">
-                      <span class="custom-cursor " >   {{ object.key }}</span>
+                      <span class="custom-cursor " >{{ object.key }}</span>
                 </td>
                 
                 @for (column of extraColumns; track column) {

@@ -268,7 +268,9 @@ class Dossier(MatchingModel):
         default='DOSSIER'
     )
 
-    parent_dossier = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True )
+    parent_dossier = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='child_dossiers')
+    
+    parent_dossier_type = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='child_dossier_types')
 
     path = models.TextField(_("path"), null=True, blank=True)
     

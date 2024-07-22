@@ -207,7 +207,8 @@ export abstract class CustomDossierFormListComponent<T extends ObjectWithId>
         this.id,
         true,
         this._nameFilter,
-        true
+        true,
+        ''
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((c) => {
@@ -220,6 +221,7 @@ export abstract class CustomDossierFormListComponent<T extends ObjectWithId>
 
   openCreateDialog() {
     var activeModal = this.modalService.open(this.editDialogComponent, {
+      size: 'xl',
       backdrop: 'static',
     })
     activeModal.componentInstance.object = { parent_dossier: this.id }

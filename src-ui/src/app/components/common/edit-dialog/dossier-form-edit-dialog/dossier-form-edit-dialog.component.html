@@ -30,11 +30,11 @@
           <pngx-permissions-form [users]="users" accordion="true" formControlName="permissions_form"></pngx-permissions-form>
         </div>
       </div>
-        <div class="col">
-          <pngx-custom-field-select [inheritedCustomFields]="object.custom_fields"></pngx-custom-field-select>
-          
-        </div>
+      <div class="col">
+        <pngx-custom-field-select [inheritedCustomFields]="object.custom_fields" formControlName="custom_fields" (dataChange)="onDataChange($event)"></pngx-custom-field-select>
+        
       </div>
+    </div>
 
   </div>
   <div class="modal-footer">

@@ -1,35 +1,69 @@
 <form [formGroup]="form" [class.opacity-50]="disabled">
   <label class="form-label">{{title}}</label>
   <ul class="list-group">
-    <li class="list-group-item d-flex">
+    <li class="list-group-item ">
       <div class="row">
         <div class="col" i18n>Field</div>
-        <div class="col-2" i18n>Enable</div>
-        <div class="col" i18n>Match value</div>
+        <div class="col" i18n>Enable</div>
+        <div class="col-3" i18n>Match value</div>
 
-        <div class="col" i18n>Reference</div>
+        <div class="col-lg-5" i18n>Reference to the field of the document</div>
       </div>
     </li>
-    @for (f of _inheritedCustomFields | keyvalue; track f) {
+    <!-- @if (!loading) {
       <li class="list-group-item" >
-        <div class="row">
-          <div class="col">{{f.value.field_name}}</div>
-          <div class="col-2 form-switch" placement="left" triggers="mouseenter:mouseleave">
-            <input type="checkbox" class="form-check-input" id="{{f.value.field}}" (change)="toggleAll($event, f.value.field)">
-            <label class="form-check-label visually-hidden" for="{{f.value.field}}" i18n>All</label>
-          </div>
-       
-          <div class="col "  placement="left" triggers="mouseenter:mouseleave">
-            <input type="text" class="form-control" id="{{f.value.field}}" [value]="f.value.match_value">
-            <label class="visually-hidden" i18n>{{f.value.match_value}}</label>
-          </div>
-          <div class="col "  placement="left" triggers="mouseenter:mouseleave">
-            <input type="select" class="form-control" id="{{f.value.field}}">
-            <label class="visually-hidden" i18n>{{f.value.match_value}}</label>
-          </div>
+        <div class="">
+          <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
+          <div class="" i18n>Loading...</div>
         </div>
       </li>
-    }
+    } @else { -->
+      <!-- @for (f of this.dictCustomFields| keyvalue; track f) {
+        <li class="list-group-item"  >
+          <div class="row" >
+            <div class="col">{{f.value.field_name}}</div>
+            <div class="col-2 form-switch" placement="left" triggers="mouseenter:mouseleave">
+              <input type="checkbox" class="form-check-input" id="{{f.value.field}}" [checked]="this.dictCustomFieldsEnable[f.value.field] || false" (change)="toggleAll($event, f.value.field)">
+              <label class="form-check-label visually-hidden" for="{{f.value.field}}" i18n>All</label>
+            </div>
+         
+            <div class="col "  placement="left" triggers="mouseenter:mouseleave">
+              <input type="text" class="form-control" id="{{f.value.field}}" [value]="f.value.match_value" [disabled]="!this.dictCustomFieldsEnable[f.value.field] || false" (change)="onMatchValueChange($event, f)">
+              <label class="visually-hidden" i18n>{{f.value.match_value}}</label>
+            </div>
+         
+            <div class="col">
+                <pngx-input-select [items]="dossier"  bindLabel="name" [allowNull]="true"></pngx-input-select>
+            </div>
+            <div class="col">
+                <pngx-input-select [items]="dossier" bindLabel="name"  [allowNull]="true"></pngx-input-select>
+            </div>
+          </div>
+        </li>
+      } -->
+
+      <li class="list-group-item" formArrayName="customFields" *ngFor="let customField of customFields.controls; let i=index" >
+        <div class="row">
+          <div class="col">{{ customField.get('field_name').value }}</div>
+          <div class="col-2 form-switch" placement="left" triggers="mouseenter:mouseleave">
+            <input type="checkbox" class="form-check-input" id="{{customField.get('field').value}}"  [checked]="this.dictCustomFieldsEnable[customField.get('field').value] || false" (change)="toggleAll($event, customField.get('field'))">
+            <label class="form-check-label visually-hidden" for="{{customField.get('field').value}}" i18n>All</label>
+          </div>
+       
+          <div class="col-lg-3"  placement="left" triggers="mouseenter:mouseleave">
+            <input type="text" class="form-control" [formControl]="customField.get('match_value')" >
+            <label class="visually-hidden" i18n>{{customField.get('match_value')}}</label>
+          </div>
+          <div class="col-lg-5">
+            <pngx-input-select [items]="dossier" bindLabel="name" [formControl]="customField.get('dossier_document')"  aria-valuetext="" [allowNull]="true" ></pngx-input-select>
+            <pngx-input-select [items]="dataDossierDocumentChange(customField.get('dossier_document').value)" bindLabel="field_name" [formControl]="customField.get('reference')" [allowNull]="true"></pngx-input-select>
+          </div>
+          <!-- <div class="col">
+          </div> -->
+        </div>
+      </li>
+    <!-- } -->
+    
     @if (error) {
       <div class="invalid-feedback d-block">{{error}}</div>
     }

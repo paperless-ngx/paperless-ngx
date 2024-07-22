@@ -61,7 +61,8 @@ export abstract class AbstractNameFilterService<T extends ObjectWithId,> extends
     id?: number,
     isForm?: boolean,
     nameFilter?: string,
-    fullPerms?: boolean) {
+    fullPerms?: boolean,
+    type?: string) {
     let params = {}
     if (id) {
       params['parent_dossier__id'] = id
@@ -80,6 +81,9 @@ export abstract class AbstractNameFilterService<T extends ObjectWithId,> extends
     }
     if (fullPerms) {
       params['full_perms'] = true
+    }
+    if (type.length){
+      params['dossier_type'] = type
     }
  
     return this.list(page, pageSize, sortField, sortReverse, params)

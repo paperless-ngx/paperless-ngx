@@ -12,4 +12,7 @@ export class DossierService extends AbstractNameFilterService<Dossier> {
   constructor(http: HttpClient) {
     super(http, 'dossiers')
   }
+  getDossierPath(id: number): Observable<Dossier> {
+    return this.http.get<Dossier>(this.getResourceUrl(id, 'dossier_path'))
+  }
 }

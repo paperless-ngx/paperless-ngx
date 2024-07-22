@@ -48,7 +48,7 @@ export class DossierFormEditDialogComponent
   getEditTitle() {
     return $localize`Edit dossier`
   }
-
+  dataCustomFields:any[] =[]
   getForm(): FormGroup {
     return new FormGroup({
       name: new FormControl(null),
@@ -57,8 +57,24 @@ export class DossierFormEditDialogComponent
       is_form: new FormControl(true),
       dossier_type: new FormControl(DossierType.Dossier),
       permissions_form: new FormControl(null),
+      custom_fields: new FormControl([]),
       
     })
+  }
+
+  onDataChange(data: any[]) {
+    this.dataCustomFields=data
+    // this.getForm().patchValue({ custom_fields1: data });
+    // Xử lý dữ liệu ở đây
+  }
+
+  save(){
+    let getFormOrgin = super.getFormOrigin()
+    // getFormOrgin.get('custom_fields').setValue(this.dataCustomFields)
+    getFormOrgin.patchValue({ custom_fields: this.dataCustomFields });
+  
+    super.save()
+
   }
 
   get typeFieldDisabled(): boolean {

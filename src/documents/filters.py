@@ -379,7 +379,7 @@ class CustomParentDossierIDFilter(NumberFilter):
         return qs.exclude(id = d.id)
 
 class DossierFilterSet(FilterSet):
-    parent_dossier__id = CustomParentDossierIDFilter(field_name="parent_dossier__id")
+    # parent_dossier__id = CustomParentDossierIDFilter(field_name="parent_dossier__id")
     is_form = BooleanFilter(field_name="is_form")
 
     class Meta:

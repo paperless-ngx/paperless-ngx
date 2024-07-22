@@ -54,8 +54,8 @@
 
 </pngx-page-header>
 <div class="form-inline d-flex flex-wrap align-items-center">
-  <a class="me" (click)="goToDossierDocumentRoot()">
-    <i-bs class="" name="dossier-fill" width="2rem" 
+  <a class="me" (click)="goToDossierDocument(null)">
+    <i-bs class="" name="archive" width="2rem" 
     height="2rem" ></i-bs>
   </a>
   <div *ngFor="let dossier of dossierPath" class="fs-5">
@@ -91,6 +91,8 @@
               </th>
               <th scope="col" class="w-40" pngxSortable="name" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name</th>
               <!-- <th scope="col" class="fw-normal d-none d-sm-table-cell" pngxSortable="matching_algorithm" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Matching</th> -->
+              <!-- <th scope="col" class="d-xl-table-cell" pngxSortable="parent_dossier_type" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Type</th> -->
+              <th scope="col" class="d-xl-table-cell" pngxSortable="parent_dossier_type" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Type</th>
               <th scope="col" class="d-xl-table-cell" pngxSortable="document_count" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Document count</th>
               @for (column of extraColumns; track column) {
                 <th scope="col" class="d-xl-table-cell" pngxSortable="{{column.key}}" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)">{{column.name}}</th>
@@ -141,7 +143,10 @@
                    
                 </td> -->
                 <td scope="row" class="d-md-table-cell">
-                      <span class="custom-cursor" >   {{ object.name }}</span>
+                      <span class="custom-cursor" >   {{ object.parent_dossier_type_name }}</span>
+                </td>
+                <td scope="row" class="d-md-table-cell">
+                      <span class="custom-cursor" >   {{ object.document_count }}</span>
                 </td>
                 <!-- @if(object.type=='dossier'){
                   <td scope="row" class="d-md-table-cell"><button class="btn btn-link ms-0 ps-0 text-start" (click)="userCanEdit(object) ? goToDossierDocument(object) : null; $event.stopPropagation()">

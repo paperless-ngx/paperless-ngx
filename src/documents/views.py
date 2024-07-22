@@ -2580,7 +2580,7 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = DossierFilterSet
-    ordering_fields = ("name", "dossier_type", "is_form")
+    ordering_fields = ("name", "dossier_type", "is_form","parent_dossier_type")
 
     def create(self, request, *args, **kwargs):
         # try:                                                          
@@ -2593,6 +2593,7 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         
         if parent_dossier == None:
             dossier = serializer.save(owner=request.user)
+           
             dossier.path = str(dossier.id)
             dossier.save()
         elif parent_dossier:
@@ -2610,3 +2611,72 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.data,status=status.HTTP_201_CREATED)
+    
+    def update_child_dossier_paths(self, dossier):
+        child_dossiers = Dossier.objects.filter(parent_dossier=dossier)
+        for child_dossier in child_dossiers:
+            if dossier.path:
+                child_dossier.path = f"{dossier.path}/{child_dossier.id}"
+            else:
+                child_dossier.path = f"{child_dossier.id}"
+            child_dossier.save()
+            self.update_child_dossier_paths(child_dossier)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        if request.data.get('parent_dossier') is None:
+            pass
+        elif 'parent_dossier' in request.data and int(request.data['parent_dossier']) == instance.id:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+        elif 'parent_dossier' in request.data:
+            new_parent_dossier = Dossier.objects.get(id=int(request.data['parent_dossier']))
+            if new_parent_dossier.path.startswith(instance.path):
+                return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a dossier into one of its child dossiers.'})
+        else:
+            request.data['parent_dossier'] = None
+      
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+
+        old_parent_dossier = instance.parent_dossier
+
+        self.perform_update(serializer)
+
+        if old_parent_dossier != instance.parent_dossier:
+            if instance.parent_dossier:
+                instance.path = f"{instance.parent_dossier.path}/{instance.id}"
+                
+            else:
+                instance.path = f"{instance.id}"
+            instance.save()
+
+            self.update_child_dossier_paths(instance)
+            
+        return Response(serializer.data)
+
+    @action(methods=["get"], detail=True)
+    def dossier_path(self, request, pk=None):
+        if request.method == "GET":
+            try:
+                fol = Dossier.objects.get(pk=pk)
+                dossier_path = fol.path.split('/')
+                dossiers = Dossier.objects.filter(id__in = dossier_path)
+                dossiers_dict = {}
+                for f in dossiers:
+                    dossiers_dict[f.id] = f
+                    # print(f)
+                new_dossier_path = []
+                for p in dossier_path:
+                    value = dossiers_dict.get(int(p))
+                    new_dossier_path.append(value)
+                dossiers_serialisers = DossierSerializer(new_dossier_path, many=True)
+                return Response({"results":dossiers_serialisers.data},status=status.HTTP_200_OK)
+            except Exception as e:
+                logger.warning(f"An error occurred retrieving dossiers: {e!s}")
+                return Response(
+                    {"error": "Error retrieving dossiers, check logs for more detail."},
+                )
+            
+        

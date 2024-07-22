@@ -499,6 +499,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
     value = ReadWriteSerializerMethodField(allow_null=True)
     match_value = ReadWriteSerializerMethodField(allow_null=True,required=False)
     field_name = SerializerMethodField(read_only=True)
+    dossier_document = SerializerMethodField(read_only=True)
     def get_field_name(self, obj):
         if obj is None:
             return None
@@ -539,6 +540,10 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         return obj.value
     def get_match_value(self,obj: CustomFieldInstance):
         return obj.match_value
+    def get_dossier_document(self,obj: CustomFieldInstance):
+        if obj.reference is not None:
+            return obj.reference.dossier.id
+        return None
 
     def validate(self, data):
         """
@@ -661,10 +666,13 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomFieldInstance
         fields = [
+            "id",
             "value",
             "field",
             "match_value",
-            'field_name'
+            "field_name",
+            "reference",
+            "dossier_document"
         ]
 
 
@@ -2084,12 +2092,24 @@ class ExportDocumentFromFolderSerializer(serializers.Serializer):
 #         model = CustomFieldInstance
 #         fields = '__all__' 
 
+class ParentDossierTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
+    class Meta:
+        model = Dossier
+        fields = '__all__'
 class DossierSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     custom_fields = CustomFieldInstanceSerializer(
         many=True,
         allow_null=True,
         required=False,
     )
+    # parent_dossier_type = ParentDossierTypeSerializer(allow_null = True,required = False)
+    parent_dossier_type_name = SerializerMethodField(read_only=True)
+
+    def get_parent_dossier_type_name(self,obj):
+        if obj.parent_dossier_type is None:
+            return None
+        return obj.parent_dossier_type.name
+
     class Meta:
         model = Dossier
         fields = [
@@ -2110,10 +2130,45 @@ class DossierSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             'is_form',
             'owner',
             'parent_dossier',
+            'parent_dossier_type',
+            'parent_dossier_type_name',
             'custom_fields'
         ]
+    def create(self, validated_data):
+        custom_fields_data = validated_data.pop('custom_fields', [])
+       
+        dossier = Dossier.objects.create(**validated_data)
+        type_to_data_store_name_map = {
+            CustomField.FieldDataType.STRING: "value_text",
+            CustomField.FieldDataType.URL: "value_url",
+            CustomField.FieldDataType.DATE: "value_date",
+            CustomField.FieldDataType.BOOL: "value_bool",
+            CustomField.FieldDataType.INT: "value_int",
+            CustomField.FieldDataType.FLOAT: "value_float",
+            CustomField.FieldDataType.MONETARY: "value_monetary",
+            CustomField.FieldDataType.DOCUMENTLINK: "value_document_ids",
+        }
+        lst_dossier_custom_field = []
+        for custom_field_data in custom_fields_data:
+
+            # And to a CustomField
+            custom_field: CustomField = custom_field_data["field"]
+            # This key must exist, as it is validated
+            data_store_name = type_to_data_store_name_map[custom_field.data_type]
+            custom_field_instance, _ = CustomFieldInstance.objects.update_or_create(
+                dossier=dossier,
+                field=custom_field,
+                defaults={data_store_name: custom_field_data["value"]},
+            )
+            custom_field_instance.match_value = custom_field_data['match_value']
+            custom_field_instance.save()
+            lst_dossier_custom_field.append(custom_field_instance.pk)
+        return dossier
+     
+        records_to_delete = CustomFieldInstance.objects.exclude(id__in=lst_dossier_custom_field).filter(dossier=dossier.pk)
     def update(self, instance, validated_data):
         custom_fields_data = validated_data.pop('custom_fields', [])
+        validated_data['parent_dossier_type']
         dossier = super().update(instance, validated_data)
         type_to_data_store_name_map = {
             CustomField.FieldDataType.STRING: "value_text",
@@ -2139,13 +2194,16 @@ class DossierSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             )
 
             custom_field_instance.match_value = custom_field_data['match_value']
+            custom_field_instance.reference = custom_field_data['reference']
             # custom_field_data['field'].
             # custom_field_instance.value()
             custom_field_instance.save()
             lst_dossier_custom_field.append(custom_field_instance.pk)
-        records_to_delete = CustomFieldInstance.objects.exclude(id__in=lst_dossier_custom_field)
+     
+        records_to_delete = CustomFieldInstance.objects.exclude(id__in=lst_dossier_custom_field).filter(dossier=dossier.pk)
+
+
         # Delete the filtered records
         records_to_delete.delete()
 
         return dossier
-    

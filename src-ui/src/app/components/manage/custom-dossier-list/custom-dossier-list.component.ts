@@ -104,6 +104,7 @@ export abstract class CustomDossierListComponent<T extends ObjectWithId>
   public togggleAll: boolean = false
   public shareLinks: ShareLink[]
   public dossier: Dossier[] = []
+  public dossierPath: Dossier[] = []
   public documentService: DocumentService
   public ColorTheme : ColorTheme
 
@@ -185,6 +186,17 @@ export abstract class CustomDossierListComponent<T extends ObjectWithId>
 
   reloadData() {
     this.selectedObjects.clear()
+    if (this.id){
+      let listDossierPath
+      this.dossierService.getDossierPath(this.id).subscribe(
+        (dossier) => {
+          listDossierPath = dossier
+          // console.log(listDossierPath)
+          this.dossierPath = listDossierPath?.results
+        },)
+      
+
+    }
     // let listFolderPath 
     // if (this.id){
     //   this.dossierService.getFolderPath(this.id).subscribe(
@@ -206,7 +218,8 @@ export abstract class CustomDossierListComponent<T extends ObjectWithId>
         this.id,
         this.isForm,
         this._nameFilter,
-        true
+        true,
+        ''
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((c) => {
@@ -219,6 +232,7 @@ export abstract class CustomDossierListComponent<T extends ObjectWithId>
 
   openCreateDialog() {
     var activeModal = this.modalService.open(this.editDialogComponent, {
+      size:'xl',
       backdrop: 'static',
     })
     activeModal.componentInstance.object = { parent_dossier: this.id }
@@ -240,6 +254,7 @@ export abstract class CustomDossierListComponent<T extends ObjectWithId>
 
   openEditDialog(object: T) {
     var activeModal = this.modalService.open(this.editDialogComponent, {
+      size:'xl',
       backdrop: 'static',
     })
     activeModal.componentInstance.object = object

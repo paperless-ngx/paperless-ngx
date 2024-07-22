@@ -63,9 +63,13 @@ extends CustomDossierListComponent<Dossier> {
 
   goToDossierDocument(object: Dossier) {
     // this.id = this.route.snapshot.params['id'];
-    this.id = object?.id
-    // console.log('trang moi',this.route.snapshot.params['id'])
-    this.router.navigate(['/dossiers/', object.id]);
+    if(object){
+      this.id = object?.id
+      this.router.navigate(['/dossiers/', object.id]);
+      
+    }else{
+      this.router.navigate(['/dossiers/',]);
+    }
     super.reloadData()
 
     
