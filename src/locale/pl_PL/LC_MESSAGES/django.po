@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-09 11:27-0700\n"
-"PO-Revision-Date: 2024-07-09 18:28\n"
+"PO-Revision-Date: 2024-07-22 00:27\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -677,7 +677,7 @@ msgstr "Link do dokumentu"
 
 #: documents/models.py:812
 msgid "Select"
-msgstr ""
+msgstr "Wybierz"
 
 #: documents/models.py:824
 msgid "data type"
@@ -685,11 +685,11 @@ msgstr "typ danych"
 
 #: documents/models.py:831
 msgid "extra data"
-msgstr ""
+msgstr "dane dodatkowe"
 
 #: documents/models.py:835
 msgid "Extra data for the custom field, such as select options"
-msgstr ""
+msgstr "Dodatkowe dane dla pola niestandardowego, takie jak opcje wyboru"
 
 #: documents/models.py:841
 msgid "custom field"

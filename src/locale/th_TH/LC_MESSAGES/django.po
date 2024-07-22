@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-09 11:27-0700\n"
-"PO-Revision-Date: 2024-07-09 18:28\n"
+"PO-Revision-Date: 2024-07-15 16:57\n"
 "Last-Translator: \n"
 "Language-Team: Thai\n"
 "Language: th_TH\n"
@@ -433,7 +433,7 @@ msgstr "ค้นจากทุกอย่าง"
 
 #: documents/models.py:489
 msgid "more like this"
-msgstr ""
+msgstr "เอกสารที่คล้ายกัน"
 
 #: documents/models.py:490
 msgid "has tags in"
@@ -645,27 +645,27 @@ msgstr "แชร์​ลิงก์"
 
 #: documents/models.py:804
 msgid "String"
-msgstr ""
+msgstr "ตัวอักษร"
 
 #: documents/models.py:805
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: documents/models.py:806
 msgid "Date"
-msgstr ""
+msgstr "Boolean"
 
 #: documents/models.py:807
 msgid "Boolean"
-msgstr ""
+msgstr "Boolean"
 
 #: documents/models.py:808
 msgid "Integer"
-msgstr ""
+msgstr "Integer"
 
 #: documents/models.py:809
 msgid "Float"
-msgstr ""
+msgstr "Float"
 
 #: documents/models.py:810
 msgid "Monetary"
@@ -677,11 +677,11 @@ msgstr ""
 
 #: documents/models.py:812
 msgid "Select"
-msgstr ""
+msgstr "เลือก"
 
 #: documents/models.py:824
 msgid "data type"
-msgstr ""
+msgstr "ชนิดข้อมูล"
 
 #: documents/models.py:831
 msgid "extra data"
@@ -841,7 +841,7 @@ msgstr ""
 
 #: documents/models.py:1186
 msgid "remove all tags"
-msgstr ""
+msgstr "ลบแท็กทั้งหมด"
 
 #: documents/models.py:1193
 msgid "remove these document type(s)"
@@ -849,7 +849,7 @@ msgstr ""
 
 #: documents/models.py:1198
 msgid "remove all document types"
-msgstr ""
+msgstr "ลบประเภทเอกสารทั้งหมด"
 
 #: documents/models.py:1205
 msgid "remove these correspondent(s)"
@@ -865,7 +865,7 @@ msgstr ""
 
 #: documents/models.py:1222
 msgid "remove all storage paths"
-msgstr ""
+msgstr "ลบที่จัดเก็บเอกสารทั้งหมด"
 
 #: documents/models.py:1229
 msgid "remove these owner(s)"
@@ -925,7 +925,7 @@ msgstr ""
 
 #: documents/models.py:1309
 msgid "enabled"
-msgstr ""
+msgstr "เปิดใช้งานอยู่"
 
 #: documents/serialisers.py:119
 #, python-format
@@ -1019,7 +1019,7 @@ msgstr ""
 
 #: documents/templates/account/password_reset_done.html:9
 msgid "Check your inbox."
-msgstr ""
+msgstr "ตรวจสอบกล่องข้อความ"
 
 #: documents/templates/account/password_reset_done.html:13
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
@@ -1069,21 +1069,21 @@ msgstr ""
 #: documents/templates/account/signup.html:10
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
-msgstr ""
+msgstr "มีบัญชีผู้ใช้งานแล้ว? <a href=\"%(login_url)s\">เข้าสู่ระบบ</a>"
 
 #: documents/templates/account/signup.html:16
 #: documents/templates/socialaccount/signup.html:14
 msgid "Email (optional)"
-msgstr ""
+msgstr "อีเมล์(ไม่บังคับ)"
 
 #: documents/templates/account/signup.html:18
 msgid "Password (again)"
-msgstr ""
+msgstr "ใส่รหัสผ่าน (อีกครั้ง)"
 
 #: documents/templates/account/signup.html:36
 #: documents/templates/socialaccount/signup.html:27
 msgid "Sign up"
-msgstr ""
+msgstr "ลงทะเบียน"
 
 #: documents/templates/index.html:61
 msgid "Paperless-ngx is loading..."

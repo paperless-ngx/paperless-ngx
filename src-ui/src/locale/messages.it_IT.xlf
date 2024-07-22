@@ -1119,7 +1119,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">212</context>
         </context-group>
-        <target state="needs-translation">Full search links to</target>
+        <target state="translated">La ricerca globale porta a</target>
       </trans-unit>
       <trans-unit id="6631288852577115923" datatype="html">
         <source>Title and content search</source>
@@ -1153,7 +1153,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">209</context>
+          <context context-type="linenumber">211</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/document.ts</context>
@@ -2085,7 +2085,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">236</context>
+          <context context-type="linenumber">238</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/document.ts</context>
@@ -2267,7 +2267,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">274</context>
         </context-group>
-        <target state="needs-translation">Trash</target>
+        <target state="translated">Cestino</target>
       </trans-unit>
       <trans-unit id="3818027200170621545" datatype="html">
         <source>Manage trashed documents that are pending deletion.</source>
@@ -2275,7 +2275,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Manage trashed documents that are pending deletion.</target>
+        <target state="translated">Gestisci i documenti cestinati in attesa di eliminazione.</target>
       </trans-unit>
       <trans-unit id="3186604097120837257" datatype="html">
         <source>Restore selected</source>
@@ -2283,7 +2283,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Restore selected</target>
+        <target state="translated">Ripristina selezionati</target>
       </trans-unit>
       <trans-unit id="8831459317888986184" datatype="html">
         <source>Delete selected</source>
@@ -2291,7 +2291,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Delete selected</target>
+        <target state="translated">Elimina selezionati</target>
       </trans-unit>
       <trans-unit id="8597030111956627342" datatype="html">
         <source>Empty trash</source>
@@ -2299,7 +2299,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Empty trash</target>
+        <target state="translated">Svuota cestino</target>
       </trans-unit>
       <trans-unit id="991066160113599649" datatype="html">
         <source>Remaining</source>
@@ -2307,7 +2307,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Remaining</target>
+        <target state="translated">Rimanenti</target>
       </trans-unit>
       <trans-unit id="7494361412465596264" datatype="html">
         <source><x id="INTERPOLATION" equiv-text="{{ getDaysRemaining(document) }}"/> days</source>
@@ -2315,7 +2315,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{ getDaysRemaining(document) }}"/> days</target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="{{ getDaysRemaining(document) }}"/> giorni</target>
       </trans-unit>
       <trans-unit id="6770769801335635194" datatype="html">
         <source>Restore</source>
@@ -2327,7 +2327,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">73</context>
         </context-group>
-        <target state="needs-translation">Restore</target>
+        <target state="translated">Ripristina</target>
       </trans-unit>
       <trans-unit id="2308646316372333720" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {One document in trash} other {<x id="INTERPOLATION"/> total documents in trash}}</source>
@@ -2335,7 +2335,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {One document in trash} other {<x id="INTERPOLATION"/> total documents in trash}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {Un documento} other {<x id="INTERPOLATION"/> documenti}} nel cestino</target>
       </trans-unit>
       <trans-unit id="9021887951960049161" datatype="html" approved="yes">
         <source>Confirm delete</source>
@@ -2363,7 +2363,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this document.</target>
+        <target state="translated">Questa operazione eliminerà permanentemente questo documento.</target>
       </trans-unit>
       <trans-unit id="5641451190833696892" datatype="html" approved="yes">
         <source>This operation cannot be undone.</source>
@@ -2411,7 +2411,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="needs-translation">Document deleted</target>
+        <target state="translated">Documento eliminato</target>
       </trans-unit>
       <trans-unit id="7295637485862454066" datatype="html">
         <source>Error deleting document</source>
@@ -2431,7 +2431,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">82</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete the selected documents.</target>
+        <target state="translated">Questa operazione eliminerà definitivamente i documenti selezionati.</target>
       </trans-unit>
       <trans-unit id="6804051092296228130" datatype="html">
         <source>This operation will permanently delete all documents in the trash.</source>
@@ -2439,7 +2439,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">83</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete all documents in the trash.</target>
+        <target state="translated">Questa operazione eliminerà permanentemente tutti i documenti nel cestino.</target>
       </trans-unit>
       <trans-unit id="6996183233986182894" datatype="html">
         <source>Document(s) deleted</source>
@@ -2463,7 +2463,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">113</context>
         </context-group>
-        <target state="needs-translation">Document restored</target>
+        <target state="translated">Documento ripristinato</target>
       </trans-unit>
       <trans-unit id="9136016619414048201" datatype="html">
         <source>Error restoring document</source>
@@ -2471,7 +2471,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">117</context>
         </context-group>
-        <target state="needs-translation">Error restoring document</target>
+        <target state="translated">Errore durante il ripristino del documento</target>
       </trans-unit>
       <trans-unit id="960063472770266304" datatype="html">
         <source>Document(s) restored</source>
@@ -2479,7 +2479,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">127</context>
         </context-group>
-        <target state="needs-translation">Document(s) restored</target>
+        <target state="translated">Documento(i) recuperato(i)</target>
       </trans-unit>
       <trans-unit id="8405416976953346141" datatype="html">
         <source>Error restoring document(s)</source>
@@ -2487,7 +2487,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">133</context>
         </context-group>
-        <target state="needs-translation">Error restoring document(s)</target>
+        <target state="translated">Errore durante il ripristino del documento(i)</target>
       </trans-unit>
       <trans-unit id="8119815638230251386" datatype="html">
         <source>Users &amp; Groups</source>
@@ -2949,7 +2949,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">191</context>
+          <context context-type="linenumber">193</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
@@ -3475,7 +3475,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Delete original documents after successful merge</target>
+        <target state="translated">Elimina documenti originali dopo l'unione</target>
       </trans-unit>
       <trans-unit id="5138283234724909648" datatype="html">
         <source>Note that only PDFs will be included.</source>
@@ -3507,7 +3507,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component.html</context>
           <context context-type="linenumber">49</context>
         </context-group>
-        <target state="needs-translation">Delete original document after successful split</target>
+        <target state="translated">Elimina documento originale dopo la divisione</target>
       </trans-unit>
       <trans-unit id="2509141182388535183" datatype="html" approved="yes">
         <source>View</source>
@@ -3613,7 +3613,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">245</context>
+          <context context-type="linenumber">247</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/document.ts</context>
@@ -3759,7 +3759,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Add option</target>
+        <target state="translated">Aggiungi opzione</target>
       </trans-unit>
       <trans-unit id="528950215505228201" datatype="html">
         <source>Create new custom field</source>
@@ -4665,13 +4665,13 @@
         </context-group>
         <target state="translated">Modello di corrispondenza contenuti</target>
       </trans-unit>
-      <trans-unit id="1333789258712064056" datatype="html">
-        <source>Has tags</source>
+      <trans-unit id="3484236514968690689" datatype="html">
+        <source>Has any of tags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">143</context>
         </context-group>
-        <target state="translated">Ha etichetta</target>
+        <target state="translated">Ha uno dei tag</target>
       </trans-unit>
       <trans-unit id="5281365940563983618" datatype="html">
         <source>Has correspondent</source>
@@ -5979,7 +5979,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">275</context>
+          <context context-type="linenumber">277</context>
         </context-group>
         <target state="final">Filtra per corrispondente</target>
       </trans-unit>
@@ -5995,7 +5995,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">310</context>
+          <context context-type="linenumber">312</context>
         </context-group>
         <target state="translated">Filtra per tipo di documento</target>
       </trans-unit>
@@ -6011,7 +6011,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">317</context>
+          <context context-type="linenumber">319</context>
         </context-group>
         <target state="translated">Filtra per percorso di archiviazione</target>
       </trans-unit>
@@ -6338,7 +6338,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">188</context>
+          <context context-type="linenumber">190</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
@@ -6382,7 +6382,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">179</context>
+          <context context-type="linenumber">180</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
@@ -6410,7 +6410,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">218</context>
+          <context context-type="linenumber">220</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
@@ -6438,7 +6438,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">227</context>
+          <context context-type="linenumber">229</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
@@ -6728,7 +6728,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">777</context>
         </context-group>
-        <target state="needs-translation">Do you really want to move the document "<x id="PH" equiv-text="this.document.title"/>" to the trash?</target>
+        <target state="translated">Vuoi davvero spostare il documento "<x id="PH" equiv-text="this.document.title"/>" nel cestino?</target>
       </trans-unit>
       <trans-unit id="282586936710748252" datatype="html">
         <source>Documents can be restored prior to permanent deletion.</source>
@@ -6740,7 +6740,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">714</context>
         </context-group>
-        <target state="needs-translation">Documents can be restored prior to permanent deletion.</target>
+        <target state="translated">I documenti possono essere ripristinati prima della cancellazione definitiva.</target>
       </trans-unit>
       <trans-unit id="2048798344356757326" datatype="html">
         <source>Move to trash</source>
@@ -6752,7 +6752,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">716</context>
         </context-group>
-        <target state="needs-translation">Move to trash</target>
+        <target state="translated">Sposta nel cestino</target>
       </trans-unit>
       <trans-unit id="619486176823357521" datatype="html">
         <source>Reprocess confirm</source>
@@ -6772,7 +6772,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">820</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently recreate the archive file for this document.</target>
+        <target state="translated">Questa operazione ricreerà in modo permanente il file di archivio per questo documento.</target>
       </trans-unit>
       <trans-unit id="302054111564709516" datatype="html">
         <source>The archive file will be re-generated with the current settings.</source>
@@ -6780,7 +6780,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">821</context>
         </context-group>
-        <target state="needs-translation">The archive file will be re-generated with the current settings.</target>
+        <target state="translated">Il file di archivio verrà rigenerato con le impostazioni attuali.</target>
       </trans-unit>
       <trans-unit id="1192507664585066165" datatype="html">
         <source>Reprocess operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
@@ -6888,7 +6888,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1192</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete the selected pages from the original document.</target>
+        <target state="translated">Questa operazione eliminerà definitivamente le pagine selezionate dal documento originale.</target>
       </trans-unit>
       <trans-unit id="8617528702531167646" datatype="html">
         <source>Delete pages operation will begin in the background. Close and re-open or reload this document after the operation has completed to see the changes.</source>
@@ -7258,7 +7258,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">713</context>
         </context-group>
-        <target state="needs-translation">Move <x id="PH" equiv-text="this.list.selected.size"/> selected document(s) to the trash?</target>
+        <target state="translated">Spostare <x id="PH" equiv-text="this.list.selected.size"/> documenti selezionati nel cestino?</target>
       </trans-unit>
       <trans-unit id="8585195717323764335" datatype="html">
         <source>This operation will permanently recreate the archive files for <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -7266,7 +7266,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">755</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently recreate the archive files for <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Questa operazione ricreerà in modo permanente i file di archivio per i <x id="PH" equiv-text="this.list.selected.size"/> documenti selezionati.</target>
       </trans-unit>
       <trans-unit id="7366623494074776040" datatype="html">
         <source>The archive files will be re-generated with the current settings.</source>
@@ -7274,7 +7274,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">756</context>
         </context-group>
-        <target state="needs-translation">The archive files will be re-generated with the current settings.</target>
+        <target state="translated">I file di archivio verranno rigenerati con le impostazioni attuali.</target>
       </trans-unit>
       <trans-unit id="6390006284731990222" datatype="html">
         <source>This operation will permanently rotate the original version of <x id="PH" equiv-text="this.list.selected.size"/> document(s).</source>
@@ -7324,7 +7324,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">286</context>
+          <context context-type="linenumber">288</context>
         </context-group>
         <target state="final">Filtra per tag</target>
       </trans-unit>
@@ -7548,7 +7548,7 @@
         <source>Sort by ASN</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">166</context>
+          <context context-type="linenumber">167</context>
         </context-group>
         <target state="translated">Ordina per ASN</target>
       </trans-unit>
@@ -7556,7 +7556,7 @@
         <source>ASN</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">170</context>
+          <context context-type="linenumber">171</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
@@ -7576,7 +7576,7 @@
         <source>Sort by correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">175</context>
+          <context context-type="linenumber">176</context>
         </context-group>
         <target state="translated">Ordina per corrispondente</target>
       </trans-unit>
@@ -7584,7 +7584,7 @@
         <source>Sort by title</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">184</context>
+          <context context-type="linenumber">185</context>
         </context-group>
         <target state="translated">Ordina per titolo</target>
       </trans-unit>
@@ -7592,7 +7592,7 @@
         <source>Sort by owner</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">196</context>
+          <context context-type="linenumber">198</context>
         </context-group>
         <target state="translated">Ordina per proprietario</target>
       </trans-unit>
@@ -7600,7 +7600,7 @@
         <source>Owner</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">200</context>
+          <context context-type="linenumber">202</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/document.ts</context>
@@ -7616,7 +7616,7 @@
         <source>Sort by notes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">205</context>
+          <context context-type="linenumber">207</context>
         </context-group>
         <target state="translated">Ordina per note</target>
       </trans-unit>
@@ -7624,7 +7624,7 @@
         <source>Sort by document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">214</context>
+          <context context-type="linenumber">216</context>
         </context-group>
         <target state="translated">Ordina per tipo di documento</target>
       </trans-unit>
@@ -7632,7 +7632,7 @@
         <source>Sort by storage path</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">223</context>
+          <context context-type="linenumber">225</context>
         </context-group>
         <target state="translated">Ordina per percorso di archiviazione</target>
       </trans-unit>
@@ -7640,7 +7640,7 @@
         <source>Sort by created date</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">232</context>
+          <context context-type="linenumber">234</context>
         </context-group>
         <target state="translated">Filtra per data di creazione</target>
       </trans-unit>
@@ -7648,7 +7648,7 @@
         <source>Sort by added date</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">241</context>
+          <context context-type="linenumber">243</context>
         </context-group>
         <target state="translated">Ordina per data di aggiunta</target>
       </trans-unit>
@@ -7656,7 +7656,7 @@
         <source> Shared </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">248,250</context>
+          <context context-type="linenumber">250,252</context>
         </context-group>
         <target state="translated"> Condiviso </target>
       </trans-unit>
@@ -7664,7 +7664,7 @@
         <source>Edit document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">282</context>
+          <context context-type="linenumber">284</context>
         </context-group>
         <target state="translated">Modifica documento</target>
       </trans-unit>
@@ -7672,7 +7672,7 @@
         <source>Yes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">333</context>
+          <context context-type="linenumber">335</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/pipes/yes-no.pipe.ts</context>
@@ -7684,7 +7684,7 @@
         <source>No</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">333</context>
+          <context context-type="linenumber">335</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/pipes/yes-no.pipe.ts</context>
