@@ -130,7 +130,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   .btn-outline-secondary {
     &:hover, &:focus, &.active, &:active {
       background-color: var(--pngx-bg-darker);
-      color: var(--bs-primary);
+      color: var(--bs-white) !important;
     }
   }
 
@@ -143,8 +143,8 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   }
 
   .search-container {
-    input, input:focus {
-      color: var(--bs-body-color) !important;
+    input, input:focus, i-bs[name="search"] , ::placeholder {
+      color: var(--pngx-primary-text-contrast) !important;
     }
   }
 
