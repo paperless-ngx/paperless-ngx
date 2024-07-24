@@ -237,9 +237,13 @@ Settings > Users & Groups, assuming the user has access. If a user is designated
 as a member of a group those permissions will be inherited and this is reflected in the UI. Explicit
 permissions can be granted to limit access to certain parts of the UI (and corresponding API endpoints).
 
-!!! note
+!!! tip
 
-    Superusers can access all parts of the front and backend application as well as any and all objects.
+    By default, new users are not granted any permissions, except those inherited from any group(s) of which they are a member.
+
+#### Superusers
+
+Superusers can access all parts of the front and backend application as well as any and all objects.
 
 #### Admin Status
 
@@ -248,29 +252,29 @@ as well as accessing the Django backend.
 
 #### Detailed Explanation of Global Permissions {#global-permissions}
 
-Global permissions define what areas of the app and API endpoints the user can access. For example, they
+Global permissions define what areas of the app and API endpoints users can access. For example, they
 determine if a user can create, edit, delete or view _any_ documents, but individual documents themselves
 still have "object-level" permissions.
 
-| Type          | Details                                                                                                                                                                                             |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| AppConfig     | _Change_ or higher permissions grants access to the "Application Configuration" area.                                                                                                               |
-| Correspondent | Grants global permissions to add, edit, delete or view Correspondents.                                                                                                                              |
-| CustomField   | Grants global permissions to add, edit, delete or view Custom Fields.                                                                                                                               |
-| Document      | Grants global permissions to add, edit, delete or view Documents.                                                                                                                                   |
-| DocumentType  | Grants global permissions to add, edit, delete or view Document Types.                                                                                                                              |
-| Group         | Grants global permissions to add, edit, delete or view Groups.                                                                                                                                      |
-| MailAccount   | Grants global permissions to add, edit, delete or view Mail Accounts.                                                                                                                               |
-| MailRule      | Grants global permissions to add, edit, delete or view Mail Rules.                                                                                                                                  |
-| Note          | Grants global permissions to add, edit, delete or view Notes.                                                                                                                                       |
-| PaperlessTask | Grants global permissions to view or dismiss (_Change_) File Tasks.                                                                                                                                 |
-| SavedView     | Grants global permissions to add, edit, delete or view Saved Views.                                                                                                                                 |
-| ShareLink     | Grants global permissions to add, delete or view Share Links.                                                                                                                                       |
-| StoragePath   | Grants global permissions to add, edit, delete or view Storage Paths.                                                                                                                               |
-| Tag           | Grants global permissions to add, edit, delete or view Tags.                                                                                                                                        |
-| UISettings    | Grants global permissions to add, edit, delete or view the UI settings that are used by the web app.<br/>Users expected to access the web UI should usually be granted at least _View_ permissions. |
-| User          | Grants global permissions to add, edit, delete or view Users.                                                                                                                                       |
-| Workflow      | Grants global permissions to add, edit, delete or view Workflows.<br/>Note that Workflows are global, in other words all users who can access workflows have access to the same set of them.        |
+| Type          | Details                                                                                                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| AppConfig     | _Change_ or higher permissions grants access to the "Application Configuration" area.                                                                                    |
+| Correspondent | Add, edit, delete or view Correspondents.                                                                                                                                |
+| CustomField   | Add, edit, delete or view Custom Fields.                                                                                                                                 |
+| Document      | Add, edit, delete or view Documents.                                                                                                                                     |
+| DocumentType  | Add, edit, delete or view Document Types.                                                                                                                                |
+| Group         | Add, edit, delete or view Groups.                                                                                                                                        |
+| MailAccount   | Add, edit, delete or view Mail Accounts.                                                                                                                                 |
+| MailRule      | Add, edit, delete or view Mail Rules.                                                                                                                                    |
+| Note          | Add, edit, delete or view Notes.                                                                                                                                         |
+| PaperlessTask | View or dismiss (_Change_) File Tasks.                                                                                                                                   |
+| SavedView     | Add, edit, delete or view Saved Views.                                                                                                                                   |
+| ShareLink     | Add, delete or view Share Links.                                                                                                                                         |
+| StoragePath   | Add, edit, delete or view Storage Paths.                                                                                                                                 |
+| Tag           | Add, edit, delete or view Tags.                                                                                                                                          |
+| UISettings    | Add, edit, delete or view the UI settings that are used by the web app.<br/>:warning: **Users that will access the web UI must be granted at least _View_ permissions.** |
+| User          | Add, edit, delete or view Users.                                                                                                                                         |
+| Workflow      | Add, edit, delete or view Workflows.<br/>Note that Workflows are global, in other words all users who can access workflows have access to the same set of them.          |
 
 #### Detailed Explanation of Object Permissions {#object-permissions}
 
