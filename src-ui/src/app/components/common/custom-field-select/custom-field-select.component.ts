@@ -92,6 +92,7 @@ export class CustomFieldSelectComponent
     this.getFields()  
   }
 
+  @Input() inputDossier: Dossier
   @Output() dataChange = new EventEmitter<any[]>();
 
   inheritedWarning: string = $localize`Inherited from dossier`
@@ -109,6 +110,7 @@ export class CustomFieldSelectComponent
     this.dataDossier()
 
     this.customFields.valueChanges.subscribe(data => {
+      console.log('gia tri refe',data)
       const filteredData = data.filter(item => this.dictCustomFieldsEnable[item.field]);
       
         this.dataChange.emit(filteredData);

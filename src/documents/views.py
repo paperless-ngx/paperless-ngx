@@ -1096,6 +1096,7 @@ class PostDocumentView(GenericAPIView):
         storage_path_id = serializer.validated_data.get("storage_path")
         warehouse_id = serializer.validated_data.get("warehouse")
         folder_id = serializer.validated_data.get("folder")
+        dossier_id = serializer.validated_data.get("dossier")
         tag_ids = serializer.validated_data.get("tags")
         title = serializer.validated_data.get("title")
         created = serializer.validated_data.get("created")
@@ -1116,6 +1117,7 @@ class PostDocumentView(GenericAPIView):
             source=DocumentSource.ApiUpload,
             original_file=temp_file_path,
         )
+        print('dossier_id',dossier_id)
         input_doc_overrides = DocumentMetadataOverrides(
             filename=doc_name,
             title=title,
@@ -1124,6 +1126,7 @@ class PostDocumentView(GenericAPIView):
             storage_path_id=storage_path_id,
             warehouse_id=warehouse_id,
             folder_id=folder_id,
+            dossier_id=dossier_id,
             tag_ids=tag_ids,
             created=created,
             asn=archive_serial_number,
@@ -2622,39 +2625,39 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             child_dossier.save()
             self.update_child_dossier_paths(child_dossier)
 
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        if request.data.get('parent_dossier') is None:
-            pass
-        elif 'parent_dossier' in request.data and int(request.data['parent_dossier']) == instance.id:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+    # def update(self, request, *args, **kwargs):
+    #     partial = kwargs.pop('partial', False)
+    #     instance = self.get_object()
+    #     if request.data.get('parent_dossier') is None:
+    #         pass
+    #     elif 'parent_dossier' in request.data and int(request.data['parent_dossier']) == instance.id:
+    #         return Response(status=status.HTTP_400_BAD_REQUEST)
         
-        elif 'parent_dossier' in request.data:
-            new_parent_dossier = Dossier.objects.get(id=int(request.data['parent_dossier']))
-            if new_parent_dossier.path.startswith(instance.path):
-                return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a dossier into one of its child dossiers.'})
-        else:
-            request.data['parent_dossier'] = None
+    #     elif 'parent_dossier' in request.data:
+    #         new_parent_dossier = Dossier.objects.get(id=int(request.data['parent_dossier']))
+    #         if new_parent_dossier.path.startswith(instance.path):
+    #             return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a dossier into one of its child dossiers.'})
+    #     else:
+    #         request.data['parent_dossier'] = None
       
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
+    #     serializer = self.get_serializer(instance, data=request.data, partial=partial)
+    #     serializer.is_valid(raise_exception=True)
 
-        old_parent_dossier = instance.parent_dossier
+    #     old_parent_dossier = instance.parent_dossier
 
-        self.perform_update(serializer)
+    #     self.perform_update(serializer)
 
-        if old_parent_dossier != instance.parent_dossier:
-            if instance.parent_dossier:
-                instance.path = f"{instance.parent_dossier.path}/{instance.id}"
+    #     if old_parent_dossier != instance.parent_dossier:
+    #         if instance.parent_dossier:
+    #             instance.path = f"{instance.parent_dossier.path}/{instance.id}"
                 
-            else:
-                instance.path = f"{instance.id}"
-            instance.save()
+    #         else:
+    #             instance.path = f"{instance.id}"
+    #         instance.save()
 
-            self.update_child_dossier_paths(instance)
+    #         self.update_child_dossier_paths(instance)
             
-        return Response(serializer.data)
+    #     return Response(serializer.data)
 
     @action(methods=["get"], detail=True)
     def dossier_path(self, request, pk=None):

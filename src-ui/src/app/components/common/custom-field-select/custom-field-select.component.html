@@ -5,7 +5,8 @@
       <div class="row">
         <div class="col" i18n>Field</div>
         <div class="col" i18n>Enable</div>
-        <div class="col-3" i18n>Match value</div>
+        <div class="col-3 " [hidden]="!inputDossier.is_form" i18n>Match value</div>
+        <div class="col-3 " [hidden]="inputDossier.is_form" i18n>Value</div>
 
         <div class="col-lg-5" i18n>Reference to the field of the document</div>
       </div>
@@ -45,12 +46,17 @@
       <li class="list-group-item" formArrayName="customFields" *ngFor="let customField of customFields.controls; let i=index" >
         <div class="row">
           <div class="col">{{ customField.get('field_name').value }}</div>
-          <div class="col-2 form-switch" placement="left" triggers="mouseenter:mouseleave">
+          <div class="col form-switch" placement="left" triggers="mouseenter:mouseleave">
             <input type="checkbox" class="form-check-input" id="{{customField.get('field').value}}"  [checked]="this.dictCustomFieldsEnable[customField.get('field').value] || false" (change)="toggleAll($event, customField.get('field'))">
             <label class="form-check-label visually-hidden" for="{{customField.get('field').value}}" i18n>All</label>
           </div>
        
-          <div class="col-lg-3"  placement="left" triggers="mouseenter:mouseleave">
+          <div class="col-lg-3" [hidden]="inputDossier.is_form" placement="left" triggers="mouseenter:mouseleave">
+            <input type="text" class="form-control" [formControl]="customField.get('value')" >
+            <label class="visually-hidden" i18n>{{customField.get('value')}}</label>
+          </div>
+
+          <div class="col-lg-3" [hidden]="!inputDossier.is_form" placement="left" triggers="mouseenter:mouseleave">
             <input type="text" class="form-control" [formControl]="customField.get('match_value')" >
             <label class="visually-hidden" i18n>{{customField.get('match_value')}}</label>
           </div>

@@ -26,7 +26,7 @@ from documents.file_handling import generate_unique_filename
 from documents.loggers import LoggingMixin
 from documents.matching import document_matches_workflow
 from documents.matching import approval_matches_workflow
-from documents.models import Correspondent
+from documents.models import Correspondent, Dossier
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
@@ -303,6 +303,7 @@ class Consumer(LoggingMixin):
         self.override_correspondent_id = None
         self.override_warehouse_id = None
         self.override_folder_id = None
+        self.override_dossier_id = None
         self.override_tag_ids = None
         self.override_document_type_id = None
         self.override_asn = None
@@ -501,6 +502,7 @@ class Consumer(LoggingMixin):
         override_tag_ids=None,
         override_warehouse_id=None,
         override_folder_id=None,
+        override_dossier_id=None,
         override_storage_path_id=None,
         task_id=None,
         override_created=None,
@@ -524,6 +526,7 @@ class Consumer(LoggingMixin):
         self.override_tag_ids = override_tag_ids
         self.override_warehouse_id = override_warehouse_id
         self.override_folder_id = override_folder_id
+        self.override_dossier_id = override_dossier_id
         self.override_storage_path_id = override_storage_path_id
         self.task_id = task_id or str(uuid.uuid4())
         self.override_created = override_created
@@ -724,6 +727,17 @@ class Consumer(LoggingMixin):
                     new_file.path = f"{new_file.id}"
                 new_file.save()
                 document.folder=new_file
+                parent_dossier = Dossier.objects.filter(id=document.dossier.pk).first()
+                parent_dossier_type = None
+                if parent_dossier:
+                    parent_dossier_type = parent_dossier.parent_dossier_type
+                new_dossier_document = Dossier.objects.create(name=document.title, parent_dossier = document.dossier, dossier_type = "DOCUMENT", parent_dossier_type = parent_dossier_type )
+                if document.dossier :
+                    new_dossier_document.path = f"{document.dossier.path}/{new_file.id}"
+                else:
+                    new_dossier_document.path = f"{new_file.id}"
+                new_dossier_document.save()
+                document.dossier=new_dossier_document
                 # After everything is in the database, copy the files into
                 # place. If this fails, we'll also rollback the transaction.
                 with FileLock(settings.MEDIA_LOCK):
@@ -917,6 +931,11 @@ class Consumer(LoggingMixin):
         if self.override_folder_id:
             document.folder = Folder.objects.get(
                 pk=self.override_folder_id,
+            )
+
+        if self.override_dossier_id:
+            document.dossier = Dossier.objects.get(
+                pk=self.override_dossier_id,
             )
         
         if self.override_warehouse_id:

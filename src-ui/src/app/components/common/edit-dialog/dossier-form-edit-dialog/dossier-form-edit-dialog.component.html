@@ -31,7 +31,7 @@
         </div>
       </div>
       <div class="col">
-        <pngx-custom-field-select [inheritedCustomFields]="object.custom_fields" formControlName="custom_fields" (dataChange)="onDataChange($event)"></pngx-custom-field-select>
+        <pngx-custom-field-select [inheritedCustomFields]="object.custom_fields" [inputDossier]="object" formControlName="custom_fields" (dataChange)="onDataChange($event)"></pngx-custom-field-select>
         
       </div>
     </div>

@@ -31,7 +31,7 @@ export class DossierEditDialogComponent
   ]
   // private readonly dossierService: DossierService
   private unsubscribeNotifier: Subject<any> = new Subject()
-  dossier: Dossier[]=[]
+  dossierArray: Dossier[]=[]
   dataCustomFields: any[]=[]
   dataFromCustomFields: any[]=[]
   constructor(
@@ -44,7 +44,6 @@ export class DossierEditDialogComponent
     super(service, activeModal, userService, settingsService)
     // this.dataDossier()
     // this.getFormOrigin().get('parent_dossier_type').setValue(null)
-    console.log(this.getFormOrigin().value)
     // if(this.getFormOrigin().get('dossier_type').value==DossierType.Document){
     //   this.dataDossier(DossierType.Document)
       
@@ -54,10 +53,10 @@ export class DossierEditDialogComponent
     //   this.dataDossier(DossierType.Dossier)
       
     // }
-
+    
+    console.log('object',this.object)
     this.getFormOrigin().valueChanges.subscribe(value => {
       
-      // console.log(value)
       if(value.dossier_type==DossierType.Document){
         this.dataDossier(DossierType.Document)
         
@@ -69,7 +68,7 @@ export class DossierEditDialogComponent
       }
 
       // console.log(this.getFormOrigin().value)
-      // const dossierSelect = this.dossier.find(obj => obj.id === value.id);
+      // const dossierSelect = this.dossierarray.find(obj => obj.id === value.id);
       // if (dossierSelect) {
       //   this.dataCustomFields=dossierSelect.custom_fields
       // } else {
@@ -83,6 +82,11 @@ export class DossierEditDialogComponent
   ngOnInit(): void {
     super.ngOnInit()
     if (this.typeFieldDisabled) {
+    }
+    if(this.object){
+      console.log(this.object)
+
+      this.dataCustomFields=this.object.custom_fields
     }
     
     
@@ -106,6 +110,7 @@ export class DossierEditDialogComponent
     })
   }
   dataDossier(type){
+    console.log('iasjdifo',this.getFormOrigin().value)
     this.dossierService
       .listDossierFiltered(
         1,
@@ -120,16 +125,7 @@ export class DossierEditDialogComponent
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((c) => {
-        this.dossier = c.results
-        
-        const dossierSelect = this.dossier.find(obj => obj.id === this.getFormOrigin().value.parent_dossier_type);
-        if (dossierSelect) {
-          
-          console.log(this.getFormOrigin().value)
-          this.dataCustomFields=dossierSelect.custom_fields
-        } else {
-          console.log("Object not found.");
-        }
+        this.dossierArray = c.results
         
       })  
   }
@@ -153,9 +149,11 @@ export class DossierEditDialogComponent
   }
   onDataInputParentDossierTypeChange(data) {
     this.dataCustomFields=[]
-    const dossierSelect = this.dossier.find(obj => obj.id === data);
+    const dossierSelect = this.dossierArray.find(obj => obj.id === this.getFormOrigin().get('parent_dossier_type').value);
+    
     if (dossierSelect) {
-      this.getFormOrigin().patchValue({ custom_fields: this.dataFromCustomFields });
+      this.dataCustomFields = dossierSelect.custom_fields
+      // this.getFormOrigin().patchValue({ custom_fields: this.dataFromCustomFields });
     } else {
       console.log("Object not found.");
     }

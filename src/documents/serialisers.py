@@ -1229,6 +1229,14 @@ class PostDocumentSerializer(serializers.Serializer):
         required=False,
     )
     
+    dossier = serializers.PrimaryKeyRelatedField(
+        queryset=Dossier.objects.all(),
+        label="Dossier",
+        allow_null=True,
+        write_only=True,
+        required=False,
+    )
+    
     warehouse = serializers.PrimaryKeyRelatedField(
         queryset=Warehouse.objects.all(),
         label="Warehouse",
@@ -1301,6 +1309,12 @@ class PostDocumentSerializer(serializers.Serializer):
     def validate_folder(self, folder):
         if folder:
             return folder.id
+        else:
+            return None
+        
+    def validate_dossier(self, dossier):
+        if dossier:
+            return dossier.id
         else:
             return None
         
