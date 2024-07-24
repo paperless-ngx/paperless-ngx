@@ -130,7 +130,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   .btn-outline-secondary {
     &:hover, &:focus, &.active, &:active {
       background-color: var(--pngx-bg-darker);
-      color: var(--bs-white) !important;
+      color: var(--pngx-body-color-accent) !important;
     }
   }
 
