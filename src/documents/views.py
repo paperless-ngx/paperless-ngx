@@ -94,7 +94,7 @@ from documents.conditionals import thumbnail_last_modified
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
-from documents.filters import CorrespondentFilterSet, DossierFilterSet
+from documents.filters import CorrespondentFilterSet, DossierFilterSet, DossierFormFilterSet
 from documents.filters import CustomFieldFilterSet
 from documents.filters import DocumentFilterSet
 from documents.filters import DocumentTypeFilterSet
@@ -111,7 +111,7 @@ from documents.matching import match_storage_paths
 from documents.matching import match_warehouses
 from documents.matching import match_folders
 from documents.matching import match_tags
-from documents.models import Approval, Correspondent, CustomFieldInstance, Dossier
+from documents.models import Approval, Correspondent, CustomFieldInstance, Dossier, DossierForm
 from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
@@ -135,7 +135,7 @@ from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
-from documents.serialisers import AcknowledgeTasksViewSerializer, ApprovalSerializer, ApprovalViewSerializer, DossierSerializer, ExportDocumentFromFolderSerializer
+from documents.serialisers import AcknowledgeTasksViewSerializer, ApprovalSerializer, ApprovalViewSerializer, DossierFormSerializer, DossierSerializer, ExportDocumentFromFolderSerializer
 from documents.serialisers import BulkDownloadSerializer
 from documents.serialisers import BulkEditObjectsSerializer
 from documents.serialisers import BulkEditSerializer
@@ -2583,7 +2583,7 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = DossierFilterSet
-    ordering_fields = ("name", "dossier_type", "is_form","parent_dossier_type")
+    ordering_fields = ("name", "type","dossier_form")
 
     def create(self, request, *args, **kwargs):
         # try:                                                          
@@ -2601,14 +2601,14 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             dossier.save()
         elif parent_dossier:
             dossier = serializer.save(owner=request.user)
-            if parent_dossier.is_form == True and dossier.is_form == False:
-                dossier.path = str(dossier.id)
-            elif parent_dossier.is_form == True and dossier.is_form == True:
-                dossier = serializer.save(parent_dossier=None,owner=request.user)
-                dossier.path = f"{parent_dossier.path}/{dossier.id}"
-            else:
-                dossier = serializer.save(parent_dossier=parent_dossier,owner=request.user)
-                dossier.path = f"{parent_dossier.path}/{dossier.id}"
+            # if parent_dossier.is_form == True and dossier.is_form == False:
+            #     dossier.path = str(dossier.id)
+            # elif parent_dossier.is_form == True and dossier.is_form == True:
+            #     dossier = serializer.save(parent_dossier=None,owner=request.user)
+            #     dossier.path = f"{parent_dossier.path}/{dossier.id}"
+            # else:
+            dossier = serializer.save(parent_dossier=parent_dossier,owner=request.user)
+            dossier.path = f"{parent_dossier.path}/{dossier.id}"
             dossier.save()
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -2681,5 +2681,121 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 return Response(
                     {"error": "Error retrieving dossiers, check logs for more detail."},
                 )
+            
+        
+class DossierFormViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
+    model = DossierForm
+
+    queryset = DossierForm.objects.select_related("owner").order_by(
+        Lower("name"),
+    )
+
+    serializer_class = DossierFormSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
+    filterset_class = DossierFormFilterSet
+    ordering_fields = ("name", "type",)
+
+    # def create(self, request, *args, **kwargs):
+    #     # try:                                                          
+    #     serializer = DossierFormSerializer(data=request.data)
+    #     parent_dossier = None
+    #     if serializer.is_valid(raise_exception=True):
+    #         parent_dossier = serializer.validated_data.get('parent_dossier',None)
+            
+    #     parent_dossier = Dossier.objects.filter(id=parent_dossier.id if parent_dossier else 0).first()   
+        
+    #     if parent_dossier == None:
+    #         dossier = serializer.save(owner=request.user)
+           
+    #         dossier.path = str(dossier.id)
+    #         dossier.save()
+    #     elif parent_dossier:
+    #         dossier = serializer.save(owner=request.user)
+    #         if parent_dossier.is_form == True and dossier.is_form == False:
+    #             dossier.path = str(dossier.id)
+    #         elif parent_dossier.is_form == True and dossier.is_form == True:
+    #             dossier = serializer.save(parent_dossier=None,owner=request.user)
+    #             dossier.path = f"{parent_dossier.path}/{dossier.id}"
+    #         else:
+    #             dossier = serializer.save(parent_dossier=parent_dossier,owner=request.user)
+    #             dossier.path = f"{parent_dossier.path}/{dossier.id}"
+    #         dossier.save()
+    #     else:
+    #         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    #     return Response(serializer.data,status=status.HTTP_201_CREATED)
+    
+    # def update_child_dossier_paths(self, dossier):
+    #     child_dossiers = Dossier.objects.filter(parent_dossier=dossier)
+    #     for child_dossier in child_dossiers:
+    #         if dossier.path:
+    #             child_dossier.path = f"{dossier.path}/{child_dossier.id}"
+    #         else:
+    #             child_dossier.path = f"{child_dossier.id}"
+    #         child_dossier.save()
+    #         self.update_child_dossier_paths(child_dossier)
+
+    # def update(self, request, *args, **kwargs):
+    #     partial = kwargs.pop('partial', False)
+    #     instance = self.get_object()
+    #     if request.data.get('parent_dossier') is None:
+    #         pass
+    #     elif 'parent_dossier' in request.data and int(request.data['parent_dossier']) == instance.id:
+    #         return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+    #     elif 'parent_dossier' in request.data:
+    #         new_parent_dossier = Dossier.objects.get(id=int(request.data['parent_dossier']))
+    #         if new_parent_dossier.path.startswith(instance.path):
+    #             return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a dossier into one of its child dossiers.'})
+    #     else:
+    #         request.data['parent_dossier'] = None
+      
+    #     serializer = self.get_serializer(instance, data=request.data, partial=partial)
+    #     serializer.is_valid(raise_exception=True)
+
+    #     old_parent_dossier = instance.parent_dossier
+
+    #     self.perform_update(serializer)
+
+    #     if old_parent_dossier != instance.parent_dossier:
+    #         if instance.parent_dossier:
+    #             instance.path = f"{instance.parent_dossier.path}/{instance.id}"
+                
+    #         else:
+    #             instance.path = f"{instance.id}"
+    #         instance.save()
+
+    #         self.update_child_dossier_paths(instance)
+            
+    #     return Response(serializer.data)
+
+    # @action(methods=["get"], detail=True)
+    # def dossier_path(self, request, pk=None):
+    #     if request.method == "GET":
+    #         try:
+    #             fol = Dossier.objects.get(pk=pk)
+    #             dossier_path = fol.path.split('/')
+    #             dossiers = Dossier.objects.filter(id__in = dossier_path)
+    #             dossiers_dict = {}
+    #             for f in dossiers:
+    #                 dossiers_dict[f.id] = f
+    #                 # print(f)
+    #             new_dossier_path = []
+    #             for p in dossier_path:
+    #                 value = dossiers_dict.get(int(p))
+    #                 new_dossier_path.append(value)
+    #             dossiers_serialisers = DossierSerializer(new_dossier_path, many=True)
+    #             return Response({"results":dossiers_serialisers.data},status=status.HTTP_200_OK)
+    #         except Exception as e:
+    #             logger.warning(f"An error occurred retrieving dossiers: {e!s}")
+    #             return Response(
+    #                 {"error": "Error retrieving dossiers, check logs for more detail."},
+    #             )
             
         

@@ -32,7 +32,8 @@ export enum PermissionType {
   Shelf = '%s_shelf',
   Approval = '%s_approval',
   Folder = '%s_folder',
-  Dossier = '%s_dossier'
+  Dossier = '%s_dossier',
+  DossierForm = '%s_dossierform'
 }
 
 @Injectable({

@@ -4,29 +4,29 @@
     <div class="border-bottom doc-img-container" [class.doc-img-background-selected]="selected"
       (click)="this.toggleSelected.emit($event)" (dblclick)="dblClickDocument.emit(this)">
       
-      <!-- @if ( dossier.document_matching == null ){ -->
+      <!-- @if ( dossierForm.document_matching == null ){ -->
         <a class="me">
 
-          @if (dossier.dossier_type == "DOSSIER") {
+          @if (dossierForm.type == "DOSSIER") {
             <i-bs class="me-1 d-flex justify-content-center align-items-center p-2" name="archive" width="2rem" height="2rem"  ></i-bs>
-          } @else if (dossier.dossier_type == "DOCUMENT") {
+          } @else if (dossierForm.type == "DOCUMENT") {
             <!-- <i-bs class="me-1" name="files"></i-bs> -->
             <i-bs class="me-1 d-flex justify-content-center align-items-center p-2" name="file-earmark-pdf" width="2rem" height="2rem"></i-bs>
           }
          
         </a>
       <!-- }@else {
-        <img class="card-img doc-img rounded-top"  [src]="getThumbUrl(dossier)">
+        <img class="card-img doc-img rounded-top"  [src]="getThumbUrl(dossierForm)">
       } -->
       
        
       <div class="border-end border-bottom bg-light py-1 px-2 document-card-check">
         <div class="form-check">
-          <!-- <input type="checkbox" class="form-check-input" id="smallCardCheck{{dossier.id}}" [checked]="selected"
+          <!-- <input type="checkbox" class="form-check-input" id="smallCardCheck{{dossierForm.id}}" [checked]="selected"
             (click)="this.toggleSelected.emit($event)">
-          <label class="form-check-label" for="smallCardCheck{{dossier.id}}"></label> -->
-          <input type="checkbox" class="form-check-input" id="{{typeName}}{{dossier.id}}" [checked]="selected" id="smallCardCheck{{dossier.id}}" [checked]="selectedObjects.has(dossier.id)" (click)="toggleSelected.emit(dossier); $event.stopPropagation();">
-                <label class="form-check-label" for="{{typeName}}{{dossier.id}}"></label>
+          <label class="form-check-label" for="smallCardCheck{{dossierForm.id}}"></label> -->
+          <input type="checkbox" class="form-check-input" id="{{typeName}}{{dossierForm.id}}" [checked]="selected" id="smallCardCheck{{dossierForm.id}}" [checked]="selectedObjects.has(dossierForm.id)" (click)="toggleSelected.emit(dossierForm); $event.stopPropagation();">
+                <label class="form-check-label" for="{{typeName}}{{dossierForm.id}}"></label>
         </div>
       </div>
 
@@ -52,23 +52,23 @@
     } -->
 
     <div class="card-body bg-light p-2">
-      @if (dossier.dossier_type=="DOSSIER"){
-        <span class="card-text"  (click)="this.goToDossier.emit(this.dossier)">
+      @if (dossierForm.type=="DOSSIER"){
+        <span class="card-text"  (click)="this.goToDossier.emit(this.dossierForm)">
           <!-- @if (document.correspondent) {
           <a title="Toggle correspondent filter" i18n-title
             (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()"
             class="fw-bold btn-link">{{(document.correspondent$ | async)?.name ?? privateName}}</a>:
           } -->
-          {{dossier.name | documentTitle}}
+          {{dossierForm.name | documentTitle}}
         </span>
-      } @else if (dossier.dossier_type=="DOCUMENT"){
+      } @else if (dossierForm.type=="DOCUMENT"){
         <span class="card-text"  routerLink="/documents/{{1}}">
           <!-- @if (document.correspondent) {
           <a title="Toggle correspondent filter" i18n-title
             (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()"
             class="fw-bold btn-link">{{(document.correspondent$ | async)?.name ?? privateName}}</a>:
           } -->
-          {{dossier.name | documentTitle}}
+          {{dossierForm.name | documentTitle}}
         </span>
       }
     </div>
@@ -86,7 +86,7 @@
         <button type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0"
           title="Toggle storage path filter" i18n-title
           (click)="clickStoragePath.emit(document.storage_path);$event.stopPropagation()">
-          <i-bs width="1em" height="1em" class="me-2 text-muted" name="dossier"></i-bs>
+          <i-bs width="1em" height="1em" class="me-2 text-muted" name="dossierForm"></i-bs>
           <small>{{(document.storage_path$ | async)?.name ?? privateName}}</small>
         </button>
         }
@@ -94,7 +94,7 @@
         <button type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0"
           title="Toggle warehouse filter" i18n-title
           (click)="clickWarehouse.emit(document.warehouse);$event.stopPropagation()">
-          <i-bs width="1em" height="1em" class="me-2 text-muted" name="dossier"></i-bs>
+          <i-bs width="1em" height="1em" class="me-2 text-muted" name="dossierForm"></i-bs>
           <small>{{(document.warehouse$ | async)?.name ?? privateName}}</small>
         </button>
         }
@@ -173,21 +173,21 @@
               *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }" i18n-title>
               <i-bs name="filter"></i-bs>
             </button>
-            <button class="btn btn-sm btn-outline-secondary" (click)="openEditDialog(dossier);  $event.stopPropagation();" title="Edit" i18n-title
-              *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType }" autoClose="true" [disabled]="!userCanEdit(dossier)" >
+            <button class="btn btn-sm btn-outline-secondary" (click)="openEditDialog(dossierForm);  $event.stopPropagation();" title="Edit" i18n-title
+              *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType }" autoClose="true" [disabled]="!userCanEdit(dossierForm)" >
               <i-bs name="pencil"></i-bs>
             </button>
-            <button class="btn btn-sm btn-outline-secondary" (click)="openDeleteDialog(dossier); $event.stopPropagation();" title="Delete" i18n-title 
-            *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType }" [disabled]="!userCanDelete(dossier)">
+            <button class="btn btn-sm btn-outline-secondary" (click)="openDeleteDialog(dossierForm); $event.stopPropagation();" title="Delete" i18n-title 
+            *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType }" [disabled]="!userCanDelete(dossierForm)">
               <i-bs name="trash"></i-bs>
             </button> -->
             <button class="btn btn-sm btn-outline-secondary" (click)="this.filterDocuments.emit(this.foler); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
               <i-bs name="filter"></i-bs>
             </button>
-            <button class="btn btn-sm btn-outline-secondary" (click)="this.openEditDialog.emit(this.dossier); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType }" [disabled]="userCanEdit.emit(this.dossier)">
+            <button class="btn btn-sm btn-outline-secondary" (click)="this.openEditDialog.emit(this.dossierForm); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType }" [disabled]="userCanEdit.emit(this.dossierForm)">
               <i-bs name="pencil"></i-bs>
             </button>
-            <button class="btn btn-sm btn-outline-danger" (click)="this.openDeleteDialog.emit(this.dossier); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType }" [disabled]="userCanDelete.emit(this.dossier)">
+            <button class="btn btn-sm btn-outline-danger" (click)="this.openDeleteDialog.emit(this.dossierForm); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType }" [disabled]="userCanDelete.emit(this.dossierForm)">
               <i-bs name="trash"></i-bs>
             </button>
 

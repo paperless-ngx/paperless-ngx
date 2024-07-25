@@ -12,10 +12,11 @@
       <div class="col-md-4">
         <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
         <pngx-input-text i18n-title title="Url" formControlName="url" [error]="error?.name" autocomplete="off"></pngx-input-text>
+        <pngx-input-text i18n-title title="Form rule" formControlName="form_rule" [error]="error?.name" autocomplete="off"></pngx-input-text>
         <pngx-input-text i18n-title title="Key" formControlName="key" [error]="error?.name" autocomplete="off"></pngx-input-text>
         <div class="input-group input-group-sm w-100 mt-2">
           <label class="input-group-text" ><ng-container i18n>Dossier type</ng-container>:</label>
-          <select class="form-select form-select-sm" formControlName="dossier_type">
+          <select class="form-select form-select-sm" formControlName="type">
             @for (option of DOSSIER_TYPES_OPTIONS; track option) {
               <option [ngValue]="option.value" >{{ option.label }}</option>
             }

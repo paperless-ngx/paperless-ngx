@@ -48,6 +48,8 @@ import { EditDialogMode } from 'src/app/components/common/edit-dialog/edit-dialo
 import { PermissionsDialogComponent } from 'src/app/components/common/permissions-dialog/permissions-dialog.component'
 import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
 import { DossierCustomFieldFormEditDialogComponent } from 'src/app/components/common/edit-dialog/dossier-instance-customfield-form-edit-dialog/dossier-instance-customfield-form-edit-dialog.component'
+import { DossierFormService } from 'src/app/services/rest/dossier-forms.service'
+import { DossierForm } from 'src/app/data/dossier-form'
 export interface ManagementListColumn {
   key: string
 
@@ -77,7 +79,7 @@ export abstract class CustomDossierFormListComponent<T extends ObjectWithId>
     public typeNamePlural: string,
     public permissionType: PermissionType,
     public extraColumns: ManagementListColumn[],
-    public dossierService: DossierService,
+    public dossierFormService: DossierFormService,
     public isForm: boolean
     
   ) {
@@ -104,7 +106,7 @@ export abstract class CustomDossierFormListComponent<T extends ObjectWithId>
   public selectedObjects: Set<number> = new Set()
   public togggleAll: boolean = false
   public shareLinks: ShareLink[]
-  public dossier: Dossier[] = []
+  public dossierForm: DossierForm[] = []
   public documentService: DocumentService
   public ColorTheme : ColorTheme
 
@@ -164,7 +166,7 @@ export abstract class CustomDossierFormListComponent<T extends ObjectWithId>
   userCanEditAll(): boolean {
     let canEdit: boolean = this.permissionService.currentUserCan(
       PermissionAction.Change,
-      PermissionType.Dossier
+      PermissionType.DossierForm
     )
     if (!canEdit) return false
 
@@ -199,13 +201,12 @@ export abstract class CustomDossierFormListComponent<T extends ObjectWithId>
     // console.log(this.dossier)
     this.isLoading = true
     this.service
-      .listDossierFiltered(
+      .listDossierFormFiltered(
         this.page,
         null,
         this.sortField,
         this.sortReverse,
         this.id,
-        true,
         this._nameFilter,
         true,
         ''
@@ -273,10 +274,10 @@ export abstract class CustomDossierFormListComponent<T extends ObjectWithId>
     modal.componentInstance.object = object
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((newDossier: Dossier) => {
+      .subscribe((newDossierForm: DossierForm) => {
        
           this.toastService.showInfo(
-            $localize`Saved dossier "${newDossier}".`
+            $localize`Saved dossier form "${newDossierForm}".`
           )
           modal.close()
           this.reloadData()
@@ -285,7 +286,7 @@ export abstract class CustomDossierFormListComponent<T extends ObjectWithId>
     modal.componentInstance.failed
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((e) => {
-        this.toastService.showError($localize`Error saving dossier.`, e)
+        this.toastService.showError($localize`Error saving dossier form.`, e)
       })
   }
 
@@ -341,7 +342,7 @@ export abstract class CustomDossierFormListComponent<T extends ObjectWithId>
   set nameFilter(nameFilter: string) {
     this.nameFilterDebounce.next(nameFilter)
   }
-  trackByDossierId(index, item: Dossier) {
+  trackByDossierId(index, item: DossierForm) {
     return item.id
   }
   onNameFilterKeyUp(event: KeyboardEvent) {

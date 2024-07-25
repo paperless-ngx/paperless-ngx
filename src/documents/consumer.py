@@ -26,7 +26,7 @@ from documents.file_handling import generate_unique_filename
 from documents.loggers import LoggingMixin
 from documents.matching import document_matches_workflow
 from documents.matching import approval_matches_workflow
-from documents.models import Correspondent, Dossier
+from documents.models import Correspondent, Dossier, DossierForm
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
@@ -491,7 +491,25 @@ class Consumer(LoggingMixin):
                 exc_info=True,
                 exception=e,
             )
-
+    def fill_custom_field(document, data_ocr_fields):
+        dict_data = {}
+                
+        if data_ocr_fields is not None:
+            if len(data_ocr_fields)>=1:    
+                for r in data_ocr_fields[0].get("fields"):
+                    dict_data[r.get("name")] = r.get("values")[0].get("value") if r.get("values") else None
+                custom_fields = CustomFieldInstance.objects.filter(dossier=document.dossier)
+                if(custom_fields):
+                    for r in custom_fields:
+                        r: CustomFieldInstance
+                        r.value = dict_data.get(r.match_value)
+                CustomFieldInstance.objects.bulk_update(custom_fields, ['value_text'])
+    def get_config_dossier_form(self):
+        if self.override_dossier_id is None:
+            return None
+        dossier = Dossier.objects.filter(id=self.override_dossier_id).select_related('dossier_form').first()
+        self.log.info('dossier',dossier)
+        return dossier.dossier_form
     def try_consume_file(
         self,
         path: Path,
@@ -622,7 +640,7 @@ class Consumer(LoggingMixin):
                 ConsumerStatusShortMessage.PARSING_DOCUMENT,
             )
             self.log.debug(f"Parsing {self.filename}...")
-            data_ocr_fields = document_parser.parse(self.working_copy, mime_type, self.filename)
+            data_ocr_fields = document_parser.parse(self.working_copy, mime_type, self.filename, self.get_config_dossier_form())
 
             self.log.debug(f"Generating thumbnail for {self.filename}...")
             self._send_progress(
@@ -697,26 +715,8 @@ class Consumer(LoggingMixin):
                 )
                
                 # update custom field by document_id
-                fields = CustomFieldInstance.objects.filter(
-                                    document=document,
-                                )
-                dict_data = {}
+                self.fill_custom_field(document,data_ocr_fields)
                 
-                if data_ocr_fields is not None:
-                    if len(data_ocr_fields)>=1:    
-                        for r in data_ocr_fields[0].get("fields"):
-                            dict_data[r.get("name")] = r.get("values")[0].get("value") if r.get("values") else None
-                        map_fields = {
-                            "Tiêu đề": dict_data.get("title"),
-                            "Số văn bản": dict_data.get("Số hiệu"),
-                            "Kính gửi": dict_data.get("Kính gửi"),
-                            # "Ngày phát hành": dict_data.get("Thời gian tạo"),
-                            "Người ký văn bản": dict_data.get("Chữ ký"),
-                            "Ngày phát hành": dict_data.get("datetime")
-                        }
-                        for f in fields:
-                            f.value_text = map_fields.get(f.field.name,None)
-                        CustomFieldInstance.objects.bulk_update(fields, ['value_text'])
                  # create file from document
                 # self.log.info('gia tri documentt', document.folder)
                 
@@ -728,10 +728,10 @@ class Consumer(LoggingMixin):
                 new_file.save()
                 document.folder=new_file
                 parent_dossier = Dossier.objects.filter(id=document.dossier.pk).first()
-                parent_dossier_type = None
+                dossier_form = None
                 if parent_dossier:
-                    parent_dossier_type = parent_dossier.parent_dossier_type
-                new_dossier_document = Dossier.objects.create(name=document.title, parent_dossier = document.dossier, dossier_type = "DOCUMENT", parent_dossier_type = parent_dossier_type )
+                    dossier_form = parent_dossier.dossier_form
+                new_dossier_document = Dossier.objects.create(name=document.title, parent_dossier = document.dossier, type = "DOCUMENT", dossier_form = dossier_form )
                 if document.dossier :
                     new_dossier_document.path = f"{document.dossier.path}/{new_file.id}"
                 else:

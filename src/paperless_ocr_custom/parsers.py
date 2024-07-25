@@ -22,6 +22,7 @@ from reportlab.pdfbase import pdfmetrics
 from pdf2image import convert_from_path
 from reportlab.lib.utils import ImageReader
 
+from documents.models import DossierForm
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
@@ -179,8 +180,8 @@ class RasterisedDocumentParser(DocumentParser):
         return None
     
     # get ocr file img/pdf
-    def ocr_file(self,path_file):
-
+    def ocr_file(self, path_file, dossierForm:DossierForm):
+        
         k = ApplicationConfiguration.objects.filter().first()
         access_token = k.ocr_key
         # upload file
@@ -211,20 +212,21 @@ class RasterisedDocumentParser(DocumentParser):
         # else:
         #     logging.error('ocr: ', response_ocr.text)
         # 
-        url_ocr_pdf_custom_field_by_fileid = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_OCR_CUSTOM_FIELD_BY_FILEID"]
-
-        payload = json.dumps({
-        "request_id": f"{get_file_id}",
-        "list_form_code": [
-            "so_xay_dung_hai_phong"
-        ]
-        })
-        headers = {
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzIxMzYzNjUxLCJpYXQiOjE3MTg3NzE2NTEsImp0aSI6ImI3OGZmMDNjYmRhZTQ0YzdhNWUyNTIxYmU2MzEzMjk0IiwidXNlcl9pZCI6MSwicm9sZSI6IkFkbWluIGhcdTFlYzcgdGhcdTFlZDFuZyJ9.oOGdwaK7p-bOoBobhxHua3JRLcJIZmDLAka5bbM1WIA',
-        'Content-Type': 'application/json'
-        }
-        
-        data_ocr_fields = self.call_ocr_api_with_retries("POST",url_ocr_pdf_custom_field_by_fileid, headers, params, payload, 5, 5, 100)        
+        if dossierForm.url is not None and dossierForm.key and dossierForm.form_rule:
+            # url_ocr_pdf_custom_field_by_fileid = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_OCR_CUSTOM_FIELD_BY_FILEID"]
+            url_ocr_pdf_custom_field_by_fileid = dossierForm.url
+            payload = json.dumps({
+            "request_id": f"{get_file_id}",
+            "list_form_code": [
+                f"{dossierForm.form_rule}"
+            ]
+            })
+            headers = {
+            'Authorization': f'Bearer {dossierForm.key}',
+            'Content-Type': 'application/json'
+            }
+            
+            data_ocr_fields = self.call_ocr_api_with_retries("POST",url_ocr_pdf_custom_field_by_fileid, headers, params, payload, 5, 5, 100)        
         return (data_ocr,data_ocr_fields)
     
 
@@ -327,8 +329,8 @@ class RasterisedDocumentParser(DocumentParser):
 
     
             
-    def ocr_img_or_pdf(self, document_path, mime_type, sidecar, output_file, **kwargs):
-        data_ocr,data_ocr_fields = self.ocr_file(document_path)
+    def ocr_img_or_pdf(self, document_path, mime_type, sidecar, output_file, dossierForm, **kwargs):
+        data_ocr,data_ocr_fields = self.ocr_file(document_path,dossierForm)
         self.render_pdf_ocr(sidecar, mime_type, document_path, output_file,data_ocr)
         return data_ocr,data_ocr_fields
      
@@ -511,7 +513,7 @@ class RasterisedDocumentParser(DocumentParser):
 
         return ocrmypdf_args
 
-    def parse(self, document_path: Path, mime_type, file_name=None):
+    def parse(self, document_path: Path, mime_type, file_name=None, dossierForm=None):
         # This forces tesseract to use one core per page.
         os.environ["OMP_THREAD_LIMIT"] = "1"
         VALID_TEXT_LENGTH = 50
@@ -562,7 +564,7 @@ class RasterisedDocumentParser(DocumentParser):
         try:
             self.log.debug(f"Calling OCRmyPDF with args: {args}")
             # ocrmypdf.ocr(**args)
-            data_ocr,data_ocr_fields = self.ocr_img_or_pdf(document_path, mime_type,**args)
+            data_ocr,data_ocr_fields = self.ocr_img_or_pdf(document_path, mime_type, dossierForm,**args)
             if self.settings.skip_archive_file != ArchiveFileChoices.ALWAYS:
                 self.archive_path = archive_path
 
@@ -613,7 +615,7 @@ class RasterisedDocumentParser(DocumentParser):
             try:
                 self.log.debug(f"Fallback: Calling OCRmyPDF with args: {args}")
                 # ocrmypdf.ocr(**args)
-                data_ocr,data_ocr_fields = self.ocr_img_or_pdf(document_path, mime_type,**args)
+                data_ocr,data_ocr_fields = self.ocr_img_or_pdf(document_path, mime_type, dossierForm, **args)
                 # Don't return the archived file here, since this file
                 # is bigger and blurry due to --force-ocr.
 

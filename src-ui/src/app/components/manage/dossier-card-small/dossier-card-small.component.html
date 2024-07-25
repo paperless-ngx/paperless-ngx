@@ -7,9 +7,9 @@
       <!-- @if ( dossier.document_matching == null ){ -->
         <a class="me">
 
-          @if (dossier.dossier_type == "DOSSIER") {
+          @if (dossier.type == "DOSSIER") {
             <i-bs class="me-1 d-flex justify-content-center align-items-center p-2" name="archive" width="2rem" height="2rem"  ></i-bs>
-          } @else if (dossier.dossier_type == "DOCUMENT") {
+          } @else if (dossier.type == "DOCUMENT") {
             <!-- <i-bs class="me-1" name="files"></i-bs> -->
             <i-bs class="me-1 d-flex justify-content-center align-items-center p-2" name="file-earmark-pdf" width="2rem" height="2rem"></i-bs>
           }
@@ -52,7 +52,7 @@
     } -->
 
     <div class="card-body bg-light p-2">
-      @if (dossier.dossier_type=="DOSSIER"){
+      @if (dossier.type=="DOSSIER"){
         <span class="card-text"  (click)="this.goToDossier.emit(this.dossier)">
           <!-- @if (document.correspondent) {
           <a title="Toggle correspondent filter" i18n-title
@@ -61,7 +61,7 @@
           } -->
           {{dossier.name | documentTitle}}
         </span>
-      } @else if (dossier.dossier_type=="DOCUMENT"){
+      } @else if (dossier.type=="DOCUMENT"){
         <span class="card-text"  routerLink="/documents/{{1}}">
           <!-- @if (document.correspondent) {
           <a title="Toggle correspondent filter" i18n-title

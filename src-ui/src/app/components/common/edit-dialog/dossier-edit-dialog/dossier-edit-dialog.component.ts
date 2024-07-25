@@ -8,6 +8,7 @@ import { Dossier, DossierType } from 'src/app/data/dossier'
 import { DossierService } from 'src/app/services/rest/dossier.service'
 import { Subject, takeUntil } from 'rxjs'
 import { valentine } from 'ngx-bootstrap-icons'
+import { DossierFormService } from 'src/app/services/rest/dossier-forms.service'
 
 @Component({
   selector: 'pngx-dossier-edit-dialog',
@@ -28,8 +29,11 @@ export class DossierEditDialogComponent
       label: $localize`Dossier`,
       id: DossierType.Dossier,
     },
+    {
+      label: $localize`File`,
+      id: DossierType.File,
+    },
   ]
-  // private readonly dossierService: DossierService
   private unsubscribeNotifier: Subject<any> = new Subject()
   dossierArray: Dossier[]=[]
   dataCustomFields: any[]=[]
@@ -39,17 +43,18 @@ export class DossierEditDialogComponent
     activeModal: NgbActiveModal,
     userService: UserService,
     settingsService: SettingsService,
-    private readonly dossierService: DossierService
+    private readonly dossierService: DossierService,
+    private readonly dossierFormService: DossierFormService
   ) {
     super(service, activeModal, userService, settingsService)
     // this.dataDossier()
-    // this.getFormOrigin().get('parent_dossier_type').setValue(null)
+    // this.getFormOrigin().get('dossier_form').setValue(null)
     // if(this.getFormOrigin().get('dossier_type').value==DossierType.Document){
     //   this.dataDossier(DossierType.Document)
       
     //   // this.dataCustomFields = 
     // }
-    // else if(this.getFormOrigin().get('dossier_type').value==DossierType.Dossier){
+    // else if(this.getFormOrigin().get('type').value==DossierType.Dossier){
     //   this.dataDossier(DossierType.Dossier)
       
     // }
@@ -57,12 +62,12 @@ export class DossierEditDialogComponent
     console.log('object',this.object)
     this.getFormOrigin().valueChanges.subscribe(value => {
       
-      if(value.dossier_type==DossierType.Document){
+      if(value.type==DossierType.Document){
         this.dataDossier(DossierType.Document)
         
         // this.dataCustomFields = 
       }
-      else if(value.dossier_type==DossierType.Dossier){
+      else if(value.type==DossierType.Dossier){
         this.dataDossier(DossierType.Dossier)
         
       }
@@ -103,22 +108,20 @@ export class DossierEditDialogComponent
   getForm(): FormGroup {
     return new FormGroup({
       name: new FormControl(null),
-      parent_dossier_type: new FormControl(null),
-      dossier_type: new FormControl(null),
+      dossier_form: new FormControl(null),
+      type: new FormControl(null),
       permissions_form: new FormControl(null),
       custom_fields: new FormControl([]),
     })
   }
   dataDossier(type){
-    console.log('iasjdifo',this.getFormOrigin().value)
-    this.dossierService
-      .listDossierFiltered(
+    this.dossierFormService
+      .listDossierFormFiltered(
         1,
         null,
         null,
         null,
         null,
-        true,
         null,
         true,
         type
@@ -133,7 +136,7 @@ export class DossierEditDialogComponent
 
   onDataInputChange(data) {
    
-    this.getFormOrigin().get('parent_dossier_type').setValue(null)
+    this.getFormOrigin().get('dossier_form').setValue(null)
     
     // this.dataCustomFields=null
     // if(data==DossierType.Document){
@@ -149,7 +152,7 @@ export class DossierEditDialogComponent
   }
   onDataInputParentDossierTypeChange(data) {
     this.dataCustomFields=[]
-    const dossierSelect = this.dossierArray.find(obj => obj.id === this.getFormOrigin().get('parent_dossier_type').value);
+    const dossierSelect = this.dossierArray.find(obj => obj.id === this.getFormOrigin().get('dossier_form').value);
     
     if (dossierSelect) {
       this.dataCustomFields = dossierSelect.custom_fields

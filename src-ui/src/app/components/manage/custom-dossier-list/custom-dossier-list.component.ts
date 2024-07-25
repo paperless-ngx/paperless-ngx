@@ -216,7 +216,6 @@ export abstract class CustomDossierListComponent<T extends ObjectWithId>
         this.sortField,
         this.sortReverse,
         this.id,
-        this.isForm,
         this._nameFilter,
         true,
         ''

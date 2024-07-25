@@ -91,8 +91,8 @@
               </th>
               <th scope="col" class="w-40" pngxSortable="name" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name</th>
               <!-- <th scope="col" class="fw-normal d-none d-sm-table-cell" pngxSortable="matching_algorithm" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Matching</th> -->
-              <!-- <th scope="col" class="d-xl-table-cell" pngxSortable="parent_dossier_type" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Type</th> -->
-              <th scope="col" class="d-xl-table-cell" pngxSortable="parent_dossier_type" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Type</th>
+              <!-- <th scope="col" class="d-xl-table-cell" pngxSortable="dossier_form" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Type</th> -->
+              <th scope="col" class="d-xl-table-cell" pngxSortable="dossier_form" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Type</th>
               <th scope="col" class="d-xl-table-cell" pngxSortable="document_count" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Document count</th>
               @for (column of extraColumns; track column) {
                 <th scope="col" class="d-xl-table-cell" pngxSortable="{{column.key}}" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)">{{column.name}}</th>
@@ -117,13 +117,13 @@
                     <label class="form-check-label" for="{{typeName}}{{object.id}}"></label>
                   </div>
                 </td>
-                @if(object.dossier_type=='DOSSIER'){
+                @if(object.type=='DOSSIER'){
                   <td scope="row" class="d-md-table-cell"><button class="btn btn-link ms-0 ps-0 text-start" (click)="userCanEdit(object) ? goToDossierDocument(object) : null; $event.stopPropagation()">
     
                       <i-bs class="me-1" name="archive" width="2rem" height="2rem"></i-bs>
                     </button> 
                     <span class="custom-cursor" (click)="userCanEdit(object) ? goToDossierDocument(object) : null; $event.stopPropagation()">{{ object.name }}</span></td>
-                }@else if (object.dossier_type=='DOCUMENT'){
+                }@else if (object.type=='DOCUMENT'){
                   <td scope="row" class="d-md-table-cell"><button class="btn btn-link ms-0 ps-0 text-start" (click)="userCanEdit(object) ? goToDossierDocument(object) : null; $event.stopPropagation()">
     
                     <i-bs class="me-1" name="files" width="2rem" height="2rem"></i-bs>
@@ -143,7 +143,7 @@
                    
                 </td> -->
                 <td scope="row" class="d-md-table-cell">
-                      <span class="custom-cursor" >   {{ object.parent_dossier_type_name }}</span>
+                      <span class="custom-cursor" >   {{ object.dossier_form_name }}</span>
                 </td>
                 <td scope="row" class="d-md-table-cell">
                       <span class="custom-cursor" >   {{ object.document_count }}</span>

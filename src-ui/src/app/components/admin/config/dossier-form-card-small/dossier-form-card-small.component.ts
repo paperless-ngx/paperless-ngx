@@ -19,6 +19,7 @@ import { Dossier } from 'src/app/data/dossier'
 import { PermissionType } from 'src/app/services/permissions.service'
 import { ColorTheme } from 'ngx-bootstrap-icons'
 import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
+import { DossierForm } from 'src/app/data/dossier-form'
 
 @Component({
   selector: 'pngx-dossier-form-card-small',
@@ -61,6 +62,9 @@ export class DossierFormCardSmallComponent extends ComponentWithPermissions {
   // @Input() permissionType: PermissionType;
   @Input()
   dossier: Dossier
+  
+  @Input()
+  dossierForm: DossierForm
 
   @Output()
   dblClickDocument = new EventEmitter()

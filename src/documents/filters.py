@@ -12,7 +12,7 @@ from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
 from rest_framework_guardian.filters import ObjectPermissionsFilter
 
-from documents.models import Approval, Correspondent, Dossier
+from documents.models import Approval, Correspondent, Dossier, DossierForm
 from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
@@ -380,7 +380,6 @@ class CustomParentDossierIDFilter(NumberFilter):
 
 class DossierFilterSet(FilterSet):
     # parent_dossier__id = CustomParentDossierIDFilter(field_name="parent_dossier__id")
-    is_form = BooleanFilter(field_name="is_form")
 
     class Meta:
         model = Dossier
@@ -389,8 +388,16 @@ class DossierFilterSet(FilterSet):
             "name": ["exact", "icontains"],
             "parent_dossier__id": ["exact", "isnull"],
             "parent_dossier": ["isnull"],
-            "dossier_type": ["exact", "isnull"],
-            "is_form": ["exact"]
+            "type": ["exact", "isnull"],
+        }
+class DossierFormFilterSet(FilterSet):
+    # parent_dossier__id = CustomParentDossierIDFilter(field_name="parent_dossier__id")
+    class Meta:
+        model = DossierForm
+        fields = {
+            "id": ["exact", "in"],
+            "name": ["exact", "icontains"],
+            "type": ["exact", "isnull"],
         }
     
 

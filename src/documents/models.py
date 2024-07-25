@@ -251,15 +251,15 @@ class Folder(MatchingModel):
         constraints = []
     def __str__(self): 
         return self.name
-    
-class Dossier(MatchingModel):
+
+class DossierForm(MatchingModel):
 
     DOSSIER_TYPE_CHOICES = [
         ('DOSSIER', _('Dossier')),
         ('DOCUMENT', _('Document')),
     ]
       
-    dossier_type = models.CharField(
+    type = models.CharField(
         max_length=30,
         choices=DOSSIER_TYPE_CHOICES,
         verbose_name=_("access_type"),
@@ -268,15 +268,15 @@ class Dossier(MatchingModel):
         default='DOSSIER'
     )
 
-    parent_dossier = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='child_dossiers')
-    
-    parent_dossier_type = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='child_dossier_types')
+    # parent_dossier_form = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='child_dossiers')
 
-    path = models.TextField(_("path"), null=True, blank=True)
+    # path = models.TextField(_("path"), null=True, blank=True)
     
     url = models.TextField(_("url"), null=True, blank=True)
 
-    key = models.CharField(max_length=128, null=True)
+    key = models.TextField(_("key"), null=True, blank=True)
+    
+    form_rule = models.TextField(_("form_rule"), null=True, blank=True)
 
     created = models.DateTimeField(
         _("created"),
@@ -285,13 +285,49 @@ class Dossier(MatchingModel):
         editable=False,
     )   
 
-    is_form = models.BooleanField(_("is form"), default=False)
+    class Meta(MatchingModel.Meta):
+        verbose_name = _("dossier type")
+        verbose_name_plural = _("dossiers type")
+    def __str__(self): 
+        return self.name
+      
+
+class Dossier(MatchingModel):
+
+    DOSSIER_TYPE_CHOICES = [
+        ('DOSSIER', _('Dossier')),
+        ('DOCUMENT', _('Document')),
+        ('FILE', _('File')),
+    ]
+      
+    type = models.CharField(
+        max_length=30,
+        choices=DOSSIER_TYPE_CHOICES,
+        verbose_name=_("access_type"),
+        null=False,
+        blank=False,
+        default='DOSSIER'
+    )
+
+    parent_dossier = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+    
+    dossier_form = models.ForeignKey(DossierForm, on_delete=models.CASCADE, null=True, blank=True)
+
+    path = models.TextField(_("path"), null=True, blank=True)
+
+    created = models.DateTimeField(
+        _("created"),
+        default=timezone.now,
+        db_index=True,
+        editable=False,
+    )   
+
     class Meta(MatchingModel.Meta):
         verbose_name = _("dossier")
         verbose_name_plural = _("dossiers")
     def __str__(self): 
         return self.name
-      
+
     
 class Document(ModelWithOwner):
     STORAGE_TYPE_UNENCRYPTED = "unencrypted"
@@ -335,6 +371,15 @@ class Document(ModelWithOwner):
         related_name="documents",
         on_delete=models.SET_NULL,
         verbose_name=_("dossier"),
+    )
+
+    dossier_form = models.ForeignKey(
+        DossierForm,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL,
+        verbose_name=_("dossier forms"),
     )
     
     warehouse = models.ForeignKey(
@@ -1007,6 +1052,15 @@ class CustomFieldInstance(models.Model):
 
     dossier = models.ForeignKey(
         Dossier,
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="custom_fields",
+        editable=False,
+    )
+
+    dossier_form = models.ForeignKey(
+        DossierForm,
         blank=True,
         null=True,
         on_delete=models.CASCADE,

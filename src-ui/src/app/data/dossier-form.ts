@@ -4,15 +4,12 @@ export enum DossierType {
     // just file tasks, for now
     Dossier = 'DOSSIER',
     Document = 'DOCUMENT',
-    File = 'FILE',
   }
-export interface Dossier extends MatchingModel {
+export interface DossierForm extends MatchingModel {
     type?: DossierType;
-    parent_dossier?: Dossier;
-    dossier_form?: Dossier;
-    dossier_form_name?: string;
     key?: string;
     url?: string;
+    form_rule?: string;
     created?: Date;
     custom_fields?: CustomFieldInstance[];
 }

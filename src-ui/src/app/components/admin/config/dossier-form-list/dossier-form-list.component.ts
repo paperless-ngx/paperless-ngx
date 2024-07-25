@@ -15,6 +15,8 @@ import { CustomDossierFormListComponent } from '../custom-dossier-form-list/cust
 import { DossierService } from 'src/app/services/rest/dossier.service'
 import { Dossier } from 'src/app/data/dossier'
 import { DossierFormEditDialogComponent } from 'src/app/components/common/edit-dialog/dossier-form-edit-dialog/dossier-form-edit-dialog.component';
+import { DossierForm } from 'src/app/data/dossier-form';
+import { DossierFormService } from 'src/app/services/rest/dossier-forms.service';
 
 
 @Component({
@@ -23,32 +25,32 @@ import { DossierFormEditDialogComponent } from 'src/app/components/common/edit-d
   styleUrls: ['./../custom-dossier-form-list/custom-dossier-form-list.component.scss'],
 })
 export class DossiersFormComponent
-extends CustomDossierFormListComponent<Dossier> {
+extends CustomDossierFormListComponent<DossierForm> {
   // id: number;
   dossierUnsubscribeNotifier: Subject<any> = new Subject();
   dossier_nameFilter: string;
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    dossierService: DossierService,
+    dossierFormService: DossierFormService,
     modalService: NgbModal,
     toastService: ToastService,
     documentListViewService: DocumentListViewService,
     permissionsService: PermissionsService,
   ) {
     super(
-      dossierService,
+      dossierFormService,
       modalService,
       DossierFormEditDialogComponent,
       toastService,
       documentListViewService,
       permissionsService,
       FILTER_HAS_FOLDER_ANY,
-      $localize`dossier`,
-      $localize`config dossiers ocr `,
+      $localize`dossier form`,
+      $localize`config dossiers form `,
       PermissionType.Dossier,
       [],
-      dossierService,
+      dossierFormService,
       false
     )
     
@@ -60,7 +62,7 @@ extends CustomDossierFormListComponent<Dossier> {
     super.reloadData()
   }
 
-  goToDossierDocument(object: Dossier) {
+  goToDossierDocument(object: DossierForm) {
     // this.id = this.route.snapshot.params['id'];
     this.id = object?.id
     // console.log('trang moi',this.route.snapshot.params['id'])
@@ -76,7 +78,7 @@ extends CustomDossierFormListComponent<Dossier> {
     
   }
     
-  getDeleteMessage(object: Dossier) {
+  getDeleteMessage(object: DossierForm) {
     return $localize`Do you really want to delete the dossier "${object.name}"?`
   }
 

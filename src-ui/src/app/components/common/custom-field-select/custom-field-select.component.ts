@@ -14,6 +14,7 @@ import { Subject, first, takeUntil } from 'rxjs'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
 import { DossierService } from 'src/app/services/rest/dossier.service'
 import { Dossier } from 'src/app/data/dossier'
+import { DossierForm } from 'src/app/data/dossier-form'
 @Component({
   providers: [
     {
@@ -93,6 +94,7 @@ export class CustomFieldSelectComponent
   }
 
   @Input() inputDossier: Dossier
+  @Input() inputDossierForm: DossierForm
   @Output() dataChange = new EventEmitter<any[]>();
 
   inheritedWarning: string = $localize`Inherited from dossier`
@@ -145,13 +147,12 @@ export class CustomFieldSelectComponent
 
   dataDossier(){
     this.dossierService
-      .listDossierFiltered(
+      .listDossierFormFiltered(
         1,
         null,
         null,
         null,
         null,
-        true,
         null,
         true,
         'DOCUMENT'

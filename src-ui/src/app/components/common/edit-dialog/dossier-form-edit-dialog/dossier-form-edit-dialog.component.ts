@@ -6,6 +6,8 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { EditDialogComponent, EditDialogMode } from '../edit-dialog.component'
 import { Dossier, DossierType } from 'src/app/data/dossier'
 import { DossierService } from 'src/app/services/rest/dossier.service'
+import { DossierForm } from 'src/app/data/dossier-form'
+import { DossierFormService } from 'src/app/services/rest/dossier-forms.service'
 
 @Component({
   selector: 'pngx-dossier-form-edit-dialog',
@@ -13,7 +15,7 @@ import { DossierService } from 'src/app/services/rest/dossier.service'
   styleUrls: ['./dossier-form-edit-dialog.component.scss'],
 })
 export class DossierFormEditDialogComponent
-  extends EditDialogComponent<Dossier>
+  extends EditDialogComponent<DossierForm>
   implements OnInit {
   DOSSIER_TYPES_OPTIONS = [
 
@@ -27,7 +29,7 @@ export class DossierFormEditDialogComponent
     },
   ]
   constructor(
-    service: DossierService,
+    service: DossierFormService,
     activeModal: NgbActiveModal,
     userService: UserService,
     settingsService: SettingsService
@@ -42,11 +44,11 @@ export class DossierFormEditDialogComponent
   }
 
   getCreateTitle() {
-    return $localize`Create new dossier`
+    return $localize`Create new dossier form`
   }
 
   getEditTitle() {
-    return $localize`Edit dossier`
+    return $localize`Edit dossier form`
   }
   dataCustomFields:any[] =[]
   getForm(): FormGroup {
@@ -54,8 +56,8 @@ export class DossierFormEditDialogComponent
       name: new FormControl(null),
       key: new FormControl(null),
       url: new FormControl(null),
-      is_form: new FormControl(true),
-      dossier_type: new FormControl(DossierType.Dossier),
+      form_rule: new FormControl(null),
+      type: new FormControl(DossierType.Dossier),
       permissions_form: new FormControl(null),
       custom_fields: new FormControl([]),
       

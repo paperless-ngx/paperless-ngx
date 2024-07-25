@@ -59,7 +59,6 @@ export abstract class AbstractNameFilterService<T extends ObjectWithId,> extends
     sortField?: string,
     sortReverse?: boolean,
     id?: number,
-    isForm?: boolean,
     nameFilter?: string,
     fullPerms?: boolean,
     type?: string) {
@@ -70,11 +69,30 @@ export abstract class AbstractNameFilterService<T extends ObjectWithId,> extends
     else{
       params['parent_dossier__isnull'] = true
     }
-    if (isForm){
-      params['is_form'] = true
+    if (nameFilter) {
+      params['name__icontains'] = nameFilter
     }
-    else{
-      params['is_form'] = false
+    if (fullPerms) {
+      params['full_perms'] = true
+    }
+    if (type.length){
+      params['type'] = type
+    }
+ 
+    return this.list(page, pageSize, sortField, sortReverse, params)
+  }
+  
+  listDossierFormFiltered(page?: number,
+    pageSize?: number,
+    sortField?: string,
+    sortReverse?: boolean,
+    id?: number,
+    nameFilter?: string,
+    fullPerms?: boolean,
+    type?: string) {
+    let params = {}
+    if (id) {
+      params['parent_dossier__id'] = id
     }
     if (nameFilter) {
       params['name__icontains'] = nameFilter
@@ -83,7 +101,7 @@ export abstract class AbstractNameFilterService<T extends ObjectWithId,> extends
       params['full_perms'] = true
     }
     if (type.length){
-      params['dossier_type'] = type
+      params['type'] = type
     }
  
     return this.list(page, pageSize, sortField, sortReverse, params)
