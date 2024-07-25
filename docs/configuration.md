@@ -568,6 +568,16 @@ system. See the corresponding
 
     Defaults to True
 
+#### [`SOCIALACCOUNT_DEFAULT_PERMISSIONS=<json>`](#SOCIALACCOUNT_DEFAULT_PERMISSIONS) {#SOCIALACCOUNT_DEFAULT_PERMISSIONS}
+
+: By default, paperless doesn't add any permissions to users signed up via social account providers.
+
+    This can be adjusted by configuring a custom json array with
+    codenames of permissions being added to users on the signup via social account providers.
+
+    Defaults to `["view_uisettings"]`.
+
+
 #### [`PAPERLESS_ACCOUNT_ALLOW_SIGNUPS=<bool>`](#PAPERLESS_ACCOUNT_ALLOW_SIGNUPS) {#PAPERLESS_ACCOUNT_ALLOW_SIGNUPS}
 
 : Allow users to signup for a new Paperless-ngx account.

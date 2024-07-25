@@ -7,6 +7,8 @@ from django.conf import settings
 from django.forms import ValidationError
 from django.urls import reverse
 
+from django.apps import apps
+from django.contrib.auth.models import Permission
 
 class CustomAccountAdapter(DefaultAccountAdapter):
     def is_open_for_signup(self, request):
@@ -87,3 +89,14 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         """
         # TODO: If default global permissions are implemented, should also be here
         return super().populate_user(request, sociallogin, data)  # pragma: no cover
+
+    def save_user(self, request, sociallogin, form=None):
+        """
+        Add the default permissions to users on signup
+        """
+        user = super().save_user(request, sociallogin, form)
+        default_permission_codenames = getattr(settings, "SOCIALACCOUNT_DEFAULT_PERMISSIONS", [])
+        permissions = apps.get_model("auth", "Permission").objects.filter( codename__in=default_permission_codenames )
+        for permission in permissions:
+            user.user_permissions.add(permission.id)
+        return user
