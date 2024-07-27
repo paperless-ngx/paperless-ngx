@@ -491,7 +491,7 @@ class Consumer(LoggingMixin):
                 exc_info=True,
                 exception=e,
             )
-    def fill_custom_field(document, data_ocr_fields):
+    def fill_custom_field(self,document:Document, data_ocr_fields, dossier_file:Dossier):
         dict_data = {}
                 
         if data_ocr_fields is not None:
@@ -502,8 +502,16 @@ class Consumer(LoggingMixin):
                 if(custom_fields):
                     for r in custom_fields:
                         r: CustomFieldInstance
-                        r.value = dict_data.get(r.match_value)
+                        self.log.info('gia tri field',r.field)
+                        r.value_text = dict_data.get(r.match_value)
+                        # create dossier file
+                        CustomFieldInstance.objects.create(field=r.field,
+                                                           value_text=dict_data.get(r.match_value),
+                                                           dossier = dossier_file,
+                                                           document=document) 
+
                 CustomFieldInstance.objects.bulk_update(custom_fields, ['value_text'])
+                
     def get_config_dossier_form(self):
         if self.override_dossier_id is None:
             return None
@@ -713,10 +721,7 @@ class Consumer(LoggingMixin):
                     logging_group=self.logging_group,
                     classifier=classifier,
                 )
-               
-                # update custom field by document_id
-                self.fill_custom_field(document,data_ocr_fields)
-                
+
                  # create file from document
                 # self.log.info('gia tri documentt', document.folder)
                 
@@ -727,17 +732,25 @@ class Consumer(LoggingMixin):
                     new_file.path = f"{new_file.id}"
                 new_file.save()
                 document.folder=new_file
-                parent_dossier = Dossier.objects.filter(id=document.dossier.pk).first()
+
+                dossier = None
+                if document.dossier:
+                    dossier = Dossier.objects.filter(id=document.dossier.pk).first()
+                    # update custom field by document_id
                 dossier_form = None
-                if parent_dossier:
-                    dossier_form = parent_dossier.dossier_form
-                new_dossier_document = Dossier.objects.create(name=document.title, parent_dossier = document.dossier, type = "DOCUMENT", dossier_form = dossier_form )
-                if document.dossier :
-                    new_dossier_document.path = f"{document.dossier.path}/{new_file.id}"
-                else:
-                    new_dossier_document.path = f"{new_file.id}"
-                new_dossier_document.save()
-                document.dossier=new_dossier_document
+                if dossier:
+                    dossier_form = dossier.dossier_form
+                    new_dossier_document = Dossier.objects.create(name=document.title,
+                                                                  parent_dossier=document.dossier,
+                                                                  type="FILE",
+                                                                  dossier_form=dossier_form)
+                    if document.dossier :
+                        new_dossier_document.path = f"{document.dossier.path}/{new_file.id}"
+                    else:
+                        new_dossier_document.path = f"{new_file.id}"
+                    new_dossier_document.save()
+                    self.fill_custom_field(document, data_ocr_fields, new_dossier_document)
+                    document.dossier=new_dossier_document
                 # After everything is in the database, copy the files into
                 # place. If this fails, we'll also rollback the transaction.
                 with FileLock(settings.MEDIA_LOCK):

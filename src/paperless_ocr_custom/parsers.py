@@ -153,16 +153,18 @@ class RasterisedDocumentParser(DocumentParser):
             return None
         
     # call api 
-    def call_ocr_api_with_retries(self, method, url, headers, params, payload, max_retries=5, delay=5, timeout=100):
+    def call_ocr_api_with_retries(self, method, url, headers, params, payload, max_retries=5, delay=5, timeout=100, status_code_success = [200], status_code_fail = []):
         retries = 0
         data_ocr = None
         
         while retries < max_retries:
             try:
                 response_ocr = requests.request(method, url, headers=headers, params=params, data=payload, timeout=timeout)
-                if response_ocr.status_code == 200:
-                    data_ocr = response_ocr.json()
-                    return data_ocr
+                if response_ocr.status_code in status_code_success:
+                    # self.log.info('api return:',url,response_ocr.json())
+                    return response_ocr.json()
+                if response_ocr.status_code in status_code_fail:
+                    return False
                 else:
                     logging.error('OCR error response: %s', response_ocr.text)
                     retries += 1
@@ -178,9 +180,58 @@ class RasterisedDocumentParser(DocumentParser):
     
         logging.error('Max retries reached. OCR request failed.')
         return None
-    
+    def get_token_ocr_field_by_refresh_token(self,dossier_form:DossierForm):
+        # check token
+        headers = {
+                'Content-Type': 'application/json'
+            }
+        payload = json.dumps({
+                    "refresh": f"{dossier_form.key['refresh']}",
+                    })
+        token = self.call_ocr_api_with_retries("POST",json.loads(dossier_form)['refresh'], 
+                                                                    headers, 
+                                                                    params={}, 
+                                                                    payload=payload, 
+                                                                    max_retries=2, 
+                                                                    delay=5,
+                                                                    timeout=100,status_code_fail=[401])
+        if token == False:
+            token = self.login_ocr_field(dossier_form)
+            if token is not None:
+                payload = json.dumps({
+                        "refresh": f"{dossier_form.key['refresh']}",
+                        })
+                
+                token = self.call_ocr_api_with_retries("POST",json.loads(dossier_form)['refresh'], 
+                                                                        headers={}, 
+                                                                        params={}, 
+                                                                        payload=payload, 
+                                                                        max_retries=2, 
+                                                                        delay=5,
+                                                                        timeout=100)
+            
+        return token
+    def login_ocr_field(self,dossier_form:DossierForm):
+        # check token
+        headers = {
+                'Content-Type': 'application/json'
+            }
+        payload = json.dumps({
+                    "username": f"{dossier_form.username}",
+                    "password": f"{dossier_form.password}",
+                    })
+        return self.call_ocr_api_with_retries("POST",json.loads(dossier_form.url)['login'], 
+                                                                    headers, 
+                                                                    params={}, 
+                                                                    payload=payload, 
+                                                                    max_retries=5, 
+                                                                    delay=5,
+                                                                    timeout=100)
+       
+
+        
     # get ocr file img/pdf
-    def ocr_file(self, path_file, dossierForm:DossierForm):
+    def ocr_file(self, path_file, dossier_form:DossierForm):
         
         k = ApplicationConfiguration.objects.filter().first()
         access_token = k.ocr_key
@@ -188,7 +239,7 @@ class RasterisedDocumentParser(DocumentParser):
         get_file_id = ''
         url_upload_file = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_UPLOAD_FILE"]
         headers = {
-            'Authorization': f'Bearer {access_token}'
+            'Authorization': f"Bearer {access_token}"
         }
         pdf_data = None
         with open(path_file, 'rb') as file:
@@ -212,21 +263,60 @@ class RasterisedDocumentParser(DocumentParser):
         # else:
         #     logging.error('ocr: ', response_ocr.text)
         # 
-        if dossierForm.url is not None and dossierForm.key and dossierForm.form_rule:
-            # url_ocr_pdf_custom_field_by_fileid = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_OCR_CUSTOM_FIELD_BY_FILEID"]
-            url_ocr_pdf_custom_field_by_fileid = dossierForm.url
+        # login API custom-field
+        if dossier_form is None:
+            return (data_ocr,None)
+        if dossier_form.url is not None and dossier_form.form_rule is not None:
+            # login for the first time ...
+            token = dossier_form.key
+            format_token = ''
+            try:
+                format_token = json.loads(dossier_form.key)
+                
+            except json.JSONDecodeError as e:
+                pass
+            if format_token == '':
+                token = self.login_ocr_field(dossier_form)
+                
+                if token is not None:
+                    dossier_form.key=token
+            url_ocr_pdf_custom_field_by_fileid = json.loads(dossier_form.url)['ocr']
             payload = json.dumps({
             "request_id": f"{get_file_id}",
             "list_form_code": [
-                f"{dossierForm.form_rule}"
+                f"{dossier_form.form_rule}"
             ]
             })
+            self.log.info('gia tri key',token['access'])
             headers = {
-            'Authorization': f'Bearer {dossierForm.key}',
-            'Content-Type': 'application/json'
+                'Authorization': f"Bearer {token['access']}",
+                'Content-Type': 'application/json'
             }
-            
-            data_ocr_fields = self.call_ocr_api_with_retries("POST",url_ocr_pdf_custom_field_by_fileid, headers, params, payload, 5, 5, 100)        
+            data_ocr_fields = self.call_ocr_api_with_retries("POST",url_ocr_pdf_custom_field_by_fileid, headers, params, payload, 5, 5, 100,status_code_fail=[401])
+            # if token expire or WRONG
+            if data_ocr_fields == False:
+                token = self.get_token_ocr_field_by_refresh_token(dossier_form)
+                if token is not None and token != False:
+                    dossier_form.key=json.dumps(token)
+                    dossier_form.save()
+                    # repeat ocr_field
+                    payload = json.dumps({
+                    "request_id": f"{get_file_id}",
+                    "list_form_code": [
+                        f"{dossier_form.form_rule}"
+                    ]
+                    })
+                    headers = {
+                        'Authorization': f"Bearer {json.load(dossier_form.key)['access_token']}",
+                        'Content-Type': 'application/json'
+                    }
+                    data_ocr_fields = self.call_ocr_api_with_retries("POST",url_ocr_pdf_custom_field_by_fileid, headers, params, payload, 5, 5, 100,status_code_fail=[401])
+
+
+
+
+
+
         return (data_ocr,data_ocr_fields)
     
 
@@ -329,8 +419,8 @@ class RasterisedDocumentParser(DocumentParser):
 
     
             
-    def ocr_img_or_pdf(self, document_path, mime_type, sidecar, output_file, dossierForm, **kwargs):
-        data_ocr,data_ocr_fields = self.ocr_file(document_path,dossierForm)
+    def ocr_img_or_pdf(self, document_path, mime_type, sidecar, output_file, dossier_form, **kwargs):
+        data_ocr,data_ocr_fields = self.ocr_file(document_path,dossier_form)
         self.render_pdf_ocr(sidecar, mime_type, document_path, output_file,data_ocr)
         return data_ocr,data_ocr_fields
      
@@ -564,7 +654,7 @@ class RasterisedDocumentParser(DocumentParser):
         try:
             self.log.debug(f"Calling OCRmyPDF with args: {args}")
             # ocrmypdf.ocr(**args)
-            data_ocr,data_ocr_fields = self.ocr_img_or_pdf(document_path, mime_type, dossierForm,**args)
+            data_ocr,data_ocr_fields = self.ocr_img_or_pdf(document_path, mime_type, dossier_form=dossierForm,**args)
             if self.settings.skip_archive_file != ArchiveFileChoices.ALWAYS:
                 self.archive_path = archive_path
 
@@ -615,7 +705,7 @@ class RasterisedDocumentParser(DocumentParser):
             try:
                 self.log.debug(f"Fallback: Calling OCRmyPDF with args: {args}")
                 # ocrmypdf.ocr(**args)
-                data_ocr,data_ocr_fields = self.ocr_img_or_pdf(document_path, mime_type, dossierForm, **args)
+                data_ocr,data_ocr_fields = self.ocr_img_or_pdf(document_path, mime_type, dossier_form=dossierForm, **args)
                 # Don't return the archived file here, since this file
                 # is bigger and blurry due to --force-ocr.
 

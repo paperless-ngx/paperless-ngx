@@ -92,7 +92,7 @@
               <th scope="col" class="w-40" pngxSortable="name" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name</th>
               <!-- <th scope="col" class="fw-normal d-none d-sm-table-cell" pngxSortable="matching_algorithm" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Matching</th> -->
               <th scope="col" class="d-xl-table-cell" pngxSortable="url" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Url</th>
-              <th scope="col" class="d-xl-table-cell" pngxSortable="key" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Key</th>
+              <th scope="col" class="d-xl-table-cell" pngxSortable="form_rule" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Rule</th>
               @for (column of extraColumns; track column) {
                 <th scope="col" class="d-xl-table-cell" pngxSortable="{{column.key}}" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)">{{column.name}}</th>
               }
@@ -138,9 +138,9 @@
                 <td scope="row" class="d-md-table-cell">
                       <span class="custom-cursor" >{{ object.form_rule }}</span>
                 </td>
-                <td scope="row" class="d-md-table-cell">
+                <!-- <td scope="row" class="d-md-table-cell">
                       <span class="custom-cursor " >{{ object.key }}</span>
-                </td>
+                </td> -->
                 
                 @for (column of extraColumns; track column) {
                   <td scope="row" class="d-md-table-cell">

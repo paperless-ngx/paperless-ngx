@@ -130,6 +130,21 @@
                   </button> 
                   <span class="custom-cursor" (click)="userCanEdit(object) ? goToDossierDocument(object) : null; $event.stopPropagation()">{{ object.name }}</span></td>
                   }
+                 @else if (object.type=='FILE'){
+                    <td scope="row" class="d-md-table-cell">
+                      <button 
+                        class="btn btn-link ms-0 ps-0 text-start"
+                        [routerLink]="userCanEdit(object) ? ['/documents', object.document_matching] : null"
+                        (click)="$event.stopPropagation()">
+                  
+                          <i-bs class="me-1 " name="file-earmark-pdf" width="2rem" 
+                          height="2rem"></i-bs>
+                        </button> 
+                          <span class="custom-cursor" [routerLink]="userCanEdit(object) ? ['/documents', object.document_matching] : null"
+                          (click)="$event.stopPropagation()">{{ object.name }}</span>
+                    </td>
+                  }
+               
                 <!-- <td scope="row" class="d-md-table-cell">
                   <button 
                     class="btn btn-link ms-0 ps-0 text-start"

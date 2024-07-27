@@ -7,7 +7,9 @@ export enum DossierType {
   }
 export interface DossierForm extends MatchingModel {
     type?: DossierType;
-    key?: string;
+    // key?: string;
+    username?: string;
+    password?: string;
     url?: string;
     form_rule?: string;
     created?: Date;

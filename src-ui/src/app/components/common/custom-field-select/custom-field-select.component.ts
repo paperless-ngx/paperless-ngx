@@ -13,8 +13,9 @@ import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service
 import { Subject, first, takeUntil } from 'rxjs'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
 import { DossierService } from 'src/app/services/rest/dossier.service'
-import { Dossier } from 'src/app/data/dossier'
+import { Dossier, DossierType } from 'src/app/data/dossier'
 import { DossierForm } from 'src/app/data/dossier-form'
+import { DossierFormService } from 'src/app/services/rest/dossier-forms.service'
 @Component({
   providers: [
     {
@@ -31,6 +32,7 @@ export class CustomFieldSelectComponent
   extends ComponentWithPermissions
   implements OnInit, ControlValueAccessor
 {
+
   @Input()
   title: string = 'Custom field'
   
@@ -93,8 +95,8 @@ export class CustomFieldSelectComponent
     this.getFields()  
   }
 
-  @Input() inputDossier: Dossier
-  @Input() inputDossierForm: DossierForm
+  @Input() inputDossier: Dossier 
+  @Input() inputDossierForm: DossierForm 
   @Output() dataChange = new EventEmitter<any[]>();
 
   inheritedWarning: string = $localize`Inherited from dossier`
@@ -103,6 +105,7 @@ export class CustomFieldSelectComponent
     private readonly customFieldsService: CustomFieldsService,
     private fb: FormBuilder,
     private readonly dossierService: DossierService,
+    private readonly dossierFormService: DossierFormService,
   ) {
     super();
     this.form = this.fb.group({
@@ -112,7 +115,7 @@ export class CustomFieldSelectComponent
     this.dataDossier()
 
     this.customFields.valueChanges.subscribe(data => {
-      console.log('gia tri refe',data)
+      console.log('gia tri refe',this.inputDossier)
       const filteredData = data.filter(item => this.dictCustomFieldsEnable[item.field]);
       
         this.dataChange.emit(filteredData);
@@ -146,7 +149,7 @@ export class CustomFieldSelectComponent
 
 
   dataDossier(){
-    this.dossierService
+    this.dossierFormService
       .listDossierFormFiltered(
         1,
         null,

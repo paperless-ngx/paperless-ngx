@@ -262,6 +262,10 @@ class DocumentFilterSet(FilterSet):
     
     folder__id__in = FolderFilter(field_name="folder", in_list=True)
 
+    dossier__id__none = FolderFilter(field_name="dossier", exclude=True)
+    
+    dossier__id__in = FolderFilter(field_name="dossier", in_list=True)
+
     is_in_inbox = InboxFilter()
 
     title_content = TitleContentFilter()

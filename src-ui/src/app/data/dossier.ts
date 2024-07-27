@@ -11,6 +11,7 @@ export interface Dossier extends MatchingModel {
     parent_dossier?: Dossier;
     dossier_form?: Dossier;
     dossier_form_name?: string;
+    document_matching?: number;
     key?: string;
     url?: string;
     created?: Date;

@@ -6,7 +6,7 @@ import { DossierEditDialogComponent } from '../../common/edit-dialog/dossier-edi
 import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { FILTER_HAS_FOLDER_ANY } from 'src/app/data/filter-rule-type'
+import { FILTER_HAS_DOSSIER_ANY, FILTER_HAS_FOLDER_ANY } from 'src/app/data/filter-rule-type'
 import {
   PermissionsService,
   PermissionType,
@@ -44,7 +44,7 @@ extends CustomDossierListComponent<Dossier> {
       toastService,
       documentListViewService,
       permissionsService,
-      FILTER_HAS_FOLDER_ANY,
+      FILTER_HAS_DOSSIER_ANY,
       $localize`dossier`,
       $localize`dossiers`,
       PermissionType.Dossier,

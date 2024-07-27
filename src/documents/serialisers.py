@@ -2116,7 +2116,13 @@ class DossierSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         allow_null=True,
         required=False,
     )
-    # parent_dossier_type = ParentDossierTypeSerializer(allow_null = True,required = False)
+    document_matching = serializers.SerializerMethodField()
+    def get_document_matching(self, obj):
+        if obj.type == 'FILE':
+            document = Document.objects.filter(dossier=obj).first()
+            if document:
+                return document.id
+        return None
     dossier_form_name = SerializerMethodField(read_only=True)
 
     def get_dossier_form_name(self,obj):
@@ -2136,17 +2142,13 @@ class DossierSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             'match',
             'matching_algorithm',
             'is_insensitive',
-            # 'dossier_type',
-            # 'path',
-            # 'url',
-            # 'key',
             'created',
-            # 'is_form',
             'owner',
             'parent_dossier',
             'dossier_form',
             'type',
             'dossier_form_name',
+            'document_matching',
             'custom_fields'
         ]
     def create(self, validated_data):
@@ -2228,13 +2230,6 @@ class DossierFormSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         allow_null=True,
         required=False,
     )
-    # parent_dossier_type = ParentDossierTypeSerializer(allow_null = True,required = False)
-    # parent_dossier_type_name = SerializerMethodField(read_only=True)
-
-    # def get_parent_dossier_type_name(self,obj):
-    #     if obj.parent_dossier_type is None:
-    #         return None
-    #     return obj.parent_dossier_type.name
 
     class Meta:
         model = DossierForm
@@ -2248,17 +2243,14 @@ class DossierFormSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             'match',
             'matching_algorithm',
             'is_insensitive',
-            # 'dossier_type',
-            # 'path',
             'url',
+            'username',
+            'password',
             'key',
             'created',
-            # 'is_form',
             'owner',
-            # 'parent_dossier',
             'type',
             'form_rule',
-            # 'parent_dossier_type_name',
             'custom_fields'
         ]
     def create(self, validated_data):

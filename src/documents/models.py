@@ -274,6 +274,10 @@ class DossierForm(MatchingModel):
     
     url = models.TextField(_("url"), null=True, blank=True)
 
+    username = models.TextField(_("username"), null=True, blank=True)
+    
+    password = models.TextField(_("password"), null=True, blank=True)
+
     key = models.TextField(_("key"), null=True, blank=True)
     
     form_rule = models.TextField(_("form_rule"), null=True, blank=True)

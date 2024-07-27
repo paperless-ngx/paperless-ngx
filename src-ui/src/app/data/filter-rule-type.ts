@@ -69,7 +69,12 @@ export const FILTER_DOES_NOT_HAVE_CUSTOM_SHELF = 61
 export const FILTER_FOLDER = 62
 export const FILTER_HAS_FOLDER_ANY = 63
 export const FILTER_DOES_NOT_HAVE_FOLDER = 64
-export const FILTER_HAS_FOLDES_ALL = 65
+export const FILTER_HAS_FOLDER_ALL = 65
+
+export const FILTER_DOSSIER = 66
+export const FILTER_HAS_DOSSIER_ANY = 67
+export const FILTER_DOES_NOT_HAVE_DOSSIER = 68
+export const FILTER_HAS_DOSSIER_ALL = 69
 
 export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
@@ -150,7 +155,7 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     multi: true,
   },
   {
-    id: FILTER_HAS_FOLDES_ALL,
+    id: FILTER_HAS_FOLDER_ALL,
     filtervar: 'folders__id__all',
     datatype: 'folder',
     multi: true,
@@ -172,6 +177,31 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     id: FILTER_DOES_NOT_HAVE_FOLDER,
     filtervar: 'folder__id__none',
     datatype: 'folder',
+    multi: true,
+  },
+  {
+    id: FILTER_HAS_DOSSIER_ALL,
+    filtervar: 'dossiers__id__all',
+    datatype: 'dossier',
+    multi: true,
+  },
+  {
+    id: FILTER_DOSSIER,
+    filtervar: 'dossier__id',
+    isnull_filtervar: 'dossier__isnull',
+    datatype: 'dossier',
+    multi: false,
+  },
+  {
+    id: FILTER_HAS_DOSSIER_ANY,
+    filtervar: 'dossier__id__in',
+    datatype: 'dossier',
+    multi: true,
+  },
+  {
+    id: FILTER_DOES_NOT_HAVE_DOSSIER,
+    filtervar: 'dossier__id__none',
+    datatype: 'dossier',
     multi: true,
   },
   //Custom-field

@@ -5,7 +5,7 @@ import { ToastService } from 'src/app/services/toast.service'
 import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { FILTER_HAS_FOLDER_ANY } from 'src/app/data/filter-rule-type'
+import { FILTER_HAS_DOSSIER_ANY, FILTER_HAS_FOLDER_ANY } from 'src/app/data/filter-rule-type'
 import {
   PermissionsService,
   PermissionType,
@@ -45,7 +45,7 @@ extends CustomDossierFormListComponent<DossierForm> {
       toastService,
       documentListViewService,
       permissionsService,
-      FILTER_HAS_FOLDER_ANY,
+      FILTER_HAS_DOSSIER_ANY,
       $localize`dossier form`,
       $localize`config dossiers form `,
       PermissionType.Dossier,
