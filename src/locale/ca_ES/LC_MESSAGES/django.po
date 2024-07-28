@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-09 11:27-0700\n"
-"PO-Revision-Date: 2024-07-17 12:10\n"
+"PO-Revision-Date: 2024-07-27 12:11\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -84,7 +84,7 @@ msgstr "color"
 
 #: documents/models.py:106
 msgid "is inbox tag"
-msgstr "etiqueta entrada"
+msgstr "és etiqueta entrada"
 
 #: documents/models.py:109
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
@@ -104,7 +104,7 @@ msgstr "tipus document"
 
 #: documents/models.py:122
 msgid "document types"
-msgstr "tipus document"
+msgstr "tipus documents"
 
 #: documents/models.py:127
 msgid "path"
@@ -325,7 +325,7 @@ msgstr "camp ordenació"
 
 #: documents/models.py:434
 msgid "sort reverse"
-msgstr "ordenament invers"
+msgstr "ordre invers"
 
 #: documents/models.py:437
 msgid "View page size"
@@ -369,7 +369,7 @@ msgstr "tipus document és"
 
 #: documents/models.py:473
 msgid "is in inbox"
-msgstr "està safata entrada"
+msgstr "està a safata entrada"
 
 #: documents/models.py:474
 msgid "has tag"
@@ -377,7 +377,7 @@ msgstr "té etiqueta"
 
 #: documents/models.py:475
 msgid "has any tag"
-msgstr "qualsevol etiqueta"
+msgstr "conté qualsevol etiqueta"
 
 #: documents/models.py:476
 msgid "created before"
@@ -501,7 +501,7 @@ msgstr "compartit per mi"
 
 #: documents/models.py:506
 msgid "has custom fields"
-msgstr "té camps personalitzat"
+msgstr "té camps personalitzats"
 
 #: documents/models.py:507
 msgid "has custom field in"
@@ -525,11 +525,11 @@ msgstr "valor"
 
 #: documents/models.py:524
 msgid "filter rule"
-msgstr "regla de filtre"
+msgstr "filtra regla"
 
 #: documents/models.py:525
 msgid "filter rules"
-msgstr "regla de filtres"
+msgstr "filtra regles"
 
 #: documents/models.py:636
 msgid "Task ID"
@@ -709,7 +709,7 @@ msgstr "instàncies de camps personalitzats"
 
 #: documents/models.py:978
 msgid "Consumption Started"
-msgstr "Començada Consumpció"
+msgstr "Consumició Començada"
 
 #: documents/models.py:979
 msgid "Document Added"
@@ -721,11 +721,11 @@ msgstr "Document Actualitzat"
 
 #: documents/models.py:983
 msgid "Consume Folder"
-msgstr "Directori 'Condumir'"
+msgstr "Directori Consumició"
 
 #: documents/models.py:984
 msgid "Api Upload"
-msgstr "Api Pujada"
+msgstr "Pujada Api"
 
 #: documents/models.py:985
 msgid "Mail Fetch"
@@ -733,7 +733,7 @@ msgstr "Recollida Correu"
 
 #: documents/models.py:988
 msgid "Workflow Trigger Type"
-msgstr "Tipus d'activador de Workflow"
+msgstr "Tipus Activador de Flux"
 
 #: documents/models.py:1000
 msgid "filter path"
@@ -959,7 +959,7 @@ msgstr "Gràcies per fer servir %(site_name)s!\n"
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
-msgstr "Paperless-ngx sign in"
+msgstr "Validació Paperless-ngx"
 
 #: documents/templates/account/login.html:10
 msgid "Please sign in."
