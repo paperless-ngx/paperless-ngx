@@ -397,11 +397,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">228</context>
+          <context context-type="linenumber">235</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">230</context>
+          <context context-type="linenumber">237</context>
         </context-group>
         <target state="final">Configurações</target>
       </trans-unit>
@@ -709,11 +709,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">263</context>
+          <context context-type="linenumber">270</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">266</context>
+          <context context-type="linenumber">273</context>
         </context-group>
         <target state="translated">Logs</target>
       </trans-unit>
@@ -1601,7 +1601,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
-          <context context-type="linenumber">9</context>
+          <context context-type="linenumber">19</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
@@ -1929,11 +1929,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">251</context>
+          <context context-type="linenumber">258</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">253</context>
+          <context context-type="linenumber">260</context>
         </context-group>
         <target state="translated">Tarefas de Arquivo</target>
       </trans-unit>
@@ -2261,11 +2261,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">271</context>
+          <context context-type="linenumber">218</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">274</context>
+          <context context-type="linenumber">221</context>
         </context-group>
         <target state="translated">Lixeira</target>
       </trans-unit>
@@ -2497,11 +2497,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">242</context>
+          <context context-type="linenumber">249</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">244</context>
+          <context context-type="linenumber">251</context>
         </context-group>
         <target state="translated">Usuários &amp; Grupos</target>
       </trans-unit>
@@ -3045,7 +3045,7 @@
         <source>Administration</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">222</context>
+          <context context-type="linenumber">229</context>
         </context-group>
         <target state="translated">Administração</target>
       </trans-unit>
@@ -3053,11 +3053,11 @@
         <source>Configuration</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">235</context>
+          <context context-type="linenumber">242</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">237</context>
+          <context context-type="linenumber">244</context>
         </context-group>
         <target state="translated">Personalização</target>
       </trans-unit>
@@ -3521,7 +3521,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
-          <context context-type="linenumber">10</context>
+          <context context-type="linenumber">20</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
@@ -4958,11 +4958,11 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
-          <context context-type="linenumber">6</context>
+          <context context-type="linenumber">16</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">27</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -5298,6 +5298,10 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
         <target state="translated">O que é isso?</target>
       </trans-unit>
       <trans-unit id="2827984212740060090" datatype="html">
@@ -5305,6 +5309,10 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
           <context context-type="linenumber">15</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
+          <context context-type="linenumber">9</context>
         </context-group>
         <target state="translated">Leia mais</target>
       </trans-unit>
@@ -5388,11 +5396,19 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         </context-group>
         <target state="translated">Ocultar sem proprietários</target>
       </trans-unit>
+      <trans-unit id="941924371433275463" datatype="html">
+        <source>Global permissions define what areas of the app and API endpoints users can access.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <target state="needs-translation">Global permissions define what areas of the app and API endpoints users can access.</target>
+      </trans-unit>
       <trans-unit id="8650499415827640724" datatype="html">
         <source>Type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
-          <context context-type="linenumber">5</context>
+          <context context-type="linenumber">15</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
@@ -5404,7 +5420,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Add</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
-          <context context-type="linenumber">7</context>
+          <context context-type="linenumber">17</context>
         </context-group>
         <target state="translated">Adicionar</target>
       </trans-unit>
@@ -5412,7 +5428,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Change</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
-          <context context-type="linenumber">8</context>
+          <context context-type="linenumber">18</context>
         </context-group>
         <target state="translated">Alterar</target>
       </trans-unit>
@@ -9602,7 +9618,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Successfully completed one-time migratration of settings to the database!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">554</context>
+          <context context-type="linenumber">567</context>
         </context-group>
         <target state="translated">A migração de configurações para o banco de dados foi concluída com sucesso!</target>
       </trans-unit>
@@ -9610,7 +9626,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>Unable to migrate settings to the database, please try saving manually.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">555</context>
+          <context context-type="linenumber">568</context>
         </context-group>
         <target state="translated">Não foi possível migrar as configurações para o banco de dados, por favor tente salvar manualmente.</target>
       </trans-unit>
@@ -9618,7 +9634,7 @@ Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsc
         <source>You can restart the tour from the settings page.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">625</context>
+          <context context-type="linenumber">638</context>
         </context-group>
         <target state="translated">Você pode reiniciar o tour na página de configurações.</target>
       </trans-unit>
