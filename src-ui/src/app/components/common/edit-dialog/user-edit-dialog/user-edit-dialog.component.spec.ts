@@ -20,6 +20,7 @@ import { PermissionsSelectComponent } from '../../permissions-select/permissions
 import { EditDialogMode } from '../edit-dialog.component'
 import { UserEditDialogComponent } from './user-edit-dialog.component'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 describe('UserEditDialogComponent', () => {
   let component: UserEditDialogComponent
@@ -38,7 +39,13 @@ describe('UserEditDialogComponent', () => {
         PermissionsFormComponent,
         PermissionsSelectComponent,
       ],
-      imports: [FormsModule, ReactiveFormsModule, NgSelectModule, NgbModule],
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgSelectModule,
+        NgbModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+      ],
       providers: [
         NgbActiveModal,
         {

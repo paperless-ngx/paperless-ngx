@@ -13,6 +13,7 @@ import { PermissionsSelectComponent } from '../../permissions-select/permissions
 import { EditDialogMode } from '../edit-dialog.component'
 import { GroupEditDialogComponent } from './group-edit-dialog.component'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 describe('GroupEditDialogComponent', () => {
   let component: GroupEditDialogComponent
@@ -30,7 +31,13 @@ describe('GroupEditDialogComponent', () => {
         PermissionsFormComponent,
         PermissionsSelectComponent,
       ],
-      imports: [FormsModule, ReactiveFormsModule, NgSelectModule, NgbModule],
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgSelectModule,
+        NgbModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+      ],
       providers: [
         NgbActiveModal,
         provideHttpClient(withInterceptorsFromDi()),
