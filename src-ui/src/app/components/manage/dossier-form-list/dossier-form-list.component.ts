@@ -66,7 +66,7 @@ extends CustomDossierFormListComponent<DossierForm> {
     // this.id = this.route.snapshot.params['id'];
     this.id = object?.id
     // console.log('trang moi',this.route.snapshot.params['id'])
-    this.router.navigate(['config/dossier-form', object.id]);
+    this.router.navigate(['dossier-form', object.id]);
     super.reloadData()
 
     
@@ -74,12 +74,12 @@ extends CustomDossierFormListComponent<DossierForm> {
   }
   goToDossier() {
       super.reloadData()
-      this.router.navigate(['config/dossier-form',]);
+      this.router.navigate(['dossier-form',]);
     
   }
     
   getDeleteMessage(object: DossierForm) {
-    return $localize`Do you really want to delete the dossier "${object.name}"?`
+    return $localize`Do you really want to delete the dossier form "${object.name}"?`
   }
 
   

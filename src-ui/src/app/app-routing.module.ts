@@ -38,6 +38,7 @@ import { CustomFieldsComponent } from './components/manage/custom-fields/custom-
 import { FoldersComponent } from './components/manage/folder-list/folder-list.component'
 import { SubFoldersComponent } from './components/manage/subfolder-list/subfolder-list.component'
 import { DossiersComponent } from './components/manage/dossier-list/dossier-list.component'
+import { DossiersFormComponent } from './components/manage/dossier-form-list/dossier-form-list.component'
 
 
 
@@ -347,24 +348,24 @@ export const routes: Routes = [
         },
       },
       {
-        path: 'config/dossier-form/',
-        component: ConfigComponent,
+        path: 'dossier-form',
+        component: DossiersFormComponent,
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
             action: PermissionAction.Change,
-            type: PermissionType.AppConfig,
+            type: PermissionType.DossierForm,
           },
         },
       },
       {
-        path: 'config/dossier-form/:id',
-        component: ConfigComponent,
+        path: 'dossier-form/:id',
+        component: DossiersFormComponent,
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
             action: PermissionAction.Change,
-            type: PermissionType.AppConfig,
+            type: PermissionType.DossierForm,
           },
         },
       },
