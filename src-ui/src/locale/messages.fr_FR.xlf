@@ -397,11 +397,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">228</context>
+          <context context-type="linenumber">235</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">230</context>
+          <context context-type="linenumber">237</context>
         </context-group>
         <target state="final">Paramètres</target>
       </trans-unit>
@@ -709,11 +709,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">263</context>
+          <context context-type="linenumber">270</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">266</context>
+          <context context-type="linenumber">273</context>
         </context-group>
         <target state="final">Journaux</target>
       </trans-unit>
@@ -1105,13 +1105,13 @@
         </context-group>
         <target state="translated">Recherche globale</target>
       </trans-unit>
-      <trans-unit id="2818183879511244335" datatype="html">
+      <trans-unit id="2818183879511244335" datatype="html" approved="yes">
         <source>Do not include advanced search results</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">204</context>
         </context-group>
-        <target state="translated">Ne pas inclure les résultats de recherche avancée</target>
+        <target state="final">Ne pas inclure les résultats de recherche avancée</target>
       </trans-unit>
       <trans-unit id="3969258421469113318" datatype="html">
         <source>Full search links to</source>
@@ -1121,13 +1121,13 @@
         </context-group>
         <target state="translated">La recherche complète mène à</target>
       </trans-unit>
-      <trans-unit id="6631288852577115923" datatype="html">
+      <trans-unit id="6631288852577115923" datatype="html" approved="yes">
         <source>Title and content search</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">216</context>
         </context-group>
-        <target state="translated">Rechercher un titre ou du contenu</target>
+        <target state="final">Rechercher un titre ou du contenu</target>
       </trans-unit>
       <trans-unit id="1010505078885609376" datatype="html" approved="yes">
         <source>Advanced search</source>
@@ -1601,7 +1601,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
-          <context context-type="linenumber">9</context>
+          <context context-type="linenumber">19</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
@@ -1929,11 +1929,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">251</context>
+          <context context-type="linenumber">258</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">253</context>
+          <context context-type="linenumber">260</context>
         </context-group>
         <target state="final">Tâches sur les fichiers</target>
       </trans-unit>
@@ -2253,7 +2253,7 @@
         </context-group>
         <target state="translated">échec</target>
       </trans-unit>
-      <trans-unit id="3418677553313974490" datatype="html">
+      <trans-unit id="3418677553313974490" datatype="html" approved="yes">
         <source>Trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
@@ -2261,21 +2261,21 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">271</context>
+          <context context-type="linenumber">218</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">274</context>
+          <context context-type="linenumber">221</context>
         </context-group>
-        <target state="translated">Corbeille</target>
+        <target state="final">Corbeille</target>
       </trans-unit>
-      <trans-unit id="3818027200170621545" datatype="html">
+      <trans-unit id="3818027200170621545" datatype="html" approved="yes">
         <source>Manage trashed documents that are pending deletion.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="translated">Gérer les documents mis à la corbeille en attente de suppression.</target>
+        <target state="final">Gérez les documents mis à la corbeille en attente de suppression.</target>
       </trans-unit>
       <trans-unit id="3186604097120837257" datatype="html">
         <source>Restore selected</source>
@@ -2293,13 +2293,13 @@
         </context-group>
         <target state="translated">Effacer le(s) sélectionné(s)</target>
       </trans-unit>
-      <trans-unit id="8597030111956627342" datatype="html">
+      <trans-unit id="8597030111956627342" datatype="html" approved="yes">
         <source>Empty trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="translated">Vider la corbeille</target>
+        <target state="final">Vider la corbeille</target>
       </trans-unit>
       <trans-unit id="991066160113599649" datatype="html">
         <source>Remaining</source>
@@ -2497,11 +2497,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">242</context>
+          <context context-type="linenumber">249</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">244</context>
+          <context context-type="linenumber">251</context>
         </context-group>
         <target state="final">Utilisateurs &amp; Groupes</target>
       </trans-unit>
@@ -3045,7 +3045,7 @@
         <source>Administration</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">222</context>
+          <context context-type="linenumber">229</context>
         </context-group>
         <target state="final">Administration</target>
       </trans-unit>
@@ -3053,11 +3053,11 @@
         <source>Configuration</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">235</context>
+          <context context-type="linenumber">242</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">237</context>
+          <context context-type="linenumber">244</context>
         </context-group>
         <target state="final">Configuration</target>
       </trans-unit>
@@ -3193,13 +3193,13 @@
         </context-group>
         <target state="final">Télécharger</target>
       </trans-unit>
-      <trans-unit id="searchResults.noResults" datatype="html">
+      <trans-unit id="searchResults.noResults" datatype="html" approved="yes">
         <source>No results</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="translated">Aucun résultat</target>
+        <target state="final">Aucun résultat</target>
       </trans-unit>
       <trans-unit id="searchResults.documents" datatype="html">
         <source>Documents</source>
@@ -3521,7 +3521,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
-          <context context-type="linenumber">10</context>
+          <context context-type="linenumber">20</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
@@ -4957,11 +4957,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
-          <context context-type="linenumber">6</context>
+          <context context-type="linenumber">16</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">27</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -5297,6 +5297,10 @@
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
         <target state="final">Qu'est-ce ?</target>
       </trans-unit>
       <trans-unit id="2827984212740060090" datatype="html" approved="yes">
@@ -5304,6 +5308,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
           <context context-type="linenumber">15</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
+          <context context-type="linenumber">9</context>
         </context-group>
         <target state="final">En savoir plus</target>
       </trans-unit>
@@ -5387,11 +5395,19 @@
         </context-group>
         <target state="final">Masquer les sans-propriétaires</target>
       </trans-unit>
+      <trans-unit id="941924371433275463" datatype="html">
+        <source>Global permissions define what areas of the app and API endpoints users can access.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <target state="translated">Les autorisations globales définissent à quelles zones de l'application et à quels endpoints de l'API les utilisateurs peuvent accéder.</target>
+      </trans-unit>
       <trans-unit id="8650499415827640724" datatype="html" approved="yes">
         <source>Type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
-          <context context-type="linenumber">5</context>
+          <context context-type="linenumber">15</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
@@ -5403,7 +5419,7 @@
         <source>Add</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
-          <context context-type="linenumber">7</context>
+          <context context-type="linenumber">17</context>
         </context-group>
         <target state="final">Ajouter</target>
       </trans-unit>
@@ -5411,7 +5427,7 @@
         <source>Change</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
-          <context context-type="linenumber">8</context>
+          <context context-type="linenumber">18</context>
         </context-group>
         <target state="final">Modifier</target>
       </trans-unit>
@@ -5671,13 +5687,13 @@
         </context-group>
         <target state="final">Partager la version archivée</target>
       </trans-unit>
-      <trans-unit id="8037476586059399916" datatype="html">
+      <trans-unit id="8037476586059399916" datatype="html" approved="yes">
         <source>Expires</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="translated">Expire</target>
+        <target state="final">Expiration </target>
       </trans-unit>
       <trans-unit id="4776429682428363094" datatype="html" approved="yes">
         <source>1 day</source>
@@ -6722,15 +6738,15 @@
         </context-group>
         <target state="final">Erreur lors de la sauvegarde du document</target>
       </trans-unit>
-      <trans-unit id="8410796510716511826" datatype="html">
+      <trans-unit id="8410796510716511826" datatype="html" approved="yes">
         <source>Do you really want to move the document &quot;<x id="PH" equiv-text="this.document.title"/>&quot; to the trash?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">777</context>
         </context-group>
-        <target state="translated">Voulez-vous vraiment déplacer le document « <x id="PH" equiv-text="this.document.title"/> » vers la corbeille ?</target>
+        <target state="final">Voulez-vous vraiment déplacer le document « <x id="PH" equiv-text="this.document.title"/> » vers la corbeille ?</target>
       </trans-unit>
-      <trans-unit id="282586936710748252" datatype="html">
+      <trans-unit id="282586936710748252" datatype="html" approved="yes">
         <source>Documents can be restored prior to permanent deletion.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
@@ -6740,9 +6756,9 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">714</context>
         </context-group>
-        <target state="translated">Les documents peuvent être restaurés avant la suppression définitive.</target>
+        <target state="final">Les documents peuvent être restaurés avant la suppression définitive.</target>
       </trans-unit>
-      <trans-unit id="2048798344356757326" datatype="html">
+      <trans-unit id="2048798344356757326" datatype="html" approved="yes">
         <source>Move to trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
@@ -6752,7 +6768,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">716</context>
         </context-group>
-        <target state="translated">Déplacer vers la corbeille</target>
+        <target state="final">Déplacer vers la corbeille</target>
       </trans-unit>
       <trans-unit id="619486176823357521" datatype="html">
         <source>Reprocess confirm</source>
@@ -7258,7 +7274,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">713</context>
         </context-group>
-        <target state="translated">Déplacer les <x id="PH" equiv-text="this.list.selected.size"/> document(s) sélectionné(s) vers la corbeille ?</target>
+        <target state="translated">Déplacer le document/les <x id="PH" equiv-text="this.list.selected.size"/> documents sélectionnés vers la corbeille ?</target>
       </trans-unit>
       <trans-unit id="8585195717323764335" datatype="html">
         <source>This operation will permanently recreate the archive files for <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -9601,7 +9617,7 @@
         <source>Successfully completed one-time migratration of settings to the database!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">554</context>
+          <context context-type="linenumber">567</context>
         </context-group>
         <target state="final">La migration des paramètres vers la base de données a été effectuée avec succès !</target>
       </trans-unit>
@@ -9609,7 +9625,7 @@
         <source>Unable to migrate settings to the database, please try saving manually.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">555</context>
+          <context context-type="linenumber">568</context>
         </context-group>
         <target state="final">Impossible de migrer les paramètres vers la base de données, veuillez essayer d’enregistrer manuellement.</target>
       </trans-unit>
@@ -9617,7 +9633,7 @@
         <source>You can restart the tour from the settings page.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">625</context>
+          <context context-type="linenumber">638</context>
         </context-group>
         <target state="final">Vous pouvez recommencer la visite depuis les paramètres.</target>
       </trans-unit>
