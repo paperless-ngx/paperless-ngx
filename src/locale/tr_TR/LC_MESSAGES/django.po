@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-09 11:27-0700\n"
-"PO-Revision-Date: 2024-07-09 18:28\n"
+"PO-Revision-Date: 2024-07-23 00:26\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -47,11 +47,11 @@ msgstr "Düzenli ifade"
 
 #: documents/models.py:61 documents/models.py:975
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Bulanık kelime"
 
 #: documents/models.py:62
 msgid "Automatic"
-msgstr ""
+msgstr "Otomatik"
 
 #: documents/models.py:65 documents/models.py:419 documents/models.py:1291
 #: paperless_mail/models.py:18 paperless_mail/models.py:107
@@ -257,59 +257,59 @@ msgstr "günlükler"
 
 #: documents/models.py:401
 msgid "Table"
-msgstr ""
+msgstr "Tablo"
 
 #: documents/models.py:402
 msgid "Small Cards"
-msgstr ""
+msgstr "Küçük Kartlar"
 
 #: documents/models.py:403
 msgid "Large Cards"
-msgstr ""
+msgstr "Büyük kartlar"
 
 #: documents/models.py:406
 msgid "Title"
-msgstr ""
+msgstr "Başlık"
 
 #: documents/models.py:407
 msgid "Created"
-msgstr ""
+msgstr "Oluşturuldu"
 
 #: documents/models.py:408
 msgid "Added"
-msgstr ""
+msgstr "Eklendi"
 
 #: documents/models.py:409
 msgid "Tags"
-msgstr ""
+msgstr "Etiketler"
 
 #: documents/models.py:410
 msgid "Correspondent"
-msgstr ""
+msgstr "Muhabirler"
 
 #: documents/models.py:411
 msgid "Document Type"
-msgstr ""
+msgstr "Döküman tipi"
 
 #: documents/models.py:412
 msgid "Storage Path"
-msgstr ""
+msgstr "Dosya yolu"
 
 #: documents/models.py:413
 msgid "Note"
-msgstr ""
+msgstr "Not"
 
 #: documents/models.py:414
 msgid "Owner"
-msgstr ""
+msgstr "Sahip"
 
 #: documents/models.py:415
 msgid "Shared"
-msgstr ""
+msgstr "Paylaşıldı"
 
 #: documents/models.py:416
 msgid "ASN"
-msgstr ""
+msgstr "ASN"
 
 #: documents/models.py:422
 msgid "show on dashboard"
@@ -329,15 +329,15 @@ msgstr "tersine sırala"
 
 #: documents/models.py:437
 msgid "View page size"
-msgstr ""
+msgstr "Dosya Boyutu"
 
 #: documents/models.py:445
 msgid "View display mode"
-msgstr ""
+msgstr "Ekran Modunu İzle"
 
 #: documents/models.py:452
 msgid "Document display fields"
-msgstr ""
+msgstr "Döküman izleme sahaları"
 
 #: documents/models.py:459 documents/models.py:516
 msgid "saved view"
@@ -433,7 +433,7 @@ msgstr "tam metin sorgulama"
 
 #: documents/models.py:489
 msgid "more like this"
-msgstr ""
+msgstr "benzer listele"
 
 #: documents/models.py:490
 msgid "has tags in"
@@ -453,7 +453,7 @@ msgstr "depolama yolu ise"
 
 #: documents/models.py:494
 msgid "has correspondent in"
-msgstr ""
+msgstr "muhabiri var"
 
 #: documents/models.py:495
 msgid "does not have correspondent in"
@@ -493,23 +493,23 @@ msgstr "şurada sahibi yoktur"
 
 #: documents/models.py:504
 msgid "has custom field value"
-msgstr ""
+msgstr "özel veritabanı sahası var"
 
 #: documents/models.py:505
 msgid "is shared by me"
-msgstr ""
+msgstr "bu benimle paylaşıldı"
 
 #: documents/models.py:506
 msgid "has custom fields"
-msgstr ""
+msgstr "özel veritabanı sahası var"
 
 #: documents/models.py:507
 msgid "has custom field in"
-msgstr ""
+msgstr "içinde özel saha var"
 
 #: documents/models.py:508
 msgid "does not have custom field in"
-msgstr ""
+msgstr "özel saha tanımlı değil"
 
 #: documents/models.py:509
 msgid "does not have custom field"
@@ -597,15 +597,15 @@ msgstr ""
 
 #: documents/models.py:688
 msgid "Result Data"
-msgstr ""
+msgstr "Sonuç veri"
 
 #: documents/models.py:690
 msgid "The data returned by the task"
-msgstr ""
+msgstr "Gören veriyi geri çevirdi"
 
 #: documents/models.py:702
 msgid "Note for the document"
-msgstr ""
+msgstr "Döküman için not"
 
 #: documents/models.py:726
 msgid "user"
@@ -645,7 +645,7 @@ msgstr "bağlantıları paylaş"
 
 #: documents/models.py:804
 msgid "String"
-msgstr ""
+msgstr "Değer"
 
 #: documents/models.py:805
 msgid "URL"
@@ -669,7 +669,7 @@ msgstr ""
 
 #: documents/models.py:810
 msgid "Monetary"
-msgstr ""
+msgstr "Parasal"
 
 #: documents/models.py:811
 msgid "Document Link"
@@ -677,19 +677,19 @@ msgstr ""
 
 #: documents/models.py:812
 msgid "Select"
-msgstr ""
+msgstr "Seç"
 
 #: documents/models.py:824
 msgid "data type"
-msgstr ""
+msgstr "veri tipi"
 
 #: documents/models.py:831
 msgid "extra data"
-msgstr ""
+msgstr "ekstra veri"
 
 #: documents/models.py:835
 msgid "Extra data for the custom field, such as select options"
-msgstr ""
+msgstr "Seçenekler gibi özel alan için ekstra veriler"
 
 #: documents/models.py:841
 msgid "custom field"
@@ -1182,11 +1182,11 @@ msgstr "atla"
 
 #: paperless/models.py:40
 msgid "redo"
-msgstr ""
+msgstr "ileri al"
 
 #: paperless/models.py:41
 msgid "force"
-msgstr ""
+msgstr "zorla"
 
 #: paperless/models.py:42
 msgid "skip_noarchive"
@@ -1202,7 +1202,7 @@ msgstr ""
 
 #: paperless/models.py:52
 msgid "always"
-msgstr ""
+msgstr "her zaman"
 
 #: paperless/models.py:60
 msgid "clean"
@@ -1230,7 +1230,7 @@ msgstr ""
 
 #: paperless/models.py:73
 msgid "Gray"
-msgstr ""
+msgstr "Gri"
 
 #: paperless/models.py:74
 msgid "CMYK"
@@ -1270,7 +1270,7 @@ msgstr ""
 
 #: paperless/models.py:141
 msgid "Enables page rotation"
-msgstr ""
+msgstr "Sayfa döndürmeyi etkinleştir"
 
 #: paperless/models.py:146
 msgid "Sets the threshold for rotation of pages"
@@ -1290,7 +1290,7 @@ msgstr ""
 
 #: paperless/models.py:171
 msgid "Application title"
-msgstr ""
+msgstr "Uygulama başlığı"
 
 #: paperless/models.py:178
 msgid "Application logo"
@@ -1318,7 +1318,7 @@ msgstr "Belarusça"
 
 #: paperless/settings.py:686
 msgid "Bulgarian"
-msgstr ""
+msgstr "Bulgarca"
 
 #: paperless/settings.py:687
 msgid "Catalan"
