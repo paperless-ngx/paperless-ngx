@@ -2,7 +2,7 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
-import { TestBed } from '@angular/core/testing'
+import { fakeAsync, TestBed, tick } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { RouterTestingModule } from '@angular/router/testing'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
@@ -18,6 +18,7 @@ import { CustomFieldDataType } from '../data/custom-field'
 import { PermissionsService } from './permissions.service'
 import { DEFAULT_DISPLAY_FIELDS, DisplayField } from '../data/document'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { ToastService } from './toast.service'
 
 const customFields = [
   {
@@ -41,6 +42,7 @@ describe('SettingsService', () => {
   let customFieldsService: CustomFieldsService
   let permissionService: PermissionsService
   let subscription: Subscription
+  let toastService: ToastService
 
   const ui_settings: UiSettings = {
     user: {
@@ -105,6 +107,7 @@ describe('SettingsService', () => {
     customFieldsService = TestBed.inject(CustomFieldsService)
     permissionService = TestBed.inject(PermissionsService)
     settingsService = TestBed.inject(SettingsService)
+    toastService = TestBed.inject(ToastService)
   })
 
   afterEach(() => {
@@ -118,6 +121,18 @@ describe('SettingsService', () => {
     )
     expect(req.request.method).toEqual('GET')
   })
+
+  it('should catch error and show toast on retrieve ui_settings error', fakeAsync(() => {
+    const toastSpy = jest.spyOn(toastService, 'showError')
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}ui_settings/`)
+      .flush(
+        { detail: 'You do not have permission to perform this action.' },
+        { status: 403, statusText: 'Forbidden' }
+      )
+    tick(500)
+    expect(toastSpy).toHaveBeenCalled()
+  }))
 
   it('calls ui_settings api endpoint with POST on store', () => {
     let req = httpTestingController.expectOne(
