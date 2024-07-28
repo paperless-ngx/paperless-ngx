@@ -2,7 +2,7 @@
 
 ## paperless-ngx 2.11.2
 
-### Features
+### Changes
 
 - Change: more clearly handle init permissions error [@shamoon](https://github.com/shamoon) ([#7334](https://github.com/paperless-ngx/paperless-ngx/pull/7334))
 - Chore: add permissions info link from webUI [@shamoon](https://github.com/shamoon) ([#7310](https://github.com/paperless-ngx/paperless-ngx/pull/7310))
