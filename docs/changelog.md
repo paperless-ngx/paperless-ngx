@@ -1,5 +1,29 @@
 # Changelog
 
+## paperless-ngx 2.11.2
+
+### Changes
+
+- Change: more clearly handle init permissions error [@shamoon](https://github.com/shamoon) ([#7334](https://github.com/paperless-ngx/paperless-ngx/pull/7334))
+- Chore: add permissions info link from webUI [@shamoon](https://github.com/shamoon) ([#7310](https://github.com/paperless-ngx/paperless-ngx/pull/7310))
+
+### Dependencies
+
+- Chore(deps-dev): Bump the development group with 2 updates [@dependabot](https://github.com/dependabot) ([#7296](https://github.com/paperless-ngx/paperless-ngx/pull/7296))
+- Chore(deps): Bump tika-client from 0.5.0 to 0.6.0 in the small-changes group [@dependabot](https://github.com/dependabot) ([#7297](https://github.com/paperless-ngx/paperless-ngx/pull/7297))
+
+### All App Changes
+
+<details>
+<summary>5 changes</summary>
+
+- Change: more clearly handle init permissions error [@shamoon](https://github.com/shamoon) ([#7334](https://github.com/paperless-ngx/paperless-ngx/pull/7334))
+- Chore: add permissions info link from webUI [@shamoon](https://github.com/shamoon) ([#7310](https://github.com/paperless-ngx/paperless-ngx/pull/7310))
+- Fix: increase search input text contrast with light custom theme colors [@JayBkr](https://github.com/JayBkr) ([#7303](https://github.com/paperless-ngx/paperless-ngx/pull/7303))
+- Chore(deps-dev): Bump the development group with 2 updates [@dependabot](https://github.com/dependabot) ([#7296](https://github.com/paperless-ngx/paperless-ngx/pull/7296))
+- Chore(deps): Bump tika-client from 0.5.0 to 0.6.0 in the small-changes group [@dependabot](https://github.com/dependabot) ([#7297](https://github.com/paperless-ngx/paperless-ngx/pull/7297))
+</details>
+
 ## paperless-ngx 2.11.1
 
 ### Features
