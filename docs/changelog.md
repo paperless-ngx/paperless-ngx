@@ -6,6 +6,7 @@
 
 - Change: more clearly handle init permissions error [@shamoon](https://github.com/shamoon) ([#7334](https://github.com/paperless-ngx/paperless-ngx/pull/7334))
 - Chore: add permissions info link from webUI [@shamoon](https://github.com/shamoon) ([#7310](https://github.com/paperless-ngx/paperless-ngx/pull/7310))
+- Fix: increase search input text contrast with light custom theme colors [@JayBkr](https://github.com/JayBkr) ([#7303](https://github.com/paperless-ngx/paperless-ngx/pull/7303))
 
 ### Dependencies
 
