@@ -540,8 +540,7 @@ are released, dependency support is confirmed, etc.
 15. Optional: If using the NLTK machine learning processing (see
     [`PAPERLESS_ENABLE_NLTK`](configuration.md#PAPERLESS_ENABLE_NLTK) for details),
     download the NLTK data for the Snowball
-    Stemmer, Stopwords and Punkt tokenizer to your
-    `PAPERLESS_DATA_DIR/nltk`. Refer to the [NLTK
+    Stemmer, Stopwords and Punkt tokenizer to `/usr/share/nltk_data`. Refer to the [NLTK
     instructions](https://www.nltk.org/data.html) for details on how to
     download the data.
 
