@@ -1086,7 +1086,7 @@ class CustomFieldInstance(models.Model):
     reference = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True )
 
     # Actual data storage
-    value_text = models.CharField(max_length=128, null=True)
+    value_text = models.TextField(null=True)
 
     value_bool = models.BooleanField(null=True)
 

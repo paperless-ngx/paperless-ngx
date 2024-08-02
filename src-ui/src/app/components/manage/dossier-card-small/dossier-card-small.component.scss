@@ -3,6 +3,7 @@
   text-align: center;
   display: block;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .doc-img {
@@ -98,4 +99,7 @@ a {
   max-width: 80%;
   row-gap: .2rem;
   line-height: 1;
+}
+.custom-cursor {
+  cursor: pointer;
 }

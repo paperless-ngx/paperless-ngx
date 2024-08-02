@@ -29,10 +29,8 @@ export class DossierEditDialogComponent
       label: $localize`Dossier`,
       id: DossierType.Dossier,
     },
-    {
-      label: $localize`File`,
-      id: DossierType.File,
-    },
+  
+  
   ]
   private unsubscribeNotifier: Subject<any> = new Subject()
   dossierArray: Dossier[]=[]
@@ -47,39 +45,18 @@ export class DossierEditDialogComponent
     private readonly dossierFormService: DossierFormService
   ) {
     super(service, activeModal, userService, settingsService)
-    // this.dataDossier()
-    // this.getFormOrigin().get('dossier_form').setValue(null)
-    // if(this.getFormOrigin().get('dossier_type').value==DossierType.Document){
-    //   this.dataDossier(DossierType.Document)
-      
-    //   // this.dataCustomFields = 
-    // }
-    // else if(this.getFormOrigin().get('type').value==DossierType.Dossier){
-    //   this.dataDossier(DossierType.Dossier)
-      
-    // }
-    
-    console.log('object',this.object)
+
     this.getFormOrigin().valueChanges.subscribe(value => {
       
       if(value.type==DossierType.Document){
         this.dataDossier(DossierType.Document)
-        
-        // this.dataCustomFields = 
+     
       }
       else if(value.type==DossierType.Dossier){
         this.dataDossier(DossierType.Dossier)
         
       }
 
-      // console.log(this.getFormOrigin().value)
-      // const dossierSelect = this.dossierarray.find(obj => obj.id === value.id);
-      // if (dossierSelect) {
-      //   this.dataCustomFields=dossierSelect.custom_fields
-      // } else {
-      //   console.log("Object not found.");
-      // }
-      
     });
    
   }
@@ -116,16 +93,7 @@ export class DossierEditDialogComponent
   }
   dataDossier(type){
     this.dossierFormService
-      .listDossierFormFiltered(
-        1,
-        null,
-        null,
-        null,
-        null,
-        null,
-        true,
-        type
-      )
+      .listDossierFormFiltered(1,null,null,null,null,null,true,type)
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((c) => {
         this.dossierArray = c.results
@@ -135,20 +103,7 @@ export class DossierEditDialogComponent
 
 
   onDataInputChange(data) {
-   
-    this.getFormOrigin().get('dossier_form').setValue(null)
-    
-    // this.dataCustomFields=null
-    // if(data==DossierType.Document){
-    //   this.dataDossier(DossierType.Document)
-      
-    // }
-    // else if(data==DossierType.Dossier){
-    //   this.dataDossier(DossierType.Dossier)
-    // }
-      
-      
-
+    this.getFormOrigin().get('dossier_form').setValue(null)    
   }
   onDataInputParentDossierTypeChange(data) {
     this.dataCustomFields=[]
@@ -170,7 +125,6 @@ export class DossierEditDialogComponent
 
   save(){
     let getFormOrgin = super.getFormOrigin()
-    // getFormOrgin.get('custom_fields').setValue(this.dataCustomFields)
     getFormOrgin.patchValue({ custom_fields: this.dataFromCustomFields });
   
     super.save()

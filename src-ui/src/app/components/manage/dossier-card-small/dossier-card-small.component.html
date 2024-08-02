@@ -11,6 +11,9 @@
             <i-bs class="me-1 d-flex justify-content-center align-items-center p-2" name="archive" width="2rem" height="2rem"  ></i-bs>
           } @else if (dossier.type == "DOCUMENT") {
             <!-- <i-bs class="me-1" name="files"></i-bs> -->
+            <i-bs class="me-1 d-flex justify-content-center align-items-center p-2" name="files" width="2rem" height="2rem"></i-bs>
+          } @else if (dossier.type == "FILE") {
+            <!-- <i-bs class="me-1" name="files"></i-bs> -->
             <i-bs class="me-1 d-flex justify-content-center align-items-center p-2" name="file-earmark-pdf" width="2rem" height="2rem"></i-bs>
           }
          
@@ -52,24 +55,18 @@
     } -->
 
     <div class="card-body bg-light p-2">
-      @if (dossier.type=="DOSSIER"){
-        <span class="card-text"  (click)="this.goToDossier.emit(this.dossier)">
-          <!-- @if (document.correspondent) {
-          <a title="Toggle correspondent filter" i18n-title
-            (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()"
-            class="fw-bold btn-link">{{(document.correspondent$ | async)?.name ?? privateName}}</a>:
-          } -->
-          {{dossier.name | documentTitle}}
-        </span>
+      @if (dossier.type=="DOSSIER" ){
+        <p class="card-text"  (click)="this.goToDossierDocument.emit(this.dossier)">
+          {{dossier.name}}
+        </p>
       } @else if (dossier.type=="DOCUMENT"){
-        <span class="card-text"  routerLink="/documents/{{1}}">
-          <!-- @if (document.correspondent) {
-          <a title="Toggle correspondent filter" i18n-title
-            (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()"
-            class="fw-bold btn-link">{{(document.correspondent$ | async)?.name ?? privateName}}</a>:
-          } -->
+        <p class="card-text"  (click)="this.goToDossierDocument.emit(this.dossier)">
           {{dossier.name | documentTitle}}
-        </span>
+        </p>
+      } @else if (dossier.type=="FILE"){
+        <p class="card-text "  routerLink="/documents/{{this.dossier.document_matching}}">
+          {{dossier.name | documentTitle}}
+        </p>
       }
     </div>
     <div class="card-footer pt-0 pb-2 px-2">

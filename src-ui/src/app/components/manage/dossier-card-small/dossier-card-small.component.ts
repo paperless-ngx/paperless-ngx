@@ -52,7 +52,7 @@ export class DossierCardSmallComponent extends ComponentWithPermissions {
   @Output() 
   filterDocuments = new EventEmitter<any>();
   @Output() 
-  goToDossier = new EventEmitter<any>();
+  goToDossierDocument = new EventEmitter<any>();
   @Output() 
   openEditDialog = new EventEmitter<any>();
   @Output() 

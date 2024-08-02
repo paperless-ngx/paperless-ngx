@@ -1,0 +1,45 @@
+<form [formGroup]="form" [class.opacity-50]="disabled">
+  <label class="form-label">{{title}}</label>
+  <ul class="list-group">
+    <li class="list-group-item ">
+      <div class="row">
+        <div class="col" i18n>Field</div>
+        <div class="col" i18n>Enable</div>
+        <div class="col-3" [hidden]=" !inputDossier" i18n>Value</div>
+        <div class="col-3 " [hidden]="!inputDossierForm" i18n>Match value</div>
+
+        <div class="col-lg-5" [hidden]=" inputDossierForm?.type == 'DOCUMENT' || inputDossier?.type == 'DOCUMENT'" i18n>Reference to value</div>
+      </div>
+    </li>
+      <li class="list-group-item" formArrayName="customFields" *ngFor="let customField of customFields.controls; let i=index" >
+        <div class="row">
+          <div class="col">{{ customField.get('field_name').value }}</div>
+          <div class="col form-switch" placement="left" triggers="mouseenter:mouseleave">
+            <input type="checkbox" class="form-check-input" id="{{customField.get('field').value}}"  [checked]="this.dictCustomFieldsEnable[customField.get('field').value] || false" (change)="enableClick($event, customField.get('field'))">
+            <label class="form-check-label visually-hidden" for="{{customField.get('field').value}}" i18n>All</label>
+          </div>
+       
+          <div class="col-lg-3" [hidden]=" !inputDossier" placement="left" triggers="mouseenter:mouseleave">
+            <input type="text" class="form-control" [formControl]="customField.get('value')" >
+            <label class="visually-hidden" i18n>{{customField.get('value')}}</label>
+          </div>
+
+          <div class="col-lg-3" [hidden]="!inputDossierForm" placement="left" triggers="mouseenter:mouseleave">
+            <input type="text" class="form-control" [formControl]="customField.get('match_value')" >
+            <label class="visually-hidden" i18n>{{customField.get('match_value')}}</label>
+          </div>
+          <div class="col-lg-5" [hidden]=" inputDossierForm?.type == 'DOCUMENT'">
+            <pngx-input-select [items]="dossierForm" bindLabel="name" [removed]="handleRemove(i)" [formControl]="customField.get('dossier_document')" (ngModelChange)="modelChangeDossier($event,i)" aria-valuetext="" [allowNull]="true" ></pngx-input-select>
+            <pngx-input-select [items]="getCustomFieldOfForm(customField.get('dossier_document'))" bindLabel="field_name" [formControl]="customField.get('reference')" (ngModelChange)="modelChangeField($event,i)" [allowNull]="true"></pngx-input-select>
+          </div>
+          <!-- <div class="col">
+          </div> -->
+        </div>
+      </li>
+    <!-- } -->
+    
+    @if (error) {
+      <div class="invalid-feedback d-block">{{error}}</div>
+    }
+  </ul>
+</form>
