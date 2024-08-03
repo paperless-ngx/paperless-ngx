@@ -151,7 +151,9 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class ApplicationConfigurationSerializer(serializers.ModelSerializer):
     user_args = serializers.JSONField(binary=True, allow_null=True)
-
+    api_ocr = serializers.JSONField(binary=True, allow_null=True)
+    api_ocr_field = serializers.JSONField(binary=True, allow_null=True)
+    
     def run_validation(self, data):
         # Empty strings treated as None to avoid unexpected behavior
         if "user_args" in data and data["user_args"] == "":

@@ -156,7 +156,6 @@ class RasterisedDocumentParser(DocumentParser):
     def call_ocr_api_with_retries(self, method, url, headers, params, payload, max_retries=5, delay=5, timeout=100, status_code_success = [200], status_code_fail = []):
         retries = 0
         data_ocr = None
-        
         while retries < max_retries:
             try:
                 response_ocr = requests.request(method, url, headers=headers, params=params, data=payload, timeout=timeout)
@@ -180,15 +179,15 @@ class RasterisedDocumentParser(DocumentParser):
     
         logging.error('Max retries reached. OCR request failed.')
         return None
-    def get_token_ocr_field_by_refresh_token(self,dossier_form:DossierForm):
+    def get_token_ocr_field_by_refresh_token(self,application_configuration:ApplicationConfiguration):
         # check token
         headers = {
                 'Content-Type': 'application/json'
             }
         payload = json.dumps({
-                    "refresh": f"{dossier_form.key['refresh']}",
+                    "refresh": f"{application_configuration.api_ocr_field.get('refresh_token')}"
                     })
-        token = self.call_ocr_api_with_retries("POST",json.loads(dossier_form)['refresh'], 
+        token = self.call_ocr_api_with_retries("POST",application_configuration.api_ocr_field.get('refresh'), 
                                                                     headers, 
                                                                     params={}, 
                                                                     payload=payload, 
@@ -196,13 +195,13 @@ class RasterisedDocumentParser(DocumentParser):
                                                                     delay=5,
                                                                     timeout=100,status_code_fail=[401])
         if token == False:
-            token = self.login_ocr_field(dossier_form)
+            token = self.login_ocr_field(application_configuration=application_configuration)
             if token is not None:
                 payload = json.dumps({
-                        "refresh": f"{dossier_form.key['refresh']}",
+                        "refresh": f"{application_configuration.api_ocr_field.get('refresh_token')}",
                         })
                 
-                token = self.call_ocr_api_with_retries("POST",json.loads(dossier_form)['refresh'], 
+                token = self.call_ocr_api_with_retries("POST",json.loads(application_configuration)['refresh'], 
                                                                         headers={}, 
                                                                         params={}, 
                                                                         payload=payload, 
@@ -211,35 +210,58 @@ class RasterisedDocumentParser(DocumentParser):
                                                                         timeout=100)
             
         return token
-    def login_ocr_field(self,dossier_form:DossierForm):
+    
+    def login_ocr_field(self,application_configuration:ApplicationConfiguration):
         # check token
         headers = {
                 'Content-Type': 'application/json'
             }
         payload = json.dumps({
-                    "username": f"{dossier_form.username}",
-                    "password": f"{dossier_form.password}",
+                    "username": f"{application_configuration.username_ocr_field}",
+                    "password": f"{application_configuration.password_ocr_field}"
                     })
-        return self.call_ocr_api_with_retries("POST",json.loads(dossier_form.url)['login'], 
+        return self.call_ocr_api_with_retries("POST",application_configuration.api_ocr_field.get('login'), 
                                                                     headers, 
                                                                     params={}, 
                                                                     payload=payload, 
-                                                                    max_retries=5, 
+                                                                    max_retries=2, 
                                                                     delay=5,
-                                                                    timeout=100)
+                                                                    timeout=10)
+       
+    def login_ocr(self,application_configuration:ApplicationConfiguration):
+        # check token
+        payload = f"username={application_configuration.username_ocr}&password={application_configuration.password_ocr}"
+        headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+        }
+       
+        return self.call_ocr_api_with_retries("POST",application_configuration.api_ocr.get('login'), 
+                                                                    headers=headers, 
+                                                                    params={}, 
+                                                                    payload=payload, 
+                                                                    max_retries=2, 
+                                                                    delay=5,
+                                                                    timeout=20)
        
 
         
     # get ocr file img/pdf
     def ocr_file(self, path_file, dossier_form:DossierForm):
         
-        k = ApplicationConfiguration.objects.filter().first()
-        access_token = k.ocr_key
+        application_configuration=ApplicationConfiguration.objects.filter().first()
+        application_configuration: ApplicationConfiguration|None
+        access_token_ocr=application_configuration.api_ocr.get("access_token",None)
+       
+        if access_token_ocr == '':
+            access_token_ocr = self.login_ocr(application_configuration=application_configuration)                
+            if access_token_ocr is not None:
+                application_configuration.api_ocr["access_token"]=access_token['access_token']
+ 
         # upload file
         get_file_id = ''
-        url_upload_file = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_UPLOAD_FILE"]
+        url_upload_file = application_configuration.api_ocr.get("upload_file",None)
         headers = {
-            'Authorization': f"Bearer {access_token}"
+            'Authorization': f"Bearer {application_configuration.api_ocr['access_token']}"
         }
         pdf_data = None
         with open(path_file, 'rb') as file:
@@ -253,52 +275,44 @@ class RasterisedDocumentParser(DocumentParser):
 
         # ocr by file_id
         params = {'file_id': get_file_id}
-        url_ocr_pdf_by_fileid = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_OCR_BY_FILEID"]
+        url_ocr_pdf_by_fileid = application_configuration.api_ocr.get("ocr_by_file_id",None)
         data_ocr = self.call_ocr_api_with_retries("POST",url_ocr_pdf_by_fileid, headers, params, {}, 5, 5, 100)
-        # response_ocr = requests.post(url_ocr_pdf_by_fileid, headers=headers, params=params)
-        # data_ocr = None
-        # # logging.error('ocr: ', response_ocr.status_code)
-        # if response_ocr.status_code == 200:
-        #     data_ocr = response_ocr.json()
-        # else:
-        #     logging.error('ocr: ', response_ocr.text)
-        # 
+        
         # login API custom-field
         if dossier_form is None:
             return (data_ocr,None)
-        if dossier_form.url is not None and dossier_form.form_rule is not None:
+
+        if len(application_configuration.api_ocr_field)>0 and dossier_form.form_rule != '':
             # login for the first time ...
-            token = dossier_form.key
-            format_token = ''
-            try:
-                format_token = json.loads(dossier_form.key)
-                
-            except json.JSONDecodeError as e:
-                pass
-            if format_token == '':
-                token = self.login_ocr_field(dossier_form)
-                
+            access_token = application_configuration.api_ocr_field.get("access_token",None)        
+            if access_token == '':
+                token = self.login_ocr_field(application_configuration=application_configuration)                
                 if token is not None:
-                    dossier_form.key=token
-            url_ocr_pdf_custom_field_by_fileid = json.loads(dossier_form.url)['ocr']
+                    application_configuration.api_ocr_field["access_token"]=token['access']
+                    application_configuration.api_ocr_field["refresh_token"]=token['refresh']
+                    application_configuration.save()
+            url_ocr_pdf_custom_field_by_fileid = application_configuration.api_ocr_field.get("ocr")
             payload = json.dumps({
             "request_id": f"{get_file_id}",
             "list_form_code": [
                 f"{dossier_form.form_rule}"
             ]
             })
-            self.log.info('gia tri key',token['access'])
             headers = {
-                'Authorization': f"Bearer {token['access']}",
+                'Authorization': f"Bearer {application_configuration.api_ocr_field['access_token']}",
                 'Content-Type': 'application/json'
             }
             data_ocr_fields = self.call_ocr_api_with_retries("POST",url_ocr_pdf_custom_field_by_fileid, headers, params, payload, 5, 5, 100,status_code_fail=[401])
+            # self.log.info("gia tri application_configuration", data_ocr_fields)
+
             # if token expire or WRONG
             if data_ocr_fields == False:
-                token = self.get_token_ocr_field_by_refresh_token(dossier_form)
+                token = self.get_token_ocr_field_by_refresh_token(application_configuration)
                 if token is not None and token != False:
-                    dossier_form.key=json.dumps(token)
-                    dossier_form.save()
+                    application_configuration.api_ocr_field["access_token"]=token['access']
+                    application_configuration.api_ocr_field["refresh_token"]=token['refresh']
+                    application_configuration.save()
+                    
                     # repeat ocr_field
                     payload = json.dumps({
                     "request_id": f"{get_file_id}",
@@ -307,15 +321,11 @@ class RasterisedDocumentParser(DocumentParser):
                     ]
                     })
                     headers = {
-                        'Authorization': f"Bearer {json.load(dossier_form.key)['access_token']}",
+                        'Authorization': f"Bearer {application_configuration.api_ocr_field.get('access_token')}",
                         'Content-Type': 'application/json'
                     }
+                    self.log.log("ocr field-------------", headers)
                     data_ocr_fields = self.call_ocr_api_with_retries("POST",url_ocr_pdf_custom_field_by_fileid, headers, params, payload, 5, 5, 100,status_code_fail=[401])
-
-
-
-
-
 
         return (data_ocr,data_ocr_fields)
     

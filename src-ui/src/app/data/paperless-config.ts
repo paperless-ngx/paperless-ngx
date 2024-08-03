@@ -167,10 +167,45 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     category: ConfigCategory.OCR,
   },
   {
-    key: 'ocr_key',
-    title: $localize`OCR Key`,
+    key: 'username_ocr',
+    title: $localize`Username Ocr`,
     type: ConfigOptionType.String,
-    config_key: 'PAPERLESS_APP_TITLE',
+    config_key: 'PAPERLESS_USERNAME_OCR',
+    category: ConfigCategory.OCR,
+  },
+  {
+    key: 'password_ocr',
+    title: $localize`Password Ocr`,
+    type: ConfigOptionType.String,
+    config_key: 'PAPERLESS_PASSWORD_OCR',
+    category: ConfigCategory.OCR,
+  },
+  {
+    key: 'username_ocr_field',
+    title: $localize`Username Ocr Field`,
+    type: ConfigOptionType.String,
+    config_key: 'PAPERLESS_USERNAME_OCR_FIELD',
+    category: ConfigCategory.OCR,
+  },
+  {
+    key: 'password_ocr_field',
+    title: $localize`Password Ocr Field`,
+    type: ConfigOptionType.String,
+    config_key: 'PAPERLESS_PASSWORD_OCR_FIELD',
+    category: ConfigCategory.OCR,
+  },
+  {
+    key: 'api_ocr',
+    title: $localize`Link Ocr`,
+    type: ConfigOptionType.JSON,
+    config_key: 'PAPERLESS_API_OCR',
+    category: ConfigCategory.OCR,
+  },
+  {
+    key: 'api_ocr_field',
+    title: $localize`Link Ocr Field`,
+    type: ConfigOptionType.JSON,
+    config_key: 'PAPERLESS_API_OCR_FIELD',
     category: ConfigCategory.OCR,
   },
   {
@@ -203,7 +238,13 @@ export interface PaperlessConfig extends ObjectWithId {
   max_image_pixels: number
   color_conversion_strategy: ColorConvertConfig
   user_args: object
-  ocr_key: string
   app_logo: string
   app_title: string
+  username_ocr: string
+  password_ocr: string
+  username_ocr_field: string
+  password_ocr_field: string
+  api_ocr: object
+  api_ocr_field: object
+
 }

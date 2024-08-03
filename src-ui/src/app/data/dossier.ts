@@ -12,8 +12,6 @@ export interface Dossier extends MatchingModel {
     dossier_form?: Dossier;
     dossier_form_name?: string;
     document_matching?: number;
-    key?: string;
-    url?: string;
     created?: Date;
     custom_fields?: CustomFieldInstance[];
 }

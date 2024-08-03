@@ -54,9 +54,6 @@ export class DossierFormEditDialogComponent
   getForm(): FormGroup {
     return new FormGroup({
       name: new FormControl(null),
-      username: new FormControl(null),
-      password: new FormControl(null),
-      url: new FormControl(null),
       form_rule: new FormControl(null),
       type: new FormControl(DossierType.Dossier),
       permissions_form: new FormControl(null),

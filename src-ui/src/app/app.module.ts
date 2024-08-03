@@ -360,7 +360,6 @@ import localeZh from '@angular/common/locales/zh'
 import localeVi from '@angular/common/locales/vi'
 import { DossiersFormComponent } from './components/manage/dossier-form-list/dossier-form-list.component'
 import { DossierFormEditDialogComponent } from './components/common/edit-dialog/dossier-form-edit-dialog/dossier-form-edit-dialog.component'
-import { DossierFormCardSmallComponent } from './components/admin/config/dossier-form-card-small/dossier-form-card-small.component'
 import { DossierCustomFieldFormEditDialogComponent } from './components/common/edit-dialog/dossier-instance-customfield-form-edit-dialog/dossier-instance-customfield-form-edit-dialog.component'
 import { CustomFieldSelectComponent } from './components/common/custom-field-select/custom-field-select.component'
 import { DossierCustomFieldSelectComponent } from './components/common/custom-field-select/dossier-custom-field-select/dossier-custom-field-select.component'
@@ -421,7 +420,6 @@ function initializeApp(settings: SettingsService) {
     DossiersFormComponent,
     DossierFormEditDialogComponent,
     DossierCustomFieldFormEditDialogComponent,
-    DossierFormCardSmallComponent,
     FoldersComponent,
     SubFoldersComponent,
     FolderEditDialogComponent,

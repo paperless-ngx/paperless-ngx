@@ -28,15 +28,7 @@
         <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
       </button>
       <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
-        <!-- <button ngbDropdownItem (click)="redoOcrSelected()" [disabled]="!userCanEditAll">
-          <i-bs name="body-text"></i-bs>&nbsp;<ng-container i18n>Redo OCR</ng-container>
-        </button>
-        <button ngbDropdownItem (click)="rotateSelected()" [disabled]="!userOwnsAll">
-          <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
-        </button>
-        <button ngbDropdownItem (click)="mergeSelected()" [disabled]="!userCanEditAll || list.selected.size < 2">
-          <i-bs name="journals"></i-bs>&nbsp;<ng-container i18n>Merge</ng-container>
-        </button> -->
+       
         <button ngbDropdownItem (click)="exportToExcelSelected()" [disabled]="!userCanEditAll">
           <i-bs name="arrow-down"></i-bs>&nbsp;<ng-container i18n>Export to Excel</ng-container>
         </button>
@@ -54,10 +46,6 @@
 
 </pngx-page-header>
 <div class="form-inline d-flex flex-wrap align-items-center">
-  <!-- <a class="me" (click)="goToDossierDocumentRoot()">
-    <i-bs class="" name="archive" width="2rem" 
-    height="2rem" ></i-bs>
-  </a> -->
   <div *ngFor="let dossier of dossierPath" class="fs-5">
     <i-bs class="" name="chevron-right" ></i-bs>&nbsp;<a class="me custom-cursor " (click)="goToDossierDocument(dossier)">
       {{ dossier.name }} 
@@ -66,7 +54,6 @@
 </div>
 <br>
 <div class="row">
-  <!-- <div class="col-12 col-lg-8 col-xl-9 mb-4"> -->
     <div class="row mb-3">
       <div class="col-md mb-2 mb-xl-0">
         <div class="form-inline d-flex align-items-center">
@@ -79,7 +66,6 @@
     </div>
     @if (displayMode === 'details'){
       
-      <!-- <div class="card border mb-3"> -->
         <table class="table table-sm align-middle border shadow-sm">
           <thead>
             <tr>
@@ -90,8 +76,6 @@
                 </div>
               </th>
               <th scope="col" class="w-40" pngxSortable="name" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name</th>
-              <!-- <th scope="col" class="fw-normal d-none d-sm-table-cell" pngxSortable="matching_algorithm" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Matching</th> -->
-              <th scope="col" class="d-xl-table-cell" pngxSortable="url" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Url</th>
               <th scope="col" class="d-xl-table-cell" pngxSortable="form_rule" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Rule</th>
               @for (column of extraColumns; track column) {
                 <th scope="col" class="d-xl-table-cell" pngxSortable="{{column.key}}" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)">{{column.name}}</th>
@@ -131,16 +115,9 @@
                       <span class="custom-cursor" (click)="userCanEdit(object) ? goToDossierDocument(object) : null; $event.stopPropagation()">{{ object.name }}</span>
                     </td>
                   }
-               
-                <td scope="row" class="d-md-table-cell">
-                      <span class="custom-cursor" >{{ object.url }}</span>
-                </td>
                 <td scope="row" class="d-md-table-cell">
                       <span class="custom-cursor" >{{ object.form_rule }}</span>
                 </td>
-                <!-- <td scope="row" class="d-md-table-cell">
-                      <span class="custom-cursor " >{{ object.key }}</span>
-                </td> -->
                 
                 @for (column of extraColumns; track column) {
                   <td scope="row" class="d-md-table-cell">
@@ -204,20 +181,6 @@
         }
       </div>
     }
-  
-  <!-- </div> -->
-  
-
-    <!-- <div class="col-auto col-lg-4 col-xl-3 col-sidebar">
-     
-      <div class="row row-cols-1 g-4 mb-4 sticky-lg-top z-0">
-       
-        <div class="col">
-          <pngx-upload-file-widget></pngx-upload-file-widget>
-        </div>
-      </div>
-    </div> -->
-
 </div>
 
 

@@ -11,10 +11,7 @@
     <div class="row">
       <div class="col-md-4">
         <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
-        <pngx-input-text i18n-title title="Url" formControlName="url" [error]="error?.name" autocomplete="off"></pngx-input-text>
         <pngx-input-text i18n-title title="Form rule" formControlName="form_rule" [error]="error?.name" autocomplete="off"></pngx-input-text>
-        <pngx-input-text i18n-title title="username" formControlName="username" [error]="error?.name" autocomplete="off"></pngx-input-text>
-        <pngx-input-text i18n-title title="Password" formControlName="password" [error]="error?.name" autocomplete="off"></pngx-input-text>
         <div class="input-group input-group-sm w-100 mt-2">
           <label class="input-group-text" ><ng-container i18n>Dossier type</ng-container>:</label>
           <select class="form-select form-select-sm" formControlName="type">
@@ -24,10 +21,6 @@
           </select>
         </div>
         <br>
-        <!-- <pngx-input-select i18n-title title="Data type" [items]="getDataTypes()" formControlName="data_type"></pngx-input-select> -->
-        <!-- @if (typeFieldDisabled) {
-          <small class="d-block mt-n2" i18n>Data type cannot be changed after a field is created</small>
-        } -->
         <div *pngxIfOwner="object">
           <pngx-permissions-form [users]="users" accordion="true" formControlName="permissions_form"></pngx-permissions-form>
         </div>

@@ -498,19 +498,24 @@ class Consumer(LoggingMixin):
             if len(data_ocr_fields)>=1:    
                 for r in data_ocr_fields[0].get("fields"):
                     dict_data[r.get("name")] = r.get("values")[0].get("value") if r.get("values") else None
+                    # self.log.debug('gia tri field',r.get("values")[0].get("value"),r.get("name")) if r.get("values") else None
+                    self.log.debug('gia tri field',dict_data)                 
                 custom_fields = CustomFieldInstance.objects.filter(dossier=document.dossier)
-                if(custom_fields):
-                    for r in custom_fields:
+                document_dossier_form = self.get_config_dossier_form()
+                custom_fields_form = CustomFieldInstance.objects.filter(dossier_form=document_dossier_form)
+                if(custom_fields_form):
+                    for r in custom_fields_form:
                         r: CustomFieldInstance
-                        self.log.info('gia tri field',r.field)
-                        r.value_text = dict_data.get(r.match_value)
+                        # self.log.info('gia tri field',r.field)
+                        # r.value_text = dict_data.get(r.match_value)
+                        # self.log.debug("gia tri value map",r.match_value)
                         # create dossier file
                         CustomFieldInstance.objects.create(field=r.field,
                                                            value_text=dict_data.get(r.match_value),
                                                            dossier = dossier_file,
                                                            document=document) 
 
-                CustomFieldInstance.objects.bulk_update(custom_fields, ['value_text'])
+                # CustomFieldInstance.objects.bulk_update(custom_fields, ['value_text'])
                 
     def get_config_dossier_form(self):
         if self.override_dossier_id is None:
