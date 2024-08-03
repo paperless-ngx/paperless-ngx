@@ -507,6 +507,23 @@ class CustomFieldSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {"error": "extra_data.select_options must be a valid list"},
             )
+        elif (
+            "data_type" in attrs
+            and attrs["data_type"] == CustomField.FieldDataType.MONETARY
+            and "extra_data" in attrs
+            and "default_currency" in attrs["extra_data"]
+            and attrs["extra_data"]["default_currency"] is not None
+            and (
+                not isinstance(attrs["extra_data"]["default_currency"], str)
+                or (
+                    len(attrs["extra_data"]["default_currency"]) > 0
+                    and len(attrs["extra_data"]["default_currency"]) != 3
+                )
+            )
+        ):
+            raise serializers.ValidationError(
+                {"error": "extra_data.default_currency must be a 3-character string"},
+            )
         return super().validate(attrs)
 
 

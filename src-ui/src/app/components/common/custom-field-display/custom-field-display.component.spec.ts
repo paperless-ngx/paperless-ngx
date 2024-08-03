@@ -20,6 +20,12 @@ const customFields: CustomField[] = [
       select_options: ['Option 1', 'Option 2', 'Option 3'],
     },
   },
+  {
+    id: 5,
+    name: 'Field 5',
+    data_type: CustomFieldDataType.Monetary,
+    extra_data: { default_currency: 'JPY' },
+  },
 ]
 const document: Document = {
   id: 1,
@@ -109,6 +115,18 @@ describe('CustomFieldDisplayComponent', () => {
       custom_fields: [{ field: 2, document: 1, created: null, value: '100' }],
     }
     expect(component.currency).toEqual('EUR')
+    expect(component.value).toEqual(100)
+  })
+
+  it('should respect explicit default currency', () => {
+    component['defaultCurrencyCode'] = 'EUR' // mock default locale injection
+    component.fieldId = 5
+    component.document = {
+      id: 1,
+      title: 'Doc 1',
+      custom_fields: [{ field: 5, document: 1, created: null, value: '100' }],
+    }
+    expect(component.currency).toEqual('JPY')
     expect(component.value).toEqual(100)
   })
 
