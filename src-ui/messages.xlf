@@ -3456,8 +3456,15 @@
           <context context-type="linenumber">20</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="8985898267205627392" datatype="html">
-        <source>Default Currency (3-character code)</source>
+      <trans-unit id="2739003406164860877" datatype="html">
+        <source>Default Currency</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7615210738790237590" datatype="html">
+        <source>3-character currency code</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
           <context context-type="linenumber">33</context>
