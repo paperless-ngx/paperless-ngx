@@ -286,8 +286,8 @@ class DossierForm(MatchingModel):
     )   
 
     class Meta(MatchingModel.Meta):
-        verbose_name = _("dossier type")
-        verbose_name_plural = _("dossiers type")
+        verbose_name = _("dossier form")
+        verbose_name_plural = _("dossiers form")
     def __str__(self): 
         return self.name
       

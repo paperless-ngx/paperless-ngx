@@ -212,6 +212,7 @@ export class DossierCustomFieldSelectComponent
         }));
         
       }
+      this.dossierReference.push([])
     }   
     
   }
@@ -278,16 +279,17 @@ export class DossierCustomFieldSelectComponent
    
   }
 
-  modelChangeDossier(event) {
+  modelChangeDossier(event,i) {
     if (event!=null){
       const d = this.dossier.find(obj => obj.id === event);
-      this.dossierReference =  d?.custom_fields
+      console.log(this.dossier)
+      this.dossierReference[i]=d?.custom_fields
     }
   }
 
   modelChangeField(event,index) {
     if (event!=null){
-      const d = this.dossierReference.find(obj => obj.id === event);
+      const d = this.dossierReference[index].find(obj => obj.id === event);
       this.customFields.at(index).patchValue({value_reference: d?.value})
       
       this.dictCustomFields[this.customFields.at(index).get('field').value].value_reference = d?.value

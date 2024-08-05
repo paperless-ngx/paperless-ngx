@@ -8,7 +8,7 @@
         <div class="col-3" [hidden]=" !inputDossier" i18n>Value</div>
         <div class="col-3 " [hidden]="!inputDossierForm" i18n>Match value</div>
 
-        <div class="col-lg-5" [hidden]=" inputDossierForm?.type == 'DOCUMENT' || inputDossier?.type == 'DOCUMENT'" i18n>Reference to value</div>
+        <div class="col-lg-5" [hidden]=" inputDossierForm?.type == 'DOCUMENT' || inputDossier?.type == 'DOCUMENT' || dataDossierForm.get('type').value=='DOCUMENT'" i18n>Reference to value</div>
       </div>
     </li>
       <li class="list-group-item" formArrayName="customFields" *ngFor="let customField of customFields.controls; let i=index" >
@@ -28,7 +28,7 @@
             <input type="text" class="form-control" [formControl]="customField.get('match_value')" >
             <label class="visually-hidden" i18n>{{customField.get('match_value')}}</label>
           </div>
-          <div class="col-lg-5" [hidden]=" inputDossierForm?.type == 'DOCUMENT'">
+          <div class="col-lg-5" [hidden]=" inputDossierForm?.type == 'DOCUMENT'||dataDossierForm.get('type').value=='DOCUMENT'">
             <pngx-input-select [items]="dossierForm" bindLabel="name" [removed]="handleRemove(i)" [formControl]="customField.get('dossier_document')" (ngModelChange)="modelChangeDossier($event,i)" aria-valuetext="" [allowNull]="true" ></pngx-input-select>
             <pngx-input-select [items]="getCustomFieldOfForm(customField.get('dossier_document'))" bindLabel="field_name" [formControl]="customField.get('reference')" (ngModelChange)="modelChangeField($event,i)" [allowNull]="true"></pngx-input-select>
           </div>

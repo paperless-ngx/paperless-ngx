@@ -68,6 +68,9 @@ export class DossierFormEditDialogComponent
     // Xử lý dữ liệu ở đây
   }
 
+  onOptionChangeDossier(event){
+  }
+
   save(){
     let getFormOrgin = super.getFormOrigin()
     // getFormOrgin.get('custom_fields').setValue(this.dataCustomFields)

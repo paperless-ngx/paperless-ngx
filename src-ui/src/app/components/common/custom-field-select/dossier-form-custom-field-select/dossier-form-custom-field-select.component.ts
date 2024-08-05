@@ -72,6 +72,7 @@ export class DossierFormCustomFieldSelectComponent
 
   @Input() inputDossier: Dossier 
   @Input() inputDossierForm: DossierForm 
+  @Input() dataDossierForm: FormGroup 
   @Output() dataChange = new EventEmitter<any[]>();
 
   inheritedWarning: string = $localize`Inherited from dossier form`
@@ -89,11 +90,9 @@ export class DossierFormCustomFieldSelectComponent
     
     this.customFields.valueChanges.subscribe(data => {
       const filteredData = data.filter(item => this.dictCustomFieldsEnable[item.field]);
-      
         this.dataChange.emit(filteredData);
-      
-      
     });
+    console.log("gia trii inputDossierForm",this.inputDossierForm);
     
   }
   
@@ -136,7 +135,6 @@ export class DossierFormCustomFieldSelectComponent
       this.dictCustomFields[obj.field] = obj;
       this.dictCustomFieldsEnable[obj.field] = true;
     });
-    console.log("dossierForm",this.dictCustomFields);
     for (let c of this.arrayCustomFields) {
       if (!(c.id in this.dictCustomFields)) {
         this.dictCustomFields[c.id] = {

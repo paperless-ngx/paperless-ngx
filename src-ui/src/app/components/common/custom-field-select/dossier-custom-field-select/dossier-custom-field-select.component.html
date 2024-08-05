@@ -30,8 +30,8 @@
             <label class="visually-hidden" i18n>{{customField.get('match_value')}}</label>
           </div>
           <div class="col-lg-5" [hidden]=" inputDossierForm?.type == 'DOCUMENT'||inputDossier?.type == 'FILE'">
-            <pngx-input-select [items]="dossier" bindLabel="name" (ngModelChange)="modelChangeDossier($event)" [formControl]="customField.get('dossier_document')"  aria-valuetext="" [allowNull]="true" ></pngx-input-select>
-            <pngx-input-select [items]="dossierReference"  bindLabel="field_name" (ngModelChange)="modelChangeField($event,i)" [formControl]="customField.get('reference')" [allowNull]="true"></pngx-input-select>
+            <pngx-input-select [items]="dossier" bindLabel="name" (ngModelChange)="modelChangeDossier($event,i)" [formControl]="customField.get('dossier_document')"  aria-valuetext="" [allowNull]="true" ></pngx-input-select>
+            <pngx-input-select [items]="dossierReference[i]"  bindLabel="field_name" (ngModelChange)="modelChangeField($event,i)" [formControl]="customField.get('reference')" [allowNull]="true"></pngx-input-select>
             <input type="text" class="form-control"  [formControl]="customField.get('value_reference')" >
             <label class="visually-hidden" i18n>{{customField.get('value_reference')}}</label>
             <div class="row p-2" >
