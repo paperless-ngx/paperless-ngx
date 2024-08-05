@@ -651,6 +651,31 @@ export class DocumentDetailComponent
       })
   }
 
+  createDisabled(dataType: DataType) {
+    switch (dataType) {
+      case DataType.Correspondent:
+        return !this.permissionsService.currentUserCan(
+          PermissionAction.Add,
+          PermissionType.Correspondent
+        )
+      case DataType.DocumentType:
+        return !this.permissionsService.currentUserCan(
+          PermissionAction.Add,
+          PermissionType.DocumentType
+        )
+      case DataType.StoragePath:
+        return !this.permissionsService.currentUserCan(
+          PermissionAction.Add,
+          PermissionType.StoragePath
+        )
+      case DataType.Tag:
+        return !this.permissionsService.currentUserCan(
+          PermissionAction.Add,
+          PermissionType.Tag
+        )
+    }
+  }
+
   discard() {
     this.documentsService
       .get(this.documentId)
