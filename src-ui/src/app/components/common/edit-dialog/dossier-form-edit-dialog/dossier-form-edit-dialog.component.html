@@ -14,7 +14,7 @@
         <pngx-input-text i18n-title title="Form rule" formControlName="form_rule" [error]="error?.name" autocomplete="off"></pngx-input-text>
         <div class="input-group input-group-sm w-100 mt-2">
           <label class="input-group-text" ><ng-container i18n>Form</ng-container>:</label>
-          <select class="form-select form-select-sm" formControlName="type" (change)="onOptionChangeDossier($event)">
+          <select class="form-select form-select-sm" formControlName="type" >
             @for (option of DOSSIER_TYPES_OPTIONS; track option) {
               <option [ngValue]="option.value" >{{ option.label }}</option>
             }

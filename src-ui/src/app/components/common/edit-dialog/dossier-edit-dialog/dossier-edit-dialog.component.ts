@@ -29,6 +29,10 @@ export class DossierEditDialogComponent
       label: $localize`Dossier`,
       id: DossierType.Dossier,
     },
+    {
+      label: $localize`File`,
+      id: DossierType.File,
+    },
   
   
   ]
