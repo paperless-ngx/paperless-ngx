@@ -57,5 +57,6 @@ export interface CustomField extends ObjectWithId {
   created?: Date
   extra_data?: {
     select_options?: string[]
+    default_currency?: string
   }
 }

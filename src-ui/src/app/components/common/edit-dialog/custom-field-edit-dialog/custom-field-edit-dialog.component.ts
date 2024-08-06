@@ -90,6 +90,7 @@ export class CustomFieldEditDialogComponent
       data_type: new FormControl(null),
       extra_data: new FormGroup({
         select_options: new FormArray([new FormControl(null)]),
+        default_currency: new FormControl(null),
       }),
     })
   }
