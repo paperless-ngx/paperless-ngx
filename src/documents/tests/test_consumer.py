@@ -322,6 +322,18 @@ class TestConsumer(
         shutil.copy(src, dst)
         return dst
 
+    def get_test_file2(self):
+        src = (
+            Path(__file__).parent
+            / "samples"
+            / "documents"
+            / "originals"
+            / "0000002.pdf"
+        )
+        dst = self.dirs.scratch_dir / "sample2.pdf"
+        shutil.copy(src, dst)
+        return dst
+
     def get_test_archive_file(self):
         src = (
             Path(__file__).parent / "samples" / "documents" / "archive" / "0000001.pdf"
@@ -641,6 +653,47 @@ class TestConsumer(
             consumer.run()
         with self.get_consumer(self.get_test_file()) as consumer:
             consumer.run()
+
+    def testDuplicateInTrash(self):
+        with self.get_consumer(self.get_test_file()) as consumer:
+            consumer.run()
+
+        Document.objects.all().delete()
+
+        with self.get_consumer(self.get_test_file()) as consumer:
+            with self.assertRaisesMessage(ConsumerError, "document is in the trash"):
+                consumer.run()
+
+    def testAsnExists(self):
+        with self.get_consumer(
+            self.get_test_file(),
+            DocumentMetadataOverrides(asn=123),
+        ) as consumer:
+            consumer.run()
+
+        with self.get_consumer(
+            self.get_test_file2(),
+            DocumentMetadataOverrides(asn=123),
+        ) as consumer:
+            with self.assertRaisesMessage(ConsumerError, "ASN 123 already exists"):
+                consumer.run()
+
+    def testAsnExistsInTrash(self):
+        with self.get_consumer(
+            self.get_test_file(),
+            DocumentMetadataOverrides(asn=123),
+        ) as consumer:
+            consumer.run()
+
+            document = Document.objects.first()
+            document.delete()
+
+        with self.get_consumer(
+            self.get_test_file2(),
+            DocumentMetadataOverrides(asn=123),
+        ) as consumer:
+            with self.assertRaisesMessage(ConsumerError, "document is in the trash"):
+                consumer.run()
 
     @mock.patch("documents.parsers.document_consumer_declaration.send")
     def testNoParsers(self, m):
