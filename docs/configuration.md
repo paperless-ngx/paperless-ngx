@@ -600,7 +600,7 @@ You can optionally also automatically redirect users to the SSO login with [PAPE
 
     Defaults to False
 
-#### ['PAPERLESS_REDIRECT_LOGIN_TO_SSO=<bool>`](#PAPERLESS_REDIRECT_LOGIN_TO_SSO) {#PAPERLESS_REDIRECT_LOGIN_TO_SSO}
+#### [`PAPERLESS_REDIRECT_LOGIN_TO_SSO=<bool>`](#PAPERLESS_REDIRECT_LOGIN_TO_SSO) {#PAPERLESS_REDIRECT_LOGIN_TO_SSO}
 
 : When this setting is enabled users will automatically be redirected (using javascript) to the first SSO provider login. You may still want to disable the frontend login form for clarity.
 
