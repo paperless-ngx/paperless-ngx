@@ -201,6 +201,7 @@ def consume_file(
         override_tag_ids=overrides.tag_ids,
         override_warehouse_id=overrides.warehouse_id,
         override_folder_id=overrides.folder_id,
+        override_dossier_id=overrides.dossier_id,
         override_storage_path_id=overrides.storage_path_id,
         override_created=overrides.created,
         override_asn=overrides.asn,

@@ -256,6 +256,79 @@ class Folder(MatchingModel):
         constraints = []
     def __str__(self): 
         return self.name
+
+class DossierForm(MatchingModel):
+
+    DOSSIER_TYPE_CHOICES = [
+        ('DOSSIER', _('Dossier')),
+        ('DOCUMENT', _('Document')),
+    ]
+      
+    type = models.CharField(
+        max_length=30,
+        choices=DOSSIER_TYPE_CHOICES,
+        verbose_name=_("access_type"),
+        null=False,
+        blank=False,
+        default='DOSSIER'
+    )
+
+    # parent_dossier_form = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='child_dossiers')
+
+    # path = models.TextField(_("path"), null=True, blank=True)
+    
+    form_rule = models.TextField(_("form_rule"), null=True, blank=True)
+
+    created = models.DateTimeField(
+        _("created"),
+        default=timezone.now,
+        db_index=True,
+        editable=False,
+    )   
+
+    class Meta(MatchingModel.Meta):
+        verbose_name = _("dossier form")
+        verbose_name_plural = _("dossiers form")
+    def __str__(self): 
+        return self.name
+      
+
+class Dossier(MatchingModel):
+
+    DOSSIER_TYPE_CHOICES = [
+        ('DOSSIER', _('Dossier')),
+        ('DOCUMENT', _('Document')),
+        ('FILE', _('File')),
+    ]
+      
+    type = models.CharField(
+        max_length=30,
+        choices=DOSSIER_TYPE_CHOICES,
+        verbose_name=_("access_type"),
+        null=False,
+        blank=False,
+        default='DOSSIER'
+    )
+
+    parent_dossier = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+    
+    dossier_form = models.ForeignKey(DossierForm, on_delete=models.CASCADE, null=True, blank=True)
+
+    path = models.TextField(_("path"), null=True, blank=True)
+
+    created = models.DateTimeField(
+        _("created"),
+        default=timezone.now,
+        db_index=True,
+        editable=False,
+    )   
+
+    class Meta(MatchingModel.Meta):
+        verbose_name = _("dossier")
+        verbose_name_plural = _("dossiers")
+    def __str__(self): 
+        return self.name
+
     
 class Document(ModelWithOwner):
     STORAGE_TYPE_UNENCRYPTED = "unencrypted"
@@ -290,6 +363,24 @@ class Document(ModelWithOwner):
         related_name="documents",
         on_delete=models.SET_NULL,
         verbose_name=_("folder"),
+    )
+
+    dossier = models.ForeignKey(
+        Dossier,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL,
+        verbose_name=_("dossier"),
+    )
+
+    dossier_form = models.ForeignKey(
+        DossierForm,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL,
+        verbose_name=_("dossier forms"),
     )
     
     warehouse = models.ForeignKey(
@@ -890,8 +981,7 @@ class ShareLink(models.Model):
         verbose_name_plural = _("share links")
 
     def __str__(self):
-        return f"Share Link for {self.document.title}"
-
+        return f"Share Link for {self.document.title}"  
 
 class CustomField(models.Model):
     """
@@ -955,7 +1045,25 @@ class CustomFieldInstance(models.Model):
     document = models.ForeignKey(
         Document,
         blank=False,
-        null=False,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="custom_fields",
+        editable=False,
+    )
+
+    dossier = models.ForeignKey(
+        Dossier,
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="custom_fields",
+        editable=False,
+    )
+
+    dossier_form = models.ForeignKey(
+        DossierForm,
+        blank=True,
+        null=True,
         on_delete=models.CASCADE,
         related_name="custom_fields",
         editable=False,
@@ -970,8 +1078,11 @@ class CustomFieldInstance(models.Model):
         editable=False,
     )
 
+    match_value = models.JSONField(null=True,blank=True)
+
+    reference = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True )
+
     # Actual data storage
-    # value_text = models.CharField(max_length=128, null=True)
     value_text = models.TextField(null=True)
 
     value_bool = models.BooleanField(null=True)
@@ -1024,8 +1135,7 @@ class CustomFieldInstance(models.Model):
             return self.value_monetary
         elif self.field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
             return self.value_document_ids
-        raise NotImplementedError(self.field.data_type)
-
+        raise NotImplementedError(self.field.data_type)        
 
 if settings.AUDIT_LOG_ENABLED:
     auditlog.register(Document, m2m_fields={"tags"})

@@ -32,7 +32,7 @@ from rest_framework.fields import SerializerMethodField
 
 from documents import bulk_edit
 from documents.data_models import DocumentSource
-from documents.models import Approval, Correspondent
+from documents.models import Approval, Correspondent, Dossier, DossierForm
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
@@ -497,6 +497,13 @@ class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
 class CustomFieldInstanceSerializer(serializers.ModelSerializer):
     field = serializers.PrimaryKeyRelatedField(queryset=CustomField.objects.all())
     value = ReadWriteSerializerMethodField(allow_null=True)
+    match_value = ReadWriteSerializerMethodField(allow_null=True,required=False)
+    field_name = SerializerMethodField(read_only=True)
+    dossier_document = SerializerMethodField(read_only=True)
+    def get_field_name(self, obj):
+        if obj is None:
+            return None
+        return obj.field.name
 
     def create(self, validated_data):
         type_to_data_store_name_map = {
@@ -531,6 +538,14 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
 
     def get_value(self, obj: CustomFieldInstance):
         return obj.value
+    def get_match_value(self,obj: CustomFieldInstance):
+        return obj.match_value
+    def get_dossier_document(self,obj: CustomFieldInstance):
+        if obj.reference is not None:
+            if obj.reference.dossier_form is not None:
+                return obj.reference.dossier_form.id
+            return None
+        return None
 
     def validate(self, data):
         """
@@ -562,8 +577,8 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
                         regex=r"^[A-Z]{3}-?\d+(\.\d{2,2})$",
                         message="Must be a two-decimal number with optional currency code e.g. GBP123.45",
                     )(data["value"])
-            elif field.data_type == CustomField.FieldDataType.STRING:
-                MaxLengthValidator(limit_value=128)(data["value"])
+            # elif field.data_type == CustomField.FieldDataType.STRING:
+            #     MaxLengthValidator(limit_value=128)(data["value"])
 
         return data
 
@@ -653,8 +668,13 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomFieldInstance
         fields = [
+            "id",
             "value",
             "field",
+            "match_value",
+            "field_name",
+            "reference",
+            "dossier_document"
         ]
 
 
@@ -1211,6 +1231,14 @@ class PostDocumentSerializer(serializers.Serializer):
         required=False,
     )
     
+    dossier = serializers.PrimaryKeyRelatedField(
+        queryset=Dossier.objects.all(),
+        label="Dossier",
+        allow_null=True,
+        write_only=True,
+        required=False,
+    )
+    
     warehouse = serializers.PrimaryKeyRelatedField(
         queryset=Warehouse.objects.all(),
         label="Warehouse",
@@ -1283,6 +1311,12 @@ class PostDocumentSerializer(serializers.Serializer):
     def validate_folder(self, folder):
         if folder:
             return folder.id
+        else:
+            return None
+        
+    def validate_dossier(self, dossier):
+        if dossier:
+            return dossier.id
         else:
             return None
         
@@ -1576,6 +1610,7 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
             "storage_paths",
             "warehouses",
             "folders",
+            "dossiers"
         ],
         label="Object Type",
         write_only=True,
@@ -1625,6 +1660,8 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
             object_class = Warehouse
         elif object_type == "folders":
             object_class = Folder
+        elif object_type == "dossiers":
+            object_class = Dossier
         return object_class
 
     def _validate_objects(self, objects, object_type):
@@ -2093,3 +2130,224 @@ class ExportDocumentFromFolderSerializer(serializers.Serializer):
         if not value:
             return Folder.objects.all().values_list('id', flat=True)
         return value
+
+
+# class CustomFieldInstanceDossierSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = CustomFieldInstance
+#         fields = '__all__' 
+
+class ParentDossierTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
+    class Meta:
+        model = Dossier
+        fields = '__all__'
+class DossierSerializer(MatchingModelSerializer, OwnedObjectSerializer):
+    custom_fields = CustomFieldInstanceSerializer(
+        many=True,
+        allow_null=True,
+        required=False,
+    )
+    document_matching = serializers.SerializerMethodField()
+    def get_document_matching(self, obj):
+        if obj.type == 'FILE':
+            document = Document.objects.filter(dossier=obj).first()
+            if document:
+                return document.id
+        return None
+    dossier_form_name = SerializerMethodField(read_only=True)
+
+    def get_dossier_form_name(self,obj):
+        if obj.dossier_form is None:
+            return None
+        return obj.dossier_form.name
+
+    class Meta:
+        model = Dossier
+        fields = [
+            'id',
+            'document_count',
+            'slug',
+            'user_can_change',
+            'is_shared_by_requester',
+            'name',
+            'match',
+            'matching_algorithm',
+            'is_insensitive',
+            'created',
+            'owner',
+            'parent_dossier',
+            'dossier_form',
+            'type',
+            'dossier_form_name',
+            'document_matching',
+            'custom_fields'
+        ]
+    def create(self, validated_data):
+        custom_fields_data = validated_data.pop('custom_fields', [])
+       
+        dossier = Dossier.objects.create(**validated_data)
+        type_to_data_store_name_map = {
+            CustomField.FieldDataType.STRING: "value_text",
+            CustomField.FieldDataType.URL: "value_url",
+            CustomField.FieldDataType.DATE: "value_date",
+            CustomField.FieldDataType.BOOL: "value_bool",
+            CustomField.FieldDataType.INT: "value_int",
+            CustomField.FieldDataType.FLOAT: "value_float",
+            CustomField.FieldDataType.MONETARY: "value_monetary",
+            CustomField.FieldDataType.DOCUMENTLINK: "value_document_ids",
+        }
+        lst_dossier_custom_field = []
+        for custom_field_data in custom_fields_data:
+
+            # And to a CustomField
+            custom_field: CustomField = custom_field_data["field"]
+            # This key must exist, as it is validated
+            data_store_name = type_to_data_store_name_map[custom_field.data_type]
+            custom_field_instance, _ = CustomFieldInstance.objects.update_or_create(
+                dossier=dossier,
+                field=custom_field,
+                defaults={data_store_name: custom_field_data["value"]},
+            )
+            custom_field_instance.match_value = custom_field_data['match_value']
+            custom_field_instance.save()
+            lst_dossier_custom_field.append(custom_field_instance.pk)
+        return dossier
+     
+        records_to_delete = CustomFieldInstance.objects.exclude(id__in=lst_dossier_custom_field).filter(dossier=dossier.pk)
+    def update(self, instance, validated_data):
+        custom_fields_data = validated_data.pop('custom_fields', [])
+        # validated_data['parent_dossier_type']
+        dossier = super().update(instance, validated_data)
+        type_to_data_store_name_map = {
+            CustomField.FieldDataType.STRING: "value_text",
+            CustomField.FieldDataType.URL: "value_url",
+            CustomField.FieldDataType.DATE: "value_date",
+            CustomField.FieldDataType.BOOL: "value_bool",
+            CustomField.FieldDataType.INT: "value_int",
+            CustomField.FieldDataType.FLOAT: "value_float",
+            CustomField.FieldDataType.MONETARY: "value_monetary",
+            CustomField.FieldDataType.DOCUMENTLINK: "value_document_ids",
+        }
+        lst_dossier_custom_field = []
+        for custom_field_data in custom_fields_data:
+
+            # And to a CustomField
+            custom_field: CustomField = custom_field_data["field"]
+            # This key must exist, as it is validated
+            data_store_name = type_to_data_store_name_map[custom_field.data_type]
+            custom_field_instance, _ = CustomFieldInstance.objects.update_or_create(
+                dossier=dossier,
+                field=custom_field,
+                defaults={data_store_name: custom_field_data["value"]},
+            )
+
+            custom_field_instance.match_value = custom_field_data['match_value']
+            custom_field_instance.reference = custom_field_data['reference']
+            # custom_field_data['field'].
+            # custom_field_instance.value()
+            custom_field_instance.save()
+            lst_dossier_custom_field.append(custom_field_instance.pk)
+     
+        records_to_delete = CustomFieldInstance.objects.exclude(id__in=lst_dossier_custom_field).filter(dossier=dossier.pk)
+
+
+        # Delete the filtered records
+        records_to_delete.delete()
+
+        return dossier
+class DossierFormSerializer(MatchingModelSerializer, OwnedObjectSerializer):
+    custom_fields = CustomFieldInstanceSerializer(
+        many=True,
+        allow_null=True,
+        required=False,
+    )
+
+    class Meta:
+        model = DossierForm
+        fields = [
+            'id',
+            'document_count',
+            'slug',
+            'user_can_change',
+            'is_shared_by_requester',
+            'name',
+            'match',
+            'matching_algorithm',
+            'is_insensitive',
+            'created',
+            'owner',
+            'type',
+            'form_rule',
+            'custom_fields'
+        ]
+    def create(self, validated_data):
+        custom_fields_data = validated_data.pop('custom_fields', [])
+       
+        dossier_form = DossierForm.objects.create(**validated_data)
+        type_to_data_store_name_map = {
+            CustomField.FieldDataType.STRING: "value_text",
+            CustomField.FieldDataType.URL: "value_url",
+            CustomField.FieldDataType.DATE: "value_date",
+            CustomField.FieldDataType.BOOL: "value_bool",
+            CustomField.FieldDataType.INT: "value_int",
+            CustomField.FieldDataType.FLOAT: "value_float",
+            CustomField.FieldDataType.MONETARY: "value_monetary",
+            CustomField.FieldDataType.DOCUMENTLINK: "value_document_ids",
+        }
+        lst_dossier_custom_field = []
+        for custom_field_data in custom_fields_data:
+
+            # And to a CustomField
+            custom_field: CustomField = custom_field_data["field"]
+            # This key must exist, as it is validated
+            data_store_name = type_to_data_store_name_map[custom_field.data_type]
+            custom_field_instance, _ = CustomFieldInstance.objects.update_or_create(
+                dossier_form=dossier_form,
+                field=custom_field,
+                defaults={data_store_name: custom_field_data["value"]},
+            )
+            custom_field_instance.match_value = custom_field_data['match_value']
+            custom_field_instance.save()
+            lst_dossier_custom_field.append(custom_field_instance.pk)
+        return dossier_form
+     
+        records_to_delete = CustomFieldInstance.objects.exclude(id__in=lst_dossier_custom_field).filter(dossier=dossier.pk)
+    def update(self, instance, validated_data):
+        custom_fields_data = validated_data.pop('custom_fields', [])
+        # validated_data['parent_dossier_type']
+        dossier_form = super().update(instance, validated_data)
+        type_to_data_store_name_map = {
+            CustomField.FieldDataType.STRING: "value_text",
+            CustomField.FieldDataType.URL: "value_url",
+            CustomField.FieldDataType.DATE: "value_date",
+            CustomField.FieldDataType.BOOL: "value_bool",
+            CustomField.FieldDataType.INT: "value_int",
+            CustomField.FieldDataType.FLOAT: "value_float",
+            CustomField.FieldDataType.MONETARY: "value_monetary",
+            CustomField.FieldDataType.DOCUMENTLINK: "value_document_ids",
+        }
+        lst_dossier_custom_field_form = []
+        for custom_field_data in custom_fields_data:
+
+            # And to a CustomField
+            custom_field: CustomField = custom_field_data["field"]
+            # This key must exist, as it is validated
+            data_store_name = type_to_data_store_name_map[custom_field.data_type]
+            custom_field_instance, _ = CustomFieldInstance.objects.update_or_create(
+                dossier_form=dossier_form,
+                field=custom_field,
+                defaults={data_store_name: custom_field_data["value"]},
+            )
+
+            custom_field_instance.match_value = custom_field_data['match_value']
+            custom_field_instance.reference = custom_field_data['reference']
+            custom_field_instance.save()
+            lst_dossier_custom_field_form.append(custom_field_instance.pk)
+     
+        records_to_delete = CustomFieldInstance.objects.exclude(id__in=lst_dossier_custom_field_form).filter(dossier_form=dossier_form.pk)
+
+
+        # Delete the filtered records
+        records_to_delete.delete()
+
+        return dossier_form

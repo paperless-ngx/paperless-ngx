@@ -124,9 +124,12 @@ export class UploadFileWidgetComponent extends ComponentWithPermissions {
 
   public onFileSelected(event: Event) {
     let getUrl = this.router.url.split('/')
-    let payload = { folder: '' };
+    let payload = { folder: '' ,dossiers:''};
     if (getUrl[1] === 'subfolders') {
       payload.folder = getUrl[2];
+    }
+    if (getUrl[1] === 'dossiers') {
+      payload.dossiers = getUrl[2];
     }
     this.uploadDocumentsService.uploadFiles(
       (event.target as HTMLInputElement).files, 

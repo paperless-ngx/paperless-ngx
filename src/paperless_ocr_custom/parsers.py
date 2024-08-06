@@ -22,6 +22,7 @@ from reportlab.pdfbase import pdfmetrics
 from pdf2image import convert_from_path
 from reportlab.lib.utils import ImageReader
 
+from documents.models import DossierForm
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
@@ -152,16 +153,17 @@ class RasterisedDocumentParser(DocumentParser):
             return None
         
     # call api 
-    def call_ocr_api_with_retries(self, method, url, headers, params, payload, max_retries=5, delay=5, timeout=100):
+    def call_ocr_api_with_retries(self, method, url, headers, params, payload, max_retries=5, delay=5, timeout=100, status_code_success = [200], status_code_fail = []):
         retries = 0
         data_ocr = None
-        
         while retries < max_retries:
             try:
                 response_ocr = requests.request(method, url, headers=headers, params=params, data=payload, timeout=timeout)
-                if response_ocr.status_code == 200:
-                    data_ocr = response_ocr.json()
-                    return data_ocr
+                if response_ocr.status_code in status_code_success:
+                    # self.log.info('api return:',url,response_ocr.json())
+                    return response_ocr.json()
+                if response_ocr.status_code in status_code_fail:
+                    return False
                 else:
                     logging.error('OCR error response: %s', response_ocr.text)
                     retries += 1
@@ -177,23 +179,89 @@ class RasterisedDocumentParser(DocumentParser):
     
         logging.error('Max retries reached. OCR request failed.')
         return None
+    def get_token_ocr_field_by_refresh_token(self,application_configuration:ApplicationConfiguration):
+        # check token
+        headers = {
+                'Content-Type': 'application/json'
+            }
+        payload = json.dumps({
+                    "refresh": f"{application_configuration.api_ocr_field.get('refresh_token')}"
+                    })
+        token = self.call_ocr_api_with_retries("POST",application_configuration.api_ocr_field.get('refresh'), 
+                                                                    headers, 
+                                                                    params={}, 
+                                                                    payload=payload, 
+                                                                    max_retries=2, 
+                                                                    delay=5,
+                                                                    timeout=100,status_code_fail=[401])
+        if token == False:
+            token = self.login_ocr_field(application_configuration=application_configuration)
+            if token is not None:
+                payload = json.dumps({
+                        "refresh": f"{application_configuration.api_ocr_field.get('refresh_token')}",
+                        })
+                
+                token = self.call_ocr_api_with_retries("POST",json.loads(application_configuration)['refresh'], 
+                                                                        headers={}, 
+                                                                        params={}, 
+                                                                        payload=payload, 
+                                                                        max_retries=2, 
+                                                                        delay=5,
+                                                                        timeout=100)
+            
+        return token
     
+    def login_ocr_field(self,application_configuration:ApplicationConfiguration):
+        # check token
+        headers = {
+                'Content-Type': 'application/json'
+            }
+        payload = json.dumps({
+                    "username": f"{application_configuration.username_ocr_field}",
+                    "password": f"{application_configuration.password_ocr_field}"
+                    })
+        return self.call_ocr_api_with_retries("POST",application_configuration.api_ocr_field.get('login'), 
+                                                                    headers, 
+                                                                    params={}, 
+                                                                    payload=payload, 
+                                                                    max_retries=2, 
+                                                                    delay=5,
+                                                                    timeout=10)
+       
+    def login_ocr(self,application_configuration:ApplicationConfiguration):
+        # check token
+        payload = f"username={application_configuration.username_ocr}&password={application_configuration.password_ocr}"
+        headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+        }
+       
+        return self.call_ocr_api_with_retries("POST",application_configuration.api_ocr.get('login'), 
+                                                                    headers=headers, 
+                                                                    params={}, 
+                                                                    payload=payload, 
+                                                                    max_retries=2, 
+                                                                    delay=5,
+                                                                    timeout=20)
+       
+
+        
     # get ocr file img/pdf
-    def ocr_file(self,path_file):
-        page_count = 1
-        try:
-            with open(path_file, 'rb') as file:
-                pdf_reader = PdfReader(file)
-                page_count = len(pdf_reader.pages)
-        except (OSError, IOError, ValueError):
-            pass
-        k = ApplicationConfiguration.objects.filter().first()
-        access_token = k.ocr_key
+    def ocr_file(self, path_file, dossier_form:DossierForm):
+        
+        application_configuration=ApplicationConfiguration.objects.filter().first()
+        application_configuration: ApplicationConfiguration|None
+        access_token_ocr=application_configuration.api_ocr.get("access_token",None)
+       
+        if access_token_ocr == '':
+            access_token_ocr = self.login_ocr(application_configuration=application_configuration)                
+            if access_token_ocr is not None:
+                application_configuration.api_ocr["access_token"]=access_token['access_token']
+ 
         # upload file
         get_file_id = ''
-        url_upload_file = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_UPLOAD_FILE"]
+        url_upload_file = application_configuration.api_ocr.get("upload_file",None)
         headers = {
-            'Authorization': f'Bearer {access_token}'
+            'Authorization': f"Bearer {application_configuration.api_ocr['access_token']}"
         }
         pdf_data = None
         with open(path_file, 'rb') as file:
@@ -206,32 +274,59 @@ class RasterisedDocumentParser(DocumentParser):
             logging.error('upload file: ',response_upload.status_code) 
 
         # ocr by file_id
-        params = {'file_id': get_file_id,
-                  'parse_table':'false'}
-        url_ocr_pdf_by_fileid = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_OCR_BY_FILEID"]
-        data_ocr = self.call_ocr_api_with_retries("POST",url_ocr_pdf_by_fileid, headers, params, {}, 5, page_count , 100)
-        # response_ocr = requests.post(url_ocr_pdf_by_fileid, headers=headers, params=params)
-        # data_ocr = None
-        # # logging.error('ocr: ', response_ocr.status_code)
-        # if response_ocr.status_code == 200:
-        #     data_ocr = response_ocr.json()
-        # else:
-        #     logging.error('ocr: ', response_ocr.text)
-        # 
-        url_ocr_pdf_custom_field_by_fileid = settings.TCGROUP_OCR_CUSTOM["URL"]["URL_OCR_CUSTOM_FIELD_BY_FILEID"]
-
-        payload = json.dumps({
-        "request_id": f"{get_file_id}",
-        "list_form_code": [
-            "so_xay_dung_hai_phong"
-        ]
-        })
-        headers = {
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzIxMzYzNjUxLCJpYXQiOjE3MTg3NzE2NTEsImp0aSI6ImI3OGZmMDNjYmRhZTQ0YzdhNWUyNTIxYmU2MzEzMjk0IiwidXNlcl9pZCI6MSwicm9sZSI6IkFkbWluIGhcdTFlYzcgdGhcdTFlZDFuZyJ9.oOGdwaK7p-bOoBobhxHua3JRLcJIZmDLAka5bbM1WIA',
-        'Content-Type': 'application/json'
-        }
+        params = {'file_id': get_file_id}
+        url_ocr_pdf_by_fileid = application_configuration.api_ocr.get("ocr_by_file_id",None)
+        data_ocr = self.call_ocr_api_with_retries("POST",url_ocr_pdf_by_fileid, headers, params, {}, 5, 5, 100)
         
-        data_ocr_fields = self.call_ocr_api_with_retries("POST",url_ocr_pdf_custom_field_by_fileid, headers, params, payload, 5, page_count , 100)        
+        # login API custom-field
+        if dossier_form is None:
+            return (data_ocr,None)
+
+        if len(application_configuration.api_ocr_field)>0 and dossier_form.form_rule != '':
+            # login for the first time ...
+            access_token = application_configuration.api_ocr_field.get("access_token",None)        
+            if access_token == '':
+                token = self.login_ocr_field(application_configuration=application_configuration)                
+                if token is not None:
+                    application_configuration.api_ocr_field["access_token"]=token['access']
+                    application_configuration.api_ocr_field["refresh_token"]=token['refresh']
+                    application_configuration.save()
+            url_ocr_pdf_custom_field_by_fileid = application_configuration.api_ocr_field.get("ocr")
+            payload = json.dumps({
+            "request_id": f"{get_file_id}",
+            "list_form_code": [
+                f"{dossier_form.form_rule}"
+            ]
+            })
+            headers = {
+                'Authorization': f"Bearer {application_configuration.api_ocr_field['access_token']}",
+                'Content-Type': 'application/json'
+            }
+            data_ocr_fields = self.call_ocr_api_with_retries("POST",url_ocr_pdf_custom_field_by_fileid, headers, params, payload, 5, 5, 100,status_code_fail=[401])
+            # self.log.info("gia tri application_configuration", data_ocr_fields)
+
+            # if token expire or WRONG
+            if data_ocr_fields == False:
+                token = self.get_token_ocr_field_by_refresh_token(application_configuration)
+                if token is not None and token != False:
+                    application_configuration.api_ocr_field["access_token"]=token['access']
+                    application_configuration.api_ocr_field["refresh_token"]=token['refresh']
+                    application_configuration.save()
+                    
+                    # repeat ocr_field
+                    payload = json.dumps({
+                    "request_id": f"{get_file_id}",
+                    "list_form_code": [
+                        f"{dossier_form.form_rule}"
+                    ]
+                    })
+                    headers = {
+                        'Authorization': f"Bearer {application_configuration.api_ocr_field.get('access_token')}",
+                        'Content-Type': 'application/json'
+                    }
+                    self.log.log("ocr field-------------", headers)
+                    data_ocr_fields = self.call_ocr_api_with_retries("POST",url_ocr_pdf_custom_field_by_fileid, headers, params, payload, 5, 5, 100,status_code_fail=[401])
+
         return (data_ocr,data_ocr_fields)
     
 
@@ -334,8 +429,8 @@ class RasterisedDocumentParser(DocumentParser):
 
     
             
-    def ocr_img_or_pdf(self, document_path, mime_type, sidecar, output_file, **kwargs):
-        data_ocr,data_ocr_fields = self.ocr_file(document_path)
+    def ocr_img_or_pdf(self, document_path, mime_type, sidecar, output_file, dossier_form, **kwargs):
+        data_ocr,data_ocr_fields = self.ocr_file(document_path,dossier_form)
         self.render_pdf_ocr(sidecar, mime_type, document_path, output_file,data_ocr)
         return data_ocr,data_ocr_fields
      
@@ -518,7 +613,7 @@ class RasterisedDocumentParser(DocumentParser):
 
         return ocrmypdf_args
 
-    def parse(self, document_path: Path, mime_type, file_name=None):
+    def parse(self, document_path: Path, mime_type, file_name=None, dossierForm=None):
         # This forces tesseract to use one core per page.
         os.environ["OMP_THREAD_LIMIT"] = "1"
         VALID_TEXT_LENGTH = 50
@@ -569,7 +664,7 @@ class RasterisedDocumentParser(DocumentParser):
         try:
             self.log.debug(f"Calling OCRmyPDF with args: {args}")
             # ocrmypdf.ocr(**args)
-            data_ocr,data_ocr_fields = self.ocr_img_or_pdf(document_path, mime_type,**args)
+            data_ocr,data_ocr_fields = self.ocr_img_or_pdf(document_path, mime_type, dossier_form=dossierForm,**args)
             if self.settings.skip_archive_file != ArchiveFileChoices.ALWAYS:
                 self.archive_path = archive_path
 
@@ -620,7 +715,7 @@ class RasterisedDocumentParser(DocumentParser):
             try:
                 self.log.debug(f"Fallback: Calling OCRmyPDF with args: {args}")
                 # ocrmypdf.ocr(**args)
-                data_ocr,data_ocr_fields = self.ocr_img_or_pdf(document_path, mime_type,**args)
+                data_ocr,data_ocr_fields = self.ocr_img_or_pdf(document_path, mime_type, dossier_form=dossierForm, **args)
                 # Don't return the archived file here, since this file
                 # is bigger and blurry due to --force-ocr.
 

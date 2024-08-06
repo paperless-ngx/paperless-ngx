@@ -1,0 +1,39 @@
+<form [formGroup]="objectForm" (ngSubmit)="save()" autocomplete="off">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
+    @if (object?.id) {
+      <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{object.id}}</span>
+    }
+    <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-4">
+        <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
+        <pngx-input-text i18n-title title="Form rule" formControlName="form_rule" [error]="error?.name" autocomplete="off"></pngx-input-text>
+        <div class="input-group input-group-sm w-100 mt-2">
+          <label class="input-group-text" ><ng-container i18n>Form</ng-container>:</label>
+          <select class="form-select form-select-sm" formControlName="type" >
+            @for (option of DOSSIER_TYPES_OPTIONS; track option) {
+              <option [ngValue]="option.value" >{{ option.label }}</option>
+            }
+          </select>
+        </div>
+        <br>
+        <div *pngxIfOwner="object">
+          <pngx-permissions-form [users]="users" accordion="true" formControlName="permissions_form"></pngx-permissions-form>
+        </div>
+      </div>
+      <div class="col">
+        <pngx-dossier-form-custom-field-select [inheritedCustomFields]="object.custom_fields" [dataDossierForm]="objectForm" [inputDossierForm]="object" formControlName="custom_fields" (dataChange)="onDataChange($event)"></pngx-dossier-form-custom-field-select>
+        
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>
+    <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
+  </div>
+</form>

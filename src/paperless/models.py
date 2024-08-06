@@ -134,6 +134,7 @@ class ApplicationConfiguration(AbstractSingletonModel):
         max_length=16,
         choices=CleanChoices.choices,
     )
+    enable_ocr = models.BooleanField(verbose_name=_("Enables ocr"), null=True, default=False)
 
     deskew = models.BooleanField(verbose_name=_("Enables deskew"), null=True)
 
@@ -184,12 +185,17 @@ class ApplicationConfiguration(AbstractSingletonModel):
         upload_to="logo/",
     )
 
-    ocr_key = models.CharField(
-        verbose_name=_("Sets key for advanced version"),
-        null=True,
-        blank=True,
-        max_length=200,
-    )
+    username_ocr = models.CharField(max_length=255, null=True, blank=True)
+
+    password_ocr = models.CharField(max_length=255, null=True, blank=True)
+
+    username_ocr_field = models.CharField(max_length=255, null=True, blank=True)
+
+    password_ocr_field = models.CharField(max_length=255, null=True, blank=True)
+
+    api_ocr = models.JSONField(null=True)
+
+    api_ocr_field = models.JSONField(null=True)
 
     class Meta:
         verbose_name = _("paperless application settings")

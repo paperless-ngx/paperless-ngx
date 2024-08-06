@@ -14,7 +14,7 @@ from django.views.static import serve
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
-from documents.views import AcknowledgeTasksView, ApprovalUpdateMutipleView, ApprovalViewSet, BulkExportExcelFromFolderView, BulkExportExcelView
+from documents.views import AcknowledgeTasksView, ApprovalUpdateMutipleView, ApprovalViewSet, BulkExportExcelFromFolderView, BulkExportExcelView, DossierFormViewSet, DossierViewSet
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
@@ -79,6 +79,8 @@ api_router.register(r"warehouses", WarehouseViewSet)
 api_router.register(r"approvals", ApprovalViewSet)
 api_router.register(r"content_types", ContentTypeViewSet, basename="content_types")
 api_router.register(r"folders", FolderViewSet)
+api_router.register(r"dossiers", DossierViewSet)
+api_router.register(r"dossier_forms", DossierFormViewSet)
 
 # api_router.register(r"approvals", ApprovalViewSet)
 api_router.register(r"content_types", ContentTypeViewSet, basename="content_types")

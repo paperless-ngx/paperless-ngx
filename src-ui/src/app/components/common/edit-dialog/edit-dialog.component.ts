@@ -125,6 +125,16 @@ export abstract class EditDialogComponent<
     }
   }
 
+  getFormOrigin(){
+    return this.objectForm
+  }
+ 
+  setFormOrigin(objectForm){
+    console.log('gia tri gan',objectForm)
+    return this.objectForm=objectForm
+  }
+ 
+
   getMatchingAlgorithms() {
     return MATCHING_ALGORITHMS
   }
@@ -139,6 +149,7 @@ export abstract class EditDialogComponent<
   save() {
     this.error = null
     const formValues = Object.assign({}, this.objectForm.value)
+    console.log('gia tri form values',formValues)
     const permissionsObject: PermissionsFormObject =
       this.objectForm.get('permissions_form')?.value
     if (permissionsObject) {
