@@ -50,6 +50,7 @@ export class TasksService {
   constructor(private http: HttpClient) {}
 
   public reload() {
+    this.cancelPending()
     this.loading = true
 
     this.http
