@@ -37,6 +37,8 @@ import { CustomShelfComponent } from './components/manage/custom-shelf/custom-sh
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
 import { FoldersComponent } from './components/manage/folder-list/folder-list.component'
 import { SubFoldersComponent } from './components/manage/subfolder-list/subfolder-list.component'
+import { DossiersComponent } from './components/manage/dossier-list/dossier-list.component'
+import { DossiersFormComponent } from './components/manage/dossier-form-list/dossier-form-list.component'
 
 
 
@@ -147,9 +149,28 @@ export const routes: Routes = [
           },
         },
       },
-
-
-
+      {
+        path: 'dossiers',
+        component: DossiersComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Dossier,
+          },
+        },
+      },
+      {
+        path: 'dossiers/:id',
+        component: DossiersComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Dossier,
+          },
+        },
+      },
       {
         path: 'box/:id',
         component: BoxFieldsComponent,
@@ -323,6 +344,28 @@ export const routes: Routes = [
           requiredPermission: {
             action: PermissionAction.Change,
             type: PermissionType.AppConfig,
+          },
+        },
+      },
+      {
+        path: 'dossier-form',
+        component: DossiersFormComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.Change,
+            type: PermissionType.DossierForm,
+          },
+        },
+      },
+      {
+        path: 'dossier-form/:id',
+        component: DossiersFormComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.Change,
+            type: PermissionType.DossierForm,
           },
         },
       },

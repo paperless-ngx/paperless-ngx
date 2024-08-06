@@ -25,6 +25,7 @@ class DocumentMetadataOverrides:
     storage_path_id: Optional[int] = None
     warehouse_id: Optional[int] = None
     folder_id: Optional[int] = None
+    dossier_id: Optional[int] = None
     created: Optional[datetime.datetime] = None
     asn: Optional[int] = None
     owner_id: Optional[int] = None
@@ -54,6 +55,8 @@ class DocumentMetadataOverrides:
             self.warehouse_id = other.warehouse_id
         if other.folder_id is not None:
             self.folder_id = other.folder_id
+        if other.dossier_id is not None:
+            self.dossier_id = other.dossier_id
         if other.owner_id is not None:
             self.owner_id = other.owner_id
 
@@ -108,6 +111,7 @@ class DocumentMetadataOverrides:
         overrides.storage_path_id = doc.storage_path.id if doc.storage_path else None
         overrides.warehouse_id = doc.warehouse.id if doc.warehouse else None
         overrides.folder_id = doc.folder.id if doc.folder else None
+        overrides.dossier_id = doc.dossier.id if doc.dossier else None
         overrides.owner_id = doc.owner.id if doc.owner else None
         overrides.tag_ids = list(doc.tags.values_list("id", flat=True))
 

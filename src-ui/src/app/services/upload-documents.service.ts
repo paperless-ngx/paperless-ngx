@@ -42,6 +42,11 @@ export class UploadDocumentsService {
       // console.log(payload)
 
     }
+    if (payload.dossiers  ){
+      formData.append('dossier',payload.dossiers)
+      // console.log(payload)
+
+    }
       
     let status = this.consumerStatusService.newFileUpload(file.name)
 

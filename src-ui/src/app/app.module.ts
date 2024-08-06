@@ -103,6 +103,9 @@ import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { FolderEditDialogComponent } from './components/common/edit-dialog/folder-edit-dialog/folder-edit-dialog.component'
+import { DossiersComponent } from './components/manage/dossier-list/dossier-list.component'
+import { DossierEditDialogComponent } from './components/common/edit-dialog/dossier-edit-dialog/dossier-edit-dialog.component'
+import { DossierCardSmallComponent } from './components/manage/dossier-card-small/dossier-card-small.component'
 import { FolderCardSmallComponent } from './components/manage/folder-card-small/folder-card-small.component'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
@@ -355,6 +358,12 @@ import localeTr from '@angular/common/locales/tr'
 import localeUk from '@angular/common/locales/uk'
 import localeZh from '@angular/common/locales/zh'
 import localeVi from '@angular/common/locales/vi'
+import { DossiersFormComponent } from './components/manage/dossier-form-list/dossier-form-list.component'
+import { DossierFormEditDialogComponent } from './components/common/edit-dialog/dossier-form-edit-dialog/dossier-form-edit-dialog.component'
+import { DossierCustomFieldFormEditDialogComponent } from './components/common/edit-dialog/dossier-instance-customfield-form-edit-dialog/dossier-instance-customfield-form-edit-dialog.component'
+import { CustomFieldSelectComponent } from './components/common/custom-field-select/custom-field-select.component'
+import { DossierCustomFieldSelectComponent } from './components/common/custom-field-select/dossier-custom-field-select/dossier-custom-field-select.component'
+import { DossierFormCustomFieldSelectComponent } from './components/common/custom-field-select/dossier-form-custom-field-select/dossier-form-custom-field-select.component'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -405,6 +414,12 @@ function initializeApp(settings: SettingsService) {
     DocumentListComponent,
     DocumentDetailComponent,
     DashboardComponent,
+    DossiersComponent,
+    DossierEditDialogComponent,
+    DossierCardSmallComponent,
+    DossiersFormComponent,
+    DossierFormEditDialogComponent,
+    DossierCustomFieldFormEditDialogComponent,
     FoldersComponent,
     SubFoldersComponent,
     FolderEditDialogComponent,
@@ -436,6 +451,9 @@ function initializeApp(settings: SettingsService) {
     BulkEditorComponent,
     TextComponent,
     SelectComponent,
+    CustomFieldSelectComponent,
+    DossierCustomFieldSelectComponent,
+    DossierFormCustomFieldSelectComponent,
     CheckComponent,
     UrlComponent,
     PasswordComponent,
