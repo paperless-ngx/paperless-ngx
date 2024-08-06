@@ -28,6 +28,11 @@
             }
           </div>
         }
+        @case (CustomFieldDataType.Monetary) {
+          <div class="my-3">
+            <pngx-input-text i18n-title title="Default Currency" hint="3-character currency code" i18n-hint formControlName="default_currency" placeholder="Use locale" i18n-placeholder autocomplete="off"></pngx-input-text>
+          </div>
+        }
       }
     </div>
   </div>

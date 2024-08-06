@@ -157,6 +157,7 @@
                     @case (CustomFieldDataType.Monetary) {
                       <pngx-input-monetary formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+                      [defaultCurrency]="getCustomFieldFromInstance(fieldInstance)?.extra_data?.default_currency"
                       [removable]="userIsOwner"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
