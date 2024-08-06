@@ -18,6 +18,9 @@ export class TextComponent extends AbstractInputComponent<string> {
   @Input()
   autocomplete: string
 
+  @Input()
+  placeholder: string = ''
+
   constructor() {
     super()
   }
