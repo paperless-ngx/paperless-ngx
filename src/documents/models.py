@@ -272,10 +272,6 @@ class DossierForm(MatchingModel):
 
     # path = models.TextField(_("path"), null=True, blank=True)
     
-    username = models.TextField(_("username"), null=True, blank=True)
-    
-    password = models.TextField(_("password"), null=True, blank=True)
-    
     form_rule = models.TextField(_("form_rule"), null=True, blank=True)
 
     created = models.DateTimeField(

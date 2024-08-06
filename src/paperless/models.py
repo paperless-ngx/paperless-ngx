@@ -134,6 +134,7 @@ class ApplicationConfiguration(AbstractSingletonModel):
         max_length=16,
         choices=CleanChoices.choices,
     )
+    enable_ocr = models.BooleanField(verbose_name=_("Enables ocr"), null=True, default=False)
 
     deskew = models.BooleanField(verbose_name=_("Enables deskew"), null=True)
 

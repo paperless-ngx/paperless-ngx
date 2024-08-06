@@ -53,6 +53,7 @@ from documents.signals import document_consumption_started
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
+from paperless.models import ApplicationConfiguration
 
 
 class WorkflowTriggerPlugin(
@@ -707,8 +708,10 @@ class Consumer(LoggingMixin):
                 ConsumerFilePhase.WORKING,
                 ConsumerStatusShortMessage.PARSING_DOCUMENT,
             )
-            self.log.debug(f"Parsing {self.filename}...")
-            data_ocr_fields = document_parser.parse(self.working_copy, mime_type, self.filename, self.get_config_dossier_form())
+            enable_ocr = ApplicationConfiguration.objects.filter().first().enable_ocr
+            if enable_ocr:
+                self.log.debug(f"Parsing {self.filename}...")
+                data_ocr_fields = document_parser.parse(self.working_copy, mime_type, self.filename, self.get_config_dossier_form())
 
             self.log.debug(f"Generating thumbnail for {self.filename}...")
             self._send_progress(
@@ -722,9 +725,10 @@ class Consumer(LoggingMixin):
                 mime_type,
                 self.filename,
             )
-
             text = document_parser.get_text()
             date = document_parser.get_date()
+            if enable_ocr!=True:
+                text=''
             if date is None:
                 self._send_progress(
                     90,
