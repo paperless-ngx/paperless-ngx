@@ -1479,7 +1479,7 @@
                <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
                <context context-type="linenumber">4</context>
             </context-group>
-            <target>Các tùy chọn cấu hình ứng dụng toàn cầu áp dụng cho &lt;strong&gt;mọi&lt;/strong&gt; người dùng của bản cài đặt TC GROUP này. Các tùy chọn cũng có thể được đặt bằng cách sử dụng các biến môi trường hoặc tệp cấu hình, nhưng giá trị được chỉ định ở đây sẽ luôn được ưu tiên.</target>
+            <target>Các tùy chọn cấu hình ứng dụng toàn cầu áp dụng cho &lt;strong&gt;mọi&lt;/strong&gt; người dùng của bản cài đặt EDOCS này. Các tùy chọn cũng có thể được đặt bằng cách sử dụng các biến môi trường hoặc tệp cấu hình, nhưng giá trị được chỉ định ở đây sẽ luôn được ưu tiên.</target>
          </trans-unit>
          <trans-unit id="187187500641108332" datatype="html">
             <source>
@@ -6419,7 +6419,7 @@
                <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
                <context context-type="linenumber">22</context>
             </context-group>
-            <target state="translated">TC GROUP Version</target>
+            <target state="translated">EDOCS Version</target>
          </trans-unit>
          <trans-unit id="6269705781013540301" datatype="html">
             <source>Install Type</source>
@@ -6888,7 +6888,7 @@
             <target state="translated">,</target>
          </trans-unit>
          <trans-unit id="7470582618438611770" datatype="html">
-            <source>TC GROUP is running!</source>
+            <source>EDOCS is running!</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
                <context context-type="linenumber">2</context>
@@ -6904,12 +6904,12 @@
             <target state="translated">Bạn đã có thể tải tài liệu lên! Tự mình khám phá các tính năng khác nhau của ứng dụng web này hoặc bắt đầu chuyến tham quan nhanh bằng nút bên dưới.</target>
          </trans-unit>
          <trans-unit id="5776867890546390610" datatype="html">
-            <source>Thanks for being a part of the TC GROUP community!</source>
+            <source>Thanks for being a part of the EDOCS community!</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
                <context context-type="linenumber">7</context>
             </context-group>
-            <target state="translated">Cảm ơn bạn đã trở thành một phần của cộng đồng TC GROUP</target>
+            <target state="translated">Cảm ơn bạn đã trở thành một phần của cộng đồng EDOCS</target>
          </trans-unit>
          <trans-unit id="1415832194529539652" datatype="html">
             <source>Start the tour</source>
@@ -10131,7 +10131,7 @@
                <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
                <context context-type="linenumber">4</context>
             </context-group>
-            <target state="translated">Sử dụng quy trình công việc để tùy chỉnh hành vi của TC GROUP khi các sự kiện 'kích hoạt' quy trình công việc</target>
+            <target state="translated">Sử dụng quy trình công việc để tùy chỉnh hành vi của EDOCS khi các sự kiện 'kích hoạt' quy trình công việc</target>
          </trans-unit>
          <trans-unit id="2437630016855517844" datatype="html">
             <source>Add Workflow</source>

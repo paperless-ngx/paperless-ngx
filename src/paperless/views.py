@@ -82,7 +82,7 @@ class FaviconView(View):
             "static",
             "paperless",
             "img",
-            "favicon-tc.ico",
+            "edocs-favicon-color.ico",
         )
         with open(favicon, "rb") as f:
             return HttpResponse(f, content_type="image/x-icon")
