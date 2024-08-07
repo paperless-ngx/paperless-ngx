@@ -21,7 +21,10 @@ Paperless-ngx is a document management system that transforms your physical docu
 
 Paperless-ngx is the official successor to the original [Paperless](https://github.com/the-paperless-project/paperless) & [Paperless-ng](https://github.com/jonaswinkler/paperless-ng) projects and is designed to distribute the responsibility of advancing and supporting the project among a team of people. [Consider joining us!](#community-support)
 
-Thanks to the generous folks at [DigitalOcean](https://m.do.co/c/8d70b916d462), a demo is available at [demo.paperless-ngx.com](https://demo.paperless-ngx.com) using login `demo` / `demo`. _Note: demo content is reset frequently and confidential information should not be uploaded._
+Thanks to the generous folks at [DigitalOcean](https://m.do.co/c/8d70b916d462), a demo is available at [demo.paperless-ngx.com](https://demo.paperless-ngx.com) using login `demo` / `demo`.
+
+> [!NOTE]
+> Demo content is frequently reset and confidential information should not be uploaded.
 
 - [Features](#features)
 - [Getting started](#getting-started)
@@ -97,7 +100,8 @@ For bugs please [open an issue](https://github.com/paperless-ngx/paperless-ngx/i
 
 Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Related-Projects) for a user-maintained list of related projects and software that is compatible with Paperless-ngx.
 
-# Important Note
+# Usage for Sensitive Documents
 
-> Document scanners are typically used to scan sensitive documents like your social insurance number, tax records, invoices, etc. **Paperless-ngx should never be run on an untrusted host** because information is stored in clear text without encryption. No guarantees are made regarding security (but we do try!) and you use the app at your own risk.
+> [!IMPORTANT]
+> Document management systems are typically used to store sensitive documents like social insurance numbers, tax records, invoices, etc. **Paperless-ngx should never be run on an untrusted host** because information is stored in clear text without encryption. No guarantees are made regarding security (but we do try!) and you use the app at your own risk.
 > **The safest way to run Paperless-ngx is on a local server in your own home with backups in place**.
