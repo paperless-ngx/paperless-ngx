@@ -71,6 +71,13 @@ describe('StatisticsWidgetComponent', () => {
     expect(reloadSpy).toHaveBeenCalled()
   })
 
+  it('should not call statistics endpoint on reload if already loading', () => {
+    httpTestingController.expectOne(`${environment.apiBaseUrl}statistics/`)
+    component.loading = true
+    component.reload()
+    httpTestingController.expectNone(`${environment.apiBaseUrl}statistics/`)
+  })
+
   it('should display inbox link with count', () => {
     const mockStats = {
       documents_total: 200,

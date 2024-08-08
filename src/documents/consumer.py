@@ -231,7 +231,9 @@ class ConsumerError(Exception):
 
 class ConsumerStatusShortMessage(str, Enum):
     DOCUMENT_ALREADY_EXISTS = "document_already_exists"
+    DOCUMENT_ALREADY_EXISTS_IN_TRASH = "document_already_exists_in_trash"
     ASN_ALREADY_EXISTS = "asn_already_exists"
+    ASN_ALREADY_EXISTS_IN_TRASH = "asn_already_exists_in_trash"
     ASN_RANGE = "asn_value_out_of_range"
     FILE_NOT_FOUND = "file_not_found"
     PRE_CONSUME_SCRIPT_NOT_FOUND = "pre_consume_script_not_found"
@@ -321,12 +323,18 @@ class ConsumerPlugin(
             Q(checksum=checksum) | Q(archive_checksum=checksum),
         )
         if existing_doc.exists():
+            msg = ConsumerStatusShortMessage.DOCUMENT_ALREADY_EXISTS
+            log_msg = f"Not consuming {self.filename}: It is a duplicate of {existing_doc.get().title} (#{existing_doc.get().pk})."
+
+            if existing_doc.first().deleted_at is not None:
+                msg = ConsumerStatusShortMessage.DOCUMENT_ALREADY_EXISTS_IN_TRASH
+                log_msg += " Note: existing document is in the trash."
+
             if settings.CONSUMER_DELETE_DUPLICATES:
                 os.unlink(self.input_doc.original_file)
             self._fail(
-                ConsumerStatusShortMessage.DOCUMENT_ALREADY_EXISTS,
-                f"Not consuming {self.filename}: It is a duplicate of"
-                f" {existing_doc.get().title} (#{existing_doc.get().pk})",
+                msg,
+                log_msg,
             )
 
     def pre_check_directories(self):
@@ -358,12 +366,20 @@ class ConsumerPlugin(
                 f"[{Document.ARCHIVE_SERIAL_NUMBER_MIN:,}, "
                 f"{Document.ARCHIVE_SERIAL_NUMBER_MAX:,}]",
             )
-        if Document.global_objects.filter(
+        existing_asn_doc = Document.global_objects.filter(
             archive_serial_number=self.metadata.asn,
-        ).exists():
+        )
+        if existing_asn_doc.exists():
+            msg = ConsumerStatusShortMessage.ASN_ALREADY_EXISTS
+            log_msg = f"Not consuming {self.filename}: Given ASN {self.metadata.asn} already exists!"
+
+            if existing_asn_doc.first().deleted_at is not None:
+                msg = ConsumerStatusShortMessage.ASN_ALREADY_EXISTS_IN_TRASH
+                log_msg += " Note: existing document is in the trash."
+
             self._fail(
-                ConsumerStatusShortMessage.ASN_ALREADY_EXISTS,
-                f"Not consuming {self.filename}: Given ASN {self.metadata.asn} already exists!",
+                msg,
+                log_msg,
             )
 
     def run_pre_consume_script(self):

@@ -137,6 +137,66 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_create_custom_field_monetary_validation(self):
+        """
+        GIVEN:
+            - Custom field does not exist
+        WHEN:
+            - API request to create custom field with invalid default currency option
+            - API request to create custom field with valid default currency option
+        THEN:
+            - HTTP 400 is returned
+            - HTTP 201 is returned
+        """
+
+        # not a string
+        resp = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "data_type": "monetary",
+                    "name": "Monetary Field",
+                    "extra_data": {
+                        "default_currency": 123,
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # not a 3-letter currency code
+        resp = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "data_type": "monetary",
+                    "name": "Monetary Field",
+                    "extra_data": {
+                        "default_currency": "EU",
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # valid currency code
+        resp = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "data_type": "monetary",
+                    "name": "Monetary Field",
+                    "extra_data": {
+                        "default_currency": "EUR",
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
     def test_create_custom_field_instance(self):
         """
         GIVEN:
