@@ -1,5 +1,63 @@
 # Changelog
 
+## paperless-ngx 2.11.3
+
+### Features
+
+- Enhancement: optimize tasks / stats reload [@shamoon](https://github.com/shamoon) ([#7402](https://github.com/paperless-ngx/paperless-ngx/pull/7402))
+- Enhancement: allow specifying default currency for Monetary custom field [@shamoon](https://github.com/shamoon) ([#7381](https://github.com/paperless-ngx/paperless-ngx/pull/7381))
+- Enhancement: specify when pre-check fails for documents in trash [@shamoon](https://github.com/shamoon) ([#7355](https://github.com/paperless-ngx/paperless-ngx/pull/7355))
+
+### Bug Fixes
+
+- Fix: clear selection after reload for management lists [@shamoon](https://github.com/shamoon) ([#7421](https://github.com/paperless-ngx/paperless-ngx/pull/7421))
+- Fix: disable inline create buttons if insufficient permissions [@shamoon](https://github.com/shamoon) ([#7401](https://github.com/paperless-ngx/paperless-ngx/pull/7401))
+- Fix: use entire document for dropzone [@shamoon](https://github.com/shamoon) ([#7342](https://github.com/paperless-ngx/paperless-ngx/pull/7342))
+
+### Maintenance
+
+- Chore(deps): Bump stumpylog/image-cleaner-action from 0.7.0 to 0.8.0 in the actions group [@dependabot](https://github.com/dependabot) ([#7371](https://github.com/paperless-ngx/paperless-ngx/pull/7371))
+
+### Dependencies
+
+<details>
+<summary>11 changes</summary>
+
+- Chore(deps): Bump django from 4.2.14 to 4.2.15 [@dependabot](https://github.com/dependabot) ([#7412](https://github.com/paperless-ngx/paperless-ngx/pull/7412))
+- Chore(deps-dev): Bump the development group with 3 updates [@dependabot](https://github.com/dependabot) ([#7394](https://github.com/paperless-ngx/paperless-ngx/pull/7394))
+- Chore(deps): Bump the small-changes group with 5 updates [@dependabot](https://github.com/dependabot) ([#7397](https://github.com/paperless-ngx/paperless-ngx/pull/7397))
+- Chore(deps-dev): Bump [@<!---->playwright/test from 1.42.1 to 1.45.3 in /src-ui @dependabot](https://github.com/<!---->playwright/test from 1.42.1 to 1.45.3 in /src-ui @dependabot) ([#7367](https://github.com/paperless-ngx/paperless-ngx/pull/7367))
+- Chore(deps-dev): Bump [@<!---->types/node from 20.12.2 to 22.0.2 in /src-ui @dependabot](https://github.com/<!---->types/node from 20.12.2 to 22.0.2 in /src-ui @dependabot) ([#7366](https://github.com/paperless-ngx/paperless-ngx/pull/7366))
+- Chore(deps-dev): Bump the frontend-eslint-dependencies group in /src-ui with 4 updates [@dependabot](https://github.com/dependabot) ([#7365](https://github.com/paperless-ngx/paperless-ngx/pull/7365))
+- Chore(deps): Bump uuid from 9.0.1 to 10.0.0 in /src-ui [@dependabot](https://github.com/dependabot) ([#7370](https://github.com/paperless-ngx/paperless-ngx/pull/7370))
+- Chore(deps): Bump stumpylog/image-cleaner-action from 0.7.0 to 0.8.0 in the actions group [@dependabot](https://github.com/dependabot) ([#7371](https://github.com/paperless-ngx/paperless-ngx/pull/7371))
+- Chore(deps): Bump zone.js from 0.14.4 to 0.14.8 in /src-ui [@dependabot](https://github.com/dependabot) ([#7368](https://github.com/paperless-ngx/paperless-ngx/pull/7368))
+- Chore(deps-dev): Bump jest-preset-angular from 14.1.1 to 14.2.2 in /src-ui in the frontend-jest-dependencies group [@dependabot](https://github.com/dependabot) ([#7364](https://github.com/paperless-ngx/paperless-ngx/pull/7364))
+- Chore(deps): Bump the frontend-angular-dependencies group in /src-ui with 20 updates [@dependabot](https://github.com/dependabot) ([#7363](https://github.com/paperless-ngx/paperless-ngx/pull/7363))
+</details>
+
+### All App Changes
+
+<details>
+<summary>15 changes</summary>
+
+- Fix: clear selection after reload for management lists [@shamoon](https://github.com/shamoon) ([#7421](https://github.com/paperless-ngx/paperless-ngx/pull/7421))
+- Enhancement: optimize tasks / stats reload [@shamoon](https://github.com/shamoon) ([#7402](https://github.com/paperless-ngx/paperless-ngx/pull/7402))
+- Enhancement: allow specifying default currency for Monetary custom field [@shamoon](https://github.com/shamoon) ([#7381](https://github.com/paperless-ngx/paperless-ngx/pull/7381))
+- Enhancement: specify when pre-check fails for documents in trash [@shamoon](https://github.com/shamoon) ([#7355](https://github.com/paperless-ngx/paperless-ngx/pull/7355))
+- Chore(deps-dev): Bump the development group with 3 updates [@dependabot](https://github.com/dependabot) ([#7394](https://github.com/paperless-ngx/paperless-ngx/pull/7394))
+- Fix: disable inline create buttons if insufficient permissions [@shamoon](https://github.com/shamoon) ([#7401](https://github.com/paperless-ngx/paperless-ngx/pull/7401))
+- Chore(deps): Bump the small-changes group with 5 updates [@dependabot](https://github.com/dependabot) ([#7397](https://github.com/paperless-ngx/paperless-ngx/pull/7397))
+- Chore(deps-dev): Bump [@<!---->playwright/test from 1.42.1 to 1.45.3 in /src-ui @dependabot](https://github.com/<!---->playwright/test from 1.42.1 to 1.45.3 in /src-ui @dependabot) ([#7367](https://github.com/paperless-ngx/paperless-ngx/pull/7367))
+- Chore(deps-dev): Bump [@<!---->types/node from 20.12.2 to 22.0.2 in /src-ui @dependabot](https://github.com/<!---->types/node from 20.12.2 to 22.0.2 in /src-ui @dependabot) ([#7366](https://github.com/paperless-ngx/paperless-ngx/pull/7366))
+- Chore(deps-dev): Bump the frontend-eslint-dependencies group in /src-ui with 4 updates [@dependabot](https://github.com/dependabot) ([#7365](https://github.com/paperless-ngx/paperless-ngx/pull/7365))
+- Chore(deps): Bump uuid from 9.0.1 to 10.0.0 in /src-ui [@dependabot](https://github.com/dependabot) ([#7370](https://github.com/paperless-ngx/paperless-ngx/pull/7370))
+- Chore(deps): Bump zone.js from 0.14.4 to 0.14.8 in /src-ui [@dependabot](https://github.com/dependabot) ([#7368](https://github.com/paperless-ngx/paperless-ngx/pull/7368))
+- Chore(deps-dev): Bump jest-preset-angular from 14.1.1 to 14.2.2 in /src-ui in the frontend-jest-dependencies group [@dependabot](https://github.com/dependabot) ([#7364](https://github.com/paperless-ngx/paperless-ngx/pull/7364))
+- Chore(deps): Bump the frontend-angular-dependencies group in /src-ui with 20 updates [@dependabot](https://github.com/dependabot) ([#7363](https://github.com/paperless-ngx/paperless-ngx/pull/7363))
+- Fix: use entire document for dropzone [@shamoon](https://github.com/shamoon) ([#7342](https://github.com/paperless-ngx/paperless-ngx/pull/7342))
+</details>
+
 ## paperless-ngx 2.11.2
 
 ### Changes
