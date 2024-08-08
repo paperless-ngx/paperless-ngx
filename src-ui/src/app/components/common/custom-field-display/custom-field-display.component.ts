@@ -90,7 +90,9 @@ export class CustomFieldDisplayComponent implements OnInit, OnDestroy {
     )?.value
     if (this.value && this.field.data_type === CustomFieldDataType.Monetary) {
       this.currency =
-        this.value.match(/([A-Z]{3})/)?.[0] ?? this.defaultCurrencyCode
+        this.value.match(/([A-Z]{3})/)?.[0] ??
+        this.field.extra_data?.default_currency ??
+        this.defaultCurrencyCode
       this.value = parseFloat(this.value.replace(this.currency, ''))
     } else if (
       this.value?.length &&
