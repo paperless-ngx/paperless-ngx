@@ -39,6 +39,12 @@ describe('TasksService', () => {
     expect(req.request.method).toEqual('GET')
   })
 
+  it('does not call tasks api endpoint on reload if already loading', () => {
+    tasksService.loading = true
+    tasksService.reload()
+    httpTestingController.expectNone(`${environment.apiBaseUrl}tasks/`)
+  })
+
   it('calls acknowledge_tasks api endpoint on dismiss and reloads', () => {
     tasksService.dismissTasks(new Set([1, 2, 3]))
     const req = httpTestingController.expectOne(

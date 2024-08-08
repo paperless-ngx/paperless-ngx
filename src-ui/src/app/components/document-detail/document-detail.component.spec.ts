@@ -1244,4 +1244,20 @@ describe('DocumentDetailComponent', () => {
     )
     fixture.detectChanges()
   }
+
+  it('createDisabled should return true if the user does not have permission to add the specified data type', () => {
+    currentUserCan = false
+    expect(component.createDisabled(DataType.Correspondent)).toBeTruthy()
+    expect(component.createDisabled(DataType.DocumentType)).toBeTruthy()
+    expect(component.createDisabled(DataType.StoragePath)).toBeTruthy()
+    expect(component.createDisabled(DataType.Tag)).toBeTruthy()
+  })
+
+  it('createDisabled should return false if the user has permission to add the specified data type', () => {
+    currentUserCan = true
+    expect(component.createDisabled(DataType.Correspondent)).toBeFalsy()
+    expect(component.createDisabled(DataType.DocumentType)).toBeFalsy()
+    expect(component.createDisabled(DataType.StoragePath)).toBeFalsy()
+    expect(component.createDisabled(DataType.Tag)).toBeFalsy()
+  })
 })
