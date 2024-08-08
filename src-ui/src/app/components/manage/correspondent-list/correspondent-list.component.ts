@@ -66,6 +66,7 @@ export class CorrespondentListComponent extends ManagementListComponent<Correspo
 
   public reloadData(): void {
     this.isLoading = true
+    this.clearSelection()
     this.service
       .listFiltered(
         this.page,
