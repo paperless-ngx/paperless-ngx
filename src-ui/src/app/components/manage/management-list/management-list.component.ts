@@ -132,6 +132,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
 
   reloadData() {
     this.isLoading = true
+    this.clearSelection()
     this.service
       .listFiltered(
         this.page,
