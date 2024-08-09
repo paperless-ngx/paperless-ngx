@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-09 11:27-0700\n"
-"PO-Revision-Date: 2024-07-09 18:28\n"
+"PO-Revision-Date: 2024-07-30 12:10\n"
 "Last-Translator: \n"
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
@@ -51,7 +51,7 @@ msgstr ""
 
 #: documents/models.py:62
 msgid "Automatic"
-msgstr ""
+msgstr "Tự động"
 
 #: documents/models.py:65 documents/models.py:419 documents/models.py:1291
 #: paperless_mail/models.py:18 paperless_mail/models.py:107
@@ -373,11 +373,11 @@ msgstr ""
 
 #: documents/models.py:474
 msgid "has tag"
-msgstr ""
+msgstr "có thẻ"
 
 #: documents/models.py:475
 msgid "has any tag"
-msgstr ""
+msgstr "có một số thẻ"
 
 #: documents/models.py:476
 msgid "created before"
@@ -389,15 +389,15 @@ msgstr ""
 
 #: documents/models.py:478
 msgid "created year is"
-msgstr ""
+msgstr "năm tạo"
 
 #: documents/models.py:479
 msgid "created month is"
-msgstr ""
+msgstr "tháng tạo"
 
 #: documents/models.py:480
 msgid "created day is"
-msgstr ""
+msgstr "ngày tạo"
 
 #: documents/models.py:481
 msgid "added before"
