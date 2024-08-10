@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-09 11:27-0700\n"
-"PO-Revision-Date: 2024-07-09 18:28\n"
+"PO-Revision-Date: 2024-08-08 00:26\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -47,11 +47,11 @@ msgstr "Expresión regular"
 
 #: documents/models.py:61 documents/models.py:975
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Palabra borrosa"
 
 #: documents/models.py:62
 msgid "Automatic"
-msgstr ""
+msgstr "Automático"
 
 #: documents/models.py:65 documents/models.py:419 documents/models.py:1291
 #: paperless_mail/models.py:18 paperless_mail/models.py:107
@@ -257,55 +257,55 @@ msgstr "logs"
 
 #: documents/models.py:401
 msgid "Table"
-msgstr ""
+msgstr "Tabla"
 
 #: documents/models.py:402
 msgid "Small Cards"
-msgstr ""
+msgstr "Tarjetas Pequeñas"
 
 #: documents/models.py:403
 msgid "Large Cards"
-msgstr ""
+msgstr "Tarjetas Grandes"
 
 #: documents/models.py:406
 msgid "Title"
-msgstr ""
+msgstr "Título"
 
 #: documents/models.py:407
 msgid "Created"
-msgstr ""
+msgstr "Creado"
 
 #: documents/models.py:408
 msgid "Added"
-msgstr ""
+msgstr "Agregado"
 
 #: documents/models.py:409
 msgid "Tags"
-msgstr ""
+msgstr "Etiquetas"
 
 #: documents/models.py:410
 msgid "Correspondent"
-msgstr ""
+msgstr "Corresponsal"
 
 #: documents/models.py:411
 msgid "Document Type"
-msgstr ""
+msgstr "Tipo de Documento"
 
 #: documents/models.py:412
 msgid "Storage Path"
-msgstr ""
+msgstr "Ruta de Almacenamiento"
 
 #: documents/models.py:413
 msgid "Note"
-msgstr ""
+msgstr "Nota"
 
 #: documents/models.py:414
 msgid "Owner"
-msgstr ""
+msgstr "Propietario"
 
 #: documents/models.py:415
 msgid "Shared"
-msgstr ""
+msgstr "Compartido"
 
 #: documents/models.py:416
 msgid "ASN"
@@ -329,15 +329,15 @@ msgstr "ordenar al revés"
 
 #: documents/models.py:437
 msgid "View page size"
-msgstr ""
+msgstr "Ver tamaño de página"
 
 #: documents/models.py:445
 msgid "View display mode"
-msgstr ""
+msgstr "Modo de visualización"
 
 #: documents/models.py:452
 msgid "Document display fields"
-msgstr ""
+msgstr "Campos de visualización de documentos"
 
 #: documents/models.py:459 documents/models.py:516
 msgid "saved view"
@@ -433,7 +433,7 @@ msgstr "consulta de texto completo"
 
 #: documents/models.py:489
 msgid "more like this"
-msgstr ""
+msgstr "más como esto"
 
 #: documents/models.py:490
 msgid "has tags in"
@@ -501,19 +501,19 @@ msgstr "compartido por mí"
 
 #: documents/models.py:506
 msgid "has custom fields"
-msgstr ""
+msgstr "tiene campos personalizados"
 
 #: documents/models.py:507
 msgid "has custom field in"
-msgstr ""
+msgstr "tiene campo personalizado en"
 
 #: documents/models.py:508
 msgid "does not have custom field in"
-msgstr ""
+msgstr "no tiene campo personalizado en"
 
 #: documents/models.py:509
 msgid "does not have custom field"
-msgstr ""
+msgstr "no tiene campo personalizado"
 
 #: documents/models.py:519
 msgid "rule type"
@@ -677,7 +677,7 @@ msgstr "Enlace al documento"
 
 #: documents/models.py:812
 msgid "Select"
-msgstr ""
+msgstr "Selecciona"
 
 #: documents/models.py:824
 msgid "data type"
@@ -685,11 +685,11 @@ msgstr "tipo de dato"
 
 #: documents/models.py:831
 msgid "extra data"
-msgstr ""
+msgstr "datos extra"
 
 #: documents/models.py:835
 msgid "Extra data for the custom field, such as select options"
-msgstr ""
+msgstr "Datos adicionales para el campo personalizado, como opciones de selección"
 
 #: documents/models.py:841
 msgid "custom field"
@@ -781,7 +781,7 @@ msgstr "Tarea"
 
 #: documents/models.py:1079
 msgid "Removal"
-msgstr ""
+msgstr "Eliminar"
 
 #: documents/models.py:1083
 msgid "Workflow Action Type"
@@ -837,71 +837,71 @@ msgstr "asignar estos campos personalizados"
 
 #: documents/models.py:1181
 msgid "remove these tag(s)"
-msgstr ""
+msgstr "eliminar estas etiqueta(s)"
 
 #: documents/models.py:1186
 msgid "remove all tags"
-msgstr ""
+msgstr "elimina todas las etiquetas"
 
 #: documents/models.py:1193
 msgid "remove these document type(s)"
-msgstr ""
+msgstr "eliminar este tipo de documento (s)"
 
 #: documents/models.py:1198
 msgid "remove all document types"
-msgstr ""
+msgstr "eliminar todos los tipos de documentos"
 
 #: documents/models.py:1205
 msgid "remove these correspondent(s)"
-msgstr ""
+msgstr "eliminar estos corresponsales"
 
 #: documents/models.py:1210
 msgid "remove all correspondents"
-msgstr ""
+msgstr "eliminar a todos los corresponsales"
 
 #: documents/models.py:1217
 msgid "remove these storage path(s)"
-msgstr ""
+msgstr "eliminar estas rutas de almacenamiento"
 
 #: documents/models.py:1222
 msgid "remove all storage paths"
-msgstr ""
+msgstr "eliminar todas las rutas de almacenamiento"
 
 #: documents/models.py:1229
 msgid "remove these owner(s)"
-msgstr ""
+msgstr "eliminar estos propietarios"
 
 #: documents/models.py:1234
 msgid "remove all owners"
-msgstr ""
+msgstr "eliminar todos los propietarios"
 
 #: documents/models.py:1241
 msgid "remove view permissions for these users"
-msgstr ""
+msgstr "elimina permisos de visualización para estos usuarios"
 
 #: documents/models.py:1248
 msgid "remove view permissions for these groups"
-msgstr ""
+msgstr "elimina permisos de visualización para estos grupos"
 
 #: documents/models.py:1255
 msgid "remove change permissions for these users"
-msgstr ""
+msgstr "eliminar permisos de cambio para estos usuarios"
 
 #: documents/models.py:1262
 msgid "remove change permissions for these groups"
-msgstr ""
+msgstr "elimina permisos de cambio para estos grupos"
 
 #: documents/models.py:1267
 msgid "remove all permissions"
-msgstr ""
+msgstr "elimina todos los permisos"
 
 #: documents/models.py:1274
 msgid "remove these custom fields"
-msgstr ""
+msgstr "elimina estos campos personalizados"
 
 #: documents/models.py:1279
 msgid "remove all custom fields"
-msgstr ""
+msgstr "elimina todos los campos personalizados"
 
 #: documents/models.py:1283
 msgid "workflow action"
@@ -948,13 +948,14 @@ msgstr "Variable inválida."
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
-msgstr ""
+msgstr "Hola de %(site_name)s!"
 
 #: documents/templates/account/email/base_message.txt:5
 #, python-format
 msgid "Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
-msgstr ""
+msgstr "Gracias por utilizar %(site_name)s!\n"
+"%(site_domain)s"
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
@@ -967,7 +968,7 @@ msgstr "Por favor, inicie sesión"
 #: documents/templates/account/login.html:12
 #, python-format
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
-msgstr ""
+msgstr "¿Aún no tienes una cuenta? <a href=\"%(signup_url)s\">Regístrate</a>"
 
 #: documents/templates/account/login.html:19
 #: documents/templates/account/signup.html:15
@@ -1064,7 +1065,7 @@ msgstr "Se ha establecido tu nueva contraseña. Ahora puedes <a href=\"%(login_u
 
 #: documents/templates/account/signup.html:5
 msgid "Paperless-ngx sign up"
-msgstr ""
+msgstr "Paperless-ngx inicio de sesión"
 
 #: documents/templates/account/signup.html:10
 #, python-format
