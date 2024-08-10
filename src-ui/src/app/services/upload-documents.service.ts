@@ -53,7 +53,7 @@ export class UploadDocumentsService {
             )
             status.message = $localize`Uploading...`
           } else if (event.type == HttpEventType.Response) {
-            status.taskId = event.body['task_id']
+            status.taskId = event.body['task_id'] ?? event.body.toString()
             status.message = $localize`Upload complete, waiting...`
             this.uploadSubscriptions[file.name]?.complete()
           }
