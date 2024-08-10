@@ -1,5 +1,15 @@
 # Changelog
 
+## paperless-ngx 2.11.4
+
+### Bug Fixes
+
+- Fix: initial upload message not being dismissed [@shamoon](https://github.com/shamoon) ([#7438](https://github.com/paperless-ngx/paperless-ngx/pull/7438))
+
+### All App Changes
+
+- Fix: initial upload message not being dismissed [@shamoon](https://github.com/shamoon) ([#7438](https://github.com/paperless-ngx/paperless-ngx/pull/7438))
+
 ## paperless-ngx 2.11.3
 
 ### Features
