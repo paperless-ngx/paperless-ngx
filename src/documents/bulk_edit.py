@@ -11,7 +11,7 @@ from django.db.models import Q
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
-from documents.models import Correspondent
+from documents.models import Correspondent, Dossier
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
@@ -63,6 +63,22 @@ def set_folder(doc_ids, folder):
     )
     affected_docs = [doc.id for doc in qs]
     qs.update(folder=folder)
+
+    bulk_update_documents.delay(
+        document_ids=affected_docs,
+    )
+
+    return "OK"
+
+def set_dossier(doc_ids, dossier):
+    if dossier:
+        dossier = Dossier.objects.get(id=dossier)
+
+    qs = Document.objects.filter(
+        Q(id__in=doc_ids) & ~Q(dossier=dossier),
+    )
+    affected_docs = [doc.id for doc in qs]
+    qs.update(dossier=dossier)
 
     bulk_update_documents.delay(
         document_ids=affected_docs,
@@ -159,9 +175,13 @@ def delete(doc_ids):
     for doc in docs:
         doc_folder = doc.folder
         doc.folder = None
+        doc_dossier = doc.dossier
+        doc.dossier = None
         doc.save()
         if doc_folder is not None:
             doc_folder.delete()
+        if doc_dossier is not None:
+            doc_dossier.delete()
     docs.delete()
     from documents import index
 

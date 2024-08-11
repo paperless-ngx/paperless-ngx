@@ -397,9 +397,12 @@ class DocumentViewSet(
         from documents import index
         instance = self.get_object()
         fold = instance.folder
+        dossier = instance.dossier
         instance.folder = None 
+        instance.dossier = None 
         instance.save()
         fold.delete()
+        dossier.delete()
         index.remove_document_from_index(self.get_object())
         
         return super().destroy(request, *args, **kwargs)
@@ -1966,6 +1969,16 @@ class BulkEditObjectsView(PassUserMixin):
                 folders.delete()
                 
             return Response(status=status.HTTP_204_NO_CONTENT)            
+        
+        elif operation == "delete" and object_type == "dossiers":
+            for dossier_id in object_ids:
+                dossier = Dossier.objects.get(id=int(dossier_id))
+                dossiers = Dossier.objects.filter(path__startswith=dossier.path)
+                documents = Document.objects.filter(dossier__in=dossier)
+                documents.delete()
+                dossiers.delete()
+                
+            return Response(status=status.HTTP_204_NO_CONTENT)            
                           
         elif operation == "delete":
 
@@ -2703,6 +2716,17 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 return Response(
                     {"error": "Error retrieving dossiers, check logs for more detail."},
                 )
+    
+    def destroy(self, request, pk, *args, **kwargs):
+        dossier = Dossier.objects.get(id=pk)
+        dossiers = Dossier.objects.filter(path__startswith=dossier.path)
+        documents = Document.objects.filter(dossier__in=dossiers)
+        folders = Folder.objects.filter(id__in=documents.select_related('folder').all().values_list("folder", flat=True))
+        folders.delete()
+        documents.delete()
+        dossiers.delete()
+        
+        return Response(status=status.HTTP_204_NO_CONTENT)
             
         
 class DossierFormViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
