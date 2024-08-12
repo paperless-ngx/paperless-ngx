@@ -1385,6 +1385,7 @@ class TestMail(
             subject="the message title",
             from_="Myself",
             attachments=2,
+            body="Test mail",
         )
 
         encrypted_message = self.messageEncryptor.encrypt(message)
@@ -1392,18 +1393,25 @@ class TestMail(
         account = MailAccount.objects.create()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
+            consumption_scope=MailRule.ConsumptionScope.EVERYTHING,
             account=account,
         )
         rule.save()
 
         result = self.mail_account_handler._handle_message(encrypted_message, rule)
 
-        self.assertEqual(result, 2)
+        self.assertEqual(result, 3)
 
         self._queue_consumption_tasks_mock.assert_called()
 
         self.assert_queue_consumption_tasks_call_args(
             [
+                [
+                    {
+                        "override_title": message.subject,
+                        "override_filename": f"{message.subject}.eml",
+                    },
+                ],
                 [
                     {"override_title": "file_0", "override_filename": "file_0.pdf"},
                     {"override_title": "file_1", "override_filename": "file_1.pdf"},
