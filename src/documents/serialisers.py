@@ -1083,6 +1083,18 @@ class BulkEditSerializer(
         else:
             raise serializers.ValidationError("folder not specified")
     
+    def _validate_parameters_dossier(self, parameters):
+        if "dossier" in parameters:
+            dossier_id = parameters["dossier"]
+            if dossier_id is None:
+                return
+            try:
+                Dossier.objects.get(id=dossier_id)
+            except Dossier.DoesNotExist:
+                raise serializers.ValidationError("Dossier does not exist")
+        else:
+            raise serializers.ValidationError("dossier not specified")
+    
     def _validate_storage_path(self, parameters):
         if "storage_path" in parameters:
             storage_path_id = parameters["storage_path"]
@@ -1174,6 +1186,8 @@ class BulkEditSerializer(
             self._validate_parameters_warehouse(parameters)
         elif method == bulk_edit.set_folder:
             self._validate_parameters_folder(parameters)
+        elif method == bulk_edit.set_dossier:
+            self._validate_parameters_dossier(parameters)
         elif method == bulk_edit.set_permissions:
             self._validate_parameters_set_permissions(parameters)
         elif method == bulk_edit.rotate:
@@ -2147,6 +2161,9 @@ class DossierSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         allow_null=True,
         required=False,
     )
+
+    document_count = serializers.SerializerMethodField()
+
     document_matching = serializers.SerializerMethodField()
     def get_document_matching(self, obj):
         if obj.type == 'FILE':
@@ -2160,7 +2177,12 @@ class DossierSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         if obj.dossier_form is None:
             return None
         return obj.dossier_form.name
+    
+    def get_document_count(self, obj):
+        dossiers = Dossier.objects.filter(path__startswith=obj.path)
+        documents = Document.objects.filter(dossier__in=dossiers)
 
+        return documents.count()
     class Meta:
         model = Dossier
         fields = [
