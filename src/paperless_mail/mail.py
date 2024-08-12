@@ -10,6 +10,7 @@ from datetime import timedelta
 from fnmatch import fnmatch
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import Callable
 from typing import Optional
 from typing import Union
 
@@ -43,6 +44,7 @@ from documents.tasks import consume_file
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
+from paperless_mail.preprocessor import MailMessageDecryptor
 
 # Apple Mail sets multiple IMAP KEYWORD and the general "\Flagged" FLAG
 # imaplib => conn.fetch(b"<message_id>", "FLAGS")
@@ -426,8 +428,11 @@ class MailAccountHandler(LoggingMixin):
 
     logging_name = "paperless_mail"
 
-    def __init__(self) -> None:
+    _message_preprocessors: list[Callable[[MailMessage], MailMessage]] = []
+
+    def __init__(self, *gpgArgs, **gpgkwArgs) -> None:
         super().__init__()
+        self._message_preprocessors.append(MailMessageDecryptor(*gpgArgs, **gpgkwArgs))
         self.renew_logging_group()
 
     def _correspondent_from_name(self, name: str) -> Optional[Correspondent]:
@@ -535,6 +540,11 @@ class MailAccountHandler(LoggingMixin):
 
         return total_processed_files
 
+    def _preprocess_message(self, message: MailMessage):
+        for preprocessor in self._message_preprocessors:
+            message = preprocessor(message)
+        return message
+
     def _handle_mail_rule(
         self,
         M: MailBox,
@@ -613,6 +623,8 @@ class MailAccountHandler(LoggingMixin):
         return total_processed_files
 
     def _handle_message(self, message, rule: MailRule) -> int:
+        message = self._preprocess_message(message)
+
         processed_elements = 0
 
         # Skip Message handling when only attachments are to be processed but
