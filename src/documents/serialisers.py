@@ -700,15 +700,21 @@ class DocumentSerializer(
     created_date = serializers.DateField(required=False)
 
     def get_warehouse_w(self,obj):
-        if obj.warehouse is None:
+        try:
+            if obj.warehouse is None:
+                return None
+            return Warehouse.objects.filter(id=obj.warehouse.parent_warehouse.id).first().parent_warehouse.id
+        except Exception:
             return None
-        return Warehouse.objects.filter(id=obj.warehouse.parent_warehouse.id).first().parent_warehouse.id
     def get_warehouse_s(self,obj):
-        if obj.warehouse is None:
+        try:
+            
+            if obj.warehouse is None:
+                return None
+            return obj.warehouse.parent_warehouse.id
+        except Exception:
             return None
-        if obj.warehouse.parent_warehouse is None:
-            return None
-        return obj.warehouse.parent_warehouse.id
+    
     def to_representation(self, instance):
         value = instance.created
         return value.astimezone(timezone.get_default_timezone()).isoformat()
