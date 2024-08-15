@@ -846,6 +846,41 @@ export class DocumentDetailComponent
     ])
   }
 
+  autoOcrField() {
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Auto OCR Field confirm`
+    modal.componentInstance.messageBold = $localize`This operation will permanently auto OCR Field for this document.`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      this.documentsService
+        .bulkEdit([this.document.id], 'redo_ocr_field', {})
+        .subscribe({
+          next: () => {
+            this.toastService.showInfo(
+              $localize`Auto OCR Field operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.`
+            )
+            if (modal) {
+              modal.close()
+            }
+          },
+          error: (error) => {
+            if (modal) {
+              modal.componentInstance.buttonsEnabled = true
+            }
+            this.toastService.showError(
+              $localize`Error executing operation`,
+              error
+            )
+          },
+        })
+    })
+  }
+  
   redoOcr() {
     let modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',

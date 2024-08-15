@@ -908,6 +908,63 @@ class RasterisedDocumentParser(DocumentParser):
                 self.text = ""
         return data_ocr_fields, form_code
 
+    def parse_field(self, document_path: Path, mime_type, file_name=None):
+        # This forces tesseract to use one core per page.
+        os.environ["OMP_THREAD_LIMIT"] = "1"
+        VALID_TEXT_LENGTH = 50
+        from ocrmypdf import InputFileError
+
+        archive_path = Path(os.path.join(self.tempdir, "archive.pdf"))
+        sidecar_file = Path(os.path.join(self.tempdir, "sidecar.txt"))
+
+        args = self.construct_ocrmypdf_parameters(
+            document_path,
+            mime_type,
+            archive_path,
+            sidecar_file,
+        )
+        data_ocr,data_ocr_fields,form_code = None,None,''
+        try:
+            self.log.debug(f"Calling OCRmyPDF with args: {args}")
+            # ocrmypdf.ocr(**args)
+            data_ocr,data_ocr_fields,form_code = self.ocr_img_or_pdf(document_path, mime_type,**args)
+            if self.settings.skip_archive_file != ArchiveFileChoices.ALWAYS:
+                self.archive_path = archive_path
+
+        except ( InputFileError) as e:
+            self.log.warning(
+                f"Encountered an error while running OCR: {e!s}. "
+                f"Attempting force OCR to get the text.",
+            )
+
+            archive_path_fallback = Path(
+                os.path.join(self.tempdir, "archive-fallback.pdf"),
+            )
+           
+
+            # Attempt to run OCR with safe settings.
+
+            args = self.construct_ocrmypdf_parameters(
+                document_path,
+                mime_type,
+                archive_path_fallback,
+                safe_fallback=True,
+            )
+
+            try:
+                self.log.debug(f"Fallback: Calling OCRmyPDF with args: {args}")
+                # ocrmypdf.ocr(**args)
+                data_ocr,data_ocr_fields,form_code = self.ocr_img_or_pdf(document_path, mime_type,**args)
+
+            except Exception as e:
+                # If this fails, we have a serious issue at hand.
+                raise ParseError(f"{e.__class__.__name__}: {e!s}") from e
+
+        except Exception as e:
+            # Anything else is probably serious.
+            raise ParseError(f"{e.__class__.__name__}: {e!s}") from e
+
+        return data_ocr_fields,form_code
 
 def post_process_text(text):
     if not text:

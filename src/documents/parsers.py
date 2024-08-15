@@ -395,6 +395,9 @@ class DocumentParser(LoggingMixin):
 
     def parse(self, document_path, mime_type, file_name=None):
         raise NotImplementedError
+    
+    def parse_field(self, document_path, mime_type, file_name=None):
+        raise NotImplementedError
 
     def get_archive_path(self):
         return self.archive_path
