@@ -248,6 +248,7 @@ optional arguments:
 -z,  --zip
 -zn, --zip-name
 --data-only
+--no-progress-bar
 --passphrase
 ```
 
@@ -310,6 +311,10 @@ value set in `-zn` or `--zip-name`.
 If `--data-only` is provided, only the database will be exported. This option is intended
 to facilitate database upgrades without needing to clean documents and thumbnails from the media directory.
 
+If `--no-progress-bar` is provided, the progress bar will be hidenn, rendering the 
+exporter quiet. This option is useful for scripting scenarios, such as when using the 
+exporter with `crontab`.
+
 If `--passphrase` is provided, it will be used to encrypt certain fields in the export. This value
 must be provided to import. If this value is lost, the export cannot be imported.
 
@@ -331,11 +336,12 @@ and the script does the rest of the work:
 document_importer source
 ```
 
-| Option         | Required | Default | Description                                                               |
-| -------------- | -------- | ------- | ------------------------------------------------------------------------- |
-| source         | Yes      | N/A     | The directory containing an export                                        |
-| `--data-only`  | No       | False   | If provided, only import data, do not import document files or thumbnails |
-| `--passphrase` | No       | N/A     | If your export was encrypted with a passphrase, must be provided          |
+| Option              | Required | Default | Description                                                               |
+| ------------------- | -------- | ------- | ------------------------------------------------------------------------- |
+| source              | Yes      | N/A     | The directory containing an export                                        |
+| `--no-progress-bar` | No       | False   | If provided, the progress bar will be hidden                              |
+| `--data-only`       | No       | False   | If provided, only import data, do not import document files or thumbnails |
+| `--passphrase`      | No       | N/A     | If your export was encrypted with a passphrase, must be provided          |
 
 When you use the provided docker compose script, put the export inside
 the `export` folder in your paperless source directory. Specify
