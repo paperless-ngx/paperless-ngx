@@ -311,7 +311,7 @@ value set in `-zn` or `--zip-name`.
 If `--data-only` is provided, only the database will be exported. This option is intended
 to facilitate database upgrades without needing to clean documents and thumbnails from the media directory.
 
-If `--no-progress-bar` is provided, the progress bar will be hidenn, rendering the 
+If `--no-progress-bar` is provided, the progress bar will be hidden, rendering the 
 exporter quiet. This option is useful for scripting scenarios, such as when using the 
 exporter with `crontab`.
 
