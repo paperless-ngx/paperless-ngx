@@ -989,7 +989,7 @@ class BulkEditSerializer(
             "set_correspondent",
             "set_document_type",
             "set_storage_path",
-            "set_warehouse"
+            "set_warehouse",
             "set_folder",
             "add_tag",
             "remove_tag",

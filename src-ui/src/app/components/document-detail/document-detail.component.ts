@@ -76,6 +76,7 @@ import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-co
 import { WarehouseService } from 'src/app/services/rest/warehouse.service'
 
 import { DocumentApproval } from 'src/app/data/document-approval'
+import { RouterTestingHarness } from '@angular/router/testing'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -289,7 +290,8 @@ export class DocumentDetailComponent
       //   .listAll()
       //   .pipe(first(), takeUntil(this.unsubscribeNotifier))
       //   .subscribe((result) => (this.warehouses = result.results))
-      console.log("gia tri form", this.documentForm.value)
+      
+      this.warehouseService.clearCache()
       this.warehouseService
         .listAll(null, null, { type__iexact: 'Warehouse' })
         .pipe(first(), takeUntil(this.unsubscribeNotifier))
@@ -1267,7 +1269,9 @@ export class DocumentDetailComponent
   }
 
   modelChangeWarehouse(event){
-    this.warehouseService.list(1,null,null,true,{type:"Shelf",parent_warehouse:event})
+    
+    this.warehouseService.clearCache()
+    this.warehouseService.list(1,null,null,true,{type__iexact:"Shelf",parent_warehouse:event})
       .pipe(first(), takeUntil(this.unsubscribeNotifier))
       .subscribe((result) => {this.shelfs = result.results;
         if (this.documentForm.get("warehouse_w").value==null||!this.shelfs.some(item => item.id === this.documentForm.get("warehouse_s").value)){
@@ -1275,17 +1279,21 @@ export class DocumentDetailComponent
           this.documentForm.get("warehouse").setValue(null);
         }
       })
+      this.shelfs=[]
+      this.boxcases=[]
     
     }
   modelChangeShelf(event){
       // this.documentForm.get("warehouse").setValue(null)
-      this.warehouseService.list(1,null,null,true,{type:"Boxcase",parent_warehouse:event})
-        .pipe(first(), takeUntil(this.unsubscribeNotifier))
-        .subscribe((result) => {this.boxcases = result.results;
-          if (this.documentForm.get("warehouse_s").value==null||!this.boxcases.some(item => item.id === this.documentForm.get("warehouse").value)){
-            this.documentForm.get("warehouse").setValue(null)
-          }
-        })
+      this.warehouseService.clearCache()
+      this.warehouseService.list(1,null,null,true,{type__iexact:"Boxcase",parent_warehouse:event})
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .subscribe((result) => {this.boxcases = result.results;
+        if (this.documentForm.get("warehouse_s").value==null||!this.boxcases.some(item => item.id === this.documentForm.get("warehouse").value)){
+          this.documentForm.get("warehouse").setValue(null)
+        }
+      })
+      this.boxcases=[]
 
     
   }

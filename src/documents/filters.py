@@ -98,11 +98,12 @@ class ObjectFilter(Filter):
 
 
 class WarehouseFilter(Filter):
-    def __init__(self, exclude=False, in_list=False, field_name=""):
+    def __init__(self, exclude=False, in_list=False, field_name="",isnull=False):
         super().__init__()
         self.exclude = exclude
         self.in_list = in_list
         self.field_name = field_name
+        self.isnull = isnull
 
     def filter(self, qs, value):
         if not value:
@@ -297,6 +298,18 @@ class DocumentFilterSet(FilterSet):
     warehouse__id__none = WarehouseFilter(field_name="warehouse", exclude=True)
     
     warehouse__id__in = WarehouseFilter(field_name="warehouse", in_list=True)
+    
+    warehouse_s__isnull = WarehouseFilter(field_name="warehouse", isnull=True)
+
+    warehouse_s__id__none = WarehouseFilter(field_name="warehouse", exclude=True)
+    
+    warehouse_s__id__in = WarehouseFilter(field_name="warehouse", in_list=True)
+    
+    warehouse_w__isnull = WarehouseFilter(field_name="warehouse", isnull=True)
+
+    warehouse_w__id__none = WarehouseFilter(field_name="warehouse", exclude=True)
+    
+    warehouse_w__id__in = WarehouseFilter(field_name="warehouse", in_list=True)
     
     folder__id__none = FolderFilter(field_name="folder", exclude=True)
     

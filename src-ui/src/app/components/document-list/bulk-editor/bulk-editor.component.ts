@@ -60,6 +60,11 @@ export class BulkEditorComponent
   documentTypes: DocumentType[]
   storagePaths: StoragePath[]
   warehouses: Warehouse[]
+  shelfs: Warehouse[]
+  boxcases: Warehouse[]
+  select_warehouse:any = null
+  select_shelf:any = null
+
 
 
   tagSelectionModel = new FilterableDropdownSelectionModel()
@@ -67,11 +72,15 @@ export class BulkEditorComponent
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
   storagePathsSelectionModel = new FilterableDropdownSelectionModel()
   warehouseSelectionModel = new FilterableDropdownSelectionModel()
+  shelfSelectionModel = new FilterableDropdownSelectionModel()
+  boxcaseSelectionModel = new FilterableDropdownSelectionModel()
   tagDocumentCounts: SelectionDataItem[]
   correspondentDocumentCounts: SelectionDataItem[]
   documentTypeDocumentCounts: SelectionDataItem[]
   storagePathDocumentCounts: SelectionDataItem[]
   warehouseDocumentCounts: SelectionDataItem[]
+  shelfDocumentCounts: SelectionDataItem[]
+  boxcaseDocumentCounts: SelectionDataItem[]
   awaitingDownload: boolean
 
   unsubscribeNotifier: Subject<any> = new Subject()
@@ -181,8 +190,13 @@ export class BulkEditorComponent
         PermissionType.Warehouse
       )
     ) {
-      this.warehouseService
-        .listAll()
+      this.warehouseService.list(1,null,null,true,{type__iexact:"Boxcase"})
+        .pipe(first())
+        .subscribe((result) => (this.boxcases = result.results))
+      this.warehouseService.list(1,null,null,true,{type__iexact:"Shelf"})
+        .pipe(first())
+        .subscribe((result) => (this.shelfs = result.results))
+      this.warehouseService.list(1,null,null,true,{type__iexact:"Warehouse"})
         .pipe(first())
         .subscribe((result) => (this.warehouses = result.results))
     }
@@ -326,6 +340,30 @@ export class BulkEditorComponent
         this.applySelectionData(
           s.selected_warehouses,
           this.warehouseSelectionModel
+        )
+      })
+  }
+  openShelfDropdown() {
+    this.documentService
+      .getSelectionData(Array.from(this.list.selected))
+      .pipe(first())
+      .subscribe((s) => {
+        this.shelfDocumentCounts = s.selected_shelfs
+        this.applySelectionData(
+          s.selected_shelfs,
+          this.shelfSelectionModel
+        )
+      })
+  }
+  openBoxcaseDropdown() {
+    this.documentService
+      .getSelectionData(Array.from(this.list.selected))
+      .pipe(first())
+      .subscribe((s) => {
+        this.boxcaseDocumentCounts = s.selected_boxcases
+        this.applySelectionData(
+          s.selected_boxcases,
+          this.boxcaseSelectionModel
         )
       })
   }
@@ -527,27 +565,27 @@ export class BulkEditorComponent
     }
   }
 
-  setWarehouses(changedDocumentPaths: ChangedItems) {
+  setBoxcases(changedShelf: ChangedItems) {
     if (
-      changedDocumentPaths.itemsToAdd.length == 0 &&
-      changedDocumentPaths.itemsToRemove.length == 0
+      changedShelf.itemsToAdd.length == 0 &&
+      changedShelf.itemsToRemove.length == 0
     )
       return
 
-    let warehouse =
-      changedDocumentPaths.itemsToAdd.length > 0
-        ? changedDocumentPaths.itemsToAdd[0]
+    let boxcase =
+      changedShelf.itemsToAdd.length > 0
+        ? changedShelf.itemsToAdd[0]
         : null
 
     if (this.showConfirmationDialogs) {
       let modal = this.modalService.open(ConfirmDialogComponent, {
         backdrop: 'static',
       })
-      modal.componentInstance.title = $localize`Confirm warehouse assignment`
-      if (warehouse) {
-        modal.componentInstance.message = $localize`This operation will assign the warehouse "${warehouse.name}" to ${this.list.selected.size} selected document(s).`
+      modal.componentInstance.title = $localize`Confirm boxcase assignment`
+      if (boxcase) {
+        modal.componentInstance.message = $localize`This operation will assign the boxcase "${boxcase.name}" to ${this.list.selected.size} selected document(s).`
       } else {
-        modal.componentInstance.message = $localize`This operation will remove the warehouse from ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will remove the boxcase from ${this.list.selected.size} selected document(s).`
       }
       modal.componentInstance.btnClass = 'btn-warning'
       modal.componentInstance.btnCaption = $localize`Confirm`
@@ -555,14 +593,49 @@ export class BulkEditorComponent
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
           this.executeBulkOperation(modal, 'set_warehouse', {
-            warehouse: warehouse ? warehouse.id : null,
+            warehouse: boxcase ? boxcase.id : null,
           })
         })
     } else {
       this.executeBulkOperation(null, 'set_warehouse', {
-        warehouse: warehouse ? warehouse.id : null,
+        warehouse: boxcase ? boxcase.id : null,
       })
     }
+  }
+  setWarehouses(changedWarehouse: ChangedItems) {
+    if (
+      changedWarehouse.itemsToAdd.length == 0 &&
+      changedWarehouse.itemsToRemove.length == 0
+    )
+      return
+
+    let objWarehouse =
+    changedWarehouse.itemsToAdd.length > 0
+        ? changedWarehouse.itemsToAdd[0]
+        : null
+    this.select_warehouse=objWarehouse?.id
+    // this.warehouseService.clearCache()
+    this.warehouseService.list(1,null,null,true,{type__iexact:"Shelf",parent_warehouse:this.select_warehouse})
+        .pipe(first())
+        .subscribe((result) => (this.shelfs = result.results))    
+  }
+
+  setShelfs(changedShelf: ChangedItems) {
+    if (
+      changedShelf.itemsToAdd.length == 0 &&
+      changedShelf.itemsToRemove.length == 0
+    )
+      return
+
+    let objShelf =
+      changedShelf.itemsToAdd.length > 0
+        ? changedShelf.itemsToAdd[0]
+        : null
+    this.select_shelf=objShelf?.id
+    this.warehouseService.list(1,null,null,true,{type__iexact:"Boxcase",parent_warehouse:this.select_shelf})
+    .pipe(first())
+    .subscribe((result) => (this.boxcases = result.results))    
+    
   }
 
   createTag(name: string) {
@@ -617,16 +690,16 @@ export class BulkEditorComponent
     modal.componentInstance.object = { name }
     modal.componentInstance.succeeded
       .pipe(
-        switchMap((newWarehouse) => {
+        switchMap((newBoxcase) => {
           return this.warehouseService
             .listAll()
-            .pipe(map((warehouses) => ({ newWarehouse, warehouses })))
+            .pipe(map((boxcases) => ({ newBoxcase, boxcases })))
         })
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(({ newWarehouse, warehouses }) => {
-        this.warehouses = warehouses.results
-        this.warehouseSelectionModel.toggle(newWarehouse.id)
+      .subscribe(({ newBoxcase, boxcases }) => {
+        this.boxcases = boxcases.results
+        this.boxcaseSelectionModel.toggle(newBoxcase.id)
       })
   }
 
