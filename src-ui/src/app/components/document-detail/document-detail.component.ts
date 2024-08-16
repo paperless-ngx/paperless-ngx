@@ -293,8 +293,7 @@ export class DocumentDetailComponent
       this.warehouseService
         .listAll(null, null, { type__iexact: 'Warehouse' })
         .pipe(first(), takeUntil(this.unsubscribeNotifier))
-        .subscribe((result) => {this.warehouses = result.results;
-        })
+        .subscribe((result) => {this.warehouses = result.results;})
       // this.warehouseService
       //   .listGia(1,
       //     null,
@@ -1223,33 +1222,26 @@ export class DocumentDetailComponent
   }
 
   modelChangeWarehouse(event){
+    this.warehouseService.list(1,null,null,true,{type:"Shelf",parent_warehouse:event})
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .subscribe((result) => {this.shelfs = result.results;
+        if (this.documentForm.get("warehouse_w").value==null||!this.shelfs.some(item => item.id === this.documentForm.get("warehouse_s").value)){
+          this.documentForm.get("warehouse_s").setValue(null);
+          this.documentForm.get("warehouse").setValue(null);
+        }
+      })
     
-    console.log("form", this.documentForm.value,this.boxcases)
-    if (this.documentForm.get("warehouse_s").value){
-      // this.documentForm.get("warehouse_s").setValue(null)
-      // this.documentForm.get("warehouse").setValue(null)
     }
-    this.shelfs = []
-    this.boxcases = []
-    if(event){
-      this.warehouseService.list(1,null,null,true,{type:"Shelf",parent_warehouse:event})
-        .pipe(first(), takeUntil(this.unsubscribeNotifier))
-        .subscribe((result) => {this.shelfs = result.results;})
-    }
-  }
   modelChangeShelf(event){
-    if (this.documentForm.get("warehouse").value){
-      // this.documentForm.get("warehouse_s").setValue(null)
-     
-    }
-   
-    if (event){
       // this.documentForm.get("warehouse").setValue(null)
-      this.boxcases = [] 
       this.warehouseService.list(1,null,null,true,{type:"Boxcase",parent_warehouse:event})
         .pipe(first(), takeUntil(this.unsubscribeNotifier))
-        .subscribe((result) => {this.boxcases = result.results;})
+        .subscribe((result) => {this.boxcases = result.results;
+          if (this.documentForm.get("warehouse_s").value==null||!this.boxcases.some(item => item.id === this.documentForm.get("warehouse").value)){
+            this.documentForm.get("warehouse").setValue(null)
+          }
+        })
 
-    }
+    
   }
 }
