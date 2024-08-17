@@ -1,22 +1,53 @@
+import abc
 from email import message_from_bytes
 from email import policy
 from email.message import Message
 
+from django.conf import settings
 from gnupg import GPG
 from imap_tools import MailMessage
 
 from documents.loggers import LoggingMixin
 
 
-class MailMessageDecryptor(LoggingMixin):
+class MailMessagePreprocessor(abc.ABC):
+    """
+    Defines the interface for preprocessors that alter messages before they are handled in MailAccountHandler
+    """
+
+    NAME: str = "MailMessagePreprocessor"
+
+    @staticmethod
+    @abc.abstractmethod
+    def able_to_run() -> bool:
+        """
+        Return True if the conditions are met for the preprocessor to run, False otherwise
+
+        If False, run(message) will not be called
+        """
+
+    @abc.abstractmethod
+    def run(self, message: MailMessage) -> MailMessage:
+        """
+        Performs the actual preprocessing task
+        """
+
+
+class MailMessageDecryptor(MailMessagePreprocessor, LoggingMixin):
     logging_name = "paperless_mail_message_decryptor"
 
-    def __init__(self, *args, **kwargs):
+    NAME = "MailMessageDecryptor"
+
+    def __init__(self):
         super().__init__()
         self.renew_logging_group()
-        self._gpg = GPG(*args, **kwargs)
+        self._gpg = GPG(gnupghome=settings.EMAIL_GNUPG_HOME)
 
-    def __call__(self, message: MailMessage) -> MailMessage:
+    @staticmethod
+    def able_to_run() -> bool:
+        return settings.EMAIL_ENABLE_GPG_DECRYPTOR
+
+    def run(self, message: MailMessage) -> MailMessage:
         if not hasattr(message, "obj"):
             self.log.debug("Message does not have 'obj' attribute")
             return message

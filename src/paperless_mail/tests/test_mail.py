@@ -16,6 +16,7 @@ import pytest
 from django.core.management import call_command
 from django.db import DatabaseError
 from django.test import TestCase
+from django.test import override_settings
 from imap_tools import NOT
 from imap_tools import EmailAddress
 from imap_tools import FolderInfo
@@ -273,10 +274,11 @@ class TestMail(
         self.reset_bogus_mailbox()
 
         self.messageEncryptor = MessageEncryptor()
-
-        self.mail_account_handler = MailAccountHandler(
-            gnupghome=self.messageEncryptor.gpg_home,
-        )
+        with override_settings(
+            EMAIL_GNUPG_HOME=self.messageEncryptor.gpg_home,
+            EMAIL_ENABLE_GPG_DECRYPTOR=True,
+        ):
+            self.mail_account_handler = MailAccountHandler()
 
         super().setUp()
 
@@ -1368,10 +1370,13 @@ class TestMail(
         self.assertEqual(encrypted_message.attachments[0].filename, "encrypted.asc")
         self.assertEqual(encrypted_message.text, "")
 
-        message_decryptor = MailMessageDecryptor(
-            gnupghome=self.messageEncryptor.gpg_home,
-        )
-        decrypted_message = message_decryptor(encrypted_message)
+        with override_settings(
+            EMAIL_ENABLE_GPG_DECRYPTOR=True,
+            EMAIL_GNUPG_HOME=self.messageEncryptor.gpg_home,
+        ):
+            message_decryptor = MailMessageDecryptor()
+            self.assertTrue(message_decryptor.able_to_run())
+            decrypted_message = message_decryptor.run(encrypted_message)
 
         self.assertEqual(len(decrypted_message.attachments), 2)
         self.assertEqual(decrypted_message.attachments[0].filename, "f1.pdf")

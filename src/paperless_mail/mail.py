@@ -10,7 +10,6 @@ from datetime import timedelta
 from fnmatch import fnmatch
 from pathlib import Path
 from typing import TYPE_CHECKING
-from typing import Callable
 from typing import Optional
 from typing import Union
 
@@ -45,6 +44,7 @@ from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
 from paperless_mail.preprocessor import MailMessageDecryptor
+from paperless_mail.preprocessor import MailMessagePreprocessor
 
 # Apple Mail sets multiple IMAP KEYWORD and the general "\Flagged" FLAG
 # imaplib => conn.fetch(b"<message_id>", "FLAGS")
@@ -428,12 +428,22 @@ class MailAccountHandler(LoggingMixin):
 
     logging_name = "paperless_mail"
 
-    _message_preprocessors: list[Callable[[MailMessage], MailMessage]] = []
+    _message_preprocessor_types: list[type[MailMessagePreprocessor]] = [
+        MailMessageDecryptor,
+    ]
 
-    def __init__(self, *gpgArgs, **gpgkwArgs) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self._message_preprocessors.append(MailMessageDecryptor(*gpgArgs, **gpgkwArgs))
         self.renew_logging_group()
+        self._init_preprocessors()
+
+    def _init_preprocessors(self):
+        self._message_preprocessors: list[MailMessagePreprocessor] = []
+        for preprocessor_type in self._message_preprocessor_types:
+            if preprocessor_type.able_to_run():
+                self._message_preprocessors.append(preprocessor_type())
+            else:
+                self.log.debug(f"Skipping mail preprocessor {preprocessor_type.NAME}")
 
     def _correspondent_from_name(self, name: str) -> Optional[Correspondent]:
         try:
@@ -542,7 +552,7 @@ class MailAccountHandler(LoggingMixin):
 
     def _preprocess_message(self, message: MailMessage):
         for preprocessor in self._message_preprocessors:
-            message = preprocessor(message)
+            message = preprocessor.run(message)
         return message
 
     def _handle_mail_rule(
