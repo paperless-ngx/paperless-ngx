@@ -690,3 +690,58 @@ More details about configuration option for various providers can be found in th
 
 Once external auth is set up, 'regular' login can be disabled with the [PAPERLESS_DISABLE_REGULAR_LOGIN](configuration.md#PAPERLESS_DISABLE_REGULAR_LOGIN) setting and / or users can be automatically
 redirected with the [PAPERLESS_REDIRECT_LOGIN_TO_SSO](configuration.md#PAPERLESS_REDIRECT_LOGIN_TO_SSO) setting.
+
+## Decryption of encrypted emails before consumption
+
+Paperless-ngx can be configured to decrypt gpg encrypted emails before consumption.
+
+### Requirements
+
+You need a recent version of `gpg-agent >= 2.1.1` installed on your host.
+Your host needs to be setup for decrypting your emails via `gpg-agent`, see this [tutorial](https://www.digitalocean.com/community/tutorials/how-to-use-gpg-to-encrypt-and-sign-messages#encrypt-and-decrypt-messages-with-gpg) for instance.
+Test your setup and make sure that you can encrypt and decrypt files using your key
+
+```
+gpg --encrypt --armor -r person@email.com name_of_file
+gpg --decrypt name_of_file.asc
+```
+
+### Setting up docker-compose file
+
+Add the following variable to your `docker-compose.env` file:
+
+```conf.
+PAPERLESS_GPG_DECRYPTOR=True
+```
+
+Determine your local `gpg-agent.extra` socket by invoking
+
+```
+gpgconf --list-dir agent-extra-socket
+```
+
+on your host. A possible output is `~/.gnupg/S.gpg-agent.extra`.
+Also find the location of your public keyring.
+
+Add the following volume mounts to your `docker-compose.yml` file:
+
+```yaml
+webserver:
+  volumes:
+    - /home/user/.gnupg/pubring.gpg:/usr/src/paperless/.gnupg/pubring.gpg
+    - <path to gpg-agent.extra socket>:/usr/src/paperless/.gnupg/S.gpg-agent
+```
+
+### Troubleshooting
+
+- Make sure, that `gpg-agent` is running on your host machine
+- Make sure, that encryption and decryption works from inside the container using the `gpg` commands from above.
+- Check that all files in `/usr/src/paperless/.gnupg` have correct permissions
+
+```shell
+paperless@9da1865df327:~/.gnupg$ ls -al
+drwx------ 1 paperless paperless   4096 Aug 18 17:52 .
+drwxr-xr-x 1 paperless paperless   4096 Aug 18 17:52 ..
+srw------- 1 paperless paperless      0 Aug 18 17:22 S.gpg-agent
+-rw------- 1 paperless paperless 147940 Jul 24 10:23 pubring.gpg
+```
