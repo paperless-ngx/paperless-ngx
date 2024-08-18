@@ -293,7 +293,17 @@ export class DocumentDetailComponent
       this.warehouseService
         .listAll(null, null, { type__iexact: 'Warehouse' })
         .pipe(first(), takeUntil(this.unsubscribeNotifier))
-        .subscribe((result) => {this.warehouses = result.results;})
+        .subscribe((result) => {this.warehouses = result.results;this.shelfs = []; this.boxcases=[]})
+      // this.warehouseService.clearCache()
+      // this.warehouseService
+      //   .listAll(null, null, { type__iexact: 'Shelf' })
+      //   .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      //   .subscribe((result) => {this.shelfs = result.results;})
+      // this.warehouseService.clearCache()
+      // this.warehouseService
+      //   .listAll(null, null, { type__iexact: 'Boxcase' })
+      //   .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      //   .subscribe((result) => {this.boxcases = result.results;})
       // this.warehouseService
       //   .listGia(1,
       //     null,
