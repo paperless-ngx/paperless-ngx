@@ -269,7 +269,7 @@ def update_document_archive_file(document_id):
                             ],
                         },
                         additional_data={
-                            "reason": "Redo OCR called",
+                            "reason": "Update document archive file",
                         },
                         action=LogEntry.Action.UPDATE,
                     )
