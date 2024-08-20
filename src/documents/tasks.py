@@ -47,8 +47,6 @@ from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
 
 if settings.AUDIT_LOG_ENABLED:
-    import json
-
     from auditlog.models import LogEntry
 logger = logging.getLogger("paperless.tasks")
 
@@ -259,24 +257,20 @@ def update_document_archive_file(document_id):
                 if settings.AUDIT_LOG_ENABLED:
                     LogEntry.objects.log_create(
                         instance=oldDocument,
-                        changes=json.dumps(
-                            {
-                                "content": [oldDocument.content, newDocument.content],
-                                "archive_checksum": [
-                                    oldDocument.archive_checksum,
-                                    newDocument.archive_checksum,
-                                ],
-                                "archive_filename": [
-                                    oldDocument.archive_filename,
-                                    newDocument.archive_filename,
-                                ],
-                            },
-                        ),
-                        additional_data=json.dumps(
-                            {
-                                "reason": "Redo OCR called",
-                            },
-                        ),
+                        changes={
+                            "content": [oldDocument.content, newDocument.content],
+                            "archive_checksum": [
+                                oldDocument.archive_checksum,
+                                newDocument.archive_checksum,
+                            ],
+                            "archive_filename": [
+                                oldDocument.archive_filename,
+                                newDocument.archive_filename,
+                            ],
+                        },
+                        additional_data={
+                            "reason": "Update document archive file",
+                        },
                         action=LogEntry.Action.UPDATE,
                     )
 
