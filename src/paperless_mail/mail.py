@@ -440,10 +440,18 @@ class MailAccountHandler(LoggingMixin):
     def _init_preprocessors(self):
         self._message_preprocessors: list[MailMessagePreprocessor] = []
         for preprocessor_type in self._message_preprocessor_types:
-            if preprocessor_type.able_to_run():
+            self._init_preprocessor(preprocessor_type)
+
+    def _init_preprocessor(self, preprocessor_type):
+        if preprocessor_type.able_to_run():
+            try:
                 self._message_preprocessors.append(preprocessor_type())
-            else:
-                self.log.debug(f"Skipping mail preprocessor {preprocessor_type.NAME}")
+            except Exception as e:
+                self.log.warning(
+                    f"Error while initializing preprocessor {preprocessor_type.NAME}: {e}",
+                )
+        else:
+            self.log.debug(f"Skipping mail preprocessor {preprocessor_type.NAME}")
 
     def _correspondent_from_name(self, name: str) -> Optional[Correspondent]:
         try:
