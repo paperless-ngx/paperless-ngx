@@ -193,31 +193,9 @@ def fake_magic_from_buffer(buffer, mime=False):
         return "Some verbose file description"
 
 
-@mock.patch("paperless_mail.mail.magic.from_buffer", fake_magic_from_buffer)
-class TestMail(
-    DirectoriesMixin,
-    FileSystemAssertsMixin,
-    TestCase,
-):
-    def setUp(self):
+class MessageBuilder:
+    def __init__(self):
         self._used_uids = set()
-
-        self.bogus_mailbox = BogusMailBox()
-
-        patcher = mock.patch("paperless_mail.mail.MailBox")
-        m = patcher.start()
-        m.return_value = self.bogus_mailbox
-        self.addCleanup(patcher.stop)
-
-        patcher = mock.patch("paperless_mail.mail.queue_consumption_tasks")
-        self._queue_consumption_tasks_mock = patcher.start()
-        self.addCleanup(patcher.stop)
-
-        self.reset_bogus_mailbox()
-
-        self.mail_account_handler = MailAccountHandler()
-
-        super().setUp()
 
     def create_message(
         self,
@@ -284,11 +262,37 @@ class TestMail(
 
         return imap_msg
 
+
+@mock.patch("paperless_mail.mail.magic.from_buffer", fake_magic_from_buffer)
+class TestMail(
+    DirectoriesMixin,
+    FileSystemAssertsMixin,
+    TestCase,
+):
+    def setUp(self):
+        self.bogus_mailbox = BogusMailBox()
+        self.messageBuilder = MessageBuilder()
+
+        patcher = mock.patch("paperless_mail.mail.MailBox")
+        m = patcher.start()
+        m.return_value = self.bogus_mailbox
+        self.addCleanup(patcher.stop)
+
+        patcher = mock.patch("paperless_mail.mail.queue_consumption_tasks")
+        self._queue_consumption_tasks_mock = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        self.reset_bogus_mailbox()
+
+        self.mail_account_handler = MailAccountHandler()
+
+        super().setUp()
+
     def reset_bogus_mailbox(self):
         self.bogus_mailbox.messages = []
         self.bogus_mailbox.messages_spam = []
         self.bogus_mailbox.messages.append(
-            self.create_message(
+            self.messageBuilder.create_message(
                 subject="Invoice 1",
                 from_="amazon@amazon.de",
                 to=["me@myselfandi.com", "helpdesk@mydomain.com"],
@@ -299,7 +303,7 @@ class TestMail(
             ),
         )
         self.bogus_mailbox.messages.append(
-            self.create_message(
+            self.messageBuilder.create_message(
                 subject="Invoice 2",
                 body="from my favorite electronic store",
                 to=["invoices@mycompany.com"],
@@ -309,7 +313,7 @@ class TestMail(
             ),
         )
         self.bogus_mailbox.messages.append(
-            self.create_message(
+            self.messageBuilder.create_message(
                 subject="Claim your $10M price now!",
                 from_="amazon@amazon-some-indian-site.org",
                 to="special@me.me",
@@ -400,7 +404,7 @@ class TestMail(
         self.assertEqual(handler._get_title(message, att, rule), None)
 
     def test_handle_message(self):
-        message = self.create_message(
+        message = self.messageBuilder.create_message(
             subject="the message title",
             from_="Myself",
             attachments=2,
@@ -440,7 +444,7 @@ class TestMail(
         self.assertEqual(result, 0)
 
     def test_handle_unknown_mime_type(self):
-        message = self.create_message(
+        message = self.messageBuilder.create_message(
             attachments=[
                 _AttachmentDef(filename="f1.pdf"),
                 _AttachmentDef(
@@ -469,7 +473,7 @@ class TestMail(
         )
 
     def test_handle_disposition(self):
-        message = self.create_message(
+        message = self.messageBuilder.create_message(
             attachments=[
                 _AttachmentDef(
                     filename="f1.pdf",
@@ -497,7 +501,7 @@ class TestMail(
         )
 
     def test_handle_inline_files(self):
-        message = self.create_message(
+        message = self.messageBuilder.create_message(
             attachments=[
                 _AttachmentDef(
                     filename="f1.pdf",
@@ -537,7 +541,7 @@ class TestMail(
             - Mail action should not be performed for files excluded
             - Mail action should be performed for files included
         """
-        message = self.create_message(
+        message = self.messageBuilder.create_message(
             attachments=[
                 _AttachmentDef(filename="f1.pdf"),
                 _AttachmentDef(filename="f2.pdf"),
@@ -649,7 +653,7 @@ class TestMail(
         THEN:
             - Mail action should not be performed
         """
-        message = self.create_message(
+        message = self.messageBuilder.create_message(
             attachments=[
                 _AttachmentDef(
                     filename="test.png",
