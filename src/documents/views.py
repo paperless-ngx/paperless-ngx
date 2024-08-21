@@ -1201,14 +1201,16 @@ class GlobalSearchView(PassUserMixin):
                 from documents import index
 
                 with index.open_index_searcher() as s:
-                    q, _ = index.DelayedFullTextQuery(
+                    fts_query = index.DelayedFullTextQuery(
                         s,
                         request.query_params,
-                        10,
+                        OBJECT_LIMIT,
                         filter_queryset=all_docs,
-                    )._get_query()
-                    results = s.search(q, limit=OBJECT_LIMIT)
-                    docs = docs | all_docs.filter(id__in=[r["id"] for r in results])
+                    )
+                    results = fts_query[0:1]
+                    docs = docs | Document.objects.filter(
+                        id__in=[r["id"] for r in results],
+                    )
             docs = docs[:OBJECT_LIMIT]
         saved_views = (
             SavedView.objects.filter(owner=request.user, name__icontains=query)

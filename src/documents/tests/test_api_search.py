@@ -15,6 +15,7 @@ from rest_framework.test import APITestCase
 from whoosh.writing import AsyncWriter
 
 from documents import index
+from documents.bulk_edit import set_permissions
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -1159,7 +1160,8 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             [d3.id, d2.id, d1.id],
         )
 
-    def test_global_search(self):
+    @mock.patch("documents.bulk_edit.bulk_update_documents")
+    def test_global_search(self, m):
         """
         GIVEN:
             - Multiple documents and objects
@@ -1186,11 +1188,38 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             checksum="C",
             pk=3,
         )
+        # The below two documents are owned by user2 and shouldn't show up in results!
+        d4 = Document.objects.create(
+            title="doc 4 owned by user2",
+            content="bank bank bank bank 4",
+            checksum="D",
+            pk=4,
+        )
+        d5 = Document.objects.create(
+            title="doc 5 owned by user2",
+            content="bank bank bank bank 5",
+            checksum="E",
+            pk=5,
+        )
+
+        user1 = User.objects.create_user("bank user1")
+        user2 = User.objects.create_superuser("user2")
+        group1 = Group.objects.create(name="bank group1")
+        Group.objects.create(name="group2")
+
+        user1.user_permissions.add(
+            *Permission.objects.filter(codename__startswith="view_").exclude(
+                content_type__app_label="admin",
+            ),
+        )
+        set_permissions([4, 5], set_permissions=[], owner=user2, merge=False)
 
         with index.open_index_writer() as writer:
             index.update_document(writer, d1)
             index.update_document(writer, d2)
             index.update_document(writer, d3)
+            index.update_document(writer, d4)
+            index.update_document(writer, d5)
 
         correspondent1 = Correspondent.objects.create(name="bank correspondent 1")
         Correspondent.objects.create(name="correspondent 2")
@@ -1200,10 +1229,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         StoragePath.objects.create(name="path 2", path="path2")
         tag1 = Tag.objects.create(name="bank tag1")
         Tag.objects.create(name="tag2")
-        user1 = User.objects.create_superuser("bank user1")
-        User.objects.create_user("user2")
-        group1 = Group.objects.create(name="bank group1")
-        Group.objects.create(name="group2")
+
         SavedView.objects.create(
             name="bank view",
             show_on_dashboard=True,
