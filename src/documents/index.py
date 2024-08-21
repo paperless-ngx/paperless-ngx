@@ -121,7 +121,6 @@ def open_index_searcher() -> Searcher:
 
 
 def update_document(writer: AsyncWriter, doc: Document):
-    logger.debug(f"Updating index for document {doc.pk}")
     tags = ",".join([t.name for t in doc.tags.all()])
     tags_ids = ",".join([str(t.id) for t in doc.tags.all()])
     notes = ",".join([str(c.note) for c in Note.objects.filter(document=doc)])
