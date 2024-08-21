@@ -35,7 +35,7 @@ export class DossierFormCustomFieldSelectComponent
 {
 
   @Input()
-  title: string = 'Custom field'
+  title: string = ''
   
   @Input()
   error: string

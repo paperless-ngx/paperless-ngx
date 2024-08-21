@@ -34,7 +34,7 @@ export class CustomFieldSelectComponent
 {
 
   @Input()
-  title: string = 'Custom field'
+  title: string = ''
   
   @Input()
   error: string
