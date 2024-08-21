@@ -185,18 +185,6 @@ class ApplicationConfiguration(AbstractSingletonModel):
         upload_to="logo/",
     )
 
-    username_ocr = models.CharField(max_length=255, null=True, blank=True)
-
-    password_ocr = models.CharField(max_length=255, null=True, blank=True)
-
-    username_ocr_field = models.CharField(max_length=255, null=True, blank=True)
-
-    password_ocr_field = models.CharField(max_length=255, null=True, blank=True)
-
-    api_ocr = models.JSONField(null=True)
-
-    api_ocr_field = models.JSONField(null=True)
-
     class Meta:
         verbose_name = _("paperless application settings")
 
