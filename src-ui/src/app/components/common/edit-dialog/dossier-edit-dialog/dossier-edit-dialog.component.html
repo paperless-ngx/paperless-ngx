@@ -11,8 +11,8 @@
     <div class="row">
       <div class="col-md-4">
         <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
-        <pngx-input-select i18n-title title="Type" [items]="DOSSIER_TYPES_OPTIONS" bindLabel="label" formControlName="type" (ngModelChange)="onDataInputChange($event)" [allowNull]="true" ></pngx-input-select>
-        <pngx-input-select i18n-title title="Dossier Form" [items]="dossierArray" bindLabel="name" formControlName="dossier_form" (ngModelChange)="onDataInputParentDossierTypeChange($event)" [allowNull]="true" ></pngx-input-select>
+        <pngx-input-select i18n-title title="Type" [items]="DOSSIER_TYPES_OPTIONS" bindLabel="label" formControlName="type" (ngModelChange)="onDataInputChange($event)" [allowNull]="true" [hidden]="object?.type=='FILE'" ></pngx-input-select>
+        <pngx-input-select i18n-title title="Dossier Form" [items]="dossierArray" bindLabel="name" formControlName="dossier_form" (ngModelChange)="onDataInputParentDossierTypeChange($event)" [allowNull]="true" [hidden]="object?.type=='FILE'" ></pngx-input-select>
         
         <div *pngxIfOwner="object">
           <pngx-permissions-form [users]="users" accordion="true" formControlName="permissions_form"></pngx-permissions-form>

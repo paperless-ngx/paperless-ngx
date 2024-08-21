@@ -75,7 +75,7 @@
             </pngx-filterable-dropdown>
           }
           @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.Warehouse)) {
-            <pngx-filterable-dropdown title="Warehouse" icon="warehouse-fill" i18n-title
+            <pngx-filterable-dropdown title="Warehouse" icon="folder-fill" i18n-title
               filterPlaceholder="Filter warehouses" i18n-filterPlaceholder
               [items]="warehouses"
               [disabled]="!userCanEditAll"

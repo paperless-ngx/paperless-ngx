@@ -29,12 +29,7 @@ export class DossierEditDialogComponent
       label: $localize`Dossier`,
       id: DossierType.Dossier,
     },
-    {
-      label: $localize`File`,
-      id: DossierType.File,
-    },
-  
-  
+   
   ]
   private unsubscribeNotifier: Subject<any> = new Subject()
   dossierArray: Dossier[]=[]
@@ -70,7 +65,7 @@ export class DossierEditDialogComponent
     if (this.typeFieldDisabled) {
     }
     if(this.object){
-      console.log(this.object)
+      // console.log(this.object)
 
       this.dataCustomFields=this.object.custom_fields
     }
@@ -116,10 +111,7 @@ export class DossierEditDialogComponent
     if (dossierSelect) {
       this.dataCustomFields = dossierSelect.custom_fields
       // this.getFormOrigin().patchValue({ custom_fields: this.dataFromCustomFields });
-    } else {
-      console.log("Object not found.");
-    }
-  
+    } 
 
   }
   onDataChange(data) {

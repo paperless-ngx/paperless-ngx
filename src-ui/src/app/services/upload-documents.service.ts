@@ -35,7 +35,7 @@ export class UploadDocumentsService {
   }
 
   private uploadFile(file: File, payload) {
-    console.log("payload",payload)
+    // console.log("payload",payload)
     let formData = new FormData()
     formData.append('document', file, file.name)
     if (payload?.folder!='' && payload?.folder!=undefined){

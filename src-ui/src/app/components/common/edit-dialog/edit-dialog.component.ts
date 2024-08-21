@@ -130,7 +130,7 @@ export abstract class EditDialogComponent<
   }
  
   setFormOrigin(objectForm){
-    console.log('gia tri gan',objectForm)
+    // console.log('gia tri gan',objectForm)
     return this.objectForm=objectForm
   }
  
@@ -149,7 +149,7 @@ export abstract class EditDialogComponent<
   save() {
     this.error = null
     const formValues = Object.assign({}, this.objectForm.value)
-    console.log('gia tri form values',formValues)
+    // console.log('gia tri form values',formValues)
     const permissionsObject: PermissionsFormObject =
       this.objectForm.get('permissions_form')?.value
     if (permissionsObject) {

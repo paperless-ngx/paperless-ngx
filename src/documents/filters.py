@@ -94,7 +94,8 @@ class ObjectFilter(Filter):
 
         return qs
 
-class WarehouseFilter(Filter):
+
+class DossierFilter(Filter):
     def __init__(self, exclude=False, in_list=False, field_name=""):
         super().__init__()
         self.exclude = exclude
@@ -111,38 +112,8 @@ class WarehouseFilter(Filter):
             return qs
 
         if self.in_list:
-            warehouse_paths = Warehouse.objects.filter(id__in=object_ids).values_list("path")
-            list_warehouses = Warehouse.objects.filter(path__startswith = warehouse_paths).values_list("id")
-            new_list = [x[0] for x in list_warehouses]
-            qs = qs.filter(**{f"{self.field_name}__id__in": new_list}).distinct()
-        else:
-            for obj_id in object_ids:
-                if self.exclude:
-                    qs = qs.exclude(**{f"{self.field_name}__id": obj_id})
-                else:
-                    qs = qs.filter(**{f"{self.field_name}__id": obj_id})
-
-        return qs
-
-class FolderFilter(Filter):
-    def __init__(self, exclude=False, in_list=False, field_name=""):
-        super().__init__()
-        self.exclude = exclude
-        self.in_list = in_list
-        self.field_name = field_name
-
-    def filter(self, qs, value):
-        if not value:
-            return qs
-
-        try:
-            object_ids = [int(x) for x in value.split(",")]
-        except ValueError:
-            return qs
-
-        if self.in_list:
-            folder_paths = Folder.objects.filter(id__in=object_ids).values_list("path")
-            list_folders = Folder.objects.filter(path__startswith = folder_paths).values_list("id")
+            folder_paths = Dossier.objects.filter(id__in=object_ids).values_list("path")
+            list_folders = Dossier.objects.filter(path__startswith = folder_paths).values_list("id")
             new_list = [x[0] for x in list_folders]
             qs = qs.filter(**{f"{self.field_name}__id__in": new_list}).distinct()
         else:
@@ -323,9 +294,9 @@ class DocumentFilterSet(FilterSet):
     
     folder__id__in = FolderFilter(field_name="folder", in_list=True)
 
-    dossier__id__none = FolderFilter(field_name="dossier", exclude=True)
+    dossier__id__none = DossierFilter(field_name="dossier", exclude=True)
     
-    dossier__id__in = FolderFilter(field_name="dossier", in_list=True)
+    dossier__id__in = DossierFilter(field_name="dossier", in_list=True)
 
     is_in_inbox = InboxFilter()
 
