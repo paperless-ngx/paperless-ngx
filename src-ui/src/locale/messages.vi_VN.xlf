@@ -1061,10 +1061,6 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-dossier-form-list/custom-dossier-form-list.component.html</context>
-               <context context-type="linenumber">28</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-dossier-form-list/custom-dossier-form-list.component.html</context>
                <context context-type="linenumber">83</context>
             </context-group>
             <context-group purpose="location">
@@ -1209,7 +1205,7 @@
          </trans-unit>
          <trans-unit id="1943508481059904274" datatype="html">
             <source>
-               (
+                (
                <x id="INTERPOLATION" equiv-text="{{selectedApprovals.size}}" />
                selected)
             </source>
@@ -2430,6 +2426,7 @@
          </trans-unit>
          <trans-unit id="9187755754633397589" datatype="html">
             <source>
+                
                <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;" />
                Appears on
                <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
@@ -4568,7 +4565,7 @@
                <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
                <context context-type="linenumber">82</context>
             </context-group>
-            <target state="translated">Shelf</target>
+            <target state="translated">Giá/kệ</target>
          </trans-unit>
          <trans-unit id="2656329676292524585" datatype="html">
             <source>Matching pattern</source>
@@ -8293,10 +8290,6 @@
                <context context-type="linenumber">132</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-dossier-form-list/custom-dossier-form-list.component.html</context>
-               <context context-type="linenumber">33</context>
-            </context-group>
-            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.html</context>
                <context context-type="linenumber">41</context>
             </context-group>
@@ -8640,7 +8633,8 @@
             <target state="translated">
                Thao tác này sẽ xóa đường dẫn lưu trữ khỏi
                <x id="PH" equiv-text="this.list.selected.size" />
-               tài liệu đã chọn</target>
+               tài liệu đã chọn
+            </target>
          </trans-unit>
          <trans-unit id="4448431783194389888" datatype="html">
             <source>Confirm boxcase assignment</source>
@@ -8704,11 +8698,11 @@
                <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
                <context context-type="linenumber">755</context>
             </context-group>
-            <target state="translated">Thao tác này sẽ xóa vĩnh viễn
+            <target state="translated">
+               Thao tác này sẽ xóa vĩnh viễn
                <x id="PH" equiv-text="this.list.selected.size" />
                tài liệu đã chọn
             </target>
-            
          </trans-unit>
          <trans-unit id="6734339521247847366" datatype="html">
             <source>Delete document(s)</source>
@@ -8728,7 +8722,8 @@
                <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
                <context context-type="linenumber">806</context>
             </context-group>
-            <target state="translated">Thao tác này sẽ thực hiện lại OCR vĩnh viễn cho
+            <target state="translated">
+               Thao tác này sẽ thực hiện lại OCR vĩnh viễn cho
                <x id="PH" equiv-text="this.list.selected.size" />
                tài liệu đã chọn
             </target>
@@ -10572,7 +10567,7 @@
                <context context-type="linenumber">58</context>
             </context-group>
             <target state="translated">
-               Bạn có thực sự muốn xóa Kệ "
+               Bạn có thực sự muốn xóa giá/kệ "
                <x id="PH" equiv-text="object.name" />
                "?
             </target>
@@ -12052,4 +12047,3 @@
       </body>
    </file>
 </xliff>
-1
