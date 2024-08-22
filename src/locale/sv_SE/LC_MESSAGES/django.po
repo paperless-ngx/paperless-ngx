@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-09 11:27-0700\n"
-"PO-Revision-Date: 2024-07-09 18:28\n"
+"POT-Creation-Date: 2024-08-19 23:29-0700\n"
+"PO-Revision-Date: 2024-08-20 06:32\n"
 "Last-Translator: \n"
 "Language-Team: Swedish\n"
 "Language: sv_SE\n"
@@ -257,59 +257,59 @@ msgstr "loggar"
 
 #: documents/models.py:401
 msgid "Table"
-msgstr ""
+msgstr "Table"
 
 #: documents/models.py:402
 msgid "Small Cards"
-msgstr ""
+msgstr "Små kort"
 
 #: documents/models.py:403
 msgid "Large Cards"
-msgstr ""
+msgstr "Stora kort"
 
 #: documents/models.py:406
 msgid "Title"
-msgstr ""
+msgstr "Titel"
 
 #: documents/models.py:407
 msgid "Created"
-msgstr ""
+msgstr "Skapad"
 
 #: documents/models.py:408
 msgid "Added"
-msgstr ""
+msgstr "Tillagd"
 
 #: documents/models.py:409
 msgid "Tags"
-msgstr ""
+msgstr "Taggar"
 
 #: documents/models.py:410
 msgid "Correspondent"
-msgstr ""
+msgstr "Korrespondent"
 
 #: documents/models.py:411
 msgid "Document Type"
-msgstr ""
+msgstr "Dokumenttyp"
 
 #: documents/models.py:412
 msgid "Storage Path"
-msgstr ""
+msgstr "Sökväg för lagring"
 
 #: documents/models.py:413
 msgid "Note"
-msgstr ""
+msgstr "Anteckning"
 
 #: documents/models.py:414
 msgid "Owner"
-msgstr ""
+msgstr "Ägare"
 
 #: documents/models.py:415
 msgid "Shared"
-msgstr ""
+msgstr "Delad"
 
 #: documents/models.py:416
 msgid "ASN"
-msgstr ""
+msgstr "ASN"
 
 #: documents/models.py:422
 msgid "show on dashboard"
@@ -329,15 +329,15 @@ msgstr "sortera omvänt"
 
 #: documents/models.py:437
 msgid "View page size"
-msgstr ""
+msgstr "Visa sidstorlek"
 
 #: documents/models.py:445
 msgid "View display mode"
-msgstr ""
+msgstr "Visa visningsläge"
 
 #: documents/models.py:452
 msgid "Document display fields"
-msgstr ""
+msgstr "Dokumentets visningsfält"
 
 #: documents/models.py:459 documents/models.py:516
 msgid "saved view"
@@ -501,19 +501,19 @@ msgstr "delas av mig"
 
 #: documents/models.py:506
 msgid "has custom fields"
-msgstr ""
+msgstr "har anpassade fält"
 
 #: documents/models.py:507
 msgid "has custom field in"
-msgstr ""
+msgstr "har anpassade fält i"
 
 #: documents/models.py:508
 msgid "does not have custom field in"
-msgstr ""
+msgstr "har inte anpassade fält i"
 
 #: documents/models.py:509
 msgid "does not have custom field"
-msgstr ""
+msgstr "har inte anpassat fält"
 
 #: documents/models.py:519
 msgid "rule type"
@@ -677,7 +677,7 @@ msgstr "Dokumentlänk"
 
 #: documents/models.py:812
 msgid "Select"
-msgstr ""
+msgstr "Välj"
 
 #: documents/models.py:824
 msgid "data type"
@@ -685,7 +685,7 @@ msgstr "datatyp"
 
 #: documents/models.py:831
 msgid "extra data"
-msgstr ""
+msgstr "extra data"
 
 #: documents/models.py:835
 msgid "Extra data for the custom field, such as select options"
@@ -729,7 +729,7 @@ msgstr "Api-uppladdning"
 
 #: documents/models.py:985
 msgid "Mail Fetch"
-msgstr ""
+msgstr "Hämta mail"
 
 #: documents/models.py:988
 msgid "Workflow Trigger Type"
@@ -936,12 +936,12 @@ msgstr "Ogiltigt reguljärt uttryck: %(error)s"
 msgid "Invalid color."
 msgstr "Ogiltig färg."
 
-#: documents/serialisers.py:1314
+#: documents/serialisers.py:1331
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Filtypen %(type)s stöds inte"
 
-#: documents/serialisers.py:1423
+#: documents/serialisers.py:1440
 msgid "Invalid variable detected."
 msgstr "Ogiltig variabel upptäckt."
 

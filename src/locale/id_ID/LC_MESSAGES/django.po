@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-09 11:27-0700\n"
-"PO-Revision-Date: 2024-07-09 18:28\n"
+"POT-Creation-Date: 2024-08-19 23:29-0700\n"
+"PO-Revision-Date: 2024-08-20 06:32\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -936,12 +936,12 @@ msgstr "Ekspresi reguler tidak valid: %(error)s"
 msgid "Invalid color."
 msgstr "Warna tidak valid."
 
-#: documents/serialisers.py:1314
+#: documents/serialisers.py:1331
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Jenis berkas %(type)s tidak didukung"
 
-#: documents/serialisers.py:1423
+#: documents/serialisers.py:1440
 msgid "Invalid variable detected."
 msgstr "Variabel ilegal terdeteksi."
 

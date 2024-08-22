@@ -843,7 +843,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="needs-translation">System Status</target>
+        <target state="translated">Статус системы</target>
       </trans-unit>
       <trans-unit id="4798013226763881638" datatype="html">
         <source>Open Django Admin</source>
@@ -2327,7 +2327,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">73</context>
         </context-group>
-        <target state="needs-translation">Restore</target>
+        <target state="translated">Восстановить</target>
       </trans-unit>
       <trans-unit id="2308646316372333720" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {One document in trash} other {<x id="INTERPOLATION"/> total documents in trash}}</source>
@@ -2411,7 +2411,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="needs-translation">Document deleted</target>
+        <target state="translated">Документ удален</target>
       </trans-unit>
       <trans-unit id="7295637485862454066" datatype="html">
         <source>Error deleting document</source>
@@ -2431,7 +2431,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">82</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete the selected documents.</target>
+        <target state="translated">Эта операция навсегда удалит выбранные документы.</target>
       </trans-unit>
       <trans-unit id="6804051092296228130" datatype="html">
         <source>This operation will permanently delete all documents in the trash.</source>
@@ -2463,7 +2463,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">113</context>
         </context-group>
-        <target state="needs-translation">Document restored</target>
+        <target state="translated">Документ восстановлен</target>
       </trans-unit>
       <trans-unit id="9136016619414048201" datatype="html">
         <source>Error restoring document</source>
@@ -3239,7 +3239,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">117</context>
         </context-group>
-        <target state="needs-translation">Document types</target>
+        <target state="translated">Типы документов</target>
       </trans-unit>
       <trans-unit id="searchResults.storagePaths" datatype="html">
         <source>Storage paths</source>
@@ -3443,7 +3443,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/delete-pages-confirm-dialog/delete-pages-confirm-dialog.component.html</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Pages to remove</target>
+        <target state="translated">Страницы для удаления</target>
       </trans-unit>
       <trans-unit id="994016933065248559" datatype="html">
         <source>Documents:</source>
@@ -3467,7 +3467,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Regenerate all metadata</target>
+        <target state="translated">Пересоздать все метаданные</target>
       </trans-unit>
       <trans-unit id="5612366187076076264" datatype="html">
         <source>Delete original documents after successful merge</source>
@@ -3543,7 +3543,7 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Create new field</target>
+        <target state="translated">Создать новое поле</target>
       </trans-unit>
       <trans-unit id="6973528734330066202" datatype="html">
         <source>Saved field &quot;<x id="PH" equiv-text="newField.name"/>&quot;.</source>
