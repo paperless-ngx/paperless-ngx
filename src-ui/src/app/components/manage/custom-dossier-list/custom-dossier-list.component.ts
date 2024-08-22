@@ -107,10 +107,11 @@ export abstract class CustomDossierListComponent<T extends ObjectWithId>
   public dossierPath: Dossier[] = []
   public documentService: DocumentService
   public ColorTheme : ColorTheme
+  public canCreate: boolean = false
 
   ngOnInit(): void {
     if (localStorage.getItem('dossier-list:displayMode') != null) {
-      console.log( localStorage.getItem('dossier-list:displayMode'))
+      // console.log( localStorage.getItem('dossier-list:displayMode'))
       this.displayMode = localStorage.getItem('dossier-list:displayMode')
     }
     this.reloadData()
@@ -189,12 +190,21 @@ export abstract class CustomDossierListComponent<T extends ObjectWithId>
     if (this.id){
       let listDossierPath
       this.dossierService.getDossierPath(this.id).subscribe(
+        
         (dossier) => {
           listDossierPath = dossier
           // console.log(listDossierPath)
           this.dossierPath = listDossierPath?.results
         },)
-      
+      this.dossierService.get(this.id).subscribe(
+        (dossier)=>{
+          if (dossier?.type=='DOCUMENT') 
+            this.canCreate=true
+          else{
+            this.canCreate=false
+          }
+        }
+      )
 
     }
     // let listFolderPath 

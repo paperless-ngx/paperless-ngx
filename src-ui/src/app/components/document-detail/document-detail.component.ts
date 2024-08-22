@@ -43,6 +43,7 @@ import {
   FILTER_DOCUMENT_TYPE,
   FILTER_FULLTEXT_MORELIKE,
   FILTER_HAS_TAGS_ALL,
+  FILTER_HAS_WAREHOUSE_ANY,
   FILTER_STORAGE_PATH,
   FILTER_WAREHOUSE,
 } from 'src/app/data/filter-rule-type'
@@ -75,6 +76,7 @@ import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-co
 import { WarehouseService } from 'src/app/services/rest/warehouse.service'
 
 import { DocumentApproval } from 'src/app/data/document-approval'
+import { RouterTestingHarness } from '@angular/router/testing'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -142,6 +144,8 @@ export class DocumentDetailComponent
   documentTypes: DocumentType[]
   storagePaths: StoragePath[]
   warehouses: Warehouse[]
+  shelfs: Warehouse[]
+  boxcases: Warehouse[]
 
 
   documentForm: FormGroup = new FormGroup({
@@ -151,6 +155,8 @@ export class DocumentDetailComponent
     correspondent: new FormControl(),
     document_type: new FormControl(),
     storage_path: new FormControl(),
+    warehouse_w: new FormControl(),
+    warehouse_s: new FormControl(),
     warehouse: new FormControl(),
     archive_serial_number: new FormControl(),
     tags: new FormControl([]),
@@ -280,10 +286,47 @@ export class DocumentDetailComponent
         PermissionType.Warehouse
       )
     ) {
+      // this.warehouseService
+      //   .listAll()
+      //   .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      //   .subscribe((result) => (this.warehouses = result.results))
+      
+      this.warehouseService.clearCache()
       this.warehouseService
-        .listAll()
+        .listAll(null, null, { type__iexact: 'Warehouse' })
         .pipe(first(), takeUntil(this.unsubscribeNotifier))
-        .subscribe((result) => (this.warehouses = result.results))
+        .subscribe((result) => {this.warehouses = result.results;this.shelfs = []; this.boxcases=[]})
+      // this.warehouseService.clearCache()
+      // this.warehouseService
+      //   .listAll(null, null, { type__iexact: 'Shelf' })
+      //   .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      //   .subscribe((result) => {this.shelfs = result.results;})
+      // this.warehouseService.clearCache()
+      // this.warehouseService
+      //   .listAll(null, null, { type__iexact: 'Boxcase' })
+      //   .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      //   .subscribe((result) => {this.boxcases = result.results;})
+      // this.warehouseService
+      //   .listGia(1,
+      //     null,
+      //     null,
+      //     null,
+      //     null,
+      //     true)
+      //   .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      //   .subscribe((result) => {this.shelfs = result.results;        console.log('gia tri Shelf',this.shelfs)
+      //   })
+      // this.warehouseService
+      //   .listBox(1,
+      //     null,
+      //     null,
+      //     null,
+      //     null,
+      //     true)
+      //   .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      //   .subscribe((result) => {this.boxcases = result.results;        console.log('gia tri Shelf',this.boxcases)
+      //   })
+   
     }
     if (
       this.permissionsService.currentUserCan(
@@ -805,6 +848,41 @@ export class DocumentDetailComponent
     ])
   }
 
+  autoOcrField() {
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Auto OCR Field confirm`
+    modal.componentInstance.messageBold = $localize`This operation will permanently auto OCR Field for this document.`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      this.documentsService
+        .bulkEdit([this.document.id], 'redo_ocr_field', {})
+        .subscribe({
+          next: () => {
+            this.toastService.showInfo(
+              $localize`Auto OCR Field operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.`
+            )
+            if (modal) {
+              modal.close()
+            }
+          },
+          error: (error) => {
+            if (modal) {
+              modal.componentInstance.buttonsEnabled = true
+            }
+            this.toastService.showError(
+              $localize`Error executing operation`,
+              error
+            )
+          },
+        })
+    })
+  }
+  
   redoOcr() {
     let modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
@@ -999,6 +1077,7 @@ export class DocumentDetailComponent
 
   filterDocuments(items: ObjectWithId[] | NgbDateStruct[]) {
     const filterRules: FilterRule[] = items.flatMap((i) => {
+      console.log('gia tri i',i)
       if (i.hasOwnProperty('year')) {
         const isoDateAdapter = new ISODateAdapter()
         const dateAfter: Date = new Date(isoDateAdapter.toModel(i))
@@ -1022,19 +1101,20 @@ export class DocumentDetailComponent
           rule_type: FILTER_CORRESPONDENT,
           value: (i as Correspondent).id.toString(),
         }
+      
+      } else if (i.hasOwnProperty('path')&&i.hasOwnProperty('type')) {
+        // Warehouse
+        return {
+          rule_type: FILTER_HAS_WAREHOUSE_ANY,
+          value: (i as Warehouse).id.toString(),
+        }
       } else if (i.hasOwnProperty('path')) {
         // Storage Path
         return {
           rule_type: FILTER_STORAGE_PATH,
           value: (i as StoragePath).id.toString(),
         }
-      } else if (i.hasOwnProperty('path')) {
-        // Warehouse
-        return {
-          rule_type: FILTER_WAREHOUSE,
-          value: (i as Warehouse).id.toString(),
-        }
-      } else if (i.hasOwnProperty('is_inbox_tag')) {
+      }else if (i.hasOwnProperty('is_inbox_tag')) {
         // Tag
         return {
           rule_type: FILTER_HAS_TAGS_ALL,
@@ -1186,5 +1266,35 @@ export class DocumentDetailComponent
             },
           })
       })
+  }
+
+  modelChangeWarehouse(event){
+    
+    this.warehouseService.clearCache()
+    this.warehouseService.list(1,null,null,true,{type__iexact:"Shelf",parent_warehouse:event})
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .subscribe((result) => {this.shelfs = result.results;
+        if (this.documentForm.get("warehouse_w").value==null||!this.shelfs.some(item => item.id === this.documentForm.get("warehouse_s").value)){
+          this.documentForm.get("warehouse_s").setValue(null);
+          this.documentForm.get("warehouse").setValue(null);
+        }
+      })
+      this.shelfs=[]
+      this.boxcases=[]
+    
+    }
+  modelChangeShelf(event){
+      // this.documentForm.get("warehouse").setValue(null)
+      this.warehouseService.clearCache()
+      this.warehouseService.list(1,null,null,true,{type__iexact:"Boxcase",parent_warehouse:event})
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .subscribe((result) => {this.boxcases = result.results;
+        if (this.documentForm.get("warehouse_s").value==null||!this.boxcases.some(item => item.id === this.documentForm.get("warehouse").value)){
+          this.documentForm.get("warehouse").setValue(null)
+        }
+      })
+      this.boxcases=[]
+
+    
   }
 }

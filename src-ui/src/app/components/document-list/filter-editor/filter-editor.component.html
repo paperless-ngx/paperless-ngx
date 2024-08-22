@@ -71,13 +71,30 @@
           [allowSelectNone]="true"></pngx-filterable-dropdown>
         }
         @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Warehouse)) {
-          <pngx-filterable-dropdown class="flex-fill" title="Warehouse" icon="folder-fill" i18n-title
+          <pngx-filterable-dropdown class="flex-fill" title="Warehouse" icon="house-fill" i18n-title
           filterPlaceholder="Filter warehouses" i18n-filterPlaceholder
           [items]="warehouses"
           [(selectionModel)]="warehouseSelectionModel"
           (selectionModelChange)="updateRules()"
           (opened)="onWarehouseDropdownOpen()"
-          [documentCounts]="warehouseDocumentCounts"
+          [allowSelectNone]="true"></pngx-filterable-dropdown>
+
+          <pngx-filterable-dropdown class="flex-fill" title="Shelf" icon="house-fill" i18n-title
+          filterPlaceholder="Filter shelf" i18n-filterPlaceholder
+          [items]="shelfs"
+          [(selectionModel)]="shelfSelectionModel"
+          (selectionModelChange)="updateRules()"
+          (opened)="onShelfDropdownOpen()"
+          
+          [allowSelectNone]="true"></pngx-filterable-dropdown>
+          
+          <pngx-filterable-dropdown class="flex-fill" title="Boxcase" icon="house-fill" i18n-title
+          filterPlaceholder="Filter boxcase" i18n-filterPlaceholder
+          [items]="boxcases"
+          [(selectionModel)]="boxcaseSelectionModel"
+          (selectionModelChange)="updateRules()"
+          (opened)="onBoxcaseDropdownOpen()"
+          [documentCounts]="boxcaseDocumentCounts"
           [allowSelectNone]="true"></pngx-filterable-dropdown>
         }
       </div>

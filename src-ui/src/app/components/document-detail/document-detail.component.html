@@ -49,6 +49,10 @@
         <i-bs width="1em" height="1em" name="arrow-counterclockwise"></i-bs>&nbsp;<span i18n>Redo OCR</span>
       </button>
 
+      <button ngbDropdownItem (click)="autoOcrField()" [disabled]="!userCanEdit">
+        <i-bs width="1em" height="1em" name="arrow-counterclockwise"></i-bs>&nbsp;<span i18n>Auto OCR Field</span>
+      </button>
+
       <button ngbDropdownItem (click)="moreLike()">
         <i-bs width="1em" height="1em" name="diagram-3"></i-bs>&nbsp;<span i18n>More like this</span>
       </button>
@@ -116,8 +120,12 @@
               (createNew)="createDocumentType($event)" [suggestions]="suggestions?.document_types" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }"></pngx-input-select>
               <pngx-input-select [items]="storagePaths" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
               (createNew)="createStoragePath($event)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }"></pngx-input-select>
-              <pngx-input-select [items]="warehouses" i18n-title title="Warehouse" formControlName="warehouse" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
-              (createNew)="createWarehouse($event)" [suggestions]="suggestions?.warehouses" i18n-placeholder placeholder="Default" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Warehouse }"></pngx-input-select>
+              <pngx-input-select [items]="warehouses" i18n-title title="Warehouse" formControlName="warehouse_w" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)" (ngModelChange)="modelChangeWarehouse($event)"
+                 *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Warehouse } "></pngx-input-select>
+              <pngx-input-select [items]="shelfs" i18n-title title="Shelf" formControlName="warehouse_s" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)" (ngModelChange)="modelChangeShelf($event)"
+                 *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Warehouse }"></pngx-input-select>
+              <pngx-input-select [items]="boxcases" i18n-title title="Boxcase" formControlName="warehouse" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
+                 *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Warehouse }"></pngx-input-select>
               <pngx-input-tags formControlName="tags" [suggestions]="suggestions?.tags" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></pngx-input-tags>
               @for (fieldInstance of document?.custom_fields; track fieldInstance; let i = $index) {
                 <div [formGroup]="customFieldFormFields.controls[i]">

@@ -21,7 +21,7 @@
     <button class="btn btn-sm btn-outline-secondary" [hidden]="selectedObjects.size > 5" (click)="selectAll();  $event.stopPropagation();" >
       <i-bs  name="check"></i-bs>&nbsp;<ng-container i18n>Select all</ng-container>
       </button>
-    <div ngbDropdown>
+    <!-- <div ngbDropdown>
       
       <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
         <i-bs name="three-dots"></i-bs>
@@ -33,7 +33,7 @@
           <i-bs name="arrow-down"></i-bs>&nbsp;<ng-container i18n>Export to Excel</ng-container>
         </button>
       </div>
-    </div>
+    </div> -->
     <button type="button" class="btn btn-sm btn-outline-primary" (click)="setPermissions()" [disabled]="!userCanBulkEdit(PermissionAction.Change) || selectedObjects.size === 0">
       <i-bs name="person-fill-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
     </button>

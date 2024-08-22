@@ -18,7 +18,7 @@ from documents.models import StoragePath
 from documents.models import Warehouse
 from documents.models import Folder
 from documents.permissions import set_permissions_for_object
-from documents.tasks import bulk_update_documents
+from documents.tasks import bulk_update_documents, update_document_field
 from documents.tasks import consume_file
 from documents.tasks import update_document_archive_file
 
@@ -195,6 +195,14 @@ def delete(doc_ids):
 def redo_ocr(doc_ids):
     for document_id in doc_ids:
         update_document_archive_file.delay(
+            document_id=document_id,
+        )
+
+    return "OK"
+
+def redo_peeling_field(doc_ids):
+    for document_id in doc_ids:
+        update_document_field.delay(
             document_id=document_id,
         )
 

@@ -492,12 +492,39 @@ class Consumer(LoggingMixin):
                 exc_info=True,
                 exception=e,
             )
+    def fill_custom_field_default(self,document:Document, data_ocr_fields):
+        fields = CustomFieldInstance.objects.filter(
+                                    document=document,
+                                )
+        dict_data = {}
+        try:
+            if data_ocr_fields is not None:
+                if isinstance(data_ocr_fields[0],list):
+
+                    for r in data_ocr_fields[0][0].get("fields"):
+                        dict_data[r.get("name")] = r.get("values")[0].get("value") if r.get("values") else None
+                    user_args=ApplicationConfiguration.objects.filter().first().user_args
+                    mapping_field_user_args = []
+                    for f in user_args.get("form_code",[]):
+                        if f.get("name") == data_ocr_fields[1]:
+                            mapping_field_user_args = f.get("mapping",[])
+                    map_fields = {}
+            
+                    for key,value in mapping_field_user_args[0].items():
+                        map_fields[key]=dict_data.get(value)
+                    for f in fields:
+                        f.value_text = map_fields.get(f.field.name,None)
+                    CustomFieldInstance.objects.bulk_update(fields, ['value_text'])
+        except Exception as e:
+            self.log.error("error ocr field",e)
+            
     def fill_custom_field(self,document:Document, data_ocr_fields, dossier_file:Dossier):
         dict_data = {}
                 
-        if data_ocr_fields is not None and isinstance(data_ocr_fields, list) == True:
-            if len(data_ocr_fields)>=1:    
-                for r in data_ocr_fields[0].get("fields"):
+        if data_ocr_fields is not None and isinstance(data_ocr_fields[0], list) == True:
+            if len(data_ocr_fields[0])>=1:    
+                for r in data_ocr_fields[0][0].get("fields"):
+
                     dict_data[r.get("name")] = r.get("values")[0].get("value") if r.get("values") else None
                              
                 custom_fields = CustomFieldInstance.objects.filter(dossier=document.dossier)
@@ -517,10 +544,9 @@ class Consumer(LoggingMixin):
                         # r.value_text = dict_data.get(r.match_value)
                         # self.log.debug("gia tri value map",r.match_value)
                         # create dossier file
-                        CustomFieldInstance.objects.create(field=r.field,
-                                                           value_text=dict_data.get(r.match_value),
-                                                           dossier = dossier_file,
-                                                           document=document)
+                        CustomFieldInstance.objects.update_or_create(field=r.field,
+                                                                     document=document,
+                                                                     defaults={"value_text":dict_data.get(r.match_value),"dossier":dossier_file})
                         
                 #     for r in custom_fields:
                 #         r: CustomFieldInstance
@@ -699,7 +725,7 @@ class Consumer(LoggingMixin):
         date = None
         thumbnail = None
         archive_path = None
-        data_ocr_fields = None
+        data_ocr_fields = (None,None)
         try:
             self._send_progress(
                 20,
@@ -811,7 +837,13 @@ class Consumer(LoggingMixin):
                 else:
                     new_dossier_document.path = f"{new_file.id}"
                 new_dossier_document.save()
-                self.fill_custom_field(document, data_ocr_fields, new_dossier_document)
+                
+            
+                if data_ocr_fields[1] == '' and isinstance(data_ocr_fields[0], list):
+                    self.fill_custom_field(document, data_ocr_fields, new_dossier_document)
+
+                elif data_ocr_fields[1] is not None and isinstance(data_ocr_fields[0], list):
+                    self.fill_custom_field_default(document, data_ocr_fields)
                 document.dossier=new_dossier_document
                 # After everything is in the database, copy the files into
                 # place. If this fails, we'll also rollback the transaction.

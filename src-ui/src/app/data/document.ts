@@ -35,6 +35,14 @@ export interface Document extends ObjectWithPermissions {
 
   warehouse?: number
 
+  warehouse_w$?: Observable<Warehouse>
+
+  warehouse_w?: number
+
+  warehouse_s$?: Observable<Warehouse>
+
+  warehouse_s?: number
+
   title?: string
 
   content?: string

@@ -54,6 +54,12 @@ import {
   FILTER_OWNER_ANY,
   FILTER_CUSTOM_FIELDS,
   FILTER_SHARED_BY_USER,
+  FILTER_CUSTOM_SHELF,
+  FILTER_HAS_CUSTOM_SHELF_ANY,
+  FILTER_BOX,
+  FILTER_HAS_BOX_ANY,
+  FILTER_DOES_NOT_HAVE_CUSTOM_SHELF,
+  FILTER_DOES_NOT_HAVE_BOX,
 } from 'src/app/data/filter-rule-type'
 import {
   FilterableDropdownSelectionModel,
@@ -202,6 +208,24 @@ export class FilterEditorComponent
           } else {
             return $localize`Without warehouse`
           }
+        case FILTER_CUSTOM_SHELF:
+        case FILTER_HAS_CUSTOM_SHELF_ANY:
+          if (rule.value) {
+            return $localize`Shelf: ${this.shelfs.find(
+              (w) => w.id == +rule.value
+            )?.name}`
+          } else {
+            return $localize`Without shelf`
+          }
+        case FILTER_BOX:
+        case FILTER_HAS_BOX_ANY:
+          if (rule.value) {
+            return $localize`Boxcase: ${this.boxcases.find(
+              (w) => w.id == +rule.value
+            )?.name}`
+          } else {
+            return $localize`Without boxcase`
+          }
 
         case FILTER_STORAGE_PATH:
         case FILTER_HAS_STORAGE_PATH_ANY:
@@ -262,12 +286,16 @@ export class FilterEditorComponent
   documentTypes: DocumentType[] = []
   storagePaths: StoragePath[] = []
   warehouses: Warehouse[] = []
+  shelfs: Warehouse[] = []
+  boxcases: Warehouse[] = []
 
   tagDocumentCounts: SelectionDataItem[]
   correspondentDocumentCounts: SelectionDataItem[]
   documentTypeDocumentCounts: SelectionDataItem[]
   storagePathDocumentCounts: SelectionDataItem[]
   warehouseDocumentCounts: SelectionDataItem[]
+  shelfDocumentCounts: SelectionDataItem[]
+  boxcaseDocumentCounts: SelectionDataItem[]
 
   _textFilter = ''
   _moreLikeId: number
@@ -306,6 +334,8 @@ export class FilterEditorComponent
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
   storagePathSelectionModel = new FilterableDropdownSelectionModel()
   warehouseSelectionModel = new FilterableDropdownSelectionModel()
+  shelfSelectionModel = new FilterableDropdownSelectionModel()
+  boxcaseSelectionModel = new FilterableDropdownSelectionModel()
 
 
   dateCreatedBefore: string
@@ -340,6 +370,8 @@ export class FilterEditorComponent
     this.documentTypeSelectionModel.clear(false)
     this.storagePathSelectionModel.clear(false)
     this.warehouseSelectionModel.clear(false)
+    this.shelfSelectionModel.clear(false)
+    this.boxcaseSelectionModel.clear(false)
     this.tagSelectionModel.clear(false)
     this.correspondentSelectionModel.clear(false)
     this._textFilter = null
@@ -500,9 +532,45 @@ export class FilterEditorComponent
             false
           )
           break
+        case FILTER_CUSTOM_SHELF:
+        case FILTER_HAS_CUSTOM_SHELF_ANY:
+          this.shelfSelectionModel.logicalOperator = LogicalOperator.Or
+          this.shelfSelectionModel.intersection = Intersection.Include
+          this.shelfSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Selected,
+            false
+          )
+          break
+        case FILTER_BOX:
+        case FILTER_HAS_BOX_ANY:
+          this.boxcaseSelectionModel.logicalOperator = LogicalOperator.Or
+          this.boxcaseSelectionModel.intersection = Intersection.Include
+          this.boxcaseSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Selected,
+            false
+          )
+          break
         case FILTER_DOES_NOT_HAVE_WAREHOUSE:
           this.warehouseSelectionModel.intersection = Intersection.Exclude
           this.warehouseSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Excluded,
+            false
+          )
+          break
+        case FILTER_DOES_NOT_HAVE_CUSTOM_SHELF:
+          this.shelfSelectionModel.intersection = Intersection.Exclude
+          this.shelfSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Excluded,
+            false
+          )
+          break
+        case FILTER_DOES_NOT_HAVE_BOX:
+          this.boxcaseSelectionModel.intersection = Intersection.Exclude
+          this.boxcaseSelectionModel.set(
             rule.value ? +rule.value : null,
             ToggleableItemState.Excluded,
             false
@@ -741,6 +809,46 @@ export class FilterEditorComponent
           })
         })
     }
+    if (this.shelfSelectionModel.isNoneSelected()) {
+      filterRules.push({ rule_type: FILTER_CUSTOM_SHELF, value: null })
+    } else {
+      this.shelfSelectionModel
+        .getSelectedItems()
+        .forEach((shelf) => {
+          filterRules.push({
+            rule_type: FILTER_HAS_CUSTOM_SHELF_ANY,
+            value: shelf.id?.toString(),
+          })
+        })
+      this.shelfSelectionModel
+        .getExcludedItems()
+        .forEach((shelf) => {
+          filterRules.push({
+            rule_type: FILTER_DOES_NOT_HAVE_CUSTOM_SHELF,
+            value: shelf.id?.toString(),
+          })
+        })
+    }
+    if (this.boxcaseSelectionModel.isNoneSelected()) {
+      filterRules.push({ rule_type: FILTER_BOX, value: null })
+    } else {
+      this.boxcaseSelectionModel
+        .getSelectedItems()
+        .forEach((box) => {
+          filterRules.push({
+            rule_type: FILTER_HAS_BOX_ANY,
+            value: box.id?.toString(),
+          })
+        })
+      this.boxcaseSelectionModel
+        .getExcludedItems()
+        .forEach((box) => {
+          filterRules.push({
+            rule_type: FILTER_DOES_NOT_HAVE_BOX,
+            value: box.id?.toString(),
+          })
+        })
+    }
     if (this.storagePathSelectionModel.isNoneSelected()) {
       filterRules.push({ rule_type: FILTER_STORAGE_PATH, value: null })
     } else {
@@ -903,6 +1011,10 @@ export class FilterEditorComponent
       selectionData?.selected_storage_paths ?? null
     this.warehouseDocumentCounts =
       selectionData?.selected_warehouses ?? null
+    this.shelfDocumentCounts =
+      selectionData?.selected_shelfs ?? null
+    this.boxcaseDocumentCounts =
+      selectionData?.selected_boxcases ?? null
   }
 
   rulesModified: boolean = false
@@ -959,9 +1071,29 @@ export class FilterEditorComponent
         PermissionType.Warehouse
       )
     ) {
-      this.warehouseService
-        .listAll()
-        .subscribe((result) => (this.warehouses = result.results))
+      // this.warehouseService
+      //   .listAll(null, null, { type__iexact: 'Warehouse' })
+      //   .subscribe((result) => (this.warehouses = result.results))
+        
+      // this.warehouseService
+      //   .listAll(null, null, { type__iexact: 'Shelf' })
+      //   .subscribe((result) => (this.shelfs = result.results))
+      // this.warehouseService
+      //   .listAll(null, null, { type__iexact: 'Boxcase' })
+      //   .subscribe((result) => (this.boxcases = result.results))
+      // this.warehouseService.clearCache()
+      this.warehouseService.list(1,null,null,true,{type__iexact:"Warehouse"})
+      .subscribe((result) => {this.warehouses = result.results;
+      })
+      this.warehouseService.list(1,null,null,true,{type__iexact:"Shelf"})
+      .subscribe((result) => {this.shelfs = result.results;
+      })
+      this.warehouseService.list(1,null,null,true,{type__iexact:"Boxcase"})
+      .subscribe((result) => {this.boxcases = result.results;
+      })
+      // this.warehouseService
+      //   .listAll()
+      //   .subscribe((result) => (this.warehouses = result.results))
     }
     if (
       this.permissionsService.currentUserCan(
@@ -1012,6 +1144,12 @@ export class FilterEditorComponent
   toggleWarehouse(warehouseId: number) {
     this.warehouseSelectionModel.toggle(warehouseId)
   }
+  toggleShelf(shelfId: number) {
+    this.shelfSelectionModel.toggle(shelfId)
+  }
+  toggleBoxcase(boxcaseId: number) {
+    this.boxcaseSelectionModel.toggle(boxcaseId)
+  }
 
   toggleStoragePath(storagePathID: number) {
     this.storagePathSelectionModel.toggle(storagePathID)
@@ -1031,6 +1169,14 @@ export class FilterEditorComponent
 
   onWarehouseDropdownOpen() {
     this.warehouseSelectionModel.apply()
+  }
+
+  onShelfDropdownOpen() {
+    this.shelfSelectionModel.apply()
+  }
+
+  onBoxcaseDropdownOpen() {
+    this.boxcaseSelectionModel.apply()
   }
 
   onStoragePathDropdownOpen() {

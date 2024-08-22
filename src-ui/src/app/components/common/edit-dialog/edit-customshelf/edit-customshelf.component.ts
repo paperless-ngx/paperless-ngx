@@ -171,7 +171,7 @@ export abstract class EditCustomShelfComponent<
     switch (this.dialogMode) {
       case EditCustomShelfdMode.CREATE:
         newObject.parent_warehouse = this.object['parent_warehouse'];
-        console.log(newObject);
+        // console.log(newObject);
         serverResponse = this.service.create(newObject)
         break
       case EditCustomShelfdMode.EDIT:

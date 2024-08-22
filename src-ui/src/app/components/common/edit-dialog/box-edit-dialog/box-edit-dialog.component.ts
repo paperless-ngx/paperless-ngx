@@ -49,7 +49,6 @@ export class BoxEditDialogComponent extends EditCustomBoxComponent<Shelf> implem
   loadShelvesByWarehouseId(warehouseId: any): void {
 
     this.customService.getShelfId(warehouseId).subscribe(data => {
-      console.log("aaa", data)
       // this.shelfs = data.results;
       this.shelfs = data.results.filter(warehouse => warehouse.type === 'Shelf',);
       if (this.shelfs.length > 0) {
@@ -60,7 +59,7 @@ export class BoxEditDialogComponent extends EditCustomBoxComponent<Shelf> implem
 
   onWarehouseChange(event: Event): void {
     const warehouseId = (event.target as HTMLSelectElement).value;
-    console.log("dd", warehouseId)
+    // console.log("dd", warehouseId)
     this.loadShelvesByWarehouseId(warehouseId);
   }
 

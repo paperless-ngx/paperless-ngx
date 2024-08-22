@@ -75,18 +75,33 @@
             </pngx-filterable-dropdown>
           }
           @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.Warehouse)) {
-            <pngx-filterable-dropdown title="Warehouse" icon="warehouse-fill" i18n-title
+            <pngx-filterable-dropdown title="Warehouse" icon="folder-fill" i18n-title
               filterPlaceholder="Filter warehouses" i18n-filterPlaceholder
               [items]="warehouses"
               [disabled]="!userCanEditAll"
               [editing]="true"
-              [manyToOne]="true"
+              [applyOnClose]="applyOnClose"
+              [(selectionModel)]="warehouseSelectionModel"
+              (apply)="setWarehouses($event)">
+            </pngx-filterable-dropdown>
+            <pngx-filterable-dropdown title="Shelf" icon="folder-fill" i18n-title
+              filterPlaceholder="Filter shelfs" i18n-filterPlaceholder
+              [items]="shelfs"
+              [disabled]="!userCanEditAll"
+              [editing]="true"
+              [applyOnClose]="applyOnClose"
+              [(selectionModel)]="shelfSelectionModel"
+              (apply)="setShelfs($event)">
+            </pngx-filterable-dropdown>
+            <pngx-filterable-dropdown title="Boxcase" icon="folder-fill" i18n-title
+              filterPlaceholder="Filter boxcases" i18n-filterPlaceholder
+              [items]="boxcases"
+              [disabled]="!userCanEditAll"
+              [editing]="true"
               [applyOnClose]="applyOnClose"
               [createRef]="createWarehouse.bind(this)"
-              (opened)="openWarehouseDropdown()"
-              [(selectionModel)]="warehouseSelectionModel"
-              [documentCounts]="warehouseDocumentCounts"
-              (apply)="setWarehouses($event)">
+              [(selectionModel)]="boxcaseSelectionModel"
+              (apply)="setBoxcases($event)">
             </pngx-filterable-dropdown>
           }
 

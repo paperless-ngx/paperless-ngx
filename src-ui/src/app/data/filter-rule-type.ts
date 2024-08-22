@@ -47,10 +47,7 @@ export const FILTER_OWNER_ISNULL = 34
 export const FILTER_OWNER_DOES_NOT_INCLUDE = 35
 export const FILTER_SHARED_BY_USER = 37
 
-//export const FILTER_CUSTOM_FIELDS = 36
-export const FILTER_CUSTOM_FIELDS = 50
-export const FILTER_HAS_CUSTOM_FIELDS_ANY = 51
-export const FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS = 52
+export const FILTER_CUSTOM_FIELDS = 36
 
 export const FILTER_WAREHOUSE = 53
 export const FILTER_HAS_WAREHOUSE_ANY = 54
@@ -137,20 +134,20 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
   },
   {
     id: FILTER_WAREHOUSE,
-    filtervar: 'warehouse__id',
-    isnull_filtervar: 'warehouse__isnull',
+    filtervar: 'warehouse_w__id',
+    isnull_filtervar: 'warehouse_w__isnull',
     datatype: 'warehouse',
     multi: false,
   },
   {
     id: FILTER_HAS_WAREHOUSE_ANY,
-    filtervar: 'warehouse__id__in',
+    filtervar: 'warehouse_w__id__in',
     datatype: 'warehouse',
     multi: true,
   },
   {
     id: FILTER_DOES_NOT_HAVE_WAREHOUSE,
-    filtervar: 'warehouse__id__none',
+    filtervar: 'warehouse_w__id__none',
     datatype: 'warehouse',
     multi: true,
   },
@@ -179,89 +176,44 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     datatype: 'folder',
     multi: true,
   },
-  {
-    id: FILTER_HAS_DOSSIER_ALL,
-    filtervar: 'dossiers__id__all',
-    datatype: 'dossier',
-    multi: true,
-  },
-  {
-    id: FILTER_DOSSIER,
-    filtervar: 'dossier__id',
-    isnull_filtervar: 'dossier__isnull',
-    datatype: 'dossier',
-    multi: false,
-  },
-  {
-    id: FILTER_HAS_DOSSIER_ANY,
-    filtervar: 'dossier__id__in',
-    datatype: 'dossier',
-    multi: true,
-  },
-  {
-    id: FILTER_DOES_NOT_HAVE_DOSSIER,
-    filtervar: 'dossier__id__none',
-    datatype: 'dossier',
-    multi: true,
-  },
-  //Custom-field
-  {
-    id: FILTER_CUSTOM_FIELDS,
-    filtervar: 'warehouses__id',
-    isnull_filtervar: 'warehouses__isnull',
-    datatype: 'warehouse',
-    multi: false,
-  },
-  {
-    id: FILTER_HAS_CUSTOM_FIELDS_ANY,
-    filtervar: 'warehouses__id__in',
-    datatype: 'warehouse',
-    multi: true,
-  },
-  {
-    id: FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
-    filtervar: 'warehouses__id__none',
-    datatype: 'warehouse',
-    multi: true,
-  },
   //box
   {
     id: FILTER_BOX,
-    filtervar: 'boxs__id',
-    isnull_filtervar: 'boxs__isnull',
-    datatype: 'box',
+    filtervar: 'warehouse__id',
+    isnull_filtervar: 'warehouse__isnull',
+    datatype: 'warehouse',
     multi: false,
   },
   {
     id: FILTER_HAS_BOX_ANY,
-    filtervar: 'boxs__id__in',
-    datatype: 'box',
+    filtervar: 'warehouse__id__in',
+    datatype: 'warehouse',
     multi: true,
   },
   {
     id: FILTER_DOES_NOT_HAVE_BOX,
-    filtervar: 'boxs__id__none',
-    datatype: 'box',
+    filtervar: 'warehouse__id__none',
+    datatype: 'warehouse',
     multi: true,
   },
   //Shelf
   {
     id: FILTER_CUSTOM_SHELF,
-    filtervar: 'shelfs__id',
-    isnull_filtervar: 'shelfs__isnull',
-    datatype: 'shelf',
+    filtervar: 'warehouse_s__id',
+    isnull_filtervar: 'warehouse_s__isnull',
+    datatype: 'warehouse',
     multi: false,
   },
   {
     id: FILTER_HAS_CUSTOM_SHELF_ANY,
-    filtervar: 'shelfs__id__in',
-    datatype: 'shelf',
+    filtervar: 'warehouse_s__id__in',
+    datatype: 'warehouse',
     multi: true,
   },
   {
     id: FILTER_DOES_NOT_HAVE_CUSTOM_SHELF,
-    filtervar: 'shelfs__id__none',
-    datatype: 'shelf',
+    filtervar: 'warehouse_s__id__none',
+    datatype: 'warehouse',
     multi: true,
   },
 

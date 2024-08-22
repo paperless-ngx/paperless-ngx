@@ -687,6 +687,8 @@ class DocumentSerializer(
     correspondent = CorrespondentField(allow_null=True)
     tags = TagsField(many=True)
     warehouse = WarehouseField(allow_null=True)
+    warehouse_w = SerializerMethodField(read_only=True)
+    warehouse_s = SerializerMethodField(read_only=True)
     folder = FolderField(allow_null=True)
     document_type = DocumentTypeField(allow_null=True)
     storage_path = StoragePathField(allow_null=True)
@@ -696,6 +698,27 @@ class DocumentSerializer(
     
     
     created_date = serializers.DateField(required=False)
+
+    def get_warehouse_w(self,obj):
+        try:
+            if obj.warehouse is None:
+                return None
+            return Warehouse.objects.filter(id=obj.warehouse.parent_warehouse.id).first().parent_warehouse.id
+        except Exception:
+            return None
+    def get_warehouse_s(self,obj):
+        try:
+            
+            if obj.warehouse is None:
+                return None
+            return obj.warehouse.parent_warehouse.id
+        except Exception:
+            return None
+    
+    def to_representation(self, instance):
+        value = instance.created
+        return value.astimezone(timezone.get_default_timezone()).isoformat()
+
 
     custom_fields = CustomFieldInstanceSerializer(
         many=True,
@@ -874,6 +897,9 @@ class DocumentSerializer(
             "custom_fields",
             "exploit",
             "remove_inbox_tags",
+            'warehouse_s',
+            'warehouse_w'
+
             
         ) 
     
@@ -963,13 +989,14 @@ class BulkEditSerializer(
             "set_correspondent",
             "set_document_type",
             "set_storage_path",
-            "set_warehouse"
+            "set_warehouse",
             "set_folder",
             "add_tag",
             "remove_tag",
             "modify_tags",
             "delete",
             "redo_ocr",
+            "redo_ocr_field",
             "set_permissions",
             "rotate",
             "merge",
@@ -1013,6 +1040,8 @@ class BulkEditSerializer(
             return bulk_edit.delete
         elif method == "redo_ocr":
             return bulk_edit.redo_ocr
+        elif method == "redo_ocr_field":
+            return bulk_edit.redo_peeling_field
         elif method == "set_permissions":
             return bulk_edit.set_permissions
         elif method == "rotate":
