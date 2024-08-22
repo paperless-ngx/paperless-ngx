@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-09 11:27-0700\n"
-"PO-Revision-Date: 2024-07-09 18:28\n"
+"POT-Creation-Date: 2024-08-19 23:29-0700\n"
+"PO-Revision-Date: 2024-08-20 06:32\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -677,7 +677,7 @@ msgstr "Σύνδεσμος Εγγράφου"
 
 #: documents/models.py:812
 msgid "Select"
-msgstr ""
+msgstr "Επιλογή"
 
 #: documents/models.py:824
 msgid "data type"
@@ -685,7 +685,7 @@ msgstr "τύπος δεδομένων"
 
 #: documents/models.py:831
 msgid "extra data"
-msgstr ""
+msgstr "περισσότερα δεδομένα"
 
 #: documents/models.py:835
 msgid "Extra data for the custom field, such as select options"
@@ -713,11 +713,11 @@ msgstr "Η Κατανάλωση Ξεκίνησε"
 
 #: documents/models.py:979
 msgid "Document Added"
-msgstr ""
+msgstr "Το έγγραφο προστέθηκε"
 
 #: documents/models.py:980
 msgid "Document Updated"
-msgstr ""
+msgstr "Το έγγραφο ενημερώθηκε"
 
 #: documents/models.py:983
 msgid "Consume Folder"
@@ -936,12 +936,12 @@ msgstr "Άκυρη έκφραση: %(error)s"
 msgid "Invalid color."
 msgstr "Άκυρο χρώμα."
 
-#: documents/serialisers.py:1314
+#: documents/serialisers.py:1331
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Ο τύπος αρχείου %(type)s δεν υποστηρίζεται"
 
-#: documents/serialisers.py:1423
+#: documents/serialisers.py:1440
 msgid "Invalid variable detected."
 msgstr "Εντοπίστηκε μη έγκυρη μεταβλητή."
 

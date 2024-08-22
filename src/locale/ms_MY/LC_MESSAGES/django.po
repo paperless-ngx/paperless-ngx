@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-09 11:27-0700\n"
-"PO-Revision-Date: 2024-08-09 12:10\n"
+"POT-Creation-Date: 2024-08-19 23:29-0700\n"
+"PO-Revision-Date: 2024-08-20 06:32\n"
 "Last-Translator: \n"
 "Language-Team: Malay\n"
 "Language: ms_MY\n"
@@ -92,11 +92,11 @@ msgstr ""
 
 #: documents/models.py:115
 msgid "tag"
-msgstr ""
+msgstr "tag"
 
 #: documents/models.py:116 documents/models.py:188
 msgid "tags"
-msgstr ""
+msgstr "tag"
 
 #: documents/models.py:121 documents/models.py:170
 msgid "document type"
@@ -104,7 +104,7 @@ msgstr "jenis dokumen"
 
 #: documents/models.py:122
 msgid "document types"
-msgstr ""
+msgstr "jenis dokumen"
 
 #: documents/models.py:127
 msgid "path"
@@ -165,7 +165,7 @@ msgstr ""
 
 #: documents/models.py:211
 msgid "modified"
-msgstr ""
+msgstr "diubah"
 
 #: documents/models.py:218
 msgid "storage type"
@@ -277,15 +277,15 @@ msgstr ""
 
 #: documents/models.py:408
 msgid "Added"
-msgstr ""
+msgstr "Ditambah"
 
 #: documents/models.py:409
 msgid "Tags"
-msgstr ""
+msgstr "Tag"
 
 #: documents/models.py:410
 msgid "Correspondent"
-msgstr ""
+msgstr "Pengirim"
 
 #: documents/models.py:411
 msgid "Document Type"
@@ -401,31 +401,31 @@ msgstr ""
 
 #: documents/models.py:481
 msgid "added before"
-msgstr ""
+msgstr "ditambah sebelum"
 
 #: documents/models.py:482
 msgid "added after"
-msgstr ""
+msgstr "ditambah selepas"
 
 #: documents/models.py:483
 msgid "modified before"
-msgstr ""
+msgstr "diubah sebelum"
 
 #: documents/models.py:484
 msgid "modified after"
-msgstr ""
+msgstr "diubah selepas"
 
 #: documents/models.py:485
 msgid "does not have tag"
-msgstr ""
+msgstr "tidak mempunyai tag"
 
 #: documents/models.py:486
 msgid "does not have ASN"
-msgstr ""
+msgstr "tidak mempunyai ASN"
 
 #: documents/models.py:487
 msgid "title or content contains"
-msgstr ""
+msgstr "tajuk atau kandungan mengandungi"
 
 #: documents/models.py:488
 msgid "fulltext query"
@@ -441,11 +441,11 @@ msgstr ""
 
 #: documents/models.py:491
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN lebih besar daripada"
 
 #: documents/models.py:492
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN kurang daripada"
 
 #: documents/models.py:493
 msgid "storage path is"
@@ -453,19 +453,19 @@ msgstr ""
 
 #: documents/models.py:494
 msgid "has correspondent in"
-msgstr ""
+msgstr "mempunyai pengirim dalam"
 
 #: documents/models.py:495
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "tidak mempunyai pengirim dalam"
 
 #: documents/models.py:496
 msgid "has document type in"
-msgstr ""
+msgstr "mempunyai jenis dokumen dalam"
 
 #: documents/models.py:497
 msgid "does not have document type in"
-msgstr ""
+msgstr "tidak mempunyai jenis dokumen dalam"
 
 #: documents/models.py:498
 msgid "has storage path in"
@@ -936,12 +936,12 @@ msgstr ""
 msgid "Invalid color."
 msgstr ""
 
-#: documents/serialisers.py:1314
+#: documents/serialisers.py:1331
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr ""
 
-#: documents/serialisers.py:1423
+#: documents/serialisers.py:1440
 msgid "Invalid variable detected."
 msgstr ""
 

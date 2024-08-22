@@ -279,7 +279,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</target>
+        <target state="translated">Dokument <x id="PH" equiv-text="status.filename"/> har lagts till Paperless-ngx.</target>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html" approved="yes">
         <source>Open document</source>
@@ -319,7 +319,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">124</context>
         </context-group>
-        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> is being processed by Paperless-ngx.</target>
+        <target state="translated">Dokument <x id="PH" equiv-text="status.filename"/> bearbetas av Paperless-ngx.</target>
       </trans-unit>
       <trans-unit id="6570363013146073520" datatype="html" approved="yes">
         <source>Dashboard</source>
@@ -491,7 +491,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Manage e-mail accounts and rules for automatically importing documents.</target>
+        <target state="translated">Hantera e-postkonton och regler för att automatiskt importera dokument.</target>
       </trans-unit>
       <trans-unit id="2258659358902319601" datatype="html">
         <source>Workflows give you more control over the document pipeline.</source>
@@ -499,7 +499,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">214</context>
         </context-group>
-        <target state="needs-translation">Workflows give you more control over the document pipeline.</target>
+        <target state="translated">Arbetsflöden ger dig mer kontroll över dokumentpipelinen.</target>
       </trans-unit>
       <trans-unit id="4680387114119209483" datatype="html">
         <source>File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</source>
@@ -519,7 +519,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">230</context>
         </context-group>
-        <target state="needs-translation">Check out the settings for various tweaks to the web app and toggle settings for saved views.</target>
+        <target state="translated">Kolla in inställningarna för olika tweaks i webbappen och ändra inställningar för sparade vyer.</target>
       </trans-unit>
       <trans-unit id="7172877665285340082" datatype="html">
         <source>Thank you! 🙏</source>
@@ -551,7 +551,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="needs-translation">Application Configuration</target>
+        <target state="translated">Applikationskonfiguration</target>
       </trans-unit>
       <trans-unit id="8528041182664173532" datatype="html">
         <source>Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of Paperless-ngx. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</source>
@@ -559,7 +559,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of Paperless-ngx. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</target>
+        <target state="translated">Globala appkonfigurationsalternativ som gäller för &lt;strong&gt;varje&lt;/strong&gt; användare av denna installation av Paperless-ngx. Alternativ kan också ställas in med hjälp av miljövariabler eller konfigurationsfilen men värdet här kommer alltid att ha företräde.</target>
       </trans-unit>
       <trans-unit id="7991430199894172363" datatype="html">
         <source>Read the documentation about this setting</source>
@@ -567,7 +567,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Read the documentation about this setting</target>
+        <target state="translated">Läs dokumentationen om den här inställningen</target>
       </trans-unit>
       <trans-unit id="2180291763949669799" datatype="html">
         <source>Enable</source>
@@ -575,7 +575,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Enable</target>
+        <target state="translated">Aktivera</target>
       </trans-unit>
       <trans-unit id="3823219296477075982" datatype="html" approved="yes">
         <source>Discard</source>
@@ -659,7 +659,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
           <context context-type="linenumber">81</context>
         </context-group>
-        <target state="needs-translation">Error retrieving config</target>
+        <target state="translated">Fel vid hämtning av konfiguration</target>
       </trans-unit>
       <trans-unit id="1172622527269118932" datatype="html">
         <source>Invalid JSON</source>
@@ -667,7 +667,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="needs-translation">Invalid JSON</target>
+        <target state="translated">Ogiltig JSON</target>
       </trans-unit>
       <trans-unit id="5103146006962696736" datatype="html">
         <source>Configuration updated</source>
@@ -675,7 +675,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
           <context context-type="linenumber">151</context>
         </context-group>
-        <target state="needs-translation">Configuration updated</target>
+        <target state="translated">Konfigurationen uppdaterad</target>
       </trans-unit>
       <trans-unit id="1664963291286452273" datatype="html">
         <source>An error occurred updating configuration</source>
@@ -683,7 +683,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
           <context context-type="linenumber">156</context>
         </context-group>
-        <target state="needs-translation">An error occurred updating configuration</target>
+        <target state="translated">Ett fel uppstod vid uppdateringen av konfigurationen</target>
       </trans-unit>
       <trans-unit id="2653081282186526824" datatype="html">
         <source>File successfully updated</source>
@@ -691,7 +691,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
           <context context-type="linenumber">178</context>
         </context-group>
-        <target state="needs-translation">File successfully updated</target>
+        <target state="translated">Filen har uppdaterats</target>
       </trans-unit>
       <trans-unit id="5902783625859504265" datatype="html">
         <source>An error occurred uploading file</source>
@@ -699,7 +699,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
           <context context-type="linenumber">183</context>
         </context-group>
-        <target state="needs-translation">An error occurred uploading file</target>
+        <target state="translated">Ett fel uppstod vid uppladdning av fil</target>
       </trans-unit>
       <trans-unit id="4804785061014590286" datatype="html" approved="yes">
         <source>Logs</source>
@@ -723,7 +723,7 @@
           <context context-type="sourcefile">src/app/components/admin/logs/logs.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Review the log files for the application and for email checking.</target>
+        <target state="translated">Granska loggfilerna för programmet och för e-postkontroll.</target>
       </trans-unit>
       <trans-unit id="8838884664569764142" datatype="html">
         <source>Auto refresh</source>
@@ -735,7 +735,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Auto refresh</target>
+        <target state="translated">Uppdatera automatiskt</target>
       </trans-unit>
       <trans-unit id="3894950702316166331" datatype="html">
         <source>Loading...</source>
@@ -823,7 +823,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Options to customize appearance, notifications, saved views and more. Settings apply to the &lt;strong&gt;current user only&lt;/strong&gt;.</target>
+        <target state="translated">Alternativ för att anpassa utseende, meddelanden, sparade vyer och mer. Inställningar gäller &lt;strong&gt;endast nuvarande användare&lt;/strong&gt;.</target>
       </trans-unit>
       <trans-unit id="1685061484835793745" datatype="html">
         <source>Start tour</source>
@@ -843,7 +843,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="needs-translation">System Status</target>
+        <target state="translated">Systemstatus</target>
       </trans-unit>
       <trans-unit id="4798013226763881638" datatype="html">
         <source>Open Django Admin</source>
@@ -1059,7 +1059,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">183</context>
         </context-group>
-        <target state="needs-translation">Document editing</target>
+        <target state="translated">Dokumentredigering</target>
       </trans-unit>
       <trans-unit id="2959590948110714366" datatype="html">
         <source>Automatically remove inbox tag(s) on save</source>
@@ -1067,7 +1067,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">187</context>
         </context-group>
-        <target state="needs-translation">Automatically remove inbox tag(s) on save</target>
+        <target state="translated">Ta automatiskt bort inkorgtagg(ar) vid spara</target>
       </trans-unit>
       <trans-unit id="8508424367627989968" datatype="html" approved="yes">
         <source>Bulk editing</source>
@@ -1103,7 +1103,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.ts</context>
           <context context-type="linenumber">104</context>
         </context-group>
-        <target state="needs-translation">Global search</target>
+        <target state="translated">Global sökning</target>
       </trans-unit>
       <trans-unit id="2818183879511244335" datatype="html">
         <source>Do not include advanced search results</source>
@@ -1111,7 +1111,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">204</context>
         </context-group>
-        <target state="needs-translation">Do not include advanced search results</target>
+        <target state="translated">Inkludera inte avancerade sökresultat</target>
       </trans-unit>
       <trans-unit id="3969258421469113318" datatype="html">
         <source>Full search links to</source>
@@ -1119,7 +1119,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">212</context>
         </context-group>
-        <target state="needs-translation">Full search links to</target>
+        <target state="translated">Fullständiga söklänkar till</target>
       </trans-unit>
       <trans-unit id="6631288852577115923" datatype="html">
         <source>Title and content search</source>
@@ -1127,7 +1127,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">216</context>
         </context-group>
-        <target state="needs-translation">Title and content search</target>
+        <target state="translated">Titel och innehållssökning</target>
       </trans-unit>
       <trans-unit id="1010505078885609376" datatype="html" approved="yes">
         <source>Advanced search</source>
@@ -1235,7 +1235,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">239</context>
         </context-group>
-        <target state="needs-translation">Default Permissions</target>
+        <target state="translated">Standardbehörigheter</target>
       </trans-unit>
       <trans-unit id="8222269449891326545" datatype="html">
         <source> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI </source>
@@ -2283,7 +2283,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Restore selected</target>
+        <target state="translated">Återställ markerade</target>
       </trans-unit>
       <trans-unit id="8831459317888986184" datatype="html">
         <source>Delete selected</source>
@@ -2291,7 +2291,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Delete selected</target>
+        <target state="translated">Radera markerade</target>
       </trans-unit>
       <trans-unit id="8597030111956627342" datatype="html">
         <source>Empty trash</source>
@@ -2299,7 +2299,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Empty trash</target>
+        <target state="translated">Töm papperskorgen</target>
       </trans-unit>
       <trans-unit id="991066160113599649" datatype="html">
         <source>Remaining</source>
@@ -2307,7 +2307,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Remaining</target>
+        <target state="translated">Återstående</target>
       </trans-unit>
       <trans-unit id="7494361412465596264" datatype="html">
         <source><x id="INTERPOLATION" equiv-text="{{ getDaysRemaining(document) }}"/> days</source>
@@ -2315,7 +2315,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{ getDaysRemaining(document) }}"/> days</target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="{{ getDaysRemaining(document) }}"/> dagar</target>
       </trans-unit>
       <trans-unit id="6770769801335635194" datatype="html">
         <source>Restore</source>
@@ -3535,7 +3535,7 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation">Search fields</target>
+        <target state="translated">Sökfält</target>
       </trans-unit>
       <trans-unit id="3672488183382190185" datatype="html">
         <source>Create new field</source>
@@ -3555,7 +3555,7 @@
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.ts</context>
           <context context-type="linenumber">56</context>
         </context-group>
-        <target state="needs-translation">Saved field "<x id="PH" equiv-text="newField.name"/>".</target>
+        <target state="translated">Sparade fält "<x id="PH" equiv-text="newField.name"/>".</target>
       </trans-unit>
       <trans-unit id="1841172489943868696" datatype="html">
         <source>Error saving field.</source>
@@ -3567,7 +3567,7 @@
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.ts</context>
           <context context-type="linenumber">63</context>
         </context-group>
-        <target state="needs-translation">Error saving field.</target>
+        <target state="translated">Kunde inte spara fältet.</target>
       </trans-unit>
       <trans-unit id="6052766076365105714" datatype="html">
         <source>now</source>
@@ -3743,7 +3743,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Data type</target>
+        <target state="translated">Datatyp</target>
       </trans-unit>
       <trans-unit id="5933665691581884232" datatype="html">
         <source>Data type cannot be changed after a field is created</source>
@@ -3751,7 +3751,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Data type cannot be changed after a field is created</target>
+        <target state="translated">Datatyp kan inte ändras efter att ett fält har skapats</target>
       </trans-unit>
       <trans-unit id="4910631867841099191" datatype="html">
         <source>Add option</source>
@@ -3759,7 +3759,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Add option</target>
+        <target state="translated">Lägga till alternativ</target>
       </trans-unit>
       <trans-unit id="2739003406164860877" datatype="html">
         <source>Default Currency</source>
@@ -3767,7 +3767,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Default Currency</target>
+        <target state="translated">Standardvaluta</target>
       </trans-unit>
       <trans-unit id="7615210738790237590" datatype="html">
         <source>3-character currency code</source>
@@ -3775,7 +3775,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">3-character currency code</target>
+        <target state="translated">3-teckens valutakod</target>
       </trans-unit>
       <trans-unit id="607636736207886379" datatype="html">
         <source>Use locale</source>
