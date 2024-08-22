@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-09 11:27-0700\n"
-"PO-Revision-Date: 2024-08-09 12:10\n"
+"POT-Creation-Date: 2024-08-19 23:29-0700\n"
+"PO-Revision-Date: 2024-08-20 06:32\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -677,7 +677,7 @@ msgstr "رابط المستند"
 
 #: documents/models.py:812
 msgid "Select"
-msgstr ""
+msgstr "تحديد"
 
 #: documents/models.py:824
 msgid "data type"
@@ -685,11 +685,11 @@ msgstr "نوع البيانات"
 
 #: documents/models.py:831
 msgid "extra data"
-msgstr ""
+msgstr "بيانات إضافية"
 
 #: documents/models.py:835
 msgid "Extra data for the custom field, such as select options"
-msgstr ""
+msgstr "بيانات إضافية للحقل المخصص، مثل تحديد خيارات"
 
 #: documents/models.py:841
 msgid "custom field"
@@ -936,12 +936,12 @@ msgstr "التعبير النظامي خاطىء: %(error)s"
 msgid "Invalid color."
 msgstr "لون خاطئ."
 
-#: documents/serialisers.py:1314
+#: documents/serialisers.py:1331
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "نوع الملف %(type)s غير مدعوم"
 
-#: documents/serialisers.py:1423
+#: documents/serialisers.py:1440
 msgid "Invalid variable detected."
 msgstr "اكتشاف متغير خاطئ."
 
