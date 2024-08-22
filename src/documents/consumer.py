@@ -813,7 +813,8 @@ class Consumer(LoggingMixin):
                  # create file from document
                 # self.log.info('gia tri documentt', document.folder)
                 
-                new_file = Folder.objects.create(name=document.title, parent_folder = document.folder,type = Folder.FILE, owner = document.owner, created = document.created, updated = document.modified, checksum = document.checksum)
+                new_file = Folder.objects.create(name=document.title, parent_folder = document.folder,type = Folder.FILE, owner = document.owner, created = document.created, updated = document.modified)
+                new_file.checksum=hashlib.md5(f'{new_file.id}.{new_file.name}'.encode()).hexdigest()
                 if document.folder :
                     new_file.path = f"{document.folder.path}/{new_file.id}"
                 else:
