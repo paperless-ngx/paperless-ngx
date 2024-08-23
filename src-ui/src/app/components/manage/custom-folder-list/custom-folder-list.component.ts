@@ -60,7 +60,7 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
   extends ComponentWithPermissions
   implements OnInit, OnDestroy {
   [x: string]: any
-  
+
 
   constructor(
     private service: AbstractNameFilterService<T>,
@@ -75,7 +75,7 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
     public permissionType: PermissionType,
     public extraColumns: ManagementListColumn[],
     public folderService: FolderService,
-    
+
   ) {
     super()
   }
@@ -108,11 +108,10 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
 
   ngOnInit(): void {
     if (localStorage.getItem('folder-list:displayMode') != null) {
-      // console.log( localStorage.getItem('folder-list:displayMode'))
       this.displayMode = localStorage.getItem('folder-list:displayMode')
     }
     this.reloadData()
-    
+
     this.nameFilterDebounce = new Subject<string>()
 
     this.nameFilterDebounce
@@ -160,7 +159,7 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
         this.awaitingDownload = false
       })
   }
-  
+
   userCanEditAll(): boolean {
     let canEdit: boolean = this.permissionService.currentUserCan(
       PermissionAction.Change,
@@ -186,7 +185,7 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
 
   reloadData() {
     this.selectedObjects.clear()
-    let listFolderPath 
+    let listFolderPath
     if (this.id){
       this.folderService.getFolderPath(this.id).subscribe(
         (folder) => {
@@ -194,7 +193,7 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
           // console.log(listFolderPath)
           this.folderPath = listFolderPath.results
         },)
-      
+
 
     }
     // console.log(this.folderPath)
@@ -237,7 +236,7 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
       )
     })
   }
-  
+
 
   openEditDialog(object: T) {
     var activeModal = this.modalService.open(this.editDialogComponent, {
@@ -359,7 +358,7 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
       : this.selectedObjects.add(object.id)
   }
   selectAll(){
-    
+
     this.selectedObjects = new Set(this.data.map((o) => o.id))
   }
 
@@ -435,7 +434,6 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
   cutFolder() {
     this.folderCut = Array.from(this.selectedObjects)
     this.isFolderCutClicked = true;
-    // console.log("folder cut :", this.folderCut)
     return this.folderCut
   }
 
@@ -447,8 +445,8 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
       this.router.navigate(['/subfolders/', this.id], {
         queryParams: {}
       });
-    } 
-  
+    }
+
     else {
       this.router.navigate(['/folders/'], {
         queryParams: {}
@@ -495,13 +493,13 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
               this.router.navigate(['/subfolders/', this.id], {
                 queryParams: {}
               });
-            } 
+            }
             else {
               this.router.navigate(['/folders/'], {
                 queryParams: {}
               });
             }
-            
+
           },
           error: (error) => {
             modal.componentInstance.buttonsEnabled = true

@@ -29,8 +29,8 @@ extends CustomFolderListComponent<Folder> {
   MyunsubscribeNotifier: Subject<any> = new Subject()
 
   public selectedObjects: Set<number> = new Set()
-  
-  
+
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -55,19 +55,23 @@ extends CustomFolderListComponent<Folder> {
       folderService
     )
   }
-  
-  
-  
+
+
+
   reloadData() {
     this.id = this.route.snapshot.params['id']
-    // console.log('load trang folder',this.router.getCurrentNavigation())
     super.reloadData()
+  }
+
+  getFolderSelect(){
+    let folderIds = this.route.snapshot.queryParams['folderIds']||[];
+    return   Array.from(folderIds).join('').length
   }
 
   goToFolder(object: Folder) {
     let folderId = this.route.snapshot.queryParams['folderIds'];
     let getQueryParams: { folderIds?: string };
-    
+
     if (this.isFolderCutClicked) {
       getQueryParams = {
         folderIds: Array.from(this.folderCut).join(',')
@@ -87,7 +91,7 @@ extends CustomFolderListComponent<Folder> {
       }
     );
     super.reloadData()
-    
+
   }
 
   goToFolderRoot() {
@@ -109,11 +113,11 @@ extends CustomFolderListComponent<Folder> {
     this.router.navigate(['/folders/',], {
       queryParams: getQueryParams
     });
-    
+
     super.reloadData()
-    
+
   }
-    
+
   getDeleteMessage(object: Folder) {
     return $localize`Do you really want to delete the folder "${object.name}"?`
   }
