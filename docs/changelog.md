@@ -1,5 +1,19 @@
 # Changelog
 
+## paperless-ngx 2.11.6
+
+### Bug Fixes
+
+- Fix: fix nltk tokenizer breaking change [@shamoon](https://github.com/shamoon) ([#7522](https://github.com/paperless-ngx/paperless-ngx/pull/7522))
+
+### All App Changes
+
+<details>
+<summary>1 change</summary>
+
+- Fix: fix nltk tokenizer breaking change [@shamoon](https://github.com/shamoon) ([#7522](https://github.com/paperless-ngx/paperless-ngx/pull/7522))
+</details>
+
 ## paperless-ngx 2.11.5
 
 ### Bug Fixes
