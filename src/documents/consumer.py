@@ -54,6 +54,7 @@ from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
 from paperless.models import ApplicationConfiguration
+from paperless_ocr_custom.parsers import RasterisedDocumentCustomParser
 
 
 class WorkflowTriggerPlugin(
@@ -736,7 +737,11 @@ class Consumer(LoggingMixin):
             enable_ocr = ApplicationConfiguration.objects.filter().first().enable_ocr
             if enable_ocr:
                 self.log.debug(f"Parsing {self.filename}...")
-                data_ocr_fields = document_parser.parse(self.working_copy, mime_type, self.filename, self.get_config_dossier_form())
+               
+                if isinstance(document_parser,RasterisedDocumentCustomParser):
+                    data_ocr_fields = document_parser.parse(self.working_copy, mime_type, self.filename, self.get_config_dossier_form())
+                else:
+                    document_parser.parse(self.working_copy, mime_type, self.filename)
 
             self.log.debug(f"Generating thumbnail for {self.filename}...")
             self._send_progress(
@@ -839,7 +844,7 @@ class Consumer(LoggingMixin):
                     new_dossier_document.path = f"{new_file.id}"
                 new_dossier_document.save()
                 
-            
+
                 if data_ocr_fields[1] == '' and isinstance(data_ocr_fields[0], list):
                     self.fill_custom_field(document, data_ocr_fields, new_dossier_document)
 
