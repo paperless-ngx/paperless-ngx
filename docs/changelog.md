@@ -1,5 +1,38 @@
 # Changelog
 
+## paperless-ngx 2.11.5
+
+### Bug Fixes
+
+- Fix: use JSON for update archive file auditlog entries [@shamoon](https://github.com/shamoon) ([#7503](https://github.com/paperless-ngx/paperless-ngx/pull/7503))
+- Fix: respect deskew / rotate pages from AppConfig if set [@shamoon](https://github.com/shamoon) ([#7501](https://github.com/paperless-ngx/paperless-ngx/pull/7501))
+
+### Dependencies
+
+<details>
+<summary>5 changes</summary>
+
+- Chore(deps): Bump the small-changes group across 1 directory with 6 updates [@dependabot](https://github.com/dependabot) ([#7502](https://github.com/paperless-ngx/paperless-ngx/pull/7502))
+- Chore(deps-dev): Bump the development group with 2 updates [@dependabot](https://github.com/dependabot) ([#7497](https://github.com/paperless-ngx/paperless-ngx/pull/7497))
+- Chore(deps-dev): Bump axios from 1.6.7 to 1.7.4 in /src-ui [@dependabot](https://github.com/dependabot) ([#7472](https://github.com/paperless-ngx/paperless-ngx/pull/7472))
+- Chore(deps-dev): Bump ruff from 0.5.6 to 0.5.7 in the development group [@dependabot](https://github.com/dependabot) ([#7457](https://github.com/paperless-ngx/paperless-ngx/pull/7457))
+- Chore(deps): Bump the small-changes group with 3 updates [@dependabot](https://github.com/dependabot) ([#7460](https://github.com/paperless-ngx/paperless-ngx/pull/7460))
+</details>
+
+### All App Changes
+
+<details>
+<summary>7 changes</summary>
+
+- Fix: use JSON for update archive file auditlog entries [@shamoon](https://github.com/shamoon) ([#7503](https://github.com/paperless-ngx/paperless-ngx/pull/7503))
+- Chore(deps): Bump the small-changes group across 1 directory with 6 updates [@dependabot](https://github.com/dependabot) ([#7502](https://github.com/paperless-ngx/paperless-ngx/pull/7502))
+- Fix: respect deskew / rotate pages from AppConfig if set [@shamoon](https://github.com/shamoon) ([#7501](https://github.com/paperless-ngx/paperless-ngx/pull/7501))
+- Chore(deps-dev): Bump the development group with 2 updates [@dependabot](https://github.com/dependabot) ([#7497](https://github.com/paperless-ngx/paperless-ngx/pull/7497))
+- Chore(deps-dev): Bump axios from 1.6.7 to 1.7.4 in /src-ui [@dependabot](https://github.com/dependabot) ([#7472](https://github.com/paperless-ngx/paperless-ngx/pull/7472))
+- Chore(deps-dev): Bump ruff from 0.5.6 to 0.5.7 in the development group [@dependabot](https://github.com/dependabot) ([#7457](https://github.com/paperless-ngx/paperless-ngx/pull/7457))
+- Chore(deps): Bump the small-changes group with 3 updates [@dependabot](https://github.com/dependabot) ([#7460](https://github.com/paperless-ngx/paperless-ngx/pull/7460))
+</details>
+
 ## paperless-ngx 2.11.4
 
 ### Bug Fixes
