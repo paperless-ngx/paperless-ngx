@@ -1,7 +1,7 @@
 def get_parser(*args, **kwargs):
-    from paperless_ocr_custom.parsers import RasterisedDocumentParser
+    from paperless_ocr_custom.parsers import RasterisedDocumentCustomParser
 
-    return RasterisedDocumentParser(*args, **kwargs)
+    return RasterisedDocumentCustomParser(*args, **kwargs)
 
 
 def tesseract_consumer_declaration(sender, **kwargs):

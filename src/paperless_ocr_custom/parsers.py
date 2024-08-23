@@ -43,13 +43,13 @@ class RtlLanguageException(Exception):
     pass
 
 
-class RasterisedDocumentParser(DocumentParser):
+class RasterisedDocumentCustomParser(DocumentParser):
     """
     This parser uses Tesseract to try and get some text out of a rasterised
     image, whether it's a PDF, or other graphical format (JPEG, TIFF, etc.)
     """
 
-    logging_name = "paperless.parsing.tesseract"
+    logging_name = "edoc.parsing.pdf"
 
     def get_settings(self) -> OcrConfig:
         """
