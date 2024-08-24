@@ -671,7 +671,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 # Internationalization                                                        #
 ###############################################################################
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "vi-vn"
 
 LANGUAGES = [
     ("en-us", _("English (US)")),  # needs to be first to act as fallback language
