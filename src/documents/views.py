@@ -852,6 +852,8 @@ class UnifiedSearchViewSet(DocumentViewSet):
         )
 
     def filter_queryset(self, queryset):
+        filtered_queryset = super().filter_queryset(queryset)
+
         if self._is_search_request():
             from documents import index
 
@@ -866,10 +868,10 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 self.searcher,
                 self.request.query_params,
                 self.paginator.get_page_size(self.request),
-                self.request.user,
+                filter_queryset=filtered_queryset,
             )
         else:
-            return super().filter_queryset(queryset)
+            return filtered_queryset
 
     def list(self, request, *args, **kwargs):
         if self._is_search_request():
@@ -1199,14 +1201,16 @@ class GlobalSearchView(PassUserMixin):
                 from documents import index
 
                 with index.open_index_searcher() as s:
-                    q, _ = index.DelayedFullTextQuery(
+                    fts_query = index.DelayedFullTextQuery(
                         s,
                         request.query_params,
-                        10,
-                        request.user,
-                    )._get_query()
-                    results = s.search(q, limit=OBJECT_LIMIT)
-                    docs = docs | all_docs.filter(id__in=[r["id"] for r in results])
+                        OBJECT_LIMIT,
+                        filter_queryset=all_docs,
+                    )
+                    results = fts_query[0:1]
+                    docs = docs | Document.objects.filter(
+                        id__in=[r["id"] for r in results],
+                    )
             docs = docs[:OBJECT_LIMIT]
         saved_views = (
             SavedView.objects.filter(owner=request.user, name__icontains=query)
@@ -1452,12 +1456,12 @@ class StatisticsView(APIView):
             {
                 "documents_total": documents_total,
                 "documents_inbox": documents_inbox,
-                "inbox_tag": inbox_tags.first().pk
-                if inbox_tags.exists()
-                else None,  # backwards compatibility
-                "inbox_tags": [tag.pk for tag in inbox_tags]
-                if inbox_tags.exists()
-                else None,
+                "inbox_tag": (
+                    inbox_tags.first().pk if inbox_tags.exists() else None
+                ),  # backwards compatibility
+                "inbox_tags": (
+                    [tag.pk for tag in inbox_tags] if inbox_tags.exists() else None
+                ),
                 "document_file_type_counts": document_file_type_counts,
                 "character_count": character_count,
                 "tag_count": len(tags),
