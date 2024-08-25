@@ -263,6 +263,41 @@ class MessageBuilder:
         return imap_msg
 
 
+def reset_bogus_mailbox(bogus_mailbox: BogusMailBox, message_builder: MessageBuilder):
+    bogus_mailbox.messages = []
+    bogus_mailbox.messages_spam = []
+    bogus_mailbox.messages.append(
+        message_builder.create_message(
+            subject="Invoice 1",
+            from_="amazon@amazon.de",
+            to=["me@myselfandi.com", "helpdesk@mydomain.com"],
+            body="cables",
+            seen=True,
+            flagged=False,
+            processed=False,
+        ),
+    )
+    bogus_mailbox.messages.append(
+        message_builder.create_message(
+            subject="Invoice 2",
+            body="from my favorite electronic store",
+            to=["invoices@mycompany.com"],
+            seen=False,
+            flagged=True,
+            processed=True,
+        ),
+    )
+    bogus_mailbox.messages.append(
+        message_builder.create_message(
+            subject="Claim your $10M price now!",
+            from_="amazon@amazon-some-indian-site.org",
+            to=["special@me.me"],
+            seen=False,
+        ),
+    )
+    bogus_mailbox.updateClient()
+
+
 @mock.patch("paperless_mail.mail.magic.from_buffer", fake_magic_from_buffer)
 class TestMail(
     DirectoriesMixin,
@@ -282,45 +317,11 @@ class TestMail(
         self._queue_consumption_tasks_mock = patcher.start()
         self.addCleanup(patcher.stop)
 
-        self.reset_bogus_mailbox()
+        reset_bogus_mailbox(self.bogus_mailbox, self.messageBuilder)
 
         self.mail_account_handler = MailAccountHandler()
 
         super().setUp()
-
-    def reset_bogus_mailbox(self):
-        self.bogus_mailbox.messages = []
-        self.bogus_mailbox.messages_spam = []
-        self.bogus_mailbox.messages.append(
-            self.messageBuilder.create_message(
-                subject="Invoice 1",
-                from_="amazon@amazon.de",
-                to=["me@myselfandi.com", "helpdesk@mydomain.com"],
-                body="cables",
-                seen=True,
-                flagged=False,
-                processed=False,
-            ),
-        )
-        self.bogus_mailbox.messages.append(
-            self.messageBuilder.create_message(
-                subject="Invoice 2",
-                body="from my favorite electronic store",
-                to=["invoices@mycompany.com"],
-                seen=False,
-                flagged=True,
-                processed=True,
-            ),
-        )
-        self.bogus_mailbox.messages.append(
-            self.messageBuilder.create_message(
-                subject="Claim your $10M price now!",
-                from_="amazon@amazon-some-indian-site.org",
-                to="special@me.me",
-                seen=False,
-            ),
-        )
-        self.bogus_mailbox.updateClient()
 
     def test_get_correspondent(self):
         message = namedtuple("MailMessage", [])
@@ -1125,7 +1126,7 @@ class TestMail(
         )
 
         self._queue_consumption_tasks_mock.reset_mock()
-        self.reset_bogus_mailbox()
+        reset_bogus_mailbox(self.bogus_mailbox, self.messageBuilder)
 
         with mock.patch("paperless_mail.mail.Correspondent.objects.get_or_create") as m:
             m.side_effect = DatabaseError()
@@ -1170,7 +1171,7 @@ class TestMail(
                     filter_from=f_from,
                     filter_to=f_to,
                 )
-                self.reset_bogus_mailbox()
+                reset_bogus_mailbox(self.bogus_mailbox, self.messageBuilder)
                 self._queue_consumption_tasks_mock.reset_mock()
 
                 self._queue_consumption_tasks_mock.assert_not_called()
