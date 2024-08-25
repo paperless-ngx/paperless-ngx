@@ -36,7 +36,7 @@
                 <span [title]="item[bindLabel]">{{item[bindLabel]}}</span>
             </ng-template>
           </ng-select>
-          @if (allowCreateNew) {
+          @if (allowCreateNew && !hideAddButton) {
             <button class="btn btn-outline-secondary" type="button" (click)="addItem()" [disabled]="disabled">
               <i-bs width="1.2em" height="1.2em" name="plus"></i-bs>
             </button>

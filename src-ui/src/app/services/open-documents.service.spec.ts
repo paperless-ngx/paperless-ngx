@@ -1,14 +1,16 @@
 import { TestBed } from '@angular/core/testing'
 import { OpenDocumentsService } from './open-documents.service'
 import {
-  HttpClientTestingModule,
   HttpTestingController,
+  provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import { environment } from 'src/environments/environment'
-import { Subscription } from 'rxjs'
+import { Subscription, throwError } from 'rxjs'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ConfirmDialogComponent } from '../components/common/confirm-dialog/confirm-dialog.component'
 import { OPEN_DOCUMENT_SERVICE } from '../data/storage-keys'
+import { wind } from 'ngx-bootstrap-icons'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const documents = [
   {
@@ -55,9 +57,14 @@ describe('OpenDocumentsService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [OpenDocumentsService, NgbModal],
-      imports: [HttpClientTestingModule],
       declarations: [ConfirmDialogComponent],
+      imports: [],
+      providers: [
+        OpenDocumentsService,
+        NgbModal,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
     })
 
     sessionStorage.clear()
@@ -108,6 +115,7 @@ describe('OpenDocumentsService', () => {
   })
 
   it('should close documents', () => {
+    openDocumentsService.closeDocument({ id: 999 } as any)
     subscriptions.push(
       openDocumentsService.openDocument(documents[0]).subscribe()
     )
@@ -128,15 +136,22 @@ describe('OpenDocumentsService', () => {
     subscriptions.push(
       openDocumentsService.openDocument(documents[0]).subscribe()
     )
+    openDocumentsService.setDirty({ id: 999 }, true) // coverage
     openDocumentsService.setDirty(documents[0], false)
     expect(openDocumentsService.hasDirty()).toBeFalsy()
     openDocumentsService.setDirty(documents[0], true)
     expect(openDocumentsService.hasDirty()).toBeTruthy()
+    expect(openDocumentsService.isDirty(documents[0])).toBeTruthy()
+    let openModal
+    modalService.activeInstances.subscribe((instances) => {
+      openModal = instances[0]
+    })
     const modalSpy = jest.spyOn(modalService, 'open')
     subscriptions.push(
       openDocumentsService.closeDocument(documents[0]).subscribe()
     )
     expect(modalSpy).toHaveBeenCalled()
+    openModal.componentInstance.confirmClicked.next()
   })
 
   it('should allow set dirty status, warn on closeAll', () => {
@@ -148,9 +163,14 @@ describe('OpenDocumentsService', () => {
     )
     openDocumentsService.setDirty(documents[0], true)
     expect(openDocumentsService.hasDirty()).toBeTruthy()
+    let openModal
+    modalService.activeInstances.subscribe((instances) => {
+      openModal = instances[0]
+    })
     const modalSpy = jest.spyOn(modalService, 'open')
     subscriptions.push(openDocumentsService.closeAll().subscribe())
     expect(modalSpy).toHaveBeenCalled()
+    openModal.componentInstance.confirmClicked.next()
   })
 
   it('should load open documents from localStorage', () => {
@@ -220,5 +240,13 @@ describe('OpenDocumentsService', () => {
     expect(req.request.method).toEqual('GET')
     req.error(new ErrorEvent('timeout'))
     expect(openDocumentsService.getOpenDocuments()).toHaveLength(0)
+  })
+
+  it('should log error on sessionStorage save', () => {
+    const doc = { ...documents[0] }
+    doc.content = 'a'.repeat(1000000)
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
+    openDocumentsService.openDocument(doc)
+    expect(consoleSpy).toHaveBeenCalled()
   })
 })

@@ -10,8 +10,8 @@ map_uidgid() {
 	local -r usermap_new_gid=${USERMAP_GID:-${usermap_original_gid:-$usermap_new_uid}}
 	if [[ ${usermap_new_uid} != "${usermap_original_uid}" || ${usermap_new_gid} != "${usermap_original_gid}" ]]; then
 		echo "Mapping UID and GID for paperless:paperless to $usermap_new_uid:$usermap_new_gid"
-		usermod -o -u "${usermap_new_uid}" paperless
-		groupmod -o -g "${usermap_new_gid}" paperless
+		usermod --non-unique --uid "${usermap_new_uid}" paperless
+		groupmod --non-unique --gid "${usermap_new_gid}" paperless
 	fi
 }
 
@@ -42,7 +42,7 @@ custom_container_init() {
 		fi
 
 		# Make sure custom init directory has files in it
-		if [ -n "$(/bin/ls -A "${custom_script_dir}" 2>/dev/null)" ]; then
+		if [ -n "$(/bin/ls --almost-all "${custom_script_dir}" 2>/dev/null)" ]; then
 			echo "[custom-init] files found in ${custom_script_dir} executing"
 			# Loop over files in the directory
 			for SCRIPT in "${custom_script_dir}"/*; do
@@ -86,23 +86,23 @@ initialize() {
 		"${CONSUME_DIR}"; do
 		if [[ ! -d "${dir}" ]]; then
 			echo "Creating directory ${dir}"
-			mkdir --parents "${dir}"
+			mkdir --parents --verbose "${dir}"
 		fi
 	done
 
-	local -r tmp_dir="/tmp/paperless"
-	echo "Creating directory ${tmp_dir}"
-	mkdir --parents "${tmp_dir}"
+	local -r tmp_dir="${PAPERLESS_SCRATCH_DIR:=/tmp/paperless}"
+	echo "Creating directory scratch directory ${tmp_dir}"
+	mkdir --parents --verbose "${tmp_dir}"
 
 	set +e
 	echo "Adjusting permissions of paperless files. This may take a while."
-	chown -R paperless:paperless ${tmp_dir}
+	chown -R paperless:paperless "${tmp_dir}"
 	for dir in \
 		"${export_dir}" \
 		"${DATA_DIR}" \
 		"${MEDIA_ROOT_DIR}" \
 		"${CONSUME_DIR}"; do
-		find "${dir}" -not \( -user paperless -and -group paperless \) -exec chown paperless:paperless {} +
+		find "${dir}" -not \( -user paperless -and -group paperless \) -exec chown --changes paperless:paperless {} +
 	done
 	set -e
 
@@ -127,7 +127,7 @@ install_languages() {
 	for lang in "${langs[@]}"; do
 		pkg="tesseract-ocr-$lang"
 
-		if dpkg -s "$pkg" &>/dev/null; then
+		if dpkg --status "$pkg" &>/dev/null; then
 			echo "Package $pkg already installed!"
 			continue
 		fi
@@ -138,7 +138,7 @@ install_languages() {
 		fi
 
 		echo "Installing package $pkg..."
-		if ! apt-get -y install "$pkg" &>/dev/null; then
+		if ! apt-get --assume-yes install "$pkg" &>/dev/null; then
 			echo "Could not install $pkg"
 			exit 1
 		fi
@@ -148,7 +148,7 @@ install_languages() {
 echo "Paperless-ngx docker container starting..."
 
 gosu_cmd=(gosu paperless)
-if [ "$(id -u)" == "$(id -u paperless)" ]; then
+if [ "$(id --user)" == "$(id --user paperless)" ]; then
 	gosu_cmd=()
 fi
 

@@ -32,6 +32,7 @@ export class PermissionsDialogComponent {
     this.o = o
     this.title = $localize`Edit permissions for ` + o['name']
     this.form.patchValue({
+      merge: true,
       permissions_form: {
         owner: o.owner,
         set_permissions: o.permissions,
@@ -43,8 +44,9 @@ export class PermissionsDialogComponent {
     return this.o
   }
 
-  form = new FormGroup({
+  public form = new FormGroup({
     permissions_form: new FormControl(),
+    merge: new FormControl(true),
   })
 
   buttonsEnabled: boolean = true
@@ -66,11 +68,21 @@ export class PermissionsDialogComponent {
     }
   }
 
-  @Input()
-  message =
-    $localize`Note that permissions set here will override any existing permissions`
+  get hint(): string {
+    if (this.object) return null
+    return this.form.get('merge').value
+      ? $localize`Existing owner, user and group permissions will be merged with these settings.`
+      : $localize`Any and all existing owner, user and group permissions will be replaced.`
+  }
 
   cancelClicked() {
     this.activeModal.close()
+  }
+
+  confirm() {
+    this.confirmClicked.emit({
+      permissions: this.permissions,
+      merge: this.form.get('merge').value,
+    })
   }
 }

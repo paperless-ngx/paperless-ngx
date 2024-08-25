@@ -7,12 +7,21 @@ import {
   OnDestroy,
   ViewChild,
   ElementRef,
+  AfterViewInit,
 } from '@angular/core'
 import { Tag } from 'src/app/data/tag'
 import { Correspondent } from 'src/app/data/correspondent'
 import { DocumentType } from 'src/app/data/document-type'
-import { Subject, Subscription } from 'rxjs'
-import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators'
+import { Observable, Subject, Subscription, from } from 'rxjs'
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  map,
+  switchMap,
+  takeUntil,
+} from 'rxjs/operators'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
@@ -48,8 +57,12 @@ import {
   FILTER_OWNER_DOES_NOT_INCLUDE,
   FILTER_OWNER_ISNULL,
   FILTER_OWNER_ANY,
-  FILTER_CUSTOM_FIELDS,
+  FILTER_CUSTOM_FIELDS_TEXT,
   FILTER_SHARED_BY_USER,
+  FILTER_HAS_CUSTOM_FIELDS_ANY,
+  FILTER_HAS_CUSTOM_FIELDS_ALL,
+  FILTER_HAS_ANY_CUSTOM_FIELDS,
+  FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
 } from 'src/app/data/filter-rule-type'
 import {
   FilterableDropdownSelectionModel,
@@ -65,11 +78,20 @@ import {
 import { Document } from 'src/app/data/document'
 import { StoragePath } from 'src/app/data/storage-path'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
-import { RelativeDate } from '../../common/date-dropdown/date-dropdown.component'
+import { RelativeDate } from '../../common/dates-dropdown/dates-dropdown.component'
 import {
   OwnerFilterType,
   PermissionsSelectionModel,
 } from '../../common/permissions-filter-dropdown/permissions-filter-dropdown.component'
+import {
+  PermissionAction,
+  PermissionType,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
+import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { CustomField } from 'src/app/data/custom-field'
+import { SearchService } from 'src/app/services/rest/search.service'
 
 const TEXT_FILTER_TARGET_TITLE = 'title'
 const TEXT_FILTER_TARGET_TITLE_CONTENT = 'title-content'
@@ -155,7 +177,10 @@ const DEFAULT_TEXT_FILTER_MODIFIER_OPTIONS = [
   templateUrl: './filter-editor.component.html',
   styleUrls: ['./filter-editor.component.scss'],
 })
-export class FilterEditorComponent implements OnInit, OnDestroy {
+export class FilterEditorComponent
+  extends ComponentWithPermissions
+  implements OnInit, OnDestroy, AfterViewInit
+{
   generateFilterName() {
     if (this.filterRules.length == 1) {
       let rule = this.filterRules[0]
@@ -199,6 +224,16 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
             return $localize`Without any tag`
           }
 
+        case FILTER_HAS_CUSTOM_FIELDS_ALL:
+          return $localize`Custom fields: ${this.customFields.find(
+            (f) => f.id == +rule.value
+          )?.name}`
+
+        case FILTER_HAS_ANY_CUSTOM_FIELDS:
+          if (rule.value == 'false') {
+            return $localize`Without any custom field`
+          }
+
         case FILTER_TITLE:
           return $localize`Title: ${rule.value}`
 
@@ -224,8 +259,13 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     private tagService: TagService,
     private correspondentService: CorrespondentService,
     private documentService: DocumentService,
-    private storagePathService: StoragePathService
-  ) {}
+    private storagePathService: StoragePathService,
+    public permissionsService: PermissionsService,
+    private customFieldService: CustomFieldsService,
+    private searchService: SearchService
+  ) {
+    super()
+  }
 
   @ViewChild('textFilterInput')
   textFilterInput: ElementRef
@@ -234,15 +274,19 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   correspondents: Correspondent[] = []
   documentTypes: DocumentType[] = []
   storagePaths: StoragePath[] = []
+  customFields: CustomField[] = []
 
   tagDocumentCounts: SelectionDataItem[]
   correspondentDocumentCounts: SelectionDataItem[]
   documentTypeDocumentCounts: SelectionDataItem[]
   storagePathDocumentCounts: SelectionDataItem[]
+  customFieldDocumentCounts: SelectionDataItem[]
 
   _textFilter = ''
   _moreLikeId: number
   _moreLikeDoc: Document
+
+  unsubscribeNotifier: Subject<any> = new Subject()
 
   get textFilterTargets() {
     if (this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_MORELIKE) {
@@ -276,6 +320,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
   storagePathSelectionModel = new FilterableDropdownSelectionModel()
+  customFieldSelectionModel = new FilterableDropdownSelectionModel()
 
   dateCreatedBefore: string
   dateCreatedAfter: string
@@ -310,6 +355,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.storagePathSelectionModel.clear(false)
     this.tagSelectionModel.clear(false)
     this.correspondentSelectionModel.clear(false)
+    this.customFieldSelectionModel.clear(false)
     this._textFilter = null
     this._moreLikeId = null
     this.dateAddedBefore = null
@@ -335,7 +381,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           this._textFilter = rule.value
           this.textFilterTarget = TEXT_FILTER_TARGET_ASN
           break
-        case FILTER_CUSTOM_FIELDS:
+        case FILTER_CUSTOM_FIELDS_TEXT:
           this._textFilter = rule.value
           this.textFilterTarget = TEXT_FILTER_TARGET_CUSTOM_FIELDS
           break
@@ -350,10 +396,11 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
                     this.dateCreatedRelativeDate =
                       RELATIVE_DATE_QUERYSTRINGS.find(
                         (qS) => qS.dateQuery == match[1]
-                      )?.relativeDate
+                      )?.relativeDate ?? null
                   }
                 }
               )
+              if (this.dateCreatedRelativeDate === null) textQueryArgs.push(arg) // relative query not in the quick list
             } else if (arg.match(RELATIVE_DATE_QUERY_REGEXP_ADDED)) {
               ;[...arg.matchAll(RELATIVE_DATE_QUERY_REGEXP_ADDED)].forEach(
                 (match) => {
@@ -361,10 +408,11 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
                     this.dateAddedRelativeDate =
                       RELATIVE_DATE_QUERYSTRINGS.find(
                         (qS) => qS.dateQuery == match[1]
-                      )?.relativeDate
+                      )?.relativeDate ?? null
                   }
                 }
               )
+              if (this.dateAddedRelativeDate === null) textQueryArgs.push(arg) // relative query not in the quick list
             } else {
               textQueryArgs.push(arg)
             }
@@ -469,6 +517,36 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
         case FILTER_DOES_NOT_HAVE_STORAGE_PATH:
           this.storagePathSelectionModel.intersection = Intersection.Exclude
           this.storagePathSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Excluded,
+            false
+          )
+          break
+        case FILTER_HAS_CUSTOM_FIELDS_ALL:
+          this.customFieldSelectionModel.logicalOperator = LogicalOperator.And
+          this.customFieldSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Selected,
+            false
+          )
+          break
+        case FILTER_HAS_CUSTOM_FIELDS_ANY:
+          this.customFieldSelectionModel.logicalOperator = LogicalOperator.Or
+          this.customFieldSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Selected,
+            false
+          )
+          break
+        case FILTER_HAS_ANY_CUSTOM_FIELDS:
+          this.customFieldSelectionModel.set(
+            null,
+            ToggleableItemState.Selected,
+            false
+          )
+          break
+        case FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS:
+          this.customFieldSelectionModel.set(
             rule.value ? +rule.value : null,
             ToggleableItemState.Excluded,
             false
@@ -581,7 +659,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       this.textFilterTarget == TEXT_FILTER_TARGET_CUSTOM_FIELDS
     ) {
       filterRules.push({
-        rule_type: FILTER_CUSTOM_FIELDS,
+        rule_type: FILTER_CUSTOM_FIELDS_TEXT,
         value: this._textFilter,
       })
     }
@@ -689,6 +767,35 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           })
         })
     }
+    if (this.customFieldSelectionModel.isNoneSelected()) {
+      filterRules.push({
+        rule_type: FILTER_HAS_ANY_CUSTOM_FIELDS,
+        value: 'false',
+      })
+    } else {
+      const customFieldFilterType =
+        this.customFieldSelectionModel.logicalOperator == LogicalOperator.And
+          ? FILTER_HAS_CUSTOM_FIELDS_ALL
+          : FILTER_HAS_CUSTOM_FIELDS_ANY
+      this.customFieldSelectionModel
+        .getSelectedItems()
+        .filter((field) => field.id)
+        .forEach((field) => {
+          filterRules.push({
+            rule_type: customFieldFilterType,
+            value: field.id?.toString(),
+          })
+        })
+      this.customFieldSelectionModel
+        .getExcludedItems()
+        .filter((field) => field.id)
+        .forEach((field) => {
+          filterRules.push({
+            rule_type: FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
+            value: field.id?.toString(),
+          })
+        })
+    }
     if (this.dateCreatedBefore) {
       filterRules.push({
         rule_type: FILTER_CREATED_BEFORE,
@@ -775,27 +882,6 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
         })
       }
     }
-    if (
-      this.dateCreatedRelativeDate == null &&
-      this.dateAddedRelativeDate == null
-    ) {
-      const existingRule = filterRules.find(
-        (fr) => fr.rule_type == FILTER_FULLTEXT_QUERY
-      )
-      if (
-        existingRule?.value.match(RELATIVE_DATE_QUERY_REGEXP_CREATED) ||
-        existingRule?.value.match(RELATIVE_DATE_QUERY_REGEXP_ADDED)
-      ) {
-        // remove any existing date query
-        existingRule.value = existingRule.value
-          .replace(RELATIVE_DATE_QUERY_REGEXP_CREATED, '')
-          .replace(RELATIVE_DATE_QUERY_REGEXP_ADDED, '')
-        if (existingRule.value.replace(',', '').trim() === '') {
-          // if its empty now, remove it entirely
-          filterRules.splice(filterRules.indexOf(existingRule), 1)
-        }
-      }
-    }
     if (this.permissionsSelectionModel.ownerFilter == OwnerFilterType.SELF) {
       filterRules.push({
         rule_type: FILTER_OWNER,
@@ -852,6 +938,8 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       selectionData?.selected_correspondents ?? null
     this.storagePathDocumentCounts =
       selectionData?.selected_storage_paths ?? null
+    this.customFieldDocumentCounts =
+      selectionData?.selected_custom_fields ?? null
   }
 
   rulesModified: boolean = false
@@ -869,37 +957,87 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   }
 
   textFilterDebounce: Subject<string>
-  subscription: Subscription
+
+  @Input()
+  public disabled: boolean = false
 
   ngOnInit() {
-    this.tagService
-      .listAll()
-      .subscribe((result) => (this.tags = result.results))
-    this.correspondentService
-      .listAll()
-      .subscribe((result) => (this.correspondents = result.results))
-    this.documentTypeService
-      .listAll()
-      .subscribe((result) => (this.documentTypes = result.results))
-    this.storagePathService
-      .listAll()
-      .subscribe((result) => (this.storagePaths = result.results))
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Tag
+      )
+    ) {
+      this.tagService
+        .listAll()
+        .subscribe((result) => (this.tags = result.results))
+    }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Correspondent
+      )
+    ) {
+      this.correspondentService
+        .listAll()
+        .subscribe((result) => (this.correspondents = result.results))
+    }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.DocumentType
+      )
+    ) {
+      this.documentTypeService
+        .listAll()
+        .subscribe((result) => (this.documentTypes = result.results))
+    }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.StoragePath
+      )
+    ) {
+      this.storagePathService
+        .listAll()
+        .subscribe((result) => (this.storagePaths = result.results))
+    }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.CustomField
+      )
+    ) {
+      this.customFieldService
+        .listAll()
+        .subscribe((result) => (this.customFields = result.results))
+    }
 
     this.textFilterDebounce = new Subject<string>()
 
-    this.subscription = this.textFilterDebounce
+    this.textFilterDebounce
       .pipe(
+        takeUntil(this.unsubscribeNotifier),
         debounceTime(400),
         distinctUntilChanged(),
         filter((query) => !query.length || query.length > 2)
       )
-      .subscribe((text) => this.updateTextFilter(text))
+      .subscribe((text) =>
+        this.updateTextFilter(
+          text,
+          this.textFilterTarget !== TEXT_FILTER_TARGET_FULLTEXT_QUERY
+        )
+      )
 
     if (this._textFilter) this.documentService.searchQuery = this._textFilter
   }
 
+  ngAfterViewInit() {
+    this.textFilterInput.nativeElement.focus()
+  }
+
   ngOnDestroy() {
-    this.textFilterDebounce.complete()
+    this.unsubscribeNotifier.next(true)
   }
 
   resetSelected() {
@@ -940,10 +1078,16 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.storagePathSelectionModel.apply()
   }
 
-  updateTextFilter(text) {
+  onCustomFieldsDropdownOpen() {
+    this.customFieldSelectionModel.apply()
+  }
+
+  updateTextFilter(text, updateRules = true) {
     this._textFilter = text
-    this.documentService.searchQuery = text
-    this.updateRules()
+    if (updateRules) {
+      this.documentService.searchQuery = text
+      this.updateRules()
+    }
   }
 
   textFilterKeyup(event: KeyboardEvent) {
@@ -954,8 +1098,12 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       if (filterString.length) {
         this.updateTextFilter(filterString)
       }
-    } else if (event.key == 'Escape') {
-      this.resetTextField()
+    } else if (event.key === 'Escape') {
+      if (this._textFilter?.length) {
+        this.resetTextField()
+      } else {
+        this.textFilterInput.nativeElement.blur()
+      }
     }
   }
 
@@ -987,5 +1135,41 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     ) {
       this.updateRules()
     }
+  }
+
+  searchAutoComplete = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      filter(() => this.textFilterTarget === TEXT_FILTER_TARGET_FULLTEXT_QUERY),
+      map((term) => {
+        if (term.lastIndexOf(' ') != -1) {
+          return term.substring(term.lastIndexOf(' ') + 1)
+        } else {
+          return term
+        }
+      }),
+      switchMap((term) =>
+        term.length < 2
+          ? from([[]])
+          : this.searchService.autocomplete(term).pipe(
+              catchError(() => {
+                return from([[]])
+              })
+            )
+      )
+    )
+
+  itemSelected(event) {
+    event.preventDefault()
+    let currentSearch: string = this._textFilter ?? ''
+    let lastSpaceIndex = currentSearch.lastIndexOf(' ')
+    if (lastSpaceIndex != -1) {
+      currentSearch = currentSearch.substring(0, lastSpaceIndex + 1)
+      currentSearch += event.item + ' '
+    } else {
+      currentSearch = event.item + ' '
+    }
+    this.updateTextFilter(currentSearch)
   }
 }

@@ -5,7 +5,7 @@
   i18n-info
   infoLink="usage/#workflows"
   >
-  <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editWorkflow()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Workflow }">
+  <button type="button" class="btn btn-sm btn-outline-primary" (click)="editWorkflow()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Workflow }">
     <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Workflow</ng-container>
   </button>
 </pngx-page-header>
@@ -25,7 +25,7 @@
   @for (workflow of workflows; track workflow.id) {
     <li class="list-group-item">
       <div class="row">
-        <div class="col d-flex align-items-center"><button class="btn btn-link p-0" type="button" (click)="editWorkflow(workflow)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.Workflow)">{{workflow.name}}</button></div>
+        <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editWorkflow(workflow)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.Workflow)">{{workflow.name}}</button></div>
         <div class="col d-flex align-items-center"><code>{{workflow.order}}</code></div>
         <div class="col d-flex align-items-center"><code> @if(workflow.enabled) { <ng-container i18n>Enabled</ng-container> } @else { <span i18n class="text-muted">Disabled</span> }</code></div>
         <div class="col d-flex align-items-center">{{getTypesList(workflow)}}</div>
@@ -33,16 +33,16 @@
           <div class="btn-group">
             <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Workflow }" class="btn btn-sm btn-outline-secondary" type="button" (click)="editWorkflow(workflow)">
               <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
-              </button>
-              <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Workflow }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteWorkflow(workflow)">
-                <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
-                </button>
-              </div>
-            </div>
+            </button>
+            <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Workflow }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteWorkflow(workflow)">
+              <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+            </button>
           </div>
-        </li>
-      }
-      @if (workflows.length === 0) {
-        <li class="list-group-item" i18n>No workflows defined.</li>
-      }
-    </ul>
+        </div>
+      </div>
+    </li>
+  }
+  @if (workflows.length === 0) {
+    <li class="list-group-item" i18n>No workflows defined.</li>
+  }
+</ul>

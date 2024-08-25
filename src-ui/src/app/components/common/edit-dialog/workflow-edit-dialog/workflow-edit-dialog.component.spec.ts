@@ -1,4 +1,4 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
@@ -38,6 +38,8 @@ import {
   WorkflowActionType,
 } from 'src/app/data/workflow-action'
 import { MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/matching-model'
+import { ConfirmButtonComponent } from '../../confirm-button/confirm-button.component'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const workflow: Workflow = {
   name: 'Workflow 1',
@@ -85,7 +87,9 @@ describe('WorkflowEditDialogComponent', () => {
         PermissionsUserComponent,
         PermissionsGroupComponent,
         SafeHtmlPipe,
+        ConfirmButtonComponent,
       ],
+      imports: [FormsModule, ReactiveFormsModule, NgSelectModule, NgbModule],
       providers: [
         NgbActiveModal,
         {
@@ -148,13 +152,8 @@ describe('WorkflowEditDialogComponent', () => {
               }),
           },
         },
-      ],
-      imports: [
-        HttpClientTestingModule,
-        FormsModule,
-        ReactiveFormsModule,
-        NgSelectModule,
-        NgbModule,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 
@@ -232,5 +231,104 @@ describe('WorkflowEditDialogComponent', () => {
     expect(component.getMatchingAlgorithms()).not.toContain(
       MATCHING_ALGORITHMS.find((a) => a.id === MATCH_AUTO)
     )
+  })
+
+  it('should disable or enable action fields based on removal action type', () => {
+    const workflow: Workflow = {
+      name: 'Workflow 1',
+      id: 1,
+      order: 1,
+      enabled: true,
+      triggers: [],
+      actions: [
+        {
+          id: 1,
+          type: WorkflowActionType.Removal,
+          remove_all_tags: true,
+          remove_all_document_types: true,
+          remove_all_correspondents: true,
+          remove_all_storage_paths: true,
+          remove_all_custom_fields: true,
+          remove_all_owners: true,
+          remove_all_permissions: true,
+        },
+      ],
+    }
+    component.object = workflow
+    component.ngOnInit()
+
+    component['checkRemovalActionFields'](workflow)
+
+    // Assert that the action fields are disabled or enabled correctly
+    expect(
+      component.actionFields.at(0).get('remove_tags').disabled
+    ).toBeTruthy()
+    expect(
+      component.actionFields.at(0).get('remove_document_types').disabled
+    ).toBeTruthy()
+    expect(
+      component.actionFields.at(0).get('remove_correspondents').disabled
+    ).toBeTruthy()
+    expect(
+      component.actionFields.at(0).get('remove_storage_paths').disabled
+    ).toBeTruthy()
+    expect(
+      component.actionFields.at(0).get('remove_custom_fields').disabled
+    ).toBeTruthy()
+    expect(
+      component.actionFields.at(0).get('remove_owners').disabled
+    ).toBeTruthy()
+    expect(
+      component.actionFields.at(0).get('remove_view_users').disabled
+    ).toBeTruthy()
+    expect(
+      component.actionFields.at(0).get('remove_view_groups').disabled
+    ).toBeTruthy()
+    expect(
+      component.actionFields.at(0).get('remove_change_users').disabled
+    ).toBeTruthy()
+    expect(
+      component.actionFields.at(0).get('remove_change_groups').disabled
+    ).toBeTruthy()
+
+    workflow.actions[0].remove_all_tags = false
+    workflow.actions[0].remove_all_document_types = false
+    workflow.actions[0].remove_all_correspondents = false
+    workflow.actions[0].remove_all_storage_paths = false
+    workflow.actions[0].remove_all_custom_fields = false
+    workflow.actions[0].remove_all_owners = false
+    workflow.actions[0].remove_all_permissions = false
+
+    component['checkRemovalActionFields'](workflow)
+
+    // Assert that the action fields are disabled or enabled correctly
+    expect(component.actionFields.at(0).get('remove_tags').disabled).toBeFalsy()
+    expect(
+      component.actionFields.at(0).get('remove_document_types').disabled
+    ).toBeFalsy()
+    expect(
+      component.actionFields.at(0).get('remove_correspondents').disabled
+    ).toBeFalsy()
+    expect(
+      component.actionFields.at(0).get('remove_storage_paths').disabled
+    ).toBeFalsy()
+    expect(
+      component.actionFields.at(0).get('remove_custom_fields').disabled
+    ).toBeFalsy()
+    expect(
+      component.actionFields.at(0).get('remove_owners').disabled
+    ).toBeFalsy()
+    expect(
+      component.actionFields.at(0).get('remove_view_users').disabled
+    ).toBeFalsy()
+    expect(
+      component.actionFields.at(0).get('remove_view_groups').disabled
+    ).toBeFalsy()
+    expect(
+      component.actionFields.at(0).get('remove_change_users').disabled
+    ).toBeFalsy()
+    expect(
+      component.actionFields.at(0).get('remove_change_groups').disabled
+    ).toBeFalsy()
   })
 })

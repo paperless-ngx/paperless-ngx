@@ -24,6 +24,7 @@ $color-mode-type: data;
   --pngx-success-darken-10: hsl(152, 69%, 11%); // based on success #198754
   --pngx-bg-alt: #fff;
   --pngx-bg-darker: var(--bs-gray-100);
+  --pngx-bg-alt2: var(--bs-gray-200);
   --pngx-focus-alpha: 0.3;
 }
 
@@ -78,6 +79,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   --bs-light: #1c1c1f;
   --bs-light-rgb: 28, 28, 31;
   --bs-border-color: #47494f;
+  --pngx-bg-alt2: #232323;
   --pngx-bg-darker: #101216;
   --bs-tertiary-bg: var(--pngx-bg-darker);
   --pngx-bg-alt: #242529;
@@ -128,7 +130,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   .btn-outline-secondary {
     &:hover, &:focus, &.active, &:active {
       background-color: var(--pngx-bg-darker);
-      color: var(--bs-primary);
+      color: var(--pngx-body-color-accent) !important;
     }
   }
 
@@ -140,9 +142,9 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     background-color: var(--pngx-body-color-accent);
   }
 
-  .search-form-container {
-    input, input:focus {
-      color: var(--bs-body-color) !important;
+  .search-container {
+    input, input:focus, i-bs[name="search"] , ::placeholder {
+      color: var(--pngx-primary-text-contrast) !important;
     }
   }
 
@@ -155,7 +157,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     }
   }
 
-  .row-cols-paperless-cards .card {
+  .row-cols-paperless-cards .card, pngx-document-card-large .card {
     --bs-border-color-translucent: rgba(0, 0, 0, .3);
   }
 
@@ -170,6 +172,10 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 
   .badge.bg-light.border {
     border-color: rgba(0,0,0,0) !important;
+  }
+
+  .badge.bg-body {
+    background-color: rgba(var(--bs-dark-rgb), var(--bs-bg-opacity)) !important;
   }
 
   .document-card .card-body.bg-light {
@@ -195,9 +201,9 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     mix-blend-mode: luminosity;
   }
 
-  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option:hover,
-  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
-    background-color: var(--bs-light);
+  .paperless-input-select .ng-select .ng-dropdown-panel .ng-dropdown-panel-items .ng-option:not(.ng-option-selected):hover,
+  .paperless-input-select .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
+    background-color: var(--bs-light) !important;
   }
 
   .ng-select-multiple .ng-select-container .ng-value-container .ng-value {
@@ -275,8 +281,9 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     color: var(--bs-body-color)
   }
 
-  .dropdown-menu {
+  .dropdown-item {
     --bs-dropdown-color: var(--bs-body-color);
+    --pngx-bg-darker: var(--pngx-bg-alt);
   }
 
   .list-group {
@@ -320,6 +327,10 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
         .navbar.bg-primary {
           // navbar is og green in dark mode
           @include paperless-green;
+        }
+
+        .navbar.bg-primary .dropdown-menu {
+          @include paperless-green-dark-mode;
         }
       }
 

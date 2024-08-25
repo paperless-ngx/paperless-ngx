@@ -9,7 +9,7 @@ test('dashboard inbox link', async ({ page }) => {
   await page.routeFromHAR(REQUESTS_HAR1, { notFound: 'fallback' })
   await page.goto('/dashboard')
   await page.getByRole('link', { name: 'Documents in inbox' }).click()
-  await expect(page).toHaveURL(/tags__id__all=9/)
+  await expect(page).toHaveURL(/tags__id__in=9/)
   await expect(page.locator('pngx-document-list')).toHaveText(/8 documents/)
 })
 

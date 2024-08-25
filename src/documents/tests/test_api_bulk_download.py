@@ -246,8 +246,6 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
 
         self.doc3.title = "Title 2 - Doc 3"
         self.doc3.save()
-        print(self.doc3.archive_path)
-        print(self.doc3.archive_filename)
 
         response = self.client.post(
             self.ENDPOINT,

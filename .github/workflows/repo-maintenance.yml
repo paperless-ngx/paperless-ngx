@@ -22,13 +22,13 @@ jobs:
         with:
           days-before-stale: 7
           days-before-close: 14
-          any-of-labels: 'cant-reproduce,not a bug'
+          any-of-labels: 'stale,cant-reproduce,not a bug'
           stale-issue-label: stale
           stale-pr-label: stale
           stale-issue-message: >
             This issue has been automatically marked as stale because it has not had
             recent activity. It will be closed if no further activity occurs. Thank you
-            for your contributions.
+            for your contributions. See our [contributing guidelines](https://github.com/paperless-ngx/paperless-ngx/blob/dev/CONTRIBUTING.md#automatic-repository-maintenance) for more details.
   lock-threads:
     name: 'Lock Old Threads'
     runs-on: ubuntu-latest
@@ -43,14 +43,17 @@ jobs:
             This issue has been automatically locked since there
             has not been any recent activity after it was closed.
             Please open a new discussion or issue for related concerns.
+            See our [contributing guidelines](https://github.com/paperless-ngx/paperless-ngx/blob/dev/CONTRIBUTING.md#automatic-repository-maintenance) for more details.
           pr-comment: >
             This pull request has been automatically locked since there
             has not been any recent activity after it was closed.
             Please open a new discussion or issue for related concerns.
+            See our [contributing guidelines](https://github.com/paperless-ngx/paperless-ngx/blob/dev/CONTRIBUTING.md#automatic-repository-maintenance) for more details.
           discussion-comment: >
             This discussion has been automatically locked since there
             has not been any recent activity after it was closed.
             Please open a new discussion for related concerns.
+            See our [contributing guidelines](https://github.com/paperless-ngx/paperless-ngx/blob/dev/CONTRIBUTING.md#automatic-repository-maintenance) for more details.
   close-answered-discussions:
     name: 'Close Answered Discussions'
     runs-on: ubuntu-latest
@@ -90,7 +93,7 @@ jobs:
               }`;
               const commentVariables = {
                 discussion: discussion.id,
-                body: 'This discussion has been automatically closed because it was marked as answered.',
+                body: 'This discussion has been automatically closed because it was marked as answered. Please see our [contributing guidelines](https://github.com/paperless-ngx/paperless-ngx/blob/dev/CONTRIBUTING.md#automatic-repository-maintenance) for more details.',
               }
               await github.graphql(addCommentMutation, commentVariables)
 
@@ -180,7 +183,85 @@ jobs:
                 }`;
                 const commentVariables = {
                   discussion: discussion.id,
-                  body: 'This discussion has been automatically closed due to inactivity.',
+                  body: 'This discussion has been automatically closed due to inactivity. Please see our [contributing guidelines](https://github.com/paperless-ngx/paperless-ngx/blob/dev/CONTRIBUTING.md#automatic-repository-maintenance) for more details.',
+                }
+                await github.graphql(addCommentMutation, commentVariables);
+
+                const closeDiscussionMutation = `mutation($discussion:ID!, $reason:DiscussionCloseReason!) {
+                  closeDiscussion(input:{discussionId:$discussion, reason:$reason}) {
+                    clientMutationId
+                  }
+                }`;
+                const closeVariables = {
+                  discussion: discussion.id,
+                  reason: "OUTDATED",
+                }
+                await github.graphql(closeDiscussionMutation, closeVariables);
+
+                await sleep(1000);
+              }
+            }
+  close-unsupported-feature-requests:
+    name: 'Close Unsupported Feature Requests'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            function sleep(ms) {
+              return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            const CUTOFF_1_DAYS = 180;
+            const CUTOFF_1_COUNT = 5;
+            const CUTOFF_2_DAYS = 365;
+            const CUTOFF_2_COUNT = 10;
+
+            const cutoff1Date = new Date();
+            cutoff1Date.setDate(cutoff1Date.getDate() - CUTOFF_1_DAYS);
+            const cutoff2Date = new Date();
+            cutoff2Date.setDate(cutoff2Date.getDate() - CUTOFF_2_DAYS);
+
+            const query = `query(
+                $owner:String!,
+                $name:String!,
+                $featureRequestsCategory:ID!,
+              ) {
+              repository(owner:$owner, name:$name){
+                discussions(
+                  categoryId:$featureRequestsCategory,
+                  last:100,
+                  states:[OPEN],
+                ) {
+                  nodes {
+                    id,
+                    number,
+                    updatedAt,
+                    upvoteCount,
+                  }
+                },
+              }
+            }`;
+            const variables = {
+              owner: context.repo.owner,
+              name: context.repo.repo,
+              featureRequestsCategory: "DIC_kwDOG1Zs184CBNr4"
+            }
+            const result = await github.graphql(query, variables);
+
+            for (const discussion of result.repository.discussions.nodes) {
+              const discussionDate = new Date(discussion.updatedAt);
+              if ((discussionDate < cutoff1Date && discussion.upvoteCount < CUTOFF_1_COUNT) ||
+                  (discussionDate < cutoff2Date && discussion.upvoteCount < CUTOFF_2_COUNT)) {
+                console.log(`Closing discussion #${discussion.number} (${discussion.id}), last updated at ${discussion.updatedAt} with votes ${discussion.upvoteCount}`);
+                const addCommentMutation = `mutation($discussion:ID!, $body:String!) {
+                  addDiscussionComment(input:{discussionId:$discussion, body:$body}) {
+                    clientMutationId
+                  }
+                }`;
+                const commentVariables = {
+                  discussion: discussion.id,
+                  body: 'This discussion has been automatically closed due to lack of community support. Please see our [contributing guidelines](https://github.com/paperless-ngx/paperless-ngx/blob/dev/CONTRIBUTING.md#automatic-repository-maintenance) for more details.',
                 }
                 await github.graphql(addCommentMutation, commentVariables);
 

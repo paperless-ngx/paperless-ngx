@@ -1,6 +1,5 @@
 import logging
 import multiprocessing
-import os
 
 import tqdm
 from django import db
@@ -52,7 +51,7 @@ class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
         self.handle_processes_mixin(**options)
         self.handle_progress_bar_mixin(**options)
 
-        os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
+        settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
 
         overwrite = options["overwrite"]
 

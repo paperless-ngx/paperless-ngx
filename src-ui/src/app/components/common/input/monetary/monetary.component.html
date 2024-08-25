@@ -1,0 +1,27 @@
+<div class="mb-3" [class.pb-3]="error">
+  <div class="row">
+    <div class="d-flex align-items-center position-relative hidden-button-container" [class.col-md-3]="horizontal">
+      @if (title) {
+        <label class="form-label" [class.mb-md-0]="horizontal" [for]="inputId">{{title}}</label>
+      }
+      @if (removable) {
+        <button type="button" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
+          <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Remove</ng-container>
+        </button>
+      }
+    </div>
+    <div class="position-relative" [class.col-md-9]="horizontal">
+      <div class="input-group" [class.is-invalid]="error">
+        <span class="input-group-text fw-bold bg-light">{{ monetaryValue | currency: currency }}</span>
+        <input #currencyField class="form-control text-muted mw-60" [(ngModel)]="currency" (input)="currencyChange()" maxlength="3" [class.is-invalid]="error" [disabled]="disabled">
+        <input #monetaryValueField type="number" class="form-control text-muted" step=".01" [(ngModel)]="monetaryValue" (input)="monetaryValueChange()" (change)="monetaryValueChange(true)" [class.is-invalid]="error" [disabled]="disabled">
+      </div>
+      <div class="invalid-feedback position-absolute top-100">
+        {{error}}
+      </div>
+      @if (hint) {
+        <small class="form-text text-muted">{{hint}}</small>
+      }
+    </div>
+  </div>
+</div>

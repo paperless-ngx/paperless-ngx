@@ -6,7 +6,7 @@ import { of, throwError } from 'rxjs'
 import { DocumentNotesService } from 'src/app/services/rest/document-notes.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { DocumentNote } from 'src/app/data/document-note'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { DatePipe } from '@angular/common'
@@ -14,27 +14,38 @@ import { By } from '@angular/platform-browser'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const notes: DocumentNote[] = [
   {
     id: 23,
     note: 'Note 23',
-    user: 1,
+    user: {
+      id: 1,
+      username: 'user1',
+      first_name: 'User1',
+      last_name: 'Lastname1',
+    },
   },
   {
     id: 24,
     note: 'Note 24',
-    user: 1,
+    user: {
+      id: 1,
+      username: 'user1',
+      first_name: 'User1',
+      last_name: 'Lastname1',
+    },
   },
   {
     id: 25,
     note: 'Note 25',
-    user: 2,
+    user: { id: 2, username: 'user2' },
   },
   {
     id: 30,
     note: 'Note 30',
-    user: 3,
+    user: { id: 3, username: 'user3' },
   },
 ]
 
@@ -50,6 +61,11 @@ describe('DocumentNotesComponent', () => {
         DocumentNotesComponent,
         CustomDatePipe,
         IfPermissionsDirective,
+      ],
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
         {
@@ -84,12 +100,8 @@ describe('DocumentNotesComponent', () => {
         },
         CustomDatePipe,
         DatePipe,
-      ],
-      imports: [
-        HttpClientTestingModule,
-        FormsModule,
-        ReactiveFormsModule,
-        NgxBootstrapIconsModule.pick(allIcons),
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 
@@ -123,11 +135,24 @@ describe('DocumentNotesComponent', () => {
   })
 
   it('should handle note user display in all situations', () => {
-    expect(component.displayName({ id: 1, user: 1 })).toEqual(
-      'User1 Lastname1 (user1)'
-    )
-    expect(component.displayName({ id: 1, user: 2 })).toEqual('user2')
-    expect(component.displayName({ id: 1, user: 4 })).toEqual('')
+    expect(
+      component.displayName({
+        id: 1,
+        user: {
+          id: 1,
+          username: 'user1',
+          first_name: 'User1',
+          last_name: 'Lastname1',
+        },
+      })
+    ).toEqual('User1 Lastname1 (user1)')
+    expect(
+      component.displayName({ id: 1, user: { id: 2, username: 'user2' } })
+    ).toEqual('user2')
+    expect(component.displayName({ id: 1, user: 2 } as any)).toEqual('user2')
+    expect(
+      component.displayName({ id: 1, user: { id: 4, username: 'user4' } })
+    ).toEqual('')
     expect(component.displayName({ id: 1 })).toEqual('')
   })
 
@@ -146,7 +171,9 @@ describe('DocumentNotesComponent', () => {
     expect(addSpy).toHaveBeenCalledWith(12, note)
     expect(toastsSpy).toHaveBeenCalled()
 
-    addSpy.mockReturnValueOnce(of([...notes, { id: 31, note, user: 1 }]))
+    addSpy.mockReturnValueOnce(
+      of([...notes, { id: 31, note, user: { id: 1 } }])
+    )
     addButton.triggerEventHandler('click')
     fixture.detectChanges()
     expect(fixture.debugElement.nativeElement.textContent).toContain(note)

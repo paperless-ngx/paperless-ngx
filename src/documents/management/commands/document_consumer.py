@@ -232,6 +232,9 @@ class Command(BaseCommand):
         if not os.path.isdir(directory):
             raise CommandError(f"Consumption directory {directory} does not exist")
 
+        # Consumer will need this
+        settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
+
         if recursive:
             for dirpath, _, filenames in os.walk(directory):
                 for filename in filenames:
@@ -283,10 +286,10 @@ class Command(BaseCommand):
     def handle_inotify(self, directory, recursive, is_testing: bool):
         logger.info(f"Using inotify to watch directory for changes: {directory}")
 
-        timeout = None
+        timeout_ms = None
         if is_testing:
-            timeout = self.testing_timeout_ms
-            logger.debug(f"Configuring timeout to {timeout}ms")
+            timeout_ms = self.testing_timeout_ms
+            logger.debug(f"Configuring timeout to {timeout_ms}ms")
 
         inotify = INotify()
         inotify_flags = flags.CLOSE_WRITE | flags.MOVED_TO | flags.MODIFY
@@ -295,7 +298,8 @@ class Command(BaseCommand):
         else:
             descriptor = inotify.add_watch(directory, inotify_flags)
 
-        inotify_debounce: Final[float] = settings.CONSUMER_INOTIFY_DELAY
+        inotify_debounce_secs: Final[float] = settings.CONSUMER_INOTIFY_DELAY
+        inotify_debounce_ms: Final[int] = inotify_debounce_secs * 1000
 
         finished = False
 
@@ -303,7 +307,7 @@ class Command(BaseCommand):
 
         while not finished:
             try:
-                for event in inotify.read(timeout=timeout):
+                for event in inotify.read(timeout=timeout_ms):
                     path = inotify.get_path(event.wd) if recursive else directory
                     filepath = os.path.join(path, event.name)
                     if flags.MODIFY in flags.from_mask(event.mask):
@@ -320,7 +324,7 @@ class Command(BaseCommand):
                     # Current time - last time over the configured timeout
                     waited_long_enough = (
                         monotonic() - last_event_time
-                    ) > inotify_debounce
+                    ) > inotify_debounce_secs
 
                     # Also make sure the file exists still, some scanners might write a
                     # temporary file first
@@ -339,11 +343,11 @@ class Command(BaseCommand):
                 # If files are waiting, need to exit read() to check them
                 # Otherwise, go back to infinite sleep time, but only if not testing
                 if len(notified_files) > 0:
-                    timeout = inotify_debounce
+                    timeout_ms = inotify_debounce_ms
                 elif is_testing:
-                    timeout = self.testing_timeout_ms
+                    timeout_ms = self.testing_timeout_ms
                 else:
-                    timeout = None
+                    timeout_ms = None
 
                 if self.stop_flag.is_set():
                     logger.debug("Finishing because event is set")

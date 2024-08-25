@@ -15,7 +15,7 @@
         }
       </div>
     }
-    <div [ngClass]="{'col-md-9': horizontal, 'align-items-center': horizontal, 'd-flex': horizontal}">
+    <div [ngClass]="{'align-items-center': horizontal, 'd-flex': horizontal}">
       <div class="form-check form-switch">
         <input #inputField type="checkbox" class="form-check-input" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" (blur)="onTouched()" [disabled]="disabled">
         @if (horizontal) {

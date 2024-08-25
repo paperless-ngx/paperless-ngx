@@ -9,6 +9,7 @@ from datetime import date
 from datetime import timedelta
 from fnmatch import fnmatch
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Optional
 from typing import Union
 
@@ -425,6 +426,10 @@ class MailAccountHandler(LoggingMixin):
 
     logging_name = "paperless_mail"
 
+    def __init__(self) -> None:
+        super().__init__()
+        self.renew_logging_group()
+
     def _correspondent_from_name(self, name: str) -> Optional[Correspondent]:
         try:
             return Correspondent.objects.get_or_create(name=name)[0]
@@ -580,12 +585,17 @@ class MailAccountHandler(LoggingMixin):
         total_processed_files = 0
 
         for message in messages:
+            if TYPE_CHECKING:
+                assert isinstance(message, MailMessage)
+
             if ProcessedMail.objects.filter(
                 rule=rule,
                 uid=message.uid,
                 folder=rule.folder,
             ).exists():
-                self.log.debug(f"Skipping mail {message}, already processed.")
+                self.log.debug(
+                    f"Skipping mail '{message.uid}' subject '{message.subject}' from '{message.from_}', already processed.",
+                )
                 continue
 
             try:
@@ -667,7 +677,7 @@ class MailAccountHandler(LoggingMixin):
     ):
         processed_attachments = 0
 
-        consume_tasks = list()
+        consume_tasks = []
 
         for att in message.attachments:
             if (
@@ -719,7 +729,7 @@ class MailAccountHandler(LoggingMixin):
                     f"{message.subject} from {message.from_}",
                 )
 
-                os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
+                settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
 
                 temp_dir = Path(
                     tempfile.mkdtemp(
@@ -748,9 +758,11 @@ class MailAccountHandler(LoggingMixin):
                     correspondent_id=correspondent.id if correspondent else None,
                     document_type_id=doc_type.id if doc_type else None,
                     tag_ids=tag_ids,
-                    owner_id=rule.owner.id
-                    if (rule.assign_owner_from_rule and rule.owner)
-                    else None,
+                    owner_id=(
+                        rule.owner.id
+                        if (rule.assign_owner_from_rule and rule.owner)
+                        else None
+                    ),
                 )
 
                 consume_task = consume_file.s(
@@ -800,7 +812,7 @@ class MailAccountHandler(LoggingMixin):
         tag_ids,
         doc_type,
     ):
-        os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
+        settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
         _, temp_filename = tempfile.mkstemp(
             prefix="paperless-mail-",
             dir=settings.SCRATCH_DIR,
@@ -838,6 +850,7 @@ class MailAccountHandler(LoggingMixin):
         input_doc = ConsumableDocument(
             source=DocumentSource.MailFetch,
             original_file=temp_filename,
+            mailrule_id=rule.pk,
         )
         doc_overrides = DocumentMetadataOverrides(
             title=message.subject,

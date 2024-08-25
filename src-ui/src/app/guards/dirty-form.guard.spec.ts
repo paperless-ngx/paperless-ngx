@@ -17,6 +17,7 @@ describe('DirtyFormGuard', () => {
   let guard: DirtyFormGuard
   let component: DirtyComponent
   let route: ActivatedRoute
+  let modalService: NgbModal
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -37,6 +38,7 @@ describe('DirtyFormGuard', () => {
 
     guard = TestBed.inject(DirtyFormGuard)
     route = TestBed.inject(ActivatedRoute)
+    modalService = TestBed.inject(NgbModal)
     const fixture = TestBed.createComponent(GenericDirtyComponent)
     component = fixture.componentInstance
 
@@ -57,9 +59,14 @@ describe('DirtyFormGuard', () => {
     component.isDirty$ = true
     const confirmSpy = jest.spyOn(guard, 'confirmChanges')
     const canDeactivate = guard.canDeactivate(component, route.snapshot)
+    let modal
+    modalService.activeInstances.subscribe((instances) => {
+      modal = instances[0]
+    })
     canDeactivate.subscribe()
 
     expect(canDeactivate).toHaveProperty('source') // Observable
     expect(confirmSpy).toHaveBeenCalled()
+    modal.componentInstance.confirmClicked.next()
   })
 })

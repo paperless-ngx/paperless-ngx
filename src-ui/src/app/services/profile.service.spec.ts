@@ -2,10 +2,11 @@ import { TestBed } from '@angular/core/testing'
 
 import { ProfileService } from './profile.service'
 import {
-  HttpClientTestingModule,
   HttpTestingController,
+  provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import { environment } from 'src/environments/environment'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('ProfileService', () => {
   let httpTestingController: HttpTestingController
@@ -13,8 +14,12 @@ describe('ProfileService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ProfileService],
-      imports: [HttpClientTestingModule],
+      imports: [],
+      providers: [
+        ProfileService,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
     })
 
     httpTestingController = TestBed.inject(HttpTestingController)
@@ -50,5 +55,21 @@ describe('ProfileService', () => {
       `${environment.apiBaseUrl}profile/generate_auth_token/`
     )
     expect(req.request.method).toEqual('POST')
+  })
+
+  it('supports disconnecting a social account', () => {
+    service.disconnectSocialAccount(1).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}profile/disconnect_social_account/`
+    )
+    expect(req.request.method).toEqual('POST')
+  })
+
+  it('calls get social account provider endpoint', () => {
+    service.getSocialAccountProviders().subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}profile/social_account_providers/`
+    )
+    expect(req.request.method).toEqual('GET')
   })
 })

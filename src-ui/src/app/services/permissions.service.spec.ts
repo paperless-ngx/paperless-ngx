@@ -418,4 +418,25 @@ describe('PermissionsService', () => {
       )
     ).toBeTruthy()
   })
+
+  it('correctly checks admin status', () => {
+    permissionsService.initialize([], {
+      username: 'testuser',
+      last_name: 'User',
+      first_name: 'Test',
+      id: 1,
+      is_staff: true,
+    })
+
+    expect(permissionsService.isAdmin()).toBeTruthy()
+
+    permissionsService.initialize([], {
+      username: 'testuser',
+      last_name: 'User',
+      first_name: 'Test',
+      id: 1,
+    })
+
+    expect(permissionsService.isAdmin()).toBeFalsy()
+  })
 })

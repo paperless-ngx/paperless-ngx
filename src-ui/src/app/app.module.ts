@@ -7,7 +7,11 @@ import {
   NgbDateParserFormatter,
   NgbModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http'
+import {
+  HTTP_INTERCEPTORS,
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http'
 import { DocumentListComponent } from './components/document-list/document-list.component'
 import { DocumentDetailComponent } from './components/document-detail/document-detail.component'
 import { DashboardComponent } from './components/dashboard/dashboard.component'
@@ -31,7 +35,7 @@ import { ToastsComponent } from './components/common/toasts/toasts.component'
 import { FilterEditorComponent } from './components/document-list/filter-editor/filter-editor.component'
 import { FilterableDropdownComponent } from './components/common/filterable-dropdown/filterable-dropdown.component'
 import { ToggleableDropdownButtonComponent } from './components/common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
-import { DateDropdownComponent } from './components/common/date-dropdown/date-dropdown.component'
+import { DatesDropdownComponent } from './components/common/dates-dropdown/dates-dropdown.component'
 import { DocumentCardLargeComponent } from './components/document-list/document-card-large/document-card-large.component'
 import { DocumentCardSmallComponent } from './components/document-list/document-card-small/document-card-small.component'
 import { BulkEditorComponent } from './components/document-list/bulk-editor/bulk-editor.component'
@@ -105,15 +109,30 @@ import { CustomFieldsComponent } from './components/manage/custom-fields/custom-
 import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { CustomFieldsDropdownComponent } from './components/common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { ProfileEditDialogComponent } from './components/common/profile-edit-dialog/profile-edit-dialog.component'
-import { PdfViewerComponent } from './components/common/pdf-viewer/pdf-viewer.component'
+import { PdfViewerModule } from 'ng2-pdf-viewer'
 import { DocumentLinkComponent } from './components/common/input/document-link/document-link.component'
 import { PreviewPopupComponent } from './components/common/preview-popup/preview-popup.component'
 import { SwitchComponent } from './components/common/input/switch/switch.component'
 import { ConfigComponent } from './components/admin/config/config.component'
 import { FileComponent } from './components/common/input/file/file.component'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { ConfirmButtonComponent } from './components/common/confirm-button/confirm-button.component'
+import { MonetaryComponent } from './components/common/input/monetary/monetary.component'
+import { SystemStatusDialogComponent } from './components/common/system-status-dialog/system-status-dialog.component'
+import { RotateConfirmDialogComponent } from './components/common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
+import { MergeConfirmDialogComponent } from './components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
+import { SplitConfirmDialogComponent } from './components/common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
+import { DocumentHistoryComponent } from './components/document-history/document-history.component'
+import { DragDropSelectComponent } from './components/common/input/drag-drop-select/drag-drop-select.component'
+import { CustomFieldDisplayComponent } from './components/common/custom-field-display/custom-field-display.component'
+import { GlobalSearchComponent } from './components/app-frame/global-search/global-search.component'
+import { HotkeyDialogComponent } from './components/common/hotkey-dialog/hotkey-dialog.component'
+import { DeletePagesConfirmDialogComponent } from './components/common/confirm-dialog/delete-pages-confirm-dialog/delete-pages-confirm-dialog.component'
+import { TrashComponent } from './components/admin/trash/trash.component'
 import {
+  airplane,
   archive,
+  arrowClockwise,
   arrowCounterclockwise,
   arrowDown,
   arrowLeft,
@@ -122,35 +141,46 @@ import {
   arrowRightShort,
   arrowUpRight,
   asterisk,
+  bodyText,
   boxArrowUp,
   boxArrowUpRight,
   boxes,
   calendar,
   calendarEvent,
+  calendarEventFill,
+  cardChecklist,
+  cardHeading,
   caretDown,
   caretUp,
   chatLeftText,
   check,
   check2All,
   checkAll,
+  checkCircleFill,
   checkLg,
   chevronDoubleLeft,
   chevronDoubleRight,
   clipboard,
+  clipboardCheck,
   clipboardCheckFill,
   clipboardFill,
   dash,
+  dashCircle,
   diagram3,
   dice5,
   doorOpen,
   download,
   envelope,
+  envelopeAt,
+  exclamationCircleFill,
   exclamationTriangle,
+  exclamationTriangleFill,
   eye,
   fileEarmark,
   fileEarmarkCheck,
   fileEarmarkFill,
   fileEarmarkLock,
+  fileEarmarkMinus,
   files,
   fileText,
   filter,
@@ -164,6 +194,7 @@ import {
   hddStack,
   house,
   infoCircle,
+  journals,
   link,
   listTask,
   listUl,
@@ -175,15 +206,18 @@ import {
   personFill,
   personFillLock,
   personLock,
+  personSquare,
   plus,
   plusCircle,
   questionCircle,
+  scissors,
   search,
   slashCircle,
   sliders2Vertical,
   sortAlphaDown,
   sortAlphaUpAlt,
   tagFill,
+  tag,
   tags,
   textIndentLeft,
   textLeft,
@@ -197,7 +231,9 @@ import {
 } from 'ngx-bootstrap-icons'
 
 const icons = {
+  airplane,
   archive,
+  arrowClockwise,
   arrowCounterclockwise,
   arrowDown,
   arrowLeft,
@@ -206,35 +242,46 @@ const icons = {
   arrowRightShort,
   arrowUpRight,
   asterisk,
+  bodyText,
   boxArrowUp,
   boxArrowUpRight,
   boxes,
   calendar,
   calendarEvent,
+  calendarEventFill,
+  cardChecklist,
+  cardHeading,
   caretDown,
   caretUp,
   chatLeftText,
   check,
   check2All,
   checkAll,
+  checkCircleFill,
   checkLg,
   chevronDoubleLeft,
   chevronDoubleRight,
   clipboard,
+  clipboardCheck,
   clipboardCheckFill,
   clipboardFill,
   dash,
+  dashCircle,
   diagram3,
   dice5,
   doorOpen,
   download,
   envelope,
+  envelopeAt,
+  exclamationCircleFill,
   exclamationTriangle,
+  exclamationTriangleFill,
   eye,
   fileEarmark,
   fileEarmarkCheck,
   fileEarmarkFill,
   fileEarmarkLock,
+  fileEarmarkMinus,
   files,
   fileText,
   filter,
@@ -248,6 +295,7 @@ const icons = {
   hddStack,
   house,
   infoCircle,
+  journals,
   link,
   listTask,
   listUl,
@@ -259,15 +307,18 @@ const icons = {
   personFill,
   personFillLock,
   personLock,
+  personSquare,
   plus,
   plusCircle,
   questionCircle,
+  scissors,
   search,
   slashCircle,
   sliders2Vertical,
   sortAlphaDown,
   sortAlphaUpAlt,
   tagFill,
+  tag,
   tags,
   textIndentLeft,
   textLeft,
@@ -295,6 +346,7 @@ import localeFi from '@angular/common/locales/fi'
 import localeFr from '@angular/common/locales/fr'
 import localeHu from '@angular/common/locales/hu'
 import localeIt from '@angular/common/locales/it'
+import localeJa from '@angular/common/locales/ja'
 import localeLb from '@angular/common/locales/lb'
 import localeNl from '@angular/common/locales/nl'
 import localeNo from '@angular/common/locales/no'
@@ -325,6 +377,7 @@ registerLocaleData(localeFi)
 registerLocaleData(localeFr)
 registerLocaleData(localeHu)
 registerLocaleData(localeIt)
+registerLocaleData(localeJa)
 registerLocaleData(localeLb)
 registerLocaleData(localeNl)
 registerLocaleData(localeNo)
@@ -373,7 +426,7 @@ function initializeApp(settings: SettingsService) {
     FilterEditorComponent,
     FilterableDropdownComponent,
     ToggleableDropdownButtonComponent,
-    DateDropdownComponent,
+    DatesDropdownComponent,
     DocumentCardLargeComponent,
     DocumentCardSmallComponent,
     BulkEditorComponent,
@@ -431,20 +484,33 @@ function initializeApp(settings: SettingsService) {
     CustomFieldEditDialogComponent,
     CustomFieldsDropdownComponent,
     ProfileEditDialogComponent,
-    PdfViewerComponent,
     DocumentLinkComponent,
     PreviewPopupComponent,
     SwitchComponent,
     ConfigComponent,
     FileComponent,
+    ConfirmButtonComponent,
+    MonetaryComponent,
+    SystemStatusDialogComponent,
+    RotateConfirmDialogComponent,
+    MergeConfirmDialogComponent,
+    SplitConfirmDialogComponent,
+    DocumentHistoryComponent,
+    DragDropSelectComponent,
+    CustomFieldDisplayComponent,
+    GlobalSearchComponent,
+    HotkeyDialogComponent,
+    DeletePagesConfirmDialogComponent,
+    TrashComponent,
   ],
+  bootstrap: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
     NgbModule,
-    HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
+    PdfViewerModule,
     NgxFileDropModule,
     NgSelectModule,
     ColorSliderModule,
@@ -479,7 +545,7 @@ function initializeApp(settings: SettingsService) {
     DirtyDocGuard,
     DirtySavedViewGuard,
     UsernamePipe,
+    provideHttpClient(withInterceptorsFromDi()),
   ],
-  bootstrap: [AppComponent],
 })
 export class AppModule {}

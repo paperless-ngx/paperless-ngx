@@ -70,12 +70,13 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         config.app_logo = "/logo/example.jpg"
         config.save()
         response = self.client.get("/api/ui_settings/", format="json")
-        self.assertDictContainsSubset(
+        self.assertDictEqual(
+            response.data["settings"],
             {
                 "app_title": config.app_title,
                 "app_logo": config.app_logo,
-            },
-            response.data["settings"],
+            }
+            | response.data["settings"],
         )
 
     def test_api_update_config(self):

@@ -1,6 +1,7 @@
 import shutil
 import tempfile
 from collections.abc import Iterable
+from pathlib import Path
 from random import randint
 
 from django.contrib.admin.models import LogEntry
@@ -396,7 +397,7 @@ class TestDocumentConsumptionFinishedSignal(TestCase):
             mime_type="application/pdf",
         )
 
-        self.index_dir = tempfile.mkdtemp()
+        self.index_dir = Path(tempfile.mkdtemp())
         # TODO: we should not need the index here.
         override_settings(INDEX_DIR=self.index_dir).enable()
 

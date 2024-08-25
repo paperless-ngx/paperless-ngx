@@ -6,6 +6,7 @@ You can go multiple routes to setup and run Paperless:
 - [Pull the image from Docker Hub](#docker_hub)
 - [Build the Docker image yourself](#docker_build)
 - [Install Paperless directly on your system manually (bare metal)](#bare_metal)
+- A user-maintained list of commercial hosting providers can be found [in the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Related-Projects)
 
 The Docker routes are quick & easy. These are the recommended routes.
 This configures all the stuff from the above automatically so that it
@@ -249,9 +250,14 @@ a minimal installation of Debian/Buster, which is the current stable
 release at the time of writing. Windows is not and will never be
 supported.
 
+Paperless requires Python 3. At this time, 3.9 - 3.11 are tested versions.
+Newer versions may work, but some dependencies may not fully support newer versions.
+Support for older Python versions may be dropped as they reach end of life or as newer versions
+are released, dependency support is confirmed, etc.
+
 1.  Install dependencies. Paperless requires the following packages.
 
-    - `python3` - 3.9 - 3.11 are supported
+    - `python3`
     - `python3-pip`
     - `python3-dev`
     - `default-libmysqlclient-dev` for MariaDB
@@ -299,8 +305,17 @@ supported.
     - `libatlas-base-dev`
     - `libxslt1-dev`
 
-    You will also need `build-essential`, `python3-setuptools` and
-    `python3-wheel` for installing some of the python dependencies.
+    You will also need these for installing some of the python dependencies:
+
+    - `build-essential`
+    - `python3-setuptools`
+    - `python3-wheel`
+
+    Use this list for your preferred package management:
+
+    ```
+    build-essential python3-setuptools python3-wheel
+    ```
 
 2.  Install `redis` >= 6.0 and configure it to start automatically.
 
@@ -400,8 +415,7 @@ supported.
     sudo chown paperless:paperless /opt/paperless/consume
     ```
 
-8.  Install python requirements from the `requirements.txt` file. It is
-    up to you if you wish to use a virtual environment or not. First you should update your pip, so it gets the actual packages.
+8.  Install python requirements from the `requirements.txt` file.
 
     ```shell-session
     sudo -Hu paperless pip3 install -r requirements.txt
@@ -409,6 +423,12 @@ supported.
 
     This will install all python dependencies in the home directory of
     the new paperless user.
+
+    !!! tip
+
+        It is up to you if you wish to use a virtual environment or not for the Python
+        dependencies.  This is an alternative to the above and may require adjusting
+        the example scripts to utilize the virtual environment paths
 
 9.  Go to `/opt/paperless/src`, and execute the following commands:
 
@@ -520,8 +540,7 @@ supported.
 15. Optional: If using the NLTK machine learning processing (see
     [`PAPERLESS_ENABLE_NLTK`](configuration.md#PAPERLESS_ENABLE_NLTK) for details),
     download the NLTK data for the Snowball
-    Stemmer, Stopwords and Punkt tokenizer to your
-    `PAPERLESS_DATA_DIR/nltk`. Refer to the [NLTK
+    Stemmer, Stopwords and Punkt tokenizer to `/usr/share/nltk_data`. Refer to the [NLTK
     instructions](https://www.nltk.org/data.html) for details on how to
     download the data.
 
@@ -666,24 +685,37 @@ commands as well.
 1.  Stop and remove the paperless container
 2.  If using an external database, stop the container
 3.  Update Redis configuration
-    a) If `REDIS_URL` is already set, change it to [`PAPERLESS_REDIS`](configuration.md#PAPERLESS_REDIS)
-    and continue to step 4.
-    b) Otherwise, in the `docker-compose.yml` add a new service for
-    Redis, following [the example compose
-    files](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose)
-    c) Set the environment variable [`PAPERLESS_REDIS`](configuration.md#PAPERLESS_REDIS) so it points to
-    the new Redis container
+
+    1. If `REDIS_URL` is already set, change it to [`PAPERLESS_REDIS`](configuration.md#PAPERLESS_REDIS)
+       and continue to step 4.
+
+    1. Otherwise, in the `docker-compose.yml` add a new service for
+       Redis, following [the example compose
+       files](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose)
+
+    1. Set the environment variable [`PAPERLESS_REDIS`](configuration.md#PAPERLESS_REDIS) so it points to
+       the new Redis container
+
 4.  Update user mapping
-    a) If set, change the environment variable `PUID` to `USERMAP_UID`
-    b) If set, change the environment variable `PGID` to `USERMAP_GID`
+
+    1. If set, change the environment variable `PUID` to `USERMAP_UID`
+
+    1. If set, change the environment variable `PGID` to `USERMAP_GID`
+
 5.  Update configuration paths
-    a) Set the environment variable [`PAPERLESS_DATA_DIR`](configuration.md#PAPERLESS_DATA_DIR) to `/config`
+
+    1. Set the environment variable [`PAPERLESS_DATA_DIR`](configuration.md#PAPERLESS_DATA_DIR) to `/config`
+
 6.  Update media paths
-    a) Set the environment variable [`PAPERLESS_MEDIA_ROOT`](configuration.md#PAPERLESS_MEDIA_ROOT) to
-    `/data/media`
+
+    1. Set the environment variable [`PAPERLESS_MEDIA_ROOT`](configuration.md#PAPERLESS_MEDIA_ROOT) to
+       `/data/media`
+
 7.  Update timezone
-    a) Set the environment variable [`PAPERLESS_TIME_ZONE`](configuration.md#PAPERLESS_TIME_ZONE) to the same
-    value as `TZ`
+
+    1. Set the environment variable [`PAPERLESS_TIME_ZONE`](configuration.md#PAPERLESS_TIME_ZONE) to the same
+       value as `TZ`
+
 8.  Modify the `image:` to point to
     `ghcr.io/paperless-ngx/paperless-ngx:latest` or a specific version
     if preferred.
@@ -691,95 +723,8 @@ commands as well.
 
 ## Moving data from SQLite to PostgreSQL or MySQL/MariaDB {#sqlite_to_psql}
 
-Moving your data from SQLite to PostgreSQL or MySQL/MariaDB is done via
-executing a series of django management commands as below. The commands
-below use PostgreSQL, but are applicable to MySQL/MariaDB with the
-
-!!! warning
-
-    Make sure that your SQLite database is migrated to the latest version.
-    Starting paperless will make sure that this is the case. If your try to
-    load data from an old database schema in SQLite into a newer database
-    schema in PostgreSQL, you will run into trouble.
-
-!!! warning
-
-    On some database fields, PostgreSQL enforces predefined limits on
-    maximum length, whereas SQLite does not. The fields in question are the
-    title of documents (128 characters), names of document types, tags and
-    correspondents (128 characters), and filenames (1024 characters). If you
-    have data in these fields that surpasses these limits, migration to
-    PostgreSQL is not possible and will fail with an error.
-
-!!! warning
-
-    MySQL is case insensitive by default, treating values like "Name" and
-    "NAME" as identical. See [MySQL caveats](advanced_usage.md#mysql-caveats) for details.
-
-!!! warning
-
-    MySQL also enforces limits on maximum lengths, but does so differently than
-    PostgreSQL.  It may not be possible to migrate to MySQL due to this.
-
-!!! warning
-
-    Using mariadb version 10.4+ is recommended. Using the `utf8mb3` character set on
-    an older system may fix issues that can arise while setting up Paperless-ngx but
-    `utf8mb3` can cause issues with consumption (where `utf8mb4` does not).
-
-1.  Stop paperless, if it is running.
-
-2.  Tell paperless to use PostgreSQL:
-
-    a) With docker, copy the provided `docker-compose.postgres.yml`
-    file to `docker-compose.yml`. Remember to adjust the consumption
-    directory, if necessary.
-    b) Without docker, configure the database in your `paperless.conf`
-    file. See [configuration](configuration.md) for
-    details.
-
-3.  Open a shell and initialize the database:
-
-    a) With docker, run the following command to open a shell within
-    the paperless container:
-
-        ``` shell-session
-        $ cd /path/to/paperless
-        $ docker compose run --rm webserver /bin/bash
-        ```
-
-        This will launch the container and initialize the PostgreSQL
-        database.
-
-    b) Without docker, remember to activate any virtual environment,
-    switch to the `src` directory and create the database schema:
-
-        ``` shell-session
-        $ cd /path/to/paperless/src
-        $ python3 manage.py migrate
-        ```
-
-        This will not copy any data yet.
-
-4.  Dump your data from SQLite:
-
-    ```shell-session
-    $ python3 manage.py dumpdata --database=sqlite --exclude=contenttypes --exclude=auth.Permission > data.json
-    ```
-
-5.  Load your data into PostgreSQL:
-
-    ```shell-session
-    $ python3 manage.py loaddata data.json
-    ```
-
-6.  If operating inside Docker, you may exit the shell now.
-
-    ```shell-session
-    $ exit
-    ```
-
-7.  Start paperless.
+The best way to migrate between database types is to perform an [export](administration.md#exporter) and then
+[import](administration.md#importer) into a clean installation of Paperless-ngx.
 
 ## Moving back to Paperless
 

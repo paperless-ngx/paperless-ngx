@@ -1,4 +1,4 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
@@ -15,6 +15,7 @@ import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.comp
 import { SettingsService } from 'src/app/services/settings.service'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const currentUserID = 13
 
@@ -29,6 +30,13 @@ describe('PermissionsFilterDropdownComponent', () => {
         PermissionsFilterDropdownComponent,
         ClearableBadgeComponent,
         IfPermissionsDirective,
+      ],
+      imports: [
+        NgSelectModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NgbModule,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
         {
@@ -63,14 +71,8 @@ describe('PermissionsFilterDropdownComponent', () => {
             },
           },
         },
-      ],
-      imports: [
-        HttpClientTestingModule,
-        NgSelectModule,
-        FormsModule,
-        ReactiveFormsModule,
-        NgbModule,
-        NgxBootstrapIconsModule.pick(allIcons),
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 

@@ -2,6 +2,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import QuerySet
 from guardian.core import ObjectPermissionChecker
 from guardian.models import GroupObjectPermission
 from guardian.shortcuts import assign_perm
@@ -40,7 +41,7 @@ class PaperlessObjectPermissions(DjangoObjectPermissions):
 
 class PaperlessAdminPermissions(BasePermission):
     def has_permission(self, request, view):
-        return request.user.has_perm("admin.view_logentry")
+        return request.user.is_staff
 
 
 def get_groups_with_only_permission(obj, codename):
@@ -122,7 +123,7 @@ def set_permissions_for_object(permissions: list[str], object, merge: bool = Fal
                     )
 
 
-def get_objects_for_user_owner_aware(user, perms, Model):
+def get_objects_for_user_owner_aware(user, perms, Model) -> QuerySet:
     objects_owned = Model.objects.filter(owner=user)
     objects_unowned = Model.objects.filter(owner__isnull=True)
     objects_with_perms = get_objects_for_user(
@@ -137,3 +138,23 @@ def get_objects_for_user_owner_aware(user, perms, Model):
 def has_perms_owner_aware(user, perms, obj):
     checker = ObjectPermissionChecker(user)
     return obj.owner is None or obj.owner == user or checker.has_perm(perms, obj)
+
+
+class PaperlessNotePermissions(BasePermission):
+    """
+    Permissions class that checks for model permissions for Notes.
+    """
+
+    perms_map = {
+        "GET": ["documents.view_note"],
+        "POST": ["documents.add_note"],
+        "DELETE": ["documents.delete_note"],
+    }
+
+    def has_permission(self, request, view):
+        if not request.user or (not request.user.is_authenticated):  # pragma: no cover
+            return False
+
+        perms = self.perms_map[request.method]
+
+        return request.user.has_perms(perms)

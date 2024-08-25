@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.middleware import PersistentRemoteUserMiddleware
@@ -5,6 +7,8 @@ from django.contrib.auth.models import User
 from django.http import HttpRequest
 from django.utils.deprecation import MiddlewareMixin
 from rest_framework import authentication
+
+logger = logging.getLogger("paperless.auth")
 
 
 class AutoLoginMiddleware(MiddlewareMixin):
@@ -35,7 +39,7 @@ class AngularApiAuthenticationOverride(authentication.BaseAuthentication):
             and request.headers["Referer"].startswith("http://localhost:4200/")
         ):
             user = User.objects.filter(is_staff=True).first()
-            print(f"Auto-Login with user {user}")
+            logger.debug(f"Auto-Login with user {user}")
             return (user, None)
         else:
             return None
@@ -47,6 +51,17 @@ class HttpRemoteUserMiddleware(PersistentRemoteUserMiddleware):
     """
 
     header = settings.HTTP_REMOTE_USER_HEADER_NAME
+
+    def process_request(self, request: HttpRequest) -> None:
+        # If remote user auth is enabled only for the frontend, not the API,
+        # then we need dont want to authenticate the user for API requests.
+        if (
+            "/api/" in request.path
+            and "paperless.auth.PaperlessRemoteUserAuthentication"
+            not in settings.REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"]
+        ):
+            return
+        return super().process_request(request)
 
 
 class PaperlessRemoteUserAuthentication(authentication.RemoteUserAuthentication):

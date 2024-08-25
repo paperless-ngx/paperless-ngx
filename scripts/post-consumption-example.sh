@@ -14,6 +14,7 @@ following additional information about it:
 * Thumbnail Path: ${DOCUMENT_THUMBNAIL_PATH}
 * Download URL: ${DOCUMENT_DOWNLOAD_URL}
 * Thumbnail URL: ${DOCUMENT_THUMBNAIL_URL}
+* Owner Name: ${DOCUMENT_OWNER}
 * Correspondent: ${DOCUMENT_CORRESPONDENT}
 * Tags: ${DOCUMENT_TAGS}
 

@@ -1,5 +1,6 @@
 import json
 
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -26,6 +27,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
             {
                 "id": self.test_user.id,
                 "username": self.test_user.username,
+                "is_staff": True,
                 "is_superuser": True,
                 "groups": [],
                 "first_name": self.test_user.first_name,
@@ -37,6 +39,8 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
             {
                 "app_title": None,
                 "app_logo": None,
+                "auditlog_enabled": True,
+                "trash_delay": 30,
                 "update_checking": {
                     "backend_setting": "default",
                 },
@@ -65,3 +69,47 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
             ui_settings.settings,
             settings["settings"],
         )
+
+    def test_api_set_ui_settings_insufficient_global_permissions(self):
+        not_superuser = User.objects.create_user(username="test_not_superuser")
+        self.client.force_authenticate(user=not_superuser)
+
+        settings = {
+            "settings": {
+                "dark_mode": {
+                    "enabled": True,
+                },
+            },
+        }
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(settings),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_api_set_ui_settings_sufficient_global_permissions(self):
+        not_superuser = User.objects.create_user(username="test_not_superuser")
+        not_superuser.user_permissions.add(
+            *Permission.objects.filter(codename__contains="uisettings"),
+        )
+        not_superuser.save()
+        self.client.force_authenticate(user=not_superuser)
+
+        settings = {
+            "settings": {
+                "dark_mode": {
+                    "enabled": True,
+                },
+            },
+        }
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(settings),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 
+SUPERVISORD_WORKING_DIR="${PAPERLESS_SUPERVISORD_WORKING_DIR:-$PWD}"
 rootless_args=()
 if [ "$(id -u)" == "$(id -u paperless)" ]; then
 	rootless_args=(
 		--user
 		paperless
 		--logfile
-		supervisord.log
+		"${SUPERVISORD_WORKING_DIR}/supervisord.log"
 		--pidfile
-		supervisord.pid
+		"${SUPERVISORD_WORKING_DIR}/supervisord.pid"
 	)
 fi
 

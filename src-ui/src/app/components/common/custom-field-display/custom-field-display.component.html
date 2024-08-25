@@ -1,0 +1,43 @@
+@if (field) {
+    @if (value?.toString().length > 0) {
+        <ng-template #nameTooltip>
+            <div class="d-flex flex-column text-light">
+                {{field.name}}
+            </div>
+        </ng-template>
+        @switch (field.data_type) {
+            @case (CustomFieldDataType.Monetary) {
+                <span [ngbTooltip]="nameTooltip">{{value | currency: currency}}</span>
+            }
+            @case (CustomFieldDataType.Date) {
+                <span [ngbTooltip]="nameTooltip">{{value | customDate}}</span>
+            }
+            @case (CustomFieldDataType.Url) {
+                <a [ngbTooltip]="nameTooltip" [href]="value" class="btn-link text-dark text-decoration-none" target="_blank">{{value}}</a>
+            }
+            @case (CustomFieldDataType.DocumentLink) {
+                <div [ngbTooltip]="nameTooltip" class="d-flex gap-1 flex-wrap">
+                    @for (docId of value; track docId) {
+                        <a routerLink="/documents/{{docId}}" class="badge bg-body text-primary" title="View" i18n-title>
+                            <i-bs width="0.9em" height="0.9em" name="file-text"></i-bs>&nbsp;<span>{{ getDocumentTitle(docId) }}</span>
+                        </a>
+                    }
+                </div>
+            }
+            @case (CustomFieldDataType.Boolean) {
+                <div class="d-flex flex-row align-items-center">
+                    <span>{{field.name}}:</span>
+                    <input type="checkbox" id="{{field.name}}" name="{{field.name}}" [checked]="value" value="" class="form-check-input ms-2 mt-0 pe-none">
+                </div>
+            }
+            @case (CustomFieldDataType.Select) {
+                <span [ngbTooltip]="nameTooltip">{{getSelectValue(field, value)}}</span>
+            }
+            @default {
+              <span [ngbTooltip]="nameTooltip">{{value}}</span>
+            }
+        }
+    } @else if (showNameIfEmpty) {
+        <span class="fst-italic text-muted">{{field.name}}</span>
+    }
+}

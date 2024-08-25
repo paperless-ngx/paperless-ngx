@@ -50,6 +50,7 @@ export class TasksService {
   constructor(private http: HttpClient) {}
 
   public reload() {
+    if (this.loading) return
     this.loading = true
 
     this.http

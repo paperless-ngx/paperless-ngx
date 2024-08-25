@@ -38,7 +38,7 @@ export class FileDropComponent {
 
   @ViewChild('ngxFileDrop') ngxFileDrop: NgxFileDropComponent
 
-  @HostListener('dragover', ['$event']) onDragOver(event: DragEvent) {
+  @HostListener('document:dragover', ['$event']) onDragOver(event: DragEvent) {
     if (!this.dragDropEnabled || !event.dataTransfer?.types?.includes('Files'))
       return
     event.preventDefault()
@@ -53,7 +53,7 @@ export class FileDropComponent {
     clearTimeout(this.fileLeaveTimeoutID)
   }
 
-  @HostListener('dragleave', ['$event']) public onDragLeave(
+  @HostListener('document:dragleave', ['$event']) public onDragLeave(
     event: DragEvent,
     immediate: boolean = false
   ) {
@@ -73,7 +73,7 @@ export class FileDropComponent {
     }, ms)
   }
 
-  @HostListener('drop', ['$event']) public onDrop(event: DragEvent) {
+  @HostListener('document:drop', ['$event']) public onDrop(event: DragEvent) {
     if (!this.dragDropEnabled) return
     event.preventDefault()
     event.stopImmediatePropagation()

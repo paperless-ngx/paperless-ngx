@@ -1,0 +1,136 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+	{
+		"label": "manage.py document_consumer",
+		"type": "shell",
+		"command": "pipenv run python manage.py document_consumer",
+		"group": "build",
+		"presentation": {
+			"echo": true,
+			"reveal": "always",
+			"focus": false,
+			"panel": "shared",
+			"showReuseMessage": false,
+			"clear": true,
+			"revealProblems": "onProblem"
+		},
+		"options": {
+			"cwd": "${workspaceFolder}/src"
+		}
+
+		},
+		{
+			"label": "manage.py runserver",
+			"type": "shell",
+			"command": "pipenv run python manage.py runserver",
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": false,
+				"clear": true,
+				"revealProblems": "onProblem"
+			},
+			"options": {
+				"cwd": "${workspaceFolder}/src"
+			}
+
+			},
+	  {
+		"label": "Maintenance: manage.py migrate",
+		"type": "shell",
+		"command": "pipenv run python manage.py migrate",
+		"group": "none",
+		"presentation": {
+			"echo": true,
+			"reveal": "always",
+			"focus": true,
+			"panel": "shared",
+			"showReuseMessage": false,
+			"clear": true,
+			"revealProblems": "onProblem"
+		},
+		"options": {
+			"cwd": "${workspaceFolder}/src"
+		}
+	  },
+	  {
+		"label": "Maintenance: manage.py createsuperuser",
+		"type": "shell",
+		"command": "pipenv run python manage.py createsuperuser",
+		"group": "none",
+		"presentation": {
+			"echo": true,
+			"reveal": "always",
+			"focus": true,
+			"panel": "shared",
+			"showReuseMessage": false,
+			"clear": true,
+			"revealProblems": "onProblem"
+		},
+		"options": {
+			"cwd": "${workspaceFolder}/src"
+		}
+	  },
+	  {
+		"label": "compile frontend",
+		"type": "shell",
+		"command": "npm ci && ./node_modules/.bin/ng build --configuration production",
+		"group": "none",
+		"presentation": {
+			"echo": true,
+			"reveal": "always",
+			"focus": true,
+			"panel": "shared",
+			"showReuseMessage": false,
+			"clear": true,
+			"revealProblems": "onProblem"
+		},
+		"options": {
+			"cwd": "${workspaceFolder}/src-ui"
+		}
+	  },
+	  {
+		"label": "Maintenance: recreate .venv",
+		"type": "shell",
+		"command": "rm -R -v .venv/* || pipenv install --dev",
+		"group": "none",
+		"presentation": {
+			"echo": true,
+			"reveal": "always",
+			"focus": true,
+			"panel": "shared",
+			"showReuseMessage": false,
+			"clear": true,
+			"revealProblems": "onProblem"
+		},
+		"options": {
+			"cwd": "${workspaceFolder}"
+		}
+	  },
+	  {
+		"label": "Celery Worker",
+		"type": "shell",
+		"command": "pipenv run celery --app paperless worker -l DEBUG",
+		"group": {
+		  "kind": "build",
+		  "isDefault": true
+		},
+		"presentation": {
+			"echo": true,
+			"reveal": "always",
+			"focus": true,
+			"panel": "shared",
+			"showReuseMessage": false,
+			"clear": true,
+			"revealProblems": "onProblem"
+		},
+		"options": {
+			"cwd": "${workspaceFolder}/src"
+		}
+	  }
+	]
+  }

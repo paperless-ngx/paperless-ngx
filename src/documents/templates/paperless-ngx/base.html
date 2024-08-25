@@ -1,0 +1,73 @@
+<!doctype html>
+{% load static i18n %}
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="author" content="Paperless-ngx project and contributors">
+        <meta name="robots" content="noindex,nofollow">
+
+        <title>
+            {% block head_title %}
+            {% endblock head_title %}
+        </title>
+        <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
+        <link href="{% static 'base.css' %}" rel="stylesheet">
+    </head>
+
+    <body class="text-center">
+        <div class="position-absolute top-50 start-50 translate-middle">
+            <form class="form-accounts" id="form-account" method="post">
+                {% csrf_token %}
+                {% if not APP_LOGO and not APP_TITLE %}
+                    {% include "paperless-ngx/snippets/svg_logo.html" with extra_attrs="width='300' class='logo mb-4'" %}
+                {% else %}
+                    {% if APP_LOGO %}
+                        <img src="{{APP_LOGO}}" width="300" class="logo mb-1" />
+                        <div class="d-flex flex-column align-items-end mb-4">
+                            <span class="byline text-uppercase font-monospace">by Paperless-ngx</span>
+                        </div>
+                    {% else %}
+                        <h1 class="font-weight-normal text-primary mb-1 d-flex justify-content-center align-items-start">
+                            {% include "paperless-ngx/snippets/svg_leaf.html" with extra_attrs="width='30' class='mt-2'" %}
+                            <div class="d-flex flex-column align-items-end mb-4">
+                                <span class="ms-2">{{ APP_TITLE }}</span>
+                                <span class="byline text-uppercase font-monospace">by Paperless-ngx</span>
+                            </div>
+                        </h1>
+                    {% endif %}
+                {% endif %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.level_tag }}" role="alert">
+                    {{ message }}
+                    </div>
+                {% endfor %}
+                {% block form_top_content %}
+                {% endblock form_top_content %}
+                {% if form.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                {{ error }}
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                {% elif request.GET.sharelink_notfound %}
+                    <div class="alert alert-danger" role="alert">
+                    {% translate "Share link was not found." %}
+                    </div>
+                {% elif request.GET.sharelink_expired %}
+                    <div class="alert alert-danger" role="alert">
+                    {% translate "Share link has expired." %}
+                    </div>
+                {% endif %}
+
+                {% block form_content %}
+                {% endblock form_content %}
+            </form>
+            {% block after_form_content %}
+            {% endblock after_form_content %}
+        </div>
+    </body>
+</html>

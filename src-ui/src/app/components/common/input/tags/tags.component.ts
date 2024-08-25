@@ -75,6 +75,9 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   allowCreate: boolean = true
 
   @Input()
+  hideAddButton: boolean = false
+
+  @Input()
   showFilter: boolean = false
 
   @Input()

@@ -1,0 +1,41 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "./src",
+			"name": "Backend"
+		},
+		{
+			"path": "./src-ui",
+			"name": "Frontend"
+		},
+		{
+			"path": "./.github",
+			"name": "CI/CD"
+		},
+		{
+			"path": "./docs",
+			"name": "Documentation"
+		}
+
+	],
+	"settings": {
+		"files.exclude": {
+			"**/__pycache__": true,
+			"**/.mypy_cache": true,
+			"**/.ruff_cache": true,
+			"**/.pytest_cache": true,
+			"**/.idea": true,
+			"**/.venv": true,
+			"**/.coverage": true,
+			"**/coverage.json": true
+		},
+		"python.defaultInterpreterPath": ".venv/bin/python3",
+	},
+	"extensions": {
+		"recommendations": ["ms-python.python", "charliermarsh.ruff", "editorconfig.editorconfig"],
+		"unwantedRecommendations": ["ms-python.black-formatter"]
+	}
+}

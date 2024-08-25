@@ -90,6 +90,10 @@ export class OpenDocumentsService {
     return this.dirtyDocuments.size > 0
   }
 
+  isDirty(doc: Document): boolean {
+    return this.dirtyDocuments.has(doc.id)
+  }
+
   closeDocument(doc: Document): Observable<boolean> {
     let index = this.openDocuments.findIndex((d) => d.id == doc.id)
     if (index == -1) return of(true)
@@ -152,9 +156,13 @@ export class OpenDocumentsService {
   }
 
   save() {
-    sessionStorage.setItem(
-      OPEN_DOCUMENT_SERVICE.DOCUMENTS,
-      JSON.stringify(this.openDocuments)
-    )
+    try {
+      sessionStorage.setItem(
+        OPEN_DOCUMENT_SERVICE.DOCUMENTS,
+        JSON.stringify(this.openDocuments)
+      )
+    } catch (e) {
+      console.error('Error saving open documents to session storage', e)
+    }
   }
 }

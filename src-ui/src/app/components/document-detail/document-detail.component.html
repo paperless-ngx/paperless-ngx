@@ -1,11 +1,13 @@
 <pngx-page-header [(title)]="title">
-  @if (contentRenderType === ContentRenderType.PDF && !useNativePdfViewer) {
-    <div class="input-group input-group-sm me-2 d-none d-md-flex">
-      <div class="input-group-text" i18n>Page</div>
-      <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages" [(ngModel)]="previewCurrentPage" />
-      <div class="input-group-text" i18n>of {{previewNumPages}}</div>
-    </div>
-    <div class="input-group input-group-sm me-5 d-none d-md-flex">
+  @if (archiveContentRenderType === ContentRenderType.PDF && !useNativePdfViewer) {
+    @if (previewNumPages) {
+      <div class="input-group input-group-sm d-none d-md-flex">
+        <div class="input-group-text" i18n>Page</div>
+          <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages" [(ngModel)]="previewCurrentPage" />
+        <div class="input-group-text" i18n>of {{previewNumPages}}</div>
+      </div>
+    }
+    <div class="input-group input-group-sm me-md-5 d-none d-md-flex">
       <button class="btn btn-outline-secondary" (click)="decreaseZoom()" i18n>-</button>
       <select class="form-select" (change)="onZoomSelect($event)">
         @for (setting of zoomSettings; track setting) {
@@ -18,11 +20,11 @@
     </div>
   }
 
-  <button type="button" class="btn btn-sm btn-outline-danger me-4" (click)="delete()" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }">
+  <button type="button" class="btn btn-sm btn-outline-danger me-md-4" (click)="delete()" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }">
     <i-bs width="1.2em" height="1.2em" name="trash"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
   </button>
 
-  <div class="btn-group me-2">
+  <div class="btn-group">
     <a [href]="downloadUrl" class="btn btn-sm btn-outline-primary">
       <i-bs width="1.2em" height="1.2em" name="download"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Download</span>
     </a>
@@ -38,24 +40,35 @@
   </div>
 
   <div class="ms-auto" ngbDropdown>
-    <button class="btn btn-sm btn-outline-primary me-2" id="actionsDropdown" ngbDropdownToggle>
+    <button class="btn btn-sm btn-outline-primary" id="actionsDropdown" ngbDropdownToggle>
       <i-bs name="three-dots"></i-bs>
       <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
-      <button ngbDropdownItem (click)="redoOcr()" [disabled]="!userCanEdit">
-        <i-bs width="1em" height="1em" name="arrow-counterclockwise"></i-bs><span class="ps-1" i18n>Redo OCR</span>
+      <button ngbDropdownItem (click)="reprocess()" [disabled]="!userCanEdit">
+        <i-bs width="1em" height="1em" name="arrow-counterclockwise"></i-bs>&nbsp;<span i18n>Reprocess</span>
       </button>
 
       <button ngbDropdownItem (click)="moreLike()">
-        <i-bs width="1em" height="1em" name="diagram-3"></i-bs><span class="ps-1" i18n>More like this</span>
+        <i-bs width="1em" height="1em" name="diagram-3"></i-bs>&nbsp;<span i18n>More like this</span>
+      </button>
+
+      <button ngbDropdownItem (click)="splitDocument()" [disabled]="originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
+        <i-bs width="1em" height="1em" name="scissors"></i-bs>&nbsp;<span i18n>Split</span>
+      </button>
+
+      <button ngbDropdownItem (click)="rotateDocument()" [disabled]="!userIsOwner || originalContentRenderType !== ContentRenderType.PDF">
+        <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
+      </button>
+
+      <button ngbDropdownItem (click)="deletePages()" [disabled]="!userIsOwner || originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
+        <i-bs name="file-earmark-minus"></i-bs>&nbsp;<ng-container i18n>Delete page(s)</ng-container>
       </button>
     </div>
   </div>
 
   <pngx-custom-fields-dropdown
     *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }"
-    class="me-2"
     [documentId]="documentId"
     [disabled]="!userIsOwner"
     [existingFields]="document?.custom_fields"
@@ -96,14 +109,14 @@
               <pngx-input-number i18n-title title="Archive serial number" [error]="error?.archive_serial_number" [horizontal]="true" formControlName='archive_serial_number'></pngx-input-number>
               <pngx-input-date i18n-title title="Date created" formControlName="created_date" [suggestions]="suggestions?.dates" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
               [error]="error?.created_date"></pngx-input-date>
-              <pngx-input-select [items]="correspondents" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
-              (createNew)="createCorrespondent($event)" [suggestions]="suggestions?.correspondents" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }"></pngx-input-select>
-              <pngx-input-select [items]="documentTypes" i18n-title title="Document type" formControlName="document_type" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
-              (createNew)="createDocumentType($event)" [suggestions]="suggestions?.document_types" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }"></pngx-input-select>
-              <pngx-input-select [items]="storagePaths" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
-              (createNew)="createStoragePath($event)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }"></pngx-input-select>
-              <pngx-input-tags formControlName="tags" [suggestions]="suggestions?.tags" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></pngx-input-tags>
-              @for (fieldInstance of document?.custom_fields; track fieldInstance; let i = $index) {
+              <pngx-input-select [items]="correspondents" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.Correspondent)"
+              (createNew)="createCorrespondent($event)" [hideAddButton]="createDisabled(DataType.Correspondent)" [suggestions]="suggestions?.correspondents" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }"></pngx-input-select>
+              <pngx-input-select [items]="documentTypes" i18n-title title="Document type" formControlName="document_type" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.DocumentType)"
+              (createNew)="createDocumentType($event)" [hideAddButton]="createDisabled(DataType.DocumentType)" [suggestions]="suggestions?.document_types" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }"></pngx-input-select>
+              <pngx-input-select [items]="storagePaths" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.StoragePath)"
+              (createNew)="createStoragePath($event)" [hideAddButton]="createDisabled(DataType.StoragePath)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }"></pngx-input-select>
+              <pngx-input-tags formControlName="tags" [suggestions]="suggestions?.tags" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.Tag)" [hideAddButton]="createDisabled(DataType.Tag)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></pngx-input-tags>
+              @for (fieldInstance of document?.custom_fields; track fieldInstance.field; let i = $index) {
                 <div [formGroup]="customFieldFormFields.controls[i]">
                   @switch (getCustomFieldFromInstance(fieldInstance)?.data_type) {
                     @case (CustomFieldDataType.String) {
@@ -142,14 +155,13 @@
                       [error]="getCustomFieldError(i)"></pngx-input-number>
                     }
                     @case (CustomFieldDataType.Monetary) {
-                      <pngx-input-number formControlName="value"
+                      <pngx-input-monetary formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+                      [defaultCurrency]="getCustomFieldFromInstance(fieldInstance)?.extra_data?.default_currency"
                       [removable]="userIsOwner"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
-                      [showAdd]="false"
-                      [step]=".01"
-                      [error]="getCustomFieldError(i)"></pngx-input-number>
+                      [error]="getCustomFieldError(i)"></pngx-input-monetary>
                     }
                     @case (CustomFieldDataType.Boolean) {
                       <pngx-input-check formControlName="value"
@@ -174,6 +186,16 @@
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [error]="getCustomFieldError(i)"></pngx-input-document-link>
+                    }
+                    @case (CustomFieldDataType.Select) {
+                      <pngx-input-select formControlName="value"
+                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+                      [itemsArray]="getCustomFieldFromInstance(fieldInstance)?.extra_data.select_options"
+                      [allowNull]="true"
+                      [horizontal]="true"
+                      [removable]="userIsOwner"
+                      (removed)="removeField(fieldInstance)"
+                      [error]="getCustomFieldError(i)"></pngx-input-select>
                     }
                   }
                 </div>
@@ -278,6 +300,17 @@
           </li>
         }
 
+        @if (historyEnabled) {
+          <li [ngbNavItem]="DocumentDetailNavIDs.History">
+            <a ngbNavLink i18n>History</a>
+            <ng-template ngbNavContent>
+              <div class="mb-3">
+                <pngx-document-history [documentId]="documentId"></pngx-document-history>
+              </div>
+            </ng-template>
+          </li>
+        }
+
         @if (showPermissions) {
           <li [ngbNavItem]="DocumentDetailNavIDs.Permissions">
             <a ngbNavLink i18n>Permissions</a>
@@ -324,44 +357,45 @@
         <ng-container i18n>Loading...</ng-container>
       </div>
     </div>
-  }
-  @switch (contentRenderType) {
-    @case (ContentRenderType.PDF) {
-      @if (!useNativePdfViewer) {
-        <div class="preview-sticky pdf-viewer-container">
-          <pngx-pdf-viewer
-            [src]="{ url: previewUrl, password: password }"
-            [original-size]="false"
-            [show-borders]="true"
-            [show-all]="true"
-            [(page)]="previewCurrentPage"
-            [zoom-scale]="previewZoomScale"
-            [zoom]="previewZoomSetting"
-            (error)="onError($event)"
-            (after-load-complete)="pdfPreviewLoaded($event)">
-          </pngx-pdf-viewer>
+  } @else {
+    @switch (archiveContentRenderType) {
+      @case (ContentRenderType.PDF) {
+        @if (!useNativePdfViewer) {
+          <div class="preview-sticky pdf-viewer-container">
+            <pdf-viewer
+              [src]="{ url: previewUrl, password: password }"
+              [original-size]="false"
+              [show-borders]="true"
+              [show-all]="true"
+              [(page)]="previewCurrentPage"
+              [zoom-scale]="previewZoomScale"
+              [zoom]="previewZoomSetting"
+              (error)="onError($event)"
+              (after-load-complete)="pdfPreviewLoaded($event)">
+            </pdf-viewer>
+          </div>
+        } @else {
+          <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>
+        }
+      }
+      @case (ContentRenderType.Text) {
+        <div class="preview-sticky bg-light p-3 overflow-auto" width="100%">{{previewText}}</div>
+      }
+      @case (ContentRenderType.Image) {
+        <div class="preview-sticky">
+          <img [src]="previewUrl | safeUrl" width="100%" height="100%" alt="{{title}}" />
         </div>
-      } @else {
+      }
+      @case (ContentRenderType.Other) {
         <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>
       }
     }
-    @case (ContentRenderType.Text) {
-      <div class="preview-sticky bg-light p-3 overflow-auto" width="100%">{{previewText}}</div>
-    }
-    @case (ContentRenderType.Image) {
-      <div class="preview-sticky">
-        <img [src]="previewUrl | safeUrl" width="100%" height="100%" alt="{{title}}" />
+    @if (requiresPassword) {
+      <div class="password-prompt">
+        <form>
+          <input autocomplete="" autofocus="true" class="form-control" i18n-placeholder placeholder="Enter Password" type="password" (keyup)="onPasswordKeyUp($event)" />
+        </form>
       </div>
     }
-    @case (ContentRenderType.Other) {
-      <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>
-    }
-  }
-  @if (requiresPassword) {
-    <div class="password-prompt">
-      <form>
-        <input autocomplete="" autofocus="true" class="form-control" i18n-placeholder placeholder="Enter Password" type="password" (keyup)="onPasswordKeyUp($event)" />
-      </form>
-    </div>
   }
 </ng-template>

@@ -1,0 +1,70 @@
+{% extends "paperless-ngx/base.html" %}
+{% load i18n allauth %}
+
+{% block head_title %}
+    {% trans "Paperless-ngx sign up" %}
+{% endblock head_title %}
+
+{% block form_top_content %}
+    <p>
+        {% blocktrans %}Already have an account? <a href="{{ login_url }}">Sign in</a>{% endblocktrans %}
+    </p>
+{% endblock form_top_content %}
+
+{% block form_content %}
+    {% translate "Username" as i18n_username %}
+    {% translate "Email (optional)" as i18n_email %}
+    {% translate "Password" as i18n_password1 %}
+    {% translate "Password (again)" as i18n_password2 %}
+    <div class="form-floating form-stacked-top">
+        <input type="text" name="username" id="inputUsername" placeholder="{{ i18n_username }}" class="form-control" autocorrect="off" autocapitalize="none" required autofocus>
+        <label for="inputUsername">{{ i18n_username }}</label>
+    </div>
+    <div class="form-floating form-stacked-middle">
+        <input type="email" name="email" id="inputEmail" placeholder="{{ i18n_email }}" class="form-control">
+        <label for="inputEmail">{{ i18n_email }}</label>
+    </div>
+    <div class="form-floating form-stacked-middle">
+        <input type="password" name="password1" id="inputPassword1" placeholder="{{ i18n_password1 }}" class="form-control" required>
+        <label for="inputPassword1">{{ i18n_password1 }}</label>
+    </div>
+    <div class="form-floating form-stacked-bottom">
+        <input type="password" name="password2" id="inputPassword2" placeholder="{{ i18n_password2 }}" class="form-control" required>
+        <label for="inputPassword2">{{ i18n_password2 }}</label>
+    </div>
+    <div class="d-grid mt-3">
+        <button class="btn btn-lg btn-primary" type="submit">{% translate "Sign up" %}</button>
+    </div>
+
+    {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+{% endblock form_content %}
+
+{% block after_form_content %}
+  {% load allauth socialaccount %}
+  {% get_providers as socialaccount_providers %}
+  {% if socialaccount_providers %}
+      {% if not DISABLE_REGULAR_LOGIN %}
+        <p class="mt-3">{% translate "or sign in via" %}</p>
+      {% endif %}
+      <ul class="m-0 p-0">
+          {% for provider in socialaccount_providers %}
+              {% if provider.id == "openid" %}
+                  {% for brand in provider.get_brands %}
+                      {% provider_login_url provider openid=brand.openid_url process=process as href %}
+                  <li class="d-grid mt-3"><a class="btn btn-secondary" href="{{ href }}">{{ brand.name }}</a></li>
+                  {% endfor %}
+              {% else %}
+              {% provider_login_url provider process=process scope=scope auth_params=auth_params as href %}
+              <li class="d-grid mt-3">
+                <form class="d-grid" method="POST" action="{{ href }}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-secondary">{{ provider.name }}</button>
+                </form>
+              </li>
+              {% endif %}
+          {% endfor %}
+      </ul>
+  {% endif %}
+{% endblock after_form_content %}

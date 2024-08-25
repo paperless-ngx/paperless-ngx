@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { MailComponent } from './mail.component'
 import { DatePipe } from '@angular/common'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { RouterTestingModule } from '@angular/router/testing'
 import {
   NgbModule,
@@ -41,6 +41,8 @@ import { TagsComponent } from '../../common/input/tags/tags.component'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { SwitchComponent } from '../../common/input/switch/switch.component'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const mailAccounts = [
   { id: 1, name: 'account1' },
@@ -82,17 +84,23 @@ describe('MailComponent', () => {
         PermissionsGroupComponent,
         PermissionsDialogComponent,
         PermissionsFormComponent,
+        SwitchComponent,
       ],
-      providers: [CustomDatePipe, DatePipe, PermissionsGuard],
       imports: [
         NgbModule,
-        HttpClientTestingModule,
         RouterTestingModule.withRoutes(routes),
         FormsModule,
         ReactiveFormsModule,
         NgbAlertModule,
         NgSelectModule,
         NgxBootstrapIconsModule.pick(allIcons),
+      ],
+      providers: [
+        CustomDatePipe,
+        DatePipe,
+        PermissionsGuard,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 
@@ -267,11 +275,11 @@ describe('MailComponent', () => {
     rulePatchSpy.mockReturnValueOnce(
       throwError(() => new Error('error saving perms'))
     )
-    dialog.confirmClicked.emit(perms)
+    dialog.confirmClicked.emit({ permissions: perms, merge: true })
     expect(rulePatchSpy).toHaveBeenCalled()
     expect(toastErrorSpy).toHaveBeenCalled()
     rulePatchSpy.mockReturnValueOnce(of(mailRules[0] as MailRule))
-    dialog.confirmClicked.emit(perms)
+    dialog.confirmClicked.emit({ permissions: perms, merge: true })
     expect(toastInfoSpy).toHaveBeenCalledWith('Permissions updated')
 
     modalService.dismissAll()
@@ -299,8 +307,7 @@ describe('MailComponent', () => {
     expect(modal).not.toBeUndefined()
     let dialog = modal.componentInstance as PermissionsDialogComponent
     expect(dialog.object).toEqual(mailAccounts[0])
-    dialog = modal.componentInstance as PermissionsDialogComponent
-    dialog.confirmClicked.emit(perms)
+    dialog.confirmClicked.emit({ permissions: perms, merge: true })
     expect(accountPatchSpy).toHaveBeenCalled()
   })
 })

@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import {
   ComponentFixture,
   TestBed,
@@ -23,7 +23,10 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { TagListComponent } from '../tag-list/tag-list.component'
 import { ManagementListComponent } from './management-list.component'
-import { PermissionsService } from 'src/app/services/permissions.service'
+import {
+  PermissionAction,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { EditDialogComponent } from '../../common/edit-dialog/edit-dialog.component'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
@@ -37,6 +40,8 @@ import { MATCH_NONE } from 'src/app/data/matching-model'
 import { MATCH_LITERAL } from 'src/app/data/matching-model'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { BulkEditObjectOperation } from 'src/app/services/rest/abstract-name-filter-service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const tags: Tag[] = [
   {
@@ -64,6 +69,7 @@ describe('ManagementListComponent', () => {
   let modalService: NgbModal
   let toastService: ToastService
   let documentListViewService: DocumentListViewService
+  let permissionsService: PermissionsService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -76,26 +82,19 @@ describe('ManagementListComponent', () => {
         ConfirmDialogComponent,
         PermissionsDialogComponent,
       ],
-      providers: [
-        {
-          provide: PermissionsService,
-          useValue: {
-            currentUserCan: () => true,
-            currentUserHasObjectPermissions: () => true,
-            currentUserOwnsObject: () => true,
-          },
-        },
-        DatePipe,
-        PermissionsGuard,
-      ],
       imports: [
-        HttpClientTestingModule,
         NgbPaginationModule,
         FormsModule,
         ReactiveFormsModule,
         NgbModalModule,
         RouterTestingModule.withRoutes(routes),
         NgxBootstrapIconsModule.pick(allIcons),
+      ],
+      providers: [
+        DatePipe,
+        PermissionsGuard,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 
@@ -114,6 +113,14 @@ describe('ManagementListComponent', () => {
           })
         }
       )
+    permissionsService = TestBed.inject(PermissionsService)
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    jest
+      .spyOn(permissionsService, 'currentUserHasObjectPermissions')
+      .mockReturnValue(true)
+    jest
+      .spyOn(permissionsService, 'currentUserOwnsObject')
+      .mockReturnValue(true)
     modalService = TestBed.inject(NgbModal)
     toastService = TestBed.inject(ToastService)
     documentListViewService = TestBed.inject(DocumentListViewService)
@@ -149,7 +156,7 @@ describe('ManagementListComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
-    const createButton = fixture.debugElement.queryAll(By.css('button'))[2]
+    const createButton = fixture.debugElement.queryAll(By.css('button'))[3]
     createButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
@@ -173,7 +180,7 @@ describe('ManagementListComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
-    const editButton = fixture.debugElement.queryAll(By.css('button'))[6]
+    const editButton = fixture.debugElement.queryAll(By.css('button'))[7]
     editButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
@@ -198,7 +205,7 @@ describe('ManagementListComponent', () => {
     const deleteSpy = jest.spyOn(tagService, 'delete')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
-    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[7]
+    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[8]
     deleteButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
@@ -218,7 +225,7 @@ describe('ManagementListComponent', () => {
 
   it('should support quick filter for objects', () => {
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    const filterButton = fixture.debugElement.queryAll(By.css('button'))[5]
+    const filterButton = fixture.debugElement.queryAll(By.css('button'))[6]
     filterButton.triggerEventHandler('click')
     expect(qfSpy).toHaveBeenCalledWith([
       { rule_type: FILTER_HAS_TAGS_ALL, value: tags[0].id.toString() },
@@ -246,7 +253,7 @@ describe('ManagementListComponent', () => {
   })
 
   it('should support bulk edit permissions', () => {
-    const bulkEditPermsSpy = jest.spyOn(tagService, 'bulk_update_permissions')
+    const bulkEditPermsSpy = jest.spyOn(tagService, 'bulk_edit_objects')
     component.toggleSelected(tags[0])
     component.toggleSelected(tags[1])
     component.toggleSelected(tags[2])
@@ -264,14 +271,57 @@ describe('ManagementListComponent', () => {
       throwError(() => new Error('error setting permissions'))
     )
     const errorToastSpy = jest.spyOn(toastService, 'showError')
-    modal.componentInstance.confirmClicked.emit()
+    modal.componentInstance.confirmClicked.emit({
+      permissions: {},
+      merge: true,
+    })
     expect(bulkEditPermsSpy).toHaveBeenCalled()
     expect(errorToastSpy).toHaveBeenCalled()
 
     const successToastSpy = jest.spyOn(toastService, 'showInfo')
     bulkEditPermsSpy.mockReturnValueOnce(of('OK'))
-    modal.componentInstance.confirmClicked.emit()
+    modal.componentInstance.confirmClicked.emit({
+      permissions: {},
+      merge: true,
+    })
     expect(bulkEditPermsSpy).toHaveBeenCalled()
     expect(successToastSpy).toHaveBeenCalled()
+  })
+
+  it('should support bulk delete objects', () => {
+    const bulkEditSpy = jest.spyOn(tagService, 'bulk_edit_objects')
+    component.toggleSelected(tags[0])
+    component.toggleSelected(tags[1])
+    const selected = new Set([tags[0].id, tags[1].id])
+    expect(component.selectedObjects).toEqual(selected)
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
+    fixture.detectChanges()
+    component.delete()
+    expect(modal).not.toBeUndefined()
+
+    // fail first
+    bulkEditSpy.mockReturnValueOnce(
+      throwError(() => new Error('error setting permissions'))
+    )
+    const errorToastSpy = jest.spyOn(toastService, 'showError')
+    modal.componentInstance.confirmClicked.emit(null)
+    expect(bulkEditSpy).toHaveBeenCalledWith(
+      Array.from(selected),
+      BulkEditObjectOperation.Delete
+    )
+    expect(errorToastSpy).toHaveBeenCalled()
+
+    const successToastSpy = jest.spyOn(toastService, 'showInfo')
+    bulkEditSpy.mockReturnValueOnce(of('OK'))
+    modal.componentInstance.confirmClicked.emit(null)
+    expect(bulkEditSpy).toHaveBeenCalled()
+    expect(successToastSpy).toHaveBeenCalled()
+  })
+
+  it('should disallow bulk permissions or delete objects if no global perms', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(false)
+    expect(component.userCanBulkEdit(PermissionAction.Delete)).toBeFalsy()
+    expect(component.userCanBulkEdit(PermissionAction.Change)).toBeFalsy()
   })
 })

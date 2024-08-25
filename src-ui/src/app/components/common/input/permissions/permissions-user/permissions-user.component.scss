@@ -1,0 +1,11 @@
+.paperless-input-select.disabled {
+    cursor: not-allowed;
+
+    ::ng-deep ng-select {
+        pointer-events: none;
+
+        .ng-select-container {
+            background-color: var(--pngx-bg-alt) !important;
+        }
+    }
+}

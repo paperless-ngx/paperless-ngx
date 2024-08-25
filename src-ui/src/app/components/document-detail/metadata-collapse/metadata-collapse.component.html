@@ -11,7 +11,7 @@
   {{title}}
 </h6>
 
-<div #collapse="ngbCollapse" [(ngbCollapse)]="!expand">
+<div #collapse="ngbCollapse" [ngbCollapse]="!expand" (ngbCollapseChange)="expand = $event">
   <table class="table table-borderless">
     <tbody>
       @for (m of metadata; track m) {

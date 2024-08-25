@@ -1,0 +1,29 @@
+{% extends "paperless-ngx/base.html" %}
+{% load i18n %}
+
+{% block head_title %}
+    {% trans "Paperless-ngx social account sign up" %}
+{% endblock head_title %}
+
+{% block form_content %}
+    <p>
+        {% blocktrans with provider_name=account.get_provider.name %}You are about to use your {{provider_name}} account to login.{% endblocktrans %}
+        {% blocktrans %}As a final step, please complete the following form:{% endblocktrans %}
+    </p>
+    {% translate "Username" as i18n_username %}
+    {% translate "Email (optional)" as i18n_email %}
+    <div class="form-floating form-stacked-top">
+        <input type="text" name="{{ form.username.name }}" id="inputUsername" placeholder="{{ i18n_username }}" class="form-control" autocorrect="off" autocapitalize="none" required autofocus value="{{ form.username.value }}">
+        <label for="inputUsername">{{ i18n_username }}</label>
+    </div>
+    <div class="form-floating form-stacked-bottom">
+        <input type="email" name="{{ form.email.name }}" id="inputEmail" placeholder="{{ i18n_email }}" class="form-control" autocorrect="off" autocapitalize="none" autofocus value="{{ form.email.value }}">
+        <label for="inputEmail">{{ i18n_email }}</label>
+    </div>
+    {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+    <div class="d-grid mt-3">
+        <button class="btn btn-lg btn-primary" type="submit">{% translate "Sign up" %}</button>
+    </div>
+{% endblock form_content %}

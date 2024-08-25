@@ -1,16 +1,26 @@
 import {
-  HttpClientTestingModule,
   HttpTestingController,
+  provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import { Subscription } from 'rxjs'
 import { TestBed } from '@angular/core/testing'
 import { environment } from 'src/environments/environment'
 import { DocumentService } from './document.service'
 import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
+import { SettingsService } from '../settings.service'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import {
+  DOCUMENT_SORT_FIELDS,
+  DOCUMENT_SORT_FIELDS_FULLTEXT,
+} from 'src/app/data/document'
+import { PermissionsService } from '../permissions.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 let httpTestingController: HttpTestingController
 let service: DocumentService
 let subscription: Subscription
+let settingsService: SettingsService
+
 const endpoint = 'documents'
 const documents = [
   {
@@ -33,6 +43,21 @@ const documents = [
     content: 'some content',
   },
 ]
+
+beforeEach(() => {
+  TestBed.configureTestingModule({
+    imports: [],
+    providers: [
+      DocumentService,
+      provideHttpClient(withInterceptorsFromDi()),
+      provideHttpClientTesting(),
+    ],
+  })
+
+  httpTestingController = TestBed.inject(HttpTestingController)
+  service = TestBed.inject(DocumentService)
+  settingsService = TestBed.inject(SettingsService)
+})
 
 describe(`DocumentService`, () => {
   // common tests e.g. commonAbstractPaperlessServiceTests differ slightly
@@ -237,16 +262,53 @@ describe(`DocumentService`, () => {
     )
     expect(req.request.method).toEqual('GET')
   })
-})
 
-beforeEach(() => {
-  TestBed.configureTestingModule({
-    providers: [DocumentService],
-    imports: [HttpClientTestingModule],
+  it('should pass remove_inbox_tags setting to update', () => {
+    subscription = service.update(documents[0]).subscribe()
+    let req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/`
+    )
+    expect(req.request.body.remove_inbox_tags).toEqual(false)
+
+    settingsService.set(SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS, true)
+    subscription = service.update(documents[0]).subscribe()
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/`
+    )
+    expect(req.request.body.remove_inbox_tags).toEqual(true)
   })
 
-  httpTestingController = TestBed.inject(HttpTestingController)
-  service = TestBed.inject(DocumentService)
+  it('should call appropriate api endpoint for getting audit log', () => {
+    subscription = service.getHistory(documents[0].id).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/history/`
+    )
+  })
+})
+
+it('should construct sort fields respecting permissions', () => {
+  expect(
+    service.sortFields.find((f) => f.field === 'correspondent__name')
+  ).toBeUndefined()
+  expect(
+    service.sortFields.find((f) => f.field === 'document_type__name')
+  ).toBeUndefined()
+
+  const permissionsService: PermissionsService =
+    TestBed.inject(PermissionsService)
+  jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+  service['setupSortFields']()
+  expect(service.sortFields).toEqual(DOCUMENT_SORT_FIELDS)
+  expect(service.sortFieldsFullText).toEqual([
+    ...DOCUMENT_SORT_FIELDS,
+    ...DOCUMENT_SORT_FIELDS_FULLTEXT,
+  ])
+
+  settingsService.set(SETTINGS_KEYS.NOTES_ENABLED, false)
+  service['setupSortFields']()
+  expect(
+    service.sortFields.find((f) => f.field === 'num_notes')
+  ).toBeUndefined()
 })
 
 afterEach(() => {

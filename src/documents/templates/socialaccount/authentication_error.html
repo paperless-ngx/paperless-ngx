@@ -1,0 +1,11 @@
+{% extends "paperless-ngx/base.html" %}
+{% load i18n allauth %}
+
+{% block head_title %}
+    {% trans "Paperless-ngx social account sign in" %}
+{% endblock head_title %}
+
+{% block form_content %}
+    {% url 'account_login' as login_url %}
+    <p>{% blocktranslate %}An error occurred while attempting to login via your social network account. Back to the <a href="{{ login_url }}">login page</a>{% endblocktranslate %}</p>
+{% endblock form_content %}

@@ -23,6 +23,8 @@ from multiselectfield import MultiSelectField
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
 
+from django_softdelete.models import SoftDeleteModel
+
 from documents.data_models import DocumentSource
 from documents.parsers import get_default_file_extension
 
@@ -32,6 +34,7 @@ class ModelWithOwner(models.Model):
         User,
         blank=True,
         null=True,
+        default=None,
         on_delete=models.SET_NULL,
         verbose_name=_("owner"),
     )
@@ -130,7 +133,7 @@ class StoragePath(MatchingModel):
         verbose_name_plural = _("storage paths")
 
 
-class Document(ModelWithOwner):
+class Document(SoftDeleteModel, ModelWithOwner):
     STORAGE_TYPE_UNENCRYPTED = "unencrypted"
     STORAGE_TYPE_GPG = "gpg"
     STORAGE_TYPES = (
@@ -394,6 +397,25 @@ class Log(models.Model):
 
 
 class SavedView(ModelWithOwner):
+    class DisplayMode(models.TextChoices):
+        TABLE = ("table", _("Table"))
+        SMALL_CARDS = ("smallCards", _("Small Cards"))
+        LARGE_CARDS = ("largeCards", _("Large Cards"))
+
+    class DisplayFields(models.TextChoices):
+        TITLE = ("title", _("Title"))
+        CREATED = ("created", _("Created"))
+        ADDED = ("added", _("Added"))
+        TAGS = ("tag"), _("Tags")
+        CORRESPONDENT = ("correspondent", _("Correspondent"))
+        DOCUMENT_TYPE = ("documenttype", _("Document Type"))
+        STORAGE_PATH = ("storagepath", _("Storage Path"))
+        NOTES = ("note", _("Note"))
+        OWNER = ("owner", _("Owner"))
+        SHARED = ("shared", _("Shared"))
+        ASN = ("asn", _("ASN"))
+        CUSTOM_FIELD = ("custom_field_%d", ("Custom Field"))
+
     name = models.CharField(_("name"), max_length=128)
 
     show_on_dashboard = models.BooleanField(
@@ -410,6 +432,27 @@ class SavedView(ModelWithOwner):
         blank=True,
     )
     sort_reverse = models.BooleanField(_("sort reverse"), default=False)
+
+    page_size = models.PositiveIntegerField(
+        _("View page size"),
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1)],
+    )
+
+    display_mode = models.CharField(
+        max_length=128,
+        verbose_name=_("View display mode"),
+        choices=DisplayMode.choices,
+        null=True,
+        blank=True,
+    )
+
+    display_fields = models.JSONField(
+        verbose_name=_("Document display fields"),
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         ordering = ("name",)
@@ -460,6 +503,10 @@ class SavedViewFilterRule(models.Model):
         (35, _("does not have owner in")),
         (36, _("has custom field value")),
         (37, _("is shared by me")),
+        (38, _("has custom fields")),
+        (39, _("has custom field in")),
+        (40, _("does not have custom field in")),
+        (41, _("does not have custom field")),
     ]
 
     saved_view = models.ForeignKey(
@@ -762,6 +809,7 @@ class CustomField(models.Model):
         FLOAT = ("float", _("Float"))
         MONETARY = ("monetary", _("Monetary"))
         DOCUMENTLINK = ("documentlink", _("Document Link"))
+        SELECT = ("select", _("Select"))
 
     created = models.DateTimeField(
         _("created"),
@@ -777,6 +825,15 @@ class CustomField(models.Model):
         max_length=50,
         choices=FieldDataType.choices,
         editable=False,
+    )
+
+    extra_data = models.JSONField(
+        _("extra data"),
+        null=True,
+        blank=True,
+        help_text=_(
+            "Extra data for the custom field, such as select options",
+        ),
     )
 
     class Meta:
@@ -838,9 +895,11 @@ class CustomFieldInstance(models.Model):
 
     value_float = models.FloatField(null=True)
 
-    value_monetary = models.DecimalField(null=True, decimal_places=2, max_digits=12)
+    value_monetary = models.CharField(null=True, max_length=128)
 
     value_document_ids = models.JSONField(null=True)
+
+    value_select = models.PositiveSmallIntegerField(null=True)
 
     class Meta:
         ordering = ("created",)
@@ -854,7 +913,15 @@ class CustomFieldInstance(models.Model):
         ]
 
     def __str__(self) -> str:
-        return str(self.field.name) + f" : {self.value}"
+        value = (
+            self.field.extra_data["select_options"][self.value_select]
+            if (
+                self.field.data_type == CustomField.FieldDataType.SELECT
+                and self.value_select is not None
+            )
+            else self.value
+        )
+        return str(self.field.name) + f" : {value}"
 
     @property
     def value(self):
@@ -878,11 +945,17 @@ class CustomFieldInstance(models.Model):
             return self.value_monetary
         elif self.field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
             return self.value_document_ids
+        elif self.field.data_type == CustomField.FieldDataType.SELECT:
+            return self.value_select
         raise NotImplementedError(self.field.data_type)
 
 
 if settings.AUDIT_LOG_ENABLED:
-    auditlog.register(Document, m2m_fields={"tags"})
+    auditlog.register(
+        Document,
+        m2m_fields={"tags"},
+        exclude_fields=["modified"],
+    )
     auditlog.register(Correspondent)
     auditlog.register(Tag)
     auditlog.register(DocumentType)
@@ -997,7 +1070,14 @@ class WorkflowTrigger(models.Model):
 
 class WorkflowAction(models.Model):
     class WorkflowActionType(models.IntegerChoices):
-        ASSIGNMENT = 1, _("Assignment")
+        ASSIGNMENT = (
+            1,
+            _("Assignment"),
+        )
+        REMOVAL = (
+            2,
+            _("Removal"),
+        )
 
     type = models.PositiveIntegerField(
         _("Workflow Action Type"),
@@ -1019,6 +1099,7 @@ class WorkflowAction(models.Model):
     assign_tags = models.ManyToManyField(
         Tag,
         blank=True,
+        related_name="+",
         verbose_name=_("assign this tag"),
     )
 
@@ -1027,6 +1108,7 @@ class WorkflowAction(models.Model):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
+        related_name="+",
         verbose_name=_("assign this document type"),
     )
 
@@ -1035,6 +1117,7 @@ class WorkflowAction(models.Model):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
+        related_name="+",
         verbose_name=_("assign this correspondent"),
     )
 
@@ -1043,6 +1126,7 @@ class WorkflowAction(models.Model):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
+        related_name="+",
         verbose_name=_("assign this storage path"),
     )
 
@@ -1088,6 +1172,111 @@ class WorkflowAction(models.Model):
         blank=True,
         related_name="+",
         verbose_name=_("assign these custom fields"),
+    )
+
+    remove_tags = models.ManyToManyField(
+        Tag,
+        blank=True,
+        related_name="+",
+        verbose_name=_("remove these tag(s)"),
+    )
+
+    remove_all_tags = models.BooleanField(
+        default=False,
+        verbose_name=_("remove all tags"),
+    )
+
+    remove_document_types = models.ManyToManyField(
+        DocumentType,
+        blank=True,
+        related_name="+",
+        verbose_name=_("remove these document type(s)"),
+    )
+
+    remove_all_document_types = models.BooleanField(
+        default=False,
+        verbose_name=_("remove all document types"),
+    )
+
+    remove_correspondents = models.ManyToManyField(
+        Correspondent,
+        blank=True,
+        related_name="+",
+        verbose_name=_("remove these correspondent(s)"),
+    )
+
+    remove_all_correspondents = models.BooleanField(
+        default=False,
+        verbose_name=_("remove all correspondents"),
+    )
+
+    remove_storage_paths = models.ManyToManyField(
+        StoragePath,
+        blank=True,
+        related_name="+",
+        verbose_name=_("remove these storage path(s)"),
+    )
+
+    remove_all_storage_paths = models.BooleanField(
+        default=False,
+        verbose_name=_("remove all storage paths"),
+    )
+
+    remove_owners = models.ManyToManyField(
+        User,
+        blank=True,
+        related_name="+",
+        verbose_name=_("remove these owner(s)"),
+    )
+
+    remove_all_owners = models.BooleanField(
+        default=False,
+        verbose_name=_("remove all owners"),
+    )
+
+    remove_view_users = models.ManyToManyField(
+        User,
+        blank=True,
+        related_name="+",
+        verbose_name=_("remove view permissions for these users"),
+    )
+
+    remove_view_groups = models.ManyToManyField(
+        Group,
+        blank=True,
+        related_name="+",
+        verbose_name=_("remove view permissions for these groups"),
+    )
+
+    remove_change_users = models.ManyToManyField(
+        User,
+        blank=True,
+        related_name="+",
+        verbose_name=_("remove change permissions for these users"),
+    )
+
+    remove_change_groups = models.ManyToManyField(
+        Group,
+        blank=True,
+        related_name="+",
+        verbose_name=_("remove change permissions for these groups"),
+    )
+
+    remove_all_permissions = models.BooleanField(
+        default=False,
+        verbose_name=_("remove all permissions"),
+    )
+
+    remove_custom_fields = models.ManyToManyField(
+        CustomField,
+        blank=True,
+        related_name="+",
+        verbose_name=_("remove these custom fields"),
+    )
+
+    remove_all_custom_fields = models.BooleanField(
+        default=False,
+        verbose_name=_("remove all custom fields"),
     )
 
     class Meta:

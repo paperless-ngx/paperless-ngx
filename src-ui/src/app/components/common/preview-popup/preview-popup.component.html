@@ -13,13 +13,13 @@
         </div>
       }
       @if (!requiresPassword) {
-        <pngx-pdf-viewer
+        <pdf-viewer
           [src]="previewURL"
           [original-size]="false"
-          [show-borders]="true"
+          [show-borders]="false"
           [show-all]="true"
           (error)="onError($event)">
-        </pngx-pdf-viewer>
+        </pdf-viewer>
       }
     }
   }

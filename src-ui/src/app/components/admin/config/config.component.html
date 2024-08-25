@@ -11,7 +11,7 @@
     <ul ngbNav #nav="ngbNav" class="nav-tabs">
         @for (category of optionCategories; track category) {
             <li [ngbNavItem]="category">
-                <a ngbNavLink i18n>{{category}}</a>
+                <a ngbNavLink>{{category}}</a>
                 <ng-template ngbNavContent>
                     <div class="p-3">
                         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">

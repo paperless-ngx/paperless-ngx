@@ -84,7 +84,8 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
 
   displayName(note: DocumentNote): string {
     if (!note.user) return ''
-    const user = this.users?.find((u) => u.id === note.user)
+    const user_id = typeof note.user === 'number' ? note.user : note.user.id
+    const user = this.users?.find((u) => u.id === user_id)
     if (!user) return ''
     const nameComponents = []
     if (user.first_name) nameComponents.push(user.first_name)

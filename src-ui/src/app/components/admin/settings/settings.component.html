@@ -4,11 +4,33 @@
   info="Options to customize appearance, notifications, saved views and more. Settings apply to the <strong>current user only</strong>."
   i18n-info
   >
-  <button class="btn btn-sm btn-outline-primary" (click)="tourService.start()"><ng-container i18n>Start tour</ng-container></button>
-  <a *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Admin }" class="btn btn-sm btn-primary ms-3" href="admin/" target="_blank">
-    <ng-container i18n>Open Django Admin</ng-container>
-    <i-bs name="arrow-up-right"></i-bs>
-  </a>
+  <button class="btn btn-sm btn-outline-primary" (click)="tourService.start()">
+    <i-bs class="me-1" name="airplane"></i-bs>&nbsp;<ng-container i18n>Start tour</ng-container>
+  </button>
+  @if (permissionsService.isAdmin()) {
+    <button class="btn btn-sm btn-outline-primary position-relative ms-md-5 me-1" (click)="showSystemStatus()"
+      [disabled]="!systemStatus">
+      @if (!systemStatus) {
+        <div class="spinner-border spinner-border-sm me-1 h-75" role="status"></div>
+      } @else {
+        <i-bs class="me-2" name="card-checklist"></i-bs>
+        @if (systemStatusHasErrors) {
+          <span class="badge bg-body position-absolute top-0 start-100 translate-middle rounded-pill p-0">
+            <i-bs name="exclamation-circle-fill" class="text-danger" width="1.75em" height="1.75em"></i-bs>
+          </span>
+        } @else {
+          <span class="badge bg-body position-absolute top-0 start-100 translate-middle rounded-pill p-0">
+            <i-bs name="check-circle-fill" class="text-primary" width="1.75em" height="1.75em"></i-bs>
+          </span>
+        }
+      }
+      <ng-container i18n>System Status</ng-container>
+    </button>
+    <a class="btn btn-sm btn-primary" href="admin/" target="_blank">
+      <ng-container i18n>Open Django Admin</ng-container>
+      &nbsp;<i-bs name="arrow-up-right"></i-bs>
+    </a>
+  }
 </pngx-page-header>
 
 <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()">
@@ -158,12 +180,44 @@
           </div>
         </div>
 
+        <h4 class="mt-4" i18n>Document editing</h4>
+
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <pngx-input-check i18n-title title="Automatically remove inbox tag(s) on save" formControlName="documentEditingRemoveInboxTags"></pngx-input-check>
+          </div>
+        </div>
+
         <h4 class="mt-4" i18n>Bulk editing</h4>
 
         <div class="row mb-3">
           <div class="offset-md-3 col">
-            <pngx-input-check i18n-title title="Show confirmation dialogs" formControlName="bulkEditConfirmationDialogs" i18n-hint hint="Deleting documents will always ask for confirmation."></pngx-input-check>
+            <pngx-input-check i18n-title title="Show confirmation dialogs" formControlName="bulkEditConfirmationDialogs"></pngx-input-check>
             <pngx-input-check i18n-title title="Apply on close" formControlName="bulkEditApplyOnClose"></pngx-input-check>
+          </div>
+        </div>
+
+        <h4 class="mt-4" i18n>Global search</h4>
+
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <pngx-input-check i18n-title title="Do not include advanced search results" formControlName="searchDbOnly"></pngx-input-check>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <div class="row">
+              <div class="col-md-2 col-form-label pt-0">
+                <span i18n>Full search links to</span>
+              </div>
+              <div class="col">
+                <select class="form-select" formControlName="searchLink">
+                  <option [ngValue]="GlobalSearchType.TITLE_CONTENT" i18n>Title and content search</option>
+                  <option [ngValue]="GlobalSearchType.ADVANCED" i18n>Advanced search</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -290,44 +344,71 @@
         </div>
 
         <h4 i18n>Views</h4>
-        <div formGroupName="savedViews">
+        <ul class="list-group" formGroupName="savedViews">
 
           @for (view of savedViews; track view) {
-            <div [formGroupName]="view.id" class="row">
-              <div class="mb-3 col">
-                <label class="form-label" for="name_{{view.id}}" i18n>Name</label>
-                <input type="text" class="form-control" formControlName="name" id="name_{{view.id}}">
-              </div>
-              <div class="mb-2 col">
-                <label class="form-label" for="show_on_dashboard_{{view.id}}" i18n>&nbsp;<span class="visually-hidden">Appears on</span></label>
-                <div class="form-check form-switch">
-                  <input type="checkbox" class="form-check-input" id="show_on_dashboard_{{view.id}}" formControlName="show_on_dashboard">
-                  <label class="form-check-label" for="show_on_dashboard_{{view.id}}" i18n>Show on dashboard</label>
+            <li class="list-group-item py-3">
+            <div [formGroupName]="view.id">
+              <div class="row">
+                <div class="col">
+                  <pngx-input-text title="Name" formControlName="name"></pngx-input-text>
                 </div>
-                <div class="form-check form-switch">
-                  <input type="checkbox" class="form-check-input" id="show_in_sidebar_{{view.id}}" formControlName="show_in_sidebar">
-                  <label class="form-check-label" for="show_in_sidebar_{{view.id}}" i18n>Show in sidebar</label>
+                <div class="col">
+                  <div class="form-check form-switch mt-3">
+                    <input type="checkbox" class="form-check-input" id="show_on_dashboard_{{view.id}}" formControlName="show_on_dashboard">
+                    <label class="form-check-label" for="show_on_dashboard_{{view.id}}" i18n>Show on dashboard</label>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input type="checkbox" class="form-check-input" id="show_in_sidebar_{{view.id}}" formControlName="show_in_sidebar">
+                    <label class="form-check-label" for="show_in_sidebar_{{view.id}}" i18n>Show in sidebar</label>
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <label class="form-label" for="name_{{view.id}}" i18n>Actions</label>
+                  <pngx-confirm-button
+                    label="Delete"
+                    i18n-label
+                    (confirm)="deleteSavedView(view)"
+                    *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.SavedView }"
+                    buttonClasses="btn-sm btn-outline-danger form-control"
+                    iconName="trash">
+                  </pngx-confirm-button>
                 </div>
               </div>
-              <div class="mb-2 col-auto">
-                <label class="form-label" for="name_{{view.id}}" i18n>Actions</label>
-                <button type="button" class="btn btn-sm btn-outline-danger form-control" (click)="deleteSavedView(view)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.SavedView }" i18n>Delete</button>
-              </div>
+              <div class="row">
+                <div class="col">
+                  <pngx-input-number i18n-title title="Documents page size" [showAdd]="false" formControlName="page_size"></pngx-input-number>
+                </div>
+                <div class="col">
+                  <label class="form-label" for="display_mode_{{view.id}}" i18n>Display as</label>
+                  <select class="form-select" formControlName="display_mode">
+                    <option [ngValue]="DisplayMode.TABLE" i18n>Table</option>
+                    <option [ngValue]="DisplayMode.SMALL_CARDS" i18n>Small Cards</option>
+                    <option [ngValue]="DisplayMode.LARGE_CARDS" i18n>Large Cards</option>
+                  </select>
+                </div>
+                  @if (displayFields) {
+                    <pngx-input-drag-drop-select i18n-title title="Show" i18n-emptyText emptyText="Default" [items]="displayFields" formControlName="display_fields"></pngx-input-drag-drop-select>
+                  }
+                </div>
             </div>
+            </li>
           }
 
           @if (savedViews && savedViews.length === 0) {
-            <div i18n>No saved views defined.</div>
+            <li class="list-group-item">
+              <div i18n>No saved views defined.</div>
+            </li>
           }
 
           @if (!savedViews) {
-            <div>
+            <li class="list-group-item">
               <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
               <div class="visually-hidden" i18n>Loading...</div>
-            </div>
+            </li>
           }
 
-        </div>
+        </ul>
 
       </ng-template>
     </li>
@@ -335,5 +416,6 @@
 
   <div [ngbNavOutlet]="nav" class="border-start border-end border-bottom p-3 mb-3 shadow-sm"></div>
 
-  <button type="submit" class="btn btn-primary mb-2" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.UISettings }" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
+  <button type="submit" class="btn btn-primary mb-2" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
+  <button type="button" (click)="reset()" class="btn btn-secondary ms-2 mb-2" [disabled]="(isDirty$ | async) === false" i18n>Cancel</button>
 </form>

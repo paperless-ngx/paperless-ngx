@@ -1,0 +1,78 @@
+{% extends "paperless-ngx/base.html" %}
+{% load i18n %}
+
+{% block head_title %}
+    {% trans "Paperless-ngx sign in" %}
+{% endblock head_title %}
+
+{% block form_top_content %}
+    <p>
+      {% translate "Please sign in." %}
+      {% if ACCOUNT_ALLOW_SIGNUPS %}
+          <br/>{% blocktrans %}Don't have an account yet? <a href="{{ signup_url }}">Sign up</a>{% endblocktrans %}
+      {% endif %}
+    </p>
+{% endblock form_top_content %}
+
+{% block form_content %}
+    {% if not DISABLE_REGULAR_LOGIN %}
+        {% translate "Username" as i18n_username %}
+        {% translate "Password" as i18n_password %}
+        <div class="form-floating form-stacked-top">
+            <input type="text" name="login" id="inputUsername" placeholder="{{ i18n_username }}" class="form-control" autocorrect="off" autocapitalize="none" required autofocus>
+            <label for="inputUsername">{{ i18n_username }}</label>
+        </div>
+        <div class="form-floating form-stacked-bottom">
+            <input type="password" name="password" id="inputPassword" placeholder="{{ i18n_password }}" class="form-control" required>
+            <label for="inputPassword">{{ i18n_password }}</label>
+        </div>
+        <div class="d-grid mt-3">
+            <button class="btn btn-lg btn-primary" type="submit">{% translate "Sign in" %}</button>
+        </div>
+        {% if EMAIL_ENABLED %}
+            <div class="d-grid mt-3">
+              <a class="btn btn-link" href="{% url 'account_reset_password' %}">{% translate "Forgot your password?" %}</a>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endblock form_content %}
+
+{% block after_form_content %}
+    {% load allauth socialaccount %}
+    {% get_providers as socialaccount_providers %}
+    {% if socialaccount_providers %}
+        {% if not DISABLE_REGULAR_LOGIN %}
+            <p class="mt-3">{% translate "or sign in via" %}</p>
+        {% endif %}
+        <ul class="m-0 p-0">
+            {% for provider in socialaccount_providers %}
+                {% if provider.id == "openid" %}
+                    {% for brand in provider.get_brands %}
+                        {% provider_login_url provider openid=brand.openid_url process=process as href %}
+                    <li class="d-grid mt-3"><a class="btn btn-secondary oidc-url" href="{{ href }}">{{ brand.name }}</a></li>
+                    {% endfor %}
+                {% else %}
+                    {% provider_login_url provider process=process scope=scope auth_params=auth_params as href %}
+                        <li class="d-grid mt-3">
+                            <form id="social-login" class="d-grid" method="POST" action="{{ href }}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-secondary">{{ provider.name }}</button>
+                            </form>
+                        </li>
+                    {% if REDIRECT_LOGIN_TO_SSO and forloop.counter0 == 0 and request.GET.loggedout != '1' %}
+                        <script type="text/javascript">
+                            const form = document.getElementById('social-login');
+                            if (form) {
+                                form.submit();
+                            } else {
+                                if (document.getElementsByClassName('oidc-url').length > 0) {
+                                    document.getElementsByClassName('oidc-url')[0].click();
+                                }
+                            }
+                        </script>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock after_form_content %}

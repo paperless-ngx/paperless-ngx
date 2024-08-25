@@ -1,6 +1,6 @@
 import {
-  HttpClientTestingModule,
   HttpTestingController,
+  provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import { AppFrameComponent } from './app-frame.component'
 import {
@@ -21,19 +21,23 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { of, throwError } from 'rxjs'
 import { ToastService } from 'src/app/services/toast.service'
+import {
+  DjangoMessageLevel,
+  DjangoMessagesService,
+} from 'src/app/services/django-messages.service'
 import { environment } from 'src/environments/environment'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { ActivatedRoute, Router } from '@angular/router'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { SearchService } from 'src/app/services/rest/search.service'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { FILTER_FULLTEXT_QUERY } from 'src/app/data/filter-rule-type'
 import { routes } from 'src/app/app-routing.module'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop'
 import { SavedView } from 'src/app/data/saved-view'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { GlobalSearchComponent } from './global-search/global-search.component'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const saved_views = [
   {
@@ -83,18 +87,20 @@ describe('AppFrameComponent', () => {
   let permissionsService: PermissionsService
   let remoteVersionService: RemoteVersionService
   let toastService: ToastService
+  let messagesService: DjangoMessagesService
   let openDocumentsService: OpenDocumentsService
-  let searchService: SearchService
-  let documentListViewService: DocumentListViewService
   let router: Router
   let savedViewSpy
   let modalService: NgbModal
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [AppFrameComponent, IfPermissionsDirective],
+      declarations: [
+        AppFrameComponent,
+        IfPermissionsDirective,
+        GlobalSearchComponent,
+      ],
       imports: [
-        HttpClientTestingModule,
         BrowserModule,
         RouterTestingModule.withRoutes(routes),
         NgbModule,
@@ -123,6 +129,7 @@ describe('AppFrameComponent', () => {
         RemoteVersionService,
         IfPermissionsDirective,
         ToastService,
+        DjangoMessagesService,
         OpenDocumentsService,
         SearchService,
         NgbModal,
@@ -143,6 +150,8 @@ describe('AppFrameComponent', () => {
           },
         },
         PermissionsGuard,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 
@@ -151,9 +160,8 @@ describe('AppFrameComponent', () => {
     permissionsService = TestBed.inject(PermissionsService)
     remoteVersionService = TestBed.inject(RemoteVersionService)
     toastService = TestBed.inject(ToastService)
+    messagesService = TestBed.inject(DjangoMessagesService)
     openDocumentsService = TestBed.inject(OpenDocumentsService)
-    searchService = TestBed.inject(SearchService)
-    documentListViewService = TestBed.inject(DocumentListViewService)
     modalService = TestBed.inject(NgbModal)
     router = TestBed.inject(Router)
 
@@ -289,62 +297,6 @@ describe('AppFrameComponent', () => {
     expect(component.canDeactivate()).toBeFalsy()
   })
 
-  it('should call autocomplete endpoint on input', fakeAsync(() => {
-    const autocompleteSpy = jest.spyOn(searchService, 'autocomplete')
-    component.searchAutoComplete(of('hello')).subscribe()
-    tick(250)
-    expect(autocompleteSpy).toHaveBeenCalled()
-
-    component.searchAutoComplete(of('hello world 1')).subscribe()
-    tick(250)
-    expect(autocompleteSpy).toHaveBeenCalled()
-  }))
-
-  it('should handle autocomplete backend failure gracefully', fakeAsync(() => {
-    const serviceAutocompleteSpy = jest.spyOn(searchService, 'autocomplete')
-    serviceAutocompleteSpy.mockReturnValue(
-      throwError(() => new Error('autcomplete failed'))
-    )
-    // serviceAutocompleteSpy.mockReturnValue(of([' world']))
-    let result
-    component.searchAutoComplete(of('hello')).subscribe((res) => {
-      result = res
-    })
-    tick(250)
-    expect(serviceAutocompleteSpy).toHaveBeenCalled()
-    expect(result).toEqual([])
-  }))
-
-  it('should support reset search field', () => {
-    const resetSpy = jest.spyOn(component, 'resetSearchField')
-    const input = (fixture.nativeElement as HTMLDivElement).querySelector(
-      'input'
-    ) as HTMLInputElement
-    input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Escape' }))
-    expect(resetSpy).toHaveBeenCalled()
-  })
-
-  it('should support choosing a search item', () => {
-    expect(component.searchField.value).toEqual('')
-    component.itemSelected({ item: 'hello', preventDefault: () => true })
-    expect(component.searchField.value).toEqual('hello ')
-    component.itemSelected({ item: 'world', preventDefault: () => true })
-    expect(component.searchField.value).toEqual('hello world ')
-  })
-
-  it('should navigate via quickFilter on search', () => {
-    const str = 'hello world '
-    component.searchField.patchValue(str)
-    const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    component.search()
-    expect(qfSpy).toHaveBeenCalledWith([
-      {
-        rule_type: FILTER_FULLTEXT_QUERY,
-        value: str.trim(),
-      },
-    ])
-  })
-
   it('should disable global dropzone on start drag + drop, re-enable after', () => {
     expect(settingsService.globalDropzoneEnabled).toBeTruthy()
     component.onDragStart(null)
@@ -392,5 +344,20 @@ describe('AppFrameComponent', () => {
     expect(modalSpy).toHaveBeenCalledWith(ProfileEditDialogComponent, {
       backdrop: 'static',
     })
+  })
+
+  it('should show toasts for django messages', () => {
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    jest.spyOn(messagesService, 'get').mockReturnValue([
+      { level: DjangoMessageLevel.WARNING, message: 'Test warning' },
+      { level: DjangoMessageLevel.ERROR, message: 'Test error' },
+      { level: DjangoMessageLevel.SUCCESS, message: 'Test success' },
+      { level: DjangoMessageLevel.INFO, message: 'Test info' },
+      { level: DjangoMessageLevel.DEBUG, message: 'Test debug' },
+    ])
+    component.ngOnInit()
+    expect(toastErrorSpy).toHaveBeenCalledTimes(2)
+    expect(toastInfoSpy).toHaveBeenCalledTimes(3)
   })
 })

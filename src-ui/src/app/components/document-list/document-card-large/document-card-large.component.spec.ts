@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import {
   ComponentFixture,
   TestBed,
@@ -21,6 +21,8 @@ import { DocumentCardLargeComponent } from './document-card-large.component'
 import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
 import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { CustomFieldDisplayComponent } from '../../common/custom-field-display/custom-field-display.component'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const doc = {
   id: 10,
@@ -53,15 +55,19 @@ describe('DocumentCardLargeComponent', () => {
         SafeUrlPipe,
         IsNumberPipe,
         PreviewPopupComponent,
+        CustomFieldDisplayComponent,
       ],
-      providers: [DatePipe],
       imports: [
-        HttpClientTestingModule,
         RouterTestingModule,
         NgbPopoverModule,
         NgbTooltipModule,
         NgbProgressbarModule,
         NgxBootstrapIconsModule.pick(allIcons),
+      ],
+      providers: [
+        DatePipe,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 

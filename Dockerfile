@@ -13,6 +13,16 @@ WORKDIR /src/src-ui
 RUN set -eux \
   && npm update npm -g \
   && npm ci
+
+ARG PNGX_TAG_VERSION=
+# Add the tag to the environment file if its a tagged dev build
+RUN set -eux && \
+case "${PNGX_TAG_VERSION}" in \
+  dev|fix*|feature*) \
+    sed -i -E "s/version: '([0-9\.]+)'/version: '\1 #${PNGX_TAG_VERSION}'/g" /src/src-ui/src/environments/environment.prod.ts \
+    ;; \
+esac
+
 RUN set -eux \
   && ./node_modules/.bin/ng build --configuration production
 
@@ -21,7 +31,7 @@ RUN set -eux \
 # Comments:
 #  - pipenv dependencies are not left in the final image
 #  - pipenv can't touch the final image somehow
-FROM --platform=$BUILDPLATFORM docker.io/python:3.11-alpine as pipenv-base
+FROM --platform=$BUILDPLATFORM docker.io/python:3.11-alpine AS pipenv-base
 
 WORKDIR /usr/src/pipenv
 
@@ -29,7 +39,7 @@ COPY Pipfile* ./
 
 RUN set -eux \
   && echo "Installing pipenv" \
-    && python3 -m pip install --no-cache-dir --upgrade pipenv==2023.11.15 \
+    && python3 -m pip install --no-cache-dir --upgrade pipenv==2024.0.1 \
   && echo "Generating requirement.txt" \
     && pipenv requirements > requirements.txt
 
@@ -37,9 +47,7 @@ RUN set -eux \
 # Purpose: The final image
 # Comments:
 #  - Don't leave anything extra in here
-FROM docker.io/python:3.11-slim-bookworm as main-app
-
-ENV PYTHONWARNINGS="ignore:::django.http.response:517"
+FROM docker.io/python:3.11-slim-bookworm AS main-app
 
 LABEL org.opencontainers.image.authors="paperless-ngx team <hello@paperless-ngx.com>"
 LABEL org.opencontainers.image.documentation="https://docs.paperless-ngx.com/"
@@ -54,8 +62,15 @@ ARG TARGETARCH
 
 # Can be workflow provided, defaults set for manual building
 ARG JBIG2ENC_VERSION=0.29
-ARG QPDF_VERSION=11.6.4
-ARG GS_VERSION=10.02.1
+ARG QPDF_VERSION=11.9.0
+ARG GS_VERSION=10.03.1
+
+# Set Python environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    # Ignore warning from Whitenoise
+    PYTHONWARNINGS="ignore:::django.http.response:517" \
+    PNGX_CONTAINERIZED=1
 
 #
 # Begin installation and configuration
@@ -78,7 +93,6 @@ ARG RUNTIME_PACKAGES="\
   icc-profiles-free \
   imagemagick \
   # PostgreSQL
-  libpq5 \
   postgresql-client \
   # MySQL / MariaDB
   mariadb-client \
@@ -124,17 +138,17 @@ RUN set -eux \
         && dpkg --install ./qpdf_${QPDF_VERSION}-1_${TARGETARCH}.deb \
       && echo "Installing Ghostscript ${GS_VERSION}" \
         && curl --fail --silent --show-error --location \
-          --output libgs10_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
+          --output libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
           https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
         && curl --fail --silent --show-error --location \
-          --output ghostscript_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
+          --output ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
           https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
         && curl --fail --silent --show-error --location \
-          --output libgs10-common_${GS_VERSION}.dfsg-2_all.deb \
+          --output libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
           https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
-        && dpkg --install ./libgs10-common_${GS_VERSION}.dfsg-2_all.deb \
-        && dpkg --install ./libgs10_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
-        && dpkg --install ./ghostscript_${GS_VERSION}.dfsg-2_${TARGETARCH}.deb \
+        && dpkg --install ./libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
+        && dpkg --install ./libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
+        && dpkg --install ./ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
       && echo "Installing jbig2enc" \
         && curl --fail --silent --show-error --location \
           --output jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
@@ -218,7 +232,13 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
     && python3 -m pip install --no-cache-dir --upgrade wheel \
   && echo "Installing Python requirements" \
-    && python3 -m pip install --default-timeout=1000 --requirement requirements.txt \
+    && curl --fail --silent --show-error --location \
+    --output psycopg_c-3.2.1-cp311-cp311-linux_x86_64.whl \
+    https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.1/psycopg_c-3.2.1-cp311-cp311-linux_x86_64.whl \
+    && curl --fail --silent --show-error --location \
+    --output psycopg_c-3.2.1-cp311-cp311-linux_aarch64.whl  \
+    https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.1/psycopg_c-3.2.1-cp311-cp311-linux_aarch64.whl \
+    && python3 -m pip install --default-timeout=1000 --find-links . --requirement requirements.txt \
   && echo "Patching whitenoise for compression speedup" \
     && curl --fail --silent --show-error --location --output 484.patch https://github.com/evansd/whitenoise/pull/484.patch \
     && patch -d /usr/local/lib/python3.11/site-packages --verbose -p2 < 484.patch \
@@ -226,11 +246,12 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
   && echo "Installing NLTK data" \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" snowball_data \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" stopwords \
-    && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" punkt \
+    && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" punkt_tab \
   && echo "Cleaning up image" \
     && apt-get --yes purge ${BUILD_PACKAGES} \
     && apt-get --yes autoremove --purge \
     && apt-get clean --yes \
+    && rm --recursive --force --verbose *.whl \
     && rm --recursive --force --verbose /var/lib/apt/lists/* \
     && rm --recursive --force --verbose /tmp/* \
     && rm --recursive --force --verbose /var/tmp/* \

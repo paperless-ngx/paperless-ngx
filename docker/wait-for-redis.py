@@ -4,6 +4,7 @@ Simple script which attempts to ping the Redis broker as set in the environment 
 a certain number of times, waiting a little bit in between
 
 """
+
 import os
 import sys
 import time

@@ -1,0 +1,11 @@
+{
+    "python.testing.pytestArgs": [
+        "src"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "files.watcherExclude": {
+        "**/.venv/**": true,
+        "**/pytest_cache/**": true
+    }
+}

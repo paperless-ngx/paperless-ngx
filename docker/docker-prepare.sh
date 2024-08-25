@@ -13,7 +13,7 @@ wait_for_postgres() {
 
 	# Disable warning, host and port can't have spaces
 	# shellcheck disable=SC2086
-	while [ ! "$(pg_isready -h ${host} -p ${port})" ]; do
+	while [ ! "$(pg_isready --host ${host} --port ${port})" ]; do
 
 		if [ $attempt_num -eq $max_attempts ]; then
 			echo "Unable to connect to database."
@@ -25,6 +25,7 @@ wait_for_postgres() {
 		attempt_num=$(("$attempt_num" + 1))
 		sleep 5
 	done
+	echo "Connected to PostgreSQL"
 }
 
 wait_for_mariadb() {
@@ -51,6 +52,7 @@ wait_for_mariadb() {
 		attempt_num=$(("$attempt_num" + 1))
 		sleep 5
 	done
+	echo "Connected to MariaDB"
 }
 
 wait_for_redis() {
@@ -80,7 +82,7 @@ django_checks() {
 
 search_index() {
 
-	local -r index_version=8
+	local -r index_version=9
 	local -r index_version_file=${DATA_DIR}/.index_version
 
 	if [[ (! -f "${index_version_file}") || $(<"${index_version_file}") != "$index_version" ]]; then

@@ -1,6 +1,9 @@
 <form [formGroup]="objectForm" (ngSubmit)="save()" autocomplete="off">
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
+    @if (object?.id) {
+      <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{object.id}}</span>
+    }
     <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
     </button>
   </div>
@@ -10,6 +13,28 @@
     @if (typeFieldDisabled) {
       <small class="d-block mt-n2" i18n>Data type cannot be changed after a field is created</small>
     }
+    <div [formGroup]="objectForm.controls.extra_data">
+      @switch (objectForm.get('data_type').value) {
+        @case (CustomFieldDataType.Select) {
+          <button type="button" class="btn btn-sm btn-primary my-2" (click)="addSelectOption()">
+            <span i18n>Add option</span>&nbsp;<i-bs name="plus-circle"></i-bs>
+          </button>
+          <div formArrayName="select_options">
+            @for (option of objectForm.controls.extra_data.controls.select_options.controls; track option; let i = $index) {
+              <div class="input-group input-group-sm my-2">
+                <input #selectOption type="text" class="form-control" [formControl]="option" autocomplete="off">
+                <button type="button" class="btn btn-outline-danger" (click)="removeSelectOption(i)" i18n>Delete</button>
+              </div>
+            }
+          </div>
+        }
+        @case (CustomFieldDataType.Monetary) {
+          <div class="my-3">
+            <pngx-input-text i18n-title title="Default Currency" hint="3-character currency code" i18n-hint formControlName="default_currency" placeholder="Use locale" i18n-placeholder autocomplete="off"></pngx-input-text>
+          </div>
+        }
+      }
+    </div>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>

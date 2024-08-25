@@ -3,10 +3,9 @@ table {
   table-layout: fixed;
 }
 
-th:first-child {
-  width: 25%;
-  @media (min-width: 768px) {
-    width: 15%;
+@media (min-width: 768px) {
+  th.w-25 {
+    width: 15% !important;
   }
 }
 
@@ -29,4 +28,46 @@ tr:hover .btn-group {
 td.py-3 {
   padding-top: 0.75em !important;
   padding-bottom: 0.75em !important;
+}
+
+$paperless-card-breakpoints: (
+  // 0: 2, // xs is manual for slim-sidebar
+  768px: 2, //md
+  992px: 2, //lg
+  1200px: 3, //xl
+  1600px: 4,
+  1800px: 5,
+  2000px: 6
+);
+
+.row-cols-paperless-cards {
+  // xs, we dont want in .col-slim block
+  > * {
+    flex: 0 0 auto;
+    width: calc(100% / 2);
+  }
+
+  @each $width, $n_cols in $paperless-card-breakpoints {
+    @media(min-width: $width) {
+      > * {
+        flex: 0 0 auto;
+        width: calc(100% / $n-cols);
+      }
+    }
+  }
+}
+
+::ng-deep .col-slim .row-cols-paperless-cards {
+  @each $width, $n_cols in $paperless-card-breakpoints {
+    @media(min-width: $width) {
+      > * {
+        flex: 0 0 auto;
+        width: calc(100% / ($n-cols + 1)) !important;
+      }
+    }
+  }
+}
+
+::ng-deep .document-card-check {
+  display: none !important; // override for dashboard
 }

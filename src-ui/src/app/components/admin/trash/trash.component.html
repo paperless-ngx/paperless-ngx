@@ -1,0 +1,98 @@
+<pngx-page-header
+    title="Trash"
+    i18n-title
+    info="Manage trashed documents that are pending deletion."
+    i18n-info
+    infoLink="usage/#document-trash">
+    <button class="btn btn-sm btn-outline-secondary" (click)="clearSelection()" [hidden]="selectedDocuments.size === 0">
+        <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-primary" (click)="restoreAll(selectedDocuments)" [disabled]="selectedDocuments.size === 0">
+        <i-bs name="arrow-counterclockwise"></i-bs>&nbsp;<ng-container i18n>Restore selected</ng-container>
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="emptyTrash(selectedDocuments)" [disabled]="selectedDocuments.size === 0">
+        <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete selected</ng-container>
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="emptyTrash()" [disabled]="documentsInTrash.length === 0">
+        <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Empty trash</ng-container>
+    </button>
+</pngx-page-header>
+
+<div class="row mb-3">
+    <ngb-pagination class="col-auto" [pageSize]="25" [collectionSize]="totalDocuments" [(page)]="page" [maxSize]="5" (pageChange)="reload()" size="sm" aria-label="Pagination"></ngb-pagination>
+</div>
+
+<div class="card border table-responsive mb-3">
+    <table class="table table-striped align-middle shadow-sm mb-0">
+        <thead>
+            <tr>
+            <th scope="col">
+                <div class="form-check m-0 ms-2 me-n2">
+                <input type="checkbox" class="form-check-input" id="all-objects" [(ngModel)]="allToggled" [disabled]="documentsInTrash.length === 0" (click)="toggleAll($event); $event.stopPropagation();">
+                <label class="form-check-label" for="all-objects"></label>
+                </div>
+            </th>
+            <th scope="col" class="fw-normal" i18n>Name</th>
+            <th scope="col" class="fw-normal d-none d-sm-table-cell" i18n>Remaining</th>
+            <th scope="col" class="fw-normal" i18n>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (isLoading) {
+                <tr>
+                    <td colspan="5">
+                    <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                    <ng-container i18n>Loading...</ng-container>
+                    </td>
+                </tr>
+            }
+            @for (document of documentsInTrash; track document.id) {
+                <tr (click)="toggleSelected(document); $event.stopPropagation();">
+                    <td>
+                    <div class="form-check m-0 ms-2 me-n2">
+                        <input type="checkbox" class="form-check-input" id="{{document.id}}" [checked]="selectedDocuments.has(document.id)" (click)="toggleSelected(document); $event.stopPropagation();">
+                        <label class="form-check-label" for="{{document.id}}"></label>
+                    </div>
+                    </td>
+                    <td scope="row">{{ document.title }}</td>
+                    <td scope="row" i18n>{{ getDaysRemaining(document) }} days</td>
+                    <td scope="row">
+                    <div class="btn-group d-block d-sm-none">
+                        <div ngbDropdown container="body" class="d-inline-block">
+                        <button type="button" class="btn btn-link" id="actionsMenuMobile" (click)="$event.stopPropagation()" ngbDropdownToggle>
+                            <i-bs name="three-dots-vertical"></i-bs>
+                        </button>
+                        <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">
+                            <button (click)="restore(document)" ngbDropdownItem i18n>Restore</button>
+                            <button (click)="delete(document)" ngbDropdownItem i18n>Delete</button>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="btn-group d-none d-sm-block">
+                        <button class="btn btn-sm btn-outline-secondary" (click)="restore(document); $event.stopPropagation();">
+                            <i-bs width="1em" height="1em" name="arrow-counterclockwise"></i-bs>&nbsp;<ng-container i18n>Restore</ng-container>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" (click)="delete(document); $event.stopPropagation();">
+                            <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+                        </button>
+                    </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (!isLoading) {
+    <div class="d-flex mb-2">
+        <div>
+            <ng-container i18n>{totalDocuments, plural, =1 {One document in trash} other {{{totalDocuments || 0}} total documents in trash}}</ng-container>
+            @if (selectedDocuments.size > 0) {
+                &nbsp;({{selectedDocuments.size}} selected)
+            }
+        </div>
+        @if (documentsInTrash.length > 20) {
+            <ngb-pagination class="ms-auto" [pageSize]="25" [collectionSize]="totalDocuments" [(page)]="page" [maxSize]="5" (pageChange)="reload()" size="sm" aria-label="Pagination"></ngb-pagination>
+        }
+    </div>
+}

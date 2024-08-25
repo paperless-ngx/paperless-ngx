@@ -36,7 +36,7 @@ The following algorithms are available:
 - **Regular expression:** Parses the match as a regular expression and
   tries to find a match within the document.
 - **Fuzzy match:** Uses a partial matching based on locating the tag text
-  inside the document, using a [partial ratio](https://maxbachmann.github.io/RapidFuzz/Usage/fuzz.html#partial-ratio)
+  inside the document, using a [partial ratio](https://rapidfuzz.github.io/RapidFuzz/Usage/fuzz.html#partial-ratio)
 - **Auto:** Tries to automatically match new documents. This does not
   require you to set a match. See the [notes below](#automatic-matching).
 
@@ -187,6 +187,7 @@ variables:
 | `DOCUMENT_THUMBNAIL_PATH`    | Path to the generated thumbnail                |
 | `DOCUMENT_DOWNLOAD_URL`      | URL for document download                      |
 | `DOCUMENT_THUMBNAIL_URL`     | URL for the document thumbnail                 |
+| `DOCUMENT_OWNER`             | Username of the document owner (if any)        |
 | `DOCUMENT_CORRESPONDENT`     | Assigned correspondent (if any)                |
 | `DOCUMENT_TAGS`              | Comma separated list of tags applied (if any)  |
 | `DOCUMENT_ORIGINAL_FILENAME` | Filename of original document                  |
@@ -256,7 +257,8 @@ document. You will end up getting files like `0000123.pdf` in your media
 directory. This isn't necessarily a bad thing, because you normally
 don't have to access these files manually. However, if you wish to name
 your files differently, you can do that by adjusting the
-[`PAPERLESS_FILENAME_FORMAT`](configuration.md#PAPERLESS_FILENAME_FORMAT) configuration option. Paperless adds the
+[`PAPERLESS_FILENAME_FORMAT`](configuration.md#PAPERLESS_FILENAME_FORMAT) configuration option
+or using [storage paths (see below)](#storage-paths). Paperless adds the
 correct file extension e.g. `.pdf`, `.jpg` automatically.
 
 This variable allows you to configure the filename (folders are allowed)
@@ -288,6 +290,15 @@ will create a directory structure as follows:
     the last filename a document was stored as. If you do rename a file,
     paperless will report your files as missing and won't be able to find
     them.
+
+!!! tip
+
+    Paperless checks the filename of a document whenever it is saved. Changing (or deleting)
+    a [storage path](#storage-paths) will automatically be reflected in the file system. However,
+    when changing `PAPERLESS_FILENAME_FORMAT` you will need to manually run the
+    [`document renamer`](administration.md#renamer) to move any existing documents.
+
+#### Placeholders
 
 Paperless provides the following placeholders within filenames:
 
@@ -321,6 +332,12 @@ Paperless provides the following placeholders within filenames:
 - `{original_name}`: Document original filename, minus the extension, if any, or "none"
 - `{doc_pk}`: The paperless identifier (primary key) for the document.
 
+!!! warning
+
+    When using file name placeholders, in particular when using `{tag_list}`,
+    you may run into the limits of your operating system's maximum path lengths.
+    In that case, files will retain the previous path instead and the issue logged.
+
 Paperless will try to conserve the information from your database as
 much as possible. However, some characters that you can use in document
 titles and correspondent names (such as `: \ /` and a couple more) are
@@ -331,34 +348,12 @@ paperless will automatically append `_01`, `_02`, etc to the filename.
 This happens if all the placeholders in a filename evaluate to the same
 value.
 
-!!! tip
-
-    You can affect how empty placeholders are treated by changing the
-    following setting to `true`.
-
-    ```
-    PAPERLESS_FILENAME_FORMAT_REMOVE_NONE=True
-    ```
-
-    Doing this results in all empty placeholders resolving to "" instead
-    of "none" as stated above. Spaces before empty placeholders are
-    removed as well, empty directories are omitted.
-
-!!! tip
-
-    Paperless checks the filename of a document whenever it is saved.
-    Therefore, you need to update the filenames of your documents and move
-    them after altering this setting by invoking the
-    [`document renamer`](administration.md#renamer).
-
-!!! warning
-
-    Make absolutely sure you get the spelling of the placeholders right, or
-    else paperless will use the default naming scheme instead.
+If there are any errors in the placeholders included in `PAPERLESS_FILENAME_FORMAT`,
+paperless will fall back to using the default naming scheme instead.
 
 !!! caution
 
-    As of now, you could totally tell paperless to store your files anywhere
+    As of now, you could potentially tell paperless to store your files anywhere
     outside the media directory by setting
 
     ```
@@ -366,28 +361,25 @@ value.
     ```
 
     However, keep in mind that inside docker, if files get stored outside of
-    the predefined volumes, they will be lost after a restart of paperless.
+    the predefined volumes, they will be lost after a restart.
 
-!!! warning
+##### Empty placeholders
 
-    When file naming handling, in particular when using `{tag_list}`,
-    you may run into the limits of your operating system's maximum
-    path lengths.  Files will retain the previous path instead and
-    the issue logged.
+You can affect how empty placeholders are treated by changing the
+[`PAPERLESS_FILENAME_FORMAT_REMOVE_NONE`](configuration.md#PAPERLESS_FILENAME_FORMAT_REMOVE_NONE) setting.
 
-## Storage paths
+Enabling this results in all empty placeholders resolving to "" instead of "none" as stated above. Spaces
+before empty placeholders are removed as well, empty directories are omitted.
 
-One of the best things in Paperless is that you can not only access the
-documents via the web interface, but also via the file system.
+### Storage paths
 
-When a single storage layout is not sufficient for your use case,
-storage paths come to the rescue. Storage paths allow you to configure
-more precisely where each document is stored in the file system.
+When a single storage layout is not sufficient for your use case, storage paths allow for more complex
+structure to set precisely where each document is stored in the file system.
 
 - Each storage path is a [`PAPERLESS_FILENAME_FORMAT`](configuration.md#PAPERLESS_FILENAME_FORMAT) and
   follows the rules described above
-- Each document is assigned a storage path using the matching
-  algorithms described above, but can be overwritten at any time
+- Each document is assigned a storage path using the matching algorithms described above, but can be
+  overwritten at any time
 
 For example, you could define the following two storage paths:
 
@@ -437,7 +429,7 @@ with Prometheus, as it exports metrics. For details on its capabilities,
 refer to the [Flower](https://flower.readthedocs.io/en/latest/index.html)
 documentation.
 
-Flower can be enabled with the setting [PAPERLESS_ENABLE_FLOWER](configuration/#PAPERLESS_ENABLE_FLOWER).
+Flower can be enabled with the setting [PAPERLESS_ENABLE_FLOWER](configuration.md#PAPERLESS_ENABLE_FLOWER).
 To configure Flower further, create a `flowerconfig.py` and
 place it into the `src/paperless` directory. For a Docker
 installation, you can use volumes to accomplish this:
@@ -517,6 +509,18 @@ existing tables) with:
     an older system may fix issues that can arise while setting up Paperless-ngx but
     `utf8mb3` can cause issues with consumption (where `utf8mb4` does not).
 
+### Missing timezones
+
+MySQL as well as MariaDB do not have any timezone information by default (though some
+docker images such as the official MariaDB image take care of this for you) which will
+cause unexpected behavior with date-based queries.
+
+To fix this, execute one of the following commands:
+
+MySQL: `mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql -p`
+
+MariaDB: `mariadb-tzinfo-to-sql /usr/share/zoneinfo | mariadb -u root mysql -p`
+
 ## Barcodes {#barcodes}
 
 Paperless is able to utilize barcodes for automatically performing some tasks.
@@ -556,6 +560,14 @@ If document splitting via barcode is also enabled, documents will be split when 
 barcode is located. However, differing from the splitting, the page with the
 barcode _will_ be retained. This allows application of a barcode to any page, including
 one which holds data to keep in the document.
+
+### Tag Assignment
+
+When enabled, Paperless will parse barcodes and attempt to interpret and assign tags.
+
+See the relevant settings [`PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE`](configuration.md#PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE)
+and [`PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING`](configuration.md#PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING)
+for more information.
 
 ## Automatic collation of double-sided documents {#collate}
 
@@ -628,3 +640,53 @@ single-sided split marker page, the split document(s) will have an empty page at
 whatever else was on the backside of the split marker page.) You can work around that by having
 a split marker page that has the split barcode on _both_ sides. This way, the extra page will
 get automatically removed.
+
+## SSO and third party authentication with Paperless-ngx
+
+Paperless-ngx has a built-in authentication system from Django but you can easily integrate an
+external authentication solution using one of the following methods:
+
+### Remote User authentication
+
+This is a simple option that uses remote user authentication made available by certain SSO
+applications. See the relevant configuration options for more information:
+[PAPERLESS_ENABLE_HTTP_REMOTE_USER](configuration.md#PAPERLESS_ENABLE_HTTP_REMOTE_USER),
+[PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME](configuration.md#PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME)
+and [PAPERLESS_LOGOUT_REDIRECT_URL](configuration.md#PAPERLESS_LOGOUT_REDIRECT_URL)
+
+### OpenID Connect and social authentication
+
+Version 2.5.0 of Paperless-ngx added support for integrating other authentication systems via
+the [django-allauth](https://github.com/pennersr/django-allauth) package. Once set up, users
+can either log in or (optionally) sign up using any third party systems you integrate. See the
+relevant [configuration settings](configuration.md#PAPERLESS_SOCIALACCOUNT_PROVIDERS) and
+[django-allauth docs](https://docs.allauth.org/en/latest/socialaccount/configuration.html)
+for more information.
+
+To associate an existing Paperless-ngx account with a social account, first login with your
+regular credentials and then choose "My Profile" from the user dropdown in the app and you
+will see options to connect social account(s). If enabled, signup options will be available
+on the login page.
+
+As an example, to set up login via Github, the following environment variables would need to be
+set:
+
+```conf
+PAPERLESS_APPS="allauth.socialaccount.providers.github"
+PAPERLESS_SOCIALACCOUNT_PROVIDERS='{"github": {"APPS": [{"provider_id": "github","name": "Github","client_id": "<CLIENT_ID>","secret": "<CLIENT_SECRET>"}]}}'
+```
+
+Or, to use OpenID Connect ("OIDC"), via Keycloak in this example:
+
+```conf
+PAPERLESS_APPS="allauth.socialaccount.providers.openid_connect"
+PAPERLESS_SOCIALACCOUNT_PROVIDERS='
+{"openid_connect": {"APPS": [{"provider_id": "keycloak","name": "Keycloak","client_id": "paperless","secret": "<CLIENT_SECRET>","settings": { "server_url": "https://<KEYCLOAK_SERVER>/realms/<REALM>/.well-known/openid-configuration"}}]}}'
+```
+
+More details about configuration option for various providers can be found in the [allauth documentation](https://docs.allauth.org/en/latest/socialaccount/providers/index.html#provider-specifics).
+
+### Disabling Regular Login
+
+Once external auth is set up, 'regular' login can be disabled with the [PAPERLESS_DISABLE_REGULAR_LOGIN](configuration.md#PAPERLESS_DISABLE_REGULAR_LOGIN) setting and / or users can be automatically
+redirected with the [PAPERLESS_REDIRECT_LOGIN_TO_SSO](configuration.md#PAPERLESS_REDIRECT_LOGIN_TO_SSO) setting.

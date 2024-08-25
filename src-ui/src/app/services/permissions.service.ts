@@ -19,12 +19,12 @@ export enum PermissionType {
   PaperlessTask = '%s_paperlesstask',
   AppConfig = '%s_applicationconfiguration',
   UISettings = '%s_uisettings',
+  History = '%s_logentry',
   Note = '%s_note',
   MailAccount = '%s_mailaccount',
   MailRule = '%s_mailrule',
   User = '%s_user',
   Group = '%s_group',
-  Admin = '%s_logentry',
   ShareLink = '%s_sharelink',
   CustomField = '%s_customfield',
   Workflow = '%s_workflow',
@@ -50,6 +50,10 @@ export class PermissionsService {
       this.currentUser?.is_superuser ||
       this.permissions?.includes(this.getPermissionCode(action, type))
     )
+  }
+
+  public isAdmin(): boolean {
+    return this.currentUser?.is_staff
   }
 
   public currentUserOwnsObject(object: ObjectWithPermissions): boolean {

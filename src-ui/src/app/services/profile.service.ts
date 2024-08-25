@@ -1,7 +1,10 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Observable } from 'rxjs'
-import { PaperlessUserProfile } from '../data/user-profile'
+import {
+  PaperlessUserProfile,
+  SocialAccountProvider,
+} from '../data/user-profile'
 import { environment } from 'src/environments/environment'
 
 @Injectable({
@@ -29,6 +32,19 @@ export class ProfileService {
     return this.http.post<string>(
       `${environment.apiBaseUrl}${this.endpoint}/generate_auth_token/`,
       {}
+    )
+  }
+
+  disconnectSocialAccount(id: number): Observable<number> {
+    return this.http.post<number>(
+      `${environment.apiBaseUrl}${this.endpoint}/disconnect_social_account/`,
+      { id: id }
+    )
+  }
+
+  getSocialAccountProviders(): Observable<SocialAccountProvider[]> {
+    return this.http.get<SocialAccountProvider[]>(
+      `${environment.apiBaseUrl}${this.endpoint}/social_account_providers/`
     )
   }
 }

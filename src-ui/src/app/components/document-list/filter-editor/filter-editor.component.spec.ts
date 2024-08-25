@@ -1,5 +1,8 @@
 import { DatePipe } from '@angular/common'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import {
+  HttpTestingController,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing'
 import {
   ComponentFixture,
   fakeAsync,
@@ -8,14 +11,14 @@ import {
 } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
-import { RouterTestingModule } from '@angular/router/testing'
 import {
   NgbDropdownModule,
   NgbDatepickerModule,
   NgbDropdownItem,
+  NgbTypeaheadModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectComponent } from '@ng-select/ng-select'
-import { of } from 'rxjs'
+import { of, throwError } from 'rxjs'
 import {
   FILTER_TITLE,
   FILTER_TITLE_CONTENT,
@@ -46,8 +49,12 @@ import {
   FILTER_OWNER_ANY,
   FILTER_OWNER_DOES_NOT_INCLUDE,
   FILTER_OWNER_ISNULL,
-  FILTER_CUSTOM_FIELDS,
+  FILTER_CUSTOM_FIELDS_TEXT,
   FILTER_SHARED_BY_USER,
+  FILTER_HAS_CUSTOM_FIELDS_ANY,
+  FILTER_HAS_ANY_CUSTOM_FIELDS,
+  FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
+  FILTER_HAS_CUSTOM_FIELDS_ALL,
 } from 'src/app/data/filter-rule-type'
 import { Correspondent } from 'src/app/data/correspondent'
 import { DocumentType } from 'src/app/data/document-type'
@@ -65,7 +72,7 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ClearableBadgeComponent } from '../../common/clearable-badge/clearable-badge.component'
-import { DateDropdownComponent } from '../../common/date-dropdown/date-dropdown.component'
+import { DatesDropdownComponent } from '../../common/dates-dropdown/dates-dropdown.component'
 import {
   FilterableDropdownComponent,
   LogicalOperator,
@@ -78,6 +85,16 @@ import {
 } from '../../common/permissions-filter-dropdown/permissions-filter-dropdown.component'
 import { FilterEditorComponent } from './filter-editor.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import {
+  PermissionType,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
+import { environment } from 'src/environments/environment'
+import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { RouterModule } from '@angular/router'
+import { SearchService } from 'src/app/services/rest/search.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const tags: Tag[] = [
   {
@@ -123,6 +140,19 @@ const storage_paths: StoragePath[] = [
   },
 ]
 
+const custom_fields: CustomField[] = [
+  {
+    id: 42,
+    data_type: CustomFieldDataType.String,
+    name: 'CustomField42',
+  },
+  {
+    id: 43,
+    data_type: CustomFieldDataType.String,
+    name: 'CustomField43',
+  },
+]
+
 const users: User[] = [
   {
     id: 1,
@@ -135,6 +165,9 @@ describe('FilterEditorComponent', () => {
   let fixture: ComponentFixture<FilterEditorComponent>
   let documentService: DocumentService
   let settingsService: SettingsService
+  let permissionsService: PermissionsService
+  let httpTestingController: HttpTestingController
+  let searchService: SearchService
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
@@ -146,8 +179,17 @@ describe('FilterEditorComponent', () => {
         IfPermissionsDirective,
         ClearableBadgeComponent,
         ToggleableDropdownButtonComponent,
-        DateDropdownComponent,
+        DatesDropdownComponent,
         CustomDatePipe,
+      ],
+      imports: [
+        RouterModule,
+        NgbDropdownModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NgbDatepickerModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+        NgbTypeaheadModule,
       ],
       providers: [
         FilterPipe,
@@ -178,33 +220,60 @@ describe('FilterEditorComponent', () => {
           },
         },
         {
+          provide: CustomFieldsService,
+          useValue: {
+            listAll: () => of({ results: custom_fields }),
+          },
+        },
+        {
           provide: UserService,
           useValue: {
             listAll: () => of({ results: users }),
           },
         },
         SettingsService,
-      ],
-      imports: [
-        HttpClientTestingModule,
-        RouterTestingModule,
-        NgbDropdownModule,
-        FormsModule,
-        ReactiveFormsModule,
-        NgbDatepickerModule,
-        NgxBootstrapIconsModule.pick(allIcons),
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 
     documentService = TestBed.inject(DocumentService)
     settingsService = TestBed.inject(SettingsService)
     settingsService.currentUser = users[0]
+    permissionsService = TestBed.inject(PermissionsService)
+    searchService = TestBed.inject(SearchService)
+    jest
+      .spyOn(permissionsService, 'currentUserCan')
+      .mockImplementation((action, type) => {
+        // a little hack-ish, permissions filter dropdown causes reactive forms issue due to ng-select
+        // trying to apply formControlName
+        return type !== PermissionType.User
+      })
+    httpTestingController = TestBed.inject(HttpTestingController)
     fixture = TestBed.createComponent(FilterEditorComponent)
     component = fixture.componentInstance
     component.filterRules = []
     fixture.detectChanges()
     tick()
   }))
+
+  it('should not attempt to retrieve objects if user does not have permissions', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReset()
+    jest
+      .spyOn(permissionsService, 'currentUserCan')
+      .mockImplementation((action, type) => false)
+    component.ngOnInit()
+    httpTestingController.expectNone(`${environment.apiBaseUrl}documents/tags/`)
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/correspondents/`
+    )
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/document_types/`
+    )
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/storage_paths/`
+    )
+  })
 
   // SET filterRules
 
@@ -248,7 +317,7 @@ describe('FilterEditorComponent', () => {
     expect(component.textFilter).toEqual(null)
     component.filterRules = [
       {
-        rule_type: FILTER_CUSTOM_FIELDS,
+        rule_type: FILTER_CUSTOM_FIELDS_TEXT,
         value: 'foo',
       },
     ]
@@ -342,6 +411,28 @@ describe('FilterEditorComponent', () => {
     ]
     expect(component.dateAddedRelativeDate).toEqual(0) // RELATIVE_DATE_QUERYSTRINGS['-1 week to now']
     expect(component.textFilter).toBeNull()
+  }))
+
+  it('should ingest text filter content with relative dates that are not in quick list', fakeAsync(() => {
+    expect(component.dateAddedRelativeDate).toBeNull()
+    component.filterRules = [
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'added:[-2 week to now]',
+      },
+    ]
+    expect(component.dateAddedRelativeDate).toBeNull()
+    expect(component.textFilter).toEqual('added:[-2 week to now]')
+
+    expect(component.dateCreatedRelativeDate).toBeNull()
+    component.filterRules = [
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'created:[-2 week to now]',
+      },
+    ]
+    expect(component.dateCreatedRelativeDate).toBeNull()
+    expect(component.textFilter).toEqual('created:[-2 week to now]')
   }))
 
   it('should ingest text filter rules for more like', fakeAsync(() => {
@@ -747,6 +838,110 @@ describe('FilterEditorComponent', () => {
     ]
   }))
 
+  it('should ingest filter rules for has all custom fields', fakeAsync(() => {
+    expect(component.customFieldSelectionModel.getSelectedItems()).toHaveLength(
+      0
+    )
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
+        value: '42',
+      },
+      {
+        rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
+        value: '43',
+      },
+    ]
+    expect(component.customFieldSelectionModel.logicalOperator).toEqual(
+      LogicalOperator.And
+    )
+    expect(component.customFieldSelectionModel.getSelectedItems()).toEqual(
+      custom_fields
+    )
+    // coverage
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
+        value: null,
+      },
+    ]
+    component.toggleTag(2) // coverage
+  }))
+
+  it('should ingest filter rules for has any custom fields', fakeAsync(() => {
+    expect(component.customFieldSelectionModel.getSelectedItems()).toHaveLength(
+      0
+    )
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_CUSTOM_FIELDS_ANY,
+        value: '42',
+      },
+      {
+        rule_type: FILTER_HAS_CUSTOM_FIELDS_ANY,
+        value: '43',
+      },
+    ]
+    expect(component.customFieldSelectionModel.logicalOperator).toEqual(
+      LogicalOperator.Or
+    )
+    expect(component.customFieldSelectionModel.getSelectedItems()).toEqual(
+      custom_fields
+    )
+    // coverage
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_CUSTOM_FIELDS_ANY,
+        value: null,
+      },
+    ]
+  }))
+
+  it('should ingest filter rules for has any custom field', fakeAsync(() => {
+    expect(component.customFieldSelectionModel.getSelectedItems()).toHaveLength(
+      0
+    )
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_ANY_CUSTOM_FIELDS,
+        value: '1',
+      },
+    ]
+    expect(component.customFieldSelectionModel.getSelectedItems()).toHaveLength(
+      1
+    )
+    expect(component.customFieldSelectionModel.get(null)).toBeTruthy()
+  }))
+
+  it('should ingest filter rules for exclude tag(s)', fakeAsync(() => {
+    expect(component.customFieldSelectionModel.getExcludedItems()).toHaveLength(
+      0
+    )
+    component.filterRules = [
+      {
+        rule_type: FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
+        value: '42',
+      },
+      {
+        rule_type: FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
+        value: '43',
+      },
+    ]
+    expect(component.customFieldSelectionModel.logicalOperator).toEqual(
+      LogicalOperator.And
+    )
+    expect(component.customFieldSelectionModel.getExcludedItems()).toEqual(
+      custom_fields
+    )
+    // coverage
+    component.filterRules = [
+      {
+        rule_type: FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
+        value: null,
+      },
+    ]
+  }))
+
   it('should ingest filter rules for owner', fakeAsync(() => {
     expect(component.permissionsSelectionModel.ownerFilter).toEqual(
       OwnerFilterType.NONE
@@ -994,7 +1189,7 @@ describe('FilterEditorComponent', () => {
     expect(component.textFilterTarget).toEqual('custom-fields')
     expect(component.filterRules).toEqual([
       {
-        rule_type: FILTER_CUSTOM_FIELDS,
+        rule_type: FILTER_CUSTOM_FIELDS_TEXT,
         value: 'foo',
       },
     ])
@@ -1258,9 +1453,78 @@ describe('FilterEditorComponent', () => {
     ])
   }))
 
+  it('should convert user input to correct filter rules on custom field select not assigned', fakeAsync(() => {
+    const customFieldsFilterableDropdown = fixture.debugElement.queryAll(
+      By.directive(FilterableDropdownComponent)
+    )[4]
+    customFieldsFilterableDropdown.triggerEventHandler('opened')
+    const customFieldButton = customFieldsFilterableDropdown.queryAll(
+      By.directive(ToggleableDropdownButtonComponent)
+    )[0]
+    customFieldButton.triggerEventHandler('toggle')
+    fixture.detectChanges()
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_HAS_ANY_CUSTOM_FIELDS,
+        value: 'false',
+      },
+    ])
+  }))
+
+  it('should convert user input to correct filter rules on custom field selections', fakeAsync(() => {
+    const customFieldsFilterableDropdown = fixture.debugElement.queryAll(
+      By.directive(FilterableDropdownComponent)
+    )[4] // CF dropdown
+    customFieldsFilterableDropdown.triggerEventHandler('opened')
+    const customFieldButtons = customFieldsFilterableDropdown.queryAll(
+      By.directive(ToggleableDropdownButtonComponent)
+    )
+    customFieldButtons[1].triggerEventHandler('toggle')
+    customFieldButtons[2].triggerEventHandler('toggle')
+    fixture.detectChanges()
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
+        value: custom_fields[0].id.toString(),
+      },
+      {
+        rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
+        value: custom_fields[1].id.toString(),
+      },
+    ])
+    const toggleOperatorButtons = customFieldsFilterableDropdown.queryAll(
+      By.css('input[type=radio]')
+    )
+    toggleOperatorButtons[1].nativeElement.checked = true
+    toggleOperatorButtons[1].triggerEventHandler('change')
+    fixture.detectChanges()
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_HAS_CUSTOM_FIELDS_ANY,
+        value: custom_fields[0].id.toString(),
+      },
+      {
+        rule_type: FILTER_HAS_CUSTOM_FIELDS_ANY,
+        value: custom_fields[1].id.toString(),
+      },
+    ])
+    customFieldButtons[2].triggerEventHandler('exclude')
+    fixture.detectChanges()
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
+        value: custom_fields[0].id.toString(),
+      },
+      {
+        rule_type: FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
+        value: custom_fields[1].id.toString(),
+      },
+    ])
+  }))
+
   it('should convert user input to correct filter rules on date created after', fakeAsync(() => {
     const dateCreatedDropdown = fixture.debugElement.queryAll(
-      By.directive(DateDropdownComponent)
+      By.directive(DatesDropdownComponent)
     )[0]
     const dateCreatedAfter = dateCreatedDropdown.queryAll(By.css('input'))[0]
 
@@ -1280,7 +1544,7 @@ describe('FilterEditorComponent', () => {
 
   it('should convert user input to correct filter rules on date created before', fakeAsync(() => {
     const dateCreatedDropdown = fixture.debugElement.queryAll(
-      By.directive(DateDropdownComponent)
+      By.directive(DatesDropdownComponent)
     )[0]
     const dateCreatedBefore = dateCreatedDropdown.queryAll(By.css('input'))[1]
 
@@ -1300,7 +1564,7 @@ describe('FilterEditorComponent', () => {
 
   it('should convert user input to correct filter rules on date created with relative date', fakeAsync(() => {
     const dateCreatedDropdown = fixture.debugElement.queryAll(
-      By.directive(DateDropdownComponent)
+      By.directive(DatesDropdownComponent)
     )[0]
     const dateCreatedBeforeRelativeButton = dateCreatedDropdown.queryAll(
       By.css('button')
@@ -1319,7 +1583,7 @@ describe('FilterEditorComponent', () => {
   it('should carry over text filtering on date created with relative date', fakeAsync(() => {
     component.textFilter = 'foo'
     const dateCreatedDropdown = fixture.debugElement.queryAll(
-      By.directive(DateDropdownComponent)
+      By.directive(DatesDropdownComponent)
     )[0]
     const dateCreatedBeforeRelativeButton = dateCreatedDropdown.queryAll(
       By.css('button')
@@ -1335,11 +1599,39 @@ describe('FilterEditorComponent', () => {
     ])
   }))
 
+  it('should leave relative dates not in quick list intact', fakeAsync(() => {
+    component.textFilterInput.nativeElement.value = 'created:[-2 week to now]'
+    component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
+    const textFieldTargetDropdown = fixture.debugElement.queryAll(
+      By.directive(NgbDropdownItem)
+    )[4]
+    textFieldTargetDropdown.triggerEventHandler('click')
+    fixture.detectChanges()
+    tick(400)
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'created:[-2 week to now]',
+      },
+    ])
+
+    component.textFilterInput.nativeElement.value = 'added:[-2 month to now]'
+    component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
+    fixture.detectChanges()
+    tick(400)
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'added:[-2 month to now]',
+      },
+    ])
+  }))
+
   it('should convert user input to correct filter rules on date added after', fakeAsync(() => {
-    const dateAddedDropdown = fixture.debugElement.queryAll(
-      By.directive(DateDropdownComponent)
-    )[1]
-    const dateAddedAfter = dateAddedDropdown.queryAll(By.css('input'))[0]
+    const datesDropdown = fixture.debugElement.query(
+      By.directive(DatesDropdownComponent)
+    )
+    const dateAddedAfter = datesDropdown.queryAll(By.css('input'))[2]
 
     dateAddedAfter.nativeElement.value = '05/14/2023'
     // dateAddedAfter.triggerEventHandler('change')
@@ -1356,10 +1648,10 @@ describe('FilterEditorComponent', () => {
   }))
 
   it('should convert user input to correct filter rules on date added before', fakeAsync(() => {
-    const dateAddedDropdown = fixture.debugElement.queryAll(
-      By.directive(DateDropdownComponent)
-    )[1]
-    const dateAddedBefore = dateAddedDropdown.queryAll(By.css('input'))[1]
+    const datesDropdown = fixture.debugElement.query(
+      By.directive(DatesDropdownComponent)
+    )
+    const dateAddedBefore = datesDropdown.queryAll(By.css('input'))[2]
 
     dateAddedBefore.nativeElement.value = '05/14/2023'
     // dateAddedBefore.triggerEventHandler('change')
@@ -1376,38 +1668,38 @@ describe('FilterEditorComponent', () => {
   }))
 
   it('should convert user input to correct filter rules on date added with relative date', fakeAsync(() => {
-    const dateAddedDropdown = fixture.debugElement.queryAll(
-      By.directive(DateDropdownComponent)
-    )[1]
-    const dateAddedBeforeRelativeButton = dateAddedDropdown.queryAll(
+    const datesDropdown = fixture.debugElement.query(
+      By.directive(DatesDropdownComponent)
+    )
+    const dateCreatedBeforeRelativeButton = datesDropdown.queryAll(
       By.css('button')
     )[1]
-    dateAddedBeforeRelativeButton.triggerEventHandler('click')
+    dateCreatedBeforeRelativeButton.triggerEventHandler('click')
     fixture.detectChanges()
     tick(400)
     expect(component.filterRules).toEqual([
       {
         rule_type: FILTER_FULLTEXT_QUERY,
-        value: 'added:[-1 week to now]',
+        value: 'created:[-1 week to now]',
       },
     ])
   }))
 
   it('should carry over text filtering on date added with relative date', fakeAsync(() => {
     component.textFilter = 'foo'
-    const dateAddedDropdown = fixture.debugElement.queryAll(
-      By.directive(DateDropdownComponent)
-    )[1]
-    const dateAddedBeforeRelativeButton = dateAddedDropdown.queryAll(
+    const datesDropdown = fixture.debugElement.query(
+      By.directive(DatesDropdownComponent)
+    )
+    const dateCreatedBeforeRelativeButton = datesDropdown.queryAll(
       By.css('button')
     )[1]
-    dateAddedBeforeRelativeButton.triggerEventHandler('click')
+    dateCreatedBeforeRelativeButton.triggerEventHandler('click')
     fixture.detectChanges()
     tick(400)
     expect(component.filterRules).toEqual([
       {
         rule_type: FILTER_FULLTEXT_QUERY,
-        value: 'foo,added:[-1 week to now]',
+        value: 'foo,created:[-1 week to now]',
       },
     ])
   }))
@@ -1558,6 +1850,10 @@ describe('FilterEditorComponent', () => {
         { id: 32, document_count: 1 },
         { id: 33, document_count: 0 },
       ],
+      selected_custom_fields: [
+        { id: 42, document_count: 1 },
+        { id: 43, document_count: 0 },
+      ],
     }
   })
 
@@ -1631,6 +1927,24 @@ describe('FilterEditorComponent', () => {
       },
     ]
     expect(component.generateFilterName()).toEqual('Without any tag')
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
+        value: '42',
+      },
+    ]
+    expect(component.generateFilterName()).toEqual(
+      `Custom fields: ${custom_fields[0].name}`
+    )
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_ANY_CUSTOM_FIELDS,
+        value: 'false',
+      },
+    ]
+    expect(component.generateFilterName()).toEqual('Without any custom field')
 
     component.filterRules = [
       {
@@ -1727,6 +2041,11 @@ describe('FilterEditorComponent', () => {
       new KeyboardEvent('keyup', { key: 'Escape' })
     )
     expect(component.textFilter).toEqual('')
+    const blurSpy = jest.spyOn(component.textFilterInput.nativeElement, 'blur')
+    component.textFilterInput.nativeElement.dispatchEvent(
+      new KeyboardEvent('keyup', { key: 'Escape' })
+    )
+    expect(blurSpy).toHaveBeenCalled()
   })
 
   it('should adjust text filter targets if more like search', () => {
@@ -1736,5 +2055,41 @@ describe('FilterEditorComponent', () => {
       id: TEXT_FILTER_TARGET_FULLTEXT_MORELIKE,
       name: $localize`More like`,
     })
+  })
+
+  it('should call autocomplete endpoint on input', fakeAsync(() => {
+    component.textFilterTarget = 'fulltext-query' // TEXT_FILTER_TARGET_FULLTEXT_QUERY
+    const autocompleteSpy = jest.spyOn(searchService, 'autocomplete')
+    component.searchAutoComplete(of('hello')).subscribe()
+    tick(250)
+    expect(autocompleteSpy).toHaveBeenCalled()
+
+    component.searchAutoComplete(of('hello world 1')).subscribe()
+    tick(250)
+    expect(autocompleteSpy).toHaveBeenCalled()
+  }))
+
+  it('should handle autocomplete backend failure gracefully', fakeAsync(() => {
+    component.textFilterTarget = 'fulltext-query' // TEXT_FILTER_TARGET_FULLTEXT_QUERY
+    const serviceAutocompleteSpy = jest.spyOn(searchService, 'autocomplete')
+    serviceAutocompleteSpy.mockReturnValue(
+      throwError(() => new Error('autcomplete failed'))
+    )
+    // serviceAutocompleteSpy.mockReturnValue(of([' world']))
+    let result
+    component.searchAutoComplete(of('hello')).subscribe((res) => {
+      result = res
+    })
+    tick(250)
+    expect(serviceAutocompleteSpy).toHaveBeenCalled()
+    expect(result).toEqual([])
+  }))
+
+  it('should support choosing a autocomplete item', () => {
+    expect(component.textFilter).toBeNull()
+    component.itemSelected({ item: 'hello', preventDefault: () => true })
+    expect(component.textFilter).toEqual('hello ')
+    component.itemSelected({ item: 'world', preventDefault: () => true })
+    expect(component.textFilter).toEqual('hello world ')
   })
 })

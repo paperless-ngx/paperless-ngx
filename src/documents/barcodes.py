@@ -14,11 +14,13 @@ from PIL import Image
 
 from documents.converters import convert_from_tiff_to_pdf
 from documents.data_models import ConsumableDocument
+from documents.models import Tag
 from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import StopConsumeTaskError
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
+from documents.utils import maybe_override_pixel_limit
 
 logger = logging.getLogger("paperless.barcodes")
 
@@ -65,7 +67,9 @@ class BarcodePlugin(ConsumeTaskPlugin):
             supported_mimes = {"application/pdf"}
 
         return (
-            settings.CONSUMER_ENABLE_ASN_BARCODE or settings.CONSUMER_ENABLE_BARCODES
+            settings.CONSUMER_ENABLE_ASN_BARCODE
+            or settings.CONSUMER_ENABLE_BARCODES
+            or settings.CONSUMER_ENABLE_TAG_BARCODE
         ) and self.input_doc.mime_type in supported_mimes
 
     def setup(self):
@@ -78,61 +82,79 @@ class BarcodePlugin(ConsumeTaskPlugin):
         self.barcodes: list[Barcode] = []
 
     def run(self) -> Optional[str]:
+        # Some operations may use PIL, override pixel setting if needed
+        maybe_override_pixel_limit()
+
         # Maybe do the conversion of TIFF to PDF
         self.convert_from_tiff_to_pdf()
 
         # Locate any barcodes in the files
         self.detect()
 
+        # try reading tags from barcodes
+        if (
+            settings.CONSUMER_ENABLE_TAG_BARCODE
+            and (tags := self.tags) is not None
+            and len(tags) > 0
+        ):
+            if self.metadata.tag_ids:
+                self.metadata.tag_ids += tags
+            else:
+                self.metadata.tag_ids = tags
+            logger.info(f"Found tags in barcode: {tags}")
+
+        # Lastly attempt to split documents
+        if settings.CONSUMER_ENABLE_BARCODES and (
+            separator_pages := self.get_separation_pages()
+        ):
+            # We have pages to split against
+
+            # Note this does NOT use the base_temp_dir, as that will be removed
+            tmp_dir = Path(
+                tempfile.mkdtemp(
+                    dir=settings.SCRATCH_DIR,
+                    prefix="paperless-barcode-split-",
+                ),
+            ).resolve()
+
+            from documents import tasks
+
+            # Create the split document tasks
+            for new_document in self.separate_pages(separator_pages):
+                copy_file_with_basic_stats(new_document, tmp_dir / new_document.name)
+
+                task = tasks.consume_file.delay(
+                    ConsumableDocument(
+                        # Same source, for templates
+                        source=self.input_doc.source,
+                        mailrule_id=self.input_doc.mailrule_id,
+                        # Can't use same folder or the consume might grab it again
+                        original_file=(tmp_dir / new_document.name).resolve(),
+                    ),
+                    # All the same metadata
+                    self.metadata,
+                )
+                logger.info(f"Created new task {task.id} for {new_document.name}")
+
+            # This file is now two or more files
+            self.input_doc.original_file.unlink()
+
+            msg = "Barcode splitting complete!"
+
+            # Update the progress to complete
+            self.status_mgr.send_progress(ProgressStatusOptions.SUCCESS, msg, 100, 100)
+
+            # Request the consume task stops
+            raise StopConsumeTaskError(msg)
+
         # Update/overwrite an ASN if possible
-        located_asn = self.asn
-        if located_asn is not None:
+        # After splitting, as otherwise each split document gets the same ASN
+        if (
+            settings.CONSUMER_ENABLE_ASN_BARCODE
+            and (located_asn := self.asn) is not None
+        ):
             logger.info(f"Found ASN in barcode: {located_asn}")
             self.metadata.asn = located_asn
-
-        separator_pages = self.get_separation_pages()
-        if not separator_pages:
-            return "No pages to split on!"
-
-        # We have pages to split against
-
-        # Note this does NOT use the base_temp_dir, as that will be removed
-        tmp_dir = Path(
-            tempfile.mkdtemp(
-                dir=settings.SCRATCH_DIR,
-                prefix="paperless-barcode-split-",
-            ),
-        ).resolve()
-
-        from documents import tasks
-
-        # Create the split document tasks
-        for new_document in self.separate_pages(separator_pages):
-            copy_file_with_basic_stats(new_document, tmp_dir / new_document.name)
-
-            task = tasks.consume_file.delay(
-                ConsumableDocument(
-                    # Same source, for templates
-                    source=self.input_doc.source,
-                    mailrule_id=self.input_doc.mailrule_id,
-                    # Can't use same folder or the consume might grab it again
-                    original_file=(tmp_dir / new_document.name).resolve(),
-                ),
-                # All the same metadata
-                self.metadata,
-            )
-            logger.info(f"Created new task {task.id} for {new_document.name}")
-
-        # This file is now two or more files
-        self.input_doc.original_file.unlink()
-
-        msg = "Barcode splitting complete!"
-
-        # Update the progress to complete
-        self.status_mgr.send_progress(ProgressStatusOptions.SUCCESS, msg, 100, 100)
-
-        # Request the consume task stops
-        raise StopConsumeTaskError(msg)
 
     def cleanup(self) -> None:
         self.temp_dir.cleanup()
@@ -278,6 +300,53 @@ class BarcodePlugin(ConsumeTaskPlugin):
                 logger.warning(f"Failed to parse ASN number because: {e}")
 
         return asn
+
+    @property
+    def tags(self) -> Optional[list[int]]:
+        """
+        Search the parsed barcodes for any tags.
+        Returns the detected tag ids (or empty list)
+        """
+        tags = []
+
+        # Ensure the barcodes have been read
+        self.detect()
+
+        for x in self.barcodes:
+            tag_texts = x.value
+
+            for raw in tag_texts.split(","):
+                try:
+                    tag = None
+                    for regex in settings.CONSUMER_TAG_BARCODE_MAPPING:
+                        if re.match(regex, raw, flags=re.IGNORECASE):
+                            sub = settings.CONSUMER_TAG_BARCODE_MAPPING[regex]
+                            tag = (
+                                re.sub(regex, sub, raw, flags=re.IGNORECASE)
+                                if sub
+                                else raw
+                            )
+                            break
+
+                    if tag:
+                        tag, _ = Tag.objects.get_or_create(
+                            name__iexact=tag,
+                            defaults={"name": tag},
+                        )
+
+                        logger.debug(
+                            f"Found Tag Barcode '{raw}', substituted "
+                            f"to '{tag}' and mapped to "
+                            f"tag #{tag.pk}.",
+                        )
+                        tags.append(tag.pk)
+
+                except Exception as e:
+                    logger.error(
+                        f"Failed to find or create TAG '{raw}' because: {e}",
+                    )
+
+        return tags
 
     def get_separation_pages(self) -> dict[int, bool]:
         """

@@ -14,6 +14,9 @@ from documents.barcodes import BarcodePlugin
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
+from documents.models import Document
+from documents.models import Tag
+from documents.plugins.base import StopConsumeTaskError
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DocumentConsumeDelayMixin
 from documents.tests.utils import DummyProgressManager
@@ -401,6 +404,7 @@ class TestBarcode(
 
             self.assertEqual(len(documents), 2)
 
+    @override_settings(CONSUMER_ENABLE_BARCODES=True)
     def test_separate_pages_no_list(self):
         """
         GIVEN:
@@ -413,7 +417,10 @@ class TestBarcode(
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
         with self.get_reader(test_file) as reader:
-            self.assertEqual("No pages to split on!", reader.run())
+            try:
+                reader.run()
+            except StopConsumeTaskError:
+                self.fail("Barcode reader split pages unexpectedly")
 
     @override_settings(
         CONSUMER_ENABLE_BARCODES=True,
@@ -668,9 +675,7 @@ class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         dst = settings.SCRATCH_DIR / "barcode-39-asn-123.pdf"
         shutil.copy(test_file, dst)
 
-        with mock.patch(
-            "documents.consumer.Consumer.try_consume_file",
-        ) as mocked_consumer:
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             tasks.consume_file(
                 ConsumableDocument(
                     source=DocumentSource.ConsumeFolder,
@@ -678,10 +683,10 @@ class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
                 ),
                 None,
             )
-            mocked_consumer.assert_called_once()
-            args, kwargs = mocked_consumer.call_args
 
-            self.assertEqual(kwargs["override_asn"], 123)
+            document = Document.objects.first()
+
+            self.assertEqual(document.archive_serial_number, 123)
 
     @override_settings(CONSUMER_BARCODE_SCANNER="PYZBAR")
     def test_scan_file_for_qrcode_without_upscale(self):
@@ -741,3 +746,125 @@ class TestBarcodeZxing(TestBarcode):
 @override_settings(CONSUMER_BARCODE_SCANNER="ZXING")
 class TestAsnBarcodesZxing(TestAsnBarcode):
     pass
+
+
+class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, TestCase):
+    @contextmanager
+    def get_reader(self, filepath: Path) -> BarcodePlugin:
+        reader = BarcodePlugin(
+            ConsumableDocument(DocumentSource.ConsumeFolder, original_file=filepath),
+            DocumentMetadataOverrides(),
+            DummyProgressManager(filepath.name, None),
+            self.dirs.scratch_dir,
+            "task-id",
+        )
+        reader.setup()
+        yield reader
+        reader.cleanup()
+
+    @override_settings(CONSUMER_ENABLE_TAG_BARCODE=True)
+    def test_scan_file_without_matching_barcodes(self):
+        """
+        GIVEN:
+            - PDF containing tag barcodes but none with matching prefix (default "TAG:")
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - No TAG has been created
+        """
+        test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-custom-prefix.pdf"
+        with self.get_reader(test_file) as reader:
+            reader.run()
+            tags = reader.metadata.tag_ids
+            self.assertEqual(tags, None)
+
+    @override_settings(
+        CONSUMER_ENABLE_TAG_BARCODE=False,
+        CONSUMER_TAG_BARCODE_MAPPING={"CUSTOM-PREFIX-(.*)": "\\g<1>"},
+    )
+    def test_scan_file_with_matching_barcode_but_function_disabled(self):
+        """
+        GIVEN:
+            - PDF containing a tag barcode with matching custom prefix
+            - The tag barcode functionality is disabled
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - No TAG has been created
+        """
+        test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-custom-prefix.pdf"
+        with self.get_reader(test_file) as reader:
+            reader.run()
+            tags = reader.metadata.tag_ids
+            self.assertEqual(tags, None)
+
+    @override_settings(
+        CONSUMER_ENABLE_TAG_BARCODE=True,
+        CONSUMER_TAG_BARCODE_MAPPING={"CUSTOM-PREFIX-(.*)": "\\g<1>"},
+    )
+    def test_scan_file_for_tag_custom_prefix(self):
+        """
+        GIVEN:
+            - PDF containing a tag barcode with custom prefix
+            - The barcode mapping accepts this prefix and removes it from the mapped tag value
+            - The created tag is the non-prefixed values
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - The TAG is located
+            - One TAG has been created
+        """
+        test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-custom-prefix.pdf"
+        with self.get_reader(test_file) as reader:
+            reader.metadata.tag_ids = [99]
+            reader.run()
+            self.assertEqual(reader.pdf_file, test_file)
+            tags = reader.metadata.tag_ids
+            self.assertEqual(len(tags), 2)
+            self.assertEqual(tags[0], 99)
+            self.assertEqual(Tag.objects.get(name__iexact="00123").pk, tags[1])
+
+    @override_settings(
+        CONSUMER_ENABLE_TAG_BARCODE=True,
+        CONSUMER_TAG_BARCODE_MAPPING={"ASN(.*)": "\\g<1>"},
+    )
+    def test_scan_file_for_many_custom_tags(self):
+        """
+        GIVEN:
+            - PDF containing multiple tag barcode with custom prefix
+            - The barcode mapping accepts this prefix and removes it from the mapped tag value
+            - The created tags are the non-prefixed values
+        WHEN:
+            - File is scanned for barcodes
+        THEN:
+            - The TAG is located
+            - File Tags have been created
+        """
+        test_file = self.BARCODE_SAMPLE_DIR / "split-by-asn-1.pdf"
+        with self.get_reader(test_file) as reader:
+            reader.run()
+            tags = reader.metadata.tag_ids
+            self.assertEqual(len(tags), 5)
+            self.assertEqual(Tag.objects.get(name__iexact="00123").pk, tags[0])
+            self.assertEqual(Tag.objects.get(name__iexact="00124").pk, tags[1])
+            self.assertEqual(Tag.objects.get(name__iexact="00125").pk, tags[2])
+            self.assertEqual(Tag.objects.get(name__iexact="00126").pk, tags[3])
+            self.assertEqual(Tag.objects.get(name__iexact="00127").pk, tags[4])
+
+    @override_settings(
+        CONSUMER_ENABLE_TAG_BARCODE=True,
+        CONSUMER_TAG_BARCODE_MAPPING={"CUSTOM-PREFIX-(.*)": "\\g<3>"},
+    )
+    def test_scan_file_for_tag_raises_value_error(self):
+        """
+        GIVEN:
+            - Any error occurs during tag barcode processing
+        THEN:
+            - The processing should be skipped and not break the import
+        """
+        test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-custom-prefix.pdf"
+        with self.get_reader(test_file) as reader:
+            reader.run()
+            # expect error to be caught and logged only
+            tags = reader.metadata.tag_ids
+            self.assertEqual(tags, None)

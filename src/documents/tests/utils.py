@@ -3,6 +3,7 @@ import tempfile
 import time
 import warnings
 from collections import namedtuple
+from collections.abc import Generator
 from collections.abc import Iterator
 from contextlib import contextmanager
 from os import PathLike
@@ -21,8 +22,10 @@ from django.db.migrations.executor import MigrationExecutor
 from django.test import TransactionTestCase
 from django.test import override_settings
 
+from documents.consumer import ConsumerPlugin
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
+from documents.data_models import DocumentSource
 from documents.parsers import ParseError
 from documents.plugins.helpers import ProgressStatusOptions
 
@@ -153,10 +156,6 @@ class DirectoriesMixin:
     they are cleaned up on exit
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.dirs = None
-
     def setUp(self) -> None:
         self.dirs = setup_directories()
         super().setUp()
@@ -196,6 +195,16 @@ class FileSystemAssertsMixin:
         hash2 = hashlib.sha256(path2.read_bytes()).hexdigest()
 
         self.assertEqual(hash1, hash2, "File SHA256 mismatch")
+
+    def assertFileCountInDir(self, path: Union[PathLike, str], count: int):
+        path = Path(path).resolve()
+        self.assertTrue(path.is_dir(), f"Path {path} is not a directory")
+        files = [x for x in path.iterdir() if x.is_file()]
+        self.assertEqual(
+            len(files),
+            count,
+            f"Path {path} contains {len(files)} files instead of {count} files",
+        )
 
 
 class ConsumerProgressMixin:
@@ -290,9 +299,7 @@ class TestMigrations(TransactionTestCase):
 
         assert (
             self.migrate_from and self.migrate_to
-        ), "TestCase '{}' must define migrate_from and migrate_to properties".format(
-            type(self).__name__,
-        )
+        ), f"TestCase '{type(self).__name__}' must define migrate_from and migrate_to properties"
         self.migrate_from = [(self.app, self.migrate_from)]
         if self.dependencies is not None:
             self.migrate_from.extend(self.dependencies)
@@ -328,6 +335,30 @@ class SampleDirMixin:
     BARCODE_SAMPLE_DIR = SAMPLE_DIR / "barcodes"
 
 
+class GetConsumerMixin:
+    @contextmanager
+    def get_consumer(
+        self,
+        filepath: Path,
+        overrides: Union[DocumentMetadataOverrides, None] = None,
+        source: DocumentSource = DocumentSource.ConsumeFolder,
+    ) -> Generator[ConsumerPlugin, None, None]:
+        # Store this for verification
+        self.status = DummyProgressManager(filepath.name, None)
+        reader = ConsumerPlugin(
+            ConsumableDocument(source, original_file=filepath),
+            overrides or DocumentMetadataOverrides(),
+            self.status,  # type: ignore
+            self.dirs.scratch_dir,
+            "task-id",
+        )
+        reader.setup()
+        try:
+            yield reader
+        finally:
+            reader.cleanup()
+
+
 class DummyProgressManager:
     """
     A dummy handler for progress management that doesn't actually try to
@@ -340,7 +371,6 @@ class DummyProgressManager:
     def __init__(self, filename: str, task_id: Optional[str] = None) -> None:
         self.filename = filename
         self.task_id = task_id
-        print("hello world")
         self.payloads = []
 
     def __enter__(self):

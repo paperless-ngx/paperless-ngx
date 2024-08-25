@@ -5,9 +5,11 @@ from unittest import mock
 
 from celery.schedules import crontab
 
+from paperless.settings import _parse_base_paths
 from paperless.settings import _parse_beat_schedule
 from paperless.settings import _parse_db_settings
 from paperless.settings import _parse_ignore_dates
+from paperless.settings import _parse_paperless_url
 from paperless.settings import _parse_redis_url
 from paperless.settings import default_threads_per_worker
 
@@ -154,6 +156,7 @@ class TestCeleryScheduleParsing(TestCase):
     CLASSIFIER_EXPIRE_TIME = 59.0 * 60.0
     INDEX_EXPIRE_TIME = 23.0 * 60.0 * 60.0
     SANITY_EXPIRE_TIME = ((7.0 * 24.0) - 1.0) * 60.0 * 60.0
+    EMPTY_TRASH_EXPIRE_TIME = 23.0 * 60.0 * 60.0
 
     def test_schedule_configuration_default(self):
         """
@@ -187,6 +190,11 @@ class TestCeleryScheduleParsing(TestCase):
                     "task": "documents.tasks.sanity_check",
                     "schedule": crontab(minute=30, hour=0, day_of_week="sun"),
                     "options": {"expires": self.SANITY_EXPIRE_TIME},
+                },
+                "Empty trash": {
+                    "task": "documents.tasks.empty_trash",
+                    "schedule": crontab(minute=0, hour="1"),
+                    "options": {"expires": self.EMPTY_TRASH_EXPIRE_TIME},
                 },
             },
             schedule,
@@ -230,6 +238,11 @@ class TestCeleryScheduleParsing(TestCase):
                     "schedule": crontab(minute=30, hour=0, day_of_week="sun"),
                     "options": {"expires": self.SANITY_EXPIRE_TIME},
                 },
+                "Empty trash": {
+                    "task": "documents.tasks.empty_trash",
+                    "schedule": crontab(minute=0, hour="1"),
+                    "options": {"expires": self.EMPTY_TRASH_EXPIRE_TIME},
+                },
             },
             schedule,
         )
@@ -264,6 +277,11 @@ class TestCeleryScheduleParsing(TestCase):
                     "schedule": crontab(minute=30, hour=0, day_of_week="sun"),
                     "options": {"expires": self.SANITY_EXPIRE_TIME},
                 },
+                "Empty trash": {
+                    "task": "documents.tasks.empty_trash",
+                    "schedule": crontab(minute=0, hour="1"),
+                    "options": {"expires": self.EMPTY_TRASH_EXPIRE_TIME},
+                },
             },
             schedule,
         )
@@ -284,6 +302,7 @@ class TestCeleryScheduleParsing(TestCase):
                 "PAPERLESS_TRAIN_TASK_CRON": "disable",
                 "PAPERLESS_SANITY_TASK_CRON": "disable",
                 "PAPERLESS_INDEX_TASK_CRON": "disable",
+                "PAPERLESS_EMPTY_TRASH_TASK_CRON": "disable",
             },
         ):
             schedule = _parse_beat_schedule()
@@ -337,11 +356,12 @@ class TestDBSettings(TestCase):
         ):
             databases = _parse_db_settings()
 
-            self.assertDictContainsSubset(
-                {
+            self.assertDictEqual(
+                databases["default"]["OPTIONS"],
+                databases["default"]["OPTIONS"]
+                | {
                     "connect_timeout": 10.0,
                 },
-                databases["default"]["OPTIONS"],
             )
             self.assertDictEqual(
                 {
@@ -349,3 +369,88 @@ class TestDBSettings(TestCase):
                 },
                 databases["sqlite"]["OPTIONS"],
             )
+
+
+class TestPaperlessURLSettings(TestCase):
+    def test_paperless_url(self):
+        """
+        GIVEN:
+            - PAPERLESS_URL is set
+        WHEN:
+            - The URL is parsed
+        THEN:
+            - The URL is returned and present in related settings
+        """
+        with mock.patch.dict(
+            os.environ,
+            {
+                "PAPERLESS_URL": "https://example.com",
+            },
+        ):
+            url = _parse_paperless_url()
+            self.assertEqual("https://example.com", url)
+            from django.conf import settings
+
+            self.assertIn(url, settings.CSRF_TRUSTED_ORIGINS)
+            self.assertIn(url, settings.CORS_ALLOWED_ORIGINS)
+
+
+class TestPathSettings(TestCase):
+    def test_default_paths(self):
+        """
+        GIVEN:
+            - PAPERLESS_FORCE_SCRIPT_NAME is not set
+        WHEN:
+            - Settings are parsed
+        THEN:
+            - Paths are as expected
+        """
+        base_paths = _parse_base_paths()
+        self.assertEqual(None, base_paths[0])  # FORCE_SCRIPT_NAME
+        self.assertEqual("/", base_paths[1])  # BASE_URL
+        self.assertEqual("/accounts/login/", base_paths[2])  # LOGIN_URL
+        self.assertEqual("/dashboard", base_paths[3])  # LOGIN_REDIRECT_URL
+        self.assertEqual(
+            "/accounts/login/?loggedout=1",
+            base_paths[4],
+        )  # LOGOUT_REDIRECT_URL
+
+    @mock.patch("os.environ", {"PAPERLESS_FORCE_SCRIPT_NAME": "/paperless"})
+    def test_subpath(self):
+        """
+        GIVEN:
+            - PAPERLESS_FORCE_SCRIPT_NAME is set
+        WHEN:
+            - Settings are parsed
+        THEN:
+            - The path is returned and present in related settings
+        """
+        base_paths = _parse_base_paths()
+        self.assertEqual("/paperless", base_paths[0])  # FORCE_SCRIPT_NAME
+        self.assertEqual("/paperless/", base_paths[1])  # BASE_URL
+        self.assertEqual("/paperless/accounts/login/", base_paths[2])  # LOGIN_URL
+        self.assertEqual("/paperless/dashboard", base_paths[3])  # LOGIN_REDIRECT_URL
+        self.assertEqual(
+            "/paperless/accounts/login/?loggedout=1",
+            base_paths[4],
+        )  # LOGOUT_REDIRECT_URL
+
+    @mock.patch(
+        "os.environ",
+        {
+            "PAPERLESS_FORCE_SCRIPT_NAME": "/paperless",
+            "PAPERLESS_LOGOUT_REDIRECT_URL": "/foobar/",
+        },
+    )
+    def test_subpath_with_explicit_logout_url(self):
+        """
+        GIVEN:
+            - PAPERLESS_FORCE_SCRIPT_NAME is set and so is PAPERLESS_LOGOUT_REDIRECT_URL
+        WHEN:
+            - Settings are parsed
+        THEN:
+            - The correct logout redirect URL is returned
+        """
+        base_paths = _parse_base_paths()
+        self.assertEqual("/paperless/", base_paths[1])  # BASE_URL
+        self.assertEqual("/foobar/", base_paths[4])  # LOGOUT_REDIRECT_URL

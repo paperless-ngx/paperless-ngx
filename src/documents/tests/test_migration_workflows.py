@@ -6,7 +6,10 @@ class TestMigrateWorkflow(TestMigrations):
     migrate_from = "1043_alter_savedviewfilterrule_rule_type"
     migrate_to = "1044_workflow_workflowaction_workflowtrigger_and_more"
     dependencies = (
-        ("paperless_mail", "0023_remove_mailrule_filter_attachment_filename_and_more"),
+        (
+            "paperless_mail",
+            "0025_alter_mailaccount_owner_alter_mailrule_owner_and_more",
+        ),
     )
 
     def setUpBeforeMigration(self, apps):

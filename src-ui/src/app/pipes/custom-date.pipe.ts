@@ -9,6 +9,39 @@ const FORMAT_TO_ISO_FORMAT = {
   shortDate: 'y-MM-dd',
 }
 
+const INTERVALS = {
+  year: {
+    label: $localize`%s year ago`,
+    labelPlural: $localize`%s years ago`,
+    interval: 31536000,
+  },
+  month: {
+    label: $localize`%s month ago`,
+    labelPlural: $localize`%s months ago`,
+    interval: 2592000,
+  },
+  week: {
+    label: $localize`%s week ago`,
+    labelPlural: $localize`%s weeks ago`,
+    interval: 604800,
+  },
+  day: {
+    label: $localize`%s day ago`,
+    labelPlural: $localize`%s days ago`,
+    interval: 86400,
+  },
+  hour: {
+    label: $localize`%s hour ago`,
+    labelPlural: $localize`%s hours ago`,
+    interval: 3600,
+  },
+  minute: {
+    label: $localize`%s minute ago`,
+    labelPlural: $localize`%s minutes ago`,
+    interval: 60,
+  },
+}
+
 @Pipe({
   name: 'customDate',
 })
@@ -34,6 +67,19 @@ export class CustomDatePipe implements PipeTransform {
       this.settings.get(SETTINGS_KEYS.DATE_LOCALE) ||
       this.defaultLocale
     let f = format || this.settings.get(SETTINGS_KEYS.DATE_FORMAT)
+    if (format === 'relative') {
+      const seconds = Math.floor((+new Date() - +new Date(value)) / 1000)
+      if (seconds < 60) return $localize`Just now`
+      let counter
+      for (const i in INTERVALS) {
+        counter = Math.floor(seconds / INTERVALS[i].interval)
+        if (counter > 0) {
+          const label =
+            counter > 1 ? INTERVALS[i].labelPlural : INTERVALS[i].label
+          return label.replace('%s', counter.toString())
+        }
+      }
+    }
     if (l == 'iso-8601') {
       return this.datePipe.transform(value, FORMAT_TO_ISO_FORMAT[f], timezone)
     } else {

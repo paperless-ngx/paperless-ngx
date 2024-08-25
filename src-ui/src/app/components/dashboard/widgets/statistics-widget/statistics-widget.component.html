@@ -15,6 +15,12 @@
         <ng-container i18n>Total characters</ng-container>:
         <span class="badge bg-secondary text-light rounded-pill">{{statistics?.character_count | number}}</span>
       </div>
+      @if (statistics?.current_asn) {
+        <div class="list-group-item d-flex justify-content-between align-items-center" routerLink="/documents/">
+          <ng-container i18n>Current ASN</ng-container>:
+          <span class="badge bg-secondary text-light rounded-pill">{{statistics?.current_asn}}</span>
+        </div>
+      }
       @if (statistics?.document_file_type_counts?.length > 1) {
         <div class="list-group-item filetypes">
           <div class="d-flex justify-content-between align-items-center my-2">

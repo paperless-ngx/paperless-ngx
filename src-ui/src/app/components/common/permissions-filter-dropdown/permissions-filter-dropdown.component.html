@@ -62,22 +62,24 @@
             <i-bs width="1em" height="1em" name="check"></i-bs>
           }
         </div>
-        <div class="me-1 w-100">
-          <ng-select
-            name="user"
-            class="user-select small"
-            [(ngModel)]="selectionModel.includeUsers"
-            [disabled]="disabled"
-            [clearable]="false"
-            [items]="users"
-            bindLabel="username"
-            multiple="true"
-            bindValue="id"
-            placeholder="Users"
-            i18n-placeholder
-            (change)="onUserSelect()">
-          </ng-select>
-        </div>
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.User)) {
+          <div class="me-1 w-100">
+            <ng-select
+              name="user"
+              class="user-select small"
+              [(ngModel)]="selectionModel.includeUsers"
+              [disabled]="disabled"
+              [clearable]="false"
+              [items]="users"
+              bindLabel="username"
+              multiple="true"
+              bindValue="id"
+              placeholder="Users"
+              i18n-placeholder
+              (change)="onUserSelect()">
+            </ng-select>
+          </div>
+        }
       </button>
       @if (selectionModel.ownerFilter === OwnerFilterType.NONE || selectionModel.ownerFilter === OwnerFilterType.NOT_SELF) {
         <div class="list-group-item list-group-item-action d-flex align-items-center p-2 ps-3 border-bottom-0 border-start-0 border-end-0">

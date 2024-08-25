@@ -36,9 +36,18 @@ export class NumberComponent extends AbstractInputComponent<number> {
     })
   }
 
+  registerOnChange(fn: any): void {
+    this.onChange = (newValue: any) => {
+      // number validation
+      if (this.step === 1 && newValue?.toString().indexOf('e') === -1)
+        newValue = parseInt(newValue, 10)
+      if (this.step === 0.01) newValue = parseFloat(newValue).toFixed(2)
+      fn(newValue)
+    }
+  }
+
   writeValue(newValue: any): void {
-    if (this.step === 1 && newValue?.toString().indexOf('e') === -1)
-      newValue = parseInt(newValue, 10)
+    // Allow monetary values to be displayed with 2 decimals
     if (this.step === 0.01) newValue = parseFloat(newValue).toFixed(2)
     super.writeValue(newValue)
   }

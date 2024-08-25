@@ -66,7 +66,12 @@ import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { PDFDocumentProxy } from '../common/pdf-viewer/typings'
+import { SplitConfirmDialogComponent } from '../common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
+import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
+import { DeletePagesConfirmDialogComponent } from '../common/confirm-dialog/delete-pages-confirm-dialog/delete-pages-confirm-dialog.component'
+import { HotKeyService } from 'src/app/services/hot-key.service'
+import { PDFDocumentProxy } from 'ng2-pdf-viewer'
+import { DataType } from 'src/app/data/datatype'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -75,6 +80,7 @@ enum DocumentDetailNavIDs {
   Preview = 4,
   Notes = 5,
   Permissions = 6,
+  History = 7,
 }
 
 enum ContentRenderType {
@@ -82,6 +88,7 @@ enum ContentRenderType {
   Image = 'image',
   Text = 'text',
   Other = 'other',
+  Unknown = 'unknown',
 }
 
 enum ZoomSetting {
@@ -146,7 +153,7 @@ export class DocumentDetailComponent
   })
 
   previewCurrentPage: number = 1
-  previewNumPages: number = 1
+  previewNumPages: number
   previewZoomSetting: ZoomSetting = ZoomSetting.One
   previewZoomScale: ZoomSetting = ZoomSetting.PageWidth
 
@@ -164,6 +171,8 @@ export class DocumentDetailComponent
   public readonly CustomFieldDataType = CustomFieldDataType
 
   public readonly ContentRenderType = ContentRenderType
+
+  public readonly DataType = DataType
 
   @ViewChild('nav') nav: NgbNav
   @ViewChild('pdfPreview') set pdfPreview(element) {
@@ -197,7 +206,8 @@ export class DocumentDetailComponent
     private permissionsService: PermissionsService,
     private userService: UserService,
     private customFieldsService: CustomFieldsService,
-    private http: HttpClient
+    private http: HttpClient,
+    private hotKeyService: HotKeyService
   ) {
     super()
   }
@@ -210,18 +220,27 @@ export class DocumentDetailComponent
     return this.settings.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
   }
 
-  get contentRenderType(): ContentRenderType {
-    const contentType = this.metadata?.has_archive_version
-      ? 'application/pdf'
-      : this.metadata?.original_mime_type
+  get archiveContentRenderType(): ContentRenderType {
+    return this.getRenderType(
+      this.metadata?.has_archive_version
+        ? 'application/pdf'
+        : this.metadata?.original_mime_type
+    )
+  }
 
-    if (contentType === 'application/pdf') {
+  get originalContentRenderType(): ContentRenderType {
+    return this.getRenderType(this.metadata?.original_mime_type)
+  }
+
+  private getRenderType(mimeType: string): ContentRenderType {
+    if (!mimeType) return ContentRenderType.Unknown
+    if (mimeType === 'application/pdf') {
       return ContentRenderType.PDF
     } else if (
-      ['text/plain', 'application/csv', 'text/csv'].includes(contentType)
+      ['text/plain', 'application/csv', 'text/csv'].includes(mimeType)
     ) {
       return ContentRenderType.Text
-    } else if (contentType?.indexOf('image/') === 0) {
+    } else if (mimeType?.indexOf('image/') === 0) {
       return ContentRenderType.Image
     }
     return ContentRenderType.Other
@@ -248,25 +267,50 @@ export class DocumentDetailComponent
         Object.assign(this.document, docValues)
       })
 
-    this.correspondentService
-      .listAll()
-      .pipe(first(), takeUntil(this.unsubscribeNotifier))
-      .subscribe((result) => (this.correspondents = result.results))
-
-    this.documentTypeService
-      .listAll()
-      .pipe(first(), takeUntil(this.unsubscribeNotifier))
-      .subscribe((result) => (this.documentTypes = result.results))
-
-    this.storagePathService
-      .listAll()
-      .pipe(first(), takeUntil(this.unsubscribeNotifier))
-      .subscribe((result) => (this.storagePaths = result.results))
-
-    this.userService
-      .listAll()
-      .pipe(first(), takeUntil(this.unsubscribeNotifier))
-      .subscribe((result) => (this.users = result.results))
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Correspondent
+      )
+    ) {
+      this.correspondentService
+        .listAll()
+        .pipe(first(), takeUntil(this.unsubscribeNotifier))
+        .subscribe((result) => (this.correspondents = result.results))
+    }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.DocumentType
+      )
+    ) {
+      this.documentTypeService
+        .listAll()
+        .pipe(first(), takeUntil(this.unsubscribeNotifier))
+        .subscribe((result) => (this.documentTypes = result.results))
+    }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.StoragePath
+      )
+    ) {
+      this.storagePathService
+        .listAll()
+        .pipe(first(), takeUntil(this.unsubscribeNotifier))
+        .subscribe((result) => (this.storagePaths = result.results))
+    }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.User
+      )
+    ) {
+      this.userService
+        .listAll()
+        .pipe(first(), takeUntil(this.unsubscribeNotifier))
+        .subscribe((result) => (this.users = result.results))
+    }
 
     this.getCustomFields()
 
@@ -385,7 +429,7 @@ export class DocumentDetailComponent
               owner: doc.owner,
               set_permissions: doc.permissions,
             },
-            custom_fields: doc.custom_fields,
+            custom_fields: [...doc.custom_fields],
           })
 
           this.isDirty$ = dirtyCheck(
@@ -425,6 +469,40 @@ export class DocumentDetailComponent
         })
       }
     })
+
+    this.hotKeyService
+      .addShortcut({
+        keys: 'control.arrowright',
+        description: $localize`Next document`,
+      })
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        if (this.hasNext()) this.nextDoc()
+      })
+
+    this.hotKeyService
+      .addShortcut({
+        keys: 'control.arrowleft',
+        description: $localize`Previous document`,
+      })
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        if (this.hasPrevious()) this.previousDoc()
+      })
+
+    this.hotKeyService
+      .addShortcut({ keys: 'escape', description: $localize`Close document` })
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        this.close()
+      })
+
+    this.hotKeyService
+      .addShortcut({ keys: 'control.s', description: $localize`Save document` })
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        if (this.openDocumentService.isDirty(this.document)) this.save()
+      })
   }
 
   ngOnDestroy(): void {
@@ -460,7 +538,7 @@ export class DocumentDetailComponent
           this.metadata = result
         },
         error: (error) => {
-          this.metadata = null
+          this.metadata = {} // allow display to fallback to <object> tag
           this.toastService.showError(
             $localize`Error retrieving metadata`,
             error
@@ -573,6 +651,31 @@ export class DocumentDetailComponent
       })
   }
 
+  createDisabled(dataType: DataType) {
+    switch (dataType) {
+      case DataType.Correspondent:
+        return !this.permissionsService.currentUserCan(
+          PermissionAction.Add,
+          PermissionType.Correspondent
+        )
+      case DataType.DocumentType:
+        return !this.permissionsService.currentUserCan(
+          PermissionAction.Add,
+          PermissionType.DocumentType
+        )
+      case DataType.StoragePath:
+        return !this.permissionsService.currentUserCan(
+          PermissionAction.Add,
+          PermissionType.StoragePath
+        )
+      case DataType.Tag:
+        return !this.permissionsService.currentUserCan(
+          PermissionAction.Add,
+          PermissionType.Tag
+        )
+    }
+  }
+
   discard() {
     this.documentsService
       .get(this.documentId)
@@ -603,13 +706,22 @@ export class DocumentDetailComponent
       .update(this.document)
       .pipe(first())
       .subscribe({
-        next: () => {
+        next: (docValues) => {
+          // in case data changed while saving eg removing inbox_tags
+          this.documentForm.patchValue(docValues)
           this.store.next(this.documentForm.value)
+          this.openDocumentService.setDirty(this.document, false)
+          this.openDocumentService.save()
           this.toastService.showInfo($localize`Document saved successfully.`)
-          close && this.close()
           this.networkActive = false
           this.error = null
-          this.openDocumentService.refreshDocument(this.documentId)
+          if (close) {
+            this.close(() =>
+              this.openDocumentService.refreshDocument(this.documentId)
+            )
+          } else {
+            this.openDocumentService.refreshDocument(this.documentId)
+          }
         },
         error: (error) => {
           this.networkActive = false
@@ -664,12 +776,13 @@ export class DocumentDetailComponent
       })
   }
 
-  close() {
+  close(closedCallback: () => void = null) {
     this.openDocumentService
       .closeDocument(this.document)
       .pipe(first())
       .subscribe((closed) => {
         if (!closed) return
+        if (closedCallback) closedCallback()
         if (this.documentListViewService.activeSavedViewId) {
           this.router.navigate([
             'view',
@@ -685,11 +798,11 @@ export class DocumentDetailComponent
     let modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.title = $localize`Confirm delete`
-    modal.componentInstance.messageBold = $localize`Do you really want to delete document "${this.document.title}"?`
-    modal.componentInstance.message = $localize`The files for this document will be deleted permanently. This operation cannot be undone.`
+    modal.componentInstance.title = $localize`Confirm`
+    modal.componentInstance.messageBold = $localize`Do you really want to move the document "${this.document.title}" to the trash?`
+    modal.componentInstance.message = $localize`Documents can be restored prior to permanent deletion.`
     modal.componentInstance.btnClass = 'btn-danger'
-    modal.componentInstance.btnCaption = $localize`Delete document`
+    modal.componentInstance.btnCaption = $localize`Move to trash`
     this.subscribeModalDelete(modal) // so can be re-subscribed if error
   }
 
@@ -724,23 +837,23 @@ export class DocumentDetailComponent
     ])
   }
 
-  redoOcr() {
+  reprocess() {
     let modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.title = $localize`Redo OCR confirm`
-    modal.componentInstance.messageBold = $localize`This operation will permanently redo OCR for this document.`
-    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.title = $localize`Reprocess confirm`
+    modal.componentInstance.messageBold = $localize`This operation will permanently recreate the archive file for this document.`
+    modal.componentInstance.message = $localize`The archive file will be re-generated with the current settings.`
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.confirmClicked.subscribe(() => {
       modal.componentInstance.buttonsEnabled = false
       this.documentsService
-        .bulkEdit([this.document.id], 'redo_ocr', {})
+        .bulkEdit([this.document.id], 'reprocess', {})
         .subscribe({
           next: () => {
             this.toastService.showInfo(
-              $localize`Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.`
+              $localize`Reprocess operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.`
             )
             if (modal) {
               modal.close()
@@ -867,6 +980,17 @@ export class DocumentDetailComponent
     )
   }
 
+  get historyEnabled(): boolean {
+    return (
+      this.settings.get(SETTINGS_KEYS.AUDITLOG_ENABLED) &&
+      this.userIsOwner &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.History
+      )
+    )
+  }
+
   notesUpdated(notes: DocumentNote[]) {
     this.document.notes = notes
     this.openDocumentService.refreshDocument(this.documentId)
@@ -902,7 +1026,7 @@ export class DocumentDetailComponent
     )
   }
 
-  filterDocuments(items: ObjectWithId[] | NgbDateStruct[]) {
+  filterDocuments(items: ObjectWithId[] | NgbDateStruct[], type?: DataType) {
     const filterRules: FilterRule[] = items.flatMap((i) => {
       if (i.hasOwnProperty('year')) {
         const isoDateAdapter = new ISODateAdapter()
@@ -921,30 +1045,28 @@ export class DocumentDetailComponent
             value: dateBefore.toISOString().substring(0, 10),
           },
         ]
-      } else if (i.hasOwnProperty('last_correspondence')) {
-        // Correspondent
-        return {
-          rule_type: FILTER_CORRESPONDENT,
-          value: (i as Correspondent).id.toString(),
-        }
-      } else if (i.hasOwnProperty('path')) {
-        // Storage Path
-        return {
-          rule_type: FILTER_STORAGE_PATH,
-          value: (i as StoragePath).id.toString(),
-        }
-      } else if (i.hasOwnProperty('is_inbox_tag')) {
-        // Tag
-        return {
-          rule_type: FILTER_HAS_TAGS_ALL,
-          value: (i as Tag).id.toString(),
-        }
-      } else {
-        // Document Type, has no specific props
-        return {
-          rule_type: FILTER_DOCUMENT_TYPE,
-          value: (i as DocumentType).id.toString(),
-        }
+      }
+      switch (type) {
+        case DataType.Correspondent:
+          return {
+            rule_type: FILTER_CORRESPONDENT,
+            value: (i as Correspondent).id.toString(),
+          }
+        case DataType.DocumentType:
+          return {
+            rule_type: FILTER_DOCUMENT_TYPE,
+            value: (i as DocumentType).id.toString(),
+          }
+        case DataType.StoragePath:
+          return {
+            rule_type: FILTER_STORAGE_PATH,
+            value: (i as StoragePath).id.toString(),
+          }
+        case DataType.Tag:
+          return {
+            rule_type: FILTER_HAS_TAGS_ALL,
+            value: (i as Tag).id.toString(),
+          }
       }
     })
 
@@ -1006,5 +1128,121 @@ export class DocumentDetailComponent
     )
     this.updateFormForCustomFields(true)
     this.documentForm.updateValueAndValidity()
+  }
+
+  splitDocument() {
+    let modal = this.modalService.open(SplitConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Split confirm`
+    modal.componentInstance.messageBold = $localize`This operation will split the selected document(s) into new documents.`
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.documentID = this.document.id
+    modal.componentInstance.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        modal.componentInstance.buttonsEnabled = false
+        this.documentsService
+          .bulkEdit([this.document.id], 'split', {
+            pages: modal.componentInstance.pagesString,
+            delete_originals: modal.componentInstance.deleteOriginal,
+          })
+          .pipe(first(), takeUntil(this.unsubscribeNotifier))
+          .subscribe({
+            next: () => {
+              this.toastService.showInfo(
+                $localize`Split operation will begin in the background.`
+              )
+              modal.close()
+            },
+            error: (error) => {
+              if (modal) {
+                modal.componentInstance.buttonsEnabled = true
+              }
+              this.toastService.showError(
+                $localize`Error executing split operation`,
+                error
+              )
+            },
+          })
+      })
+  }
+
+  rotateDocument() {
+    let modal = this.modalService.open(RotateConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Rotate confirm`
+    modal.componentInstance.messageBold = $localize`This operation will permanently rotate the original version of the current document.`
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.documentID = this.document.id
+    modal.componentInstance.showPDFNote = false
+    modal.componentInstance.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        modal.componentInstance.buttonsEnabled = false
+        this.documentsService
+          .bulkEdit([this.document.id], 'rotate', {
+            degrees: modal.componentInstance.degrees,
+          })
+          .pipe(first(), takeUntil(this.unsubscribeNotifier))
+          .subscribe({
+            next: () => {
+              this.toastService.show({
+                content: $localize`Rotation will begin in the background. Close and re-open the document after the operation has completed to see the changes.`,
+                delay: 8000,
+                action: this.close.bind(this),
+                actionName: $localize`Close`,
+              })
+              modal.close()
+            },
+            error: (error) => {
+              if (modal) {
+                modal.componentInstance.buttonsEnabled = true
+              }
+              this.toastService.showError(
+                $localize`Error executing rotate operation`,
+                error
+              )
+            },
+          })
+      })
+  }
+
+  deletePages() {
+    let modal = this.modalService.open(DeletePagesConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Delete pages confirm`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete the selected pages from the original document.`
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.documentID = this.document.id
+    modal.componentInstance.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        modal.componentInstance.buttonsEnabled = false
+        this.documentsService
+          .bulkEdit([this.document.id], 'delete_pages', {
+            pages: modal.componentInstance.pages,
+          })
+          .pipe(first(), takeUntil(this.unsubscribeNotifier))
+          .subscribe({
+            next: () => {
+              this.toastService.showInfo(
+                $localize`Delete pages operation will begin in the background. Close and re-open or reload this document after the operation has completed to see the changes.`
+              )
+              modal.close()
+            },
+            error: (error) => {
+              if (modal) {
+                modal.componentInstance.buttonsEnabled = true
+              }
+              this.toastService.showError(
+                $localize`Error executing delete pages operation`,
+                error
+              )
+            },
+          })
+      })
   }
 }

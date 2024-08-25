@@ -4,6 +4,7 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
+from auditlog.context import disable_auditlog
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import DatabaseError
@@ -18,6 +19,7 @@ from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
+from documents.tasks import empty_trash
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 
@@ -143,7 +145,12 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         # Set a correspondent and save the document
         document.correspondent = Correspondent.objects.get_or_create(name="test")[0]
 
-        with mock.patch("documents.signals.handlers.Document.objects.filter") as m:
+        with (
+            mock.patch(
+                "documents.signals.handlers.Document.objects.filter",
+            ) as m,
+            disable_auditlog(),
+        ):
             m.side_effect = DatabaseError()
             document.save()
 
@@ -163,6 +170,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         # Ensure that filename is properly generated
         document.filename = generate_filename(document)
+        document.save()
         self.assertEqual(document.filename, "none/none.pdf")
 
         create_source_path_directory(document.source_path)
@@ -170,6 +178,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         # Ensure file deletion after delete
         document.delete()
+        empty_trash([document.pk])
         self.assertIsNotFile(
             os.path.join(settings.ORIGINALS_DIR, "none", "none.pdf"),
         )
@@ -177,9 +186,9 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
     @override_settings(
         FILENAME_FORMAT="{correspondent}/{correspondent}",
-        TRASH_DIR=tempfile.mkdtemp(),
+        EMPTY_TRASH_DIR=tempfile.mkdtemp(),
     )
-    def test_document_delete_trash(self):
+    def test_document_delete_trash_dir(self):
         document = Document()
         document.mime_type = "application/pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -187,20 +196,22 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         # Ensure that filename is properly generated
         document.filename = generate_filename(document)
+        document.save()
         self.assertEqual(document.filename, "none/none.pdf")
 
         create_source_path_directory(document.source_path)
         Path(document.source_path).touch()
 
         # Ensure file was moved to trash after delete
-        self.assertIsNotFile(os.path.join(settings.TRASH_DIR, "none", "none.pdf"))
+        self.assertIsNotFile(os.path.join(settings.EMPTY_TRASH_DIR, "none", "none.pdf"))
         document.delete()
+        empty_trash([document.pk])
         self.assertIsNotFile(
             os.path.join(settings.ORIGINALS_DIR, "none", "none.pdf"),
         )
         self.assertIsNotDir(os.path.join(settings.ORIGINALS_DIR, "none"))
-        self.assertIsFile(os.path.join(settings.TRASH_DIR, "none.pdf"))
-        self.assertIsNotFile(os.path.join(settings.TRASH_DIR, "none_01.pdf"))
+        self.assertIsFile(os.path.join(settings.EMPTY_TRASH_DIR, "none.pdf"))
+        self.assertIsNotFile(os.path.join(settings.EMPTY_TRASH_DIR, "none_01.pdf"))
 
         # Create an identical document and ensure it is trashed under a new name
         document = Document()
@@ -208,10 +219,12 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
         document.filename = generate_filename(document)
+        document.save()
         create_source_path_directory(document.source_path)
         Path(document.source_path).touch()
         document.delete()
-        self.assertIsFile(os.path.join(settings.TRASH_DIR, "none_01.pdf"))
+        empty_trash([document.pk])
+        self.assertIsFile(os.path.join(settings.EMPTY_TRASH_DIR, "none_01.pdf"))
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_document_delete_nofile(self):
@@ -221,6 +234,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         document.save()
 
         document.delete()
+        empty_trash([document.pk])
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_directory_not_empty(self):
@@ -430,6 +444,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         # Ensure that filename is properly generated
         document.filename = generate_filename(document)
+        document.save()
         self.assertEqual(document.filename, "none/none/none.pdf")
         create_source_path_directory(document.source_path)
         Path(document.source_path).touch()
@@ -438,6 +453,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsDir(os.path.join(settings.ORIGINALS_DIR, "none/none"))
 
         document.delete()
+        empty_trash([document.pk])
 
         self.assertIsNotFile(
             os.path.join(settings.ORIGINALS_DIR, "none/none/none.pdf"),
@@ -470,12 +486,12 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
     def test_try_delete_empty_directories(self):
         # Create our working directory
-        tmp = os.path.join(settings.ORIGINALS_DIR, "test_delete_empty")
-        os.makedirs(tmp)
+        tmp: Path = settings.ORIGINALS_DIR / "test_delete_empty"
+        tmp.mkdir(exist_ok=True, parents=True)
 
-        os.makedirs(os.path.join(tmp, "notempty"))
-        Path(os.path.join(tmp, "notempty", "file")).touch()
-        os.makedirs(os.path.join(tmp, "notempty", "empty"))
+        (tmp / "notempty").mkdir(exist_ok=True, parents=True)
+        (tmp / "notempty" / "file").touch()
+        (tmp / "notempty" / "empty").mkdir(exist_ok=True, parents=True)
 
         delete_empty_directories(
             os.path.join(tmp, "notempty", "empty"),
@@ -544,6 +560,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertEqual(document2.filename, "qwe_01.pdf")
 
         document.delete()
+        empty_trash([document.pk])
 
         self.assertIsNotFile(document.source_path)
 
@@ -556,21 +573,38 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
     @override_settings(FILENAME_FORMAT="{title}")
     @mock.patch("documents.signals.handlers.Document.objects.filter")
-    def test_no_update_without_change(self, m):
-        doc = Document.objects.create(
-            title="document",
-            filename="document.pdf",
-            archive_filename="document.pdf",
-            checksum="A",
-            archive_checksum="B",
-            mime_type="application/pdf",
-        )
-        Path(doc.source_path).touch()
-        Path(doc.archive_path).touch()
+    @mock.patch("documents.signals.handlers.shutil.move")
+    def test_no_move_only_save(self, mock_move, mock_filter):
+        """
+        GIVEN:
+            - A document with a filename
+            - The document is saved
+            - The filename is not changed
+        WHEN:
+            - The document is saved
+        THEN:
+            - The document modified date is updated
+            - The document is not moved
+        """
+        with disable_auditlog():
+            doc = Document.objects.create(
+                title="document",
+                filename="document.pdf",
+                archive_filename="document.pdf",
+                checksum="A",
+                archive_checksum="B",
+                mime_type="application/pdf",
+            )
+            original_modified = doc.modified
+            Path(doc.source_path).touch()
+            Path(doc.archive_path).touch()
 
-        doc.save()
+            doc.save()
+            doc.refresh_from_db()
 
-        m.assert_not_called()
+            mock_filter.assert_called()
+            self.assertNotEqual(original_modified, doc.modified)
+            mock_move.assert_not_called()
 
 
 class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
@@ -647,7 +681,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
         existing_archive_file = os.path.join(settings.ARCHIVE_DIR, "none", "my_doc.pdf")
         Path(original).touch()
         Path(archive).touch()
-        os.makedirs(os.path.join(settings.ARCHIVE_DIR, "none"))
+        (settings.ARCHIVE_DIR / "none").mkdir(parents=True, exist_ok=True)
         Path(existing_archive_file).touch()
         doc = Document.objects.create(
             mime_type="application/pdf",
@@ -812,6 +846,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
         self.assertIsFile(doc.archive_path)
 
         doc.delete()
+        empty_trash([doc.pk])
 
         self.assertIsNotFile(original)
         self.assertIsNotFile(archive)
@@ -847,6 +882,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
         self.assertIsFile(doc2.source_path)
 
         doc2.delete()
+        empty_trash([doc2.pk])
 
         self.assertIsFile(doc1.source_path)
         self.assertIsFile(doc1.archive_path)

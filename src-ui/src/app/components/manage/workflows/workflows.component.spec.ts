@@ -1,4 +1,4 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
@@ -25,6 +25,7 @@ import {
 } from 'src/app/data/workflow-trigger'
 import { WorkflowActionType } from 'src/app/data/workflow-action'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const workflows: Workflow[] = [
   {
@@ -85,6 +86,14 @@ describe('WorkflowsComponent', () => {
         PageHeaderComponent,
         ConfirmDialogComponent,
       ],
+      imports: [
+        NgbPaginationModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NgbModalModule,
+        NgbPopoverModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+      ],
       providers: [
         {
           provide: PermissionsService,
@@ -94,15 +103,8 @@ describe('WorkflowsComponent', () => {
             currentUserOwnsObject: () => true,
           },
         },
-      ],
-      imports: [
-        HttpClientTestingModule,
-        NgbPaginationModule,
-        FormsModule,
-        ReactiveFormsModule,
-        NgbModalModule,
-        NgbPopoverModule,
-        NgxBootstrapIconsModule.pick(allIcons),
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     })
 

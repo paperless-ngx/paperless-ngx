@@ -26,6 +26,7 @@ import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
 import { ConfigComponent } from './components/admin/config/config.component'
+import { TrashComponent } from './components/admin/trash/trash.component'
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -141,9 +142,17 @@ export const routes: Routes = [
         component: LogsComponent,
         canActivate: [PermissionsGuard],
         data: {
+          requireAdmin: true,
+        },
+      },
+      {
+        path: 'trash',
+        component: TrashComponent,
+        canActivate: [PermissionsGuard],
+        data: {
           requiredPermission: {
-            action: PermissionAction.View,
-            type: PermissionType.Admin,
+            action: PermissionAction.Delete,
+            type: PermissionType.Document,
           },
         },
       },
@@ -163,7 +172,7 @@ export const routes: Routes = [
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
-            action: PermissionAction.View,
+            action: PermissionAction.Change,
             type: PermissionType.UISettings,
           },
         },
