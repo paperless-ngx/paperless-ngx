@@ -656,10 +656,15 @@ class MailAccountHandler(LoggingMixin):
 
         return processed_elements
 
-    def filename_exclusion_matches(filter_attachment_filename_exclude, filename) -> bool:
+    def filename_exclusion_matches(
+        filter_attachment_filename_exclude,
+        filename,
+    ) -> bool:
         if filter_attachment_filename_exclude:
-            filter_attachment_filename_exclusions = filter_attachment_filename_exclude.split(",")
-        
+            filter_attachment_filename_exclusions = (
+                filter_attachment_filename_exclude.split(",")
+            )
+
             # Force the filename and pattern to the lowercase
             # as this is system dependent otherwise
             filename = filename.lower()
@@ -705,7 +710,8 @@ class MailAccountHandler(LoggingMixin):
                 )
                 continue
             elif self.filename_exclusion_matches(
-                rule.filter_attachment_filename_exclude, att.filename
+                rule.filter_attachment_filename_exclude,
+                att.filename,
             ):
                 self.log.debug(
                     f"Rule {rule}: "
