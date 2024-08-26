@@ -4,11 +4,13 @@ import tempfile
 from email.message import Message
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
+from unittest import mock
 
 import gnupg
 from django.test import override_settings
 from imap_tools import MailMessage
 
+from paperless_mail.mail import MailAccountHandler
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.preprocessor import MailMessageDecryptor
@@ -117,6 +119,22 @@ class TestMailMessageGpgDecryptor(TestMail):
             EMAIL_GNUPG_HOME="_)@# notapath &%#$",
         ):
             self.assertFalse(MailMessageDecryptor.able_to_run())
+
+    def test_fails_at_initialization(self):
+        with (
+            mock.patch("gnupg.GPG.__init__") as mock_run,
+            override_settings(
+                EMAIL_ENABLE_GPG_DECRYPTOR=True,
+            ),
+        ):
+
+            def side_effect(*args, **kwargs):
+                raise OSError("Cannot find 'gpg' binary")
+
+            mock_run.side_effect = side_effect
+
+            handler = MailAccountHandler()
+            self.assertEqual(len(handler._message_preprocessors), 0)
 
     def test_decrypt_fails(self):
         encrypted_message, _ = self.create_encrypted_unencrypted_message_pair()
