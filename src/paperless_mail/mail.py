@@ -658,7 +658,7 @@ class MailAccountHandler(LoggingMixin):
 
     def filename_exclusion_matches(
         self,
-        filter_attachment_filename_exclude: str | None,
+        filter_attachment_filename_exclude: Optional[str],
         filename: str,
     ) -> bool:
         if filter_attachment_filename_exclude:
