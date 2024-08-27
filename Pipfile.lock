@@ -1223,12 +1223,12 @@
         },
         "pathvalidate": {
             "hashes": [
-                "sha256:5e8378cf6712bff67fbe7a8307d99fa8c1a0cb28aa477056f8fc374f0dff24ad",
-                "sha256:cc593caa6299b22b37f228148257997e2fa850eea2daf7e4cc9205cef6908dee"
+                "sha256:9a6255eb8f63c9e2135b9be97a5ce08f10230128c4ae7b3e935378b82b22c4c9",
+                "sha256:f5d07b1e2374187040612a1fcd2bcb2919f8db180df254c9581bb90bf903377d"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.7'",
-            "version": "==3.2.0"
+            "version": "==3.2.1"
         },
         "pdf2image": {
             "hashes": [
