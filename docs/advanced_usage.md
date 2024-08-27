@@ -691,7 +691,7 @@ More details about configuration option for various providers can be found in th
 Once external auth is set up, 'regular' login can be disabled with the [PAPERLESS_DISABLE_REGULAR_LOGIN](configuration.md#PAPERLESS_DISABLE_REGULAR_LOGIN) setting and / or users can be automatically
 redirected with the [PAPERLESS_REDIRECT_LOGIN_TO_SSO](configuration.md#PAPERLESS_REDIRECT_LOGIN_TO_SSO) setting.
 
-## Decryption of encrypted emails before consumption
+## Decryption of encrypted emails before consumption {#gpg-decryptor}
 
 Paperless-ngx can be configured to decrypt gpg encrypted emails before consumption.
 
@@ -706,15 +706,11 @@ gpg --encrypt --armor -r person@email.com name_of_file
 gpg --decrypt name_of_file.asc
 ```
 
-### Setting up docker-compose file
+### Setup
 
-Add the following variable to your `docker-compose.env` file:
+First, enable the [PAPERLESS_GPG_DECRYPTOR environment variable](configuration.md#PAPERLESS_GPG_DECRYPTOR).
 
-```conf.
-PAPERLESS_GPG_DECRYPTOR=True
-```
-
-Determine your local `gpg-agent.extra` socket by invoking
+Then determine your local `gpg-agent.extra` socket by invoking
 
 ```
 gpgconf --list-dir agent-extra-socket
@@ -723,7 +719,7 @@ gpgconf --list-dir agent-extra-socket
 on your host. A possible output is `~/.gnupg/S.gpg-agent.extra`.
 Also find the location of your public keyring.
 
-Add the following volume mounts to your `docker-compose.yml` file:
+If using docker, you'll need to add the following volume mounts to your `docker-compose.yml` file:
 
 ```yaml
 webserver:

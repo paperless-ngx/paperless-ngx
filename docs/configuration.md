@@ -1149,6 +1149,12 @@ within your documents.
     second, and year last order. Characters D, M, or Y can be shuffled
     to meet the required order.
 
+#### [`PAPERLESS_GPG_DECRYPTOR=<bool>`](#PAPERLESS_GPG_DECRYPTOR) {#PAPERLESS_GPG_DECRYPTOR}
+
+: Enable or disable the GPG decryptor for encrypted files. See [GPG Decryptor](advanced_usage.md#gpg-decryptor) for more information.
+
+    Defaults to false.
+
 ### Polling {#polling}
 
 #### [`PAPERLESS_CONSUMER_POLLING=<num>`](#PAPERLESS_CONSUMER_POLLING) {#PAPERLESS_CONSUMER_POLLING}
