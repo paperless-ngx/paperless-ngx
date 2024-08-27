@@ -593,6 +593,18 @@ class TestMail(
                 expected_matches=["f2.pdf", "f3.pdf", "file.PDf"],
             ),
             FilterTestCase(
+                "PDF Files without f1 and f2",
+                include_pattern="*.pdf",
+                exclude_pattern="f1*,f2*",
+                expected_matches=["f3.pdf", "file.PDf"],
+            ),
+            FilterTestCase(
+                "PDF Files without f1 and f2 and f3",
+                include_pattern="*.pdf",
+                exclude_pattern="f1*,f2*,f3*",
+                expected_matches=["file.PDf"],
+            ),
+            FilterTestCase(
                 "All Files, no PNG",
                 include_pattern="*",
                 exclude_pattern="*.png",
