@@ -728,6 +728,9 @@ webserver:
     - <path to gpg-agent.extra socket>:/usr/src/paperless/.gnupg/S.gpg-agent
 ```
 
+For a 'bare-metal' installation no further configuration is necessary. If you
+want to use a separate `GNUPG_HOME`, you can do so by configuring the [PAPERLESS_EMAIL_GNUPG_HOME environment variable](configuration.md#PAPERLESS_EMAIL_GNUPG_HOME).
+
 ### Troubleshooting
 
 - Make sure, that `gpg-agent` is running on your host machine

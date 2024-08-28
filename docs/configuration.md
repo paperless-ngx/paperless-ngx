@@ -1151,9 +1151,15 @@ within your documents.
 
 #### [`PAPERLESS_GPG_DECRYPTOR=<bool>`](#PAPERLESS_GPG_DECRYPTOR) {#PAPERLESS_GPG_DECRYPTOR}
 
-: Enable or disable the GPG decryptor for encrypted files. See [GPG Decryptor](advanced_usage.md#gpg-decryptor) for more information.
+: Enable or disable the GPG decryptor for encrypted emails. See [GPG Decryptor](advanced_usage.md#gpg-decryptor) for more information.
 
     Defaults to false.
+
+#### [`PAPERLESS_EMAIL_GNUPG_HOME=<str>`](#PAPERLESS_EMAIL_GNUPG_HOME) {#PAPERLESS_EMAIL_GNUPG_HOME}
+
+: Optional, sets the `GNUPG_HOME` path to use with GPG decryptor for encrypted emails. See [GPG Decryptor](advanced_usage.md#gpg-decryptor) for more information. If not set, defaults to the default `GNUPG_HOME` path.
+
+    Defaults to <not set>.
 
 ### Polling {#polling}
 
