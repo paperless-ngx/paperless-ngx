@@ -33,6 +33,7 @@
           "it-IT": "src/locale/messages.it_IT.xlf",
           "ja-JP": "src/locale/messages.ja_JP.xlf",
           "lb-LU": "src/locale/messages.lb_LU.xlf",
+          "ko-KR": "src/locale/messages.ko_KR.xlf",
           "nl-NL": "src/locale/messages.nl_NL.xlf",
           "no-NO": "src/locale/messages.no_NO.xlf",
           "pl-PL": "src/locale/messages.pl_PL.xlf",

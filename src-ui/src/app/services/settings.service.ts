@@ -144,6 +144,12 @@ const LANGUAGE_OPTIONS = [
     dateInputFormat: 'yyyy/mm/dd',
   },
   {
+    code: 'ko-kr',
+    name: $localize`Korean`,
+    englishName: 'Korean',
+    dateInputFormat: 'yyyy-mm-dd',
+  },
+  {
     code: 'lb-lu',
     name: $localize`Luxembourgish`,
     englishName: 'Luxembourgish',
