@@ -43,6 +43,8 @@ from documents.tasks import consume_file
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
+from paperless_mail.preprocessor import MailMessageDecryptor
+from paperless_mail.preprocessor import MailMessagePreprocessor
 
 # Apple Mail sets multiple IMAP KEYWORD and the general "\Flagged" FLAG
 # imaplib => conn.fetch(b"<message_id>", "FLAGS")
@@ -426,9 +428,30 @@ class MailAccountHandler(LoggingMixin):
 
     logging_name = "paperless_mail"
 
+    _message_preprocessor_types: list[type[MailMessagePreprocessor]] = [
+        MailMessageDecryptor,
+    ]
+
     def __init__(self) -> None:
         super().__init__()
         self.renew_logging_group()
+        self._init_preprocessors()
+
+    def _init_preprocessors(self):
+        self._message_preprocessors: list[MailMessagePreprocessor] = []
+        for preprocessor_type in self._message_preprocessor_types:
+            self._init_preprocessor(preprocessor_type)
+
+    def _init_preprocessor(self, preprocessor_type):
+        if preprocessor_type.able_to_run():
+            try:
+                self._message_preprocessors.append(preprocessor_type())
+            except Exception as e:
+                self.log.warning(
+                    f"Error while initializing preprocessor {preprocessor_type.NAME}: {e}",
+                )
+        else:
+            self.log.debug(f"Skipping mail preprocessor {preprocessor_type.NAME}")
 
     def _correspondent_from_name(self, name: str) -> Optional[Correspondent]:
         try:
@@ -535,6 +558,11 @@ class MailAccountHandler(LoggingMixin):
 
         return total_processed_files
 
+    def _preprocess_message(self, message: MailMessage):
+        for preprocessor in self._message_preprocessors:
+            message = preprocessor.run(message)
+        return message
+
     def _handle_mail_rule(
         self,
         M: MailBox,
@@ -613,6 +641,8 @@ class MailAccountHandler(LoggingMixin):
         return total_processed_files
 
     def _handle_message(self, message, rule: MailRule) -> int:
+        message = self._preprocess_message(message)
+
         processed_elements = 0
 
         # Skip Message handling when only attachments are to be processed but

@@ -1171,6 +1171,15 @@ if DEBUG:  # pragma: no cover
     EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
     EMAIL_FILE_PATH = BASE_DIR / "sent_emails"
 
+###############################################################################
+# Email Preprocessors                                                         #
+###############################################################################
+
+EMAIL_GNUPG_HOME: Final[Optional[str]] = os.getenv("PAPERLESS_EMAIL_GNUPG_HOME")
+EMAIL_ENABLE_GPG_DECRYPTOR: Final[bool] = __get_boolean(
+    "PAPERLESS_ENABLE_GPG_DECRYPTOR",
+)
+
 
 ###############################################################################
 # Soft Delete
