@@ -507,6 +507,7 @@ class SavedViewFilterRule(models.Model):
         (39, _("has custom field in")),
         (40, _("does not have custom field in")),
         (41, _("does not have custom field")),
+        (42, _("custom fields lookup")),
     ]
 
     saved_view = models.ForeignKey(

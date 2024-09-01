@@ -1,0 +1,44 @@
+<div class="btn-group w-100" ngbDropdown role="group" #dropdown="ngbDropdown">
+  <button class="btn btn-sm btn-outline-primary" id="dropdown_{{name}}" ngbDropdownToggle [disabled]="disabled">
+    <i-bs name="{{icon}}"></i-bs>
+    <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
+  </button>
+  <div class="dropdown-menu shadow" ngbDropdownMenu attr.aria-labelledby="dropdown_{{name}}">
+    <button type="button" class="btn btn-sm btn-outline-primary ms-3" (click)="addQuery()" [disabled]="disabled">
+      <i-bs name="plus"></i-bs>&nbsp;Add query
+    </button>
+    <div class="list-group list-group-flush">
+      @for (query of selectionModel.queries; track query; let i = $index) {
+        <div class="list-group-item d-flex">
+          <div class="input-group input-group-sm flex-shrink-1 flex-nowrap">
+            <ng-select
+              class="w-50"
+              [items]="customFields"
+              [(ngModel)]="query.field"
+              [disabled]="disabled"
+              bindLabel="name"
+              bindValue="id"
+            ></ng-select>
+            <select class="w-25 form-control" [(ngModel)]="query.operator" [disabled]="disabled">
+              <option *ngFor="let operator of getOperatorsForField(query.field)" [ngValue]="operator">{{operator}}</option>
+            </select>
+            @switch (query.operator) {
+              @case ('exists') {
+                <select class="w-25 form-control" [(ngModel)]="query.value" [disabled]="disabled">
+                  <option value="true" i18n>true</option>
+                  <option value="false" i18n>false</option>
+                </select>
+              }
+              @default {
+                <input class="w-25 form-control" type="text" [(ngModel)]="query.value" [disabled]="disabled">
+              }
+            }
+          </div>
+          <button class="btn btn-link btn-sm pe-0" type="button" (click)="removeQuery(i)" [disabled]="disabled">
+            <i-bs name="x"></i-bs>
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</div>

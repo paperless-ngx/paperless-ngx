@@ -839,9 +839,7 @@ describe('FilterEditorComponent', () => {
   }))
 
   it('should ingest filter rules for has all custom fields', fakeAsync(() => {
-    expect(component.customFieldSelectionModel.getSelectedItems()).toHaveLength(
-      0
-    )
+    expect(component.customFieldQueriesModel.getSelectedItems()).toHaveLength(0)
     component.filterRules = [
       {
         rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
@@ -852,10 +850,10 @@ describe('FilterEditorComponent', () => {
         value: '43',
       },
     ]
-    expect(component.customFieldSelectionModel.logicalOperator).toEqual(
+    expect(component.customFieldQueriesModel.logicalOperator).toEqual(
       LogicalOperator.And
     )
-    expect(component.customFieldSelectionModel.getSelectedItems()).toEqual(
+    expect(component.customFieldQueriesModel.getSelectedItems()).toEqual(
       custom_fields
     )
     // coverage
@@ -869,9 +867,7 @@ describe('FilterEditorComponent', () => {
   }))
 
   it('should ingest filter rules for has any custom fields', fakeAsync(() => {
-    expect(component.customFieldSelectionModel.getSelectedItems()).toHaveLength(
-      0
-    )
+    expect(component.customFieldQueriesModel.getSelectedItems()).toHaveLength(0)
     component.filterRules = [
       {
         rule_type: FILTER_HAS_CUSTOM_FIELDS_ANY,
@@ -882,10 +878,10 @@ describe('FilterEditorComponent', () => {
         value: '43',
       },
     ]
-    expect(component.customFieldSelectionModel.logicalOperator).toEqual(
+    expect(component.customFieldQueriesModel.logicalOperator).toEqual(
       LogicalOperator.Or
     )
-    expect(component.customFieldSelectionModel.getSelectedItems()).toEqual(
+    expect(component.customFieldQueriesModel.getSelectedItems()).toEqual(
       custom_fields
     )
     // coverage
@@ -898,25 +894,19 @@ describe('FilterEditorComponent', () => {
   }))
 
   it('should ingest filter rules for has any custom field', fakeAsync(() => {
-    expect(component.customFieldSelectionModel.getSelectedItems()).toHaveLength(
-      0
-    )
+    expect(component.customFieldQueriesModel.getSelectedItems()).toHaveLength(0)
     component.filterRules = [
       {
         rule_type: FILTER_HAS_ANY_CUSTOM_FIELDS,
         value: '1',
       },
     ]
-    expect(component.customFieldSelectionModel.getSelectedItems()).toHaveLength(
-      1
-    )
-    expect(component.customFieldSelectionModel.get(null)).toBeTruthy()
+    expect(component.customFieldQueriesModel.getSelectedItems()).toHaveLength(1)
+    expect(component.customFieldQueriesModel.get(null)).toBeTruthy()
   }))
 
   it('should ingest filter rules for exclude tag(s)', fakeAsync(() => {
-    expect(component.customFieldSelectionModel.getExcludedItems()).toHaveLength(
-      0
-    )
+    expect(component.customFieldQueriesModel.getExcludedItems()).toHaveLength(0)
     component.filterRules = [
       {
         rule_type: FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
@@ -927,10 +917,10 @@ describe('FilterEditorComponent', () => {
         value: '43',
       },
     ]
-    expect(component.customFieldSelectionModel.logicalOperator).toEqual(
+    expect(component.customFieldQueriesModel.logicalOperator).toEqual(
       LogicalOperator.And
     )
-    expect(component.customFieldSelectionModel.getExcludedItems()).toEqual(
+    expect(component.customFieldQueriesModel.getExcludedItems()).toEqual(
       custom_fields
     )
     // coverage

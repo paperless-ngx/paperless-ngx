@@ -12,7 +12,7 @@ import {
 import { Tag } from 'src/app/data/tag'
 import { Correspondent } from 'src/app/data/correspondent'
 import { DocumentType } from 'src/app/data/document-type'
-import { Observable, Subject, Subscription, from } from 'rxjs'
+import { Observable, Subject, from } from 'rxjs'
 import {
   catchError,
   debounceTime,
@@ -63,6 +63,7 @@ import {
   FILTER_HAS_CUSTOM_FIELDS_ALL,
   FILTER_HAS_ANY_CUSTOM_FIELDS,
   FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
+  FILTER_CUSTOM_FIELDS_LOOKUP,
 } from 'src/app/data/filter-rule-type'
 import {
   FilterableDropdownSelectionModel,
@@ -92,13 +93,16 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { CustomField } from 'src/app/data/custom-field'
 import { SearchService } from 'src/app/services/rest/search.service'
+import {
+  CustomFieldQueriesModel,
+  CustomFieldQuery,
+} from '../../common/custom-fields-lookup-dropdown/custom-fields-lookup-dropdown.component'
 
 const TEXT_FILTER_TARGET_TITLE = 'title'
 const TEXT_FILTER_TARGET_TITLE_CONTENT = 'title-content'
 const TEXT_FILTER_TARGET_ASN = 'asn'
 const TEXT_FILTER_TARGET_FULLTEXT_QUERY = 'fulltext-query'
 const TEXT_FILTER_TARGET_FULLTEXT_MORELIKE = 'fulltext-morelike'
-const TEXT_FILTER_TARGET_CUSTOM_FIELDS = 'custom-fields'
 
 const TEXT_FILTER_MODIFIER_EQUALS = 'equals'
 const TEXT_FILTER_MODIFIER_NULL = 'is null'
@@ -134,10 +138,6 @@ const DEFAULT_TEXT_FILTER_TARGET_OPTIONS = [
     name: $localize`Title & content`,
   },
   { id: TEXT_FILTER_TARGET_ASN, name: $localize`ASN` },
-  {
-    id: TEXT_FILTER_TARGET_CUSTOM_FIELDS,
-    name: $localize`Custom fields`,
-  },
   {
     id: TEXT_FILTER_TARGET_FULLTEXT_QUERY,
     name: $localize`Advanced search`,
@@ -321,7 +321,7 @@ export class FilterEditorComponent
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
   storagePathSelectionModel = new FilterableDropdownSelectionModel()
-  customFieldSelectionModel = new FilterableDropdownSelectionModel()
+  customFieldQueriesModel = new CustomFieldQueriesModel()
 
   dateCreatedBefore: string
   dateCreatedAfter: string
@@ -356,7 +356,7 @@ export class FilterEditorComponent
     this.storagePathSelectionModel.clear(false)
     this.tagSelectionModel.clear(false)
     this.correspondentSelectionModel.clear(false)
-    this.customFieldSelectionModel.clear(false)
+    this.customFieldQueriesModel.clear(false)
     this._textFilter = null
     this._moreLikeId = null
     this.dateAddedBefore = null
@@ -383,8 +383,7 @@ export class FilterEditorComponent
           this.textFilterTarget = TEXT_FILTER_TARGET_ASN
           break
         case FILTER_CUSTOM_FIELDS_TEXT:
-          this._textFilter = rule.value
-          this.textFilterTarget = TEXT_FILTER_TARGET_CUSTOM_FIELDS
+          console.log('FILTER_CUSTOM_FIELDS_TEXT', rule.value)
           break
         case FILTER_FULLTEXT_QUERY:
           let allQueryArgs = rule.value.split(',')
@@ -523,35 +522,28 @@ export class FilterEditorComponent
             false
           )
           break
-        case FILTER_HAS_CUSTOM_FIELDS_ALL:
-          this.customFieldSelectionModel.logicalOperator = LogicalOperator.And
-          this.customFieldSelectionModel.set(
-            rule.value ? +rule.value : null,
-            ToggleableItemState.Selected,
-            false
+        case FILTER_CUSTOM_FIELDS_LOOKUP:
+          // TODO: fully implement
+          const query = JSON.parse(rule.value)
+          this.customFieldQueriesModel.addQuery(
+            new CustomFieldQuery(query[0], query[1], query[2])
           )
+          break
+        case FILTER_HAS_CUSTOM_FIELDS_ALL:
+          console.log('FILTER_HAS_CUSTOM_FIELDS_ALL', rule.value)
+          // TODO: fully implement
           break
         case FILTER_HAS_CUSTOM_FIELDS_ANY:
-          this.customFieldSelectionModel.logicalOperator = LogicalOperator.Or
-          this.customFieldSelectionModel.set(
-            rule.value ? +rule.value : null,
-            ToggleableItemState.Selected,
-            false
-          )
+          console.log('FILTER_HAS_CUSTOM_FIELDS_ANY', rule.value)
+          // TODO: fully implement
           break
         case FILTER_HAS_ANY_CUSTOM_FIELDS:
-          this.customFieldSelectionModel.set(
-            null,
-            ToggleableItemState.Selected,
-            false
-          )
+          console.log('FILTER_HAS_ANY_CUSTOM_FIELDS', rule.value)
+          // TODO: fully implement
           break
         case FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS:
-          this.customFieldSelectionModel.set(
-            rule.value ? +rule.value : null,
-            ToggleableItemState.Excluded,
-            false
-          )
+          console.log('FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS', rule.value)
+          // TODO: fully implement
           break
         case FILTER_ASN_ISNULL:
           this.textFilterTarget = TEXT_FILTER_TARGET_ASN
@@ -657,15 +649,6 @@ export class FilterEditorComponent
     }
     if (
       this._textFilter &&
-      this.textFilterTarget == TEXT_FILTER_TARGET_CUSTOM_FIELDS
-    ) {
-      filterRules.push({
-        rule_type: FILTER_CUSTOM_FIELDS_TEXT,
-        value: this._textFilter,
-      })
-    }
-    if (
-      this._textFilter &&
       this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_QUERY
     ) {
       filterRules.push({
@@ -768,35 +751,24 @@ export class FilterEditorComponent
           })
         })
     }
-    if (this.customFieldSelectionModel.isNoneSelected()) {
+    let queries = this.customFieldQueriesModel.queries
+      .filter((query) => query.field && query.operator)
+      .map((query) => [query.field, query.operator, query.value])
+    console.log(
+      'this.customFieldQueriesModel.queries',
+      this.customFieldQueriesModel.queries
+    )
+    console.log('queries', queries)
+    if (queries.length > 0) {
       filterRules.push({
-        rule_type: FILTER_HAS_ANY_CUSTOM_FIELDS,
-        value: 'false',
+        rule_type: FILTER_CUSTOM_FIELDS_LOOKUP,
+        value:
+          queries.length === 1
+            ? JSON.stringify(queries[0])
+            : JSON.stringify(queries),
       })
-    } else {
-      const customFieldFilterType =
-        this.customFieldSelectionModel.logicalOperator == LogicalOperator.And
-          ? FILTER_HAS_CUSTOM_FIELDS_ALL
-          : FILTER_HAS_CUSTOM_FIELDS_ANY
-      this.customFieldSelectionModel
-        .getSelectedItems()
-        .filter((field) => field.id)
-        .forEach((field) => {
-          filterRules.push({
-            rule_type: customFieldFilterType,
-            value: field.id?.toString(),
-          })
-        })
-      this.customFieldSelectionModel
-        .getExcludedItems()
-        .filter((field) => field.id)
-        .forEach((field) => {
-          filterRules.push({
-            rule_type: FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
-            value: field.id?.toString(),
-          })
-        })
     }
+    // TODO: fully implement custom fields
     if (this.dateCreatedBefore) {
       filterRules.push({
         rule_type: FILTER_CREATED_BEFORE,
@@ -1077,10 +1049,6 @@ export class FilterEditorComponent
 
   onStoragePathDropdownOpen() {
     this.storagePathSelectionModel.apply()
-  }
-
-  onCustomFieldsDropdownOpen() {
-    this.customFieldSelectionModel.apply()
   }
 
   updateTextFilter(text, updateRules = true) {

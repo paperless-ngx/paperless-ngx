@@ -1,0 +1,8 @@
+.dropdown-menu {
+  width: 450px;
+}
+
+::ng-deep .ng-select-container {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
