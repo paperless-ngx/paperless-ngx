@@ -50,7 +50,7 @@
     "@angular-eslint/template-parser": "18.3.0",
     "@angular/cli": "~18.2.2",
     "@angular/compiler-cli": "~18.2.2",
-    "@playwright/test": "^1.45.3",
+    "@playwright/test": "^1.46.1",
     "@types/jest": "^29.5.12",
     "@types/node": "^22.0.2",
     "@typescript-eslint/eslint-plugin": "^8.3.0",
