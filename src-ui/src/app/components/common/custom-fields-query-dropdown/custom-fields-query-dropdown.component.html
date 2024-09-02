@@ -63,7 +63,7 @@
 </ng-template>
 
 <ng-template #queryExpression let-query="query">
-  <div class="d-flex flex-column border border-primary rounded p-2 mt-2">
+  <div class="d-flex flex-column w-100 border border-primary rounded p-2 mt-2">
     <div class="btn-group btn-group-xs flex-fill" role="group">
       <input [(ngModel)]="query.operator" type="radio" class="btn-check" id="logicalOperatorAnd_{{query.field}}" name="logicalOperatorAnd_{{query.field}}" value="AND">
       <label class="btn btn-outline-primary" for="logicalOperatorAnd_{{query.field}}" i18n>And</label>
