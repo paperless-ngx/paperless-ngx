@@ -126,12 +126,6 @@ export class CustomFieldQueriesModel {
     })
   }
 
-  public removeQuery(index: number) {
-    const query = this.queries.splice(index, 1)[0]
-    query.changed.complete()
-    this.changed.next(this)
-  }
-
   public addExpression(
     expression: CustomFieldQueryExpression = new CustomFieldQueryExpression()
   ) {
@@ -145,6 +139,51 @@ export class CustomFieldQueriesModel {
     expression.changed.subscribe(() => {
       this.changed.next(this)
     })
+  }
+
+  private findComponent(
+    queryComponent: CustomFieldQueryAtom | CustomFieldQueryExpression,
+    components: any[]
+  ) {
+    for (let i = 0; i < components.length; i++) {
+      if (components[i] === queryComponent) {
+        return components.splice(i, 1)[0]
+      } else if (
+        components[i].type === CustomFieldQueryComponentType.Expression
+      ) {
+        let found = this.findComponent(
+          queryComponent,
+          components[i].value as any[]
+        )
+        if (found !== undefined) {
+          return found
+        }
+      }
+    }
+    return undefined
+  }
+
+  public removeComponent(
+    queryComponent: CustomFieldQueryAtom | CustomFieldQueryExpression
+  ) {
+    let foundComponent
+    for (let i = 0; i < this.queries.length; i++) {
+      let query = this.queries[i]
+      if (query === queryComponent) {
+        foundComponent = this.queries.splice(i, 1)[0]
+        break
+      } else if (query.type === CustomFieldQueryComponentType.Expression) {
+        let found = this.findComponent(queryComponent, query.value as any[])
+        if (found !== undefined) {
+          foundComponent = found
+        }
+      }
+    }
+    if (foundComponent === undefined) {
+      return
+    }
+    foundComponent.changed.complete()
+    this.changed.next(this)
   }
 }
 
@@ -228,8 +267,10 @@ export class CustomFieldsLookupDropdownComponent {
     this.selectionModel.addExpression()
   }
 
-  public removeQuery(index: number) {
-    this.selectionModel.removeQuery(index)
+  public removeComponent(
+    component: CustomFieldQueryAtom | CustomFieldQueryExpression
+  ) {
+    this.selectionModel.removeComponent(component)
   }
 
   getOperatorsForField(field: CustomField): string[] {

@@ -23,7 +23,7 @@
               <ng-container *ngTemplateOutlet="queryExpression; context: { query: query }"></ng-container>
             }
           }
-          <button class="btn btn-link btn-sm pe-0" type="button" (click)="removeQuery(i)" [disabled]="disabled">
+          <button class="btn btn-link btn-sm pe-0" type="button" (click)="removeComponent(query)" [disabled]="disabled">
             <i-bs name="x"></i-bs>
           </button>
         </div>
@@ -80,7 +80,7 @@
               <ng-container *ngTemplateOutlet="queryExpression; context: { query: subquery }"></ng-container>
             }
           }
-          <button class="btn btn-link btn-sm pe-0" type="button" (click)="removeQuery(i)" [disabled]="disabled">
+          <button class="btn btn-link btn-sm pe-0" type="button" (click)="removeComponent(subquery)" [disabled]="disabled">
             <i-bs name="x"></i-bs>
           </button>
         </div>
