@@ -768,11 +768,6 @@ export class FilterEditorComponent
     let queries = this.customFieldQueriesModel.queries
       .filter((query) => query.value && query.operator)
       .map((query) => query.serialize())
-    console.log(
-      'this.customFieldQueriesModel.queries',
-      this.customFieldQueriesModel.queries
-    )
-    console.log('queries', queries)
     if (queries.length > 0) {
       filterRules.push({
         rule_type: FILTER_CUSTOM_FIELDS_LOOKUP,
