@@ -152,7 +152,7 @@ export class CustomFieldsLookupDropdownComponent {
   }
 
   getOperatorsForField(field: CustomField): string[] {
-    return ['exact', 'in', 'isnull', 'exists']
+    return ['exact', 'in', 'icontains', 'isnull', 'exists']
     // TODO: implement this
   }
 }

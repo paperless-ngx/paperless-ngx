@@ -239,15 +239,9 @@ class CustomFieldLookupParser:
     EXPR_BY_CATEGORY = {
         "basic": ["exact", "in", "isnull", "exists"],
         "string": [
-            "iexact",
-            "contains",
             "icontains",
-            "startswith",
             "istartswith",
-            "endswith",
             "iendswith",
-            "regex",
-            "iregex",
         ],
         "arithmetic": [
             "gt",
@@ -258,23 +252,6 @@ class CustomFieldLookupParser:
         ],
         "containment": ["contains"],
     }
-
-    # These string lookup expressions are problematic. We shall disable
-    # them by default unless the user explicitly opts in.
-    STR_EXPR_DISABLED_BY_DEFAULT = [
-        # SQLite: is case-sensitive outside the ASCII range
-        "iexact",
-        # SQLite: behaves the same as icontains
-        "contains",
-        # SQLite: behaves the same as istartswith
-        "startswith",
-        # SQLite: behaves the same as iendswith
-        "endswith",
-        # Syntax depends on database backends, can be exploited for ReDoS
-        "regex",
-        # Syntax depends on database backends, can be exploited for ReDoS
-        "iregex",
-    ]
 
     SUPPORTED_EXPR_CATEGORIES = {
         CustomField.FieldDataType.STRING: ("basic", "string"),
@@ -495,22 +472,6 @@ class CustomFieldLookupParser:
         # Check if the operator is supported for the current data_type.
         supported = False
         for category in self.SUPPORTED_EXPR_CATEGORIES[custom_field.data_type]:
-            if (
-                category == "string"
-                and op in self.STR_EXPR_DISABLED_BY_DEFAULT
-                and op not in settings.CUSTOM_FIELD_LOOKUP_OPT_IN
-            ):
-                raise serializers.ValidationError(
-                    [
-                        _(
-                            "{expr!r} is disabled by default because it does not "
-                            "behave consistently across database backends, or can "
-                            "cause security risks. If you understand the implications "
-                            "you may enabled it by adding it to "
-                            "`PAPERLESS_CUSTOM_FIELD_LOOKUP_OPT_IN`.",
-                        ).format(expr=op),
-                    ],
-                )
             if op in self.EXPR_BY_CATEGORY[category]:
                 supported = True
                 break

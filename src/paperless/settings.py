@@ -1200,10 +1200,6 @@ EMPTY_TRASH_DELAY = max(__get_int("PAPERLESS_EMPTY_TRASH_DELAY", 30), 1)
 # custom_field_lookup Filter Settings                                         #
 ###############################################################################
 
-CUSTOM_FIELD_LOOKUP_OPT_IN = __get_list(
-    "PAPERLESS_CUSTOM_FIELD_LOOKUP_OPT_IN",
-    default=[],
-)
 CUSTOM_FIELD_LOOKUP_MAX_DEPTH = __get_int(
     "PAPERLESS_CUSTOM_FIELD_LOOKUP_MAX_DEPTH",
     default=10,

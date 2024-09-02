@@ -319,22 +319,6 @@ including `gt` (>), `gte` (>=), `lt` (<), `lte` (<=), and `range`.
 Lastly, document link fields support a `contains` operator that behaves
 like a "is superset of" check.
 
-!!! warning
-
-    It is possible to do case-insensitive exact match (i.e., `iexact`) and
-    case-sensitive substring match (i.e., `contains`, `startswith`,
-    `endswith`) for string, URL, and monetary fields, but
-    [they may not work as expected on some database backends](https://docs.djangoproject.com/en/5.1/ref/databases/#substring-matching-and-case-sensitivity).
-
-    It is also possible to use regular expressions to match string, URL, and
-    monetary fields, but the syntax is database-dependent, and accepting
-    regular expressions from untrusted sources could make your instance
-    vulnerable to regular expression denial of service attacks.
-
-    For these reasons the above expressions are disabled by default.
-    If you understand the implications, you may enable them by uncommenting
-    `PAPERLESS_CUSTOM_FIELD_LOOKUP_OPT_IN` in your configuration file.
-
 ### `/api/search/autocomplete/`
 
 Get auto completions for a partial search term.
