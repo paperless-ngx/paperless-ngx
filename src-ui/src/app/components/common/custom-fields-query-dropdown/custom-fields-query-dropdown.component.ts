@@ -82,7 +82,13 @@ export class CustomFieldQueryExpression extends CustomFieldQueryComponent {
     if (!values) {
       this._value = []
     } else if (values?.length > 0 && values[0] instanceof Array) {
-      this._value = values.map((value) => new CustomFieldQueryAtom(value))
+      this._value = values.map((value) => {
+        const atom = new CustomFieldQueryAtom(value)
+        atom.changed.subscribe(() => {
+          this.changed.next(this)
+        })
+        return atom
+      })
     } else {
       this._value = new CustomFieldQueryExpression(values as any)
     }
