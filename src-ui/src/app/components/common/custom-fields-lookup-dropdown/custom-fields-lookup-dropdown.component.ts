@@ -111,10 +111,18 @@ export class CustomFieldQueriesModel {
     }
   }
 
-  public addQuery(query: CustomFieldQueryAtom = new CustomFieldQueryAtom()) {
+  public addQuery(
+    query: CustomFieldQueryAtom = new CustomFieldQueryAtom([
+      null,
+      'exists',
+      'true',
+    ])
+  ) {
     if (this.queries.length > 0) {
       if (this.queries[0].type === CustomFieldQueryComponentType.Expression) {
         ;(this.queries[0].value as Array<any>).push(query)
+      } else {
+        this.queries.push(query)
       }
     } else {
       this.queries.push(query)
