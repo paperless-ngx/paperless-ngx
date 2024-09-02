@@ -108,7 +108,7 @@ import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
 import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { CustomFieldsDropdownComponent } from './components/common/custom-fields-dropdown/custom-fields-dropdown.component'
-import { CustomFieldsLookupDropdownComponent } from './components/common/custom-fields-lookup-dropdown/custom-fields-lookup-dropdown.component'
+import { CustomFieldsQueryDropdownComponent } from './components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
 import { ProfileEditDialogComponent } from './components/common/profile-edit-dialog/profile-edit-dialog.component'
 import { PdfViewerModule } from 'ng2-pdf-viewer'
 import { DocumentLinkComponent } from './components/common/input/document-link/document-link.component'
@@ -228,6 +228,7 @@ import {
   uiRadios,
   upcScan,
   x,
+  xCircle,
   xLg,
 } from 'ngx-bootstrap-icons'
 
@@ -329,6 +330,7 @@ const icons = {
   uiRadios,
   upcScan,
   x,
+  xCircle,
   xLg,
 }
 
@@ -486,7 +488,7 @@ function initializeApp(settings: SettingsService) {
     CustomFieldsComponent,
     CustomFieldEditDialogComponent,
     CustomFieldsDropdownComponent,
-    CustomFieldsLookupDropdownComponent,
+    CustomFieldsQueryDropdownComponent,
     ProfileEditDialogComponent,
     DocumentLinkComponent,
     PreviewPopupComponent,

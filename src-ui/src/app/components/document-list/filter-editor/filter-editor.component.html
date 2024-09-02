@@ -86,10 +86,10 @@
         }
 
         @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.CustomField) && customFields.length > 0) {
-          <pngx-custom-fields-lookup-dropdown class="flex-fill" title="Custom fields" icon="ui-radios" i18n-title
+          <pngx-custom-fields-query-dropdown class="flex-fill" title="Custom fields" icon="ui-radios" i18n-title
           [(selectionModel)]="customFieldQueriesModel"
           (selectionModelChange)="updateRules()"
-          ></pngx-custom-fields-lookup-dropdown>
+          ></pngx-custom-fields-query-dropdown>
         }
         <pngx-dates-dropdown
           title="Dates" i18n-title

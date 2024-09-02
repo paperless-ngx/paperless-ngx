@@ -95,7 +95,7 @@ import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service
 import { RouterModule } from '@angular/router'
 import { SearchService } from 'src/app/services/rest/search.service'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { CustomFieldsLookupDropdownComponent } from '../../common/custom-fields-lookup-dropdown/custom-fields-lookup-dropdown.component'
+import { CustomFieldsQueryDropdownComponent } from '../../common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
 
 const tags: Tag[] = [
   {
@@ -182,7 +182,7 @@ describe('FilterEditorComponent', () => {
         ToggleableDropdownButtonComponent,
         DatesDropdownComponent,
         CustomDatePipe,
-        CustomFieldsLookupDropdownComponent,
+        CustomFieldsQueryDropdownComponent,
       ],
       imports: [
         RouterModule,

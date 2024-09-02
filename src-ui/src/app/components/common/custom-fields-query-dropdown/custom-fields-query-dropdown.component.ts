@@ -196,11 +196,11 @@ export class CustomFieldQueriesModel {
 }
 
 @Component({
-  selector: 'pngx-custom-fields-lookup-dropdown',
-  templateUrl: './custom-fields-lookup-dropdown.component.html',
-  styleUrls: ['./custom-fields-lookup-dropdown.component.scss'],
+  selector: 'pngx-custom-fields-query-dropdown',
+  templateUrl: './custom-fields-query-dropdown.component.html',
+  styleUrls: ['./custom-fields-query-dropdown.component.scss'],
 })
-export class CustomFieldsLookupDropdownComponent {
+export class CustomFieldsQueryDropdownComponent {
   public CustomFieldQueryComponentType = CustomFieldQueryComponentType
 
   @Input()
@@ -279,6 +279,10 @@ export class CustomFieldsLookupDropdownComponent {
     component: CustomFieldQueryAtom | CustomFieldQueryExpression
   ) {
     this.selectionModel.removeComponent(component)
+  }
+
+  public reset() {
+    this.selectionModel.clear()
   }
 
   getOperatorsForField(field: CustomField): string[] {

@@ -2,6 +2,9 @@
   <button class="btn btn-sm btn-outline-primary" id="dropdown_{{name}}" ngbDropdownToggle [disabled]="disabled">
     <i-bs name="{{icon}}"></i-bs>
     <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
+    @if (selectionModel.queries.length > 0) {
+      <pngx-clearable-badge [selected]="selectionModel.queries.length > 0" (cleared)="reset()"></pngx-clearable-badge>
+    }
   </button>
   <div class="dropdown-menu px-3 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown_{{name}}">
     <div class="btn-group my-2 w-100">
@@ -23,8 +26,8 @@
               <ng-container *ngTemplateOutlet="queryExpression; context: { query: query }"></ng-container>
             }
           }
-          <button class="btn btn-link btn-sm pe-0" type="button" (click)="removeComponent(query)" [disabled]="disabled">
-            <i-bs name="x"></i-bs>
+          <button class="btn btn-link btn-sm text-danger pe-0" type="button" (click)="removeComponent(query)" [disabled]="disabled">
+            <i-bs name="x-circle"></i-bs>
           </button>
         </div>
       }
@@ -78,8 +81,8 @@
               <ng-container *ngTemplateOutlet="queryExpression; context: { query: subquery }"></ng-container>
             }
           }
-          <button class="btn btn-link btn-sm pe-0" type="button" (click)="removeComponent(subquery)" [disabled]="disabled">
-            <i-bs name="x"></i-bs>
+          <button class="btn btn-link btn-sm text-danger pe-0" type="button" (click)="removeComponent(subquery)" [disabled]="disabled">
+            <i-bs name="x-circle"></i-bs>
           </button>
         </div>
       }

@@ -97,7 +97,7 @@ import {
   CustomFieldQueriesModel,
   CustomFieldQueryAtom,
   CustomFieldQueryExpression,
-} from '../../common/custom-fields-lookup-dropdown/custom-fields-lookup-dropdown.component'
+} from '../../common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
 
 const TEXT_FILTER_TARGET_TITLE = 'title'
 const TEXT_FILTER_TARGET_TITLE_CONTENT = 'title-content'
