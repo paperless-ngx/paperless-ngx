@@ -1,11 +1,9 @@
 import json
-import re
 from datetime import date
 from typing import Callable
 from unittest.mock import Mock
 from urllib.parse import quote
 
-import pytest
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 
@@ -13,7 +11,6 @@ from documents.models import CustomField
 from documents.models import Document
 from documents.serialisers import DocumentSerializer
 from documents.tests.utils import DirectoriesMixin
-from paperless import settings
 
 
 class DocumentWrapper:
@@ -31,11 +28,7 @@ class DocumentWrapper:
         return self._document.custom_fields.get(field__name=custom_field).value
 
 
-def string_expr_opted_in(op):
-    return op in settings.CUSTOM_FIELD_LOOKUP_OPT_IN
-
-
-class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
+class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
     def setUp(self):
         super().setUp()
 
@@ -313,52 +306,12 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
     # ==========================================================#
     # Expressions for string, URL, and monetary fields          #
     # ==========================================================#
-    @pytest.mark.skipif(
-        not string_expr_opted_in("iexact"),
-        reason="iexact expr is disabled.",
-    )
-    def test_iexact(self):
-        self._assert_query_match_predicate(
-            ["string_field", "iexact", "paperless"],
-            lambda document: "string_field" in document
-            and document["string_field"] is not None
-            and document["string_field"].lower() == "paperless",
-        )
-
-    @pytest.mark.skipif(
-        not string_expr_opted_in("contains"),
-        reason="contains expr is disabled.",
-    )
-    def test_contains(self):
-        # WARNING: SQLite treats "contains" as "icontains"!
-        # You should avoid "contains" unless you know what you are doing!
-        self._assert_query_match_predicate(
-            ["string_field", "contains", "aper"],
-            lambda document: "string_field" in document
-            and document["string_field"] is not None
-            and "aper" in document["string_field"],
-        )
-
     def test_icontains(self):
         self._assert_query_match_predicate(
             ["string_field", "icontains", "aper"],
             lambda document: "string_field" in document
             and document["string_field"] is not None
             and "aper" in document["string_field"].lower(),
-        )
-
-    @pytest.mark.skipif(
-        not string_expr_opted_in("startswith"),
-        reason="startswith expr is disabled.",
-    )
-    def test_startswith(self):
-        # WARNING: SQLite treats "startswith" as "istartswith"!
-        # You should avoid "startswith" unless you know what you are doing!
-        self._assert_query_match_predicate(
-            ["string_field", "startswith", "paper"],
-            lambda document: "string_field" in document
-            and document["string_field"] is not None
-            and document["string_field"].startswith("paper"),
         )
 
     def test_istartswith(self):
@@ -369,52 +322,12 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             and document["string_field"].lower().startswith("paper"),
         )
 
-    @pytest.mark.skipif(
-        not string_expr_opted_in("endswith"),
-        reason="endswith expr is disabled.",
-    )
-    def test_endswith(self):
-        # WARNING: SQLite treats "endswith" as "iendswith"!
-        # You should avoid "endswith" unless you know what you are doing!
-        self._assert_query_match_predicate(
-            ["string_field", "iendswith", "less"],
-            lambda document: "string_field" in document
-            and document["string_field"] is not None
-            and document["string_field"].lower().endswith("less"),
-        )
-
     def test_iendswith(self):
         self._assert_query_match_predicate(
             ["string_field", "iendswith", "less"],
             lambda document: "string_field" in document
             and document["string_field"] is not None
             and document["string_field"].lower().endswith("less"),
-        )
-
-    @pytest.mark.skipif(
-        not string_expr_opted_in("regex"),
-        reason="regex expr is disabled.",
-    )
-    def test_regex(self):
-        # WARNING: the regex syntax is database dependent!
-        self._assert_query_match_predicate(
-            ["string_field", "regex", r"^p.+s$"],
-            lambda document: "string_field" in document
-            and document["string_field"] is not None
-            and re.match(r"^p.+s$", document["string_field"]),
-        )
-
-    @pytest.mark.skipif(
-        not string_expr_opted_in("iregex"),
-        reason="iregex expr is disabled.",
-    )
-    def test_iregex(self):
-        # WARNING: the regex syntax is database dependent!
-        self._assert_query_match_predicate(
-            ["string_field", "iregex", r"^p.+s$"],
-            lambda document: "string_field" in document
-            and document["string_field"] is not None
-            and re.match(r"^p.+s$", document["string_field"], re.IGNORECASE),
         )
 
     def test_url_field_istartswith(self):
@@ -425,28 +338,6 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             lambda document: "url_field" in document
             and document["url_field"] is not None
             and document["url_field"].startswith("http://"),
-        )
-
-    @pytest.mark.skipif(
-        not string_expr_opted_in("iregex"),
-        reason="regex expr is disabled.",
-    )
-    def test_monetary_field_iregex(self):
-        # Monetary fields supports all of the expressions above.
-        # Just showing one of them here.
-        #
-        # Unfortunately we can't do arithmetic comparisons on monetary field,
-        # but you are welcome to use regex to do some of that.
-        # E.g., USD between 100.00 and 999.99:
-        self._assert_query_match_predicate(
-            ["monetary_field", "regex", r"USD[1-9][0-9]{2}\.[0-9]{2}"],
-            lambda document: "monetary_field" in document
-            and document["monetary_field"] is not None
-            and re.match(
-                r"USD[1-9][0-9]{2}\.[0-9]{2}",
-                document["monetary_field"],
-                re.IGNORECASE,
-            ),
         )
 
     # ==========================================================#
@@ -637,17 +528,6 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             json.dumps(["integer_field", "foo__gt", 0]),
             ["custom_field_lookup", "1"],
             "does not support lookup expr",
-        )
-
-    @pytest.mark.skipif(
-        string_expr_opted_in("regex"),
-        reason="user opted into allowing regex expr",
-    )
-    def test_disabled_operator(self):
-        self._assert_validation_error(
-            json.dumps(["string_field", "regex", r"^p.+s$"]),
-            ["custom_field_lookup", "1"],
-            "disabled by default",
         )
 
     def test_query_too_deep(self):
