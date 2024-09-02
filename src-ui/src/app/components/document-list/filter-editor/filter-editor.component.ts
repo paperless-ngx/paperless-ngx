@@ -95,7 +95,8 @@ import { CustomField } from 'src/app/data/custom-field'
 import { SearchService } from 'src/app/services/rest/search.service'
 import {
   CustomFieldQueriesModel,
-  CustomFieldQuery,
+  CustomFieldQueryAtom,
+  CustomFieldQueryExpression,
 } from '../../common/custom-fields-lookup-dropdown/custom-fields-lookup-dropdown.component'
 
 const TEXT_FILTER_TARGET_TITLE = 'title'
@@ -523,11 +524,24 @@ export class FilterEditorComponent
           )
           break
         case FILTER_CUSTOM_FIELDS_LOOKUP:
-          // TODO: fully implement
-          const query = JSON.parse(rule.value)
-          this.customFieldQueriesModel.addQuery(
-            new CustomFieldQuery(query[0], query[1], query[2])
-          )
+          try {
+            const query = JSON.parse(rule.value)
+            if (Array.isArray(query)) {
+              if (query.length === 2) {
+                // expression
+                this.customFieldQueriesModel.addExpression(
+                  new CustomFieldQueryExpression(query as any)
+                )
+              } else if (query.length === 3) {
+                // atom
+                this.customFieldQueriesModel.addQuery(
+                  new CustomFieldQueryAtom(query as any)
+                )
+              }
+            }
+          } catch (e) {
+            // TODO: handle error?
+          }
           break
         case FILTER_HAS_CUSTOM_FIELDS_ALL:
           console.log('FILTER_HAS_CUSTOM_FIELDS_ALL', rule.value)
@@ -752,8 +766,8 @@ export class FilterEditorComponent
         })
     }
     let queries = this.customFieldQueriesModel.queries
-      .filter((query) => query.field && query.operator)
-      .map((query) => [query.field, query.operator, query.value])
+      .filter((query) => query.value && query.operator)
+      .map((query) => query.serialize())
     console.log(
       'this.customFieldQueriesModel.queries',
       this.customFieldQueriesModel.queries
@@ -762,10 +776,7 @@ export class FilterEditorComponent
     if (queries.length > 0) {
       filterRules.push({
         rule_type: FILTER_CUSTOM_FIELDS_LOOKUP,
-        value:
-          queries.length === 1
-            ? JSON.stringify(queries[0])
-            : JSON.stringify(queries),
+        value: JSON.stringify(queries[0]),
       })
     }
     // TODO: fully implement custom fields

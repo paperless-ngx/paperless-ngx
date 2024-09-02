@@ -3,37 +3,26 @@
     <i-bs name="{{icon}}"></i-bs>
     <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
   </button>
-  <div class="dropdown-menu shadow" ngbDropdownMenu attr.aria-labelledby="dropdown_{{name}}">
-    <button type="button" class="btn btn-sm btn-outline-primary ms-3" (click)="addQuery()" [disabled]="disabled">
-      <i-bs name="plus"></i-bs>&nbsp;Add query
-    </button>
+  <div class="dropdown-menu px-3 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown_{{name}}">
+    <div class="btn-group mb-2 w-100">
+      <button type="button" class="btn btn-sm btn-outline-primary" (click)="addAtom()" [disabled]="disabled">
+        <i-bs name="plus"></i-bs>&nbsp;Add query
+      </button>
+      <button type="button" class="btn btn-sm btn-outline-primary" (click)="addExpression()" [disabled]="disabled">
+        <i-bs name="plus"></i-bs>&nbsp;Add expression
+      </button>
+    </div>
     <div class="list-group list-group-flush">
       @for (query of selectionModel.queries; track query; let i = $index) {
-        <div class="list-group-item d-flex">
-          <div class="input-group input-group-sm flex-shrink-1 flex-nowrap">
-            <ng-select
-              class="w-50"
-              [items]="customFields"
-              [(ngModel)]="query.field"
-              [disabled]="disabled"
-              bindLabel="name"
-              bindValue="id"
-            ></ng-select>
-            <select class="w-25 form-control" [(ngModel)]="query.operator" [disabled]="disabled">
-              <option *ngFor="let operator of getOperatorsForField(query.field)" [ngValue]="operator">{{operator}}</option>
-            </select>
-            @switch (query.operator) {
-              @case ('exists') {
-                <select class="w-25 form-control" [(ngModel)]="query.value" [disabled]="disabled">
-                  <option value="true" i18n>true</option>
-                  <option value="false" i18n>false</option>
-                </select>
-              }
-              @default {
-                <input class="w-25 form-control" type="text" [(ngModel)]="query.value" [disabled]="disabled">
-              }
+        <div class="list-group-item px-0 d-flex">
+          @switch (query.type) {
+            @case (CustomFieldQueryComponentType.Atom) {
+              <ng-container *ngTemplateOutlet="queryAtom; context: { query: query }"></ng-container>
             }
-          </div>
+            @case (CustomFieldQueryComponentType.Expression) {
+              <ng-container *ngTemplateOutlet="queryExpression; context: { query: query }"></ng-container>
+            }
+          }
           <button class="btn btn-link btn-sm pe-0" type="button" (click)="removeQuery(i)" [disabled]="disabled">
             <i-bs name="x"></i-bs>
           </button>
@@ -42,3 +31,60 @@
     </div>
   </div>
 </div>
+
+<ng-template #queryAtom let-query="query">
+  <div class="input-group input-group-sm flex-shrink-1 flex-nowrap">
+    <ng-select
+      class="w-50"
+      [items]="customFields"
+      [(ngModel)]="query.field"
+      [disabled]="disabled"
+      bindLabel="name"
+      bindValue="id"
+    ></ng-select>
+    <select class="w-25 form-control" [(ngModel)]="query.operator" [disabled]="disabled">
+      <option *ngFor="let operator of getOperatorsForField(query.field)" [ngValue]="operator">{{operator}}</option>
+    </select>
+    @switch (query.operator) {
+      @case ('exists') {
+        <select class="w-25 form-control" [(ngModel)]="query.value" [disabled]="disabled">
+          <option value="true" i18n>true</option>
+          <option value="false" i18n>false</option>
+        </select>
+      }
+      @default {
+        <input class="w-25 form-control" type="text" [(ngModel)]="query.value" [disabled]="disabled">
+      }
+    }
+  </div>
+</ng-template>
+
+<ng-template #queryExpression let-query="query">
+  <div class="d-flex flex-column">
+    <div class="btn-group btn-group-xs flex-fill" role="group">
+      <input [(ngModel)]="query.operator" type="radio" class="btn-check" id="logicalOperatorAnd_{{query.field}}" name="logicalOperatorAnd_{{query.field}}" value="AND">
+      <label class="btn btn-outline-primary" for="logicalOperatorAnd_{{query.field}}" i18n>And</label>
+      <input [(ngModel)]="query.operator" type="radio" class="btn-check" id="logicalOperatorOr_{{query.field}}" name="logicalOperatorOr_{{query.field}}" value="OR">
+      <label class="btn btn-outline-primary" for="logicalOperatorOr_{{query.field}}" i18n>Or</label>
+      <input [(ngModel)]="query.operator" type="radio" class="btn-check" id="logicalOperatorNot_{{query.field}}" name="logicalOperatorNot_{{query.field}}" value="NOT">
+      <label class="btn btn-outline-primary" for="logicalOperatorNot_{{query.field}}" i18n>Not</label>
+    </div>
+    <div class="border border-1 border-primary rounded p-2 mt-2">
+      @for (subquery of query.value; track subquery; let i = $index) {
+        <div class="list-group-item px-0 d-flex">
+          @switch (subquery.type) {
+            @case (CustomFieldQueryComponentType.Atom) {
+              <ng-container *ngTemplateOutlet="queryAtom; context: { query: subquery }"></ng-container>
+            }
+            @case (CustomFieldQueryComponentType.Expression) {
+              <ng-container *ngTemplateOutlet="queryExpression; context: { query: subquery }"></ng-container>
+            }
+          }
+          <button class="btn btn-link btn-sm pe-0" type="button" (click)="removeQuery(i)" [disabled]="disabled">
+            <i-bs name="x"></i-bs>
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</ng-template>
