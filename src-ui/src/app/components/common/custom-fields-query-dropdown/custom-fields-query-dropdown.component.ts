@@ -9,23 +9,29 @@ export enum CustomFieldQueryLogicalOperator {
   Not = 'NOT',
 }
 
-export enum CustomFieldQueryComponentType {
+export enum CustomFieldQueryElementType {
   Atom = 'Atom',
   Expression = 'Expression',
 }
 
-export class CustomFieldQueryComponent {
-  public readonly type: CustomFieldQueryComponentType
-  public changed: Subject<CustomFieldQueryComponent>
+export class CustomFieldQueryElement {
+  public readonly type: CustomFieldQueryElementType
+  public changed: Subject<CustomFieldQueryElement>
 
-  constructor(type: CustomFieldQueryComponentType) {
+  constructor(type: CustomFieldQueryElementType) {
     this.type = type
-    this.changed = new Subject<CustomFieldQueryComponent>()
+    this.changed = new Subject<CustomFieldQueryElement>()
   }
 
-  public serialize() {}
+  public serialize() {
+    throw new Error('Implemented in subclass')
+  }
 
-  protected _operator: string
+  public get isValid(): boolean {
+    throw new Error('Implemented in subclass')
+  }
+
+  protected _operator: string = null
   set operator(value: string) {
     this._operator = value
     this.changed.next(this)
@@ -37,7 +43,7 @@ export class CustomFieldQueryComponent {
   protected _value:
     | string
     | CustomFieldQueryAtom[]
-    | CustomFieldQueryExpression[]
+    | CustomFieldQueryExpression[] = null
   set value(
     value: string | CustomFieldQueryAtom[] | CustomFieldQueryExpression[]
   ) {
@@ -49,34 +55,38 @@ export class CustomFieldQueryComponent {
   }
 }
 
-export class CustomFieldQueryAtom extends CustomFieldQueryComponent {
+export class CustomFieldQueryAtom extends CustomFieldQueryElement {
   protected _field: string
   set field(value: string) {
     this._field = value
-    this.changed.next(this)
+    if (this.isValid) this.changed.next(this)
   }
   get field(): string {
     return this._field
   }
 
   constructor(queryArray: [string, string, string] = [null, null, null]) {
-    super(CustomFieldQueryComponentType.Atom)
+    super(CustomFieldQueryElementType.Atom)
     ;[this._field, this._operator, this._value] = queryArray
   }
 
   public serialize() {
     return [this._field, this._operator, this._value]
   }
+
+  public get isValid(): boolean {
+    return !!(this._field && this._operator && this._value !== null)
+  }
 }
 
-export class CustomFieldQueryExpression extends CustomFieldQueryComponent {
+export class CustomFieldQueryExpression extends CustomFieldQueryElement {
   constructor(
     expressionArray: [CustomFieldQueryLogicalOperator, any[]] = [
       CustomFieldQueryLogicalOperator.And,
       null,
     ]
   ) {
-    super(CustomFieldQueryComponentType.Expression)
+    super(CustomFieldQueryElementType.Expression)
     ;[this._operator] = expressionArray
     let values = expressionArray[1]
     if (!values) {
@@ -111,6 +121,14 @@ export class CustomFieldQueryExpression extends CustomFieldQueryComponent {
     }
     return [this._operator, value]
   }
+
+  public get isValid(): boolean {
+    return (
+      this._operator &&
+      this._value.length > 0 &&
+      (this._value as any[]).every((v) => v.isValid)
+    )
+  }
 }
 
 export class CustomFieldQueriesModel {
@@ -133,7 +151,7 @@ export class CustomFieldQueriesModel {
     ])
   ) {
     if (this.queries.length > 0) {
-      if (this.queries[0].type === CustomFieldQueryComponentType.Expression) {
+      if (this.queries[0].type === CustomFieldQueryElementType.Expression) {
         ;(this.queries[0].value as Array<any>).push(query)
       } else {
         this.queries.push(query)
@@ -152,7 +170,7 @@ export class CustomFieldQueriesModel {
     expression: CustomFieldQueryExpression = new CustomFieldQueryExpression()
   ) {
     if (this.queries.length > 0) {
-      if (this.queries[0].type === CustomFieldQueryComponentType.Atom) {
+      if (this.queries[0].type === CustomFieldQueryElementType.Atom) {
         expression.value = this.queries as CustomFieldQueryAtom[]
         this.queries = []
       }
@@ -171,7 +189,7 @@ export class CustomFieldQueriesModel {
       if (components[i] === queryComponent) {
         return components.splice(i, 1)[0]
       } else if (
-        components[i].type === CustomFieldQueryComponentType.Expression
+        components[i].type === CustomFieldQueryElementType.Expression
       ) {
         let found = this.findComponent(
           queryComponent,
@@ -194,7 +212,7 @@ export class CustomFieldQueriesModel {
       if (query === queryComponent) {
         foundComponent = this.queries.splice(i, 1)[0]
         break
-      } else if (query.type === CustomFieldQueryComponentType.Expression) {
+      } else if (query.type === CustomFieldQueryElementType.Expression) {
         let found = this.findComponent(queryComponent, query.value as any[])
         if (found !== undefined) {
           foundComponent = found
@@ -215,7 +233,7 @@ export class CustomFieldQueriesModel {
   styleUrls: ['./custom-fields-query-dropdown.component.scss'],
 })
 export class CustomFieldsQueryDropdownComponent {
-  public CustomFieldQueryComponentType = CustomFieldQueryComponentType
+  public CustomFieldQueryComponentType = CustomFieldQueryElementType
 
   @Input()
   title: string

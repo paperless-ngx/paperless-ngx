@@ -766,7 +766,7 @@ export class FilterEditorComponent
         })
     }
     let queries = this.customFieldQueriesModel.queries
-      .filter((query) => query.value && query.operator)
+      .filter((query) => query.isValid)
       .map((query) => query.serialize())
     if (queries.length > 0) {
       filterRules.push({
