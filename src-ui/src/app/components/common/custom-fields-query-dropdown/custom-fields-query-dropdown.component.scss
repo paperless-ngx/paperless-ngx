@@ -1,5 +1,5 @@
 .dropdown-menu {
-  width: 500px;
+  width: 450px;
 }
 
 ::ng-deep .ng-select-container {
@@ -7,6 +7,8 @@
   border-bottom-right-radius: 0 !important;
 }
 
-.w-40 {
-  width: 40%;
+::ng-deep .ng-select {
+  max-width: 100px;
+  min-width: 35%;
+  font-size: 14px;
 }

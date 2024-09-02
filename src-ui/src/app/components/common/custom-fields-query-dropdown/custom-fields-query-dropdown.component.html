@@ -9,10 +9,10 @@
   <div class="dropdown-menu px-3 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown_{{name}}">
     <div class="btn-group my-2 w-100">
       <button type="button" class="btn btn-sm btn-outline-primary" (click)="addAtom()" [disabled]="disabled">
-        <i-bs name="plus"></i-bs>&nbsp;Add query
+        <i-bs name="node-plus"></i-bs>&nbsp;Add query
       </button>
       <button type="button" class="btn btn-sm btn-outline-primary" (click)="addExpression()" [disabled]="disabled">
-        <i-bs name="plus"></i-bs>&nbsp;Add expression
+        <i-bs name="braces"></i-bs>&nbsp;Add expression
       </button>
     </div>
     <div class="list-group list-group-flush">
@@ -26,9 +26,6 @@
               <ng-container *ngTemplateOutlet="queryExpression; context: { query: query }"></ng-container>
             }
           }
-          <button class="btn btn-link btn-sm text-danger pe-0" type="button" (click)="removeComponent(query)" [disabled]="disabled">
-            <i-bs name="x-circle"></i-bs>
-          </button>
         </div>
       }
     </div>
@@ -38,7 +35,6 @@
 <ng-template #queryAtom let-query="query">
   <div class="input-group input-group-sm">
     <ng-select
-      class="w-40"
       [items]="customFields"
       [(ngModel)]="query.field"
       [disabled]="disabled"
@@ -50,20 +46,23 @@
     </select>
     @switch (query.operator) {
       @case ('exists') {
-        <select class="w-25 form-select" [(ngModel)]="query.value" [disabled]="disabled">
+        <select class="w-25 form-select rounded-end" [(ngModel)]="query.value" [disabled]="disabled">
           <option value="true" i18n>true</option>
           <option value="false" i18n>false</option>
         </select>
       }
       @default {
-        <input class="w-25 form-control" type="text" [(ngModel)]="query.value" [disabled]="disabled">
+        <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="query.value" [disabled]="disabled">
       }
     }
+    <button class="btn btn-link btn-sm text-danger pe-0" type="button" (click)="removeComponent(query)" [disabled]="disabled">
+      <i-bs name="x-circle"></i-bs>
+    </button>
   </div>
 </ng-template>
 
 <ng-template #queryExpression let-query="query">
-  <div class="d-flex flex-column border border-primary rounded p-2 mt-2">
+  <div class="d-flex flex-column border border-primary rounded px-2 pt-2">
     <div class="btn-group btn-group-xs" role="group">
       <input [(ngModel)]="query.operator" type="radio" class="btn-check" id="logicalOperatorAnd_{{query.field}}" name="logicalOperatorAnd_{{query.field}}" value="AND">
       <label class="btn btn-outline-primary" for="logicalOperatorAnd_{{query.field}}" i18n>And</label>
@@ -81,11 +80,11 @@
               <ng-container *ngTemplateOutlet="queryExpression; context: { query: subquery }"></ng-container>
             }
           }
-          <button class="btn btn-link btn-sm text-danger pe-0" type="button" (click)="removeComponent(subquery)" [disabled]="disabled">
-            <i-bs name="x-circle"></i-bs>
-          </button>
         </div>
       }
     </div>
   </div>
+  <button class="btn btn-link btn-sm text-danger pe-0" type="button" (click)="removeComponent(query)" [disabled]="disabled">
+    <i-bs name="x-circle"></i-bs>
+  </button>
 </ng-template>
