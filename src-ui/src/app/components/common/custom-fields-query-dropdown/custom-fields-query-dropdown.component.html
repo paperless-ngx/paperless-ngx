@@ -17,7 +17,7 @@
     </div>
     <div class="list-group list-group-flush">
       @for (query of selectionModel.queries; track query; let i = $index) {
-        <div class="list-group-item px-0 d-flex">
+        <div class="list-group-item px-0 d-flex flex-nowrap">
           @switch (query.type) {
             @case (CustomFieldQueryComponentType.Atom) {
               <ng-container *ngTemplateOutlet="queryAtom; context: { query: query }"></ng-container>
@@ -36,9 +36,9 @@
 </div>
 
 <ng-template #queryAtom let-query="query">
-  <div class="input-group input-group-sm flex-shrink-1 flex-nowrap">
+  <div class="input-group input-group-sm">
     <ng-select
-      class="w-50"
+      class="w-40"
       [items]="customFields"
       [(ngModel)]="query.field"
       [disabled]="disabled"
@@ -63,8 +63,8 @@
 </ng-template>
 
 <ng-template #queryExpression let-query="query">
-  <div class="d-flex flex-column w-100 border border-primary rounded p-2 mt-2">
-    <div class="btn-group btn-group-xs flex-fill" role="group">
+  <div class="d-flex flex-column border border-primary rounded p-2 mt-2">
+    <div class="btn-group btn-group-xs" role="group">
       <input [(ngModel)]="query.operator" type="radio" class="btn-check" id="logicalOperatorAnd_{{query.field}}" name="logicalOperatorAnd_{{query.field}}" value="AND">
       <label class="btn btn-outline-primary" for="logicalOperatorAnd_{{query.field}}" i18n>And</label>
       <input [(ngModel)]="query.operator" type="radio" class="btn-check" id="logicalOperatorOr_{{query.field}}" name="logicalOperatorOr_{{query.field}}" value="OR">
@@ -72,7 +72,7 @@
     </div>
     <div class="list-group list-group-flush">
       @for (subquery of query.value; track subquery; let i = $index) {
-        <div class="list-group-item px-0 d-flex">
+        <div class="list-group-item px-0 d-flex flex-nowrap">
           @switch (subquery.type) {
             @case (CustomFieldQueryComponentType.Atom) {
               <ng-container *ngTemplateOutlet="queryAtom; context: { query: subquery }"></ng-container>

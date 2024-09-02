@@ -34,14 +34,17 @@ export class CustomFieldQueryComponent {
     return this._operator
   }
 
-  protected _value: string | CustomFieldQueryAtom[] | CustomFieldQueryExpression
+  protected _value:
+    | string
+    | CustomFieldQueryAtom[]
+    | CustomFieldQueryExpression[]
   set value(
-    value: string | CustomFieldQueryAtom[] | CustomFieldQueryExpression
+    value: string | CustomFieldQueryAtom[] | CustomFieldQueryExpression[]
   ) {
     this._value = value
     this.changed.next(this)
   }
-  get value(): string | CustomFieldQueryAtom[] | CustomFieldQueryExpression {
+  get value(): string | CustomFieldQueryAtom[] | CustomFieldQueryExpression[] {
     return this._value
   }
 }
@@ -68,13 +71,10 @@ export class CustomFieldQueryAtom extends CustomFieldQueryComponent {
 
 export class CustomFieldQueryExpression extends CustomFieldQueryComponent {
   constructor(
-    expressionArray: [
-      CustomFieldQueryLogicalOperator,
-      (
-        | [string, string, string][]
-        | [CustomFieldQueryLogicalOperator, [string, string, string][]]
-      ),
-    ] = [CustomFieldQueryLogicalOperator.And, null]
+    expressionArray: [CustomFieldQueryLogicalOperator, any[]] = [
+      CustomFieldQueryLogicalOperator.And,
+      null,
+    ]
   ) {
     super(CustomFieldQueryComponentType.Expression)
     ;[this._operator] = expressionArray
@@ -83,14 +83,22 @@ export class CustomFieldQueryExpression extends CustomFieldQueryComponent {
       this._value = []
     } else if (values?.length > 0 && values[0] instanceof Array) {
       this._value = values.map((value) => {
-        const atom = new CustomFieldQueryAtom(value)
-        atom.changed.subscribe(() => {
-          this.changed.next(this)
-        })
-        return atom
+        if (value.length === 3) {
+          const atom = new CustomFieldQueryAtom(value)
+          atom.changed.subscribe(() => {
+            this.changed.next(this)
+          })
+          return atom
+        } else {
+          const expression = new CustomFieldQueryExpression(value)
+          expression.changed.subscribe(() => {
+            this.changed.next(this)
+          })
+          return expression
+        }
       })
     } else {
-      this._value = new CustomFieldQueryExpression(values as any)
+      this._value = [new CustomFieldQueryExpression(values as any)]
     }
   }
 
