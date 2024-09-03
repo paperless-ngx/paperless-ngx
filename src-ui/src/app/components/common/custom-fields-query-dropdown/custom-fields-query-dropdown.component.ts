@@ -28,7 +28,7 @@ export class CustomFieldQueriesModel {
   public addQuery(
     query: CustomFieldQueryAtom = new CustomFieldQueryAtom([
       null,
-      'exists',
+      CustomFieldQueryOperator.Exists,
       'true',
     ])
   ) {
@@ -204,11 +204,9 @@ export class CustomFieldsQueryDropdownComponent {
     fieldID: number
   ): Array<{ value: string; label: string }> {
     const field = this.customFields.find((field) => field.id === fieldID)
-    const groups: CustomFieldQueryOperatorGroups[] =
-      CUSTOM_FIELD_QUERY_OPERATOR_GROUPS_BY_TYPE[field.data_type]
-    if (!groups) {
-      return []
-    }
+    const groups: CustomFieldQueryOperatorGroups[] = field
+      ? CUSTOM_FIELD_QUERY_OPERATOR_GROUPS_BY_TYPE[field.data_type]
+      : [CustomFieldQueryOperatorGroups.Basic]
     const operators = groups.flatMap(
       (group) => CUSTOM_FIELD_QUERY_OPERATORS_BY_GROUP[group]
     )
