@@ -316,15 +316,15 @@ describe('FilterEditorComponent', () => {
   }))
 
   it('should ingest text filter rules for custom fields', fakeAsync(() => {
-    // expect(component.textFilter).toEqual(null)
-    // component.filterRules = [
-    //   {
-    //     rule_type: FILTER_CUSTOM_FIELDS_TEXT,
-    //     value: 'foo',
-    //   },
-    // ]
-    // expect(component.textFilter).toEqual('foo')
-    // expect(component.textFilterTarget).toEqual('custom-fields') // TEXT_FILTER_TARGET_CUSTOM_FIELDS
+    expect(component.textFilter).toEqual(null)
+    component.filterRules = [
+      {
+        rule_type: FILTER_CUSTOM_FIELDS_TEXT,
+        value: 'foo',
+      },
+    ]
+    expect(component.textFilter).toEqual('foo')
+    expect(component.textFilterTarget).toEqual('custom-fields') // TEXT_FILTER_TARGET_CUSTOM_FIELDS
   }))
 
   it('should ingest text filter rules for doc asn is null', fakeAsync(() => {
@@ -1170,21 +1170,21 @@ describe('FilterEditorComponent', () => {
   }))
 
   it('should convert user input to correct filter rules on custom fields query', fakeAsync(() => {
-    // component.textFilterInput.nativeElement.value = 'foo'
-    // component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
-    // const textFieldTargetDropdown = fixture.debugElement.queryAll(
-    //   By.directive(NgbDropdownItem)
-    // )[3]
-    // textFieldTargetDropdown.triggerEventHandler('click') // TEXT_FILTER_TARGET_CUSTOM_FIELDS
-    // fixture.detectChanges()
-    // tick(400)
-    // expect(component.textFilterTarget).toEqual('custom-fields')
-    // expect(component.filterRules).toEqual([
-    //   {
-    //     rule_type: FILTER_CUSTOM_FIELDS_TEXT,
-    //     value: 'foo',
-    //   },
-    // ])
+    component.textFilterInput.nativeElement.value = 'foo'
+    component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
+    const textFieldTargetDropdown = fixture.debugElement.queryAll(
+      By.directive(NgbDropdownItem)
+    )[3]
+    textFieldTargetDropdown.triggerEventHandler('click') // TEXT_FILTER_TARGET_CUSTOM_FIELDS
+    fixture.detectChanges()
+    tick(400)
+    expect(component.textFilterTarget).toEqual('custom-fields')
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_CUSTOM_FIELDS_TEXT,
+        value: 'foo',
+      },
+    ])
   }))
 
   it('should convert user input to correct filter rules on full text query', fakeAsync(() => {
@@ -1192,7 +1192,7 @@ describe('FilterEditorComponent', () => {
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
     const textFieldTargetDropdown = fixture.debugElement.queryAll(
       By.directive(NgbDropdownItem)
-    )[3]
+    )[4]
     textFieldTargetDropdown.triggerEventHandler('click') // TEXT_FILTER_TARGET_ASN
     fixture.detectChanges()
     tick(400)
@@ -1596,7 +1596,7 @@ describe('FilterEditorComponent', () => {
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
     const textFieldTargetDropdown = fixture.debugElement.queryAll(
       By.directive(NgbDropdownItem)
-    )[3]
+    )[4]
     textFieldTargetDropdown.triggerEventHandler('click')
     fixture.detectChanges()
     tick(400)

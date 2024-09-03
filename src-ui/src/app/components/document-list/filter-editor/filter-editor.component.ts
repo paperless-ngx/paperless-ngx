@@ -97,6 +97,7 @@ import {
   CustomFieldQueriesModel,
   CustomFieldQueryAtom,
   CustomFieldQueryExpression,
+  CustomFieldQueryLogicalOperator,
 } from '../../common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
 
 const TEXT_FILTER_TARGET_TITLE = 'title'
@@ -104,6 +105,7 @@ const TEXT_FILTER_TARGET_TITLE_CONTENT = 'title-content'
 const TEXT_FILTER_TARGET_ASN = 'asn'
 const TEXT_FILTER_TARGET_FULLTEXT_QUERY = 'fulltext-query'
 const TEXT_FILTER_TARGET_FULLTEXT_MORELIKE = 'fulltext-morelike'
+const TEXT_FILTER_TARGET_CUSTOM_FIELDS = 'custom-fields'
 
 const TEXT_FILTER_MODIFIER_EQUALS = 'equals'
 const TEXT_FILTER_MODIFIER_NULL = 'is null'
@@ -139,6 +141,10 @@ const DEFAULT_TEXT_FILTER_TARGET_OPTIONS = [
     name: $localize`Title & content`,
   },
   { id: TEXT_FILTER_TARGET_ASN, name: $localize`ASN` },
+  {
+    id: TEXT_FILTER_TARGET_CUSTOM_FIELDS,
+    name: $localize`Custom fields`,
+  },
   {
     id: TEXT_FILTER_TARGET_FULLTEXT_QUERY,
     name: $localize`Advanced search`,
@@ -384,7 +390,8 @@ export class FilterEditorComponent
           this.textFilterTarget = TEXT_FILTER_TARGET_ASN
           break
         case FILTER_CUSTOM_FIELDS_TEXT:
-          console.log('FILTER_CUSTOM_FIELDS_TEXT', rule.value)
+          this._textFilter = rule.value
+          this.textFilterTarget = TEXT_FILTER_TARGET_CUSTOM_FIELDS
           break
         case FILTER_FULLTEXT_QUERY:
           let allQueryArgs = rule.value.split(',')
@@ -543,22 +550,6 @@ export class FilterEditorComponent
             // TODO: handle error?
           }
           break
-        case FILTER_HAS_CUSTOM_FIELDS_ALL:
-          console.log('FILTER_HAS_CUSTOM_FIELDS_ALL', rule.value)
-          // TODO: fully implement
-          break
-        case FILTER_HAS_CUSTOM_FIELDS_ANY:
-          console.log('FILTER_HAS_CUSTOM_FIELDS_ANY', rule.value)
-          // TODO: fully implement
-          break
-        case FILTER_HAS_ANY_CUSTOM_FIELDS:
-          console.log('FILTER_HAS_ANY_CUSTOM_FIELDS', rule.value)
-          // TODO: fully implement
-          break
-        case FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS:
-          console.log('FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS', rule.value)
-          // TODO: fully implement
-          break
         case FILTER_ASN_ISNULL:
           this.textFilterTarget = TEXT_FILTER_TARGET_ASN
           this.textFilterModifier =
@@ -660,6 +651,15 @@ export class FilterEditorComponent
           value: this._textFilter,
         })
       }
+    }
+    if (
+      this._textFilter &&
+      this.textFilterTarget == TEXT_FILTER_TARGET_CUSTOM_FIELDS
+    ) {
+      filterRules.push({
+        rule_type: FILTER_CUSTOM_FIELDS_TEXT,
+        value: this._textFilter,
+      })
     }
     if (
       this._textFilter &&
