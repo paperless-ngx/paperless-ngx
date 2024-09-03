@@ -1,4 +1,4 @@
-import { Subject } from 'rxjs'
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs'
 import { CustomFieldDataType } from './custom-field'
 
 export enum CustomFieldQueryLogicalOperator {
@@ -112,10 +112,20 @@ export enum CustomFieldQueryElementType {
 export class CustomFieldQueryElement {
   public readonly type: CustomFieldQueryElementType
   public changed: Subject<CustomFieldQueryElement>
+  protected valueModelChanged: Subject<string | CustomFieldQueryElement[]>
 
   constructor(type: CustomFieldQueryElementType) {
     this.type = type
     this.changed = new Subject<CustomFieldQueryElement>()
+    this.valueModelChanged = new Subject<string | CustomFieldQueryElement[]>()
+    this.connectValueModelChanged()
+  }
+
+  protected connectValueModelChanged() {
+    // Allows overriding in subclasses
+    this.valueModelChanged.subscribe(() => {
+      this.changed.next(this)
+    })
   }
 
   public serialize() {
@@ -135,17 +145,12 @@ export class CustomFieldQueryElement {
     return this._operator
   }
 
-  protected _value:
-    | string
-    | CustomFieldQueryAtom[]
-    | CustomFieldQueryExpression[] = null
-  set value(
-    value: string | CustomFieldQueryAtom[] | CustomFieldQueryExpression[]
-  ) {
+  protected _value: string | CustomFieldQueryElement[] = null
+  set value(value: string | CustomFieldQueryElement[]) {
     this._value = value
-    this.changed.next(this)
+    this.valueModelChanged.next(value)
   }
-  get value(): string | CustomFieldQueryAtom[] | CustomFieldQueryExpression[] {
+  get value(): string | CustomFieldQueryElement[] {
     return this._value
   }
 }
@@ -163,6 +168,14 @@ export class CustomFieldQueryAtom extends CustomFieldQueryElement {
   constructor(queryArray: [string, string, string] = [null, null, null]) {
     super(CustomFieldQueryElementType.Atom)
     ;[this._field, this._operator, this._value] = queryArray
+  }
+
+  protected connectValueModelChanged(): void {
+    this.valueModelChanged
+      .pipe(debounceTime(1000), distinctUntilChanged())
+      .subscribe(() => {
+        this.changed.next(this)
+      })
   }
 
   public serialize() {
