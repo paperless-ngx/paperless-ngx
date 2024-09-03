@@ -42,13 +42,13 @@
       bindValue="id"
     ></ng-select>
     <select class="w-25 form-select" [(ngModel)]="query.operator" [disabled]="disabled">
-      <option *ngFor="let operator of getOperatorsForField(query.field)" [ngValue]="operator">{{operator}}</option>
+      <option *ngFor="let operator of getOperatorsForField(query.field)" [ngValue]="operator.value">{{operator.label}}</option>
     </select>
     @switch (query.operator) {
-      @case ('exists') {
+      @case (CustomFieldQueryOperator.Exists) {
         <select class="w-25 form-select rounded-end" [(ngModel)]="query.value" [disabled]="disabled">
-          <option value="true" i18n>true</option>
-          <option value="false" i18n>false</option>
+          <option value="true" i18n>True</option>
+          <option value="false" i18n>False</option>
         </select>
       }
       @default {

@@ -8,7 +8,10 @@ import {
   FILTER_HAS_CUSTOM_FIELDS_ALL,
 } from '../data/filter-rule-type'
 import { ListViewState } from '../services/document-list-view.service'
-import { CustomFieldQueryLogicalOperator } from '../components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
+import {
+  CustomFieldQueryLogicalOperator,
+  CustomFieldQueryOperator,
+} from '../data/custom-field-query'
 
 const SORT_FIELD_PARAMETER = 'sort'
 const SORT_REVERSE_PARAMETER = 'reverse'
@@ -71,7 +74,13 @@ export function transformLegacyFilterRules(
     const valueRules = allRules.length ? allRules : anyRules
     const customFieldQueryExpression = [
       customFieldQueryLogicalOperator,
-      [...valueRules.map((rule) => [parseInt(rule.value), 'exists', true])],
+      [
+        ...valueRules.map((rule) => [
+          parseInt(rule.value),
+          CustomFieldQueryOperator.Exists,
+          true,
+        ]),
+      ],
     ]
     filterRules.push({
       rule_type: FILTER_CUSTOM_FIELDS_LOOKUP,

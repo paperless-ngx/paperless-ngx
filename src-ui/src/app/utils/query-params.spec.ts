@@ -12,7 +12,7 @@ import { paramsToViewState, transformLegacyFilterRules } from './query-params'
 import { paramsFromViewState } from './query-params'
 import { queryParamsFromFilterRules } from './query-params'
 import { filterRulesFromQueryParams } from './query-params'
-import { CustomFieldQueryLogicalOperator } from '../components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
+import { CustomFieldQueryLogicalOperator } from '../data/custom-field-query'
 
 const tags__id__all = '9'
 const filterRules: FilterRule[] = [
