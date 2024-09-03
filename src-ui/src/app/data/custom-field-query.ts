@@ -104,6 +104,23 @@ export const CUSTOM_FIELD_QUERY_OPERATOR_GROUPS_BY_TYPE = {
   [CustomFieldDataType.Select]: [CustomFieldQueryOperatorGroups.Basic],
 }
 
+export const CUSTOM_FIELD_QUERY_VALUE_TYPES_BY_OPERATOR = {
+  [CustomFieldQueryOperator.Exact]: 'string',
+  [CustomFieldQueryOperator.IsNull]: 'boolean',
+  [CustomFieldQueryOperator.Exists]: 'boolean',
+  [CustomFieldQueryOperator.IContains]: 'string',
+  // TODO: Implement these
+  // [CustomFieldQueryOperator.In]: 'array',
+  // [CustomFieldQueryOperator.Contains]: 'string',
+  // [CustomFieldQueryOperator.IStartsWith]: 'string',
+  // [CustomFieldQueryOperator.IEndsWith]: 'string',
+  // [CustomFieldQueryOperator.GreaterThan]: 'number',
+  // [CustomFieldQueryOperator.GreaterThanOrEqual]: 'number',
+  // [CustomFieldQueryOperator.LessThan]: 'number',
+  // [CustomFieldQueryOperator.LessThanOrEqual]: 'number',
+  // [CustomFieldQueryOperator.Range]: 'array',
+}
+
 export enum CustomFieldQueryElementType {
   Atom = 'Atom',
   Expression = 'Expression',
@@ -137,20 +154,20 @@ export class CustomFieldQueryElement {
   }
 
   protected _operator: string = null
-  set operator(value: string) {
+  public set operator(value: string) {
     this._operator = value
     this.changed.next(this)
   }
-  get operator(): string {
+  public get operator(): string {
     return this._operator
   }
 
   protected _value: string | CustomFieldQueryElement[] = null
-  set value(value: string | CustomFieldQueryElement[]) {
+  public set value(value: string | CustomFieldQueryElement[]) {
     this._value = value
     this.valueModelChanged.next(value)
   }
-  get value(): string | CustomFieldQueryElement[] {
+  public get value(): string | CustomFieldQueryElement[] {
     return this._value
   }
 }
@@ -165,12 +182,37 @@ export class CustomFieldQueryAtom extends CustomFieldQueryElement {
     return this._field
   }
 
+  override set operator(operator: string) {
+    if (
+      typeof this.value !== CUSTOM_FIELD_QUERY_VALUE_TYPES_BY_OPERATOR[operator]
+    ) {
+      switch (CUSTOM_FIELD_QUERY_VALUE_TYPES_BY_OPERATOR[operator]) {
+        case 'string':
+          this.value = ''
+          break
+        case 'boolean':
+          this.value = 'true'
+          break
+        // TODO: Implement these
+        default:
+          this.value = null
+          break
+      }
+    }
+    super.operator = operator
+  }
+
+  override get operator(): string {
+    // why?
+    return super.operator
+  }
+
   constructor(queryArray: [string, string, string] = [null, null, null]) {
     super(CustomFieldQueryElementType.Atom)
     ;[this._field, this._operator, this._value] = queryArray
   }
 
-  protected connectValueModelChanged(): void {
+  protected override connectValueModelChanged(): void {
     this.valueModelChanged
       .pipe(debounceTime(1000), distinctUntilChanged())
       .subscribe(() => {
@@ -178,11 +220,11 @@ export class CustomFieldQueryAtom extends CustomFieldQueryElement {
       })
   }
 
-  public serialize() {
+  public override serialize() {
     return [this._field, this._operator, this._value.toString()]
   }
 
-  public get isValid(): boolean {
+  public override get isValid(): boolean {
     return !!(this._field && this._operator && this._value !== null)
   }
 }
@@ -220,7 +262,7 @@ export class CustomFieldQueryExpression extends CustomFieldQueryElement {
     }
   }
 
-  public serialize() {
+  public override serialize() {
     let value
     if (this._value instanceof Array) {
       value = this._value.map((atom) => atom.serialize())
@@ -230,7 +272,7 @@ export class CustomFieldQueryExpression extends CustomFieldQueryElement {
     return [this._operator, value]
   }
 
-  public get isValid(): boolean {
+  public override get isValid(): boolean {
     return (
       this._operator &&
       this._value.length > 0 &&
