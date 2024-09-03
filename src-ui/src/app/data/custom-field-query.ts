@@ -109,15 +109,15 @@ export const CUSTOM_FIELD_QUERY_VALUE_TYPES_BY_OPERATOR = {
   [CustomFieldQueryOperator.IsNull]: 'boolean',
   [CustomFieldQueryOperator.Exists]: 'boolean',
   [CustomFieldQueryOperator.IContains]: 'string',
+  [CustomFieldQueryOperator.GreaterThanOrEqual]: 'string',
+  [CustomFieldQueryOperator.LessThanOrEqual]: 'string',
   // TODO: Implement these
   // [CustomFieldQueryOperator.In]: 'array',
   // [CustomFieldQueryOperator.Contains]: 'string',
   // [CustomFieldQueryOperator.IStartsWith]: 'string',
   // [CustomFieldQueryOperator.IEndsWith]: 'string',
   // [CustomFieldQueryOperator.GreaterThan]: 'number',
-  // [CustomFieldQueryOperator.GreaterThanOrEqual]: 'number',
   // [CustomFieldQueryOperator.LessThan]: 'number',
-  // [CustomFieldQueryOperator.LessThanOrEqual]: 'number',
   // [CustomFieldQueryOperator.Range]: 'array',
 }
 

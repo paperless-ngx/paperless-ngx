@@ -51,6 +51,12 @@
           <option value="false" i18n>False</option>
         </select>
       }
+      @case (CustomFieldQueryOperator.IsNull) {
+        <select class="w-25 form-select rounded-end" [(ngModel)]="query.value" [disabled]="disabled">
+          <option value="true" i18n>True</option>
+          <option value="false" i18n>False</option>
+        </select>
+      }
       @default {
         <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="query.value" [disabled]="disabled">
       }
