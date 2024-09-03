@@ -55,9 +55,15 @@ export class CustomFieldQueriesModel {
       if (this.queries[0].type === CustomFieldQueryElementType.Atom) {
         expression.value = this.queries as CustomFieldQueryAtom[]
         this.queries = []
+        this.queries.push(expression)
+      } else {
+        ;((this.queries[0] as CustomFieldQueryExpression).value as any[]).push(
+          expression
+        )
       }
+    } else {
+      this.queries.push(expression)
     }
-    this.queries.push(expression)
     expression.changed.subscribe(() => {
       this.changed.next(this)
     })
