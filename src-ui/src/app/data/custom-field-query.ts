@@ -189,10 +189,9 @@ export class CustomFieldQueryAtom extends CustomFieldQueryElement {
   }
 
   override set operator(operator: string) {
-    if (
-      typeof this.value !== CUSTOM_FIELD_QUERY_VALUE_TYPES_BY_OPERATOR[operator]
-    ) {
-      switch (CUSTOM_FIELD_QUERY_VALUE_TYPES_BY_OPERATOR[operator]) {
+    const newType: string = CUSTOM_FIELD_QUERY_VALUE_TYPES_BY_OPERATOR[operator]
+    if (typeof this.value !== newType) {
+      switch (newType) {
         case 'string':
           this.value = ''
           break
@@ -204,6 +203,11 @@ export class CustomFieldQueryAtom extends CustomFieldQueryElement {
           this.value = null
           break
       }
+    } else if (
+      ['true', 'false'].includes(this.value as string) &&
+      newType === 'string'
+    ) {
+      this.value = ''
     }
     super.operator = operator
   }
