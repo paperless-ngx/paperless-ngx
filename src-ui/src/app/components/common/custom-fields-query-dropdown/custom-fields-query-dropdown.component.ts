@@ -10,11 +10,12 @@ import {
   CUSTOM_FIELD_QUERY_OPERATORS_BY_GROUP,
   CustomFieldQueryOperatorGroups,
   CUSTOM_FIELD_QUERY_OPERATOR_LABELS,
+  CustomFieldQueryElement,
 } from 'src/app/data/custom-field-query'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 
 export class CustomFieldQueriesModel {
-  public queries: Array<CustomFieldQueryAtom | CustomFieldQueryExpression> = []
+  public queries: CustomFieldQueryElement[] = []
 
   public readonly changed = new Subject<CustomFieldQueriesModel>()
 
@@ -25,22 +26,11 @@ export class CustomFieldQueriesModel {
     }
   }
 
-  public addQuery(
-    query: CustomFieldQueryAtom = new CustomFieldQueryAtom([
-      null,
-      CustomFieldQueryOperator.Exists,
-      'true',
-    ])
-  ) {
-    if (this.queries.length > 0) {
-      if (this.queries[0].type === CustomFieldQueryElementType.Expression) {
-        ;(this.queries[0].value as Array<any>).push(query)
-      } else {
-        this.queries.push(query)
-      }
-    } else {
-      this.queries.push(query)
+  public addQuery(query: CustomFieldQueryAtom) {
+    if (this.queries.length === 0) {
+      this.addExpression()
     }
+    ;(this.queries[0].value as CustomFieldQueryElement[]).push(query)
     query.changed.subscribe(() => {
       if (query.field && query.operator && query.value) {
         this.changed.next(this)
@@ -52,15 +42,10 @@ export class CustomFieldQueriesModel {
     expression: CustomFieldQueryExpression = new CustomFieldQueryExpression()
   ) {
     if (this.queries.length > 0) {
-      if (this.queries[0].type === CustomFieldQueryElementType.Atom) {
-        expression.value = this.queries as CustomFieldQueryAtom[]
-        this.queries = []
-        this.queries.push(expression)
-      } else {
-        ;((this.queries[0] as CustomFieldQueryExpression).value as any[]).push(
-          expression
-        )
-      }
+      ;(
+        (this.queries[0] as CustomFieldQueryExpression)
+          .value as CustomFieldQueryElement[]
+      ).push(expression)
     } else {
       this.queries.push(expression)
     }
@@ -69,20 +54,12 @@ export class CustomFieldQueriesModel {
     })
   }
 
-  private findComponent(
-    queryComponent: CustomFieldQueryAtom | CustomFieldQueryExpression,
-    components: any[]
-  ) {
-    for (let i = 0; i < components.length; i++) {
-      if (components[i] === queryComponent) {
-        return components.splice(i, 1)[0]
-      } else if (
-        components[i].type === CustomFieldQueryElementType.Expression
-      ) {
-        let found = this.findComponent(
-          queryComponent,
-          components[i].value as any[]
-        )
+  private findElement(queryElement: CustomFieldQueryElement, elements: any[]) {
+    for (let i = 0; i < elements.length; i++) {
+      if (elements[i] === queryElement) {
+        return elements.splice(i, 1)[0]
+      } else if (elements[i].type === CustomFieldQueryElementType.Expression) {
+        let found = this.findElement(queryElement, elements[i].value as any[])
         if (found !== undefined) {
           return found
         }
@@ -91,17 +68,15 @@ export class CustomFieldQueriesModel {
     return undefined
   }
 
-  public removeComponent(
-    queryComponent: CustomFieldQueryAtom | CustomFieldQueryExpression
-  ) {
+  public removeElement(queryElement: CustomFieldQueryElement) {
     let foundComponent
     for (let i = 0; i < this.queries.length; i++) {
       let query = this.queries[i]
-      if (query === queryComponent) {
+      if (query === queryElement) {
         foundComponent = this.queries.splice(i, 1)[0]
         break
       } else if (query.type === CustomFieldQueryElementType.Expression) {
-        let found = this.findComponent(queryComponent, query.value as any[])
+        let found = this.findElement(queryElement, query.value as any[])
         if (found !== undefined) {
           foundComponent = found
         }
@@ -149,10 +124,14 @@ export class CustomFieldsQueryDropdownComponent {
   @Input()
   disabled: boolean = false
 
-  _selectionModel: CustomFieldQueriesModel = new CustomFieldQueriesModel()
+  private _selectionModel: CustomFieldQueriesModel =
+    new CustomFieldQueriesModel()
 
   @Input()
   set selectionModel(model: CustomFieldQueriesModel) {
+    if (this._selectionModel) {
+      this._selectionModel.changed.complete()
+    }
     model.changed.subscribe((updatedModel) => {
       this.selectionModelChange.next(updatedModel)
     })
@@ -172,11 +151,25 @@ export class CustomFieldsQueryDropdownComponent {
 
   constructor(protected customFieldsService: CustomFieldsService) {
     this.getFields()
+    this.reset()
   }
 
   ngOnDestroy(): void {
     this.unsubscribeNotifier.next(this)
     this.unsubscribeNotifier.complete()
+  }
+
+  public onOpenChange(open: boolean) {
+    if (open && this.selectionModel.queries.length === 0) {
+      this.selectionModel.addExpression()
+    }
+  }
+
+  public get isActive(): boolean {
+    return (
+      (this.selectionModel.queries[0] as CustomFieldQueryExpression)?.value
+        ?.length > 0
+    )
   }
 
   private getFields() {
@@ -188,22 +181,23 @@ export class CustomFieldsQueryDropdownComponent {
       })
   }
 
-  public addAtom() {
-    this.selectionModel.addQuery()
+  public addAtom(expression: CustomFieldQueryExpression) {
+    expression.addAtom()
   }
 
-  public addExpression() {
-    this.selectionModel.addExpression()
+  public addExpression(expression: CustomFieldQueryExpression) {
+    expression.addExpression()
   }
 
   public removeComponent(
     component: CustomFieldQueryAtom | CustomFieldQueryExpression
   ) {
-    this.selectionModel.removeComponent(component)
+    this.selectionModel.removeElement(component)
   }
 
   public reset() {
-    this.selectionModel.clear()
+    this.selectionModel.clear(false)
+    this.selectionModel.changed.next(this.selectionModel)
   }
 
   getOperatorsForField(

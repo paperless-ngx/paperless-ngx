@@ -44,6 +44,7 @@ export enum CustomFieldQueryOperatorGroups {
   String = 'string',
   Arithmetic = 'arithmetic',
   Containment = 'containment',
+  Date = 'date',
 }
 
 export const CUSTOM_FIELD_QUERY_OPERATORS_BY_GROUP = {
@@ -63,10 +64,14 @@ export const CUSTOM_FIELD_QUERY_OPERATORS_BY_GROUP = {
     CustomFieldQueryOperator.GreaterThanOrEqual,
     CustomFieldQueryOperator.LessThan,
     CustomFieldQueryOperator.LessThanOrEqual,
-    CustomFieldQueryOperator.Range,
+    // CustomFieldQueryOperator.Range,
   ],
   [CustomFieldQueryOperatorGroups.Containment]: [
     CustomFieldQueryOperator.Contains,
+  ],
+  [CustomFieldQueryOperatorGroups.Date]: [
+    CustomFieldQueryOperator.GreaterThanOrEqual,
+    CustomFieldQueryOperator.LessThanOrEqual,
   ],
 }
 
@@ -82,7 +87,7 @@ export const CUSTOM_FIELD_QUERY_OPERATOR_GROUPS_BY_TYPE = {
   ],
   [CustomFieldDataType.Date]: [
     CustomFieldQueryOperatorGroups.Basic,
-    CustomFieldQueryOperatorGroups.Arithmetic,
+    CustomFieldQueryOperatorGroups.Date,
   ],
   [CustomFieldDataType.Boolean]: [CustomFieldQueryOperatorGroups.Basic],
   [CustomFieldDataType.Integer]: [
@@ -232,13 +237,13 @@ export class CustomFieldQueryAtom extends CustomFieldQueryElement {
 export class CustomFieldQueryExpression extends CustomFieldQueryElement {
   constructor(
     expressionArray: [CustomFieldQueryLogicalOperator, any[]] = [
-      CustomFieldQueryLogicalOperator.And,
+      CustomFieldQueryLogicalOperator.Or,
       null,
     ]
   ) {
     super(CustomFieldQueryElementType.Expression)
-    ;[this._operator] = expressionArray
-    let values = expressionArray[1]
+    let values
+    ;[this._operator, values] = expressionArray
     if (!values) {
       this._value = []
     } else if (values?.length > 0 && values[0] instanceof Array) {
@@ -278,5 +283,27 @@ export class CustomFieldQueryExpression extends CustomFieldQueryElement {
       this._value.length > 0 &&
       (this._value as any[]).every((v) => v.isValid)
     )
+  }
+
+  public addAtom(
+    atom: CustomFieldQueryAtom = new CustomFieldQueryAtom([
+      null,
+      CustomFieldQueryOperator.Exists,
+      'true',
+    ])
+  ) {
+    ;(this._value as CustomFieldQueryElement[]).push(atom)
+    atom.changed.subscribe(() => {
+      this.changed.next(this)
+    })
+  }
+
+  public addExpression(
+    expression: CustomFieldQueryExpression = new CustomFieldQueryExpression()
+  ) {
+    ;(this._value as CustomFieldQueryElement[]).push(expression)
+    expression.changed.subscribe(() => {
+      this.changed.next(this)
+    })
   }
 }

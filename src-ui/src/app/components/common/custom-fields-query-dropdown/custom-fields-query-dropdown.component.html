@@ -1,20 +1,12 @@
-<div class="btn-group w-100" ngbDropdown role="group" #dropdown="ngbDropdown">
+<div class="btn-group w-100" ngbDropdown role="group" #dropdown="ngbDropdown" (openChange)="onOpenChange($event)">
   <button class="btn btn-sm btn-outline-primary" id="dropdown_{{name}}" ngbDropdownToggle [disabled]="disabled">
     <i-bs name="{{icon}}"></i-bs>
     <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
-    @if (selectionModel.queries.length > 0) {
-      <pngx-clearable-badge [selected]="selectionModel.queries.length > 0" (cleared)="reset()"></pngx-clearable-badge>
+    @if (isActive) {
+      <pngx-clearable-badge [selected]="isActive" (cleared)="reset()"></pngx-clearable-badge>
     }
   </button>
   <div class="dropdown-menu px-3 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown_{{name}}">
-    <div class="btn-group my-2 w-100">
-      <button type="button" class="btn btn-sm btn-outline-primary" (click)="addAtom()" [disabled]="disabled">
-        <i-bs name="node-plus"></i-bs>&nbsp;Add query
-      </button>
-      <button type="button" class="btn btn-sm btn-outline-primary" (click)="addExpression()" [disabled]="disabled">
-        <i-bs name="braces"></i-bs>&nbsp;Add expression
-      </button>
-    </div>
     <div class="list-group list-group-flush">
       @for (query of selectionModel.queries; track query; let i = $index) {
         <div class="list-group-item px-0 d-flex flex-nowrap">
@@ -61,36 +53,46 @@
         <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="query.value" [disabled]="disabled">
       }
     }
-    <button class="btn btn-link btn-sm text-danger pe-0" type="button" (click)="removeComponent(query)" [disabled]="disabled">
+    <button class="btn btn-link btn-sm text-danger pe-0" type="button" (click)="removeElement(query)" [disabled]="disabled">
       <i-bs name="x-circle"></i-bs>
     </button>
   </div>
 </ng-template>
 
 <ng-template #queryExpression let-query="query">
-  <div class="d-flex flex-column border border-primary rounded px-2 pt-2 w-100">
-    <div class="btn-group btn-group-xs" role="group">
-      <input [(ngModel)]="query.operator" type="radio" class="btn-check" id="logicalOperatorAnd_{{query.field}}" name="logicalOperatorAnd_{{query.field}}" value="AND">
-      <label class="btn btn-outline-primary" for="logicalOperatorAnd_{{query.field}}" i18n>And</label>
-      <input [(ngModel)]="query.operator" type="radio" class="btn-check" id="logicalOperatorOr_{{query.field}}" name="logicalOperatorOr_{{query.field}}" value="OR">
-      <label class="btn btn-outline-primary" for="logicalOperatorOr_{{query.field}}" i18n>Or</label>
+  <div class="d-flex w-100">
+    <div class="d-flex flex-grow-1 flex-column">
+      <div class="btn-group btn-group-xs" role="group">
+        <input [(ngModel)]="query.operator" type="radio" class="btn-check" id="logicalOperatorOr_{{query.field}}" name="logicalOperatorOr_{{query.field}}" value="OR">
+        <label class="btn btn-outline-primary" for="logicalOperatorOr_{{query.field}}" i18n>Any</label>
+        <input [(ngModel)]="query.operator" type="radio" class="btn-check" id="logicalOperatorAnd_{{query.field}}" name="logicalOperatorAnd_{{query.field}}" value="AND">
+        <label class="btn btn-outline-primary" for="logicalOperatorAnd_{{query.field}}" i18n>All</label>
+      </div>
+      <div class="list-group list-group-flush mb-n2">
+        @for (subquery of query.value; track subquery; let i = $index) {
+          <div class="list-group-item px-0 d-flex flex-nowrap">
+            @switch (subquery.type) {
+              @case (CustomFieldQueryComponentType.Atom) {
+                <ng-container *ngTemplateOutlet="queryAtom; context: { query: subquery }"></ng-container>
+              }
+              @case (CustomFieldQueryComponentType.Expression) {
+                <ng-container *ngTemplateOutlet="queryExpression; context: { query: subquery }"></ng-container>
+              }
+            }
+          </div>
+        }
+      </div>
     </div>
-    <div class="list-group list-group-flush">
-      @for (subquery of query.value; track subquery; let i = $index) {
-        <div class="list-group-item px-0 d-flex flex-nowrap">
-          @switch (subquery.type) {
-            @case (CustomFieldQueryComponentType.Atom) {
-              <ng-container *ngTemplateOutlet="queryAtom; context: { query: subquery }"></ng-container>
-            }
-            @case (CustomFieldQueryComponentType.Expression) {
-              <ng-container *ngTemplateOutlet="queryExpression; context: { query: subquery }"></ng-container>
-            }
-          }
-        </div>
-      }
+    <div class="btn-group-vertical ms-2 ps-2 border-start" role="group" aria-label="Vertical button group">
+      <button type="button" class="btn btn-sm btn-outline-secondary text-primary" title="Add query" i18n-title (click)="addAtom(query)" [disabled]="disabled">
+        <i-bs name="node-plus"></i-bs>
+      </button>
+      <button type="button" class="btn btn-sm btn-outline-secondary text-primary" title="Add expression" i18n-title (click)="addExpression(query)" [disabled]="disabled">
+        <i-bs name="braces"></i-bs>
+      </button>
+      <button type="button" class="btn btn-sm btn-outline-secondary text-danger" (click)="removeElement(query)" [disabled]="disabled">
+        <i-bs name="x-circle"></i-bs>
+      </button>
     </div>
   </div>
-  <button class="btn btn-link btn-sm text-danger pe-0" type="button" (click)="removeComponent(query)" [disabled]="disabled">
-    <i-bs name="x-circle"></i-bs>
-  </button>
 </ng-template>
