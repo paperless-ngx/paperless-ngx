@@ -85,5 +85,9 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         Populate the user with data from the social account. Stub is kept in case
         global default permissions are implemented in the future.
         """
-        # TODO: If default global permissions are implemented, should also be here
-        return super().populate_user(request, sociallogin, data)  # pragma: no cover
+        user = super().populate_user(request, sociallogin, data)
+        groups = sociallogin.account.extra_data.get(settings.SOCIALACCOUNT_ADMIN_GROUP_SCOPE)
+        if groups:
+            if settings.SOCIALACCOUNT_ADMIN_GROUP in groups:
+                user.is_superuser = True
+        return user  # pragma: no cover
