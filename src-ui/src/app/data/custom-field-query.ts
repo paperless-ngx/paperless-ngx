@@ -135,6 +135,7 @@ export class CustomFieldQueryElement {
   public readonly type: CustomFieldQueryElementType
   public changed: Subject<CustomFieldQueryElement>
   protected valueModelChanged: Subject<string | CustomFieldQueryElement[]>
+  public depth: number = 0
 
   constructor(type: CustomFieldQueryElementType) {
     this.type = type
@@ -292,6 +293,7 @@ export class CustomFieldQueryExpression extends CustomFieldQueryElement {
       'true',
     ])
   ) {
+    atom.depth = this.depth + 1
     ;(this._value as CustomFieldQueryElement[]).push(atom)
     atom.changed.subscribe(() => {
       this.changed.next(this)
@@ -301,6 +303,7 @@ export class CustomFieldQueryExpression extends CustomFieldQueryElement {
   public addExpression(
     expression: CustomFieldQueryExpression = new CustomFieldQueryExpression()
   ) {
+    expression.depth = this.depth + 1
     ;(this._value as CustomFieldQueryElement[]).push(expression)
     expression.changed.subscribe(() => {
       this.changed.next(this)

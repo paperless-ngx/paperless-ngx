@@ -189,10 +189,8 @@ export class CustomFieldsQueryDropdownComponent {
     expression.addExpression()
   }
 
-  public removeComponent(
-    component: CustomFieldQueryAtom | CustomFieldQueryExpression
-  ) {
-    this.selectionModel.removeElement(component)
+  public removeElement(element: CustomFieldQueryElement) {
+    this.selectionModel.removeElement(element)
   }
 
   public reset() {

@@ -63,9 +63,9 @@
   <div class="d-flex w-100">
     <div class="d-flex flex-grow-1 flex-column">
       <div class="btn-group btn-group-xs" role="group">
-        <input [(ngModel)]="query.operator" type="radio" class="btn-check" id="logicalOperatorOr_{{query.field}}" name="logicalOperatorOr_{{query.field}}" value="OR">
+        <input [(ngModel)]="query.operator" type="radio" class="btn-check" id="logicalOperatorOr_{{query.field}}" name="logicalOperatorOr_{{query.field}}" value="OR" [disabled]="query.value.length < 2">
         <label class="btn btn-outline-primary" for="logicalOperatorOr_{{query.field}}" i18n>Any</label>
-        <input [(ngModel)]="query.operator" type="radio" class="btn-check" id="logicalOperatorAnd_{{query.field}}" name="logicalOperatorAnd_{{query.field}}" value="AND">
+        <input [(ngModel)]="query.operator" type="radio" class="btn-check" id="logicalOperatorAnd_{{query.field}}" name="logicalOperatorAnd_{{query.field}}" value="AND" [disabled]="query.value.length < 2">
         <label class="btn btn-outline-primary" for="logicalOperatorAnd_{{query.field}}" i18n>All</label>
       </div>
       <div class="list-group list-group-flush mb-n2">
@@ -90,9 +90,11 @@
       <button type="button" class="btn btn-sm btn-outline-secondary text-primary" title="Add expression" i18n-title (click)="addExpression(query)" [disabled]="disabled">
         <i-bs name="braces"></i-bs>
       </button>
-      <button type="button" class="btn btn-sm btn-outline-secondary text-danger" (click)="removeElement(query)" [disabled]="disabled">
-        <i-bs name="x-circle"></i-bs>
-      </button>
+      @if (query.depth > 0) {
+        <button type="button" class="btn btn-sm btn-outline-secondary text-danger" (click)="removeElement(query)" [disabled]="disabled">
+          <i-bs name="x-circle"></i-bs>
+        </button>
+      }
     </div>
   </div>
 </ng-template>
