@@ -30,12 +30,14 @@ from documents.models import Log
 from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
-from paperless import settings
 
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]
 INT_KWARGS = ["exact", "gt", "gte", "lt", "lte", "isnull"]
 DATE_KWARGS = ["year", "month", "day", "date__gt", "gt", "date__lt", "lt"]
+
+CUSTOM_FIELD_LOOKUP_MAX_DEPTH = 10
+CUSTOM_FIELD_LOOKUP_MAX_ATOMS = 20
 
 
 class CorrespondentFilterSet(FilterSet):
@@ -394,13 +396,7 @@ class CustomFieldLookupParser:
         self._atom_count += 1
         if self._atom_count > self._max_atom_count:
             raise serializers.ValidationError(
-                [
-                    _(
-                        "Maximum number of query conditions exceeded. You can raise "
-                        "the limit by setting PAPERLESS_CUSTOM_FIELD_LOOKUP_MAX_ATOMS "
-                        "in your configuration file.",
-                    ),
-                ],
+                [_("Maximum number of query conditions exceeded.")],
             )
 
         custom_field = self._get_custom_field(id_or_name, validation_prefix="0")
@@ -597,15 +593,7 @@ class CustomFieldLookupParser:
         # guard against queries that are too deeply nested
         self._current_depth += 1
         if self._current_depth > self._max_query_depth:
-            raise serializers.ValidationError(
-                [
-                    _(
-                        "Maximum nesting depth exceeded. You can raise the limit "
-                        "by setting PAPERLESS_CUSTOM_FIELD_LOOKUP_MAX_DEPTH in "
-                        "your configuration file.",
-                    ),
-                ],
-            )
+            raise serializers.ValidationError([_("Maximum nesting depth exceeded.")])
         try:
             yield
         finally:
@@ -629,8 +617,8 @@ class CustomFieldLookupFilter(Filter):
 
         parser = CustomFieldLookupParser(
             self._validation_prefix,
-            max_query_depth=settings.CUSTOM_FIELD_LOOKUP_MAX_DEPTH,
-            max_atom_count=settings.CUSTOM_FIELD_LOOKUP_MAX_ATOMS,
+            max_query_depth=CUSTOM_FIELD_LOOKUP_MAX_DEPTH,
+            max_atom_count=CUSTOM_FIELD_LOOKUP_MAX_ATOMS,
         )
         q, annotations = parser.parse(value)
 

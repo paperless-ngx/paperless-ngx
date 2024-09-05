@@ -1195,16 +1195,3 @@ EMAIL_ENABLE_GPG_DECRYPTOR: Final[bool] = __get_boolean(
 # Soft Delete                                                                 #
 ###############################################################################
 EMPTY_TRASH_DELAY = max(__get_int("PAPERLESS_EMPTY_TRASH_DELAY", 30), 1)
-
-###############################################################################
-# custom_field_lookup Filter Settings                                         #
-###############################################################################
-
-CUSTOM_FIELD_LOOKUP_MAX_DEPTH = __get_int(
-    "PAPERLESS_CUSTOM_FIELD_LOOKUP_MAX_DEPTH",
-    default=10,
-)
-CUSTOM_FIELD_LOOKUP_MAX_ATOMS = __get_int(
-    "PAPERLESS_CUSTOM_FIELD_LOOKUP_MAX_ATOMS",
-    default=20,
-)
