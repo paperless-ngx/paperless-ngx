@@ -41,6 +41,7 @@
 <ng-template #queryAtom let-atom="atom">
   <div class="input-group input-group-sm">
     <ng-select
+      class="paperless-input-select"
       [items]="customFields"
       [(ngModel)]="atom.field"
       [disabled]="disabled"
