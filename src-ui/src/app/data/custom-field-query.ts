@@ -1,5 +1,6 @@
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs'
 import { CustomFieldDataType } from './custom-field'
+import { v4 as uuidv4 } from 'uuid'
 
 export enum CustomFieldQueryLogicalOperator {
   And = 'AND',
@@ -135,6 +136,7 @@ export class CustomFieldQueryElement {
   public changed: Subject<CustomFieldQueryElement>
   protected valueModelChanged: Subject<string | CustomFieldQueryElement[]>
   public depth: number = 0
+  public id: string = uuidv4()
 
   constructor(type: CustomFieldQueryElementType) {
     this.type = type
