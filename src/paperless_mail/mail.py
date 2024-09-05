@@ -686,6 +686,25 @@ class MailAccountHandler(LoggingMixin):
 
         return processed_elements
 
+    def filename_inclusion_matches(
+        self,
+        filter_attachment_filename_include: Optional[str],
+        filename: str,
+    ) -> bool:
+        if filter_attachment_filename_include:
+            filter_attachment_filename_inclusions = (
+                filter_attachment_filename_include.split(",")
+            )
+
+            # Force the filename and pattern to the lowercase
+            # as this is system dependent otherwise
+            filename = filename.lower()
+            for filename_include in filter_attachment_filename_inclusions:
+                if filename_include and fnmatch(filename, filename_include.lower()):
+                    return True
+            return False
+        return True
+
     def filename_exclusion_matches(
         self,
         filter_attachment_filename_exclude: Optional[str],
@@ -728,9 +747,9 @@ class MailAccountHandler(LoggingMixin):
                 )
                 continue
 
-            if rule.filter_attachment_filename_include and not fnmatch(
-                att.filename.lower(),
-                rule.filter_attachment_filename_include.lower(),
+            if not self.filename_inclusion_matches(
+                rule.filter_attachment_filename_include,
+                att.filename,
             ):
                 # Force the filename and pattern to the lowercase
                 # as this is system dependent otherwise
