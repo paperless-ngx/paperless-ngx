@@ -1,5 +1,8 @@
 .dropdown-menu {
-  width: 450px;
+  width: 450;
+  @media(min-width: 768px) {
+    width: 600px;
+  }
 }
 
 ::ng-deep .ng-select-container {
