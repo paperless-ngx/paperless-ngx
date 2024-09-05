@@ -246,12 +246,14 @@ export class CustomFieldQueryExpression extends CustomFieldQueryElement {
       this._value = values.map((value) => {
         if (value.length === 3) {
           const atom = new CustomFieldQueryAtom(value)
+          atom.depth = this.depth + 1
           atom.changed.subscribe(() => {
             this.changed.next(this)
           })
           return atom
         } else {
           const expression = new CustomFieldQueryExpression(value)
+          expression.depth = this.depth + 1
           expression.changed.subscribe(() => {
             this.changed.next(this)
           })
