@@ -67,8 +67,8 @@
               "src/assets",
               "src/manifest.webmanifest",
               {
-                "glob": "{pdf.worker.min.js,pdf.min.js}",
-                "input": "node_modules/pdfjs-dist/build/",
+                "glob": "{pdf.worker.min.mjs,pdf.min.mjs}",
+                "input": "node_modules/pdfjs-dist/legacy/build/",
                 "output": "/assets/js/"
               }
             ],
