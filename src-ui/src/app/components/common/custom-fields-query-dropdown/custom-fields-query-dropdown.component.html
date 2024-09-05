@@ -8,14 +8,14 @@
   </button>
   <div class="dropdown-menu px-3 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown_{{name}}">
     <div class="list-group list-group-flush">
-      @for (query of selectionModel.queries; track query; let i = $index) {
+      @for (element of selectionModel.queries; track element; let i = $index) {
         <div class="list-group-item px-0 d-flex flex-nowrap">
-          @switch (query.type) {
+          @switch (element.type) {
             @case (CustomFieldQueryComponentType.Atom) {
-              <ng-container *ngTemplateOutlet="queryAtom; context: { query: query }"></ng-container>
+              <ng-container *ngTemplateOutlet="queryAtom; context: { atom: element }"></ng-container>
             }
             @case (CustomFieldQueryComponentType.Expression) {
-              <ng-container *ngTemplateOutlet="queryExpression; context: { query: query }"></ng-container>
+              <ng-container *ngTemplateOutlet="queryExpression; context: { expression: element }"></ng-container>
             }
           }
         </div>
@@ -24,85 +24,79 @@
   </div>
 </div>
 
-<ng-template #queryAtom let-query="query">
+<ng-template #dateValue let-atom="atom">
+  @if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Date) {
+    <input class="form-control" placeholder="yyyy-mm-dd"
+      [(ngModel)]="atom.value"
+      ngbDatepicker
+      #d="ngbDatepicker" />
+    <button class="btn btn-sm btn-outline-secondary rounded-end" (click)="d.toggle()" type="button">
+      <i-bs name="calendar-event"></i-bs>
+    </button>
+  } @else {
+    <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="atom.value" [disabled]="disabled">
+  }
+</ng-template>
+
+<ng-template #queryAtom let-atom="atom">
   <div class="input-group input-group-sm">
     <ng-select
       [items]="customFields"
-      [(ngModel)]="query.field"
+      [(ngModel)]="atom.field"
       [disabled]="disabled"
       bindLabel="name"
       bindValue="id"
     ></ng-select>
-    <select class="w-25 form-select" [(ngModel)]="query.operator" [disabled]="disabled">
-      <option *ngFor="let operator of getOperatorsForField(query.field)" [ngValue]="operator.value">{{operator.label}}</option>
+    <select class="w-25 form-select" [(ngModel)]="atom.operator" [disabled]="disabled">
+      <option *ngFor="let operator of getOperatorsForField(atom.field)" [ngValue]="operator.value">{{operator.label}}</option>
     </select>
-    @switch (query.operator) {
+    @switch (atom.operator) {
       @case (CustomFieldQueryOperator.Exists) {
-        <select class="w-25 form-select rounded-end" [(ngModel)]="query.value" [disabled]="disabled">
+        <select class="w-25 form-select rounded-end" [(ngModel)]="atom.value" [disabled]="disabled">
           <option value="true" i18n>True</option>
           <option value="false" i18n>False</option>
         </select>
       }
       @case (CustomFieldQueryOperator.IsNull) {
-        <select class="w-25 form-select rounded-end" [(ngModel)]="query.value" [disabled]="disabled">
+        <select class="w-25 form-select rounded-end" [(ngModel)]="atom.value" [disabled]="disabled">
           <option value="true" i18n>True</option>
           <option value="false" i18n>False</option>
         </select>
       }
       @case (CustomFieldQueryOperator.GreaterThanOrEqual) {
-        @if (getCustomFieldByID(query.field)?.data_type === CustomFieldDataType.Date) {
-          <input class="form-control" placeholder="yyyy-mm-dd"
-            [(ngModel)]="query.value"
-            ngbDatepicker
-            #d="ngbDatepicker" />
-          <button class="btn btn-sm btn-outline-secondary rounded-end" (click)="d.toggle()" type="button">
-            <i-bs name="calendar-event"></i-bs>
-          </button>
-        } @else {
-          <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="query.value" [disabled]="disabled">
-        }
+        <ng-container *ngTemplateOutlet="dateValue; context: { atom: atom }"></ng-container>
       }
       @case (CustomFieldQueryOperator.LessThanOrEqual) {
-        @if (getCustomFieldByID(query.field)?.data_type === CustomFieldDataType.Date) {
-          <input class="form-control" placeholder="yyyy-mm-dd"
-            [(ngModel)]="query.value"
-            ngbDatepicker
-            #d="ngbDatepicker" />
-          <button class="btn btn-sm btn-outline-secondary rounded-end" (click)="d.toggle()" type="button">
-            <i-bs name="calendar-event"></i-bs>
-          </button>
-        } @else {
-          <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="query.value" [disabled]="disabled">
-        }
+        <ng-container *ngTemplateOutlet="dateValue; context: { atom: atom }"></ng-container>
       }
       @default {
-        <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="query.value" [disabled]="disabled">
+        <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="atom.value" [disabled]="disabled">
       }
     }
-    <button class="btn btn-link btn-sm text-danger pe-0" type="button" (click)="removeElement(query)" [disabled]="disabled">
+    <button class="btn btn-link btn-sm text-danger pe-0" type="button" (click)="removeElement(atom)" [disabled]="disabled">
       <i-bs name="x-circle"></i-bs>
     </button>
   </div>
 </ng-template>
 
-<ng-template #queryExpression let-query="query">
+<ng-template #queryExpression let-expression="expression">
   <div class="d-flex w-100">
     <div class="d-flex flex-grow-1 flex-column">
       <div class="btn-group btn-group-xs" role="group">
-        <input [(ngModel)]="query.operator" type="radio" class="btn-check" id="logicalOperatorOr_{{query.field}}" name="logicalOperatorOr_{{query.field}}" value="OR" [disabled]="query.value.length < 2">
-        <label class="btn btn-outline-primary" for="logicalOperatorOr_{{query.field}}" i18n>Any</label>
-        <input [(ngModel)]="query.operator" type="radio" class="btn-check" id="logicalOperatorAnd_{{query.field}}" name="logicalOperatorAnd_{{query.field}}" value="AND" [disabled]="query.value.length < 2">
-        <label class="btn btn-outline-primary" for="logicalOperatorAnd_{{query.field}}" i18n>All</label>
+        <input [(ngModel)]="expression.operator" type="radio" class="btn-check" id="logicalOperatorOr_{{expression.field}}" name="logicalOperatorOr_{{expression.field}}" value="OR" [disabled]="expression.value.length < 2">
+        <label class="btn btn-outline-primary" for="logicalOperatorOr_{{expression.field}}" i18n>Any</label>
+        <input [(ngModel)]="expression.operator" type="radio" class="btn-check" id="logicalOperatorAnd_{{expression.field}}" name="logicalOperatorAnd_{{expression.field}}" value="AND" [disabled]="expression.value.length < 2">
+        <label class="btn btn-outline-primary" for="logicalOperatorAnd_{{expression.field}}" i18n>All</label>
       </div>
       <div class="list-group list-group-flush mb-n2">
-        @for (subquery of query.value; track subquery; let i = $index) {
+        @for (element of expression.value; track element; let i = $index) {
           <div class="list-group-item px-0 d-flex flex-nowrap">
-            @switch (subquery.type) {
+            @switch (element.type) {
               @case (CustomFieldQueryComponentType.Atom) {
-                <ng-container *ngTemplateOutlet="queryAtom; context: { query: subquery }"></ng-container>
+                <ng-container *ngTemplateOutlet="queryAtom; context: { atom: element }"></ng-container>
               }
               @case (CustomFieldQueryComponentType.Expression) {
-                <ng-container *ngTemplateOutlet="queryExpression; context: { query: subquery }"></ng-container>
+                <ng-container *ngTemplateOutlet="queryExpression; context: { expression: element }"></ng-container>
               }
             }
           </div>
@@ -110,14 +104,14 @@
       </div>
     </div>
     <div class="btn-group-vertical ms-2 ps-2 border-start" role="group" aria-label="Vertical button group">
-      <button type="button" class="btn btn-sm btn-outline-secondary text-primary" title="Add query" i18n-title (click)="addAtom(query)" [disabled]="disabled">
+      <button type="button" class="btn btn-sm btn-outline-secondary text-primary" title="Add query" i18n-title (click)="addAtom(expression)" [disabled]="disabled">
         <i-bs name="node-plus"></i-bs>
       </button>
-      <button type="button" class="btn btn-sm btn-outline-secondary text-primary" title="Add expression" i18n-title (click)="addExpression(query)" [disabled]="disabled">
+      <button type="button" class="btn btn-sm btn-outline-secondary text-primary" title="Add expression" i18n-title (click)="addExpression(expression)" [disabled]="disabled">
         <i-bs name="braces"></i-bs>
       </button>
-      @if (query.depth > 0) {
-        <button type="button" class="btn btn-sm btn-outline-secondary text-danger" (click)="removeElement(query)" [disabled]="disabled">
+      @if (expression.depth > 0) {
+        <button type="button" class="btn btn-sm btn-outline-secondary text-danger" (click)="removeElement(expression)" [disabled]="disabled">
           <i-bs name="x-circle"></i-bs>
         </button>
       }
