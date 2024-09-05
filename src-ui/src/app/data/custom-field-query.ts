@@ -126,6 +126,9 @@ export const CUSTOM_FIELD_QUERY_VALUE_TYPES_BY_OPERATOR = {
   // [CustomFieldQueryOperator.Range]: 'array',
 }
 
+export const CUSTOM_FIELD_QUERY_MAX_DEPTH = 4
+export const CUSTOM_FIELD_QUERY_MAX_ATOMS = 5
+
 export enum CustomFieldQueryElementType {
   Atom = 'Atom',
   Expression = 'Expression',

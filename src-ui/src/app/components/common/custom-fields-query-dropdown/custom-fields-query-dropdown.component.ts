@@ -1,11 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Injectable,
-  Input,
-  Output,
-} from '@angular/core'
-import { NgbDateAdapter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { Subject, first, takeUntil } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
@@ -18,9 +11,10 @@ import {
   CustomFieldQueryOperatorGroups,
   CUSTOM_FIELD_QUERY_OPERATOR_LABELS,
   CustomFieldQueryElement,
+  CUSTOM_FIELD_QUERY_MAX_DEPTH,
+  CUSTOM_FIELD_QUERY_MAX_ATOMS,
 } from 'src/app/data/custom-field-query'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 
 export class CustomFieldQueriesModel {
   public queries: CustomFieldQueryElement[] = []
@@ -131,6 +125,8 @@ export class CustomFieldsQueryDropdownComponent {
   public CustomFieldQueryComponentType = CustomFieldQueryElementType
   public CustomFieldQueryOperator = CustomFieldQueryOperator
   public CustomFieldDataType = CustomFieldDataType
+  public CUSTOM_FIELD_QUERY_MAX_DEPTH = CUSTOM_FIELD_QUERY_MAX_DEPTH
+  public CUSTOM_FIELD_QUERY_MAX_ATOMS = CUSTOM_FIELD_QUERY_MAX_ATOMS
 
   @Input()
   title: string
