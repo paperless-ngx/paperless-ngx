@@ -3752,22 +3752,19 @@
           <context context-type="linenumber">43</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="8772833173536287413" datatype="html">
-        <source>Optional. Wildcards e.g. *.pdf or *invoice* allowed. Case insensitive.</source>
+      <trans-unit id="7233407036155150477" datatype="html">
+        <source>Optional. Wildcards e.g. *.pdf or *invoice* allowed. Can be comma-separated list. Case insensitive.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-      </trans-unit>
-      <trans-unit id="1546332577833742677" datatype="html">
-        <source>Exclude files matching</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="7233407036155150477" datatype="html">
-        <source>Optional. Wildcards e.g. *.pdf or *invoice* allowed. Can be comma-separated list. Case insensitive.</source>
+      <trans-unit id="1546332577833742677" datatype="html">
+        <source>Exclude files matching</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">44</context>
