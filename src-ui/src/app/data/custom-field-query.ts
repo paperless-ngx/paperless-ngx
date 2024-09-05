@@ -64,7 +64,6 @@ export const CUSTOM_FIELD_QUERY_OPERATORS_BY_GROUP = {
     CustomFieldQueryOperator.GreaterThanOrEqual,
     CustomFieldQueryOperator.LessThan,
     CustomFieldQueryOperator.LessThanOrEqual,
-    // CustomFieldQueryOperator.Range,
   ],
   [CustomFieldQueryOperatorGroups.Containment]: [
     CustomFieldQueryOperator.Contains,
@@ -155,10 +154,6 @@ export class CustomFieldQueryElement {
     throw new Error('Implemented in subclass')
   }
 
-  public get isValid(): boolean {
-    throw new Error('Implemented in subclass')
-  }
-
   protected _operator: string = null
   public set operator(value: string) {
     this._operator = value
@@ -179,12 +174,12 @@ export class CustomFieldQueryElement {
 }
 
 export class CustomFieldQueryAtom extends CustomFieldQueryElement {
-  protected _field: string
-  set field(value: string) {
-    this._field = value
-    if (this.isValid) this.changed.next(this)
+  protected _field: number
+  set field(field: any) {
+    this._field = parseInt(field, 10)
+    this.changed.next(this)
   }
-  get field(): string {
+  get field(): number {
     return this._field
   }
 
@@ -217,7 +212,7 @@ export class CustomFieldQueryAtom extends CustomFieldQueryElement {
     return super.operator
   }
 
-  constructor(queryArray: [string, string, string] = [null, null, null]) {
+  constructor(queryArray: [number, string, string] = [null, null, null]) {
     super(CustomFieldQueryElementType.Atom)
     ;[this._field, this._operator, this._value] = queryArray
   }
@@ -232,10 +227,6 @@ export class CustomFieldQueryAtom extends CustomFieldQueryElement {
 
   public override serialize() {
     return [this._field, this._operator, this._value.toString()]
-  }
-
-  public override get isValid(): boolean {
-    return !!(this._field && this._operator && this._value !== null)
   }
 }
 
@@ -280,14 +271,6 @@ export class CustomFieldQueryExpression extends CustomFieldQueryElement {
       value = value.serialize()
     }
     return [this._operator, value]
-  }
-
-  public override get isValid(): boolean {
-    return (
-      this._operator &&
-      this._value.length > 0 &&
-      (this._value as any[]).every((v) => v.isValid)
-    )
   }
 
   public addAtom(

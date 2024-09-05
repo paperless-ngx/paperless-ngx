@@ -26,6 +26,30 @@ export class CustomFieldQueriesModel {
     }
   }
 
+  public isValid(): boolean {
+    return (
+      this.queries.length > 0 &&
+      this.validateExpression(this.queries[0] as CustomFieldQueryExpression)
+    )
+  }
+
+  private validateAtom(atom: CustomFieldQueryAtom) {
+    let valid: boolean = !!(atom.field && atom.operator && atom.value)
+    return valid
+  }
+
+  private validateExpression(expression: CustomFieldQueryExpression) {
+    return (
+      expression.operator &&
+      expression.value.length > 0 &&
+      (expression.value as CustomFieldQueryElement[]).every((e) =>
+        e.type === CustomFieldQueryElementType.Atom
+          ? this.validateAtom(e as CustomFieldQueryAtom)
+          : this.validateExpression(e as CustomFieldQueryExpression)
+      )
+    )
+  }
+
   public addQuery(query: CustomFieldQueryAtom) {
     if (this.queries.length === 0) {
       this.addExpression()
@@ -133,13 +157,19 @@ export class CustomFieldsQueryDropdownComponent {
       this._selectionModel.changed.complete()
     }
     model.changed.subscribe((updatedModel) => {
-      this.selectionModelChange.next(updatedModel)
+      this.onModelChange()
     })
     this._selectionModel = model
   }
 
   get selectionModel(): CustomFieldQueriesModel {
     return this._selectionModel
+  }
+
+  private onModelChange() {
+    if (this.selectionModel.isValid()) {
+      this.selectionModelChange.next(this.selectionModel)
+    }
   }
 
   @Output()

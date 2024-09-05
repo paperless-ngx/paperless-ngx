@@ -764,9 +764,9 @@ export class FilterEditorComponent
           })
         })
     }
-    let queries = this.customFieldQueriesModel.queries
-      .filter((query) => query.isValid)
-      .map((query) => query.serialize())
+    let queries = this.customFieldQueriesModel.queries.map((query) =>
+      query.serialize()
+    )
     if (queries.length > 0) {
       filterRules.push({
         rule_type: FILTER_CUSTOM_FIELDS_LOOKUP,
