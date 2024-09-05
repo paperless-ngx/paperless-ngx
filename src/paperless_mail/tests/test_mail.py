@@ -659,6 +659,12 @@ class TestMail(
                 expected_matches=["f2.png"],
             ),
             FilterTestCase(
+                "PDF Files with f2 and f3",
+                include_pattern="f2.pdf,f3*",
+                exclude_pattern=None,
+                expected_matches=["f2.pdf", "f3.pdf"],
+            ),
+            FilterTestCase(
                 "PDF Files without f1",
                 include_pattern="*.pdf",
                 exclude_pattern="f1*",
