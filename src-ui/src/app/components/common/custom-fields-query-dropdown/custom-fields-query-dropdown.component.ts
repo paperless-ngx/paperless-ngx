@@ -1,6 +1,13 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core'
+import {
+  Component,
+  EventEmitter,
+  Injectable,
+  Input,
+  Output,
+} from '@angular/core'
+import { NgbDateAdapter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap'
 import { Subject, first, takeUntil } from 'rxjs'
-import { CustomField } from 'src/app/data/custom-field'
+import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
   CustomFieldQueryAtom,
   CustomFieldQueryExpression,
@@ -13,6 +20,7 @@ import {
   CustomFieldQueryElement,
 } from 'src/app/data/custom-field-query'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 
 export class CustomFieldQueriesModel {
   public queries: CustomFieldQueryElement[] = []
@@ -122,6 +130,7 @@ export class CustomFieldQueriesModel {
 export class CustomFieldsQueryDropdownComponent {
   public CustomFieldQueryComponentType = CustomFieldQueryElementType
   public CustomFieldQueryOperator = CustomFieldQueryOperator
+  public CustomFieldDataType = CustomFieldDataType
 
   @Input()
   title: string
@@ -209,6 +218,10 @@ export class CustomFieldsQueryDropdownComponent {
       .subscribe((result) => {
         this.customFields = result.results
       })
+  }
+
+  public getCustomFieldByID(id: number): CustomField {
+    return this.customFields.find((field) => field.id === id)
   }
 
   public addAtom(expression: CustomFieldQueryExpression) {

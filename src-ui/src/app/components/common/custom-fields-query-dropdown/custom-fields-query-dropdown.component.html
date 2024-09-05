@@ -49,6 +49,32 @@
           <option value="false" i18n>False</option>
         </select>
       }
+      @case (CustomFieldQueryOperator.GreaterThanOrEqual) {
+        @if (getCustomFieldByID(query.field)?.data_type === CustomFieldDataType.Date) {
+          <input class="form-control" placeholder="yyyy-mm-dd"
+            [(ngModel)]="query.value"
+            ngbDatepicker
+            #d="ngbDatepicker" />
+          <button class="btn btn-sm btn-outline-secondary rounded-end" (click)="d.toggle()" type="button">
+            <i-bs name="calendar-event"></i-bs>
+          </button>
+        } @else {
+          <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="query.value" [disabled]="disabled">
+        }
+      }
+      @case (CustomFieldQueryOperator.LessThanOrEqual) {
+        @if (getCustomFieldByID(query.field)?.data_type === CustomFieldDataType.Date) {
+          <input class="form-control" placeholder="yyyy-mm-dd"
+            [(ngModel)]="query.value"
+            ngbDatepicker
+            #d="ngbDatepicker" />
+          <button class="btn btn-sm btn-outline-secondary rounded-end" (click)="d.toggle()" type="button">
+            <i-bs name="calendar-event"></i-bs>
+          </button>
+        } @else {
+          <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="query.value" [disabled]="disabled">
+        }
+      }
       @default {
         <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="query.value" [disabled]="disabled">
       }
