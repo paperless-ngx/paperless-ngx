@@ -21,6 +21,9 @@ def get_tesseract_langs():
 
 @register()
 def check_default_language_available(app_configs, **kwargs):
+    if shutil.which("tesseract") is None:
+        return [Error("Executable 'tesseract' was not located")]
+
     installed_langs = get_tesseract_langs()
 
     if not settings.OCR_LANGUAGE:
