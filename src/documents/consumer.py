@@ -539,6 +539,29 @@ class ConsumerPlugin(
 
             self.log.debug(f"Detected mime type: {mime_type}")
 
+            if (
+                Path(self.filename).suffix.lower() == ".pdf"
+                and mime_type in settings.CONSUMER_PDF_RECOVERABLE_MIME_TYPES
+            ):
+                try:
+                    # The file might be a pdf, but the mime type is wrong.
+                    # Try to clean with qpdf
+                    self.log.debug(
+                        "Detected possible PDF with wrong mime type, trying to clean with qpdf",
+                    )
+                    run_subprocess(
+                        [
+                            "qpdf",
+                            "--replace-input",
+                            self.working_copy,
+                        ],
+                        logger=self.log,
+                    )
+                    mime_type = magic.from_file(self.working_copy, mime=True)
+                    self.log.debug(f"Detected mime type after qpdf: {mime_type}")
+                except Exception as e:
+                    self.log.error(f"Error attempting to clean PDF: {e}")
+
             # Based on the mime type, get the parser for that type
             parser_class: Optional[type[DocumentParser]] = (
                 get_parser_class_for_mime_type(

@@ -960,6 +960,8 @@ CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT: Final[bool] = __get_boolean(
     "PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT",
 )
 
+CONSUMER_PDF_RECOVERABLE_MIME_TYPES = ("application/octet-stream",)
+
 OCR_PAGES = __get_optional_int("PAPERLESS_OCR_PAGES")
 
 # The default language that tesseract will attempt to use when parsing
