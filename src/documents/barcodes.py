@@ -246,7 +246,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
 
             if barcode_max_pages < num_of_pages:
                 logger.debug(
-                    f"Reading of barcodes is limited to the first {barcode_max_pages} pages",
+                    f"Barcodes detection will be limited to the first {barcode_max_pages} pages",
                 )
 
             # Loop al page
@@ -254,7 +254,6 @@ class BarcodePlugin(ConsumeTaskPlugin):
                 logger.debug(f"Processing page {current_page_number}")
 
                 # Convert page to image
-                logger.debug("Converting page to image")
                 page = convert_from_path(
                     self.pdf_file,
                     dpi=settings.CONSUMER_BARCODE_DPI,
@@ -279,14 +278,12 @@ class BarcodePlugin(ConsumeTaskPlugin):
                     )
 
                 # Detect barcodes
-                logger.debug("Detecting barcodes")
                 for barcode_value in reader(page):
                     self.barcodes.append(
                         Barcode(current_page_number, barcode_value),
                     )
 
                 # Delete temporary image file
-                logger.debug("Cleaning up temporary image file")
                 os.remove(page_filename)
 
         # Password protected files can't be checked
