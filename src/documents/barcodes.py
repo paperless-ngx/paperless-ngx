@@ -243,7 +243,9 @@ class BarcodePlugin(ConsumeTaskPlugin):
                 barcode_max_pages = num_of_pages
 
             if barcode_max_pages < num_of_pages:
-                logger.debug(f"Reading of barcodes is limited to the first {barcode_max_pages} pages")
+                logger.debug(
+                    f"Reading of barcodes is limited to the first {barcode_max_pages} pages",
+                )
 
             # Loop al page
             for current_page_number in range(min(num_of_pages, barcode_max_pages)):
