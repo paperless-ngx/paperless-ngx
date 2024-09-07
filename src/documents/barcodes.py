@@ -1,4 +1,5 @@
 import logging
+import os
 import re
 import tempfile
 from dataclasses import dataclass
@@ -7,6 +8,7 @@ from typing import Optional
 
 from django.conf import settings
 from pdf2image import convert_from_path
+from pdf2image import pdfinfo_from_path
 from pdf2image.exceptions import PDFPageCountError
 from pikepdf import Page
 from pikepdf import Pdf
@@ -231,13 +233,37 @@ class BarcodePlugin(ConsumeTaskPlugin):
             logger.debug("Scanning for barcodes using ZXING")
 
         try:
-            pages_from_path = convert_from_path(
-                self.pdf_file,
-                dpi=settings.CONSUMER_BARCODE_DPI,
-                output_folder=self.temp_dir.name,
-            )
+            # Read number of pages from pdf
+            num_of_pages = pdfinfo_from_path(self.pdf_file)["Pages"]
+            logger.debug(f"PDF has {num_of_pages} pages")
 
-            for current_page_number, page in enumerate(pages_from_path):
+            # Get limit from configuration
+            barcode_max_pages = settings.CONSUMER_BARCODE_MAX_PAGES
+            if barcode_max_pages == 0:
+                barcode_max_pages = num_of_pages
+
+            if barcode_max_pages < num_of_pages:
+                logger.debug(f"Reading of barcodes is limited to the first {barcode_max_pages} pages")
+
+            # Loop al page
+            for current_page_number in range(min(num_of_pages, barcode_max_pages)):
+                logger.debug(f"Processing page {current_page_number}")
+
+                # Convert page to image
+                logger.debug("Converting page to image")
+                page = convert_from_path(
+                    self.pdf_file,
+                    dpi=settings.CONSUMER_BARCODE_DPI,
+                    output_folder=self.temp_dir.name,
+                    first_page=current_page_number + 1,
+                    last_page=current_page_number + 1,
+                )[0]
+
+                # Remember filename, since it is lost by upscaling
+                page_filename = page.filename
+                logger.debug(f"Image is at {page_filename}")
+
+                # Upscale image if configured
                 factor = settings.CONSUMER_BARCODE_UPSCALE
                 if factor > 1.0:
                     logger.debug(
@@ -248,10 +274,16 @@ class BarcodePlugin(ConsumeTaskPlugin):
                         (int(round(x * factor)), (int(round(y * factor)))),
                     )
 
+                # Detect barcodes
+                logger.debug("Detecting barcodes")
                 for barcode_value in reader(page):
                     self.barcodes.append(
                         Barcode(current_page_number, barcode_value),
                     )
+
+                # Delete temporary image file
+                logger.debug("Cleaning up temporary image file")
+                os.remove(page_filename)
 
         # Password protected files can't be checked
         # This is the exception raised for those

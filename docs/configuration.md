@@ -1289,6 +1289,18 @@ combination with PAPERLESS_CONSUMER_BARCODE_UPSCALE bigger than 1.0.
 
     Defaults to "300"
 
+#### [`PAPERLESS_CONSUMER_BARCODE_MAX_PAGES=<int>`](#PAPERLESS_CONSUMER_BARCODE_MAX_PAGES) {#PAPERLESS_CONSUMER_BARCODE_MAX_PAGES}
+
+: Barcode detection is a computationaly intensive operation. This setting
+limits the recognition of barcodes to a number of first pages. Since many
+scanners have a limit for the number of pages that can be scanned it is
+sensible to set this as the limit here. If a longer document is encountered
+it is imported directly and not via scanner there should also be no barcodes
+present. By setting this value to 0 the upper limit is disabled. This is also
+the default setting.
+
+    Defaults to "0"
+
 #### [`PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE=<bool>`](#PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE) {#PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE}
 
 : Enables the detection of barcodes in the scanned document and
