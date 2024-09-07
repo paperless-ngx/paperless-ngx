@@ -238,9 +238,11 @@ class BarcodePlugin(ConsumeTaskPlugin):
             logger.debug(f"PDF has {num_of_pages} pages")
 
             # Get limit from configuration
-            barcode_max_pages = settings.CONSUMER_BARCODE_MAX_PAGES
-            if barcode_max_pages == 0:
-                barcode_max_pages = num_of_pages
+ barcode_max_pages = (
+                num_of_pages
+                if settings.CONSUMER_BARCODE_MAX_PAGES == 0
+                else settings.CONSUMER_BARCODE_MAX_PAGES
+            )
 
             if barcode_max_pages < num_of_pages:
                 logger.debug(
