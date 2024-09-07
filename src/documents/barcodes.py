@@ -7,8 +7,8 @@ from typing import Optional
 
 from django.conf import settings
 from pdf2image import convert_from_path
-from pdf2image.exceptions import PDFPageCountError
 from pikepdf import Page
+from pikepdf import PasswordError
 from pikepdf import Pdf
 from PIL import Image
 
@@ -287,7 +287,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
 
         # Password protected files can't be checked
         # This is the exception raised for those
-        except PDFPageCountError as e:
+        except PasswordError as e:
             logger.warning(
                 f"File is likely password protected, not checking for barcodes: {e}",
             )
