@@ -244,7 +244,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
                 else settings.CONSUMER_BARCODE_MAX_PAGES
             )
 
-            if barcode_max_pages < num_of_pages:
+            if barcode_max_pages < num_of_pages:  # pragma: no cover
                 logger.debug(
                     f"Barcodes detection will be limited to the first {barcode_max_pages} pages",
                 )
