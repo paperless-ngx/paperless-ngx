@@ -423,10 +423,6 @@ Insurances/                             # Insurances
 Paperless will attempt to "clean" certain invalid PDFs with `qpdf` before processing if, for example, the mime_type
 detection is incorrect. This can happen if the PDF is not properly formatted or contains errors.
 
-!!! warning
-
-    This process will technically modify the document before processing.
-
 ## Celery Monitoring {#celery-monitoring}
 
 The monitoring tool

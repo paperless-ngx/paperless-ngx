@@ -532,6 +532,7 @@ class ConsumerPlugin(
             )
             self.working_copy = Path(tempdir.name) / Path(self.filename)
             copy_file_with_basic_stats(self.input_doc.original_file, self.working_copy)
+            self.unmodified_original = None
 
             # Determine the parser class.
 
@@ -559,6 +560,14 @@ class ConsumerPlugin(
                     )
                     mime_type = magic.from_file(self.working_copy, mime=True)
                     self.log.debug(f"Detected mime type after qpdf: {mime_type}")
+                    # Save the original file for later
+                    self.unmodified_original = (
+                        Path(tempdir.name) / Path("uo") / Path(self.filename)
+                    )
+                    copy_file_with_basic_stats(
+                        self.input_doc.original_file,
+                        self.unmodified_original,
+                    )
                 except Exception as e:
                     self.log.error(f"Error attempting to clean PDF: {e}")
 
@@ -712,7 +721,9 @@ class ConsumerPlugin(
 
                     self._write(
                         document.storage_type,
-                        self.working_copy,
+                        self.unmodified_original
+                        if self.unmodified_original is not None
+                        else self.working_copy,
                         document.source_path,
                     )
 
@@ -748,6 +759,8 @@ class ConsumerPlugin(
                 self.log.debug(f"Deleting file {self.working_copy}")
                 self.input_doc.original_file.unlink()
                 self.working_copy.unlink()
+                if self.unmodified_original is not None:  # pragma: no cover
+                    self.unmodified_original.unlink()
 
                 # https://github.com/jonaswinkler/paperless-ng/discussions/1037
                 shadow_file = os.path.join(
