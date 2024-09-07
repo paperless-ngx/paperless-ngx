@@ -1,5 +1,4 @@
 import logging
-import os
 import re
 import tempfile
 from dataclasses import dataclass
@@ -263,8 +262,8 @@ class BarcodePlugin(ConsumeTaskPlugin):
                 )[0]
 
                 # Remember filename, since it is lost by upscaling
-                page_filename = page.filename
-                logger.debug(f"Image is at {page_filename}")
+                page_filepath = Path(page.filename)
+                logger.debug(f"Image is at {page_filepath}")
 
                 # Upscale image if configured
                 factor = settings.CONSUMER_BARCODE_UPSCALE
@@ -284,7 +283,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
                     )
 
                 # Delete temporary image file
-                os.remove(page_filename)
+                page_filepath.unlink()
 
         # Password protected files can't be checked
         # This is the exception raised for those
