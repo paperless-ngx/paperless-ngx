@@ -7,7 +7,6 @@ from typing import Optional
 
 from django.conf import settings
 from pdf2image import convert_from_path
-from pdf2image import pdfinfo_from_path
 from pdf2image.exceptions import PDFPageCountError
 from pikepdf import Page
 from pikepdf import Pdf
@@ -233,7 +232,8 @@ class BarcodePlugin(ConsumeTaskPlugin):
 
         try:
             # Read number of pages from pdf
-            num_of_pages = pdfinfo_from_path(self.pdf_file)["Pages"]
+            with Pdf.open(self.pdf_file) as pdf:
+                num_of_pages = len(pdf.pages)
             logger.debug(f"PDF has {num_of_pages} pages")
 
             # Get limit from configuration
