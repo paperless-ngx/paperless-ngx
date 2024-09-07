@@ -678,11 +678,9 @@ class DocumentViewSet(
                 if settings.AUDIT_LOG_ENABLED:
                     LogEntry.objects.log_create(
                         instance=doc,
-                        changes=json.dumps(
-                            {
-                                "Note Added": ["None", c.id],
-                            },
-                        ),
+                        changes={
+                            "Note Added": ["None", c.id],
+                        },
                         action=LogEntry.Action.UPDATE,
                     )
 
@@ -715,11 +713,9 @@ class DocumentViewSet(
             if settings.AUDIT_LOG_ENABLED:
                 LogEntry.objects.log_create(
                     instance=doc,
-                    changes=json.dumps(
-                        {
-                            "Note Deleted": [note.id, "None"],
-                        },
-                    ),
+                    changes={
+                        "Note Deleted": [note.id, "None"],
+                    },
                     action=LogEntry.Action.UPDATE,
                 )
 
