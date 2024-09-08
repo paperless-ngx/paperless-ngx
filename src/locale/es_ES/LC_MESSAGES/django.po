@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-19 23:29-0700\n"
-"PO-Revision-Date: 2024-08-20 06:32\n"
+"POT-Creation-Date: 2024-08-28 17:12-0700\n"
+"PO-Revision-Date: 2024-09-05 22:32\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -309,7 +309,7 @@ msgstr "Compartido"
 
 #: documents/models.py:416
 msgid "ASN"
-msgstr ""
+msgstr "ASN"
 
 #: documents/models.py:422
 msgid "show on dashboard"
@@ -549,7 +549,7 @@ msgstr "Si la tarea es reconocida a través del frontend o API"
 
 #: documents/models.py:649
 msgid "Task Filename"
-msgstr "Nombre del archivo de tarea"
+msgstr "Nombre del archivo de la tarea"
 
 #: documents/models.py:650
 msgid "Name of the file which the Task was run for"
@@ -633,7 +633,7 @@ msgstr "expiración"
 
 #: documents/models.py:759
 msgid "slug"
-msgstr ""
+msgstr "slug"
 
 #: documents/models.py:791
 msgid "share link"
@@ -927,21 +927,21 @@ msgstr "acciones"
 msgid "enabled"
 msgstr "habilitado"
 
-#: documents/serialisers.py:119
+#: documents/serialisers.py:120
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Expresión irregular inválida: %(error)s"
 
-#: documents/serialisers.py:435
+#: documents/serialisers.py:467
 msgid "Invalid color."
 msgstr "Color inválido."
 
-#: documents/serialisers.py:1331
+#: documents/serialisers.py:1397
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Tipo de fichero %(type)s no suportado"
 
-#: documents/serialisers.py:1440
+#: documents/serialisers.py:1506
 msgid "Invalid variable detected."
 msgstr "Variable inválida."
 
@@ -1070,16 +1070,16 @@ msgstr "Paperless-ngx inicio de sesión"
 #: documents/templates/account/signup.html:10
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
-msgstr ""
+msgstr "¿Ya tienes una cuenta? <a href=\"%(login_url)s\">Inicia sesión</a>"
 
 #: documents/templates/account/signup.html:16
 #: documents/templates/socialaccount/signup.html:14
 msgid "Email (optional)"
-msgstr ""
+msgstr "Correo electrónico (opcional)"
 
 #: documents/templates/account/signup.html:18
 msgid "Password (again)"
-msgstr ""
+msgstr "Contraseña (otra vez)"
 
 #: documents/templates/account/signup.html:36
 #: documents/templates/socialaccount/signup.html:27
@@ -1132,11 +1132,11 @@ msgstr "Acceso a Paperless-ngx con cuenta social"
 #: documents/templates/socialaccount/signup.html:10
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
-msgstr ""
+msgstr "Estás a punto de usar tu cuenta de %(provider_name)s para iniciar sesión."
 
 #: documents/templates/socialaccount/signup.html:11
 msgid "As a final step, please complete the following form:"
-msgstr ""
+msgstr "Como último paso, por favor complete el siguiente formulario:"
 
 #: documents/validators.py:17
 #, python-brace-format
@@ -1191,7 +1191,7 @@ msgstr "forzar"
 
 #: paperless/models.py:42
 msgid "skip_noarchive"
-msgstr ""
+msgstr "omitir_sinarchivo"
 
 #: paperless/models.py:50
 msgid "never"
@@ -1259,7 +1259,7 @@ msgstr "Controla la generación de un archivo"
 
 #: paperless/models.py:124
 msgid "Sets image DPI fallback value"
-msgstr ""
+msgstr "Establece el valor DPI por defecto"
 
 #: paperless/models.py:131
 msgid "Controls the unpaper cleaning"
@@ -1271,23 +1271,23 @@ msgstr ""
 
 #: paperless/models.py:141
 msgid "Enables page rotation"
-msgstr ""
+msgstr "Permite rotación de página"
 
 #: paperless/models.py:146
 msgid "Sets the threshold for rotation of pages"
-msgstr ""
+msgstr "Establece el umbral de rotación de páginas"
 
 #: paperless/models.py:152
 msgid "Sets the maximum image size for decompression"
-msgstr ""
+msgstr "Establece el tamaño máximo de imagen para la descompresión"
 
 #: paperless/models.py:158
 msgid "Sets the Ghostscript color conversion strategy"
-msgstr ""
+msgstr "Establece la estrategia de conversión de colores de Ghostscript"
 
 #: paperless/models.py:166
 msgid "Adds additional user arguments for OCRMyPDF"
-msgstr ""
+msgstr "Añade argumentos de usuario adicionales para OCRMyPDF"
 
 #: paperless/models.py:171
 msgid "Application title"
@@ -1295,11 +1295,11 @@ msgstr "Título de la aplicación"
 
 #: paperless/models.py:178
 msgid "Application logo"
-msgstr ""
+msgstr "Logo de la aplicación"
 
 #: paperless/models.py:188
 msgid "paperless application settings"
-msgstr ""
+msgstr "Ajustes de la aplicación paperless"
 
 #: paperless/settings.py:682
 msgid "English (US)"
@@ -1367,65 +1367,69 @@ msgstr "Italiano"
 
 #: paperless/settings.py:698
 msgid "Japanese"
-msgstr ""
+msgstr "Japonés"
 
 #: paperless/settings.py:699
+msgid "Korean"
+msgstr "Coreano"
+
+#: paperless/settings.py:700
 msgid "Luxembourgish"
 msgstr "Luxemburgués"
 
-#: paperless/settings.py:700
+#: paperless/settings.py:701
 msgid "Norwegian"
 msgstr "Noruego"
 
-#: paperless/settings.py:701
+#: paperless/settings.py:702
 msgid "Dutch"
 msgstr "Alemán"
 
-#: paperless/settings.py:702
+#: paperless/settings.py:703
 msgid "Polish"
 msgstr "Polaco"
 
-#: paperless/settings.py:703
+#: paperless/settings.py:704
 msgid "Portuguese (Brazil)"
 msgstr "Portugués (Brasil)"
 
-#: paperless/settings.py:704
+#: paperless/settings.py:705
 msgid "Portuguese"
 msgstr "Portugués"
 
-#: paperless/settings.py:705
+#: paperless/settings.py:706
 msgid "Romanian"
 msgstr "Rumano"
 
-#: paperless/settings.py:706
+#: paperless/settings.py:707
 msgid "Russian"
 msgstr "Ruso"
 
-#: paperless/settings.py:707
+#: paperless/settings.py:708
 msgid "Slovak"
 msgstr "Eslovaco"
 
-#: paperless/settings.py:708
+#: paperless/settings.py:709
 msgid "Slovenian"
 msgstr "Esloveno"
 
-#: paperless/settings.py:709
+#: paperless/settings.py:710
 msgid "Serbian"
 msgstr "Serbio"
 
-#: paperless/settings.py:710
+#: paperless/settings.py:711
 msgid "Swedish"
 msgstr "Sueco"
 
-#: paperless/settings.py:711
+#: paperless/settings.py:712
 msgid "Turkish"
 msgstr "Turco"
 
-#: paperless/settings.py:712
+#: paperless/settings.py:713
 msgid "Ukrainian"
 msgstr "Ucraniano"
 
-#: paperless/settings.py:713
+#: paperless/settings.py:714
 msgid "Chinese Simplified"
 msgstr "Chino simplificado"
 
@@ -1515,7 +1519,7 @@ msgstr "contraseña"
 
 #: paperless_mail/models.py:42
 msgid "Is token authentication"
-msgstr ""
+msgstr "Es la autenticación por token"
 
 #: paperless_mail/models.py:45
 msgid "character set"
@@ -1627,11 +1631,11 @@ msgstr "filtrar cuerpo"
 
 #: paperless_mail/models.py:157
 msgid "filter attachment filename inclusive"
-msgstr ""
+msgstr "filtrar nombre del archivo adjunto modo incluyente"
 
 #: paperless_mail/models.py:169
 msgid "filter attachment filename exclusive"
-msgstr ""
+msgstr "Filtrar nombre del archivo adjunto modo excluyente"
 
 #: paperless_mail/models.py:174
 msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."

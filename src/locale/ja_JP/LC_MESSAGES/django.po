@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-19 23:29-0700\n"
-"PO-Revision-Date: 2024-08-20 06:32\n"
+"POT-Creation-Date: 2024-08-28 17:12-0700\n"
+"PO-Revision-Date: 2024-08-30 12:10\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -257,59 +257,59 @@ msgstr "ログ"
 
 #: documents/models.py:401
 msgid "Table"
-msgstr ""
+msgstr "テーブル"
 
 #: documents/models.py:402
 msgid "Small Cards"
-msgstr ""
+msgstr "小カード"
 
 #: documents/models.py:403
 msgid "Large Cards"
-msgstr ""
+msgstr "大カード"
 
 #: documents/models.py:406
 msgid "Title"
-msgstr ""
+msgstr "タイトル"
 
 #: documents/models.py:407
 msgid "Created"
-msgstr ""
+msgstr "作成済み"
 
 #: documents/models.py:408
 msgid "Added"
-msgstr ""
+msgstr "追加済"
 
 #: documents/models.py:409
 msgid "Tags"
-msgstr ""
+msgstr "タグ"
 
 #: documents/models.py:410
 msgid "Correspondent"
-msgstr ""
+msgstr "担当"
 
 #: documents/models.py:411
 msgid "Document Type"
-msgstr ""
+msgstr "ドキュメントタイプ"
 
 #: documents/models.py:412
 msgid "Storage Path"
-msgstr ""
+msgstr "ストレージパス"
 
 #: documents/models.py:413
 msgid "Note"
-msgstr ""
+msgstr "メモ"
 
 #: documents/models.py:414
 msgid "Owner"
-msgstr ""
+msgstr "所有者"
 
 #: documents/models.py:415
 msgid "Shared"
-msgstr ""
+msgstr "共有済み"
 
 #: documents/models.py:416
 msgid "ASN"
-msgstr ""
+msgstr "ASN"
 
 #: documents/models.py:422
 msgid "show on dashboard"
@@ -329,15 +329,15 @@ msgstr "項目を逆順で並べ替え"
 
 #: documents/models.py:437
 msgid "View page size"
-msgstr ""
+msgstr "ページサイズの表示"
 
 #: documents/models.py:445
 msgid "View display mode"
-msgstr ""
+msgstr "表示モード"
 
 #: documents/models.py:452
 msgid "Document display fields"
-msgstr ""
+msgstr "ドキュメントの表示フィールド"
 
 #: documents/models.py:459 documents/models.py:516
 msgid "saved view"
@@ -501,19 +501,19 @@ msgstr "自分が共有した"
 
 #: documents/models.py:506
 msgid "has custom fields"
-msgstr ""
+msgstr "カスタムフィールド"
 
 #: documents/models.py:507
 msgid "has custom field in"
-msgstr ""
+msgstr "カスタムフィールドがあります"
 
 #: documents/models.py:508
 msgid "does not have custom field in"
-msgstr ""
+msgstr "カスタムフィールドがありません"
 
 #: documents/models.py:509
 msgid "does not have custom field"
-msgstr ""
+msgstr "カスタムフィールドがありません"
 
 #: documents/models.py:519
 msgid "rule type"
@@ -677,7 +677,7 @@ msgstr "ドキュメントリンク"
 
 #: documents/models.py:812
 msgid "Select"
-msgstr ""
+msgstr "選択"
 
 #: documents/models.py:824
 msgid "data type"
@@ -685,11 +685,11 @@ msgstr "データの種類"
 
 #: documents/models.py:831
 msgid "extra data"
-msgstr ""
+msgstr "追加データ"
 
 #: documents/models.py:835
 msgid "Extra data for the custom field, such as select options"
-msgstr ""
+msgstr "カスタムフィールドの追加データ（選択オプションなど）"
 
 #: documents/models.py:841
 msgid "custom field"
@@ -927,21 +927,21 @@ msgstr "アクション"
 msgid "enabled"
 msgstr "有効"
 
-#: documents/serialisers.py:119
+#: documents/serialisers.py:120
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "不正な正規表現: %(error)s"
 
-#: documents/serialisers.py:435
+#: documents/serialisers.py:467
 msgid "Invalid color."
 msgstr "無効な色"
 
-#: documents/serialisers.py:1331
+#: documents/serialisers.py:1397
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "ファイルタイプ %(type)s はサポートされていません"
 
-#: documents/serialisers.py:1440
+#: documents/serialisers.py:1506
 msgid "Invalid variable detected."
 msgstr "無効な変数を検出しました"
 
@@ -1370,62 +1370,66 @@ msgid "Japanese"
 msgstr "日本語"
 
 #: paperless/settings.py:699
+msgid "Korean"
+msgstr "韓国語"
+
+#: paperless/settings.py:700
 msgid "Luxembourgish"
 msgstr "ルクセンブルク語"
 
-#: paperless/settings.py:700
+#: paperless/settings.py:701
 msgid "Norwegian"
 msgstr "ノルウェー語"
 
-#: paperless/settings.py:701
+#: paperless/settings.py:702
 msgid "Dutch"
 msgstr "オランダ語"
 
-#: paperless/settings.py:702
+#: paperless/settings.py:703
 msgid "Polish"
 msgstr "ポーランド語"
 
-#: paperless/settings.py:703
+#: paperless/settings.py:704
 msgid "Portuguese (Brazil)"
 msgstr "ポルトガル語 (ブラジル)"
 
-#: paperless/settings.py:704
+#: paperless/settings.py:705
 msgid "Portuguese"
 msgstr "ポルトガル語"
 
-#: paperless/settings.py:705
+#: paperless/settings.py:706
 msgid "Romanian"
 msgstr "ルーマニア語"
 
-#: paperless/settings.py:706
+#: paperless/settings.py:707
 msgid "Russian"
 msgstr "ロシア語"
 
-#: paperless/settings.py:707
+#: paperless/settings.py:708
 msgid "Slovak"
 msgstr "スロバキア語"
 
-#: paperless/settings.py:708
+#: paperless/settings.py:709
 msgid "Slovenian"
 msgstr "スロベニア語"
 
-#: paperless/settings.py:709
+#: paperless/settings.py:710
 msgid "Serbian"
 msgstr "セルビア語"
 
-#: paperless/settings.py:710
+#: paperless/settings.py:711
 msgid "Swedish"
 msgstr "スウェーデン語"
 
-#: paperless/settings.py:711
+#: paperless/settings.py:712
 msgid "Turkish"
 msgstr "トルコ語"
 
-#: paperless/settings.py:712
+#: paperless/settings.py:713
 msgid "Ukrainian"
 msgstr "ウクライナ語"
 
-#: paperless/settings.py:713
+#: paperless/settings.py:714
 msgid "Chinese Simplified"
 msgstr "中国語 (簡体字)"
 
