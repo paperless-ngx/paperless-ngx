@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-19 23:29-0700\n"
-"PO-Revision-Date: 2024-08-20 06:32\n"
+"POT-Creation-Date: 2024-08-28 17:12-0700\n"
+"PO-Revision-Date: 2024-08-29 03:10\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -927,21 +927,21 @@ msgstr ""
 msgid "enabled"
 msgstr ""
 
-#: documents/serialisers.py:119
+#: documents/serialisers.py:120
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr ""
 
-#: documents/serialisers.py:435
+#: documents/serialisers.py:467
 msgid "Invalid color."
 msgstr ""
 
-#: documents/serialisers.py:1331
+#: documents/serialisers.py:1397
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr ""
 
-#: documents/serialisers.py:1440
+#: documents/serialisers.py:1506
 msgid "Invalid variable detected."
 msgstr ""
 
@@ -1369,62 +1369,66 @@ msgid "Japanese"
 msgstr ""
 
 #: paperless/settings.py:699
-msgid "Luxembourgish"
+msgid "Korean"
 msgstr ""
 
 #: paperless/settings.py:700
-msgid "Norwegian"
+msgid "Luxembourgish"
 msgstr ""
 
 #: paperless/settings.py:701
-msgid "Dutch"
+msgid "Norwegian"
 msgstr ""
 
 #: paperless/settings.py:702
-msgid "Polish"
+msgid "Dutch"
 msgstr ""
 
 #: paperless/settings.py:703
-msgid "Portuguese (Brazil)"
+msgid "Polish"
 msgstr ""
 
 #: paperless/settings.py:704
-msgid "Portuguese"
+msgid "Portuguese (Brazil)"
 msgstr ""
 
 #: paperless/settings.py:705
-msgid "Romanian"
+msgid "Portuguese"
 msgstr ""
 
 #: paperless/settings.py:706
-msgid "Russian"
+msgid "Romanian"
 msgstr ""
 
 #: paperless/settings.py:707
-msgid "Slovak"
+msgid "Russian"
 msgstr ""
 
 #: paperless/settings.py:708
-msgid "Slovenian"
+msgid "Slovak"
 msgstr ""
 
 #: paperless/settings.py:709
-msgid "Serbian"
+msgid "Slovenian"
 msgstr ""
 
 #: paperless/settings.py:710
-msgid "Swedish"
+msgid "Serbian"
 msgstr ""
 
 #: paperless/settings.py:711
-msgid "Turkish"
+msgid "Swedish"
 msgstr ""
 
 #: paperless/settings.py:712
-msgid "Ukrainian"
+msgid "Turkish"
 msgstr ""
 
 #: paperless/settings.py:713
+msgid "Ukrainian"
+msgstr ""
+
+#: paperless/settings.py:714
 msgid "Chinese Simplified"
 msgstr ""
 

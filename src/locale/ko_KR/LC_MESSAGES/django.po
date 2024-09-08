@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-19 23:29-0700\n"
-"PO-Revision-Date: 2024-08-20 06:32\n"
+"POT-Creation-Date: 2024-08-28 17:12-0700\n"
+"PO-Revision-Date: 2024-08-29 03:11\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -72,11 +72,11 @@ msgstr "대소문자 구분 없음"
 
 #: documents/models.py:98 documents/models.py:150
 msgid "correspondent"
-msgstr "작성자"
+msgstr "담당자"
 
 #: documents/models.py:99
 msgid "correspondents"
-msgstr "작성자"
+msgstr "담당자"
 
 #: documents/models.py:103
 msgid "color"
@@ -285,7 +285,7 @@ msgstr "태그"
 
 #: documents/models.py:410
 msgid "Correspondent"
-msgstr "작성자"
+msgstr "담당자"
 
 #: documents/models.py:411
 msgid "Document Type"
@@ -677,7 +677,7 @@ msgstr "자료 링크"
 
 #: documents/models.py:812
 msgid "Select"
-msgstr ""
+msgstr "선택"
 
 #: documents/models.py:824
 msgid "data type"
@@ -685,11 +685,11 @@ msgstr "데이터 타입"
 
 #: documents/models.py:831
 msgid "extra data"
-msgstr ""
+msgstr "추가 데이터"
 
 #: documents/models.py:835
 msgid "Extra data for the custom field, such as select options"
-msgstr ""
+msgstr "선택 옵션과 같은 사용자 지정 필드에 대한 추가 데이터"
 
 #: documents/models.py:841
 msgid "custom field"
@@ -765,7 +765,7 @@ msgstr "이 문서 유형이 있습니다."
 
 #: documents/models.py:1060
 msgid "has this correspondent"
-msgstr "이 특파원이 있습니다."
+msgstr "이 담당자가 있습니다."
 
 #: documents/models.py:1064
 msgid "workflow trigger"
@@ -805,7 +805,7 @@ msgstr "이 문서 유형 지정"
 
 #: documents/models.py:1121 paperless_mail/models.py:252
 msgid "assign this correspondent"
-msgstr "이 특파원을 할당합니다."
+msgstr "이 담당자를 할당합니다."
 
 #: documents/models.py:1130
 msgid "assign this storage path"
@@ -853,11 +853,11 @@ msgstr "모든 문서 유형 제거"
 
 #: documents/models.py:1205
 msgid "remove these correspondent(s)"
-msgstr "이 특파원 삭제"
+msgstr "이 담당자 삭제"
 
 #: documents/models.py:1210
 msgid "remove all correspondents"
-msgstr "모든 특파원 제거"
+msgstr "모든 담당자 제거"
 
 #: documents/models.py:1217
 msgid "remove these storage path(s)"
@@ -927,21 +927,21 @@ msgstr "동작"
 msgid "enabled"
 msgstr "활성화됨"
 
-#: documents/serialisers.py:119
+#: documents/serialisers.py:120
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "잘못된 정규식: %(error)s"
 
-#: documents/serialisers.py:435
+#: documents/serialisers.py:467
 msgid "Invalid color."
 msgstr ""
 
-#: documents/serialisers.py:1331
+#: documents/serialisers.py:1397
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr ""
 
-#: documents/serialisers.py:1440
+#: documents/serialisers.py:1506
 msgid "Invalid variable detected."
 msgstr "잘못된 변수가 감지되었습니다."
 
@@ -1370,62 +1370,66 @@ msgid "Japanese"
 msgstr "일본어"
 
 #: paperless/settings.py:699
+msgid "Korean"
+msgstr ""
+
+#: paperless/settings.py:700
 msgid "Luxembourgish"
 msgstr "룩셈부르크어"
 
-#: paperless/settings.py:700
+#: paperless/settings.py:701
 msgid "Norwegian"
 msgstr "노르웨이어"
 
-#: paperless/settings.py:701
+#: paperless/settings.py:702
 msgid "Dutch"
 msgstr "네덜란드어"
 
-#: paperless/settings.py:702
+#: paperless/settings.py:703
 msgid "Polish"
 msgstr "폴란드어"
 
-#: paperless/settings.py:703
+#: paperless/settings.py:704
 msgid "Portuguese (Brazil)"
 msgstr "포르투갈어 (브라질)"
 
-#: paperless/settings.py:704
+#: paperless/settings.py:705
 msgid "Portuguese"
 msgstr "포르투갈어"
 
-#: paperless/settings.py:705
+#: paperless/settings.py:706
 msgid "Romanian"
 msgstr "루마니아어"
 
-#: paperless/settings.py:706
+#: paperless/settings.py:707
 msgid "Russian"
 msgstr "러시아어"
 
-#: paperless/settings.py:707
+#: paperless/settings.py:708
 msgid "Slovak"
 msgstr "슬로바키아어"
 
-#: paperless/settings.py:708
+#: paperless/settings.py:709
 msgid "Slovenian"
 msgstr "슬로베니아어"
 
-#: paperless/settings.py:709
+#: paperless/settings.py:710
 msgid "Serbian"
 msgstr "세르비아어"
 
-#: paperless/settings.py:710
+#: paperless/settings.py:711
 msgid "Swedish"
 msgstr "스웨덴어"
 
-#: paperless/settings.py:711
+#: paperless/settings.py:712
 msgid "Turkish"
 msgstr "튀르키예어"
 
-#: paperless/settings.py:712
+#: paperless/settings.py:713
 msgid "Ukrainian"
 msgstr "우크라이나어"
 
-#: paperless/settings.py:713
+#: paperless/settings.py:714
 msgid "Chinese Simplified"
 msgstr "중국어 간체"
 
@@ -1463,7 +1467,7 @@ msgstr "메타데이터"
 
 #: paperless_mail/admin.py:92
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr "이 규칙에서 소비되는 문서에 메타데이터를 자동으로 할당합니다. 여기서 태그, 유형 또는 대응자를 지정하지 않아도 Paperless는 사용자가 정의한 모든 일치하는 규칙을 처리합니다."
+msgstr "이 규칙에서 소비되는 문서에 메타데이터를 자동으로 할당합니다. 여기서 태그, 유형 또는 담당자를 지정하지 않아도 Paperless는 사용자가 정의한 모든 일치하는 규칙을 처리합니다."
 
 #: paperless_mail/apps.py:11
 msgid "Paperless mail"
@@ -1595,7 +1599,7 @@ msgstr "이름(또는 사용할 수 없는 경우 메일 주소) 사용"
 
 #: paperless_mail/models.py:105
 msgid "Use correspondent selected below"
-msgstr "아래에서 선택한 특파원 사용"
+msgstr "아래에서 선택한 담당자 사용"
 
 #: paperless_mail/models.py:115
 msgid "account"
