@@ -78,6 +78,10 @@
       @case (CustomFieldQueryOperator.LessThan) {
         <ng-container *ngTemplateOutlet="comparisonValueTemplate; context: { atom: atom }"></ng-container>
       }
+      @case (CustomFieldQueryOperator.Contains) {
+        <!-- TODO: needs visual work -->
+        <pngx-input-document-link [(ngModel)]="atom.value" [horizontal]="true"></pngx-input-document-link>
+      }
       @default {
         <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="atom.value" [disabled]="disabled">
       }

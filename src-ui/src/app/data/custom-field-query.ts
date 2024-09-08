@@ -115,10 +115,8 @@ export const CUSTOM_FIELD_QUERY_VALUE_TYPES_BY_OPERATOR = {
   [CustomFieldQueryOperator.LessThanOrEqual]: 'string|number',
   [CustomFieldQueryOperator.GreaterThan]: 'number',
   [CustomFieldQueryOperator.LessThan]: 'number',
-  // TODO: Implement these
-  // [CustomFieldQueryOperator.In]: 'array',
-  // [CustomFieldQueryOperator.Contains]: 'string',
-  // [CustomFieldQueryOperator.Range]: 'array',
+  [CustomFieldQueryOperator.Contains]: 'array',
+  // [CustomFieldQueryOperator.In]: 'array', // TODO: Implement
 }
 
 export const CUSTOM_FIELD_QUERY_MAX_DEPTH = 4
@@ -132,7 +130,9 @@ export enum CustomFieldQueryElementType {
 export class CustomFieldQueryElement {
   public readonly type: CustomFieldQueryElementType
   public changed: Subject<CustomFieldQueryElement>
-  protected valueModelChanged: Subject<string | CustomFieldQueryElement[]>
+  protected valueModelChanged: Subject<
+    string | string[] | number[] | CustomFieldQueryElement[]
+  >
   public depth: number = 0
   public id: string = uuidv4()
 
@@ -163,12 +163,15 @@ export class CustomFieldQueryElement {
     return this._operator
   }
 
-  protected _value: string | CustomFieldQueryElement[] = null
-  public set value(value: string | CustomFieldQueryElement[]) {
+  protected _value: string | string[] | number[] | CustomFieldQueryElement[] =
+    null
+  public set value(
+    value: string | string[] | number[] | CustomFieldQueryElement[]
+  ) {
     this._value = value
     this.valueModelChanged.next(value)
   }
-  public get value(): string | CustomFieldQueryElement[] {
+  public get value(): string | string[] | number[] | CustomFieldQueryElement[] {
     return this._value
   }
 }
@@ -205,7 +208,9 @@ export class CustomFieldQueryAtom extends CustomFieldQueryElement {
               this.value = null
             }
             break
-          // TODO: Implement all
+          case 'array':
+            this.value = []
+            break
           default:
             this.value = null
             break
@@ -249,7 +254,7 @@ export class CustomFieldQueryAtom extends CustomFieldQueryElement {
   }
 
   public override serialize() {
-    return [this._field, this._operator, this._value.toString()]
+    return [this._field, this._operator, this._value]
   }
 }
 
