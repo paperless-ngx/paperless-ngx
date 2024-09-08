@@ -12,7 +12,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop'
       <button
         *pngxIfObjectPermissions="{
           object: { id: 2, owner: user1 },
-          action: 'view'
+          action: 'view',
         }"
       >
         Some Text

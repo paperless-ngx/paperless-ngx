@@ -29,7 +29,7 @@ export class UsernamePipe implements PipeTransform {
 
   transform(userID: number): string {
     return this.users
-      ? this.getName(this.users.find((u) => u.id === userID)) ?? ''
+      ? (this.getName(this.users.find((u) => u.id === userID)) ?? '')
       : $localize`Shared`
   }
 
