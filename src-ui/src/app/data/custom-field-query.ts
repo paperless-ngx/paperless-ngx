@@ -15,8 +15,6 @@ export enum CustomFieldQueryOperator {
   Exists = 'exists',
   Contains = 'contains',
   IContains = 'icontains',
-  IStartsWith = 'istartswith',
-  IEndsWith = 'iendswith',
   GreaterThan = 'gt',
   GreaterThanOrEqual = 'gte',
   LessThan = 'lt',
@@ -31,8 +29,6 @@ export const CUSTOM_FIELD_QUERY_OPERATOR_LABELS = {
   [CustomFieldQueryOperator.Exists]: $localize`Exists`,
   [CustomFieldQueryOperator.Contains]: $localize`Contains`,
   [CustomFieldQueryOperator.IContains]: $localize`Contains (case-insensitive)`,
-  [CustomFieldQueryOperator.IStartsWith]: $localize`Starts with (case-insensitive)`,
-  [CustomFieldQueryOperator.IEndsWith]: $localize`Ends with (case-insensitive)`,
   [CustomFieldQueryOperator.GreaterThan]: $localize`Greater than`,
   [CustomFieldQueryOperator.GreaterThanOrEqual]: $localize`Greater than or equal to`,
   [CustomFieldQueryOperator.LessThan]: $localize`Less than`,
@@ -45,21 +41,18 @@ export enum CustomFieldQueryOperatorGroups {
   String = 'string',
   Arithmetic = 'arithmetic',
   Containment = 'containment',
+  Subset = 'subset',
   Date = 'date',
 }
 
+// Modified from filters.py > SUPPORTED_EXPR_OPERATORS
 export const CUSTOM_FIELD_QUERY_OPERATORS_BY_GROUP = {
   [CustomFieldQueryOperatorGroups.Basic]: [
-    CustomFieldQueryOperator.Exact,
-    CustomFieldQueryOperator.In,
-    CustomFieldQueryOperator.IsNull,
     CustomFieldQueryOperator.Exists,
+    CustomFieldQueryOperator.IsNull,
+    CustomFieldQueryOperator.Exact,
   ],
-  [CustomFieldQueryOperatorGroups.String]: [
-    CustomFieldQueryOperator.IContains,
-    CustomFieldQueryOperator.IStartsWith,
-    CustomFieldQueryOperator.IEndsWith,
-  ],
+  [CustomFieldQueryOperatorGroups.String]: [CustomFieldQueryOperator.IContains],
   [CustomFieldQueryOperatorGroups.Arithmetic]: [
     CustomFieldQueryOperator.GreaterThan,
     CustomFieldQueryOperator.GreaterThanOrEqual,
@@ -69,6 +62,7 @@ export const CUSTOM_FIELD_QUERY_OPERATORS_BY_GROUP = {
   [CustomFieldQueryOperatorGroups.Containment]: [
     CustomFieldQueryOperator.Contains,
   ],
+  [CustomFieldQueryOperatorGroups.Subset]: [CustomFieldQueryOperator.In],
   [CustomFieldQueryOperatorGroups.Date]: [
     CustomFieldQueryOperator.GreaterThanOrEqual,
     CustomFieldQueryOperator.LessThanOrEqual,
@@ -106,7 +100,10 @@ export const CUSTOM_FIELD_QUERY_OPERATOR_GROUPS_BY_TYPE = {
     CustomFieldQueryOperatorGroups.Basic,
     CustomFieldQueryOperatorGroups.Containment,
   ],
-  [CustomFieldDataType.Select]: [CustomFieldQueryOperatorGroups.Basic],
+  [CustomFieldDataType.Select]: [
+    CustomFieldQueryOperatorGroups.Basic,
+    CustomFieldQueryOperatorGroups.Subset,
+  ],
 }
 
 export const CUSTOM_FIELD_QUERY_VALUE_TYPES_BY_OPERATOR = {
@@ -114,15 +111,13 @@ export const CUSTOM_FIELD_QUERY_VALUE_TYPES_BY_OPERATOR = {
   [CustomFieldQueryOperator.IsNull]: 'boolean',
   [CustomFieldQueryOperator.Exists]: 'boolean',
   [CustomFieldQueryOperator.IContains]: 'string',
-  [CustomFieldQueryOperator.GreaterThanOrEqual]: 'string',
-  [CustomFieldQueryOperator.LessThanOrEqual]: 'string',
+  [CustomFieldQueryOperator.GreaterThanOrEqual]: 'string|number',
+  [CustomFieldQueryOperator.LessThanOrEqual]: 'string|number',
+  [CustomFieldQueryOperator.GreaterThan]: 'number',
+  [CustomFieldQueryOperator.LessThan]: 'number',
   // TODO: Implement these
   // [CustomFieldQueryOperator.In]: 'array',
   // [CustomFieldQueryOperator.Contains]: 'string',
-  // [CustomFieldQueryOperator.IStartsWith]: 'string',
-  // [CustomFieldQueryOperator.IEndsWith]: 'string',
-  // [CustomFieldQueryOperator.GreaterThan]: 'number',
-  // [CustomFieldQueryOperator.LessThan]: 'number',
   // [CustomFieldQueryOperator.Range]: 'array',
 }
 
@@ -189,23 +184,46 @@ export class CustomFieldQueryAtom extends CustomFieldQueryElement {
   }
 
   override set operator(operator: string) {
-    const newType: string = CUSTOM_FIELD_QUERY_VALUE_TYPES_BY_OPERATOR[operator]
-    if (typeof this.value !== newType) {
-      switch (newType) {
-        case 'string':
-          this.value = ''
-          break
-        case 'boolean':
-          this.value = 'true'
-          break
-        // TODO: Implement these
-        default:
+    const newTypes: string[] =
+      CUSTOM_FIELD_QUERY_VALUE_TYPES_BY_OPERATOR[operator]?.split('|')
+    if (!newTypes) {
+      this.value = null
+    }
+    if (!newTypes.includes(typeof this.value)) {
+      if (newTypes.length === 1) {
+        switch (newTypes[0]) {
+          case 'string':
+            this.value = ''
+            break
+          case 'boolean':
+            this.value = 'true'
+            break
+          case 'number':
+            try {
+              this.value = parseFloat(this.value as string).toString()
+            } catch (e) {
+              this.value = null
+            }
+            break
+          // TODO: Implement all
+          default:
+            this.value = null
+            break
+        }
+      } else {
+        if (newTypes.includes('number')) {
+          try {
+            this.value = parseFloat(this.value as string).toString()
+          } catch (e) {
+            this.value = null
+          }
+        } else {
           this.value = null
-          break
+        }
       }
     } else if (
       ['true', 'false'].includes(this.value as string) &&
-      newType === 'string'
+      newTypes.includes('string')
     ) {
       this.value = ''
     }

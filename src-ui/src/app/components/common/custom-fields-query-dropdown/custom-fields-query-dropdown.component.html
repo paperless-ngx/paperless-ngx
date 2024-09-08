@@ -24,7 +24,7 @@
   </div>
 </div>
 
-<ng-template #dateValue let-atom="atom">
+<ng-template #comparisonValueTemplate let-atom="atom">
   @if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Date) {
     <input class="form-control" placeholder="yyyy-mm-dd"
       [(ngModel)]="atom.value"
@@ -33,6 +33,8 @@
     <button class="btn btn-sm btn-outline-secondary rounded-end" (click)="d.toggle()" type="button">
       <i-bs name="calendar-event"></i-bs>
     </button>
+  } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Float || getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Integer) {
+    <input class="w-25 form-control rounded-end" type="number" [(ngModel)]="atom.value" [disabled]="disabled">
   } @else {
     <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="atom.value" [disabled]="disabled">
   }
@@ -65,10 +67,16 @@
         </select>
       }
       @case (CustomFieldQueryOperator.GreaterThanOrEqual) {
-        <ng-container *ngTemplateOutlet="dateValue; context: { atom: atom }"></ng-container>
+        <ng-container *ngTemplateOutlet="comparisonValueTemplate; context: { atom: atom }"></ng-container>
       }
       @case (CustomFieldQueryOperator.LessThanOrEqual) {
-        <ng-container *ngTemplateOutlet="dateValue; context: { atom: atom }"></ng-container>
+        <ng-container *ngTemplateOutlet="comparisonValueTemplate; context: { atom: atom }"></ng-container>
+      }
+      @case (CustomFieldQueryOperator.GreaterThan) {
+        <ng-container *ngTemplateOutlet="comparisonValueTemplate; context: { atom: atom }"></ng-container>
+      }
+      @case (CustomFieldQueryOperator.LessThan) {
+        <ng-container *ngTemplateOutlet="comparisonValueTemplate; context: { atom: atom }"></ng-container>
       }
       @default {
         <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="atom.value" [disabled]="disabled">
