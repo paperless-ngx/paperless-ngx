@@ -17,7 +17,7 @@ jobs:
   stale:
     name: 'Stale'
     if: github.repository_owner == 'paperless-ngx'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/stale@v9
         with:
@@ -33,7 +33,7 @@ jobs:
   lock-threads:
     name: 'Lock Old Threads'
     if: github.repository_owner == 'paperless-ngx'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: dessant/lock-threads@v5
         with:
@@ -59,7 +59,7 @@ jobs:
   close-answered-discussions:
     name: 'Close Answered Discussions'
     if: github.repository_owner == 'paperless-ngx'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/github-script@v7
         with:
@@ -116,7 +116,7 @@ jobs:
   close-outdated-discussions:
     name: 'Close Outdated Discussions'
     if: github.repository_owner == 'paperless-ngx'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/github-script@v7
         with:
@@ -208,7 +208,7 @@ jobs:
   close-unsupported-feature-requests:
     name: 'Close Unsupported Feature Requests'
     if: github.repository_owner == 'paperless-ngx'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/github-script@v7
         with:
