@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-19 23:29-0700\n"
-"PO-Revision-Date: 2024-08-20 06:32\n"
+"POT-Creation-Date: 2024-08-28 17:12-0700\n"
+"PO-Revision-Date: 2024-09-07 00:27\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -261,55 +261,55 @@ msgstr ""
 
 #: documents/models.py:402
 msgid "Small Cards"
-msgstr ""
+msgstr "小卡片"
 
 #: documents/models.py:403
 msgid "Large Cards"
-msgstr ""
+msgstr "大卡片"
 
 #: documents/models.py:406
 msgid "Title"
-msgstr ""
+msgstr "标题"
 
 #: documents/models.py:407
 msgid "Created"
-msgstr ""
+msgstr "创建时间"
 
 #: documents/models.py:408
 msgid "Added"
-msgstr ""
+msgstr "添加时间"
 
 #: documents/models.py:409
 msgid "Tags"
-msgstr ""
+msgstr "标签"
 
 #: documents/models.py:410
 msgid "Correspondent"
-msgstr ""
+msgstr "联系人"
 
 #: documents/models.py:411
 msgid "Document Type"
-msgstr ""
+msgstr "文档类型"
 
 #: documents/models.py:412
 msgid "Storage Path"
-msgstr ""
+msgstr "保存路径"
 
 #: documents/models.py:413
 msgid "Note"
-msgstr ""
+msgstr "备注"
 
 #: documents/models.py:414
 msgid "Owner"
-msgstr ""
+msgstr "所有者"
 
 #: documents/models.py:415
 msgid "Shared"
-msgstr ""
+msgstr "已共享"
 
 #: documents/models.py:416
 msgid "ASN"
-msgstr ""
+msgstr "ASN"
 
 #: documents/models.py:422
 msgid "show on dashboard"
@@ -329,15 +329,15 @@ msgstr "反向排序"
 
 #: documents/models.py:437
 msgid "View page size"
-msgstr ""
+msgstr "查看页面大小"
 
 #: documents/models.py:445
 msgid "View display mode"
-msgstr ""
+msgstr "查看显示模式"
 
 #: documents/models.py:452
 msgid "Document display fields"
-msgstr ""
+msgstr "文档显示字段"
 
 #: documents/models.py:459 documents/models.py:516
 msgid "saved view"
@@ -927,21 +927,21 @@ msgstr "动作"
 msgid "enabled"
 msgstr "已启用"
 
-#: documents/serialisers.py:119
+#: documents/serialisers.py:120
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "无效的正则表达式：%(error)s"
 
-#: documents/serialisers.py:435
+#: documents/serialisers.py:467
 msgid "Invalid color."
 msgstr "无效的颜色"
 
-#: documents/serialisers.py:1331
+#: documents/serialisers.py:1397
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "不支持文件类型 %(type)s"
 
-#: documents/serialisers.py:1440
+#: documents/serialisers.py:1506
 msgid "Invalid variable detected."
 msgstr "检测到无效变量。"
 
@@ -1370,62 +1370,66 @@ msgid "Japanese"
 msgstr "日语"
 
 #: paperless/settings.py:699
+msgid "Korean"
+msgstr "韩语"
+
+#: paperless/settings.py:700
 msgid "Luxembourgish"
 msgstr "卢森堡语"
 
-#: paperless/settings.py:700
+#: paperless/settings.py:701
 msgid "Norwegian"
 msgstr "Norwegian 挪威语"
 
-#: paperless/settings.py:701
+#: paperless/settings.py:702
 msgid "Dutch"
 msgstr "荷兰语"
 
-#: paperless/settings.py:702
+#: paperless/settings.py:703
 msgid "Polish"
 msgstr "波兰语"
 
-#: paperless/settings.py:703
+#: paperless/settings.py:704
 msgid "Portuguese (Brazil)"
 msgstr "葡萄牙语 (巴西)"
 
-#: paperless/settings.py:704
+#: paperless/settings.py:705
 msgid "Portuguese"
 msgstr "葡萄牙语"
 
-#: paperless/settings.py:705
+#: paperless/settings.py:706
 msgid "Romanian"
 msgstr "罗马尼亚语"
 
-#: paperless/settings.py:706
+#: paperless/settings.py:707
 msgid "Russian"
 msgstr "俄语"
 
-#: paperless/settings.py:707
+#: paperless/settings.py:708
 msgid "Slovak"
 msgstr "Slovak 斯洛伐克语"
 
-#: paperless/settings.py:708
+#: paperless/settings.py:709
 msgid "Slovenian"
 msgstr "斯洛语尼亚语"
 
-#: paperless/settings.py:709
+#: paperless/settings.py:710
 msgid "Serbian"
 msgstr "塞尔维亚语"
 
-#: paperless/settings.py:710
+#: paperless/settings.py:711
 msgid "Swedish"
 msgstr "瑞典语"
 
-#: paperless/settings.py:711
+#: paperless/settings.py:712
 msgid "Turkish"
 msgstr "土耳其语"
 
-#: paperless/settings.py:712
+#: paperless/settings.py:713
 msgid "Ukrainian"
 msgstr "Ukrainian 乌克兰语"
 
-#: paperless/settings.py:713
+#: paperless/settings.py:714
 msgid "Chinese Simplified"
 msgstr "简体中文"
 

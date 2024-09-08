@@ -397,11 +397,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">235</context>
+          <context context-type="linenumber">237</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">237</context>
+          <context context-type="linenumber">239</context>
         </context-group>
         <target state="translated">システム設定</target>
       </trans-unit>
@@ -621,7 +621,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">51</context>
+          <context context-type="linenumber">72</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
@@ -709,11 +709,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">270</context>
+          <context context-type="linenumber">272</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">273</context>
+          <context context-type="linenumber">275</context>
         </context-group>
         <target state="translated">ログ</target>
       </trans-unit>
@@ -1103,7 +1103,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.ts</context>
           <context context-type="linenumber">104</context>
         </context-group>
-        <target state="needs-translation">Global search</target>
+        <target state="translated">グローバル検索</target>
       </trans-unit>
       <trans-unit id="2818183879511244335" datatype="html">
         <source>Do not include advanced search results</source>
@@ -1111,7 +1111,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">204</context>
         </context-group>
-        <target state="needs-translation">Do not include advanced search results</target>
+        <target state="translated">高度な検索結果を含めない</target>
       </trans-unit>
       <trans-unit id="3969258421469113318" datatype="html">
         <source>Full search links to</source>
@@ -1119,7 +1119,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">212</context>
         </context-group>
-        <target state="needs-translation">Full search links to</target>
+        <target state="translated">完全な検索リンク</target>
       </trans-unit>
       <trans-unit id="6631288852577115923" datatype="html">
         <source>Title and content search</source>
@@ -1127,7 +1127,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">216</context>
         </context-group>
-        <target state="needs-translation">Title and content search</target>
+        <target state="translated">タイトルとコンテンツ検索</target>
       </trans-unit>
       <trans-unit id="1010505078885609376" datatype="html">
         <source>Advanced search</source>
@@ -1439,6 +1439,10 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">98</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">103</context>
+        </context-group>
         <target state="translated">保存済みビュー</target>
       </trans-unit>
       <trans-unit id="1595668988802980095" datatype="html">
@@ -1691,7 +1695,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">380</context>
         </context-group>
-        <target state="needs-translation">Documents page size</target>
+        <target state="translated">ドキュメントのページサイズ</target>
       </trans-unit>
       <trans-unit id="4729108320774167624" datatype="html">
         <source>Display as</source>
@@ -1699,7 +1703,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">383</context>
         </context-group>
-        <target state="needs-translation">Display as</target>
+        <target state="translated">表示</target>
       </trans-unit>
       <trans-unit id="1358239534403218079" datatype="html">
         <source>Table</source>
@@ -1707,7 +1711,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">385</context>
         </context-group>
-        <target state="needs-translation">Table</target>
+        <target state="translated">テーブル</target>
       </trans-unit>
       <trans-unit id="4236040382842528005" datatype="html">
         <source>Small Cards</source>
@@ -1715,7 +1719,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">386</context>
         </context-group>
-        <target state="needs-translation">Small Cards</target>
+        <target state="translated">小カード</target>
       </trans-unit>
       <trans-unit id="8569593958139569111" datatype="html">
         <source>Large Cards</source>
@@ -1723,7 +1727,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">387</context>
         </context-group>
-        <target state="needs-translation">Large Cards</target>
+        <target state="translated">大カード</target>
       </trans-unit>
       <trans-unit id="8461842260159597706" datatype="html">
         <source>Show</source>
@@ -1735,7 +1739,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Show</target>
+        <target state="translated">表示</target>
       </trans-unit>
       <trans-unit id="5607669932062416162" datatype="html">
         <source>Default</source>
@@ -1789,7 +1793,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">50</context>
+          <context context-type="linenumber">71</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
@@ -1909,7 +1913,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">126</context>
+          <context context-type="linenumber">125</context>
         </context-group>
         <target state="translated">設定の保存中にエラーが発生しました</target>
       </trans-unit>
@@ -1929,11 +1933,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">258</context>
+          <context context-type="linenumber">260</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">260</context>
+          <context context-type="linenumber">262</context>
         </context-group>
         <target state="translated">ファイルタスク</target>
       </trans-unit>
@@ -2261,13 +2265,13 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">218</context>
+          <context context-type="linenumber">220</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">221</context>
+          <context context-type="linenumber">223</context>
         </context-group>
-        <target state="needs-translation">Trash</target>
+        <target state="translated">ごみ箱</target>
       </trans-unit>
       <trans-unit id="3818027200170621545" datatype="html">
         <source>Manage trashed documents that are pending deletion.</source>
@@ -2275,7 +2279,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Manage trashed documents that are pending deletion.</target>
+        <target state="translated">ごみ箱にある削除待ちのドキュメントを管理します。</target>
       </trans-unit>
       <trans-unit id="3186604097120837257" datatype="html">
         <source>Restore selected</source>
@@ -2283,7 +2287,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Restore selected</target>
+        <target state="translated">選択項目の復元</target>
       </trans-unit>
       <trans-unit id="8831459317888986184" datatype="html">
         <source>Delete selected</source>
@@ -2291,7 +2295,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Delete selected</target>
+        <target state="translated">選択項目を削除</target>
       </trans-unit>
       <trans-unit id="8597030111956627342" datatype="html">
         <source>Empty trash</source>
@@ -2299,7 +2303,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Empty trash</target>
+        <target state="translated">ごみ箱を空にする</target>
       </trans-unit>
       <trans-unit id="991066160113599649" datatype="html">
         <source>Remaining</source>
@@ -2307,7 +2311,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Remaining</target>
+        <target state="translated">残り</target>
       </trans-unit>
       <trans-unit id="7494361412465596264" datatype="html">
         <source><x id="INTERPOLATION" equiv-text="{{ getDaysRemaining(document) }}"/> days</source>
@@ -2315,7 +2319,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{ getDaysRemaining(document) }}"/> days</target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="{{ getDaysRemaining(document) }}"/> 日</target>
       </trans-unit>
       <trans-unit id="6770769801335635194" datatype="html">
         <source>Restore</source>
@@ -2327,7 +2331,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">73</context>
         </context-group>
-        <target state="needs-translation">Restore</target>
+        <target state="translated">復元</target>
       </trans-unit>
       <trans-unit id="2308646316372333720" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {One document in trash} other {<x id="INTERPOLATION"/> total documents in trash}}</source>
@@ -2335,7 +2339,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {One document in trash} other {<x id="INTERPOLATION"/> total documents in trash}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {ごみ箱の中に1件のドキュメント} other {ごみ箱の中に合計<x id="INTERPOLATION"/>件のドキュメント}}</target>
       </trans-unit>
       <trans-unit id="9021887951960049161" datatype="html">
         <source>Confirm delete</source>
@@ -2363,7 +2367,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this document.</target>
+        <target state="translated">この操作はこのドキュメントを完全に削除します。</target>
       </trans-unit>
       <trans-unit id="5641451190833696892" datatype="html">
         <source>This operation cannot be undone.</source>
@@ -2411,7 +2415,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="needs-translation">Document deleted</target>
+        <target state="translated">ドキュメントを削除しました</target>
       </trans-unit>
       <trans-unit id="7295637485862454066" datatype="html">
         <source>Error deleting document</source>
@@ -2431,7 +2435,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">82</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete the selected documents.</target>
+        <target state="translated">この操作は選択したドキュメントを完全に削除します。</target>
       </trans-unit>
       <trans-unit id="6804051092296228130" datatype="html">
         <source>This operation will permanently delete all documents in the trash.</source>
@@ -2439,7 +2443,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">83</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete all documents in the trash.</target>
+        <target state="translated">この操作はごみ箱内のすべてのドキュメントを完全に削除します。</target>
       </trans-unit>
       <trans-unit id="6996183233986182894" datatype="html">
         <source>Document(s) deleted</source>
@@ -2447,7 +2451,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="needs-translation">Document(s) deleted</target>
+        <target state="translated">ドキュメントを削除しました</target>
       </trans-unit>
       <trans-unit id="6962724852893361467" datatype="html">
         <source>Error deleting document(s)</source>
@@ -2455,7 +2459,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">101</context>
         </context-group>
-        <target state="needs-translation">Error deleting document(s)</target>
+        <target state="translated">ドキュメントの削除中にエラーが発生しました。</target>
       </trans-unit>
       <trans-unit id="7534569062269274401" datatype="html">
         <source>Document restored</source>
@@ -2463,7 +2467,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">113</context>
         </context-group>
-        <target state="needs-translation">Document restored</target>
+        <target state="translated">ドキュメントが復元されました</target>
       </trans-unit>
       <trans-unit id="9136016619414048201" datatype="html">
         <source>Error restoring document</source>
@@ -2471,7 +2475,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">117</context>
         </context-group>
-        <target state="needs-translation">Error restoring document</target>
+        <target state="translated">ドキュメントの復元に失敗しました</target>
       </trans-unit>
       <trans-unit id="960063472770266304" datatype="html">
         <source>Document(s) restored</source>
@@ -2479,7 +2483,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">127</context>
         </context-group>
-        <target state="needs-translation">Document(s) restored</target>
+        <target state="translated">ドキュメントが復元されました</target>
       </trans-unit>
       <trans-unit id="8405416976953346141" datatype="html">
         <source>Error restoring document(s)</source>
@@ -2487,7 +2491,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">133</context>
         </context-group>
-        <target state="needs-translation">Error restoring document(s)</target>
+        <target state="translated">ドキュメントの復元に失敗しました)</target>
       </trans-unit>
       <trans-unit id="8119815638230251386" datatype="html">
         <source>Users &amp; Groups</source>
@@ -2497,11 +2501,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">249</context>
+          <context context-type="linenumber">251</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">251</context>
+          <context context-type="linenumber">253</context>
         </context-group>
         <target state="translated">ユーザー &amp; グループ</target>
       </trans-unit>
@@ -2873,11 +2877,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">279</context>
+          <context context-type="linenumber">281</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">282</context>
+          <context context-type="linenumber">284</context>
         </context-group>
         <target state="translated">マニュアル</target>
       </trans-unit>
@@ -2885,7 +2889,7 @@
         <source>Open documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">128</context>
+          <context context-type="linenumber">130</context>
         </context-group>
         <target state="translated">開いているドキュメント</target>
       </trans-unit>
@@ -2893,11 +2897,11 @@
         <source>Close all</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">148</context>
+          <context context-type="linenumber">150</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">150</context>
+          <context context-type="linenumber">152</context>
         </context-group>
         <target state="translated">すべて閉じる</target>
       </trans-unit>
@@ -2905,7 +2909,7 @@
         <source>Manage</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">159</context>
+          <context context-type="linenumber">161</context>
         </context-group>
         <target state="translated">ドキュメント管理</target>
       </trans-unit>
@@ -2913,11 +2917,11 @@
         <source>Correspondents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">165</context>
+          <context context-type="linenumber">167</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">167</context>
+          <context context-type="linenumber">169</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -2929,11 +2933,11 @@
         <source>Tags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">172</context>
+          <context context-type="linenumber">174</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">175</context>
+          <context context-type="linenumber">177</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.ts</context>
@@ -2965,11 +2969,11 @@
         <source>Document Types</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">181</context>
+          <context context-type="linenumber">183</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">183</context>
+          <context context-type="linenumber">185</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -2981,11 +2985,11 @@
         <source>Storage Paths</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">188</context>
+          <context context-type="linenumber">190</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">190</context>
+          <context context-type="linenumber">192</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -2997,11 +3001,11 @@
         <source>Custom Fields</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">195</context>
+          <context context-type="linenumber">197</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">197</context>
+          <context context-type="linenumber">199</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.html</context>
@@ -3017,11 +3021,11 @@
         <source>Workflows</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">204</context>
+          <context context-type="linenumber">206</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">206</context>
+          <context context-type="linenumber">208</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
@@ -3033,11 +3037,11 @@
         <source>Mail</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">211</context>
+          <context context-type="linenumber">213</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">214</context>
+          <context context-type="linenumber">216</context>
         </context-group>
         <target state="translated">メール</target>
       </trans-unit>
@@ -3045,7 +3049,7 @@
         <source>Administration</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">229</context>
+          <context context-type="linenumber">231</context>
         </context-group>
         <target state="translated">システム管理</target>
       </trans-unit>
@@ -3053,11 +3057,11 @@
         <source>Configuration</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">242</context>
+          <context context-type="linenumber">244</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">244</context>
+          <context context-type="linenumber">246</context>
         </context-group>
         <target state="translated">設定</target>
       </trans-unit>
@@ -3065,7 +3069,7 @@
         <source>GitHub</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">289</context>
+          <context context-type="linenumber">291</context>
         </context-group>
         <target state="translated">GitHub</target>
       </trans-unit>
@@ -3073,7 +3077,7 @@
         <source>is available.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">298,299</context>
+          <context context-type="linenumber">300,301</context>
         </context-group>
         <target state="translated">が利用可能です。</target>
       </trans-unit>
@@ -3081,7 +3085,7 @@
         <source>Click to view.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">299</context>
+          <context context-type="linenumber">301</context>
         </context-group>
         <target state="translated">クリックして表示</target>
       </trans-unit>
@@ -3089,7 +3093,7 @@
         <source>Paperless-ngx can automatically check for updates</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">303</context>
+          <context context-type="linenumber">305</context>
         </context-group>
         <target state="translated">Paperless-ngxは自動的にアップデートを確認できます</target>
       </trans-unit>
@@ -3097,7 +3101,7 @@
         <source> How does this work? </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">310,312</context>
+          <context context-type="linenumber">312,314</context>
         </context-group>
         <target state="translated"> アップデートの自動確認機能について </target>
       </trans-unit>
@@ -3105,7 +3109,7 @@
         <source>Update available</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">323</context>
+          <context context-type="linenumber">325</context>
         </context-group>
         <target state="translated">アップデートがあります。</target>
       </trans-unit>
@@ -3113,7 +3117,7 @@
         <source>Sidebar views updated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">209</context>
+          <context context-type="linenumber">208</context>
         </context-group>
         <target state="translated">サイドバービューを更新しました</target>
       </trans-unit>
@@ -3121,7 +3125,7 @@
         <source>Error updating sidebar views</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">212</context>
+          <context context-type="linenumber">211</context>
         </context-group>
         <target state="translated">サイドバービューの更新に失敗しました</target>
       </trans-unit>
@@ -3129,7 +3133,7 @@
         <source>An error occurred while saving update checking settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">233</context>
+          <context context-type="linenumber">232</context>
         </context-group>
         <target state="translated">アップデートの確認設定の保存中にエラーが発生しました</target>
       </trans-unit>
@@ -3143,7 +3147,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Search</target>
+        <target state="translated">検索</target>
       </trans-unit>
       <trans-unit id="7593555694782789615" datatype="html">
         <source>Open</source>
@@ -3155,7 +3159,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">56</context>
         </context-group>
-        <target state="needs-translation">Open</target>
+        <target state="translated">開く</target>
       </trans-unit>
       <trans-unit id="6329940072345709724" datatype="html">
         <source>Filter documents</source>
@@ -3163,7 +3167,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">62</context>
         </context-group>
-        <target state="needs-translation">Filter documents</target>
+        <target state="translated">ドキュメントをフィルタ</target>
       </trans-unit>
       <trans-unit id="3099741642167775297" datatype="html">
         <source>Download</source>
@@ -3199,7 +3203,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="needs-translation">No results</target>
+        <target state="translated">結果はありません</target>
       </trans-unit>
       <trans-unit id="searchResults.documents" datatype="html">
         <source>Documents</source>
@@ -3207,7 +3211,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="needs-translation">Documents</target>
+        <target state="translated">ドキュメント</target>
       </trans-unit>
       <trans-unit id="searchResults.saved_views" datatype="html">
         <source>Saved Views</source>
@@ -3215,7 +3219,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="needs-translation">Saved Views</target>
+        <target state="translated">保存済みビュー</target>
       </trans-unit>
       <trans-unit id="searchResults.tags" datatype="html">
         <source>Tags</source>
@@ -3223,7 +3227,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="needs-translation">Tags</target>
+        <target state="translated">タグ</target>
       </trans-unit>
       <trans-unit id="searchResults.correspondents" datatype="html">
         <source>Correspondents</source>
@@ -3231,7 +3235,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">110</context>
         </context-group>
-        <target state="needs-translation">Correspondents</target>
+        <target state="translated">担当</target>
       </trans-unit>
       <trans-unit id="searchResults.documentTypes" datatype="html">
         <source>Document types</source>
@@ -3239,7 +3243,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">117</context>
         </context-group>
-        <target state="needs-translation">Document types</target>
+        <target state="translated">ドキュメントタイプ</target>
       </trans-unit>
       <trans-unit id="searchResults.storagePaths" datatype="html">
         <source>Storage paths</source>
@@ -3247,7 +3251,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">124</context>
         </context-group>
-        <target state="needs-translation">Storage paths</target>
+        <target state="translated">ストレージパス</target>
       </trans-unit>
       <trans-unit id="searchResults.users" datatype="html">
         <source>Users</source>
@@ -3255,7 +3259,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">131</context>
         </context-group>
-        <target state="needs-translation">Users</target>
+        <target state="translated">ユーザー</target>
       </trans-unit>
       <trans-unit id="searchResults.groups" datatype="html">
         <source>Groups</source>
@@ -3263,7 +3267,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">138</context>
         </context-group>
-        <target state="needs-translation">Groups</target>
+        <target state="translated">グループ</target>
       </trans-unit>
       <trans-unit id="searchResults.customFields" datatype="html">
         <source>Custom fields</source>
@@ -3271,7 +3275,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">145</context>
         </context-group>
-        <target state="needs-translation">Custom fields</target>
+        <target state="translated">カスタムフィールド</target>
       </trans-unit>
       <trans-unit id="searchResults.mailAccounts" datatype="html">
         <source>Mail accounts</source>
@@ -3279,7 +3283,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">152</context>
         </context-group>
-        <target state="needs-translation">Mail accounts</target>
+        <target state="translated">メールアカウント</target>
       </trans-unit>
       <trans-unit id="searchResults.mailRules" datatype="html">
         <source>Mail rules</source>
@@ -3287,7 +3291,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">159</context>
         </context-group>
-        <target state="needs-translation">Mail rules</target>
+        <target state="translated">メールルール</target>
       </trans-unit>
       <trans-unit id="searchResults.workflows" datatype="html">
         <source>Workflows</source>
@@ -3295,7 +3299,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">166</context>
         </context-group>
-        <target state="needs-translation">Workflows</target>
+        <target state="translated">ワークフロー</target>
       </trans-unit>
       <trans-unit id="83507137894716798" datatype="html">
         <source>Successfully updated object.</source>
@@ -3307,7 +3311,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.ts</context>
           <context context-type="linenumber">231</context>
         </context-group>
-        <target state="needs-translation">Successfully updated object.</target>
+        <target state="translated">オブジェクトを更新しました。</target>
       </trans-unit>
       <trans-unit id="1801333259018423190" datatype="html">
         <source>Error occurred saving object.</source>
@@ -3319,7 +3323,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.ts</context>
           <context context-type="linenumber">234</context>
         </context-group>
-        <target state="needs-translation">Error occurred saving object.</target>
+        <target state="translated">オブジェクトの保存中にエラーが発生しました</target>
       </trans-unit>
       <trans-unit id="8700121026680200191" datatype="html">
         <source>Clear</source>
@@ -3443,7 +3447,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/delete-pages-confirm-dialog/delete-pages-confirm-dialog.component.html</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Pages to remove</target>
+        <target state="translated">削除するページ</target>
       </trans-unit>
       <trans-unit id="994016933065248559" datatype="html">
         <source>Documents:</source>
@@ -3475,7 +3479,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Delete original documents after successful merge</target>
+        <target state="translated">結合が成功した後に元のドキュメントを削除します</target>
       </trans-unit>
       <trans-unit id="5138283234724909648" datatype="html">
         <source>Note that only PDFs will be included.</source>
@@ -3507,7 +3511,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component.html</context>
           <context context-type="linenumber">49</context>
         </context-group>
-        <target state="needs-translation">Delete original document after successful split</target>
+        <target state="translated">分割に成功した後に元のドキュメントを削除します</target>
       </trans-unit>
       <trans-unit id="2509141182388535183" datatype="html">
         <source>View</source>
@@ -3535,7 +3539,7 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation">Search fields</target>
+        <target state="translated">フィールドを検索</target>
       </trans-unit>
       <trans-unit id="3672488183382190185" datatype="html">
         <source>Create new field</source>
@@ -3543,7 +3547,7 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Create new field</target>
+        <target state="translated">新規フィールドを作成</target>
       </trans-unit>
       <trans-unit id="6973528734330066202" datatype="html">
         <source>Saved field &quot;<x id="PH" equiv-text="newField.name"/>&quot;.</source>
@@ -3759,7 +3763,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Add option</target>
+        <target state="translated">追加オプション</target>
       </trans-unit>
       <trans-unit id="2739003406164860877" datatype="html">
         <source>Default Currency</source>
@@ -3767,7 +3771,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Default Currency</target>
+        <target state="translated">デフォルトの通貨</target>
       </trans-unit>
       <trans-unit id="7615210738790237590" datatype="html">
         <source>3-character currency code</source>
@@ -3775,7 +3779,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">3-character currency code</target>
+        <target state="translated">3文字の通貨コード</target>
       </trans-unit>
       <trans-unit id="607636736207886379" datatype="html">
         <source>Use locale</source>
@@ -3783,7 +3787,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Use locale</target>
+        <target state="translated">ロケールを使用</target>
       </trans-unit>
       <trans-unit id="528950215505228201" datatype="html">
         <source>Create new custom field</source>
@@ -3977,11 +3981,19 @@
         </context-group>
         <target state="translated">メールサーバーに接続できません</target>
       </trans-unit>
+      <trans-unit id="5163375362523428079" datatype="html">
+        <source>Rule order</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <target state="translated">ルールの順序</target>
+      </trans-unit>
       <trans-unit id="4086606389696938932" datatype="html">
         <source>Account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">14</context>
+          <context context-type="linenumber">19</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
@@ -3989,11 +4001,19 @@
         </context-group>
         <target state="translated">アカウント</target>
       </trans-unit>
+      <trans-unit id="4348351765075925931" datatype="html">
+        <source>Paperless will only process mails that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> of the criteria specified below.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+        <target state="needs-translation">Paperless will only process mails that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> of the criteria specified below.</target>
+      </trans-unit>
       <trans-unit id="7046259383943324039" datatype="html">
         <source>Folder</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="linenumber">26</context>
         </context-group>
         <target state="translated">フォルダー</target>
       </trans-unit>
@@ -4001,7 +4021,7 @@
         <source>Subfolders must be separated by a delimiter, often a dot (&apos;.&apos;) or slash (&apos;/&apos;), but it varies by mail server.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="linenumber">26</context>
         </context-group>
         <target state="translated">サブフォルダーは、区切り文字 (通常はドット ( . ) またはスラッシュ ( / ) で区切る必要がありますが、これはメール サーバーによって異なります。</target>
       </trans-unit>
@@ -4009,55 +4029,15 @@
         <source>Maximum age (days)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">16</context>
+          <context context-type="linenumber">27</context>
         </context-group>
         <target state="translated">最大有効期間 (日)</target>
-      </trans-unit>
-      <trans-unit id="7093509971705471817" datatype="html">
-        <source>Attachment type</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">17</context>
-        </context-group>
-        <target state="translated">添付ファイルの種類</target>
-      </trans-unit>
-      <trans-unit id="559099472394646919" datatype="html">
-        <source>Consumption scope</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">18</context>
-        </context-group>
-        <target state="translated">利用範囲</target>
-      </trans-unit>
-      <trans-unit id="56643687972548912" datatype="html">
-        <source>See docs for .eml processing requirements</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">18</context>
-        </context-group>
-        <target state="translated">.eml の処理要件についてはマニュアルを参照してください</target>
-      </trans-unit>
-      <trans-unit id="5163375362523428079" datatype="html">
-        <source>Rule order</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">19</context>
-        </context-group>
-        <target state="translated">ルールの順序</target>
-      </trans-unit>
-      <trans-unit id="5488632521862493221" datatype="html">
-        <source>Paperless will only process mails that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> of the filters specified below.</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">22</context>
-        </context-group>
-        <target state="translated">Paperless は、以下で指定された <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>すべて<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> のフィルターにマッチするメールのみを処理します。</target>
       </trans-unit>
       <trans-unit id="6925928412364847639" datatype="html">
         <source>Filter from</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">23</context>
+          <context context-type="linenumber">30</context>
         </context-group>
         <target state="translated">送信元のフィルター</target>
       </trans-unit>
@@ -4065,7 +4045,7 @@
         <source>Filter to</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">31</context>
         </context-group>
         <target state="translated">宛先のフィルター</target>
       </trans-unit>
@@ -4073,7 +4053,7 @@
         <source>Filter subject</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">25</context>
+          <context context-type="linenumber">32</context>
         </context-group>
         <target state="translated">件名のフィルター</target>
       </trans-unit>
@@ -4081,63 +4061,83 @@
         <source>Filter body</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">26</context>
+          <context context-type="linenumber">33</context>
         </context-group>
         <target state="translated">本文のフィルター</target>
       </trans-unit>
-      <trans-unit id="4603548543464136402" datatype="html">
-        <source>Filter attachment filename includes</source>
+      <trans-unit id="559099472394646919" datatype="html">
+        <source>Consumption scope</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">27</context>
+          <context context-type="linenumber">39</context>
         </context-group>
-        <target state="translated">添付ファイル名のフィルター</target>
+        <target state="translated">利用範囲</target>
       </trans-unit>
-      <trans-unit id="4245210767172267486" datatype="html">
-        <source>Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</source>
+      <trans-unit id="56643687972548912" datatype="html">
+        <source>See docs for .eml processing requirements</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">27</context>
+          <context context-type="linenumber">39</context>
         </context-group>
-        <target state="translated">このファイル名にマッチするドキュメントのみを使用します。 *.pdf や *請求書* などのワイルドカードが使用できます。大文字・小文字を区別しません。</target>
+        <target state="translated">.eml の処理要件についてはマニュアルを参照してください</target>
       </trans-unit>
-      <trans-unit id="6869675473865305593" datatype="html">
-        <source>Filter attachment filename excluding</source>
+      <trans-unit id="7093509971705471817" datatype="html">
+        <source>Attachment type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">40</context>
         </context-group>
-        <target state="translated">除外する添付ファイル名のフィルター</target>
+        <target state="translated">添付ファイルの種類</target>
       </trans-unit>
-      <trans-unit id="6774472763442688477" datatype="html">
-        <source>Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</source>
+      <trans-unit id="2873939123535615966" datatype="html">
+        <source>Include only files matching</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">43</context>
         </context-group>
-        <target state="translated">このファイル名にマッチするドキュメントは使用しません。 *.pdf や *請求書* などのワイルドカードが使用できます。大文字・小文字を区別しません。</target>
+        <target state="needs-translation">Include only files matching</target>
+      </trans-unit>
+      <trans-unit id="7233407036155150477" datatype="html">
+        <source>Optional. Wildcards e.g. *.pdf or *invoice* allowed. Can be comma-separated list. Case insensitive.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+        <target state="needs-translation">Optional. Wildcards e.g. *.pdf or *invoice* allowed. Can be comma-separated list. Case insensitive.</target>
+      </trans-unit>
+      <trans-unit id="1546332577833742677" datatype="html">
+        <source>Exclude files matching</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+        <target state="needs-translation">Exclude files matching</target>
       </trans-unit>
       <trans-unit id="9216117865911519658" datatype="html">
         <source>Action</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">50</context>
         </context-group>
         <target state="translated">アクション</target>
       </trans-unit>
-      <trans-unit id="4274038999388817994" datatype="html">
-        <source>Action is only performed when documents are consumed from the mail. Mails without attachments remain entirely untouched.</source>
+      <trans-unit id="7841986067387421166" datatype="html">
+        <source>Only performed if the mail is processed.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">50</context>
         </context-group>
-        <target state="translated">アクションは、メールで送信されたドキュメントに対してのみ実行されます。添付ファイルのないメールはまったく変更されません。</target>
+        <target state="needs-translation">Only performed if the mail is processed.</target>
       </trans-unit>
       <trans-unit id="1261794314435932203" datatype="html">
         <source>Action parameter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">33</context>
+          <context context-type="linenumber">52</context>
         </context-group>
         <target state="translated">アクションパラメーター</target>
       </trans-unit>
@@ -4145,15 +4145,23 @@
         <source>Assign title from</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">35</context>
+          <context context-type="linenumber">54</context>
         </context-group>
         <target state="translated">タイトルの割り当て元</target>
+      </trans-unit>
+      <trans-unit id="5232720756589450549" datatype="html">
+        <source>Assign owner from rule</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+        <target state="translated">ルールから所有者を割り当てる</target>
       </trans-unit>
       <trans-unit id="6695990587380209737" datatype="html">
         <source>Assign document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">59</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
@@ -4165,7 +4173,7 @@
         <source>Assign correspondent from</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">38</context>
+          <context context-type="linenumber">60</context>
         </context-group>
         <target state="translated">担当の割り当て元</target>
       </trans-unit>
@@ -4173,7 +4181,7 @@
         <source>Assign correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">40</context>
+          <context context-type="linenumber">62</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
@@ -4181,19 +4189,11 @@
         </context-group>
         <target state="translated">担当の割り当て</target>
       </trans-unit>
-      <trans-unit id="5232720756589450549" datatype="html">
-        <source>Assign owner from rule</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">42</context>
-        </context-group>
-        <target state="translated">ルールから所有者を割り当てる</target>
-      </trans-unit>
       <trans-unit id="1519954996184640001" datatype="html">
         <source>Error</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">48</context>
+          <context context-type="linenumber">69</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
@@ -4695,7 +4695,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">143</context>
         </context-group>
-        <target state="needs-translation">Has any of tags</target>
+        <target state="translated">タグがあります</target>
       </trans-unit>
       <trans-unit id="5281365940563983618" datatype="html">
         <source>Has correspondent</source>
@@ -5076,7 +5076,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.ts</context>
           <context context-type="linenumber">452</context>
         </context-group>
-        <target state="needs-translation">Open <x id="PH" equiv-text="this.title"/> filter</target>
+        <target state="translated"><x id="PH" equiv-text="this.title"/> フィルタを開く</target>
       </trans-unit>
       <trans-unit id="7005745151564974365" datatype="html">
         <source>Keyboard shortcuts</source>
@@ -5084,7 +5084,7 @@
           <context context-type="sourcefile">src/app/components/common/hotkey-dialog/hotkey-dialog.component.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Keyboard shortcuts</target>
+        <target state="translated">キーボードショートカット</target>
       </trans-unit>
       <trans-unit id="4814285799071780083" datatype="html">
         <source>Remove</source>
@@ -5176,7 +5176,7 @@
           <context context-type="sourcefile">src/app/components/common/input/document-link/document-link.component.html</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">Remove link</target>
+        <target state="translated">リンクを削除</target>
       </trans-unit>
       <trans-unit id="1388712764439031120" datatype="html">
         <source>Open link</source>
@@ -5204,7 +5204,7 @@
           <context context-type="sourcefile">src/app/components/common/input/drag-drop-select/drag-drop-select.component.ts</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Selected items</target>
+        <target state="translated">選択したアイテム</target>
       </trans-unit>
       <trans-unit id="528456107179161277" datatype="html">
         <source>No items selected</source>
@@ -5212,7 +5212,7 @@
           <context context-type="sourcefile">src/app/components/common/input/drag-drop-select/drag-drop-select.component.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">No items selected</target>
+        <target state="translated">アイテムが選択されていません</target>
       </trans-unit>
       <trans-unit id="6932865105766151309" datatype="html">
         <source>Upload</source>
@@ -5305,7 +5305,7 @@
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Remove tag</target>
+        <target state="translated">タグを削除</target>
       </trans-unit>
       <trans-unit id="2561408369057364131" datatype="html">
         <source>Filter documents with these Tags</source>
@@ -5425,7 +5425,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Global permissions define what areas of the app and API endpoints users can access.</target>
+        <target state="translated">グローバル権限を使用して、ユーザーがアクセスできるアプリとAPIエンドポイントの領域を定義します。</target>
       </trans-unit>
       <trans-unit id="8650499415827640724" datatype="html">
         <source>Type</source>
@@ -6125,7 +6125,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Current ASN</target>
+        <target state="translated">現在のASN</target>
       </trans-unit>
       <trans-unit id="8693603235657020323" datatype="html">
         <source>Other</source>
@@ -6296,7 +6296,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">111</context>
         </context-group>
-        <target state="needs-translation">Reprocess</target>
+        <target state="translated">再処理</target>
       </trans-unit>
       <trans-unit id="1418444397960583910" datatype="html">
         <source>More like this</source>
@@ -6336,7 +6336,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="needs-translation">Delete page(s)</target>
+        <target state="translated">ページを削除</target>
       </trans-unit>
       <trans-unit id="7819314041543176992" datatype="html">
         <source>Close</source>
@@ -6620,7 +6620,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">305</context>
         </context-group>
-        <target state="needs-translation">History</target>
+        <target state="translated">履歴</target>
       </trans-unit>
       <trans-unit id="5129524307369213584" datatype="html">
         <source>Save &amp; next</source>
@@ -6692,7 +6692,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">476</context>
         </context-group>
-        <target state="needs-translation">Next document</target>
+        <target state="translated">次のドキュメント</target>
       </trans-unit>
       <trans-unit id="651985345816518480" datatype="html">
         <source>Previous document</source>
@@ -6700,7 +6700,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">486</context>
         </context-group>
-        <target state="needs-translation">Previous document</target>
+        <target state="translated">前のドキュメント</target>
       </trans-unit>
       <trans-unit id="2885986061416655600" datatype="html">
         <source>Close document</source>
@@ -6720,7 +6720,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">501</context>
         </context-group>
-        <target state="needs-translation">Save document</target>
+        <target state="translated">ドキュメントを保存</target>
       </trans-unit>
       <trans-unit id="5758784066858623886" datatype="html">
         <source>Error retrieving metadata</source>
@@ -6768,7 +6768,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">802</context>
         </context-group>
-        <target state="needs-translation">Do you really want to move the document "<x id="PH" equiv-text="this.document.title"/>" to the trash?</target>
+        <target state="translated">ドキュメント "<x id="PH" equiv-text="this.document.title"/>" をごみ箱に移動しますか？</target>
       </trans-unit>
       <trans-unit id="282586936710748252" datatype="html">
         <source>Documents can be restored prior to permanent deletion.</source>
@@ -6780,7 +6780,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">714</context>
         </context-group>
-        <target state="needs-translation">Documents can be restored prior to permanent deletion.</target>
+        <target state="translated">ドキュメントは永久に削除される前に復元できます。</target>
       </trans-unit>
       <trans-unit id="2048798344356757326" datatype="html">
         <source>Move to trash</source>
@@ -6792,7 +6792,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">716</context>
         </context-group>
-        <target state="needs-translation">Move to trash</target>
+        <target state="translated">ごみ箱へ移動</target>
       </trans-unit>
       <trans-unit id="619486176823357521" datatype="html">
         <source>Reprocess confirm</source>
@@ -6804,7 +6804,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">754</context>
         </context-group>
-        <target state="needs-translation">Reprocess confirm</target>
+        <target state="translated">再処理の確認</target>
       </trans-unit>
       <trans-unit id="2951161989614003846" datatype="html">
         <source>This operation will permanently recreate the archive file for this document.</source>
@@ -6812,7 +6812,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">845</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently recreate the archive file for this document.</target>
+        <target state="translated">この操作により、このドキュメントのアーカイブファイルが永続的に再作成されます。</target>
       </trans-unit>
       <trans-unit id="302054111564709516" datatype="html">
         <source>The archive file will be re-generated with the current settings.</source>
@@ -6820,7 +6820,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">846</context>
         </context-group>
-        <target state="needs-translation">The archive file will be re-generated with the current settings.</target>
+        <target state="translated">アーカイブファイルは現在の設定で再生成されます。</target>
       </trans-unit>
       <trans-unit id="1192507664585066165" datatype="html">
         <source>Reprocess operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
@@ -6828,7 +6828,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">856</context>
         </context-group>
-        <target state="needs-translation">Reprocess operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</target>
+        <target state="translated">再処理はバックグラウンドで開始されます。操作が完了した後、このドキュメントを閉じて再読み込みし、新しいコンテンツを表示します。</target>
       </trans-unit>
       <trans-unit id="4409560272830824468" datatype="html">
         <source>Error executing operation</source>
@@ -6920,7 +6920,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1216</context>
         </context-group>
-        <target state="needs-translation">Delete pages confirm</target>
+        <target state="translated">本当にページを削除しますか？</target>
       </trans-unit>
       <trans-unit id="5854352498125813866" datatype="html">
         <source>This operation will permanently delete the selected pages from the original document.</source>
@@ -6928,7 +6928,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1217</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete the selected pages from the original document.</target>
+        <target state="translated">この操作は選択したページを元のドキュメントから完全に削除します。</target>
       </trans-unit>
       <trans-unit id="8617528702531167646" datatype="html">
         <source>Delete pages operation will begin in the background. Close and re-open or reload this document after the operation has completed to see the changes.</source>
@@ -6936,7 +6936,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1232</context>
         </context-group>
-        <target state="needs-translation">Delete pages operation will begin in the background. Close and re-open or reload this document after the operation has completed to see the changes.</target>
+        <target state="translated">ページの削除はバックグラウンドで開始されます。変更を確認するために操作が完了した後、このドキュメントを閉じて再読み込みします。</target>
       </trans-unit>
       <trans-unit id="1249139200486584973" datatype="html">
         <source>Error executing delete pages operation</source>
@@ -6944,7 +6944,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1241</context>
         </context-group>
-        <target state="needs-translation">Error executing delete pages operation</target>
+        <target state="translated">ページ削除の実行中にエラーが発生しました</target>
       </trans-unit>
       <trans-unit id="4958946940233632319" datatype="html">
         <source>No entries found.</source>
@@ -6952,7 +6952,7 @@
           <context context-type="sourcefile">src/app/components/document-history/document-history.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation">No entries found.</target>
+        <target state="translated">エントリーが見つかりません。</target>
       </trans-unit>
       <trans-unit id="6857598786757174736" datatype="html">
         <source>Select:</source>
@@ -7044,7 +7044,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="needs-translation">Filter custom fields</target>
+        <target state="translated">カスタムフィールドをフィルタ</target>
       </trans-unit>
       <trans-unit id="3206542606001340679" datatype="html">
         <source>Merge</source>
@@ -7250,7 +7250,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">543</context>
         </context-group>
-        <target state="needs-translation">Confirm custom field assignment</target>
+        <target state="translated">カスタムフィールドの割り当てを確認</target>
       </trans-unit>
       <trans-unit id="7966494636326273856" datatype="html">
         <source>This operation will assign the custom field &quot;<x id="PH" equiv-text="customField.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -7258,7 +7258,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">549</context>
         </context-group>
-        <target state="needs-translation">This operation will assign the custom field "<x id="PH" equiv-text="customField.name"/>" to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">この操作により、カスタムフィールド "<x id="PH" equiv-text="customField.name"/>" が選択されたドキュメント <x id="PH_1" equiv-text="this.list.selected.size"/> に割り当てられます。</target>
       </trans-unit>
       <trans-unit id="5789455969634598553" datatype="html">
         <source>This operation will assign the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -7266,7 +7266,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">554,556</context>
         </context-group>
-        <target state="needs-translation">This operation will assign the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">この操作により、カスタムフィールド "<x id="PH" equiv-text="customField.name"/>" が選択されたドキュメント <x id="PH_1" equiv-text="this.list.selected.size"/> に割り当てられます。</target>
       </trans-unit>
       <trans-unit id="5648572354333199245" datatype="html">
         <source>This operation will remove the custom field &quot;<x id="PH" equiv-text="customField.name"/>&quot; from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -7274,7 +7274,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">562</context>
         </context-group>
-        <target state="needs-translation">This operation will remove the custom field "<x id="PH" equiv-text="customField.name"/>" from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">この操作により、カスタムフィールド "<x id="PH" equiv-text="customField.name"/>" が選択したドキュメント <x id="PH_1" equiv-text="this.list.selected.size"/> から削除されます。</target>
       </trans-unit>
       <trans-unit id="6666899594015948817" datatype="html">
         <source>This operation will remove the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -7282,7 +7282,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">567,569</context>
         </context-group>
-        <target state="needs-translation">This operation will remove the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">この操作により、カスタムフィールド <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> が選択したドキュメント <x id="PH_1" equiv-text="this.list.selected.size"/> から削除されます。</target>
       </trans-unit>
       <trans-unit id="8050047262594964176" datatype="html">
         <source>This operation will assign the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> and remove the custom fields <x id="PH_1" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -7290,7 +7290,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">571,575</context>
         </context-group>
-        <target state="needs-translation">This operation will assign the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> and remove the custom fields <x id="PH_1" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">この操作により、選択したドキュメント <x id="PH_2" equiv-text="this.list.selected.size"/> にカスタムフィールド <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> が割り当てられ、カスタムフィールド <x id="PH_1" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> が削除されます。</target>
       </trans-unit>
       <trans-unit id="8615059324209654051" datatype="html">
         <source>Move <x id="PH" equiv-text="this.list.selected.size"/> selected document(s) to the trash?</source>
@@ -7298,7 +7298,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">713</context>
         </context-group>
-        <target state="needs-translation">Move <x id="PH" equiv-text="this.list.selected.size"/> selected document(s) to the trash?</target>
+        <target state="translated">選択したドキュメント <x id="PH" equiv-text="this.list.selected.size"/> をゴミ箱に移動しますか？</target>
       </trans-unit>
       <trans-unit id="8585195717323764335" datatype="html">
         <source>This operation will permanently recreate the archive files for <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -7306,7 +7306,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">755</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently recreate the archive files for <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">この操作により、選択した <x id="PH" equiv-text="this.list.selected.size"/> のドキュメントのアーカイブ ファイルが永続的に再作成されます。</target>
       </trans-unit>
       <trans-unit id="7366623494074776040" datatype="html">
         <source>The archive files will be re-generated with the current settings.</source>
@@ -7314,7 +7314,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">756</context>
         </context-group>
-        <target state="needs-translation">The archive files will be re-generated with the current settings.</target>
+        <target state="translated">アーカイブファイルは現在の設定で再生成されます。</target>
       </trans-unit>
       <trans-unit id="6390006284731990222" datatype="html">
         <source>This operation will permanently rotate the original version of <x id="PH" equiv-text="this.list.selected.size"/> document(s).</source>
@@ -7390,7 +7390,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">80,81</context>
         </context-group>
-        <target state="needs-translation">Created: <x id="INTERPOLATION" equiv-text="{{ document.created_date | customDate }}"/></target>
+        <target state="translated">作成日: <x id="INTERPOLATION" equiv-text="{{ document.created_date | customDate }}"/></target>
       </trans-unit>
       <trans-unit id="2030261243264601523" datatype="html">
         <source>Added: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate }}"/></source>
@@ -7698,7 +7698,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">250,252</context>
         </context-group>
-        <target state="needs-translation"> Shared </target>
+        <target state="translated"> 共有済み </target>
       </trans-unit>
       <trans-unit id="2179847500064178686" datatype="html">
         <source>Edit document</source>
@@ -7738,7 +7738,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
           <context context-type="linenumber">226</context>
         </context-group>
-        <target state="needs-translation">Reset filters / selection</target>
+        <target state="translated">フィルター/選択をリセット</target>
       </trans-unit>
       <trans-unit id="4135055128446167640" datatype="html">
         <source>Open first [selected] document</source>
@@ -7746,7 +7746,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
           <context context-type="linenumber">254</context>
         </context-group>
-        <target state="needs-translation">Open first [selected] document</target>
+        <target state="translated">最初の [selected] ドキュメントを開く</target>
       </trans-unit>
       <trans-unit id="2155249406916744630" datatype="html">
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
@@ -7770,7 +7770,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">100</context>
         </context-group>
-        <target state="needs-translation">Dates</target>
+        <target state="translated">日付</target>
       </trans-unit>
       <trans-unit id="3100631071441658964" datatype="html">
         <source>Title &amp; content</source>
@@ -7898,7 +7898,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">228,230</context>
         </context-group>
-        <target state="needs-translation">Custom fields: <x id="PH" equiv-text="this.customFields.find(             (f) =&gt; f.id == +rule.value           )?.name"/></target>
+        <target state="translated">カスタムフィールド: <x id="PH" equiv-text="this.customFields.find(             (f) =&gt; f.id == +rule.value           )?.name"/></target>
       </trans-unit>
       <trans-unit id="5297600960590041873" datatype="html">
         <source>Without any custom field</source>
@@ -7906,7 +7906,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">234</context>
         </context-group>
-        <target state="needs-translation">Without any custom field</target>
+        <target state="translated">カスタムフィールドなし</target>
       </trans-unit>
       <trans-unit id="6523384805359286307" datatype="html">
         <source>Title: <x id="PH" equiv-text="rule.value"/></source>
@@ -8222,7 +8222,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
           <context context-type="linenumber">67</context>
         </context-group>
-        <target state="needs-translation">Sort Order</target>
+        <target state="translated">並び順</target>
       </trans-unit>
       <trans-unit id="6751234988479444294" datatype="html">
         <source>No mail rules defined.</source>
@@ -9119,7 +9119,7 @@
           <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">%s year ago</target>
+        <target state="translated">%s 年前</target>
       </trans-unit>
       <trans-unit id="3393387677918927062" datatype="html">
         <source>%s years ago</source>
@@ -9127,7 +9127,7 @@
           <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">%s years ago</target>
+        <target state="translated">%s 年前</target>
       </trans-unit>
       <trans-unit id="3053246523831285824" datatype="html">
         <source>%s month ago</source>
@@ -9135,7 +9135,7 @@
           <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">%s month ago</target>
+        <target state="translated">%s か月前</target>
       </trans-unit>
       <trans-unit id="1158628882375251480" datatype="html">
         <source>%s months ago</source>
@@ -9143,7 +9143,7 @@
           <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">%s months ago</target>
+        <target state="translated">%s か月前</target>
       </trans-unit>
       <trans-unit id="7039133412826927309" datatype="html">
         <source>%s week ago</source>
@@ -9151,7 +9151,7 @@
           <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">%s week ago</target>
+        <target state="translated">%s 週前</target>
       </trans-unit>
       <trans-unit id="2896962543647781653" datatype="html">
         <source>%s weeks ago</source>
@@ -9159,7 +9159,7 @@
           <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">%s weeks ago</target>
+        <target state="translated">%s 週前</target>
       </trans-unit>
       <trans-unit id="91416192007234700" datatype="html">
         <source>%s day ago</source>
@@ -9167,7 +9167,7 @@
           <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">%s day ago</target>
+        <target state="translated">%s 日前</target>
       </trans-unit>
       <trans-unit id="5601594741748068208" datatype="html">
         <source>%s days ago</source>
@@ -9175,7 +9175,7 @@
           <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">%s days ago</target>
+        <target state="translated">%s 日前</target>
       </trans-unit>
       <trans-unit id="8387405724402999437" datatype="html">
         <source>%s hour ago</source>
@@ -9183,7 +9183,7 @@
           <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">%s hour ago</target>
+        <target state="translated">%s 時間前</target>
       </trans-unit>
       <trans-unit id="2008395012733474465" datatype="html">
         <source>%s hours ago</source>
@@ -9191,7 +9191,7 @@
           <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">%s hours ago</target>
+        <target state="translated">%s時間前</target>
       </trans-unit>
       <trans-unit id="5782387980670840884" datatype="html">
         <source>%s minute ago</source>
@@ -9199,7 +9199,7 @@
           <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="needs-translation">%s minute ago</target>
+        <target state="translated">%s分前</target>
       </trans-unit>
       <trans-unit id="7573942914011074807" datatype="html">
         <source>%s minutes ago</source>
@@ -9207,7 +9207,7 @@
           <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">%s minutes ago</target>
+        <target state="translated">%s分前</target>
       </trans-unit>
       <trans-unit id="4272436583644511364" datatype="html">
         <source>Just now</source>
@@ -9215,7 +9215,7 @@
           <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
           <context context-type="linenumber">72</context>
         </context-group>
-        <target state="needs-translation">Just now</target>
+        <target state="translated">たった今</target>
       </trans-unit>
       <trans-unit id="7536524521722799066" datatype="html">
         <source>(no title)</source>
@@ -9239,7 +9239,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Document already exists. Note: existing document is in the trash.</target>
+        <target state="translated">ドキュメントは既に存在します。注：既存のドキュメントはごみ箱にあります。</target>
       </trans-unit>
       <trans-unit id="6108404046106249255" datatype="html">
         <source>Document with ASN already exists.</source>
@@ -9255,7 +9255,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Document with ASN already exists. Note: existing document is in the trash.</target>
+        <target state="translated">ASNのドキュメントは既に存在します。注：既存のドキュメントはごみ箱にあります。</target>
       </trans-unit>
       <trans-unit id="148389968432135849" datatype="html">
         <source>File not found.</source>
@@ -9525,11 +9525,19 @@
         </context-group>
         <target state="translated">日本語</target>
       </trans-unit>
+      <trans-unit id="6145439649200570157" datatype="html">
+        <source>Korean</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">148</context>
+        </context-group>
+        <target state="translated">韓国語</target>
+      </trans-unit>
       <trans-unit id="1334425850005897370" datatype="html">
         <source>Luxembourgish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">148</context>
+          <context context-type="linenumber">154</context>
         </context-group>
         <target state="translated">ルクセンブルク語</target>
       </trans-unit>
@@ -9537,7 +9545,7 @@
         <source>Dutch</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">154</context>
+          <context context-type="linenumber">160</context>
         </context-group>
         <target state="translated">オランダ語</target>
       </trans-unit>
@@ -9545,7 +9553,7 @@
         <source>Norwegian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">160</context>
+          <context context-type="linenumber">166</context>
         </context-group>
         <target state="translated">ノルウェー語</target>
       </trans-unit>
@@ -9553,7 +9561,7 @@
         <source>Polish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">166</context>
+          <context context-type="linenumber">172</context>
         </context-group>
         <target state="translated">ポーランド語</target>
       </trans-unit>
@@ -9561,7 +9569,7 @@
         <source>Portuguese (Brazil)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">172</context>
+          <context context-type="linenumber">178</context>
         </context-group>
         <target state="translated">ポルトガル語 (ブラジル)</target>
       </trans-unit>
@@ -9569,7 +9577,7 @@
         <source>Portuguese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">178</context>
+          <context context-type="linenumber">184</context>
         </context-group>
         <target state="translated">ポルトガル語</target>
       </trans-unit>
@@ -9577,7 +9585,7 @@
         <source>Romanian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">184</context>
+          <context context-type="linenumber">190</context>
         </context-group>
         <target state="translated">ルーマニア語</target>
       </trans-unit>
@@ -9585,7 +9593,7 @@
         <source>Russian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">190</context>
+          <context context-type="linenumber">196</context>
         </context-group>
         <target state="translated">ロシア語</target>
       </trans-unit>
@@ -9593,7 +9601,7 @@
         <source>Slovak</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">196</context>
+          <context context-type="linenumber">202</context>
         </context-group>
         <target state="translated">スロバキア語</target>
       </trans-unit>
@@ -9601,7 +9609,7 @@
         <source>Slovenian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">202</context>
+          <context context-type="linenumber">208</context>
         </context-group>
         <target state="translated">スロベニア語</target>
       </trans-unit>
@@ -9609,7 +9617,7 @@
         <source>Serbian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">208</context>
+          <context context-type="linenumber">214</context>
         </context-group>
         <target state="translated">セルビア語</target>
       </trans-unit>
@@ -9617,7 +9625,7 @@
         <source>Swedish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">214</context>
+          <context context-type="linenumber">220</context>
         </context-group>
         <target state="translated">スウェーデン語</target>
       </trans-unit>
@@ -9625,7 +9633,7 @@
         <source>Turkish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">220</context>
+          <context context-type="linenumber">226</context>
         </context-group>
         <target state="translated">トルコ語</target>
       </trans-unit>
@@ -9633,7 +9641,7 @@
         <source>Ukrainian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">226</context>
+          <context context-type="linenumber">232</context>
         </context-group>
         <target state="translated">ウクライナ語</target>
       </trans-unit>
@@ -9641,7 +9649,7 @@
         <source>Chinese Simplified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">232</context>
+          <context context-type="linenumber">238</context>
         </context-group>
         <target state="translated">中国語 (簡体字)</target>
       </trans-unit>
@@ -9649,7 +9657,7 @@
         <source>ISO 8601</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">240</context>
+          <context context-type="linenumber">246</context>
         </context-group>
         <target state="translated">ISO 8601</target>
       </trans-unit>
@@ -9657,7 +9665,7 @@
         <source>Successfully completed one-time migratration of settings to the database!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">567</context>
+          <context context-type="linenumber">573</context>
         </context-group>
         <target state="translated">データベースへのワンタイム設定移行が正常に完了しました！</target>
       </trans-unit>
@@ -9665,7 +9673,7 @@
         <source>Unable to migrate settings to the database, please try saving manually.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">568</context>
+          <context context-type="linenumber">574</context>
         </context-group>
         <target state="translated">データベースに設定を移行できません。手動で保存してみてください。</target>
       </trans-unit>
@@ -9673,7 +9681,7 @@
         <source>You can restart the tour from the settings page.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">638</context>
+          <context context-type="linenumber">644</context>
         </context-group>
         <target state="translated">設定ページからツアーを再開することができます</target>
       </trans-unit>

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-19 23:29-0700\n"
-"PO-Revision-Date: 2024-08-20 06:32\n"
+"POT-Creation-Date: 2024-08-28 17:12-0700\n"
+"PO-Revision-Date: 2024-08-30 12:10\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -293,7 +293,7 @@ msgstr "Tipo di documento"
 
 #: documents/models.py:412
 msgid "Storage Path"
-msgstr "Percorso archiviazione"
+msgstr "Percorso di archiviazione"
 
 #: documents/models.py:413
 msgid "Note"
@@ -497,7 +497,7 @@ msgstr "ha un valore di campo personalizzato"
 
 #: documents/models.py:505
 msgid "is shared by me"
-msgstr "condiviso da me"
+msgstr "è condiviso da me"
 
 #: documents/models.py:506
 msgid "has custom fields"
@@ -633,7 +633,7 @@ msgstr "scadenza"
 
 #: documents/models.py:759
 msgid "slug"
-msgstr ""
+msgstr "slug"
 
 #: documents/models.py:791
 msgid "share link"
@@ -927,21 +927,21 @@ msgstr "azioni"
 msgid "enabled"
 msgstr "abilitato"
 
-#: documents/serialisers.py:119
+#: documents/serialisers.py:120
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Espressione regolare non valida: %(error)s"
 
-#: documents/serialisers.py:435
+#: documents/serialisers.py:467
 msgid "Invalid color."
 msgstr "Colore non valido."
 
-#: documents/serialisers.py:1331
+#: documents/serialisers.py:1397
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Il tipo di file %(type)s non è supportato"
 
-#: documents/serialisers.py:1440
+#: documents/serialisers.py:1506
 msgid "Invalid variable detected."
 msgstr "Variabile non valida rilevata."
 
@@ -1127,7 +1127,7 @@ msgstr "Continua"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
-msgstr "Registrati con un account social"
+msgstr "Registrati con un account social a Paperless-ngx"
 
 #: documents/templates/socialaccount/signup.html:10
 #, python-format
@@ -1211,7 +1211,7 @@ msgstr "pulisci"
 
 #: paperless/models.py:61
 msgid "clean-final"
-msgstr "pulito-finale"
+msgstr "pulizia-finale"
 
 #: paperless/models.py:62
 msgid "none"
@@ -1370,62 +1370,66 @@ msgid "Japanese"
 msgstr "Giapponese"
 
 #: paperless/settings.py:699
+msgid "Korean"
+msgstr ""
+
+#: paperless/settings.py:700
 msgid "Luxembourgish"
 msgstr "Lussemburghese"
 
-#: paperless/settings.py:700
+#: paperless/settings.py:701
 msgid "Norwegian"
 msgstr "Norvegese"
 
-#: paperless/settings.py:701
+#: paperless/settings.py:702
 msgid "Dutch"
 msgstr "Olandese"
 
-#: paperless/settings.py:702
+#: paperless/settings.py:703
 msgid "Polish"
 msgstr "Polacco"
 
-#: paperless/settings.py:703
+#: paperless/settings.py:704
 msgid "Portuguese (Brazil)"
 msgstr "Portoghese (Brasile)"
 
-#: paperless/settings.py:704
+#: paperless/settings.py:705
 msgid "Portuguese"
 msgstr "Portoghese"
 
-#: paperless/settings.py:705
+#: paperless/settings.py:706
 msgid "Romanian"
 msgstr "Rumeno"
 
-#: paperless/settings.py:706
+#: paperless/settings.py:707
 msgid "Russian"
 msgstr "Russo"
 
-#: paperless/settings.py:707
+#: paperless/settings.py:708
 msgid "Slovak"
 msgstr "Slovacco"
 
-#: paperless/settings.py:708
+#: paperless/settings.py:709
 msgid "Slovenian"
 msgstr "Sloveno"
 
-#: paperless/settings.py:709
+#: paperless/settings.py:710
 msgid "Serbian"
 msgstr "Serbo"
 
-#: paperless/settings.py:710
+#: paperless/settings.py:711
 msgid "Swedish"
 msgstr "Svedese"
 
-#: paperless/settings.py:711
+#: paperless/settings.py:712
 msgid "Turkish"
 msgstr "Turco"
 
-#: paperless/settings.py:712
+#: paperless/settings.py:713
 msgid "Ukrainian"
 msgstr "Ucraino"
 
-#: paperless/settings.py:713
+#: paperless/settings.py:714
 msgid "Chinese Simplified"
 msgstr "Cinese semplificato"
 
