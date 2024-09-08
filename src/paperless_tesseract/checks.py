@@ -21,10 +21,22 @@ def get_tesseract_langs():
 
 @register()
 def check_default_language_available(app_configs, **kwargs):
-    if shutil.which("tesseract") is None:
-        return [Error("Executable 'tesseract' was not located")]
+    # binaries_check in paperless will check and report if this doesn't exist
+    # So skip trying to do anything here and let that handle missing binaries
+    if shutil.which("tesseract") is not None:
+        installed_langs = get_tesseract_langs()
 
-    installed_langs = get_tesseract_langs()
+        specified_langs = settings.OCR_LANGUAGE.split("+")
+
+        for lang in specified_langs:
+            if lang not in installed_langs:
+                return [
+                    Error(
+                        f"The selected ocr language {lang} is "
+                        f"not installed. Paperless cannot OCR your documents "
+                        f"without it. Please fix PAPERLESS_OCR_LANGUAGE.",
+                    ),
+                ]
 
     if not settings.OCR_LANGUAGE:
         return [
@@ -33,17 +45,5 @@ def check_default_language_available(app_configs, **kwargs):
                 "This means that tesseract will fallback to english.",
             ),
         ]
-
-    specified_langs = settings.OCR_LANGUAGE.split("+")
-
-    for lang in specified_langs:
-        if lang not in installed_langs:
-            return [
-                Error(
-                    f"The selected ocr language {lang} is "
-                    f"not installed. Paperless cannot OCR your documents "
-                    f"without it. Please fix PAPERLESS_OCR_LANGUAGE.",
-                ),
-            ]
 
     return []
