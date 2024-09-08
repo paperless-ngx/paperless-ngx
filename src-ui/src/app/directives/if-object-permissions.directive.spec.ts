@@ -9,7 +9,7 @@ import { PermissionsService } from '../services/permissions.service'
       <button
         *pngxIfObjectPermissions="{
           object: { id: 2, owner: user1 },
-          action: 'view'
+          action: 'view',
         }"
       >
         Some Text
