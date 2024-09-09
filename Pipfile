@@ -35,7 +35,7 @@ inotifyrecursive = "~=0.3"
 langdetect = "*"
 mysqlclient = "*"
 nltk = "*"
-ocrmypdf = "~=15.4"
+ocrmypdf = "~=16.5"
 pathvalidate = "*"
 pdf2image = "*"
 psycopg = {version = "*", extras = ["c"]}
@@ -53,7 +53,7 @@ tika-client = "*"
 tqdm = "*"
 # See https://github.com/paperless-ngx/paperless-ngx/issues/5494
 uvicorn = {extras = ["standard"], version = "==0.25.0"}
-watchdog = "~=4.0"
+watchdog = "~=5.0"
 whitenoise = "~=6.7"
 whoosh = "~=2.7"
 zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
