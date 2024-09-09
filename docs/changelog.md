@@ -1,5 +1,77 @@
 # Changelog
 
+## paperless-ngx 2.12.0
+
+### Features
+
+- Chore: Update backend dependencies in bulk [@stumpylog](https://github.com/stumpylog) ([#7656](https://github.com/paperless-ngx/paperless-ngx/pull/7656))
+- Enhancement: re-work mail rule dialog, support multiple include patterns [@shamoon](https://github.com/shamoon) ([#7635](https://github.com/paperless-ngx/paperless-ngx/pull/7635))
+- Enhancement: add Korean language [@shamoon](https://github.com/shamoon) ([#7573](https://github.com/paperless-ngx/paperless-ngx/pull/7573))
+- Enhancement: allow multiple filename attachment exclusion patterns for a mail rule [@MelleD](https://github.com/MelleD) ([#5524](https://github.com/paperless-ngx/paperless-ngx/pull/5524))
+
+### Bug Fixes
+
+- Fix: use JSON for note audit log entries [@shamoon](https://github.com/shamoon) ([#7650](https://github.com/paperless-ngx/paperless-ngx/pull/7650))
+- Fix: correct broken pdfjs worker src after upgrade to pdfjs v4 [@shamoon](https://github.com/shamoon) ([#7626](https://github.com/paperless-ngx/paperless-ngx/pull/7626))
+- Chore: remove unused frontend dependencies [@shamoon](https://github.com/shamoon) ([#7607](https://github.com/paperless-ngx/paperless-ngx/pull/7607))
+- Fix: fix non-clickable scroll wheel in file uploads list [@shamoon](https://github.com/shamoon) ([#7591](https://github.com/paperless-ngx/paperless-ngx/pull/7591))
+- Fix: deselect file tasks select all button on dismiss [@shamoon](https://github.com/shamoon) ([#7592](https://github.com/paperless-ngx/paperless-ngx/pull/7592))
+- Fix: saved view sidebar heading not always visible [@shamoon](https://github.com/shamoon) ([#7584](https://github.com/paperless-ngx/paperless-ngx/pull/7584))
+- Fix: correct select field wrapping with long text [@shamoon](https://github.com/shamoon) ([#7572](https://github.com/paperless-ngx/paperless-ngx/pull/7572))
+- Fix: update ng-bootstrap to fix datepicker bug [@shamoon](https://github.com/shamoon) ([#7567](https://github.com/paperless-ngx/paperless-ngx/pull/7567))
+
+### Dependencies
+
+<details>
+<summary>11 changes</summary>
+
+- Chore(deps): Bump cryptography from 42.0.8 to 43.0.1 [@dependabot](https://github.com/dependabot) ([#7620](https://github.com/paperless-ngx/paperless-ngx/pull/7620))
+- Chore(deps-dev): Bump the development group with 3 updates [@dependabot](https://github.com/dependabot) ([#7608](https://github.com/paperless-ngx/paperless-ngx/pull/7608))
+- Chore(deps): Bump rapidfuzz from 3.9.6 to 3.9.7 in the small-changes group [@dependabot](https://github.com/dependabot) ([#7611](https://github.com/paperless-ngx/paperless-ngx/pull/7611))
+- Chore(deps): Bump tslib from 2.6.3 to 2.7.0 in /src-ui [@dependabot](https://github.com/dependabot) ([#7606](https://github.com/paperless-ngx/paperless-ngx/pull/7606))
+- Chore(deps-dev): Bump [@<!---->playwright/test from 1.45.3 to 1.46.1 in /src-ui @dependabot](https://github.com/<!---->playwright/test from 1.45.3 to 1.46.1 in /src-ui @dependabot) ([#7603](https://github.com/paperless-ngx/paperless-ngx/pull/7603))
+- Chore(deps-dev): Bump typescript from 5.4.5 to 5.5.4 in /src-ui [@dependabot](https://github.com/dependabot) ([#7604](https://github.com/paperless-ngx/paperless-ngx/pull/7604))
+- Chore(deps-dev): Bump the frontend-eslint-dependencies group in /src-ui with 4 updates [@dependabot](https://github.com/dependabot) ([#7600](https://github.com/paperless-ngx/paperless-ngx/pull/7600))
+- Chore(deps): Bump the frontend-angular-dependencies group in /src-ui with 21 updates [@dependabot](https://github.com/dependabot) ([#7599](https://github.com/paperless-ngx/paperless-ngx/pull/7599))
+- Chore(deps): Bump pathvalidate from 3.2.0 to 3.2.1 in the small-changes group [@dependabot](https://github.com/dependabot) ([#7548](https://github.com/paperless-ngx/paperless-ngx/pull/7548))
+- Chore(deps): Bump micromatch from 4.0.5 to 4.0.8 in /src-ui [@dependabot](https://github.com/dependabot) ([#7551](https://github.com/paperless-ngx/paperless-ngx/pull/7551))
+- Chore(deps-dev): Bump the development group with 2 updates [@dependabot](https://github.com/dependabot) ([#7545](https://github.com/paperless-ngx/paperless-ngx/pull/7545))
+</details>
+
+### All App Changes
+
+<details>
+<summary>27 changes</summary>
+
+- Chore: Update backend dependencies in bulk [@stumpylog](https://github.com/stumpylog) ([#7656](https://github.com/paperless-ngx/paperless-ngx/pull/7656))
+- Fix: Rework system check so it won't crash if tesseract is not found [@stumpylog](https://github.com/stumpylog) ([#7640](https://github.com/paperless-ngx/paperless-ngx/pull/7640))
+- Refactor: performance and storage optimization of barcode scanning [@loewexy](https://github.com/loewexy) ([#7646](https://github.com/paperless-ngx/paperless-ngx/pull/7646))
+- Fix: use JSON for note audit log entries [@shamoon](https://github.com/shamoon) ([#7650](https://github.com/paperless-ngx/paperless-ngx/pull/7650))
+- Enhancement: re-work mail rule dialog, support multiple include patterns [@shamoon](https://github.com/shamoon) ([#7635](https://github.com/paperless-ngx/paperless-ngx/pull/7635))
+- Fix: correct broken pdfjs worker src after upgrade to pdfjs v4 [@shamoon](https://github.com/shamoon) ([#7626](https://github.com/paperless-ngx/paperless-ngx/pull/7626))
+- Chore(deps-dev): Bump the development group with 3 updates [@dependabot](https://github.com/dependabot) ([#7608](https://github.com/paperless-ngx/paperless-ngx/pull/7608))
+- Chore(deps): Bump rapidfuzz from 3.9.6 to 3.9.7 in the small-changes group [@dependabot](https://github.com/dependabot) ([#7611](https://github.com/paperless-ngx/paperless-ngx/pull/7611))
+- Chore: remove unused frontend dependencies [@shamoon](https://github.com/shamoon) ([#7607](https://github.com/paperless-ngx/paperless-ngx/pull/7607))
+- Chore(deps): Bump tslib from 2.6.3 to 2.7.0 in /src-ui [@dependabot](https://github.com/dependabot) ([#7606](https://github.com/paperless-ngx/paperless-ngx/pull/7606))
+- Chore(deps-dev): Bump [@<!---->playwright/test from 1.45.3 to 1.46.1 in /src-ui @dependabot](https://github.com/<!---->playwright/test from 1.45.3 to 1.46.1 in /src-ui @dependabot) ([#7603](https://github.com/paperless-ngx/paperless-ngx/pull/7603))
+- Chore(deps-dev): Bump typescript from 5.4.5 to 5.5.4 in /src-ui [@dependabot](https://github.com/dependabot) ([#7604](https://github.com/paperless-ngx/paperless-ngx/pull/7604))
+- Chore(deps-dev): Bump the frontend-eslint-dependencies group in /src-ui with 4 updates [@dependabot](https://github.com/dependabot) ([#7600](https://github.com/paperless-ngx/paperless-ngx/pull/7600))
+- Chore(deps): Bump the frontend-angular-dependencies group in /src-ui with 21 updates [@dependabot](https://github.com/dependabot) ([#7599](https://github.com/paperless-ngx/paperless-ngx/pull/7599))
+- Fix: fix non-clickable scroll wheel in file uploads list [@shamoon](https://github.com/shamoon) ([#7591](https://github.com/paperless-ngx/paperless-ngx/pull/7591))
+- Fix: deselect file tasks select all button on dismiss [@shamoon](https://github.com/shamoon) ([#7592](https://github.com/paperless-ngx/paperless-ngx/pull/7592))
+- Fix: saved view sidebar heading not always visible [@shamoon](https://github.com/shamoon) ([#7584](https://github.com/paperless-ngx/paperless-ngx/pull/7584))
+- Enhancement: add Korean language [@shamoon](https://github.com/shamoon) ([#7573](https://github.com/paperless-ngx/paperless-ngx/pull/7573))
+- Enhancement: mail message preprocessor for gpg encrypted mails [@dbankmann](https://github.com/dbankmann) ([#7456](https://github.com/paperless-ngx/paperless-ngx/pull/7456))
+- Fix: correct select field wrapping with long text [@shamoon](https://github.com/shamoon) ([#7572](https://github.com/paperless-ngx/paperless-ngx/pull/7572))
+- Fix: update ng-bootstrap to fix datepicker bug [@shamoon](https://github.com/shamoon) ([#7567](https://github.com/paperless-ngx/paperless-ngx/pull/7567))
+- Enhancement: allow multiple filename attachment exclusion patterns for a mail rule [@MelleD](https://github.com/MelleD) ([#5524](https://github.com/paperless-ngx/paperless-ngx/pull/5524))
+- Chore(deps): Bump pathvalidate from 3.2.0 to 3.2.1 in the small-changes group [@dependabot](https://github.com/dependabot) ([#7548](https://github.com/paperless-ngx/paperless-ngx/pull/7548))
+- Chore(deps): Bump micromatch from 4.0.5 to 4.0.8 in /src-ui [@dependabot](https://github.com/dependabot) ([#7551](https://github.com/paperless-ngx/paperless-ngx/pull/7551))
+- Chore(deps-dev): Bump the development group with 2 updates [@dependabot](https://github.com/dependabot) ([#7545](https://github.com/paperless-ngx/paperless-ngx/pull/7545))
+- Refactor: Use django-filter logic for filtering full text search queries [@yichi-yang](https://github.com/yichi-yang) ([#7507](https://github.com/paperless-ngx/paperless-ngx/pull/7507))
+- Refactor: Reduce number of SQL queries when serializing List[Document] [@yichi-yang](https://github.com/yichi-yang) ([#7505](https://github.com/paperless-ngx/paperless-ngx/pull/7505))
+</details>
+
 ## paperless-ngx 2.11.6
 
 ### Bug Fixes
