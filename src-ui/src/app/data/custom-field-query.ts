@@ -268,7 +268,7 @@ export class CustomFieldQueryExpression extends CustomFieldQueryElement {
     super(CustomFieldQueryElementType.Expression)
     let values
     ;[this._operator, values] = expressionArray
-    if (!values) {
+    if (!values || values.length === 0) {
       this._value = []
     } else if (values?.length > 0 && values[0] instanceof Array) {
       this._value = values.map((value) => {
