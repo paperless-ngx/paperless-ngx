@@ -4,7 +4,6 @@
 
 ### Features
 
-- Chore: Update backend dependencies in bulk [@stumpylog](https://github.com/stumpylog) ([#7656](https://github.com/paperless-ngx/paperless-ngx/pull/7656))
 - Enhancement: re-work mail rule dialog, support multiple include patterns [@shamoon](https://github.com/shamoon) ([#7635](https://github.com/paperless-ngx/paperless-ngx/pull/7635))
 - Enhancement: add Korean language [@shamoon](https://github.com/shamoon) ([#7573](https://github.com/paperless-ngx/paperless-ngx/pull/7573))
 - Enhancement: allow multiple filename attachment exclusion patterns for a mail rule [@MelleD](https://github.com/MelleD) ([#5524](https://github.com/paperless-ngx/paperless-ngx/pull/5524))
