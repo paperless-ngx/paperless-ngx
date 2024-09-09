@@ -62,7 +62,6 @@ import {
   FILTER_HAS_CUSTOM_FIELDS_ANY,
   FILTER_HAS_CUSTOM_FIELDS_ALL,
   FILTER_HAS_ANY_CUSTOM_FIELDS,
-  FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
   FILTER_CUSTOM_FIELDS_LOOKUP,
 } from 'src/app/data/filter-rule-type'
 import {
@@ -96,6 +95,7 @@ import { SearchService } from 'src/app/services/rest/search.service'
 import {
   CustomFieldQueryExpression,
   CustomFieldQueryAtom,
+  CustomFieldQueryLogicalOperator,
 } from 'src/app/data/custom-field-query'
 import { CustomFieldQueriesModel } from '../../common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
 
@@ -230,6 +230,11 @@ export class FilterEditorComponent
           if (rule.value == 'false') {
             return $localize`Without any tag`
           }
+
+        case FILTER_HAS_CUSTOM_FIELDS_ANY:
+          return $localize`Custom fields include: ${this.customFields.find(
+            (f) => f.id == +rule.value
+          )?.name}`
 
         case FILTER_HAS_CUSTOM_FIELDS_ALL:
           return $localize`Custom fields: ${
@@ -546,8 +551,25 @@ export class FilterEditorComponent
               }
             }
           } catch (e) {
-            // TODO: handle error?
+            // error handled by list view service
           }
+          break
+        // Legacy custom field filters
+        case FILTER_HAS_CUSTOM_FIELDS_ALL:
+          this.customFieldQueriesModel.addExpression(
+            new CustomFieldQueryExpression([
+              CustomFieldQueryLogicalOperator.And,
+              rule.value.split(','),
+            ])
+          )
+          break
+        case FILTER_HAS_CUSTOM_FIELDS_ANY:
+          this.customFieldQueriesModel.addExpression(
+            new CustomFieldQueryExpression([
+              CustomFieldQueryLogicalOperator.Or,
+              rule.value.split(','),
+            ])
+          )
           break
         case FILTER_ASN_ISNULL:
           this.textFilterTarget = TEXT_FILTER_TARGET_ASN
@@ -773,7 +795,6 @@ export class FilterEditorComponent
         value: JSON.stringify(queries[0]),
       })
     }
-    // TODO: fully implement custom fields
     if (this.dateCreatedBefore) {
       filterRules.push({
         rule_type: FILTER_CREATED_BEFORE,
