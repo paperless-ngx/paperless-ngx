@@ -79,7 +79,7 @@
         <ng-container *ngTemplateOutlet="comparisonValueTemplate; context: { atom: atom }"></ng-container>
       }
       @case (CustomFieldQueryOperator.Contains) {
-        <pngx-input-document-link [(ngModel)]="atom.value" class="w-25 form-select doc-link-select" placeholder="Search docs" [minimal]="true"></pngx-input-document-link>
+        <pngx-input-document-link [(ngModel)]="atom.value" class="w-25 form-select doc-link-select p-0" placeholder="Search docs..." i18n-placeholder [minimal]="true"></pngx-input-document-link>
       }
       @default {
         <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="atom.value" [disabled]="disabled">
