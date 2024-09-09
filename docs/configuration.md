@@ -1149,6 +1149,18 @@ within your documents.
     second, and year last order. Characters D, M, or Y can be shuffled
     to meet the required order.
 
+#### [`PAPERLESS_GPG_DECRYPTOR=<bool>`](#PAPERLESS_GPG_DECRYPTOR) {#PAPERLESS_GPG_DECRYPTOR}
+
+: Enable or disable the GPG decryptor for encrypted emails. See [GPG Decryptor](advanced_usage.md#gpg-decryptor) for more information.
+
+    Defaults to false.
+
+#### [`PAPERLESS_EMAIL_GNUPG_HOME=<str>`](#PAPERLESS_EMAIL_GNUPG_HOME) {#PAPERLESS_EMAIL_GNUPG_HOME}
+
+: Optional, sets the `GNUPG_HOME` path to use with GPG decryptor for encrypted emails. See [GPG Decryptor](advanced_usage.md#gpg-decryptor) for more information. If not set, defaults to the default `GNUPG_HOME` path.
+
+    Defaults to <not set>.
+
 ### Polling {#polling}
 
 #### [`PAPERLESS_CONSUMER_POLLING=<num>`](#PAPERLESS_CONSUMER_POLLING) {#PAPERLESS_CONSUMER_POLLING}
@@ -1276,6 +1288,15 @@ fails a bigger dpi value i.e. 600 can fix the issue. Try using in
 combination with PAPERLESS_CONSUMER_BARCODE_UPSCALE bigger than 1.0.
 
     Defaults to "300"
+
+#### [`PAPERLESS_CONSUMER_BARCODE_MAX_PAGES=<int>`](#PAPERLESS_CONSUMER_BARCODE_MAX_PAGES) {#PAPERLESS_CONSUMER_BARCODE_MAX_PAGES}
+
+: Because barcode detection is a computationally-intensive operation, this setting
+limits the detection of barcodes to a number of first pages. If your scanner has
+a limit for the number of pages that can be scanned it would be sensible to set this
+as the limit here.
+
+    Defaults to "0", allowing all pages to be checked for barcodes.
 
 #### [`PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE=<bool>`](#PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE) {#PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE}
 

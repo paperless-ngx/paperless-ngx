@@ -27,3 +27,11 @@
     background-position: right calc(0.375em + 0.1875rem) center !important;
     background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem) !important;
 }
+
+.input-group .ng-select-taggable:first-child:nth-last-child(2) {
+    max-width: calc(100% - 45px); // fudge factor for (1x) ng-select button width
+}
+
+.input-group .ng-select-taggable:first-child:nth-last-child(3) {
+    max-width: calc(100% - 90px); // fudge factor for (2x) ng-select button width
+}

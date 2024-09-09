@@ -70,11 +70,11 @@ export class TasksComponent
         modal.componentInstance.buttonsEnabled = false
         modal.close()
         this.tasksService.dismissTasks(tasks)
-        this.selectedTasks.clear()
+        this.clearSelection()
       })
     } else {
       this.tasksService.dismissTasks(tasks)
-      this.selectedTasks.clear()
+      this.clearSelection()
     }
   }
 
