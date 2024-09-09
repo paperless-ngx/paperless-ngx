@@ -116,7 +116,7 @@ export const CUSTOM_FIELD_QUERY_VALUE_TYPES_BY_OPERATOR = {
   [CustomFieldQueryOperator.GreaterThan]: 'number',
   [CustomFieldQueryOperator.LessThan]: 'number',
   [CustomFieldQueryOperator.Contains]: 'array',
-  // [CustomFieldQueryOperator.In]: 'array', // TODO: Implement
+  [CustomFieldQueryOperator.In]: 'array',
 }
 
 export const CUSTOM_FIELD_QUERY_MAX_DEPTH = 4

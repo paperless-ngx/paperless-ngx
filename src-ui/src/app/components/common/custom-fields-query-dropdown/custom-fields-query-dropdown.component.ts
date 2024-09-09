@@ -252,4 +252,12 @@ export class CustomFieldsQueryDropdownComponent {
       label: CUSTOM_FIELD_QUERY_OPERATOR_LABELS[operator],
     }))
   }
+
+  getSelectOptionsForField(fieldID: number): string[] {
+    const field = this.customFields.find((field) => field.id === fieldID)
+    if (field) {
+      return field.extra_data['select_options']
+    }
+    return []
+  }
 }
