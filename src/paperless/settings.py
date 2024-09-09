@@ -696,6 +696,7 @@ LANGUAGES = [
     ("hu-hu", _("Hungarian")),
     ("it-it", _("Italian")),
     ("ja-jp", _("Japanese")),
+    ("ko-kr", _("Korean")),
     ("lb-lu", _("Luxembourgish")),
     ("no-no", _("Norwegian")),
     ("nl-nl", _("Dutch")),
@@ -923,6 +924,11 @@ CONSUMER_BARCODE_UPSCALE: Final[float] = __get_float(
 )
 
 CONSUMER_BARCODE_DPI: Final[int] = __get_int("PAPERLESS_CONSUMER_BARCODE_DPI", 300)
+
+CONSUMER_BARCODE_MAX_PAGES: Final[int] = __get_int(
+    "PAPERLESS_CONSUMER_BARCODE_MAX_PAGES",
+    0,
+)
 
 CONSUMER_ENABLE_TAG_BARCODE: Final[bool] = __get_boolean(
     "PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE",
@@ -1170,6 +1176,15 @@ EMAIL_SUBJECT_PREFIX: Final[str] = "[Paperless-ngx] "
 if DEBUG:  # pragma: no cover
     EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
     EMAIL_FILE_PATH = BASE_DIR / "sent_emails"
+
+###############################################################################
+# Email Preprocessors                                                         #
+###############################################################################
+
+EMAIL_GNUPG_HOME: Final[Optional[str]] = os.getenv("PAPERLESS_EMAIL_GNUPG_HOME")
+EMAIL_ENABLE_GPG_DECRYPTOR: Final[bool] = __get_boolean(
+    "PAPERLESS_ENABLE_GPG_DECRYPTOR",
+)
 
 
 ###############################################################################
