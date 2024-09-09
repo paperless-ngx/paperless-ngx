@@ -2,15 +2,18 @@
 
 ## paperless-ngx 2.12.0
 
-### Features
+### Features / Enhancements
 
 - Enhancement: re-work mail rule dialog, support multiple include patterns [@shamoon](https://github.com/shamoon) ([#7635](https://github.com/paperless-ngx/paperless-ngx/pull/7635))
 - Enhancement: add Korean language [@shamoon](https://github.com/shamoon) ([#7573](https://github.com/paperless-ngx/paperless-ngx/pull/7573))
 - Enhancement: allow multiple filename attachment exclusion patterns for a mail rule [@MelleD](https://github.com/MelleD) ([#5524](https://github.com/paperless-ngx/paperless-ngx/pull/5524))
+- Refactor: Use django-filter logic for filtering full text search queries [@yichi-yang](https://github.com/yichi-yang) ([#7507](https://github.com/paperless-ngx/paperless-ngx/pull/7507))
+- Refactor: Reduce number of SQL queries when serializing List[Document] [@yichi-yang](https://github.com/yichi-yang) ([#7505](https://github.com/paperless-ngx/paperless-ngx/pull/7505))
 
 ### Bug Fixes
 
 - Fix: use JSON for note audit log entries [@shamoon](https://github.com/shamoon) ([#7650](https://github.com/paperless-ngx/paperless-ngx/pull/7650))
+- Fix: Rework system check so it won't crash if tesseract is not found [@stumpylog](https://github.com/stumpylog) ([#7640](https://github.com/paperless-ngx/paperless-ngx/pull/7640))
 - Fix: correct broken pdfjs worker src after upgrade to pdfjs v4 [@shamoon](https://github.com/shamoon) ([#7626](https://github.com/paperless-ngx/paperless-ngx/pull/7626))
 - Chore: remove unused frontend dependencies [@shamoon](https://github.com/shamoon) ([#7607](https://github.com/paperless-ngx/paperless-ngx/pull/7607))
 - Fix: fix non-clickable scroll wheel in file uploads list [@shamoon](https://github.com/shamoon) ([#7591](https://github.com/paperless-ngx/paperless-ngx/pull/7591))
