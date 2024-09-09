@@ -15,3 +15,18 @@
   min-width: 35%;
   font-size: 14px;
 }
+
+::ng-deep .doc-link-select {
+  padding-top: 0 !important;
+  border-top-right-radius: var(--bs-border-radius) !important;
+  border-bottom-right-radius: var(--bs-border-radius) !important;
+
+  .ng-select-container {
+    border: none !important;
+    min-height: auto !important;
+  }
+  .ng-select {
+    max-width: 200px;
+    min-width: 140px;
+  }
+}

@@ -46,6 +46,9 @@ export class DocumentLinkComponent
   @Input()
   parentDocumentID: number
 
+  @Input()
+  minimal: boolean = false
+
   constructor(private documentsService: DocumentService) {
     super()
   }
