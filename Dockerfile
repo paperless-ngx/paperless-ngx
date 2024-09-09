@@ -275,6 +275,8 @@ RUN set -eux \
     && mkdir --parents --verbose /usr/src/paperless/media \
     && mkdir --parents --verbose /usr/src/paperless/consume \
     && mkdir --parents --verbose /usr/src/paperless/export \
+  && echo "Creating gnupg directory" \
+    && mkdir -m700 --verbose /usr/src/paperless/.gnupg \
   && echo "Adjusting all permissions" \
     && chown --from root:root --changes --recursive paperless:paperless /usr/src/paperless \
   && echo "Collecting static files" \

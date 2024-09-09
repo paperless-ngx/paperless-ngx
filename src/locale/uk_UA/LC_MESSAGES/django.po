@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-19 23:29-0700\n"
-"PO-Revision-Date: 2024-08-20 06:32\n"
+"POT-Creation-Date: 2024-08-28 17:12-0700\n"
+"PO-Revision-Date: 2024-09-02 00:29\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -257,59 +257,59 @@ msgstr "логи"
 
 #: documents/models.py:401
 msgid "Table"
-msgstr ""
+msgstr "Таблиця"
 
 #: documents/models.py:402
 msgid "Small Cards"
-msgstr ""
+msgstr "Малі Картки"
 
 #: documents/models.py:403
 msgid "Large Cards"
-msgstr ""
+msgstr "Великі Картки"
 
 #: documents/models.py:406
 msgid "Title"
-msgstr ""
+msgstr "Назва"
 
 #: documents/models.py:407
 msgid "Created"
-msgstr ""
+msgstr "Створено"
 
 #: documents/models.py:408
 msgid "Added"
-msgstr ""
+msgstr "Додано"
 
 #: documents/models.py:409
 msgid "Tags"
-msgstr ""
+msgstr "Теги"
 
 #: documents/models.py:410
 msgid "Correspondent"
-msgstr ""
+msgstr "Кореспондент"
 
 #: documents/models.py:411
 msgid "Document Type"
-msgstr ""
+msgstr "Тип документа"
 
 #: documents/models.py:412
 msgid "Storage Path"
-msgstr ""
+msgstr "Шлях до сховища"
 
 #: documents/models.py:413
 msgid "Note"
-msgstr ""
+msgstr "Примітка"
 
 #: documents/models.py:414
 msgid "Owner"
-msgstr ""
+msgstr "Власник"
 
 #: documents/models.py:415
 msgid "Shared"
-msgstr ""
+msgstr "Спільні"
 
 #: documents/models.py:416
 msgid "ASN"
-msgstr ""
+msgstr "ASN"
 
 #: documents/models.py:422
 msgid "show on dashboard"
@@ -329,15 +329,15 @@ msgstr "зворотнє сортування"
 
 #: documents/models.py:437
 msgid "View page size"
-msgstr ""
+msgstr "Розмір перегляду сторінок"
 
 #: documents/models.py:445
 msgid "View display mode"
-msgstr ""
+msgstr "Режим відображення"
 
 #: documents/models.py:452
 msgid "Document display fields"
-msgstr ""
+msgstr "Відображення полів документу"
 
 #: documents/models.py:459 documents/models.py:516
 msgid "saved view"
@@ -501,19 +501,19 @@ msgstr "поділився я"
 
 #: documents/models.py:506
 msgid "has custom fields"
-msgstr ""
+msgstr "має користувацькі поля"
 
 #: documents/models.py:507
 msgid "has custom field in"
-msgstr ""
+msgstr "має користувацькі поля у"
 
 #: documents/models.py:508
 msgid "does not have custom field in"
-msgstr ""
+msgstr "не має користувацьких полей у"
 
 #: documents/models.py:509
 msgid "does not have custom field"
-msgstr ""
+msgstr "не має користувацьких полей"
 
 #: documents/models.py:519
 msgid "rule type"
@@ -677,7 +677,7 @@ msgstr "Посилання на документ"
 
 #: documents/models.py:812
 msgid "Select"
-msgstr ""
+msgstr "Вибрати"
 
 #: documents/models.py:824
 msgid "data type"
@@ -685,11 +685,11 @@ msgstr "тип даних"
 
 #: documents/models.py:831
 msgid "extra data"
-msgstr ""
+msgstr "додаткові дані"
 
 #: documents/models.py:835
 msgid "Extra data for the custom field, such as select options"
-msgstr ""
+msgstr "Додаткові дані для користувальницького поля, такі як варіанти вибору"
 
 #: documents/models.py:841
 msgid "custom field"
@@ -927,21 +927,21 @@ msgstr "дії"
 msgid "enabled"
 msgstr "ввімкнено"
 
-#: documents/serialisers.py:119
+#: documents/serialisers.py:120
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Неправильний регулярний вираз: %(error)s"
 
-#: documents/serialisers.py:435
+#: documents/serialisers.py:467
 msgid "Invalid color."
 msgstr "Неправильний колір."
 
-#: documents/serialisers.py:1331
+#: documents/serialisers.py:1397
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Тип файлу %(type)s не підтримується"
 
-#: documents/serialisers.py:1440
+#: documents/serialisers.py:1506
 msgid "Invalid variable detected."
 msgstr "Виявлено неправильну змінну."
 
@@ -1127,16 +1127,16 @@ msgstr "Продовжити"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
-msgstr ""
+msgstr "Зареєструватися в Paperless-ngx за допомогою акаунту в соцмережах"
 
 #: documents/templates/socialaccount/signup.html:10
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
-msgstr ""
+msgstr "Ви збираєтеся використовувати ваш обліковий запис %(provider_name)s для входу."
 
 #: documents/templates/socialaccount/signup.html:11
 msgid "As a final step, please complete the following form:"
-msgstr ""
+msgstr "Як останній крок, будь ласка, заповніть наступну форму:"
 
 #: documents/validators.py:17
 #, python-brace-format
@@ -1291,11 +1291,11 @@ msgstr "Додає додаткові аргументи користувачі�
 
 #: paperless/models.py:171
 msgid "Application title"
-msgstr ""
+msgstr "Назва додатку"
 
 #: paperless/models.py:178
 msgid "Application logo"
-msgstr ""
+msgstr "Логотип додатка"
 
 #: paperless/models.py:188
 msgid "paperless application settings"
@@ -1367,65 +1367,69 @@ msgstr "Італійська"
 
 #: paperless/settings.py:698
 msgid "Japanese"
-msgstr ""
+msgstr "Японська"
 
 #: paperless/settings.py:699
+msgid "Korean"
+msgstr "Корейська"
+
+#: paperless/settings.py:700
 msgid "Luxembourgish"
 msgstr "Люксембурзька"
 
-#: paperless/settings.py:700
+#: paperless/settings.py:701
 msgid "Norwegian"
 msgstr "Норвезька"
 
-#: paperless/settings.py:701
+#: paperless/settings.py:702
 msgid "Dutch"
 msgstr "Нідерландська"
 
-#: paperless/settings.py:702
+#: paperless/settings.py:703
 msgid "Polish"
 msgstr "Польська"
 
-#: paperless/settings.py:703
+#: paperless/settings.py:704
 msgid "Portuguese (Brazil)"
 msgstr "Португальська (Бразилія)"
 
-#: paperless/settings.py:704
+#: paperless/settings.py:705
 msgid "Portuguese"
 msgstr "Португальська"
 
-#: paperless/settings.py:705
+#: paperless/settings.py:706
 msgid "Romanian"
 msgstr "Румунська"
 
-#: paperless/settings.py:706
+#: paperless/settings.py:707
 msgid "Russian"
 msgstr "Російська"
 
-#: paperless/settings.py:707
+#: paperless/settings.py:708
 msgid "Slovak"
 msgstr "Словацька"
 
-#: paperless/settings.py:708
+#: paperless/settings.py:709
 msgid "Slovenian"
 msgstr "Словенська"
 
-#: paperless/settings.py:709
+#: paperless/settings.py:710
 msgid "Serbian"
 msgstr "Сербська"
 
-#: paperless/settings.py:710
+#: paperless/settings.py:711
 msgid "Swedish"
 msgstr "Шведська"
 
-#: paperless/settings.py:711
+#: paperless/settings.py:712
 msgid "Turkish"
 msgstr "Турецька"
 
-#: paperless/settings.py:712
+#: paperless/settings.py:713
 msgid "Ukrainian"
 msgstr "Українська"
 
-#: paperless/settings.py:713
+#: paperless/settings.py:714
 msgid "Chinese Simplified"
 msgstr "Китайська спрощена"
 

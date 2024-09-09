@@ -69,6 +69,16 @@ describe(`Additional service tests for SavedViewService`, () => {
     expect(service.sidebarViews).toHaveLength(3)
   })
 
+  it('should gracefully handle errors', () => {
+    service.initialize()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
+    )
+    req.error(new ErrorEvent('error'))
+    expect(service.loading).toBeFalsy()
+    expect(service.allViews).toHaveLength(0)
+  })
+
   it('should support patchMany', () => {
     subscription = service.patchMany(saved_views).subscribe()
     saved_views.forEach((saved_view) => {

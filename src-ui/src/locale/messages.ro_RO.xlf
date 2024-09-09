@@ -319,7 +319,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">124</context>
         </context-group>
-        <target state="translated">Documentul <x id="PH" equiv-text="status.filename"/> este procesat de către sistem.</target>
+        <target state="translated">Documentul <x id="PH" equiv-text="status.filename"/> este procesat de Paperless-ngx.</target>
       </trans-unit>
       <trans-unit id="6570363013146073520" datatype="html" approved="yes">
         <source>Dashboard</source>
@@ -397,11 +397,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">235</context>
+          <context context-type="linenumber">237</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">237</context>
+          <context context-type="linenumber">239</context>
         </context-group>
         <target state="final">Setări</target>
       </trans-unit>
@@ -551,7 +551,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="needs-translation">Application Configuration</target>
+        <target state="translated">Configurarea aplicației</target>
       </trans-unit>
       <trans-unit id="8528041182664173532" datatype="html">
         <source>Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of Paperless-ngx. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</source>
@@ -567,7 +567,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Read the documentation about this setting</target>
+        <target state="translated">Citește documentația despre setări</target>
       </trans-unit>
       <trans-unit id="2180291763949669799" datatype="html">
         <source>Enable</source>
@@ -575,7 +575,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Enable</target>
+        <target state="translated">Activeaza</target>
       </trans-unit>
       <trans-unit id="3823219296477075982" datatype="html" approved="yes">
         <source>Discard</source>
@@ -621,7 +621,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">51</context>
+          <context context-type="linenumber">72</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
@@ -659,7 +659,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
           <context context-type="linenumber">81</context>
         </context-group>
-        <target state="needs-translation">Error retrieving config</target>
+        <target state="translated">Eroare la preluarea link-urilor</target>
       </trans-unit>
       <trans-unit id="1172622527269118932" datatype="html">
         <source>Invalid JSON</source>
@@ -667,7 +667,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="needs-translation">Invalid JSON</target>
+        <target state="translated">JSON invalid</target>
       </trans-unit>
       <trans-unit id="5103146006962696736" datatype="html">
         <source>Configuration updated</source>
@@ -675,7 +675,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
           <context context-type="linenumber">151</context>
         </context-group>
-        <target state="needs-translation">Configuration updated</target>
+        <target state="translated">Configurație actualizată</target>
       </trans-unit>
       <trans-unit id="1664963291286452273" datatype="html">
         <source>An error occurred updating configuration</source>
@@ -683,7 +683,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
           <context context-type="linenumber">156</context>
         </context-group>
-        <target state="needs-translation">An error occurred updating configuration</target>
+        <target state="translated">A apărut o eroare la actualizarea configurației</target>
       </trans-unit>
       <trans-unit id="2653081282186526824" datatype="html">
         <source>File successfully updated</source>
@@ -691,7 +691,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
           <context context-type="linenumber">178</context>
         </context-group>
-        <target state="needs-translation">File successfully updated</target>
+        <target state="translated">Fișier actualizat cu succes</target>
       </trans-unit>
       <trans-unit id="5902783625859504265" datatype="html">
         <source>An error occurred uploading file</source>
@@ -699,7 +699,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
           <context context-type="linenumber">183</context>
         </context-group>
-        <target state="needs-translation">An error occurred uploading file</target>
+        <target state="translated">A apărut o eroare la încărcarea fișierului</target>
       </trans-unit>
       <trans-unit id="4804785061014590286" datatype="html" approved="yes">
         <source>Logs</source>
@@ -709,11 +709,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">270</context>
+          <context context-type="linenumber">272</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">273</context>
+          <context context-type="linenumber">275</context>
         </context-group>
         <target state="final">Jurnale</target>
       </trans-unit>
@@ -723,7 +723,7 @@
           <context context-type="sourcefile">src/app/components/admin/logs/logs.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Review the log files for the application and for email checking.</target>
+        <target state="translated">Uitați-vă la fișierele de log-uri pentru aplicație si verificarea email-ului.</target>
       </trans-unit>
       <trans-unit id="8838884664569764142" datatype="html">
         <source>Auto refresh</source>
@@ -823,7 +823,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Options to customize appearance, notifications, saved views and more. Settings apply to the &lt;strong&gt;current user only&lt;/strong&gt;.</target>
+        <target state="translated">Opțiuni pentru a personaliza aspectul, notificările, vizualizările salvate si mai multe. Setările se aplica doar la &lt;strong&gt;user-ul curent&lt;/strong&gt;.</target>
       </trans-unit>
       <trans-unit id="1685061484835793745" datatype="html">
         <source>Start tour</source>
@@ -843,7 +843,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="needs-translation">System Status</target>
+        <target state="translated">Status de sistem</target>
       </trans-unit>
       <trans-unit id="4798013226763881638" datatype="html">
         <source>Open Django Admin</source>
@@ -1035,7 +1035,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">172,175</context>
         </context-group>
-        <target state="needs-translation"> Update checking works by pinging the public <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>GitHub API<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> for the latest release to determine whether a new version is available.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Actual updating of the app must still be performed manually. </target>
+        <target state="translated"> Verificarea actualizărilor funcționează prin ping-uri la <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;"/>API-ul GitHub<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> pentru a determina care este cea mai nouă versiune valabilă.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> Actualizarea trebuie făcută manual. </target>
       </trans-unit>
       <trans-unit id="5489945693955857309" datatype="html">
         <source><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&gt;"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></source>
@@ -1043,7 +1043,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">177,179</context>
         </context-group>
-        <target state="needs-translation"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&gt;"/>No tracking data is collected by the app in any way.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
+        <target state="translated"><x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&gt;"/>Nici un fel de date de urmărire nu sunt colectate de către aplicație.<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/></target>
       </trans-unit>
       <trans-unit id="5070799004079086984" datatype="html">
         <source>Enable update checking</source>
@@ -1051,7 +1051,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">179</context>
         </context-group>
-        <target state="needs-translation">Enable update checking</target>
+        <target state="translated">Activați verificarea actualizării</target>
       </trans-unit>
       <trans-unit id="908152367861642592" datatype="html">
         <source>Document editing</source>
@@ -1059,7 +1059,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">183</context>
         </context-group>
-        <target state="needs-translation">Document editing</target>
+        <target state="translated">Editare documente</target>
       </trans-unit>
       <trans-unit id="2959590948110714366" datatype="html">
         <source>Automatically remove inbox tag(s) on save</source>
@@ -1103,7 +1103,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.ts</context>
           <context context-type="linenumber">104</context>
         </context-group>
-        <target state="needs-translation">Global search</target>
+        <target state="translated">Căutare generala</target>
       </trans-unit>
       <trans-unit id="2818183879511244335" datatype="html">
         <source>Do not include advanced search results</source>
@@ -1111,7 +1111,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">204</context>
         </context-group>
-        <target state="needs-translation">Do not include advanced search results</target>
+        <target state="translated">Nu includeți rezultate din căutarea avansata</target>
       </trans-unit>
       <trans-unit id="3969258421469113318" datatype="html">
         <source>Full search links to</source>
@@ -1163,7 +1163,7 @@
           <context context-type="sourcefile">src/app/data/document.ts</context>
           <context context-type="linenumber">95</context>
         </context-group>
-        <target state="needs-translation">Notes</target>
+        <target state="translated">Notițe</target>
       </trans-unit>
       <trans-unit id="293524471897878391" datatype="html">
         <source>Enable notes</source>
@@ -1171,7 +1171,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">228</context>
         </context-group>
-        <target state="needs-translation">Enable notes</target>
+        <target state="translated">Activați notițe</target>
       </trans-unit>
       <trans-unit id="7314814725704332646" datatype="html">
         <source>Permissions</source>
@@ -1227,7 +1227,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">6</context>
         </context-group>
-        <target state="needs-translation">Permissions</target>
+        <target state="translated">Permisiuni</target>
       </trans-unit>
       <trans-unit id="309314153079578337" datatype="html">
         <source>Default Permissions</source>
@@ -1251,7 +1251,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">250</context>
         </context-group>
-        <target state="needs-translation">Default Owner</target>
+        <target state="translated">Deținător implicit</target>
       </trans-unit>
       <trans-unit id="734147282056744882" datatype="html">
         <source>Objects without an owner can be viewed and edited by all users</source>
@@ -1438,6 +1438,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">98</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">103</context>
         </context-group>
         <target state="final">Vizualizări</target>
       </trans-unit>
@@ -1735,7 +1739,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Show</target>
+        <target state="translated">Arată</target>
       </trans-unit>
       <trans-unit id="5607669932062416162" datatype="html">
         <source>Default</source>
@@ -1747,7 +1751,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">117</context>
         </context-group>
-        <target state="needs-translation">Default</target>
+        <target state="translated">Implicit</target>
       </trans-unit>
       <trans-unit id="7877440816920439876" datatype="html" approved="yes">
         <source>No saved views defined.</source>
@@ -1789,7 +1793,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">50</context>
+          <context context-type="linenumber">71</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
@@ -1899,7 +1903,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
           <context context-type="linenumber">566</context>
         </context-group>
-        <target state="needs-translation">Reload now</target>
+        <target state="translated">Reîncarcă acum</target>
       </trans-unit>
       <trans-unit id="3011185103048412841" datatype="html">
         <source>An error occurred while saving settings.</source>
@@ -1909,7 +1913,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">126</context>
+          <context context-type="linenumber">125</context>
         </context-group>
         <target state="needs-translation">An error occurred while saving settings.</target>
       </trans-unit>
@@ -1929,11 +1933,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">258</context>
+          <context context-type="linenumber">260</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">260</context>
+          <context context-type="linenumber">262</context>
         </context-group>
         <target state="needs-translation">File Tasks</target>
       </trans-unit>
@@ -2261,11 +2265,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">218</context>
+          <context context-type="linenumber">220</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">221</context>
+          <context context-type="linenumber">223</context>
         </context-group>
         <target state="needs-translation">Trash</target>
       </trans-unit>
@@ -2291,7 +2295,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Delete selected</target>
+        <target state="translated">Șterge selecția</target>
       </trans-unit>
       <trans-unit id="8597030111956627342" datatype="html">
         <source>Empty trash</source>
@@ -2299,7 +2303,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Empty trash</target>
+        <target state="translated">Golește coșul de gunoi</target>
       </trans-unit>
       <trans-unit id="991066160113599649" datatype="html">
         <source>Remaining</source>
@@ -2307,7 +2311,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Remaining</target>
+        <target state="translated">Rămase</target>
       </trans-unit>
       <trans-unit id="7494361412465596264" datatype="html">
         <source><x id="INTERPOLATION" equiv-text="{{ getDaysRemaining(document) }}"/> days</source>
@@ -2315,7 +2319,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{ getDaysRemaining(document) }}"/> days</target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="{{ getDaysRemaining(document) }}"/> zile</target>
       </trans-unit>
       <trans-unit id="6770769801335635194" datatype="html">
         <source>Restore</source>
@@ -2327,7 +2331,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">73</context>
         </context-group>
-        <target state="needs-translation">Restore</target>
+        <target state="translated">Restabilește</target>
       </trans-unit>
       <trans-unit id="2308646316372333720" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {One document in trash} other {<x id="INTERPOLATION"/> total documents in trash}}</source>
@@ -2363,7 +2367,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this document.</target>
+        <target state="translated">Această operațiune va șterge permanent acest document.</target>
       </trans-unit>
       <trans-unit id="5641451190833696892" datatype="html" approved="yes">
         <source>This operation cannot be undone.</source>
@@ -2411,7 +2415,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="needs-translation">Document deleted</target>
+        <target state="translated">Document șters</target>
       </trans-unit>
       <trans-unit id="7295637485862454066" datatype="html">
         <source>Error deleting document</source>
@@ -2423,7 +2427,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">824</context>
         </context-group>
-        <target state="needs-translation">Error deleting document</target>
+        <target state="translated">Eroare la ștergerea documentului</target>
       </trans-unit>
       <trans-unit id="7266264608936522311" datatype="html">
         <source>This operation will permanently delete the selected documents.</source>
@@ -2447,7 +2451,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="needs-translation">Document(s) deleted</target>
+        <target state="translated">Document(e) șterse</target>
       </trans-unit>
       <trans-unit id="6962724852893361467" datatype="html">
         <source>Error deleting document(s)</source>
@@ -2463,7 +2467,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">113</context>
         </context-group>
-        <target state="needs-translation">Document restored</target>
+        <target state="translated">Document restaurat</target>
       </trans-unit>
       <trans-unit id="9136016619414048201" datatype="html">
         <source>Error restoring document</source>
@@ -2471,7 +2475,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">117</context>
         </context-group>
-        <target state="needs-translation">Error restoring document</target>
+        <target state="translated">Eroare la restaurarea documentului</target>
       </trans-unit>
       <trans-unit id="960063472770266304" datatype="html">
         <source>Document(s) restored</source>
@@ -2497,13 +2501,13 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">249</context>
+          <context context-type="linenumber">251</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">251</context>
+          <context context-type="linenumber">253</context>
         </context-group>
-        <target state="needs-translation">Users &amp; Groups</target>
+        <target state="translated">Utilizatori &amp; Grupuri</target>
       </trans-unit>
       <trans-unit id="4569276013106377105" datatype="html">
         <source>Create, delete and edit users and groups.</source>
@@ -2523,7 +2527,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="needs-translation">Users</target>
+        <target state="translated">Utilizatori</target>
       </trans-unit>
       <trans-unit id="2941198503117307737" datatype="html">
         <source>Add User</source>
@@ -2531,7 +2535,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Add User</target>
+        <target state="translated">Adaugă utilizator</target>
       </trans-unit>
       <trans-unit id="5248717555542428023" datatype="html">
         <source>Username</source>
@@ -2567,7 +2571,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Groups</target>
+        <target state="translated">Grupuri</target>
       </trans-unit>
       <trans-unit id="7585826646011739428" datatype="html" approved="yes">
         <source>Edit</source>
@@ -2655,7 +2659,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.html</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="needs-translation">Add Group</target>
+        <target state="translated">Adaugă grup</target>
       </trans-unit>
       <trans-unit id="4746158651610481283" datatype="html">
         <source>No groups defined</source>
@@ -2675,7 +2679,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
           <context context-type="linenumber">159</context>
         </context-group>
-        <target state="needs-translation">Password has been changed, you will be logged out momentarily.</target>
+        <target state="translated">Parola a fost schimbată, vei fi deconectat momentan.</target>
       </trans-unit>
       <trans-unit id="2753185112875184719" datatype="html">
         <source>Saved user &quot;<x id="PH" equiv-text="newUser.username"/>&quot;.</source>
@@ -2683,7 +2687,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="needs-translation">Saved user "<x id="PH" equiv-text="newUser.username"/>".</target>
+        <target state="translated">Utilizator salvat "<x id="PH" equiv-text="newUser.username"/>".</target>
       </trans-unit>
       <trans-unit id="3471101514724661554" datatype="html">
         <source>Error saving user.</source>
@@ -2691,7 +2695,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">106</context>
         </context-group>
-        <target state="needs-translation">Error saving user.</target>
+        <target state="translated">Eroare la salvarea utilizatorului.</target>
       </trans-unit>
       <trans-unit id="5565868288871970148" datatype="html">
         <source>Confirm delete user account</source>
@@ -2699,7 +2703,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">114</context>
         </context-group>
-        <target state="needs-translation">Confirm delete user account</target>
+        <target state="translated">Confirmă ștergerea contului</target>
       </trans-unit>
       <trans-unit id="8133663925694885325" datatype="html">
         <source>This operation will permanently delete this user account.</source>
@@ -2707,7 +2711,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">115</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this user account.</target>
+        <target state="translated">Această operațiune va șterge permanent acest cont.</target>
       </trans-unit>
       <trans-unit id="1181910457994920507" datatype="html">
         <source>Proceed</source>
@@ -2873,11 +2877,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">279</context>
+          <context context-type="linenumber">281</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">282</context>
+          <context context-type="linenumber">284</context>
         </context-group>
         <target state="final">Documentație</target>
       </trans-unit>
@@ -2885,7 +2889,7 @@
         <source>Open documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">128</context>
+          <context context-type="linenumber">130</context>
         </context-group>
         <target state="final">Deschide documente</target>
       </trans-unit>
@@ -2893,11 +2897,11 @@
         <source>Close all</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">148</context>
+          <context context-type="linenumber">150</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">150</context>
+          <context context-type="linenumber">152</context>
         </context-group>
         <target state="final">Închide tot</target>
       </trans-unit>
@@ -2905,7 +2909,7 @@
         <source>Manage</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">159</context>
+          <context context-type="linenumber">161</context>
         </context-group>
         <target state="final">Administrează</target>
       </trans-unit>
@@ -2913,11 +2917,11 @@
         <source>Correspondents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">165</context>
+          <context context-type="linenumber">167</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">167</context>
+          <context context-type="linenumber">169</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -2929,11 +2933,11 @@
         <source>Tags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">172</context>
+          <context context-type="linenumber">174</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">175</context>
+          <context context-type="linenumber">177</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.ts</context>
@@ -2965,11 +2969,11 @@
         <source>Document Types</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">181</context>
+          <context context-type="linenumber">183</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">183</context>
+          <context context-type="linenumber">185</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -2981,11 +2985,11 @@
         <source>Storage Paths</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">188</context>
+          <context context-type="linenumber">190</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">190</context>
+          <context context-type="linenumber">192</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -2997,11 +3001,11 @@
         <source>Custom Fields</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">195</context>
+          <context context-type="linenumber">197</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">197</context>
+          <context context-type="linenumber">199</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.html</context>
@@ -3017,11 +3021,11 @@
         <source>Workflows</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">204</context>
+          <context context-type="linenumber">206</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">206</context>
+          <context context-type="linenumber">208</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
@@ -3033,11 +3037,11 @@
         <source>Mail</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">211</context>
+          <context context-type="linenumber">213</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">214</context>
+          <context context-type="linenumber">216</context>
         </context-group>
         <target state="translated">Mail</target>
       </trans-unit>
@@ -3045,7 +3049,7 @@
         <source>Administration</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">229</context>
+          <context context-type="linenumber">231</context>
         </context-group>
         <target state="translated">Administrare</target>
       </trans-unit>
@@ -3053,11 +3057,11 @@
         <source>Configuration</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">242</context>
+          <context context-type="linenumber">244</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">244</context>
+          <context context-type="linenumber">246</context>
         </context-group>
         <target state="needs-translation">Configuration</target>
       </trans-unit>
@@ -3065,7 +3069,7 @@
         <source>GitHub</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">289</context>
+          <context context-type="linenumber">291</context>
         </context-group>
         <target state="translated">GitHub</target>
       </trans-unit>
@@ -3073,7 +3077,7 @@
         <source>is available.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">298,299</context>
+          <context context-type="linenumber">300,301</context>
         </context-group>
         <target state="translated">este disponibilă.</target>
       </trans-unit>
@@ -3081,7 +3085,7 @@
         <source>Click to view.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">299</context>
+          <context context-type="linenumber">301</context>
         </context-group>
         <target state="translated">Click pentru a vizualiza.</target>
       </trans-unit>
@@ -3089,7 +3093,7 @@
         <source>Paperless-ngx can automatically check for updates</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">303</context>
+          <context context-type="linenumber">305</context>
         </context-group>
         <target state="translated">Sistemul poate verifica automat actualizările</target>
       </trans-unit>
@@ -3097,7 +3101,7 @@
         <source> How does this work? </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">310,312</context>
+          <context context-type="linenumber">312,314</context>
         </context-group>
         <target state="translated"> Cum funcţionează? </target>
       </trans-unit>
@@ -3105,7 +3109,7 @@
         <source>Update available</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">323</context>
+          <context context-type="linenumber">325</context>
         </context-group>
         <target state="translated">Actualizare disponibilă</target>
       </trans-unit>
@@ -3113,7 +3117,7 @@
         <source>Sidebar views updated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">209</context>
+          <context context-type="linenumber">208</context>
         </context-group>
         <target state="translated">Vizualizări bară laterală actualizate</target>
       </trans-unit>
@@ -3121,7 +3125,7 @@
         <source>Error updating sidebar views</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">212</context>
+          <context context-type="linenumber">211</context>
         </context-group>
         <target state="translated">Eroare la actualizarea vizualizărilor barei laterale</target>
       </trans-unit>
@@ -3129,7 +3133,7 @@
         <source>An error occurred while saving update checking settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">233</context>
+          <context context-type="linenumber">232</context>
         </context-group>
         <target state="needs-translation">An error occurred while saving update checking settings.</target>
       </trans-unit>
@@ -3977,11 +3981,19 @@
         </context-group>
         <target state="translated">Problemă la conectarea la server</target>
       </trans-unit>
+      <trans-unit id="5163375362523428079" datatype="html">
+        <source>Rule order</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <target state="needs-translation">Rule order</target>
+      </trans-unit>
       <trans-unit id="4086606389696938932" datatype="html">
         <source>Account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">14</context>
+          <context context-type="linenumber">19</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
@@ -3989,11 +4001,19 @@
         </context-group>
         <target state="translated">Cont</target>
       </trans-unit>
+      <trans-unit id="4348351765075925931" datatype="html">
+        <source>Paperless will only process mails that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> of the criteria specified below.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+        <target state="needs-translation">Paperless will only process mails that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> of the criteria specified below.</target>
+      </trans-unit>
       <trans-unit id="7046259383943324039" datatype="html">
         <source>Folder</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="linenumber">26</context>
         </context-group>
         <target state="translated">Dosar</target>
       </trans-unit>
@@ -4001,7 +4021,7 @@
         <source>Subfolders must be separated by a delimiter, often a dot (&apos;.&apos;) or slash (&apos;/&apos;), but it varies by mail server.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="linenumber">26</context>
         </context-group>
         <target state="translated">Subdosarele trebuie separate printr-un delimitator, adesea un punct ('.') sau slash ('/'), dar variază de la serverul de mail.</target>
       </trans-unit>
@@ -4009,55 +4029,15 @@
         <source>Maximum age (days)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">16</context>
+          <context context-type="linenumber">27</context>
         </context-group>
         <target state="translated">Vârsta maximă (zile)</target>
-      </trans-unit>
-      <trans-unit id="7093509971705471817" datatype="html">
-        <source>Attachment type</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">17</context>
-        </context-group>
-        <target state="translated">Tip atașament</target>
-      </trans-unit>
-      <trans-unit id="559099472394646919" datatype="html">
-        <source>Consumption scope</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">18</context>
-        </context-group>
-        <target state="translated">Sfera de consum</target>
-      </trans-unit>
-      <trans-unit id="56643687972548912" datatype="html">
-        <source>See docs for .eml processing requirements</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">18</context>
-        </context-group>
-        <target state="needs-translation">See docs for .eml processing requirements</target>
-      </trans-unit>
-      <trans-unit id="5163375362523428079" datatype="html">
-        <source>Rule order</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">19</context>
-        </context-group>
-        <target state="needs-translation">Rule order</target>
-      </trans-unit>
-      <trans-unit id="5488632521862493221" datatype="html">
-        <source>Paperless will only process mails that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> of the filters specified below.</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">22</context>
-        </context-group>
-        <target state="needs-translation">Paperless will only process mails that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> of the filters specified below.</target>
       </trans-unit>
       <trans-unit id="6925928412364847639" datatype="html">
         <source>Filter from</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">23</context>
+          <context context-type="linenumber">30</context>
         </context-group>
         <target state="translated">Filtrează de la</target>
       </trans-unit>
@@ -4065,7 +4045,7 @@
         <source>Filter to</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">31</context>
         </context-group>
         <target state="translated">Filtrează către</target>
       </trans-unit>
@@ -4073,7 +4053,7 @@
         <source>Filter subject</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">25</context>
+          <context context-type="linenumber">32</context>
         </context-group>
         <target state="translated">Filtrează subiect</target>
       </trans-unit>
@@ -4081,63 +4061,83 @@
         <source>Filter body</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">26</context>
+          <context context-type="linenumber">33</context>
         </context-group>
         <target state="translated">Filtrează corpul email-ului</target>
       </trans-unit>
-      <trans-unit id="4603548543464136402" datatype="html">
-        <source>Filter attachment filename includes</source>
+      <trans-unit id="559099472394646919" datatype="html">
+        <source>Consumption scope</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">27</context>
+          <context context-type="linenumber">39</context>
         </context-group>
-        <target state="translated">Filtrul de nume al fișierului include</target>
+        <target state="translated">Sfera de consum</target>
       </trans-unit>
-      <trans-unit id="4245210767172267486" datatype="html">
-        <source>Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</source>
+      <trans-unit id="56643687972548912" datatype="html">
+        <source>See docs for .eml processing requirements</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">27</context>
+          <context context-type="linenumber">39</context>
         </context-group>
-        <target state="needs-review-translation" state-qualifier="leveraged-tm">Consumă doar documentele care se potrivesc în întregime cu acest nume de fișier, dacă este specificat. Simbolul * ține locul oricărui șir de caractere. Majusculele nu contează.</target>
+        <target state="needs-translation">See docs for .eml processing requirements</target>
       </trans-unit>
-      <trans-unit id="6869675473865305593" datatype="html">
-        <source>Filter attachment filename excluding</source>
+      <trans-unit id="7093509971705471817" datatype="html">
+        <source>Attachment type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">40</context>
         </context-group>
-        <target state="translated">Filtru nume fișier atașat exclusiv</target>
+        <target state="translated">Tip atașament</target>
       </trans-unit>
-      <trans-unit id="6774472763442688477" datatype="html">
-        <source>Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</source>
+      <trans-unit id="2873939123535615966" datatype="html">
+        <source>Include only files matching</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</target>
+        <target state="needs-translation">Include only files matching</target>
+      </trans-unit>
+      <trans-unit id="7233407036155150477" datatype="html">
+        <source>Optional. Wildcards e.g. *.pdf or *invoice* allowed. Can be comma-separated list. Case insensitive.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+        <target state="needs-translation">Optional. Wildcards e.g. *.pdf or *invoice* allowed. Can be comma-separated list. Case insensitive.</target>
+      </trans-unit>
+      <trans-unit id="1546332577833742677" datatype="html">
+        <source>Exclude files matching</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+        <target state="needs-translation">Exclude files matching</target>
       </trans-unit>
       <trans-unit id="9216117865911519658" datatype="html">
         <source>Action</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">50</context>
         </context-group>
         <target state="translated">Acţiune</target>
       </trans-unit>
-      <trans-unit id="4274038999388817994" datatype="html">
-        <source>Action is only performed when documents are consumed from the mail. Mails without attachments remain entirely untouched.</source>
+      <trans-unit id="7841986067387421166" datatype="html">
+        <source>Only performed if the mail is processed.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">50</context>
         </context-group>
-        <target state="translated">Acțiunea este efectuată numai atunci când documentele sunt consumate din e-mail. Mailurile fără atașamente rămân în întregime neatinse.</target>
+        <target state="needs-translation">Only performed if the mail is processed.</target>
       </trans-unit>
       <trans-unit id="1261794314435932203" datatype="html">
         <source>Action parameter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">33</context>
+          <context context-type="linenumber">52</context>
         </context-group>
         <target state="translated">Parametru acțiune</target>
       </trans-unit>
@@ -4145,15 +4145,23 @@
         <source>Assign title from</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">35</context>
+          <context context-type="linenumber">54</context>
         </context-group>
         <target state="translated">Atribuie titlu din</target>
+      </trans-unit>
+      <trans-unit id="5232720756589450549" datatype="html">
+        <source>Assign owner from rule</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+        <target state="translated">Atribuiți proprietarul din regulă</target>
       </trans-unit>
       <trans-unit id="6695990587380209737" datatype="html">
         <source>Assign document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">59</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
@@ -4165,7 +4173,7 @@
         <source>Assign correspondent from</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">38</context>
+          <context context-type="linenumber">60</context>
         </context-group>
         <target state="translated">Atribuie corespondent din</target>
       </trans-unit>
@@ -4173,7 +4181,7 @@
         <source>Assign correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">40</context>
+          <context context-type="linenumber">62</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
@@ -4181,19 +4189,11 @@
         </context-group>
         <target state="needs-translation">Assign correspondent</target>
       </trans-unit>
-      <trans-unit id="5232720756589450549" datatype="html">
-        <source>Assign owner from rule</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">42</context>
-        </context-group>
-        <target state="translated">Atribuiți proprietarul din regulă</target>
-      </trans-unit>
       <trans-unit id="1519954996184640001" datatype="html" approved="yes">
         <source>Error</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
-          <context context-type="linenumber">48</context>
+          <context context-type="linenumber">69</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
@@ -9525,11 +9525,19 @@
         </context-group>
         <target state="needs-translation">Japanese</target>
       </trans-unit>
+      <trans-unit id="6145439649200570157" datatype="html">
+        <source>Korean</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">148</context>
+        </context-group>
+        <target state="needs-translation">Korean</target>
+      </trans-unit>
       <trans-unit id="1334425850005897370" datatype="html">
         <source>Luxembourgish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">148</context>
+          <context context-type="linenumber">154</context>
         </context-group>
         <target state="translated">Luxemburgheză</target>
       </trans-unit>
@@ -9537,7 +9545,7 @@
         <source>Dutch</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">154</context>
+          <context context-type="linenumber">160</context>
         </context-group>
         <target state="final">Olandeză</target>
       </trans-unit>
@@ -9545,7 +9553,7 @@
         <source>Norwegian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">160</context>
+          <context context-type="linenumber">166</context>
         </context-group>
         <target state="needs-translation">Norwegian</target>
       </trans-unit>
@@ -9553,7 +9561,7 @@
         <source>Polish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">166</context>
+          <context context-type="linenumber">172</context>
         </context-group>
         <target state="final">Poloneză</target>
       </trans-unit>
@@ -9561,7 +9569,7 @@
         <source>Portuguese (Brazil)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">172</context>
+          <context context-type="linenumber">178</context>
         </context-group>
         <target state="final">Portugheză (Brazilia)</target>
       </trans-unit>
@@ -9569,7 +9577,7 @@
         <source>Portuguese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">178</context>
+          <context context-type="linenumber">184</context>
         </context-group>
         <target state="final">Portugheză</target>
       </trans-unit>
@@ -9577,7 +9585,7 @@
         <source>Romanian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">184</context>
+          <context context-type="linenumber">190</context>
         </context-group>
         <target state="final">Română</target>
       </trans-unit>
@@ -9585,7 +9593,7 @@
         <source>Russian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">190</context>
+          <context context-type="linenumber">196</context>
         </context-group>
         <target state="final">Rusă</target>
       </trans-unit>
@@ -9593,7 +9601,7 @@
         <source>Slovak</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">196</context>
+          <context context-type="linenumber">202</context>
         </context-group>
         <target state="needs-translation">Slovak</target>
       </trans-unit>
@@ -9601,7 +9609,7 @@
         <source>Slovenian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">202</context>
+          <context context-type="linenumber">208</context>
         </context-group>
         <target state="needs-translation">Slovenian</target>
       </trans-unit>
@@ -9609,7 +9617,7 @@
         <source>Serbian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">208</context>
+          <context context-type="linenumber">214</context>
         </context-group>
         <target state="needs-translation">Serbian</target>
       </trans-unit>
@@ -9617,7 +9625,7 @@
         <source>Swedish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">214</context>
+          <context context-type="linenumber">220</context>
         </context-group>
         <target state="final">Suedeză</target>
       </trans-unit>
@@ -9625,7 +9633,7 @@
         <source>Turkish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">220</context>
+          <context context-type="linenumber">226</context>
         </context-group>
         <target state="needs-translation">Turkish</target>
       </trans-unit>
@@ -9633,7 +9641,7 @@
         <source>Ukrainian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">226</context>
+          <context context-type="linenumber">232</context>
         </context-group>
         <target state="needs-translation">Ukrainian</target>
       </trans-unit>
@@ -9641,7 +9649,7 @@
         <source>Chinese Simplified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">232</context>
+          <context context-type="linenumber">238</context>
         </context-group>
         <target state="needs-translation">Chinese Simplified</target>
       </trans-unit>
@@ -9649,7 +9657,7 @@
         <source>ISO 8601</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">240</context>
+          <context context-type="linenumber">246</context>
         </context-group>
         <target state="translated">ISO 8601</target>
       </trans-unit>
@@ -9657,7 +9665,7 @@
         <source>Successfully completed one-time migratration of settings to the database!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">567</context>
+          <context context-type="linenumber">573</context>
         </context-group>
         <target state="needs-translation">Successfully completed one-time migratration of settings to the database!</target>
       </trans-unit>
@@ -9665,7 +9673,7 @@
         <source>Unable to migrate settings to the database, please try saving manually.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">568</context>
+          <context context-type="linenumber">574</context>
         </context-group>
         <target state="needs-translation">Unable to migrate settings to the database, please try saving manually.</target>
       </trans-unit>
@@ -9673,7 +9681,7 @@
         <source>You can restart the tour from the settings page.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">638</context>
+          <context context-type="linenumber">644</context>
         </context-group>
         <target state="needs-translation">You can restart the tour from the settings page.</target>
       </trans-unit>

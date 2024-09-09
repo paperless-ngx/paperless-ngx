@@ -110,6 +110,8 @@ body:
       options:
         - label: I believe this issue is a bug that affects all users of Paperless-ngx, not something specific to my installation.
           required: true
+        - label: This issue is not about the OCR or archive creation of a specific file(s). Otherwise, please see above regarding OCR tools.
+          required: true
         - label: I have already searched for relevant existing issues and discussions before opening this report.
           required: true
         - label: I have updated the title field above with a concise description.
