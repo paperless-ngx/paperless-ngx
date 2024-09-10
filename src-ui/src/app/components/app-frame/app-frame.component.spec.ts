@@ -115,7 +115,7 @@ describe('AppFrameComponent', () => {
         {
           provide: SavedViewService,
           useValue: {
-            initialize: () => {},
+            reload: () => {},
             listAll: () =>
               of({
                 all: [saved_views.map((v) => v.id)],
