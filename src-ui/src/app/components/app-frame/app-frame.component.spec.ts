@@ -170,7 +170,7 @@ describe('AppFrameComponent', () => {
       .mockReturnValue('Hello World')
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
 
-    savedViewSpy = jest.spyOn(savedViewService, 'initialize')
+    savedViewSpy = jest.spyOn(savedViewService, 'reload')
 
     fixture = TestBed.createComponent(AppFrameComponent)
     component = fixture.componentInstance
