@@ -22,10 +22,6 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
     super(http, 'saved_views')
   }
 
-  public initialize() {
-    this.reload()
-  }
-
   public list(
     page?: number,
     pageSize?: number,
@@ -49,7 +45,7 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
     )
   }
 
-  private reload() {
+  public reload() {
     this.listAll().subscribe()
   }
 
