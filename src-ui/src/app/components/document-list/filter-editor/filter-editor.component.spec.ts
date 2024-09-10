@@ -55,6 +55,7 @@ import {
   FILTER_HAS_ANY_CUSTOM_FIELDS,
   FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
   FILTER_HAS_CUSTOM_FIELDS_ALL,
+  FILTER_CUSTOM_FIELDS_LOOKUP,
 } from 'src/app/data/filter-rule-type'
 import { Correspondent } from 'src/app/data/correspondent'
 import { DocumentType } from 'src/app/data/document-type'
@@ -1445,24 +1446,6 @@ describe('FilterEditorComponent', () => {
     ])
   }))
 
-  it('should convert user input to correct filter rules on custom field select not assigned', fakeAsync(() => {
-    // const customFieldsFilterableDropdown = fixture.debugElement.queryAll(
-    //   By.directive(FilterableDropdownComponent)
-    // )[4]
-    // customFieldsFilterableDropdown.triggerEventHandler('opened')
-    // const customFieldButton = customFieldsFilterableDropdown.queryAll(
-    //   By.directive(ToggleableDropdownButtonComponent)
-    // )[0]
-    // customFieldButton.triggerEventHandler('toggle')
-    // fixture.detectChanges()
-    // expect(component.filterRules).toEqual([
-    //   {
-    //     rule_type: FILTER_HAS_ANY_CUSTOM_FIELDS,
-    //     value: 'false',
-    //   },
-    // ])
-  }))
-
   it('should convert user input to correct filter rules on custom field selections', fakeAsync(() => {
     // const customFieldsFilterableDropdown = fixture.debugElement.queryAll(
     //   By.directive(FilterableDropdownComponent)
@@ -1920,23 +1903,13 @@ describe('FilterEditorComponent', () => {
     ]
     expect(component.generateFilterName()).toEqual('Without any tag')
 
-    // component.filterRules = [
-    //   {
-    //     rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
-    //     value: '42',
-    //   },
-    // ]
-    // expect(component.generateFilterName()).toEqual(
-    //   `Custom fields: ${custom_fields[0].name}`
-    // )
-
-    // component.filterRules = [
-    //   {
-    //     rule_type: FILTER_HAS_ANY_CUSTOM_FIELDS,
-    //     value: 'false',
-    //   },
-    // ]
-    // expect(component.generateFilterName()).toEqual('Without any custom field')
+    component.filterRules = [
+      {
+        rule_type: FILTER_CUSTOM_FIELDS_LOOKUP,
+        value: '["AND",[["42","exists","true"],["43","exists","true"]]]',
+      },
+    ]
+    expect(component.generateFilterName()).toEqual(`Custom fields query`)
 
     component.filterRules = [
       {
