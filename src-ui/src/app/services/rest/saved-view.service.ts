@@ -6,6 +6,7 @@ import { SavedView } from 'src/app/data/saved-view'
 import { AbstractPaperlessService } from './abstract-paperless-service'
 import { SettingsService } from '../settings.service'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { Results } from 'src/app/data/results'
 
 @Injectable({
   providedIn: 'root',
@@ -25,18 +26,31 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
     this.reload()
   }
 
+  public list(
+    page?: number,
+    pageSize?: number,
+    sortField?: string,
+    sortReverse?: boolean,
+    extraParams?: any
+  ): Observable<Results<SavedView>> {
+    return super.list(page, pageSize, sortField, sortReverse, extraParams).pipe(
+      tap({
+        next: (r) => {
+          this.savedViews = r.results
+          this.loading = false
+          this.settingsService.dashboardIsEmpty =
+            this.dashboardViews.length === 0
+        },
+        error: () => {
+          this.loading = false
+          this.settingsService.dashboardIsEmpty = true
+        },
+      })
+    )
+  }
+
   private reload() {
-    this.listAll().subscribe({
-      next: (r) => {
-        this.savedViews = r.results
-        this.loading = false
-        this.settingsService.dashboardIsEmpty = this.dashboardViews.length === 0
-      },
-      error: () => {
-        this.loading = false
-        this.settingsService.dashboardIsEmpty = true
-      },
-    })
+    this.listAll().subscribe()
   }
 
   get allViews() {
