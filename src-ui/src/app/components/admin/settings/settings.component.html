@@ -332,7 +332,7 @@
       </ng-template>
     </li>
 
-    <li [ngbNavItem]="SettingsNavIDs.SavedViews">
+    <li [ngbNavItem]="SettingsNavIDs.SavedViews" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.SavedView }">
       <a ngbNavLink i18n>Saved views</a>
       <ng-template ngbNavContent>
 
