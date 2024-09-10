@@ -57,7 +57,7 @@ describe(`Additional service tests for SavedViewService`, () => {
   let settingsService
 
   it('should retrieve saved views and sort them', () => {
-    service.initialize()
+    service.reload()
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
     )
@@ -70,7 +70,7 @@ describe(`Additional service tests for SavedViewService`, () => {
   })
 
   it('should gracefully handle errors', () => {
-    service.initialize()
+    service.reload()
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
     )
