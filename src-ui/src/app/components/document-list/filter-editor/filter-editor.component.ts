@@ -96,6 +96,7 @@ import {
   CustomFieldQueryExpression,
   CustomFieldQueryAtom,
   CustomFieldQueryLogicalOperator,
+  CustomFieldQueryOperator,
 } from 'src/app/data/custom-field-query'
 import { CustomFieldQueriesModel } from '../../common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
 
@@ -559,7 +560,9 @@ export class FilterEditorComponent
           this.customFieldQueriesModel.addExpression(
             new CustomFieldQueryExpression([
               CustomFieldQueryLogicalOperator.And,
-              rule.value.split(','),
+              rule.value
+                .split(',')
+                .map((id) => [id, CustomFieldQueryOperator.Exists, 'true']),
             ])
           )
           break
@@ -567,7 +570,9 @@ export class FilterEditorComponent
           this.customFieldQueriesModel.addExpression(
             new CustomFieldQueryExpression([
               CustomFieldQueryLogicalOperator.Or,
-              rule.value.split(','),
+              rule.value
+                .split(',')
+                .map((id) => [id, CustomFieldQueryOperator.Exists, 'true']),
             ])
           )
           break

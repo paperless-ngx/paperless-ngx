@@ -97,6 +97,11 @@ import { RouterModule } from '@angular/router'
 import { SearchService } from 'src/app/services/rest/search.service'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { CustomFieldsQueryDropdownComponent } from '../../common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
+import {
+  CustomFieldQueryAtom,
+  CustomFieldQueryLogicalOperator,
+  CustomFieldQueryOperator,
+} from 'src/app/data/custom-field-query'
 
 const tags: Tag[] = [
   {
@@ -842,70 +847,43 @@ describe('FilterEditorComponent', () => {
   }))
 
   it('should ingest filter rules for has all custom fields', fakeAsync(() => {
-    // expect(component.customFieldQueriesModel.getSelectedItems()).toHaveLength(0)
-    // component.filterRules = [
-    //   {
-    //     rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
-    //     value: '42',
-    //   },
-    //   {
-    //     rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
-    //     value: '43',
-    //   },
-    // ]
-    // expect(component.customFieldQueriesModel.logicalOperator).toEqual(
-    //   LogicalOperator.And
-    // )
-    // expect(component.customFieldQueriesModel.getSelectedItems()).toEqual(
-    //   custom_fields
-    // )
-    // // coverage
-    // component.filterRules = [
-    //   {
-    //     rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
-    //     value: null,
-    //   },
-    // ]
-    // component.toggleTag(2) // coverage
+    expect(component.customFieldQueriesModel.isEmpty()).toBeTruthy()
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
+        value: '42,43',
+      },
+    ]
+    expect(component.customFieldQueriesModel.queries[0].operator).toEqual(
+      CustomFieldQueryLogicalOperator.And
+    )
+    expect(component.customFieldQueriesModel.queries[0].value.length).toEqual(2)
+    expect(
+      (
+        component.customFieldQueriesModel.queries[0]
+          .value[0] as CustomFieldQueryAtom
+      ).serialize()
+    ).toEqual(['42', CustomFieldQueryOperator.Exists, 'true'])
   }))
 
   it('should ingest filter rules for has any custom fields', fakeAsync(() => {
-    // expect(component.customFieldQueriesModel.getSelectedItems()).toHaveLength(0)
-    // component.filterRules = [
-    //   {
-    //     rule_type: FILTER_HAS_CUSTOM_FIELDS_ANY,
-    //     value: '42',
-    //   },
-    //   {
-    //     rule_type: FILTER_HAS_CUSTOM_FIELDS_ANY,
-    //     value: '43',
-    //   },
-    // ]
-    // expect(component.customFieldQueriesModel.logicalOperator).toEqual(
-    //   LogicalOperator.Or
-    // )
-    // expect(component.customFieldQueriesModel.getSelectedItems()).toEqual(
-    //   custom_fields
-    // )
-    // // coverage
-    // component.filterRules = [
-    //   {
-    //     rule_type: FILTER_HAS_CUSTOM_FIELDS_ANY,
-    //     value: null,
-    //   },
-    // ]
-  }))
-
-  it('should ingest filter rules for has any custom field', fakeAsync(() => {
-    // expect(component.customFieldQueriesModel.getSelectedItems()).toHaveLength(0)
-    // component.filterRules = [
-    //   {
-    //     rule_type: FILTER_HAS_ANY_CUSTOM_FIELDS,
-    //     value: '1',
-    //   },
-    // ]
-    // expect(component.customFieldQueriesModel.getSelectedItems()).toHaveLength(1)
-    // expect(component.customFieldQueriesModel.get(null)).toBeTruthy()
+    expect(component.customFieldQueriesModel.isEmpty()).toBeTruthy()
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_CUSTOM_FIELDS_ANY,
+        value: '42,43',
+      },
+    ]
+    expect(component.customFieldQueriesModel.queries[0].operator).toEqual(
+      CustomFieldQueryLogicalOperator.Or
+    )
+    expect(component.customFieldQueriesModel.queries[0].value.length).toEqual(2)
+    expect(
+      (
+        component.customFieldQueriesModel.queries[0]
+          .value[0] as CustomFieldQueryAtom
+      ).serialize()
+    ).toEqual(['42', CustomFieldQueryOperator.Exists, 'true'])
   }))
 
   it('should ingest filter rules for exclude tag(s)', fakeAsync(() => {
