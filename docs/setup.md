@@ -269,14 +269,13 @@ are released, dependency support is confirmed, etc.
     - `libpq-dev` for PostgreSQL
     - `libmagic-dev` for mime type detection
     - `mariadb-client` for MariaDB compile time
-    - `mime-support` for mime type detection
     - `libzbar0` for barcode detection
     - `poppler-utils` for barcode detection
 
     Use this list for your preferred package management:
 
     ```
-    python3 python3-pip python3-dev imagemagick fonts-liberation gnupg libpq-dev default-libmysqlclient-dev pkg-config libmagic-dev mime-support libzbar0 poppler-utils
+    python3 python3-pip python3-dev imagemagick fonts-liberation gnupg libpq-dev default-libmysqlclient-dev pkg-config libmagic-dev libzbar0 poppler-utils
     ```
 
     These dependencies are required for OCRmyPDF, which is used for text
@@ -304,6 +303,7 @@ are released, dependency support is confirmed, etc.
 
     - `libatlas-base-dev`
     - `libxslt1-dev`
+    - `mime-support`
 
     You will also need these for installing some of the python dependencies:
 
