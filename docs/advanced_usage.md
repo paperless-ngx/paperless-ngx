@@ -708,7 +708,7 @@ gpg --decrypt name_of_file.asc
 
 ### Setup
 
-First, enable the [PAPERLESS_GPG_DECRYPTOR environment variable](configuration.md#PAPERLESS_GPG_DECRYPTOR).
+First, enable the [PAPERLESS_ENABLE_GPG_DECRYPTOR environment variable](configuration.md#PAPERLESS_ENABLE_GPG_DECRYPTOR).
 
 Then determine your local `gpg-agent.extra` socket by invoking
 
