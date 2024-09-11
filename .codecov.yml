@@ -14,6 +14,8 @@ flag_management:
 # codecov will only comment if coverage changes
 comment:
   require_changes: true
+  require_bundle_changes: true
+  bundle_change_threshold: "1Kb"
 coverage:
   status:
     project:

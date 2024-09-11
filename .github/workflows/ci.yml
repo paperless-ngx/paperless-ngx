@@ -260,7 +260,7 @@ jobs:
           retention-days: 7
 
   tests-coverage-upload:
-    name: "Upload Coverage"
+    name: "Upload to Codecov"
     runs-on: ubuntu-22.04
     needs:
       - tests-backend
@@ -306,6 +306,30 @@ jobs:
           # future expansion
           flags: backend
           directory: src/
+      -
+        name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+          cache-dependency-path: 'src-ui/package-lock.json'
+      -
+        name: Cache frontend dependencies
+        id: cache-frontend-deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            ~/.cache
+          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/package-lock.json') }}
+      -
+        name: Re-link Angular cli
+        run: cd src-ui && npm link @angular/cli
+      -
+        name: Build frontend and upload analysis
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: cd src-ui && ng build --configuration=production
 
   build-docker-image:
     name: Build Docker image for ${{ github.ref_name }}
