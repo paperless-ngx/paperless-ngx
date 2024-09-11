@@ -303,6 +303,7 @@ are released, dependency support is confirmed, etc.
 
     - `libatlas-base-dev`
     - `libxslt1-dev`
+    - `mime-support`
 
     You will also need these for installing some of the python dependencies:
 
