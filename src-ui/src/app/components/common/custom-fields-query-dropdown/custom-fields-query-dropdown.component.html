@@ -104,9 +104,9 @@
   <div class="d-flex w-100">
     <div class="d-flex flex-grow-1 flex-column">
       <div class="btn-group btn-group-xs" role="group">
-        <input [(ngModel)]="expression.operator" type="radio" class="btn-check" id="logicalOperatorOr_{{expression.id}}" name="logicalOperatorOr_{{expression.id}}" value="OR" [disabled]="expression.value.length < 2">
+        <input [(ngModel)]="expression.operator" type="radio" class="btn-check" id="logicalOperatorOr_{{expression.id}}" name="logicalOperatorOr_{{expression.id}}" value="OR" [disabled]="expression.depth > 0 && expression.value.length < 2">
         <label class="btn btn-outline-primary" for="logicalOperatorOr_{{expression.id}}" i18n>Any</label>
-        <input [(ngModel)]="expression.operator" type="radio" class="btn-check" id="logicalOperatorAnd_{{expression.id}}" name="logicalOperatorAnd_{{expression.id}}" value="AND" [disabled]="expression.value.length < 2">
+        <input [(ngModel)]="expression.operator" type="radio" class="btn-check" id="logicalOperatorAnd_{{expression.id}}" name="logicalOperatorAnd_{{expression.id}}" value="AND" [disabled]="expression.depth > 0 && expression.value.length < 2">
         <label class="btn btn-outline-primary" for="logicalOperatorAnd_{{expression.id}}" i18n>All</label>
         @if (expression.negatable)  {
           <input [(ngModel)]="expression.operator" type="radio" class="btn-check" id="logicalOperatorNot_{{expression.id}}" name="logicalOperatorNot_{{expression.id}}" value="NOT">
