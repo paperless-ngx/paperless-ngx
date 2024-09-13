@@ -268,8 +268,6 @@ export class CustomFieldQueryExpression extends CustomFieldQueryElement {
     super(CustomFieldQueryElementType.Expression)
     let values
     ;[this._operator, values] = expressionArray
-    console.log(values)
-
     if (!values || values.length === 0) {
       this._value = []
     } else if (values?.length > 0 && values[0] instanceof Array) {
@@ -291,7 +289,12 @@ export class CustomFieldQueryExpression extends CustomFieldQueryElement {
         }
       })
     } else {
-      this._value = [new CustomFieldQueryExpression(values as any)]
+      const expression = new CustomFieldQueryExpression(values as any)
+      expression.depth = this.depth + 1
+      expression.changed.subscribe(() => {
+        this.changed.next(this)
+      })
+      this._value = [expression]
     }
   }
 
@@ -299,6 +302,13 @@ export class CustomFieldQueryExpression extends CustomFieldQueryElement {
     let value
     if (this._value instanceof Array) {
       value = this._value.map((atom) => atom.serialize())
+      // If the expression is negated it should have only one child which is an expression
+      if (
+        this._operator === CustomFieldQueryLogicalOperator.Not &&
+        value.length === 1
+      ) {
+        value = value[0]
+      }
     } else {
       value = value.serialize()
     }
@@ -327,5 +337,13 @@ export class CustomFieldQueryExpression extends CustomFieldQueryElement {
     expression.changed.subscribe(() => {
       this.changed.next(this)
     })
+  }
+
+  public get negatable(): boolean {
+    return (
+      this.value.length === 1 &&
+      (this.value[0] as CustomFieldQueryElement).type ===
+        CustomFieldQueryElementType.Expression
+    )
   }
 }

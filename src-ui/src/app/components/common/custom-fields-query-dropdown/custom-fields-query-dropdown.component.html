@@ -108,6 +108,10 @@
         <label class="btn btn-outline-primary" for="logicalOperatorOr_{{expression.id}}" i18n>Any</label>
         <input [(ngModel)]="expression.operator" type="radio" class="btn-check" id="logicalOperatorAnd_{{expression.id}}" name="logicalOperatorAnd_{{expression.id}}" value="AND" [disabled]="expression.value.length < 2">
         <label class="btn btn-outline-primary" for="logicalOperatorAnd_{{expression.id}}" i18n>All</label>
+        @if (expression.negatable)  {
+          <input [(ngModel)]="expression.operator" type="radio" class="btn-check" id="logicalOperatorNot_{{expression.id}}" name="logicalOperatorNot_{{expression.id}}" value="NOT">
+          <label class="btn btn-outline-warning" for="logicalOperatorNot_{{expression.id}}" i18n>Not</label>
+        }
       </div>
       <div class="list-group list-group-flush mb-n2">
         @for (element of expression.value; track element.id; let i = $index) {
