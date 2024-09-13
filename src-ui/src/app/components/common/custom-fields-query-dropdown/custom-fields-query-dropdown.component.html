@@ -110,7 +110,7 @@
         <label class="btn btn-outline-primary" for="logicalOperatorAnd_{{expression.id}}" i18n>All</label>
         @if (expression.negatable)  {
           <input [(ngModel)]="expression.operator" type="radio" class="btn-check" id="logicalOperatorNot_{{expression.id}}" name="logicalOperatorNot_{{expression.id}}" value="NOT">
-          <label class="btn btn-outline-warning" for="logicalOperatorNot_{{expression.id}}" i18n>Not</label>
+          <label class="btn btn-outline-secondary" for="logicalOperatorNot_{{expression.id}}" i18n>Not</label>
         }
       </div>
       <div class="list-group list-group-flush mb-n2">
