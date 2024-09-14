@@ -93,12 +93,14 @@ import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service
 import { CustomField } from 'src/app/data/custom-field'
 import { SearchService } from 'src/app/services/rest/search.service'
 import {
-  CustomFieldQueryExpression,
-  CustomFieldQueryAtom,
   CustomFieldQueryLogicalOperator,
   CustomFieldQueryOperator,
 } from 'src/app/data/custom-field-query'
 import { CustomFieldQueriesModel } from '../../common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
+import {
+  CustomFieldQueryExpression,
+  CustomFieldQueryAtom,
+} from 'src/app/utils/custom-field-query-element'
 
 const TEXT_FILTER_TARGET_TITLE = 'title'
 const TEXT_FILTER_TARGET_TITLE_CONTENT = 'title-content'
@@ -546,7 +548,7 @@ export class FilterEditorComponent
                 )
               } else if (query.length === 3) {
                 // atom
-                this.customFieldQueriesModel.addQuery(
+                this.customFieldQueriesModel.addAtom(
                   new CustomFieldQueryAtom(query as any)
                 )
               }

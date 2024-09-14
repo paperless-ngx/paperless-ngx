@@ -2,19 +2,21 @@ import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { Subject, first, takeUntil } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
-  CustomFieldQueryAtom,
-  CustomFieldQueryExpression,
   CustomFieldQueryElementType,
   CustomFieldQueryOperator,
   CUSTOM_FIELD_QUERY_OPERATOR_GROUPS_BY_TYPE,
   CUSTOM_FIELD_QUERY_OPERATORS_BY_GROUP,
   CustomFieldQueryOperatorGroups,
   CUSTOM_FIELD_QUERY_OPERATOR_LABELS,
-  CustomFieldQueryElement,
   CUSTOM_FIELD_QUERY_MAX_DEPTH,
   CUSTOM_FIELD_QUERY_MAX_ATOMS,
 } from 'src/app/data/custom-field-query'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import {
+  CustomFieldQueryElement,
+  CustomFieldQueryExpression,
+  CustomFieldQueryAtom,
+} from 'src/app/utils/custom-field-query-element'
 
 export class CustomFieldQueriesModel {
   public queries: CustomFieldQueryElement[] = []
@@ -59,13 +61,13 @@ export class CustomFieldQueriesModel {
     )
   }
 
-  public addQuery(query: CustomFieldQueryAtom) {
+  public addAtom(atom: CustomFieldQueryAtom) {
     if (this.queries.length === 0) {
       this.addExpression()
     }
-    ;(this.queries[0].value as CustomFieldQueryElement[]).push(query)
-    query.changed.subscribe(() => {
-      if (query.field && query.operator && query.value) {
+    ;(this.queries[0].value as CustomFieldQueryElement[]).push(atom)
+    atom.changed.subscribe(() => {
+      if (atom.field && atom.operator && atom.value) {
         this.changed.next(this)
       }
     })
@@ -163,8 +165,7 @@ export class CustomFieldsQueryDropdownComponent {
   @Input()
   disabled: boolean = false
 
-  private _selectionModel: CustomFieldQueriesModel =
-    new CustomFieldQueriesModel()
+  private _selectionModel: CustomFieldQueriesModel
 
   @Input()
   set selectionModel(model: CustomFieldQueriesModel) {
@@ -195,6 +196,7 @@ export class CustomFieldsQueryDropdownComponent {
   private unsubscribeNotifier: Subject<any> = new Subject()
 
   constructor(protected customFieldsService: CustomFieldsService) {
+    this.selectionModel = new CustomFieldQueriesModel()
     this.getFields()
     this.reset()
   }
