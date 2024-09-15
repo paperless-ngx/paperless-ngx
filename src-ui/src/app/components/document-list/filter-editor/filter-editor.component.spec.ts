@@ -98,10 +98,10 @@ import { SearchService } from 'src/app/services/rest/search.service'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { CustomFieldsQueryDropdownComponent } from '../../common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
 import {
-  CustomFieldQueryAtom,
   CustomFieldQueryLogicalOperator,
   CustomFieldQueryOperator,
 } from 'src/app/data/custom-field-query'
+import { CustomFieldQueryAtom } from 'src/app/utils/custom-field-query-element'
 
 const tags: Tag[] = [
   {
@@ -886,31 +886,39 @@ describe('FilterEditorComponent', () => {
     ).toEqual(['42', CustomFieldQueryOperator.Exists, 'true'])
   }))
 
-  it('should ingest filter rules for exclude tag(s)', fakeAsync(() => {
-    // expect(component.customFieldQueriesModel.getExcludedItems()).toHaveLength(0)
-    // component.filterRules = [
-    //   {
-    //     rule_type: FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
-    //     value: '42',
-    //   },
-    //   {
-    //     rule_type: FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
-    //     value: '43',
-    //   },
-    // ]
-    // expect(component.customFieldQueriesModel.logicalOperator).toEqual(
-    //   LogicalOperator.And
-    // )
-    // expect(component.customFieldQueriesModel.getExcludedItems()).toEqual(
-    //   custom_fields
-    // )
-    // // coverage
-    // component.filterRules = [
-    //   {
-    //     rule_type: FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
-    //     value: null,
-    //   },
-    // ]
+  it('should ingest filter rules for custom field lookup', fakeAsync(() => {
+    expect(component.customFieldQueriesModel.isEmpty()).toBeTruthy()
+    component.filterRules = [
+      {
+        rule_type: FILTER_CUSTOM_FIELDS_LOOKUP,
+        value: '["AND", [[42, "exists", "true"],[43, "exists", "true"]]]',
+      },
+    ]
+    expect(component.customFieldQueriesModel.queries[0].operator).toEqual(
+      CustomFieldQueryLogicalOperator.And
+    )
+    expect(component.customFieldQueriesModel.queries[0].value.length).toEqual(2)
+    expect(
+      (
+        component.customFieldQueriesModel.queries[0]
+          .value[0] as CustomFieldQueryAtom
+      ).serialize()
+    ).toEqual([42, CustomFieldQueryOperator.Exists, 'true'])
+
+    // atom
+    component.filterRules = [
+      {
+        rule_type: FILTER_CUSTOM_FIELDS_LOOKUP,
+        value: '[42, "exists", "true"]',
+      },
+    ]
+    expect(component.customFieldQueriesModel.queries[0].value.length).toEqual(1)
+    expect(
+      (
+        component.customFieldQueriesModel.queries[0]
+          .value[0] as CustomFieldQueryAtom
+      ).serialize()
+    ).toEqual([42, CustomFieldQueryOperator.Exists, 'true'])
   }))
 
   it('should ingest filter rules for owner', fakeAsync(() => {

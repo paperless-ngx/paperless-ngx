@@ -73,31 +73,20 @@ export class CustomFieldQueryAtom extends CustomFieldQueryElement {
       this.value = null
     } else {
       if (!newTypes.includes(typeof this.value)) {
-        if (newTypes.length === 1) {
-          switch (newTypes[0]) {
-            case 'string':
-              this.value = ''
-              break
-            case 'boolean':
-              this.value = 'true'
-              break
-            case 'array':
-              this.value = []
-              break
-            default:
-              this.value = null
-              break
-          }
-        } else {
-          if (newTypes.includes('number')) {
-            try {
-              this.value = parseFloat(this.value as string).toString()
-            } catch (e) {
-              this.value = null
-            }
-          } else {
-            this.value = null
-          }
+        switch (newTypes[0]) {
+          case 'string':
+            this.value = ''
+            break
+          case 'boolean':
+            this.value = 'true'
+            break
+          case 'array':
+            this.value = []
+            break
+          case 'number':
+            const num = parseFloat(this.value as string)
+            this.value = isNaN(num) ? null : num.toString()
+            break
         }
       } else if (
         ['true', 'false'].includes(this.value as string) &&
@@ -133,6 +122,8 @@ export class CustomFieldQueryAtom extends CustomFieldQueryElement {
 }
 
 export class CustomFieldQueryExpression extends CustomFieldQueryElement {
+  protected _value: string[] | number[] | CustomFieldQueryElement[]
+
   constructor(
     expressionArray: [CustomFieldQueryLogicalOperator, any[]] = [
       CustomFieldQueryLogicalOperator.Or,
@@ -174,17 +165,13 @@ export class CustomFieldQueryExpression extends CustomFieldQueryElement {
 
   public override serialize() {
     let value
-    if (this._value instanceof Array) {
-      value = this._value.map((atom) => atom.serialize())
-      // If the expression is negated it should have only one child which is an expression
-      if (
-        this._operator === CustomFieldQueryLogicalOperator.Not &&
-        value.length === 1
-      ) {
-        value = value[0]
-      }
-    } else {
-      value = value.serialize()
+    value = this._value.map((element) => element.serialize())
+    // If the expression is negated it should have only one child which is an expression
+    if (
+      this._operator === CustomFieldQueryLogicalOperator.Not &&
+      value.length === 1
+    ) {
+      value = value[0]
     }
     return [this._operator, value]
   }
