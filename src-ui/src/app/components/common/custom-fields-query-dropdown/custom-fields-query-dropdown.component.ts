@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core'
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core'
+import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
 import { Subject, first, takeUntil } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
@@ -165,6 +172,8 @@ export class CustomFieldsQueryDropdownComponent {
   @Input()
   disabled: boolean = false
 
+  @ViewChild('dropdown') dropdown: NgbDropdown
+
   private _selectionModel: CustomFieldQueriesModel
 
   @Input()
@@ -185,6 +194,7 @@ export class CustomFieldsQueryDropdownComponent {
   private onModelChange() {
     if (this.selectionModel.isEmpty() || this.selectionModel.isValid()) {
       this.selectionModelChange.next(this.selectionModel)
+      this.selectionModel.isEmpty() && this.dropdown?.close()
     }
   }
 
