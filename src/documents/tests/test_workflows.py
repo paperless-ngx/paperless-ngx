@@ -1758,3 +1758,52 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         info = cm.output[0]
         expected_str = f"Document matched {trigger} from {w}"
         self.assertIn(expected_str, info)
+
+    def test_workflow_with_tag_actions_doesnt_overwrite_other_actions(self):
+        """
+        GIVEN:
+            - Document updated workflow filtered by has tag with two actions, first adds owner, second removes a tag
+        WHEN:
+            - File that matches is consumed
+        THEN:
+            - Both actions are applied correctly
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        trigger.filter_has_tags.add(self.t1)
+        action1 = WorkflowAction.objects.create(
+            assign_owner=self.user2,
+        )
+        action2 = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.REMOVAL,
+        )
+        action2.remove_tags.add(self.t1)
+        w = Workflow.objects.create(
+            name="Workflow Add Owner and Remove Tag",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action1)
+        w.actions.add(action2)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        superuser = User.objects.create_superuser("superuser")
+        self.client.force_authenticate(user=superuser)
+
+        self.client.patch(
+            f"/api/documents/{doc.id}/",
+            {"tags": [self.t1.id, self.t2.id]},
+            format="json",
+        )
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.owner, self.user2)
+        self.assertEqual(doc.tags.all().count(), 1)
+        self.assertIn(self.t2, doc.tags.all())

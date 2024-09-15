@@ -535,7 +535,9 @@ def run_workflow(
 ):
     def assignment_action():
         if action.assign_tags.all().count() > 0:
-            document.tags.add(*action.assign_tags.all())
+            doc_tag_ids.extend(
+                list(action.assign_tags.all().values_list("pk", flat=True)),
+            )
 
         if action.assign_correspondent is not None:
             document.correspondent = action.assign_correspondent
@@ -641,12 +643,12 @@ def run_workflow(
 
     def removal_action():
         if action.remove_all_tags:
-            document.tags.clear()
+            doc_tag_ids.clear()
         else:
             for tag in action.remove_tags.filter(
                 pk__in=list(document.tags.values_list("pk", flat=True)),
             ).all():
-                document.tags.remove(tag.pk)
+                doc_tag_ids.remove(tag.pk)
 
         if action.remove_all_correspondents or (
             document.correspondent
@@ -747,6 +749,7 @@ def run_workflow(
         # Refresh this so the matching data is fresh and instance fields are re-freshed
         # Otherwise, this instance might be behind and overwrite the work another process did
         document.refresh_from_db()
+        doc_tag_ids = list(document.tags.all().values_list("pk", flat=True))
         if matching.document_matches_workflow(
             document,
             workflow,
@@ -765,7 +768,9 @@ def run_workflow(
                 elif action.type == WorkflowAction.WorkflowActionType.REMOVAL:
                     removal_action()
 
+            # save first before setting tags
             document.save()
+            document.tags.set(doc_tag_ids)
 
 
 @before_task_publish.connect
