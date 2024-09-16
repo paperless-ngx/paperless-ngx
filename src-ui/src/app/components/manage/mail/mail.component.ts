@@ -137,14 +137,13 @@ export class MailComponent
     })
   }
 
-  editMailRule(rule: MailRule = null) {
+  editMailRule(rule: MailRule = null, clone = false) {
     const modal = this.modalService.open(MailRuleEditDialogComponent, {
       backdrop: 'static',
       size: 'xl',
     })
-    modal.componentInstance.dialogMode = rule
-      ? EditDialogMode.EDIT
-      : EditDialogMode.CREATE
+    modal.componentInstance.dialogMode =
+      rule && !clone ? EditDialogMode.EDIT : EditDialogMode.CREATE
     modal.componentInstance.object = rule
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -162,6 +161,13 @@ export class MailComponent
       .subscribe((e) => {
         this.toastService.showError($localize`Error saving rule.`, e)
       })
+  }
+
+  cloneMailRule(rule: MailRule) {
+    const clone = { ...rule }
+    clone.id = null
+    clone.name = `${rule.name} (clone)`
+    this.editMailRule(clone, true)
   }
 
   deleteMailRule(rule: MailRule) {
