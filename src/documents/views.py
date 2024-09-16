@@ -980,6 +980,7 @@ class BulkEditView(PassUserMixin):
                     bulk_edit.set_permissions,
                     bulk_edit.delete,
                     bulk_edit.rotate,
+                    bulk_edit.delete_pages,
                 ]
                 else all(
                     has_perms_owner_aware(user, "change_document", doc)
