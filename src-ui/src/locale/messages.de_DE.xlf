@@ -2525,7 +2525,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
-          <context context-type="linenumber">77</context>
+          <context context-type="linenumber">76</context>
         </context-group>
         <target state="final">Benutzer</target>
       </trans-unit>
@@ -4001,13 +4001,13 @@
         </context-group>
         <target state="final">Konto</target>
       </trans-unit>
-      <trans-unit id="4348351765075925931" datatype="html">
+      <trans-unit id="4348351765075925931" datatype="html" approved="yes">
         <source>Paperless will only process mails that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> of the criteria specified below.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="translated">Paperless wird nur E-Mails verarbeiten, die mit <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>allen<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> unten angegebenen Kriterien übereinstimmen.</target>
+        <target state="final">Paperless wird nur E-Mails verarbeiten, die mit <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>allen<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> unten angegebenen Kriterien übereinstimmen.</target>
       </trans-unit>
       <trans-unit id="7046259383943324039" datatype="html" approved="yes">
         <source>Folder</source>
@@ -4089,15 +4089,15 @@
         </context-group>
         <target state="final">Dateianhangstyp</target>
       </trans-unit>
-      <trans-unit id="2873939123535615966" datatype="html">
+      <trans-unit id="2873939123535615966" datatype="html" approved="yes">
         <source>Include only files matching</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="translated">Nur übereinstimmende Dateien einbeziehen</target>
+        <target state="final">Nur übereinstimmende Dateien einbeziehen</target>
       </trans-unit>
-      <trans-unit id="7233407036155150477" datatype="html">
+      <trans-unit id="7233407036155150477" datatype="html" approved="yes">
         <source>Optional. Wildcards e.g. *.pdf or *invoice* allowed. Can be comma-separated list. Case insensitive.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
@@ -4107,15 +4107,15 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="translated">Optional. Platzhalter wie *.pdf oder *rechnung* sind erlaubt und können als kommagetrennte Liste angegeben werden. Groß- und Kleinschreibung wird nicht beachtet.</target>
+        <target state="final">Optional. Platzhalter wie *.pdf oder *rechnung* sind erlaubt und können als kommagetrennte Liste angegeben werden. Groß- und Kleinschreibung wird nicht beachtet.</target>
       </trans-unit>
-      <trans-unit id="1546332577833742677" datatype="html">
+      <trans-unit id="1546332577833742677" datatype="html" approved="yes">
         <source>Exclude files matching</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="translated">Übereinstimmende Dateien ausschließen</target>
+        <target state="final">Übereinstimmende Dateien ausschließen</target>
       </trans-unit>
       <trans-unit id="9216117865911519658" datatype="html" approved="yes">
         <source>Action</source>
@@ -4125,13 +4125,13 @@
         </context-group>
         <target state="final">Aktion</target>
       </trans-unit>
-      <trans-unit id="7841986067387421166" datatype="html">
+      <trans-unit id="7841986067387421166" datatype="html" approved="yes">
         <source>Only performed if the mail is processed.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="translated">Wird nur ausgeführt, wenn die Mail verarbeitet wird.</target>
+        <target state="final">Wird nur ausgeführt, wenn die E-Mail verarbeitet wird.</target>
       </trans-unit>
       <trans-unit id="1261794314435932203" datatype="html" approved="yes">
         <source>Action parameter</source>
@@ -5415,7 +5415,7 @@
         <source>Hide unowned</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
-          <context context-type="linenumber">88</context>
+          <context context-type="linenumber">86</context>
         </context-group>
         <target state="final">Dokumente ohne Eigentümer ausblenden</target>
       </trans-unit>
@@ -7829,12 +7829,12 @@
         <target state="final">kleiner als</target>
       </trans-unit>
       <trans-unit id="5195932016807797291" datatype="html" approved="yes">
-        <source>Correspondent: <x id="PH" equiv-text="this.correspondents.find(               (c) =&gt; c.id == +rule.value             )?.name"/></source>
+        <source>Correspondent: <x id="PH" equiv-text="this.correspondents.find((c) =&gt; c.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">191,193</context>
         </context-group>
-        <target state="final">Korrespondent: <x id="PH" equiv-text="this.correspondents.find(               (c) =&gt; c.id == +rule.value             )?.name"/></target>
+        <target state="final">Korrespondent: <x id="PH" equiv-text="this.correspondents.find((c) =&gt; c.id == +rule.value)?.name"/></target>
       </trans-unit>
       <trans-unit id="8170755470576301659" datatype="html" approved="yes">
         <source>Without correspondent</source>
@@ -7845,12 +7845,12 @@
         <target state="final">Ohne Korrespondent</target>
       </trans-unit>
       <trans-unit id="317796810569008208" datatype="html" approved="yes">
-        <source>Document type: <x id="PH" equiv-text="this.documentTypes.find(               (dt) =&gt; dt.id == +rule.value             )?.name"/></source>
+        <source>Document type: <x id="PH" equiv-text="this.documentTypes.find((dt) =&gt; dt.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">201,203</context>
         </context-group>
-        <target state="final">Dokumenttyp: <x id="PH" equiv-text="this.documentTypes.find(               (dt) =&gt; dt.id == +rule.value             )?.name"/></target>
+        <target state="final">Dokumenttyp: <x id="PH" equiv-text="this.documentTypes.find((dt) =&gt; dt.id == +rule.value)?.name"/></target>
       </trans-unit>
       <trans-unit id="4362173610367509215" datatype="html" approved="yes">
         <source>Without document type</source>
@@ -7861,12 +7861,12 @@
         <target state="final">Ohne Dokumenttyp</target>
       </trans-unit>
       <trans-unit id="232202047340644471" datatype="html" approved="yes">
-        <source>Storage path: <x id="PH" equiv-text="this.storagePaths.find(               (sp) =&gt; sp.id == +rule.value             )?.name"/></source>
+        <source>Storage path: <x id="PH" equiv-text="this.storagePaths.find((sp) =&gt; sp.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">211,213</context>
         </context-group>
-        <target state="final">Speicherpfad: <x id="PH" equiv-text="this.storagePaths.find(               (sp) =&gt; sp.id == +rule.value             )?.name"/></target>
+        <target state="final">Speicherpfad: <x id="PH" equiv-text="this.storagePaths.find((sp) =&gt; sp.id == +rule.value)?.name"/></target>
       </trans-unit>
       <trans-unit id="1562820715074533164" datatype="html" approved="yes">
         <source>Without storage path</source>
@@ -7877,34 +7877,34 @@
         <target state="final">Ohne Speicherpfad</target>
       </trans-unit>
       <trans-unit id="8180755793012580465" datatype="html" approved="yes">
-        <source>Tag: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)             ?.name"/></source>
+        <source>Tag: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">219,220</context>
+          <context context-type="linenumber">219,221</context>
         </context-group>
-        <target state="final">Tag: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)             ?.name"/></target>
+        <target state="final">Tag: <x id="PH" equiv-text="this.tags.find((t) =&gt; t.id == +rule.value)?.name"/></target>
       </trans-unit>
       <trans-unit id="6494566478302448576" datatype="html" approved="yes">
         <source>Without any tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">224</context>
+          <context context-type="linenumber">225</context>
         </context-group>
         <target state="final">Ohne Tag</target>
       </trans-unit>
       <trans-unit id="6370692707013694620" datatype="html" approved="yes">
-        <source>Custom fields: <x id="PH" equiv-text="this.customFields.find(             (f) =&gt; f.id == +rule.value           )?.name"/></source>
+        <source>Custom fields: <x id="PH" equiv-text="this.customFields.find((f) =&gt; f.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">228,230</context>
+          <context context-type="linenumber">229,231</context>
         </context-group>
-        <target state="final">Benutzerdefinierte Felder: <x id="PH" equiv-text="this.customFields.find(             (f) =&gt; f.id == +rule.value           )?.name"/></target>
+        <target state="final">Benutzerdefinierte Felder: <x id="PH" equiv-text="this.customFields.find((f) =&gt; f.id == +rule.value)?.name"/></target>
       </trans-unit>
       <trans-unit id="5297600960590041873" datatype="html" approved="yes">
         <source>Without any custom field</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">234</context>
+          <context context-type="linenumber">235</context>
         </context-group>
         <target state="final">Ohne benutzerdefinierte Felder</target>
       </trans-unit>
@@ -7912,7 +7912,7 @@
         <source>Title: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">238</context>
+          <context context-type="linenumber">239</context>
         </context-group>
         <target state="final">Titel: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
@@ -7920,7 +7920,7 @@
         <source>ASN: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">241</context>
+          <context context-type="linenumber">242</context>
         </context-group>
         <target state="final">ASN: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
@@ -7928,7 +7928,7 @@
         <source>Owner: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">244</context>
+          <context context-type="linenumber">245</context>
         </context-group>
         <target state="final">Eigentümer: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
@@ -7936,7 +7936,7 @@
         <source>Owner not in: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">247</context>
+          <context context-type="linenumber">248</context>
         </context-group>
         <target state="final">Eigentümer nicht in: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
@@ -7944,7 +7944,7 @@
         <source>Without an owner</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">250</context>
+          <context context-type="linenumber">251</context>
         </context-group>
         <target state="final">Ohne Eigentümer</target>
       </trans-unit>
