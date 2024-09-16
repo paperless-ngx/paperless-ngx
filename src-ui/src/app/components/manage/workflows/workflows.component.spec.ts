@@ -178,7 +178,7 @@ describe('WorkflowsComponent', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
 
-    const cloneButton = fixture.debugElement.queryAll(By.css('button'))[4]
+    const cloneButton = fixture.debugElement.queryAll(By.css('button'))[5]
     cloneButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
@@ -194,7 +194,7 @@ describe('WorkflowsComponent', () => {
     const deleteSpy = jest.spyOn(workflowService, 'delete')
     const reloadSpy = jest.spyOn(component, 'reload')
 
-    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[5]
+    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[4]
     deleteButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
