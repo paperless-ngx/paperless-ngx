@@ -1,10 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { CustomFieldsQueryDropdownComponent } from './custom-fields-query-dropdown.component'
+import {
+  CustomFieldQueriesModel,
+  CustomFieldsQueryDropdownComponent,
+} from './custom-fields-query-dropdown.component'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { of } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
   CUSTOM_FIELD_QUERY_OPERATORS_BY_GROUP,
+  CustomFieldQueryLogicalOperator,
   CustomFieldQueryOperatorGroups,
 } from 'src/app/data/custom-field-query'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
@@ -129,6 +133,16 @@ describe('CustomFieldsQueryDropdownComponent', () => {
     component.selectionModel.addExpression(expression)
     component.removeElement(atom)
     expect(component.selectionModel.isEmpty()).toBeTruthy()
+    const expression2 = new CustomFieldQueryExpression([
+      CustomFieldQueryLogicalOperator.And,
+      [
+        [1, 'icontains', 'test'],
+        [2, 'icontains', 'test'],
+      ],
+    ])
+    component.selectionModel.addExpression(expression2)
+    component.removeElement(expression2)
+    expect(component.selectionModel.isEmpty()).toBeTruthy()
   })
 
   it('should emit selectionModelChange when model changes', () => {
@@ -137,5 +151,33 @@ describe('CustomFieldsQueryDropdownComponent', () => {
     component.selectionModel.addAtom(atom)
     atom.changed.next(atom)
     expect(nextSpy).toHaveBeenCalled()
+  })
+
+  it('should complete selection model subscription when new selection model is set', () => {
+    const completeSpy = jest.spyOn(component.selectionModel.changed, 'complete')
+    const selectionModel = new CustomFieldQueriesModel()
+    component.selectionModel = selectionModel
+    expect(completeSpy).toHaveBeenCalled()
+  })
+
+  it('should support adding an atom', () => {
+    const expression = new CustomFieldQueryExpression()
+    component.addAtom(expression)
+    expect(expression.value.length).toBe(1)
+  })
+
+  it('should support adding an expression', () => {
+    const expression = new CustomFieldQueryExpression()
+    component.addExpression(expression)
+    expect(expression.value.length).toBe(1)
+  })
+
+  it('should support getting a custom field by ID', () => {
+    expect(component.getCustomFieldByID(1)).toEqual(customFields[0])
+  })
+
+  it('should sanitize name from title', () => {
+    component.title = 'Test Title'
+    expect(component.name).toBe('test_title')
   })
 })

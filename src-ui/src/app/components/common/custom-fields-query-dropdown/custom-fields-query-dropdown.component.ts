@@ -96,15 +96,18 @@ export class CustomFieldQueriesModel {
     })
   }
 
-  private findElement(queryElement: CustomFieldQueryElement, elements: any[]) {
+  private findElement(
+    queryElement: CustomFieldQueryElement,
+    elements: any[]
+  ): CustomFieldQueryElement {
     for (let i = 0; i < elements.length; i++) {
       if (elements[i] === queryElement) {
         return elements.splice(i, 1)[0]
       } else if (elements[i].type === CustomFieldQueryElementType.Expression) {
-        let found = this.findElement(queryElement, elements[i].value as any[])
-        if (found !== undefined) {
-          return found
-        }
+        return this.findElement(
+          queryElement,
+          elements[i].value as CustomFieldQueryElement[]
+        )
       }
     }
     return undefined
@@ -118,20 +121,16 @@ export class CustomFieldQueriesModel {
         foundComponent = this.queries.splice(i, 1)[0]
         break
       } else if (query.type === CustomFieldQueryElementType.Expression) {
-        let found = this.findElement(queryElement, query.value as any[])
-        if (found !== undefined) {
-          foundComponent = found
-        }
+        foundComponent = this.findElement(queryElement, query.value as any[])
       }
     }
-    if (foundComponent === undefined) {
-      return
+    if (foundComponent) {
+      foundComponent.changed.complete()
+      if (this.isEmpty()) {
+        this.clear()
+      }
+      this.changed.next(this)
     }
-    foundComponent.changed.complete()
-    if (this.isEmpty()) {
-      this.clear()
-    }
-    this.changed.next(this)
   }
 }
 
