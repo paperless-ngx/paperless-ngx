@@ -34,6 +34,9 @@
             <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Workflow }" class="btn btn-sm btn-outline-secondary" type="button" (click)="editWorkflow(workflow)">
               <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
             </button>
+            <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Workflow }" class="btn btn-sm btn-outline-secondary" type="button" (click)="cloneWorkflow(workflow)">
+              <i-bs width="1em" height="1em" name="files"></i-bs>&nbsp;<ng-container i18n>Clone</ng-container>
+            </button>
             <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Workflow }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteWorkflow(workflow)">
               <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
             </button>
