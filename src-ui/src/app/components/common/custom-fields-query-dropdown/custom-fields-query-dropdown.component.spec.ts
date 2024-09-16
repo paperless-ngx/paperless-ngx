@@ -180,4 +180,131 @@ describe('CustomFieldsQueryDropdownComponent', () => {
     component.title = 'Test Title'
     expect(component.name).toBe('test_title')
   })
+
+  describe('CustomFieldQueriesModel', () => {
+    let model: CustomFieldQueriesModel
+
+    beforeEach(() => {
+      model = new CustomFieldQueriesModel()
+    })
+
+    it('should initialize with empty queries', () => {
+      expect(model.queries).toEqual([])
+    })
+
+    it('should clear queries and fire event', () => {
+      const nextSpy = jest.spyOn(model.changed, 'next')
+      model.addExpression()
+      model.clear()
+      expect(model.queries).toEqual([])
+      expect(nextSpy).toHaveBeenCalledWith(model)
+    })
+
+    it('should clear queries without firing event', () => {
+      const nextSpy = jest.spyOn(model.changed, 'next')
+      model.addExpression()
+      model.clear(false)
+      expect(model.queries).toEqual([])
+      expect(nextSpy).not.toHaveBeenCalled()
+    })
+
+    it('should validate an empty model as invalid', () => {
+      expect(model.isValid()).toBeFalsy()
+    })
+
+    it('should validate a model with valid expression as valid', () => {
+      const expression = new CustomFieldQueryExpression()
+      const atom = new CustomFieldQueryAtom([1, 'icontains', 'test'])
+      const atom2 = new CustomFieldQueryAtom([2, 'icontains', 'test'])
+      const expression2 = new CustomFieldQueryExpression()
+      expression2.addAtom(atom)
+      expression2.addAtom(atom2)
+      expression.addExpression(expression2)
+      model.addExpression(expression)
+      expect(model.isValid()).toBeTruthy()
+    })
+
+    it('should validate a model with invalid expression as invalid', () => {
+      const expression = new CustomFieldQueryExpression()
+      model.addExpression(expression)
+      expect(model.isValid()).toBeFalsy()
+    })
+
+    it('should check if model is empty', () => {
+      expect(model.isEmpty()).toBeTruthy()
+      model.addExpression()
+      expect(model.isEmpty()).toBeTruthy()
+      const atom = new CustomFieldQueryAtom([1, 'icontains', 'test'])
+      model.addAtom(atom)
+      expect(model.isEmpty()).toBeFalsy()
+    })
+
+    it('should add an atom to the model', () => {
+      const atom = new CustomFieldQueryAtom([1, 'icontains', 'test'])
+      model.addAtom(atom)
+      expect(model.queries.length).toBe(1)
+      expect(
+        (model.queries[0] as CustomFieldQueryExpression).value.length
+      ).toBe(1)
+    })
+
+    it('should add an expression to the model, propagate changes', () => {
+      const expression = new CustomFieldQueryExpression()
+      model.addExpression(expression)
+      expect(model.queries.length).toBe(1)
+      const expression2 = new CustomFieldQueryExpression([
+        CustomFieldQueryLogicalOperator.And,
+        [
+          [1, 'icontains', 'test'],
+          [2, 'icontains', 'test'],
+        ],
+      ])
+      model.addExpression(expression2)
+      const nextSpy = jest.spyOn(model.changed, 'next')
+      expression2.changed.next(expression2)
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('should remove an element from the model', () => {
+      const expression = new CustomFieldQueryExpression([
+        CustomFieldQueryLogicalOperator.And,
+        [
+          [1, 'icontains', 'test'],
+          [2, 'icontains', 'test'],
+        ],
+      ])
+      const atom = new CustomFieldQueryAtom([1, 'icontains', 'test'])
+      const expression2 = new CustomFieldQueryExpression([
+        CustomFieldQueryLogicalOperator.And,
+        [
+          [3, 'icontains', 'test'],
+          [4, 'icontains', 'test'],
+        ],
+      ])
+      expression2.addAtom(atom)
+      expression2.addExpression(expression)
+      model.addExpression(expression2)
+      model.removeElement(expression)
+      expect(model.queries.length).toBe(1)
+      model.removeElement(expression2)
+    })
+
+    it('should fire changed event when an atom changes', () => {
+      const nextSpy = jest.spyOn(model.changed, 'next')
+      const atom = new CustomFieldQueryAtom([1, 'icontains', 'test'])
+      model.addAtom(atom)
+      atom.changed.next(atom)
+      expect(nextSpy).toHaveBeenCalledWith(model)
+    })
+
+    it('should complete changed subject when element is removed', () => {
+      const expression = new CustomFieldQueryExpression()
+      const atom = new CustomFieldQueryAtom([1, 'icontains', 'test'])
+      ;(expression.value as CustomFieldQueryElement[]).push(atom)
+      model.addExpression(expression)
+      const completeSpy = jest.spyOn(atom.changed, 'complete')
+      model.removeElement(atom)
+      expect(completeSpy).toHaveBeenCalled()
+    })
+  })
 })
