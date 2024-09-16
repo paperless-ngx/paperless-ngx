@@ -49,6 +49,7 @@
       [disabled]="disabled"
       bindLabel="name"
       bindValue="id"
+      (mousedown)="$event.stopImmediatePropagation()"
     ></ng-select>
     <select class="w-25 form-select" [(ngModel)]="atom.operator" [disabled]="disabled">
       <option *ngFor="let operator of getOperatorsForField(atom.field)" [ngValue]="operator.value">{{operator.label}}</option>
