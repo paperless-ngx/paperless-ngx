@@ -281,10 +281,10 @@ describe('CustomFieldsQueryDropdownComponent', () => {
           [4, 'icontains', 'test'],
         ],
       ])
-      expression2.addAtom(atom)
+      expression.addAtom(atom)
       expression2.addExpression(expression)
       model.addExpression(expression2)
-      model.removeElement(expression)
+      model.removeElement(atom)
       expect(model.queries.length).toBe(1)
       model.removeElement(expression2)
     })

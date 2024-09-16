@@ -103,6 +103,11 @@ export class CustomFieldQueriesModel {
     for (let i = 0; i < elements.length; i++) {
       if (elements[i] === queryElement) {
         return elements.splice(i, 1)[0]
+      } else if (elements[i].type === CustomFieldQueryElementType.Expression) {
+        return this.findElement(
+          queryElement,
+          elements[i].value as CustomFieldQueryElement[]
+        )
       }
     }
   }
