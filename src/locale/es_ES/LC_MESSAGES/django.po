@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-08-28 17:12-0700\n"
-"PO-Revision-Date: 2024-09-08 23:52\n"
+"PO-Revision-Date: 2024-09-16 00:30\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -1219,7 +1219,7 @@ msgstr "ninguno"
 
 #: paperless/models.py:70
 msgid "LeaveColorUnchanged"
-msgstr ""
+msgstr "DejaColorSinAlterar"
 
 #: paperless/models.py:71
 msgid "RGB"
@@ -1227,7 +1227,7 @@ msgstr "RGB"
 
 #: paperless/models.py:72
 msgid "UseDeviceIndependentColor"
-msgstr ""
+msgstr "UsarColorDelDispositivo"
 
 #: paperless/models.py:73
 msgid "Gray"
@@ -1263,11 +1263,11 @@ msgstr "Establece el valor DPI por defecto"
 
 #: paperless/models.py:131
 msgid "Controls the unpaper cleaning"
-msgstr ""
+msgstr "Controla la limpieza de desempapelar"
 
 #: paperless/models.py:138
 msgid "Enables deskew"
-msgstr ""
+msgstr "Permite la applicacion deskew"
 
 #: paperless/models.py:141
 msgid "Enables page rotation"

@@ -233,6 +233,12 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     }
   }
 
+  .table-row-selected {
+    td, a {
+      color: var(--pngx-primary-text-contrast) !important;
+    }
+  }
+
   .card .table {
     border-color: var(--bs-gray-800);
   }

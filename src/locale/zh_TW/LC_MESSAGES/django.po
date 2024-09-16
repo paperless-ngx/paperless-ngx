@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-08-28 17:12-0700\n"
-"PO-Revision-Date: 2024-08-29 03:10\n"
+"PO-Revision-Date: 2024-09-10 00:28\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -43,7 +43,7 @@ msgstr "完全符合"
 
 #: documents/models.py:60 documents/models.py:974
 msgid "Regular expression"
-msgstr ""
+msgstr "正則表達式"
 
 #: documents/models.py:61 documents/models.py:975
 msgid "Fuzzy word"
@@ -51,7 +51,7 @@ msgstr ""
 
 #: documents/models.py:62
 msgid "Automatic"
-msgstr ""
+msgstr "自動"
 
 #: documents/models.py:65 documents/models.py:419 documents/models.py:1291
 #: paperless_mail/models.py:18 paperless_mail/models.py:107
@@ -257,7 +257,7 @@ msgstr "記錄"
 
 #: documents/models.py:401
 msgid "Table"
-msgstr ""
+msgstr "表格"
 
 #: documents/models.py:402
 msgid "Small Cards"
@@ -269,47 +269,47 @@ msgstr ""
 
 #: documents/models.py:406
 msgid "Title"
-msgstr ""
+msgstr "標題"
 
 #: documents/models.py:407
 msgid "Created"
-msgstr ""
+msgstr "已建立"
 
 #: documents/models.py:408
 msgid "Added"
-msgstr ""
+msgstr "已新增"
 
 #: documents/models.py:409
 msgid "Tags"
-msgstr ""
+msgstr "標籤"
 
 #: documents/models.py:410
 msgid "Correspondent"
-msgstr ""
+msgstr "聯絡人"
 
 #: documents/models.py:411
 msgid "Document Type"
-msgstr ""
+msgstr "文件類型"
 
 #: documents/models.py:412
 msgid "Storage Path"
-msgstr ""
+msgstr "儲存路徑"
 
 #: documents/models.py:413
 msgid "Note"
-msgstr ""
+msgstr "備註"
 
 #: documents/models.py:414
 msgid "Owner"
-msgstr ""
+msgstr "所有者"
 
 #: documents/models.py:415
 msgid "Shared"
-msgstr ""
+msgstr "已分享"
 
 #: documents/models.py:416
 msgid "ASN"
-msgstr ""
+msgstr "ASN"
 
 #: documents/models.py:422
 msgid "show on dashboard"
@@ -329,11 +329,11 @@ msgstr "倒轉排序"
 
 #: documents/models.py:437
 msgid "View page size"
-msgstr ""
+msgstr "頁面大小"
 
 #: documents/models.py:445
 msgid "View display mode"
-msgstr ""
+msgstr "顯示模式"
 
 #: documents/models.py:452
 msgid "Document display fields"
@@ -573,7 +573,7 @@ msgstr ""
 
 #: documents/models.py:670
 msgid "Created DateTime"
-msgstr ""
+msgstr "建立時間"
 
 #: documents/models.py:671
 msgid "Datetime field when the task result was created in UTC"
@@ -581,7 +581,7 @@ msgstr ""
 
 #: documents/models.py:676
 msgid "Started DateTime"
-msgstr ""
+msgstr "開始時間"
 
 #: documents/models.py:677
 msgid "Datetime field when the task was started in UTC"
@@ -589,7 +589,7 @@ msgstr ""
 
 #: documents/models.py:682
 msgid "Completed DateTime"
-msgstr ""
+msgstr "完成時間"
 
 #: documents/models.py:683
 msgid "Datetime field when the task was completed in UTC"
@@ -609,7 +609,7 @@ msgstr ""
 
 #: documents/models.py:726
 msgid "user"
-msgstr ""
+msgstr "使用者"
 
 #: documents/models.py:731
 msgid "note"
@@ -621,7 +621,7 @@ msgstr ""
 
 #: documents/models.py:740
 msgid "Archive"
-msgstr ""
+msgstr "封存"
 
 #: documents/models.py:741
 msgid "Original"
@@ -629,63 +629,63 @@ msgstr ""
 
 #: documents/models.py:752
 msgid "expiration"
-msgstr ""
+msgstr "過期時間"
 
 #: documents/models.py:759
 msgid "slug"
-msgstr ""
+msgstr "縮寫"
 
 #: documents/models.py:791
 msgid "share link"
-msgstr ""
+msgstr "分享連結"
 
 #: documents/models.py:792
 msgid "share links"
-msgstr ""
+msgstr "分享連結"
 
 #: documents/models.py:804
 msgid "String"
-msgstr ""
+msgstr "字串"
 
 #: documents/models.py:805
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: documents/models.py:806
 msgid "Date"
-msgstr ""
+msgstr "日期"
 
 #: documents/models.py:807
 msgid "Boolean"
-msgstr ""
+msgstr "布林值"
 
 #: documents/models.py:808
 msgid "Integer"
-msgstr ""
+msgstr "整數"
 
 #: documents/models.py:809
 msgid "Float"
-msgstr ""
+msgstr "浮點數"
 
 #: documents/models.py:810
 msgid "Monetary"
-msgstr ""
+msgstr "貨幣"
 
 #: documents/models.py:811
 msgid "Document Link"
-msgstr ""
+msgstr "文件連結"
 
 #: documents/models.py:812
 msgid "Select"
-msgstr ""
+msgstr "選擇"
 
 #: documents/models.py:824
 msgid "data type"
-msgstr ""
+msgstr "資料類型"
 
 #: documents/models.py:831
 msgid "extra data"
-msgstr ""
+msgstr "額外資料"
 
 #: documents/models.py:835
 msgid "Extra data for the custom field, such as select options"
@@ -693,19 +693,19 @@ msgstr ""
 
 #: documents/models.py:841
 msgid "custom field"
-msgstr ""
+msgstr "自訂欄位"
 
 #: documents/models.py:842
 msgid "custom fields"
-msgstr ""
+msgstr "自訂欄位"
 
 #: documents/models.py:906
 msgid "custom field instance"
-msgstr ""
+msgstr "自訂實例"
 
 #: documents/models.py:907
 msgid "custom field instances"
-msgstr ""
+msgstr "自訂實例"
 
 #: documents/models.py:978
 msgid "Consumption Started"
@@ -713,11 +713,11 @@ msgstr ""
 
 #: documents/models.py:979
 msgid "Document Added"
-msgstr ""
+msgstr "已新增文件"
 
 #: documents/models.py:980
 msgid "Document Updated"
-msgstr ""
+msgstr "已更新文件"
 
 #: documents/models.py:983
 msgid "Consume Folder"
@@ -725,7 +725,7 @@ msgstr ""
 
 #: documents/models.py:984
 msgid "Api Upload"
-msgstr ""
+msgstr "Api上傳"
 
 #: documents/models.py:985
 msgid "Mail Fetch"
@@ -737,7 +737,7 @@ msgstr ""
 
 #: documents/models.py:1000
 msgid "filter path"
-msgstr ""
+msgstr "過濾路徑"
 
 #: documents/models.py:1005
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
@@ -745,7 +745,7 @@ msgstr ""
 
 #: documents/models.py:1012
 msgid "filter filename"
-msgstr ""
+msgstr "過濾檔名"
 
 #: documents/models.py:1017 paperless_mail/models.py:162
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
@@ -777,7 +777,7 @@ msgstr ""
 
 #: documents/models.py:1075
 msgid "Assignment"
-msgstr ""
+msgstr "分配任務"
 
 #: documents/models.py:1079
 msgid "Removal"
@@ -789,7 +789,7 @@ msgstr ""
 
 #: documents/models.py:1089
 msgid "assign title"
-msgstr ""
+msgstr "指定標題"
 
 #: documents/models.py:1094
 msgid "Assign a document title, can include some placeholders, see documentation."
@@ -797,11 +797,11 @@ msgstr ""
 
 #: documents/models.py:1103 paperless_mail/models.py:230
 msgid "assign this tag"
-msgstr ""
+msgstr "指定標籤"
 
 #: documents/models.py:1112 paperless_mail/models.py:238
 msgid "assign this document type"
-msgstr ""
+msgstr "指定文件類型"
 
 #: documents/models.py:1121 paperless_mail/models.py:252
 msgid "assign this correspondent"
@@ -809,11 +809,11 @@ msgstr "指派這個聯繫者"
 
 #: documents/models.py:1130
 msgid "assign this storage path"
-msgstr ""
+msgstr "指定儲存路徑"
 
 #: documents/models.py:1139
 msgid "assign this owner"
-msgstr ""
+msgstr "指定所有者"
 
 #: documents/models.py:1146
 msgid "grant view permissions to these users"
@@ -841,7 +841,7 @@ msgstr ""
 
 #: documents/models.py:1186
 msgid "remove all tags"
-msgstr ""
+msgstr "移除全部標籤"
 
 #: documents/models.py:1193
 msgid "remove these document type(s)"
@@ -849,7 +849,7 @@ msgstr ""
 
 #: documents/models.py:1198
 msgid "remove all document types"
-msgstr ""
+msgstr "移除全部文件類型"
 
 #: documents/models.py:1205
 msgid "remove these correspondent(s)"
@@ -857,7 +857,7 @@ msgstr ""
 
 #: documents/models.py:1210
 msgid "remove all correspondents"
-msgstr ""
+msgstr "移除全部聯絡人"
 
 #: documents/models.py:1217
 msgid "remove these storage path(s)"
@@ -865,7 +865,7 @@ msgstr ""
 
 #: documents/models.py:1222
 msgid "remove all storage paths"
-msgstr ""
+msgstr "移除全部儲存路徑"
 
 #: documents/models.py:1229
 msgid "remove these owner(s)"
@@ -873,7 +873,7 @@ msgstr ""
 
 #: documents/models.py:1234
 msgid "remove all owners"
-msgstr ""
+msgstr "移除全部所有者"
 
 #: documents/models.py:1241
 msgid "remove view permissions for these users"
@@ -893,7 +893,7 @@ msgstr ""
 
 #: documents/models.py:1267
 msgid "remove all permissions"
-msgstr ""
+msgstr "移除全部權限"
 
 #: documents/models.py:1274
 msgid "remove these custom fields"
@@ -901,7 +901,7 @@ msgstr ""
 
 #: documents/models.py:1279
 msgid "remove all custom fields"
-msgstr ""
+msgstr "移除全部自訂欄位"
 
 #: documents/models.py:1283
 msgid "workflow action"
@@ -913,28 +913,28 @@ msgstr ""
 
 #: documents/models.py:1293 paperless_mail/models.py:109
 msgid "order"
-msgstr ""
+msgstr "排序"
 
 #: documents/models.py:1299
 msgid "triggers"
-msgstr ""
+msgstr "觸發器"
 
 #: documents/models.py:1306
 msgid "actions"
-msgstr ""
+msgstr "動作"
 
 #: documents/models.py:1309
 msgid "enabled"
-msgstr ""
+msgstr "已啟用"
 
 #: documents/serialisers.py:120
 #, python-format
 msgid "Invalid regular expression: %(error)s"
-msgstr ""
+msgstr "無效的正則表達式: %(error)s"
 
 #: documents/serialisers.py:467
 msgid "Invalid color."
-msgstr ""
+msgstr "無效的顏色"
 
 #: documents/serialisers.py:1397
 #, python-format
@@ -943,12 +943,12 @@ msgstr ""
 
 #: documents/serialisers.py:1506
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "檢測到無效的變數"
 
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
-msgstr ""
+msgstr "已收到%(site_name)s的訊息"
 
 #: documents/templates/account/email/base_message.txt:5
 #, python-format
@@ -958,40 +958,40 @@ msgstr ""
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "登入 Paperless-ngx"
 
 #: documents/templates/account/login.html:10
 msgid "Please sign in."
-msgstr ""
+msgstr "請登入"
 
 #: documents/templates/account/login.html:12
 #, python-format
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
-msgstr ""
+msgstr "沒有帳號? <a href=\"%(signup_url)s\">註冊</a>"
 
 #: documents/templates/account/login.html:19
 #: documents/templates/account/signup.html:15
 #: documents/templates/socialaccount/signup.html:13
 msgid "Username"
-msgstr ""
+msgstr "使用者名稱"
 
 #: documents/templates/account/login.html:20
 #: documents/templates/account/signup.html:17
 msgid "Password"
-msgstr ""
+msgstr "密碼"
 
 #: documents/templates/account/login.html:30
 msgid "Sign in"
-msgstr ""
+msgstr "登入"
 
 #: documents/templates/account/login.html:34
 msgid "Forgot your password?"
-msgstr ""
+msgstr "忘記密碼?"
 
 #: documents/templates/account/login.html:45
 #: documents/templates/account/signup.html:49
 msgid "or sign in via"
-msgstr ""
+msgstr "或通過以下方式登入"
 
 #: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
@@ -1003,11 +1003,11 @@ msgstr ""
 
 #: documents/templates/account/password_reset.html:12
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "發生錯誤。請重新嘗試。"
 
 #: documents/templates/account/password_reset.html:15
 msgid "Email"
-msgstr ""
+msgstr "電子信箱"
 
 #: documents/templates/account/password_reset.html:21
 msgid "Send me instructions!"
@@ -1031,15 +1031,15 @@ msgstr ""
 
 #: documents/templates/account/password_reset_from_key.html:9
 msgid "Set a new password."
-msgstr ""
+msgstr "設置新密碼"
 
 #: documents/templates/account/password_reset_from_key.html:15
 msgid "request a new password reset"
-msgstr ""
+msgstr "請求密碼重置"
 
 #: documents/templates/account/password_reset_from_key.html:17
 msgid "New Password"
-msgstr ""
+msgstr "新密碼"
 
 #: documents/templates/account/password_reset_from_key.html:18
 msgid "Confirm Password"
@@ -1074,7 +1074,7 @@ msgstr ""
 #: documents/templates/account/signup.html:16
 #: documents/templates/socialaccount/signup.html:14
 msgid "Email (optional)"
-msgstr ""
+msgstr "電子信箱 (可選)"
 
 #: documents/templates/account/signup.html:18
 msgid "Password (again)"
@@ -1083,7 +1083,7 @@ msgstr ""
 #: documents/templates/account/signup.html:36
 #: documents/templates/socialaccount/signup.html:27
 msgid "Sign up"
-msgstr ""
+msgstr "註冊"
 
 #: documents/templates/index.html:61
 msgid "Paperless-ngx is loading..."
@@ -1103,7 +1103,7 @@ msgstr ""
 
 #: documents/templates/paperless-ngx/base.html:62
 msgid "Share link has expired."
-msgstr ""
+msgstr "分享連結已失效"
 
 #: documents/templates/socialaccount/authentication_error.html:5
 #: documents/templates/socialaccount/login.html:5
@@ -1122,7 +1122,7 @@ msgstr ""
 
 #: documents/templates/socialaccount/login.html:13
 msgid "Continue"
-msgstr ""
+msgstr "繼續"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
@@ -1158,27 +1158,27 @@ msgstr ""
 
 #: paperless/models.py:26
 msgid "pdf"
-msgstr ""
+msgstr "pdf"
 
 #: paperless/models.py:27
 msgid "pdfa"
-msgstr ""
+msgstr "pdfa"
 
 #: paperless/models.py:28
 msgid "pdfa-1"
-msgstr ""
+msgstr "pdfa-1"
 
 #: paperless/models.py:29
 msgid "pdfa-2"
-msgstr ""
+msgstr "pdfa-2"
 
 #: paperless/models.py:30
 msgid "pdfa-3"
-msgstr ""
+msgstr "pdfa-3"
 
 #: paperless/models.py:39
 msgid "skip"
-msgstr ""
+msgstr "跳過"
 
 #: paperless/models.py:40
 msgid "redo"
@@ -1186,7 +1186,7 @@ msgstr ""
 
 #: paperless/models.py:41
 msgid "force"
-msgstr ""
+msgstr "強制"
 
 #: paperless/models.py:42
 msgid "skip_noarchive"
@@ -1194,7 +1194,7 @@ msgstr ""
 
 #: paperless/models.py:50
 msgid "never"
-msgstr ""
+msgstr "從不"
 
 #: paperless/models.py:51
 msgid "with_text"
@@ -1202,11 +1202,11 @@ msgstr ""
 
 #: paperless/models.py:52
 msgid "always"
-msgstr ""
+msgstr "總是"
 
 #: paperless/models.py:60
 msgid "clean"
-msgstr ""
+msgstr "清除"
 
 #: paperless/models.py:61
 msgid "clean-final"
@@ -1214,15 +1214,15 @@ msgstr ""
 
 #: paperless/models.py:62
 msgid "none"
-msgstr ""
+msgstr "無"
 
 #: paperless/models.py:70
 msgid "LeaveColorUnchanged"
-msgstr ""
+msgstr "保持顏色不變"
 
 #: paperless/models.py:71
 msgid "RGB"
-msgstr ""
+msgstr "RGB"
 
 #: paperless/models.py:72
 msgid "UseDeviceIndependentColor"
@@ -1230,19 +1230,19 @@ msgstr ""
 
 #: paperless/models.py:73
 msgid "Gray"
-msgstr ""
+msgstr "灰色"
 
 #: paperless/models.py:74
 msgid "CMYK"
-msgstr ""
+msgstr "CMYK"
 
 #: paperless/models.py:83
 msgid "Sets the output PDF type"
-msgstr ""
+msgstr "設置 PDF 輸出類型"
 
 #: paperless/models.py:95
 msgid "Do OCR from page 1 to this value"
-msgstr ""
+msgstr "從第一頁執行OCR至此位置"
 
 #: paperless/models.py:101
 msgid "Do OCR using these languages"
@@ -1250,7 +1250,7 @@ msgstr ""
 
 #: paperless/models.py:108
 msgid "Sets the OCR mode"
-msgstr ""
+msgstr "設置 OCR 模式"
 
 #: paperless/models.py:116
 msgid "Controls the generation of an archive file"
@@ -1270,7 +1270,7 @@ msgstr ""
 
 #: paperless/models.py:141
 msgid "Enables page rotation"
-msgstr ""
+msgstr "啟用頁面旋轉"
 
 #: paperless/models.py:146
 msgid "Sets the threshold for rotation of pages"
@@ -1290,7 +1290,7 @@ msgstr ""
 
 #: paperless/models.py:171
 msgid "Application title"
-msgstr ""
+msgstr "應用程式標題"
 
 #: paperless/models.py:178
 msgid "Application logo"
@@ -1486,7 +1486,7 @@ msgstr ""
 
 #: paperless_mail/models.py:15
 msgid "Use SSL"
-msgstr ""
+msgstr "使用SSL"
 
 #: paperless_mail/models.py:16
 msgid "Use STARTTLS"

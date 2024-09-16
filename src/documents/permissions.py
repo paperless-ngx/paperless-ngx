@@ -146,6 +146,7 @@ class PaperlessNotePermissions(BasePermission):
     """
 
     perms_map = {
+        "OPTIONS": ["documents.view_note"],
         "GET": ["documents.view_note"],
         "POST": ["documents.add_note"],
         "DELETE": ["documents.delete_note"],
