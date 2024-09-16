@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-08-28 17:12-0700\n"
-"PO-Revision-Date: 2024-09-06 12:10\n"
+"PO-Revision-Date: 2024-09-12 00:28\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -1467,7 +1467,7 @@ msgstr "Metadaten"
 
 #: paperless_mail/admin.py:92
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr "Folgende Metadaten werden Dokumenten dieser Regel automatisch zugewiesen. Wenn Sie hier nichts auswählen wird Paperless weiterhin alle Zuweisungsalgorithmen ausführen und Metadaten auf Basis des Dokumentinhalts zuweisen."
+msgstr "Folgende Metadaten werden Dokumenten dieser Regel automatisch zugewiesen. Wenn Sie hier nichts auswählen, wird Paperless weiterhin alle Zuweisungsalgorithmen ausführen und Metadaten auf Basis des Dokumentinhalts zuweisen."
 
 #: paperless_mail/apps.py:11
 msgid "Paperless mail"
