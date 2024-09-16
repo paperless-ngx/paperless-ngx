@@ -1,5 +1,30 @@
 # Changelog
 
+## paperless-ngx 2.12.1
+
+### Bug Fixes
+
+- Fix: wait to apply tag changes until other changes saved with multiple workflow actions [@shamoon](https://github.com/shamoon) ([#7711](https://github.com/paperless-ngx/paperless-ngx/pull/7711))
+- Fix: delete_pages should require ownership (not just change perms) [@shamoon](https://github.com/shamoon) ([#7714](https://github.com/paperless-ngx/paperless-ngx/pull/7714))
+- Fix: filter out shown custom fields that have been deleted from saved… [@shamoon](https://github.com/shamoon) ([#7710](https://github.com/paperless-ngx/paperless-ngx/pull/7710))
+- Fix: only filter by string or number properties for filter pipe [@shamoon](https://github.com/shamoon) ([#7699](https://github.com/paperless-ngx/paperless-ngx/pull/7699))
+- Fix: saved view permissions fixes [@shamoon](https://github.com/shamoon) ([#7672](https://github.com/paperless-ngx/paperless-ngx/pull/7672))
+- Fix: add permissions for OPTIONS requests for notes [@shamoon](https://github.com/shamoon) ([#7661](https://github.com/paperless-ngx/paperless-ngx/pull/7661))
+
+### All App Changes
+
+<details>
+<summary>7 changes</summary>
+
+- Fix: wait to apply tag changes until other changes saved with multiple workflow actions [@shamoon](https://github.com/shamoon) ([#7711](https://github.com/paperless-ngx/paperless-ngx/pull/7711))
+- Fix: delete_pages should require ownership (not just change perms) [@shamoon](https://github.com/shamoon) ([#7714](https://github.com/paperless-ngx/paperless-ngx/pull/7714))
+- Enhancement: improve text contrast for selected documents in list view dark mode [@shamoon](https://github.com/shamoon) ([#7712](https://github.com/paperless-ngx/paperless-ngx/pull/7712))
+- Fix: filter out shown custom fields that have been deleted from saved… [@shamoon](https://github.com/shamoon) ([#7710](https://github.com/paperless-ngx/paperless-ngx/pull/7710))
+- Fix: only filter by string or number properties for filter pipe [@shamoon](https://github.com/shamoon) ([#7699](https://github.com/paperless-ngx/paperless-ngx/pull/7699))
+- Fix: saved view permissions fixes [@shamoon](https://github.com/shamoon) ([#7672](https://github.com/paperless-ngx/paperless-ngx/pull/7672))
+- Fix: add permissions for OPTIONS requests for notes [@shamoon](https://github.com/shamoon) ([#7661](https://github.com/paperless-ngx/paperless-ngx/pull/7661))
+</details>
+
 ## paperless-ngx 2.12.0
 
 ### Features / Enhancements
