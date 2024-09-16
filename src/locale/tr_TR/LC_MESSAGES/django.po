@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-08-28 17:12-0700\n"
-"PO-Revision-Date: 2024-08-29 03:11\n"
+"PO-Revision-Date: 2024-09-16 00:30\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -697,7 +697,7 @@ msgstr ""
 
 #: documents/models.py:842
 msgid "custom fields"
-msgstr ""
+msgstr "özel alanlar"
 
 #: documents/models.py:906
 msgid "custom field instance"
@@ -717,7 +717,7 @@ msgstr ""
 
 #: documents/models.py:980
 msgid "Document Updated"
-msgstr ""
+msgstr "Belge Güncellendi"
 
 #: documents/models.py:983
 msgid "Consume Folder"
@@ -1069,12 +1069,12 @@ msgstr ""
 #: documents/templates/account/signup.html:10
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
-msgstr ""
+msgstr "Bir hesabınız mı var? <a href=\"%(login_url)s\">Giriş yapın</a>"
 
 #: documents/templates/account/signup.html:16
 #: documents/templates/socialaccount/signup.html:14
 msgid "Email (optional)"
-msgstr ""
+msgstr "E-posta(opsiyonel)"
 
 #: documents/templates/account/signup.html:18
 msgid "Password (again)"

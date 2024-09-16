@@ -73,7 +73,7 @@ export class AppFrameComponent
         PermissionType.SavedView
       )
     ) {
-      this.savedViewService.initialize()
+      this.savedViewService.reload()
     }
   }
 

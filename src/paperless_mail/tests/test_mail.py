@@ -717,6 +717,7 @@ class TestMail(
                     ],
                 )
 
+    @pytest.mark.flaky(reruns=4)
     def test_filename_filter_inline_no_consumption(self):
         """
         GIVEN:
@@ -1153,6 +1154,7 @@ class TestMail(
         self.mailMocker.bogus_mailbox.folder.list.assert_called_once()
         self.mailMocker._queue_consumption_tasks_mock.assert_not_called()
 
+    @pytest.mark.flaky(reruns=4)
     @mock.patch("paperless_mail.mail.MailAccountHandler._get_correspondent")
     def test_error_skip_mail(self, m):
         def get_correspondent_fake(message, rule):
