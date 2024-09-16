@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-08-28 17:12-0700\n"
-"PO-Revision-Date: 2024-08-29 03:10\n"
+"PO-Revision-Date: 2024-09-11 16:49\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -51,7 +51,7 @@ msgstr ""
 
 #: documents/models.py:62
 msgid "Automatic"
-msgstr ""
+msgstr "Automatikus"
 
 #: documents/models.py:65 documents/models.py:419 documents/models.py:1291
 #: paperless_mail/models.py:18 paperless_mail/models.py:107
@@ -257,7 +257,7 @@ msgstr "naplók"
 
 #: documents/models.py:401
 msgid "Table"
-msgstr ""
+msgstr "Táblázat"
 
 #: documents/models.py:402
 msgid "Small Cards"
@@ -269,27 +269,27 @@ msgstr ""
 
 #: documents/models.py:406
 msgid "Title"
-msgstr ""
+msgstr "Cím"
 
 #: documents/models.py:407
 msgid "Created"
-msgstr ""
+msgstr "Létrehozva"
 
 #: documents/models.py:408
 msgid "Added"
-msgstr ""
+msgstr "Hozzáadva"
 
 #: documents/models.py:409
 msgid "Tags"
-msgstr ""
+msgstr "Címkék"
 
 #: documents/models.py:410
 msgid "Correspondent"
-msgstr ""
+msgstr "Partner"
 
 #: documents/models.py:411
 msgid "Document Type"
-msgstr ""
+msgstr "Dokumentum típus"
 
 #: documents/models.py:412
 msgid "Storage Path"
@@ -297,19 +297,19 @@ msgstr ""
 
 #: documents/models.py:413
 msgid "Note"
-msgstr ""
+msgstr "Megjegyzés"
 
 #: documents/models.py:414
 msgid "Owner"
-msgstr ""
+msgstr "Tulajdonos"
 
 #: documents/models.py:415
 msgid "Shared"
-msgstr ""
+msgstr "Megosztva"
 
 #: documents/models.py:416
 msgid "ASN"
-msgstr ""
+msgstr "Automata serial szám"
 
 #: documents/models.py:422
 msgid "show on dashboard"
@@ -677,7 +677,7 @@ msgstr "Dokumentum link"
 
 #: documents/models.py:812
 msgid "Select"
-msgstr ""
+msgstr "Válassz"
 
 #: documents/models.py:824
 msgid "data type"
