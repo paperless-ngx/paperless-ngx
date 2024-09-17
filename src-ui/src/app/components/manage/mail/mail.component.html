@@ -98,7 +98,7 @@
                   <button (click)="editMailRule(rule)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" ngbDropdownItem i18n>Edit</button>
                   <button (click)="editPermissions(rule)" *pngxIfOwner="rule" ngbDropdownItem i18n>Permissions</button>
                   <button (click)="deleteMailRule(rule)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailRule }" ngbDropdownItem i18n>Delete</button>
-                  <button (click)="cloneMailRule(rule)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" ngbDropdownItem i18n>Clone</button>
+                  <button (click)="copyMailrule(rule)" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailRule }" ngbDropdownItem i18n>Copy</button>
                 </div>
               </div>
             </div>
@@ -114,8 +114,8 @@
               </button>
             </div>
             <div class="btn-group ms-2 d-none d-sm-inline-block">
-              <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" class="btn btn-sm btn-outline-secondary" type="button" (click)="cloneMailRule(rule)">
-                <i-bs width="1em" height="1em" name="files"></i-bs>&nbsp;<ng-container i18n>Clone</ng-container>
+              <button *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailRule }" class="btn btn-sm btn-outline-secondary" type="button" (click)="copyMailrule(rule)">
+                <i-bs width="1em" height="1em" name="files"></i-bs>&nbsp;<ng-container i18n>Copy</ng-container>
               </button>
             </div>
           </div>

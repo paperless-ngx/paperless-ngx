@@ -39,7 +39,7 @@
               <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">
                 <button (click)="editWorkflow(workflow)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Workflow }" ngbDropdownItem i18n>Edit</button>
                 <button (click)="deleteWorkflow(workflow)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Workflow }" ngbDropdownItem i18n>Delete</button>
-                <button (click)="cloneWorkflow(workflow)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Workflow }" ngbDropdownItem i18n>Clone</button>
+                <button (click)="copyWorkflow(workflow)" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Workflow }" ngbDropdownItem i18n>Copy</button>
               </div>
             </div>
           </div>
@@ -53,8 +53,8 @@
             </button>
           </div>
           <div class="btn-group ms-2 d-none d-sm-block">
-            <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Workflow }" class="btn btn-sm btn-outline-secondary" type="button" (click)="cloneWorkflow(workflow)">
-              <i-bs width="1em" height="1em" name="files"></i-bs>&nbsp;<ng-container i18n>Clone</ng-container>
+            <button *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Workflow }" class="btn btn-sm btn-outline-secondary" type="button" (click)="copyWorkflow(workflow)">
+              <i-bs width="1em" height="1em" name="files"></i-bs>&nbsp;<ng-container i18n>Copy</ng-container>
             </button>
           </div>
         </div>

@@ -57,13 +57,13 @@ export class WorkflowsComponent
       .join(', ')
   }
 
-  editWorkflow(workflow: Workflow, clone: boolean = false) {
+  editWorkflow(workflow: Workflow, forceCreate: boolean = false) {
     const modal = this.modalService.open(WorkflowEditDialogComponent, {
       backdrop: 'static',
       size: 'xl',
     })
     modal.componentInstance.dialogMode =
-      workflow && !clone ? EditDialogMode.EDIT : EditDialogMode.CREATE
+      workflow && !forceCreate ? EditDialogMode.EDIT : EditDialogMode.CREATE
     if (workflow) {
       // quick "deep" clone so original doesn't get modified
       const clone = Object.assign({}, workflow)
@@ -87,7 +87,7 @@ export class WorkflowsComponent
       })
   }
 
-  cloneWorkflow(workflow: Workflow) {
+  copyWorkflow(workflow: Workflow) {
     const clone = Object.assign({}, workflow)
     clone.id = null
     clone.name = `${workflow.name} (copy)`

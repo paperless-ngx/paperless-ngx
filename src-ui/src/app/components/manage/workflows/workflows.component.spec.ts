@@ -174,12 +174,12 @@ describe('WorkflowsComponent', () => {
     expect(reloadSpy).toHaveBeenCalled()
   })
 
-  it('should support clone', () => {
+  it('should support copy', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
 
-    const cloneButton = fixture.debugElement.queryAll(By.css('button'))[6]
-    cloneButton.triggerEventHandler('click')
+    const copyButton = fixture.debugElement.queryAll(By.css('button'))[6]
+    copyButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
     const editDialog = modal.componentInstance as WorkflowEditDialogComponent
