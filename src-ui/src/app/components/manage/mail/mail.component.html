@@ -19,7 +19,7 @@
       <div class="row">
         <div class="col" i18n>Name</div>
         <div class="col" i18n>Server</div>
-        <div class="col" i18n>Username</div>
+        <div class="col d-none d-sm-block" i18n>Username</div>
         <div class="col" i18n>Actions</div>
       </div>
     </li>
@@ -29,9 +29,21 @@
         <div class="row">
           <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editMailAccount(account)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailAccount)">{{account.name}}</button></div>
           <div class="col d-flex align-items-center">{{account.imap_server}}</div>
-          <div class="col d-flex align-items-center">{{account.username}}</div>
+          <div class="col d-flex align-items-center d-none d-sm-block">{{account.username}}</div>
           <div class="col">
-            <div class="btn-group">
+            <div class="btn-group d-block d-sm-none">
+              <div ngbDropdown container="body" class="d-inline-block">
+                <button type="button" class="btn btn-link" id="actionsMenuMobile" (click)="$event.stopPropagation()" ngbDropdownToggle>
+                  <i-bs name="three-dots-vertical"></i-bs>
+                </button>
+                <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">
+                  <button (click)="editMailAccount(account)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" ngbDropdownItem i18n>Edit</button>
+                  <button (click)="editPermissions(account)" *pngxIfOwner="account" ngbDropdownItem i18n>Permissions</button>
+                  <button (click)="deleteMailAccount(account)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailAccount }" ngbDropdownItem i18n>Delete</button>
+                </div>
+              </div>
+            </div>
+            <div class="btn-group d-none d-sm-block">
               <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" [disabled]="!userCanEdit(account)" class="btn btn-sm btn-outline-secondary" type="button" (click)="editMailAccount(account)">
                 <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
               </button>
@@ -64,7 +76,7 @@
     <li class="list-group-item">
       <div class="row">
         <div class="col" i18n>Name</div>
-        <div class="col" i18n>Sort Order</div>
+        <div class="col d-none d-sm-block" i18n>Sort Order</div>
         <div class="col" i18n>Account</div>
         <div class="col" i18n>Actions</div>
       </div>
@@ -74,10 +86,23 @@
       <li class="list-group-item">
         <div class="row">
           <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editMailRule(rule)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailRule)">{{rule.name}}</button></div>
-          <div class="col d-flex align-items-center">{{rule.order}}</div>
+          <div class="col d-flex align-items-center d-none d-sm-block">{{rule.order}}</div>
           <div class="col d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
           <div class="col">
-            <div class="btn-group">
+            <div class="btn-group d-block d-sm-none">
+              <div ngbDropdown container="body" class="d-inline-block">
+                <button type="button" class="btn btn-link" id="actionsMenuMobile" (click)="$event.stopPropagation()" ngbDropdownToggle>
+                  <i-bs name="three-dots-vertical"></i-bs>
+                </button>
+                <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">
+                  <button (click)="editMailRule(rule)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" ngbDropdownItem i18n>Edit</button>
+                  <button (click)="editPermissions(rule)" *pngxIfOwner="rule" ngbDropdownItem i18n>Permissions</button>
+                  <button (click)="deleteMailRule(rule)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailRule }" ngbDropdownItem i18n>Delete</button>
+                  <button (click)="cloneMailRule(rule)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" ngbDropdownItem i18n>Clone</button>
+                </div>
+              </div>
+            </div>
+            <div class="btn-group d-none d-sm-inline-block">
               <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" [disabled]="!userCanEdit(rule)" class="btn btn-sm btn-outline-secondary" type="button" (click)="editMailRule(rule)">
                 <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
               </button>
@@ -88,7 +113,7 @@
                 <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
               </button>
             </div>
-            <div class="btn-group ms-2">
+            <div class="btn-group ms-2 d-none d-sm-inline-block">
               <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }" class="btn btn-sm btn-outline-secondary" type="button" (click)="cloneMailRule(rule)">
                 <i-bs width="1em" height="1em" name="files"></i-bs>&nbsp;<ng-container i18n>Clone</ng-container>
               </button>
