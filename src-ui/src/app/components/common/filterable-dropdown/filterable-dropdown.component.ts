@@ -483,7 +483,7 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
   dropdownOpenChange(open: boolean): void {
     if (open) {
       setTimeout(() => {
-        this.listFilterTextInput.nativeElement.focus()
+        this.listFilterTextInput?.nativeElement.focus()
       }, 0)
       if (this.editing) {
         this.selectionModel.reset()
@@ -492,7 +492,7 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
       this.opened.next(this)
     } else {
       if (this.creating) {
-        this.dropdown.open()
+        this.dropdown?.open()
         this.creating = false
       } else {
         this.filterText = ''
