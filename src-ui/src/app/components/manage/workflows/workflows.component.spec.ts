@@ -26,6 +26,7 @@ import {
 import { WorkflowActionType } from 'src/app/data/workflow-action'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 
 const workflows: Workflow[] = [
   {
@@ -173,6 +174,19 @@ describe('WorkflowsComponent', () => {
     expect(reloadSpy).toHaveBeenCalled()
   })
 
+  it('should support copy', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
+
+    const copyButton = fixture.debugElement.queryAll(By.css('button'))[6]
+    copyButton.triggerEventHandler('click')
+
+    expect(modal).not.toBeUndefined()
+    const editDialog = modal.componentInstance as WorkflowEditDialogComponent
+    expect(editDialog.object.name).toEqual(workflows[0].name + ' (copy)')
+    expect(editDialog.dialogMode).toEqual(EditDialogMode.CREATE)
+  })
+
   it('should support delete, show notification on error / success', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
@@ -180,7 +194,7 @@ describe('WorkflowsComponent', () => {
     const deleteSpy = jest.spyOn(workflowService, 'delete')
     const reloadSpy = jest.spyOn(component, 'reload')
 
-    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[4]
+    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[5]
     deleteButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
