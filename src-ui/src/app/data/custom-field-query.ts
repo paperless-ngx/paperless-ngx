@@ -105,7 +105,7 @@ export const CUSTOM_FIELD_QUERY_OPERATOR_GROUPS_BY_TYPE = {
 }
 
 export const CUSTOM_FIELD_QUERY_VALUE_TYPES_BY_OPERATOR = {
-  [CustomFieldQueryOperator.Exact]: 'string',
+  [CustomFieldQueryOperator.Exact]: 'string|boolean',
   [CustomFieldQueryOperator.IsNull]: 'boolean',
   [CustomFieldQueryOperator.Exists]: 'boolean',
   [CustomFieldQueryOperator.IContains]: 'string',

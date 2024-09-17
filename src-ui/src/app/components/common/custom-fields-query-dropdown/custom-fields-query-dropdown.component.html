@@ -35,6 +35,18 @@
     </button>
   } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Float || getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Integer) {
     <input class="w-25 form-control rounded-end" type="number" [(ngModel)]="atom.value" [disabled]="disabled">
+  } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Boolean) {
+    <select class="w-25 form-select rounded-end" [(ngModel)]="atom.value" [disabled]="disabled">
+      <option value="true" i18n>True</option>
+      <option value="false" i18n>False</option>
+    </select>
+  } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Select) {
+    <ng-select
+      class="paperless-input-select rounded-end"
+      [items]="getSelectOptionsForField(atom.field)"
+      [(ngModel)]="atom.value"
+      [disabled]="disabled"
+    ></ng-select>
   } @else {
     <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="atom.value" [disabled]="disabled">
   }
@@ -90,6 +102,9 @@
           [disabled]="disabled"
           [multiple]="true"
         ></ng-select>
+      }
+      @case (CustomFieldQueryOperator.Exact) {
+        <ng-container *ngTemplateOutlet="comparisonValueTemplate; context: { atom: atom }"></ng-container>
       }
       @default {
         <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="atom.value" [disabled]="disabled">
