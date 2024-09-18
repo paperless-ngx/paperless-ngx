@@ -611,6 +611,13 @@ You can optionally also automatically redirect users to the SSO login with [PAPE
 : Only applies to regular (non-SSO) accounts. See the corresponding
 [django-allauth documentation](https://docs.allauth.org/en/latest/account/configuration.html)
 
+#### [`PAPERLESS_SESSION_COOKIE_AGE=<bool>`](#PAPERLESS_SESSION_COOKIE_AGE) {#PAPERLESS_SESSION_COOKIE_AGE}
+
+: Applies to all logins. See the corresponding
+[django documentation](https://docs.djangoproject.com/en/5.1/ref/settings/#std-setting-SESSION_COOKIE_AGE)
+
+    Defaults to 1209600 (2 weeks)
+
 ## OCR settings {#ocr}
 
 Paperless uses [OCRmyPDF](https://ocrmypdf.readthedocs.io/en/latest/)
