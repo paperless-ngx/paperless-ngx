@@ -608,7 +608,7 @@ You can optionally also automatically redirect users to the SSO login with [PAPE
 
 #### [`PAPERLESS_ACCOUNT_SESSION_REMEMBER=<bool>`](#PAPERLESS_ACCOUNT_SESSION_REMEMBER) {#PAPERLESS_ACCOUNT_SESSION_REMEMBER}
 
-: See the corresponding
+: Only applies to regular (non-SSO) accounts. See the corresponding
 [django-allauth documentation](https://docs.allauth.org/en/latest/account/configuration.html)
 
 ## OCR settings {#ocr}
