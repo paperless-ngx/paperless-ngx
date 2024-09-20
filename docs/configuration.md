@@ -611,6 +611,8 @@ You can optionally also automatically redirect users to the SSO login with [PAPE
 : See the corresponding
 [django-allauth documentation](https://docs.allauth.org/en/latest/account/configuration.html)
 
+    Defaults to True
+
 #### [`PAPERLESS_SESSION_COOKIE_AGE=<int>`](#PAPERLESS_SESSION_COOKIE_AGE) {#PAPERLESS_SESSION_COOKIE_AGE}
 
 : Default login cookie expiration. Applies to regular logins if remember is enabled and always for SSO logins. See the corresponding
