@@ -608,12 +608,14 @@ You can optionally also automatically redirect users to the SSO login with [PAPE
 
 #### [`PAPERLESS_ACCOUNT_SESSION_REMEMBER=<bool>`](#PAPERLESS_ACCOUNT_SESSION_REMEMBER) {#PAPERLESS_ACCOUNT_SESSION_REMEMBER}
 
-: Only applies to regular (non-SSO) accounts. See the corresponding
+: If false, sessions will expire at browser close, if true will use `PAPERLESS_SESSION_COOKIE_AGE` for expiration. See the corresponding
 [django-allauth documentation](https://docs.allauth.org/en/latest/account/configuration.html)
+
+    Defaults to True
 
 #### [`PAPERLESS_SESSION_COOKIE_AGE=<int>`](#PAPERLESS_SESSION_COOKIE_AGE) {#PAPERLESS_SESSION_COOKIE_AGE}
 
-: Default login cookie expiration. Applies to regular logins if remember is enabled and always for SSO logins. See the corresponding
+: Login session cookie expiration. Applies if `PAPERLESS_ACCOUNT_SESSION_REMEMBER` is enabled. See the corresponding
 [django documentation](https://docs.djangoproject.com/en/5.1/ref/settings/#std-setting-SESSION_COOKIE_AGE)
 
     Defaults to 1209600 (2 weeks)
