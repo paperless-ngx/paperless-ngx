@@ -613,7 +613,7 @@ You can optionally also automatically redirect users to the SSO login with [PAPE
 
 #### [`PAPERLESS_SESSION_COOKIE_AGE=<bool>`](#PAPERLESS_SESSION_COOKIE_AGE) {#PAPERLESS_SESSION_COOKIE_AGE}
 
-: Applies to all logins. See the corresponding
+: Default login cookie expiration. Applies to regular logins if remember is enabled and always for SSO logins. See the corresponding
 [django documentation](https://docs.djangoproject.com/en/5.1/ref/settings/#std-setting-SESSION_COOKIE_AGE)
 
     Defaults to 1209600 (2 weeks)
