@@ -445,24 +445,6 @@ class DocumentViewSet(
             logger.warning(f"No parser for {mime_type}")
             return []
 
-    def get_pages_count(self, file, mime_type):
-        if not os.path.isfile(file):
-            return None
-
-        parser_class = get_parser_class_for_mime_type(mime_type)
-        if parser_class:
-            parser = parser_class(progress_callback=None, logging_group=None)
-
-            try:
-                return parser.get_pages_count(file, mime_type)
-            except Exception:  # pragma: no cover
-                logger.exception(f"Error getting pages count for {file}")
-                # TODO: cover GPG errors, remove later.
-                return None
-        else:  # pragma: no cover
-            logger.warning(f"No parser for {mime_type}")
-            return None
-
     def get_filesize(self, filename):
         if os.path.isfile(filename):
             return os.stat(filename).st_size
