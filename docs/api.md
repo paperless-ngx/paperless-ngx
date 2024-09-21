@@ -54,6 +54,7 @@ fields:
 - `archived_file_name`: Verbose filename of the archived document.
   Read-only. Null if no archived document is available.
 - `notes`: Array of notes associated with the document.
+- `pages_count`: Number of pages.
 - `set_permissions`: Allows setting document permissions. Optional,
   write-only. See [below](#permissions).
 - `custom_fields`: Array of custom fields & values, specified as
