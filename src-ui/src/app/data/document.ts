@@ -26,6 +26,7 @@ export enum DisplayField {
   OWNER = 'owner',
   SHARED = 'shared',
   ASN = 'asn',
+  PAGES_COUNT = 'pagescount',
 }
 
 export const DEFAULT_DISPLAY_FIELDS = [
@@ -73,6 +74,10 @@ export const DEFAULT_DISPLAY_FIELDS = [
     id: DisplayField.ASN,
     name: $localize`ASN`,
   },
+  {
+    id: DisplayField.PAGES_COUNT,
+    name: $localize`Pages`,
+  },
 ]
 
 export const DEFAULT_DASHBOARD_VIEW_PAGE_SIZE = 10
@@ -94,6 +99,7 @@ export const DOCUMENT_SORT_FIELDS = [
   { field: 'modified', name: $localize`Modified` },
   { field: 'num_notes', name: $localize`Notes` },
   { field: 'owner', name: $localize`Owner` },
+  { field: 'pages_count', name: $localize`Pages` },
 ]
 
 export const DOCUMENT_SORT_FIELDS_FULLTEXT = [
@@ -164,4 +170,6 @@ export interface Document extends ObjectWithPermissions {
 
   // write-only field
   remove_inbox_tags?: boolean
+
+  pages_count?: number
 }

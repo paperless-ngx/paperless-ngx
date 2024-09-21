@@ -41,6 +41,15 @@ class RasterisedDocumentParser(DocumentParser):
         """
         return OcrConfig()
 
+    def get_pages_count(self, document_path, mime_type):
+        pages_count = None
+        if mime_type == "application/pdf":
+            import pikepdf
+
+            pdf = pikepdf.open(document_path)
+            pages_count = len(pdf.pages)
+        return pages_count
+
     def extract_metadata(self, document_path, mime_type):
         result = []
         if mime_type == "application/pdf":

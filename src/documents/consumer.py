@@ -586,6 +586,7 @@ class ConsumerPlugin(
         date = None
         thumbnail = None
         archive_path = None
+        pages_count = None
 
         try:
             self._send_progress(
@@ -621,6 +622,7 @@ class ConsumerPlugin(
                 )
                 date = parse_date(self.filename, text)
             archive_path = document_parser.get_archive_path()
+            pages_count = document_parser.get_pages_count(self.working_copy, mime_type)
 
         except ParseError as e:
             document_parser.cleanup()
@@ -662,7 +664,12 @@ class ConsumerPlugin(
         try:
             with transaction.atomic():
                 # store the document.
-                document = self._store(text=text, date=date, mime_type=mime_type)
+                document = self._store(
+                    text=text,
+                    date=date,
+                    pages_count=pages_count,
+                    mime_type=mime_type,
+                )
 
                 # If we get here, it was successful. Proceed with post-consume
                 # hooks. If they fail, nothing will get changed.
@@ -790,6 +797,7 @@ class ConsumerPlugin(
         self,
         text: str,
         date: Optional[datetime.datetime],
+        pages_count: int,
         mime_type: str,
     ) -> Document:
         # If someone gave us the original filename, use it instead of doc.
@@ -835,6 +843,7 @@ class ConsumerPlugin(
             created=create_date,
             modified=create_date,
             storage_type=storage_type,
+            pages_count=pages_count,
             original_filename=self.filename,
         )
 

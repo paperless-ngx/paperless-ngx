@@ -345,6 +345,7 @@ export class SettingsService {
             DisplayField.CREATED,
             DisplayField.ADDED,
             DisplayField.ASN,
+            DisplayField.PAGES_COUNT,
             DisplayField.SHARED,
           ].includes(field.id)
         ) {

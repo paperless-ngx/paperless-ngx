@@ -205,6 +205,18 @@ class Document(SoftDeleteModel, ModelWithOwner):
         help_text=_("The checksum of the archived document."),
     )
 
+    pages_count = models.PositiveIntegerField(
+        _("pages count"),
+        blank=False,
+        null=True,
+        unique=False,
+        db_index=False,
+        validators=[MinValueValidator(1)],
+        help_text=_(
+            "The number of pages of the document.",
+        ),
+    )
+
     created = models.DateTimeField(_("created"), default=timezone.now, db_index=True)
 
     modified = models.DateTimeField(
@@ -414,6 +426,7 @@ class SavedView(ModelWithOwner):
         OWNER = ("owner", _("Owner"))
         SHARED = ("shared", _("Shared"))
         ASN = ("asn", _("ASN"))
+        PAGES_COUNT = ("pagescount", _("Pages"))
         CUSTOM_FIELD = ("custom_field_%d", ("Custom Field"))
 
     name = models.CharField(_("name"), max_length=128)

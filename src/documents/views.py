@@ -361,6 +361,7 @@ class DocumentViewSet(
         "archive_serial_number",
         "num_notes",
         "owner",
+        "pages_count",
     )
 
     def get_queryset(self):
@@ -438,6 +439,24 @@ class DocumentViewSet(
                 return parser.extract_metadata(file, mime_type)
             except Exception:  # pragma: no cover
                 logger.exception(f"Issue getting metadata for {file}")
+                # TODO: cover GPG errors, remove later.
+                return []
+        else:  # pragma: no cover
+            logger.warning(f"No parser for {mime_type}")
+            return []
+
+    def get_pages_count(self, file, mime_type):
+        if not os.path.isfile(file):
+            return None
+
+        parser_class = get_parser_class_for_mime_type(mime_type)
+        if parser_class:
+            parser = parser_class(progress_callback=None, logging_group=None)
+
+            try:
+                return parser.get_pages_count(file)
+            except Exception:  # pragma: no cover
+                logger.exception(f"Issue getting pages count for {file}")
                 # TODO: cover GPG errors, remove later.
                 return []
         else:  # pragma: no cover

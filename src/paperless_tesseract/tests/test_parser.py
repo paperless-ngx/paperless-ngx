@@ -57,6 +57,20 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         self.assertContainsStrings(text.strip(), ["This is a test document."])
 
+    def test_get_pages_count(self):
+        parser = RasterisedDocumentParser(uuid.uuid4())
+        pages_count = parser.get_pages_count(
+            os.path.join(self.SAMPLE_FILES, "simple-digital.pdf"),
+            "application/pdf",
+        )
+        self.assertEqual(pages_count, 1)
+
+        pages_count = parser.get_pages_count(
+            os.path.join(self.SAMPLE_FILES, "multi-page-mixed.pdf"),
+            "application/pdf",
+        )
+        self.assertEqual(pages_count, 6)
+
     def test_thumbnail(self):
         parser = RasterisedDocumentParser(uuid.uuid4())
         thumb = parser.get_thumbnail(
