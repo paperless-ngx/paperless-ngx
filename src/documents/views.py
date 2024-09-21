@@ -456,7 +456,7 @@ class DocumentViewSet(
             try:
                 return parser.get_pages_count(file)
             except Exception:  # pragma: no cover
-                logger.exception(f"Issue getting pages count for {file}")
+                logger.exception(f"Error getting pages count for {file}")
                 # TODO: cover GPG errors, remove later.
                 return []
         else:  # pragma: no cover
