@@ -454,14 +454,14 @@ class DocumentViewSet(
             parser = parser_class(progress_callback=None, logging_group=None)
 
             try:
-                return parser.get_pages_count(file)
+                return parser.get_pages_count(file, mime_type)
             except Exception:  # pragma: no cover
                 logger.exception(f"Error getting pages count for {file}")
                 # TODO: cover GPG errors, remove later.
-                return []
+                return None
         else:  # pragma: no cover
             logger.warning(f"No parser for {mime_type}")
-            return []
+            return None
 
     def get_filesize(self, filename):
         if os.path.isfile(filename):
