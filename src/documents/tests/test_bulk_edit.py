@@ -389,6 +389,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             title="B",
             filename=sample2,
             mime_type="application/pdf",
+            pages_count=8,
         )
         self.doc2.archive_filename = sample2_archive
         self.doc2.save()
@@ -681,13 +682,19 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         THEN:
             - Save should be called once
             - Archive file should be updated once
+            - The document's pages_count should be reduced by the number of deleted pages
         """
         doc_ids = [self.doc2.id]
+        initial_pages_count = self.doc2.pages_count
         pages = [1, 3]
         result = bulk_edit.delete_pages(doc_ids, pages)
         mock_pdf_save.assert_called_once()
         mock_update_archive_file.assert_called_once()
         self.assertEqual(result, "OK")
+
+        expected_pages_count = initial_pages_count - len(pages)
+        self.doc2.refresh_from_db()
+        self.assertEqual(self.doc2.pages_count, expected_pages_count)
 
     @mock.patch("documents.tasks.update_document_archive_file.delay")
     @mock.patch("pikepdf.Pdf.save")
