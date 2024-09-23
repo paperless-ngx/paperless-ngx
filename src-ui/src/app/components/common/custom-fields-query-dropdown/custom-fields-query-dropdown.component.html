@@ -6,7 +6,7 @@
       <pngx-clearable-badge [selected]="isActive" (cleared)="reset()"></pngx-clearable-badge>
     }
   </button>
-  <div class="dropdown-menu px-3 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown_{{name}}">
+  <div class="px-3 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown_{{name}}">
     <div class="list-group list-group-flush">
       @for (element of selectionModel.queries; track element.id; let i = $index) {
         <div class="list-group-item px-0 d-flex flex-nowrap">
