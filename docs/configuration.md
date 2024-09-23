@@ -38,7 +38,7 @@ matcher.
         `redis://<username>:<password>@<host>:<port>/<DBIndex>`
 
     [More information on securing your Redis
-    Instance](https://redis.io/docs/getting-started/#securing-redis).
+    Instance](https://redis.io/docs/latest/operate/oss_and_stack/management/security).
 
     Defaults to `redis://localhost:6379`.
 
