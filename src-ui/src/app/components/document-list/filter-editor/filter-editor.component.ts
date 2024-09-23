@@ -235,9 +235,9 @@ export class FilterEditorComponent
           }
 
         case FILTER_HAS_CUSTOM_FIELDS_ANY:
-          return $localize`Custom fields include: ${this.customFields.find(
-            (f) => f.id == +rule.value
-          )?.name}`
+          return $localize`Custom fields include: ${
+            this.customFields.find((f) => f.id == +rule.value)?.name
+          }`
 
         case FILTER_HAS_CUSTOM_FIELDS_ALL:
           return $localize`Custom fields: ${
