@@ -17,7 +17,7 @@ import {
   NgbDropdownItem,
   NgbTypeaheadModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgSelectComponent } from '@ng-select/ng-select'
+import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
 import { of, throwError } from 'rxjs'
 import {
   FILTER_TITLE,
@@ -198,6 +198,7 @@ describe('FilterEditorComponent', () => {
         NgbDatepickerModule,
         NgxBootstrapIconsModule.pick(allIcons),
         NgbTypeaheadModule,
+        NgSelectModule,
       ],
       providers: [
         FilterPipe,
@@ -846,7 +847,7 @@ describe('FilterEditorComponent', () => {
     ]
   }))
 
-  it('should ingest filter rules for has all custom fields', fakeAsync(() => {
+  it('should ingest filter rules for custom fields all', fakeAsync(() => {
     expect(component.customFieldQueriesModel.isEmpty()).toBeTruthy()
     component.filterRules = [
       {
@@ -1433,54 +1434,38 @@ describe('FilterEditorComponent', () => {
   }))
 
   it('should convert user input to correct filter rules on custom field selections', fakeAsync(() => {
-    // const customFieldsFilterableDropdown = fixture.debugElement.queryAll(
-    //   By.directive(FilterableDropdownComponent)
-    // )[4] // CF dropdown
-    // customFieldsFilterableDropdown.triggerEventHandler('opened')
-    // const customFieldButtons = customFieldsFilterableDropdown.queryAll(
-    //   By.directive(ToggleableDropdownButtonComponent)
-    // )
-    // customFieldButtons[1].triggerEventHandler('toggle')
-    // customFieldButtons[2].triggerEventHandler('toggle')
-    // fixture.detectChanges()
-    // expect(component.filterRules).toEqual([
-    //   {
-    //     rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
-    //     value: custom_fields[0].id.toString(),
-    //   },
-    //   {
-    //     rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
-    //     value: custom_fields[1].id.toString(),
-    //   },
-    // ])
-    // const toggleOperatorButtons = customFieldsFilterableDropdown.queryAll(
-    //   By.css('input[type=radio]')
-    // )
-    // toggleOperatorButtons[1].nativeElement.checked = true
-    // toggleOperatorButtons[1].triggerEventHandler('change')
-    // fixture.detectChanges()
-    // expect(component.filterRules).toEqual([
-    //   {
-    //     rule_type: FILTER_HAS_CUSTOM_FIELDS_ANY,
-    //     value: custom_fields[0].id.toString(),
-    //   },
-    //   {
-    //     rule_type: FILTER_HAS_CUSTOM_FIELDS_ANY,
-    //     value: custom_fields[1].id.toString(),
-    //   },
-    // ])
-    // customFieldButtons[2].triggerEventHandler('exclude')
-    // fixture.detectChanges()
-    // expect(component.filterRules).toEqual([
-    //   {
-    //     rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
-    //     value: custom_fields[0].id.toString(),
-    //   },
-    //   {
-    //     rule_type: FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
-    //     value: custom_fields[1].id.toString(),
-    //   },
-    // ])
+    const customFieldsQueryDropdown = fixture.debugElement.queryAll(
+      By.directive(CustomFieldsQueryDropdownComponent)
+    )[0]
+    const customFieldToggleButton = customFieldsQueryDropdown.query(
+      By.css('button')
+    )
+    customFieldToggleButton.triggerEventHandler('click')
+    fixture.detectChanges()
+    const customFieldButtons = customFieldsQueryDropdown.queryAll(
+      By.css('button')
+    )
+    customFieldButtons[1].triggerEventHandler('click')
+    fixture.detectChanges()
+    const query = component.customFieldQueriesModel
+      .queries[0] as CustomFieldQueryAtom
+    query.field = custom_fields[0].id
+    const fieldSelect: NgSelectComponent = customFieldsQueryDropdown.queryAll(
+      By.directive(NgSelectComponent)
+    )[0].componentInstance
+    fieldSelect.open()
+    const options = customFieldsQueryDropdown.queryAll(By.css('.ng-option'))
+    options[0].nativeElement.click()
+    expect(component.customFieldQueriesModel.queries[0].value.length).toEqual(1)
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_CUSTOM_FIELDS_LOOKUP,
+        value: JSON.stringify([
+          CustomFieldQueryLogicalOperator.Or,
+          [[custom_fields[0].id, 'exists', 'true']],
+        ]),
+      },
+    ])
   }))
 
   it('should convert user input to correct filter rules on date created after', fakeAsync(() => {

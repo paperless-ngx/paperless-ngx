@@ -5,8 +5,7 @@ import {
   Output,
   ViewChild,
 } from '@angular/core'
-import { NgbDropdown, NgbDropdownToggle } from '@ng-bootstrap/ng-bootstrap'
-import { Options } from '@popperjs/core'
+import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
 import { Subject, first, takeUntil } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
