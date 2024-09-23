@@ -383,10 +383,6 @@ export class DocumentListComponent
     ])
   }
 
-  trackByDocumentId(index, item: Document) {
-    return item.id
-  }
-
   get notesEnabled(): boolean {
     return this.settingsService.get(SETTINGS_KEYS.NOTES_ENABLED)
   }
