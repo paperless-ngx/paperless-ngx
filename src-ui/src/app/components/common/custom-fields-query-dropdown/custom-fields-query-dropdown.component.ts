@@ -25,7 +25,7 @@ import {
   CustomFieldQueryExpression,
   CustomFieldQueryAtom,
 } from 'src/app/utils/custom-field-query-element'
-import { popperOptionsWithAutoOffset } from 'src/app/utils/popper-options'
+import { popperOptionsReenablePreventOverflow } from 'src/app/utils/popper-options'
 
 export class CustomFieldQueriesModel {
   public queries: CustomFieldQueryElement[] = []
@@ -146,7 +146,7 @@ export class CustomFieldsQueryDropdownComponent {
   public CustomFieldDataType = CustomFieldDataType
   public CUSTOM_FIELD_QUERY_MAX_DEPTH = CUSTOM_FIELD_QUERY_MAX_DEPTH
   public CUSTOM_FIELD_QUERY_MAX_ATOMS = CUSTOM_FIELD_QUERY_MAX_ATOMS
-  public popperOptions = popperOptionsWithAutoOffset
+  public popperOptions = popperOptionsReenablePreventOverflow
 
   @Input()
   title: string
