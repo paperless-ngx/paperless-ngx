@@ -1,5 +1,5 @@
-<div class="btn-group w-100" ngbDropdown role="group" #dropdown="ngbDropdown" (openChange)="onOpenChange($event)">
-  <button class="btn btn-sm btn-outline-primary" id="dropdown_{{name}}" ngbDropdownToggle [disabled]="disabled">
+<div class="btn-group w-100" role="group" ngbDropdown #dropdown="ngbDropdown" (openChange)="onOpenChange($event)" [popperOptions]="popperOptions">
+  <button class="btn btn-sm btn-outline-primary" id="dropdown_toggle" ngbDropdownToggle [disabled]="disabled">
     <i-bs name="{{icon}}"></i-bs>
     <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
     @if (isActive) {

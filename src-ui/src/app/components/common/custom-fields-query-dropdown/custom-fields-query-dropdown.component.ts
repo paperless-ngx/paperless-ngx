@@ -5,7 +5,8 @@ import {
   Output,
   ViewChild,
 } from '@angular/core'
-import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
+import { NgbDropdown, NgbDropdownToggle } from '@ng-bootstrap/ng-bootstrap'
+import { Options } from '@popperjs/core'
 import { Subject, first, takeUntil } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
@@ -24,6 +25,7 @@ import {
   CustomFieldQueryExpression,
   CustomFieldQueryAtom,
 } from 'src/app/utils/custom-field-query-element'
+import { popperOptionsWithAutoOffset } from 'src/app/utils/popper-options'
 
 export class CustomFieldQueriesModel {
   public queries: CustomFieldQueryElement[] = []
@@ -144,6 +146,7 @@ export class CustomFieldsQueryDropdownComponent {
   public CustomFieldDataType = CustomFieldDataType
   public CUSTOM_FIELD_QUERY_MAX_DEPTH = CUSTOM_FIELD_QUERY_MAX_DEPTH
   public CUSTOM_FIELD_QUERY_MAX_ATOMS = CUSTOM_FIELD_QUERY_MAX_ATOMS
+  public popperOptions = popperOptionsWithAutoOffset
 
   @Input()
   title: string
