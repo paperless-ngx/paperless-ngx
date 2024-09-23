@@ -2,7 +2,7 @@ import { convertToParamMap } from '@angular/router'
 import { FilterRule } from '../data/filter-rule'
 import {
   FILTER_CORRESPONDENT,
-  FILTER_CUSTOM_FIELDS_LOOKUP,
+  FILTER_CUSTOM_FIELDS_QUERY,
   FILTER_HAS_ANY_TAG,
   FILTER_HAS_CUSTOM_FIELDS_ALL,
   FILTER_HAS_CUSTOM_FIELDS_ANY,
@@ -214,7 +214,7 @@ describe('QueryParams Utils', () => {
 
     expect(transformedFilterRules).toEqual([
       {
-        rule_type: FILTER_CUSTOM_FIELDS_LOOKUP,
+        rule_type: FILTER_CUSTOM_FIELDS_QUERY,
         value: JSON.stringify([
           CustomFieldQueryLogicalOperator.Or,
           [
@@ -240,7 +240,7 @@ describe('QueryParams Utils', () => {
 
     expect(transformedFilterRules).toEqual([
       {
-        rule_type: FILTER_CUSTOM_FIELDS_LOOKUP,
+        rule_type: FILTER_CUSTOM_FIELDS_QUERY,
         value: JSON.stringify([
           CustomFieldQueryLogicalOperator.And,
           [

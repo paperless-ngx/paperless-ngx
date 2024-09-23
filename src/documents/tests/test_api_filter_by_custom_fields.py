@@ -181,7 +181,7 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
             "/api/documents/?"
             + "&".join(
                 (
-                    f"custom_field_lookup={query_string}",
+                    f"custom_field_query={query_string}",
                     "ordering=archive_serial_number",
                     "page=1",
                     f"page_size={len(self.documents)}",
@@ -205,7 +205,7 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
             "/api/documents/?"
             + "&".join(
                 (
-                    f"custom_field_lookup={query_string}",
+                    f"custom_field_query={query_string}",
                     "ordering=archive_serial_number",
                     "page=1",
                     f"page_size={len(self.documents)}",
@@ -477,57 +477,57 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
     def test_invalid_json(self):
         self._assert_validation_error(
             "not valid json",
-            ["custom_field_lookup"],
+            ["custom_field_query"],
             "must be valid JSON",
         )
 
     def test_invalid_expression(self):
         self._assert_validation_error(
             json.dumps("valid json but not valid expr"),
-            ["custom_field_lookup"],
-            "Invalid custom field lookup expression",
+            ["custom_field_query"],
+            "Invalid custom field query expression",
         )
 
     def test_invalid_custom_field_name(self):
         self._assert_validation_error(
             json.dumps(["invalid name", "iexact", "foo"]),
-            ["custom_field_lookup", "0"],
+            ["custom_field_query", "0"],
             "is not a valid custom field",
         )
 
     def test_invalid_operator(self):
         self._assert_validation_error(
             json.dumps(["integer_field", "iexact", "foo"]),
-            ["custom_field_lookup", "1"],
-            "does not support lookup expr",
+            ["custom_field_query", "1"],
+            "does not support query expr",
         )
 
     def test_invalid_value(self):
         self._assert_validation_error(
             json.dumps(["select_field", "exact", "not an option"]),
-            ["custom_field_lookup", "2"],
+            ["custom_field_query", "2"],
             "integer",
         )
 
     def test_invalid_logical_operator(self):
         self._assert_validation_error(
             json.dumps(["invalid op", ["integer_field", "gt", 0]]),
-            ["custom_field_lookup", "0"],
+            ["custom_field_query", "0"],
             "Invalid logical operator",
         )
 
     def test_invalid_expr_list(self):
         self._assert_validation_error(
             json.dumps(["AND", "not a list"]),
-            ["custom_field_lookup", "1"],
+            ["custom_field_query", "1"],
             "Invalid expression list",
         )
 
     def test_invalid_operator_prefix(self):
         self._assert_validation_error(
             json.dumps(["integer_field", "foo__gt", 0]),
-            ["custom_field_lookup", "1"],
-            "does not support lookup expr",
+            ["custom_field_query", "1"],
+            "does not support query expr",
         )
 
     def test_query_too_deep(self):
@@ -536,7 +536,7 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
             query = ["NOT", query]
         self._assert_validation_error(
             json.dumps(query),
-            ["custom_field_lookup", *(["1"] * 10)],
+            ["custom_field_query", *(["1"] * 10)],
             "Maximum nesting depth exceeded",
         )
 
@@ -545,6 +545,6 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
         query = ["AND", [atom for _ in range(21)]]
         self._assert_validation_error(
             json.dumps(query),
-            ["custom_field_lookup", "1", "20"],
+            ["custom_field_query", "1", "20"],
             "Maximum number of query conditions exceeded",
         )

@@ -277,39 +277,39 @@ attribute with various information about the search results:
 ### Filtering by custom fields
 
 You can filter documents by their custom field values by specifying the
-`custom_field_lookup` query parameter. Here are some recipes for common
+`custom_field_query` query parameter. Here are some recipes for common
 use cases:
 
 1. Documents with a custom field "due" (date) between Aug 1, 2024 and
    Sept 1, 2024 (inclusive):
 
-   `?custom_field_lookup=["due", "range", ["2024-08-01", "2024-09-01"]]`
+   `?custom_field_query=["due", "range", ["2024-08-01", "2024-09-01"]]`
 
 2. Documents with a custom field "customer" (text) that equals "bob"
    (case sensitive):
 
-   `?custom_field_lookup=["customer", "exact", "bob"]`
+   `?custom_field_query=["customer", "exact", "bob"]`
 
 3. Documents with a custom field "answered" (boolean) set to `true`:
 
-   `?custom_field_lookup=["answered", "exact", true]`
+   `?custom_field_query=["answered", "exact", true]`
 
 4. Documents with a custom field "favorite animal" (select) set to either
    "cat" or "dog":
 
-   `?custom_field_lookup=["favorite animal", "in", ["cat", "dog"]]`
+   `?custom_field_query=["favorite animal", "in", ["cat", "dog"]]`
 
 5. Documents with a custom field "address" (text) that is empty:
 
-   `?custom_field_lookup=["OR", ["address", "isnull", true], ["address", "exact", ""]]`
+   `?custom_field_query=["OR", ["address", "isnull", true], ["address", "exact", ""]]`
 
 6. Documents that don't have a field called "foo":
 
-   `?custom_field_lookup=["foo", "exists", false]`
+   `?custom_field_query=["foo", "exists", false]`
 
 7. Documents that have document links "references" to both document 3 and 7:
 
-   `?custom_field_lookup=["references", "contains", [3, 7]]`
+   `?custom_field_query=["references", "contains", [3, 7]]`
 
 All field types support basic operations including `exact`, `in`, `isnull`,
 and `exists`. String, URL, and monetary fields support case-insensitive

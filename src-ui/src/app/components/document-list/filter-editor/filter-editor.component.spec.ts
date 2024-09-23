@@ -55,7 +55,7 @@ import {
   FILTER_HAS_ANY_CUSTOM_FIELDS,
   FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
   FILTER_HAS_CUSTOM_FIELDS_ALL,
-  FILTER_CUSTOM_FIELDS_LOOKUP,
+  FILTER_CUSTOM_FIELDS_QUERY,
 } from 'src/app/data/filter-rule-type'
 import { Correspondent } from 'src/app/data/correspondent'
 import { DocumentType } from 'src/app/data/document-type'
@@ -887,11 +887,11 @@ describe('FilterEditorComponent', () => {
     ).toEqual(['42', CustomFieldQueryOperator.Exists, 'true'])
   }))
 
-  it('should ingest filter rules for custom field lookup', fakeAsync(() => {
+  it('should ingest filter rules for custom field queries', fakeAsync(() => {
     expect(component.customFieldQueriesModel.isEmpty()).toBeTruthy()
     component.filterRules = [
       {
-        rule_type: FILTER_CUSTOM_FIELDS_LOOKUP,
+        rule_type: FILTER_CUSTOM_FIELDS_QUERY,
         value: '["AND", [[42, "exists", "true"],[43, "exists", "true"]]]',
       },
     ]
@@ -909,7 +909,7 @@ describe('FilterEditorComponent', () => {
     // atom
     component.filterRules = [
       {
-        rule_type: FILTER_CUSTOM_FIELDS_LOOKUP,
+        rule_type: FILTER_CUSTOM_FIELDS_QUERY,
         value: '[42, "exists", "true"]',
       },
     ]
@@ -1459,7 +1459,7 @@ describe('FilterEditorComponent', () => {
     expect(component.customFieldQueriesModel.queries[0].value.length).toEqual(1)
     expect(component.filterRules).toEqual([
       {
-        rule_type: FILTER_CUSTOM_FIELDS_LOOKUP,
+        rule_type: FILTER_CUSTOM_FIELDS_QUERY,
         value: JSON.stringify([
           CustomFieldQueryLogicalOperator.Or,
           [[custom_fields[0].id, 'exists', 'true']],
@@ -1876,7 +1876,7 @@ describe('FilterEditorComponent', () => {
 
     component.filterRules = [
       {
-        rule_type: FILTER_CUSTOM_FIELDS_LOOKUP,
+        rule_type: FILTER_CUSTOM_FIELDS_QUERY,
         value: '["AND",[["42","exists","true"],["43","exists","true"]]]',
       },
     ]

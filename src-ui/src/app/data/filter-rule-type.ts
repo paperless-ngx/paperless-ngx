@@ -55,7 +55,7 @@ export const FILTER_HAS_CUSTOM_FIELDS_ANY = 39
 export const FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS = 40
 export const FILTER_HAS_ANY_CUSTOM_FIELDS = 41
 
-export const FILTER_CUSTOM_FIELDS_LOOKUP = 42
+export const FILTER_CUSTOM_FIELDS_QUERY = 42
 
 export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
@@ -320,8 +320,8 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     default: true,
   },
   {
-    id: FILTER_CUSTOM_FIELDS_LOOKUP,
-    filtervar: 'custom_field_lookup',
+    id: FILTER_CUSTOM_FIELDS_QUERY,
+    filtervar: 'custom_field_query',
     datatype: 'string',
     multi: false,
   },

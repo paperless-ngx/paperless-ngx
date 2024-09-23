@@ -62,7 +62,7 @@ import {
   FILTER_HAS_CUSTOM_FIELDS_ANY,
   FILTER_HAS_CUSTOM_FIELDS_ALL,
   FILTER_HAS_ANY_CUSTOM_FIELDS,
-  FILTER_CUSTOM_FIELDS_LOOKUP,
+  FILTER_CUSTOM_FIELDS_QUERY,
 } from 'src/app/data/filter-rule-type'
 import {
   FilterableDropdownSelectionModel,
@@ -234,7 +234,7 @@ export class FilterEditorComponent
             return $localize`Without any tag`
           }
 
-        case FILTER_CUSTOM_FIELDS_LOOKUP:
+        case FILTER_CUSTOM_FIELDS_QUERY:
           return $localize`Custom fields query`
 
         case FILTER_TITLE:
@@ -525,7 +525,7 @@ export class FilterEditorComponent
             false
           )
           break
-        case FILTER_CUSTOM_FIELDS_LOOKUP:
+        case FILTER_CUSTOM_FIELDS_QUERY:
           try {
             const query = JSON.parse(rule.value)
             if (Array.isArray(query)) {
@@ -786,7 +786,7 @@ export class FilterEditorComponent
     )
     if (queries.length > 0) {
       filterRules.push({
-        rule_type: FILTER_CUSTOM_FIELDS_LOOKUP,
+        rule_type: FILTER_CUSTOM_FIELDS_QUERY,
         value: JSON.stringify(queries[0]),
       })
     }
