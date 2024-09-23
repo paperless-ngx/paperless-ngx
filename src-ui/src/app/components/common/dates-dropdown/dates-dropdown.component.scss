@@ -5,6 +5,12 @@
     --bs-dropdown-min-width: 40rem;
   }
 
+  @media screen and (max-width: 767px) {
+    .border-end {
+      border: none !important;
+    }
+  }
+
   .btn-link {
     line-height: 1;
   }
@@ -13,4 +19,25 @@
 .selected-icon {
   min-width: 1em;
   min-height: 1em;
+}
+
+.input-group-sm {
+  .form-control {
+    font-size: 0.875rem;
+  }
+}
+
+.focus-variants {
+  .variant-focused {
+    display: none;
+  }
+
+  &:hover, &:focus {
+    .variant-unfocused {
+      display: none;
+    }
+    .variant-focused {
+      display: block;
+    }
+  }
 }
