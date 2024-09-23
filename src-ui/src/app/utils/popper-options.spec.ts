@@ -8,7 +8,7 @@ describe('popperOptionsReenablePreventOverflow', () => {
         { name: 'preventOverflow', fn: function () {} },
         {
           name: 'preventOverflow',
-          fn: function () {
+          fn: function (arg0) {
             return
           },
         },
