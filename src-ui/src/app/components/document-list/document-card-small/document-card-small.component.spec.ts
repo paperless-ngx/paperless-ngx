@@ -92,7 +92,7 @@ describe('DocumentCardSmallComponent', () => {
     fixture.detectChanges()
   })
 
-  it('should display a document', () => {
+  it('should display page count', () => {
     expect(fixture.nativeElement.textContent).toContain('12 pages')
   })
 
