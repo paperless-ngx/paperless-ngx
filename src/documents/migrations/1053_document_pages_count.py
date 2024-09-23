@@ -31,7 +31,7 @@ def add_number_of_pages_to_pages_count(apps, schema_editor):
         )
 
         try:
-            pdf = pikepdf.open(doc.source_path)
+            pdf = pikepdf.open(source_path(doc))
 
             if pdf.pages is not None:
                 doc.pages_count = len(pdf.pages)
