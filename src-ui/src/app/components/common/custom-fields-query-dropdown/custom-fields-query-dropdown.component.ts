@@ -53,8 +53,7 @@ export class CustomFieldQueriesModel {
   }
 
   private validateAtom(atom: CustomFieldQueryAtom) {
-    let valid: boolean = !!(atom.field && atom.operator && atom.value)
-    return valid
+    return !!(atom.field && atom.operator && atom.value !== null)
   }
 
   private validateExpression(expression: CustomFieldQueryExpression) {
