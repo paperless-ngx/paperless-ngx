@@ -46,6 +46,7 @@
       [items]="getSelectOptionsForField(atom.field)"
       [(ngModel)]="atom.value"
       [disabled]="disabled"
+      (mousedown)="$event.stopImmediatePropagation()"
     ></ng-select>
   } @else {
     <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="atom.value" [disabled]="disabled">
@@ -101,6 +102,7 @@
           [(ngModel)]="atom.value"
           [disabled]="disabled"
           [multiple]="true"
+          (mousedown)="$event.stopImmediatePropagation()"
         ></ng-select>
       }
       @case (CustomFieldQueryOperator.Exact) {

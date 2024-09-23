@@ -53,7 +53,17 @@ export class CustomFieldQueriesModel {
   }
 
   private validateAtom(atom: CustomFieldQueryAtom) {
-    return !!(atom.field && atom.operator && atom.value !== null)
+    let valid = !!(atom.field && atom.operator && atom.value !== null)
+    if (
+      [
+        CustomFieldQueryOperator.In.valueOf(),
+        CustomFieldQueryOperator.Contains.valueOf(),
+      ].includes(atom.operator) &&
+      atom.value
+    ) {
+      valid = valid && atom.value.length > 0
+    }
+    return valid
   }
 
   private validateExpression(expression: CustomFieldQueryExpression) {

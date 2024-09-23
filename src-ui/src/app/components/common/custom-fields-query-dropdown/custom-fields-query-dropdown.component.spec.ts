@@ -230,6 +230,16 @@ describe('CustomFieldsQueryDropdownComponent', () => {
       expect(model.isValid()).toBeFalsy()
     })
 
+    it('should validate an atom with in or contains operator', () => {
+      const atom = new CustomFieldQueryAtom([1, 'in', '[1,2,3]'])
+      expect(model['validateAtom'].apply(null, [atom])).toBeTruthy()
+      atom.operator = 'contains'
+      atom.value = [1, 2, 3]
+      expect(model['validateAtom'].apply(null, [atom])).toBeTruthy()
+      atom.value = null
+      expect(model['validateAtom'].apply(null, [atom])).toBeFalsy()
+    })
+
     it('should check if model is empty', () => {
       expect(model.isEmpty()).toBeTruthy()
       model.addExpression()
