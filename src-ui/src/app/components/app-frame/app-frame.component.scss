@@ -13,7 +13,7 @@
   padding: 50px 0 0; /* Height of navbar */
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
   overflow-y: auto;
-  --pngx-sidebar-width: 25%;
+  --pngx-sidebar-width: 100%;
   max-width: var(--pngx-sidebar-width);
 
   .sidebar-heading .spinner-border {
