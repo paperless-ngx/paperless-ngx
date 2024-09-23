@@ -1,4 +1,4 @@
-<div class="btn-group w-100" ngbDropdown role="group">
+<div class="btn-group w-100" ngbDropdown role="group" [popperOptions]="popperOptions">
   <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="createdDateBefore || createdDateAfter ? 'btn-primary' : 'btn-outline-primary'" [disabled]="disabled">
     <i-bs width="1em" height="1em" name="calendar-event-fill"></i-bs>
     <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
