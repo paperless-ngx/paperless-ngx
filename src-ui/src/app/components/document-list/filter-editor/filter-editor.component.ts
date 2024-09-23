@@ -234,20 +234,8 @@ export class FilterEditorComponent
             return $localize`Without any tag`
           }
 
-        case FILTER_HAS_CUSTOM_FIELDS_ANY:
-          return $localize`Custom fields include: ${
-            this.customFields.find((f) => f.id == +rule.value)?.name
-          }`
-
-        case FILTER_HAS_CUSTOM_FIELDS_ALL:
-          return $localize`Custom fields: ${
-            this.customFields.find((f) => f.id == +rule.value)?.name
-          }`
-
-        case FILTER_HAS_ANY_CUSTOM_FIELDS:
-          if (rule.value == 'false') {
-            return $localize`Without any custom field`
-          }
+        case FILTER_CUSTOM_FIELDS_LOOKUP:
+          return $localize`Custom fields query`
 
         case FILTER_TITLE:
           return $localize`Title: ${rule.value}`
