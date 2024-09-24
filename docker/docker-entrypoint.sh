@@ -124,6 +124,7 @@ install_languages() {
 	fi
 
 	# Build list of packages to install
+	to_install=()
 	for lang in "${langs[@]}"; do
 		pkg="tesseract-ocr-$lang"
 
@@ -131,12 +132,12 @@ install_languages() {
 			echo "Package $pkg already installed!"
 			continue
 		else
-			to_install+=($pkg)
+			to_install+=("$pkg")
 		fi
 	done
 
 	# Use apt only when we install packages
-	if [ ${#to_install[@]} > 0 ]; then
+	if [ ${#to_install[@]} -gt 0 ]; then
 		apt-get update
 
 		for pkg in "${to_install[@]}"; do
