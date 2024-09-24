@@ -472,7 +472,11 @@ ACCOUNT_EMAIL_VERIFICATION = os.getenv(
     "optional",
 )
 
-ACCOUNT_SESSION_REMEMBER = __get_boolean("PAPERLESS_ACCOUNT_SESSION_REMEMBER")
+ACCOUNT_SESSION_REMEMBER = __get_boolean("PAPERLESS_ACCOUNT_SESSION_REMEMBER", "True")
+SESSION_EXPIRE_AT_BROWSER_CLOSE = not ACCOUNT_SESSION_REMEMBER
+SESSION_COOKIE_AGE = int(
+    os.getenv("PAPERLESS_SESSION_COOKIE_AGE", 60 * 60 * 24 * 7 * 3),
+)
 
 if AUTO_LOGIN_USERNAME:
     _index = MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware")
@@ -1188,6 +1192,23 @@ EMAIL_ENABLE_GPG_DECRYPTOR: Final[bool] = __get_boolean(
 
 
 ###############################################################################
-# Soft Delete
+# Soft Delete                                                                 #
 ###############################################################################
 EMPTY_TRASH_DELAY = max(__get_int("PAPERLESS_EMPTY_TRASH_DELAY", 30), 1)
+
+###############################################################################
+# custom_field_lookup Filter Settings                                         #
+###############################################################################
+
+CUSTOM_FIELD_LOOKUP_OPT_IN = __get_list(
+    "PAPERLESS_CUSTOM_FIELD_LOOKUP_OPT_IN",
+    default=[],
+)
+CUSTOM_FIELD_LOOKUP_MAX_DEPTH = __get_int(
+    "PAPERLESS_CUSTOM_FIELD_LOOKUP_MAX_DEPTH",
+    default=10,
+)
+CUSTOM_FIELD_LOOKUP_MAX_ATOMS = __get_int(
+    "PAPERLESS_CUSTOM_FIELD_LOOKUP_MAX_ATOMS",
+    default=20,
+)

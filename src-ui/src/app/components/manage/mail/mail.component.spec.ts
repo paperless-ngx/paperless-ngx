@@ -226,6 +226,17 @@ describe('MailComponent', () => {
     component.editMailRule()
   })
 
+  it('should support copy mail rule', () => {
+    completeSetup()
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
+    component.copyMailRule(mailRules[0] as MailRule)
+    const editDialog = modal.componentInstance as MailRuleEditDialogComponent
+    expect(editDialog.object.id).toBeNull()
+    expect(editDialog.object.name).toEqual(`${mailRules[0].name} (copy)`)
+    expect(editDialog.dialogMode).toEqual(EditDialogMode.CREATE)
+  })
+
   it('should support delete mail rule, show error if needed', () => {
     completeSetup()
     let modal: NgbModalRef

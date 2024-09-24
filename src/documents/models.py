@@ -857,6 +857,18 @@ class CustomFieldInstance(models.Model):
     and attached to a single Document to be metadata for it
     """
 
+    TYPE_TO_DATA_STORE_NAME_MAP = {
+        CustomField.FieldDataType.STRING: "value_text",
+        CustomField.FieldDataType.URL: "value_url",
+        CustomField.FieldDataType.DATE: "value_date",
+        CustomField.FieldDataType.BOOL: "value_bool",
+        CustomField.FieldDataType.INT: "value_int",
+        CustomField.FieldDataType.FLOAT: "value_float",
+        CustomField.FieldDataType.MONETARY: "value_monetary",
+        CustomField.FieldDataType.DOCUMENTLINK: "value_document_ids",
+        CustomField.FieldDataType.SELECT: "value_select",
+    }
+
     created = models.DateTimeField(
         _("created"),
         default=timezone.now,
@@ -923,31 +935,21 @@ class CustomFieldInstance(models.Model):
         )
         return str(self.field.name) + f" : {value}"
 
+    @classmethod
+    def get_value_field_name(cls, data_type: CustomField.FieldDataType):
+        try:
+            return cls.TYPE_TO_DATA_STORE_NAME_MAP[data_type]
+        except KeyError:  # pragma: no cover
+            raise NotImplementedError(data_type)
+
     @property
     def value(self):
         """
         Based on the data type, access the actual value the instance stores
         A little shorthand/quick way to get what is actually here
         """
-        if self.field.data_type == CustomField.FieldDataType.STRING:
-            return self.value_text
-        elif self.field.data_type == CustomField.FieldDataType.URL:
-            return self.value_url
-        elif self.field.data_type == CustomField.FieldDataType.DATE:
-            return self.value_date
-        elif self.field.data_type == CustomField.FieldDataType.BOOL:
-            return self.value_bool
-        elif self.field.data_type == CustomField.FieldDataType.INT:
-            return self.value_int
-        elif self.field.data_type == CustomField.FieldDataType.FLOAT:
-            return self.value_float
-        elif self.field.data_type == CustomField.FieldDataType.MONETARY:
-            return self.value_monetary
-        elif self.field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
-            return self.value_document_ids
-        elif self.field.data_type == CustomField.FieldDataType.SELECT:
-            return self.value_select
-        raise NotImplementedError(self.field.data_type)
+        value_field_name = self.get_value_field_name(self.field.data_type)
+        return getattr(self, value_field_name)
 
 
 if settings.AUDIT_LOG_ENABLED:
