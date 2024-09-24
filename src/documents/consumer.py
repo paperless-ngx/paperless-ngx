@@ -797,7 +797,7 @@ class ConsumerPlugin(
         self,
         text: str,
         date: Optional[datetime.datetime],
-        pages_count: int,
+        pages_count: Optional[int],
         mime_type: str,
     ) -> Document:
         # If someone gave us the original filename, use it instead of doc.
