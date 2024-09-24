@@ -1,5 +1,6 @@
 import os
 import shutil
+from pathlib import Path
 
 from django.conf import settings
 
@@ -26,7 +27,7 @@ class TestMigrateDocumentPagesCount(TestMigrations):
         )
         self.doc_id = doc.id
         shutil.copy(
-            os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
+            Path(__file__).parent / "samples" / "simple.pdf",
             source_path_before(doc),
         )
 
