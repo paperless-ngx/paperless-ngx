@@ -578,23 +578,14 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
     value = ReadWriteSerializerMethodField(allow_null=True)
 
     def create(self, validated_data):
-        type_to_data_store_name_map = {
-            CustomField.FieldDataType.STRING: "value_text",
-            CustomField.FieldDataType.URL: "value_url",
-            CustomField.FieldDataType.DATE: "value_date",
-            CustomField.FieldDataType.BOOL: "value_bool",
-            CustomField.FieldDataType.INT: "value_int",
-            CustomField.FieldDataType.FLOAT: "value_float",
-            CustomField.FieldDataType.MONETARY: "value_monetary",
-            CustomField.FieldDataType.DOCUMENTLINK: "value_document_ids",
-            CustomField.FieldDataType.SELECT: "value_select",
-        }
         # An instance is attached to a document
         document: Document = validated_data["document"]
         # And to a CustomField
         custom_field: CustomField = validated_data["field"]
         # This key must exist, as it is validated
-        data_store_name = type_to_data_store_name_map[custom_field.data_type]
+        data_store_name = CustomFieldInstance.get_value_field_name(
+            custom_field.data_type,
+        )
 
         if custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
             # prior to update so we can look for any docs that are going to be removed
