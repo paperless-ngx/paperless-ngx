@@ -40,17 +40,6 @@ def add_number_of_pages_to_pages_count(apps, schema_editor):
             print(f"Error retrieving number of pages for {doc.filename}: {e}")
 
 
-def remove_number_of_pages_to_pages_count(apps, schema_editor):
-    Document = apps.get_model("documents", "Document")
-
-    if not Document.objects.all().exists():
-        return
-
-    for document in Document.objects.filter(mime_type="application/pdf"):
-        document.pages_count = 0
-        document.save()
-
-
 class Migration(migrations.Migration):
     dependencies = [
         ("documents", "1052_document_transaction_id"),
@@ -69,6 +58,6 @@ class Migration(migrations.Migration):
         ),
         migrations.RunPython(
             add_number_of_pages_to_pages_count,
-            remove_number_of_pages_to_pages_count,
+            migrations.RunPython.noop,
         ),
     ]
