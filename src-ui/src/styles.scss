@@ -680,3 +680,13 @@ code {
     }
   }
 }
+
+// pdfjs
+canvas.hiddenCanvasElement {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: -1;
+  height: 0;
+  width: 0;
+}
