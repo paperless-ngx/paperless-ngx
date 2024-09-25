@@ -418,6 +418,11 @@ Insurances/                             # Insurances
     Defining a storage path is optional. If no storage path is defined for a
     document, the global [`PAPERLESS_FILENAME_FORMAT`](configuration.md#PAPERLESS_FILENAME_FORMAT) is applied.
 
+## Automatic recovery of invalid PDFs {#pdf-recovery}
+
+Paperless will attempt to "clean" certain invalid PDFs with `qpdf` before processing if, for example, the mime_type
+detection is incorrect. This can happen if the PDF is not properly formatted or contains errors.
+
 ## Celery Monitoring {#celery-monitoring}
 
 The monitoring tool

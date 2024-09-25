@@ -1389,9 +1389,18 @@ class PostDocumentSerializer(serializers.Serializer):
         mime_type = magic.from_buffer(document_data, mime=True)
 
         if not is_mime_type_supported(mime_type):
-            raise serializers.ValidationError(
-                _("File type %(type)s not supported") % {"type": mime_type},
-            )
+            if (
+                mime_type in settings.CONSUMER_PDF_RECOVERABLE_MIME_TYPES
+                and document.name.endswith(
+                    ".pdf",
+                )
+            ):
+                # If the file is an invalid PDF, we can try to recover it later in the consumer
+                mime_type = "application/pdf"
+            else:
+                raise serializers.ValidationError(
+                    _("File type %(type)s not supported") % {"type": mime_type},
+                )
 
         return document.name, document_data
 
