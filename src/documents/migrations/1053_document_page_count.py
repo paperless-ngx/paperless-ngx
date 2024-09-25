@@ -15,7 +15,7 @@ def source_path(self):
     return Path(settings.ORIGINALS_DIR / fname).resolve()
 
 
-def add_number_of_pages_to_pages_count(apps, schema_editor):
+def add_number_of_pages_to_page_count(apps, schema_editor):
     Document = apps.get_model("documents", "Document")
 
     if not Document.objects.all().exists():
@@ -33,7 +33,7 @@ def add_number_of_pages_to_pages_count(apps, schema_editor):
         try:
             with pikepdf.Pdf.open(source_path(doc)) as pdf:
                 if pdf.pages is not None:
-                    doc.pages_count = len(pdf.pages)
+                    doc.page_count = len(pdf.pages)
                     doc.save()
         except Exception as e:  # pragma: no cover
             print(f"Error retrieving number of pages for {doc.filename}: {e}")
@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name="document",
-            name="pages_count",
+            name="page_count",
             field=models.PositiveIntegerField(
                 blank=False,
                 null=True,
@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.RunPython(
-            add_number_of_pages_to_pages_count,
+            add_number_of_pages_to_page_count,
             migrations.RunPython.noop,
         ),
     ]

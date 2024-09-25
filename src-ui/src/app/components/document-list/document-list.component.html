@@ -246,9 +246,9 @@
                 (sort)="onSort($event)"
                 i18n>Added</th>
             }
-            @if (activeDisplayFields.includes(DisplayField.PAGES_COUNT)) {
+            @if (activeDisplayFields.includes(DisplayField.PAGE_COUNT)) {
                 <th class="cursor-pointer"
-                  pngxSortable="pages_count"
+                  pngxSortable="page_count"
                   title="Sort by number of pages" i18n-title
                   [currentSortField]="list.sortField"
                   [currentSortReverse]="list.sortReverse"
@@ -339,9 +339,9 @@
                     {{d.added | customDate}}
                   </td>
                 }
-                @if (activeDisplayFields.includes(DisplayField.PAGES_COUNT)) {
+                @if (activeDisplayFields.includes(DisplayField.PAGE_COUNT)) {
                     <td>
-                        {{ d.pages_count }}
+                        {{ d.page_count }}
                     </td>
                   }
                 @if (activeDisplayFields.includes(DisplayField.SHARED)) {

@@ -26,7 +26,7 @@ export enum DisplayField {
   OWNER = 'owner',
   SHARED = 'shared',
   ASN = 'asn',
-  PAGES_COUNT = 'pagescount',
+  PAGE_COUNT = 'pagecount',
 }
 
 export const DEFAULT_DISPLAY_FIELDS = [
@@ -75,7 +75,7 @@ export const DEFAULT_DISPLAY_FIELDS = [
     name: $localize`ASN`,
   },
   {
-    id: DisplayField.PAGES_COUNT,
+    id: DisplayField.PAGE_COUNT,
     name: $localize`Pages`,
   },
 ]
@@ -99,7 +99,7 @@ export const DOCUMENT_SORT_FIELDS = [
   { field: 'modified', name: $localize`Modified` },
   { field: 'num_notes', name: $localize`Notes` },
   { field: 'owner', name: $localize`Owner` },
-  { field: 'pages_count', name: $localize`Pages` },
+  { field: 'page_count', name: $localize`Pages` },
 ]
 
 export const DOCUMENT_SORT_FIELDS_FULLTEXT = [
@@ -171,5 +171,5 @@ export interface Document extends ObjectWithPermissions {
   // write-only field
   remove_inbox_tags?: boolean
 
-  pages_count?: number
+  page_count?: number
 }

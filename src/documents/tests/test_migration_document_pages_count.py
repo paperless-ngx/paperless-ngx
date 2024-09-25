@@ -14,9 +14,9 @@ def source_path_before(self):
     return os.path.join(settings.ORIGINALS_DIR, fname)
 
 
-class TestMigrateDocumentPagesCount(TestMigrations):
+class TestMigrateDocumentPageCount(TestMigrations):
     migrate_from = "1052_document_transaction_id"
-    migrate_to = "1053_document_pages_count"
+    migrate_to = "1053_document_page_count"
 
     def setUpBeforeMigration(self, apps):
         Document = apps.get_model("documents", "Document")
@@ -31,15 +31,15 @@ class TestMigrateDocumentPagesCount(TestMigrations):
             source_path_before(doc),
         )
 
-    def testDocumentPagesCountMigrated(self):
+    def testDocumentPageCountMigrated(self):
         Document = self.apps.get_model("documents", "Document")
 
         doc = Document.objects.get(id=self.doc_id)
-        self.assertEqual(doc.pages_count, 1)
+        self.assertEqual(doc.page_count, 1)
 
 
-class TestMigrateDocumentPagesCountBackwards(TestMigrations):
-    migrate_from = "1053_document_pages_count"
+class TestMigrateDocumentPageCountBackwards(TestMigrations):
+    migrate_from = "1053_document_page_count"
     migrate_to = "1052_document_transaction_id"
 
     def setUpBeforeMigration(self, apps):
@@ -48,12 +48,12 @@ class TestMigrateDocumentPagesCountBackwards(TestMigrations):
             title="test1",
             mime_type="application/pdf",
             filename="file1.pdf",
-            pages_count=8,
+            page_count=8,
         )
         self.doc_id = doc.id
 
-    def test_remove_number_of_pages_to_pages_count(self):
+    def test_remove_number_of_pages_to_page_count(self):
         Document = self.apps.get_model("documents", "Document")
         self.assertFalse(
-            "pages_count" in [field.name for field in Document._meta.get_fields()],
+            "page_count" in [field.name for field in Document._meta.get_fields()],
         )

@@ -65,7 +65,7 @@ const savedView: SavedView = {
     DisplayField.CORRESPONDENT,
     DisplayField.DOCUMENT_TYPE,
     DisplayField.STORAGE_PATH,
-    DisplayField.PAGES_COUNT,
+    DisplayField.PAGE_COUNT,
     `${DisplayField.CUSTOM_FIELD}11` as any,
     `${DisplayField.CUSTOM_FIELD}15` as any,
   ],
@@ -345,7 +345,7 @@ describe('SavedViewWidgetComponent', () => {
     expect(component.getColumnTitle(DisplayField.STORAGE_PATH)).toEqual(
       'Storage path'
     )
-    expect(component.getColumnTitle(DisplayField.PAGES_COUNT)).toEqual('Pages')
+    expect(component.getColumnTitle(DisplayField.PAGE_COUNT)).toEqual('Pages')
   })
 
   it('should get correct column title for custom field', () => {

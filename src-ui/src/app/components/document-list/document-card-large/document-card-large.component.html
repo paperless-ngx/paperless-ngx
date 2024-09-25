@@ -111,10 +111,10 @@
                   </div>
                 }
               }
-              @if (displayFields.includes(DisplayField.PAGES_COUNT) && document.pages_count) {
+              @if (displayFields.includes(DisplayField.PAGE_COUNT) && document.page_count) {
                 <div class="list-group-item bg-light text-dark p-1 border-0 d-flex align-items-center">
                   <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="files"></i-bs>
-                  <small i18n>{document.pages_count, plural, =1 {1 page} other {{{document.pages_count}} pages}}</small>
+                  <small i18n>{document.page_count, plural, =1 {1 page} other {{{document.page_count}} pages}}</small>
                 </div>
               }
               @if (displayFields.includes(DisplayField.OWNER) && document.owner && document.owner !== settingsService.currentUser.id) {

@@ -205,8 +205,8 @@ class Document(SoftDeleteModel, ModelWithOwner):
         help_text=_("The checksum of the archived document."),
     )
 
-    pages_count = models.PositiveIntegerField(
-        _("pages count"),
+    page_count = models.PositiveIntegerField(
+        _("page count"),
         blank=False,
         null=True,
         unique=False,
@@ -426,7 +426,7 @@ class SavedView(ModelWithOwner):
         OWNER = ("owner", _("Owner"))
         SHARED = ("shared", _("Shared"))
         ASN = ("asn", _("ASN"))
-        PAGES_COUNT = ("pagescount", _("Pages"))
+        PAGE_COUNT = ("pagecount", _("Pages"))
         CUSTOM_FIELD = ("custom_field_%d", ("Custom Field"))
 
     name = models.CharField(_("name"), max_length=128)

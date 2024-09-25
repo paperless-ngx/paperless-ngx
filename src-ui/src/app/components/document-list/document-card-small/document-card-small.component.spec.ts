@@ -34,7 +34,7 @@ const doc = {
   correspondent: 8,
   document_type: 10,
   storage_path: null,
-  pages_count: 12,
+  page_count: 12,
   notes: [
     {
       id: 11,
