@@ -387,6 +387,8 @@ def delete_pages(doc_ids: list[int], pages: list[int]):
             pdf.remove_unreferenced_resources()
             pdf.save()
             doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
+            if doc.page_count is not None:
+                doc.page_count = doc.page_count - len(pages)
             doc.save()
             update_document_archive_file.delay(document_id=doc.id)
             logger.info(f"Deleted pages {pages} from document {doc.id}")

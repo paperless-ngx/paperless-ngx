@@ -361,6 +361,7 @@ class DocumentViewSet(
         "archive_serial_number",
         "num_notes",
         "owner",
+        "page_count",
     )
 
     def get_queryset(self):

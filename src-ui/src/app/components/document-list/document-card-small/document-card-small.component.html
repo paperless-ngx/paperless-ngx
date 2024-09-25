@@ -88,6 +88,14 @@
             </div>
           </div>
         }
+        @if (displayFields.includes(DisplayField.PAGE_COUNT) && document.page_count) {
+          <div class="list-group-item bg-transparent p-0 border-0 d-flex flex-wrap-reverse justify-content-between">
+            <div class="ps-0 p-1" placement="top">
+              <i-bs width="1em" height="1em" class="me-2 text-muted" name="files"></i-bs>
+              <small i18n>{document.page_count, plural, =1 {1 page} other {{{document.page_count}} pages}}</small>
+            </div>
+          </div>
+        }
         @if (displayFields.includes(DisplayField.ASN) && document.archive_serial_number | isNumber) {
           <div class="ps-0 p-1">
             <i-bs width="1em" height="1em" class="me-2 text-muted" name="upc-scan"></i-bs>
