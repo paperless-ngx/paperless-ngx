@@ -750,6 +750,7 @@ class DocumentSerializer(
     original_file_name = SerializerMethodField()
     archived_file_name = SerializerMethodField()
     created_date = serializers.DateField(required=False)
+    page_count = SerializerMethodField()
 
     custom_fields = CustomFieldInstanceSerializer(
         many=True,
@@ -769,6 +770,9 @@ class DocumentSerializer(
         allow_null=True,
         required=False,
     )
+
+    def get_page_count(self, obj):
+        return obj.page_count
 
     def get_original_file_name(self, obj):
         return obj.original_filename
@@ -885,6 +889,7 @@ class DocumentSerializer(
             "notes",
             "custom_fields",
             "remove_inbox_tags",
+            "page_count",
         )
         list_serializer_class = OwnedObjectListSerializer
 
