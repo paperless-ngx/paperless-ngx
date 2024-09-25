@@ -251,7 +251,7 @@ class Command(BaseCommand):
             self.handle_inotify(directory, recursive, options["testing"])
         else:
             if INotify is None and settings.CONSUMER_POLLING == 0:  # pragma: no cover
-                logger.warn("Using polling as INotify import failed")
+                logger.warning("Using polling as INotify import failed")
             self.handle_polling(directory, recursive, options["testing"])
 
         logger.debug("Consumer exiting.")
@@ -267,7 +267,7 @@ class Command(BaseCommand):
         polling_interval = settings.CONSUMER_POLLING
         if polling_interval == 0:  # pragma: no cover
             # Only happens if INotify failed to import
-            logger.warn("Using polling of 10s, consider setting this")
+            logger.warning("Using polling of 10s, consider setting this")
             polling_interval = 10
 
         with ThreadPoolExecutor(max_workers=4) as pool:
