@@ -31,11 +31,10 @@ def add_number_of_pages_to_pages_count(apps, schema_editor):
         )
 
         try:
-            pdf = pikepdf.open(source_path(doc))
-
-            if pdf.pages is not None:
-                doc.pages_count = len(pdf.pages)
-                doc.save()
+            with pikepdf.Pdf.open(source_path(doc)) as pdf:
+                if pdf.pages is not None:
+                    doc.pages_count = len(pdf.pages)
+                    doc.save()
         except Exception as e:  # pragma: no cover
             print(f"Error retrieving number of pages for {doc.filename}: {e}")
 
