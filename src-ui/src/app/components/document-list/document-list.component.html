@@ -246,6 +246,15 @@
                 (sort)="onSort($event)"
                 i18n>Added</th>
             }
+            @if (activeDisplayFields.includes(DisplayField.PAGE_COUNT)) {
+                <th class="cursor-pointer"
+                  pngxSortable="page_count"
+                  title="Sort by number of pages" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)"
+                  i18n>Pages</th>
+              }
             @if (activeDisplayFields.includes(DisplayField.SHARED)) {
               <th i18n>
                 Shared
@@ -330,6 +339,11 @@
                     {{d.added | customDate}}
                   </td>
                 }
+                @if (activeDisplayFields.includes(DisplayField.PAGE_COUNT)) {
+                    <td>
+                        {{ d.page_count }}
+                    </td>
+                  }
                 @if (activeDisplayFields.includes(DisplayField.SHARED)) {
                   <td>
                     @if (d.is_shared_by_requester) { <ng-container i18n>Yes</ng-container> } @else { <ng-container i18n>No</ng-container> }

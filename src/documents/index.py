@@ -80,6 +80,7 @@ def get_schema():
         has_owner=BOOLEAN(),
         viewer_id=KEYWORD(commas=True),
         checksum=TEXT(),
+        page_count=NUMERIC(sortable=True),
         original_filename=TEXT(sortable=True),
         is_shared=BOOLEAN(),
     )
@@ -181,6 +182,7 @@ def update_document(writer: AsyncWriter, doc: Document):
         has_owner=doc.owner is not None,
         viewer_id=viewer_ids if viewer_ids else None,
         checksum=doc.checksum,
+        page_count=doc.page_count,
         original_filename=doc.original_filename,
         is_shared=len(viewer_ids) > 0,
     )
@@ -247,6 +249,7 @@ class DelayedQuery:
             "archive_serial_number": "asn",
             "num_notes": "num_notes",
             "owner": "owner",
+            "page_count": "page_count",
         }
 
         if field.startswith("-"):
