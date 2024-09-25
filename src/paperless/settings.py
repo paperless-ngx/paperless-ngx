@@ -9,8 +9,6 @@ from os import PathLike
 from pathlib import Path
 from platform import machine
 from typing import Final
-from typing import Optional
-from typing import Union
 from urllib.parse import urlparse
 
 from celery.schedules import crontab
@@ -57,7 +55,7 @@ def __get_int(key: str, default: int) -> int:
     return int(os.getenv(key, default))
 
 
-def __get_optional_int(key: str) -> Optional[int]:
+def __get_optional_int(key: str) -> int | None:
     """
     Returns None if the environment key is not present, otherwise an integer
     """
@@ -75,7 +73,7 @@ def __get_float(key: str, default: float) -> float:
 
 def __get_path(
     key: str,
-    default: Union[PathLike, str],
+    default: PathLike | str,
 ) -> Path:
     """
     Return a normalized, absolute path based on the environment variable or a default,
@@ -86,7 +84,7 @@ def __get_path(
     return Path(default).resolve()
 
 
-def __get_optional_path(key: str) -> Optional[Path]:
+def __get_optional_path(key: str) -> Path | None:
     """
     Returns None if the environment key is not present, otherwise a fully resolved Path
     """
@@ -97,7 +95,7 @@ def __get_optional_path(key: str) -> Optional[Path]:
 
 def __get_list(
     key: str,
-    default: Optional[list[str]] = None,
+    default: list[str] | None = None,
     sep: str = ",",
 ) -> list[str]:
     """
@@ -112,7 +110,7 @@ def __get_list(
         return []
 
 
-def _parse_redis_url(env_redis: Optional[str]) -> tuple[str, str]:
+def _parse_redis_url(env_redis: str | None) -> tuple[str, str]:
     """
     Gets the Redis information from the environment or a default and handles
     converting from incompatible django_channels and celery formats.
@@ -989,7 +987,7 @@ OCR_ROTATE_PAGES_THRESHOLD: Final[float] = __get_float(
     12.0,
 )
 
-OCR_MAX_IMAGE_PIXELS: Final[Optional[int]] = __get_optional_int(
+OCR_MAX_IMAGE_PIXELS: Final[int | None] = __get_optional_int(
     "PAPERLESS_OCR_MAX_IMAGE_PIXELS",
 )
 
@@ -1000,7 +998,7 @@ OCR_COLOR_CONVERSION_STRATEGY = os.getenv(
 
 OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS")
 
-MAX_IMAGE_PIXELS: Final[Optional[int]] = __get_optional_int(
+MAX_IMAGE_PIXELS: Final[int | None] = __get_optional_int(
     "PAPERLESS_MAX_IMAGE_PIXELS",
 )
 
@@ -1128,7 +1126,7 @@ APP_LOGO = os.getenv("PAPERLESS_APP_LOGO", None)
 ###############################################################################
 
 
-def _get_nltk_language_setting(ocr_lang: str) -> Optional[str]:
+def _get_nltk_language_setting(ocr_lang: str) -> str | None:
     """
     Maps an ISO-639-1 language code supported by Tesseract into
     an optional NLTK language name.  This is the set of common supported
@@ -1165,7 +1163,7 @@ def _get_nltk_language_setting(ocr_lang: str) -> Optional[str]:
 
 NLTK_ENABLED: Final[bool] = __get_boolean("PAPERLESS_ENABLE_NLTK", "yes")
 
-NLTK_LANGUAGE: Optional[str] = _get_nltk_language_setting(OCR_LANGUAGE)
+NLTK_LANGUAGE: str | None = _get_nltk_language_setting(OCR_LANGUAGE)
 
 ###############################################################################
 # Email (SMTP) Backend                                                        #
@@ -1187,7 +1185,7 @@ if DEBUG:  # pragma: no cover
 # Email Preprocessors                                                         #
 ###############################################################################
 
-EMAIL_GNUPG_HOME: Final[Optional[str]] = os.getenv("PAPERLESS_EMAIL_GNUPG_HOME")
+EMAIL_GNUPG_HOME: Final[str | None] = os.getenv("PAPERLESS_EMAIL_GNUPG_HOME")
 EMAIL_ENABLE_GPG_DECRYPTOR: Final[bool] = __get_boolean(
     "PAPERLESS_ENABLE_GPG_DECRYPTOR",
 )

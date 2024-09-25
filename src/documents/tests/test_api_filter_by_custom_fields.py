@@ -1,7 +1,7 @@
 import json
 import re
+from collections.abc import Callable
 from datetime import date
-from typing import Callable
 from unittest.mock import Mock
 from urllib.parse import quote
 
