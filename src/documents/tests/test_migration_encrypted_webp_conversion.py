@@ -1,10 +1,9 @@
 import importlib
 import shutil
 import tempfile
+from collections.abc import Callable
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Callable
-from typing import Union
 from unittest import mock
 
 from django.test import override_settings
@@ -115,7 +114,7 @@ class TestMigrateToEncrytpedWebPThumbnails(TestMigrations):
     def assert_file_count_by_extension(
         self,
         ext: str,
-        dir: Union[str, Path],
+        dir: str | Path,
         expected_count: int,
     ):
         """

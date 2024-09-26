@@ -5,7 +5,6 @@ import re
 from collections import OrderedDict
 from pathlib import Path
 from typing import Final
-from typing import Optional
 
 import dateutil.parser
 import pathvalidate
@@ -205,6 +204,18 @@ class Document(SoftDeleteModel, ModelWithOwner):
         help_text=_("The checksum of the archived document."),
     )
 
+    page_count = models.PositiveIntegerField(
+        _("page count"),
+        blank=False,
+        null=True,
+        unique=False,
+        db_index=False,
+        validators=[MinValueValidator(1)],
+        help_text=_(
+            "The number of pages of the document.",
+        ),
+    )
+
     created = models.DateTimeField(_("created"), default=timezone.now, db_index=True)
 
     modified = models.DateTimeField(
@@ -314,7 +325,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
         return self.archive_filename is not None
 
     @property
-    def archive_path(self) -> Optional[Path]:
+    def archive_path(self) -> Path | None:
         if self.has_archive_version:
             return (settings.ARCHIVE_DIR / Path(str(self.archive_filename))).resolve()
         else:
@@ -414,6 +425,7 @@ class SavedView(ModelWithOwner):
         OWNER = ("owner", _("Owner"))
         SHARED = ("shared", _("Shared"))
         ASN = ("asn", _("ASN"))
+        PAGE_COUNT = ("pagecount", _("Pages"))
         CUSTOM_FIELD = ("custom_field_%d", ("Custom Field"))
 
     name = models.CharField(_("name"), max_length=128)

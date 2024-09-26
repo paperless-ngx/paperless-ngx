@@ -5,8 +5,6 @@ import tempfile
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING
-from typing import Optional
-from typing import Union
 
 import magic
 from django.conf import settings
@@ -61,7 +59,7 @@ class WorkflowTriggerPlugin(
 ):
     NAME: str = "WorkflowTriggerPlugin"
 
-    def run(self) -> Optional[str]:
+    def run(self) -> str | None:
         """
         Get overrides from matching workflows
         """
@@ -278,7 +276,7 @@ class ConsumerPlugin(
         current_progress: int,
         max_progress: int,
         status: ProgressStatusOptions,
-        message: Optional[Union[ConsumerStatusShortMessage, str]] = None,
+        message: ConsumerStatusShortMessage | str | None = None,
         document_id=None,
     ):  # pragma: no cover
         self.status_mgr.send_progress(
@@ -294,10 +292,10 @@ class ConsumerPlugin(
 
     def _fail(
         self,
-        message: Union[ConsumerStatusShortMessage, str],
-        log_message: Optional[str] = None,
+        message: ConsumerStatusShortMessage | str,
+        log_message: str | None = None,
         exc_info=None,
-        exception: Optional[Exception] = None,
+        exception: Exception | None = None,
     ):
         self._send_progress(100, 100, ProgressStatusOptions.FAILED, message)
         self.log.error(log_message or message, exc_info=exc_info)
@@ -532,6 +530,7 @@ class ConsumerPlugin(
             )
             self.working_copy = Path(tempdir.name) / Path(self.filename)
             copy_file_with_basic_stats(self.input_doc.original_file, self.working_copy)
+            self.unmodified_original = None
 
             # Determine the parser class.
 
@@ -539,11 +538,40 @@ class ConsumerPlugin(
 
             self.log.debug(f"Detected mime type: {mime_type}")
 
+            if (
+                Path(self.filename).suffix.lower() == ".pdf"
+                and mime_type in settings.CONSUMER_PDF_RECOVERABLE_MIME_TYPES
+            ):
+                try:
+                    # The file might be a pdf, but the mime type is wrong.
+                    # Try to clean with qpdf
+                    self.log.debug(
+                        "Detected possible PDF with wrong mime type, trying to clean with qpdf",
+                    )
+                    run_subprocess(
+                        [
+                            "qpdf",
+                            "--replace-input",
+                            self.working_copy,
+                        ],
+                        logger=self.log,
+                    )
+                    mime_type = magic.from_file(self.working_copy, mime=True)
+                    self.log.debug(f"Detected mime type after qpdf: {mime_type}")
+                    # Save the original file for later
+                    self.unmodified_original = (
+                        Path(tempdir.name) / Path("uo") / Path(self.filename)
+                    )
+                    copy_file_with_basic_stats(
+                        self.input_doc.original_file,
+                        self.unmodified_original,
+                    )
+                except Exception as e:
+                    self.log.error(f"Error attempting to clean PDF: {e}")
+
             # Based on the mime type, get the parser for that type
-            parser_class: Optional[type[DocumentParser]] = (
-                get_parser_class_for_mime_type(
-                    mime_type,
-                )
+            parser_class: type[DocumentParser] | None = get_parser_class_for_mime_type(
+                mime_type,
             )
             if not parser_class:
                 tempdir.cleanup()
@@ -586,6 +614,7 @@ class ConsumerPlugin(
         date = None
         thumbnail = None
         archive_path = None
+        page_count = None
 
         try:
             self._send_progress(
@@ -621,6 +650,7 @@ class ConsumerPlugin(
                 )
                 date = parse_date(self.filename, text)
             archive_path = document_parser.get_archive_path()
+            page_count = document_parser.get_page_count(self.working_copy, mime_type)
 
         except ParseError as e:
             document_parser.cleanup()
@@ -662,7 +692,12 @@ class ConsumerPlugin(
         try:
             with transaction.atomic():
                 # store the document.
-                document = self._store(text=text, date=date, mime_type=mime_type)
+                document = self._store(
+                    text=text,
+                    date=date,
+                    page_count=page_count,
+                    mime_type=mime_type,
+                )
 
                 # If we get here, it was successful. Proceed with post-consume
                 # hooks. If they fail, nothing will get changed.
@@ -682,7 +717,9 @@ class ConsumerPlugin(
 
                     self._write(
                         document.storage_type,
-                        self.working_copy,
+                        self.unmodified_original
+                        if self.unmodified_original is not None
+                        else self.working_copy,
                         document.source_path,
                     )
 
@@ -718,6 +755,8 @@ class ConsumerPlugin(
                 self.log.debug(f"Deleting file {self.working_copy}")
                 self.input_doc.original_file.unlink()
                 self.working_copy.unlink()
+                if self.unmodified_original is not None:  # pragma: no cover
+                    self.unmodified_original.unlink()
 
                 # https://github.com/jonaswinkler/paperless-ng/discussions/1037
                 shadow_file = os.path.join(
@@ -789,7 +828,8 @@ class ConsumerPlugin(
     def _store(
         self,
         text: str,
-        date: Optional[datetime.datetime],
+        date: datetime.datetime | None,
+        page_count: int | None,
         mime_type: str,
     ) -> Document:
         # If someone gave us the original filename, use it instead of doc.
@@ -835,6 +875,7 @@ class ConsumerPlugin(
             created=create_date,
             modified=create_date,
             storage_type=storage_type,
+            page_count=page_count,
             original_filename=self.filename,
         )
 
@@ -916,7 +957,7 @@ def parse_doc_title_w_placeholders(
     owner_username: str,
     local_added: datetime.datetime,
     original_filename: str,
-    created: Optional[datetime.datetime] = None,
+    created: datetime.datetime | None = None,
 ) -> str:
     """
     Available title placeholders for Workflows depend on what has already been assigned,

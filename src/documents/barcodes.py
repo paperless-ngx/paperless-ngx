@@ -3,7 +3,6 @@ import re
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 from django.conf import settings
 from pdf2image import convert_from_path
@@ -81,7 +80,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
         self._tiff_conversion_done = False
         self.barcodes: list[Barcode] = []
 
-    def run(self) -> Optional[str]:
+    def run(self) -> str | None:
         # Some operations may use PIL, override pixel setting if needed
         maybe_override_pixel_limit()
 
@@ -299,7 +298,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
             )
 
     @property
-    def asn(self) -> Optional[int]:
+    def asn(self) -> int | None:
         """
         Search the parsed barcodes for any ASNs.
         The first barcode that starts with CONSUMER_ASN_BARCODE_PREFIX
@@ -334,7 +333,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
         return asn
 
     @property
-    def tags(self) -> Optional[list[int]]:
+    def tags(self) -> list[int] | None:
         """
         Search the parsed barcodes for any tags.
         Returns the detected tag ids (or empty list)

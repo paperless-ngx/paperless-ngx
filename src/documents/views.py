@@ -361,6 +361,7 @@ class DocumentViewSet(
         "archive_serial_number",
         "num_notes",
         "owner",
+        "page_count",
     )
 
     def get_queryset(self):
@@ -1637,9 +1638,8 @@ class RemoteVersionView(GenericAPIView):
             try:
                 remote_json = json.loads(remote)
                 remote_version = remote_json["tag_name"]
-                # Basically PEP 616 but that only went in 3.9
-                if remote_version.startswith("ngx-"):
-                    remote_version = remote_version[len("ngx-") :]
+                # Some early tags used ngx-x.y.z
+                remote_version = remote_version.removeprefix("ngx-")
             except ValueError:
                 logger.debug("An error occurred parsing remote version json")
         except urllib.error.URLError:

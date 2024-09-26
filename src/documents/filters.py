@@ -2,9 +2,8 @@ import functools
 import inspect
 import json
 import operator
+from collections.abc import Callable
 from contextlib import contextmanager
-from typing import Callable
-from typing import Union
 
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import CharField
@@ -311,7 +310,7 @@ class CustomFieldQueryParser:
         `max_query_depth` and `max_atom_count` can be set to guard against generating arbitrarily
         complex SQL queries.
         """
-        self._custom_fields: dict[Union[int, str], CustomField] = {}
+        self._custom_fields: dict[int | str, CustomField] = {}
         self._validation_prefix = validation_prefix
         # Dummy ModelSerializer used to convert a Django models.Field to serializers.Field.
         self._model_serializer = serializers.ModelSerializer()
@@ -345,7 +344,7 @@ class CustomFieldQueryParser:
         Applies rule (1, 2, 3) or (4, 5, 6) based on the length of the expr.
         """
         with self._track_query_depth():
-            if isinstance(expr, (list, tuple)):
+            if isinstance(expr, list | tuple):
                 if len(expr) == 2:
                     return self._parse_logical_expr(*expr)
                 elif len(expr) == 3:
@@ -359,7 +358,7 @@ class CustomFieldQueryParser:
         """
         Handles [`q0`, `q1`, ..., `qn`] in rule 4 & 5.
         """
-        if not isinstance(exprs, (list, tuple)) or not exprs:
+        if not isinstance(exprs, list | tuple) or not exprs:
             raise serializers.ValidationError(
                 [_("Invalid expression list. Must be nonempty.")],
             )

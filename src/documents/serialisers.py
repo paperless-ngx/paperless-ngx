@@ -750,6 +750,7 @@ class DocumentSerializer(
     original_file_name = SerializerMethodField()
     archived_file_name = SerializerMethodField()
     created_date = serializers.DateField(required=False)
+    page_count = SerializerMethodField()
 
     custom_fields = CustomFieldInstanceSerializer(
         many=True,
@@ -769,6 +770,9 @@ class DocumentSerializer(
         allow_null=True,
         required=False,
     )
+
+    def get_page_count(self, obj):
+        return obj.page_count
 
     def get_original_file_name(self, obj):
         return obj.original_filename
@@ -885,6 +889,7 @@ class DocumentSerializer(
             "notes",
             "custom_fields",
             "remove_inbox_tags",
+            "page_count",
         )
         list_serializer_class = OwnedObjectListSerializer
 
@@ -1384,9 +1389,18 @@ class PostDocumentSerializer(serializers.Serializer):
         mime_type = magic.from_buffer(document_data, mime=True)
 
         if not is_mime_type_supported(mime_type):
-            raise serializers.ValidationError(
-                _("File type %(type)s not supported") % {"type": mime_type},
-            )
+            if (
+                mime_type in settings.CONSUMER_PDF_RECOVERABLE_MIME_TYPES
+                and document.name.endswith(
+                    ".pdf",
+                )
+            ):
+                # If the file is an invalid PDF, we can try to recover it later in the consumer
+                mime_type = "application/pdf"
+            else:
+                raise serializers.ValidationError(
+                    _("File type %(type)s not supported") % {"type": mime_type},
+                )
 
         return document.name, document_data
 
