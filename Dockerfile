@@ -233,11 +233,11 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
     && python3 -m pip install --no-cache-dir --upgrade wheel \
   && echo "Installing Python requirements" \
     && curl --fail --silent --show-error --location \
-    --output psycopg_c-3.2.1-cp311-cp311-linux_x86_64.whl \
-    https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.1/psycopg_c-3.2.1-cp311-cp311-linux_x86_64.whl \
+    --output psycopg_c-3.2.2-cp311-cp311-linux_x86_64.whl \
+    https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.2/psycopg_c-3.2.2-cp311-cp311-linux_x86_64.whl \
     && curl --fail --silent --show-error --location \
-    --output psycopg_c-3.2.1-cp311-cp311-linux_aarch64.whl  \
-    https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.1/psycopg_c-3.2.1-cp311-cp311-linux_aarch64.whl \
+    --output psycopg_c-3.2.2-cp311-cp311-linux_aarch64.whl  \
+    https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.2/psycopg_c-3.2.2-cp311-cp311-linux_aarch64.whl \
     && python3 -m pip install --default-timeout=1000 --find-links . --requirement requirements.txt \
   && echo "Patching whitenoise for compression speedup" \
     && curl --fail --silent --show-error --location --output 484.patch https://github.com/evansd/whitenoise/pull/484.patch \
