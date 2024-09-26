@@ -4,8 +4,6 @@ import random
 import uuid
 from collections import namedtuple
 from contextlib import AbstractContextManager
-from typing import Optional
-from typing import Union
 from unittest import mock
 
 import pytest
@@ -199,11 +197,11 @@ class MessageBuilder:
 
     def create_message(
         self,
-        attachments: Union[int, list[_AttachmentDef]] = 1,
+        attachments: int | list[_AttachmentDef] = 1,
         body: str = "",
         subject: str = "the subject",
         from_: str = "no_one@mail.com",
-        to: Optional[list[str]] = None,
+        to: list[str] | None = None,
         seen: bool = False,
         flagged: bool = False,
         processed: bool = False,
@@ -622,8 +620,8 @@ class TestMail(
         @dataclasses.dataclass(frozen=True)
         class FilterTestCase:
             name: str
-            include_pattern: Optional[str]
-            exclude_pattern: Optional[str]
+            include_pattern: str | None
+            exclude_pattern: str | None
             expected_matches: list[str]
 
         tests = [

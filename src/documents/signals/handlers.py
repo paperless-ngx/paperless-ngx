@@ -1,7 +1,6 @@
 import logging
 import os
 import shutil
-from typing import Optional
 
 from celery import states
 from celery.signals import before_task_publish
@@ -62,7 +61,7 @@ def _suggestion_printer(
     suggestion_type: str,
     document: Document,
     selected: MatchingModel,
-    base_url: Optional[str] = None,
+    base_url: str | None = None,
 ):
     """
     Smaller helper to reduce duplication when just outputting suggestions to the console
@@ -80,7 +79,7 @@ def set_correspondent(
     sender,
     document: Document,
     logging_group=None,
-    classifier: Optional[DocumentClassifier] = None,
+    classifier: DocumentClassifier | None = None,
     replace=False,
     use_first=True,
     suggest=False,
@@ -135,7 +134,7 @@ def set_document_type(
     sender,
     document: Document,
     logging_group=None,
-    classifier: Optional[DocumentClassifier] = None,
+    classifier: DocumentClassifier | None = None,
     replace=False,
     use_first=True,
     suggest=False,
@@ -191,7 +190,7 @@ def set_tags(
     sender,
     document: Document,
     logging_group=None,
-    classifier: Optional[DocumentClassifier] = None,
+    classifier: DocumentClassifier | None = None,
     replace=False,
     suggest=False,
     base_url=None,
@@ -246,7 +245,7 @@ def set_storage_path(
     sender,
     document: Document,
     logging_group=None,
-    classifier: Optional[DocumentClassifier] = None,
+    classifier: DocumentClassifier | None = None,
     replace=False,
     use_first=True,
     suggest=False,

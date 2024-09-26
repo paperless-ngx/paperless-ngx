@@ -3,7 +3,6 @@ import logging
 import os
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Optional
 
 import tqdm
 from django.conf import settings
@@ -228,8 +227,8 @@ class Command(CryptMixin, BaseCommand):
         self.data_only: bool = options["data_only"]
         self.no_progress_bar: bool = options["no_progress_bar"]
         self.passphrase: str | None = options.get("passphrase")
-        self.version: Optional[str] = None
-        self.salt: Optional[str] = None
+        self.version: str | None = None
+        self.salt: str | None = None
         self.manifest_paths = []
         self.manifest = []
 
