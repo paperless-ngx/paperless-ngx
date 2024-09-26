@@ -1,7 +1,6 @@
 import abc
 from pathlib import Path
 from typing import Final
-from typing import Optional
 
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
@@ -88,7 +87,7 @@ class ConsumeTaskPlugin(abc.ABC):
         """
 
     @abc.abstractmethod
-    def run(self) -> Optional[str]:
+    def run(self) -> str | None:
         """
         The bulk of plugin processing, this does whatever action the plugin is for.
 

@@ -5,7 +5,6 @@ import re
 from collections import OrderedDict
 from pathlib import Path
 from typing import Final
-from typing import Optional
 
 import dateutil.parser
 import pathvalidate
@@ -326,7 +325,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
         return self.archive_filename is not None
 
     @property
-    def archive_path(self) -> Optional[Path]:
+    def archive_path(self) -> Path | None:
         if self.has_archive_version:
             return (settings.ARCHIVE_DIR / Path(str(self.archive_filename))).resolve()
         else:

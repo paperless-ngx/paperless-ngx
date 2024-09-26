@@ -10,8 +10,6 @@ from datetime import timedelta
 from fnmatch import fnmatch
 from pathlib import Path
 from typing import TYPE_CHECKING
-from typing import Optional
-from typing import Union
 
 import magic
 import pathvalidate
@@ -84,7 +82,7 @@ class BaseMailAction:
     read mails when the action is to mark mails as read).
     """
 
-    def get_criteria(self) -> Union[dict, LogicOperator]:
+    def get_criteria(self) -> dict | LogicOperator:
         """
         Returns filtering criteria/query for this mail action.
         """
@@ -453,7 +451,7 @@ class MailAccountHandler(LoggingMixin):
         else:
             self.log.debug(f"Skipping mail preprocessor {preprocessor_type.NAME}")
 
-    def _correspondent_from_name(self, name: str) -> Optional[Correspondent]:
+    def _correspondent_from_name(self, name: str) -> Correspondent | None:
         try:
             return Correspondent.objects.get_or_create(name=name)[0]
         except DatabaseError as e:
@@ -465,7 +463,7 @@ class MailAccountHandler(LoggingMixin):
         message: MailMessage,
         att: MailAttachment,
         rule: MailRule,
-    ) -> Optional[str]:
+    ) -> str | None:
         if rule.assign_title_from == MailRule.TitleSource.FROM_SUBJECT:
             return message.subject
 
@@ -484,7 +482,7 @@ class MailAccountHandler(LoggingMixin):
         self,
         message: MailMessage,
         rule: MailRule,
-    ) -> Optional[Correspondent]:
+    ) -> Correspondent | None:
         c_from = rule.assign_correspondent_from
 
         if c_from == MailRule.CorrespondentSource.FROM_NOTHING:
@@ -688,7 +686,7 @@ class MailAccountHandler(LoggingMixin):
 
     def filename_inclusion_matches(
         self,
-        filter_attachment_filename_include: Optional[str],
+        filter_attachment_filename_include: str | None,
         filename: str,
     ) -> bool:
         if filter_attachment_filename_include:
@@ -707,7 +705,7 @@ class MailAccountHandler(LoggingMixin):
 
     def filename_exclusion_matches(
         self,
-        filter_attachment_filename_exclude: Optional[str],
+        filter_attachment_filename_exclude: str | None,
         filename: str,
     ) -> bool:
         if filter_attachment_filename_exclude:

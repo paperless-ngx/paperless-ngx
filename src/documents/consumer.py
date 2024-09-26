@@ -5,8 +5,6 @@ import tempfile
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING
-from typing import Optional
-from typing import Union
 
 import magic
 from django.conf import settings
@@ -61,7 +59,7 @@ class WorkflowTriggerPlugin(
 ):
     NAME: str = "WorkflowTriggerPlugin"
 
-    def run(self) -> Optional[str]:
+    def run(self) -> str | None:
         """
         Get overrides from matching workflows
         """
@@ -278,7 +276,7 @@ class ConsumerPlugin(
         current_progress: int,
         max_progress: int,
         status: ProgressStatusOptions,
-        message: Optional[Union[ConsumerStatusShortMessage, str]] = None,
+        message: ConsumerStatusShortMessage | str | None = None,
         document_id=None,
     ):  # pragma: no cover
         self.status_mgr.send_progress(
@@ -294,10 +292,10 @@ class ConsumerPlugin(
 
     def _fail(
         self,
-        message: Union[ConsumerStatusShortMessage, str],
-        log_message: Optional[str] = None,
+        message: ConsumerStatusShortMessage | str,
+        log_message: str | None = None,
         exc_info=None,
-        exception: Optional[Exception] = None,
+        exception: Exception | None = None,
     ):
         self._send_progress(100, 100, ProgressStatusOptions.FAILED, message)
         self.log.error(log_message or message, exc_info=exc_info)
@@ -572,10 +570,8 @@ class ConsumerPlugin(
                     self.log.error(f"Error attempting to clean PDF: {e}")
 
             # Based on the mime type, get the parser for that type
-            parser_class: Optional[type[DocumentParser]] = (
-                get_parser_class_for_mime_type(
-                    mime_type,
-                )
+            parser_class: type[DocumentParser] | None = get_parser_class_for_mime_type(
+                mime_type,
             )
             if not parser_class:
                 tempdir.cleanup()
@@ -832,8 +828,8 @@ class ConsumerPlugin(
     def _store(
         self,
         text: str,
-        date: Optional[datetime.datetime],
-        page_count: Optional[int],
+        date: datetime.datetime | None,
+        page_count: int | None,
         mime_type: str,
     ) -> Document:
         # If someone gave us the original filename, use it instead of doc.
@@ -961,7 +957,7 @@ def parse_doc_title_w_placeholders(
     owner_username: str,
     local_added: datetime.datetime,
     original_filename: str,
-    created: Optional[datetime.datetime] = None,
+    created: datetime.datetime | None = None,
 ) -> str:
     """
     Available title placeholders for Workflows depend on what has already been assigned,

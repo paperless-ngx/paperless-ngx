@@ -3,7 +3,6 @@ import importlib
 import os
 import shutil
 from pathlib import Path
-from typing import Optional
 from unittest import mock
 
 from django.conf import settings
@@ -66,8 +65,8 @@ def make_test_document(
     mime_type: str,
     original: str,
     original_filename: str,
-    archive: Optional[str] = None,
-    archive_filename: Optional[str] = None,
+    archive: str | None = None,
+    archive_filename: str | None = None,
 ):
     doc = document_class()
     doc.filename = original_filename
