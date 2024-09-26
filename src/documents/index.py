@@ -6,7 +6,6 @@ from contextlib import contextmanager
 from datetime import datetime
 from datetime import timezone
 from shutil import rmtree
-from typing import Optional
 
 from django.conf import settings
 from django.db.models import QuerySet
@@ -389,7 +388,7 @@ def autocomplete(
     ix: FileIndex,
     term: str,
     limit: int = 10,
-    user: Optional[User] = None,
+    user: User | None = None,
 ):
     """
     Mimics whoosh.reading.IndexReader.most_distinctive_terms with permissions
@@ -425,7 +424,7 @@ def autocomplete(
     return terms
 
 
-def get_permissions_criterias(user: Optional[User] = None):
+def get_permissions_criterias(user: User | None = None):
     user_criterias = [query.Term("has_owner", False)]
     if user is not None:
         if user.is_superuser:  # superusers see all docs

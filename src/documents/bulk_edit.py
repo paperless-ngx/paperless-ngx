@@ -3,7 +3,6 @@ import itertools
 import logging
 import os
 import tempfile
-from typing import Optional
 
 from celery import chain
 from celery import chord
@@ -242,7 +241,7 @@ def rotate(doc_ids: list[int], degrees: int):
 
 def merge(
     doc_ids: list[int],
-    metadata_document_id: Optional[int] = None,
+    metadata_document_id: int | None = None,
     delete_originals: bool = False,
     user: User = None,
 ):
