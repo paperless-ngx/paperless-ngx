@@ -1,6 +1,6 @@
 import {
   HttpTestingController,
-  HttpClientTestingModule,
+  provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import { Component } from '@angular/core'
 import {
@@ -30,6 +30,7 @@ import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { environment } from 'src/environments/environment'
 import { EditDialogComponent, EditDialogMode } from './edit-dialog.component'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 @Component({
   template: `
@@ -96,6 +97,7 @@ describe('EditDialogComponent', () => {
   beforeEach(async () => {
     TestBed.configureTestingModule({
       declarations: [TestComponent],
+      imports: [FormsModule, ReactiveFormsModule],
       providers: [
         NgbActiveModal,
         {
@@ -114,8 +116,9 @@ describe('EditDialogComponent', () => {
         },
         SettingsService,
         TagService,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
-      imports: [HttpClientTestingModule, FormsModule, ReactiveFormsModule],
     }).compileComponents()
 
     tagService = TestBed.inject(TagService)

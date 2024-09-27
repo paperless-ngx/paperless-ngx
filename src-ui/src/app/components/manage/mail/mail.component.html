@@ -19,6 +19,7 @@
       <div class="row">
         <div class="col" i18n>Name</div>
         <div class="col" i18n>Server</div>
+        <div class="col" i18n>Username</div>
         <div class="col" i18n>Actions</div>
       </div>
     </li>
@@ -28,6 +29,7 @@
         <div class="row">
           <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editMailAccount(account)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailAccount)">{{account.name}}</button></div>
           <div class="col d-flex align-items-center">{{account.imap_server}}</div>
+          <div class="col d-flex align-items-center">{{account.username}}</div>
           <div class="col">
             <div class="btn-group">
               <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" [disabled]="!userCanEdit(account)" class="btn btn-sm btn-outline-secondary" type="button" (click)="editMailAccount(account)">
@@ -62,6 +64,7 @@
     <li class="list-group-item">
       <div class="row">
         <div class="col" i18n>Name</div>
+        <div class="col" i18n>Sort Order</div>
         <div class="col" i18n>Account</div>
         <div class="col" i18n>Actions</div>
       </div>
@@ -71,6 +74,7 @@
       <li class="list-group-item">
         <div class="row">
           <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editMailRule(rule)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailRule)">{{rule.name}}</button></div>
+          <div class="col d-flex align-items-center">{{rule.order}}</div>
           <div class="col d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
           <div class="col">
             <div class="btn-group">

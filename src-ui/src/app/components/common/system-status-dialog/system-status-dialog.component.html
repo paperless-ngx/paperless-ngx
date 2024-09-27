@@ -28,7 +28,7 @@
               <dt i18n>Media Storage</dt>
               <dd>
                 <ngb-progressbar style="height: 4px;" class="mt-2 mb-1" type="primary" [max]="status.storage.total" [value]="status.storage.total - status.storage.available"></ngb-progressbar>
-                <span class="small">{{status.storage.available | filesize}} <ng-container i18n>available</ng-container> ({{status.storage.total | filesize}} <ng-container i18n>total</ng-container>)</span>
+                <span class="small">{{status.storage.available | fileSize}} <ng-container i18n>available</ng-container> ({{status.storage.total | fileSize}} <ng-container i18n>total</ng-container>)</span>
               </dd>
             </dl>
           </div>

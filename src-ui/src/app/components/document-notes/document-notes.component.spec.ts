@@ -6,7 +6,7 @@ import { of, throwError } from 'rxjs'
 import { DocumentNotesService } from 'src/app/services/rest/document-notes.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { DocumentNote } from 'src/app/data/document-note'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { DatePipe } from '@angular/common'
@@ -14,6 +14,7 @@ import { By } from '@angular/platform-browser'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const notes: DocumentNote[] = [
   {
@@ -61,6 +62,11 @@ describe('DocumentNotesComponent', () => {
         CustomDatePipe,
         IfPermissionsDirective,
       ],
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+      ],
       providers: [
         {
           provide: UserService,
@@ -94,12 +100,8 @@ describe('DocumentNotesComponent', () => {
         },
         CustomDatePipe,
         DatePipe,
-      ],
-      imports: [
-        HttpClientTestingModule,
-        FormsModule,
-        ReactiveFormsModule,
-        NgxBootstrapIconsModule.pick(allIcons),
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 

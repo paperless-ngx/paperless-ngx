@@ -8,8 +8,8 @@ from datetime import timezone
 from shutil import rmtree
 from typing import Optional
 
-from dateutil.parser import isoparse
 from django.conf import settings
+from django.db.models import QuerySet
 from django.utils import timezone as django_timezone
 from guardian.shortcuts import get_users_with_perms
 from whoosh import classify
@@ -22,6 +22,8 @@ from whoosh.fields import NUMERIC
 from whoosh.fields import TEXT
 from whoosh.fields import Schema
 from whoosh.highlight import HtmlFormatter
+from whoosh.idsets import BitSet
+from whoosh.idsets import DocIdSet
 from whoosh.index import FileIndex
 from whoosh.index import create_in
 from whoosh.index import exists_in
@@ -31,6 +33,7 @@ from whoosh.qparser import QueryParser
 from whoosh.qparser.dateparse import DateParserPlugin
 from whoosh.qparser.dateparse import English
 from whoosh.qparser.plugins import FieldsPlugin
+from whoosh.reading import IndexReader
 from whoosh.scoring import TF_IDF
 from whoosh.searching import ResultsPage
 from whoosh.searching import Searcher
@@ -201,114 +204,32 @@ def remove_document_from_index(document: Document):
         remove_document(writer, document)
 
 
+class MappedDocIdSet(DocIdSet):
+    """
+    A DocIdSet backed by a set of `Document` IDs.
+    Supports efficiently looking up if a whoosh docnum is in the provided `filter_queryset`.
+    """
+
+    def __init__(self, filter_queryset: QuerySet, ixreader: IndexReader) -> None:
+        super().__init__()
+        document_ids = filter_queryset.order_by("id").values_list("id", flat=True)
+        max_id = document_ids.last() or 0
+        self.document_ids = BitSet(document_ids, size=max_id)
+        self.ixreader = ixreader
+
+    def __contains__(self, docnum):
+        document_id = self.ixreader.stored_fields(docnum)["id"]
+        return document_id in self.document_ids
+
+    def __bool__(self):
+        # searcher.search ignores a filter if it's "falsy".
+        # We use this hack so this DocIdSet, when used as a filter, is never ignored.
+        return True
+
+
 class DelayedQuery:
-    param_map = {
-        "correspondent": ("correspondent", ["id", "id__in", "id__none", "isnull"]),
-        "document_type": ("type", ["id", "id__in", "id__none", "isnull"]),
-        "storage_path": ("path", ["id", "id__in", "id__none", "isnull"]),
-        "owner": ("owner", ["id", "id__in", "id__none", "isnull"]),
-        "shared_by": ("shared_by", ["id"]),
-        "tags": ("tag", ["id__all", "id__in", "id__none"]),
-        "added": ("added", ["date__lt", "date__gt"]),
-        "created": ("created", ["date__lt", "date__gt"]),
-        "checksum": ("checksum", ["icontains", "istartswith"]),
-        "original_filename": ("original_filename", ["icontains", "istartswith"]),
-        "custom_fields": (
-            "custom_fields",
-            ["icontains", "istartswith", "id__all", "id__in", "id__none"],
-        ),
-    }
-
     def _get_query(self):
-        raise NotImplementedError
-
-    def _get_query_filter(self):
-        criterias = []
-        for key, value in self.query_params.items():
-            # is_tagged is a special case
-            if key == "is_tagged":
-                criterias.append(query.Term("has_tag", self.evalBoolean(value)))
-                continue
-
-            if key == "has_custom_fields":
-                criterias.append(
-                    query.Term("has_custom_fields", self.evalBoolean(value)),
-                )
-                continue
-
-            # Don't process query params without a filter
-            if "__" not in key:
-                continue
-
-            # All other query params consist of a parameter and a query filter
-            param, query_filter = key.split("__", 1)
-            try:
-                field, supported_query_filters = self.param_map[param]
-            except KeyError:
-                logger.error(f"Unable to build a query filter for parameter {key}")
-                continue
-
-            # We only support certain filters per parameter
-            if query_filter not in supported_query_filters:
-                logger.info(
-                    f"Query filter {query_filter} not supported for parameter {param}",
-                )
-                continue
-
-            if query_filter == "id":
-                if param == "shared_by":
-                    criterias.append(query.Term("is_shared", True))
-                    criterias.append(query.Term("owner_id", value))
-                else:
-                    criterias.append(query.Term(f"{field}_id", value))
-            elif query_filter == "id__in":
-                in_filter = []
-                for object_id in value.split(","):
-                    in_filter.append(
-                        query.Term(f"{field}_id", object_id),
-                    )
-                criterias.append(query.Or(in_filter))
-            elif query_filter == "id__none":
-                for object_id in value.split(","):
-                    criterias.append(
-                        query.Not(query.Term(f"{field}_id", object_id)),
-                    )
-            elif query_filter == "isnull":
-                criterias.append(
-                    query.Term(f"has_{field}", self.evalBoolean(value) is False),
-                )
-            elif query_filter == "id__all":
-                for object_id in value.split(","):
-                    criterias.append(query.Term(f"{field}_id", object_id))
-            elif query_filter == "date__lt":
-                criterias.append(
-                    query.DateRange(field, start=None, end=isoparse(value)),
-                )
-            elif query_filter == "date__gt":
-                criterias.append(
-                    query.DateRange(field, start=isoparse(value), end=None),
-                )
-            elif query_filter == "icontains":
-                criterias.append(
-                    query.Term(field, value),
-                )
-            elif query_filter == "istartswith":
-                criterias.append(
-                    query.Prefix(field, value),
-                )
-
-        user_criterias = get_permissions_criterias(
-            user=self.user,
-        )
-        if len(criterias) > 0:
-            if len(user_criterias) > 0:
-                criterias.append(query.Or(user_criterias))
-            return query.And(criterias)
-        else:
-            return query.Or(user_criterias) if len(user_criterias) > 0 else None
-
-    def evalBoolean(self, val):
-        return val.lower() in {"true", "1"}
+        raise NotImplementedError  # pragma: no cover
 
     def _get_query_sortedby(self):
         if "ordering" not in self.query_params:
@@ -339,13 +260,19 @@ class DelayedQuery:
         else:
             return sort_fields_map[field], reverse
 
-    def __init__(self, searcher: Searcher, query_params, page_size, user):
+    def __init__(
+        self,
+        searcher: Searcher,
+        query_params,
+        page_size,
+        filter_queryset: QuerySet,
+    ):
         self.searcher = searcher
         self.query_params = query_params
         self.page_size = page_size
         self.saved_results = dict()
         self.first_score = None
-        self.user = user
+        self.filter_queryset = filter_queryset
 
     def __len__(self):
         page = self[0:1]
@@ -361,7 +288,7 @@ class DelayedQuery:
         page: ResultsPage = self.searcher.search_page(
             q,
             mask=mask,
-            filter=self._get_query_filter(),
+            filter=MappedDocIdSet(self.filter_queryset, self.searcher.ixreader),
             pagenum=math.floor(item.start / self.page_size) + 1,
             pagelen=self.page_size,
             sortedby=sortedby,

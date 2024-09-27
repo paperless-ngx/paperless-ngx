@@ -2,9 +2,10 @@ import { TestBed } from '@angular/core/testing'
 import { LocalizedDateParserFormatter } from './ngb-date-parser-formatter'
 import { SettingsService } from '../services/settings.service'
 import {
-  HttpClientTestingModule,
   HttpTestingController,
+  provideHttpClientTesting,
 } from '@angular/common/http/testing'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('LocalizedDateParserFormatter', () => {
   let dateParserFormatter: LocalizedDateParserFormatter
@@ -13,8 +14,13 @@ describe('LocalizedDateParserFormatter', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [LocalizedDateParserFormatter, SettingsService],
-      imports: [HttpClientTestingModule],
+      imports: [],
+      providers: [
+        LocalizedDateParserFormatter,
+        SettingsService,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
     })
 
     dateParserFormatter = TestBed.inject(LocalizedDateParserFormatter)

@@ -4,13 +4,28 @@ import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { CustomFieldDisplayComponent } from './custom-field-display.component'
 import { DisplayField, Document } from 'src/app/data/document'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const customFields: CustomField[] = [
   { id: 1, name: 'Field 1', data_type: CustomFieldDataType.String },
   { id: 2, name: 'Field 2', data_type: CustomFieldDataType.Monetary },
   { id: 3, name: 'Field 3', data_type: CustomFieldDataType.DocumentLink },
+  {
+    id: 4,
+    name: 'Field 4',
+    data_type: CustomFieldDataType.Select,
+    extra_data: {
+      select_options: ['Option 1', 'Option 2', 'Option 3'],
+    },
+  },
+  {
+    id: 5,
+    name: 'Field 5',
+    data_type: CustomFieldDataType.Monetary,
+    extra_data: { default_currency: 'JPY' },
+  },
 ]
 const document: Document = {
   id: 1,
@@ -18,7 +33,7 @@ const document: Document = {
   custom_fields: [
     { field: 1, document: 1, created: null, value: 'Text value' },
     { field: 2, document: 1, created: null, value: 'USD100' },
-    { field: 3, document: 1, created: null, value: '1,2,3' },
+    { field: 3, document: 1, created: null, value: [1, 2, 3] },
   ],
 }
 
@@ -31,8 +46,12 @@ describe('CustomFieldDisplayComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [CustomFieldDisplayComponent],
-      providers: [DocumentService],
-      imports: [HttpClientTestingModule],
+      imports: [],
+      providers: [
+        DocumentService,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
     }).compileComponents()
   })
 
@@ -97,5 +116,21 @@ describe('CustomFieldDisplayComponent', () => {
     }
     expect(component.currency).toEqual('EUR')
     expect(component.value).toEqual(100)
+  })
+
+  it('should respect explicit default currency', () => {
+    component['defaultCurrencyCode'] = 'EUR' // mock default locale injection
+    component.fieldId = 5
+    component.document = {
+      id: 1,
+      title: 'Doc 1',
+      custom_fields: [{ field: 5, document: 1, created: null, value: '100' }],
+    }
+    expect(component.currency).toEqual('JPY')
+    expect(component.value).toEqual(100)
+  })
+
+  it('should show select value', () => {
+    expect(component.getSelectValue(customFields[3], 2)).toEqual('Option 3')
   })
 })

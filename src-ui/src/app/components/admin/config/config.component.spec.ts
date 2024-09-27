@@ -5,7 +5,7 @@ import { ConfigService } from 'src/app/services/config.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { of, throwError } from 'rxjs'
 import { OutputTypeConfig } from 'src/app/data/paperless-config'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { BrowserModule } from '@angular/platform-browser'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
@@ -18,6 +18,7 @@ import { SelectComponent } from '../../common/input/select/select.component'
 import { FileComponent } from '../../common/input/file/file.component'
 import { SettingsService } from 'src/app/services/settings.service'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('ConfigComponent', () => {
   let component: ConfigComponent
@@ -38,13 +39,16 @@ describe('ConfigComponent', () => {
         PageHeaderComponent,
       ],
       imports: [
-        HttpClientTestingModule,
         BrowserModule,
         NgbModule,
         NgSelectModule,
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+      ],
+      providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 

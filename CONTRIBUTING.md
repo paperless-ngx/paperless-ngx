@@ -11,7 +11,7 @@ If you want to implement something big:
 
 ## Python
 
-Paperless supports python 3.9 - 3.11. We format Python code with [ruff](https://docs.astral.sh/ruff/formatter/).
+Paperless supports python 3.9 - 3.11 at this time. We format Python code with [ruff](https://docs.astral.sh/ruff/formatter/).
 
 ## Branches
 

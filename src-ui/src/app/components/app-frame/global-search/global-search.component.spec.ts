@@ -17,7 +17,7 @@ import {
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
   FILTER_FULLTEXT_QUERY,
@@ -25,6 +25,7 @@ import {
   FILTER_HAS_DOCUMENT_TYPE_ANY,
   FILTER_HAS_STORAGE_PATH_ANY,
   FILTER_HAS_TAGS_ALL,
+  FILTER_TITLE_CONTENT,
 } from 'src/app/data/filter-rule-type'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { DocumentService } from 'src/app/services/rest/document.service'
@@ -37,6 +38,9 @@ import { ElementRef } from '@angular/core'
 import { ToastService } from 'src/app/services/toast.service'
 import { DataType } from 'src/app/data/datatype'
 import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
+import { SettingsService } from 'src/app/services/settings.service'
+import { GlobalSearchType, SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const searchResults = {
   total: 11,
@@ -130,17 +134,21 @@ describe('GlobalSearchComponent', () => {
   let documentService: DocumentService
   let documentListViewService: DocumentListViewService
   let toastService: ToastService
+  let settingsService: SettingsService
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [GlobalSearchComponent],
       imports: [
-        HttpClientTestingModule,
         NgbModalModule,
         NgbDropdownModule,
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+      ],
+      providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 
@@ -150,6 +158,7 @@ describe('GlobalSearchComponent', () => {
     documentService = TestBed.inject(DocumentService)
     documentListViewService = TestBed.inject(DocumentListViewService)
     toastService = TestBed.inject(ToastService)
+    settingsService = TestBed.inject(SettingsService)
 
     fixture = TestBed.createComponent(GlobalSearchComponent)
     component = fixture.componentInstance
@@ -262,7 +271,7 @@ describe('GlobalSearchComponent', () => {
     component.searchResults = searchResults as any
     component.resultsDropdown.open()
     component.query = 'test'
-    const advancedSearchSpy = jest.spyOn(component, 'runAdvanedSearch')
+    const advancedSearchSpy = jest.spyOn(component, 'runFullSearch')
     component.searchInputKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }))
     expect(advancedSearchSpy).toHaveBeenCalled()
   })
@@ -499,15 +508,6 @@ describe('GlobalSearchComponent', () => {
     expect(focusSpy).toHaveBeenCalled()
   })
 
-  it('should support explicit advanced search', () => {
-    const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    component.query = 'test'
-    component.runAdvanedSearch()
-    expect(qfSpy).toHaveBeenCalledWith([
-      { rule_type: FILTER_FULLTEXT_QUERY, value: 'test' },
-    ])
-  })
-
   it('should support open in new window', () => {
     const openSpy = jest.spyOn(window, 'open')
     const event = new Event('click')
@@ -527,5 +527,24 @@ describe('GlobalSearchComponent', () => {
     const dispatchSpy = jest.spyOn(button, 'dispatchEvent')
     button.dispatchEvent(keyboardEvent)
     expect(dispatchSpy).toHaveBeenCalledTimes(2) // once for keydown, second for click
+  })
+
+  it('should support title content search and advanced search', () => {
+    const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
+    component.query = 'test'
+    component.runFullSearch()
+    expect(qfSpy).toHaveBeenCalledWith([
+      { rule_type: FILTER_TITLE_CONTENT, value: 'test' },
+    ])
+
+    settingsService.set(
+      SETTINGS_KEYS.SEARCH_FULL_TYPE,
+      GlobalSearchType.ADVANCED
+    )
+    component.query = 'test'
+    component.runFullSearch()
+    expect(qfSpy).toHaveBeenCalledWith([
+      { rule_type: FILTER_FULLTEXT_QUERY, value: 'test' },
+    ])
   })
 })

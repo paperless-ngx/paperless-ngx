@@ -22,7 +22,7 @@ jobs:
         with:
           days-before-stale: 7
           days-before-close: 14
-          any-of-labels: 'cant-reproduce,not a bug'
+          any-of-labels: 'stale,cant-reproduce,not a bug'
           stale-issue-label: stale
           stale-pr-label: stale
           stale-issue-message: >

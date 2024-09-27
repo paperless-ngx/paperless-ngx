@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import {
   ComponentFixture,
   TestBed,
@@ -44,6 +44,7 @@ import { UsersAndGroupsComponent } from './users-groups.component'
 import { User } from 'src/app/data/user'
 import { Group } from 'src/app/data/group'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const users = [
   { id: 1, username: 'user1', is_superuser: false },
@@ -84,16 +85,21 @@ describe('UsersAndGroupsComponent', () => {
         PermissionsGroupComponent,
         IfOwnerDirective,
       ],
-      providers: [CustomDatePipe, DatePipe, PermissionsGuard],
       imports: [
         NgbModule,
-        HttpClientTestingModule,
         RouterTestingModule.withRoutes(routes),
         FormsModule,
         ReactiveFormsModule,
         NgbAlertModule,
         NgSelectModule,
         NgxBootstrapIconsModule.pick(allIcons),
+      ],
+      providers: [
+        CustomDatePipe,
+        DatePipe,
+        PermissionsGuard,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
     fixture = TestBed.createComponent(UsersAndGroupsComponent)

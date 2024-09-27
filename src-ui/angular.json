@@ -33,6 +33,7 @@
           "it-IT": "src/locale/messages.it_IT.xlf",
           "ja-JP": "src/locale/messages.ja_JP.xlf",
           "lb-LU": "src/locale/messages.lb_LU.xlf",
+          "ko-KR": "src/locale/messages.ko_KR.xlf",
           "nl-NL": "src/locale/messages.nl_NL.xlf",
           "no-NO": "src/locale/messages.no_NO.xlf",
           "pl-PL": "src/locale/messages.pl_PL.xlf",
@@ -51,8 +52,11 @@
       },
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-builders/custom-webpack:browser",
           "options": {
+            "customWebpackConfig": {
+                "path": "./extra-webpack.config.ts"
+            },
             "outputPath": "dist/paperless-ui",
             "outputHashing": "none",
             "index": "src/index.html",
@@ -66,8 +70,8 @@
               "src/assets",
               "src/manifest.webmanifest",
               {
-                "glob": "{pdf.worker.min.js,pdf.min.js}",
-                "input": "node_modules/pdfjs-dist/build/",
+                "glob": "{pdf.worker.min.mjs,pdf.min.mjs}",
+                "input": "node_modules/pdfjs-dist/legacy/build/",
                 "output": "/assets/js/"
               }
             ],
@@ -77,7 +81,6 @@
             "scripts": [],
             "allowedCommonJsDependencies": [
               "ng2-pdf-viewer",
-              "filesize",
               "file-saver"
             ],
             "vendorChunk": true,
@@ -125,7 +128,7 @@
           "defaultConfiguration": ""
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular-builders/custom-webpack:dev-server",
           "options": {
             "buildTarget": "paperless-ui:build:en-US"
           },
@@ -136,7 +139,7 @@
           }
         },
         "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "builder": "@angular-builders/custom-webpack:extract-i18n",
           "options": {
             "buildTarget": "paperless-ui:build"
           }

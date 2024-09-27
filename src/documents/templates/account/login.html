@@ -49,16 +49,28 @@
                 {% if provider.id == "openid" %}
                     {% for brand in provider.get_brands %}
                         {% provider_login_url provider openid=brand.openid_url process=process as href %}
-                    <li class="d-grid mt-3"><a class="btn btn-secondary" href="{{ href }}">{{ brand.name }}</a></li>
+                    <li class="d-grid mt-3"><a class="btn btn-secondary oidc-url" href="{{ href }}">{{ brand.name }}</a></li>
                     {% endfor %}
                 {% else %}
-                {% provider_login_url provider process=process scope=scope auth_params=auth_params as href %}
-                <li class="d-grid mt-3">
-                  <form class="d-grid" method="POST" action="{{ href }}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-secondary">{{ provider.name }}</button>
-                  </form>
-                </li>
+                    {% provider_login_url provider process=process scope=scope auth_params=auth_params as href %}
+                        <li class="d-grid mt-3">
+                            <form id="social-login" class="d-grid" method="POST" action="{{ href }}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-secondary">{{ provider.name }}</button>
+                            </form>
+                        </li>
+                    {% if REDIRECT_LOGIN_TO_SSO and forloop.counter0 == 0 and request.GET.loggedout != '1' %}
+                        <script type="text/javascript">
+                            const form = document.getElementById('social-login');
+                            if (form) {
+                                form.submit();
+                            } else {
+                                if (document.getElementsByClassName('oidc-url').length > 0) {
+                                    document.getElementsByClassName('oidc-url')[0].click();
+                                }
+                            }
+                        </script>
+                    {% endif %}
                 {% endif %}
             {% endfor %}
         </ul>

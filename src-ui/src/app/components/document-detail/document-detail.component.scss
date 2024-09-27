@@ -19,10 +19,6 @@
   --page-border: 0;
 }
 
-::ng-deep form .ng-select-taggable {
-  max-width: calc(100% - 90px); // fudge factor for (2x) ng-select button width
-}
-
 .btn-group .dropdown-toggle-split {
   border-top-right-radius: inherit;
   border-bottom-right-radius: inherit;

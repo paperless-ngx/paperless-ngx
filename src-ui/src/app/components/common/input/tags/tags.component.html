@@ -1,7 +1,7 @@
 <div class="mb-3 paperless-input-select paperless-input-tags" [class.disabled]="disabled" [class.pb-3]="getSuggestions().length > 0">
   <div class="row">
     <div class="d-flex align-items-center" [class.col-md-3]="horizontal">
-      <label class="form-label" [class.mb-md-0]="horizontal" for="tags" i18n>{{title}}</label>
+      <label class="form-label" [class.mb-md-0]="horizontal" for="tags">{{title}}</label>
     </div>
     <div class="position-relative" [class.col-md-9]="horizontal">
       <div class="input-group flex-nowrap">
@@ -17,12 +17,12 @@
           (change)="onChange(value)">
 
           <ng-template ng-label-tmp let-item="item">
-            <span class="tag-wrap tag-wrap-delete" (mousedown)="removeTag($event, item.id)">
-              <i-bs name="x"></i-bs>
+            <button class="tag-wrap btn p-0" (click)="removeTag($event, item.id)" title="Remove tag" i18n-title>
+              <i-bs name="x" style="margin-inline-end: 1px;"></i-bs>
               @if (item.id && tags) {
                 <pngx-tag style="background-color: none;" [tag]="getTag(item.id)"></pngx-tag>
               }
-            </span>
+            </button>
           </ng-template>
           <ng-template ng-option-tmp let-item="item" let-index="index" let-search="searchTerm">
             <div class="tag-wrap">
@@ -32,7 +32,7 @@
             </div>
           </ng-template>
         </ng-select>
-        @if (allowCreate) {
+        @if (allowCreate && !hideAddButton) {
           <button class="btn btn-outline-secondary" type="button" (click)="createTag()" [disabled]="disabled">
             <i-bs width="1.2em" height="1.2em" name="plus"></i-bs>
           </button>
@@ -49,7 +49,7 @@
       @if (getSuggestions().length > 0) {
         <small class="position-absolute top-100">
           <span i18n>Suggestions:</span>&nbsp;
-          @for (tag of getSuggestions(); track tag) {
+          @for (tag of getSuggestions(); track tag.id) {
             <a (click)="addTag(tag.id)" [routerLink]="[]">{{tag?.name}}</a>&nbsp;
           }
         </small>

@@ -1,4 +1,4 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import {
   ComponentFixture,
   TestBed,
@@ -24,6 +24,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap'
 import { HotKeyService } from './services/hot-key.service'
 import { PermissionsGuard } from './guards/permissions.guard'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('AppComponent', () => {
   let component: AppComponent
@@ -39,13 +40,17 @@ describe('AppComponent', () => {
   beforeEach(async () => {
     TestBed.configureTestingModule({
       declarations: [AppComponent, ToastsComponent, FileDropComponent],
-      providers: [PermissionsGuard, DirtySavedViewGuard],
       imports: [
-        HttpClientTestingModule,
         TourNgBootstrapModule,
         RouterModule.forRoot(routes),
         NgxFileDropModule,
         NgbModalModule,
+      ],
+      providers: [
+        PermissionsGuard,
+        DirtySavedViewGuard,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 

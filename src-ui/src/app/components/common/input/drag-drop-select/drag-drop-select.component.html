@@ -9,14 +9,14 @@
             <div class="badge bg-primary" cdkDrag>{{item.name}}</div>
         }
         @if (selectedItems.length === 0) {
-            <div class="badge bg-light text-secondary fst-italic" i18n>{{emptyText}}</div>
+            <div class="badge bg-light text-secondary fst-italic">{{emptyText}}</div>
         }
     </div>
 </div>
-<div class="d-flex flex-row mt-2 align-items-center bg-light p-2">
-    <div class="d-flex flex-row gap-2 w-100 mh-1" style="min-height: 1em;"
+<div class="mt-2 align-items-center bg-light p-2">
+    <div class="d-flex flex-wrap flex-row gap-2 w-100"
         cdkDropList #unselectedList="cdkDropList"
-        cdkDropListOrientation="horizontal"
+        cdkDropListOrientation="mixed"
         (cdkDropListDropped)="drop($event)"
         [cdkDropListConnectedTo]="[selectedList]">
         @for (item of unselectedItems; track item.id) {

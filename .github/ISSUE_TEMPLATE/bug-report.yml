@@ -9,7 +9,7 @@ body:
         ### ⚠️ Please remember: issues are for *bugs*
         That is, something you believe affects every single user of Paperless-ngx, not just you. If you're not sure, start with one of the other options below.
 
-        Also, note that **Paperless-ngx does not perform OCR itself**, that is handled by other tools. Problems with OCR of specific files should likely be raised 'upstream', see https://github.com/ocrmypdf/OCRmyPDF/issues or https://github.com/tesseract-ocr/tesseract/issues
+        Also, note that **Paperless-ngx does not perform OCR or archive file creation itself**, those are handled by other tools. Problems with OCR or archive versions of specific files should likely be raised 'upstream', see https://github.com/ocrmypdf/OCRmyPDF/issues or https://github.com/tesseract-ocr/tesseract/issues
   - type: markdown
     attributes:
       value: |
@@ -109,6 +109,8 @@ body:
       label: Please confirm the following
       options:
         - label: I believe this issue is a bug that affects all users of Paperless-ngx, not something specific to my installation.
+          required: true
+        - label: This issue is not about the OCR or archive creation of a specific file(s). Otherwise, please see above regarding OCR tools.
           required: true
         - label: I have already searched for relevant existing issues and discussions before opening this report.
           required: true

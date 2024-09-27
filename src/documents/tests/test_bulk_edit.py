@@ -410,7 +410,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             mime_type="image/jpeg",
         )
 
-    @mock.patch("documents.tasks.consume_file.delay")
+    @mock.patch("documents.tasks.consume_file.s")
     def test_merge(self, mock_consume_file):
         """
         GIVEN:
@@ -422,8 +422,9 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         """
         doc_ids = [self.doc1.id, self.doc2.id, self.doc3.id]
         metadata_document_id = self.doc1.id
+        user = User.objects.create(username="test_user")
 
-        result = bulk_edit.merge(doc_ids)
+        result = bulk_edit.merge(doc_ids, None, False, user)
 
         expected_filename = (
             f"{'_'.join([str(doc_id) for doc_id in doc_ids])[:100]}_merged.pdf"
@@ -443,6 +444,50 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertEqual(consume_file_args[1].title, "A (merged)")
 
         self.assertEqual(result, "OK")
+
+    @mock.patch("documents.bulk_edit.delete.si")
+    @mock.patch("documents.tasks.consume_file.s")
+    @mock.patch("documents.bulk_edit.chain")
+    def test_merge_and_delete_originals(
+        self,
+        mock_chain,
+        mock_consume_file,
+        mock_delete_documents,
+    ):
+        """
+        GIVEN:
+            - Existing documents
+        WHEN:
+            - Merge action with deleting documents is called with 3 documents
+        THEN:
+            - Consume file task should be called
+            - Document deletion task should be called
+        """
+        doc_ids = [self.doc1.id, self.doc2.id, self.doc3.id]
+
+        result = bulk_edit.merge(doc_ids, delete_originals=True)
+        self.assertEqual(result, "OK")
+
+        expected_filename = (
+            f"{'_'.join([str(doc_id) for doc_id in doc_ids])[:100]}_merged.pdf"
+        )
+
+        mock_consume_file.assert_called()
+        mock_delete_documents.assert_called()
+        mock_chain.assert_called_once()
+
+        consume_file_args, _ = mock_consume_file.call_args
+        self.assertEqual(
+            Path(consume_file_args[0].original_file).name,
+            expected_filename,
+        )
+        self.assertEqual(consume_file_args[1].title, None)
+
+        delete_documents_args, _ = mock_delete_documents.call_args
+        self.assertEqual(
+            delete_documents_args[0],
+            doc_ids,
+        )
 
     @mock.patch("documents.tasks.consume_file.delay")
     @mock.patch("pikepdf.open")
@@ -469,7 +514,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
         mock_consume_file.assert_not_called()
 
-    @mock.patch("documents.tasks.consume_file.delay")
+    @mock.patch("documents.tasks.consume_file.s")
     def test_split(self, mock_consume_file):
         """
         GIVEN:
@@ -481,12 +526,51 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         """
         doc_ids = [self.doc2.id]
         pages = [[1, 2], [3]]
-        result = bulk_edit.split(doc_ids, pages)
+        user = User.objects.create(username="test_user")
+        result = bulk_edit.split(doc_ids, pages, False, user)
         self.assertEqual(mock_consume_file.call_count, 2)
         consume_file_args, _ = mock_consume_file.call_args
         self.assertEqual(consume_file_args[1].title, "B (split 2)")
 
         self.assertEqual(result, "OK")
+
+    @mock.patch("documents.bulk_edit.delete.si")
+    @mock.patch("documents.tasks.consume_file.s")
+    @mock.patch("documents.bulk_edit.chord")
+    def test_split_and_delete_originals(
+        self,
+        mock_chord,
+        mock_consume_file,
+        mock_delete_documents,
+    ):
+        """
+        GIVEN:
+            - Existing documents
+        WHEN:
+            - Split action with deleting documents is called with 1 document and 2 page groups
+            - delete_originals is set to True
+        THEN:
+            - Consume file should be called twice
+            - Document deletion task should be called
+        """
+        doc_ids = [self.doc2.id]
+        pages = [[1, 2], [3]]
+
+        result = bulk_edit.split(doc_ids, pages, delete_originals=True)
+        self.assertEqual(result, "OK")
+
+        self.assertEqual(mock_consume_file.call_count, 2)
+        consume_file_args, _ = mock_consume_file.call_args
+        self.assertEqual(consume_file_args[1].title, "B (split 2)")
+
+        mock_delete_documents.assert_called()
+        mock_chord.assert_called_once()
+
+        delete_documents_args, _ = mock_delete_documents.call_args
+        self.assertEqual(
+            delete_documents_args[0],
+            doc_ids,
+        )
 
     @mock.patch("documents.tasks.consume_file.delay")
     @mock.patch("pikepdf.Pdf.save")
@@ -585,3 +669,46 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             mock_update_documents.assert_called_once()
             mock_chord.assert_called_once()
             self.assertEqual(result, "OK")
+
+    @mock.patch("documents.tasks.update_document_archive_file.delay")
+    @mock.patch("pikepdf.Pdf.save")
+    def test_delete_pages(self, mock_pdf_save, mock_update_archive_file):
+        """
+        GIVEN:
+            - Existing documents
+        WHEN:
+            - Delete pages action is called with 1 document and 2 pages
+        THEN:
+            - Save should be called once
+            - Archive file should be updated once
+        """
+        doc_ids = [self.doc2.id]
+        pages = [1, 3]
+        result = bulk_edit.delete_pages(doc_ids, pages)
+        mock_pdf_save.assert_called_once()
+        mock_update_archive_file.assert_called_once()
+        self.assertEqual(result, "OK")
+
+    @mock.patch("documents.tasks.update_document_archive_file.delay")
+    @mock.patch("pikepdf.Pdf.save")
+    def test_delete_pages_with_error(self, mock_pdf_save, mock_update_archive_file):
+        """
+        GIVEN:
+            - Existing documents
+        WHEN:
+            - Delete pages action is called with 1 document and 2 pages
+            - PikePDF raises an error
+        THEN:
+            - Save should be called once
+            - Archive file should not be updated
+        """
+        mock_pdf_save.side_effect = Exception("Error saving PDF")
+        doc_ids = [self.doc2.id]
+        pages = [1, 3]
+
+        with self.assertLogs("paperless.bulk_edit", level="ERROR") as cm:
+            bulk_edit.delete_pages(doc_ids, pages)
+            error_str = cm.output[0]
+            expected_str = "Error deleting pages from document"
+            self.assertIn(expected_str, error_str)
+            mock_update_archive_file.assert_not_called()

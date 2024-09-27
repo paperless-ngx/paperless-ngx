@@ -1,4 +1,4 @@
-import { Component, forwardRef, Inject, LOCALE_ID } from '@angular/core'
+import { Component, forwardRef, Inject, Input, LOCALE_ID } from '@angular/core'
 import { NG_VALUE_ACCESSOR } from '@angular/forms'
 import { AbstractInputComponent } from '../abstract-input'
 import { getLocaleCurrencyCode } from '@angular/common'
@@ -29,11 +29,16 @@ export class MonetaryComponent extends AbstractInputComponent<string> {
 
   defaultCurrencyCode: string
 
+  @Input()
+  set defaultCurrency(currency: string) {
+    if (currency) this.defaultCurrencyCode = currency
+  }
+
   constructor(@Inject(LOCALE_ID) currentLocale: string) {
     super()
 
     this.currency = this.defaultCurrencyCode =
-      getLocaleCurrencyCode(currentLocale)
+      this.defaultCurrency ?? getLocaleCurrencyCode(currentLocale)
   }
 
   writeValue(newValue: any): void {

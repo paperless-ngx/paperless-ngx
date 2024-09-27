@@ -156,6 +156,7 @@ class TestCeleryScheduleParsing(TestCase):
     CLASSIFIER_EXPIRE_TIME = 59.0 * 60.0
     INDEX_EXPIRE_TIME = 23.0 * 60.0 * 60.0
     SANITY_EXPIRE_TIME = ((7.0 * 24.0) - 1.0) * 60.0 * 60.0
+    EMPTY_TRASH_EXPIRE_TIME = 23.0 * 60.0 * 60.0
 
     def test_schedule_configuration_default(self):
         """
@@ -189,6 +190,11 @@ class TestCeleryScheduleParsing(TestCase):
                     "task": "documents.tasks.sanity_check",
                     "schedule": crontab(minute=30, hour=0, day_of_week="sun"),
                     "options": {"expires": self.SANITY_EXPIRE_TIME},
+                },
+                "Empty trash": {
+                    "task": "documents.tasks.empty_trash",
+                    "schedule": crontab(minute=0, hour="1"),
+                    "options": {"expires": self.EMPTY_TRASH_EXPIRE_TIME},
                 },
             },
             schedule,
@@ -232,6 +238,11 @@ class TestCeleryScheduleParsing(TestCase):
                     "schedule": crontab(minute=30, hour=0, day_of_week="sun"),
                     "options": {"expires": self.SANITY_EXPIRE_TIME},
                 },
+                "Empty trash": {
+                    "task": "documents.tasks.empty_trash",
+                    "schedule": crontab(minute=0, hour="1"),
+                    "options": {"expires": self.EMPTY_TRASH_EXPIRE_TIME},
+                },
             },
             schedule,
         )
@@ -266,6 +277,11 @@ class TestCeleryScheduleParsing(TestCase):
                     "schedule": crontab(minute=30, hour=0, day_of_week="sun"),
                     "options": {"expires": self.SANITY_EXPIRE_TIME},
                 },
+                "Empty trash": {
+                    "task": "documents.tasks.empty_trash",
+                    "schedule": crontab(minute=0, hour="1"),
+                    "options": {"expires": self.EMPTY_TRASH_EXPIRE_TIME},
+                },
             },
             schedule,
         )
@@ -286,6 +302,7 @@ class TestCeleryScheduleParsing(TestCase):
                 "PAPERLESS_TRAIN_TASK_CRON": "disable",
                 "PAPERLESS_SANITY_TASK_CRON": "disable",
                 "PAPERLESS_INDEX_TASK_CRON": "disable",
+                "PAPERLESS_EMPTY_TRASH_TASK_CRON": "disable",
             },
         ):
             schedule = _parse_beat_schedule()
@@ -339,11 +356,12 @@ class TestDBSettings(TestCase):
         ):
             databases = _parse_db_settings()
 
-            self.assertDictContainsSubset(
-                {
+            self.assertDictEqual(
+                databases["default"]["OPTIONS"],
+                databases["default"]["OPTIONS"]
+                | {
                     "connect_timeout": 10.0,
                 },
-                databases["default"]["OPTIONS"],
             )
             self.assertDictEqual(
                 {
@@ -392,7 +410,10 @@ class TestPathSettings(TestCase):
         self.assertEqual("/", base_paths[1])  # BASE_URL
         self.assertEqual("/accounts/login/", base_paths[2])  # LOGIN_URL
         self.assertEqual("/dashboard", base_paths[3])  # LOGIN_REDIRECT_URL
-        self.assertEqual("/", base_paths[4])  # LOGOUT_REDIRECT_URL
+        self.assertEqual(
+            "/accounts/login/?loggedout=1",
+            base_paths[4],
+        )  # LOGOUT_REDIRECT_URL
 
     @mock.patch("os.environ", {"PAPERLESS_FORCE_SCRIPT_NAME": "/paperless"})
     def test_subpath(self):
@@ -409,7 +430,10 @@ class TestPathSettings(TestCase):
         self.assertEqual("/paperless/", base_paths[1])  # BASE_URL
         self.assertEqual("/paperless/accounts/login/", base_paths[2])  # LOGIN_URL
         self.assertEqual("/paperless/dashboard", base_paths[3])  # LOGIN_REDIRECT_URL
-        self.assertEqual("/paperless/", base_paths[4])  # LOGOUT_REDIRECT_URL
+        self.assertEqual(
+            "/paperless/accounts/login/?loggedout=1",
+            base_paths[4],
+        )  # LOGOUT_REDIRECT_URL
 
     @mock.patch(
         "os.environ",

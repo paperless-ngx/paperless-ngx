@@ -26,6 +26,7 @@ import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
 import { ConfigComponent } from './components/admin/config/config.component'
+import { TrashComponent } from './components/admin/trash/trash.component'
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -142,6 +143,17 @@ export const routes: Routes = [
         canActivate: [PermissionsGuard],
         data: {
           requireAdmin: true,
+        },
+      },
+      {
+        path: 'trash',
+        component: TrashComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.Delete,
+            type: PermissionType.Document,
+          },
         },
       },
       // redirect old paths

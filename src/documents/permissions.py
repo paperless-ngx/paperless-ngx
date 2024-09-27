@@ -138,3 +138,24 @@ def get_objects_for_user_owner_aware(user, perms, Model) -> QuerySet:
 def has_perms_owner_aware(user, perms, obj):
     checker = ObjectPermissionChecker(user)
     return obj.owner is None or obj.owner == user or checker.has_perm(perms, obj)
+
+
+class PaperlessNotePermissions(BasePermission):
+    """
+    Permissions class that checks for model permissions for Notes.
+    """
+
+    perms_map = {
+        "OPTIONS": ["documents.view_note"],
+        "GET": ["documents.view_note"],
+        "POST": ["documents.add_note"],
+        "DELETE": ["documents.delete_note"],
+    }
+
+    def has_permission(self, request, view):
+        if not request.user or (not request.user.is_authenticated):  # pragma: no cover
+            return False
+
+        perms = self.perms_map[request.method]
+
+        return request.user.has_perms(perms)

@@ -7,6 +7,19 @@ body {
   --pngx-primary-active: #0c2c10;
 }
 
+.logo {
+  height: auto;
+}
+
+.byline {
+  font-size: 0.6rem;
+  letter-spacing: 0.1rem;
+}
+
+.text-primary {
+  color: var(--pngx-primary) !important;
+}
+
 .form-control {
   --bs-body-bg: #fff;
 }
@@ -28,6 +41,7 @@ body {
 
 .form-accounts {
   max-width: 330px;
+  min-width: 300px;
 }
 
 .form-stacked-top input {
@@ -73,5 +87,9 @@ body {
 
   svg.logo .text {
     fill: #abb2bf !important;
+  }
+
+  .byline {
+    color: #abb2bf;
   }
 }

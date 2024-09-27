@@ -34,7 +34,7 @@ class SanityCheckMessages:
             logger.info("Sanity checker detected no issues.")
         else:
             # Query once
-            all_docs = Document.objects.all()
+            all_docs = Document.global_objects.all()
 
             for doc_pk in self._messages:
                 if doc_pk is not None:
@@ -68,7 +68,7 @@ def check_sanity(progress=False) -> SanityCheckMessages:
     if lockfile in present_files:
         present_files.remove(lockfile)
 
-    for doc in tqdm(Document.objects.all(), disable=not progress):
+    for doc in tqdm(Document.global_objects.all(), disable=not progress):
         # Check sanity of the thumbnail
         thumbnail_path: Final[Path] = Path(doc.thumbnail_path).resolve()
         if not thumbnail_path.exists() or not thumbnail_path.is_file():

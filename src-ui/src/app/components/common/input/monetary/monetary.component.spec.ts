@@ -4,9 +4,10 @@ import {
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { CurrencyPipe } from '@angular/common'
 import { MonetaryComponent } from './monetary.component'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('MonetaryComponent', () => {
   let component: MonetaryComponent
@@ -15,8 +16,12 @@ describe('MonetaryComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [MonetaryComponent],
-      providers: [CurrencyPipe],
-      imports: [FormsModule, ReactiveFormsModule, HttpClientTestingModule],
+      imports: [FormsModule, ReactiveFormsModule],
+      providers: [
+        CurrencyPipe,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
     }).compileComponents()
 
     fixture = TestBed.createComponent(MonetaryComponent)
@@ -45,6 +50,11 @@ describe('MonetaryComponent', () => {
     expect(component.defaultCurrencyCode).toEqual('USD') // default
     component = new MonetaryComponent('pt-BR')
     expect(component.defaultCurrencyCode).toEqual('BRL')
+  })
+
+  it('should support setting a default currency code', () => {
+    component.defaultCurrency = 'EUR'
+    expect(component.defaultCurrencyCode).toEqual('EUR')
   })
 
   it('should parse monetary value correctly', () => {
