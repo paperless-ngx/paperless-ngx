@@ -1,0 +1,84 @@
+# Docker Compose file for developing Paperless NGX in VSCode DevContainers.
+# This file contains everything Paperless NGX needs to run.
+# Paperless supports amd64, arm, and arm64 hardware.
+# All compose files of Paperless configure it in the following way:
+#
+# - Paperless is (re)started on system boot if it was running before shutdown.
+# - Docker volumes for storing data are managed by Docker.
+# - Folders for importing and exporting files are created in the same directory
+#   as this file and mounted to the correct folders inside the container.
+# - Paperless listens on port 8000.
+#
+# SQLite is used as the database. The SQLite file is stored in the data volume.
+#
+# In addition, this Docker Compose file adds the following optional
+# configurations:
+#
+# - Apache Tika and Gotenberg servers are started with Paperless NGX and Paperless
+#   is configured to use these services. These provide support for consuming
+#   Office documents (Word, Excel, PowerPoint, and their LibreOffice counterparts).
+#
+# This file is intended only to be used through VSCOde devcontainers. See README.md
+# in the folder .devcontainer.
+
+
+services:
+  broker:
+    image: docker.io/library/redis:7
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+
+  # No ports need to be exposed; the VSCode DevContainer plugin manages them.
+  paperless-development:
+    image: paperless-ngx
+    build:
+      context: ../    # Dockerfile cannot access files from parent directories if context is not set.
+      dockerfile: ./.devcontainer/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - broker
+      - gotenberg
+      - tika
+    volumes:
+      - ..:/usr/src/paperless/paperless-ngx:delegated
+      - ../.devcontainer/vscode:/usr/src/paperless/paperless-ngx/.vscode:delegated # VSCode config files
+      - pipenv:/usr/src/paperless/paperless-ngx/.venv # Pipenv environment persisted in volume
+      - /usr/src/paperless/paperless-ngx/src/documents/static/frontend # Static frontend files exist only in container
+      - /usr/src/paperless/paperless-ngx/src/.pytest_cache
+      - /usr/src/paperless/paperless-ngx/.ruff_cache
+      - /usr/src/paperless/paperless-ngx/htmlcov
+      - /usr/src/paperless/paperless-ngx/.coverage
+      - data:/usr/src/paperless/paperless-ngx/data
+      - media:/usr/src/paperless/paperless-ngx/media
+    environment:
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_TIKA_ENABLED: 1
+      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
+      PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+      PAPERLESS_STATICDIR: ./src/documents/static
+      PAPERLESS_DEBUG: true
+
+    # Overrides default command so things don't shut down after the process ends.
+    command: /bin/sh -c "chown -R paperless:paperless /usr/src/paperless/paperless-ngx/src/documents/static/frontend && chown -R paperless:paperless /usr/src/paperless/paperless-ngx/.ruff_cache && while sleep 1000; do :; done"
+
+  gotenberg:
+    image: docker.io/gotenberg/gotenberg:7.10
+    restart: unless-stopped
+
+    # The Gotenberg Chromium route is used to convert .eml files. We do not
+    # want to allow external content like tracking pixels or even JavaScript.
+    command:
+      - "gotenberg"
+      - "--chromium-disable-javascript=true"
+      - "--chromium-allow-list=file:///tmp/.*"
+
+  tika:
+    image: docker.io/apache/tika:latest
+    restart: unless-stopped
+
+volumes:
+  data:
+  media:
+  redisdata:
+  pipenv:

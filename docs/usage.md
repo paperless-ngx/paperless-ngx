@@ -136,7 +136,8 @@ These rules perform the following:
 
 Paperless will check all emails only once and completely ignore messages
 that do not match your filters. It will also only perform the rule action
-on e-mails that it has consumed documents from.
+on e-mails that it has consumed documents from. The filename attachment
+patterns can include wildcards and multiple patterns separated by a comma.
 
 The actions all ensure that the same mail is not consumed twice by
 different means. These are as follows:
@@ -237,9 +238,13 @@ Settings > Users & Groups, assuming the user has access. If a user is designated
 as a member of a group those permissions will be inherited and this is reflected in the UI. Explicit
 permissions can be granted to limit access to certain parts of the UI (and corresponding API endpoints).
 
-!!! note
+!!! tip
 
-    Superusers can access all parts of the front and backend application as well as any and all objects.
+    By default, new users are not granted any permissions, except those inherited from any group(s) of which they are a member.
+
+#### Superusers
+
+Superusers can access all parts of the front and backend application as well as any and all objects.
 
 #### Admin Status
 
@@ -248,29 +253,29 @@ as well as accessing the Django backend.
 
 #### Detailed Explanation of Global Permissions {#global-permissions}
 
-Global permissions define what areas of the app and API endpoints the user can access. For example, they
+Global permissions define what areas of the app and API endpoints users can access. For example, they
 determine if a user can create, edit, delete or view _any_ documents, but individual documents themselves
 still have "object-level" permissions.
 
-| Type          | Details                                                                                                                                                                                             |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| AppConfig     | _Change_ or higher permissions grants access to the "Application Configuration" area.                                                                                                               |
-| Correspondent | Grants global permissions to add, edit, delete or view Correspondents.                                                                                                                              |
-| CustomField   | Grants global permissions to add, edit, delete or view Custom Fields.                                                                                                                               |
-| Document      | Grants global permissions to add, edit, delete or view Documents.                                                                                                                                   |
-| DocumentType  | Grants global permissions to add, edit, delete or view Document Types.                                                                                                                              |
-| Group         | Grants global permissions to add, edit, delete or view Groups.                                                                                                                                      |
-| MailAccount   | Grants global permissions to add, edit, delete or view Mail Accounts.                                                                                                                               |
-| MailRule      | Grants global permissions to add, edit, delete or view Mail Rules.                                                                                                                                  |
-| Note          | Grants global permissions to add, edit, delete or view Notes.                                                                                                                                       |
-| PaperlessTask | Grants global permissions to view or dismiss (_Change_) File Tasks.                                                                                                                                 |
-| SavedView     | Grants global permissions to add, edit, delete or view Saved Views.                                                                                                                                 |
-| ShareLink     | Grants global permissions to add, delete or view Share Links.                                                                                                                                       |
-| StoragePath   | Grants global permissions to add, edit, delete or view Storage Paths.                                                                                                                               |
-| Tag           | Grants global permissions to add, edit, delete or view Tags.                                                                                                                                        |
-| UISettings    | Grants global permissions to add, edit, delete or view the UI settings that are used by the web app.<br/>Users expected to access the web UI should usually be granted at least _View_ permissions. |
-| User          | Grants global permissions to add, edit, delete or view Users.                                                                                                                                       |
-| Workflow      | Grants global permissions to add, edit, delete or view Workflows.<br/>Note that Workflows are global, in other words all users who can access workflows have access to the same set of them.        |
+| Type          | Details                                                                                                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| AppConfig     | _Change_ or higher permissions grants access to the "Application Configuration" area.                                                                                    |
+| Correspondent | Add, edit, delete or view Correspondents.                                                                                                                                |
+| CustomField   | Add, edit, delete or view Custom Fields.                                                                                                                                 |
+| Document      | Add, edit, delete or view Documents.                                                                                                                                     |
+| DocumentType  | Add, edit, delete or view Document Types.                                                                                                                                |
+| Group         | Add, edit, delete or view Groups.                                                                                                                                        |
+| MailAccount   | Add, edit, delete or view Mail Accounts.                                                                                                                                 |
+| MailRule      | Add, edit, delete or view Mail Rules.                                                                                                                                    |
+| Note          | Add, edit, delete or view Notes.                                                                                                                                         |
+| PaperlessTask | View or dismiss (_Change_) File Tasks.                                                                                                                                   |
+| SavedView     | Add, edit, delete or view Saved Views.                                                                                                                                   |
+| ShareLink     | Add, delete or view Share Links.                                                                                                                                         |
+| StoragePath   | Add, edit, delete or view Storage Paths.                                                                                                                                 |
+| Tag           | Add, edit, delete or view Tags.                                                                                                                                          |
+| UISettings    | Add, edit, delete or view the UI settings that are used by the web app.<br/>:warning: **Users that will access the web UI must be granted at least _View_ permissions.** |
+| User          | Add, edit, delete or view Users.                                                                                                                                         |
+| Workflow      | Add, edit, delete or view Workflows.<br/>Note that Workflows are global, in other words all users who can access workflows have access to the same set of them.          |
 
 #### Detailed Explanation of Object Permissions {#object-permissions}
 
@@ -421,13 +426,12 @@ to optionally attach data to documents which does not fit in the existing set of
 Paperless-ngx provides.
 
 1. First, create a custom field (under "Manage"), with a given name and data type. This could be something like "Invoice Number" or "Date Paid", with a data type of "Number", "Date", "String", etc.
-2. Once created, a field can be used with documents and data stored. To do so, use the "Custom Fields" menu on the document detail page, choose your existing field and click "Add". Once the field is visible in the form you can enter the appropriate
-   data which will be validated according to the custom field "data type".
+2. Once created, a field can be used with documents and data stored. To do so, use the "Custom Fields" menu on the document detail page, choose your existing field from the dropdown. Once the field is visible in the form you can enter the appropriate data which will be validated according to the custom field "data type".
 3. Fields can be removed by hovering over the field name revealing a "Remove" button.
 
 !!! important
 
-    Added / removed fields, as well as any data is not saved to the document until you
+    Added / removed fields, as well as any data, is not saved to the document until you
     actually hit the "Save" button, similar to other changes on the document details page.
 
 !!! note
@@ -446,6 +450,7 @@ The following custom field types are supported:
 - `Number`: float number e.g. 12.3456
 - `Monetary`: [ISO 4217 currency code](https://en.wikipedia.org/wiki/ISO_4217#List_of_ISO_4217_currency_codes) and a number with exactly two decimals, e.g. USD12.30
 - `Document Link`: reference(s) to other document(s) displayed as links, automatically creates a symmetrical link in reverse
+- `Select`: a pre-defined list of strings from which the user can choose
 
 ## Share Links
 
@@ -462,21 +467,31 @@ Paperless-ngx added the ability to create shareable links to files in version 2.
 
 ## PDF Actions
 
-Paperless-ngx supports 3 basic editing operations for PDFs (these operations cannot be performed on non-PDF files):
+Paperless-ngx supports four basic editing operations for PDFs (these operations currently cannot be performed on non-PDF files):
 
-- Merging documents: available when selecting multiple documents for 'bulk editing'
+- Merging documents: available when selecting multiple documents for 'bulk editing'.
 - Rotating documents: available when selecting multiple documents for 'bulk editing' and from an individual document's details page.
-- Splitting documents: available from an individual document's details page
+- Splitting documents: available from an individual document's details page.
+- Deleting pages: available from an individual document's details page.
 
 !!! important
 
-    Note that rotation alters the Paperless-ngx _original_ file, which would, for example, invalidate a digital signature.
+    Note that rotation and deleting pages alter the Paperless-ngx _original_ file, which would, for example, invalidate a digital signature.
 
 ## Document History
 
 As of version 2.7, Paperless-ngx automatically records all changes to a document and records this in an audit log. The feature requires [`PAPERLESS_AUDIT_LOG_ENABLED`](configuration.md#PAPERLESS_AUDIT_LOG_ENABLED) be enabled, which it is by default as of version 2.7.
 Changes to documents are visible under the "History" tab. Note that certain changes such as those made by workflows, record the 'actor'
 as "System".
+
+## Document Trash
+
+When you first delete a document it is moved to the 'trash' until either it is explicitly deleted or it is automatically removed after a set amount of time has passed.
+You can set how long documents remain in the trash before being automatically deleted with [`PAPERLESS_EMPTY_TRASH_DELAY`](configuration.md#PAPERLESS_EMPTY_TRASH_DELAY), which defaults
+to 30 days. Until the file is actually deleted (e.g. the trash is emptied), all files and database content remains intact and can be restored at any point up until that time.
+
+Additionally you may configure a directory where deleted files are moved to when they the trash is emptied with [`PAPERLESS_EMPTY_TRASH_DIR`](configuration.md#PAPERLESS_EMPTY_TRASH_DIR).
+Note that the empty trash directory only stores the original file, the archive file and all database information is permanently removed once a document is fully deleted.
 
 ## Best practices {#basic-searching}
 

@@ -1,39 +1,29 @@
 import datetime
+import logging
 from pathlib import Path
-from unittest import mock
 
 import httpx
-from django.test import TestCase
+import pytest
+from django.test.html import parse_html
+from pytest_django.fixtures import SettingsWrapper
+from pytest_httpx import HTTPXMock
+from pytest_mock import MockerFixture
 
 from documents.parsers import ParseError
-from documents.tests.utils import FileSystemAssertsMixin
 from paperless_mail.parsers import MailDocumentParser
-from paperless_tika.tests.utils import HttpxMockMixin
 
 
-class BaseMailParserTestCase(TestCase):
-    """
-    Basic setup for the below test cases
-    """
-
-    SAMPLE_DIR = Path(__file__).parent / "samples"
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.parser = MailDocumentParser(logging_group=None)
-
-    def tearDown(self) -> None:
-        super().tearDown()
-        self.parser.cleanup()
-
-
-class TestEmailFileParsing(FileSystemAssertsMixin, BaseMailParserTestCase):
+class TestEmailFileParsing:
     """
     Tests around reading a file and parsing it into a
     MailMessage
     """
 
-    def test_parse_error_missing_file(self):
+    def test_parse_error_missing_file(
+        self,
+        mail_parser: MailDocumentParser,
+        sample_dir: Path,
+    ):
         """
         GIVEN:
             - Fresh parser
@@ -43,17 +33,18 @@ class TestEmailFileParsing(FileSystemAssertsMixin, BaseMailParserTestCase):
             - An Exception is thrown
         """
         # Check if exception is raised when parsing fails.
-        test_file = self.SAMPLE_DIR / "doesntexist.eml"
+        test_file = sample_dir / "doesntexist.eml"
 
-        self.assertIsNotFile(test_file)
-        self.assertRaises(
-            ParseError,
-            self.parser.parse,
-            test_file,
-            "messages/rfc822",
-        )
+        assert not test_file.exists()
 
-    def test_parse_error_invalid_email(self):
+        with pytest.raises(ParseError):
+            mail_parser.parse(test_file, "messages/rfc822")
+
+    def test_parse_error_invalid_email(
+        self,
+        mail_parser: MailDocumentParser,
+        broken_email_file: Path,
+    ):
         """
         GIVEN:
             - Fresh parser
@@ -63,14 +54,15 @@ class TestEmailFileParsing(FileSystemAssertsMixin, BaseMailParserTestCase):
             - An Exception is thrown
         """
         # Check if exception is raised when the mail is faulty.
-        self.assertRaises(
-            ParseError,
-            self.parser.parse,
-            self.SAMPLE_DIR / "broken.eml",
-            "messages/rfc822",
-        )
 
-    def test_parse_simple_text_email_file(self):
+        with pytest.raises(ParseError):
+            mail_parser.parse(broken_email_file, "messages/rfc822")
+
+    def test_parse_simple_text_email_file(
+        self,
+        mail_parser: MailDocumentParser,
+        simple_txt_email_file: Path,
+    ):
         """
         GIVEN:
             - Fresh parser
@@ -80,29 +72,31 @@ class TestEmailFileParsing(FileSystemAssertsMixin, BaseMailParserTestCase):
             - The content of the mail should be available in the parse result.
         """
         # Parse Test file and check relevant content
-        parsed1 = self.parser.parse_file_to_message(
-            self.SAMPLE_DIR / "simple_text.eml",
-        )
+        parsed_msg = mail_parser.parse_file_to_message(simple_txt_email_file)
 
-        self.assertEqual(parsed1.date.year, 2022)
-        self.assertEqual(parsed1.date.month, 10)
-        self.assertEqual(parsed1.date.day, 12)
-        self.assertEqual(parsed1.date.hour, 21)
-        self.assertEqual(parsed1.date.minute, 40)
-        self.assertEqual(parsed1.date.second, 43)
-        self.assertEqual(parsed1.date.tzname(), "UTC+02:00")
-        self.assertEqual(parsed1.from_, "mail@someserver.de")
-        self.assertEqual(parsed1.subject, "Simple Text Mail")
-        self.assertEqual(parsed1.text, "This is just a simple Text Mail.\n")
-        self.assertEqual(parsed1.to, ("some@one.de",))
+        assert parsed_msg.date.year == 2022
+        assert parsed_msg.date.month == 10
+        assert parsed_msg.date.day == 12
+        assert parsed_msg.date.hour == 21
+        assert parsed_msg.date.minute == 40
+        assert parsed_msg.date.second == 43
+        assert parsed_msg.date.tzname() == "UTC+02:00"
+        assert parsed_msg.from_ == "mail@someserver.de"
+        assert parsed_msg.subject == "Simple Text Mail"
+        assert parsed_msg.text == "This is just a simple Text Mail.\n"
+        assert parsed_msg.to == ("some@one.de",)
 
 
-class TestEmailMetadataExtraction(BaseMailParserTestCase):
+class TestEmailMetadataExtraction:
     """
     Tests extraction of metadata from an email
     """
 
-    def test_extract_metadata_fail(self):
+    def test_extract_metadata_fail(
+        self,
+        caplog: pytest.LogCaptureFixture,
+        mail_parser: MailDocumentParser,
+    ):
         """
         GIVEN:
             - Fresh start
@@ -112,14 +106,20 @@ class TestEmailMetadataExtraction(BaseMailParserTestCase):
             - A log warning should be generated
         """
         # Validate if warning is logged when parsing fails
-        with self.assertLogs("paperless.parsing.mail", level="WARNING") as cm:
-            self.assertEqual([], self.parser.extract_metadata("na", "message/rfc822"))
-            self.assertIn(
-                "WARNING:paperless.parsing.mail:Error while fetching document metadata for na",
-                cm.output[0],
-            )
+        assert mail_parser.extract_metadata("na", "message/rfc822") == []
 
-    def test_extract_metadata(self):
+        assert len(caplog.records) == 1
+        record = caplog.records[0]
+
+        assert record.levelno == logging.WARNING
+        assert record.name == "paperless.parsing.mail"
+        assert "Error while fetching document metadata for na" in record.message
+
+    def test_extract_metadata(
+        self,
+        mail_parser: MailDocumentParser,
+        simple_txt_email_file: Path,
+    ):
         """
         GIVEN:
             - Fresh start
@@ -129,149 +129,110 @@ class TestEmailMetadataExtraction(BaseMailParserTestCase):
             - metadata is returned
         """
         # Validate Metadata parsing returns the expected results
-        metadata = self.parser.extract_metadata(
-            self.SAMPLE_DIR / "simple_text.eml",
-            "message/rfc822",
-        )
+        metadata = mail_parser.extract_metadata(simple_txt_email_file, "message/rfc822")
 
-        self.assertIn(
-            {"namespace": "", "prefix": "", "key": "attachments", "value": ""},
-            metadata,
-        )
-        self.assertIn(
-            {
-                "namespace": "",
-                "prefix": "",
-                "key": "date",
-                "value": "2022-10-12 21:40:43 UTC+02:00",
-            },
-            metadata,
-        )
-        self.assertIn(
-            {
-                "namespace": "",
-                "prefix": "header",
-                "key": "content-language",
-                "value": "en-US",
-            },
-            metadata,
-        )
-        self.assertIn(
-            {
-                "namespace": "",
-                "prefix": "header",
-                "key": "content-type",
-                "value": "text/plain; charset=UTF-8; format=flowed",
-            },
-            metadata,
-        )
-        self.assertIn(
-            {
-                "namespace": "",
-                "prefix": "header",
-                "key": "date",
-                "value": "Wed, 12 Oct 2022 21:40:43 +0200",
-            },
-            metadata,
-        )
-        self.assertIn(
-            {
-                "namespace": "",
-                "prefix": "header",
-                "key": "delivered-to",
-                "value": "mail@someserver.de",
-            },
-            metadata,
-        )
-        self.assertIn(
-            {
-                "namespace": "",
-                "prefix": "header",
-                "key": "from",
-                "value": "Some One <mail@someserver.de>",
-            },
-            metadata,
-        )
-        self.assertIn(
-            {
-                "namespace": "",
-                "prefix": "header",
-                "key": "message-id",
-                "value": "<6e99e34d-e20a-80c4-ea61-d8234b612be9@someserver.de>",
-            },
-            metadata,
-        )
-        self.assertIn(
-            {
-                "namespace": "",
-                "prefix": "header",
-                "key": "mime-version",
-                "value": "1.0",
-            },
-            metadata,
-        )
-        self.assertIn(
-            {
-                "namespace": "",
-                "prefix": "header",
-                "key": "received",
-                "value": "from mail.someserver.org ([::1])\n\tby e1acdba3bd07 with LMTP\n\tid KBKZGD2YR2NTCgQAjubtDA\n\t(envelope-from <mail@someserver.de>)\n\tfor <mail@someserver.de>; Wed, 10 Oct 2022 11:40:46 +0200, from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2BC9064C1616\n\tfor <some@one.de>; Wed, 12 Oct 2022 21:40:46 +0200 (CEST)",
-            },
-            metadata,
-        )
-        self.assertIn(
-            {
-                "namespace": "",
-                "prefix": "header",
-                "key": "return-path",
-                "value": "<mail@someserver.de>",
-            },
-            metadata,
-        )
-        self.assertIn(
-            {
-                "namespace": "",
-                "prefix": "header",
-                "key": "subject",
-                "value": "Simple Text Mail",
-            },
-            metadata,
-        )
-        self.assertIn(
-            {"namespace": "", "prefix": "header", "key": "to", "value": "some@one.de"},
-            metadata,
-        )
-        self.assertIn(
-            {
-                "namespace": "",
-                "prefix": "header",
-                "key": "user-agent",
-                "value": "Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101\n Thunderbird/102.3.1",
-            },
-            metadata,
-        )
-        self.assertIn(
-            {
-                "namespace": "",
-                "prefix": "header",
-                "key": "x-last-tls-session-version",
-                "value": "TLSv1.3",
-            },
-            metadata,
-        )
+        assert {
+            "namespace": "",
+            "prefix": "",
+            "key": "attachments",
+            "value": "",
+        } in metadata
+        assert {
+            "namespace": "",
+            "prefix": "",
+            "key": "date",
+            "value": "2022-10-12 21:40:43 UTC+02:00",
+        } in metadata
+        assert {
+            "namespace": "",
+            "prefix": "header",
+            "key": "content-language",
+            "value": "en-US",
+        } in metadata
+        assert {
+            "namespace": "",
+            "prefix": "header",
+            "key": "content-type",
+            "value": "text/plain; charset=UTF-8; format=flowed",
+        } in metadata
+        assert {
+            "namespace": "",
+            "prefix": "header",
+            "key": "date",
+            "value": "Wed, 12 Oct 2022 21:40:43 +0200",
+        } in metadata
+        assert {
+            "namespace": "",
+            "prefix": "header",
+            "key": "delivered-to",
+            "value": "mail@someserver.de",
+        } in metadata
+        assert {
+            "namespace": "",
+            "prefix": "header",
+            "key": "from",
+            "value": "Some One <mail@someserver.de>",
+        } in metadata
+        assert {
+            "namespace": "",
+            "prefix": "header",
+            "key": "message-id",
+            "value": "<6e99e34d-e20a-80c4-ea61-d8234b612be9@someserver.de>",
+        } in metadata
+        assert {
+            "namespace": "",
+            "prefix": "header",
+            "key": "mime-version",
+            "value": "1.0",
+        } in metadata
+        assert {
+            "namespace": "",
+            "prefix": "header",
+            "key": "received",
+            "value": "from mail.someserver.org ([::1])\n\tby e1acdba3bd07 with LMTP\n\tid KBKZGD2YR2NTCgQAjubtDA\n\t(envelope-from <mail@someserver.de>)\n\tfor <mail@someserver.de>; Wed, 10 Oct 2022 11:40:46 +0200, from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2BC9064C1616\n\tfor <some@one.de>; Wed, 12 Oct 2022 21:40:46 +0200 (CEST)",
+        } in metadata
+        assert {
+            "namespace": "",
+            "prefix": "header",
+            "key": "return-path",
+            "value": "<mail@someserver.de>",
+        } in metadata
+        assert {
+            "namespace": "",
+            "prefix": "header",
+            "key": "subject",
+            "value": "Simple Text Mail",
+        } in metadata
+        assert {
+            "namespace": "",
+            "prefix": "header",
+            "key": "to",
+            "value": "some@one.de",
+        } in metadata
+        assert {
+            "namespace": "",
+            "prefix": "header",
+            "key": "user-agent",
+            "value": "Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101\n Thunderbird/102.3.1",
+        } in metadata
+        assert {
+            "namespace": "",
+            "prefix": "header",
+            "key": "x-last-tls-session-version",
+            "value": "TLSv1.3",
+        } in metadata
 
 
-class TestEmailThumbnailGenerate(BaseMailParserTestCase):
+class TestEmailThumbnailGenerate:
     """
     Tests the correct generation of an thumbnail for an email
     """
 
-    @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf")
-    @mock.patch("paperless_mail.parsers.make_thumbnail_from_pdf")
     def test_get_thumbnail(
         self,
-        mock_make_thumbnail_from_pdf: mock.MagicMock,
-        mock_generate_pdf: mock.MagicMock,
+        mocker: MockerFixture,
+        mail_parser: MailDocumentParser,
+        simple_txt_email_file: Path,
     ):
         """
         GIVEN:
@@ -282,29 +243,34 @@ class TestEmailThumbnailGenerate(BaseMailParserTestCase):
             - The parser should call the functions which generate the thumbnail
         """
         mocked_return = "Passing the return value through.."
+        mock_make_thumbnail_from_pdf = mocker.patch(
+            "paperless_mail.parsers.make_thumbnail_from_pdf",
+        )
         mock_make_thumbnail_from_pdf.return_value = mocked_return
 
+        mock_generate_pdf = mocker.patch(
+            "paperless_mail.parsers.MailDocumentParser.generate_pdf",
+        )
         mock_generate_pdf.return_value = "Mocked return value.."
 
-        test_file = self.SAMPLE_DIR / "simple_text.eml"
-
-        thumb = self.parser.get_thumbnail(
-            test_file,
-            "message/rfc822",
-        )
+        thumb = mail_parser.get_thumbnail(simple_txt_email_file, "message/rfc822")
 
         mock_generate_pdf.assert_called_once()
         mock_make_thumbnail_from_pdf.assert_called_once_with(
             "Mocked return value..",
-            self.parser.tempdir,
+            mail_parser.tempdir,
             None,
         )
 
-        self.assertEqual(mocked_return, thumb)
+        assert mocked_return == thumb
 
 
-class TestTikaHtmlParse(HttpxMockMixin, BaseMailParserTestCase):
-    def test_tika_parse_unsuccessful(self):
+class TestTikaHtmlParse:
+    def test_tika_parse_unsuccessful(
+        self,
+        httpx_mock: HTTPXMock,
+        mail_parser: MailDocumentParser,
+    ):
         """
         GIVEN:
             - Fresh start
@@ -314,13 +280,13 @@ class TestTikaHtmlParse(HttpxMockMixin, BaseMailParserTestCase):
             - the parser should return an empty string
         """
         # Check unsuccessful parsing
-        self.httpx_mock.add_response(
+        httpx_mock.add_response(
             json={"Content-Type": "text/html", "X-TIKA:Parsed-By": []},
         )
-        parsed = self.parser.tika_parse("None")
-        self.assertEqual("", parsed)
+        parsed = mail_parser.tika_parse("None")
+        assert parsed == ""
 
-    def test_tika_parse(self):
+    def test_tika_parse(self, httpx_mock: HTTPXMock, mail_parser: MailDocumentParser):
         """
         GIVEN:
             - Fresh start
@@ -332,18 +298,22 @@ class TestTikaHtmlParse(HttpxMockMixin, BaseMailParserTestCase):
         html = '<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body><p>Some Text</p></body></html>'
         expected_text = "Some Text"
 
-        self.httpx_mock.add_response(
+        httpx_mock.add_response(
             json={
                 "Content-Type": "text/html",
                 "X-TIKA:Parsed-By": [],
                 "X-TIKA:content": expected_text,
             },
         )
-        parsed = self.parser.tika_parse(html)
-        self.assertEqual(expected_text, parsed.strip())
-        self.assertIn("http://localhost:9998", str(self.httpx_mock.get_request().url))
+        parsed = mail_parser.tika_parse(html)
+        assert expected_text == parsed.strip()
+        assert "http://localhost:9998" in str(httpx_mock.get_request().url)
 
-    def test_tika_parse_exception(self):
+    def test_tika_parse_exception(
+        self,
+        httpx_mock: HTTPXMock,
+        mail_parser: MailDocumentParser,
+    ):
         """
         GIVEN:
             - Fresh start
@@ -354,11 +324,16 @@ class TestTikaHtmlParse(HttpxMockMixin, BaseMailParserTestCase):
         """
         html = '<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body><p>Some Text</p></body></html>'
 
-        self.httpx_mock.add_response(status_code=httpx.codes.INTERNAL_SERVER_ERROR)
+        httpx_mock.add_response(status_code=httpx.codes.INTERNAL_SERVER_ERROR)
 
-        self.assertRaises(ParseError, self.parser.tika_parse, html)
+        with pytest.raises(ParseError):
+            mail_parser.tika_parse(html)
 
-    def test_tika_parse_unreachable(self):
+    def test_tika_parse_unreachable(
+        self,
+        settings: SettingsWrapper,
+        mail_parser: MailDocumentParser,
+    ):
         """
         GIVEN:
             - Fresh start
@@ -370,30 +345,18 @@ class TestTikaHtmlParse(HttpxMockMixin, BaseMailParserTestCase):
         html = '<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body><p>Some Text</p></body></html>'
 
         # Check if exception is raised when Tika cannot be reached.
-        self.parser.tika_server = ""
-        self.assertRaises(ParseError, self.parser.tika_parse, html)
+        with pytest.raises(ParseError):
+            settings.TIKA_ENDPOINT = "http://does-not-exist:9998"
+            mail_parser.tika_parse(html)
 
 
-class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase):
-    def test_parse_no_file(self):
-        """
-        GIVEN:
-            - Fresh start
-        WHEN:
-            - parsing is attempted with nonexistent file
-        THEN:
-            - Exception is thrown
-        """
-        # Check if exception is raised when parsing fails.
-        self.assertRaises(
-            ParseError,
-            self.parser.parse,
-            self.SAMPLE_DIR / "na.eml",
-            "message/rfc822",
-        )
-
-    @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf")
-    def test_parse_eml_simple(self, mock_generate_pdf: mock.MagicMock):
+class TestParser:
+    def test_parse_eml_simple(
+        self,
+        mocker: MockerFixture,
+        mail_parser: MailDocumentParser,
+        simple_txt_email_file: Path,
+    ):
         """
         GIVEN:
             - Fresh start
@@ -403,11 +366,11 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
             - parsed information is available
         """
         # Validate parsing returns the expected results
-
-        self.parser.parse(
-            self.SAMPLE_DIR / "simple_text.eml",
-            "message/rfc822",
+        mock_generate_pdf = mocker.patch(
+            "paperless_mail.parsers.MailDocumentParser.generate_pdf",
         )
+
+        mail_parser.parse(simple_txt_email_file, "message/rfc822")
         text_expected = (
             "Subject: Simple Text Mail\n\n"
             "From: Some One <mail@someserver.de>\n\n"
@@ -416,8 +379,8 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
             "BCC: fdf@fvf.de\n\n"
             "\n\nThis is just a simple Text Mail."
         )
-        self.assertEqual(text_expected, self.parser.text)
-        self.assertEqual(
+        assert text_expected == mail_parser.text
+        assert (
             datetime.datetime(
                 2022,
                 10,
@@ -426,15 +389,20 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
                 40,
                 43,
                 tzinfo=datetime.timezone(datetime.timedelta(seconds=7200)),
-            ),
-            self.parser.date,
+            )
+            == mail_parser.date
         )
 
         # Just check if tried to generate archive, the unittest for generate_pdf() goes deeper.
         mock_generate_pdf.assert_called()
 
-    @mock.patch("paperless_mail.parsers.MailDocumentParser.generate_pdf")
-    def test_parse_eml_html(self, mock_generate_pdf: mock.MagicMock):
+    def test_parse_eml_html(
+        self,
+        mocker: MockerFixture,
+        httpx_mock: HTTPXMock,
+        mail_parser: MailDocumentParser,
+        html_email_file: Path,
+    ):
         """
         GIVEN:
             - Fresh start
@@ -443,6 +411,11 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
         THEN:
             - Tika is called, parsed information from non html parts is available
         """
+
+        mock_generate_pdf = mocker.patch(
+            "paperless_mail.parsers.MailDocumentParser.generate_pdf",
+        )
+
         # Validate parsing returns the expected results
         text_expected = (
             "Subject: HTML Message\n\n"
@@ -453,7 +426,7 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
             "Some Text and an embedded image."
         )
 
-        self.httpx_mock.add_response(
+        httpx_mock.add_response(
             json={
                 "Content-Type": "text/html",
                 "X-TIKA:Parsed-By": [],
@@ -461,11 +434,11 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
             },
         )
 
-        self.parser.parse(self.SAMPLE_DIR / "html.eml", "message/rfc822")
+        mail_parser.parse(html_email_file, "message/rfc822")
 
         mock_generate_pdf.assert_called_once()
-        self.assertEqual(text_expected, self.parser.text)
-        self.assertEqual(
+        assert text_expected == mail_parser.text
+        assert (
             datetime.datetime(
                 2022,
                 10,
@@ -474,11 +447,16 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
                 23,
                 19,
                 tzinfo=datetime.timezone(datetime.timedelta(seconds=7200)),
-            ),
-            self.parser.date,
+            )
+            == mail_parser.date
         )
 
-    def test_generate_pdf_parse_error(self):
+    def test_generate_pdf_parse_error(
+        self,
+        httpx_mock: HTTPXMock,
+        mail_parser: MailDocumentParser,
+        simple_txt_email_file: Path,
+    ):
         """
         GIVEN:
             - Fresh start
@@ -487,16 +465,18 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
         THEN:
             - a ParseError Exception is thrown
         """
-        self.httpx_mock.add_response(status_code=httpx.codes.INTERNAL_SERVER_ERROR)
+        httpx_mock.add_response(status_code=httpx.codes.INTERNAL_SERVER_ERROR)
 
-        self.assertRaises(
-            ParseError,
-            self.parser.parse,
-            self.SAMPLE_DIR / "simple_text.eml",
-            "message/rfc822",
-        )
+        with pytest.raises(ParseError):
+            mail_parser.parse(simple_txt_email_file, "message/rfc822")
 
-    def test_generate_pdf_simple_email(self):
+    def test_generate_pdf_simple_email(
+        self,
+        httpx_mock: HTTPXMock,
+        mail_parser: MailDocumentParser,
+        simple_txt_email_file: Path,
+        simple_txt_email_pdf_file: Path,
+    ):
         """
         GIVEN:
             - Simple text email with no HTML content
@@ -507,17 +487,23 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
             - Archive file is generated
         """
 
-        self.httpx_mock.add_response(
+        httpx_mock.add_response(
             url="http://localhost:3000/forms/chromium/convert/html",
             method="POST",
-            content=(self.SAMPLE_DIR / "simple_text.eml.pdf").read_bytes(),
+            content=simple_txt_email_pdf_file.read_bytes(),
         )
 
-        self.parser.parse(self.SAMPLE_DIR / "simple_text.eml", "message/rfc822")
+        mail_parser.parse(simple_txt_email_file, "message/rfc822")
 
-        self.assertIsNotNone(self.parser.archive_path)
+        assert mail_parser.archive_path is not None
 
-    def test_generate_pdf_html_email(self):
+    def test_generate_pdf_html_email(
+        self,
+        httpx_mock: HTTPXMock,
+        mail_parser: MailDocumentParser,
+        html_email_file: Path,
+        html_email_pdf_file: Path,
+    ):
         """
         GIVEN:
             - email with HTML content
@@ -528,7 +514,7 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
             - Gotenberg is used to merge the two PDFs
             - Archive file is generated
         """
-        self.httpx_mock.add_response(
+        httpx_mock.add_response(
             url="http://localhost:9998/tika/text",
             method="PUT",
             json={
@@ -537,21 +523,27 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
                 "X-TIKA:content": "This is some Tika HTML text",
             },
         )
-        self.httpx_mock.add_response(
+        httpx_mock.add_response(
             url="http://localhost:3000/forms/chromium/convert/html",
             method="POST",
-            content=(self.SAMPLE_DIR / "html.eml.pdf").read_bytes(),
+            content=html_email_pdf_file.read_bytes(),
         )
-        self.httpx_mock.add_response(
+        httpx_mock.add_response(
             url="http://localhost:3000/forms/pdfengines/merge",
             method="POST",
             content=b"Pretend merged PDF content",
         )
-        self.parser.parse(self.SAMPLE_DIR / "html.eml", "message/rfc822")
+        mail_parser.parse(html_email_file, "message/rfc822")
 
-        self.assertIsNotNone(self.parser.archive_path)
+        assert mail_parser.archive_path is not None
 
-    def test_generate_pdf_html_email_html_to_pdf_failure(self):
+    def test_generate_pdf_html_email_html_to_pdf_failure(
+        self,
+        httpx_mock: HTTPXMock,
+        mail_parser: MailDocumentParser,
+        html_email_file: Path,
+        html_email_pdf_file: Path,
+    ):
         """
         GIVEN:
             - email with HTML content
@@ -561,7 +553,7 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
         THEN:
             - ParseError is raised
         """
-        self.httpx_mock.add_response(
+        httpx_mock.add_response(
             url="http://localhost:9998/tika/text",
             method="PUT",
             json={
@@ -570,20 +562,26 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
                 "X-TIKA:content": "This is some Tika HTML text",
             },
         )
-        self.httpx_mock.add_response(
+        httpx_mock.add_response(
             url="http://localhost:3000/forms/chromium/convert/html",
             method="POST",
-            content=(self.SAMPLE_DIR / "html.eml.pdf").read_bytes(),
+            content=html_email_pdf_file.read_bytes(),
         )
-        self.httpx_mock.add_response(
+        httpx_mock.add_response(
             url="http://localhost:3000/forms/chromium/convert/html",
             method="POST",
             status_code=httpx.codes.INTERNAL_SERVER_ERROR,
         )
-        with self.assertRaises(ParseError):
-            self.parser.parse(self.SAMPLE_DIR / "html.eml", "message/rfc822")
+        with pytest.raises(ParseError):
+            mail_parser.parse(html_email_file, "message/rfc822")
 
-    def test_generate_pdf_html_email_merge_failure(self):
+    def test_generate_pdf_html_email_merge_failure(
+        self,
+        httpx_mock: HTTPXMock,
+        mail_parser: MailDocumentParser,
+        html_email_file: Path,
+        html_email_pdf_file: Path,
+    ):
         """
         GIVEN:
             - email with HTML content
@@ -593,7 +591,7 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
         THEN:
             - ParseError is raised
         """
-        self.httpx_mock.add_response(
+        httpx_mock.add_response(
             url="http://localhost:9998/tika/text",
             method="PUT",
             json={
@@ -602,20 +600,25 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
                 "X-TIKA:content": "This is some Tika HTML text",
             },
         )
-        self.httpx_mock.add_response(
+        httpx_mock.add_response(
             url="http://localhost:3000/forms/chromium/convert/html",
             method="POST",
-            content=(self.SAMPLE_DIR / "html.eml.pdf").read_bytes(),
+            content=html_email_pdf_file.read_bytes(),
         )
-        self.httpx_mock.add_response(
+        httpx_mock.add_response(
             url="http://localhost:3000/forms/pdfengines/merge",
             method="POST",
             status_code=httpx.codes.INTERNAL_SERVER_ERROR,
         )
-        with self.assertRaises(ParseError):
-            self.parser.parse(self.SAMPLE_DIR / "html.eml", "message/rfc822")
+        with pytest.raises(ParseError):
+            mail_parser.parse(html_email_file, "message/rfc822")
 
-    def test_mail_to_html(self):
+    def test_mail_to_html(
+        self,
+        mail_parser: MailDocumentParser,
+        html_email_file: Path,
+        html_email_html_file: Path,
+    ):
         """
         GIVEN:
             - Email message with HTML content
@@ -624,14 +627,19 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
         THEN:
             - Resulting HTML is as expected
         """
-        mail = self.parser.parse_file_to_message(self.SAMPLE_DIR / "html.eml")
-        html_file = self.parser.mail_to_html(mail)
-        expected_html_file = self.SAMPLE_DIR / "html.eml.html"
+        mail = mail_parser.parse_file_to_message(html_email_file)
+        html_file = mail_parser.mail_to_html(mail)
 
-        self.assertHTMLEqual(expected_html_file.read_text(), html_file.read_text())
+        expected_html = parse_html(html_email_html_file.read_text())
+        actual_html = parse_html(html_file.read_text())
+
+        assert expected_html == actual_html
 
     def test_generate_pdf_from_mail(
         self,
+        httpx_mock: HTTPXMock,
+        mail_parser: MailDocumentParser,
+        html_email_file: Path,
     ):
         """
         GIVEN:
@@ -642,16 +650,13 @@ class TestParser(FileSystemAssertsMixin, HttpxMockMixin, BaseMailParserTestCase)
             - Gotenberg is used to convert HTML to PDF
         """
 
-        self.httpx_mock.add_response(content=b"Content")
+        httpx_mock.add_response(content=b"Content")
 
-        mail = self.parser.parse_file_to_message(self.SAMPLE_DIR / "html.eml")
+        mail = mail_parser.parse_file_to_message(html_email_file)
 
-        retval = self.parser.generate_pdf_from_mail(mail)
-        self.assertEqual(b"Content", retval.read_bytes())
+        retval = mail_parser.generate_pdf_from_mail(mail)
+        assert retval.read_bytes() == b"Content"
 
-        request = self.httpx_mock.get_request()
+        request = httpx_mock.get_request()
 
-        self.assertEqual(
-            str(request.url),
-            "http://localhost:3000/forms/chromium/convert/html",
-        )
+        assert str(request.url) == "http://localhost:3000/forms/chromium/convert/html"

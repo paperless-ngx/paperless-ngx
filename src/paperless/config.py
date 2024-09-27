@@ -70,8 +70,14 @@ class OcrConfig(OutputTypeConfig):
         )
         self.image_dpi = app_config.image_dpi or settings.OCR_IMAGE_DPI
         self.clean = app_config.unpaper_clean or settings.OCR_CLEAN
-        self.deskew = app_config.deskew or settings.OCR_DESKEW
-        self.rotate = app_config.rotate_pages or settings.OCR_ROTATE_PAGES
+        self.deskew = (
+            app_config.deskew if app_config.deskew is not None else settings.OCR_DESKEW
+        )
+        self.rotate = (
+            app_config.rotate_pages
+            if app_config.rotate_pages is not None
+            else settings.OCR_ROTATE_PAGES
+        )
         self.rotate_threshold = (
             app_config.rotate_pages_threshold or settings.OCR_ROTATE_PAGES_THRESHOLD
         )

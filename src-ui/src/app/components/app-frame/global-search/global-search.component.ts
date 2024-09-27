@@ -15,6 +15,7 @@ import {
   FILTER_HAS_DOCUMENT_TYPE_ANY,
   FILTER_HAS_STORAGE_PATH_ANY,
   FILTER_HAS_TAGS_ALL,
+  FILTER_TITLE_CONTENT,
 } from 'src/app/data/filter-rule-type'
 import { DataType } from 'src/app/data/datatype'
 import { ObjectWithId } from 'src/app/data/object-with-id'
@@ -42,6 +43,8 @@ import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dial
 import { WorkflowEditDialogComponent } from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
 import { HotKeyService } from 'src/app/services/hot-key.service'
 import { paramsFromViewState } from 'src/app/utils/query-params'
+import { SettingsService } from 'src/app/services/settings.service'
+import { GlobalSearchType, SETTINGS_KEYS } from 'src/app/data/ui-settings'
 
 @Component({
   selector: 'pngx-global-search',
@@ -63,6 +66,13 @@ export class GlobalSearchComponent implements OnInit {
   @ViewChildren('primaryButton') primaryButtons: QueryList<ElementRef>
   @ViewChildren('secondaryButton') secondaryButtons: QueryList<ElementRef>
 
+  get useAdvancedForFullSearch(): boolean {
+    return (
+      this.settingsService.get(SETTINGS_KEYS.SEARCH_FULL_TYPE) ===
+      GlobalSearchType.ADVANCED
+    )
+  }
+
   constructor(
     public searchService: SearchService,
     private router: Router,
@@ -71,7 +81,8 @@ export class GlobalSearchComponent implements OnInit {
     private documentListViewService: DocumentListViewService,
     private permissionsService: PermissionsService,
     private toastService: ToastService,
-    private hotkeyService: HotKeyService
+    private hotkeyService: HotKeyService,
+    private settingsService: SettingsService
   ) {
     this.queryDebounce = new Subject<string>()
 
@@ -282,7 +293,7 @@ export class GlobalSearchComponent implements OnInit {
         this.primaryButtons.first.nativeElement.click()
         this.searchInput.nativeElement.blur()
       } else if (this.query?.length) {
-        this.runAdvanedSearch()
+        this.runFullSearch()
         this.reset(true)
       }
     } else if (event.key === 'Escape' && !this.resultsDropdown.isOpen()) {
@@ -378,9 +389,12 @@ export class GlobalSearchComponent implements OnInit {
     )
   }
 
-  public runAdvanedSearch() {
+  public runFullSearch() {
+    const ruleType = this.useAdvancedForFullSearch
+      ? FILTER_FULLTEXT_QUERY
+      : FILTER_TITLE_CONTENT
     this.documentListViewService.quickFilter([
-      { rule_type: FILTER_FULLTEXT_QUERY, value: this.query },
+      { rule_type: ruleType, value: this.query },
     ])
     this.reset(true)
   }

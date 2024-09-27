@@ -6,8 +6,8 @@
       <input type="file" class="visually-hidden" (change)="onFileSelected($event)" multiple #fileUpload>
     </form>
     @if (getStatus().length > 0) {
-    <div class="fixed-bottom p-2 p-md-4 d-flex justify-content-end pe-none max-vh100-40 overflow-y-scroll" [ngClass]="slimSidebarEnabled ? 'col-slim' : 'offset-md-3 offset-lg-2'">
-      <div class="col col-lg-4 col-xl-3 ps-0 pe-0 ps-lg-3 pe-lg-0 pe-auto">
+    <div class="fixed-bottom p-2 p-md-4 d-flex justify-content-end pe-none max-vh100-40" [ngClass]="slimSidebarEnabled ? 'col-slim' : 'offset-md-3 offset-lg-2'">
+      <div class="col col-lg-4 col-xl-3 ps-0 pe-0 ps-lg-3 pe-lg-0 pe-auto overflow-y-scroll">
         <div class="card shadow-sm consumer-status-card">
           <div class="card-body">
             <div class="row">
@@ -39,7 +39,7 @@
                         <a [routerLink]="[]" (click)="alertsExpanded = !alertsExpanded" aria-controls="hiddenAlerts" [attr.aria-expanded]="alertsExpanded" i18n>Show all</a>
                       </p>
                     }
-                    <div #hiddenAlerts="ngbCollapse" [(ngbCollapse)]="!alertsExpanded">
+                    <div #hiddenAlerts="ngbCollapse" [ngbCollapse]="!alertsExpanded" (ngbCollapseChange)="alertsExpanded = $event">
                       @for (status of getStatusHidden(); track status) {
                         <div>
                           <ng-container [ngTemplateOutlet]="consumerAlert" [ngTemplateOutletContext]="{ $implicit: status }"></ng-container>

@@ -1,5 +1,15 @@
 <form [formGroup]="form" [class.opacity-50]="disabled">
-  <label class="form-label">{{title}}</label>
+  <label class="form-label">
+    {{title}}
+    <button class="btn btn-sm btn-link text-muted me-auto p-0 p-md-2" title="What's this?" i18n-title type="button" [ngbPopover]="infoPopover" [autoClose]="true" container="body">
+      <i-bs name="question-circle"></i-bs>
+    </button>
+    <ng-template #infoPopover>
+      <p i18n>Global permissions define what areas of the app and API endpoints users can access.</p>
+      <a href="https://docs.paperless-ngx.com/usage/#global-permissions" target="_blank" referrerpolicy="noopener noreferrer" i18n>Read more</a>
+      <i-bs class="ms-1" width=".8em" height=".8em" name="box-arrow-up-right"></i-bs>
+    </ng-template>
+  </label>
   <ul class="list-group">
     <li class="list-group-item d-flex">
       <div class="col-3" i18n>Type</div>
@@ -19,7 +29,7 @@
         @for (action of PermissionAction | keyvalue; track action) {
           <div class="col form-check form-check-inline" [ngbPopover]="inheritedWarning" [disablePopover]="!isInherited(type, action.key)" placement="left" triggers="mouseenter:mouseleave">
             <input type="checkbox" class="form-check-input" id="{{type}}_{{action.key}}" formControlName="{{action.key}}">
-            <label class="form-check-label visually-hidden" for="{{type}}_{{action.key}}" i18n>{{action.key}}</label>
+            <label class="form-check-label visually-hidden" for="{{type}}_{{action.key}}">{{action.key}}</label>
           </div>
         }
       </li>

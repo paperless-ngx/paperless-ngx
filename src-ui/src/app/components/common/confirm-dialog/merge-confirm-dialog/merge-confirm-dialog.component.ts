@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { ConfirmDialogComponent } from '../confirm-dialog.component'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { DocumentService } from 'src/app/services/rest/document.service'
+import { PermissionsService } from 'src/app/services/permissions.service'
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop'
 import { Subject, takeUntil } from 'rxjs'
 import { Document } from 'src/app/data/document'
@@ -16,6 +17,7 @@ export class MergeConfirmDialogComponent
   implements OnInit
 {
   public documentIDs: number[] = []
+  public deleteOriginals: boolean = false
   private _documents: Document[] = []
   get documents(): Document[] {
     return this._documents
@@ -27,7 +29,8 @@ export class MergeConfirmDialogComponent
 
   constructor(
     activeModal: NgbActiveModal,
-    private documentService: DocumentService
+    private documentService: DocumentService,
+    private permissionService: PermissionsService
   ) {
     super(activeModal)
   }
@@ -47,5 +50,11 @@ export class MergeConfirmDialogComponent
 
   getDocument(documentID: number): Document {
     return this.documents.find((d) => d.id === documentID)
+  }
+
+  get userOwnsAllDocuments(): boolean {
+    return this.documents.every((d) =>
+      this.permissionService.currentUserOwnsObject(d)
+    )
   }
 }

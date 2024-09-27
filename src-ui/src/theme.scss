@@ -130,7 +130,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   .btn-outline-secondary {
     &:hover, &:focus, &.active, &:active {
       background-color: var(--pngx-bg-darker);
-      color: var(--bs-primary);
+      color: var(--pngx-body-color-accent) !important;
     }
   }
 
@@ -143,8 +143,8 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   }
 
   .search-container {
-    input, input:focus {
-      color: var(--bs-body-color) !important;
+    input, input:focus, i-bs[name="search"] , ::placeholder {
+      color: var(--pngx-primary-text-contrast) !important;
     }
   }
 
@@ -230,6 +230,12 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     &.table-hover > tbody > tr:hover > * {
       background-color: var(--bs-light);
       color: var(--pngx-body-color-accent);
+    }
+  }
+
+  .table-row-selected {
+    td, a {
+      color: var(--pngx-primary-text-contrast) !important;
     }
   }
 

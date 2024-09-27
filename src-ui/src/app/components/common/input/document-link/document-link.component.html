@@ -27,8 +27,8 @@
           (change)="onChange(selectedDocuments)">
           <ng-template ng-label-tmp let-document="item">
             <div class="d-flex align-items-center">
-              <i-bs (click)="unselect(document)" name="x"></i-bs>
-              <a routerLink="/documents/{{document.id}}" class="badge bg-light text-primary" (mousedown)="$event.stopImmediatePropagation();">
+              <button class="btn p-0 lh-1" (click)="unselect(document)" title="Remove link" i18n-title><i-bs name="x"></i-bs></button>
+              <a routerLink="/documents/{{document.id}}" class="badge bg-light text-primary" (mousedown)="$event.stopImmediatePropagation();" title="Open link" i18n-title>
                 <i-bs width="0.9em" height="0.9em" name="file-text"></i-bs>&nbsp;<span>{{document.title}}</span>
               </a>
             </div>

@@ -24,11 +24,20 @@
                     }
                 </div>
             }
+            @case (CustomFieldDataType.Boolean) {
+                <div class="d-flex flex-row align-items-center">
+                    <span>{{field.name}}:</span>
+                    <input type="checkbox" id="{{field.name}}" name="{{field.name}}" [checked]="value" value="" class="form-check-input ms-2 mt-0 pe-none">
+                </div>
+            }
+            @case (CustomFieldDataType.Select) {
+                <span [ngbTooltip]="nameTooltip">{{getSelectValue(field, value)}}</span>
+            }
             @default {
               <span [ngbTooltip]="nameTooltip">{{value}}</span>
             }
         }
     } @else if (showNameIfEmpty) {
-        <span class="fst-italic text-muted" i18n>{{field.name}}</span>
+        <span class="fst-italic text-muted">{{field.name}}</span>
     }
 }

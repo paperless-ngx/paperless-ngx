@@ -16,7 +16,7 @@ on:
 env:
   # This is the version of pipenv all the steps will use
   # If changing this, change Dockerfile
-  DEFAULT_PIP_ENV_VERSION: "2023.12.1"
+  DEFAULT_PIP_ENV_VERSION: "2024.0.1"
   # This is the default version of Python to use in most steps which aren't specific
   DEFAULT_PYTHON_VERSION: "3.10"
 
@@ -260,7 +260,7 @@ jobs:
           retention-days: 7
 
   tests-coverage-upload:
-    name: "Upload Coverage"
+    name: "Upload to Codecov"
     runs-on: ubuntu-22.04
     needs:
       - tests-backend
@@ -306,6 +306,30 @@ jobs:
           # future expansion
           flags: backend
           directory: src/
+      -
+        name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+          cache-dependency-path: 'src-ui/package-lock.json'
+      -
+        name: Cache frontend dependencies
+        id: cache-frontend-deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            ~/.cache
+          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/package-lock.json') }}
+      -
+        name: Re-link Angular cli
+        run: cd src-ui && npm link @angular/cli
+      -
+        name: Build frontend and upload analysis
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: cd src-ui && ng build --configuration=production
 
   build-docker-image:
     name: Build Docker image for ${{ github.ref_name }}
@@ -398,7 +422,7 @@ jobs:
           password: ${{ secrets.QUAY_ROBOT_TOKEN }}
       -
         name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
@@ -406,6 +430,8 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker-meta.outputs.tags }}
           labels: ${{ steps.docker-meta.outputs.labels }}
+          build-args: |
+            PNGX_TAG_VERSION=${{ steps.docker-meta.outputs.version }}
           # Get cache layers from this branch, then dev
           # This allows new branches to get at least some cache benefits, generally from dev
           cache-from: |

@@ -57,7 +57,7 @@ describe(`Additional service tests for SavedViewService`, () => {
   let settingsService
 
   it('should retrieve saved views and sort them', () => {
-    service.initialize()
+    service.reload()
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
     )
@@ -67,6 +67,16 @@ describe(`Additional service tests for SavedViewService`, () => {
     expect(service.allViews).toHaveLength(4)
     expect(service.dashboardViews).toHaveLength(3)
     expect(service.sidebarViews).toHaveLength(3)
+  })
+
+  it('should gracefully handle errors', () => {
+    service.reload()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
+    )
+    req.error(new ErrorEvent('error'))
+    expect(service.loading).toBeFalsy()
+    expect(service.allViews).toHaveLength(0)
   })
 
   it('should support patchMany', () => {

@@ -7,7 +7,11 @@ import {
   NgbDateParserFormatter,
   NgbModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http'
+import {
+  HTTP_INTERCEPTORS,
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http'
 import { DocumentListComponent } from './components/document-list/document-list.component'
 import { DocumentDetailComponent } from './components/document-detail/document-detail.component'
 import { DashboardComponent } from './components/dashboard/dashboard.component'
@@ -116,7 +120,6 @@ import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { ConfirmButtonComponent } from './components/common/confirm-button/confirm-button.component'
 import { MonetaryComponent } from './components/common/input/monetary/monetary.component'
 import { SystemStatusDialogComponent } from './components/common/system-status-dialog/system-status-dialog.component'
-import { NgxFilesizeModule } from 'ngx-filesize'
 import { RotateConfirmDialogComponent } from './components/common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { MergeConfirmDialogComponent } from './components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
 import { SplitConfirmDialogComponent } from './components/common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
@@ -125,6 +128,8 @@ import { DragDropSelectComponent } from './components/common/input/drag-drop-sel
 import { CustomFieldDisplayComponent } from './components/common/custom-field-display/custom-field-display.component'
 import { GlobalSearchComponent } from './components/app-frame/global-search/global-search.component'
 import { HotkeyDialogComponent } from './components/common/hotkey-dialog/hotkey-dialog.component'
+import { DeletePagesConfirmDialogComponent } from './components/common/confirm-dialog/delete-pages-confirm-dialog/delete-pages-confirm-dialog.component'
+import { TrashComponent } from './components/admin/trash/trash.component'
 import {
   airplane,
   archive,
@@ -161,6 +166,7 @@ import {
   clipboardCheckFill,
   clipboardFill,
   dash,
+  dashCircle,
   diagram3,
   dice5,
   doorOpen,
@@ -175,6 +181,7 @@ import {
   fileEarmarkCheck,
   fileEarmarkFill,
   fileEarmarkLock,
+  fileEarmarkMinus,
   files,
   fileText,
   filter,
@@ -260,6 +267,7 @@ const icons = {
   clipboardCheckFill,
   clipboardFill,
   dash,
+  dashCircle,
   diagram3,
   dice5,
   doorOpen,
@@ -274,6 +282,7 @@ const icons = {
   fileEarmarkCheck,
   fileEarmarkFill,
   fileEarmarkLock,
+  fileEarmarkMinus,
   files,
   fileText,
   filter,
@@ -339,6 +348,7 @@ import localeFr from '@angular/common/locales/fr'
 import localeHu from '@angular/common/locales/hu'
 import localeIt from '@angular/common/locales/it'
 import localeJa from '@angular/common/locales/ja'
+import localeKo from '@angular/common/locales/ko'
 import localeLb from '@angular/common/locales/lb'
 import localeNl from '@angular/common/locales/nl'
 import localeNo from '@angular/common/locales/no'
@@ -370,6 +380,7 @@ registerLocaleData(localeFr)
 registerLocaleData(localeHu)
 registerLocaleData(localeIt)
 registerLocaleData(localeJa)
+registerLocaleData(localeKo)
 registerLocaleData(localeLb)
 registerLocaleData(localeNl)
 registerLocaleData(localeNo)
@@ -493,12 +504,14 @@ function initializeApp(settings: SettingsService) {
     CustomFieldDisplayComponent,
     GlobalSearchComponent,
     HotkeyDialogComponent,
+    DeletePagesConfirmDialogComponent,
+    TrashComponent,
   ],
+  bootstrap: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
     NgbModule,
-    HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
     PdfViewerModule,
@@ -508,7 +521,6 @@ function initializeApp(settings: SettingsService) {
     TourNgBootstrapModule,
     DragDropModule,
     NgxBootstrapIconsModule.pick(icons),
-    NgxFilesizeModule,
   ],
   providers: [
     {
@@ -537,7 +549,7 @@ function initializeApp(settings: SettingsService) {
     DirtyDocGuard,
     DirtySavedViewGuard,
     UsernamePipe,
+    provideHttpClient(withInterceptorsFromDi()),
   ],
-  bootstrap: [AppComponent],
 })
 export class AppModule { }

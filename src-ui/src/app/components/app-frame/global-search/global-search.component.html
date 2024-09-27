@@ -19,8 +19,12 @@
                 </div>
             </div>
             @if (query) {
-                <button class="btn btn-sm btn-outline-secondary" type="button" (click)="runAdvanedSearch()">
-                    <ng-container i18n>Advanced search</ng-container>
+                <button class="btn btn-sm btn-outline-secondary" type="button" (click)="runFullSearch()">
+                    @if (useAdvancedForFullSearch) {
+                        <ng-container i18n>Advanced search</ng-container>
+                    } @else {
+                        <ng-container i18n>Search</ng-container>
+                    }
                     <i-bs width="1em" height="1em" name="arrow-right-short"></i-bs>
                 </button>
             }

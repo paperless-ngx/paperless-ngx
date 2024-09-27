@@ -21,7 +21,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
     - name: crowdin action
-      uses: crowdin/github-action@v1
+      uses: crowdin/github-action@v2
       with:
         upload_translations: false
         download_translations: true

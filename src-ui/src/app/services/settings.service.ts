@@ -10,7 +10,7 @@ import {
 } from '@angular/core'
 import { Meta } from '@angular/platform-browser'
 import { CookieService } from 'ngx-cookie-service'
-import { first, Observable, tap } from 'rxjs'
+import { catchError, first, Observable, of, tap } from 'rxjs'
 import {
   BRIGHTNESS,
   estimateBrightnessForColor,
@@ -142,6 +142,12 @@ const LANGUAGE_OPTIONS = [
     name: $localize`Japanese`,
     englishName: 'Japanese',
     dateInputFormat: 'yyyy/mm/dd',
+  },
+  {
+    code: 'ko-kr',
+    name: $localize`Korean`,
+    englishName: 'Korean',
+    dateInputFormat: 'yyyy-mm-dd',
   },
   {
     code: 'lb-lu',
@@ -288,6 +294,19 @@ export class SettingsService {
   public initializeSettings(): Observable<UiSettings> {
     return this.http.get<UiSettings>(this.baseUrl).pipe(
       first(),
+      catchError((error) => {
+        setTimeout(() => {
+          this.toastService.showError('Error loading settings', error)
+        }, 500)
+        return of({
+          settings: {
+            documentListSize: 10,
+            update_checking: { backend_setting: 'default' },
+          },
+          user: {},
+          permissions: [],
+        })
+      }),
       tap((uisettings) => {
         Object.assign(this.settings, uisettings.settings)
         if (this.get(SETTINGS_KEYS.APP_TITLE)?.length) {

@@ -1,6 +1,6 @@
 import {
-  HttpClientTestingModule,
   HttpTestingController,
+  provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import { AppFrameComponent } from './app-frame.component'
 import {
@@ -37,6 +37,7 @@ import { SavedView } from 'src/app/data/saved-view'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { GlobalSearchComponent } from './global-search/global-search.component'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const saved_views = [
   {
@@ -100,7 +101,6 @@ describe('AppFrameComponent', () => {
         GlobalSearchComponent,
       ],
       imports: [
-        HttpClientTestingModule,
         BrowserModule,
         RouterTestingModule.withRoutes(routes),
         NgbModule,
@@ -115,7 +115,7 @@ describe('AppFrameComponent', () => {
         {
           provide: SavedViewService,
           useValue: {
-            initialize: () => {},
+            reload: () => {},
             listAll: () =>
               of({
                 all: [saved_views.map((v) => v.id)],
@@ -150,6 +150,8 @@ describe('AppFrameComponent', () => {
           },
         },
         PermissionsGuard,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 
@@ -168,7 +170,7 @@ describe('AppFrameComponent', () => {
       .mockReturnValue('Hello World')
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
 
-    savedViewSpy = jest.spyOn(savedViewService, 'initialize')
+    savedViewSpy = jest.spyOn(savedViewService, 'reload')
 
     fixture = TestBed.createComponent(AppFrameComponent)
     component = fixture.componentInstance

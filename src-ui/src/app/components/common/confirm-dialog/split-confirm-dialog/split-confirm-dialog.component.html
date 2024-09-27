@@ -23,7 +23,7 @@
         </div>
         <div class="col-4">
             <div class="d-grid">
-                <button class="btn btn-sm btn-primary" (click)="addSplit()" [disabled]="page === totalPages">
+                <button class="btn btn-sm btn-primary" (click)="addSplit()" [disabled]="!canSplit">
                     <i-bs name="plus-circle"></i-bs>&nbsp;
                     <span i18n>Add Split</span>
                 </button>
@@ -44,6 +44,10 @@
             </ul>
         </div>
     </div>
+    <div class="form-check form-switch mt-4">
+       <input class="form-check-input" type="checkbox" role="switch" id="deleteOriginalSwitch" [(ngModel)]="deleteOriginal" [disabled]="!userOwnsDocument">
+       <label class="form-check-label" for="deleteOriginalSwitch" i18n>Delete original document after successful split</label>
+     </div>
 </div>
 <div class="modal-footer">
     <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">

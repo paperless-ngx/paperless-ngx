@@ -11,7 +11,7 @@
         }
       </div>
       <div class="position-relative" [class.col-md-9]="horizontal">
-        <input #inputField type="text" class="form-control" [class.is-invalid]="error" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [disabled]="disabled" [autocomplete]="autocomplete">
+        <input #inputField type="text" class="form-control" [class.is-invalid]="error" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [disabled]="disabled" [autocomplete]="autocomplete" [placeholder]="placeholder">
         @if (hint) {
           <small class="form-text text-muted" [innerHTML]="hint | safeHtml"></small>
         }

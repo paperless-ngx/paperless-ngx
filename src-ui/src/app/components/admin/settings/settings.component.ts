@@ -27,7 +27,7 @@ import {
 } from 'rxjs'
 import { Group } from 'src/app/data/group'
 import { SavedView } from 'src/app/data/saved-view'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { GlobalSearchType, SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { User } from 'src/app/data/user'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
@@ -101,6 +101,7 @@ export class SettingsComponent
     defaultPermsEditGroups: new FormControl(null),
     documentEditingRemoveInboxTags: new FormControl(null),
     searchDbOnly: new FormControl(null),
+    searchLink: new FormControl(null),
 
     notificationsConsumerNewDocument: new FormControl(null),
     notificationsConsumerSuccess: new FormControl(null),
@@ -128,6 +129,8 @@ export class SettingsComponent
   groups: Group[]
 
   public systemStatus: SystemStatus
+
+  public readonly GlobalSearchType = GlobalSearchType
 
   get systemStatusHasErrors(): boolean {
     return (
@@ -306,6 +309,7 @@ export class SettingsComponent
         SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS
       ),
       searchDbOnly: this.settings.get(SETTINGS_KEYS.SEARCH_DB_ONLY),
+      searchLink: this.settings.get(SETTINGS_KEYS.SEARCH_FULL_TYPE),
       savedViews: {},
     }
   }
@@ -538,6 +542,10 @@ export class SettingsComponent
     this.settings.set(
       SETTINGS_KEYS.SEARCH_DB_ONLY,
       this.settingsForm.value.searchDbOnly
+    )
+    this.settings.set(
+      SETTINGS_KEYS.SEARCH_FULL_TYPE,
+      this.settingsForm.value.searchLink
     )
     this.settings.setLanguage(this.settingsForm.value.displayLanguage)
     this.settings

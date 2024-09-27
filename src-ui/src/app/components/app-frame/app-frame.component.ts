@@ -35,7 +35,6 @@ import {
 } from '@angular/cdk/drag-drop'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
-import { ObjectWithId } from 'src/app/data/object-with-id'
 
 @Component({
   selector: 'pngx-app-frame',
@@ -74,7 +73,7 @@ export class AppFrameComponent
         PermissionType.SavedView
       )
     ) {
-      this.savedViewService.initialize()
+      this.savedViewService.reload()
     }
   }
 

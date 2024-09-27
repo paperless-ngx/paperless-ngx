@@ -193,30 +193,9 @@ def fake_magic_from_buffer(buffer, mime=False):
         return "Some verbose file description"
 
 
-@mock.patch("paperless_mail.mail.magic.from_buffer", fake_magic_from_buffer)
-class TestMail(
-    DirectoriesMixin,
-    FileSystemAssertsMixin,
-    TestCase,
-):
-    def setUp(self):
+class MessageBuilder:
+    def __init__(self):
         self._used_uids = set()
-
-        self.bogus_mailbox = BogusMailBox()
-
-        patcher = mock.patch("paperless_mail.mail.MailBox")
-        m = patcher.start()
-        m.return_value = self.bogus_mailbox
-        self.addCleanup(patcher.stop)
-
-        patcher = mock.patch("paperless_mail.mail.queue_consumption_tasks")
-        self._queue_consumption_tasks_mock = patcher.start()
-        self.addCleanup(patcher.stop)
-
-        self.reset_bogus_mailbox()
-
-        self.mail_account_handler = MailAccountHandler()
-        super().setUp()
 
     def create_message(
         self,
@@ -283,39 +262,132 @@ class TestMail(
 
         return imap_msg
 
-    def reset_bogus_mailbox(self):
-        self.bogus_mailbox.messages = []
-        self.bogus_mailbox.messages_spam = []
-        self.bogus_mailbox.messages.append(
-            self.create_message(
-                subject="Invoice 1",
-                from_="amazon@amazon.de",
-                to=["me@myselfandi.com", "helpdesk@mydomain.com"],
-                body="cables",
-                seen=True,
-                flagged=False,
-                processed=False,
-            ),
+
+def reset_bogus_mailbox(bogus_mailbox: BogusMailBox, message_builder: MessageBuilder):
+    bogus_mailbox.messages = []
+    bogus_mailbox.messages_spam = []
+    bogus_mailbox.messages.append(
+        message_builder.create_message(
+            subject="Invoice 1",
+            from_="amazon@amazon.de",
+            to=["me@myselfandi.com", "helpdesk@mydomain.com"],
+            body="cables",
+            seen=True,
+            flagged=False,
+            processed=False,
+        ),
+    )
+    bogus_mailbox.messages.append(
+        message_builder.create_message(
+            subject="Invoice 2",
+            body="from my favorite electronic store",
+            to=["invoices@mycompany.com"],
+            seen=False,
+            flagged=True,
+            processed=True,
+        ),
+    )
+    bogus_mailbox.messages.append(
+        message_builder.create_message(
+            subject="Claim your $10M price now!",
+            from_="amazon@amazon-some-indian-site.org",
+            to=["special@me.me"],
+            seen=False,
+        ),
+    )
+    bogus_mailbox.updateClient()
+
+
+class MailMocker(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
+    def setUp(self):
+        self.bogus_mailbox = BogusMailBox()
+        self.messageBuilder = MessageBuilder()
+
+        reset_bogus_mailbox(self.bogus_mailbox, self.messageBuilder)
+
+        patcher = mock.patch("paperless_mail.mail.MailBox")
+        m = patcher.start()
+        m.return_value = self.bogus_mailbox
+        self.addCleanup(patcher.stop)
+
+        patcher = mock.patch("paperless_mail.mail.queue_consumption_tasks")
+        self._queue_consumption_tasks_mock = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        super().setUp()
+
+    def assert_queue_consumption_tasks_call_args(
+        self,
+        expected_call_args: list[list[dict[str, str]]],
+    ):
+        """
+        Verifies that queue_consumption_tasks has been called with the expected arguments.
+
+        expected_call_args is the following format:
+
+        * List of calls to queue_consumption_tasks, called once per mail, where each element is:
+        * List of signatures for the consume_file task, where each element is:
+        * dictionary containing arguments that need to be present in the consume_file signature.
+
+        """
+
+        # assert number of calls to queue_consumption_tasks match
+        self.assertEqual(
+            len(self._queue_consumption_tasks_mock.call_args_list),
+            len(expected_call_args),
         )
-        self.bogus_mailbox.messages.append(
-            self.create_message(
-                subject="Invoice 2",
-                body="from my favorite electronic store",
-                to=["invoices@mycompany.com"],
-                seen=False,
-                flagged=True,
-                processed=True,
-            ),
-        )
-        self.bogus_mailbox.messages.append(
-            self.create_message(
-                subject="Claim your $10M price now!",
-                from_="amazon@amazon-some-indian-site.org",
-                to="special@me.me",
-                seen=False,
-            ),
-        )
-        self.bogus_mailbox.updateClient()
+
+        for (mock_args, mock_kwargs), expected_signatures in zip(
+            self._queue_consumption_tasks_mock.call_args_list,
+            expected_call_args,
+        ):
+            consume_tasks = mock_kwargs["consume_tasks"]
+
+            # assert number of consume_file tasks match
+            self.assertEqual(len(consume_tasks), len(expected_signatures))
+
+            for consume_task, expected_signature in zip(
+                consume_tasks,
+                expected_signatures,
+            ):
+                input_doc, overrides = consume_task.args
+
+                # assert the file exists
+                self.assertIsFile(input_doc.original_file)
+
+                # assert all expected arguments are present in the signature
+                for key, value in expected_signature.items():
+                    if key == "override_correspondent_id":
+                        self.assertEqual(overrides.correspondent_id, value)
+                    elif key == "override_filename":
+                        self.assertEqual(overrides.filename, value)
+                    elif key == "override_title":
+                        self.assertEqual(overrides.title, value)
+                    else:
+                        self.fail("No match for expected arg")
+
+    def apply_mail_actions(self):
+        """
+        Applies pending actions to mails by inspecting calls to the queue_consumption_tasks method.
+        """
+        for args, kwargs in self._queue_consumption_tasks_mock.call_args_list:
+            message = kwargs["message"]
+            rule = kwargs["rule"]
+            apply_mail_action([], rule.pk, message.uid, message.subject, message.date)
+
+
+@mock.patch("paperless_mail.mail.magic.from_buffer", fake_magic_from_buffer)
+class TestMail(
+    DirectoriesMixin,
+    FileSystemAssertsMixin,
+    TestCase,
+):
+    def setUp(self):
+        self.mailMocker = MailMocker()
+        self.mailMocker.setUp()
+        self.mail_account_handler = MailAccountHandler()
+
+        super().setUp()
 
     def test_get_correspondent(self):
         message = namedtuple("MailMessage", [])
@@ -399,7 +471,7 @@ class TestMail(
         self.assertEqual(handler._get_title(message, att, rule), None)
 
     def test_handle_message(self):
-        message = self.create_message(
+        message = self.mailMocker.messageBuilder.create_message(
             subject="the message title",
             from_="Myself",
             attachments=2,
@@ -416,9 +488,9 @@ class TestMail(
 
         self.assertEqual(result, 2)
 
-        self._queue_consumption_tasks_mock.assert_called()
+        self.mailMocker._queue_consumption_tasks_mock.assert_called()
 
-        self.assert_queue_consumption_tasks_call_args(
+        self.mailMocker.assert_queue_consumption_tasks_call_args(
             [
                 [
                     {"override_title": "file_0", "override_filename": "file_0.pdf"},
@@ -435,11 +507,11 @@ class TestMail(
 
         result = self.mail_account_handler._handle_message(message, rule)
 
-        self._queue_consumption_tasks_mock.assert_not_called()
+        self.mailMocker._queue_consumption_tasks_mock.assert_not_called()
         self.assertEqual(result, 0)
 
     def test_handle_unknown_mime_type(self):
-        message = self.create_message(
+        message = self.mailMocker.messageBuilder.create_message(
             attachments=[
                 _AttachmentDef(filename="f1.pdf"),
                 _AttachmentDef(
@@ -459,7 +531,7 @@ class TestMail(
         result = self.mail_account_handler._handle_message(message, rule)
 
         self.assertEqual(result, 1)
-        self.assert_queue_consumption_tasks_call_args(
+        self.mailMocker.assert_queue_consumption_tasks_call_args(
             [
                 [
                     {"override_filename": "f1.pdf"},
@@ -468,7 +540,7 @@ class TestMail(
         )
 
     def test_handle_disposition(self):
-        message = self.create_message(
+        message = self.mailMocker.messageBuilder.create_message(
             attachments=[
                 _AttachmentDef(
                     filename="f1.pdf",
@@ -487,7 +559,7 @@ class TestMail(
 
         result = self.mail_account_handler._handle_message(message, rule)
         self.assertEqual(result, 1)
-        self.assert_queue_consumption_tasks_call_args(
+        self.mailMocker.assert_queue_consumption_tasks_call_args(
             [
                 [
                     {"override_filename": "f2.pdf"},
@@ -496,7 +568,7 @@ class TestMail(
         )
 
     def test_handle_inline_files(self):
-        message = self.create_message(
+        message = self.mailMocker.messageBuilder.create_message(
             attachments=[
                 _AttachmentDef(
                     filename="f1.pdf",
@@ -516,7 +588,7 @@ class TestMail(
 
         result = self.mail_account_handler._handle_message(message, rule)
         self.assertEqual(result, 2)
-        self.assert_queue_consumption_tasks_call_args(
+        self.mailMocker.assert_queue_consumption_tasks_call_args(
             [
                 [
                     {"override_filename": "f1.pdf"},
@@ -536,7 +608,7 @@ class TestMail(
             - Mail action should not be performed for files excluded
             - Mail action should be performed for files included
         """
-        message = self.create_message(
+        message = self.mailMocker.messageBuilder.create_message(
             attachments=[
                 _AttachmentDef(filename="f1.pdf"),
                 _AttachmentDef(filename="f2.pdf"),
@@ -587,10 +659,28 @@ class TestMail(
                 expected_matches=["f2.png"],
             ),
             FilterTestCase(
+                "PDF Files with f2 and f3",
+                include_pattern="f2.pdf,f3*",
+                exclude_pattern=None,
+                expected_matches=["f2.pdf", "f3.pdf"],
+            ),
+            FilterTestCase(
                 "PDF Files without f1",
                 include_pattern="*.pdf",
                 exclude_pattern="f1*",
                 expected_matches=["f2.pdf", "f3.pdf", "file.PDf"],
+            ),
+            FilterTestCase(
+                "PDF Files without f1 and f2",
+                include_pattern="*.pdf",
+                exclude_pattern="f1*,f2*",
+                expected_matches=["f3.pdf", "file.PDf"],
+            ),
+            FilterTestCase(
+                "PDF Files without f1 and f2 and f3",
+                include_pattern="*.pdf",
+                exclude_pattern="f1*,f2*,f3*",
+                expected_matches=["file.PDf"],
             ),
             FilterTestCase(
                 "All Files, no PNG",
@@ -608,7 +698,7 @@ class TestMail(
 
         for test_case in tests:
             with self.subTest(msg=test_case.name):
-                self._queue_consumption_tasks_mock.reset_mock()
+                self.mailMocker._queue_consumption_tasks_mock.reset_mock()
                 account = MailAccount(name=str(uuid.uuid4()))
                 account.save()
                 rule = MailRule(
@@ -621,12 +711,13 @@ class TestMail(
                 rule.save()
 
                 self.mail_account_handler._handle_message(message, rule)
-                self.assert_queue_consumption_tasks_call_args(
+                self.mailMocker.assert_queue_consumption_tasks_call_args(
                     [
                         [{"override_filename": m} for m in test_case.expected_matches],
                     ],
                 )
 
+    @pytest.mark.flaky(reruns=4)
     def test_filename_filter_inline_no_consumption(self):
         """
         GIVEN:
@@ -636,7 +727,7 @@ class TestMail(
         THEN:
             - Mail action should not be performed
         """
-        message = self.create_message(
+        message = self.mailMocker.messageBuilder.create_message(
             attachments=[
                 _AttachmentDef(
                     filename="test.png",
@@ -644,7 +735,7 @@ class TestMail(
                 ),
             ],
         )
-        self.bogus_mailbox.messages.append(message)
+        self.mailMocker.bogus_mailbox.messages.append(message)
         account = MailAccount.objects.create(
             name="test",
             imap_server="",
@@ -662,12 +753,12 @@ class TestMail(
         )
         rule.save()
 
-        self.assertEqual(len(self.bogus_mailbox.messages), 4)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 4)
 
         self.mail_account_handler.handle_mail_account(account)
-        self.apply_mail_actions()
+        self.mailMocker.apply_mail_actions()
 
-        self.assertEqual(len(self.bogus_mailbox.messages), 1)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 1)
 
     def test_handle_mail_account_mark_read(self):
         account = MailAccount.objects.create(
@@ -683,14 +774,14 @@ class TestMail(
             action=MailRule.MailAction.MARK_READ,
         )
 
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        self.assertEqual(len(self.bogus_mailbox.fetch("UNSEEN", False)), 2)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", False)), 2)
 
         self.mail_account_handler.handle_mail_account(account)
-        self.apply_mail_actions()
+        self.mailMocker.apply_mail_actions()
 
-        self.assertEqual(len(self.bogus_mailbox.fetch("UNSEEN", False)), 0)
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", False)), 0)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
 
     def test_handle_mail_account_delete(self):
         account = MailAccount.objects.create(
@@ -707,12 +798,12 @@ class TestMail(
             filter_subject="Invoice",
         )
 
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
 
         self.mail_account_handler.handle_mail_account(account)
-        self.apply_mail_actions()
+        self.mailMocker.apply_mail_actions()
 
-        self.assertEqual(len(self.bogus_mailbox.messages), 1)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 1)
 
     def test_handle_mail_account_delete_no_filters(self):
         account = MailAccount.objects.create(
@@ -729,12 +820,12 @@ class TestMail(
             maximum_age=0,
         )
 
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
 
         self.mail_account_handler.handle_mail_account(account)
-        self.apply_mail_actions()
+        self.mailMocker.apply_mail_actions()
 
-        self.assertEqual(len(self.bogus_mailbox.messages), 0)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 0)
 
     def test_handle_mail_account_flag(self):
         account = MailAccount.objects.create(
@@ -751,14 +842,20 @@ class TestMail(
             filter_subject="Invoice",
         )
 
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        self.assertEqual(len(self.bogus_mailbox.fetch("UNFLAGGED", False)), 2)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
+        self.assertEqual(
+            len(self.mailMocker.bogus_mailbox.fetch("UNFLAGGED", False)),
+            2,
+        )
 
         self.mail_account_handler.handle_mail_account(account)
-        self.apply_mail_actions()
+        self.mailMocker.apply_mail_actions()
 
-        self.assertEqual(len(self.bogus_mailbox.fetch("UNFLAGGED", False)), 1)
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+        self.assertEqual(
+            len(self.mailMocker.bogus_mailbox.fetch("UNFLAGGED", False)),
+            1,
+        )
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
 
     @pytest.mark.flaky(reruns=4)
     def test_handle_mail_account_move(self):
@@ -777,14 +874,14 @@ class TestMail(
             filter_subject="Claim",
         )
 
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        self.assertEqual(len(self.bogus_mailbox.messages_spam), 0)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages_spam), 0)
 
         self.mail_account_handler.handle_mail_account(account)
-        self.apply_mail_actions()
+        self.mailMocker.apply_mail_actions()
 
-        self.assertEqual(len(self.bogus_mailbox.messages), 2)
-        self.assertEqual(len(self.bogus_mailbox.messages_spam), 1)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 2)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages_spam), 1)
 
     def test_handle_mail_account_move_no_filters(self):
         account = MailAccount.objects.create(
@@ -802,14 +899,14 @@ class TestMail(
             maximum_age=0,
         )
 
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        self.assertEqual(len(self.bogus_mailbox.messages_spam), 0)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages_spam), 0)
 
         self.mail_account_handler.handle_mail_account(account)
-        self.apply_mail_actions()
+        self.mailMocker.apply_mail_actions()
 
-        self.assertEqual(len(self.bogus_mailbox.messages), 0)
-        self.assertEqual(len(self.bogus_mailbox.messages_spam), 3)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 0)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages_spam), 3)
 
     def test_handle_mail_account_tag(self):
         account = MailAccount.objects.create(
@@ -826,18 +923,24 @@ class TestMail(
             action_parameter="processed",
         )
 
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        self.assertEqual(len(self.bogus_mailbox.fetch("UNKEYWORD processed", False)), 2)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
+        self.assertEqual(
+            len(self.mailMocker.bogus_mailbox.fetch("UNKEYWORD processed", False)),
+            2,
+        )
 
         self.mail_account_handler.handle_mail_account(account)
-        self.apply_mail_actions()
+        self.mailMocker.apply_mail_actions()
 
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        self.assertEqual(len(self.bogus_mailbox.fetch("UNKEYWORD processed", False)), 0)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
+        self.assertEqual(
+            len(self.mailMocker.bogus_mailbox.fetch("UNKEYWORD processed", False)),
+            0,
+        )
 
     def test_handle_mail_account_tag_gmail(self):
-        self.bogus_mailbox._host = "imap.gmail.com"
-        self.bogus_mailbox.client.capabilities = ["X-GM-EXT-1"]
+        self.mailMocker.bogus_mailbox._host = "imap.gmail.com"
+        self.mailMocker.bogus_mailbox.client.capabilities = ["X-GM-EXT-1"]
 
         account = MailAccount.objects.create(
             name="test",
@@ -853,15 +956,15 @@ class TestMail(
             action_parameter="processed",
         )
 
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
         criteria = NOT(gmail_label="processed")
-        self.assertEqual(len(self.bogus_mailbox.fetch(criteria, False)), 2)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.fetch(criteria, False)), 2)
 
         self.mail_account_handler.handle_mail_account(account)
-        self.apply_mail_actions()
+        self.mailMocker.apply_mail_actions()
 
-        self.assertEqual(len(self.bogus_mailbox.fetch(criteria, False)), 0)
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.fetch(criteria, False)), 0)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
 
     def test_tag_mail_action_applemail_wrong_input(self):
         self.assertRaises(
@@ -888,14 +991,20 @@ class TestMail(
             action_parameter="apple:green",
         )
 
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        self.assertEqual(len(self.bogus_mailbox.fetch("UNFLAGGED", False)), 2)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
+        self.assertEqual(
+            len(self.mailMocker.bogus_mailbox.fetch("UNFLAGGED", False)),
+            2,
+        )
 
         self.mail_account_handler.handle_mail_account(account)
-        self.apply_mail_actions()
+        self.mailMocker.apply_mail_actions()
 
-        self.assertEqual(len(self.bogus_mailbox.fetch("UNFLAGGED", False)), 0)
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+        self.assertEqual(
+            len(self.mailMocker.bogus_mailbox.fetch("UNFLAGGED", False)),
+            0,
+        )
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
 
     def test_error_login(self):
         """
@@ -943,10 +1052,10 @@ class TestMail(
         )
 
         tasks.process_mail_accounts()
-        self.apply_mail_actions()
+        self.mailMocker.apply_mail_actions()
 
-        self.assertEqual(len(self.bogus_mailbox.messages), 2)
-        self.assertEqual(len(self.bogus_mailbox.messages_spam), 1)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 2)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages_spam), 1)
 
     def test_error_skip_rule(self):
         account = MailAccount.objects.create(
@@ -974,10 +1083,10 @@ class TestMail(
         )
 
         self.mail_account_handler.handle_mail_account(account)
-        self.apply_mail_actions()
+        self.mailMocker.apply_mail_actions()
 
-        self.assertEqual(len(self.bogus_mailbox.messages), 2)
-        self.assertEqual(len(self.bogus_mailbox.messages_spam), 1)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 2)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages_spam), 1)
 
     def test_error_folder_set(self):
         """
@@ -1003,14 +1112,14 @@ class TestMail(
             folder="uuuhhhh",  # Invalid folder name
         )
 
-        self.bogus_mailbox.folder.list = mock.Mock(
+        self.mailMocker.bogus_mailbox.folder.list = mock.Mock(
             return_value=[FolderInfo("SomeFoldername", "|", ())],
         )
 
         self.mail_account_handler.handle_mail_account(account)
 
-        self.bogus_mailbox.folder.list.assert_called_once()
-        self._queue_consumption_tasks_mock.assert_not_called()
+        self.mailMocker.bogus_mailbox.folder.list.assert_called_once()
+        self.mailMocker._queue_consumption_tasks_mock.assert_not_called()
 
     def test_error_folder_set_error_listing(self):
         """
@@ -1036,15 +1145,16 @@ class TestMail(
             folder="uuuhhhh",  # Invalid folder name
         )
 
-        self.bogus_mailbox.folder.list = mock.Mock(
+        self.mailMocker.bogus_mailbox.folder.list = mock.Mock(
             side_effect=MailboxFolderSelectError(None, "uhm"),
         )
 
         self.mail_account_handler.handle_mail_account(account)
 
-        self.bogus_mailbox.folder.list.assert_called_once()
-        self._queue_consumption_tasks_mock.assert_not_called()
+        self.mailMocker.bogus_mailbox.folder.list.assert_called_once()
+        self.mailMocker._queue_consumption_tasks_mock.assert_not_called()
 
+    @pytest.mark.flaky(reruns=4)
     @mock.patch("paperless_mail.mail.MailAccountHandler._get_correspondent")
     def test_error_skip_mail(self, m):
         def get_correspondent_fake(message, rule):
@@ -1069,14 +1179,17 @@ class TestMail(
         )
 
         self.mail_account_handler.handle_mail_account(account)
-        self.apply_mail_actions()
+        self.mailMocker.apply_mail_actions()
 
         # test that we still consume mail even if some mails throw errors.
-        self.assertEqual(self._queue_consumption_tasks_mock.call_count, 2)
+        self.assertEqual(self.mailMocker._queue_consumption_tasks_mock.call_count, 2)
 
         # faulty mail still in inbox, untouched
-        self.assertEqual(len(self.bogus_mailbox.messages), 1)
-        self.assertEqual(self.bogus_mailbox.messages[0].from_, "amazon@amazon.de")
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 1)
+        self.assertEqual(
+            self.mailMocker.bogus_mailbox.messages[0].from_,
+            "amazon@amazon.de",
+        )
 
     def test_error_create_correspondent(self):
         account = MailAccount.objects.create(
@@ -1096,10 +1209,10 @@ class TestMail(
 
         self.mail_account_handler.handle_mail_account(account)
 
-        self._queue_consumption_tasks_mock.assert_called_once()
+        self.mailMocker._queue_consumption_tasks_mock.assert_called_once()
 
         c = Correspondent.objects.get(name="amazon@amazon.de")
-        self.assert_queue_consumption_tasks_call_args(
+        self.mailMocker.assert_queue_consumption_tasks_call_args(
             [
                 [
                     {"override_correspondent_id": c.id},
@@ -1107,15 +1220,18 @@ class TestMail(
             ],
         )
 
-        self._queue_consumption_tasks_mock.reset_mock()
-        self.reset_bogus_mailbox()
+        self.mailMocker._queue_consumption_tasks_mock.reset_mock()
+        reset_bogus_mailbox(
+            self.mailMocker.bogus_mailbox,
+            self.mailMocker.messageBuilder,
+        )
 
         with mock.patch("paperless_mail.mail.Correspondent.objects.get_or_create") as m:
             m.side_effect = DatabaseError()
 
             self.mail_account_handler.handle_mail_account(account)
 
-        self.assert_queue_consumption_tasks_call_args(
+        self.mailMocker.assert_queue_consumption_tasks_call_args(
             [
                 [
                     {"override_correspondent_id": None},
@@ -1153,21 +1269,24 @@ class TestMail(
                     filter_from=f_from,
                     filter_to=f_to,
                 )
-                self.reset_bogus_mailbox()
-                self._queue_consumption_tasks_mock.reset_mock()
+                reset_bogus_mailbox(
+                    self.mailMocker.bogus_mailbox,
+                    self.mailMocker.messageBuilder,
+                )
+                self.mailMocker._queue_consumption_tasks_mock.reset_mock()
 
-                self._queue_consumption_tasks_mock.assert_not_called()
-                self.assertEqual(len(self.bogus_mailbox.messages), 3)
+                self.mailMocker._queue_consumption_tasks_mock.assert_not_called()
+                self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
 
                 self.mail_account_handler.handle_mail_account(account)
-                self.apply_mail_actions()
+                self.mailMocker.apply_mail_actions()
 
                 self.assertEqual(
-                    len(self.bogus_mailbox.messages),
+                    len(self.mailMocker.bogus_mailbox.messages),
                     3 - expected_mail_count,
                 )
                 self.assertEqual(
-                    self._queue_consumption_tasks_mock.call_count,
+                    self.mailMocker._queue_consumption_tasks_mock.call_count,
                     expected_mail_count,
                 )
 
@@ -1194,16 +1313,16 @@ class TestMail(
             action=MailRule.MailAction.MARK_READ,
         )
 
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        self._queue_consumption_tasks_mock.assert_not_called()
-        self.assertEqual(len(self.bogus_mailbox.fetch("UNSEEN", False)), 2)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
+        self.mailMocker._queue_consumption_tasks_mock.assert_not_called()
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", False)), 2)
 
         self.mail_account_handler.handle_mail_account(account)
-        self.apply_mail_actions()
+        self.mailMocker.apply_mail_actions()
 
-        self.assertEqual(self._queue_consumption_tasks_mock.call_count, 2)
-        self.assertEqual(len(self.bogus_mailbox.fetch("UNSEEN", False)), 0)
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+        self.assertEqual(self.mailMocker._queue_consumption_tasks_mock.call_count, 2)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", False)), 0)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
 
     def test_auth_plain_fallback_fails_still(self):
         """
@@ -1260,75 +1379,16 @@ class TestMail(
             action=MailRule.MailAction.MARK_READ,
         )
 
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        self.assertEqual(self._queue_consumption_tasks_mock.call_count, 0)
-        self.assertEqual(len(self.bogus_mailbox.fetch("UNSEEN", False)), 2)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
+        self.assertEqual(self.mailMocker._queue_consumption_tasks_mock.call_count, 0)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", False)), 2)
 
         self.mail_account_handler.handle_mail_account(account)
-        self.apply_mail_actions()
+        self.mailMocker.apply_mail_actions()
 
-        self.assertEqual(self._queue_consumption_tasks_mock.call_count, 2)
-        self.assertEqual(len(self.bogus_mailbox.fetch("UNSEEN", False)), 0)
-        self.assertEqual(len(self.bogus_mailbox.messages), 3)
-
-    def assert_queue_consumption_tasks_call_args(
-        self,
-        expected_call_args: list[list[dict[str, str]]],
-    ):
-        """
-        Verifies that queue_consumption_tasks has been called with the expected arguments.
-
-        expected_call_args is the following format:
-
-        * List of calls to queue_consumption_tasks, called once per mail, where each element is:
-        * List of signatures for the consume_file task, where each element is:
-        * dictionary containing arguments that need to be present in the consume_file signature.
-
-        """
-
-        # assert number of calls to queue_consumption_tasks match
-        self.assertEqual(
-            len(self._queue_consumption_tasks_mock.call_args_list),
-            len(expected_call_args),
-        )
-
-        for (mock_args, mock_kwargs), expected_signatures in zip(
-            self._queue_consumption_tasks_mock.call_args_list,
-            expected_call_args,
-        ):
-            consume_tasks = mock_kwargs["consume_tasks"]
-
-            # assert number of consume_file tasks match
-            self.assertEqual(len(consume_tasks), len(expected_signatures))
-
-            for consume_task, expected_signature in zip(
-                consume_tasks,
-                expected_signatures,
-            ):
-                input_doc, overrides = consume_task.args
-
-                # assert the file exists
-                self.assertIsFile(input_doc.original_file)
-
-                # assert all expected arguments are present in the signature
-                for key, value in expected_signature.items():
-                    if key == "override_correspondent_id":
-                        self.assertEqual(overrides.correspondent_id, value)
-                    elif key == "override_filename":
-                        self.assertEqual(overrides.filename, value)
-                    elif key == "override_title":
-                        self.assertEqual(overrides.title, value)
-                    else:
-                        self.fail("No match for expected arg")
-
-    def apply_mail_actions(self):
-        """
-        Applies pending actions to mails by inspecting calls to the queue_consumption_tasks method.
-        """
-        for args, kwargs in self._queue_consumption_tasks_mock.call_args_list:
-            message = kwargs["message"]
-            rule = kwargs["rule"]
-            apply_mail_action([], rule.pk, message.uid, message.subject, message.date)
+        self.assertEqual(self.mailMocker._queue_consumption_tasks_mock.call_count, 2)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", False)), 0)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
 
 
 class TestManagementCommand(TestCase):

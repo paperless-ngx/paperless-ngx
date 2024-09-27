@@ -34,32 +34,32 @@
               <td class="py-2 py-md-3 position-relative" [ngClass]="{ 'd-none d-md-table-cell': i > 1 }">
                 @switch (field) {
                   @case (DisplayField.ADDED) {
-                    <a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.added | customDate}}</a>
+                    <a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3" title="Open document" i18n-title>{{doc.added | customDate}}</a>
                   }
                   @case (DisplayField.CREATED) {
-                    <a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.created_date | customDate}}</a>
+                    <a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3" title="Open document" i18n-title>{{doc.created_date | customDate}}</a>
                   }
                   @case (DisplayField.TITLE) {
-                    <a routerLink="/documents/{{doc.id}}" title="Edit" i18n-title class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.title | documentTitle}}</a>
+                    <a routerLink="/documents/{{doc.id}}" title="Open document" i18n-title class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.title | documentTitle}}</a>
                   }
                   @case (DisplayField.CORRESPONDENT) {
                     @if (doc.correspondent) {
-                      <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickCorrespondent(doc.correspondent, $event)">{{(doc.correspondent$ | async)?.name}}</a>
+                      <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickCorrespondent(doc.correspondent, $event)" title="Filter by correspondent" i18n-title>{{(doc.correspondent$ | async)?.name}}</a>
                     }
                   }
                   @case (DisplayField.TAGS) {
                     @for (t of doc.tags$ | async; track t) {
-                      <pngx-tag [tag]="t" class="ms-1" (click)="clickTag(t.id, $event)"></pngx-tag>
+                      <pngx-tag [tag]="t" class="ms-1" (click)="clickTag(t.id, $event)" [clickable]="true" linkTitle="Filter by tag" i18n-title></pngx-tag>
                     }
                   }
                   @case (DisplayField.DOCUMENT_TYPE) {
                     @if (doc.document_type) {
-                      <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickDocType(doc.document_type, $event)">{{(doc.document_type$ | async)?.name}}</a>
+                      <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickDocType(doc.document_type, $event)" title="Filter by document type" i18n-title>{{(doc.document_type$ | async)?.name}}</a>
                     }
                   }
                   @case (DisplayField.STORAGE_PATH) {
                     @if (doc.storage_path) {
-                      <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickStoragePath(doc.storage_path, $event)">{{(doc.storage_path$ | async)?.name}}</a>
+                      <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickStoragePath(doc.storage_path, $event)" title="Filter by storage path" i18n-title>{{(doc.storage_path$ | async)?.name}}</a>
                     }
                   }
                 }
@@ -88,7 +88,7 @@
       </tbody>
     </table>
   } @else if (documents.length && displayMode === DisplayMode.SMALL_CARDS) {
-    <div class="row row-cols-paperless-cards my-n2">
+    <div content class="row row-cols-paperless-cards my-n2">
       @for (d of documents; track d.id) {
         <pngx-document-card-small
           class="p-0"
@@ -103,7 +103,7 @@
       }
     </div>
   } @else if (documents.length && displayMode === DisplayMode.LARGE_CARDS) {
-    <div class="row my-n2">
+    <div content class="row my-n2">
       @for (d of documents; track d.id) {
         <pngx-document-card-large
           (dblClickDocument)="openDocumentDetail(d)"
@@ -118,7 +118,7 @@
       }
     </div>
   } @else {
-    <p i18n class="text-center text-muted mb-0 fst-italic">No documents</p>
+    <p content i18n class="text-center text-muted mb-0 fst-italic">No documents</p>
   }
 
 

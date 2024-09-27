@@ -1,16 +1,23 @@
 import { TestBed } from '@angular/core/testing'
 import { CustomDatePipe } from './custom-date.pipe'
 import { SettingsService } from '../services/settings.service'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { DatePipe } from '@angular/common'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('CustomDatePipe', () => {
   let datePipe: CustomDatePipe
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [CustomDatePipe, SettingsService, DatePipe],
-      imports: [HttpClientTestingModule],
+      imports: [],
+      providers: [
+        CustomDatePipe,
+        SettingsService,
+        DatePipe,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
     })
 
     datePipe = TestBed.inject(CustomDatePipe)

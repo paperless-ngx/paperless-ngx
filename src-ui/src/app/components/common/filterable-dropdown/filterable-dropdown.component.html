@@ -35,7 +35,7 @@
       </div>
       @if (selectionModel.items) {
         <div class="items" #buttonItems>
-          @for (item of selectionModel.itemsSorted | filter: filterText; track item; let i = $index) {
+          @for (item of selectionModel.itemsSorted | filter: filterText:'name'; track item; let i = $index) {
             @if (allowSelectNone || item.id) {
               <pngx-toggleable-dropdown-button
                 [item]="item" [hideCount]="hideCount(item)" [state]="selectionModel.get(item.id)" [count]="getUpdatedDocumentCount(item.id)" (toggle)="selectionModel.toggle(item.id)" (exclude)="excludeClicked(item.id)" (click)="setButtonItemIndex(i - 1)" [disabled]="disabled">
@@ -45,13 +45,13 @@
         </div>
       }
       @if (editing) {
-        @if ((selectionModel.itemsSorted | filter: filterText).length === 0 && createRef !== undefined) {
+        @if ((selectionModel.itemsSorted | filter: filterText:'name').length === 0 && createRef !== undefined) {
           <button class="list-group-item list-group-item-action bg-light" (click)="createClicked()" [disabled]="disabled">
             <small class="ms-2"><ng-container i18n>Create</ng-container> "{{filterText}}"</small>
             <i-bs width="1.5em" height="1em" name="plus"></i-bs>
           </button>
         }
-        @if ((selectionModel.itemsSorted | filter: filterText).length > 0) {
+        @if ((selectionModel.itemsSorted | filter: filterText:'name').length > 0) {
           <button class="list-group-item list-group-item-action bg-light" (click)="applyClicked()" [disabled]="!modelIsDirty || disabled">
             <small class="ms-2" [ngClass]="{'fw-bold': modelIsDirty}" i18n>Apply</small>
             <i-bs width="1.5em" height="1em" name="arrow-right"></i-bs>

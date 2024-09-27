@@ -1,12 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { SplitConfirmDialogComponent } from './split-confirm-dialog.component'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ReactiveFormsModule, FormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { PdfViewerModule } from 'ng2-pdf-viewer'
+import { of } from 'rxjs'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('SplitConfirmDialogComponent', () => {
   let component: SplitConfirmDialogComponent
@@ -16,13 +18,16 @@ describe('SplitConfirmDialogComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [SplitConfirmDialogComponent],
-      providers: [NgbActiveModal],
       imports: [
-        HttpClientTestingModule,
         NgxBootstrapIconsModule.pick(allIcons),
         ReactiveFormsModule,
         FormsModule,
         PdfViewerModule,
+      ],
+      providers: [
+        NgbActiveModal,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 
@@ -30,6 +35,14 @@ describe('SplitConfirmDialogComponent', () => {
     documentService = TestBed.inject(DocumentService)
     component = fixture.componentInstance
     fixture.detectChanges()
+  })
+
+  it('should load document on init', () => {
+    const getSpy = jest.spyOn(documentService, 'get')
+    component.documentID = 1
+    getSpy.mockReturnValue(of({ id: 1 } as any))
+    component.ngOnInit()
+    expect(documentService.get).toHaveBeenCalledWith(1)
   })
 
   it('should update pagesString when pages are added', () => {
@@ -78,5 +91,17 @@ describe('SplitConfirmDialogComponent', () => {
   it('should update totalPages when pdf is loaded', () => {
     component.pdfPreviewLoaded({ numPages: 5 } as any)
     expect(component.totalPages).toEqual(5)
+  })
+
+  it('should correctly disable split button', () => {
+    component.totalPages = 5
+    component.page = 1
+    expect(component.canSplit).toBeTruthy()
+    component.page = 5
+    expect(component.canSplit).toBeFalsy()
+    component.page = 4
+    expect(component.canSplit).toBeTruthy()
+    component['pages'] = new Set([1, 2, 3, 4])
+    expect(component.canSplit).toBeFalsy()
   })
 })

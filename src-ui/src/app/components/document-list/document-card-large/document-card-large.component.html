@@ -72,7 +72,7 @@
             <div class="list-group list-group-horizontal border-0 card-info ms-md-auto mt-2 mt-md-0">
               @if (displayFields.includes(DisplayField.NOTES) && notesEnabled && document.notes.length) {
                 <button routerLink="/documents/{{document.id}}/notes" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2 d-flex align-items-center" title="View notes" i18n-title>
-                  <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="chat-left-text"></i-bs><small i18n>{{document.notes.length}} Notes</small>
+                  <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="chat-left-text"></i-bs><small>{{document.notes.length}} Notes</small>
                 </button>
               }
               @if (displayFields.includes(DisplayField.DOCUMENT_TYPE) && document.document_type) {
@@ -127,7 +127,7 @@
                   <ngb-progressbar [type]="searchScoreClass" [value]="document.__search_hit__.score" class="search-score-bar mx-2 mt-1" [max]="1"></ngb-progressbar>
                 </div>
               }
-              @for (field of document.custom_fields; track field.id) {
+              @for (field of document.custom_fields; track field.field) {
                 @if (displayFields.includes(DisplayField.CUSTOM_FIELD + field.field)) {
                   <div class="list-group-item bg-light text-dark p-1 border-0 d-flex align-items-center">
                     <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="ui-radios"></i-bs>

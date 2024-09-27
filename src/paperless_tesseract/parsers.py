@@ -258,7 +258,7 @@ class RasterisedDocumentParser(DocumentParser):
             ocrmypdf_args["sidecar"] = sidecar_file
 
         if self.is_image(mime_type):
-            # This may be required, depending on the known imformation
+            # This may be required, depending on the known information
             maybe_override_pixel_limit()
 
             dpi = self.get_dpi(input_file)

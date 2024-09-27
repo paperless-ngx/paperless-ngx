@@ -1,0 +1,43 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "manage.py runserver",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/manage.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["runserver"],
+            "django": true
+        },
+        {
+            "name": "manage.py document_consumer",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/manage.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["document_consumer"],
+            "django": true
+        },
+        {
+            "name": "celery",
+            "type": "python",
+            "cwd": "${workspaceFolder}/src",
+            "request": "launch",
+            "module": "celery",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src"
+              },
+            "args": [
+                "-A",
+                "paperless",
+                "worker",
+                "-l",
+                "DEBUG"
+            ]
+        }
+    ]
+}

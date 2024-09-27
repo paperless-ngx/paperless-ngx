@@ -1,6 +1,6 @@
 import {
-  HttpClientTestingModule,
   HttpTestingController,
+  provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import { Subscription } from 'rxjs'
 import { TestBed } from '@angular/core/testing'
@@ -14,6 +14,7 @@ import {
   DOCUMENT_SORT_FIELDS_FULLTEXT,
 } from 'src/app/data/document'
 import { PermissionsService } from '../permissions.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 let httpTestingController: HttpTestingController
 let service: DocumentService
@@ -45,8 +46,12 @@ const documents = [
 
 beforeEach(() => {
   TestBed.configureTestingModule({
-    providers: [DocumentService],
-    imports: [HttpClientTestingModule],
+    imports: [],
+    providers: [
+      DocumentService,
+      provideHttpClient(withInterceptorsFromDi()),
+      provideHttpClientTesting(),
+    ],
   })
 
   httpTestingController = TestBed.inject(HttpTestingController)

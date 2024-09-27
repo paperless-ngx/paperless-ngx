@@ -10,7 +10,7 @@ import {
   DateSelection,
   RelativeDate,
 } from './dates-dropdown.component'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
@@ -18,6 +18,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DatePipe } from '@angular/common'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('DatesDropdownComponent', () => {
   let component: DatesDropdownComponent
@@ -31,13 +32,18 @@ describe('DatesDropdownComponent', () => {
         ClearableBadgeComponent,
         CustomDatePipe,
       ],
-      providers: [SettingsService, CustomDatePipe, DatePipe],
       imports: [
-        HttpClientTestingModule,
         NgbModule,
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+      ],
+      providers: [
+        SettingsService,
+        CustomDatePipe,
+        DatePipe,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 

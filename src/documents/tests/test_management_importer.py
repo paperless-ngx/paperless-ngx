@@ -14,9 +14,15 @@ from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
+from documents.tests.utils import SampleDirMixin
 
 
-class TestCommandImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
+class TestCommandImport(
+    DirectoriesMixin,
+    FileSystemAssertsMixin,
+    SampleDirMixin,
+    TestCase,
+):
     def test_check_manifest_exists(self):
         """
         GIVEN:
@@ -119,15 +125,16 @@ class TestCommandImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                     EXPORTER_ARCHIVE_NAME: "archive.pdf",
                 },
             ]
+            cmd.data_only = False
             with self.assertRaises(CommandError) as cm:
-                cmd._check_manifest_valid()
+                cmd.check_manifest_validity()
                 self.assertInt("Failed to read from original file", str(cm.exception))
 
             original_path.chmod(0o444)
             archive_path.chmod(0o222)
 
             with self.assertRaises(CommandError) as cm:
-                cmd._check_manifest_valid()
+                cmd.check_manifest_validity()
                 self.assertInt("Failed to read from archive file", str(cm.exception))
 
     def test_import_source_not_existing(self):
@@ -234,7 +241,7 @@ class TestCommandImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         stdout.seek(0)
         self.assertIn(
             "Found existing user(s), this might indicate a non-empty installation",
-            str(stdout.read()),
+            stdout.read(),
         )
 
     def test_import_with_documents_exists(self):
@@ -272,3 +279,59 @@ class TestCommandImport(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             "Found existing documents(s), this might indicate a non-empty installation",
             str(stdout.read()),
         )
+
+    def test_import_no_metadata_or_version_file(self):
+        """
+        GIVEN:
+            - A source directory with a manifest file only
+        WHEN:
+            - An import is attempted
+        THEN:
+            - Warning about the missing files is output
+        """
+        stdout = StringIO()
+
+        (self.dirs.scratch_dir / "manifest.json").touch()
+
+        # We're not building a manifest, so it fails, but this test doesn't care
+        with self.assertRaises(json.decoder.JSONDecodeError):
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                str(self.dirs.scratch_dir),
+                stdout=stdout,
+            )
+        stdout.seek(0)
+        stdout_str = str(stdout.read())
+
+        self.assertIn("No version.json or metadata.json file located", stdout_str)
+
+    def test_import_version_file(self):
+        """
+        GIVEN:
+            - A source directory with a manifest file and version file
+        WHEN:
+            - An import is attempted
+        THEN:
+            - Warning about the the version mismatch is output
+        """
+        stdout = StringIO()
+
+        (self.dirs.scratch_dir / "manifest.json").touch()
+        (self.dirs.scratch_dir / "version.json").write_text(
+            json.dumps({"version": "2.8.1"}),
+        )
+
+        # We're not building a manifest, so it fails, but this test doesn't care
+        with self.assertRaises(json.decoder.JSONDecodeError):
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                str(self.dirs.scratch_dir),
+                stdout=stdout,
+            )
+        stdout.seek(0)
+        stdout_str = str(stdout.read())
+
+        self.assertIn("Version mismatch:", stdout_str)
+        self.assertIn("importing 2.8.1", stdout_str)

@@ -1,4 +1,4 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
@@ -12,6 +12,8 @@ import { TextComponent } from '../../input/text/text.component'
 import { PermissionsSelectComponent } from '../../permissions-select/permissions-select.component'
 import { EditDialogMode } from '../edit-dialog.component'
 import { GroupEditDialogComponent } from './group-edit-dialog.component'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 describe('GroupEditDialogComponent', () => {
   let component: GroupEditDialogComponent
@@ -29,13 +31,17 @@ describe('GroupEditDialogComponent', () => {
         PermissionsFormComponent,
         PermissionsSelectComponent,
       ],
-      providers: [NgbActiveModal],
       imports: [
-        HttpClientTestingModule,
         FormsModule,
         ReactiveFormsModule,
         NgSelectModule,
         NgbModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+      ],
+      providers: [
+        NgbActiveModal,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
 

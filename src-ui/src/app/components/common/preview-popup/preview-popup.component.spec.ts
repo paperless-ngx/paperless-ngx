@@ -5,10 +5,11 @@ import { By } from '@angular/platform-browser'
 import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { SettingsService } from 'src/app/services/settings.service'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { PdfViewerModule } from 'ng2-pdf-viewer'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const doc = {
   id: 10,
@@ -26,10 +27,10 @@ describe('PreviewPopupComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [PreviewPopupComponent, SafeUrlPipe],
-      imports: [
-        HttpClientTestingModule,
-        NgxBootstrapIconsModule.pick(allIcons),
-        PdfViewerModule,
+      imports: [NgxBootstrapIconsModule.pick(allIcons), PdfViewerModule],
+      providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     })
     settingsService = TestBed.inject(SettingsService)

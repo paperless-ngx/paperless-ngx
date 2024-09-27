@@ -2,10 +2,11 @@ import { TestBed } from '@angular/core/testing'
 
 import { SystemStatusService } from './system-status.service'
 import {
-  HttpClientTestingModule,
   HttpTestingController,
+  provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import { environment } from 'src/environments/environment'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('SystemStatusService', () => {
   let httpTestingController: HttpTestingController
@@ -13,8 +14,12 @@ describe('SystemStatusService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [SystemStatusService],
-      imports: [HttpClientTestingModule],
+      imports: [],
+      providers: [
+        SystemStatusService,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
     })
 
     httpTestingController = TestBed.inject(HttpTestingController)

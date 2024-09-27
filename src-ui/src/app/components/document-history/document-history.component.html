@@ -27,31 +27,33 @@
                         }
                         <span class="badge bg-secondary ms-auto" [class.bg-primary]="entry.action === AuditLogAction.Create">{{ entry.action | titlecase }}</span>
                     </div>
-                    @if (entry.action === AuditLogAction.Update) {
-                        <ul class="mt-2">
-                            @for (change of entry.changes | keyvalue; track change.key) {
-                                @if (change.value["type"] === 'm2m') {
-                                    <li>
-                                        <span class="fst-italic" i18n>{{ change.value["operation"] | titlecase }}</span>&nbsp;
-                                        <span>{{ change.key | titlecase }}</span>:&nbsp;
-                                        <code class="text-primary">{{ change.value["objects"].join(', ') }}</code>
-                                    </li>
-                                }
-                                @else if (change.value["type"] === 'custom_field') {
-                                    <li>
-                                        <span>{{ change.value["field"] }}</span>:&nbsp;
-                                        <code class="text-primary">{{ change.value["value"] }}</code>
-                                    </li>
-                                }
-                                @else {
-                                    <li>
-                                        <span>{{ change.key | titlecase }}</span>:&nbsp;
-                                        <code class="text-primary">{{ change.value[1] }}</code>
-                                    </li>
-                                }
+                    <ul class="mt-2">
+                        @for (change of entry.changes | keyvalue; track change.key) {
+                            @if (change.value["type"] === 'm2m') {
+                                <li>
+                                    <span class="fst-italic">{{ change.value["operation"] | titlecase }}</span>&nbsp;
+                                    <span>{{ change.key | titlecase }}</span>:&nbsp;
+                                    <code class="text-primary">{{ change.value["objects"].join(', ') }}</code>
+                                </li>
                             }
-                        </ul>
-                    }
+                            @else if (change.value["type"] === 'custom_field') {
+                                <li>
+                                    <span>{{ change.value["field"] }}</span>:&nbsp;
+                                    <code class="text-primary">{{ change.value["value"] }}</code>
+                                </li>
+                            }
+                            @else {
+                                <li>
+                                    <span>{{ change.key | titlecase }}</span>:&nbsp;
+                                    @if (change.key === 'content') {
+                                        <code class="text-primary">{{ change.value[1]?.substring(0,100) }}...</code>
+                                    } @else {
+                                        <code class="text-primary">{{ getPrettyName(change.key, change.value[1]) | async }}</code>
+                                    }
+                                </li>
+                            }
+                        }
+                    </ul>
                 </li>
             }
         }
