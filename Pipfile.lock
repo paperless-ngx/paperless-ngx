@@ -3528,12 +3528,12 @@
         },
         "pytest-httpx": {
             "hashes": [
-                "sha256:685d93ce5e5edb5e52310b72342cdc190bebf83aab058328943dd8bd8f6ac790",
-                "sha256:7807647e8254e5cff79bf2041ae272449ce915d3cf1bbecaa581c384163adb87"
+                "sha256:6d47849691faf11d2532565d0c8e0e02b9f4ee730da31687feae315581d7520c",
+                "sha256:755b8edca87c974dd4f3605c374fda11db84631de3d163b99c0df5807023a19a"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.9'",
-            "version": "==0.32.0"
+            "version": "==0.30.0"
         },
         "pytest-mock": {
             "hashes": [
