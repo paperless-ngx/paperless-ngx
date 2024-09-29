@@ -104,6 +104,7 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
         self._create_document(monetary_field="USD100.00")
         self._create_document(monetary_field="USD1.00")
         self._create_document(monetary_field="EUR50.00")
+        self._create_document(monetary_field="101.00")
 
         # CustomField.FieldDataType.DOCUMENTLINK
         self._create_document(documentlink_field=None)
@@ -398,7 +399,10 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
             ["monetary_field", "gt", "99"],
             lambda document: "monetary_field" in document
             and document["monetary_field"] is not None
-            and document["monetary_field"] == "USD100.00",
+            and (
+                document["monetary_field"] == "USD100.00"  # With currency symbol
+                or document["monetary_field"] == "101.00"  # No currency symbol
+            ),
         )
 
     # ==========================================================#
