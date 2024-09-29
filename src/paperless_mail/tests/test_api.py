@@ -87,6 +87,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
             "imap_port": 443,
             "imap_security": MailAccount.ImapSecurity.SSL,
             "character_set": "UTF-8",
+            "enabled": True,
         }
 
         response = self.client.post(
@@ -105,6 +106,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_account1.imap_port, account1["imap_port"])
         self.assertEqual(returned_account1.imap_security, account1["imap_security"])
         self.assertEqual(returned_account1.character_set, account1["character_set"])
+        self.assertEqual(returned_account1.enabled, account1["enabled"])
 
     def test_delete_mail_account(self):
         """

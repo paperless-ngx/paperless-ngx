@@ -27,14 +27,15 @@ class MailAccountAdminForm(forms.ModelForm):
             "password",
             "is_token",
             "character_set",
+            "enabled",
         ]
 
 
 class MailAccountAdmin(GuardedModelAdmin):
-    list_display = ("name", "imap_server", "username")
+    list_display = ("name", "imap_server", "username", "enabled")
 
     fieldsets = [
-        (None, {"fields": ["name", "imap_server", "imap_port"]}),
+        (None, {"fields": ["name", "imap_server", "imap_port", "enabled"]}),
         (
             _("Authentication"),
             {"fields": ["imap_security", "username", "password", "is_token"]},

@@ -39,6 +39,7 @@ class MailAccountSerializer(OwnedObjectSerializer):
             "user_can_change",
             "permissions",
             "set_permissions",
+            "enabled",
         ]
 
     def update(self, instance, validated_data):

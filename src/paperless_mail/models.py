@@ -41,6 +41,12 @@ class MailAccount(document_models.ModelWithOwner):
 
     is_token = models.BooleanField(_("Is token authentication"), default=False)
 
+    enabled = models.BooleanField(
+        _("enabled"),
+        default=True,
+        help_text=_("Whether fetching of mail for this account is enabled."),
+    )
+
     character_set = models.CharField(
         _("character set"),
         max_length=256,

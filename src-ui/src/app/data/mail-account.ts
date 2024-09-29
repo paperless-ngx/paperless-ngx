@@ -22,4 +22,6 @@ export interface MailAccount extends ObjectWithPermissions {
   character_set?: string
 
   is_token: boolean
+
+  enabled: boolean
 }

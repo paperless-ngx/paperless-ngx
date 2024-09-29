@@ -20,6 +20,7 @@
         <div class="col" i18n>Name</div>
         <div class="col" i18n>Server</div>
         <div class="col d-none d-sm-block" i18n>Username</div>
+        <div class="col" i18n>Status</div>
         <div class="col" i18n>Actions</div>
       </div>
     </li>
@@ -30,6 +31,7 @@
           <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editMailAccount(account)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailAccount)">{{account.name}}</button></div>
           <div class="col d-flex align-items-center">{{account.imap_server}}</div>
           <div class="col d-flex align-items-center d-none d-sm-block">{{account.username}}</div>
+          <div class="col d-flex align-items-center"><code> @if(account.enabled) { <ng-container i18n>Enabled</ng-container> } @else { <span i18n class="text-muted">Disabled</span> }</code></div>
           <div class="col">
             <div class="btn-group d-block d-sm-none">
               <div ngbDropdown container="body" class="d-inline-block">

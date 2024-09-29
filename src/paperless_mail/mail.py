@@ -513,6 +513,10 @@ class MailAccountHandler(LoggingMixin):
 
         self.renew_logging_group()
 
+        if not (account.enabled):
+            self.log.info(f"Skipping disabled mail account {account}")
+            return 0
+
         self.log.debug(f"Processing mail account {account}")
 
         total_processed_files = 0

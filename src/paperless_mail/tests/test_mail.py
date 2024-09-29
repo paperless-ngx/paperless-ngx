@@ -1389,6 +1389,34 @@ class TestMail(
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
 
 
+    def test_skip_disabled_mail_account(self):
+        """
+        GIVEN:
+            - Mail account with enabled flag set to False
+        WHEN:
+            - Mail account is handled
+        THEN:
+            - Should skip handling the mail account
+        """
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+            enabled=False,
+        )
+
+        _ = MailRule.objects.create(
+            name="testrule",
+            account=account,
+        )
+
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
+        result = self.mail_account_handler.handle_mail_account(account)
+
+        self.assertEqual(result, 0)
+
+
 class TestManagementCommand(TestCase):
     @mock.patch(
         "paperless_mail.management.commands.mail_fetcher.tasks.process_mail_accounts",

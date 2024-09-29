@@ -52,6 +52,7 @@ export class MailAccountEditDialogComponent extends EditDialogComponent<MailAcco
       password: new FormControl(null),
       is_token: new FormControl(false),
       character_set: new FormControl('UTF-8'),
+      enabled: new FormControl(true),
     })
   }
 
