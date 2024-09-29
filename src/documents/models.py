@@ -23,6 +23,7 @@ if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
 
 from django.db.models import Case
+from django.db.models.functions import Cast
 from django.db.models.functions import Substr
 from django_softdelete.models import SoftDeleteModel
 
@@ -929,10 +930,16 @@ class CustomFieldInstance(models.Model):
             # If the value starts with a number and no currency symbol, use the whole string
             models.When(
                 value_monetary__regex=r"^\d+",
-                then=Substr("value_monetary", 1),
+                then=Cast(
+                    Substr("value_monetary", 1),
+                    output_field=models.DecimalField(decimal_places=2, max_digits=125),
+                ),
             ),
             # If the value starts with a 3-char currency symbol, use the rest of the string
-            default=Substr("value_monetary", 4),
+            default=Cast(
+                Substr("value_monetary", 4),
+                output_field=models.DecimalField(decimal_places=2, max_digits=125),
+            ),
             output_field=models.DecimalField(decimal_places=2, max_digits=125),
         ),
         output_field=models.DecimalField(decimal_places=2, max_digits=125),
