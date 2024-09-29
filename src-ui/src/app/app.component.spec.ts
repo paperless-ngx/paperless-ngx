@@ -167,3 +167,4 @@ describe('AppComponent', () => {
     expect(routerSpy).toHaveBeenCalledWith(['/settings'])
   })
 })
+

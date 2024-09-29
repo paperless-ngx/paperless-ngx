@@ -20,6 +20,7 @@ const mail_accounts = [
     username: 'user',
     password: 'pass',
     is_token: false,
+    enabled: true,
   },
   {
     name: 'Mail Account 2',
@@ -30,6 +31,7 @@ const mail_accounts = [
     username: 'user',
     password: 'pass',
     is_token: false,
+    enabled: true,
   },
   {
     name: 'Mail Account 3',
@@ -40,6 +42,7 @@ const mail_accounts = [
     username: 'user',
     password: 'pass',
     is_token: false,
+    enabled: true,
   },
 ]
 
