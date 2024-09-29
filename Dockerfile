@@ -31,7 +31,7 @@ RUN set -eux \
 # Comments:
 #  - pipenv dependencies are not left in the final image
 #  - pipenv can't touch the final image somehow
-FROM --platform=$BUILDPLATFORM docker.io/python:3.11-alpine AS pipenv-base
+FROM --platform=$BUILDPLATFORM docker.io/python:3.12-alpine AS pipenv-base
 
 WORKDIR /usr/src/pipenv
 
@@ -47,7 +47,7 @@ RUN set -eux \
 # Purpose: The final image
 # Comments:
 #  - Don't leave anything extra in here
-FROM docker.io/python:3.11-slim-bookworm AS main-app
+FROM docker.io/python:3.12-slim-bookworm AS main-app
 
 LABEL org.opencontainers.image.authors="paperless-ngx team <hello@paperless-ngx.com>"
 LABEL org.opencontainers.image.documentation="https://docs.paperless-ngx.com/"
@@ -233,15 +233,15 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
     && python3 -m pip install --no-cache-dir --upgrade wheel \
   && echo "Installing Python requirements" \
     && curl --fail --silent --show-error --location \
-    --output psycopg_c-3.2.2-cp311-cp311-linux_x86_64.whl \
-    https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.2/psycopg_c-3.2.2-cp311-cp311-linux_x86_64.whl \
+    --output psycopg_c-3.2.2-cp312-cp312-linux_x86_64.whl \
+    https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.2/psycopg_c-3.2.2-cp312-cp312-linux_x86_64.whl \
     && curl --fail --silent --show-error --location \
-    --output psycopg_c-3.2.2-cp311-cp311-linux_aarch64.whl  \
-    https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.2/psycopg_c-3.2.2-cp311-cp311-linux_aarch64.whl \
+    --output psycopg_c-3.2.2-cp312-cp312-linux_aarch64.whl  \
+    https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.2/psycopg_c-3.2.2-cp312-cp312-linux_aarch64.whl \
     && python3 -m pip install --default-timeout=1000 --find-links . --requirement requirements.txt \
   && echo "Patching whitenoise for compression speedup" \
     && curl --fail --silent --show-error --location --output 484.patch https://github.com/evansd/whitenoise/pull/484.patch \
-    && patch -d /usr/local/lib/python3.11/site-packages --verbose -p2 < 484.patch \
+    && patch -d /usr/local/lib/python3.12/site-packages --verbose -p2 < 484.patch \
     && rm 484.patch \
   && echo "Installing NLTK data" \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" snowball_data \
