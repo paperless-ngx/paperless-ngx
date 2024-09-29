@@ -932,17 +932,17 @@ class CustomFieldInstance(models.Model):
                 value_monetary__regex=r"^\d+",
                 then=Cast(
                     Substr("value_monetary", 1),
-                    output_field=models.DecimalField(decimal_places=2, max_digits=125),
+                    output_field=models.DecimalField(decimal_places=2, max_digits=65),
                 ),
             ),
             # If the value starts with a 3-char currency symbol, use the rest of the string
             default=Cast(
                 Substr("value_monetary", 4),
-                output_field=models.DecimalField(decimal_places=2, max_digits=125),
+                output_field=models.DecimalField(decimal_places=2, max_digits=65),
             ),
-            output_field=models.DecimalField(decimal_places=2, max_digits=125),
+            output_field=models.DecimalField(decimal_places=2, max_digits=65),
         ),
-        output_field=models.DecimalField(decimal_places=2, max_digits=125),
+        output_field=models.DecimalField(decimal_places=2, max_digits=65),
         db_persist=True,
     )
 
