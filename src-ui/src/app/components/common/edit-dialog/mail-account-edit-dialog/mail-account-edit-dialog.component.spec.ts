@@ -82,6 +82,7 @@ describe('MailAccountEditDialogComponent', () => {
       imap_port: 443,
       imap_security: IMAPSecurity.SSL,
       is_token: false,
+      enabled: true
     }
 
     // success
