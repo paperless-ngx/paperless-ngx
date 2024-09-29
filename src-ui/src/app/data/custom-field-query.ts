@@ -93,6 +93,7 @@ export const CUSTOM_FIELD_QUERY_OPERATOR_GROUPS_BY_TYPE = {
   [CustomFieldDataType.Monetary]: [
     CustomFieldQueryOperatorGroups.Basic,
     CustomFieldQueryOperatorGroups.String,
+    CustomFieldQueryOperatorGroups.Arithmetic,
   ],
   [CustomFieldDataType.DocumentLink]: [
     CustomFieldQueryOperatorGroups.Basic,

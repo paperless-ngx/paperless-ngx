@@ -261,7 +261,7 @@ class CustomFieldQueryParser:
         CustomField.FieldDataType.BOOL: ("basic",),
         CustomField.FieldDataType.INT: ("basic", "arithmetic"),
         CustomField.FieldDataType.FLOAT: ("basic", "arithmetic"),
-        CustomField.FieldDataType.MONETARY: ("basic", "string"),
+        CustomField.FieldDataType.MONETARY: ("basic", "string", "arithmetic"),
         CustomField.FieldDataType.DOCUMENTLINK: ("basic", "containment"),
         CustomField.FieldDataType.SELECT: ("basic",),
     }
@@ -417,6 +417,13 @@ class CustomFieldQueryParser:
         value_field_name = CustomFieldInstance.get_value_field_name(
             custom_field.data_type,
         )
+        if custom_field.data_type == CustomField.FieldDataType.MONETARY and op in (
+            "gt",
+            "gte",
+            "lt",
+            "lte",
+        ):
+            value_field_name = "value_monetary_amount"
         has_field = Q(custom_fields__field=custom_field)
 
         # Our special exists operator.

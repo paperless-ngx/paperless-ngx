@@ -22,6 +22,7 @@ from multiselectfield import MultiSelectField
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
 
+from django.db.models.functions import Substr
 from django_softdelete.models import SoftDeleteModel
 
 from documents.data_models import DocumentSource
@@ -921,6 +922,12 @@ class CustomFieldInstance(models.Model):
     value_float = models.FloatField(null=True)
 
     value_monetary = models.CharField(null=True, max_length=128)
+
+    value_monetary_amount = models.GeneratedField(
+        expression=Substr("value_monetary", 4),
+        output_field=models.DecimalField(decimal_places=2, max_digits=125),
+        db_persist=True,
+    )
 
     value_document_ids = models.JSONField(null=True)
 

@@ -393,6 +393,14 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
             and document["date_field"].year >= 2024,
         )
 
+    def test_gt_monetary(self):
+        self._assert_query_match_predicate(
+            ["monetary_field", "gt", "99"],
+            lambda document: "monetary_field" in document
+            and document["monetary_field"] is not None
+            and document["monetary_field"] == "USD100.00",
+        )
+
     # ==========================================================#
     # Subset check (document link field only)                   #
     # ==========================================================#
