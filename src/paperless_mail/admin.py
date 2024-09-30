@@ -53,7 +53,7 @@ class MailRuleAdmin(GuardedModelAdmin):
     }
 
     fieldsets = (
-        (None, {"fields": ("name", "order", "account", "folder")}),
+        (None, {"fields": ("name", "order", "account", "enabled", "folder")}),
         (
             _("Filter"),
             {
