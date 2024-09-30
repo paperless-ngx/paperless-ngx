@@ -28,6 +28,7 @@ from imap_tools import MailboxFolderSelectError
 from imap_tools import MailBoxUnencrypted
 from imap_tools import MailMessage
 from imap_tools import MailMessageFlags
+from imap_tools import errors
 from imap_tools.mailbox import MailBoxTls
 from imap_tools.query import LogicOperator
 
@@ -266,7 +267,14 @@ def apply_mail_action(
             M.folder.set(rule.folder)
 
             action = get_rule_action(rule, supports_gmail_labels)
-            action.post_consume(M, message_uid, rule.action_parameter)
+            try:
+                action.post_consume(M, message_uid, rule.action_parameter)
+            except errors.ImapToolsError:
+                logger = logging.getLogger("paperless_mail")
+                logger.exception(
+                    "Error while processing mail action during post_consume",
+                )
+                raise
 
         ProcessedMail.objects.create(
             owner=rule.owner,
