@@ -78,6 +78,7 @@
         <div class="col" i18n>Name</div>
         <div class="col d-none d-sm-block" i18n>Sort Order</div>
         <div class="col" i18n>Account</div>
+        <div class="col d-none d-sm-block" i18n>Status</div>
         <div class="col" i18n>Actions</div>
       </div>
     </li>
@@ -88,6 +89,7 @@
           <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editMailRule(rule)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailRule)">{{rule.name}}</button></div>
           <div class="col d-flex align-items-center d-none d-sm-block">{{rule.order}}</div>
           <div class="col d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
+          <div class="col d-flex align-items-center d-none d-sm-block"><code> @if(rule.enabled) { <ng-container i18n>Enabled</ng-container> } @else { <span i18n class="text-muted">Disabled</span> }</code></div>
           <div class="col">
             <div class="btn-group d-block d-sm-none">
               <div ngbDropdown container="body" class="d-inline-block">
