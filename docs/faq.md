@@ -132,3 +132,11 @@ Multiple options for ASGI servers exist:
 - `daphne` as a standalone server, which is the reference
   implementation for ASGI.
 - `uvicorn` as a standalone server
+
+## _What about the Redis licensing change and using one of the open source forks_?
+
+Currently, forks of Redis such as Valkey or Redirect are not officially supported by our upstream
+libraries, so using one of these to replace Redis is not officially supported.
+
+However, they do claim to be compatible with the Redis protocol and will likely work, but we will
+not be updating from using Redis as the broker officially just yet.
