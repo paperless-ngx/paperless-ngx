@@ -567,13 +567,17 @@ class MailAccountHandler(LoggingMixin):
         rule: MailRule,
         supports_gmail_labels: bool,
     ):
-        self.log.debug(f"Rule {rule}: Selecting folder {rule.folder}")
-
+        folders = [rule.folder]
+        # In case of MOVE, make sure also the destination exists
+        if rule.action == MailRule.MailAction.MOVE:
+            folders.insert(0, rule.action_parameter)
         try:
-            M.folder.set(rule.folder)
+            for folder in folders:
+                self.log.debug(f"Rule {rule}: Selecting folder {folder}")
+                M.folder.set(folder)
         except MailboxFolderSelectError as err:
             self.log.error(
-                f"Unable to access folder {rule.folder}, attempting folder listing",
+                f"Unable to access folder {folder}, attempting folder listing",
             )
             try:
                 for folder_info in M.folder.list():
@@ -585,7 +589,7 @@ class MailAccountHandler(LoggingMixin):
                 )
 
             raise MailError(
-                f"Rule {rule}: Folder {rule.folder} "
+                f"Rule {rule}: Folder {folder} "
                 f"does not exist in account {rule.account}",
             ) from err
 
