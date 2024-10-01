@@ -1141,3 +1141,34 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         # Ensure that filename is properly generated
         document.filename = generate_filename(document)
         self.assertEqual(document.filename, "XX/doc1.pdf")
+
+    def test_complex_template_strings(self):
+        sp = StoragePath.objects.create(
+            name="sp1",
+            path="""{% if document.checksum == \"2\" %}
+                          {{created}}
+                        {% else %}
+                          {{added}}
+                        {% endif %}""",
+        )
+
+        doc_a = Document.objects.create(
+            title="Does Matter",
+            created=timezone.make_aware(datetime.datetime(2020, 6, 25, 7, 36, 51, 153)),
+            added=timezone.make_aware(datetime.datetime(2024, 10, 1, 7, 36, 51, 153)),
+            mime_type="application/pdf",
+            pk=2,
+            checksum="2",
+            archive_serial_number=4,
+            storage_path=sp,
+        )
+
+        self.assertEqual(generate_filename(doc_a), "2020-06-25.pdf")
+        doc_a.checksum = "5"
+
+        self.assertEqual(generate_filename(doc_a), "2024-10-01.pdf")
+
+        sp.path = '{{ document.title|lower }}{{ document.asn|add:"-2" }}'
+        sp.save()
+
+        self.assertEqual(generate_filename(doc_a), "does matter-2.pdf")
