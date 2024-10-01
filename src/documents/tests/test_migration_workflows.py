@@ -8,7 +8,7 @@ class TestMigrateWorkflow(TestMigrations):
     dependencies = (
         (
             "paperless_mail",
-            "0025_alter_mailaccount_owner_alter_mailrule_owner_and_more",
+            "0026_mailrule_enabled",
         ),
     )
 
