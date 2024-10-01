@@ -510,7 +510,6 @@ class Consumer(LoggingMixin):
                         if f.get("name") == data_ocr_fields[1]:
                             mapping_field_user_args = f.get("mapping",[])
                     map_fields = {}
-            
                     for key,value in mapping_field_user_args[0].items():
                         map_fields[key]=dict_data.get(value)
                     for f in fields:
@@ -518,16 +517,14 @@ class Consumer(LoggingMixin):
                     CustomFieldInstance.objects.bulk_update(fields, ['value_text'])
         except Exception as e:
             self.log.error("error ocr field",e)
-            
+
     def fill_custom_field(self,document:Document, data_ocr_fields, dossier_file:Dossier):
         dict_data = {}
-                
         if data_ocr_fields is not None and isinstance(data_ocr_fields[0], list) == True:
-            if len(data_ocr_fields[0])>=1:    
+            if len(data_ocr_fields[0])>=1:
                 for r in data_ocr_fields[0][0].get("fields"):
 
                     dict_data[r.get("name")] = r.get("values")[0].get("value") if r.get("values") else None
-                             
                 custom_fields = CustomFieldInstance.objects.filter(dossier=document.dossier)
                 document_dossier_form = self.get_config_dossier_form()
                 custom_fields_form = CustomFieldInstance.objects.filter(dossier_form=document_dossier_form)
@@ -538,7 +535,7 @@ class Consumer(LoggingMixin):
                 if(custom_fields_form):
                     for r in custom_fields_form:
                         r: CustomFieldInstance
-                     
+
                         if dict_custom_fields.get(r.field) is not None:
                             dict_custom_fields[r.field].value_text=dict_data.get(r.match_value)
                         # self.log.info('gia tri field',r.field)
@@ -548,18 +545,18 @@ class Consumer(LoggingMixin):
                         CustomFieldInstance.objects.update_or_create(field=r.field,
                                                                      document=document,
                                                                      defaults={"value_text":dict_data.get(r.match_value),"dossier":dossier_file})
-                        
+
                 #     for r in custom_fields:
                 #         r: CustomFieldInstance
-                       
+
                 #         r.value_text = dict_data.get(r.match_value)
                 #         # self.log.debug("gia tri value map",r.match_value)
                 #         # create dossier file
                 #         # CustomFieldInstance.objects.create(field=r.field,
                 #         #                                    value_text=dict_data.get(r.match_value),
                 #         #                                    dossier = dossier_file,
-                #         #                                    document=document) 
-                
+                #         #                                    document=document)
+
                 CustomFieldInstance.objects.bulk_update(custom_fields, ['value_text'])
                 # assign new value to dossier by dossier_form----------------
 
@@ -573,8 +570,8 @@ class Consumer(LoggingMixin):
                     if dict_custom_fields_dossier_document.get(field) is not None:
 
                         dict_custom_fields_document_reference[obj.id]=dict_custom_fields_dossier_document.get(field)
-               
-                # get dossier_form by document_form 
+
+                # get dossier_form by document_form
                 lst_id_dossier = dossier_file.path.split("/")
                 lst_id_dossier = [int(num) for num in lst_id_dossier]
                 lst_dossiers = Dossier.objects.filter(id__in=lst_id_dossier,type="DOSSIER")
@@ -597,10 +594,10 @@ class Consumer(LoggingMixin):
                         if dict_custom_fields_document_reference.get(field) is not None:
                             obj:CustomFieldInstance
                             obj.value_text=dict_custom_fields_document_reference.get(field).value_text
-                    CustomFieldInstance.objects.bulk_update(dict_custom_fields_dossier_reference.values(), ['value_text'])        
+                    CustomFieldInstance.objects.bulk_update(dict_custom_fields_dossier_reference.values(), ['value_text'])
 
-                
-                
+
+
     def get_config_dossier_form(self):
         if self.override_dossier_id is None:
             return None
@@ -650,8 +647,8 @@ class Consumer(LoggingMixin):
         self.override_change_users = override_change_users
         self.override_change_groups = override_change_groups
         self.override_custom_field_ids = override_custom_field_ids
-        
-    
+
+
         self._send_progress(
             0,
             100,
@@ -737,7 +734,7 @@ class Consumer(LoggingMixin):
             enable_ocr = ApplicationConfiguration.objects.filter().first().enable_ocr
             if enable_ocr:
                 self.log.debug(f"Parsing {self.filename}...")
-               
+
                 if isinstance(document_parser,RasterisedDocumentCustomParser):
                     data_ocr_fields = document_parser.parse(self.working_copy, mime_type, self.filename, self.get_config_dossier_form())
                 else:
@@ -817,7 +814,6 @@ class Consumer(LoggingMixin):
                 )
                  # create file from document
                 # self.log.info('gia tri documentt', document.folder)
-                
                 new_file = Folder.objects.create(name=document.title, parent_folder = document.folder,type = Folder.FILE, owner = document.owner, created = document.created, updated = document.modified)
                 new_file.checksum=hashlib.md5(f'{new_file.id}.{new_file.name}'.encode()).hexdigest()
                 if document.folder :
@@ -843,7 +839,7 @@ class Consumer(LoggingMixin):
                 else:
                     new_dossier_document.path = f"{new_file.id}"
                 new_dossier_document.save()
-                
+
 
                 if data_ocr_fields[1] == '' and isinstance(data_ocr_fields[0], list):
                     self.fill_custom_field(document, data_ocr_fields, new_dossier_document)
@@ -1040,7 +1036,7 @@ class Consumer(LoggingMixin):
             document.storage_path = StoragePath.objects.get(
                 pk=self.override_storage_path_id,
             )
-        
+
         if self.override_folder_id:
             document.folder = Folder.objects.get(
                 pk=self.override_folder_id,
@@ -1050,7 +1046,7 @@ class Consumer(LoggingMixin):
             document.dossier = Dossier.objects.get(
                 pk=self.override_dossier_id,
             )
-        
+
         if self.override_warehouse_id:
             document.warehouse = Warehouse.objects.get(
                 pk=self.override_warehouse_id,

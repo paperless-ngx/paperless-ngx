@@ -137,7 +137,8 @@ class RasterisedDocumentCustomParser(DocumentParser):
                 x, y = im.info["dpi"]
                 return round(x)
         except Exception as e:
-            self.log.warning(f"Error while getting DPI from image {image}: {e}")
+            self.log.warning(
+                f"Error while getting DPI from image {image}: {e}")
             return None
 
     def calculate_a4_dpi(self, image) -> Optional[int]:
@@ -146,40 +147,43 @@ class RasterisedDocumentCustomParser(DocumentParser):
                 width, height = im.size
                 # divide image width by A4 width (210mm) in inches.
                 dpi = int(width / (21 / 2.54))
-                self.log.debug(f"Estimated DPI {dpi} based on image width {width}")
+                self.log.debug(
+                    f"Estimated DPI {dpi} based on image width {width}")
                 return dpi
 
         except Exception as e:
-            self.log.warning(f"Error while calculating DPI for image {image}: {e}")
+            self.log.warning(
+                f"Error while calculating DPI for image {image}: {e}")
             return None
-        
-    # call api 
+
+    # call api
     def call_ocr_api_with_retries(self, method, url, headers, params, payload,
                                   max_retries=5, delay=5, timeout=100,
                                   status_code_success=[200],
-                                  status_code_fail=[],data_compare={}):
+                                  status_code_fail=[], data_compare={}):
         retries = 0
         data_ocr = None
         while retries < max_retries:
             try:
                 response_ocr = requests.request(method, url, headers=headers,
                                                 params=params, data=payload,
-                                                timeout=timeout,)
+                                                timeout=timeout, )
                 if response_ocr.status_code in status_code_success:
-                    flag=False
-                    for key,value in data_compare.items():
-                        if response_ocr.json().get(key,None) == value:
-                            flag=True
+                    flag = False
+                    for key, value in data_compare.items():
+                        if response_ocr.json().get(key, None) == value:
+                            flag = True
                             break
                     if flag:
                         retries += 1
                         time.sleep(delay)
                     else:
                         return response_ocr.json()
-                if response_ocr.status_code in status_code_fail :
+                if response_ocr.status_code in status_code_fail:
                     return False
                 else:
-                    logging.error('OCR error response: %s', response_ocr.status_code)
+                    logging.error('OCR error response: %s',
+                                  response_ocr.status_code)
                     retries += 1
                     time.sleep(delay)
             except requests.exceptions.Timeout:
@@ -190,20 +194,24 @@ class RasterisedDocumentCustomParser(DocumentParser):
                 logging.error('OCR request failed: %s', e)
                 retries += 1
                 time.sleep(delay)
-    
+
         logging.error('Max retries reached. OCR request failed.')
         return None
-    
-    def get_token_ocr_field_by_refresh_token(self, **args):
+
+    def get_token_ocr_field_by_refresh_token(self, username_ocr, password_ocr,
+                                             api_login_ocr, api_refresh_ocr,
+                                             refresh_token_ocr_field,
+                                             api_refresh_ocr_field):
+        self.log.debug('refresh_token_ocr',api_login_ocr,api_refresh_ocr,refresh_token_ocr_field,api_refresh_ocr_field)
         # check token
         headers = {
             'Content-Type': 'application/json'
         }
         payload = json.dumps({
-            "refresh": f"{args.get('refresh_token_ocr')}"
+            "refresh": f"{api_refresh_ocr}"
         })
         token = self.call_ocr_api_with_retries("POST",
-                                               args.get('api_refresh_ocr'),
+                                               api_refresh_ocr,
                                                headers,
                                                params={},
                                                payload=payload,
@@ -212,65 +220,86 @@ class RasterisedDocumentCustomParser(DocumentParser):
                                                timeout=20,
                                                status_code_fail=[401])
         if token == False:
-            token = self.login_ocr(**args)
-            if token is not None:
-                payload = json.dumps({
-                    "refresh": f"{args.get('refresh_token_ocr_field')}",
-                })
-
-                token = self.call_ocr_api_with_retries("POST", args.get(
-                    'api_refresh_ocr_field'),
-                                                       headers={},
-                                                       params={},
-                                                       payload=payload,
-                                                       max_retries=2,
-                                                       delay=5,
-                                                       timeout=20)
+            token = self.login_ocr(username_ocr, password_ocr, api_login_ocr)
 
         return token
 
-    
-    def login_ocr(self, **args):
+    def login_ocr(self, username_ocr, password_ocr, api_login_ocr, **args):
         # check token
-        payload = f"username={args.get('username_ocr')}&password={args.get('password_ocr')}"
+        payload = f"username={username_ocr}&password={password_ocr}"
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded'
         }
-
         return self.call_ocr_api_with_retries("POST",
-                                              args.get('api_login_ocr'),
+                                              api_login_ocr,
                                               headers=headers,
                                               params={},
                                               payload=payload,
                                               max_retries=2,
                                               delay=5,
                                               timeout=20)
-       
-    def login_ocr(self, **args):
-        # check token
-        payload = f"username={args.get('username_ocr')}&password={args.get('password_ocr')}"
-        headers = {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
 
-        return self.call_ocr_api_with_retries("POST",
-                                              args.get('api_login_ocr'),
-                                              headers=headers,
-                                              params={},
-                                              payload=payload,
-                                              max_retries=2,
-                                              delay=5,
-                                              timeout=20)
-       
-
-    def ocr_file(self, path_file, dossier_form:DossierForm, **args):
+    def ocr_file(self, path_file, dossier_form: DossierForm, **args):
+        # config {
+        #     "api_login_ocr": "http://172.16.100.201:18000/token",
+        #     "api_upload_file_ocr": "http://172.16.100.201:18000/api/v1/file/upload",
+        #     "api_ocr_by_file_id": "http://172.16.100.201:18000/api/v1/ocr/general",
+        #     "access_token_ocr": "",
+        #     "username_ocr": "test",
+        #     "password_ocr": "test",
+        #     "form_code": [
+        #         {
+        #             "name":"van_ban_hanh_chinh",
+        #             "mapping": [
+        #                 {
+        #                     "Tiêu đề": "Tiêu đề",
+        #                     "Số văn bản": "Số hiệu văn bản",
+        #                     "Kính gửi": "Kính gửi",
+        #                     "Người ký văn bản": "Người ký văn bản",
+        #                     "Ngày phát hành": "Ngày phát hành",
+        #                     "Đơn vị phát hành": "Đơn vị phát hành",
+        #                     "Nơi gửi": "Nơi gửi",
+        #                     "Thời gian tạo": "Thời gian tạo"
+        #                 }
+        #             ]
+        #         },
+        #         {
+        #             "name":"van_ban_nha_dat",
+        #             "mapping": [
+        #                 {
+        #                     "Tiêu đề": "Tiêu đề",
+        #                     "Số văn bản": "Số hiệu văn bản",
+        #                     "Kính gửi": "Kính gửi",
+        #                     "Người ký văn bản": "Người ký văn bản",
+        #                     "Ngày phát hành": "Ngày phát hành",
+        #                     "Đơn vị phát hành": "Đơn vị phát hành",
+        #                     "Nơi gửi": "Nơi gửi",
+        #                     "Thời gian tạo": "Thời gian tạo"
+        #                 }
+        #             ]
+        #         }
+        #     ],
+        #     "api_login_ocr_field": "https://ocr-general-api.tcgroup.vn/user/api/token/",
+        #     "api_refresh_ocr_field": "https://ocr-general-api.tcgroup.vn/user/api/token/refresh/",
+        #     "api_ocr_field": "https://ocr-general-api.tcgroup.vn/home/api/v1/extract-by-rule",
+        #     "access_token_ocr_field": "",
+        #     "refresh_token_ocr_field": "",
+        #     "username_ocr_field": "ductm@tc.vn",
+        #     "password_ocr_field": "Ductm@123456"
+        # }
         # data general
         data_ocr = None
         data_ocr_fields = None
         form_code = ""
         app_config = ApplicationConfiguration.objects.filter().first()
-
-         # count page number
+        username_ocr = args.get("username_ocr", '')
+        password_ocr = args.get("password_ocr", '')
+        api_login_ocr = args.get("api_login_ocr", '')
+        api_refresh_ocr = args.get("api_refresh_ocr", '')
+        refresh_token_ocr_field = args.get("refresh_token_ocr_field", '')
+        api_refresh_ocr_field = args.get("api_refresh_ocr_field", '')
+        api_upload_file_ocr = args.get("api_upload_file_ocr",'')
+        # count page number
         page_count = 1
         try:
             with open(path_file, 'rb') as f:
@@ -289,7 +318,8 @@ class RasterisedDocumentCustomParser(DocumentParser):
                 return data_ocr, data_ocr_fields, form_code
                 # login for the first time ...
             if access_token_ocr == '':
-                token = self.login_ocr(**args)
+                token = self.login_ocr(username_ocr, password_ocr,
+                                       api_login_ocr)
                 if token is not None:
                     args["access_token_ocr"] = token['access']
                     app_config.user_args[
@@ -298,10 +328,10 @@ class RasterisedDocumentCustomParser(DocumentParser):
                     app_config.user_args[
                         "refresh_token_ocr"] = token['refresh']
                     app_config.save()
-           
+
             # upload file -------------------
             get_file_id = ''
-            url_upload_file = args.get("api_upload_file_ocr", "")
+
             headers = {
                 'Authorization': f"Bearer {args.get('access_token_ocr')}"
             }
@@ -311,16 +341,55 @@ class RasterisedDocumentCustomParser(DocumentParser):
             payload = {'title': (str(path_file).split("/")[-1]),
                        'folder': '1',
                        'extract': '1'}
-            response_upload = requests.post(url_upload_file, data=payload,
+            response_upload = requests.post(api_upload_file_ocr, data=payload,
                                             files={
                                                 'file': (
-                                                str(path_file).split("/")[-1],
-                                                pdf_data)},
+                                                    str(path_file).split("/")[
+                                                        -1],
+                                                    pdf_data)},
                                             headers=headers)
+
+            # login get access token and refresh token
+            if response_upload.status_code == 401:
+                token = self.get_token_ocr_field_by_refresh_token(username_ocr,
+                                                                  password_ocr,
+                                                                  api_login_ocr,
+                                                                  api_refresh_ocr,
+                                                                  refresh_token_ocr_field,
+                                                                  api_refresh_ocr_field)
+                if token is not None:
+                    args["access_token_ocr"] = token['access']
+                    app_config.user_args[
+                        "access_token_ocr"] = token['access']
+                    args["refresh_token_ocr"] = token['refresh']
+                    app_config.user_args[
+                        "refresh_token_ocr"] = token['refresh']
+                    app_config.save()
+                else:
+                    raise Exception(
+                        "Cannot get access token and refresh token")
+
+                headers = {
+                    'Authorization': f"Bearer {args.get('access_token_ocr')}"
+                }
+                pdf_data = None
+                with open(path_file, 'rb') as file:
+                    pdf_data = file.read()
+                payload = {'title': (str(path_file).split("/")[-1]),
+                           'folder': '1',
+                           'extract': '1'}
+                response_upload = requests.post(api_upload_file_ocr, data=payload,
+                                                files={
+                                                    'file': (
+                                                        str(path_file).split("/")[
+                                                            -1],
+                                                        pdf_data)},
+                                                headers=headers)
 
             if response_upload.status_code == 201:
                 get_file_id = response_upload.json().get('id', '')
-                
+                self.log.debug("Upload------------------------------------------")
+
                 # else :
                 #     # logging.error('upload file: ', response_upload.status_code)
                 #     return data_ocr, data_ocr_fields, form_code
@@ -329,22 +398,27 @@ class RasterisedDocumentCustomParser(DocumentParser):
                 params = {'file_id': get_file_id}
                 url_ocr_pdf_by_fileid = args.get("api_ocr_by_file_id", None)
                 data_ocr_general = self.call_ocr_api_with_retries("GET",
-                                                                url_ocr_pdf_by_fileid,
-                                                                headers, params,
-                                                                {},max_retries = 5,
-                                                                delay=page_count * 2,
-                                                                timeout=30,data_compare={'status_code':1})
-                
+                                                                  url_ocr_pdf_by_fileid,
+                                                                  headers,
+                                                                  params,
+                                                                  {},
+                                                                  max_retries=5,
+                                                                  delay=page_count * 2,
+                                                                  timeout=30,
+                                                                  data_compare={
+                                                                      'status_code': 1})
+
                 if data_ocr_general is not None:
-                    
                     data_ocr = data_ocr_general.get('response', None)
-                    enable_ocr_field = args.get("enable_ocr_field",False)
-                    url_ocr_pdf_custom_field_by_fileid = args.get("api_ocr_field",False)
+                    enable_ocr_field = args.get("enable_ocr_field", False)
+                    url_ocr_pdf_custom_field_by_fileid = args.get(
+                        "api_ocr_field", False)
                     if not enable_ocr_field and not url_ocr_pdf_custom_field_by_fileid:
                         return (data_ocr, data_ocr_fields, form_code)
                     # peeling field
                     get_request_id = data_ocr_general.get('request_id', None)
-                    if dossier_form is None and app_config.user_args.get("form_code", False):
+                    if dossier_form is None and app_config.user_args.get(
+                        "form_code", False):
                         for i in app_config.user_args.get("form_code", []):
                             payload = json.dumps({
                                 "request_id": f"{get_request_id}",
@@ -356,14 +430,10 @@ class RasterisedDocumentCustomParser(DocumentParser):
                                 'Authorization': f"Bearer {args['access_token_ocr']}",
                                 'Content-Type': 'application/json'
                             }
-                            data_ocr_fields = self.call_ocr_api_with_retries("POST",
-                                                                            url_ocr_pdf_custom_field_by_fileid,
-                                                                            headers,
-                                                                            params,
-                                                                            payload, 5, 5,
-                                                                            100,
-                                                                            status_code_fail=[
-                                                                                401])
+                            data_ocr_fields = self.call_ocr_api_with_retries(
+                                "POST", url_ocr_pdf_custom_field_by_fileid,
+                                headers, params, payload, 5, 5, 100,
+                                status_code_fail=[401])
 
                             if not isinstance(data_ocr_fields, list):
                                 continue
@@ -373,40 +443,35 @@ class RasterisedDocumentCustomParser(DocumentParser):
                     elif dossier_form is not None and dossier_form.form_rule:
                         self.log.debug("da vao dossier form")
                         payload = json.dumps({
-                                "request_id": f"{get_request_id}",
-                                "list_form_code": [
-                                    f"{dossier_form.form_rule}"
-                                ]
-                            })
+                            "request_id": f"{get_request_id}",
+                            "list_form_code": [
+                                f"{dossier_form.form_rule}"
+                            ]
+                        })
                         headers = {
                             'Authorization': f"Bearer {args['access_token_ocr']}",
                             'Content-Type': 'application/json'
                         }
-                        data_ocr_fields = self.call_ocr_api_with_retries("POST",
-                                                                        url_ocr_pdf_custom_field_by_fileid,
-                                                                        headers,
-                                                                        params,
-                                                                        payload, 5, 5,
-                                                                        100,
-                                                                        status_code_fail=[
-                                                                            401])
-                      
+                        data_ocr_fields = self.call_ocr_api_with_retries(
+                            "POST", url_ocr_pdf_custom_field_by_fileid,
+                            headers, params, payload, 5, 5, 100,
+                            status_code_fail=[401])
         except Exception as e:
             self.log.error("error", e)
-        
         return (data_ocr, data_ocr_fields, form_code)
+
     # # get ocr file img/pdf
     # def ocr_file(self, path_file, dossier_form:DossierForm):
-        
+
     #     application_configuration=ApplicationConfiguration.objects.filter().first()
     #     application_configuration: ApplicationConfiguration|None
     #     access_token_ocr=application_configuration.api_ocr.get("access_token",None)
-       
+
     #     if access_token_ocr == '':
-    #         access_token_ocr = self.login_ocr(application_configuration=application_configuration)                
+    #         access_token_ocr = self.login_ocr(application_configuration=application_configuration)
     #         if access_token_ocr is not None:
     #             application_configuration.api_ocr["access_token"]=access_token['access_token']
- 
+
     #     # upload file
     #     get_file_id = ''
     #     url_upload_file = application_configuration.api_ocr.get("upload_file",None)
@@ -416,27 +481,27 @@ class RasterisedDocumentCustomParser(DocumentParser):
     #     pdf_data = None
     #     with open(path_file, 'rb') as file:
     #         pdf_data = file.read()
-        
+
     #     response_upload = requests.post(url_upload_file, files={'file': (str(path_file).split("/")[-1], pdf_data)}, headers=headers)
     #     if response_upload.status_code == 200:
     #         get_file_id = response_upload.json().get('file_id','')
     #     else:
-    #         logging.error('upload file: ',response_upload.status_code) 
+    #         logging.error('upload file: ',response_upload.status_code)
 
     #     # ocr by file_id
     #     params = {'file_id': get_file_id}
     #     url_ocr_pdf_by_fileid = application_configuration.api_ocr.get("ocr_by_file_id",None)
     #     data_ocr = self.call_ocr_api_with_retries("POST",url_ocr_pdf_by_fileid, headers, params, {}, 5, 5, 100)
-        
+
     #     # login API custom-field
     #     if dossier_form is None:
     #         return (data_ocr,None)
 
     #     if len(application_configuration.api_ocr_field)>0 and dossier_form.form_rule != '':
     #         # login for the first time ...
-    #         access_token = application_configuration.api_ocr_field.get("access_token",None)        
+    #         access_token = application_configuration.api_ocr_field.get("access_token",None)
     #         if access_token == '':
-    #             token = self.login_ocr_field(application_configuration=application_configuration)                
+    #             token = self.login_ocr_field(application_configuration=application_configuration)
     #             if token is not None:
     #                 application_configuration.api_ocr_field["access_token"]=token['access']
     #                 application_configuration.api_ocr_field["refresh_token"]=token['refresh']
@@ -462,7 +527,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
     #                 application_configuration.api_ocr_field["access_token"]=token['access']
     #                 application_configuration.api_ocr_field["refresh_token"]=token['refresh']
     #                 application_configuration.save()
-                    
+
     #                 # repeat ocr_field
     #                 payload = json.dumps({
     #                 "request_id": f"{get_file_id}",
@@ -478,13 +543,12 @@ class RasterisedDocumentCustomParser(DocumentParser):
     #                 data_ocr_fields = self.call_ocr_api_with_retries("POST",url_ocr_pdf_custom_field_by_fileid, headers, params, payload, 5, 5, 100,status_code_fail=[401])
 
     #     return (data_ocr,data_ocr_fields)
-    
 
     def render_pdf_ocr(self, sidecar, mime_type, input_path, output_path,
                        data_ocr):
         font_name = 'Arial'
         data = data_ocr or {}
-        
+
         font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                  'fonts', 'arial-font/arial.ttf')
         with open(sidecar, "w") as txt_sidecar:
@@ -495,7 +559,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
             c = canvas.Canvas(str(output_path), pagesize=(width, height))
             pdfmetrics.registerFont(TTFont(font_name, font_path))
             # c.drawImage(input_path, 0, 0, width=width, height=height)
-            for page in data.get("pages",{}):
+            for page in data.get("pages", {}):
                 for block in page["blocks"]:
                     for line in block.get("lines", []):
                         y1 = line.get("bbox")[0][1]
@@ -516,13 +580,13 @@ class RasterisedDocumentCustomParser(DocumentParser):
                             c.setFont('Arial', font_size)
                             c.drawString(x_center_coordinates - w / 2,
                                          height - y_center_coordinates - (
-                                                 font_size / 2),
+                                             font_size / 2),
                                          value)
             c.drawImage(input_path, 0, 0, width=width, height=height)
             c.save()
         else:
             shutil.copy(str(input_path), str(output_path))
-            if len(data)<1:
+            if len(data) < 1:
                 return
             input_pdf = PdfReader(input_path)
             images = convert_from_path(input_path,
@@ -553,12 +617,12 @@ class RasterisedDocumentCustomParser(DocumentParser):
                 for block in data["pages"][page_num]["blocks"]:
                     for line in block.get("lines", []):
                         y1_line = (
-                                line.get("bbox")[0][1] / float(rolate_height))
+                            line.get("bbox")[0][1] / float(rolate_height))
                         y2_line = (
-                                line.get("bbox")[1][1] / float(rolate_height))
+                            line.get("bbox")[1][1] / float(rolate_height))
 
                         y_center_coordinates = y2_line - (
-                                y2_line - y1_line) / 2
+                            y2_line - y1_line) / 2
                         for word in line.get("words", []):
                             x1 = word["bbox"][0][0] / float(rolate_width)
                             y1 = word["bbox"][0][1] / float(rolate_height)
@@ -575,7 +639,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                             can.drawString(int(x_center_coordinates - w / 2),
                                            int(float(
                                                page_height) - y_center_coordinates - (
-                                                       font_size / 2)) + 2,
+                                                   font_size / 2)) + 2,
                                            value)
                 can.drawImage(ImageReader(io.BytesIO(jpg_image)),
                               0, 0,
@@ -583,20 +647,18 @@ class RasterisedDocumentCustomParser(DocumentParser):
                               height=float(page_height))
                 can.showPage()
             can.save()
-        
-     
 
-    
-            
-    def ocr_img_or_pdf(self, document_path, mime_type, dossier_form, sidecar, output_file, **kwargs):
-        data_ocr=None
-        data_ocr_fields=None
-        form_code=None
-        data_ocr, data_ocr_fields, form_code = self.ocr_file(document_path, dossier_form, **kwargs)
+    def ocr_img_or_pdf(self, document_path, mime_type, dossier_form, sidecar,
+                       output_file, **kwargs):
+        data_ocr = None
+        data_ocr_fields = None
+        form_code = None
+        data_ocr, data_ocr_fields, form_code = self.ocr_file(document_path,
+                                                             dossier_form,
+                                                             **kwargs)
         self.render_pdf_ocr(sidecar, mime_type, document_path, output_file,
                             data_ocr)
         return data_ocr, data_ocr_fields, form_code
-     
 
     def extract_text(
         self,
@@ -710,7 +772,8 @@ class RasterisedDocumentCustomParser(DocumentParser):
 
         if self.settings.rotate:
             ocrmypdf_args["rotate_pages"] = True
-            ocrmypdf_args["rotate_pages_threshold"] = self.settings.rotate_threshold
+            ocrmypdf_args[
+                "rotate_pages_threshold"] = self.settings.rotate_threshold
 
         if self.settings.pages is not None and self.settings.pages > 0:
             ocrmypdf_args["pages"] = f"1-{self.settings.pages}"
@@ -776,7 +839,8 @@ class RasterisedDocumentCustomParser(DocumentParser):
 
         return ocrmypdf_args
 
-    def parse(self, document_path: Path, mime_type, file_name=None, dossierForm=None):
+    def parse(self, document_path: Path, mime_type, file_name=None,
+              dossier_form=None):
         # This forces tesseract to use one core per page.
         os.environ["OMP_THREAD_LIMIT"] = "1"
         VALID_TEXT_LENGTH = 50
@@ -784,7 +848,8 @@ class RasterisedDocumentCustomParser(DocumentParser):
         if mime_type == "application/pdf":
             text_original = self.extract_text(None, document_path)
             original_has_text = (
-                text_original is not None and len(text_original) > VALID_TEXT_LENGTH
+                text_original is not None and len(
+                text_original) > VALID_TEXT_LENGTH
             )
         else:
             text_original = None
@@ -827,14 +892,16 @@ class RasterisedDocumentCustomParser(DocumentParser):
         try:
             self.log.debug(f"Calling OCRmyPDF with args: {args}")
             # ocrmypdf.ocr(**args)
-            data_ocr,data_ocr_fields, form_code = self.ocr_img_or_pdf(document_path, mime_type, dossierForm,**args)
+            data_ocr, data_ocr_fields, form_code = self.ocr_img_or_pdf(
+                document_path, mime_type, dossier_form, **args)
             if self.settings.skip_archive_file != ArchiveFileChoices.ALWAYS:
                 self.archive_path = archive_path
 
             self.text = self.extract_text(sidecar_file, archive_path)
 
             if not self.text:
-                raise NoTextFoundException("No text was found in the original document")
+                raise NoTextFoundException(
+                    "No text was found in the original document")
         except EncryptedPdfError:
             self.log.warning(
                 "This file is encrypted, OCR is impossible. Using "
@@ -878,7 +945,8 @@ class RasterisedDocumentCustomParser(DocumentParser):
             try:
                 self.log.debug(f"Fallback: Calling OCRmyPDF with args: {args}")
                 # ocrmypdf.ocr(**args)
-                data_ocr,data_ocr_fields, form_code = self.ocr_img_or_pdf(document_path, mime_type, dossierForm, **args)
+                data_ocr, data_ocr_fields, form_code = self.ocr_img_or_pdf(
+                    document_path, mime_type, dossier_form, **args)
                 # Don't return the archived file here, since this file
                 # is bigger and blurry due to --force-ocr.
 
@@ -923,15 +991,16 @@ class RasterisedDocumentCustomParser(DocumentParser):
             archive_path,
             sidecar_file,
         )
-        data_ocr,data_ocr_fields,form_code = None,None,''
+        data_ocr, data_ocr_fields, form_code = None, None, ''
         try:
             self.log.debug(f"Calling OCRmyPDF with args: {args}")
             # ocrmypdf.ocr(**args)
-            data_ocr,data_ocr_fields,form_code = self.ocr_img_or_pdf(document_path, mime_type,**args)
+            data_ocr, data_ocr_fields, form_code = self.ocr_img_or_pdf(
+                document_path, mime_type, **args)
             if self.settings.skip_archive_file != ArchiveFileChoices.ALWAYS:
                 self.archive_path = archive_path
 
-        except ( InputFileError) as e:
+        except (InputFileError) as e:
             self.log.warning(
                 f"Encountered an error while running OCR: {e!s}. "
                 f"Attempting force OCR to get the text.",
@@ -940,7 +1009,6 @@ class RasterisedDocumentCustomParser(DocumentParser):
             archive_path_fallback = Path(
                 os.path.join(self.tempdir, "archive-fallback.pdf"),
             )
-           
 
             # Attempt to run OCR with safe settings.
 
@@ -954,7 +1022,8 @@ class RasterisedDocumentCustomParser(DocumentParser):
             try:
                 self.log.debug(f"Fallback: Calling OCRmyPDF with args: {args}")
                 # ocrmypdf.ocr(**args)
-                data_ocr,data_ocr_fields,form_code = self.ocr_img_or_pdf(document_path, mime_type,**args)
+                data_ocr, data_ocr_fields, form_code = self.ocr_img_or_pdf(
+                    document_path, mime_type, **args)
 
             except Exception as e:
                 # If this fails, we have a serious issue at hand.
@@ -964,15 +1033,17 @@ class RasterisedDocumentCustomParser(DocumentParser):
             # Anything else is probably serious.
             raise ParseError(f"{e.__class__.__name__}: {e!s}") from e
 
-        return data_ocr_fields,form_code
+        return data_ocr_fields, form_code
 
 def post_process_text(text):
     if not text:
         return None
 
     collapsed_spaces = re.sub(r"([^\S\r\n]+)", " ", text)
-    no_leading_whitespace = re.sub(r"([\n\r]+)([^\S\n\r]+)", "\\1", collapsed_spaces)
-    no_trailing_whitespace = re.sub(r"([^\S\n\r]+)$", "", no_leading_whitespace)
+    no_leading_whitespace = re.sub(r"([\n\r]+)([^\S\n\r]+)", "\\1",
+                                   collapsed_spaces)
+    no_trailing_whitespace = re.sub(r"([^\S\n\r]+)$", "",
+                                    no_leading_whitespace)
 
     # TODO: this needs a rework
     # replace \0 prevents issues with saving to postgres.
