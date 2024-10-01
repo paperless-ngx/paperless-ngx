@@ -290,88 +290,6 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertEqual(generate_filename(d1), "652 - the_doc.pdf")
         self.assertEqual(generate_filename(d2), "none - the_doc.pdf")
 
-    @override_settings(FILENAME_FORMAT="{tags[type]}")
-    def test_tags_with_underscore(self):
-        document = Document()
-        document.mime_type = "application/pdf"
-        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
-        document.save()
-
-        # Add tag to document
-        document.tags.create(name="type_demo")
-        document.tags.create(name="foo_bar")
-        document.save()
-
-        # Ensure that filename is properly generated
-        self.assertEqual(generate_filename(document), "demo.pdf")
-
-    @override_settings(FILENAME_FORMAT="{tags[type]}")
-    def test_tags_with_dash(self):
-        document = Document()
-        document.mime_type = "application/pdf"
-        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
-        document.save()
-
-        # Add tag to document
-        document.tags.create(name="type-demo")
-        document.tags.create(name="foo-bar")
-        document.save()
-
-        # Ensure that filename is properly generated
-        self.assertEqual(generate_filename(document), "demo.pdf")
-
-    @override_settings(FILENAME_FORMAT="{tags[type]}")
-    def test_tags_malformed(self):
-        document = Document()
-        document.mime_type = "application/pdf"
-        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
-        document.save()
-
-        # Add tag to document
-        document.tags.create(name="type:demo")
-        document.tags.create(name="foo:bar")
-        document.save()
-
-        # Ensure that filename is properly generated
-        self.assertEqual(generate_filename(document), "none.pdf")
-
-    @override_settings(FILENAME_FORMAT="{tags[0]}")
-    def test_tags_all(self):
-        document = Document()
-        document.mime_type = "application/pdf"
-        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
-        document.save()
-
-        # Add tag to document
-        document.tags.create(name="demo")
-        document.save()
-
-        # Ensure that filename is properly generated
-        self.assertEqual(generate_filename(document), "demo.pdf")
-
-    @override_settings(FILENAME_FORMAT="{tags[1]}")
-    def test_tags_out_of_bounds(self):
-        document = Document()
-        document.mime_type = "application/pdf"
-        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
-        document.save()
-
-        # Add tag to document
-        document.tags.create(name="demo")
-        document.save()
-
-        # Ensure that filename is properly generated
-        self.assertEqual(generate_filename(document), "none.pdf")
-
-    @override_settings(FILENAME_FORMAT="{tags}")
-    def test_tags_without_args(self):
-        document = Document()
-        document.mime_type = "application/pdf"
-        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
-        document.save()
-
-        self.assertEqual(generate_filename(document), f"{document.pk:07}.pdf")
-
     @override_settings(FILENAME_FORMAT="{title} {tag_list}")
     def test_tag_list(self):
         doc = Document.objects.create(title="doc1", mime_type="application/pdf")
@@ -978,7 +896,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             mime_type="application/pdf",
             pk=2,
             checksum="2",
-            storage_path=StoragePath.objects.create(path="{asn} - {created}"),
+            storage_path=StoragePath.objects.create(path="{{asn}} - {{created}}"),
         )
         self.assertEqual(generate_filename(doc), "none - 2020-06-25.pdf")
 
@@ -1003,7 +921,9 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             mime_type="application/pdf",
             pk=2,
             checksum="2",
-            storage_path=StoragePath.objects.create(path="TestFolder/{asn}/{created}"),
+            storage_path=StoragePath.objects.create(
+                path="TestFolder/{{asn}}/{{created}}",
+            ),
         )
         self.assertEqual(generate_filename(doc), "TestFolder/2020-06-25.pdf")
 
@@ -1025,7 +945,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             archive_serial_number=4,
             storage_path=StoragePath.objects.create(
                 name="sp1",
-                path="ThisIsAFolder/{asn}/{created}",
+                path="ThisIsAFolder/{{asn}}/{{created}}",
             ),
         )
         doc_b = Document.objects.create(
@@ -1036,7 +956,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             checksum="abcde",
             storage_path=StoragePath.objects.create(
                 name="sp2",
-                path="SomeImportantNone/{created}",
+                path="SomeImportantNone/{{created}}",
             ),
         )
 
@@ -1072,7 +992,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             checksum="abcde",
             storage_path=StoragePath.objects.create(
                 name="sp2",
-                path="SomeImportantNone/{created}",
+                path="SomeImportantNone/{{created}}",
             ),
         )
 

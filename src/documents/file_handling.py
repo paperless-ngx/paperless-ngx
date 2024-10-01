@@ -195,7 +195,7 @@ def get_basic_metadata_context(
 
 def get_tags_context(tags: Iterable[Tag]) -> dict[str, str]:
     return {
-        "tags_list": pathvalidate.sanitize_filename(
+        "tag_list": pathvalidate.sanitize_filename(
             ",".join(
                 sorted(tag.name for tag in tags),
             ),
@@ -327,7 +327,7 @@ def generate_filename(
         )  # backward compatibility
 
         rendered_filename = (
-            rendered_filename.strip(os.sep).replace("\n", "").replace("\r", "")
+            rendered_filename.strip(os.sep).replace("\n", "").replace("\r", "").strip()
         )
 
         return rendered_filename
