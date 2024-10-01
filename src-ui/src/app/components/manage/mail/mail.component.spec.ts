@@ -43,14 +43,15 @@ import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { SwitchComponent } from '../../common/input/switch/switch.component'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { By } from '@angular/platform-browser'
 
 const mailAccounts = [
   { id: 1, name: 'account1' },
   { id: 2, name: 'account2' },
 ]
 const mailRules = [
-  { id: 1, name: 'rule1', owner: 1, account: 1 },
-  { id: 2, name: 'rule2', owner: 2, account: 2 },
+  { id: 1, name: 'rule1', owner: 1, account: 1, enabled: true },
+  { id: 2, name: 'rule2', owner: 2, account: 2, enabled: true },
 ]
 
 describe('MailComponent', () => {
@@ -320,5 +321,31 @@ describe('MailComponent', () => {
     expect(dialog.object).toEqual(mailAccounts[0])
     dialog.confirmClicked.emit({ permissions: perms, merge: true })
     expect(accountPatchSpy).toHaveBeenCalled()
+  })
+
+  it('should update mail rule when enable is toggled', () => {
+    completeSetup()
+    const patchSpy = jest.spyOn(mailRuleService, 'patch')
+    const toggleInput = fixture.debugElement.query(
+      By.css('input[type="checkbox"]')
+    )
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    // fail first
+    patchSpy.mockReturnValueOnce(
+      throwError(() => new Error('Error getting config'))
+    )
+    toggleInput.nativeElement.click()
+    expect(patchSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
+    // succeed second
+    patchSpy.mockReturnValueOnce(of(mailRules[0] as MailRule))
+    toggleInput.nativeElement.click()
+    patchSpy.mockReturnValueOnce(
+      of({ ...mailRules[0], enabled: false } as MailRule)
+    )
+    toggleInput.nativeElement.click()
+    expect(patchSpy).toHaveBeenCalled()
+    expect(toastInfoSpy).toHaveBeenCalled()
   })
 })
