@@ -115,6 +115,8 @@ class MailRule(document_models.ModelWithOwner):
         verbose_name=_("account"),
     )
 
+    enabled = models.BooleanField(_("enabled"), default=True)
+
     folder = models.CharField(
         _("folder"),
         default="INBOX",

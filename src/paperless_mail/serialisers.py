@@ -74,6 +74,7 @@ class MailRuleSerializer(OwnedObjectSerializer):
             "id",
             "name",
             "account",
+            "enabled",
             "folder",
             "filter_from",
             "filter_to",
