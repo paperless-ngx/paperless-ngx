@@ -501,7 +501,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsFile(os.path.join(tmp, "notempty", "file"))
         self.assertIsNotDir(os.path.join(tmp, "notempty", "empty"))
 
-    @override_settings(FILENAME_FORMAT="{created/[title]")
+    @override_settings(FILENAME_FORMAT="{% if x is None %}/{title]")
     def test_invalid_format(self):
         document = Document()
         document.pk = 1
@@ -957,7 +957,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             mime_type="application/pdf",
             pk=2,
             checksum="2",
-            storage_path=StoragePath.objects.create(path="TestFolder/{created}"),
+            storage_path=StoragePath.objects.create(path="TestFolder/{{created}}"),
         )
         self.assertEqual(generate_filename(doc), "TestFolder/2020-06-25.pdf")
 
