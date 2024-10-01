@@ -35,7 +35,7 @@ inotifyrecursive = "~=0.3"
 langdetect = "*"
 mysqlclient = "*"
 nltk = "*"
-ocrmypdf = "~=15.4"
+ocrmypdf = "~=16.5"
 pathvalidate = "*"
 pdf2image = "*"
 psycopg = {version = "*", extras = ["c"]}

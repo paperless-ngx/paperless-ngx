@@ -544,6 +544,9 @@ class MailAccountHandler(LoggingMixin):
                 )
 
                 for rule in account.rules.order_by("order"):
+                    if not rule.enabled:
+                        self.log.debug(f"Rule {rule}: Skipping disabled rule")
+                        continue
                     try:
                         total_processed_files += self._handle_mail_rule(
                             M,

@@ -1388,6 +1388,41 @@ class TestMail(
         self.assertEqual(len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", False)), 0)
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
 
+    def test_disabled_rule(self):
+        """
+        GIVEN:
+            - Mail rule is disabled
+        WHEN:
+            - Mail account is handled
+        THEN:
+            - Should not process any messages
+        """
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+        MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.MARK_READ,
+            enabled=False,
+        )
+
+        self.mail_account_handler.handle_mail_account(account)
+        self.mailMocker.apply_mail_actions()
+
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
+        self.assertEqual(len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", False)), 2)
+
+        self.mail_account_handler.handle_mail_account(account)
+        self.mailMocker.apply_mail_actions()
+        self.assertEqual(
+            len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", False)),
+            2,
+        )  # still 2
+
 
 class TestManagementCommand(TestCase):
     @mock.patch(

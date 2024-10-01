@@ -170,6 +170,21 @@ export class MailComponent
     this.editMailRule(clone, true)
   }
 
+  onMailRuleEnableToggled(rule: MailRule) {
+    this.mailRuleService.patch(rule).subscribe({
+      next: () => {
+        this.toastService.showInfo(
+          rule.enabled
+            ? $localize`Rule "${rule.name}" enabled.`
+            : $localize`Rule "${rule.name}" disabled.`
+        )
+      },
+      error: (e) => {
+        this.toastService.showError($localize`Error toggling rule.`, e)
+      },
+    })
+  }
+
   deleteMailRule(rule: MailRule) {
     const modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
