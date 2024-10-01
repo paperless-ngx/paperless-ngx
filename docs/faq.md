@@ -135,7 +135,7 @@ Multiple options for ASGI servers exist:
 
 ## _What about the Redis licensing change and using one of the open source forks_?
 
-Currently, forks of Redis such as Valkey or Redirect are not officially supported by our upstream
+Currently (October 2024), forks of Redis such as Valkey or Redirect are not officially supported by our upstream
 libraries, so using one of these to replace Redis is not officially supported.
 
 However, they do claim to be compatible with the Redis protocol and will likely work, but we will
