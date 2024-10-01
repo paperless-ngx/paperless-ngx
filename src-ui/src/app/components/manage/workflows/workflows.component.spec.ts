@@ -211,4 +211,27 @@ describe('WorkflowsComponent', () => {
     editDialog.confirmClicked.emit()
     expect(reloadSpy).toHaveBeenCalled()
   })
+
+  it('should update workflow when enable is toggled', () => {
+    const patchSpy = jest.spyOn(workflowService, 'patch')
+    const toggleInput = fixture.debugElement.query(
+      By.css('input[type="checkbox"]')
+    )
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    // fail first
+    patchSpy.mockReturnValueOnce(
+      throwError(() => new Error('Error getting config'))
+    )
+    toggleInput.nativeElement.click()
+    expect(patchSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
+    // succeed second
+    patchSpy.mockReturnValueOnce(of(workflows[0]))
+    toggleInput.nativeElement.click()
+    patchSpy.mockReturnValueOnce(of({ ...workflows[0], enabled: false }))
+    toggleInput.nativeElement.click()
+    expect(patchSpy).toHaveBeenCalled()
+    expect(toastInfoSpy).toHaveBeenCalled()
+  })
 })
