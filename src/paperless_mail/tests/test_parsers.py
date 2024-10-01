@@ -497,6 +497,7 @@ class TestParser:
 
         assert mail_parser.archive_path is not None
 
+    @pytest.mark.httpx_mock(can_send_already_matched_responses=True)
     def test_generate_pdf_html_email(
         self,
         httpx_mock: HTTPXMock,
@@ -575,6 +576,7 @@ class TestParser:
         with pytest.raises(ParseError):
             mail_parser.parse(html_email_file, "message/rfc822")
 
+    @pytest.mark.httpx_mock(can_send_already_matched_responses=True)
     def test_generate_pdf_html_email_merge_failure(
         self,
         httpx_mock: HTTPXMock,
