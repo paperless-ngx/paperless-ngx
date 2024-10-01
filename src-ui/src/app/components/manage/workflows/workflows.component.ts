@@ -130,4 +130,21 @@ export class WorkflowsComponent
       })
     })
   }
+
+  onWorkflowEnableToggled(workflow: Workflow) {
+    this.workflowService.patch(workflow).subscribe({
+      next: () => {
+        this.toastService.showInfo(
+          workflow.enabled
+            ? $localize`Enabled workflow`
+            : $localize`Disabled workflow`
+        )
+        this.workflowService.clearCache()
+        this.reload()
+      },
+      error: (e) => {
+        this.toastService.showError($localize`Error toggling workflow.`, e)
+      },
+    })
+  }
 }
