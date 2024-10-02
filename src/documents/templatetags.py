@@ -1,3 +1,4 @@
+import os
 import re
 
 from django import template
@@ -26,7 +27,10 @@ class FilePathNode(template.Node):
             """
             value = value.replace("\n", "").replace("\r", "")
             value = re.sub(r"\s*/\s*", "/", value)
-            return value.strip()
+
+            # We remove trailing and leading separators, as these are always relative paths, not absolute, even if the user
+            # tries
+            return value.strip().strip(os.sep)
 
         output = self.nodelist.render(context)
         return clean_filepath(output)
@@ -41,3 +45,26 @@ def construct_filepath(parser, token):
     nodelist = parser.parse(("endfilepath",))
     parser.delete_first_token()
     return FilePathNode(nodelist)
+
+
+def convert_to_django_template_format(old_format: str) -> str:
+    """
+    Converts old Python string format (with {}) to Django template style (with {{ }}),
+    while ignoring existing {{ ... }} placeholders.
+
+    :param old_format: The old style format string (e.g., "{title} by {author}")
+    :return: Converted string in Django Template style (e.g., "{{ title }} by {{ author }}")
+    """
+
+    # Step 1: Match placeholders with single curly braces but not those with double braces
+    pattern = r"(?<!\{)\{(\w*)\}(?!\})"  # Matches {var} but not {{var}}
+
+    # Step 2: Replace the placeholders with {{ var }} or {{ }}
+    def replace_with_django(match):
+        variable = match.group(1)  # The variable inside the braces
+        return f"{{{{ {variable} }}}}"  # Convert to {{ variable }}
+
+    # Apply the substitution
+    converted_format = re.sub(pattern, replace_with_django, old_format)
+
+    return converted_format

@@ -29,8 +29,6 @@ from rest_framework import fields
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
-from documents.file_handling import convert_to_django_template_format
-
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.context import set_actor
 
@@ -56,6 +54,7 @@ from documents.models import WorkflowTrigger
 from documents.parsers import is_mime_type_supported
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import set_permissions_for_object
+from documents.templatetags import convert_to_django_template_format
 from documents.validators import uri_validator
 
 logger = logging.getLogger("paperless.serializers")

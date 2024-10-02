@@ -17,6 +17,7 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.templatetags import convert_to_django_template_format
 
 logger = logging.getLogger("paperless.filehandling")
 
@@ -110,29 +111,6 @@ def generate_unique_filename(doc, archive_filename=False):
             counter += 1
         else:
             return new_filename
-
-
-def convert_to_django_template_format(old_format: str) -> str:
-    """
-    Converts old Python string format (with {}) to Django template style (with {{ }}),
-    while ignoring existing {{ ... }} placeholders.
-
-    :param old_format: The old style format string (e.g., "{title} by {author}")
-    :return: Converted string in Django Template style (e.g., "{{ title }} by {{ author }}")
-    """
-
-    # Step 1: Match placeholders with single curly braces but not those with double braces
-    pattern = r"(?<!\{)\{(\w*)\}(?!\})"  # Matches {var} but not {{var}}
-
-    # Step 2: Replace the placeholders with {{ var }} or {{ }}
-    def replace_with_django(match):
-        variable = match.group(1)  # The variable inside the braces
-        return f"{{{{ {variable} }}}}"  # Convert to {{ variable }}
-
-    # Apply the substitution
-    converted_format = re.sub(pattern, replace_with_django, old_format)
-
-    return converted_format
 
 
 def create_dummy_document():
@@ -258,26 +236,28 @@ def get_tags_context(tags: Iterable[Tag]) -> dict[str, str | list[str]]:
 
 def get_custom_fields_context(
     custom_fields: Iterable[CustomFieldInstance],
-) -> dict[str, dict[str, str]]:
+) -> dict[str, dict[str, dict[str, str]]]:
     """
     Given an Iterable of CustomFieldInstance, builds a dictionary mapping the field name
     to its type and value
     """
     return {
-        pathvalidate.sanitize_filename(
-            field_instance.field.name,
-            replacement_text="-",
-        ): {
-            "type": pathvalidate.sanitize_filename(
-                field_instance.field.data_type,
+        "custom_fields": {
+            pathvalidate.sanitize_filename(
+                field_instance.field.name,
                 replacement_text="-",
-            ),
-            "value": pathvalidate.sanitize_filename(
-                str(field_instance.value),
-                replacement_text="-",
-            ),
-        }
-        for field_instance in custom_fields
+            ): {
+                "type": pathvalidate.sanitize_filename(
+                    field_instance.field.data_type,
+                    replacement_text="-",
+                ),
+                "value": pathvalidate.sanitize_filename(
+                    str(field_instance.value),
+                    replacement_text="-",
+                ),
+            }
+            for field_instance in custom_fields
+        },
     }
 
 
@@ -401,14 +381,6 @@ def generate_filename(
         filename_format = convert_to_django_template_format(
             settings.FILENAME_FORMAT,
         )
-
-        # Warn the user they should update
-        # TODO: Move this to system check
-        if filename_format != settings.FILENAME_FORMAT:
-            logger.warning(
-                f"Filename format {settings.FILENAME_FORMAT} is using the old style, please update to use double curly brackets",
-            )
-            logger.info(filename_format)
     else:
         filename_format = None
 

@@ -8,6 +8,7 @@ from django.db.utils import OperationalError
 from django.db.utils import ProgrammingError
 
 from documents.signals import document_consumer_declaration
+from documents.templatetags import convert_to_django_template_format
 
 
 @register()
@@ -69,3 +70,17 @@ def parser_check(app_configs, **kwargs):
         ]
     else:
         return []
+
+
+@register()
+def filename_format_check(app_configs, **kwargs):
+    if settings.FILENAME_FORMAT:
+        converted_format = convert_to_django_template_format(settings.FILENAME_FORMAT)
+        if converted_format != settings.FILENAME_FORMAT:
+            return [
+                Error(
+                    f"Filename format {settings.FILENAME_FORMAT} is using the old style, please update to use double curly brackets",
+                    hint=converted_format,
+                ),
+            ]
+    return []
