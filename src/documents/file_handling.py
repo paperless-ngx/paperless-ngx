@@ -7,7 +7,7 @@ from pathlib import PurePath
 import pathvalidate
 from django.conf import settings
 from django.template import Context
-from django.template import Template
+from django.template import Engine
 from django.utils import timezone
 
 from documents.models import Correspondent
@@ -19,6 +19,14 @@ from documents.models import StoragePath
 from documents.models import Tag
 
 logger = logging.getLogger("paperless.filehandling")
+
+INVALID_VARIABLE_STR = "InvalidVarError"
+
+filepath_engine = Engine(
+    autoescape=False,
+    string_if_invalid=f"{INVALID_VARIABLE_STR}: %s",
+    libraries={"filepath": "documents.templatetags"},
+)
 
 
 def create_source_path_directory(source_path):
@@ -235,6 +243,22 @@ def validate_template_and_render(
     Returns None if the string is not valid or an error occurred, otherwise
     """
 
+    def detect_undefined_variables(rendered_string: str) -> list[str] | None:
+        """
+        Checks the rendered template for variables which were not defined/invalid and returns a
+        listing of them or None if none were found.
+
+        Used to provide context to the user, rather than mostly failing silently
+
+        """
+        pattern = rf"{INVALID_VARIABLE_STR}: (\w+)"
+        matches = re.findall(pattern, rendered_string)
+
+        if matches:
+            return list(set(matches))
+        else:
+            return None
+
     # Create the dummy document object with all fields filled in for validation purposes
     if document is None:
         document = create_dummy_document()
@@ -250,10 +274,10 @@ def validate_template_and_render(
         ]
     else:
         # or use the real document information
-        logger.info("Using real document")
         tags_list = document.tags.all()
         custom_fields = document.custom_fields.all()
 
+    # Build the context dictionary
     context = (
         {"document": document}
         | get_basic_metadata_context(document, no_value_default="-none-")
@@ -263,13 +287,23 @@ def validate_template_and_render(
         | get_custom_fields_context(custom_fields)
     )
 
-    logger.info(context)
-
     # Try rendering the template
     try:
-        template = Template(template_string)
+        # We load the custom tag used to remove spaces and newlines from the final string around the user string
+        template = filepath_engine.from_string(
+            "{% load filepath %}{% filepath %}" + template_string + "{% endfilepath %}",
+        )
         rendered_template = template.render(Context(context))
-        logger.info(f"Template is valid and rendered successfully: {rendered_template}")
+
+        # Check for errors
+        undefined_vars = detect_undefined_variables(rendered_template)
+        if undefined_vars:
+            logger.error(f"Template contained {len(undefined_vars)} undefined values:")
+            for x in undefined_vars:
+                logger.error(f"  Variable '{x}' was undefined")
+            return None
+
+        # We're good!
         return rendered_template
     except Exception as e:
         logger.warning(f"Error in filename generation: {e}")
@@ -287,7 +321,7 @@ def generate_filename(
 ):
     path = ""
 
-    def convert_to_django_template_format(old_format):
+    def convert_to_django_template_format(old_format: str) -> str:
         """
         Converts old Python string format (with {}) to Django template style (with {{ }}),
         while ignoring existing {{ ... }} placeholders.
@@ -314,8 +348,7 @@ def generate_filename(
         if rendered_filename is None:
             return None
 
-        logger.info(rendered_filename)
-
+        # Apply this setting.  It could become a filter in the future (or users could use |default)
         if settings.FILENAME_FORMAT_REMOVE_NONE:
             rendered_filename = rendered_filename.replace("/-none-/", "/")
             rendered_filename = rendered_filename.replace(" -none-", "")
@@ -325,10 +358,6 @@ def generate_filename(
             "-none-",
             "none",
         )  # backward compatibility
-
-        rendered_filename = (
-            rendered_filename.strip(os.sep).replace("\n", "").replace("\r", "").strip()
-        )
 
         return rendered_filename
 
@@ -346,6 +375,7 @@ def generate_filename(
         )
 
         # Warn the user they should update
+        # TODO: Move this to system check
         if filename_format != settings.FILENAME_FORMAT:
             logger.warning(
                 f"Filename format {settings.FILENAME_FORMAT} is using the old style, please update to use double curly brackets",

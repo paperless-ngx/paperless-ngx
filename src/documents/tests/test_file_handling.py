@@ -1145,11 +1145,15 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
     def test_complex_template_strings(self):
         sp = StoragePath.objects.create(
             name="sp1",
-            path="""{% if document.checksum == \"2\" %}
-                          {{created}}
-                        {% else %}
-                          {{added}}
-                        {% endif %}""",
+            path="""
+                 somepath/
+                 {% if document.checksum == '2' %}
+                   some where/{{created}}
+                 {% else %}
+                   {{added}}
+                 {% endif %}
+                 /{{ title }}
+                 """,
         )
 
         doc_a = Document.objects.create(
@@ -1159,16 +1163,50 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             mime_type="application/pdf",
             pk=2,
             checksum="2",
-            archive_serial_number=4,
+            archive_serial_number=25,
             storage_path=sp,
         )
 
-        self.assertEqual(generate_filename(doc_a), "2020-06-25.pdf")
+        self.assertEqual(
+            generate_filename(doc_a),
+            "somepath/some where/2020-06-25/Does Matter.pdf",
+        )
         doc_a.checksum = "5"
 
-        self.assertEqual(generate_filename(doc_a), "2024-10-01.pdf")
+        self.assertEqual(
+            generate_filename(doc_a),
+            "somepath/2024-10-01/Does Matter.pdf",
+        )
 
-        sp.path = '{{ document.title|lower }}{{ document.asn|add:"-2" }}'
+        sp.path = (
+            "{{ document.title|lower }}{{ document.archive_serial_number|add:'-2' }}"
+        )
         sp.save()
 
-        self.assertEqual(generate_filename(doc_a), "does matter-2.pdf")
+        self.assertEqual(generate_filename(doc_a), "does matter23.pdf")
+
+        sp.path = """
+                 somepath/
+                 {% if document.archive_serial_number >= 0 and document.archive_serial_number <= 200 %}
+                   asn-000-200/{{title}}
+                 {% elif document.archive_serial_number >= 201 and document.archive_serial_number <= 400 %}
+                   asn-201-400
+                   {% if document.archive_serial_number >= 201 and document.archive_serial_number < 300 %}
+                     /asn-2xx
+                   {% elif document.archive_serial_number >= 300 and document.archive_serial_number < 400 %}
+                     /asn-3xx
+                   {% endif %}
+                 {% endif %}
+                 /{{ title }}
+                 """
+        sp.save()
+        self.assertEqual(
+            generate_filename(doc_a),
+            "somepath/asn-000-200/Does Matter/Does Matter.pdf",
+        )
+        doc_a.archive_serial_number = 301
+        doc_a.save()
+        self.assertEqual(
+            generate_filename(doc_a),
+            "somepath/asn-201-400/asn-3xx/Does Matter.pdf",
+        )
