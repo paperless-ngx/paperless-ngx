@@ -473,6 +473,19 @@ a document with an ASN of 355 would be placed in `somepath/asn-201-400/asn-3xx/T
 
 For a PDF document, it would result in `pdfs/Title.pdf`, but for a PNG document, the path would be `pngs/Title.pdf`.
 
+To use custom fields:
+
+```django
+{% if \"Invoice\" in custom_fields %}
+  invoices/{{ custom_fields.Invoice.value\ }}
+{% else %}
+  not-invoices/{{ title }}
+{% endif %}
+```
+
+If the document has a custom field named "Invoice" with a value of 123, it would be filed into the `invoices/123.pdf`, but a document without the custom field
+would be filed to `not-invoices/Title.pdf`
+
 ## Automatic recovery of invalid PDFs {#pdf-recovery}
 
 Paperless will attempt to "clean" certain invalid PDFs with `qpdf` before processing if, for example, the mime_type

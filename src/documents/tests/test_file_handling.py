@@ -17,6 +17,8 @@ from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_filename
 from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
@@ -1241,3 +1243,49 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
                 capture.output[1],
                 "ERROR:paperless.filehandling:  Variable 'creation_date' was undefined",
             )
+
+    def test_template_with_custom_fields(self):
+        sp = StoragePath.objects.create(
+            name="sp1",
+            path="""
+                 {% if "Invoice" in custom_fields %}
+                   invoices/{{ custom_fields.Invoice.value }}
+                 {% else %}
+                   not-invoices/{{ title }}
+                 {% endif %}
+                 """,
+        )
+
+        doc_a = Document.objects.create(
+            title="Some Title",
+            created=timezone.make_aware(datetime.datetime(2020, 6, 25, 7, 36, 51, 153)),
+            added=timezone.make_aware(datetime.datetime(2024, 10, 1, 7, 36, 51, 153)),
+            mime_type="application/pdf",
+            pk=2,
+            checksum="2",
+            archive_serial_number=25,
+            storage_path=sp,
+        )
+
+        cf = CustomField.objects.create(
+            name="Invoice",
+            data_type=CustomField.FieldDataType.INT,
+        )
+
+        cfi = CustomFieldInstance.objects.create(
+            document=doc_a,
+            field=cf,
+            value_int=1234,
+        )
+
+        self.assertEqual(
+            generate_filename(doc_a),
+            "invoices/1234.pdf",
+        )
+
+        cfi.delete()
+
+        self.assertEqual(
+            generate_filename(doc_a),
+            "not-invoices/Some Title.pdf",
+        )
