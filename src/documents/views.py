@@ -1910,7 +1910,7 @@ class BulkEditObjectsView(PassUserMixin):
                 )
         
         elif operation == "update" and object_type == "folders":
-            parent_folder_id = serializer.validated_data.get("parent_folder")[0]
+            parent_folder_id = serializer.validated_data.get("parent_folder")
             parent_folder_obj = Folder.objects.get(pk=parent_folder_id) if parent_folder_id else None
 
             for folder_id in object_ids:
@@ -1921,17 +1921,18 @@ class BulkEditObjectsView(PassUserMixin):
                 
                 # print(folder.id)
                 # print(int(request.data['parent_folder'][0]))
-                
-                if int(request.data['parent_folder'][0]) == folder.id:
+                if request.data.get('parent_folder') is None:
+                    pass
+                elif int(request.data['parent_folder']) == folder.id:
                     return Response(status=status.HTTP_400_BAD_REQUEST)
                 elif 'parent_folder' in request.data:
-                    new_parent_folder = Folder.objects.get(id=int(request.data['parent_folder'][0]))
+                    new_parent_folder = Folder.objects.get(id=int(request.data['parent_folder']))
                     if new_parent_folder.path.startswith(folder.path):
                         return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a folder into one of its child folders.'})
                     elif new_parent_folder.type == "file":
                         return Response(status=status.HTTP_400_BAD_REQUEST)
                 else:
-                    request.data['parent_folder'][0] = None
+                    request.data['parent_folder'] = None
                 
                 old_parent_folder = folder.parent_folder
                 folder.parent_folder = parent_folder_obj
@@ -2547,11 +2548,9 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     def partial_update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', True)
         instance = self.get_object()
-        
         if request.data.get('parent_folder') is None:
             pass
-        
-        if 'parent_folder' in request.data and int(request.data['parent_folder']) == instance.id:
+        elif 'parent_folder' in request.data and int(request.data['parent_folder']) == instance.id:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         
         elif 'parent_folder' in request.data :

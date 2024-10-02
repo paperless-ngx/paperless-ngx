@@ -1,5 +1,5 @@
 <pngx-page-header title="{{ typeNamePlural | titlecase }}">
-  
+
   <div class="btn-group flex-fill" role="group">
     <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="details" (ngModelChange)="saveDisplayMode()"  id="displayModeDetails" name="displayModeDetails">
     <label for="displayModeDetails" class="btn btn-outline-primary btn-sm">
@@ -9,11 +9,13 @@
     <label for="displayModeSmall" class="btn btn-outline-primary btn-sm">
       <i-bs name="grid"></i-bs>
     </label>
-   
-  </div>
-  
 
-  
+  </div>
+
+
+  <button class="btn btn-sm btn-outline-secondary" (click)="cutFolder()" [disabled]="selectedObjects.size === 0 || isFolderCutClicked == true">
+    <i-bs  name="x"></i-bs>&nbsp;<ng-container i18n>Cut</ng-container>
+    </button>
 
   <button class="btn btn-sm btn-outline-secondary" (click)="clearSelection()" [hidden]="selectedObjects.size === 0">
     <i-bs  name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
@@ -22,7 +24,7 @@
       <i-bs  name="check"></i-bs>&nbsp;<ng-container i18n>Select all</ng-container>
       </button>
     <div ngbDropdown>
-      
+
       <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
         <i-bs name="three-dots"></i-bs>
         <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
@@ -48,21 +50,36 @@
     <button type="button" class="btn btn-sm btn-outline-danger" (click)="delete()" [disabled]="!userCanBulkEdit(PermissionAction.Delete) || selectedObjects.size === 0">
       <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
     </button>
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="update()" [disabled]="!userCanBulkEdit(PermissionAction.Update) || selectedObjects.size > 0" [hidden]="getFolderSelect()==0">
+      <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Paste</ng-container>
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="cancelFolder()" [hidden]="getFolderSelect()==0"   >
+      <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Cancel</ng-container>
+    </button>
     <button type="button" class="btn btn-sm btn-outline-primary ms-md-5" (click)="openCreateDialog()" *pngxIfPermissions="{ action: PermissionAction.Add, type: permissionType }">
       <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Create</ng-container>
     </button>
 
 </pngx-page-header>
-<div class="form-inline d-flex flex-wrap align-items-center">
+<div class="form-inline d-flex align-items-center">
   <a class="me" (click)="goToFolderRoot()">
-    <i-bs class="" name="folder-fill" width="2rem" 
+    <i-bs class="" name="folder-fill" width="2rem"
     height="2rem" ></i-bs>
   </a>
-  <div *ngFor="let folder of folderPath" class="fs-5">
-    <i-bs class="" name="chevron-right" ></i-bs>&nbsp;<a class="me custom-cursor " (click)="goToFolder(folder)">
-      {{ folder.name }} 
-    </a>
+
+  <div *ngFor="let folder of folderPath; let i = index" class="fs-5" style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center;">
+    <ng-container *ngIf="i >= folderPath.length - 3 || i < 3">
+      <i-bs class="" name="chevron-right"></i-bs>&nbsp;<a class="me custom-cursor" (click)="goToFolder(folder)">
+        {{ folder.name }}
+      </a>
+    </ng-container>
+    <ng-container *ngIf="i === 2&&folderPath.length>i+1 " >
+      <i-bs class="" name="chevron-right"></i-bs>&nbsp;<a class="me custom-cursor" (click)="goToFolder(folder)">
+        ...
+      </a>
+    </ng-container>
   </div>
+
 </div>
 <br>
 <div class="row">
@@ -74,11 +91,11 @@
           <input class="form-control form-control-sm flex-fill w-auto" type="text" autofocus [(ngModel)]="nameFilter" (keyup)="onNameFilterKeyUp($event)" placeholder="Name" i18n-placeholder>
         </div>
       </div>
-    
+
       <ngb-pagination class="col-auto" [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page" [maxSize]="5" (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
     </div>
     @if (displayMode === 'details'){
-      
+
       <!-- <div class="card border mb-3"> -->
         <table class="table table-sm align-middle border shadow-sm">
           <thead>
@@ -117,33 +134,33 @@
                 </td>
                 @if(object.type=='folder'){
                   <td scope="row" class="d-md-table-cell"><button class="btn btn-link ms-0 ps-0 text-start" (click)="userCanEdit(object) ? goToFolder(object) : null; $event.stopPropagation()">
-    
+
                       <i-bs class="me-1" name="folder-fill" width="2rem" height="2rem"></i-bs>
-                    </button> 
+                    </button>
                     <span class="custom-cursor" (click)="userCanEdit(object) ? goToFolder(object) : null; $event.stopPropagation()">{{ object.name }}</span></td>
                 }@else{
                   <td scope="row" class="d-md-table-cell">
-                    <button 
+                    <button
                       class="btn btn-link ms-0 ps-0 text-start"
                       [routerLink]="userCanEdit(object) ? ['/documents', object.document_matching] : null"
                       (click)="$event.stopPropagation()">
-    
-                        <i-bs class="me-1 " name="file-earmark-pdf" width="2rem" 
+
+                        <i-bs class="me-1 " name="file-earmark-pdf" width="2rem"
                         height="2rem"></i-bs>
-                      </button> 
+                      </button>
                         <span class="custom-cursor" [routerLink]="userCanEdit(object) ? ['/documents', object.document_matching] : null"
                         (click)="$event.stopPropagation()">   {{ object.name }}</span>
-                     
+
                       </td>
                   }
                 <!-- <td scope="row" class="d-none d-sm-table-cell">{{ getMatching(object) }}</td> -->
-      
+
                 <td scope="row" class="d-md-table-cell">
                   @if (object.type == "folder") {
                     {{ object.document_count }}
                   } @else {
                     <!-- {{ object.document_count }} -->
-                      
+
                   }
                   </td>
                 @for (column of extraColumns; track column) {
@@ -189,13 +206,13 @@
     @if (displayMode === 'smallCards') {
       <div class="row row-cols-paperless-cards">
         @for (f of data; track f) {
-      
+
           <pngx-folder-card-small class="p-0"  (toggleSelected)="toggleSelected(f)" [selected]="isSelected(f)" [selectedObjects]="selectedObjects" [typeName]="typeName" [folder]="f" (goToFolder)="goToFolder(f)" (filterDocuments)="filterDocuments(f)" (openEditDialog)="openEditDialog(f)" (openDeleteDialog)="openDeleteDialog(f)" (userCanEdit)="userCanEdit(f)" (userCanDelete)="userCanDelete(f)"></pngx-folder-card-small>
         }
       </div>
-      
+
     }
-    
+
     @if (!isLoading) {
       <div class="d-flex mb-2">
         @if (collectionSize > 0) {
@@ -212,14 +229,14 @@
         }
       </div>
     }
-  
+
   </div>
-  
+
 
     <div class="col-auto col-lg-4 col-xl-3 col-sidebar">
-     
+
       <div class="row row-cols-1 g-4 mb-4 sticky-lg-top z-0">
-       
+
         <div class="col">
           <pngx-upload-file-widget></pngx-upload-file-widget>
         </div>
