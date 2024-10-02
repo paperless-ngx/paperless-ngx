@@ -279,7 +279,7 @@ def validate_template_and_render(
         Used to provide context to the user, rather than mostly failing silently
 
         """
-        pattern = rf"{INVALID_VARIABLE_STR}: (\w+)"
+        pattern = rf"{INVALID_VARIABLE_STR}: ([\w]+(?:[.\s]+[\w]+)*)"
         matches = re.findall(pattern, rendered_string)
 
         if matches:
@@ -322,8 +322,6 @@ def validate_template_and_render(
             "{% load filepath %}{% filepath %}" + template_string + "{% endfilepath %}",
         )
         rendered_template = template.render(Context(context))
-
-        logger.info(rendered_template)
 
         # Check for errors
         undefined_vars = detect_undefined_variables(rendered_template)
