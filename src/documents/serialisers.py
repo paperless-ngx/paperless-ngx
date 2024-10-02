@@ -1,4 +1,5 @@
 import datetime
+import logging
 import math
 import re
 import zoneinfo
@@ -28,6 +29,8 @@ from rest_framework import fields
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
+from documents.file_handling import convert_to_django_template_format
+
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.context import set_actor
 
@@ -54,6 +57,8 @@ from documents.parsers import is_mime_type_supported
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import set_permissions_for_object
 from documents.validators import uri_validator
+
+logger = logging.getLogger("paperless.serializers")
 
 
 # https://www.django-rest-framework.org/api-guide/serializers/#example
@@ -1481,12 +1486,17 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         )
 
     def validate_path(self, path: str):
-        result = validate_template_and_render(path)
+        converted_path = convert_to_django_template_format(path)
+        if converted_path != path:
+            logger.warning(
+                f"Storage path {path} is not using the new style format, consider updating",
+            )
+        result = validate_template_and_render(converted_path)
 
         if result is None:
             raise serializers.ValidationError(_("Invalid variable detected."))
 
-        return path
+        return converted_path
 
     def update(self, instance, validated_data):
         """

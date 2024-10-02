@@ -112,8 +112,33 @@ def generate_unique_filename(doc, archive_filename=False):
             return new_filename
 
 
+def convert_to_django_template_format(old_format: str) -> str:
+    """
+    Converts old Python string format (with {}) to Django template style (with {{ }}),
+    while ignoring existing {{ ... }} placeholders.
+
+    :param old_format: The old style format string (e.g., "{title} by {author}")
+    :return: Converted string in Django Template style (e.g., "{{ title }} by {{ author }}")
+    """
+
+    # Step 1: Match placeholders with single curly braces but not those with double braces
+    pattern = r"(?<!\{)\{(\w*)\}(?!\})"  # Matches {var} but not {{var}}
+
+    # Step 2: Replace the placeholders with {{ var }} or {{ }}
+    def replace_with_django(match):
+        variable = match.group(1)  # The variable inside the braces
+        return f"{{{{ {variable} }}}}"  # Convert to {{ variable }}
+
+    # Apply the substitution
+    converted_format = re.sub(pattern, replace_with_django, old_format)
+
+    return converted_format
+
+
 def create_dummy_document():
-    """Create a dummy Document instance with all possible fields filled, including tags and custom fields."""
+    """
+    Create a dummy Document instance with all possible fields filled
+    """
     # Populate the document with representative values for every field
     dummy_doc = Document(
         pk=1,
@@ -139,6 +164,10 @@ def create_dummy_document():
 
 
 def get_creation_date_context(document: Document) -> dict[str, str]:
+    """
+    Given a Document, localizes the creation date and builds a context dictionary with some common, shorthand
+    formatted values from it
+    """
     local_created = timezone.localdate(document.created)
 
     return {
@@ -153,6 +182,10 @@ def get_creation_date_context(document: Document) -> dict[str, str]:
 
 
 def get_added_date_context(document: Document) -> dict[str, str]:
+    """
+    Given a Document, localizes the added date and builds a context dictionary with some common, shorthand
+    formatted values from it
+    """
     local_added = timezone.localdate(document.added)
 
     return {
@@ -171,6 +204,12 @@ def get_basic_metadata_context(
     *,
     no_value_default: str,
 ) -> dict[str, str]:
+    """
+    Given a Document, constructs some basic information about it.  If certain values are not set,
+    they will be replaced with the no_value_default.
+
+    Regardless of set or not, the values will be sanitized
+    """
     return {
         "title": pathvalidate.sanitize_filename(
             document.title,
@@ -201,7 +240,10 @@ def get_basic_metadata_context(
     }
 
 
-def get_tags_context(tags: Iterable[Tag]) -> dict[str, str]:
+def get_tags_context(tags: Iterable[Tag]) -> dict[str, str | list[str]]:
+    """
+    Given an Iterable of tags, constructs some context from them for usage
+    """
     return {
         "tag_list": pathvalidate.sanitize_filename(
             ",".join(
@@ -209,12 +251,18 @@ def get_tags_context(tags: Iterable[Tag]) -> dict[str, str]:
             ),
             replacement_text="-",
         ),
+        # Assumed to be ordered, but a template could loop through to find what they want
+        "tag_name_list": [x.name for x in tags],
     }
 
 
 def get_custom_fields_context(
     custom_fields: Iterable[CustomFieldInstance],
 ) -> dict[str, dict[str, str]]:
+    """
+    Given an Iterable of CustomFieldInstance, builds a dictionary mapping the field name
+    to its type and value
+    """
     return {
         pathvalidate.sanitize_filename(
             field_instance.field.name,
@@ -225,7 +273,7 @@ def get_custom_fields_context(
                 replacement_text="-",
             ),
             "value": pathvalidate.sanitize_filename(
-                field_instance.value,
+                str(field_instance.value),
                 replacement_text="-",
             ),
         }
@@ -274,7 +322,7 @@ def validate_template_and_render(
         ]
     else:
         # or use the real document information
-        tags_list = document.tags.all()
+        tags_list = document.tags.order_by("name").all()
         custom_fields = document.custom_fields.all()
 
     # Build the context dictionary
@@ -294,6 +342,8 @@ def validate_template_and_render(
             "{% load filepath %}{% filepath %}" + template_string + "{% endfilepath %}",
         )
         rendered_template = template.render(Context(context))
+
+        logger.info(rendered_template)
 
         # Check for errors
         undefined_vars = detect_undefined_variables(rendered_template)
@@ -320,28 +370,6 @@ def generate_filename(
     archive_filename=False,
 ):
     path = ""
-
-    def convert_to_django_template_format(old_format: str) -> str:
-        """
-        Converts old Python string format (with {}) to Django template style (with {{ }}),
-        while ignoring existing {{ ... }} placeholders.
-
-        :param old_format: The old style format string (e.g., "{title} by {author}")
-        :return: Converted string in Django Template style (e.g., "{{ title }} by {{ author }}")
-        """
-
-        # Step 1: Match placeholders with single curly braces but not those with double braces
-        pattern = r"(?<!\{)\{(\w*)\}(?!\})"  # Matches {var} but not {{var}}
-
-        # Step 2: Replace the placeholders with {{ var }} or {{ }}
-        def replace_with_django(match):
-            variable = match.group(1)  # The variable inside the braces
-            return f"{{{{ {variable} }}}}"  # Convert to {{ variable }}
-
-        # Apply the substitution
-        converted_format = re.sub(pattern, replace_with_django, old_format)
-
-        return converted_format
 
     def format_filename(document: Document, template_str: str) -> str | None:
         rendered_filename = validate_template_and_render(template_str, document)
