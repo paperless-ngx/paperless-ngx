@@ -40,8 +40,9 @@ export class StoragePathListComponent extends ManagementListComponent<StoragePat
         {
           key: 'path',
           name: $localize`Path`,
+          rendersHtml: true,
           valueFn: (c: StoragePath) => {
-            return c.path
+            return `<code>${c.path}</code>`
           },
         },
       ]

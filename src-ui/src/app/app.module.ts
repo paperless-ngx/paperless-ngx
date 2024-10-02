@@ -41,6 +41,7 @@ import { DocumentCardSmallComponent } from './components/document-list/document-
 import { BulkEditorComponent } from './components/document-list/bulk-editor/bulk-editor.component'
 import { NgxFileDropModule } from 'ngx-file-drop'
 import { TextComponent } from './components/common/input/text/text.component'
+import { TextAreaComponent } from './components/common/input/textarea/textarea.component'
 import { SelectComponent } from './components/common/input/select/select.component'
 import { CheckComponent } from './components/common/input/check/check.component'
 import { UrlComponent } from './components/common/input/url/url.component'
@@ -433,6 +434,7 @@ function initializeApp(settings: SettingsService) {
     DocumentCardSmallComponent,
     BulkEditorComponent,
     TextComponent,
+    TextAreaComponent,
     SelectComponent,
     CheckComponent,
     UrlComponent,
