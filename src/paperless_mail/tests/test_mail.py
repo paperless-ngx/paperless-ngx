@@ -10,6 +10,7 @@ import pytest
 from django.core.management import call_command
 from django.db import DatabaseError
 from django.test import TestCase
+from django.utils import timezone
 from imap_tools import NOT
 from imap_tools import EmailAddress
 from imap_tools import FolderInfo
@@ -28,6 +29,7 @@ from paperless_mail.mail import TagMailAction
 from paperless_mail.mail import apply_mail_action
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+from paperless_mail.models import ProcessedMail
 
 
 @dataclasses.dataclass
@@ -1422,6 +1424,89 @@ class TestMail(
             len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", False)),
             2,
         )  # still 2
+
+
+class TestPostConsumeAction(TestCase):
+    def setUp(self):
+        self.account = MailAccount.objects.create(
+            name="test",
+            imap_server="imap.test.com",
+            imap_port=993,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            username="testuser",
+            password="password",
+        )
+        self.rule = MailRule.objects.create(
+            name="testrule",
+            account=self.account,
+            action=MailRule.MailAction.MARK_READ,
+            action_parameter="",
+            folder="INBOX",
+        )
+        self.message_uid = "12345"
+        self.message_subject = "Test Subject"
+        self.message_date = timezone.make_aware(timezone.datetime(2023, 1, 1, 12, 0, 0))
+
+    @mock.patch("paperless_mail.mail.get_mailbox")
+    @mock.patch("paperless_mail.mail.mailbox_login")
+    @mock.patch("paperless_mail.mail.get_rule_action")
+    def test_post_consume_success(
+        self,
+        mock_get_rule_action,
+        mock_mailbox_login,
+        mock_get_mailbox,
+    ):
+        mock_mailbox = mock.MagicMock()
+        mock_get_mailbox.return_value.__enter__.return_value = mock_mailbox
+        mock_action = mock.MagicMock()
+        mock_get_rule_action.return_value = mock_action
+
+        apply_mail_action(
+            result=[],
+            rule_id=self.rule.pk,
+            message_uid=self.message_uid,
+            message_subject=self.message_subject,
+            message_date=self.message_date,
+        )
+
+        mock_mailbox_login.assert_called_once_with(mock_mailbox, self.account)
+        mock_mailbox.folder.set.assert_called_once_with(self.rule.folder)
+        mock_action.post_consume.assert_called_once_with(
+            mock_mailbox,
+            self.message_uid,
+            self.rule.action_parameter,
+        )
+
+        processed_mail = ProcessedMail.objects.get(uid=self.message_uid)
+        self.assertEqual(processed_mail.status, "SUCCESS")
+
+    @mock.patch("paperless_mail.mail.get_mailbox")
+    @mock.patch("paperless_mail.mail.mailbox_login")
+    @mock.patch("paperless_mail.mail.get_rule_action")
+    def test_post_consume_failure(
+        self,
+        mock_get_rule_action,
+        mock_mailbox_login,
+        mock_get_mailbox,
+    ):
+        mock_mailbox = mock.MagicMock()
+        mock_get_mailbox.return_value.__enter__.return_value = mock_mailbox
+        mock_action = mock.MagicMock()
+        mock_get_rule_action.return_value = mock_action
+        mock_action.post_consume.side_effect = Exception("Test Exception")
+
+        with self.assertRaises(Exception):
+            apply_mail_action(
+                result=[],
+                rule_id=self.rule.pk,
+                message_uid=self.message_uid,
+                message_subject=self.message_subject,
+                message_date=self.message_date,
+            )
+
+        processed_mail = ProcessedMail.objects.get(uid=self.message_uid)
+        self.assertEqual(processed_mail.status, "FAILED")
+        self.assertIn("Test Exception", processed_mail.error)
 
 
 class TestManagementCommand(TestCase):
