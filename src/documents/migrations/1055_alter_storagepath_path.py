@@ -10,7 +10,7 @@ def convert_from_format_to_template(apps, schema_editor):
 
     StoragePath = apps.get_model("documents", "StoragePath")
 
-    from documents.templatetags import convert_to_django_template_format
+    from documents.templatetags.filepath import convert_to_django_template_format
 
     with transaction.atomic():
         for storage_path in StoragePath.objects.all():

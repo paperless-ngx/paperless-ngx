@@ -9,7 +9,7 @@ from django.db.utils import OperationalError
 from django.db.utils import ProgrammingError
 
 from documents.signals import document_consumer_declaration
-from documents.templatetags import convert_to_django_template_format
+from documents.templatetags.filepath import convert_to_django_template_format
 
 
 @register()

@@ -17,7 +17,7 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.templatetags import convert_to_django_template_format
+from documents.templatetags.filepath import convert_to_django_template_format
 
 logger = logging.getLogger("paperless.filehandling")
 
@@ -26,7 +26,7 @@ INVALID_VARIABLE_STR = "InvalidVarError"
 filepath_engine = Engine(
     autoescape=False,
     string_if_invalid=f"{INVALID_VARIABLE_STR}: %s",
-    libraries={"filepath": "documents.templatetags"},
+    libraries={"filepath": "documents.templatetags.filepath"},
 )
 
 
