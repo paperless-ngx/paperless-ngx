@@ -261,6 +261,15 @@ def get_custom_fields_context(
                 field_instance.value,
                 replacement_text="-",
             )
+        elif (
+            field_instance.field.data_type == CustomField.FieldDataType.SELECT
+            and field_instance.field.extra_data["select_options"] is not None
+        ):
+            options = field_instance.field.extra_data["select_options"]
+            value = pathvalidate.sanitize_filename(
+                options[int(field_instance.value)],
+                replacement_text="-",
+            )
         else:
             value = field_instance.value
         field_data["custom_fields"][

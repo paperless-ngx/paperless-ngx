@@ -1266,6 +1266,18 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             value_int=1234,
         )
 
+        cf2 = CustomField.objects.create(
+            name="Select Field",
+            data_type=CustomField.FieldDataType.SELECT,
+            extra_data={"select_options": ["ChoiceOne", "ChoiceTwo"]},
+        )
+
+        CustomFieldInstance.objects.create(
+            document=doc_a,
+            field=cf2,
+            value_select=0,
+        )
+
         with override_settings(
             FILENAME_FORMAT="""
                  {% if "Invoice" in custom_fields %}
@@ -1278,6 +1290,20 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             self.assertEqual(
                 generate_filename(doc_a),
                 "invoices/1234.pdf",
+            )
+
+        with override_settings(
+            FILENAME_FORMAT="""
+                 {% if "Select Field" in custom_fields %}
+                   {{ title }}_{{ custom_fields|get_cf_value:'Select Field' }}
+                 {% else %}
+                   {{ title }}
+                 {% endif %}
+                 """,
+        ):
+            self.assertEqual(
+                generate_filename(doc_a),
+                "Some Title_ChoiceOne.pdf",
             )
 
         cf.name = "Invoice Number"
