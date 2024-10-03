@@ -18,6 +18,7 @@ from imap_tools import MailboxFolderSelectError
 from imap_tools import MailboxLoginError
 from imap_tools import MailMessage
 from imap_tools import MailMessageFlags
+from imap_tools import errors
 
 from documents.models import Correspondent
 from documents.tests.utils import DirectoriesMixin
@@ -1493,9 +1494,12 @@ class TestPostConsumeAction(TestCase):
         mock_get_mailbox.return_value.__enter__.return_value = mock_mailbox
         mock_action = mock.MagicMock()
         mock_get_rule_action.return_value = mock_action
-        mock_action.post_consume.side_effect = Exception("Test Exception")
+        mock_action.post_consume.side_effect = errors.ImapToolsError("Test Exception")
 
-        with self.assertRaises(Exception):
+        with (
+            self.assertRaises(errors.ImapToolsError),
+            self.assertLogs("paperless.mail", level="ERROR") as cm,
+        ):
             apply_mail_action(
                 result=[],
                 rule_id=self.rule.pk,
@@ -1503,6 +1507,9 @@ class TestPostConsumeAction(TestCase):
                 message_subject=self.message_subject,
                 message_date=self.message_date,
             )
+            error_str = cm.output[0]
+            expected_str = "Error while processing mail action during post_consume"
+            self.assertIn(expected_str, error_str)
 
         processed_mail = ProcessedMail.objects.get(uid=self.message_uid)
         self.assertEqual(processed_mail.status, "FAILED")
