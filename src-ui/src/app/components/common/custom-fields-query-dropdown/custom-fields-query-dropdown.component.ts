@@ -2,6 +2,7 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnDestroy,
   Output,
   ViewChild,
 } from '@angular/core'
@@ -148,7 +149,7 @@ export class CustomFieldQueriesModel {
   templateUrl: './custom-fields-query-dropdown.component.html',
   styleUrls: ['./custom-fields-query-dropdown.component.scss'],
 })
-export class CustomFieldsQueryDropdownComponent {
+export class CustomFieldsQueryDropdownComponent implements OnDestroy {
   public CustomFieldQueryComponentType = CustomFieldQueryElementType
   public CustomFieldQueryOperator = CustomFieldQueryOperator
   public CustomFieldDataType = CustomFieldDataType
