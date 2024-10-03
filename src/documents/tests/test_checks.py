@@ -2,6 +2,7 @@ import textwrap
 from unittest import mock
 
 from django.core.checks import Error
+from django.core.checks import Warning
 from django.test import TestCase
 from django.test import override_settings
 
@@ -82,7 +83,7 @@ class TestDocumentChecks(TestCase):
             self.assertEqual(
                 filename_format_check(None),
                 [
-                    Error(
+                    Warning(
                         "Filename format {created}/{title} is using the old style, please update to use double curly brackets",
                         hint="{{ created }}/{{ title }}",
                     ),

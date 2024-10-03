@@ -2,6 +2,7 @@ import textwrap
 
 from django.conf import settings
 from django.core.checks import Error
+from django.core.checks import Warning
 from django.core.checks import register
 from django.core.exceptions import FieldError
 from django.db.utils import OperationalError
@@ -78,7 +79,7 @@ def filename_format_check(app_configs, **kwargs):
         converted_format = convert_to_django_template_format(settings.FILENAME_FORMAT)
         if converted_format != settings.FILENAME_FORMAT:
             return [
-                Error(
+                Warning(
                     f"Filename format {settings.FILENAME_FORMAT} is using the old style, please update to use double curly brackets",
                     hint=converted_format,
                 ),
