@@ -11,6 +11,7 @@ import { PageHeaderComponent } from '../../common/page-header/page-header.compon
 import { StoragePathListComponent } from './storage-path-list.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 
 describe('StoragePathListComponent', () => {
   let component: StoragePathListComponent
@@ -24,6 +25,7 @@ describe('StoragePathListComponent', () => {
         SortableDirective,
         PageHeaderComponent,
         IfPermissionsDirective,
+        SafeHtmlPipe,
       ],
       imports: [
         NgbPaginationModule,
