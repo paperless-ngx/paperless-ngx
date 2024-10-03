@@ -29,12 +29,14 @@ from documents.models import Log
 from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
-from paperless import settings
 
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]
 INT_KWARGS = ["exact", "gt", "gte", "lt", "lte", "isnull"]
 DATE_KWARGS = ["year", "month", "day", "date__gt", "gt", "date__lt", "lt"]
+
+CUSTOM_FIELD_QUERY_MAX_DEPTH = 10
+CUSTOM_FIELD_QUERY_MAX_ATOMS = 20
 
 
 class CorrespondentFilterSet(FilterSet):
@@ -234,19 +236,13 @@ def handle_validation_prefix(func: Callable):
     return wrapper
 
 
-class CustomFieldLookupParser:
+class CustomFieldQueryParser:
     EXPR_BY_CATEGORY = {
         "basic": ["exact", "in", "isnull", "exists"],
         "string": [
-            "iexact",
-            "contains",
             "icontains",
-            "startswith",
             "istartswith",
-            "endswith",
             "iendswith",
-            "regex",
-            "iregex",
         ],
         "arithmetic": [
             "gt",
@@ -258,23 +254,6 @@ class CustomFieldLookupParser:
         "containment": ["contains"],
     }
 
-    # These string lookup expressions are problematic. We shall disable
-    # them by default unless the user explicitly opts in.
-    STR_EXPR_DISABLED_BY_DEFAULT = [
-        # SQLite: is case-sensitive outside the ASCII range
-        "iexact",
-        # SQLite: behaves the same as icontains
-        "contains",
-        # SQLite: behaves the same as istartswith
-        "startswith",
-        # SQLite: behaves the same as iendswith
-        "endswith",
-        # Syntax depends on database backends, can be exploited for ReDoS
-        "regex",
-        # Syntax depends on database backends, can be exploited for ReDoS
-        "iregex",
-    ]
-
     SUPPORTED_EXPR_CATEGORIES = {
         CustomField.FieldDataType.STRING: ("basic", "string"),
         CustomField.FieldDataType.URL: ("basic", "string"),
@@ -282,7 +261,7 @@ class CustomFieldLookupParser:
         CustomField.FieldDataType.BOOL: ("basic",),
         CustomField.FieldDataType.INT: ("basic", "arithmetic"),
         CustomField.FieldDataType.FLOAT: ("basic", "arithmetic"),
-        CustomField.FieldDataType.MONETARY: ("basic", "string"),
+        CustomField.FieldDataType.MONETARY: ("basic", "string", "arithmetic"),
         CustomField.FieldDataType.DOCUMENTLINK: ("basic", "containment"),
         CustomField.FieldDataType.SELECT: ("basic",),
     }
@@ -371,7 +350,7 @@ class CustomFieldLookupParser:
                 elif len(expr) == 3:
                     return self._parse_atom(*expr)
             raise serializers.ValidationError(
-                [_("Invalid custom field lookup expression")],
+                [_("Invalid custom field query expression")],
             )
 
     @handle_validation_prefix
@@ -416,13 +395,7 @@ class CustomFieldLookupParser:
         self._atom_count += 1
         if self._atom_count > self._max_atom_count:
             raise serializers.ValidationError(
-                [
-                    _(
-                        "Maximum number of query conditions exceeded. You can raise "
-                        "the limit by setting PAPERLESS_CUSTOM_FIELD_LOOKUP_MAX_ATOMS "
-                        "in your configuration file.",
-                    ),
-                ],
+                [_("Maximum number of query conditions exceeded.")],
             )
 
         custom_field = self._get_custom_field(id_or_name, validation_prefix="0")
@@ -444,6 +417,11 @@ class CustomFieldLookupParser:
         value_field_name = CustomFieldInstance.get_value_field_name(
             custom_field.data_type,
         )
+        if (
+            custom_field.data_type == CustomField.FieldDataType.MONETARY
+            and op in self.EXPR_BY_CATEGORY["arithmetic"]
+        ):
+            value_field_name = "value_monetary_amount"
         has_field = Q(custom_fields__field=custom_field)
 
         # Our special exists operator.
@@ -494,22 +472,6 @@ class CustomFieldLookupParser:
         # Check if the operator is supported for the current data_type.
         supported = False
         for category in self.SUPPORTED_EXPR_CATEGORIES[custom_field.data_type]:
-            if (
-                category == "string"
-                and op in self.STR_EXPR_DISABLED_BY_DEFAULT
-                and op not in settings.CUSTOM_FIELD_LOOKUP_OPT_IN
-            ):
-                raise serializers.ValidationError(
-                    [
-                        _(
-                            "{expr!r} is disabled by default because it does not "
-                            "behave consistently across database backends, or can "
-                            "cause security risks. If you understand the implications "
-                            "you may enabled it by adding it to "
-                            "`PAPERLESS_CUSTOM_FIELD_LOOKUP_OPT_IN`.",
-                        ).format(expr=op),
-                    ],
-                )
             if op in self.EXPR_BY_CATEGORY[category]:
                 supported = True
                 break
@@ -527,7 +489,7 @@ class CustomFieldLookupParser:
         if not supported:
             raise serializers.ValidationError(
                 [
-                    _("{data_type} does not support lookup expr {expr!r}.").format(
+                    _("{data_type} does not support query expr {expr!r}.").format(
                         data_type=custom_field.data_type,
                         expr=raw_op,
                     ),
@@ -548,7 +510,7 @@ class CustomFieldLookupParser:
             custom_field.data_type == CustomField.FieldDataType.DATE
             and prefix in self.DATE_COMPONENTS
         ):
-            # DateField admits lookups in the form of `year__exact`, etc. These take integers.
+            # DateField admits queries in the form of `year__exact`, etc. These take integers.
             field = serializers.IntegerField()
         elif custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
             # We can be more specific here and make sure the value is a list.
@@ -610,7 +572,7 @@ class CustomFieldLookupParser:
                 custom_fields__value_document_ids__isnull=False,
             )
 
-        # First we lookup reverse links from the requested documents.
+        # First we look up reverse links from the requested documents.
         links = CustomFieldInstance.objects.filter(
             document_id__in=value,
             field__data_type=CustomField.FieldDataType.DOCUMENTLINK,
@@ -635,22 +597,14 @@ class CustomFieldLookupParser:
         # guard against queries that are too deeply nested
         self._current_depth += 1
         if self._current_depth > self._max_query_depth:
-            raise serializers.ValidationError(
-                [
-                    _(
-                        "Maximum nesting depth exceeded. You can raise the limit "
-                        "by setting PAPERLESS_CUSTOM_FIELD_LOOKUP_MAX_DEPTH in "
-                        "your configuration file.",
-                    ),
-                ],
-            )
+            raise serializers.ValidationError([_("Maximum nesting depth exceeded.")])
         try:
             yield
         finally:
             self._current_depth -= 1
 
 
-class CustomFieldLookupFilter(Filter):
+class CustomFieldQueryFilter(Filter):
     def __init__(self, validation_prefix):
         """
         A filter that filters documents based on custom field name and value.
@@ -665,10 +619,10 @@ class CustomFieldLookupFilter(Filter):
         if not value:
             return qs
 
-        parser = CustomFieldLookupParser(
+        parser = CustomFieldQueryParser(
             self._validation_prefix,
-            max_query_depth=settings.CUSTOM_FIELD_LOOKUP_MAX_DEPTH,
-            max_atom_count=settings.CUSTOM_FIELD_LOOKUP_MAX_ATOMS,
+            max_query_depth=CUSTOM_FIELD_QUERY_MAX_DEPTH,
+            max_atom_count=CUSTOM_FIELD_QUERY_MAX_ATOMS,
         )
         q, annotations = parser.parse(value)
 
@@ -722,7 +676,7 @@ class DocumentFilterSet(FilterSet):
         exclude=True,
     )
 
-    custom_field_lookup = CustomFieldLookupFilter("custom_field_lookup")
+    custom_field_query = CustomFieldQueryFilter("custom_field_query")
 
     shared_by__id = SharedByUser()
 
