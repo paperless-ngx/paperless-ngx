@@ -18,6 +18,9 @@ export class TextAreaComponent extends AbstractInputComponent<string> {
   @Input()
   placeholder: string = ''
 
+  @Input()
+  monospace: boolean = false
+
   constructor() {
     super()
   }

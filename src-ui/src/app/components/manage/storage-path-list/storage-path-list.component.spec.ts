@@ -12,6 +12,7 @@ import { StoragePathListComponent } from './storage-path-list.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
+import { StoragePath } from 'src/app/data/storage-path'
 
 describe('StoragePathListComponent', () => {
   let component: StoragePathListComponent
@@ -71,6 +72,17 @@ describe('StoragePathListComponent', () => {
   it('should use correct delete message', () => {
     expect(component.getDeleteMessage({ id: 1, name: 'StoragePath1' })).toEqual(
       'Do you really want to delete the storage path "StoragePath1"?'
+    )
+  })
+
+  it('should truncate path if necessary', () => {
+    const path: StoragePath = {
+      id: 1,
+      name: 'StoragePath1',
+      path: 'a'.repeat(100),
+    }
+    expect(component.extraColumns[0].valueFn(path)).toEqual(
+      `<code>${'a'.repeat(49)}...</code>`
     )
   })
 })
