@@ -54,7 +54,7 @@ from documents.models import WorkflowTrigger
 from documents.parsers import is_mime_type_supported
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import set_permissions_for_object
-from documents.templatetags import convert_to_django_template_format
+from documents.templatetags.filepath import convert_to_django_template_format
 from documents.validators import uri_validator
 
 logger = logging.getLogger("paperless.serializers")

@@ -438,6 +438,10 @@ with more complex logic.
 - `{{ tag_name_list }}`: A list of tag names applied to the document, ordered by the tag name. Note this is a list, not a single string
 - `{{ custom_fields }}`: A mapping of custom field names to their type and value. A user can access the mapping by field name or check if a field is applied by checking its existence in the variable.
 
+!!! tip
+
+    To access a custom field which has a space in the name, use the `get_cf_value` filter.  See the examples below.
+
 #### Examples
 
 This example will construct a path based on the archive serial number range:
@@ -485,6 +489,12 @@ To use custom fields:
 
 If the document has a custom field named "Invoice" with a value of 123, it would be filed into the `invoices/123.pdf`, but a document without the custom field
 would be filed to `not-invoices/Title.pdf`
+
+If the custom field is named "Invoice Number", you would access the value of it via the `get_cf_value` filter due to quirks of the Django Template Language:
+
+```django
+"invoices/{{ custom_fields|get_cf_value:'Invoice Number' }}"
+```
 
 ## Automatic recovery of invalid PDFs {#pdf-recovery}
 

@@ -1245,17 +1245,6 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             )
 
     def test_template_with_custom_fields(self):
-        sp = StoragePath.objects.create(
-            name="sp1",
-            path="""
-                 {% if "Invoice" in custom_fields %}
-                   invoices/{{ custom_fields.Invoice.value }}
-                 {% else %}
-                   not-invoices/{{ title }}
-                 {% endif %}
-                 """,
-        )
-
         doc_a = Document.objects.create(
             title="Some Title",
             created=timezone.make_aware(datetime.datetime(2020, 6, 25, 7, 36, 51, 153)),
@@ -1264,7 +1253,6 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             pk=2,
             checksum="2",
             archive_serial_number=25,
-            storage_path=sp,
         )
 
         cf = CustomField.objects.create(
@@ -1278,17 +1266,32 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             value_int=1234,
         )
 
-        self.assertEqual(
-            generate_filename(doc_a),
-            "invoices/1234.pdf",
-        )
+        with override_settings(
+            FILENAME_FORMAT="""
+                 {% if "Invoice" in custom_fields %}
+                   invoices/{{ custom_fields|get_cf_value:'Invoice' }}
+                 {% else %}
+                   not-invoices/{{ title }}
+                 {% endif %}
+                 """,
+        ):
+            self.assertEqual(
+                generate_filename(doc_a),
+                "invoices/1234.pdf",
+            )
 
-        cfi.delete()
+        cf.name = "Invoice Number"
+        cfi.value_int = 4567
+        cfi.save()
+        cf.save()
 
-        self.assertEqual(
-            generate_filename(doc_a),
-            "not-invoices/Some Title.pdf",
-        )
+        with override_settings(
+            FILENAME_FORMAT="invoices/{{ custom_fields|get_cf_value:'Invoice Number' }}",
+        ):
+            self.assertEqual(
+                generate_filename(doc_a),
+                "invoices/4567.pdf",
+            )
 
     def test_using_other_filters(self):
         doc_a = Document.objects.create(

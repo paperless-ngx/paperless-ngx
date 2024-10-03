@@ -26,7 +26,10 @@ INVALID_VARIABLE_STR = "InvalidVarError"
 filepath_engine = Engine(
     autoescape=False,
     string_if_invalid=f"{INVALID_VARIABLE_STR}: %s",
-    libraries={"filepath": "documents.templatetags.filepath"},
+    libraries={
+        "filepath": "documents.templatetags.filepath",
+        "get_cf_value": "documents.templatetags.get_cf_value",
+    },
 )
 
 
@@ -330,7 +333,9 @@ def validate_template_and_render(
     try:
         # We load the custom tag used to remove spaces and newlines from the final string around the user string
         template = filepath_engine.from_string(
-            "{% load filepath %}{% filepath %}" + template_string + "{% endfilepath %}",
+            "{% load filepath %}{% load get_cf_value %}{% filepath %}"
+            + template_string
+            + "{% endfilepath %}",
         )
         rendered_template = template.render(Context(context))
 
