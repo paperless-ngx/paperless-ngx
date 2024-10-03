@@ -1,11 +1,9 @@
 import json
-import re
 from collections.abc import Callable
 from datetime import date
 from unittest.mock import Mock
 from urllib.parse import quote
 
-import pytest
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 
@@ -13,7 +11,6 @@ from documents.models import CustomField
 from documents.models import Document
 from documents.serialisers import DocumentSerializer
 from documents.tests.utils import DirectoriesMixin
-from paperless import settings
 
 
 class DocumentWrapper:
@@ -31,11 +28,7 @@ class DocumentWrapper:
         return self._document.custom_fields.get(field__name=custom_field).value
 
 
-def string_expr_opted_in(op):
-    return op in settings.CUSTOM_FIELD_LOOKUP_OPT_IN
-
-
-class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
+class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
     def setUp(self):
         super().setUp()
 
@@ -111,6 +104,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self._create_document(monetary_field="USD100.00")
         self._create_document(monetary_field="USD1.00")
         self._create_document(monetary_field="EUR50.00")
+        self._create_document(monetary_field="101.00")
 
         # CustomField.FieldDataType.DOCUMENTLINK
         self._create_document(documentlink_field=None)
@@ -188,7 +182,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             "/api/documents/?"
             + "&".join(
                 (
-                    f"custom_field_lookup={query_string}",
+                    f"custom_field_query={query_string}",
                     "ordering=archive_serial_number",
                     "page=1",
                     f"page_size={len(self.documents)}",
@@ -212,7 +206,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             "/api/documents/?"
             + "&".join(
                 (
-                    f"custom_field_lookup={query_string}",
+                    f"custom_field_query={query_string}",
                     "ordering=archive_serial_number",
                     "page=1",
                     f"page_size={len(self.documents)}",
@@ -313,52 +307,12 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
     # ==========================================================#
     # Expressions for string, URL, and monetary fields          #
     # ==========================================================#
-    @pytest.mark.skipif(
-        not string_expr_opted_in("iexact"),
-        reason="iexact expr is disabled.",
-    )
-    def test_iexact(self):
-        self._assert_query_match_predicate(
-            ["string_field", "iexact", "paperless"],
-            lambda document: "string_field" in document
-            and document["string_field"] is not None
-            and document["string_field"].lower() == "paperless",
-        )
-
-    @pytest.mark.skipif(
-        not string_expr_opted_in("contains"),
-        reason="contains expr is disabled.",
-    )
-    def test_contains(self):
-        # WARNING: SQLite treats "contains" as "icontains"!
-        # You should avoid "contains" unless you know what you are doing!
-        self._assert_query_match_predicate(
-            ["string_field", "contains", "aper"],
-            lambda document: "string_field" in document
-            and document["string_field"] is not None
-            and "aper" in document["string_field"],
-        )
-
     def test_icontains(self):
         self._assert_query_match_predicate(
             ["string_field", "icontains", "aper"],
             lambda document: "string_field" in document
             and document["string_field"] is not None
             and "aper" in document["string_field"].lower(),
-        )
-
-    @pytest.mark.skipif(
-        not string_expr_opted_in("startswith"),
-        reason="startswith expr is disabled.",
-    )
-    def test_startswith(self):
-        # WARNING: SQLite treats "startswith" as "istartswith"!
-        # You should avoid "startswith" unless you know what you are doing!
-        self._assert_query_match_predicate(
-            ["string_field", "startswith", "paper"],
-            lambda document: "string_field" in document
-            and document["string_field"] is not None
-            and document["string_field"].startswith("paper"),
         )
 
     def test_istartswith(self):
@@ -369,52 +323,12 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             and document["string_field"].lower().startswith("paper"),
         )
 
-    @pytest.mark.skipif(
-        not string_expr_opted_in("endswith"),
-        reason="endswith expr is disabled.",
-    )
-    def test_endswith(self):
-        # WARNING: SQLite treats "endswith" as "iendswith"!
-        # You should avoid "endswith" unless you know what you are doing!
-        self._assert_query_match_predicate(
-            ["string_field", "iendswith", "less"],
-            lambda document: "string_field" in document
-            and document["string_field"] is not None
-            and document["string_field"].lower().endswith("less"),
-        )
-
     def test_iendswith(self):
         self._assert_query_match_predicate(
             ["string_field", "iendswith", "less"],
             lambda document: "string_field" in document
             and document["string_field"] is not None
             and document["string_field"].lower().endswith("less"),
-        )
-
-    @pytest.mark.skipif(
-        not string_expr_opted_in("regex"),
-        reason="regex expr is disabled.",
-    )
-    def test_regex(self):
-        # WARNING: the regex syntax is database dependent!
-        self._assert_query_match_predicate(
-            ["string_field", "regex", r"^p.+s$"],
-            lambda document: "string_field" in document
-            and document["string_field"] is not None
-            and re.match(r"^p.+s$", document["string_field"]),
-        )
-
-    @pytest.mark.skipif(
-        not string_expr_opted_in("iregex"),
-        reason="iregex expr is disabled.",
-    )
-    def test_iregex(self):
-        # WARNING: the regex syntax is database dependent!
-        self._assert_query_match_predicate(
-            ["string_field", "iregex", r"^p.+s$"],
-            lambda document: "string_field" in document
-            and document["string_field"] is not None
-            and re.match(r"^p.+s$", document["string_field"], re.IGNORECASE),
         )
 
     def test_url_field_istartswith(self):
@@ -425,28 +339,6 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             lambda document: "url_field" in document
             and document["url_field"] is not None
             and document["url_field"].startswith("http://"),
-        )
-
-    @pytest.mark.skipif(
-        not string_expr_opted_in("iregex"),
-        reason="regex expr is disabled.",
-    )
-    def test_monetary_field_iregex(self):
-        # Monetary fields supports all of the expressions above.
-        # Just showing one of them here.
-        #
-        # Unfortunately we can't do arithmetic comparisons on monetary field,
-        # but you are welcome to use regex to do some of that.
-        # E.g., USD between 100.00 and 999.99:
-        self._assert_query_match_predicate(
-            ["monetary_field", "regex", r"USD[1-9][0-9]{2}\.[0-9]{2}"],
-            lambda document: "monetary_field" in document
-            and document["monetary_field"] is not None
-            and re.match(
-                r"USD[1-9][0-9]{2}\.[0-9]{2}",
-                document["monetary_field"],
-                re.IGNORECASE,
-            ),
         )
 
     # ==========================================================#
@@ -500,6 +392,17 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             lambda document: "date_field" in document
             and document["date_field"] is not None
             and document["date_field"].year >= 2024,
+        )
+
+    def test_gt_monetary(self):
+        self._assert_query_match_predicate(
+            ["monetary_field", "gt", "99"],
+            lambda document: "monetary_field" in document
+            and document["monetary_field"] is not None
+            and (
+                document["monetary_field"] == "USD100.00"  # With currency symbol
+                or document["monetary_field"] == "101.00"  # No currency symbol
+            ),
         )
 
     # ==========================================================#
@@ -586,68 +489,57 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
     def test_invalid_json(self):
         self._assert_validation_error(
             "not valid json",
-            ["custom_field_lookup"],
+            ["custom_field_query"],
             "must be valid JSON",
         )
 
     def test_invalid_expression(self):
         self._assert_validation_error(
             json.dumps("valid json but not valid expr"),
-            ["custom_field_lookup"],
-            "Invalid custom field lookup expression",
+            ["custom_field_query"],
+            "Invalid custom field query expression",
         )
 
     def test_invalid_custom_field_name(self):
         self._assert_validation_error(
             json.dumps(["invalid name", "iexact", "foo"]),
-            ["custom_field_lookup", "0"],
+            ["custom_field_query", "0"],
             "is not a valid custom field",
         )
 
     def test_invalid_operator(self):
         self._assert_validation_error(
             json.dumps(["integer_field", "iexact", "foo"]),
-            ["custom_field_lookup", "1"],
-            "does not support lookup expr",
+            ["custom_field_query", "1"],
+            "does not support query expr",
         )
 
     def test_invalid_value(self):
         self._assert_validation_error(
             json.dumps(["select_field", "exact", "not an option"]),
-            ["custom_field_lookup", "2"],
+            ["custom_field_query", "2"],
             "integer",
         )
 
     def test_invalid_logical_operator(self):
         self._assert_validation_error(
             json.dumps(["invalid op", ["integer_field", "gt", 0]]),
-            ["custom_field_lookup", "0"],
+            ["custom_field_query", "0"],
             "Invalid logical operator",
         )
 
     def test_invalid_expr_list(self):
         self._assert_validation_error(
             json.dumps(["AND", "not a list"]),
-            ["custom_field_lookup", "1"],
+            ["custom_field_query", "1"],
             "Invalid expression list",
         )
 
     def test_invalid_operator_prefix(self):
         self._assert_validation_error(
             json.dumps(["integer_field", "foo__gt", 0]),
-            ["custom_field_lookup", "1"],
-            "does not support lookup expr",
-        )
-
-    @pytest.mark.skipif(
-        string_expr_opted_in("regex"),
-        reason="user opted into allowing regex expr",
-    )
-    def test_disabled_operator(self):
-        self._assert_validation_error(
-            json.dumps(["string_field", "regex", r"^p.+s$"]),
-            ["custom_field_lookup", "1"],
-            "disabled by default",
+            ["custom_field_query", "1"],
+            "does not support query expr",
         )
 
     def test_query_too_deep(self):
@@ -656,7 +548,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             query = ["NOT", query]
         self._assert_validation_error(
             json.dumps(query),
-            ["custom_field_lookup", *(["1"] * 10)],
+            ["custom_field_query", *(["1"] * 10)],
             "Maximum nesting depth exceeded",
         )
 
@@ -665,6 +557,6 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         query = ["AND", [atom for _ in range(21)]]
         self._assert_validation_error(
             json.dumps(query),
-            ["custom_field_lookup", "1", "20"],
+            ["custom_field_query", "1", "20"],
             "Maximum number of query conditions exceeded",
         )
