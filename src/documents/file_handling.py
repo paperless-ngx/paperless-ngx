@@ -241,24 +241,35 @@ def get_custom_fields_context(
     Given an Iterable of CustomFieldInstance, builds a dictionary mapping the field name
     to its type and value
     """
-    return {
-        "custom_fields": {
+    field_data = {"custom_fields": {}}
+    for field_instance in custom_fields:
+        type_ = pathvalidate.sanitize_filename(
+            field_instance.field.data_type,
+            replacement_text="-",
+        )
+        # String types need to be sanitized
+        if field_instance.field.data_type in {
+            CustomField.FieldDataType.DOCUMENTLINK,
+            CustomField.FieldDataType.MONETARY,
+            CustomField.FieldDataType.STRING,
+            CustomField.FieldDataType.URL,
+        }:
+            value = pathvalidate.sanitize_filename(
+                field_instance.value,
+                replacement_text="-",
+            )
+        else:
+            value = field_instance.value
+        field_data["custom_fields"][
             pathvalidate.sanitize_filename(
                 field_instance.field.name,
                 replacement_text="-",
-            ): {
-                "type": pathvalidate.sanitize_filename(
-                    field_instance.field.data_type,
-                    replacement_text="-",
-                ),
-                "value": pathvalidate.sanitize_filename(
-                    str(field_instance.value),
-                    replacement_text="-",
-                ),
-            }
-            for field_instance in custom_fields
-        },
-    }
+            )
+        ] = {
+            "type": type_,
+            "value": value,
+        }
+    return field_data
 
 
 def validate_template_and_render(
