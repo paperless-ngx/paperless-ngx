@@ -302,7 +302,7 @@ describe('DocumentListComponent', () => {
     displayModeButtons[0].triggerEventHandler('change')
     fixture.detectChanges()
     expect(component.list.displayMode).toEqual('table')
-    expect(fixture.debugElement.queryAll(By.css('tr'))).toHaveLength(3)
+    expect(fixture.debugElement.queryAll(By.css('tr'))).toHaveLength(4)
 
     displayModeButtons[1].nativeElement.checked = true
     displayModeButtons[1].triggerEventHandler('change')
