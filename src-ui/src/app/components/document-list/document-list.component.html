@@ -140,7 +140,7 @@
   } @else {
     @if (list.displayMode === DisplayMode.LARGE_CARDS) {
       <div>
-        @for (d of list.documents; track trackByDocumentId($index, d)) {
+        @for (d of list.documents; track d.id) {
           <pngx-document-card-large
             [selected]="list.isSelected(d)"
             (toggleSelected)="toggleSelected(d, $event)"
@@ -269,7 +269,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (d of list.documents; track trackByDocumentId($index, d)) {
+            @for (d of list.documents; track d.id) {
               <tr (click)="toggleSelected(d, $event); $event.stopPropagation();" (dblclick)="openDocumentDetail(d)" [ngClass]="list.isSelected(d) ? 'table-row-selected' : ''">
                 <td>
                   <div class="form-check">
@@ -364,7 +364,7 @@
     }
     @if (list.displayMode === DisplayMode.SMALL_CARDS) {
       <div class="row row-cols-paperless-cards">
-        @for (d of list.documents; track trackByDocumentId($index, d)) {
+        @for (d of list.documents; track d.id) {
           <pngx-document-card-small class="p-0"
             [selected]="list.isSelected(d)"
             (toggleSelected)="toggleSelected(d, $event)"

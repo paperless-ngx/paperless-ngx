@@ -108,6 +108,7 @@ import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
 import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { CustomFieldsDropdownComponent } from './components/common/custom-fields-dropdown/custom-fields-dropdown.component'
+import { CustomFieldsQueryDropdownComponent } from './components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
 import { ProfileEditDialogComponent } from './components/common/profile-edit-dialog/profile-edit-dialog.component'
 import { PdfViewerModule } from 'ng2-pdf-viewer'
 import { DocumentLinkComponent } from './components/common/input/document-link/document-link.component'
@@ -141,6 +142,7 @@ import {
   arrowRightShort,
   arrowUpRight,
   asterisk,
+  braces,
   bodyText,
   boxArrowUp,
   boxArrowUpRight,
@@ -198,6 +200,7 @@ import {
   link,
   listTask,
   listUl,
+  nodePlus,
   pencil,
   people,
   peopleFill,
@@ -227,6 +230,7 @@ import {
   uiRadios,
   upcScan,
   x,
+  xCircle,
   xLg,
 } from 'ngx-bootstrap-icons'
 
@@ -242,6 +246,7 @@ const icons = {
   arrowRightShort,
   arrowUpRight,
   asterisk,
+  braces,
   bodyText,
   boxArrowUp,
   boxArrowUpRight,
@@ -299,6 +304,7 @@ const icons = {
   link,
   listTask,
   listUl,
+  nodePlus,
   pencil,
   people,
   peopleFill,
@@ -328,6 +334,7 @@ const icons = {
   uiRadios,
   upcScan,
   x,
+  xCircle,
   xLg,
 }
 
@@ -485,6 +492,7 @@ function initializeApp(settings: SettingsService) {
     CustomFieldsComponent,
     CustomFieldEditDialogComponent,
     CustomFieldsDropdownComponent,
+    CustomFieldsQueryDropdownComponent,
     ProfileEditDialogComponent,
     DocumentLinkComponent,
     PreviewPopupComponent,

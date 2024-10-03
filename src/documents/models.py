@@ -22,6 +22,9 @@ from multiselectfield import MultiSelectField
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
 
+from django.db.models import Case
+from django.db.models.functions import Cast
+from django.db.models.functions import Substr
 from django_softdelete.models import SoftDeleteModel
 
 from documents.data_models import DocumentSource
@@ -519,6 +522,7 @@ class SavedViewFilterRule(models.Model):
         (39, _("has custom field in")),
         (40, _("does not have custom field in")),
         (41, _("does not have custom field")),
+        (42, _("custom fields query")),
     ]
 
     saved_view = models.ForeignKey(
@@ -920,6 +924,27 @@ class CustomFieldInstance(models.Model):
     value_float = models.FloatField(null=True)
 
     value_monetary = models.CharField(null=True, max_length=128)
+
+    value_monetary_amount = models.GeneratedField(
+        expression=Case(
+            # If the value starts with a number and no currency symbol, use the whole string
+            models.When(
+                value_monetary__regex=r"^\d+",
+                then=Cast(
+                    Substr("value_monetary", 1),
+                    output_field=models.DecimalField(decimal_places=2, max_digits=65),
+                ),
+            ),
+            # If the value starts with a 3-char currency symbol, use the rest of the string
+            default=Cast(
+                Substr("value_monetary", 4),
+                output_field=models.DecimalField(decimal_places=2, max_digits=65),
+            ),
+            output_field=models.DecimalField(decimal_places=2, max_digits=65),
+        ),
+        output_field=models.DecimalField(decimal_places=2, max_digits=65),
+        db_persist=True,
+    )
 
     value_document_ids = models.JSONField(null=True)
 
