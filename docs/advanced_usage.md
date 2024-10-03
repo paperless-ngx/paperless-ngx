@@ -465,9 +465,9 @@ For a document with an ASN of 205, it would result in `somepath/asn-201-400/asn-
 a document with an ASN of 355 would be placed in `somepath/asn-201-400/asn-3xx/Title.pdf`.
 
 ```django
-{% if document.mime_type == \"application/pdf\" %}
+{% if document.mime_type == "application/pdf" %}
   pdfs
-{% elif document.mime_type == \"image/png\" %}
+{% elif document.mime_type == "image/png" %}
   pngs
 {% else %}
   others
@@ -480,8 +480,8 @@ For a PDF document, it would result in `pdfs/Title.pdf`, but for a PNG document,
 To use custom fields:
 
 ```django
-{% if \"Invoice\" in custom_fields %}
-  invoices/{{ custom_fields.Invoice.value\ }}
+{% if "Invoice" in custom_fields %}
+  invoices/{{ custom_fields.Invoice.value }}
 {% else %}
   not-invoices/{{ title }}
 {% endif %}
@@ -495,6 +495,18 @@ If the custom field is named "Invoice Number", you would access the value of it 
 ```django
 "invoices/{{ custom_fields|get_cf_value:'Invoice Number' }}"
 ```
+
+An example using Django's [date filters](https://docs.djangoproject.com/en/5.1/ref/templates/builtins/#date) and others:
+
+```django
+invoices/
+{{ custom_fields|get_cf_value:"Date Field"|date:"Y" }}/
+{{ custom_fields|get_cf_value:"Date Field"|date:"m" }}/
+{{ custom_fields|get_cf_value:"Date Field"|date:"d" }}/
+Invoice_{{ custom_fields|get_cf_value:"Select Field" }}_{{ custom_fields|get_cf_value:"Date Field"|cut:"-" }}
+```
+
+This will create a path like `invoices/2022/01/01/Invoice_OptionTwo_20220101.pdf` if the custom field "Date Field" is set to January 1, 2022 and "Select Field" is set to `OptionTwo`.
 
 ## Automatic recovery of invalid PDFs {#pdf-recovery}
 
