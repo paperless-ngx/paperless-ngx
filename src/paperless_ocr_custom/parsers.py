@@ -161,6 +161,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                                   max_retries=5, delay=5, timeout=100,
                                   status_code_success=[200],
                                   status_code_fail=[], data_compare={}):
+
         retries = 0
         data_ocr = None
         while retries < max_retries:
@@ -168,6 +169,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                 response_ocr = requests.request(method, url, headers=headers,
                                                 params=params, data=payload,
                                                 timeout=timeout, )
+                self.log.info("Got response", response_ocr.status_code)
                 if response_ocr.status_code in status_code_success:
                     flag = False
                     for key, value in data_compare.items():
@@ -180,38 +182,40 @@ class RasterisedDocumentCustomParser(DocumentParser):
                     else:
                         return response_ocr.json()
                 if response_ocr.status_code in status_code_fail:
+                    self.log.error("Got response", response_ocr.status_code)
                     return False
                 else:
-                    logging.error('OCR error response: %s',
-                                  response_ocr.status_code)
+                    self.log.error('OCR error response: %s',
+                                   response_ocr.json())
                     retries += 1
                     time.sleep(delay)
             except requests.exceptions.Timeout:
-                logging.warning('OCR request timed out. Retrying...')
                 retries += 1
+                self.log.warning(
+                    f'OCR request timed out. Retrying... time{retries}')
                 time.sleep(delay)
             except requests.exceptions.RequestException as e:
-                logging.error('OCR request failed: %s', e)
-                retries += 1
-                time.sleep(delay)
+                self.log.exception('OCR request failed: %s', e)
+                break
 
-        logging.error('Max retries reached. OCR request failed.')
+            except Exception as e:
+                self.log.exception(e)
+                break
+
+        self.log.error('Max retries reached. OCR request failed.')
         return None
 
-    def get_token_ocr_field_by_refresh_token(self, username_ocr, password_ocr,
-                                             api_login_ocr, api_refresh_ocr,
-                                             refresh_token_ocr_field,
-                                             api_refresh_ocr_field):
-        self.log.debug('refresh_token_ocr',api_login_ocr,api_refresh_ocr,refresh_token_ocr_field,api_refresh_ocr_field)
+    def get_access_and_refresh_token(self, refresh_token_ocr, api_refresh_ocr,
+                                     username_ocr, password_ocr,
+                                     api_login_ocr):
         # check token
         headers = {
             'Content-Type': 'application/json'
         }
         payload = json.dumps({
-            "refresh": f"{api_refresh_ocr}"
+            "refresh": f"{refresh_token_ocr}"
         })
-        token = self.call_ocr_api_with_retries("POST",
-                                               api_refresh_ocr,
+        token = self.call_ocr_api_with_retries("POST", api_refresh_ocr,
                                                headers,
                                                params={},
                                                payload=payload,
@@ -221,17 +225,16 @@ class RasterisedDocumentCustomParser(DocumentParser):
                                                status_code_fail=[401])
         if token == False:
             token = self.login_ocr(username_ocr, password_ocr, api_login_ocr)
-
         return token
 
-    def login_ocr(self, username_ocr, password_ocr, api_login_ocr, **args):
+    def login_ocr(self, username_ocr, password_ocr, api_login_ocr):
         # check token
         payload = f"username={username_ocr}&password={password_ocr}"
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded'
         }
-        return self.call_ocr_api_with_retries("POST",
-                                              api_login_ocr,
+
+        return self.call_ocr_api_with_retries("POST", api_login_ocr,
                                               headers=headers,
                                               params={},
                                               payload=payload,
@@ -296,9 +299,8 @@ class RasterisedDocumentCustomParser(DocumentParser):
         password_ocr = args.get("password_ocr", '')
         api_login_ocr = args.get("api_login_ocr", '')
         api_refresh_ocr = args.get("api_refresh_ocr", '')
-        refresh_token_ocr_field = args.get("refresh_token_ocr_field", '')
-        api_refresh_ocr_field = args.get("api_refresh_ocr_field", '')
-        api_upload_file_ocr = args.get("api_upload_file_ocr",'')
+        refresh_token_ocr = args.get("refresh_token_ocr", '')
+        api_upload_file_ocr = args.get("api_upload_file_ocr", '')
         # count page number
         page_count = 1
         try:
@@ -316,24 +318,12 @@ class RasterisedDocumentCustomParser(DocumentParser):
             # login API custom-field
             if len(args) == 0 and args.get('form_code') == '':
                 return data_ocr, data_ocr_fields, form_code
-                # login for the first time ...
-            if access_token_ocr == '':
-                token = self.login_ocr(username_ocr, password_ocr,
-                                       api_login_ocr)
-                if token is not None:
-                    args["access_token_ocr"] = token['access']
-                    app_config.user_args[
-                        "access_token_ocr"] = token['access']
-                    args["refresh_token_ocr"] = token['refresh']
-                    app_config.user_args[
-                        "refresh_token_ocr"] = token['refresh']
-                    app_config.save()
 
             # upload file -------------------
             get_file_id = ''
 
             headers = {
-                'Authorization': f"Bearer {args.get('access_token_ocr')}"
+                'Authorization': f"Bearer {access_token_ocr}"
             }
             pdf_data = None
             with open(path_file, 'rb') as file:
@@ -350,24 +340,29 @@ class RasterisedDocumentCustomParser(DocumentParser):
                                             headers=headers)
 
             # login get access token and refresh token
-            if response_upload.status_code == 401:
-                token = self.get_token_ocr_field_by_refresh_token(username_ocr,
-                                                                  password_ocr,
-                                                                  api_login_ocr,
-                                                                  api_refresh_ocr,
-                                                                  refresh_token_ocr_field,
-                                                                  api_refresh_ocr_field)
-                if token is not None:
+            if access_token_ocr == '' or response_upload.status_code == 401:
+                token = self.get_access_and_refresh_token(
+                    username_ocr=username_ocr,
+                    password_ocr=password_ocr,
+                    api_login_ocr=api_login_ocr,
+                    refresh_token_ocr=refresh_token_ocr,
+                    api_refresh_ocr=api_refresh_ocr)
+
+                if token is not None and token.get('access', '') != '' and token.get('refresh_token', '') != '':
                     args["access_token_ocr"] = token['access']
-                    app_config.user_args[
-                        "access_token_ocr"] = token['access']
+                    app_config.user_args["access_token_ocr"] = token['access']
                     args["refresh_token_ocr"] = token['refresh']
-                    app_config.user_args[
-                        "refresh_token_ocr"] = token['refresh']
-                    app_config.save()
+                    app_config.user_args["refresh_token_ocr"] = token[
+                        'refresh']
+
+                elif token is not None and token.get('access','') != '' and token.get('refresh_token', '') == '':
+                    args["access_token_ocr"] = token['access']
+                    app_config.user_args["access_token_ocr"] = token['access']
+
                 else:
                     raise Exception(
                         "Cannot get access token and refresh token")
+                app_config.save()
 
                 headers = {
                     'Authorization': f"Bearer {args.get('access_token_ocr')}"
@@ -378,17 +373,13 @@ class RasterisedDocumentCustomParser(DocumentParser):
                 payload = {'title': (str(path_file).split("/")[-1]),
                            'folder': '1',
                            'extract': '1'}
-                response_upload = requests.post(api_upload_file_ocr, data=payload,
-                                                files={
-                                                    'file': (
-                                                        str(path_file).split("/")[
-                                                            -1],
-                                                        pdf_data)},
+                response_upload = requests.post(api_upload_file_ocr,
+                                                data=payload,
+                                                files={'file': (str(path_file).split("/")[-1], pdf_data)},
                                                 headers=headers)
 
             if response_upload.status_code == 201:
                 get_file_id = response_upload.json().get('id', '')
-                self.log.debug("Upload------------------------------------------")
 
                 # else :
                 #     # logging.error('upload file: ', response_upload.status_code)
@@ -405,8 +396,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                                                                   max_retries=5,
                                                                   delay=page_count * 2,
                                                                   timeout=30,
-                                                                  data_compare={
-                                                                      'status_code': 1})
+                                                                  data_compare={'status_code': 1})
 
                 if data_ocr_general is not None:
                     data_ocr = data_ocr_general.get('response', None)
@@ -456,6 +446,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                             "POST", url_ocr_pdf_custom_field_by_fileid,
                             headers, params, payload, 5, 5, 100,
                             status_code_fail=[401])
+
         except Exception as e:
             self.log.error("error", e)
         return (data_ocr, data_ocr_fields, form_code)
@@ -1034,6 +1025,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
             raise ParseError(f"{e.__class__.__name__}: {e!s}") from e
 
         return data_ocr_fields, form_code
+
 
 def post_process_text(text):
     if not text:
