@@ -22,6 +22,12 @@ import { PageHeaderComponent } from '../../common/page-header/page-header.compon
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { FILTER_CUSTOM_FIELDS_QUERY } from 'src/app/data/filter-rule-type'
+import {
+  CustomFieldQueryLogicalOperator,
+  CustomFieldQueryOperator,
+} from 'src/app/data/custom-field-query'
 
 const fields: CustomField[] = [
   {
@@ -42,6 +48,7 @@ describe('CustomFieldsComponent', () => {
   let customFieldsService: CustomFieldsService
   let modalService: NgbModal
   let toastService: ToastService
+  let listViewService: DocumentListViewService
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -83,6 +90,7 @@ describe('CustomFieldsComponent', () => {
     )
     modalService = TestBed.inject(NgbModal)
     toastService = TestBed.inject(ToastService)
+    listViewService = TestBed.inject(DocumentListViewService)
 
     fixture = TestBed.createComponent(CustomFieldsComponent)
     component = fixture.componentInstance
@@ -145,7 +153,7 @@ describe('CustomFieldsComponent', () => {
     const deleteSpy = jest.spyOn(customFieldsService, 'delete')
     const reloadSpy = jest.spyOn(component, 'reload')
 
-    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[4]
+    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[5]
     deleteButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
@@ -161,5 +169,19 @@ describe('CustomFieldsComponent', () => {
     deleteSpy.mockReturnValueOnce(of(true))
     editDialog.confirmClicked.emit()
     expect(reloadSpy).toHaveBeenCalled()
+  })
+
+  it('should support filter documents', () => {
+    const filterSpy = jest.spyOn(listViewService, 'quickFilter')
+    component.filterDocuments(fields[0])
+    expect(filterSpy).toHaveBeenCalledWith([
+      {
+        rule_type: FILTER_CUSTOM_FIELDS_QUERY,
+        value: JSON.stringify([
+          CustomFieldQueryLogicalOperator.Or,
+          [[fields[0].id, CustomFieldQueryOperator.Exists, true]],
+        ]),
+      },
+    ])
   })
 })
