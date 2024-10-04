@@ -18,6 +18,9 @@ import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-ac
 import { MailRuleEditDialogComponent } from '../../common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { SettingsService } from 'src/app/services/settings.service'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { ActivatedRoute } from '@angular/router'
 
 @Component({
   selector: 'pngx-mail',
@@ -32,13 +35,20 @@ export class MailComponent
   mailRules: MailRule[] = []
 
   unsubscribeNotifier: Subject<any> = new Subject()
+  oAuthAccoundId: number
+
+  public get googleOAuthUrl(): string {
+    return this.settingsService.get(SETTINGS_KEYS.GOOGLE_OAUTH_URL)
+  }
 
   constructor(
     public mailAccountService: MailAccountService,
     public mailRuleService: MailRuleService,
     private toastService: ToastService,
     private modalService: NgbModal,
-    public permissionsService: PermissionsService
+    public permissionsService: PermissionsService,
+    private settingsService: SettingsService,
+    private route: ActivatedRoute
   ) {
     super()
   }
@@ -50,6 +60,13 @@ export class MailComponent
       .subscribe({
         next: (r) => {
           this.mailAccounts = r.results
+          if (this.oAuthAccoundId) {
+            this.editMailAccount(
+              this.mailAccounts.find(
+                (account) => account.id === this.oAuthAccoundId
+              )
+            )
+          }
         },
         error: (e) => {
           this.toastService.showError(
@@ -70,6 +87,19 @@ export class MailComponent
           this.toastService.showError($localize`Error retrieving mail rules`, e)
         },
       })
+
+    this.route.queryParamMap.subscribe((params) => {
+      if (params.get('oauth_success')) {
+        this.oAuthAccoundId = parseInt(params.get('account_id'))
+        if (this.mailAccounts.length > 0) {
+          this.editMailAccount(
+            this.mailAccounts.find(
+              (account) => account.id === this.oAuthAccoundId
+            )
+          )
+        }
+      }
+    })
   }
 
   ngOnDestroy() {
