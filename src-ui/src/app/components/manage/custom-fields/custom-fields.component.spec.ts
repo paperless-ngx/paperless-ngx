@@ -153,7 +153,7 @@ describe('CustomFieldsComponent', () => {
     const deleteSpy = jest.spyOn(customFieldsService, 'delete')
     const reloadSpy = jest.spyOn(component, 'reload')
 
-    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[4]
+    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[5]
     deleteButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
