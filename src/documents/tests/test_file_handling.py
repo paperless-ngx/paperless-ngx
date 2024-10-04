@@ -1146,6 +1146,15 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         self.assertEqual(document.filename, "XX/doc1.pdf")
 
     def test_complex_template_strings(self):
+        """
+        GIVEN:
+            - Storage paths with complex conditionals and logic
+        WHEN:
+            - Filepath for a document with this storage path is called
+        THEN:
+            - The filepath is rendered without error
+            - The filepath is rendered as a single line string
+        """
         sp = StoragePath.objects.create(
             name="sp1",
             path="""
@@ -1181,9 +1190,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             "somepath/2024-10-01/Does Matter.pdf",
         )
 
-        sp.path = (
-            "{{ document.title|lower }}{{ document.archive_serial_number|add:'-2' }}"
-        )
+        sp.path = "{{ document.title|lower }}{{ document.archive_serial_number - 2 }}"
         sp.save()
 
         self.assertEqual(generate_filename(doc_a), "does matter23.pdf")
@@ -1215,9 +1222,18 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         )
 
     @override_settings(
-        FILENAME_FORMAT="{{creation_date}}/{title}",
+        FILENAME_FORMAT="{{creation_date}}/{{ title_name_str }}",
     )
     def test_template_with_undefined_var(self):
+        """
+        GIVEN:
+            - Filename format with one or more undefined variables
+        WHEN:
+            - Filepath for a document with this format is called
+        THEN:
+            - The first undefined variable is logged
+            - The default format is used
+        """
         doc_a = Document.objects.create(
             title="Does Matter",
             created=timezone.make_aware(datetime.datetime(2020, 6, 25, 7, 36, 51, 153)),
@@ -1228,23 +1244,63 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             archive_serial_number=25,
         )
 
-        with self.assertLogs(level=logging.ERROR) as capture:
+        with self.assertLogs(level=logging.WARNING) as capture:
             self.assertEqual(
                 generate_filename(doc_a),
                 "0000002.pdf",
             )
 
-            self.assertEqual(len(capture.output), 2)
+            self.assertEqual(len(capture.output), 1)
             self.assertEqual(
                 capture.output[0],
-                "ERROR:paperless.filehandling:Template contained 1 undefined values:",
+                "WARNING:paperless.templating:Template variable warning: 'creation_date' is undefined",
             )
+
+    @override_settings(
+        FILENAME_FORMAT="{{created}}/{{ document.save() }}",
+    )
+    def test_template_with_security(self):
+        """
+        GIVEN:
+            - Filename format with one or more undefined variables
+        WHEN:
+            - Filepath for a document with this format is called
+        THEN:
+            - The first undefined variable is logged
+            - The default format is used
+        """
+        doc_a = Document.objects.create(
+            title="Does Matter",
+            created=timezone.make_aware(datetime.datetime(2020, 6, 25, 7, 36, 51, 153)),
+            added=timezone.make_aware(datetime.datetime(2024, 10, 1, 7, 36, 51, 153)),
+            mime_type="application/pdf",
+            pk=2,
+            checksum="2",
+            archive_serial_number=25,
+        )
+
+        with self.assertLogs(level=logging.WARNING) as capture:
             self.assertEqual(
-                capture.output[1],
-                "ERROR:paperless.filehandling:  Variable 'creation_date' was undefined",
+                generate_filename(doc_a),
+                "0000002.pdf",
+            )
+
+            self.assertEqual(len(capture.output), 1)
+            self.assertEqual(
+                capture.output[0],
+                "WARNING:paperless.templating:Template attempted restricted operation: <bound method Model.save of <Document: 2020-06-25 Does Matter>> is not safely callable",
             )
 
     def test_template_with_custom_fields(self):
+        """
+        GIVEN:
+            - Filename format which accesses custom field data
+        WHEN:
+            - Filepath for a document with this format is called
+        THEN:
+            - The custom field data is rendered
+            - If the field name is not defined, the default value is rendered, if any
+        """
         doc_a = Document.objects.create(
             title="Some Title",
             created=timezone.make_aware(datetime.datetime(2020, 6, 25, 7, 36, 51, 153)),
@@ -1258,6 +1314,18 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         cf = CustomField.objects.create(
             name="Invoice",
             data_type=CustomField.FieldDataType.INT,
+        )
+
+        cf2 = CustomField.objects.create(
+            name="Select Field",
+            data_type=CustomField.FieldDataType.SELECT,
+            extra_data={"select_options": ["ChoiceOne", "ChoiceTwo"]},
+        )
+
+        CustomFieldInstance.objects.create(
+            document=doc_a,
+            field=cf2,
+            value_select=0,
         )
 
         cfi = CustomFieldInstance.objects.create(
@@ -1281,7 +1349,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         with override_settings(
             FILENAME_FORMAT="""
                  {% if "Invoice" in custom_fields %}
-                   invoices/{{ custom_fields|get_cf_value:'Invoice' }}
+                   invoices/{{ custom_fields | get_cf_value('Invoice') }}
                  {% else %}
                    not-invoices/{{ title }}
                  {% endif %}
@@ -1312,28 +1380,32 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         cf.save()
 
         with override_settings(
-            FILENAME_FORMAT="invoices/{{ custom_fields|get_cf_value:'Invoice Number' }}",
+            FILENAME_FORMAT="invoices/{{ custom_fields | get_cf_value('Invoice Number') }}",
         ):
             self.assertEqual(
                 generate_filename(doc_a),
                 "invoices/4567.pdf",
             )
 
-    def test_using_other_filters(self):
-        doc_a = Document.objects.create(
-            title="Some Title",
-            created=timezone.make_aware(datetime.datetime(2020, 6, 25, 7, 36, 51, 153)),
-            added=timezone.make_aware(datetime.datetime(2024, 10, 1, 7, 36, 51, 153)),
-            mime_type="application/pdf",
-            pk=2,
-            checksum="2",
-            archive_serial_number=25,
-        )
-
         with override_settings(
-            FILENAME_FORMAT="{% if document.correspondent %}{{ document.correspondent.name }}{% else %}No Correspondent{% endif %}/{title}",
+            FILENAME_FORMAT="invoices/{{ custom_fields | get_cf_value('Ince Number', 0) }}",
         ):
             self.assertEqual(
                 generate_filename(doc_a),
-                "No Correspondent/Some Title.pdf",
+                "invoices/0.pdf",
+            )
+
+
+        with override_settings(
+            FILENAME_FORMAT="""
+                 {% if "Select Field" in custom_fields %}
+                   {{ title }}_{{ custom_fields|get_cf_value:'Select Field' }}
+                 {% else %}
+                   {{ title }}
+                 {% endif %}
+                 """,
+        ):
+            self.assertEqual(
+                generate_filename(doc_a),
+                "Some Title_ChoiceOne.pdf",
             )

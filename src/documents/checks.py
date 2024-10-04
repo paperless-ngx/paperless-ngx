@@ -9,7 +9,7 @@ from django.db.utils import OperationalError
 from django.db.utils import ProgrammingError
 
 from documents.signals import document_consumer_declaration
-from documents.templatetags.filepath import convert_to_django_template_format
+from documents.templating.utils import convert_format_str_to_template_format
 
 
 @register()
@@ -76,7 +76,9 @@ def parser_check(app_configs, **kwargs):
 @register()
 def filename_format_check(app_configs, **kwargs):
     if settings.FILENAME_FORMAT:
-        converted_format = convert_to_django_template_format(settings.FILENAME_FORMAT)
+        converted_format = convert_format_str_to_template_format(
+            settings.FILENAME_FORMAT,
+        )
         if converted_format != settings.FILENAME_FORMAT:
             return [
                 Warning(

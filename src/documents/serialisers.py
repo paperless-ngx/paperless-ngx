@@ -34,7 +34,6 @@ if settings.AUDIT_LOG_ENABLED:
 
 from documents import bulk_edit
 from documents.data_models import DocumentSource
-from documents.file_handling import validate_template_and_render
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -54,7 +53,8 @@ from documents.models import WorkflowTrigger
 from documents.parsers import is_mime_type_supported
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import set_permissions_for_object
-from documents.templatetags.filepath import convert_to_django_template_format
+from documents.templating.filepath import validate_filepath_template_and_render
+from documents.templating.utils import convert_format_str_to_template_format
 from documents.validators import uri_validator
 
 logger = logging.getLogger("paperless.serializers")
@@ -1485,12 +1485,12 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         )
 
     def validate_path(self, path: str):
-        converted_path = convert_to_django_template_format(path)
+        converted_path = convert_format_str_to_template_format(path)
         if converted_path != path:
             logger.warning(
                 f"Storage path {path} is not using the new style format, consider updating",
             )
-        result = validate_template_and_render(converted_path)
+        result = validate_filepath_template_and_render(converted_path)
 
         if result is None:
             raise serializers.ValidationError(_("Invalid variable detected."))
