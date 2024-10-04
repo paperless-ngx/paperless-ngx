@@ -1546,17 +1546,17 @@
                 "c"
             ],
             "hashes": [
-                "sha256:644d3973fe26908c73d4be746074f6e5224b03c1101d302d9a53bf565ad64907",
-                "sha256:a5764f67c27bec8bfac85764d23c534af2c27b893550377e37ce59c12aac47a2"
+                "sha256:8bad2e497ce22d556dac1464738cb948f8d6bab450d965cf1d8a8effd52412e0",
+                "sha256:babf565d459d8f72fb65da5e211dd0b58a52c51e4e1fa9cadecff42d6b7619b2"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==3.2.3"
+            "version": "==3.2.2"
         },
         "psycopg-c": {
             "hashes": [
-                "sha256:06ae7db8eaec1a3845960fa7f997f4ccdb1a7a7ab8dc593a680bcc74e1359671"
+                "sha256:de8cac75bc6640ef0f54ad9187b81e07c430206a83c566b73d4cca41ecccb7c8"
             ],
-            "version": "==3.2.3"
+            "version": "==3.2.2"
         },
         "pycparser": {
             "hashes": [
