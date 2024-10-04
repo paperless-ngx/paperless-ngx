@@ -1395,7 +1395,6 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
                 "invoices/0.pdf",
             )
 
-
         with override_settings(
             FILENAME_FORMAT="""
                  {% if "Select Field" in custom_fields %}
