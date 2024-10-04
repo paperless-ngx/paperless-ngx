@@ -1558,8 +1558,8 @@ class UiSettingsView(GenericAPIView):
     def generate_google_oauth_url(self) -> str:
         token_request_uri = "https://accounts.google.com/o/oauth2/auth"
         response_type = "code"
-        client_id = settings.GOOGLE_OAUTH_CLIENT_ID
-        redirect_uri = "http://localhost:8000/api/oauth/google/callback/"
+        client_id = settings.GMAIL_OAUTH_CLIENT_ID
+        redirect_uri = "http://localhost:8000/api/oauth/callback/"
         scope = "https://mail.google.com/"
         access_type = "offline"
         url = f"{token_request_uri}?response_type={response_type}&client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}&access_type={access_type}"
@@ -1595,7 +1595,7 @@ class UiSettingsView(GenericAPIView):
 
         ui_settings["auditlog_enabled"] = settings.AUDIT_LOG_ENABLED
 
-        if settings.GOOGLE_OAUTH_ENABLED:
+        if settings.GMAIL_OAUTH_ENABLED:
             ui_settings["google_oauth_url"] = self.generate_google_oauth_url()
 
         user_resp = {
@@ -2146,36 +2146,52 @@ class TrashView(ListModelMixin, PassUserMixin):
 
 
 # Outlook https://stackoverflow.com/questions/73902642/office-365-imap-authentication-via-oauth2-and-python-msal-library
-class GoogleOauthCallbackView(GenericAPIView):
+class OauthCallbackView(GenericAPIView):
     # permission_classes = (AllowAny,)
 
     def get(self, request, format=None):
-        # Guide: https://postmansmtp.com/how-to-configure-post-smtp-with-gmailgsuite-using-oauth/
-        # http://localhost:4200/api/oauth/google/callback?code=4%2F0AQlEd8yxIwqjz95p82tWMq4ogn4KxRdprtjjGqjEHW4x7X1roEgswzn9EfiAit1cOLfSog&scope=email+profile+openid+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&authuser=0&hd=michaelshamoon.com&prompt=consent
+        # Gmail setup guide: https://postmansmtp.com/how-to-configure-post-smtp-with-gmailgsuite-using-oauth/
+        # Outlok setup guide: https://medium.com/@manojkumardhakad/python-read-and-send-outlook-mail-using-oauth2-token-and-graph-api-53de606ecfa1
         code = request.query_params.get("code")
-        if code is None:
-            return HttpResponseBadRequest("Code required")
+        scope = request.query_params.get("scope")
+        if code is None or scope is None:
+            logger.error(
+                f"Invalid oauth callback request, code: {code}, scope: {scope}",
+            )
+            return HttpResponseBadRequest("Invalid request, see logs for more detail")
 
-        token_request_uri = "https://accounts.google.com/o/oauth2/token"
-        client_id = settings.GOOGLE_OAUTH_CLIENT_ID
-        client_secret = settings.GOOGLE_OAUTH_CLIENT_SECRET
-        redirect_uri = "http://localhost:8000/api/oauth/google/callback/"
-        grant_type = "authorization_code"
-        scope = "https://mail.google.com/"
-        url = f"{token_request_uri}"
-        data = {
-            "code": code,
-            "client_id": client_id,
-            "client_secret": client_secret,
-            "redirect_uri": redirect_uri,
-            "grant_type": grant_type,
-            "scope": scope,
-        }
-        headers = {
-            "Content-Type": "application/x-www-form-urlencoded",
-        }
-        response = httpx.post(url, data=data, headers=headers)
-        data = response.json()
+        if "google" in scope:
+            # Google
+            imap_server = "imap.gmail.com"
+            defaults = {
+                "name": f"Gmail {datetime.now()}",
+                "username": "",
+                "imap_security": MailAccount.ImapSecurity.SSL,
+                "imap_port": 993,
+            }
+
+            token_request_uri = "https://accounts.google.com/o/oauth2/token"
+            client_id = settings.GMAIL_OAUTH_CLIENT_ID
+            client_secret = settings.GMAIL_OAUTH_CLIENT_SECRET
+            redirect_uri = "http://localhost:8000/api/oauth/callback/"
+            grant_type = "authorization_code"
+            scope = "https://mail.google.com/"
+            data = {
+                "code": code,
+                "client_id": client_id,
+                "client_secret": client_secret,
+                "redirect_uri": redirect_uri,
+                "grant_type": grant_type,
+                "scope": scope,
+            }
+            headers = {
+                "Content-Type": "application/x-www-form-urlencoded",
+            }
+            response = httpx.post(token_request_uri, data=data, headers=headers)
+            data = response.json()
+        elif "outlook" in scope:
+            data = {}
+
         if "error" in data:
             return HttpResponseBadRequest(data["error"])
         elif "access_token" in data:
@@ -2186,13 +2202,8 @@ class GoogleOauthCallbackView(GenericAPIView):
             account, _ = MailAccount.objects.update_or_create(
                 password=access_token,
                 is_token=True,
-                imap_server="imap.gmail.com",
-                defaults={
-                    "name": f"Gmail {datetime.now()}",
-                    "username": "",
-                    "imap_security": MailAccount.ImapSecurity.SSL,
-                    "imap_port": 993,
-                },
+                imap_server=imap_server,
+                defaults=defaults,
             )
 
         return HttpResponseRedirect(

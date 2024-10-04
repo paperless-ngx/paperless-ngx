@@ -22,9 +22,9 @@ from documents.views import CorrespondentViewSet
 from documents.views import CustomFieldViewSet
 from documents.views import DocumentTypeViewSet
 from documents.views import GlobalSearchView
-from documents.views import GoogleOauthCallbackView
 from documents.views import IndexView
 from documents.views import LogViewSet
+from documents.views import OauthCallbackView
 from documents.views import PostDocumentView
 from documents.views import RemoteVersionView
 from documents.views import SavedViewViewSet
@@ -167,9 +167,9 @@ urlpatterns = [
                     name="trash",
                 ),
                 re_path(
-                    r"^oauth/google/callback/",
-                    GoogleOauthCallbackView.as_view(),
-                    name="google_oauth_callback",
+                    r"^oauth/callback/",
+                    OauthCallbackView.as_view(),
+                    name="oauth_callback",
                 ),
                 *api_router.urls,
             ],
