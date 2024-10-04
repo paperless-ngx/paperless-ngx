@@ -13,7 +13,8 @@
     <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editMailAccount()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailAccount }">
       <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Account</ng-container>
     </button>
-    <a class="btn btn-sm btn-outline-primary ms-2" [href]="googleOAuthUrl" i18n>Connect with Google</a>
+    <a class="btn btn-sm btn-outline-primary ms-2" [href]="gmailOAuthUrl" i18n>Connect with Gmail</a>
+    <a class="btn btn-sm btn-outline-primary ms-2" [href]="outlookOAuthUrl" i18n>Connect with Outlook</a>
   </h4>
   <ul class="list-group">
     <li class="list-group-item">

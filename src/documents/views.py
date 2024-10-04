@@ -1555,7 +1555,7 @@ class UiSettingsView(GenericAPIView):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     serializer_class = UiSettingsViewSerializer
 
-    def generate_google_oauth_url(self) -> str:
+    def generate_gmail_oauth_url(self) -> str:
         token_request_uri = "https://accounts.google.com/o/oauth2/auth"
         response_type = "code"
         client_id = settings.GMAIL_OAUTH_CLIENT_ID
@@ -1563,6 +1563,16 @@ class UiSettingsView(GenericAPIView):
         scope = "https://mail.google.com/"
         access_type = "offline"
         url = f"{token_request_uri}?response_type={response_type}&client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}&access_type={access_type}"
+        return url
+
+    def generate_outlook_oauth_url(self) -> str:
+        # https://login.microsoftonline.com/common/oauth2/v2.0/authorize ?
+        token_request_uri = f"https://login.microsoftonline.com/{settings.OUTLOOK_OAUTH_TENANT_ID}/oauth2/v2.0/authorize"
+        response_type = "code"
+        client_id = settings.OUTLOOK_OAUTH_CLIENT_ID
+        redirect_uri = "http://localhost:8000/api/oauth/callback/"
+        scope = "offline_access%20Mail.ReadWrite"
+        url = f"{token_request_uri}?response_type={response_type}&response_mode=query&client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}"
         return url
 
     def get(self, request, format=None):
@@ -1596,7 +1606,10 @@ class UiSettingsView(GenericAPIView):
         ui_settings["auditlog_enabled"] = settings.AUDIT_LOG_ENABLED
 
         if settings.GMAIL_OAUTH_ENABLED:
-            ui_settings["google_oauth_url"] = self.generate_google_oauth_url()
+            ui_settings["google_oauth_url"] = self.generate_gmail_oauth_url()
+
+        if settings.OUTLOOK_OAUTH_ENABLED:
+            ui_settings["outlook_oauth_url"] = self.generate_outlook_oauth_url()
 
         user_resp = {
             "id": user.id,
@@ -2150,18 +2163,27 @@ class OauthCallbackView(GenericAPIView):
     # permission_classes = (AllowAny,)
 
     def get(self, request, format=None):
-        # Gmail setup guide: https://postmansmtp.com/how-to-configure-post-smtp-with-gmailgsuite-using-oauth/
-        # Outlok setup guide: https://medium.com/@manojkumardhakad/python-read-and-send-outlook-mail-using-oauth2-token-and-graph-api-53de606ecfa1
+        # https://login.microsoftonline.com/<tenant-id>/adminconsent?client_id=<client-id> needed?
+        admin_consent = request.query_params.get("admin_consent")
+        if admin_consent is not None:
+            return HttpResponseRedirect(
+                "http://localhost:4200/mail",
+            )
         code = request.query_params.get("code")
+        # Gmail passes scope as a query param
         scope = request.query_params.get("scope")
-        if code is None or scope is None:
+        # Outlook passes session_state as a query param
+        session_state = request.query_params.get("session_state")
+
+        if code is None and scope is None and session_state is None:
             logger.error(
-                f"Invalid oauth callback request, code: {code}, scope: {scope}",
+                f"Invalid oauth callback request, code: {code}, scope: {scope}, session_state: {session_state}",
             )
             return HttpResponseBadRequest("Invalid request, see logs for more detail")
 
-        if "google" in scope:
+        if scope is not None and "google" in scope:
             # Google
+            # Gmail setup guide: https://postmansmtp.com/how-to-configure-post-smtp-with-gmailgsuite-using-oauth/
             imap_server = "imap.gmail.com"
             defaults = {
                 "name": f"Gmail {datetime.now()}",
@@ -2173,26 +2195,40 @@ class OauthCallbackView(GenericAPIView):
             token_request_uri = "https://accounts.google.com/o/oauth2/token"
             client_id = settings.GMAIL_OAUTH_CLIENT_ID
             client_secret = settings.GMAIL_OAUTH_CLIENT_SECRET
-            redirect_uri = "http://localhost:8000/api/oauth/callback/"
-            grant_type = "authorization_code"
             scope = "https://mail.google.com/"
-            data = {
-                "code": code,
-                "client_id": client_id,
-                "client_secret": client_secret,
-                "redirect_uri": redirect_uri,
-                "grant_type": grant_type,
-                "scope": scope,
+        elif session_state is not None:
+            # Outlook
+            # Outlok setup guide: https://medium.com/@manojkumardhakad/python-read-and-send-outlook-mail-using-oauth2-token-and-graph-api-53de606ecfa1
+            imap_server = "outlook.office365.com"
+            defaults = {
+                "name": f"Outlook {datetime.now()}",
+                "username": "",
+                "imap_security": MailAccount.ImapSecurity.SSL,
+                "imap_port": 993,
             }
-            headers = {
-                "Content-Type": "application/x-www-form-urlencoded",
-            }
-            response = httpx.post(token_request_uri, data=data, headers=headers)
-            data = response.json()
-        elif "outlook" in scope:
-            data = {}
+
+            token_request_uri = f"https://login.microsoftonline.com/{settings.OUTLOOK_OAUTH_TENANT_ID}/oauth2/v2.0/token"
+            client_id = settings.OUTLOOK_OAUTH_CLIENT_ID
+            client_secret = settings.OUTLOOK_OAUTH_CLIENT_SECRET
+            scope = "offline_access%20Mail.ReadWrite"
+
+        data = {
+            "code": code,
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "scope": scope,
+            "redirect_uri": "http://localhost:8000/api/oauth/callback/",
+            "grant_type": "authorization_code",
+        }
+        headers = {
+            "Content-Type": "application/x-www-form-urlencoded",
+        }
+        response = httpx.post(token_request_uri, data=data, headers=headers)
+        data = response.json()
+        logger.debug(data)
 
         if "error" in data:
+            logger.error(f"Error {response.status_code} getting access token: {data}")
             return HttpResponseBadRequest(data["error"])
         elif "access_token" in data:
             access_token = data["access_token"]

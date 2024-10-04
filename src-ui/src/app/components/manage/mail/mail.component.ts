@@ -37,8 +37,12 @@ export class MailComponent
   unsubscribeNotifier: Subject<any> = new Subject()
   oAuthAccoundId: number
 
-  public get googleOAuthUrl(): string {
+  public get gmailOAuthUrl(): string {
     return this.settingsService.get(SETTINGS_KEYS.GOOGLE_OAUTH_URL)
+  }
+
+  public get outlookOAuthUrl(): string {
+    return this.settingsService.get(SETTINGS_KEYS.OUTLOOK_OAUTH_URL)
   }
 
   constructor(
