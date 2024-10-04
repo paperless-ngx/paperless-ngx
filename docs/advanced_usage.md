@@ -425,10 +425,10 @@ Insurances/                             # Insurances
 
 ### Filename Templates {#filename-templates}
 
-The filename formatting using the [Django Template Language](https://docs.djangoproject.com/en/5.1/ref/templates/language/) to build the filename.
-This allows for complex logic to be included in the format, including [tags](https://docs.djangoproject.com/en/5.1/ref/templates/language/#tags)
-and [filters](https://docs.djangoproject.com/en/5.1/ref/templates/language/#filters) to manipulate the [variables](#filename-format-variables)
-provided.
+The filename formatting uses [Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/templates/) to build the filename.
+This allows for complex logic to be included in the format, including [logical structures](https://jinja.palletsprojects.com/en/3.1.x/templates/#list-of-control-structures)
+and [filters](https://jinja.palletsprojects.com/en/3.1.x/templates/#id11) to manipulate the [variables](#filename-format-variables)
+provided. The template is provided as a string, potentially multiline, and rendered into a single line.
 
 In addition, the entire Document instance is available to be utilized in a more advanced way, as well as some variables which only make sense to be accessed
 with more complex logic.
@@ -441,12 +441,13 @@ with more complex logic.
 !!! tip
 
     To access a custom field which has a space in the name, use the `get_cf_value` filter.  See the examples below.
+    This helps get fields by name and handle a default value if the named field is not attached to a Document.
 
 #### Examples
 
 This example will construct a path based on the archive serial number range:
 
-```django
+```jinja
 somepath/
 {% if document.archive_serial_number >= 0 and document.archive_serial_number <= 200 %}
   asn-000-200/{{title}}
@@ -464,7 +465,7 @@ somepath/
 For a document with an ASN of 205, it would result in `somepath/asn-201-400/asn-2xx/Title.pdf`, but
 a document with an ASN of 355 would be placed in `somepath/asn-201-400/asn-3xx/Title.pdf`.
 
-```django
+```jinja
 {% if document.mime_type == "application/pdf" %}
   pdfs
 {% elif document.mime_type == "image/png" %}
@@ -479,7 +480,7 @@ For a PDF document, it would result in `pdfs/Title.pdf`, but for a PNG document,
 
 To use custom fields:
 
-```django
+```jinja
 {% if "Invoice" in custom_fields %}
   invoices/{{ custom_fields.Invoice.value }}
 {% else %}
@@ -492,13 +493,13 @@ would be filed to `not-invoices/Title.pdf`
 
 If the custom field is named "Invoice Number", you would access the value of it via the `get_cf_value` filter due to quirks of the Django Template Language:
 
-```django
+```jinja
 "invoices/{{ custom_fields|get_cf_value:'Invoice Number' }}"
 ```
 
 An example using Django's [date filters](https://docs.djangoproject.com/en/5.1/ref/templates/builtins/#date) and others:
 
-```django
+```jinja
 invoices/
 {{ custom_fields|get_cf_value:"Date Field"|date:"Y" }}/
 {{ custom_fields|get_cf_value:"Date Field"|date:"m" }}/
