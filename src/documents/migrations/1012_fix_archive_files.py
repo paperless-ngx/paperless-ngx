@@ -20,11 +20,11 @@ logger = logging.getLogger("paperless.migrations")
 # This is code copied straight paperless before the change.
 ###############################################################################
 class defaultdictNoStr(defaultdict):
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         raise ValueError("Don't use {tags} directly.")
 
 
-def many_to_dictionary(field):
+def many_to_dictionary(field):  # pragma: no cover
     # Converts ManyToManyField to dictionary by assuming, that field
     # entries contain an _ or - which will be used as a delimiter
     mydictionary = dict()
