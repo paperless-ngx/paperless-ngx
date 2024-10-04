@@ -1897,6 +1897,32 @@ class CustomFieldViewSet(ModelViewSet):
 
     queryset = CustomField.objects.all().order_by("-created")
 
+    def get_queryset(self):
+        filter = (
+            Q(fields__document__deleted_at__isnull=True)
+            if self.request.user is None or self.request.user.is_superuser
+            else (
+                Q(
+                    fields__document__deleted_at__isnull=True,
+                    fields__document__id__in=get_objects_for_user_owner_aware(
+                        self.request.user,
+                        "documents.view_document",
+                        Document,
+                    ).values_list("id", flat=True),
+                )
+            )
+        )
+        return (
+            super()
+            .get_queryset()
+            .annotate(
+                document_count=Count(
+                    "fields",
+                    filter=filter,
+                ),
+            )
+        )
+
 
 class SystemStatusView(PassUserMixin):
     permission_classes = (IsAuthenticated,)

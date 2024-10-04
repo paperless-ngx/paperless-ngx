@@ -26,7 +26,21 @@
         <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editField(field)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.CustomField)">{{field.name}}</button></div>
         <div class="col d-flex align-items-center">{{getDataType(field)}}</div>
         <div class="col">
-          <div class="btn-group">
+          <div class="btn-group d-block d-sm-none">
+            <div ngbDropdown container="body" class="d-inline-block">
+              <button type="button" class="btn btn-link" id="actionsMenuMobile" (click)="$event.stopPropagation()" ngbDropdownToggle>
+                <i-bs name="three-dots-vertical"></i-bs>
+              </button>
+              <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">
+                <button (click)="editField(field)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.CustomField }" ngbDropdownItem i18n>Edit</button>
+                <button class="text-danger" (click)="deleteField(field)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.CustomField }" ngbDropdownItem i18n>Delete</button>
+                @if (field.document_count > 0) {
+                  <button (click)="filterDocuments(field)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }" ngbDropdownItem i18n>Filter Documents ({{ field.document_count }})</button>
+                }
+              </div>
+            </div>
+          </div>
+          <div class="btn-group d-none d-sm-inline-block">
             <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.CustomField }" class="btn btn-sm btn-outline-secondary" type="button" (click)="editField(field)">
               <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
             </button>
@@ -34,6 +48,13 @@
               <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
             </button>
           </div>
+          @if (field.document_count > 0) {
+            <div class="btn-group d-none d-sm-inline-block ms-2">
+              <button class="btn btn-sm btn-outline-secondary" type="button" (click)="filterDocuments(field)">
+                <i-bs width="1em" height="1em" name="filter"></i-bs>&nbsp;<ng-container i18n>Documents</ng-container><span class="badge bg-light text-secondary ms-2">{{ field.document_count }}</span>
+              </button>
+            </div>
+          }
         </div>
       </div>
     </li>

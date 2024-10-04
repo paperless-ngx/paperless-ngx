@@ -499,6 +499,8 @@ class CustomFieldSerializer(serializers.ModelSerializer):
         read_only=False,
     )
 
+    document_count = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = CustomField
         fields = [
@@ -506,6 +508,7 @@ class CustomFieldSerializer(serializers.ModelSerializer):
             "name",
             "data_type",
             "extra_data",
+            "document_count",
         ]
 
     def validate(self, attrs):
