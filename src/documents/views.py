@@ -1897,6 +1897,17 @@ class CustomFieldViewSet(ModelViewSet):
 
     queryset = CustomField.objects.all().order_by("-created")
 
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .annotate(
+                document_count=Count(
+                    "fields",
+                ),
+            )
+        )
+
 
 class SystemStatusView(PassUserMixin):
     permission_classes = (IsAuthenticated,)
