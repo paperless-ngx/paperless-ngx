@@ -398,13 +398,13 @@ class DocumentViewSet(
         instance = self.get_object()
         fold = instance.folder
         dossier = instance.dossier
-        instance.folder = None 
-        instance.dossier = None 
+        instance.folder = None
+        instance.dossier = None
         instance.save()
         fold.delete()
         dossier.delete()
         index.remove_document_from_index(self.get_object())
-        
+
         return super().destroy(request, *args, **kwargs)
 
     @staticmethod
@@ -588,8 +588,8 @@ class DocumentViewSet(
             # Allow all users to view thumbnails
             if request.user is None:
                 return HttpResponseForbidden("Insufficient permissions")
-            
-            # Original 
+
+            # Original
             # if request.user is not None and not has_perms_owner_aware(
             #     request.user,
             #     "view_document",
@@ -612,11 +612,11 @@ class DocumentViewSet(
             return self.file_response(pk, request, "attachment")
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404
-        
+
     @action(methods=["get"], detail=True)
     def export_excel(self, request, pk=None):
         try:
-           
+
             document = Document.objects.get(pk=pk)
             fields = CustomFieldInstance.objects.filter(document=pk)
 
@@ -764,12 +764,12 @@ class DocumentViewSet(
                 "error": "error",
             },
         )
-    
+
     def get_approvals(self, doc:Document):
         approvals = Approval.objects.get(id=doc.pk)
 
         return approvals
-    
+
     @action(methods=["get", "post"], detail=True)
     def approvals(self, request, pk=None):
         currentUser = request.user
@@ -805,7 +805,7 @@ class DocumentViewSet(
                 serializer = ApprovalSerializer(data=request.data)
                 existing_approval = False
                 if serializer.is_valid(raise_exception=True):
-                
+
                     existing_approval = Approval.objects.filter(
                         object_pk=serializer.validated_data.get("object_pk"),
                         access_type=serializer.validated_data.get("access_type"),
@@ -861,7 +861,7 @@ class DocumentViewSet(
                         "error": "Error saving approval, check logs for more detail.",
                     },
                 )
-        
+
         return Response(
             {
                 "error": "error",
@@ -899,7 +899,7 @@ class DocumentViewSet(
             ]
             return Response(links)
 
-            
+
 class SearchResultSerializer(DocumentSerializer, PassUserMixin):
     def to_representation(self, instance):
         doc = (
@@ -1114,7 +1114,7 @@ class PostDocumentView(GenericAPIView):
             pathvalidate.sanitize_filename(doc_name),
         )
         temp_file_path.write_bytes(doc_data)
-        
+
         os.utime(temp_file_path, times=(t, t))
         input_doc = ConsumableDocument(
             source=DocumentSource.ApiUpload,
@@ -1136,7 +1136,7 @@ class PostDocumentView(GenericAPIView):
             owner_id=request.user.id,
             custom_field_ids=custom_field_ids,
         )
-       
+
 
         async_task = consume_file.delay(
             input_doc,
@@ -1180,13 +1180,13 @@ class SelectionDataView(GenericAPIView):
                 Case(When(documents__id__in=ids, then=1), output_field=IntegerField()),
             ),
         )
-        
+
         warehouses = Warehouse.objects.annotate(
             document_count=Count(
                 Case(When(documents__id__in=ids, then=1), output_field=IntegerField()),
             ),
         )
-        
+
         folders = Folder.objects.annotate(
             document_count=Count(
                 Case(When(documents__id__in=ids, then=1), output_field=IntegerField()),
@@ -1306,7 +1306,7 @@ class StatisticsView(APIView):
                 ),
             )
         )
-        
+
         folder_count = (
             Folder.objects.count()
             if user is None
@@ -1318,7 +1318,7 @@ class StatisticsView(APIView):
                 ),
             )
         )
-        
+
         storage_path_count = (
             StoragePath.objects.count()
             if user is None
@@ -1416,7 +1416,7 @@ class BulkDownloadView(GenericAPIView):
             )
 
             return response
-        
+
 class BulkExportExcelView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = BulkDownloadSerializer
@@ -1427,9 +1427,9 @@ class BulkExportExcelView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         ids = serializer.validated_data.get("documents")
-    
+
         try:
-           
+
             documents = Document.objects.filter(id__in=ids)
             # fields = CustomFieldInstance.objects.filter(document__in=ids)
             data = []
@@ -1455,18 +1455,18 @@ class BulkExportExcelView(GenericAPIView):
             return response
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404
-        
+
 class BulkExportExcelFromFolderView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = ExportDocumentFromFolderSerializer
- 
+
 
     def post(self, request, format=None):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         ids = serializer.validated_data.get("folders")
-    
+
         try:
 
             folder_ids = Folder.objects.filter(id__in=ids).values_list('id',flat=False)
@@ -1474,7 +1474,7 @@ class BulkExportExcelFromFolderView(GenericAPIView):
             if len(ids)==0:
                 folder_ids = Folder.objects.all().values_list('id',flat=False)
                 folder_ids = [x[0] for x in folder_ids]
-            
+
 
             documents = Document.objects.filter(folder__in=ids)
             # fields = CustomFieldInstance.objects.filter(document__in=ids)
@@ -1698,7 +1698,7 @@ class ApprovalViewSet(ModelViewSet):
         existing_approval = False
         if serializer.is_valid(raise_exception=True):
             serializer.validated_data['submitted_by'] = request.user
-            
+
             existing_approval = Approval.objects.filter(
                 object_pk=serializer.validated_data.get("object_pk"),
                 access_type=serializer.validated_data.get("access_type"),
@@ -1720,17 +1720,17 @@ class ApprovalViewSet(ModelViewSet):
 
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-            
+
     def update(self, request, *args, **kwargs):
         response = super().update(request, *args, **kwargs)
-        
+
         approval_updated.send(
             sender=self.__class__,
             approval=self.get_object(),
         )
 
         return response
-    
+
 class ApprovalUpdateMutipleView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = ApprovalViewSerializer
@@ -1755,7 +1755,7 @@ class ApprovalUpdateMutipleView(GenericAPIView):
             return Response({"result": result})
         except Exception:
             return HttpResponseBadRequest()
-        
+
 class AcknowledgeTasksView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = AcknowledgeTasksViewSerializer
@@ -1860,7 +1860,7 @@ class BulkEditObjectsView(PassUserMixin):
         operation = serializer.validated_data.get("operation")
         # parent_folder_id = serializer.validated_data.get("parent_folder")[0]
 
-        
+
         objs = object_class.objects.filter(pk__in=object_ids)
 
         if not user.is_superuser:
@@ -1908,7 +1908,7 @@ class BulkEditObjectsView(PassUserMixin):
                 return HttpResponseBadRequest(
                     "Error performing bulk permissions edit, check logs for more detail.",
                 )
-        
+
         elif operation == "update" and object_type == "folders":
             parent_folder_id = serializer.validated_data.get("parent_folder")
             parent_folder_obj = Folder.objects.get(pk=parent_folder_id) if parent_folder_id else None
@@ -1918,7 +1918,7 @@ class BulkEditObjectsView(PassUserMixin):
                 # folder.parent_folder = parent_folder_obj
                 # folder.path = f"{folder.parent_folder.path}/{folder.id}"
                 # folder.save()
-                
+
                 # print(folder.id)
                 # print(int(request.data['parent_folder'][0]))
                 if request.data.get('parent_folder') is None:
@@ -1933,34 +1933,34 @@ class BulkEditObjectsView(PassUserMixin):
                         return Response(status=status.HTTP_400_BAD_REQUEST)
                 else:
                     request.data['parent_folder'] = None
-                
+
                 old_parent_folder = folder.parent_folder
                 folder.parent_folder = parent_folder_obj
-                
+
                 if old_parent_folder != folder.parent_folder:
                     if folder.parent_folder:
                         folder.path = f"{folder.parent_folder.path}/{folder.id}"
                         folder.parent_folder = parent_folder_obj
-                    
+
                     else:
                         folder.path = f"{folder.id}"
                     folder.save()
-                    
+
                     self.update_child_folder_paths(folder)
-                        
+
             return Response(status=status.HTTP_204_NO_CONTENT)
-        
-        elif operation == "delete" and object_type == "warehouses": 
+
+        elif operation == "delete" and object_type == "warehouses":
             for warehouse_id in object_ids:
                 warehouse = Warehouse.objects.get(id=int(warehouse_id))
                 warehouses = Warehouse.objects.filter(path__startswith=warehouse.path)
                 documents = Document.objects.filter(warehouse__in=warehouses)
                 documents.delete()
                 warehouses.delete()
-                
-                    
+
+
             return Response(status=status.HTTP_204_NO_CONTENT)
-        
+
         elif operation == "delete" and object_type == "folders":
             for folder_id in object_ids:
                 folder = Folder.objects.get(id=int(folder_id))
@@ -1968,9 +1968,9 @@ class BulkEditObjectsView(PassUserMixin):
                 documents = Document.objects.filter(folder__in=folders)
                 documents.delete()
                 folders.delete()
-                
-            return Response(status=status.HTTP_204_NO_CONTENT)            
-        
+
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
         elif operation == "delete" and object_type == "dossiers":
             for dossier_id in object_ids:
                 dossier = Dossier.objects.get(id=int(dossier_id))
@@ -1978,14 +1978,14 @@ class BulkEditObjectsView(PassUserMixin):
                 documents = Document.objects.filter(dossier__in=dossier)
                 documents.delete()
                 dossiers.delete()
-                
-            return Response(status=status.HTTP_204_NO_CONTENT)            
-                          
+
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
         elif operation == "delete":
 
             objs.delete()
-            
-        
+
+
         return Response({"result": "OK"})
     def update_child_folder_paths(self, folder):
         child_folders = Folder.objects.filter(parent_folder=folder)
@@ -1996,7 +1996,7 @@ class BulkEditObjectsView(PassUserMixin):
                 child_folder.path = f"{child_folder.id}"
             child_folder.save()
             self.update_child_folder_paths(child_folder)
-    
+
 class WorkflowTriggerViewSet(ModelViewSet):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
 
@@ -2233,8 +2233,8 @@ class SystemStatusView(PassUserMixin):
                 },
             },
         )
-        
-        
+
+
 
 class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = Warehouse
@@ -2253,19 +2253,19 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     )
     filterset_class = WarehouseFilterSet
     ordering_fields = ("name", "type", "parent_warehouse", "document_count")
-    
-    
-    
-    
+
+
+
+
     def create(self, request, *args, **kwargs):
-        # try:                                                                                                                    
+        # try:
         serializer = WarehouseSerializer(data=request.data)
         parent_warehouse = None
         if serializer.is_valid(raise_exception=True):
             parent_warehouse = serializer.validated_data.get('parent_warehouse',None)
-            
-        parent_warehouse = Warehouse.objects.filter(id=parent_warehouse.id if parent_warehouse else 0).first()   
-        
+
+        parent_warehouse = Warehouse.objects.filter(id=parent_warehouse.id if parent_warehouse else 0).first()
+
         if serializer.validated_data.get("type") == Warehouse.WAREHOUSE and not parent_warehouse:
             warehouse = serializer.save(owner=request.user)
             warehouse.path = str(warehouse.id)
@@ -2289,23 +2289,23 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
 
-       
+
         old_parent_warehouse = instance.parent_warehouse
 
         self.perform_update(serializer)
 
         if old_parent_warehouse != instance.parent_warehouse:
-           
+
             if instance.type == Warehouse.SHELF and getattr(instance.parent_warehouse, 'type', "") == Warehouse.WAREHOUSE :
                 instance.path = f"{instance.parent_warehouse.path}/{instance.id}"
             elif instance.type == Warehouse.BOXCASE and  getattr(instance.parent_warehouse, 'type', "") == Warehouse.SHELF :
                 instance.path = f"{instance.parent_warehouse.path}/{instance.id}"
             elif instance.type == Warehouse.WAREHOUSE and not instance.parent_warehouse:
                 instance.path = str(instance.id)
-            else: 
+            else:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
             instance.save()
-            
+
             boxcase_warehouses = Warehouse.objects.filter(type=Warehouse.BOXCASE, parent_warehouse=instance)
             for boxcase_warehouse in boxcase_warehouses:
                 boxcase_warehouse.path = f"{instance.path}/{boxcase_warehouse.id}"
@@ -2320,23 +2320,23 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
 
-       
+
         old_parent_warehouse = instance.parent_warehouse
 
         self.perform_update(serializer)
 
         if old_parent_warehouse != instance.parent_warehouse:
-           
+
             if instance.type == Warehouse.SHELF and getattr(instance.parent_warehouse, 'type', "") == Warehouse.WAREHOUSE :
                 instance.path = f"{instance.parent_warehouse.path}/{instance.id}"
             elif instance.type == Warehouse.BOXCASE and  getattr(instance.parent_warehouse, 'type', "") == Warehouse.SHELF :
                 instance.path = f"{instance.parent_warehouse.path}/{instance.id}"
             elif instance.type == Warehouse.WAREHOUSE and not instance.parent_warehouse:
                 instance.path = str(instance.id)
-            else: 
+            else:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
             instance.save()
-            
+
             boxcase_warehouses = Warehouse.objects.filter(type=Warehouse.BOXCASE, parent_warehouse=instance)
             for boxcase_warehouse in boxcase_warehouses:
                 boxcase_warehouse.path = f"{instance.path}/{boxcase_warehouse.id}"
@@ -2344,7 +2344,7 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
 
         return Response(serializer.data)
-        
+
     def destroy(self, request, pk, *args, **kwargs):
         warehouse = Warehouse.objects.get(id=pk)
         warehouses = Warehouse.objects.filter(path__startswith=warehouse.path)
@@ -2359,9 +2359,13 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = Folder
 
-    queryset = Folder.objects.select_related("owner").order_by(
-        Lower("name"),
-    )
+    queryset = Folder.objects.annotate(
+        type_order=Case(
+            When(type='folder', then=0),  # Gán giá trị 0 cho folder
+            When(type='file', then=1),  # Gán giá trị 1 cho file
+            output_field=IntegerField(),
+        )
+    ).order_by('type_order', Lower('name'))
 
     serializer_class = FolderSerializer
     pagination_class = StandardPagination
@@ -2374,7 +2378,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     filterset_class = FolderFilterSet
     ordering_fields = ("name", "path", "parent_folder", "document_count")
 
-        
+
     def getFolderDoc(self, request):
         currentUser = request.user
         documents = list(Document.objects.filter(folder=None, owner=currentUser).order_by("-created").values())
@@ -2383,11 +2387,11 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         return {
             "documents": documents,
             "folders": folders_serialisers.data,
-        }    
-        
+        }
+
     @action(methods=["get"], detail=False)
     def folders_documents(self, request):
-        
+
         if request.method == "GET":
             try:
                 return Response(self.getFolderDoc(request))
@@ -2396,7 +2400,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 return Response(
                     {"error": "Error retrieving folders, check logs for more detail."},
                 )
-            
+
     @action(methods=["get"], detail=True)
     def bulk_export_excel(self, request, pk=None):
         try:
@@ -2446,8 +2450,8 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 return Response(
                     {"error": "Error retrieving folders, check logs for more detail."},
                 )
-    
-    
+
+
     def getFolderDocById(self, fol):
         currentUser = self.request.user
         documents = list(Document.objects.filter(folder=fol, owner=currentUser).order_by("-created").values())
@@ -2457,7 +2461,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             "documents": documents,
             "folders": folders_serialisers.data,
         }
-    
+
     @action(methods=["get"], detail=True)
     def folders_documents_by_id(self, request, pk=None):
         currentUser = request.user
@@ -2480,17 +2484,17 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 return Response(
                     {"error": "Error retrieving folders, check logs for more detail."},
                 )
-    
-    
+
+
     def create(self, request, *args, **kwargs):
-        # try:                                                          
+        # try:
         serializer = FolderSerializer(data=request.data)
         parent_folder = None
         if serializer.is_valid(raise_exception=True):
             parent_folder = serializer.validated_data.get('parent_folder',None)
-            
-        parent_folder = Folder.objects.filter(id=parent_folder.id if parent_folder else 0).first()   
-        
+
+        parent_folder = Folder.objects.filter(id=parent_folder.id if parent_folder else 0).first()
+
         if parent_folder == None:
             folder = serializer.save(owner=request.user)
             folder.path = str(folder.id)
@@ -2513,7 +2517,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             pass
         elif 'parent_folder' in request.data and int(request.data['parent_folder']) == instance.id:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        
+
         elif 'parent_folder' in request.data:
             new_parent_folder = Folder.objects.get(id=int(request.data['parent_folder']))
             if new_parent_folder.path.startswith(instance.path):
@@ -2522,7 +2526,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
             request.data['parent_folder'] = None
-      
+
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         serializer.validated_data['updated'] = timezone.now()
@@ -2534,16 +2538,16 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         if old_parent_folder != instance.parent_folder:
             if instance.parent_folder:
                 instance.path = f"{instance.parent_folder.path}/{instance.id}"
-                
+
             else:
                 instance.path = f"{instance.id}"
             instance.save()
 
             self.update_child_folder_paths(instance)
-            
+
         return Response(serializer.data)
-    
-    
+
+
 
     def partial_update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', True)
@@ -2552,7 +2556,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             pass
         elif 'parent_folder' in request.data and int(request.data['parent_folder']) == instance.id:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        
+
         elif 'parent_folder' in request.data :
             new_parent_folder = Folder.objects.get(id=int(request.data['parent_folder']))
             if new_parent_folder.path.startswith(instance.path):
@@ -2561,7 +2565,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
             request.data['parent_folder'] = None
-        
+
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
 
@@ -2589,17 +2593,17 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 child_folder.path = f"{child_folder.id}"
             child_folder.save()
             self.update_child_folder_paths(child_folder)
-            
-    
+
+
     def destroy(self, request, pk, *args, **kwargs):
         folder = Folder.objects.get(id=pk)
         folders = Folder.objects.filter(path__startswith=folder.path)
         documents = Document.objects.filter(folder__in=folders)
         documents.delete()
         folders.delete()
-        
+
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
 
 class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = Dossier
@@ -2620,17 +2624,17 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     ordering_fields = ("name", "type","dossier_form")
 
     def create(self, request, *args, **kwargs):
-        # try:                                                          
+        # try:
         serializer = DossierSerializer(data=request.data)
         parent_dossier = None
         if serializer.is_valid(raise_exception=True):
             parent_dossier = serializer.validated_data.get('parent_dossier',None)
-            
-        parent_dossier = Dossier.objects.filter(id=parent_dossier.id if parent_dossier else 0).first()   
-        
+
+        parent_dossier = Dossier.objects.filter(id=parent_dossier.id if parent_dossier else 0).first()
+
         if parent_dossier == None:
             dossier = serializer.save(owner=request.user)
-           
+
             dossier.path = str(dossier.id)
             dossier.save()
         elif parent_dossier:
@@ -2648,7 +2652,7 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.data,status=status.HTTP_201_CREATED)
-    
+
     def update_child_dossier_paths(self, dossier):
         child_dossiers = Dossier.objects.filter(parent_dossier=dossier)
         for child_dossier in child_dossiers:
@@ -2666,14 +2670,14 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     #         pass
     #     elif 'parent_dossier' in request.data and int(request.data['parent_dossier']) == instance.id:
     #         return Response(status=status.HTTP_400_BAD_REQUEST)
-        
+
     #     elif 'parent_dossier' in request.data:
     #         new_parent_dossier = Dossier.objects.get(id=int(request.data['parent_dossier']))
     #         if new_parent_dossier.path.startswith(instance.path):
     #             return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a dossier into one of its child dossiers.'})
     #     else:
     #         request.data['parent_dossier'] = None
-      
+
     #     serializer = self.get_serializer(instance, data=request.data, partial=partial)
     #     serializer.is_valid(raise_exception=True)
 
@@ -2684,13 +2688,13 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     #     if old_parent_dossier != instance.parent_dossier:
     #         if instance.parent_dossier:
     #             instance.path = f"{instance.parent_dossier.path}/{instance.id}"
-                
+
     #         else:
     #             instance.path = f"{instance.id}"
     #         instance.save()
 
     #         self.update_child_dossier_paths(instance)
-            
+
     #     return Response(serializer.data)
 
     @action(methods=["get"], detail=True)
@@ -2715,7 +2719,7 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 return Response(
                     {"error": "Error retrieving dossiers, check logs for more detail."},
                 )
-    
+
     def destroy(self, request, pk, *args, **kwargs):
         dossier = Dossier.objects.get(id=pk)
         dossiers = Dossier.objects.filter(path__startswith=dossier.path)
@@ -2724,10 +2728,10 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         folders.delete()
         documents.delete()
         dossiers.delete()
-        
+
         return Response(status=status.HTTP_204_NO_CONTENT)
-            
-        
+
+
 class DossierFormViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = DossierForm
 
@@ -2747,17 +2751,17 @@ class DossierFormViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     ordering_fields = ("name", "type",)
 
     # def create(self, request, *args, **kwargs):
-    #     # try:                                                          
+    #     # try:
     #     serializer = DossierFormSerializer(data=request.data)
     #     parent_dossier = None
     #     if serializer.is_valid(raise_exception=True):
     #         parent_dossier = serializer.validated_data.get('parent_dossier',None)
-            
-    #     parent_dossier = Dossier.objects.filter(id=parent_dossier.id if parent_dossier else 0).first()   
-        
+
+    #     parent_dossier = Dossier.objects.filter(id=parent_dossier.id if parent_dossier else 0).first()
+
     #     if parent_dossier == None:
     #         dossier = serializer.save(owner=request.user)
-           
+
     #         dossier.path = str(dossier.id)
     #         dossier.save()
     #     elif parent_dossier:
@@ -2775,7 +2779,7 @@ class DossierFormViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     #         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     #     return Response(serializer.data,status=status.HTTP_201_CREATED)
-    
+
     # def update_child_dossier_paths(self, dossier):
     #     child_dossiers = Dossier.objects.filter(parent_dossier=dossier)
     #     for child_dossier in child_dossiers:
@@ -2793,14 +2797,14 @@ class DossierFormViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     #         pass
     #     elif 'parent_dossier' in request.data and int(request.data['parent_dossier']) == instance.id:
     #         return Response(status=status.HTTP_400_BAD_REQUEST)
-        
+
     #     elif 'parent_dossier' in request.data:
     #         new_parent_dossier = Dossier.objects.get(id=int(request.data['parent_dossier']))
     #         if new_parent_dossier.path.startswith(instance.path):
     #             return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a dossier into one of its child dossiers.'})
     #     else:
     #         request.data['parent_dossier'] = None
-      
+
     #     serializer = self.get_serializer(instance, data=request.data, partial=partial)
     #     serializer.is_valid(raise_exception=True)
 
@@ -2811,13 +2815,13 @@ class DossierFormViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     #     if old_parent_dossier != instance.parent_dossier:
     #         if instance.parent_dossier:
     #             instance.path = f"{instance.parent_dossier.path}/{instance.id}"
-                
+
     #         else:
     #             instance.path = f"{instance.id}"
     #         instance.save()
 
     #         self.update_child_dossier_paths(instance)
-            
+
     #     return Response(serializer.data)
 
     # @action(methods=["get"], detail=True)
@@ -2842,5 +2846,5 @@ class DossierFormViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     #             return Response(
     #                 {"error": "Error retrieving dossiers, check logs for more detail."},
     #             )
-            
-        
+
+
