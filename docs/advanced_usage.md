@@ -501,10 +501,10 @@ You can also use a custom `datetime` filter to format dates:
 
 ```jinja
 invoices/
-{{ custom_fields|get_cf_value("Date Field")|datetime('%Y') }}/
-{{ custom_fields|get_cf_value("Date Field")|datetime('%m') }}/
-{{ custom_fields|get_cf_value("Date Field")|datetime('%d') }}/
-Invoice_{{ custom_fields|get_cf_value("Select Field") }}_{{ custom_fields|get_cf_value("Date Field")|replace("-", "") }}.pdf
+{{ custom_fields|get_cf_value("Date Field","2024-01-01")|datetime('%Y') }}/
+{{ custom_fields|get_cf_value("Date Field","2024-01-01")|datetime('%m') }}/
+{{ custom_fields|get_cf_value("Date Field","2024-01-01")|datetime('%d') }}/
+Invoice_{{ custom_fields|get_cf_value("Select Field") }}_{{ custom_fields|get_cf_value("Date Field","2024-01-01")|replace("-", "") }}.pdf
 ```
 
 This will create a path like `invoices/2022/01/01/Invoice_OptionTwo_20220101.pdf` if the custom field "Date Field" is set to January 1, 2022 and "Select Field" is set to `OptionTwo`.
