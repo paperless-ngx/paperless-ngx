@@ -1543,6 +1543,14 @@ class TestTasks(TestCase):
             username="A",
             password="A",
         )
+        MailRule.objects.create(
+            name="A",
+            account=MailAccount.objects.get(name="A"),
+        )
+        MailRule.objects.create(
+            name="B",
+            account=MailAccount.objects.get(name="B"),
+        )
 
         result = tasks.process_mail_accounts()
 
@@ -1552,3 +1560,33 @@ class TestTasks(TestCase):
         m.side_effect = lambda account: 0
         result = tasks.process_mail_accounts()
         self.assertIn("No new", result)
+
+    @mock.patch("paperless_mail.tasks.MailAccountHandler.handle_mail_account")
+    def test_accounts_no_enabled_rules(self, m):
+        m.side_effect = lambda account: 6
+
+        MailAccount.objects.create(
+            name="A",
+            imap_server="A",
+            username="A",
+            password="A",
+        )
+        MailAccount.objects.create(
+            name="B",
+            imap_server="A",
+            username="A",
+            password="A",
+        )
+        MailRule.objects.create(
+            name="A",
+            account=MailAccount.objects.get(name="A"),
+            enabled=False,
+        )
+        MailRule.objects.create(
+            name="B",
+            account=MailAccount.objects.get(name="B"),
+            enabled=False,
+        )
+
+        tasks.process_mail_accounts()
+        self.assertEqual(m.call_count, 0)
