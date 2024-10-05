@@ -422,13 +422,14 @@ def get_mailbox(server, port, security) -> MailBox:
     return mailbox
 
 
-def refresh_oauth_token(self, account: MailAccount) -> bool:
+def refresh_oauth_token(account: MailAccount) -> bool:
     """
-    Refreshes the token for the given mail account.
+    Refreshes the oauth token for the given mail account.
     """
-    self.log.debug(f"Attempting to refresh oauth token for account {account}")
+    logger = logging.getLogger("paperless_mail")
+    logger.debug(f"Attempting to refresh oauth token for account {account}")
     if not account.refresh_token:
-        self.log.error(f"Account {account}: No refresh token available.")
+        logger.error(f"Account {account}: No refresh token available.")
         return False
 
     if account.account_type == MailAccount.MailAccountType.GMAIL:
@@ -460,10 +461,10 @@ def refresh_oauth_token(self, account: MailAccount) -> bool:
             seconds=data["expires_in"],
         )
         account.save()
-        self.log.debug(f"Successfully refreshed oauth token for account {account}")
+        logger.debug(f"Successfully refreshed oauth token for account {account}")
         return True
     else:
-        self.log.error(
+        logger.error(
             f"Failed to refresh oauth token for account {account}: {response}",
         )
         return False
