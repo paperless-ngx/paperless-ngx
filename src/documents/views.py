@@ -1567,11 +1567,13 @@ class UiSettingsView(GenericAPIView):
 
     def generate_outlook_oauth_url(self) -> str:
         # https://login.microsoftonline.com/common/oauth2/v2.0/authorize ?
-        token_request_uri = f"https://login.microsoftonline.com/{settings.OUTLOOK_OAUTH_TENANT_ID}/oauth2/v2.0/authorize"
+        token_request_uri = (
+            "https://login.microsoftonline.com/common/oauth2/v2.0/authorize"
+        )
         response_type = "code"
         client_id = settings.OUTLOOK_OAUTH_CLIENT_ID
         redirect_uri = "http://localhost:8000/api/oauth/callback/"
-        scope = "offline_access%20Mail.ReadWrite"
+        scope = "offline_access Mail.ReadWrite"
         url = f"{token_request_uri}?response_type={response_type}&response_mode=query&client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}"
         return url
 
@@ -2163,21 +2165,13 @@ class OauthCallbackView(GenericAPIView):
     # permission_classes = (AllowAny,)
 
     def get(self, request, format=None):
-        # https://login.microsoftonline.com/<tenant-id>/adminconsent?client_id=<client-id> needed?
-        admin_consent = request.query_params.get("admin_consent")
-        if admin_consent is not None:
-            return HttpResponseRedirect(
-                "http://localhost:4200/mail",
-            )
         code = request.query_params.get("code")
-        # Gmail passes scope as a query param
+        # Gmail passes scope as a query param, Outlook does not
         scope = request.query_params.get("scope")
-        # Outlook passes session_state as a query param
-        session_state = request.query_params.get("session_state")
 
-        if code is None and scope is None and session_state is None:
+        if code is None:
             logger.error(
-                f"Invalid oauth callback request, code: {code}, scope: {scope}, session_state: {session_state}",
+                f"Invalid oauth callback request, code: {code}, scope: {scope}",
             )
             return HttpResponseBadRequest("Invalid request, see logs for more detail")
 
@@ -2196,7 +2190,7 @@ class OauthCallbackView(GenericAPIView):
             client_id = settings.GMAIL_OAUTH_CLIENT_ID
             client_secret = settings.GMAIL_OAUTH_CLIENT_SECRET
             scope = "https://mail.google.com/"
-        elif session_state is not None:
+        elif scope is None:
             # Outlook
             # Outlok setup guide: https://medium.com/@manojkumardhakad/python-read-and-send-outlook-mail-using-oauth2-token-and-graph-api-53de606ecfa1
             imap_server = "outlook.office365.com"
@@ -2207,10 +2201,12 @@ class OauthCallbackView(GenericAPIView):
                 "imap_port": 993,
             }
 
-            token_request_uri = f"https://login.microsoftonline.com/{settings.OUTLOOK_OAUTH_TENANT_ID}/oauth2/v2.0/token"
+            token_request_uri = (
+                "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+            )
             client_id = settings.OUTLOOK_OAUTH_CLIENT_ID
             client_secret = settings.OUTLOOK_OAUTH_CLIENT_SECRET
-            scope = "offline_access%20Mail.ReadWrite"
+            scope = "offline_access Mail.ReadWrite"
 
         data = {
             "code": code,
