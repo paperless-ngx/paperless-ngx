@@ -525,6 +525,7 @@ class MailAccountHandler(LoggingMixin):
             return False
 
         if "gmail" in account.imap_server:
+            url = "https://accounts.google.com/o/oauth2/token"
             data = {
                 "client_id": settings.GMAIL_OAUTH_CLIENT_ID,
                 "client_secret": settings.GMAIL_OAUTH_CLIENT_SECRET,
@@ -532,6 +533,7 @@ class MailAccountHandler(LoggingMixin):
                 "grant_type": "refresh_token",
             }
         elif "outlook" in account.imap_server:
+            url = "https://login.microsoftonline.com/common/oauth2/v2.0/token"
             data = {
                 "client_id": settings.OUTLOOK_OAUTH_CLIENT_ID,
                 "client_secret": settings.OUTLOOK_OAUTH_CLIENT_SECRET,
@@ -540,17 +542,18 @@ class MailAccountHandler(LoggingMixin):
             }
 
         response = httpx.post(
-            "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+            url=url,
             data=data,
             headers={"Content-Type": "application/x-www-form-urlencoded"},
         )
         data = response.json()
         if "access_token" in data:
-            account.token = data["access_token"]
-            account.expiration = datetime.datetime.now() + timedelta(
+            account.password = data["access_token"]
+            account.expiration = timezone.now() + timedelta(
                 seconds=data["expires_in"],
             )
             account.save()
+            self.log.debug(f"Successfully refreshed token for account {account}")
             return True
         else:
             self.log.error(f"Failed to refresh token for account {account}: {data}")
@@ -579,8 +582,9 @@ class MailAccountHandler(LoggingMixin):
                 ):
                     self.log.debug(f"Attempting to refresh token for account {account}")
                     success = self.refresh_token(account)
-                    if not success:
-                        self.log.error(f"Failed to refresh token for account {account}")
+                    if success:
+                        account.refresh_from_db()
+                    else:
                         return total_processed_files
 
                 supports_gmail_labels = "X-GM-EXT-1" in M.client.capabilities
