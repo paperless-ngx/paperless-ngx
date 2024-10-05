@@ -64,7 +64,7 @@ export const SETTINGS_KEYS = {
   SEARCH_DB_ONLY: 'general-settings:search:db-only',
   SEARCH_FULL_TYPE: 'general-settings:search:more-link',
   EMPTY_TRASH_DELAY: 'trash_delay',
-  GOOGLE_OAUTH_URL: 'google_oauth_url',
+  GMAIL_OAUTH_URL: 'gmail_oauth_url',
   OUTLOOK_OAUTH_URL: 'outlook_oauth_url',
 }
 
@@ -245,7 +245,7 @@ export const SETTINGS: UiSetting[] = [
     default: 30,
   },
   {
-    key: SETTINGS_KEYS.GOOGLE_OAUTH_URL,
+    key: SETTINGS_KEYS.GMAIL_OAUTH_URL,
     type: 'string',
     default: '',
   },

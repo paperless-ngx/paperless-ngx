@@ -38,7 +38,7 @@ export class MailComponent
   oAuthAccoundId: number
 
   public get gmailOAuthUrl(): string {
-    return this.settingsService.get(SETTINGS_KEYS.GOOGLE_OAUTH_URL)
+    return this.settingsService.get(SETTINGS_KEYS.GMAIL_OAUTH_URL)
   }
 
   public get outlookOAuthUrl(): string {
@@ -94,12 +94,20 @@ export class MailComponent
 
     this.route.queryParamMap.subscribe((params) => {
       if (params.get('oauth_success')) {
-        this.oAuthAccoundId = parseInt(params.get('account_id'))
-        if (this.mailAccounts.length > 0) {
-          this.editMailAccount(
-            this.mailAccounts.find(
-              (account) => account.id === this.oAuthAccoundId
+        const success = params.get('oauth_success') === '1'
+        if (success) {
+          this.toastService.showInfo($localize`OAuth2 authentication success`)
+          this.oAuthAccoundId = parseInt(params.get('account_id'))
+          if (this.mailAccounts.length > 0) {
+            this.editMailAccount(
+              this.mailAccounts.find(
+                (account) => account.id === this.oAuthAccoundId
+              )
             )
+          }
+        } else {
+          this.toastService.showError(
+            $localize`OAuth2 authentication failed, see logs for details`
           )
         }
       }

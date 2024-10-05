@@ -1566,7 +1566,6 @@ class UiSettingsView(GenericAPIView):
         return url
 
     def generate_outlook_oauth_url(self) -> str:
-        # https://login.microsoftonline.com/common/oauth2/v2.0/authorize ?
         token_request_uri = (
             "https://login.microsoftonline.com/common/oauth2/v2.0/authorize"
         )
@@ -1608,7 +1607,7 @@ class UiSettingsView(GenericAPIView):
         ui_settings["auditlog_enabled"] = settings.AUDIT_LOG_ENABLED
 
         if settings.GMAIL_OAUTH_ENABLED:
-            ui_settings["google_oauth_url"] = self.generate_gmail_oauth_url()
+            ui_settings["gmail_oauth_url"] = self.generate_gmail_oauth_url()
 
         if settings.OUTLOOK_OAUTH_ENABLED:
             ui_settings["outlook_oauth_url"] = self.generate_outlook_oauth_url()
@@ -2225,7 +2224,9 @@ class OauthCallbackView(GenericAPIView):
 
         if "error" in data:
             logger.error(f"Error {response.status_code} getting access token: {data}")
-            return HttpResponseBadRequest(data["error"])
+            return HttpResponseRedirect(
+                "http://localhost:4200/mail?oauth_success=0",
+            )
         elif "access_token" in data:
             access_token = data["access_token"]
             # if "refresh_token" in data:
@@ -2237,7 +2238,6 @@ class OauthCallbackView(GenericAPIView):
                 imap_server=imap_server,
                 defaults=defaults,
             )
-
-        return HttpResponseRedirect(
-            f"http://localhost:4200/mail?oauth_success=1&account_id={account.pk}",
-        )
+            return HttpResponseRedirect(
+                f"http://localhost:4200/mail?oauth_success=1&account_id={account.pk}",
+            )
