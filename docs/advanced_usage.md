@@ -494,17 +494,17 @@ would be filed to `not-invoices/Title.pdf`
 If the custom field is named "Invoice Number", you would access the value of it via the `get_cf_value` filter due to quirks of the Django Template Language:
 
 ```jinja
-"invoices/{{ custom_fields|get_cf_value:'Invoice Number' }}"
+"invoices/{{ custom_fields|get_cf_value('Invoice Number') }}"
 ```
 
-An example using Django's [date filters](https://docs.djangoproject.com/en/5.1/ref/templates/builtins/#date) and others:
+You can also use a custom `datetime` filter to format dates:
 
 ```jinja
 invoices/
-{{ custom_fields|get_cf_value:"Date Field"|date:"Y" }}/
-{{ custom_fields|get_cf_value:"Date Field"|date:"m" }}/
-{{ custom_fields|get_cf_value:"Date Field"|date:"d" }}/
-Invoice_{{ custom_fields|get_cf_value:"Select Field" }}_{{ custom_fields|get_cf_value:"Date Field"|cut:"-" }}
+{{ custom_fields|get_cf_value("Date Field")|datetime('%Y') }}/
+{{ custom_fields|get_cf_value("Date Field")|datetime('%m') }}/
+{{ custom_fields|get_cf_value("Date Field")|datetime('%d') }}/
+Invoice_{{ custom_fields|get_cf_value:"Select Field" }}_{{ custom_fields|get_cf_value("Date Field")|replace("-", "") }}.pdf
 ```
 
 This will create a path like `invoices/2022/01/01/Invoice_OptionTwo_20220101.pdf` if the custom field "Date Field" is set to January 1, 2022 and "Select Field" is set to `OptionTwo`.
