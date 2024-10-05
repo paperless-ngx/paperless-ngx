@@ -80,8 +80,10 @@ class MailAccountTestView(GenericAPIView):
                     and account.expiration is not None
                     and account.expiration < timezone.now()
                 ):
-                    if refresh_oauth_token(account):
-                        account.refresh_from_db()
+                    if refresh_oauth_token(existing_account):
+                        # User is not changing password and token needs to be refreshed
+                        existing_account.refresh_from_db()
+                        account.password = existing_account.password
                     else:
                         raise MailError("Unable to refresh oauth token")
 
