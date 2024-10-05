@@ -1572,7 +1572,7 @@ class UiSettingsView(GenericAPIView):
         response_type = "code"
         client_id = settings.OUTLOOK_OAUTH_CLIENT_ID
         redirect_uri = "http://localhost:8000/api/oauth/callback/"
-        scope = "offline_access Mail.ReadWrite"
+        scope = "offline_access https://outlook.office.com/IMAP.AccessAsUser.All"
         url = f"{token_request_uri}?response_type={response_type}&response_mode=query&client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}"
         return url
 
@@ -2205,7 +2205,7 @@ class OauthCallbackView(GenericAPIView):
             )
             client_id = settings.OUTLOOK_OAUTH_CLIENT_ID
             client_secret = settings.OUTLOOK_OAUTH_CLIENT_SECRET
-            scope = "offline_access Mail.ReadWrite"
+            scope = "offline_access https://outlook.office.com/IMAP.AccessAsUser.All"
 
         data = {
             "code": code,
