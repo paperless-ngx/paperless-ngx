@@ -50,7 +50,7 @@
     <button type="button" class="btn btn-sm btn-outline-danger" (click)="delete()" [disabled]="!userCanBulkEdit(PermissionAction.Delete) || selectedObjects.size === 0">
       <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
     </button>
-    <button type="button" class="btn btn-sm btn-outline-danger" (click)="update()" [disabled]="!userCanBulkEdit(PermissionAction.Update) || selectedObjects.size > 0" [hidden]="getFolderSelect()==0">
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="update()" [disabled]="!userCanBulkEdit(PermissionAction.Change) || selectedObjects.size > 0" [hidden]="getFolderSelect()==0">
       <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Paste</ng-container>
     </button>
     <button type="button" class="btn btn-sm btn-outline-danger" (click)="cancelFolder()" [hidden]="getFolderSelect()==0"   >
