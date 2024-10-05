@@ -39,6 +39,9 @@ class MailAccountSerializer(OwnedObjectSerializer):
             "user_can_change",
             "permissions",
             "set_permissions",
+            "account_type",
+            "refresh_token",
+            "expiration",
         ]
 
     def update(self, instance, validated_data):

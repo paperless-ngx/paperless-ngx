@@ -15,6 +15,11 @@ class MailAccount(document_models.ModelWithOwner):
         SSL = 2, _("Use SSL")
         STARTTLS = 3, _("Use STARTTLS")
 
+    class MailAccountType(models.IntegerChoices):
+        IMAP = 1, _("IMAP")
+        GMAIL = 2, _("Gmail")
+        OUTLOOK = 3, _("Outlook")
+
     name = models.CharField(_("name"), max_length=256, unique=True)
 
     imap_server = models.CharField(_("IMAP server"), max_length=256)
@@ -49,6 +54,12 @@ class MailAccount(document_models.ModelWithOwner):
             "The character set to use when communicating with the "
             "mail server, such as 'UTF-8' or 'US-ASCII'.",
         ),
+    )
+
+    account_type = models.PositiveIntegerField(
+        _("account type"),
+        choices=MailAccountType.choices,
+        default=MailAccountType.IMAP,
     )
 
     refresh_token = models.CharField(

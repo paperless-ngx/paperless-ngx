@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Subject, first, takeUntil } from 'rxjs'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
-import { MailAccount } from 'src/app/data/mail-account'
+import { MailAccount, MailAccountType } from 'src/app/data/mail-account'
 import { MailRule } from 'src/app/data/mail-rule'
 import {
   PermissionsService,
@@ -31,6 +31,8 @@ export class MailComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy
 {
+  public MailAccountType = MailAccountType
+
   mailAccounts: MailAccount[] = []
   mailRules: MailRule[] = []
 

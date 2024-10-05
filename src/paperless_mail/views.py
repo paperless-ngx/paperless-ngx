@@ -63,6 +63,7 @@ class MailAccountTestView(GenericAPIView):
         ):
             existing_account = MailAccount.objects.get(pk=request.data["id"])
             serializer.validated_data["password"] = existing_account.password
+            serializer.validated_data["account_type"] = existing_account.account_type
             serializer.validated_data["refresh_token"] = existing_account.refresh_token
             serializer.validated_data["expiration"] = existing_account.expiration
 
@@ -109,12 +110,14 @@ class OauthCallbackView(GenericAPIView):
         if scope is not None and "google" in scope:
             # Google
             # Gmail setup guide: https://postmansmtp.com/how-to-configure-post-smtp-with-gmailgsuite-using-oauth/
+            account_type = MailAccount.AccountType.GMAIL
             imap_server = "imap.gmail.com"
             defaults = {
                 "name": f"Gmail OAuth {datetime.now()}",
                 "username": "",
                 "imap_security": MailAccount.ImapSecurity.SSL,
                 "imap_port": 993,
+                "account_type": account_type,
             }
 
             token_request_uri = "https://accounts.google.com/o/oauth2/token"
@@ -124,12 +127,14 @@ class OauthCallbackView(GenericAPIView):
         elif scope is None:
             # Outlook
             # Outlok setup guide: https://medium.com/@manojkumardhakad/python-read-and-send-outlook-mail-using-oauth2-token-and-graph-api-53de606ecfa1
+            account_type = MailAccount.AccountType.OUTLOOK
             imap_server = "outlook.office365.com"
             defaults = {
                 "name": f"Outlook OAuth {datetime.now()}",
                 "username": "",
                 "imap_security": MailAccount.ImapSecurity.SSL,
                 "imap_port": 993,
+                "account_type": account_type,
             }
 
             token_request_uri = (

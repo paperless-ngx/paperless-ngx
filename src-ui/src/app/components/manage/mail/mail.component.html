@@ -37,7 +37,16 @@
     @for (account of mailAccounts; track account) {
       <li class="list-group-item">
         <div class="row">
-          <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editMailAccount(account)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailAccount)">{{account.name}}</button></div>
+          <div class="col d-flex align-items-center">
+            <button class="btn btn-link p-0 text-start" type="button" (click)="editMailAccount(account)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailAccount)">
+              {{account.name}}
+              @if (account.account_type === MailAccountType.Gmail) {
+                <i-bs name="google" class="ms-2"></i-bs>
+              } @else if (account.account_type === MailAccountType.Outlook) {
+                <i-bs name="microsoft" class="ms-2"></i-bs>
+              }
+            </button>
+          </div>
           <div class="col d-flex align-items-center">{{account.imap_server}}</div>
           <div class="col d-flex align-items-center d-none d-sm-block">{{account.username}}</div>
           <div class="col">

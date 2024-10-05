@@ -247,11 +247,11 @@ export const SETTINGS: UiSetting[] = [
   {
     key: SETTINGS_KEYS.GMAIL_OAUTH_URL,
     type: 'string',
-    default: '',
+    default: null,
   },
   {
     key: SETTINGS_KEYS.OUTLOOK_OAUTH_URL,
     type: 'string',
-    default: '',
+    default: null,
   },
 ]

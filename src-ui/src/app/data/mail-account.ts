@@ -6,6 +6,12 @@ export enum IMAPSecurity {
   STARTTLS = 3,
 }
 
+export enum MailAccountType {
+  IMAP = 1,
+  Gmail = 2,
+  Outlook = 3,
+}
+
 export interface MailAccount extends ObjectWithPermissions {
   name: string
 
@@ -22,4 +28,10 @@ export interface MailAccount extends ObjectWithPermissions {
   character_set?: string
 
   is_token: boolean
+
+  account_type: MailAccountType
+
+  refresh_token?: string
+
+  expiration?: string // Date
 }
