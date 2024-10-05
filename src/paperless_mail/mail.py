@@ -422,6 +422,53 @@ def get_mailbox(server, port, security) -> MailBox:
     return mailbox
 
 
+def refresh_oauth_token(self, account: MailAccount) -> bool:
+    """
+    Refreshes the token for the given mail account.
+    """
+    self.log.debug(f"Attempting to refresh oauth token for account {account}")
+    if not account.refresh_token:
+        self.log.error(f"Account {account}: No refresh token available.")
+        return False
+
+    if "gmail" in account.imap_server:
+        url = "https://accounts.google.com/o/oauth2/token"
+        data = {
+            "client_id": settings.GMAIL_OAUTH_CLIENT_ID,
+            "client_secret": settings.GMAIL_OAUTH_CLIENT_SECRET,
+            "refresh_token": account.refresh_token,
+            "grant_type": "refresh_token",
+        }
+    elif "outlook" in account.imap_server:
+        url = "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+        data = {
+            "client_id": settings.OUTLOOK_OAUTH_CLIENT_ID,
+            "client_secret": settings.OUTLOOK_OAUTH_CLIENT_SECRET,
+            "refresh_token": account.refresh_token,
+            "grant_type": "refresh_token",
+        }
+
+    response = httpx.post(
+        url=url,
+        data=data,
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    data = response.json()
+    if response.status_code < 400 and "access_token" in data:
+        account.password = data["access_token"]
+        account.expiration = timezone.now() + timedelta(
+            seconds=data["expires_in"],
+        )
+        account.save()
+        self.log.debug(f"Successfully refreshed oauth token for account {account}")
+        return True
+    else:
+        self.log.error(
+            f"Failed to refresh oauth token for account {account}: {response}",
+        )
+        return False
+
+
 class MailAccountHandler(LoggingMixin):
     """
     The main class that handles mail accounts.
@@ -516,49 +563,6 @@ class MailAccountHandler(LoggingMixin):
                 "Unknown correspondent selector",
             )  # pragma: no cover
 
-    def refresh_token(self, account: MailAccount) -> bool:
-        """
-        Refreshes the token for the given mail account.
-        """
-        if not account.refresh_token:
-            self.log.error(f"Account {account}: No refresh token available.")
-            return False
-
-        if "gmail" in account.imap_server:
-            url = "https://accounts.google.com/o/oauth2/token"
-            data = {
-                "client_id": settings.GMAIL_OAUTH_CLIENT_ID,
-                "client_secret": settings.GMAIL_OAUTH_CLIENT_SECRET,
-                "refresh_token": account.refresh_token,
-                "grant_type": "refresh_token",
-            }
-        elif "outlook" in account.imap_server:
-            url = "https://login.microsoftonline.com/common/oauth2/v2.0/token"
-            data = {
-                "client_id": settings.OUTLOOK_OAUTH_CLIENT_ID,
-                "client_secret": settings.OUTLOOK_OAUTH_CLIENT_SECRET,
-                "refresh_token": account.refresh_token,
-                "grant_type": "refresh_token",
-            }
-
-        response = httpx.post(
-            url=url,
-            data=data,
-            headers={"Content-Type": "application/x-www-form-urlencoded"},
-        )
-        data = response.json()
-        if "access_token" in data:
-            account.password = data["access_token"]
-            account.expiration = timezone.now() + timedelta(
-                seconds=data["expires_in"],
-            )
-            account.save()
-            self.log.debug(f"Successfully refreshed token for account {account}")
-            return True
-        else:
-            self.log.error(f"Failed to refresh token for account {account}: {data}")
-            return False
-
     def handle_mail_account(self, account: MailAccount):
         """
         Main entry method to handle a specific mail account.
@@ -580,9 +584,7 @@ class MailAccountHandler(LoggingMixin):
                     and account.expiration is not None
                     and account.expiration < timezone.now()
                 ):
-                    self.log.debug(f"Attempting to refresh token for account {account}")
-                    success = self.refresh_token(account)
-                    if success:
+                    if refresh_oauth_token(account):
                         account.refresh_from_db()
                     else:
                         return total_processed_files
