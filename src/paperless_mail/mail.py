@@ -572,7 +572,11 @@ class MailAccountHandler(LoggingMixin):
                 account.imap_port,
                 account.imap_security,
             ) as M:
-                if account.is_token and account.expiration < timezone.now():
+                if (
+                    account.is_token
+                    and account.expiration is not None
+                    and account.expiration < timezone.now()
+                ):
                     self.log.debug(f"Attempting to refresh token for account {account}")
                     success = self.refresh_token(account)
                     if not success:
