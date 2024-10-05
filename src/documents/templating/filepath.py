@@ -2,10 +2,12 @@ import logging
 import os
 import re
 from collections.abc import Iterable
+from datetime import datetime
 from pathlib import PurePath
 
 import pathvalidate
 from django.utils import timezone
+from django.utils.dateparse import parse_date
 from jinja2 import StrictUndefined
 from jinja2 import Template
 from jinja2 import TemplateSyntaxError
@@ -88,6 +90,15 @@ def get_cf_value(
 
 
 _template_environment.filters["get_cf_value"] = get_cf_value
+
+
+def format_datetime(value: str | datetime, format: str) -> str:
+    if isinstance(value, str):
+        value = parse_date(value)
+    return value.strftime(format=format)
+
+
+_template_environment.filters["datetime"] = format_datetime
 
 
 def create_dummy_document():

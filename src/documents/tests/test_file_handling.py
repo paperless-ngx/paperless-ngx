@@ -1382,3 +1382,58 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
                 generate_filename(doc_a),
                 "invoices/0.pdf",
             )
+
+    def test_datetime_filter(self):
+        """
+        GIVEN:
+            - Filename format with datetime filter
+        WHEN:
+            - Filepath for a document with this format is called
+        THEN:
+            - The datetime filter is rendered
+        """
+        doc_a = Document.objects.create(
+            title="Some Title",
+            created=timezone.make_aware(datetime.datetime(2020, 6, 25, 7, 36, 51, 153)),
+            added=timezone.make_aware(datetime.datetime(2024, 10, 1, 7, 36, 51, 153)),
+            mime_type="application/pdf",
+            pk=2,
+            checksum="2",
+            archive_serial_number=25,
+        )
+
+        CustomField.objects.create(
+            name="Invoice Date",
+            data_type=CustomField.FieldDataType.DATE,
+        )
+        CustomFieldInstance.objects.create(
+            document=doc_a,
+            field=CustomField.objects.get(name="Invoice Date"),
+            value_date=timezone.make_aware(
+                datetime.datetime(2024, 10, 1, 7, 36, 51, 153),
+            ),
+        )
+
+        with override_settings(
+            FILENAME_FORMAT="{{ created | datetime('%Y') }}/{{ title }}",
+        ):
+            self.assertEqual(
+                generate_filename(doc_a),
+                "2020/Some Title.pdf",
+            )
+
+        with override_settings(
+            FILENAME_FORMAT="{{ created | datetime('%Y-%m-%d') }}/{{ title }}",
+        ):
+            self.assertEqual(
+                generate_filename(doc_a),
+                "2020-06-25/Some Title.pdf",
+            )
+
+        with override_settings(
+            FILENAME_FORMAT="{{ custom_fields | get_cf_value('Invoice Date') | datetime('%Y-%m-%d') }}/{{ title }}",
+        ):
+            self.assertEqual(
+                generate_filename(doc_a),
+                "2024-10-01/Some Title.pdf",
+            )
