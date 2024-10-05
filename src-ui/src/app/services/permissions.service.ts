@@ -7,7 +7,6 @@ export enum PermissionAction {
   View = 'view',
   Change = 'change',
   Delete = 'delete',
-  Update = 'update',
 }
 
 export enum PermissionType {
