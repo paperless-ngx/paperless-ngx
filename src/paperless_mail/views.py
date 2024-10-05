@@ -7,7 +7,6 @@ from django.conf import settings
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseRedirect
 from django.utils import timezone
-from rest_framework.decorators import action
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -36,14 +35,6 @@ class MailAccountViewSet(ModelViewSet, PassUserMixin):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
 
-    @action(methods=["post"], detail=True)
-    def refresh_oauth_token(self, request, pk=None):
-        return (
-            Response({"success": True})
-            if refresh_oauth_token(MailAccount.objects.get(id=pk))
-            else HttpResponseBadRequest("Unable to refresh token")
-        )
-
 
 class MailRuleViewSet(ModelViewSet, PassUserMixin):
     model = MailRule
@@ -65,14 +56,16 @@ class MailAccountTestView(GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        # account exists, use the password from there instead of ***
+        # account exists, use the password from there instead of *** and refresh_token / expiration
         if (
             len(serializer.validated_data.get("password").replace("*", "")) == 0
             and request.data["id"] is not None
         ):
-            serializer.validated_data["password"] = MailAccount.objects.get(
-                pk=request.data["id"],
-            ).password
+            existing_account = MailAccount.objects.get(pk=request.data["id"])
+            serializer.validated_data["password"] = existing_account.password
+            serializer.validated_data["account_type"] = existing_account.account_type
+            serializer.validated_data["refresh_token"] = existing_account.refresh_token
+            serializer.validated_data["expiration"] = existing_account.expiration
 
         account = MailAccount(**serializer.validated_data)
 
@@ -82,6 +75,16 @@ class MailAccountTestView(GenericAPIView):
             account.imap_security,
         ) as M:
             try:
+                if (
+                    account.is_token
+                    and account.expiration is not None
+                    and account.expiration < timezone.now()
+                ):
+                    if refresh_oauth_token(account):
+                        account.refresh_from_db()
+                    else:
+                        raise MailError("Unable to refresh oauth token")
+
                 mailbox_login(M, account)
                 return Response({"success": True})
             except MailError:
