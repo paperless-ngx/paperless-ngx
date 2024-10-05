@@ -2179,7 +2179,7 @@ class OauthCallbackView(GenericAPIView):
             # Gmail setup guide: https://postmansmtp.com/how-to-configure-post-smtp-with-gmailgsuite-using-oauth/
             imap_server = "imap.gmail.com"
             defaults = {
-                "name": f"Gmail {datetime.now()}",
+                "name": f"Gmail OAuth {datetime.now()}",
                 "username": "",
                 "imap_security": MailAccount.ImapSecurity.SSL,
                 "imap_port": 993,
@@ -2194,7 +2194,7 @@ class OauthCallbackView(GenericAPIView):
             # Outlok setup guide: https://medium.com/@manojkumardhakad/python-read-and-send-outlook-mail-using-oauth2-token-and-graph-api-53de606ecfa1
             imap_server = "outlook.office365.com"
             defaults = {
-                "name": f"Outlook {datetime.now()}",
+                "name": f"Outlook OAuth {datetime.now()}",
                 "username": "",
                 "imap_security": MailAccount.ImapSecurity.SSL,
                 "imap_port": 993,
