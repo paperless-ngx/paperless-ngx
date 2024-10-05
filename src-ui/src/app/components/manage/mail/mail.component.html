@@ -40,10 +40,10 @@
           <div class="col d-flex align-items-center">
             <button class="btn btn-link p-0 text-start" type="button" (click)="editMailAccount(account)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailAccount)">
               {{account.name}}
-              @if (account.account_type === MailAccountType.Gmail) {
-                <i-bs name="google" class="ms-2"></i-bs>
-              } @else if (account.account_type === MailAccountType.Outlook) {
-                <i-bs name="microsoft" class="ms-2"></i-bs>
+              @switch (account.account_type) {
+                @case (MailAccountType.IMAP) { <i-bs name="envelope-at-fill" class="ms-2"></i-bs> }
+                @case (MailAccountType.Gmail) { <i-bs name="google" class="ms-2"></i-bs> }
+                @case (MailAccountType.Outlook) { <i-bs name="microsoft" class="ms-2"></i-bs> }
               }
             </button>
           </div>
