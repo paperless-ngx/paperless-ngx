@@ -8,6 +8,7 @@ import tempfile
 import urllib
 import zipfile
 from datetime import datetime
+from datetime import timedelta
 from pathlib import Path
 from time import mktime
 from unicodedata import normalize
@@ -1562,7 +1563,7 @@ class UiSettingsView(GenericAPIView):
         redirect_uri = "http://localhost:8000/api/oauth/callback/"
         scope = "https://mail.google.com/"
         access_type = "offline"
-        url = f"{token_request_uri}?response_type={response_type}&client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}&access_type={access_type}"
+        url = f"{token_request_uri}?response_type={response_type}&client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}&access_type={access_type}&prompt=consent"
         return url
 
     def generate_outlook_oauth_url(self) -> str:
@@ -2220,7 +2221,6 @@ class OauthCallbackView(GenericAPIView):
         }
         response = httpx.post(token_request_uri, data=data, headers=headers)
         data = response.json()
-        logger.debug(data)
 
         if "error" in data:
             logger.error(f"Error {response.status_code} getting access token: {data}")
@@ -2229,13 +2229,14 @@ class OauthCallbackView(GenericAPIView):
             )
         elif "access_token" in data:
             access_token = data["access_token"]
-            # if "refresh_token" in data:
-            #     refresh_token = data["refresh_token"]
-            # expires_in = data["expires_in"]
+            refresh_token = data["refresh_token"]
+            expires_in = data["expires_in"]
             account, _ = MailAccount.objects.update_or_create(
                 password=access_token,
                 is_token=True,
                 imap_server=imap_server,
+                refresh_token=refresh_token,
+                expiration=timezone.now() + timedelta(seconds=expires_in),
                 defaults=defaults,
             )
             return HttpResponseRedirect(

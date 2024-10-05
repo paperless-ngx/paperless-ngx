@@ -51,6 +51,25 @@ class MailAccount(document_models.ModelWithOwner):
         ),
     )
 
+    refresh_token = models.CharField(
+        _("refresh token"),
+        max_length=2048,
+        blank=True,
+        null=True,
+        help_text=_(
+            "The refresh token to use for token authentication e.g. with oauth2.",
+        ),
+    )
+
+    expiration = models.DateTimeField(
+        _("expiration"),
+        blank=True,
+        null=True,
+        help_text=_(
+            "The expiration date of the refresh token. ",
+        ),
+    )
+
     def __str__(self):
         return self.name
 
