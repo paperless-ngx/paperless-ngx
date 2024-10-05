@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { combineLatest, Observable } from 'rxjs'
 import { tap } from 'rxjs/operators'
 import { MailAccount } from 'src/app/data/mail-account'
 import { AbstractPaperlessService } from './abstract-paperless-service'
@@ -34,13 +33,9 @@ export class MailAccountService extends AbstractPaperlessService<MailAccount> {
   }
 
   update(o: MailAccount) {
+    delete o.expiration
+    delete o.refresh_token
     return super.update(o).pipe(tap(() => this.reload()))
-  }
-
-  patchMany(objects: MailAccount[]): Observable<MailAccount[]> {
-    return combineLatest(objects.map((o) => super.patch(o))).pipe(
-      tap(() => this.reload())
-    )
   }
 
   delete(o: MailAccount) {
@@ -51,5 +46,9 @@ export class MailAccountService extends AbstractPaperlessService<MailAccount> {
     const account = Object.assign({}, o)
     delete account['set_permissions']
     return this.http.post(this.getResourceUrl() + 'test/', account)
+  }
+
+  refreshOauthToken(o: MailAccount) {
+    return this.http.post(this.getResourceUrl(o.id) + 'refresh_oauth_token/', o)
   }
 }

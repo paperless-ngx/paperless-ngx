@@ -21,9 +21,14 @@ const IMAP_SECURITY_OPTIONS = [
 export class MailAccountEditDialogComponent extends EditDialogComponent<MailAccount> {
   testActive: boolean = false
   testResult: string
-  alertTimeout
+  testAlertTimeout
+  refreshTokenActive: boolean = false
+  refreshTokenResult: string
+  refreshTokenAlertTimeout
 
   @ViewChild('testResultAlert', { static: false }) testResultAlert: NgbAlert
+  @ViewChild('refreshTokenResultAlert', { static: false })
+  refreshTokenResultAlert: NgbAlert
 
   constructor(
     service: MailAccountService,
@@ -62,7 +67,7 @@ export class MailAccountEditDialogComponent extends EditDialogComponent<MailAcco
   test() {
     this.testActive = true
     this.testResult = null
-    clearTimeout(this.alertTimeout)
+    clearTimeout(this.testAlertTimeout)
     const mailService = this.service as MailAccountService
     const newObject = Object.assign(
       Object.assign({}, this.object),
@@ -72,12 +77,18 @@ export class MailAccountEditDialogComponent extends EditDialogComponent<MailAcco
       next: (result: { success: boolean }) => {
         this.testActive = false
         this.testResult = result.success ? 'success' : 'danger'
-        this.alertTimeout = setTimeout(() => this.testResultAlert.close(), 5000)
+        this.testAlertTimeout = setTimeout(
+          () => this.testResultAlert.close(),
+          5000
+        )
       },
       error: (e) => {
         this.testActive = false
         this.testResult = 'danger'
-        this.alertTimeout = setTimeout(() => this.testResultAlert.close(), 5000)
+        this.testAlertTimeout = setTimeout(
+          () => this.testResultAlert.close(),
+          5000
+        )
       },
     })
   }
@@ -86,5 +97,36 @@ export class MailAccountEditDialogComponent extends EditDialogComponent<MailAcco
     return this.testResult === 'success'
       ? $localize`Successfully connected to the mail server`
       : $localize`Unable to connect to the mail server`
+  }
+
+  refreshToken() {
+    this.refreshTokenActive = true
+    this.refreshTokenResult = null
+    clearTimeout(this.refreshTokenAlertTimeout)
+    const mailService = this.service as MailAccountService
+    mailService.refreshOauthToken(this.object).subscribe({
+      next: (result: { success: boolean }) => {
+        this.refreshTokenActive = false
+        this.refreshTokenResult = result.success ? 'success' : 'danger'
+        this.refreshTokenAlertTimeout = setTimeout(
+          () => this.refreshTokenResultAlert.close(),
+          5000
+        )
+      },
+      error: (e) => {
+        this.refreshTokenActive = false
+        this.refreshTokenResult = 'danger'
+        this.refreshTokenAlertTimeout = setTimeout(
+          () => this.refreshTokenResultAlert.close(),
+          5000
+        )
+      },
+    })
+  }
+
+  get refreshTokenResultMessage() {
+    return this.refreshTokenResult === 'success'
+      ? $localize`Successfully refreshed the token`
+      : $localize`Unable to refresh the token`
   }
 }
