@@ -4,9 +4,11 @@ import random
 import uuid
 from collections import namedtuple
 from contextlib import AbstractContextManager
+from datetime import timedelta
 from unittest import mock
 
 import pytest
+from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.db import DatabaseError
 from django.test import TestCase
@@ -19,6 +21,8 @@ from imap_tools import MailboxLoginError
 from imap_tools import MailMessage
 from imap_tools import MailMessageFlags
 from imap_tools import errors
+from rest_framework import status
+from rest_framework.test import APITestCase
 
 from documents.models import Correspondent
 from documents.tests.utils import DirectoriesMixin
@@ -1590,3 +1594,91 @@ class TestTasks(TestCase):
 
         tasks.process_mail_accounts()
         self.assertEqual(m.call_count, 0)
+
+
+class TestMailAccountTestView(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="testuser",
+            password="testpassword",
+        )
+        self.client.force_authenticate(user=self.user)
+        self.url = "/api/mail_accounts/test/"
+
+    @mock.patch("paperless_mail.mail.get_mailbox")
+    @mock.patch("paperless_mail.mail.mailbox_login")
+    def test_mail_account_test_view_success(self, mock_mailbox_login, mock_get_mailbox):
+        mock_get_mailbox.return_value.__enter__.return_value = mock.MagicMock()
+        mock_mailbox_login.return_value = True
+        data = {
+            "imap_server": "imap.example.com",
+            "imap_port": 993,
+            "imap_security": MailAccount.ImapSecurity.SSL,
+            "username": "testuser",
+            "password": "testpassword",
+            "account_type": MailAccount.MailAccountType.IMAP,
+            "is_token": False,
+        }
+        response = self.client.post(self.url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {"success": True})
+
+    @mock.patch("paperless_mail.mail.get_mailbox")
+    @mock.patch("paperless_mail.mail.mailbox_login")
+    def test_mail_account_test_view_mail_error(
+        self,
+        mock_mailbox_login,
+        mock_get_mailbox,
+    ):
+        mock_get_mailbox.return_value.__enter__.return_value = mock.MagicMock()
+        mock_mailbox_login.side_effect = MailError("Unable to connect to server")
+        data = {
+            "imap_server": "imap.example.com",
+            "imap_port": 993,
+            "imap_security": MailAccount.ImapSecurity.SSL,
+            "username": "testuser",
+            "password": "testpassword",
+            "account_type": MailAccount.MailAccountType.IMAP,
+            "is_token": False,
+        }
+        response = self.client.post(self.url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.content.decode(), "Unable to connect to server")
+
+    @mock.patch("paperless_mail.views.MailAccount.objects.get")
+    @mock.patch("paperless_mail.mail.get_mailbox")
+    @mock.patch("paperless_mail.mail.mailbox_login")
+    def test_mail_account_test_view_refresh_token(
+        self,
+        mock_mailbox_login,
+        mock_get_mailbox,
+        mock_get,
+    ):
+        mock_get_mailbox.return_value.__enter__.return_value = mock.MagicMock()
+        existing_account = MailAccount(
+            imap_server="imap.example.com",
+            imap_port=993,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            username="testuser",
+            password="oldpassword",
+            account_type=MailAccount.MailAccountType.IMAP,
+            refresh_token="oldtoken",
+            expiration=timezone.now() - timedelta(days=1),
+            is_token=True,
+        )
+        mock_get.return_value = existing_account
+
+        with mock.patch("paperless_mail.views.refresh_oauth_token", return_value=True):
+            data = {
+                "id": existing_account.id,
+                "imap_server": "imap.example.com",
+                "imap_port": 993,
+                "imap_security": MailAccount.ImapSecurity.SSL,
+                "username": "testuser",
+                "password": "********",
+                "account_type": MailAccount.MailAccountType.IMAP,
+                "is_token": True,
+            }
+            response = self.client.post(self.url, data, format="json")
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(response.data, {"success": True})
