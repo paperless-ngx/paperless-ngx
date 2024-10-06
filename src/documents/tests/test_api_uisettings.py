@@ -116,11 +116,13 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     @override_settings(
-        PAPERLESS_OAUTH_CALLBACK_BASE_URL="http://localhost:8000",
-        PAPERLESS_GMAIL_OAUTH_CLIENT_ID="abc123",
-        PAPERLESS_GMAIL_OAUTH_CLIENT_SECRET="def456",
-        PAPERLESS_OUTLOOK_OAUTH_CLIENT_ID="ghi789",
-        PAPERLESS_OUTLOOK_OAUTH_CLIENT_SECRET="jkl012",
+        OAUTH_CALLBACK_BASE_URL="http://localhost:8000",
+        GMAIL_OAUTH_CLIENT_ID="abc123",
+        GMAIL_OAUTH_CLIENT_SECRET="def456",
+        GMAIL_OAUTH_ENABLED=True,
+        OUTLOOK_OAUTH_CLIENT_ID="ghi789",
+        OUTLOOK_OAUTH_CLIENT_SECRET="jkl012",
+        OUTLOOK_OAUTH_ENABLED=True,
     )
     def test_settings_includes_oauth_urls_if_enabled(self):
         response = self.client.get(self.ENDPOINT, format="json")
