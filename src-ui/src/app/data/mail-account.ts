@@ -31,7 +31,5 @@ export interface MailAccount extends ObjectWithPermissions {
 
   account_type: MailAccountType
 
-  refresh_token?: string
-
   expiration?: string // Date
 }

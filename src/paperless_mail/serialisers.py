@@ -40,7 +40,6 @@ class MailAccountSerializer(OwnedObjectSerializer):
             "permissions",
             "set_permissions",
             "account_type",
-            "refresh_token",
             "expiration",
         ]
 

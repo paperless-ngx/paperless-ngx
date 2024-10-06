@@ -33,8 +33,7 @@ export class MailAccountService extends AbstractPaperlessService<MailAccount> {
   }
 
   update(o: MailAccount) {
-    // Remove refresh_token and expiration from the object before updating
-    delete o.refresh_token
+    // Remove expiration from the object before updating
     delete o.expiration
     return super.update(o).pipe(tap(() => this.reload()))
   }
