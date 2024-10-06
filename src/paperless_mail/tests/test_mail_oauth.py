@@ -10,6 +10,8 @@ from rest_framework import status
 
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.models import MailAccount
+from paperless_mail.oauth import generate_gmail_oauth_url
+from paperless_mail.oauth import generate_outlook_oauth_url
 from paperless_mail.oauth import get_oauth_callback_url
 from paperless_mail.oauth import get_oauth_redirect_url
 
@@ -22,6 +24,7 @@ class TestMailOAuth(
         self.client.force_login(self.user)
         self.mail_account_handler = MailAccountHandler()
         # Mock settings
+        settings.OAUTH_CALLBACK_BASE_URL = "http://localhost:8000"
         settings.GMAIL_OAUTH_CLIENT_ID = "test_gmail_client_id"
         settings.GMAIL_OAUTH_CLIENT_SECRET = "test_gmail_client_secret"
         settings.OUTLOOK_OAUTH_CLIENT_ID = "test_outlook_client_id"
@@ -73,6 +76,24 @@ class TestMailOAuth(
                 "/mail",
             )
 
+    def test_generate_oauth_urls(self):
+        """
+        GIVEN:
+            - Mocked settings for Gmail and Outlook OAuth client IDs
+        WHEN:
+            - generate_gmail_oauth_url and generate_outlook_oauth_url are called
+        THEN:
+            - Correct URLs are generated
+        """
+        self.assertEqual(
+            "https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=test_gmail_client_id&redirect_uri=http://localhost:8000/api/oauth/callback/&scope=https://mail.google.com/&access_type=offline&prompt=consent",
+            generate_gmail_oauth_url(),
+        )
+        self.assertEqual(
+            "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&response_mode=query&client_id=test_outlook_client_id&redirect_uri=http://localhost:8000/api/oauth/callback/&scope=offline_access https://outlook.office.com/IMAP.AccessAsUser.All",
+            generate_outlook_oauth_url(),
+        )
+
     @mock.patch("httpx.post")
     def test_oauth_callback_view(self, mock_post):
         """
@@ -106,6 +127,27 @@ class TestMailOAuth(
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertIn("oauth_success=1", response.url)
         self.assertTrue(
+            MailAccount.objects.filter(imap_server="outlook.office365.com").exists(),
+        )
+
+    def test_oauth_callback_view_no_code(self):
+        """
+        GIVEN:
+            - Mocked settings for Gmail and Outlook OAuth client IDs and secrets
+        WHEN:
+            - OAuth callback is called without a code
+        THEN:
+            - Error is logged
+        """
+
+        response = self.client.get(
+            "/api/oauth/callback/",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(
+            MailAccount.objects.filter(imap_server="imap.gmail.com").exists(),
+        )
+        self.assertFalse(
             MailAccount.objects.filter(imap_server="outlook.office365.com").exists(),
         )
 
