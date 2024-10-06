@@ -1609,8 +1609,15 @@ class TestMailAccountTestView(APITestCase):
     @mock.patch("paperless_mail.mail.get_mailbox")
     @mock.patch("paperless_mail.mail.mailbox_login")
     def test_mail_account_test_view_success(self, mock_mailbox_login, mock_get_mailbox):
-        mock_get_mailbox.return_value.__enter__.return_value = mock.MagicMock()
-        mock_mailbox_login.return_value = True
+        def get_mailbox(server, port, security):
+            return mock.MagicMock()
+
+        mock_get_mailbox.side_effect = get_mailbox
+
+        def mock_mailbox_login(mailbox, account):
+            return True
+
+        mock_mailbox_login.side_effect = mock_mailbox_login
         data = {
             "imap_server": "imap.example.com",
             "imap_port": 993,
