@@ -1,4 +1,5 @@
 import datetime
+import logging
 import math
 import re
 import zoneinfo
@@ -52,7 +53,11 @@ from documents.models import WorkflowTrigger
 from documents.parsers import is_mime_type_supported
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import set_permissions_for_object
+from documents.templating.filepath import validate_filepath_template_and_render
+from documents.templating.utils import convert_format_str_to_template_format
 from documents.validators import uri_validator
+
+logger = logging.getLogger("paperless.serializers")
 
 
 # https://www.django-rest-framework.org/api-guide/serializers/#example
@@ -1482,38 +1487,18 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "set_permissions",
         )
 
-    def validate_path(self, path):
-        try:
-            path.format(
-                title="title",
-                correspondent="correspondent",
-                document_type="document_type",
-                created="created",
-                created_year="created_year",
-                created_year_short="created_year_short",
-                created_month="created_month",
-                created_month_name="created_month_name",
-                created_month_name_short="created_month_name_short",
-                created_day="created_day",
-                added="added",
-                added_year="added_year",
-                added_year_short="added_year_short",
-                added_month="added_month",
-                added_month_name="added_month_name",
-                added_month_name_short="added_month_name_short",
-                added_day="added_day",
-                asn="asn",
-                tags="tags",
-                tag_list="tag_list",
-                owner_username="someone",
-                original_name="testfile",
-                doc_pk="doc_pk",
+    def validate_path(self, path: str):
+        converted_path = convert_format_str_to_template_format(path)
+        if converted_path != path:
+            logger.warning(
+                f"Storage path {path} is not using the new style format, consider updating",
             )
+        result = validate_filepath_template_and_render(converted_path)
 
-        except KeyError as err:
-            raise serializers.ValidationError(_("Invalid variable detected.")) from err
+        if result is None:
+            raise serializers.ValidationError(_("Invalid variable detected."))
 
-        return path
+        return converted_path
 
     def update(self, instance, validated_data):
         """

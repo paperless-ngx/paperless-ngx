@@ -57,6 +57,7 @@ watchdog = "~=4.0"
 whitenoise = "~=6.7"
 whoosh = "~=2.7"
 zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
+jinja2 = "~=3.1"
 
 [dev-packages]
 # Linting
