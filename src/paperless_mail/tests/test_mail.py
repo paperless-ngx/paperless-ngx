@@ -1612,7 +1612,7 @@ class TestMailAccountTestView(APITestCase):
         def get_mailbox(server, port, security):
             return mock.MagicMock()
 
-        mock_get_mailbox.side_effect = get_mailbox
+        mock_get_mailbox.__enter__.return_value = get_mailbox
 
         def mock_mailbox_login(mailbox, account):
             return True
