@@ -10,6 +10,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { PermissionsFormComponent } from '../../input/permissions/permissions-form/permissions-form.component'
 import { SelectComponent } from '../../input/select/select.component'
 import { TextComponent } from '../../input/text/text.component'
+import { TextAreaComponent } from '../../input/textarea/textarea.component'
 import { EditDialogMode } from '../edit-dialog.component'
 import { StoragePathEditDialogComponent } from './storage-path-edit-dialog.component'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
@@ -27,6 +28,7 @@ describe('StoragePathEditDialogComponent', () => {
         IfOwnerDirective,
         SelectComponent,
         TextComponent,
+        TextAreaComponent,
         PermissionsFormComponent,
         SafeHtmlPipe,
       ],
