@@ -37,7 +37,7 @@ export class MailComponent
   mailRules: MailRule[] = []
 
   unsubscribeNotifier: Subject<any> = new Subject()
-  oAuthAccoundId: number
+  oAuthAccountId: number
 
   public get gmailOAuthUrl(): string {
     return this.settingsService.get(SETTINGS_KEYS.GMAIL_OAUTH_URL)
@@ -66,10 +66,12 @@ export class MailComponent
       .subscribe({
         next: (r) => {
           this.mailAccounts = r.results
-          if (this.oAuthAccoundId) {
+          console.log(this.mailAccounts, this.oAuthAccountId)
+
+          if (this.oAuthAccountId) {
             this.editMailAccount(
               this.mailAccounts.find(
-                (account) => account.id === this.oAuthAccoundId
+                (account) => account.id === this.oAuthAccountId
               )
             )
           }
@@ -99,11 +101,11 @@ export class MailComponent
         const success = params.get('oauth_success') === '1'
         if (success) {
           this.toastService.showInfo($localize`OAuth2 authentication success`)
-          this.oAuthAccoundId = parseInt(params.get('account_id'))
+          this.oAuthAccountId = parseInt(params.get('account_id'))
           if (this.mailAccounts.length > 0) {
             this.editMailAccount(
               this.mailAccounts.find(
-                (account) => account.id === this.oAuthAccoundId
+                (account) => account.id === this.oAuthAccountId
               )
             )
           }
