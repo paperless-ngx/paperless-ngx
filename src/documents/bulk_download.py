@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 from zipfile import ZipFile
 
 from documents.models import Document
@@ -45,9 +45,9 @@ class BulkArchiveStrategy:
         The path is already unique, as handled when a document is consumed or updated
         """
         if archive and doc.has_archive_version:
-            in_archive_path = os.path.join(folder, doc.archive_filename)
+            in_archive_path = (Path(folder) / doc.archive_filename).as_posix()
         else:
-            in_archive_path = os.path.join(folder, doc.filename)
+            in_archive_path = (Path(folder) / doc.filename).as_posix()
 
         return in_archive_path
 
