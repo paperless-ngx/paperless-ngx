@@ -35,6 +35,7 @@ from paperless_mail.mail import apply_mail_action
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
+from paperless_mail.oauth import GMAIL_OAUTH_ENDPOINT_TOKEN
 
 
 @dataclasses.dataclass
@@ -1645,41 +1646,42 @@ class TestMailAccountTestView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.content.decode(), "Unable to connect to server")
 
-    @mock.patch("paperless_mail.models.MailAccount.objects.get")
     @mock.patch("paperless_mail.mail.get_mailbox")
     @mock.patch("paperless_mail.mail.mailbox_login")
+    @mock.patch("httpx.post")
     def test_mail_account_test_view_refresh_token(
         self,
+        mock_post,
         mock_mailbox_login,
         mock_get_mailbox,
-        mock_get,
     ):
         mock_get_mailbox.return_value.__enter__.return_value = mock.MagicMock()
         mock_mailbox_login.return_value = True
-        existing_account = MailAccount(
+        existing_account = MailAccount.objects.create(
             imap_server="imap.example.com",
             imap_port=993,
             imap_security=MailAccount.ImapSecurity.SSL,
             username="testuser",
             password="oldpassword",
-            account_type=MailAccount.MailAccountType.IMAP,
+            account_type=MailAccount.MailAccountType.GMAIL_OAUTH,
             refresh_token="oldtoken",
             expiration=timezone.now() - timedelta(days=1),
             is_token=True,
         )
-        mock_get.return_value = existing_account
 
-        with mock.patch("paperless_mail.oauth.refresh_oauth_token", return_value=True):
-            data = {
-                "id": existing_account.id,
-                "imap_server": "imap.example.com",
-                "imap_port": 993,
-                "imap_security": MailAccount.ImapSecurity.SSL,
-                "username": "testuser",
-                "password": "********",
-                "account_type": MailAccount.MailAccountType.IMAP,
-                "is_token": True,
-            }
-            response = self.client.post(self.url, data, format="json")
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertEqual(response.data, {"success": True})
+        mock_post.return_value.status_code = status.HTTP_200_OK
+        mock_post.return_value.json.return_value = {
+            "access_token": "newtoken",
+            "expires_in": 3600,
+        }
+        data = {
+            "id": existing_account.id,
+            "imap_server": "imap.example.com",
+            "imap_port": 993,
+            "imap_security": MailAccount.ImapSecurity.SSL,
+            "username": "testuser",
+            "password": "****",
+            "is_token": True,
+        }
+        self.client.post(self.url, data, format="json")
+        self.assertEqual(mock_post.call_args[1]["url"], GMAIL_OAUTH_ENDPOINT_TOKEN)

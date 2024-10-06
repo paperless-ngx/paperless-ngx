@@ -18,13 +18,13 @@ from paperless.views import StandardPagination
 from paperless_mail.mail import MailError
 from paperless_mail.mail import get_mailbox
 from paperless_mail.mail import mailbox_login
-from paperless_mail.mail import refresh_oauth_token
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.oauth import GMAIL_OAUTH_ENDPOINT_TOKEN
 from paperless_mail.oauth import OUTLOOK_OAUTH_ENDPOINT_TOKEN
 from paperless_mail.oauth import generate_gmail_oauth_token_request_data
 from paperless_mail.oauth import generate_outlook_oauth_token_request_data
+from paperless_mail.oauth import refresh_oauth_token
 from paperless_mail.serialisers import MailAccountSerializer
 from paperless_mail.serialisers import MailRuleSerializer
 
@@ -71,7 +71,6 @@ class MailAccountTestView(GenericAPIView):
             serializer.validated_data["expiration"] = existing_account.expiration
 
         account = MailAccount(**serializer.validated_data)
-
         with get_mailbox(
             account.imap_server,
             account.imap_port,
