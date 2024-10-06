@@ -1655,6 +1655,7 @@ class TestMailAccountTestView(APITestCase):
         mock_get,
     ):
         mock_get_mailbox.return_value.__enter__.return_value = mock.MagicMock()
+        mock_mailbox_login.return_value = True
         existing_account = MailAccount(
             imap_server="imap.example.com",
             imap_port=993,
