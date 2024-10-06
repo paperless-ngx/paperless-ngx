@@ -17,8 +17,8 @@ class MailAccount(document_models.ModelWithOwner):
 
     class MailAccountType(models.IntegerChoices):
         IMAP = 1, _("IMAP")
-        GMAIL = 2, _("Gmail")
-        OUTLOOK = 3, _("Outlook")
+        GMAIL_OAUTH = 2, _("Gmail OAuth")
+        OUTLOOK_OAUTH = 3, _("Outlook OAuth")
 
     name = models.CharField(_("name"), max_length=256, unique=True)
 

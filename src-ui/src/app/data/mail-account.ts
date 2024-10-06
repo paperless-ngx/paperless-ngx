@@ -8,8 +8,8 @@ export enum IMAPSecurity {
 
 export enum MailAccountType {
   IMAP = 1,
-  Gmail = 2,
-  Outlook = 3,
+  Gmail_OAuth = 2,
+  Outlook_OAuth = 3,
 }
 
 export interface MailAccount extends ObjectWithPermissions {

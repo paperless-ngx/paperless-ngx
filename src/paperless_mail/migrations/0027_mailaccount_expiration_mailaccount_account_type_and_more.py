@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
             model_name="mailaccount",
             name="account_type",
             field=models.PositiveIntegerField(
-                choices=[(1, "IMAP"), (2, "Gmail"), (3, "Outlook")],
+                choices=[(1, "IMAP"), (2, "Gmail OAuth"), (3, "Outlook OAuth")],
                 default=1,
                 verbose_name="account type",
             ),

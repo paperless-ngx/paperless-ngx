@@ -432,7 +432,7 @@ def refresh_oauth_token(account: MailAccount) -> bool:
         logger.error(f"Account {account}: No refresh token available.")
         return False
 
-    if account.account_type == MailAccount.MailAccountType.GMAIL:
+    if account.account_type == MailAccount.MailAccountType.GMAIL_OAUTH:
         url = "https://accounts.google.com/o/oauth2/token"
         data = {
             "client_id": settings.GMAIL_OAUTH_CLIENT_ID,
@@ -440,7 +440,7 @@ def refresh_oauth_token(account: MailAccount) -> bool:
             "refresh_token": account.refresh_token,
             "grant_type": "refresh_token",
         }
-    elif account.account_type == MailAccount.MailAccountType.OUTLOOK:
+    elif account.account_type == MailAccount.MailAccountType.OUTLOOK_OAUTH:
         url = "https://login.microsoftonline.com/common/oauth2/v2.0/token"
         data = {
             "client_id": settings.OUTLOOK_OAUTH_CLIENT_ID,

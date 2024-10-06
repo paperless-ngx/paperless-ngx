@@ -109,7 +109,7 @@ class TestMailOAuth(
             username="test_username",
             imap_security=MailAccount.ImapSecurity.SSL,
             imap_port=993,
-            account_type=MailAccount.MailAccountType.GMAIL,
+            account_type=MailAccount.MailAccountType.GMAIL_OAUTH,
             is_token=True,
             refresh_token="test_refresh_token",
             expiration=timezone.now() - timedelta(days=1),

@@ -50,7 +50,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 const mailAccounts = [
   { id: 1, name: 'account1', account_type: MailAccountType.IMAP },
   { id: 2, name: 'account2', account_type: MailAccountType.IMAP },
-  { id: 3, name: 'account3', accout_type: MailAccountType.Gmail },
+  { id: 3, name: 'account3', accout_type: MailAccountType.Gmail_OAuth },
 ]
 const mailRules = [
   { id: 1, name: 'rule1', owner: 1, account: 1, enabled: true },

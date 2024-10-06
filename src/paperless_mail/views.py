@@ -112,7 +112,7 @@ class OauthCallbackView(GenericAPIView):
         if scope is not None and "google" in scope:
             # Google
             # Gmail setup guide: https://postmansmtp.com/how-to-configure-post-smtp-with-gmailgsuite-using-oauth/
-            account_type = MailAccount.MailAccountType.GMAIL
+            account_type = MailAccount.MailAccountType.GMAIL_OAUTH
             imap_server = "imap.gmail.com"
             defaults = {
                 "name": f"Gmail OAuth {timezone.now()}",
@@ -129,7 +129,7 @@ class OauthCallbackView(GenericAPIView):
         elif scope is None:
             # Outlook
             # Outlok setup guide: https://medium.com/@manojkumardhakad/python-read-and-send-outlook-mail-using-oauth2-token-and-graph-api-53de606ecfa1
-            account_type = MailAccount.MailAccountType.OUTLOOK
+            account_type = MailAccount.MailAccountType.OUTLOOK_OAUTH
             imap_server = "outlook.office365.com"
             defaults = {
                 "name": f"Outlook OAuth {timezone.now()}",
