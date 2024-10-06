@@ -1599,6 +1599,8 @@ class TestTasks(TestCase):
 
 class TestMailAccountTestView(APITestCase):
     def setUp(self):
+        self.mailMocker = MailMocker()
+        self.mailMocker.setUp()
         self.user = User.objects.create_user(
             username="testuser",
             password="testpassword",
@@ -1606,24 +1608,13 @@ class TestMailAccountTestView(APITestCase):
         self.client.force_authenticate(user=self.user)
         self.url = "/api/mail_accounts/test/"
 
-    @mock.patch("paperless_mail.mail.get_mailbox")
-    @mock.patch("paperless_mail.mail.mailbox_login")
-    def test_mail_account_test_view_success(self, mock_mailbox_login, mock_get_mailbox):
-        def get_mailbox(server, port, security):
-            return mock.MagicMock()
-
-        mock_get_mailbox.return_value.__enter__.return_value = get_mailbox
-
-        def mock_mailbox_login(mailbox, account):
-            return True
-
-        mock_mailbox_login.side_effect = mock_mailbox_login
+    def test_mail_account_test_view_success(self):
         data = {
             "imap_server": "imap.example.com",
             "imap_port": 993,
             "imap_security": MailAccount.ImapSecurity.SSL,
-            "username": "testuser",
-            "password": "testpassword",
+            "username": "admin",
+            "password": "secret",
             "account_type": MailAccount.MailAccountType.IMAP,
             "is_token": False,
         }
@@ -1631,21 +1622,13 @@ class TestMailAccountTestView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {"success": True})
 
-    @mock.patch("paperless_mail.mail.get_mailbox")
-    @mock.patch("paperless_mail.mail.mailbox_login")
-    def test_mail_account_test_view_mail_error(
-        self,
-        mock_mailbox_login,
-        mock_get_mailbox,
-    ):
-        mock_get_mailbox.return_value.__enter__.return_value = mock.MagicMock()
-        mock_mailbox_login.side_effect = MailError("Unable to connect to server")
+    def test_mail_account_test_view_mail_error(self):
         data = {
             "imap_server": "imap.example.com",
             "imap_port": 993,
             "imap_security": MailAccount.ImapSecurity.SSL,
-            "username": "testuser",
-            "password": "testpassword",
+            "username": "admin",
+            "password": "wrong",
             "account_type": MailAccount.MailAccountType.IMAP,
             "is_token": False,
         }
@@ -1653,23 +1636,17 @@ class TestMailAccountTestView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.content.decode(), "Unable to connect to server")
 
-    @mock.patch("paperless_mail.mail.get_mailbox")
-    @mock.patch("paperless_mail.mail.mailbox_login")
     @mock.patch("httpx.post")
     def test_mail_account_test_view_refresh_token(
         self,
         mock_post,
-        mock_mailbox_login,
-        mock_get_mailbox,
     ):
-        mock_get_mailbox.return_value.__enter__.return_value = mock.MagicMock()
-        mock_mailbox_login.return_value = True
         existing_account = MailAccount.objects.create(
             imap_server="imap.example.com",
             imap_port=993,
             imap_security=MailAccount.ImapSecurity.SSL,
-            username="testuser",
-            password="oldpassword",
+            username="admin",
+            password="secret",
             account_type=MailAccount.MailAccountType.GMAIL_OAUTH,
             refresh_token="oldtoken",
             expiration=timezone.now() - timedelta(days=1),
@@ -1686,7 +1663,7 @@ class TestMailAccountTestView(APITestCase):
             "imap_server": "imap.example.com",
             "imap_port": 993,
             "imap_security": MailAccount.ImapSecurity.SSL,
-            "username": "testuser",
+            "username": "admin",
             "password": "****",
             "is_token": True,
         }
