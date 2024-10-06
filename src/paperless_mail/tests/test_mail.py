@@ -1645,7 +1645,7 @@ class TestMailAccountTestView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.content.decode(), "Unable to connect to server")
 
-    @mock.patch("paperless_mail.views.MailAccount.objects.get")
+    @mock.patch("paperless_mail.models.MailAccount.objects.get")
     @mock.patch("paperless_mail.mail.get_mailbox")
     @mock.patch("paperless_mail.mail.mailbox_login")
     def test_mail_account_test_view_refresh_token(
@@ -1668,7 +1668,7 @@ class TestMailAccountTestView(APITestCase):
         )
         mock_get.return_value = existing_account
 
-        with mock.patch("paperless_mail.views.refresh_oauth_token", return_value=True):
+        with mock.patch("paperless_mail.oauth.refresh_oauth_token", return_value=True):
             data = {
                 "id": existing_account.id,
                 "imap_server": "imap.example.com",

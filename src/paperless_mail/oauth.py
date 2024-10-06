@@ -1,4 +1,11 @@
+import logging
+from datetime import timedelta
+
+import httpx
 from django.conf import settings
+from django.utils import timezone
+
+from paperless_mail.models import MailAccount
 
 # Gmail setup guide: https://postmansmtp.com/how-to-configure-post-smtp-with-gmailgsuite-using-oauth/
 # Outlok setup guide: https://medium.com/@manojkumardhakad/python-read-and-send-outlook-mail-using-oauth2-token-and-graph-api-53de606ecfa1
@@ -53,3 +60,51 @@ def generate_outlook_token_request_data(code: str) -> dict:
         "redirect_uri": "http://localhost:8000/api/oauth/callback/",
         "grant_type": "authorization_code",
     }
+
+
+def refresh_oauth_token(account: MailAccount) -> bool:
+    """
+    Refreshes the oauth token for the given mail account.
+    """
+    logger = logging.getLogger("paperless_mail")
+    logger.debug(f"Attempting to refresh oauth token for account {account}")
+    if not account.refresh_token:
+        logger.error(f"Account {account}: No refresh token available.")
+        return False
+
+    if account.account_type == MailAccount.MailAccountType.GMAIL_OAUTH:
+        url = "https://accounts.google.com/o/oauth2/token"
+        data = {
+            "client_id": settings.GMAIL_OAUTH_CLIENT_ID,
+            "client_secret": settings.GMAIL_OAUTH_CLIENT_SECRET,
+            "refresh_token": account.refresh_token,
+            "grant_type": "refresh_token",
+        }
+    elif account.account_type == MailAccount.MailAccountType.OUTLOOK_OAUTH:
+        url = "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+        data = {
+            "client_id": settings.OUTLOOK_OAUTH_CLIENT_ID,
+            "client_secret": settings.OUTLOOK_OAUTH_CLIENT_SECRET,
+            "refresh_token": account.refresh_token,
+            "grant_type": "refresh_token",
+        }
+
+    response = httpx.post(
+        url=url,
+        data=data,
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    data = response.json()
+    if response.status_code < 400 and "access_token" in data:
+        account.password = data["access_token"]
+        account.expiration = timezone.now() + timedelta(
+            seconds=data["expires_in"],
+        )
+        account.save()
+        logger.debug(f"Successfully refreshed oauth token for account {account}")
+        return True
+    else:
+        logger.error(
+            f"Failed to refresh oauth token for account {account}: {response}",
+        )
+        return False

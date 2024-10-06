@@ -11,7 +11,6 @@ from fnmatch import fnmatch
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import httpx
 import magic
 import pathvalidate
 from celery import chord
@@ -44,6 +43,7 @@ from documents.tasks import consume_file
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
+from paperless_mail.oauth import refresh_oauth_token
 from paperless_mail.preprocessor import MailMessageDecryptor
 from paperless_mail.preprocessor import MailMessagePreprocessor
 
@@ -420,54 +420,6 @@ def get_mailbox(server, port, security) -> MailBox:
     else:
         raise NotImplementedError("Unknown IMAP security")  # pragma: no cover
     return mailbox
-
-
-def refresh_oauth_token(account: MailAccount) -> bool:
-    """
-    Refreshes the oauth token for the given mail account.
-    """
-    logger = logging.getLogger("paperless_mail")
-    logger.debug(f"Attempting to refresh oauth token for account {account}")
-    if not account.refresh_token:
-        logger.error(f"Account {account}: No refresh token available.")
-        return False
-
-    if account.account_type == MailAccount.MailAccountType.GMAIL_OAUTH:
-        url = "https://accounts.google.com/o/oauth2/token"
-        data = {
-            "client_id": settings.GMAIL_OAUTH_CLIENT_ID,
-            "client_secret": settings.GMAIL_OAUTH_CLIENT_SECRET,
-            "refresh_token": account.refresh_token,
-            "grant_type": "refresh_token",
-        }
-    elif account.account_type == MailAccount.MailAccountType.OUTLOOK_OAUTH:
-        url = "https://login.microsoftonline.com/common/oauth2/v2.0/token"
-        data = {
-            "client_id": settings.OUTLOOK_OAUTH_CLIENT_ID,
-            "client_secret": settings.OUTLOOK_OAUTH_CLIENT_SECRET,
-            "refresh_token": account.refresh_token,
-            "grant_type": "refresh_token",
-        }
-
-    response = httpx.post(
-        url=url,
-        data=data,
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
-    )
-    data = response.json()
-    if response.status_code < 400 and "access_token" in data:
-        account.password = data["access_token"]
-        account.expiration = timezone.now() + timedelta(
-            seconds=data["expires_in"],
-        )
-        account.save()
-        logger.debug(f"Successfully refreshed oauth token for account {account}")
-        return True
-    else:
-        logger.error(
-            f"Failed to refresh oauth token for account {account}: {response}",
-        )
-        return False
 
 
 class MailAccountHandler(LoggingMixin):
