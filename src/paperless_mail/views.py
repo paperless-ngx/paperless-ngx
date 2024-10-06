@@ -3,7 +3,6 @@ import logging
 from datetime import timedelta
 
 import httpx
-from django.conf import settings
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseRedirect
 from django.utils import timezone
@@ -22,6 +21,8 @@ from paperless_mail.mail import mailbox_login
 from paperless_mail.mail import refresh_oauth_token
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+from paperless_mail.oauth import generate_gmail_token_request_data
+from paperless_mail.oauth import generate_outlook_token_request_data
 from paperless_mail.serialisers import MailAccountSerializer
 from paperless_mail.serialisers import MailRuleSerializer
 
@@ -111,7 +112,6 @@ class OauthCallbackView(GenericAPIView):
 
         if scope is not None and "google" in scope:
             # Google
-            # Gmail setup guide: https://postmansmtp.com/how-to-configure-post-smtp-with-gmailgsuite-using-oauth/
             account_type = MailAccount.MailAccountType.GMAIL_OAUTH
             imap_server = "imap.gmail.com"
             defaults = {
@@ -121,14 +121,11 @@ class OauthCallbackView(GenericAPIView):
                 "imap_port": 993,
                 "account_type": account_type,
             }
-
             token_request_uri = "https://accounts.google.com/o/oauth2/token"
-            client_id = settings.GMAIL_OAUTH_CLIENT_ID
-            client_secret = settings.GMAIL_OAUTH_CLIENT_SECRET
-            scope = "https://mail.google.com/"
+            data = generate_gmail_token_request_data(code)
+
         elif scope is None:
             # Outlook
-            # Outlok setup guide: https://medium.com/@manojkumardhakad/python-read-and-send-outlook-mail-using-oauth2-token-and-graph-api-53de606ecfa1
             account_type = MailAccount.MailAccountType.OUTLOOK_OAUTH
             imap_server = "outlook.office365.com"
             defaults = {
@@ -142,18 +139,8 @@ class OauthCallbackView(GenericAPIView):
             token_request_uri = (
                 "https://login.microsoftonline.com/common/oauth2/v2.0/token"
             )
-            client_id = settings.OUTLOOK_OAUTH_CLIENT_ID
-            client_secret = settings.OUTLOOK_OAUTH_CLIENT_SECRET
-            scope = "offline_access https://outlook.office.com/IMAP.AccessAsUser.All"
+            data = generate_outlook_token_request_data(code)
 
-        data = {
-            "code": code,
-            "client_id": client_id,
-            "client_secret": client_secret,
-            "scope": scope,
-            "redirect_uri": "http://localhost:8000/api/oauth/callback/",
-            "grant_type": "authorization_code",
-        }
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
         }

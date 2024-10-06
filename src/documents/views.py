@@ -160,6 +160,8 @@ from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+from paperless_mail.oauth import generate_gmail_oauth_url
+from paperless_mail.oauth import generate_outlook_oauth_url
 from paperless_mail.serialisers import MailAccountSerializer
 from paperless_mail.serialisers import MailRuleSerializer
 
@@ -1554,27 +1556,6 @@ class UiSettingsView(GenericAPIView):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     serializer_class = UiSettingsViewSerializer
 
-    def generate_gmail_oauth_url(self) -> str:
-        token_request_uri = "https://accounts.google.com/o/oauth2/auth"
-        response_type = "code"
-        client_id = settings.GMAIL_OAUTH_CLIENT_ID
-        redirect_uri = "http://localhost:8000/api/oauth/callback/"
-        scope = "https://mail.google.com/"
-        access_type = "offline"
-        url = f"{token_request_uri}?response_type={response_type}&client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}&access_type={access_type}&prompt=consent"
-        return url
-
-    def generate_outlook_oauth_url(self) -> str:
-        token_request_uri = (
-            "https://login.microsoftonline.com/common/oauth2/v2.0/authorize"
-        )
-        response_type = "code"
-        client_id = settings.OUTLOOK_OAUTH_CLIENT_ID
-        redirect_uri = "http://localhost:8000/api/oauth/callback/"
-        scope = "offline_access https://outlook.office.com/IMAP.AccessAsUser.All"
-        url = f"{token_request_uri}?response_type={response_type}&response_mode=query&client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}"
-        return url
-
     def get(self, request, format=None):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -1606,10 +1587,10 @@ class UiSettingsView(GenericAPIView):
         ui_settings["auditlog_enabled"] = settings.AUDIT_LOG_ENABLED
 
         if settings.GMAIL_OAUTH_ENABLED:
-            ui_settings["gmail_oauth_url"] = self.generate_gmail_oauth_url()
+            ui_settings["gmail_oauth_url"] = generate_gmail_oauth_url()
 
         if settings.OUTLOOK_OAUTH_ENABLED:
-            ui_settings["outlook_oauth_url"] = self.generate_outlook_oauth_url()
+            ui_settings["outlook_oauth_url"] = generate_outlook_oauth_url()
 
         user_resp = {
             "id": user.id,
