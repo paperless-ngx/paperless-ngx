@@ -24,6 +24,7 @@ from paperless_mail.oauth import GMAIL_OAUTH_ENDPOINT_TOKEN
 from paperless_mail.oauth import OUTLOOK_OAUTH_ENDPOINT_TOKEN
 from paperless_mail.oauth import generate_gmail_oauth_token_request_data
 from paperless_mail.oauth import generate_outlook_oauth_token_request_data
+from paperless_mail.oauth import get_oauth_redirect_url
 from paperless_mail.oauth import refresh_oauth_token
 from paperless_mail.serialisers import MailAccountSerializer
 from paperless_mail.serialisers import MailRuleSerializer
@@ -148,9 +149,8 @@ class OauthCallbackView(GenericAPIView):
 
         if "error" in data:
             logger.error(f"Error {response.status_code} getting access token: {data}")
-            # TODO: Fix URL
             return HttpResponseRedirect(
-                "http://localhost:4200/mail?oauth_success=0",
+                f"{get_oauth_redirect_url()}?oauth_success=0",
             )
         elif "access_token" in data:
             access_token = data["access_token"]
@@ -164,7 +164,6 @@ class OauthCallbackView(GenericAPIView):
                 expiration=timezone.now() + timedelta(seconds=expires_in),
                 defaults=defaults,
             )
-            # TODO: Fix URL
             return HttpResponseRedirect(
-                f"http://localhost:4200/mail?oauth_success=1&account_id={account.pk}",
+                f"{get_oauth_redirect_url()}?oauth_success=1&account_id={account.pk}",
             )

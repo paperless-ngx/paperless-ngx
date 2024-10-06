@@ -19,11 +19,18 @@ OUTLOOK_OAUTH_ENDPOINT_AUTH = (
 )
 
 
+def get_oauth_callback_url() -> str:
+    return f"{settings.OAUTH_CALLBACK_BASE_URL if settings.OAUTH_CALLBACK_BASE_URL is not None else settings.PAPERLESS_URL}{settings.BASE_URL}api/oauth/callback/"
+
+
+def get_oauth_redirect_url() -> str:
+    return f"{'http://localhost:4200/' if settings.DEBUG else settings.BASE_URL}mail"  # e.g. "http://localhost:4200/mail" or "/mail"
+
+
 def generate_gmail_oauth_url() -> str:
     response_type = "code"
     client_id = settings.GMAIL_OAUTH_CLIENT_ID
-    # TODO: Fix URL
-    redirect_uri = "http://localhost:8000/api/oauth/callback/"
+    redirect_uri = get_oauth_callback_url()
     scope = "https://mail.google.com/"
     access_type = "offline"
     url = f"{GMAIL_OAUTH_ENDPOINT_AUTH}?response_type={response_type}&client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}&access_type={access_type}&prompt=consent"
@@ -33,8 +40,7 @@ def generate_gmail_oauth_url() -> str:
 def generate_outlook_oauth_url() -> str:
     response_type = "code"
     client_id = settings.OUTLOOK_OAUTH_CLIENT_ID
-    # TODO: Fix URL
-    redirect_uri = "http://localhost:8000/api/oauth/callback/"
+    redirect_uri = get_oauth_callback_url()
     scope = "offline_access https://outlook.office.com/IMAP.AccessAsUser.All"
     url = f"{OUTLOOK_OAUTH_ENDPOINT_AUTH}?response_type={response_type}&response_mode=query&client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}"
     return url
@@ -50,8 +56,7 @@ def generate_gmail_oauth_token_request_data(code: str) -> dict:
         "client_id": client_id,
         "client_secret": client_secret,
         "scope": scope,
-        # TODO: Fix URL
-        "redirect_uri": "http://localhost:8000/api/oauth/callback/",
+        "redirect_uri": get_oauth_callback_url(),
         "grant_type": "authorization_code",
     }
 
@@ -66,8 +71,7 @@ def generate_outlook_oauth_token_request_data(code: str) -> dict:
         "client_id": client_id,
         "client_secret": client_secret,
         "scope": scope,
-        # TODO: Fix URL
-        "redirect_uri": "http://localhost:8000/api/oauth/callback/",
+        "redirect_uri": get_oauth_callback_url(),
         "grant_type": "authorization_code",
     }
 

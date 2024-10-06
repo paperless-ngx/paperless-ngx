@@ -4,11 +4,14 @@ from unittest import mock
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
+from django.test import override_settings
 from django.utils import timezone
 from rest_framework import status
 
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.models import MailAccount
+from paperless_mail.oauth import get_oauth_callback_url
+from paperless_mail.oauth import get_oauth_redirect_url
 
 
 class TestMailOAuth(
@@ -24,6 +27,51 @@ class TestMailOAuth(
         settings.OUTLOOK_OAUTH_CLIENT_ID = "test_outlook_client_id"
         settings.OUTLOOK_OAUTH_CLIENT_SECRET = "test_outlook_client_secret"
         super().setUp()
+
+    def test_generate_paths(self):
+        """
+        GIVEN:
+            - Mocked settings for OAuth callback and base URLs
+        WHEN:
+            - get_oauth_callback_url and get_oauth_redirect_url are called
+        THEN:
+            - Correct URLs are generated
+        """
+        # Callback URL
+        with override_settings(OAUTH_CALLBACK_BASE_URL="http://paperless.example.com"):
+            self.assertEqual(
+                get_oauth_callback_url(),
+                "http://paperless.example.com/api/oauth/callback/",
+            )
+        with override_settings(
+            OAUTH_CALLBACK_BASE_URL=None,
+            PAPERLESS_URL="http://paperless.example.com",
+        ):
+            self.assertEqual(
+                get_oauth_callback_url(),
+                "http://paperless.example.com/api/oauth/callback/",
+            )
+        with override_settings(
+            OAUTH_CALLBACK_BASE_URL=None,
+            PAPERLESS_URL="http://paperless.example.com",
+            BASE_URL="/paperless/",
+        ):
+            self.assertEqual(
+                get_oauth_callback_url(),
+                "http://paperless.example.com/paperless/api/oauth/callback/",
+            )
+
+        # Redirect URL
+        with override_settings(DEBUG=True):
+            self.assertEqual(
+                get_oauth_redirect_url(),
+                "http://localhost:4200/mail",
+            )
+        with override_settings(DEBUG=False):
+            self.assertEqual(
+                get_oauth_redirect_url(),
+                "/mail",
+            )
 
     @mock.patch("httpx.post")
     def test_oauth_callback_view(self, mock_post):
