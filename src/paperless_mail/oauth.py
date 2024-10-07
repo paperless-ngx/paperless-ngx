@@ -64,7 +64,7 @@ class PaperlessMailOAuth2Manager:
             self.gmail_client.get_authorization_url(
                 redirect_uri=self.oauth_callback_url,
                 scope=["https://mail.google.com/"],
-                extras_params={"access_type": "offline"},
+                extras_params={"prompt": "consent", "access_type": "offline"},
             ),
         )
 
