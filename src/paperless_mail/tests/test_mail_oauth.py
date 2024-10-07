@@ -14,6 +14,7 @@ from paperless_mail.oauth import generate_gmail_oauth_url
 from paperless_mail.oauth import generate_outlook_oauth_url
 from paperless_mail.oauth import get_oauth_callback_url
 from paperless_mail.oauth import get_oauth_redirect_url
+from paperless_mail.oauth import refresh_oauth_token
 
 
 class TestMailOAuth(
@@ -195,7 +196,7 @@ class TestMailOAuth(
         mock_get_mailbox.return_value.__enter__.return_value = mock_mailbox
 
         mail_account = MailAccount.objects.create(
-            name="test_mail_account",
+            name="Test Gmail Mail Account",
             username="test_username",
             imap_security=MailAccount.ImapSecurity.SSL,
             imap_port=993,
@@ -205,6 +206,7 @@ class TestMailOAuth(
             expiration=timezone.now() - timedelta(days=1),
         )
 
+        mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {
             "access_token": "test_access_token",
             "refresh_token": "test_refresh_token",
@@ -213,3 +215,83 @@ class TestMailOAuth(
 
         self.mail_account_handler.handle_mail_account(mail_account)
         mock_post.assert_called_once()
+
+        outlook_mail_account = MailAccount.objects.create(
+            name="Test Outlook Mail Account",
+            username="test_username",
+            imap_security=MailAccount.ImapSecurity.SSL,
+            imap_port=993,
+            account_type=MailAccount.MailAccountType.OUTLOOK_OAUTH,
+            is_token=True,
+            refresh_token="test_refresh_token",
+            expiration=timezone.now() - timedelta(days=1),
+        )
+
+        self.mail_account_handler.handle_mail_account(outlook_mail_account)
+        mock_post.assert_called()
+
+    @mock.patch("paperless_mail.mail.get_mailbox")
+    @mock.patch("httpx.post")
+    def test_refresh_token_on_handle_mail_account_fails(
+        self,
+        mock_post,
+        mock_get_mailbox,
+    ):
+        """
+        GIVEN:
+            - Mail account with refresh token and expiration
+        WHEN:
+            - handle_mail_account is called
+            - Refresh token is called but fails
+        THEN:
+            - 0 processed mails is returned
+        """
+
+        mock_mailbox = mock.MagicMock()
+        mock_get_mailbox.return_value.__enter__.return_value = mock_mailbox
+
+        mail_account = MailAccount.objects.create(
+            name="Test Gmail Mail Account",
+            username="test_username",
+            imap_security=MailAccount.ImapSecurity.SSL,
+            imap_port=993,
+            account_type=MailAccount.MailAccountType.GMAIL_OAUTH,
+            is_token=True,
+            refresh_token="test_refresh_token",
+            expiration=timezone.now() - timedelta(days=1),
+        )
+
+        mock_post.return_value.status_code = 400
+        mock_post.return_value.json.return_value = {
+            "error": "test_error",
+        }
+
+        self.assertEqual(
+            self.mail_account_handler.handle_mail_account(mail_account),
+            0,
+        )
+        mock_post.assert_called_once()
+
+    def test_refresh_token_invalid_account(self):
+        """
+        GIVEN:
+            - Mail account without refresh token
+        WHEN:
+            - refresh_oauth_token is called
+        THEN:
+            - False is returned
+        """
+
+        mail_account = MailAccount.objects.create(
+            name="test_mail_account",
+            username="test_username",
+            imap_security=MailAccount.ImapSecurity.SSL,
+            imap_port=993,
+            account_type=MailAccount.MailAccountType.GMAIL_OAUTH,
+            is_token=True,
+            expiration=timezone.now() - timedelta(days=1),
+        )
+
+        self.assertFalse(
+            refresh_oauth_token(mail_account),
+        )
