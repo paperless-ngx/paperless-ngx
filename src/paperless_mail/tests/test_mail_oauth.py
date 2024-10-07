@@ -7,6 +7,7 @@ from django.test import TestCase
 from django.test import override_settings
 from django.utils import timezone
 from httpx_oauth.oauth2 import GetAccessTokenError
+from httpx_oauth.oauth2 import RefreshTokenError
 from rest_framework import status
 
 from paperless_mail.mail import MailAccountHandler
@@ -261,6 +262,7 @@ class TestMailOAuth(
             - handle_mail_account is called
             - Refresh token is called but fails
         THEN:
+            - Error is logged
             - 0 processed mails is returned
         """
 
@@ -278,13 +280,16 @@ class TestMailOAuth(
             expiration=timezone.now() - timedelta(days=1),
         )
 
-        mock_refresh_token.return_value = {
-            "error": "test_error",
-        }
+        mock_refresh_token.side_effect = RefreshTokenError("test_error")
 
-        # returns 0 processed mails
-        self.assertEqual(
-            self.mail_account_handler.handle_mail_account(mail_account),
-            0,
-        )
-        mock_refresh_token.assert_called_once()
+        with self.assertLogs("paperless_mail", level="ERROR") as cm:
+            # returns 0 processed mails
+            self.assertEqual(
+                self.mail_account_handler.handle_mail_account(mail_account),
+                0,
+            )
+            mock_refresh_token.assert_called_once()
+            self.assertIn(
+                f"Failed to refresh oauth token for account {mail_account}: test_error",
+                cm.output[0],
+            )
