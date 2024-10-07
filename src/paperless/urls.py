@@ -32,6 +32,7 @@ from documents.views import SelectionDataView
 from documents.views import SharedLinkView
 from documents.views import ShareLinkViewSet
 from documents.views import StatisticsView
+from documents.views import StoragePathTestView
 from documents.views import StoragePathViewSet
 from documents.views import SystemStatusView
 from documents.views import TagViewSet
@@ -164,6 +165,11 @@ urlpatterns = [
                     "^trash/",
                     TrashView.as_view(),
                     name="trash",
+                ),
+                re_path(
+                    "^storage_paths/test/",
+                    StoragePathTestView.as_view(),
+                    name="storage_paths_test",
                 ),
                 *api_router.urls,
             ],
