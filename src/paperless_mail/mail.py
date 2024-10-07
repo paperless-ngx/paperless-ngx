@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import itertools
 import logging
@@ -43,7 +44,7 @@ from documents.tasks import consume_file
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
-from paperless_mail.oauth import refresh_oauth_token
+from paperless_mail.oauth import PaperlessMailOAuth2Manager
 from paperless_mail.preprocessor import MailMessageDecryptor
 from paperless_mail.preprocessor import MailMessagePreprocessor
 
@@ -537,7 +538,8 @@ class MailAccountHandler(LoggingMixin):
                     and account.expiration is not None
                     and account.expiration < timezone.now()
                 ):
-                    if refresh_oauth_token(account):
+                    manager = PaperlessMailOAuth2Manager()
+                    if asyncio.run(manager.refresh_account_oauth_token(account)):
                         account.refresh_from_db()
                     else:
                         return total_processed_files

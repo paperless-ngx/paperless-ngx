@@ -2,10 +2,10 @@ import datetime
 import logging
 from datetime import timedelta
 
-import httpx
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseRedirect
 from django.utils import timezone
+from httpx_oauth.oauth2 import GetAccessTokenError
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -20,12 +20,7 @@ from paperless_mail.mail import get_mailbox
 from paperless_mail.mail import mailbox_login
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
-from paperless_mail.oauth import GMAIL_OAUTH_ENDPOINT_TOKEN
-from paperless_mail.oauth import OUTLOOK_OAUTH_ENDPOINT_TOKEN
-from paperless_mail.oauth import generate_gmail_oauth_token_request_data
-from paperless_mail.oauth import generate_outlook_oauth_token_request_data
-from paperless_mail.oauth import get_oauth_redirect_url
-from paperless_mail.oauth import refresh_oauth_token
+from paperless_mail.oauth import PaperlessMailOAuth2Manager
 from paperless_mail.serialisers import MailAccountSerializer
 from paperless_mail.serialisers import MailRuleSerializer
 
@@ -83,7 +78,8 @@ class MailAccountTestView(GenericAPIView):
                     and account.expiration is not None
                     and account.expiration < timezone.now()
                 ):
-                    if refresh_oauth_token(existing_account):
+                    oauth_manager = PaperlessMailOAuth2Manager()
+                    if oauth_manager.refresh_account_oauth_token(existing_account):
                         # User is not changing password and token needs to be refreshed
                         existing_account.refresh_from_db()
                         account.password = existing_account.password
@@ -114,50 +110,39 @@ class OauthCallbackView(GenericAPIView):
             )
             return HttpResponseBadRequest("Invalid request, see logs for more detail")
 
-        if scope is not None and "google" in scope:
-            # Google
-            account_type = MailAccount.MailAccountType.GMAIL_OAUTH
-            imap_server = "imap.gmail.com"
-            defaults = {
-                "name": f"Gmail OAuth {timezone.now()}",
-                "username": "",
-                "imap_security": MailAccount.ImapSecurity.SSL,
-                "imap_port": 993,
-                "account_type": account_type,
-            }
-            token_request_uri = GMAIL_OAUTH_ENDPOINT_TOKEN
-            data = generate_gmail_oauth_token_request_data(code)
+        oauth_manager = PaperlessMailOAuth2Manager()
 
-        elif scope is None:
-            # Outlook
-            account_type = MailAccount.MailAccountType.OUTLOOK_OAUTH
-            imap_server = "outlook.office365.com"
-            defaults = {
-                "name": f"Outlook OAuth {timezone.now()}",
-                "username": "",
-                "imap_security": MailAccount.ImapSecurity.SSL,
-                "imap_port": 993,
-                "account_type": account_type,
-            }
+        try:
+            if scope is not None and "google" in scope:
+                # Google
+                account_type = MailAccount.MailAccountType.GMAIL_OAUTH
+                imap_server = "imap.gmail.com"
+                defaults = {
+                    "name": f"Gmail OAuth {timezone.now()}",
+                    "username": "",
+                    "imap_security": MailAccount.ImapSecurity.SSL,
+                    "imap_port": 993,
+                    "account_type": account_type,
+                }
+                result = oauth_manager.get_gmail_access_token(code)
 
-            token_request_uri = OUTLOOK_OAUTH_ENDPOINT_TOKEN
-            data = generate_outlook_oauth_token_request_data(code)
+            elif scope is None:
+                # Outlook
+                account_type = MailAccount.MailAccountType.OUTLOOK_OAUTH
+                imap_server = "outlook.office365.com"
+                defaults = {
+                    "name": f"Outlook OAuth {timezone.now()}",
+                    "username": "",
+                    "imap_security": MailAccount.ImapSecurity.SSL,
+                    "imap_port": 993,
+                    "account_type": account_type,
+                }
 
-        headers = {
-            "Content-Type": "application/x-www-form-urlencoded",
-        }
-        response = httpx.post(token_request_uri, data=data, headers=headers)
-        data = response.json()
+                result = oauth_manager.get_outlook_access_token(code)
 
-        if "error" in data:
-            logger.error(f"Error {response.status_code} getting access token: {data}")
-            return HttpResponseRedirect(
-                f"{get_oauth_redirect_url()}?oauth_success=0",
-            )
-        elif "access_token" in data:
-            access_token = data["access_token"]
-            refresh_token = data["refresh_token"]
-            expires_in = data["expires_in"]
+            access_token = result["access_token"]
+            refresh_token = result["refresh_token"]
+            expires_in = result["expires_in"]
             account, _ = MailAccount.objects.update_or_create(
                 password=access_token,
                 is_token=True,
@@ -167,5 +152,10 @@ class OauthCallbackView(GenericAPIView):
                 defaults=defaults,
             )
             return HttpResponseRedirect(
-                f"{get_oauth_redirect_url()}?oauth_success=1&account_id={account.pk}",
+                f"{oauth_manager.oauth_redirect_url}?oauth_success=1&account_id={account.pk}",
+            )
+        except GetAccessTokenError as e:
+            logger.error(f"Error getting access token: {e}")
+            return HttpResponseRedirect(
+                f"{oauth_manager.oauth_redirect_url}?oauth_success=0",
             )

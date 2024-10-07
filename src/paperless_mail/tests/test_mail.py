@@ -35,7 +35,6 @@ from paperless_mail.mail import apply_mail_action
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
-from paperless_mail.oauth import GMAIL_OAUTH_ENDPOINT_TOKEN
 
 
 @dataclasses.dataclass
@@ -1636,11 +1635,19 @@ class TestMailAccountTestView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.content.decode(), "Unable to connect to server")
 
-    @mock.patch("httpx.post")
+    @mock.patch("paperless_mail.oauth.PaperlessMailOAuth2Manager")
     def test_mail_account_test_view_refresh_token(
         self,
-        mock_post,
+        mock_manager,
     ):
+        """
+        GIVEN:
+            - Mail account with expired token
+        WHEN:
+            - Mail account is tested
+        THEN:
+            - Should refresh the token
+        """
         existing_account = MailAccount.objects.create(
             imap_server="imap.example.com",
             imap_port=993,
@@ -1653,11 +1660,7 @@ class TestMailAccountTestView(APITestCase):
             is_token=True,
         )
 
-        mock_post.return_value.status_code = status.HTTP_200_OK
-        mock_post.return_value.json.return_value = {
-            "access_token": "newtoken",
-            "expires_in": 3600,
-        }
+        mock_manager.return_value.refresh_account_oauth_token.return_value = True
         data = {
             "id": existing_account.id,
             "imap_server": "imap.example.com",
@@ -1668,13 +1671,22 @@ class TestMailAccountTestView(APITestCase):
             "is_token": True,
         }
         self.client.post(self.url, data, format="json")
-        self.assertEqual(mock_post.call_args[1]["url"], GMAIL_OAUTH_ENDPOINT_TOKEN)
+        self.assertEqual(mock_manager.call_count, 1)
 
-    @mock.patch("httpx.post")
+    @mock.patch("paperless_mail.oauth.PaperlessMailOAuth2Manager")
     def test_mail_account_test_view_refresh_token_fails(
         self,
-        mock_post,
+        mock_manager,
     ):
+        """
+        GIVEN:
+            - Mail account with expired token
+        WHEN:
+            - Mail account is tested
+            - Token refresh fails
+        THEN:
+            - Should log an error
+        """
         existing_account = MailAccount.objects.create(
             imap_server="imap.example.com",
             imap_port=993,
@@ -1687,10 +1699,7 @@ class TestMailAccountTestView(APITestCase):
             is_token=True,
         )
 
-        mock_post.return_value.status_code = status.HTTP_400_BAD_REQUEST
-        mock_post.return_value.json.return_value = {
-            "error": "invalid_grant",
-        }
+        mock_manager.return_value.refresh_account_oauth_token.return_value = False
         data = {
             "id": existing_account.id,
             "imap_server": "imap.example.com",
@@ -1704,5 +1713,5 @@ class TestMailAccountTestView(APITestCase):
             response = self.client.post(self.url, data, format="json")
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
             error_str = cm.output[0]
-            expected_str = "Failed to refresh oauth token for account"
+            expected_str = "Unable to refresh oauth token"
             self.assertIn(expected_str, error_str)
