@@ -1669,3 +1669,40 @@ class TestMailAccountTestView(APITestCase):
         }
         self.client.post(self.url, data, format="json")
         self.assertEqual(mock_post.call_args[1]["url"], GMAIL_OAUTH_ENDPOINT_TOKEN)
+
+    @mock.patch("httpx.post")
+    def test_mail_account_test_view_refresh_token_fails(
+        self,
+        mock_post,
+    ):
+        existing_account = MailAccount.objects.create(
+            imap_server="imap.example.com",
+            imap_port=993,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            username="admin",
+            password="secret",
+            account_type=MailAccount.MailAccountType.GMAIL_OAUTH,
+            refresh_token="oldtoken",
+            expiration=timezone.now() - timedelta(days=1),
+            is_token=True,
+        )
+
+        mock_post.return_value.status_code = status.HTTP_400_BAD_REQUEST
+        mock_post.return_value.json.return_value = {
+            "error": "invalid_grant",
+        }
+        data = {
+            "id": existing_account.id,
+            "imap_server": "imap.example.com",
+            "imap_port": 993,
+            "imap_security": MailAccount.ImapSecurity.SSL,
+            "username": "admin",
+            "password": "****",
+            "is_token": True,
+        }
+        with self.assertLogs("paperless_mail", level="ERROR") as cm:
+            response = self.client.post(self.url, data, format="json")
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            error_str = cm.output[0]
+            expected_str = "Failed to refresh oauth token for account"
+            self.assertIn(expected_str, error_str)
