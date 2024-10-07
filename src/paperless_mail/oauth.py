@@ -101,10 +101,6 @@ class PaperlessMailOAuth2Manager:
         """
         logger = logging.getLogger("paperless_mail")
         logger.debug(f"Attempting to refresh oauth token for account {account}")
-        if not account.refresh_token:
-            logger.error(f"Account {account}: No refresh token available.")
-            return False
-
         try:
             result: OAuth2Token
             if account.account_type == MailAccount.MailAccountType.GMAIL_OAUTH:

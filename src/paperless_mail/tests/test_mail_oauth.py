@@ -186,11 +186,11 @@ class TestMailOAuth(
 
     @mock.patch("paperless_mail.mail.get_mailbox")
     @mock.patch(
-        "paperless_mail.oauth.PaperlessMailOAuth2Manager.refresh_account_oauth_token",
+        "httpx_oauth.oauth2.BaseOAuth2.refresh_token",
     )
     def test_refresh_token_on_handle_mail_account(
         self,
-        mock_refresh_account_oauth_token,
+        mock_refresh_token,
         mock_get_mailbox,
     ):
         """
@@ -216,13 +216,21 @@ class TestMailOAuth(
             expiration=timezone.now() - timedelta(days=1),
         )
 
-        mock_refresh_account_oauth_token.return_value = True
+        mock_refresh_token.return_value = {
+            "access_token": "test_access_token",
+            "refresh_token": "test_refresh_token",
+            "expires_in": 3600,
+        }
 
         self.mail_account_handler.handle_mail_account(mail_account)
-        mock_refresh_account_oauth_token.assert_called_once()
-        mock_refresh_account_oauth_token.reset_mock()
+        mock_refresh_token.assert_called_once()
+        mock_refresh_token.reset_mock()
 
-        mock_refresh_account_oauth_token.return_value = True
+        mock_refresh_token.return_value = {
+            "access_token": "test_access_token",
+            "refresh_token": "test_refresh",
+            "expires_in": 3600,
+        }
         outlook_mail_account = MailAccount.objects.create(
             name="Test Outlook Mail Account",
             username="test_username",
@@ -235,15 +243,15 @@ class TestMailOAuth(
         )
 
         self.mail_account_handler.handle_mail_account(outlook_mail_account)
-        mock_refresh_account_oauth_token.assert_called_once()
+        mock_refresh_token.assert_called_once()
 
     @mock.patch("paperless_mail.mail.get_mailbox")
     @mock.patch(
-        "paperless_mail.oauth.PaperlessMailOAuth2Manager.refresh_account_oauth_token",
+        "httpx_oauth.oauth2.BaseOAuth2.refresh_token",
     )
     def test_refresh_token_on_handle_mail_account_fails(
         self,
-        mock_refresh_account_oauth_token,
+        mock_refresh_token,
         mock_get_mailbox,
     ):
         """
@@ -270,10 +278,13 @@ class TestMailOAuth(
             expiration=timezone.now() - timedelta(days=1),
         )
 
-        mock_refresh_account_oauth_token.return_value = False
+        mock_refresh_token.return_value = {
+            "error": "test_error",
+        }
 
+        # returns 0 processed mails
         self.assertEqual(
             self.mail_account_handler.handle_mail_account(mail_account),
             0,
         )
-        mock_refresh_account_oauth_token.assert_called_once()
+        mock_refresh_token.assert_called_once()
