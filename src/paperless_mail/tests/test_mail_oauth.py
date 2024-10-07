@@ -91,8 +91,10 @@ class TestMailOAuth(
             - Mocked settings for Gmail and Outlook OAuth client IDs and secrets
         WHEN:
             - OAuth callback is called with a code and scope
+            - OAuth callback is called with a code and no scope
         THEN:
             - Gmail mail account is created
+            - Outlook mail account is created
         """
 
         mock_get_gmail_access_token.return_value = {
@@ -132,7 +134,7 @@ class TestMailOAuth(
         WHEN:
             - OAuth callback is called without a code
         THEN:
-            - Error is logged
+            - 400 bad request returned, no mail accounts are created
         """
 
         response = self.client.get(
@@ -152,7 +154,7 @@ class TestMailOAuth(
         GIVEN:
             - Mocked settings for Gmail and Outlook OAuth client IDs and secrets
         WHEN:
-            - OAuth callback is called with an error
+            - OAuth callback is called and get access token returns an error
         THEN:
             - No mail account is created
             - Error is logged
