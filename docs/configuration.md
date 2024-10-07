@@ -1219,25 +1219,25 @@ consumers working on the same file. Configure this to prevent that.
 
 #### [`PAPERLESS_GMAIL_OAUTH_CLIENT_ID=<str>`](#PAPERLESS_GMAIL_OAUTH_CLIENT_ID) {#PAPERLESS_GMAIL_OAUTH_CLIENT_ID}
 
-: The OAuth client ID for Gmail. This is required for Gmail OAuth Email setup. See [Gmail OAuth Email Setup](usage.md#oauth-email-setup) for more information.
+: The OAuth client ID for Gmail. This is required for Gmail OAuth Email setup. See [OAuth Email Setup](usage.md#oauth-email-setup) for more information.
 
     Defaults to none.
 
 #### [`PAPERLESS_GMAIL_OAUTH_CLIENT_SECRET=<str>`](#PAPERLESS_GMAIL_OAUTH_CLIENT_SECRET) {#PAPERLESS_GMAIL_OAUTH_CLIENT_SECRET}
 
-: The OAuth client secret for Gmail. This is required for Gmail OAuth Email setup. See [Gmail OAuth Email Setup](usage.md#oauth-email-setup) for more information.
+: The OAuth client secret for Gmail. This is required for Gmail OAuth Email setup. See [OAuth Email Setup](usage.md#oauth-email-setup) for more information.
 
     Defaults to none.
 
 #### [`PAPERLESS_OUTLOOK_OAUTH_CLIENT_ID=<str>`](#PAPERLESS_OUTLOOK_OAUTH_CLIENT_ID) {#PAPERLESS_OUTLOOK_OAUTH_CLIENT_ID}
 
-: The OAuth client ID for Outlook. This is required for Outlook OAuth Email setup. See [Outlook OAuth Email Setup](usage.md#oauth-email-setup) for more information.
+: The OAuth client ID for Outlook. This is required for Outlook OAuth Email setup. See [OAuth Email Setup](usage.md#oauth-email-setup) for more information.
 
     Defaults to none.
 
 #### [`PAPERLESS_OUTLOOK_OAUTH_CLIENT_SECRET=<str>`](#PAPERLESS_OUTLOOK_OAUTH_CLIENT_SECRET) {#PAPERLESS_OUTLOOK_OAUTH_CLIENT_SECRET}
 
-: The OAuth client secret for Outlook. This is required for Outlook OAuth Email setup. See [Outlook OAuth Email Setup](usage.md#oauth-email-setup) for more information.
+: The OAuth client secret for Outlook. This is required for Outlook OAuth Email setup. See [OAuth Email Setup](usage.md#oauth-email-setup) for more information.
 
     Defaults to none.
 
