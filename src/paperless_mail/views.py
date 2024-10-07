@@ -100,6 +100,8 @@ class MailAccountTestView(GenericAPIView):
 
 
 class OauthCallbackView(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
     def get(self, request, format=None):
         logger = logging.getLogger("paperless_mail")
         code = request.query_params.get("code")
