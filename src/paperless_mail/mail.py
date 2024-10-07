@@ -1,4 +1,3 @@
-import asyncio
 import datetime
 import itertools
 import logging
@@ -539,7 +538,7 @@ class MailAccountHandler(LoggingMixin):
                     and account.expiration < timezone.now()
                 ):
                     manager = PaperlessMailOAuth2Manager()
-                    if asyncio.run(manager.refresh_account_oauth_token(account)):
+                    if manager.refresh_account_oauth_token(account):
                         account.refresh_from_db()
                     else:
                         return total_processed_files

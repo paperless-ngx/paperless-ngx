@@ -1635,10 +1635,12 @@ class TestMailAccountTestView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.content.decode(), "Unable to connect to server")
 
-    @mock.patch("paperless_mail.oauth.PaperlessMailOAuth2Manager")
+    @mock.patch(
+        "paperless_mail.oauth.PaperlessMailOAuth2Manager.refresh_account_oauth_token",
+    )
     def test_mail_account_test_view_refresh_token(
         self,
-        mock_manager,
+        mock_refresh_account_oauth_token,
     ):
         """
         GIVEN:
@@ -1660,7 +1662,7 @@ class TestMailAccountTestView(APITestCase):
             is_token=True,
         )
 
-        mock_manager.return_value.refresh_account_oauth_token.return_value = True
+        mock_refresh_account_oauth_token.return_value = True
         data = {
             "id": existing_account.id,
             "imap_server": "imap.example.com",
@@ -1671,12 +1673,14 @@ class TestMailAccountTestView(APITestCase):
             "is_token": True,
         }
         self.client.post(self.url, data, format="json")
-        self.assertEqual(mock_manager.call_count, 1)
+        self.assertEqual(mock_refresh_account_oauth_token.call_count, 1)
 
-    @mock.patch("paperless_mail.oauth.PaperlessMailOAuth2Manager")
+    @mock.patch(
+        "paperless_mail.oauth.PaperlessMailOAuth2Manager.refresh_account_oauth_token",
+    )
     def test_mail_account_test_view_refresh_token_fails(
         self,
-        mock_manager,
+        mock_mock_refresh_account_oauth_token,
     ):
         """
         GIVEN:
@@ -1699,7 +1703,7 @@ class TestMailAccountTestView(APITestCase):
             is_token=True,
         )
 
-        mock_manager.return_value.refresh_account_oauth_token.return_value = False
+        mock_mock_refresh_account_oauth_token.return_value = False
         data = {
             "id": existing_account.id,
             "imap_server": "imap.example.com",
