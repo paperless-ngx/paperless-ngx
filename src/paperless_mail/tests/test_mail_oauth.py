@@ -2,6 +2,7 @@ from datetime import timedelta
 from unittest import mock
 
 from django.conf import settings
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test import override_settings
@@ -20,6 +21,14 @@ class TestMailOAuth(
 ):
     def setUp(self) -> None:
         self.user = User.objects.create_user("testuser")
+        self.user.user_permissions.add(
+            *Permission.objects.filter(
+                codename__in=[
+                    "add_mailaccount",
+                ],
+            ),
+        )
+        self.user.save()
         self.client.force_login(self.user)
         self.mail_account_handler = MailAccountHandler()
         # Mock settings
@@ -82,7 +91,7 @@ class TestMailOAuth(
     @mock.patch(
         "paperless_mail.oauth.PaperlessMailOAuth2Manager.get_outlook_access_token",
     )
-    def test_oauth_callback_view(
+    def test_oauth_callback_view_success(
         self,
         mock_get_outlook_access_token,
         mock_get_gmail_access_token,
@@ -128,29 +137,8 @@ class TestMailOAuth(
             MailAccount.objects.filter(imap_server="outlook.office365.com").exists(),
         )
 
-    def test_oauth_callback_view_no_code(self):
-        """
-        GIVEN:
-            - Mocked settings for Gmail and Outlook OAuth client IDs and secrets
-        WHEN:
-            - OAuth callback is called without a code
-        THEN:
-            - 400 bad request returned, no mail accounts are created
-        """
-
-        response = self.client.get(
-            "/api/oauth/callback/",
-        )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertFalse(
-            MailAccount.objects.filter(imap_server="imap.gmail.com").exists(),
-        )
-        self.assertFalse(
-            MailAccount.objects.filter(imap_server="outlook.office365.com").exists(),
-        )
-
     @mock.patch("httpx_oauth.oauth2.BaseOAuth2.get_access_token")
-    def test_oauth_callback_view_error(self, mock_get_access_token):
+    def test_oauth_callback_view_fails(self, mock_get_access_token):
         """
         GIVEN:
             - Mocked settings for Gmail and Outlook OAuth client IDs and secrets
@@ -184,6 +172,57 @@ class TestMailOAuth(
             )
 
             self.assertIn("Error getting access token: test_error", cm.output[0])
+
+    def test_oauth_callback_view_insufficient_permissions(self):
+        """
+        GIVEN:
+            - Mocked settings for Gmail and Outlook OAuth client IDs and secrets
+            - User without add_mailaccount permission
+        WHEN:
+            - OAuth callback is called
+        THEN:
+            - 400 bad request returned, no mail accounts are created
+        """
+        self.user.user_permissions.remove(
+            *Permission.objects.filter(
+                codename__in=[
+                    "add_mailaccount",
+                ],
+            ),
+        )
+        self.user.save()
+
+        response = self.client.get(
+            "/api/oauth/callback/?code=test_code&scope=https://mail.google.com/",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(
+            MailAccount.objects.filter(imap_server="imap.gmail.com").exists(),
+        )
+        self.assertFalse(
+            MailAccount.objects.filter(imap_server="outlook.office365.com").exists(),
+        )
+
+    def test_oauth_callback_view_no_code(self):
+        """
+        GIVEN:
+            - Mocked settings for Gmail and Outlook OAuth client IDs and secrets
+        WHEN:
+            - OAuth callback is called without a code
+        THEN:
+            - 400 bad request returned, no mail accounts are created
+        """
+
+        response = self.client.get(
+            "/api/oauth/callback/",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(
+            MailAccount.objects.filter(imap_server="imap.gmail.com").exists(),
+        )
+        self.assertFalse(
+            MailAccount.objects.filter(imap_server="outlook.office365.com").exists(),
+        )
 
     @mock.patch("paperless_mail.mail.get_mailbox")
     @mock.patch(

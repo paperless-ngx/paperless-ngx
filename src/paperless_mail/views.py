@@ -99,6 +99,13 @@ class OauthCallbackView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
+        if not (
+            request.user and request.user.has_perms(["paperless_mail.add_mailaccount"])
+        ):
+            return HttpResponseBadRequest(
+                "You do not have permission to add mail accounts",
+            )
+
         logger = logging.getLogger("paperless_mail")
         code = request.query_params.get("code")
         # Gmail passes scope as a query param, Outlook does not
