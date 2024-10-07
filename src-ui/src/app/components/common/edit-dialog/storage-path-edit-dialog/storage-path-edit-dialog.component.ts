@@ -59,10 +59,6 @@ export class StoragePathEditDialogComponent
     this.unsubscribeNotifier.complete()
   }
 
-  get pathHint() {
-    return $localize`See <a target="_blank" href="https://docs.paperless-ngx.com/advanced_usage/#file-name-handling">the documentation</a>.`
-  }
-
   getCreateTitle() {
     return $localize`Create new storage path`
   }

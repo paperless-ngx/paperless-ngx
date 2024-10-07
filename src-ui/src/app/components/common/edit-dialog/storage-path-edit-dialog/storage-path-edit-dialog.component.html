@@ -10,7 +10,7 @@
   <div class="modal-body">
 
     <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
-    <pngx-input-textarea i18n-title title="Path" formControlName="path" [error]="error?.path" [hint]="pathHint" [monospace]="true"></pngx-input-textarea>
+    <pngx-input-textarea i18n-title title="Path" formControlName="path" [error]="error?.path" hint="See <a target='_blank' href='https://docs.paperless-ngx.com/advanced_usage/#file-name-handling'>the documentation</a>." i18n-hint [monospace]="true"></pngx-input-textarea>
 
     <div ngbAccordion>
       <div ngbAccordionItem>
@@ -35,7 +35,7 @@
               </div>
               <ng-select name="testDocument"
                 [items]="foundDocuments$ | async"
-                placeholder="Search for documents" i18n-placeholder
+                placeholder="Search for a document" i18n-placeholder
                 notFoundText="No documents found" i18n-notFoundText
                 bindValue="id"
                 bindLabel="title"
