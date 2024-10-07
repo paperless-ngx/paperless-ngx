@@ -30,8 +30,10 @@ filelock = "*"
 flower = "*"
 gotenberg-client = "*"
 gunicorn = "*"
+httpx-oauth = "*"
 imap-tools = "*"
 inotifyrecursive = "~=0.3"
+jinja2 = "~=3.1"
 langdetect = "*"
 mysqlclient = "*"
 nltk = "*"
@@ -57,8 +59,6 @@ watchdog = "~=4.0"
 whitenoise = "~=6.7"
 whoosh = "~=2.7"
 zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
-jinja2 = "~=3.1"
-httpx-oauth = "*"
 
 [dev-packages]
 # Linting
