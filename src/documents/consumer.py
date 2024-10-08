@@ -348,7 +348,7 @@ class ConsumerPlugin(
         """
         Check that if override_asn is given, it is unique and within a valid range
         """
-        if not self.metadata.asn:
+        if self.metadata.asn is None:
             # check not necessary in case no ASN gets set
             return
         # Validate the range is above zero and less than uint32_t max
@@ -905,7 +905,7 @@ class ConsumerPlugin(
                 pk=self.metadata.storage_path_id,
             )
 
-        if self.metadata.asn:
+        if self.metadata.asn is not None:
             document.archive_serial_number = self.metadata.asn
 
         if self.metadata.owner_id:
