@@ -4,7 +4,8 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.utils import timezone
-from httpx_oauth.oauth2 import OAuth2
+from httpx_oauth.clients.google import GoogleOAuth2
+from httpx_oauth.clients.microsoft import MicrosoftGraphOAuth2
 from httpx_oauth.oauth2 import OAuth2Token
 from httpx_oauth.oauth2 import RefreshTokenError
 
@@ -12,42 +13,25 @@ from paperless_mail.models import MailAccount
 
 
 class PaperlessMailOAuth2Manager:
-    GMAIL_OAUTH_ENDPOINT_TOKEN = "https://accounts.google.com/o/oauth2/token"
-    GMAIL_OAUTH_ENDPOINT_AUTH = "https://accounts.google.com/o/oauth2/auth"
-    OUTLOOK_OAUTH_ENDPOINT_TOKEN = (
-        "https://login.microsoftonline.com/common/oauth2/v2.0/token"
-    )
-    OUTLOOK_OAUTH_ENDPOINT_AUTH = (
-        "https://login.microsoftonline.com/common/oauth2/v2.0/authorize"
-    )
-
     def __init__(self):
         self._gmail_client = None
         self._outlook_client = None
 
     @property
-    def gmail_client(self) -> OAuth2:
+    def gmail_client(self) -> GoogleOAuth2:
         if self._gmail_client is None:
-            self._gmail_client = OAuth2(
+            self._gmail_client = GoogleOAuth2(
                 settings.GMAIL_OAUTH_CLIENT_ID,
                 settings.GMAIL_OAUTH_CLIENT_SECRET,
-                self.GMAIL_OAUTH_ENDPOINT_AUTH,
-                self.GMAIL_OAUTH_ENDPOINT_TOKEN,
-                refresh_token_endpoint=self.GMAIL_OAUTH_ENDPOINT_TOKEN,
-                token_endpoint_auth_method="client_secret_post",
             )
         return self._gmail_client
 
     @property
-    def outlook_client(self) -> OAuth2:
+    def outlook_client(self) -> MicrosoftGraphOAuth2:
         if self._outlook_client is None:
-            self._outlook_client = OAuth2(
+            self._outlook_client = MicrosoftGraphOAuth2(
                 settings.OUTLOOK_OAUTH_CLIENT_ID,
                 settings.OUTLOOK_OAUTH_CLIENT_SECRET,
-                self.OUTLOOK_OAUTH_ENDPOINT_AUTH,
-                self.OUTLOOK_OAUTH_ENDPOINT_TOKEN,
-                refresh_token_endpoint=self.OUTLOOK_OAUTH_ENDPOINT_TOKEN,
-                token_endpoint_auth_method="client_secret_post",
             )
         return self._outlook_client
 
