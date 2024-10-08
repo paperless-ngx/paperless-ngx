@@ -24,12 +24,10 @@ from guardian.shortcuts import remove_perm
 from documents import matching
 from documents.caching import clear_document_caches
 from documents.classifier import DocumentClassifier
-from documents.data_models import ConsumableDocument
-from documents.data_models import DocumentMetadataOverrides
+from documents.consumer import parse_doc_title_w_placeholders
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_unique_filename
-from documents.file_handling import parse_doc_title_w_placeholders
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import MatchingModel
@@ -531,79 +529,55 @@ def run_workflow_updated(sender, document: Document, logging_group=None, **kwarg
 
 def run_workflow(
     trigger_type: WorkflowTrigger.WorkflowTriggerType,
-    document: Document | ConsumableDocument,
+    document: Document,
     logging_group=None,
-    overrides: DocumentMetadataOverrides = None,
-) -> None | DocumentMetadataOverrides:
-    """
-    Run the workflow for the given document and trigger type.
-    If overrides is provided, the document will not be saved, and an updated DocumentMetadataOverrides object will be returned.
-    """
-
-    def assignment_action(
-        document: Document,
-        overrides: DocumentMetadataOverrides | None = None,
-    ):
+):
+    def assignment_action():
         if action.assign_tags.all().count() > 0:
             doc_tag_ids.extend(
                 list(action.assign_tags.all().values_list("pk", flat=True)),
             )
 
         if action.assign_correspondent is not None:
-            if overrides is not None:
-                overrides.correspondent_id = action.assign_correspondent.pk
-            else:
-                document.correspondent = action.assign_correspondent
+            document.correspondent = action.assign_correspondent
 
         if action.assign_document_type is not None:
-            if overrides is not None:
-                overrides.document_type_id = action.assign_document_type.pk
-            else:
-                document.document_type = action.assign_document_type
+            document.document_type = action.assign_document_type
 
         if action.assign_storage_path is not None:
-            if overrides is not None:
-                overrides.storage_path_id = action.assign_storage_path.pk
-            else:
-                document.storage_path = action.assign_storage_path
+            document.storage_path = action.assign_storage_path
 
         if action.assign_owner is not None:
-            if overrides is not None:
-                overrides.owner_id = action.assign_owner.pk
-            else:
-                document.owner = action.assign_owner
+            document.owner = action.assign_owner
 
         if action.assign_title is not None:
-            if overrides is not None:
-                overrides.title = action.assign_title
-            else:
-                try:
-                    document.title = parse_doc_title_w_placeholders(
-                        action.assign_title,
-                        (
-                            document.correspondent.name
-                            if document.correspondent is not None
-                            else ""
-                        ),
-                        (
-                            document.document_type.name
-                            if document.document_type is not None
-                            else ""
-                        ),
-                        (document.owner.username if document.owner is not None else ""),
-                        timezone.localtime(document.added),
-                        (
-                            document.original_filename
-                            if document.original_filename is not None
-                            else ""
-                        ),
-                        timezone.localtime(document.created),
-                    )
-                except Exception:
-                    logger.exception(
-                        f"Error occurred parsing title assignment '{action.assign_title}', falling back to original",
-                        extra={"group": logging_group},
-                    )
+            try:
+                document.title = parse_doc_title_w_placeholders(
+                    action.assign_title,
+                    (
+                        document.correspondent.name
+                        if document.correspondent is not None
+                        else ""
+                    ),
+                    (
+                        document.document_type.name
+                        if document.document_type is not None
+                        else ""
+                    ),
+                    (document.owner.username if document.owner is not None else ""),
+                    timezone.localtime(document.added),
+                    (
+                        document.original_filename
+                        if document.original_filename is not None
+                        else ""
+                    ),
+                    timezone.localtime(document.created),
+                )
+            except Exception:
+                logger.exception(
+                    f"Error occurred parsing title assignment '{action.assign_title}', falling back to original",
+                    extra={"group": logging_group},
+                )
 
         if (
             (
@@ -645,42 +619,28 @@ def run_workflow(
                     or [],
                 },
             }
-            if overrides is not None:
-                overrides.view_users = permissions["view"]["users"]
-                overrides.view_groups = permissions["view"]["groups"]
-                overrides.change_users = permissions["change"]["users"]
-                overrides.change_groups = permissions["change"]["groups"]
-            else:
-                set_permissions_for_object(
-                    permissions=permissions,
-                    object=document,
-                    merge=True,
-                )
+            set_permissions_for_object(
+                permissions=permissions,
+                object=document,
+                merge=True,
+            )
 
         if action.assign_custom_fields is not None:
-            if overrides is not None:
-                overrides.custom_field_ids = list(
-                    action.assign_custom_fields.all().values_list("pk", flat=True),
-                )
-            else:
-                for field in action.assign_custom_fields.all():
-                    if (
-                        CustomFieldInstance.objects.filter(
-                            field=field,
-                            document=document,
-                        ).count()
-                        == 0
-                    ):
-                        # can be triggered on existing docs, so only add the field if it doesn't already exist
-                        CustomFieldInstance.objects.create(
-                            field=field,
-                            document=document,
-                        )
+            for field in action.assign_custom_fields.all():
+                if (
+                    CustomFieldInstance.objects.filter(
+                        field=field,
+                        document=document,
+                    ).count()
+                    == 0
+                ):
+                    # can be triggered on existing docs, so only add the field if it doesn't already exist
+                    CustomFieldInstance.objects.create(
+                        field=field,
+                        document=document,
+                    )
 
-    def removal_action(
-        document: Document,
-        overrides: DocumentMetadataOverrides | None = None,
-    ):
+    def removal_action():
         if action.remove_all_tags:
             doc_tag_ids.clear()
         else:
@@ -689,72 +649,41 @@ def run_workflow(
             ).all():
                 doc_tag_ids.remove(tag.pk)
 
-        corresspondent_id = (
-            document.correspondent.pk
-            if (overrides is None and document.correspondent)
-            else overrides.correspondent_id
-        )
         if action.remove_all_correspondents or (
-            corresspondent_id
+            document.correspondent
             and (
                 action.remove_correspondents.filter(
-                    pk=corresspondent_id,
+                    pk=document.correspondent.pk,
                 ).exists()
             )
         ):
-            if overrides is not None:
-                overrides.correspondent_id = None
-            else:
-                document.correspondent = None
+            document.correspondent = None
 
-        document_type_id = (
-            document.document_type.pk
-            if (overrides is None and document.document_type)
-            else overrides.document_type_id
-        )
         if action.remove_all_document_types or (
-            document_type_id
+            document.document_type
             and (
                 action.remove_document_types.filter(
-                    pk=document_type_id,
+                    pk=document.document_type.pk,
                 ).exists()
             )
         ):
-            if overrides is not None:
-                overrides.document_type_id = None
-            else:
-                document.document_type = None
+            document.document_type = None
 
-        storage_path_id = (
-            document.storage_path.pk
-            if (overrides is None and document.storage_path)
-            else overrides.storage_path_id
-        )
         if action.remove_all_storage_paths or (
-            storage_path_id
+            document.storage_path
             and (
                 action.remove_storage_paths.filter(
-                    pk=storage_path_id,
+                    pk=document.storage_path.pk,
                 ).exists()
             )
         ):
-            if overrides is not None:
-                overrides.storage_path_id = None
-            else:
-                document.storage_path = None
+            document.storage_path = None
 
-        owner_id = (
-            document.owner.pk
-            if (overrides is None and document.owner)
-            else overrides.owner_id
-        )
         if action.remove_all_owners or (
-            owner_id and (action.remove_owners.filter(pk=owner_id).exists())
+            document.owner
+            and (action.remove_owners.filter(pk=document.owner.pk).exists())
         ):
-            if overrides is not None:
-                overrides.owner_id = None
-            else:
-                document.owner = None
+            document.owner = None
 
         if action.remove_all_permissions:
             permissions = {
@@ -767,72 +696,29 @@ def run_workflow(
                     "groups": [],
                 },
             }
-            if overrides is not None:
-                overrides.view_users = []
-                overrides.view_groups = []
-                overrides.change_users = []
-                overrides.change_groups = []
-            else:
-                set_permissions_for_object(
-                    permissions=permissions,
-                    object=document,
-                    merge=False,
-                )
+            set_permissions_for_object(
+                permissions=permissions,
+                object=document,
+                merge=False,
+            )
         elif (
             (action.remove_view_users.all().count() > 0)
             or (action.remove_view_groups.all().count() > 0)
             or (action.remove_change_users.all().count() > 0)
             or (action.remove_change_groups.all().count() > 0)
         ):
-            if overrides is not None:
-                if (
-                    action.remove_view_users.all().count() > 0
-                    and overrides.view_users is not None
-                ):
-                    overrides.view_users.remove(
-                        *action.remove_view_users.all().values_list("id", flat=True),
-                    )
-                if (
-                    action.remove_view_groups.all().count() > 0
-                    and overrides.view_groups is not None
-                ):
-                    overrides.view_groups.remove(
-                        *action.remove_view_groups.all().values_list("id", flat=True),
-                    )
-                if (
-                    action.remove_change_users.all().count() > 0
-                    and overrides.change_users is not None
-                ):
-                    overrides.change_users.remove(
-                        *action.remove_change_users.all().values_list("id", flat=True),
-                    )
-                if (
-                    action.remove_change_groups.all().count() > 0
-                    and overrides.change_groups is not None
-                ):
-                    overrides.change_groups.remove(
-                        *action.remove_change_groups.all().values_list("id", flat=True),
-                    )
-            else:
-                for user in action.remove_view_users.all():
-                    remove_perm("view_document", user, document)
-                for user in action.remove_change_users.all():
-                    remove_perm("change_document", user, document)
-                for group in action.remove_view_groups.all():
-                    remove_perm("view_document", group, document)
-                for group in action.remove_change_groups.all():
-                    remove_perm("change_document", group, document)
+            for user in action.remove_view_users.all():
+                remove_perm("view_document", user, document)
+            for user in action.remove_change_users.all():
+                remove_perm("change_document", user, document)
+            for group in action.remove_view_groups.all():
+                remove_perm("view_document", group, document)
+            for group in action.remove_change_groups.all():
+                remove_perm("change_document", group, document)
 
         if action.remove_all_custom_fields:
-            if overrides is not None:
-                overrides.custom_field_ids = []
-            else:
-                CustomFieldInstance.objects.filter(document=document).delete()
+            CustomFieldInstance.objects.filter(document=document).delete()
         elif action.remove_custom_fields.all().count() > 0:
-            if overrides is not None and overrides.custom_field_ids is not None:
-                overrides.custom_field_ids.remove(
-                    *action.remove_custom_fields.all().values_list("id", flat=True),
-                )
             CustomFieldInstance.objects.filter(
                 field__in=action.remove_custom_fields.all(),
                 document=document,
@@ -858,14 +744,11 @@ def run_workflow(
         .prefetch_related("triggers")
         .order_by("order")
     ):
-        if overrides is None:
-            # This can be called from bulk_update_documents, which may be running multiple times
-            # Refresh this so the matching data is fresh and instance fields are re-freshed
-            # Otherwise, this instance might be behind and overwrite the work another process did
-            document.refresh_from_db()
-            doc_tag_ids = list(document.tags.all().values_list("pk", flat=True))
-        else:
-            doc_tag_ids = overrides.tag_ids or []
+        # This can be called from bulk_update_documents, which may be running multiple times
+        # Refresh this so the matching data is fresh and instance fields are re-freshed
+        # Otherwise, this instance might be behind and overwrite the work another process did
+        document.refresh_from_db()
+        doc_tag_ids = list(document.tags.all().values_list("pk", flat=True))
         if matching.document_matches_workflow(
             document,
             workflow,
@@ -879,17 +762,14 @@ def run_workflow(
                 )
 
                 if action.type == WorkflowAction.WorkflowActionType.ASSIGNMENT:
-                    assignment_action(document, overrides)
+                    assignment_action()
 
                 elif action.type == WorkflowAction.WorkflowActionType.REMOVAL:
-                    removal_action(document, overrides)
-            if overrides is not None:
-                overrides.tag_ids = doc_tag_ids
-                return overrides
-            else:
-                # save first before setting tags
-                document.save()
-                document.tags.set(doc_tag_ids)
+                    removal_action()
+
+            # save first before setting tags
+            document.save()
+            document.tags.set(doc_tag_ids)
 
 
 @before_task_publish.connect
