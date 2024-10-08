@@ -85,7 +85,7 @@ extends CustomFolderListComponent<Folder> {
     }
 
     this.id = object?.id
-    this.router.navigate(['/subfolders/', object.id],
+    this.router.navigate(['/folders/', object.id],
       {
         queryParams: getQueryParams
       }

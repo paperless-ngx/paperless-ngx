@@ -1,0 +1,46 @@
+<ng-container content>
+
+    <table class="">
+
+      <tbody>
+        @if (isLoading) {
+          <tr>
+            <td colspan="5">
+              <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+              <ng-container i18n>Loading...</ng-container>
+            </td>
+          </tr>
+        }
+        @for (object of data; track object) {
+          <tr>
+            <td class="custom-space"></td>
+            @if (object.type == 'folder') {
+              <td scope="row" class="d-md-table-cell custom-width-content">
+
+                 <span class="text-primary"
+                        (click)="goToFolder(object,$event); $event.stopPropagation()">
+
+                    <i-bs class="me-1" name="chevronRight" width="1rem" height="1rem"></i-bs>
+                    <i-bs class="me-1" name="folder-fill" width="1.2rem" height="1.2rem"></i-bs>
+                    {{ object.name }}
+                  </span>
+              </td>
+            } @else {
+              <td scope="row" class="d-md-table-cell custom-width-content">
+               <span
+                    class="text-primary"
+                    [routerLink]="['/documents', object.document_matching]"
+                    (click)="$event.stopPropagation()">
+
+                    <i-bs class="me-1 " name="file-earmark-pdf" width="1.2rem"
+                          height="1.2rem"></i-bs>
+                    {{ object.name }}
+                  </span>
+              </td>
+            }
+
+          </tr>
+        }
+      </tbody>
+    </table>
+  </ng-container>

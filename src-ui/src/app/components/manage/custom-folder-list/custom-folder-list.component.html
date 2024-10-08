@@ -1,11 +1,13 @@
 <pngx-page-header title="{{ typeNamePlural | titlecase }}">
 
   <div class="btn-group flex-fill" role="group">
-    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="details" (ngModelChange)="saveDisplayMode()"  id="displayModeDetails" name="displayModeDetails">
+    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="details" (ngModelChange)="saveDisplayMode()"
+           id="displayModeDetails" name="displayModeDetails">
     <label for="displayModeDetails" class="btn btn-outline-primary btn-sm">
       <i-bs name="list-ul"></i-bs>
     </label>
-    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="smallCards" (ngModelChange)="saveDisplayMode()"  id="displayModeSmall" name="displayModeSmall">
+    <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="smallCards"
+           (ngModelChange)="saveDisplayMode()" id="displayModeSmall" name="displayModeSmall">
     <label for="displayModeSmall" class="btn btn-outline-primary btn-sm">
       <i-bs name="grid"></i-bs>
     </label>
@@ -13,201 +15,261 @@
   </div>
 
 
-  <button class="btn btn-sm btn-outline-secondary" (click)="cutFolder()" [disabled]="selectedObjects.size === 0 || isFolderCutClicked == true">
-    <i-bs  name="x"></i-bs>&nbsp;<ng-container i18n>Cut</ng-container>
-    </button>
+  <button class="btn btn-sm btn-outline-secondary" (click)="cutFolder()"
+          [disabled]="selectedObjects.size === 0 || isFolderCutClicked == true">
+    <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Cut</ng-container>
+  </button>
 
   <button class="btn btn-sm btn-outline-secondary" (click)="clearSelection()" [hidden]="selectedObjects.size === 0">
-    <i-bs  name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
-    </button>
-    <button class="btn btn-sm btn-outline-secondary" [hidden]="selectedObjects.size > 5" (click)="selectAll();  $event.stopPropagation();" >
-      <i-bs  name="check"></i-bs>&nbsp;<ng-container i18n>Select all</ng-container>
-      </button>
-    <div ngbDropdown>
+    <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
+  </button>
+  <button class="btn btn-sm btn-outline-secondary" [hidden]="selectedObjects.size > 5"
+          (click)="selectAll();  $event.stopPropagation();">
+    <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Select all</ng-container>
+  </button>
+  <div ngbDropdown>
 
-      <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
-        <i-bs name="three-dots"></i-bs>
-        <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
-      </button>
-      <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
-        <!-- <button ngbDropdownItem (click)="redoOcrSelected()" [disabled]="!userCanEditAll">
-          <i-bs name="body-text"></i-bs>&nbsp;<ng-container i18n>Redo OCR</ng-container>
-        </button>
-        <button ngbDropdownItem (click)="rotateSelected()" [disabled]="!userOwnsAll">
-          <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
-        </button>
-        <button ngbDropdownItem (click)="mergeSelected()" [disabled]="!userCanEditAll || list.selected.size < 2">
-          <i-bs name="journals"></i-bs>&nbsp;<ng-container i18n>Merge</ng-container>
-        </button> -->
-        <button ngbDropdownItem (click)="exportToExcelSelected()" [disabled]="!userCanEditAll">
-          <i-bs name="arrow-down"></i-bs>&nbsp;<ng-container i18n>Export to Excel</ng-container>
-        </button>
+    <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
+      <i-bs name="three-dots"></i-bs>
+      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container>
       </div>
+    </button>
+    <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
+      <!-- <button ngbDropdownItem (click)="redoOcrSelected()" [disabled]="!userCanEditAll">
+        <i-bs name="body-text"></i-bs>&nbsp;<ng-container i18n>Redo OCR</ng-container>
+      </button>
+      <button ngbDropdownItem (click)="rotateSelected()" [disabled]="!userOwnsAll">
+        <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
+      </button>
+      <button ngbDropdownItem (click)="mergeSelected()" [disabled]="!userCanEditAll || list.selected.size < 2">
+        <i-bs name="journals"></i-bs>&nbsp;<ng-container i18n>Merge</ng-container>
+      </button> -->
+      <button ngbDropdownItem (click)="exportToExcelSelected()" [disabled]="!userCanEditAll">
+        <i-bs name="arrow-down"></i-bs>&nbsp;<ng-container i18n>Export to Excel</ng-container>
+      </button>
     </div>
-    <button type="button" class="btn btn-sm btn-outline-primary" (click)="setPermissions()" [disabled]="!userCanBulkEdit(PermissionAction.Change) || selectedObjects.size === 0">
-      <i-bs name="person-fill-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
-    </button>
-    <button type="button" class="btn btn-sm btn-outline-danger" (click)="delete()" [disabled]="!userCanBulkEdit(PermissionAction.Delete) || selectedObjects.size === 0">
-      <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
-    </button>
-    <button type="button" class="btn btn-sm btn-outline-danger" (click)="update()" [disabled]="!userCanBulkEdit(PermissionAction.Change) || selectedObjects.size > 0" [hidden]="getFolderSelect()==0">
-      <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Paste</ng-container>
-    </button>
-    <button type="button" class="btn btn-sm btn-outline-danger" (click)="cancelFolder()" [hidden]="getFolderSelect()==0"   >
-      <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Cancel</ng-container>
-    </button>
-    <button type="button" class="btn btn-sm btn-outline-primary ms-md-5" (click)="openCreateDialog()" *pngxIfPermissions="{ action: PermissionAction.Add, type: permissionType }">
-      <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Create</ng-container>
-    </button>
+  </div>
+  <button type="button" class="btn btn-sm btn-outline-primary" (click)="setPermissions()"
+          [disabled]="!userCanBulkEdit(PermissionAction.Change) || selectedObjects.size === 0">
+    <i-bs name="person-fill-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
+  </button>
+  <button type="button" class="btn btn-sm btn-outline-danger" (click)="delete()"
+          [disabled]="!userCanBulkEdit(PermissionAction.Delete) || selectedObjects.size === 0">
+    <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+  </button>
+  <button type="button" class="btn btn-sm btn-outline-danger" (click)="update()"
+          [disabled]="!userCanBulkEdit(PermissionAction.Change) || selectedObjects.size > 0"
+          [hidden]="getFolderSelect()==0">
+    <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Paste</ng-container>
+  </button>
+  <button type="button" class="btn btn-sm btn-outline-danger" (click)="cancelFolder()" [hidden]="getFolderSelect()==0">
+    <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Cancel</ng-container>
+  </button>
+  <button type="button" class="btn btn-sm btn-outline-primary ms-md-5" (click)="openCreateDialog()"
+          *pngxIfPermissions="{ action: PermissionAction.Add, type: permissionType }">
+    <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Create</ng-container>
+  </button>
 
 </pngx-page-header>
 <div class="form-inline d-flex align-items-center">
   <a class="me" (click)="goToFolderRoot()">
     <i-bs class="" name="folder-fill" width="2rem"
-    height="2rem" ></i-bs>
+          height="2rem"></i-bs>
   </a>
 
-  <div *ngFor="let folder of folderPath; let i = index" class="fs-5" style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center;">
+  <div *ngFor="let folder of folderPath; let i = index" class="fs-5"
+       style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center;">
     <ng-container *ngIf="i >= folderPath.length - 3 || i < 3">
       <i-bs class="" name="chevron-right"></i-bs>&nbsp;<a class="me custom-cursor" (click)="goToFolder(folder)">
-        {{ folder.name }}
-      </a>
+      {{ folder.name }}
+    </a>
     </ng-container>
-    <ng-container *ngIf="i === 2&&folderPath.length>i+1 " >
+    <ng-container *ngIf="i === 2&&folderPath.length>i+1 ">
       <i-bs class="" name="chevron-right"></i-bs>&nbsp;<a class="me custom-cursor" (click)="goToFolder(folder)">
-        ...
-      </a>
+      ...
+    </a>
     </ng-container>
   </div>
 
 </div>
 <br>
 <div class="row">
+  <div class="col-auto col-lg-4 col-xl-3 col-sidebar">
+
+    <div class="row row-cols-1 g-4 mb-4 sticky-lg-top z-0">
+
+      <div class="col">
+        <pngx-file-tree-widget></pngx-file-tree-widget>
+      </div>
+    </div>
+  </div>
+
+
   <div class="col-12 col-lg-8 col-xl-9 mb-4">
     <div class="row mb-3">
       <div class="col-md mb-2 mb-xl-0">
         <div class="form-inline d-flex align-items-center">
           <label class="text-muted me-2 mb-0" i18n>Filter by:</label>
-          <input class="form-control form-control-sm flex-fill w-auto" type="text" autofocus [(ngModel)]="nameFilter" (keyup)="onNameFilterKeyUp($event)" placeholder="Name" i18n-placeholder>
+          <input class="form-control form-control-sm flex-fill w-auto" type="text" autofocus [(ngModel)]="nameFilter"
+                 (keyup)="onNameFilterKeyUp($event)" placeholder="Name" i18n-placeholder>
         </div>
       </div>
 
-      <ngb-pagination class="col-auto" [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page" [maxSize]="5" (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
+      <ngb-pagination class="col-auto" [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page" [maxSize]="5"
+                      (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
     </div>
-    @if (displayMode === 'details'){
+    @if (displayMode === 'details') {
 
       <!-- <div class="card border mb-3"> -->
-        <table class="table table-sm align-middle border shadow-sm">
-          <thead>
+      <table class="table table-sm align-middle border shadow-sm">
+        <thead>
+        <tr>
+          <th scope="col">
+            <div class="form-check m-0 ms-2 me-n2">
+              <input type="checkbox" class="form-check-input" id="all-objects" [(ngModel)]="togggleAll"
+                     [disabled]="data.length === 0" (click)="toggleAll($event); $event.stopPropagation();">
+              <label class="form-check-label" for="all-objects"></label>
+            </div>
+          </th>
+          <th scope="col" class="w-40" pngxSortable="name" [currentSortField]="sortField"
+              [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name
+          </th>
+          <!-- <th scope="col" class="fw-normal d-none d-sm-table-cell" pngxSortable="matching_algorithm" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Matching</th> -->
+          <th scope="col" class="d-xl-table-cell" pngxSortable="document_count" [currentSortField]="sortField"
+              [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Document count
+          </th>
+          @for (column of extraColumns; track column) {
+            <th scope="col" class="d-xl-table-cell" pngxSortable="{{column.key}}" [currentSortField]="sortField"
+                [currentSortReverse]="sortReverse" (sort)="onSort($event)">{{ column.name }}
+            </th>
+          }
+          <th scope="col" class="d-xl-table-cell" i18n>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+          @if (isLoading) {
             <tr>
-              <th scope="col" >
-                <div class="form-check m-0 ms-2 me-n2">
-                  <input type="checkbox" class="form-check-input" id="all-objects" [(ngModel)]="togggleAll" [disabled]="data.length === 0" (click)="toggleAll($event); $event.stopPropagation();">
-                  <label class="form-check-label" for="all-objects"></label>
-                </div>
-              </th>
-              <th scope="col" class="w-40" pngxSortable="name" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name</th>
-              <!-- <th scope="col" class="fw-normal d-none d-sm-table-cell" pngxSortable="matching_algorithm" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Matching</th> -->
-              <th scope="col" class="d-xl-table-cell" pngxSortable="document_count" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Document count</th>
-              @for (column of extraColumns; track column) {
-                <th scope="col" class="d-xl-table-cell" pngxSortable="{{column.key}}" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)">{{column.name}}</th>
-              }
-              <th scope="col" class="d-xl-table-cell" i18n>Actions</th>
+              <td colspan="5">
+                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                <ng-container i18n>Loading...</ng-container>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            @if (isLoading) {
-              <tr>
-                <td colspan="5">
-                  <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                  <ng-container i18n>Loading...</ng-container>
-                </td>
-              </tr>
-            }
-            @for (object of data; track object) {
-              <tr (click)="toggleSelected(object); $event.stopPropagation();">
-                <td>
-                  <div class="form-check m-0 ms-2 me-n2">
-                    <input type="checkbox" class="form-check-input" id="{{typeName}}{{object.id}}" [checked]="selectedObjects.has(object.id)" (click)="toggleSelected(object); $event.stopPropagation();">
-                    <label class="form-check-label" for="{{typeName}}{{object.id}}"></label>
-                  </div>
-                </td>
-                @if(object.type=='folder'){
-                  <td scope="row" class="d-md-table-cell"><button class="btn btn-link ms-0 ps-0 text-start" (click)="userCanEdit(object) ? goToFolder(object) : null; $event.stopPropagation()">
+          }
+          @for (object of data; track object) {
+            <tr (click)="toggleSelected(object); $event.stopPropagation();">
+              <td>
+                <div class="form-check m-0 ms-2 me-n2">
+                  <input type="checkbox" class="form-check-input" id="{{typeName}}{{object.id}}"
+                         [checked]="selectedObjects.has(object.id)"
+                         (click)="toggleSelected(object); $event.stopPropagation();">
+                  <label class="form-check-label" for="{{typeName}}{{object.id}}"></label>
+                </div>
+              </td>
+              @if (object.type == 'folder') {
+                <td scope="row" class="d-md-table-cell">
+                  <button class="btn btn-link ms-0 ps-0 text-start"
+                          (click)="userCanEdit(object) ? goToFolder(object) : null; $event.stopPropagation()">
 
-                      <i-bs class="me-1" name="folder-fill" width="2rem" height="2rem"></i-bs>
-                    </button>
-                    <span class="custom-cursor" (click)="userCanEdit(object) ? goToFolder(object) : null; $event.stopPropagation()">{{ object.name }}</span></td>
-                }@else{
-                  <td scope="row" class="d-md-table-cell">
-                    <button
-                      class="btn btn-link ms-0 ps-0 text-start"
-                      [routerLink]="userCanEdit(object) ? ['/documents', object.document_matching] : null"
-                      (click)="$event.stopPropagation()">
+                    <i-bs class="me-1" name="folder-fill" width="2rem" height="2rem"></i-bs>
+                  </button>
+                  <span class="custom-cursor"
+                        (click)="userCanEdit(object) ? goToFolder(object) : null; $event.stopPropagation()">{{ object.name }}</span>
+                </td>
+              } @else {
+                <td scope="row" class="d-md-table-cell">
+                  <button
+                    class="btn btn-link ms-0 ps-0 text-start"
+                    [routerLink]="userCanEdit(object) ? ['/documents', object.document_matching] : null"
+                    (click)="$event.stopPropagation()">
 
-                        <i-bs class="me-1 " name="file-earmark-pdf" width="2rem"
-                        height="2rem"></i-bs>
-                      </button>
-                        <span class="custom-cursor" [routerLink]="userCanEdit(object) ? ['/documents', object.document_matching] : null"
+                    <i-bs class="me-1 " name="file-earmark-pdf" width="2rem"
+                          height="2rem"></i-bs>
+                  </button>
+                  <span class="custom-cursor"
+                        [routerLink]="userCanEdit(object) ? ['/documents', object.document_matching] : null"
                         (click)="$event.stopPropagation()">   {{ object.name }}</span>
 
-                      </td>
-                  }
-                <!-- <td scope="row" class="d-none d-sm-table-cell">{{ getMatching(object) }}</td> -->
+                </td>
+              }
+              <!-- <td scope="row" class="d-none d-sm-table-cell">{{ getMatching(object) }}</td> -->
 
-                <td scope="row" class="d-md-table-cell">
-                  @if (object.type == "folder") {
-                    {{ object.document_count }}
-                  } @else {
-                    <!-- {{ object.document_count }} -->
+              <td scope="row" class="d-md-table-cell">
+                @if (object.type == "folder") {
+                  {{ object.document_count }}
+                } @else {
+                  <!-- {{ object.document_count }} -->
 
-                  }
-                  </td>
-                @for (column of extraColumns; track column) {
-                  <td scope="row" class="d-md-table-cell">
-                    @if (column.rendersHtml) {
-                      <div [innerHtml]="column.valueFn.call(null, object) | safeHtml"></div>
-                    } @else {
-                      {{ column.valueFn.call(null, object) }}
-                    }
-                  </td>
                 }
+              </td>
+              @for (column of extraColumns; track column) {
                 <td scope="row" class="d-md-table-cell">
-                  <div class="btn-group d-block d-sm-none">
-                    <div ngbDropdown class="d-inline-block">
-                      <button type="button" class="btn btn-link" id="actionsMenuMobile" (click)="$event.stopPropagation()" ngbDropdownToggle>
-                        <i-bs name="three-dots-vertical"></i-bs>
+                  @if (column.rendersHtml) {
+                    <div [innerHtml]="column.valueFn.call(null, object) | safeHtml"></div>
+                  } @else {
+                    {{ column.valueFn.call(null, object) }}
+                  }
+                </td>
+              }
+              <td scope="row" class="d-md-table-cell">
+                <div class="btn-group d-block d-sm-none">
+                  <div ngbDropdown class="d-inline-block">
+                    <button type="button" class="btn btn-link" id="actionsMenuMobile" (click)="$event.stopPropagation()"
+                            ngbDropdownToggle>
+                      <i-bs name="three-dots-vertical"></i-bs>
+                    </button>
+                    <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">
+                      <button (click)="filterDocuments(object)"
+                              *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }"
+                              ngbDropdownItem i18n>Filter Documents
                       </button>
-                      <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">
-                        <button (click)="filterDocuments(object)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }" ngbDropdownItem i18n>Filter Documents</button>
-                        <button (click)="openEditDialog(object)" *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }" ngbDropdownItem i18n>Edit</button>
-                        <button class="text-danger" (click)="openDeleteDialog(object)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }" ngbDropdownItem i18n>Delete</button>
-                      </div>
+                      <button (click)="openEditDialog(object)"
+                              *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }"
+                              ngbDropdownItem i18n>Edit
+                      </button>
+                      <button class="text-danger" (click)="openDeleteDialog(object)"
+                              *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }"
+                              ngbDropdownItem i18n>Delete
+                      </button>
                     </div>
                   </div>
-                  <div class="btn-group d-none d-sm-block">
-                    <button class="btn btn-sm btn-outline-secondary" (click)="filterDocuments(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
-                      <i-bs width="1em" height="1em" name="filter"></i-bs>&nbsp;<ng-container i18n>Documents</ng-container>
-                    </button>
-                    <button class="btn btn-sm btn-outline-secondary" (click)="openEditDialog(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }" [disabled]="!userCanEdit(object)">
-                      <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" (click)="openDeleteDialog(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }" [disabled]="!userCanDelete(object)">
-                      <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
+                </div>
+                <div class="btn-group d-none d-sm-block">
+                  <button class="btn btn-sm btn-outline-secondary"
+                          (click)="filterDocuments(object); $event.stopPropagation();"
+                          *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+                    <i-bs width="1em" height="1em" name="filter"></i-bs>&nbsp;<ng-container i18n>Documents
+                  </ng-container>
+                  </button>
+                  <button class="btn btn-sm btn-outline-secondary"
+                          (click)="openEditDialog(object); $event.stopPropagation();"
+                          *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }"
+                          [disabled]="!userCanEdit(object)">
+                    <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger"
+                          (click)="openDeleteDialog(object); $event.stopPropagation();"
+                          *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }"
+                          [disabled]="!userCanDelete(object)">
+                    <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
     }
     <!-- </div> -->
     @if (displayMode === 'smallCards') {
       <div class="row row-cols-paperless-cards">
         @for (f of data; track f) {
 
-          <pngx-folder-card-small class="p-0"  (toggleSelected)="toggleSelected(f)" [selected]="isSelected(f)" [selectedObjects]="selectedObjects" [typeName]="typeName" [folder]="f" (goToFolder)="goToFolder(f)" (filterDocuments)="filterDocuments(f)" (openEditDialog)="openEditDialog(f)" (openDeleteDialog)="openDeleteDialog(f)" (userCanEdit)="userCanEdit(f)" (userCanDelete)="userCanDelete(f)"></pngx-folder-card-small>
+          <pngx-folder-card-small class="p-0" (toggleSelected)="toggleSelected(f)" [selected]="isSelected(f)"
+                                  [selectedObjects]="selectedObjects" [typeName]="typeName" [folder]="f"
+                                  (goToFolder)="goToFolder(f)" (filterDocuments)="filterDocuments(f)"
+                                  (openEditDialog)="openEditDialog(f)" (openDeleteDialog)="openDeleteDialog(f)"
+                                  (userCanEdit)="userCanEdit(f)"
+                                  (userCanDelete)="userCanDelete(f)"></pngx-folder-card-small>
         }
       </div>
 
@@ -217,15 +279,17 @@
       <div class="d-flex mb-2">
         @if (collectionSize > 0) {
           <div>
-            <ng-container i18n>{collectionSize, plural, =1 {One {{typeName}}} other {{{collectionSize || 0}} total {{typeNamePlural}}}}</ng-container>
+            <ng-container
+              i18n>{collectionSize, plural, =1 {One {{ typeName }}} other {{{ collectionSize || 0 }} total {{ typeNamePlural }}}}</ng-container>
             @if (selectedObjects.size > 0) {
               <!-- &nbsp;({{selectedObjects.size}} selected) -->
-              <ng-container i18n>&nbsp;({{selectedObjects.size}} selected)</ng-container>
+              <ng-container i18n>&nbsp;({{ selectedObjects.size }} selected)</ng-container>
             }
           </div>
         }
         @if (collectionSize > 20) {
-          <ngb-pagination class="ms-auto" [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page" [maxSize]="5" (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
+          <ngb-pagination class="ms-auto" [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page"
+                          [maxSize]="5" (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
         }
       </div>
     }
@@ -233,15 +297,7 @@
   </div>
 
 
-    <div class="col-auto col-lg-4 col-xl-3 col-sidebar">
 
-      <div class="row row-cols-1 g-4 mb-4 sticky-lg-top z-0">
-
-        <div class="col">
-          <pngx-upload-file-widget></pngx-upload-file-widget>
-        </div>
-      </div>
-    </div>
 
 </div>
 

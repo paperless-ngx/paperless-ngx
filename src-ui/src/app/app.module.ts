@@ -51,6 +51,7 @@ import { SavedViewWidgetComponent } from './components/dashboard/widgets/saved-v
 import { StatisticsWidgetComponent } from './components/dashboard/widgets/statistics-widget/statistics-widget.component'
 import { UploadFileWidgetComponent } from './components/dashboard/widgets/upload-file-widget/upload-file-widget.component'
 import { WidgetFrameComponent } from './components/dashboard/widgets/widget-frame/widget-frame.component'
+import { FileTreeWidgetComponent } from './components/dashboard/widgets/folder-tree-widget/file-tree-widget.component'
 import { WelcomeWidgetComponent } from './components/dashboard/widgets/welcome-widget/welcome-widget.component'
 import { YesNoPipe } from './pipes/yes-no.pipe'
 import { FileSizePipe } from './pipes/file-size.pipe'
@@ -163,6 +164,7 @@ import {
   checkCircleFill,
   checkLg,
   chevronRight,
+  chevronDown,
   chevronDoubleLeft,
   chevronDoubleRight,
   clipboard,
@@ -259,6 +261,7 @@ const icons = {
   checkCircleFill,
   checkLg,
   chevronRight,
+  chevronDown,
   chevronDoubleLeft,
   chevronDoubleRight,
   clipboard,
@@ -364,6 +367,7 @@ import { DossierCustomFieldFormEditDialogComponent } from './components/common/e
 import { CustomFieldSelectComponent } from './components/common/custom-field-select/custom-field-select.component'
 import { DossierCustomFieldSelectComponent } from './components/common/custom-field-select/dossier-custom-field-select/dossier-custom-field-select.component'
 import { DossierFormCustomFieldSelectComponent } from './components/common/custom-field-select/dossier-form-custom-field-select/dossier-form-custom-field-select.component'
+import { NodeFileWidgetComponent } from './components/dashboard/widgets/folder-node-widget/node-tree-widget.component'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -465,6 +469,8 @@ function initializeApp(settings: SettingsService) {
     StatisticsWidgetComponent,
     UploadFileWidgetComponent,
     WidgetFrameComponent,
+    FileTreeWidgetComponent,
+    NodeFileWidgetComponent,
     WelcomeWidgetComponent,
     YesNoPipe,
     FileSizePipe,

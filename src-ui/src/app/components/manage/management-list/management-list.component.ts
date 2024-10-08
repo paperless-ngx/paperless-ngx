@@ -349,12 +349,5 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
         })
     })
   }
-  // getShareUrl(link: ShareLink): string {
-  //   const apiURL = new URL(environment.apiBaseUrl)
-  //   return `${apiURL.origin}${apiURL.pathname.replace(/\/api\/$/, '/share/')}${link.slug
-  //     }`
-  // }
-  // share(link: ShareLink) {
-  //   navigator.share({ url: this.getShareUrl(link) })
-  // }
+
 }

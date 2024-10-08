@@ -1,0 +1,151 @@
+<pngx-widget-frame title="Folder Tree" [loading]="loading" i18n-title>
+  <ng-container content>
+    <!--    <table>-->
+    <!--      <tr>-->
+    <!--        <td class="custom-width-content">Dòng 1</td>-->
+    <!--      </tr>-->
+    <!--      <tr>-->
+    <!--        <td class="custom-width-content">Dòng 2.1-->
+    <!--          <table>-->
+    <!--            <tr>-->
+    <!--              <td class="custom-space"></td>-->
+    <!--              <td class="custom-width-content">Dòng 2.1</td>-->
+    <!--            </tr>s-->
+    <!--            <tr>-->
+    <!--              <td class="custom-space"></td>-->
+    <!--              <td class="custom-width-content">Dòng 2.3</td>-->
+    <!--            </tr>-->
+    <!--            <tr>-->
+    <!--              <td class="custom-space"></td>-->
+    <!--              <td class="custom-width-content">Dòng 2.5</td>-->
+    <!--            </tr>-->
+    <!--          </table>-->
+    <!--        </td>-->
+    <!--      </tr>-->
+    <!--      <tr>-->
+    <!--        <td class="custom-width-content">Dòng 1</td>-->
+    <!--      </tr>-->
+    <!--    </table>-->
+
+    <section class="custom-scroll">
+      <table class="">
+        <!--      <thead>-->
+        <!--      <tr>-->
+        <!--        <th scope="col">-->
+        <!--          <div class="form-check m-0 ms-2 me-n2">-->
+        <!--            <input type="checkbox" class="form-check-input" id="all-objects" [(ngModel)]="togggleAll"-->
+        <!--                   [disabled]="data.length === 0" (click)="toggleAll($event); $event.stopPropagation();">-->
+        <!--            <label class="form-check-label" for="all-objects"></label>-->
+        <!--          </div>-->
+        <!--        </th>-->
+        <!--        &lt;!&ndash; <th scope="col" class="fw-normal d-none d-sm-table-cell" pngxSortable="matching_algorithm" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Matching</th> &ndash;&gt;-->
+        <!--&lt;!&ndash;        <th scope="col" class="d-xl-table-cell" i18n>Actions</th>&ndash;&gt;-->
+        <!--      </tr>-->
+        <!--      </thead>-->
+        <tbody>
+          @if (isLoading) {
+            <tr>
+              <td colspan="5">
+                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                <ng-container i18n>Loading...</ng-container>
+              </td>
+            </tr>
+          }
+          @for (object of data; track object) {
+            <tr>
+              <!--            <td>-->
+              <!--              <div class="form-check m-0 ms-2 me-n2">-->
+              <!--                <input type="checkbox" class="form-check-input" id="{{object.id}}">-->
+              <!--                <label class="form-check-label" for="{{object.id}}"></label>-->
+              <!--              </div>-->
+              <!--            </td>-->
+              @if (object.type == 'folder') {
+                <td scope="row" class="d-md-table-cell custom-width-content">
+                  <span class="text-primary"
+                        (click)="goToFolder(object,$event); $event.stopPropagation()">
+
+                    <i-bs class="me-1" name="chevronRight" width="1rem" height="1rem"></i-bs>
+                    <i-bs class="me-1" name="folder-fill" width="1.2rem" height="1.2rem"></i-bs>
+                    {{ object.name }}
+                  </span>
+<!--                  <span class=""-->
+<!--                        (click)="goToFolder(object, $event); $event.stopPropagation()">{{ object.name }}</span>-->
+                </td>
+              } @else {
+                <td scope="row" class="d-md-table-cell custom-width-content">
+                  <span
+                    class="text-primary"
+                    [routerLink]="['/documents', object.document_matching]"
+                    (click)="$event.stopPropagation()">
+
+                    <i-bs class="me-1 " name="file-earmark-pdf" width="1.2rem"
+                          height="1.2rem"></i-bs>
+                    {{ object.name }}
+                  </span>
+
+                </td>
+              }
+              <!-- <td scope="row" class="d-none d-sm-table-cell">{{ getMatching(object) }}</td> -->
+
+              <!--            @for (column of extraColumns; track column) {-->
+              <!--              <td scope="row" class="d-md-table-cell">-->
+              <!--                @if (column.rendersHtml) {-->
+              <!--                  <div [innerHtml]="column.valueFn.call(null, object) | safeHtml"></div>-->
+              <!--                } @else {-->
+              <!--                  {{ column.valueFn.call(null, object) }}-->
+              <!--                }-->
+              <!--              </td>-->
+              <!--            }-->
+              <!--            <td scope="row" class="d-md-table-cell">-->
+              <!--                              <div class="btn-group d-block d-sm-none">-->
+              <!--                                <div ngbDropdown class="d-inline-block">-->
+              <!--                                  <button type="button" class="btn btn-link" id="actionsMenuMobile" (click)="$event.stopPropagation()"-->
+              <!--                                          ngbDropdownToggle>-->
+              <!--                                    <i-bs name="three-dots-vertical"></i-bs>-->
+              <!--                                  </button>-->
+              <!--                                  <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">-->
+              <!--                                    <button (click)="filterDocuments(object)"-->
+              <!--                                            *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }"-->
+              <!--                                            ngbDropdownItem i18n>Filter Documents-->
+              <!--                                    </button>-->
+              <!--                                    <button (click)="openEditDialog(object)"-->
+              <!--                                            *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }"-->
+              <!--                                            ngbDropdownItem i18n>Edit-->
+              <!--                                    </button>-->
+              <!--                                    <button class="text-danger" (click)="openDeleteDialog(object)"-->
+              <!--                                            *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }"-->
+              <!--                                            ngbDropdownItem i18n>Delete-->
+              <!--                                    </button>-->
+              <!--                                  </div>-->
+              <!--                                </div>-->
+              <!--                              </div>-->
+              <!--                              <div class="btn-group d-none d-sm-block">-->
+              <!--                                <button class="btn btn-sm btn-outline-secondary"-->
+              <!--                                        (click)="filterDocuments(object); $event.stopPropagation();"-->
+              <!--                                        *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">-->
+              <!--                                  <i-bs width="1em" height="1em" name="filter"></i-bs>&nbsp;<ng-container i18n>Documents-->
+              <!--                                </ng-container>-->
+              <!--                                </button>-->
+              <!--                                <button class="btn btn-sm btn-outline-secondary"-->
+              <!--                                        (click)="openEditDialog(object); $event.stopPropagation();"-->
+              <!--                                        *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }"-->
+              <!--                                        [disabled]="!userCanEdit(object)">-->
+              <!--                                  <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>-->
+              <!--                                </button>-->
+              <!--                                <button class="btn btn-sm btn-outline-danger"-->
+              <!--                                        (click)="openDeleteDialog(object); $event.stopPropagation();"-->
+              <!--                                        *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }"-->
+              <!--                                        [disabled]="!userCanDelete(object)">-->
+              <!--                                  <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>-->
+              <!--                                </button>-->
+              <!--                              </div>-->
+              <!--            </td>-->
+            </tr>
+          }
+        </tbody>
+      </table>
+
+    </section>
+  </ng-container>
+
+</pngx-widget-frame>

@@ -18,7 +18,10 @@ export class FolderService extends AbstractNameFilterService<Folder> {
   getFolderDocument(id: number): Observable<FolderDocument> {
     return this.http.get<FolderDocument>(this.getResourceUrl(id, 'folders_documents_by_id'))
   }
-  
+  // getFolderById(id: number): Observable<Folder> {
+  //   return this.http.get<Folder>(this.getResourceUrl(id, 'folders_by_id'))
+  // }
+
   getFolderDocumentById(id: number): Observable<FolderDocument> {
     return this.http.get<FolderDocument>(this.getResourceUrl(id, 'folders_documents_by_id'))
   }
@@ -34,5 +37,5 @@ export class FolderService extends AbstractNameFilterService<Folder> {
       { responseType: 'blob' }
     )
   }
-  
+
 }

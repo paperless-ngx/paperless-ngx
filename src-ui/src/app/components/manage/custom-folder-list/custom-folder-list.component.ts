@@ -440,9 +440,9 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
   cancelFolder() {
     this.reloadData()
 
-    if (this.router.url.includes('/subfolders/')) {
+    if (this.router.url.includes('/folders/')) {
       this.id = this.route.snapshot.params['id'];
-      this.router.navigate(['/subfolders/', this.id], {
+      this.router.navigate(['/folders/', this.id], {
         queryParams: {}
       });
     }
@@ -489,8 +489,8 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
             this.toastService.showInfo($localize`Objects update successfully`)
             this.reloadData()
 
-            if (this.router.url.includes('/subfolders/')) {
-              this.router.navigate(['/subfolders/', this.id], {
+            if (this.router.url.includes('/folders/')) {
+              this.router.navigate(['/folders/', this.id], {
                 queryParams: {}
               });
             }
