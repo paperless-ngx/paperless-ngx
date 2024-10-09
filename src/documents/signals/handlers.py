@@ -535,6 +535,13 @@ def run_workflows(
     logging_group=None,
     overrides: DocumentMetadataOverrides | None = None,
 ) -> tuple[DocumentMetadataOverrides, str] | None:
+    """Run workflows which match a Document (or ConsumableDocument) for a specific trigger type.
+
+    Assignment or removal actions are either applied directly to the document or an overrides object. If an overrides
+    object is provided, the function returns the object with the applied changes and a string of messages for each action.
+    If no overrides object is provided, the changes are applied directly to the document and the function returns None.
+    """
+
     def assignment_action():
         if action.assign_tags.exists():
             if not use_overrides:
