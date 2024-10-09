@@ -39,7 +39,7 @@ from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import set_permissions_for_object
-from documents.templating.filepath import parse_doc_title_w_placeholders
+from documents.templating.title import parse_doc_title_w_placeholders
 
 logger = logging.getLogger("paperless.handlers")
 
