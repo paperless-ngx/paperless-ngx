@@ -600,16 +600,12 @@ def run_workflows(
         ):
             permissions = {
                 "view": {
-                    "users": action.assign_view_users.values_list("id", flat=True)
-                    or [],
-                    "groups": action.assign_view_groups.values_list("id", flat=True)
-                    or [],
+                    "users": action.assign_view_users.values_list("id", flat=True),
+                    "groups": action.assign_view_groups.values_list("id", flat=True),
                 },
                 "change": {
-                    "users": action.assign_change_users.values_list("id", flat=True)
-                    or [],
-                    "groups": action.assign_change_groups.values_list("id", flat=True)
-                    or [],
+                    "users": action.assign_change_users.values_list("id", flat=True),
+                    "groups": action.assign_change_groups.values_list("id", flat=True),
                 },
             }
             if not use_overrides:
@@ -758,11 +754,11 @@ def run_workflows(
             overrides.owner_id = None
 
         if action.remove_all_permissions:
-            permissions = {
-                "view": {"users": [], "groups": []},
-                "change": {"users": [], "groups": []},
-            }
             if not use_overrides:
+                permissions = {
+                    "view": {"users": [], "groups": []},
+                    "change": {"users": [], "groups": []},
+                }
                 set_permissions_for_object(
                     permissions=permissions,
                     object=document,
@@ -859,10 +855,9 @@ def run_workflows(
             # Otherwise, this instance might be behind and overwrite the work another process did
             document.refresh_from_db()
             doc_tag_ids = list(document.tags.values_list("pk", flat=True))
-        else:
-            doc_tag_ids = overrides.tag_ids or []
 
         if matching.document_matches_workflow(document, workflow, trigger_type):
+            action: WorkflowAction
             for action in workflow.actions.all():
                 message = f"Applying {action} from {workflow}"
                 if not use_overrides:
