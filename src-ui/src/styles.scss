@@ -21,7 +21,8 @@ $form-file-button-hover-bg: var(--pngx-bg-alt);
 
 // Paperless-ngx styles
 body {
-  font-size: 0.875rem;
+  --pngx-body-font-size: 0.875rem;
+  font-size: var(--pngx-body-font-size);
   height: 100vh;
 }
 
@@ -651,6 +652,10 @@ code {
 
 .accordion-button::after {
   filter: invert(0.5) saturate(0);
+}
+
+.accordion-button {
+  font-size: var(--pngx-body-font-size);
 }
 
 .me-1px {
