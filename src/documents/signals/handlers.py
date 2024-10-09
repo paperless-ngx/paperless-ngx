@@ -538,8 +538,9 @@ def run_workflows(
     """Run workflows which match a Document (or ConsumableDocument) for a specific trigger type.
 
     Assignment or removal actions are either applied directly to the document or an overrides object. If an overrides
-    object is provided, the function returns the object with the applied changes and a string of messages for each action.
-    If no overrides object is provided, the changes are applied directly to the document and the function returns None.
+    object is provided, the function returns the object with the applied changes or None if no actions were applied and a string
+    of messages for each action. If no overrides object is provided, the changes are applied directly to the document and the
+    function returns None.
     """
 
     def assignment_action():
