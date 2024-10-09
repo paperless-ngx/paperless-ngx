@@ -659,10 +659,30 @@ def run_workflows(
                     merge=True,
                 )
             else:
-                overrides.view_users = list(permissions["view"]["users"])
-                overrides.view_groups = list(permissions["view"]["groups"])
-                overrides.change_users = list(permissions["change"]["users"])
-                overrides.change_groups = list(permissions["change"]["groups"])
+                overrides.view_users = list(
+                    set(
+                        (overrides.view_users or [])
+                        + list(permissions["view"]["users"]),
+                    ),
+                )
+                overrides.view_groups = list(
+                    set(
+                        (overrides.view_groups or [])
+                        + list(permissions["view"]["groups"]),
+                    ),
+                )
+                overrides.change_users = list(
+                    set(
+                        (overrides.change_users or [])
+                        + list(permissions["change"]["users"]),
+                    ),
+                )
+                overrides.change_groups = list(
+                    set(
+                        (overrides.change_groups or [])
+                        + list(permissions["change"]["groups"]),
+                    ),
+                )
 
         if action.assign_custom_fields is not None:
             if not use_overrides:
@@ -927,8 +947,8 @@ def run_workflows(
                 # save first before setting tags
                 document.save()
                 document.tags.set(doc_tag_ids)
-        if use_overrides:
-            return overrides, "\n".join(messages)
+    if use_overrides:
+        return overrides, "\n".join(messages)
 
 
 @before_task_publish.connect
