@@ -306,11 +306,11 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
     def test_workflow_match_multiple(self):
         """
         GIVEN:
-            - Multiple existing workflow
+            - Multiple existing workflows
         WHEN:
             - File that matches is consumed
         THEN:
-            - Template overrides are applied with subsequent templates overwriting previous values
+            - Workflow overrides are applied with subsequent workflows overwriting previous values
             or merging if multiple
         """
         trigger1 = WorkflowTrigger.objects.create(
@@ -373,12 +373,12 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
                     None,
                 )
                 document = Document.objects.first()
-                # template 1
+                # workflow 1
                 self.assertEqual(document.document_type, self.dt)
-                # template 2
+                # workflow 2
                 self.assertEqual(document.correspondent, self.c2)
                 self.assertEqual(document.storage_path, self.sp)
-                # template 1 & 2
+                # workflow 1 & 2
                 self.assertEqual(
                     list(document.tags.all()),
                     [self.t1, self.t2, self.t3],
