@@ -608,23 +608,13 @@ def run_workflows(
             else:
                 overrides.title = action.assign_title
 
-        if (
-            (
-                action.assign_view_users is not None
-                and action.assign_view_users.count() > 0
-            )
-            or (
-                action.assign_view_groups is not None
-                and action.assign_view_groups.count() > 0
-            )
-            or (
-                action.assign_change_users is not None
-                and action.assign_change_users.count() > 0
-            )
-            or (
-                action.assign_change_groups is not None
-                and action.assign_change_groups.count() > 0
-            )
+        if any(
+            [
+                action.assign_view_users.exists(),
+                action.assign_view_groups.exists(),
+                action.assign_change_users.exists(),
+                action.assign_change_groups.exists(),
+            ],
         ):
             permissions = {
                 "view": {
