@@ -711,12 +711,14 @@ def run_workflows(
             )
         ):
             document.correspondent = None
-        elif (
-            use_overrides
-            and overrides.correspondent_id is not None
-            and action.remove_correspondents.filter(
-                pk=overrides.correspondent_id,
-            ).exists()
+        elif use_overrides and (
+            action.remove_all_correspondents
+            or (
+                overrides.correspondent_id is not None
+                and action.remove_correspondents.filter(
+                    pk=overrides.correspondent_id,
+                ).exists()
+            )
         ):
             overrides.correspondent_id = None
 
@@ -733,12 +735,14 @@ def run_workflows(
             )
         ):
             document.document_type = None
-        elif (
-            use_overrides
-            and overrides.document_type_id is not None
-            and action.remove_document_types.filter(
-                pk=overrides.document_type_id,
-            ).exists()
+        elif use_overrides and (
+            action.remove_all_document_types
+            or (
+                overrides.document_type_id is not None
+                and action.remove_document_types.filter(
+                    pk=overrides.document_type_id,
+                ).exists()
+            )
         ):
             overrides.document_type_id = None
 
@@ -755,12 +759,14 @@ def run_workflows(
             )
         ):
             document.storage_path = None
-        elif (
-            use_overrides
-            and overrides.storage_path_id is not None
-            and action.remove_storage_paths.filter(
-                pk=overrides.storage_path_id,
-            ).exists()
+        elif use_overrides and (
+            action.remove_all_storage_paths
+            or (
+                overrides.storage_path_id is not None
+                and action.remove_storage_paths.filter(
+                    pk=overrides.storage_path_id,
+                ).exists()
+            )
         ):
             overrides.storage_path_id = None
 
@@ -773,12 +779,14 @@ def run_workflows(
             )
         ):
             document.owner = None
-        elif (
-            use_overrides
-            and overrides.owner_id is not None
-            and action.remove_owners.filter(
-                pk=overrides.owner_id,
-            ).exists()
+        elif use_overrides and (
+            action.remove_all_owners
+            or (
+                overrides.owner_id is not None
+                and action.remove_owners.filter(
+                    pk=overrides.owner_id,
+                ).exists()
+            )
         ):
             overrides.owner_id = None
 
