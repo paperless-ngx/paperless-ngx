@@ -306,6 +306,35 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         # only called once
         bulk_update_mock.assert_called_once_with([document.pk])
 
+    def test_test_storage_path(self):
+        """
+        GIVEN:
+            - API request to test a storage path
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP response
+            - Correct response data
+        """
+        document = Document.objects.create(
+            mime_type="application/pdf",
+            storage_path=self.sp1,
+            title="Something",
+            checksum="123",
+        )
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "document": document.id,
+                    "path": "path/{{ title }}",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, "path/Something")
+
 
 class TestBulkEditObjects(APITestCase):
     # See test_api_permissions.py for bulk tests on permissions

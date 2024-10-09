@@ -237,7 +237,6 @@ def get_custom_fields_context(
         )
         # String types need to be sanitized
         if field_instance.field.data_type in {
-            CustomField.FieldDataType.DOCUMENTLINK,
             CustomField.FieldDataType.MONETARY,
             CustomField.FieldDataType.STRING,
             CustomField.FieldDataType.URL,
