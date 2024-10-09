@@ -146,7 +146,28 @@ main {
     position: sticky;
   }
 }
+.sidebar:hover::-webkit-scrollbar {
+  width: 5px; /* Remove scrollbar space */
+  height: 5px;
+  background: transparent; /* Optional: just make scrollbar invisible */
+}
 
+.sidebar:hover::-webkit-scrollbar-thumb {
+  background: var(--bs-primary);
+  border-radius: 5px;
+
+}
+.sidebar::-webkit-scrollbar {
+  width: 5px; /* Remove scrollbar space */
+  height: 5px;
+  background: transparent; /* Optional: just make scrollbar invisible */
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  //background: var(--bs-primary);
+  border-radius: 5px;
+
+}
 .sidebar .nav-link {
   font-weight: 500;
   white-space: nowrap;
