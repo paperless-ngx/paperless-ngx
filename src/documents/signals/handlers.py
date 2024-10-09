@@ -534,7 +534,7 @@ def run_workflows(
     document: Document | ConsumableDocument,
     logging_group=None,
     overrides: DocumentMetadataOverrides | None = None,
-):
+) -> tuple[DocumentMetadataOverrides, str] | None:
     def assignment_action():
         if action.assign_tags.all().count() > 0:
             if not use_overrides:
@@ -597,10 +597,14 @@ def run_workflows(
                         timezone.localtime(document.created),
                     )
                 except Exception:
-                    logger.exception(
-                        f"Error occurred parsing title assignment '{action.assign_title}', falling back to original",
-                        extra={"group": logging_group},
-                    )
+                    message = f"Error occurred parsing title assignment '{action.assign_title}', falling back to original"
+                    if not use_overrides:
+                        logger.exception(
+                            message,
+                            extra={"group": logging_group},
+                        )
+                    else:
+                        messages.append(message)
             else:
                 overrides.title = action.assign_title
 
@@ -867,6 +871,7 @@ def run_workflows(
                     overrides.custom_field_ids.remove(field.pk)
 
     use_overrides = overrides is not None
+    messages = []
 
     for workflow in (
         Workflow.objects.filter(
@@ -903,10 +908,14 @@ def run_workflows(
         ):
             action: WorkflowAction
             for action in workflow.actions.all():
-                logger.info(
-                    f"Applying {action} from {workflow}",
-                    extra={"group": logging_group},
-                )
+                message = f"Applying {action} from {workflow}"
+                if not use_overrides:
+                    logger.info(
+                        message,
+                        extra={"group": logging_group},
+                    )
+                else:
+                    messages.append(message)
 
                 if action.type == WorkflowAction.WorkflowActionType.ASSIGNMENT:
                     assignment_action()
@@ -918,8 +927,8 @@ def run_workflows(
                 # save first before setting tags
                 document.save()
                 document.tags.set(doc_tag_ids)
-            else:
-                return overrides
+        if use_overrides:
+            return overrides, "\n".join(messages)
 
 
 @before_task_publish.connect

@@ -59,10 +59,9 @@ class WorkflowTriggerPlugin(
 
     def run(self) -> str | None:
         """
-        Get overrides from matching workflows
+        Run matching workflows
         """
-        msg = ""
-        overrides = run_workflows(
+        overrides, msg = run_workflows(
             WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
             self.input_doc,
             "paperless_consumer",
