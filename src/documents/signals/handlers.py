@@ -661,7 +661,12 @@ def run_workflows(
                         )
             else:
                 overrides.custom_field_ids = list(
-                    action.assign_custom_fields.values_list("pk", flat=True),
+                    set(
+                        (overrides.custom_field_ids or [])
+                        + list(
+                            action.assign_custom_fields.values_list("pk", flat=True),
+                        ),
+                    ),
                 )
 
     def removal_action():
