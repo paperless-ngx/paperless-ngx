@@ -722,7 +722,6 @@ def run_workflows(
                 ):
                     overrides.tag_ids.remove(tag.pk)
 
-        # correspondent
         if not use_overrides and (
             action.remove_all_correspondents
             or (
@@ -746,7 +745,6 @@ def run_workflows(
         ):
             overrides.correspondent_id = None
 
-        # document type
         if not use_overrides and (
             action.remove_all_document_types
             or (
@@ -770,7 +768,6 @@ def run_workflows(
         ):
             overrides.document_type_id = None
 
-        # storage path
         if not use_overrides and (
             action.remove_all_storage_paths
             or (
@@ -794,7 +791,6 @@ def run_workflows(
         ):
             overrides.storage_path_id = None
 
-        # owner
         if not use_overrides and (
             action.remove_all_owners
             or (
