@@ -1,8 +1,8 @@
 import hashlib
 import itertools
 import logging
-import os
 import tempfile
+from pathlib import Path
 
 from celery import chain
 from celery import chord
@@ -270,10 +270,12 @@ def merge(
         logger.warning("No documents were merged")
         return "OK"
 
-    filepath = os.path.join(
-        tempfile.mkdtemp(dir=settings.SCRATCH_DIR),
-        f"{'_'.join([str(doc_id) for doc_id in doc_ids])[:100]}_merged.pdf",
-    )
+    filepath = (
+        Path(
+            tempfile.mkdtemp(dir=settings.SCRATCH_DIR),
+        )
+        / f"{'_'.join([str(doc_id) for doc_id in doc_ids])[:100]}_merged.pdf"
+    ).as_posix()
     merged_pdf.remove_unreferenced_resources()
     merged_pdf.save(filepath, min_version=version)
     merged_pdf.close()
@@ -330,10 +332,12 @@ def split(
                 dst = pikepdf.new()
                 for page in split_doc:
                     dst.pages.append(pdf.pages[page - 1])
-                filepath = os.path.join(
-                    tempfile.mkdtemp(dir=settings.SCRATCH_DIR),
-                    f"{doc.id}_{split_doc[0]}-{split_doc[-1]}.pdf",
-                )
+                filepath = (
+                    Path(
+                        tempfile.mkdtemp(dir=settings.SCRATCH_DIR),
+                    )
+                    / f"{doc.id}_{split_doc[0]}-{split_doc[-1]}.pdf"
+                ).as_posix()
                 dst.remove_unreferenced_resources()
                 dst.save(filepath)
                 dst.close()
