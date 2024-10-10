@@ -162,6 +162,7 @@ from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+from paperless_mail.oauth import PaperlessMailOAuth2Manager
 from paperless_mail.serialisers import MailAccountSerializer
 from paperless_mail.serialisers import MailRuleSerializer
 
@@ -1604,6 +1605,15 @@ class UiSettingsView(GenericAPIView):
             ui_settings["app_logo"] = general_config.app_logo
 
         ui_settings["auditlog_enabled"] = settings.AUDIT_LOG_ENABLED
+
+        if settings.GMAIL_OAUTH_ENABLED or settings.OUTLOOK_OAUTH_ENABLED:
+            manager = PaperlessMailOAuth2Manager()
+            if settings.GMAIL_OAUTH_ENABLED:
+                ui_settings["gmail_oauth_url"] = manager.get_gmail_authorization_url()
+            if settings.OUTLOOK_OAUTH_ENABLED:
+                ui_settings["outlook_oauth_url"] = (
+                    manager.get_outlook_authorization_url()
+                )
 
         user_resp = {
             "id": user.id,

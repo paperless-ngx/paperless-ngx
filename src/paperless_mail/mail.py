@@ -18,6 +18,7 @@ from celery import shared_task
 from celery.canvas import Signature
 from django.conf import settings
 from django.db import DatabaseError
+from django.utils import timezone
 from django.utils.timezone import is_naive
 from django.utils.timezone import make_aware
 from imap_tools import AND
@@ -42,6 +43,7 @@ from documents.tasks import consume_file
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
+from paperless_mail.oauth import PaperlessMailOAuth2Manager
 from paperless_mail.preprocessor import MailMessageDecryptor
 from paperless_mail.preprocessor import MailMessagePreprocessor
 
@@ -530,6 +532,17 @@ class MailAccountHandler(LoggingMixin):
                 account.imap_port,
                 account.imap_security,
             ) as M:
+                if (
+                    account.is_token
+                    and account.expiration is not None
+                    and account.expiration < timezone.now()
+                ):
+                    manager = PaperlessMailOAuth2Manager()
+                    if manager.refresh_account_oauth_token(account):
+                        account.refresh_from_db()
+                    else:
+                        return total_processed_files
+
                 supports_gmail_labels = "X-GM-EXT-1" in M.client.capabilities
                 supports_auth_plain = "AUTH=PLAIN" in M.client.capabilities
 
