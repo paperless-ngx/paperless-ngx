@@ -4,7 +4,7 @@
 	{
 		"label": "manage.py document_consumer",
 		"type": "shell",
-		"command": "pipenv run python manage.py document_consumer",
+		"command": "uv run python manage.py document_consumer",
 		"group": "build",
 		"presentation": {
 			"echo": true,
@@ -23,7 +23,7 @@
 		{
 			"label": "manage.py runserver",
 			"type": "shell",
-			"command": "pipenv run python manage.py runserver",
+			"command": "uv run python manage.py runserver",
 			"group": "build",
 			"presentation": {
 				"echo": true,
@@ -42,7 +42,7 @@
 	  {
 		"label": "Maintenance: manage.py migrate",
 		"type": "shell",
-		"command": "pipenv run python manage.py migrate",
+		"command": "uv run python manage.py migrate",
 		"group": "none",
 		"presentation": {
 			"echo": true,
@@ -60,7 +60,7 @@
 	  {
 		"label": "Maintenance: manage.py createsuperuser",
 		"type": "shell",
-		"command": "pipenv run python manage.py createsuperuser",
+		"command": "uv run python manage.py createsuperuser",
 		"group": "none",
 		"presentation": {
 			"echo": true,
@@ -96,7 +96,7 @@
 	  {
 		"label": "Maintenance: recreate .venv",
 		"type": "shell",
-		"command": "rm -R -v .venv/* || pipenv install --dev",
+		"command": "uv sync --reinstall --dev",
 		"group": "none",
 		"presentation": {
 			"echo": true,
@@ -114,7 +114,7 @@
 	  {
 		"label": "Celery Worker",
 		"type": "shell",
-		"command": "pipenv run celery --app paperless worker -l DEBUG",
+		"command": "uv run celery --app paperless worker -l DEBUG",
 		"group": {
 		  "kind": "build",
 		  "isDefault": true

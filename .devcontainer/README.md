@@ -36,7 +36,7 @@ The setup includes debugging configurations (`launch.json`) and tasks (`tasks.js
 - **Maintenance Tasks:**
   - Create superuser
   - Run migrations
-  - Recreate virtual environment (`.venv` with pipenv)
+  - Recreate virtual environment (`.venv` with `uv`)
   - Compile frontend assets
 
 ## Getting Started
@@ -108,7 +108,7 @@ You can start and debug backend services either as debugging sessions via `launc
 
 Additional tasks are available for common maintenance operations:
 
-- **Recreate .venv**: For setting up the virtual environment using pipenv.
+- **Recreate .venv**: For setting up the virtual environment using `uv`.
 - **Migrate Database**: To apply database migrations.
 - **Create Superuser**: To create an admin user for the application.
 
