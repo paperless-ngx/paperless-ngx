@@ -127,7 +127,6 @@ extends CustomFolderListComponent<Folder> {
 
   }
   isSidebarVisible: boolean = false; // Biến để theo dõi trạng thái của sidebar
-
   toggleSidebar() {
     this.isSidebarVisible = !this.isSidebarVisible; // Đảo ngược trạng thái khi nhấn nút
   }

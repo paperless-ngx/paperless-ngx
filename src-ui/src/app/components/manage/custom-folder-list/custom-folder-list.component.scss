@@ -29,7 +29,7 @@ $paperless-card-breakpoints: (
       flex: 0 0 auto;
       width: calc(100% / 2);
     }
-  
+
     @each $width, $n_cols in $paperless-card-breakpoints {
       @media(min-width: $width) {
         > * {
@@ -41,4 +41,9 @@ $paperless-card-breakpoints: (
   }
 .custom-cursor {
   cursor: pointer;
+}
+
+.rotate {
+    transition: transform 0.3s ease; /* Hiệu ứng chuyển tiếp cho xoay */
+    transform: rotate(180deg); /* Xoay 180 độ */
 }

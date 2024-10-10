@@ -79,24 +79,24 @@
 <!--    <pngx-file-tree-widget (goToFolder)="goToFolder($event)"></pngx-file-tree-widget>-->
 <!--  </div>-->
 <!--</div>-->
-<div>
-  <div class="fixed-top mt-5 p-1 d-lg-none"> <!-- Chỉ hiển thị trên màn hình nhỏ -->
-    <pngx-file-tree-widget (goToFolder)="goToFolder($event)"
-                           [ngClass]="{'collapse': !isSidebarVisible}"></pngx-file-tree-widget>
-  </div>
-  <div class="fixed-bottom d-lg-none"> <!-- Chỉ hiển thị trên màn hình nhỏ -->
-    <button (click)="toggleSidebar()" class="toggle-button">
-      <i-bs class="me-1" name="chevronUp" width="0.8rem" height="0.8rem"></i-bs>
-    </button>
-  </div>
+<div class="fixed-bottom pb-5 d-lg-none"> <!-- Chỉ hiển thị trên màn hình nhỏ -->
+  <button (click)="toggleSidebar()" type="button" class="btn btn-light d-lg-none fixed-bottom"
+        style="border-color:var(--bs-primary); border-style: solid;">
+  <i-bs class="me-1" name="chevronUp" width="1rem" height="1rem"></i-bs>
+</button>
+  <pngx-file-tree-widget (goToFolder)="goToFolder($event)"
+                         [ngClass]="{'collapse': !isSidebarVisible}"></pngx-file-tree-widget>
 </div>
-
+<button (click)="toggleSidebar()" type="button" class="btn btn-light d-lg-none fixed-bottom"
+        style="border-color:var(--bs-primary); border-style: solid;">
+  <i-bs class="me-1" name="chevronUp" width="1rem" height="1rem"></i-bs>
+</button>
 <div class="row row-cols-1 g-4 mb-4 sticky-lg-top z-0">
   <div class="col-md-4">
-  <div class="d-none d-lg-block mt-5 p-1"> <!-- Chỉ hiển thị trên màn hình lớn -->
-    <pngx-file-tree-widget (goToFolder)="goToFolder($event)"></pngx-file-tree-widget>
+    <div class="d-none d-lg-block p-1"> <!-- Chỉ hiển thị trên màn hình lớn -->
+      <pngx-file-tree-widget (goToFolder)="goToFolder($event)"></pngx-file-tree-widget>
+    </div>
   </div>
-</div>
   <div class="col-md-8 ">
 
     <div class="form-inline d-flex align-items-center">
@@ -290,7 +290,7 @@
     }
 
     @if (!isLoading) {
-      <div class="d-flex mb-2">
+      <div class="d-flex mb-4">
         @if (collectionSize > 0) {
           <div>
             <ng-container

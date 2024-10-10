@@ -290,7 +290,7 @@ export class DocumentDetailComponent
       //   .listAll()
       //   .pipe(first(), takeUntil(this.unsubscribeNotifier))
       //   .subscribe((result) => (this.warehouses = result.results))
-      
+
       this.warehouseService.clearCache()
       this.warehouseService
         .listAll(null, null, { type__iexact: 'Warehouse' })
@@ -326,7 +326,7 @@ export class DocumentDetailComponent
       //   .pipe(first(), takeUntil(this.unsubscribeNotifier))
       //   .subscribe((result) => {this.boxcases = result.results;        console.log('gia tri Shelf',this.boxcases)
       //   })
-   
+
     }
     if (
       this.permissionsService.currentUserCan(
@@ -882,7 +882,7 @@ export class DocumentDetailComponent
         })
     })
   }
-  
+
   redoOcr() {
     let modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
@@ -1041,7 +1041,7 @@ export class DocumentDetailComponent
     this.openDocumentService.refreshDocument(this.documentId)
   }
   approvalsUpdated(approvals: DocumentApproval[]) {
-    this.document.approvals = approvals 
+    this.document.approvals = approvals
     this.openDocumentService.refreshDocument(this.documentId)
   }
 
@@ -1101,7 +1101,7 @@ export class DocumentDetailComponent
           rule_type: FILTER_CORRESPONDENT,
           value: (i as Correspondent).id.toString(),
         }
-      
+
       } else if (i.hasOwnProperty('path')&&i.hasOwnProperty('type')) {
         // Warehouse
         return {
@@ -1269,7 +1269,7 @@ export class DocumentDetailComponent
   }
 
   modelChangeWarehouse(event){
-    
+
     this.warehouseService.clearCache()
     this.warehouseService.list(1,null,null,true,{type__iexact:"Shelf",parent_warehouse:event})
       .pipe(first(), takeUntil(this.unsubscribeNotifier))
@@ -1281,7 +1281,7 @@ export class DocumentDetailComponent
       })
       this.shelfs=[]
       this.boxcases=[]
-    
+
     }
   modelChangeShelf(event){
       // this.documentForm.get("warehouse").setValue(null)
@@ -1295,6 +1295,6 @@ export class DocumentDetailComponent
       })
       this.boxcases=[]
 
-    
+
   }
 }

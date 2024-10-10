@@ -73,36 +73,38 @@ td {
 .custom-scroll {
   //max-height: 500px;
   height: 70vh;
-  overflow: auto;
+  overflow: hidden;
 }
-
+.custom-scroll:hover {
+  overflow: auto; /* Hiện thanh cuộn khi hover */
+}
 .rotate-90 {
   transform: rotate(90deg);
   transition: transform 0.3s ease; /* Thêm hiệu ứng chuyển động nếu cần */
 }
 
-.custom-scroll:hover::-webkit-scrollbar {
-  width: 5px; /* Remove scrollbar space */
-  height: 5px;
-  background: transparent; /* Optional: just make scrollbar invisible */
-}
-
-.custom-scroll:hover::-webkit-scrollbar-thumb {
-  background: var(--bs-primary);
-  border-radius: 5px;
-
-}
-.custom-scroll::-webkit-scrollbar {
-  width: 5px; /* Remove scrollbar space */
-  height: 5px;
-  background: transparent; /* Optional: just make scrollbar invisible */
-}
-
-.custom-scroll::-webkit-scrollbar-thumb {
-  //background: var(--bs-primary);
-  border-radius: 5px;
-
-}
+//.custom-scroll:hover::-webkit-scrollbar {
+//  width: 5px; /* Remove scrollbar space */
+//  height: 5px;
+//  background: transparent; /* Optional: just make scrollbar invisible */
+//}
+//
+//.custom-scroll:hover::-webkit-scrollbar-thumb {
+//  //background: var(--bs-primary);
+//  border-radius: 5px;
+//
+//}
+//.custom-scroll::-webkit-scrollbar {
+//  width: 5px; /* Remove scrollbar space */
+//  height: 5px;
+//  background: transparent; /* Optional: just make scrollbar invisible */
+//}
+//
+//.custom-scroll::-webkit-scrollbar-thumb {
+//  //background: var(--bs-primary);
+//  border-radius: 5px;
+//
+//}
 @media (max-width: 768px) {
   .custom-scroll {
   //max-height: 500px;
