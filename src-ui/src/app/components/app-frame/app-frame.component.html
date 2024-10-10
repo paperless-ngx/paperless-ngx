@@ -96,7 +96,7 @@
               <i-bs class="me-1" name="house"></i-bs><span>&nbsp;<ng-container i18n>Dashboard</ng-container></span>
             </a>
           </li>
-          
+
           <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
             <a class="nav-link" routerLink="documents" routerLinkActive="active" (click)="closeMenu()"
               ngbPopover="Documents" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
@@ -105,7 +105,7 @@
             </a>
           </li>
           <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Folder}">
-            <a class="nav-link" routerLink="folders" routerLinkActive="active" (click)="closeMenu()"
+            <a class="nav-link" routerLink="folders/root" routerLinkActive="active" (click)="closeMenu()"
               ngbPopover="Folder" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
               container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <i-bs class="me-1" name="folder"></i-bs><span>&nbsp;<ng-container i18n>Folder</ng-container></span>
@@ -236,7 +236,7 @@
                     <i-bs class="me-1" name="ui-radios"></i-bs><span>&nbsp;<ng-container i18n>Custom Fields</ng-container></span>
                   </a>
                 </li>
-            
+
             <li class="nav-item app-link"
               *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Workflow }"
               tourAnchor="tour.workflows">

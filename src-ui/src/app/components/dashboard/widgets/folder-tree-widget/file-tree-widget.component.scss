@@ -45,37 +45,67 @@
 //}
 
 table {
-    width: max-content;
-    //border-collapse: collapse;
+  width: max-content;
+  //border-collapse: collapse;
 
 }
 
 th,
 td {
-    border: 1px solid black;
+  border: 1px solid black;
 }
 
 .custom-space {
-    //border-top: none;
-    //border-right: none;
-    //border-bottom: none;
-    //width: 2%;
+  //border-top: none;
+  //border-right: none;
+  //border-bottom: none;
+  //width: 2%;
 }
 
 .custom-width-content {
-    //width: 80%;
-    border-top: none;
-    border-right: none;
-    border-bottom: none;
-    border-left: none;
+  //width: 80%;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+  border-left: none;
 }
 
 .custom-scroll {
-  max-height: 500px;
+  //max-height: 500px;
+  height: 70vh;
   overflow: auto;
 }
 
 .rotate-90 {
   transform: rotate(90deg);
   transition: transform 0.3s ease; /* Thêm hiệu ứng chuyển động nếu cần */
+}
+
+.custom-scroll:hover::-webkit-scrollbar {
+  width: 5px; /* Remove scrollbar space */
+  height: 5px;
+  background: transparent; /* Optional: just make scrollbar invisible */
+}
+
+.custom-scroll:hover::-webkit-scrollbar-thumb {
+  background: var(--bs-primary);
+  border-radius: 5px;
+
+}
+.custom-scroll::-webkit-scrollbar {
+  width: 5px; /* Remove scrollbar space */
+  height: 5px;
+  background: transparent; /* Optional: just make scrollbar invisible */
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  //background: var(--bs-primary);
+  border-radius: 5px;
+
+}
+@media (max-width: 768px) {
+  .custom-scroll {
+  //max-height: 500px;
+
+}
 }

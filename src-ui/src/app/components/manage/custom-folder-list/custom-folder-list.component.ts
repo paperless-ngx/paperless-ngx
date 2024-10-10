@@ -99,12 +99,12 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
 
   public selectedObjects: Set<number> = new Set()
   public togggleAll: boolean = false
-  public shareLinks: ShareLink[]
   public folderPath: Folder[] = []
   public documentService: DocumentService
-  public ColorTheme : ColorTheme
   public folderCut: number[] = []
   public isFolderCutClicked = false;
+  public preFolder: number = null;
+
 
   ngOnInit(): void {
     if (localStorage.getItem('folder-list:displayMode') != null) {
@@ -184,6 +184,8 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
   }
 
   reloadData() {
+    if (this.id!=this.preFolder)
+      this.page=1
     this.selectedObjects.clear()
     let listFolderPath
     if (this.id){
@@ -193,8 +195,6 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
           // console.log(listFolderPath)
           this.folderPath = listFolderPath.results
         },)
-
-
     }
     // console.log(this.folderPath)
     this.isLoading = true
@@ -214,6 +214,7 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
         this.collectionSize = c.count
         this.isLoading = false
       })
+    this.preFolder=this.id
   }
 
 
@@ -458,7 +459,7 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
     this.route.queryParams.subscribe(params => {
       folderIds = params['folderIds'];
     });
-    console.log("gia tri folder",folderIds)
+
     const parts = folderIds.split(',');
     this.folderCut = parts.map(part => parseInt(part, 10));
     return this.folderCut

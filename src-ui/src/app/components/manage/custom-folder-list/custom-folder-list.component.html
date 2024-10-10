@@ -16,7 +16,7 @@
 
 
   <button class="btn btn-sm btn-outline-secondary" (click)="cutFolder()"
-          [disabled]="selectedObjects.size === 0 || isFolderCutClicked == true">
+          [disabled]="selectedObjects.size === 0 || isFolderCutClicked === true">
     <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Cut</ng-container>
   </button>
 
@@ -59,10 +59,10 @@
   </button>
   <button type="button" class="btn btn-sm btn-outline-danger" (click)="update()"
           [disabled]="!userCanBulkEdit(PermissionAction.Change) || selectedObjects.size > 0"
-          [hidden]="getFolderSelect()==0">
+          [hidden]="getFolderSelect()===0">
     <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Paste</ng-container>
   </button>
-  <button type="button" class="btn btn-sm btn-outline-danger" (click)="cancelFolder()" [hidden]="getFolderSelect()==0">
+  <button type="button" class="btn btn-sm btn-outline-danger" (click)="cancelFolder()" [hidden]="getFolderSelect()===0">
     <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Cancel</ng-container>
   </button>
   <button type="button" class="btn btn-sm btn-outline-primary ms-md-5" (click)="openCreateDialog()"
@@ -71,41 +71,55 @@
   </button>
 
 </pngx-page-header>
-<div class="form-inline d-flex align-items-center">
-  <a class="me" (click)="goToFolderRoot()">
-    <i-bs class="" name="folder-fill" width="2rem"
-          height="2rem"></i-bs>
-  </a>
 
-  <div *ngFor="let folder of folderPath; let i = index" class="fs-5"
-       style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center;">
-    <ng-container *ngIf="i >= folderPath.length - 3 || i < 3">
-      <i-bs class="" name="chevron-right"></i-bs>&nbsp;<a class="me custom-cursor" (click)="goToFolder(folder)">
-      {{ folder.name }}
-    </a>
-    </ng-container>
-    <ng-container *ngIf="i === 2&&folderPath.length>i+1 ">
-      <i-bs class="" name="chevron-right"></i-bs>&nbsp;<a class="me custom-cursor" (click)="goToFolder(folder)">
-      ...
-    </a>
-    </ng-container>
-  </div>
 
-</div>
 <br>
-<div class="row">
-  <div class="col-auto col-lg-4 col-xl-3 col-sidebar">
-
-    <div class="row row-cols-1 g-4 mb-4 sticky-lg-top z-0">
-
-      <div class="col">
-        <pngx-file-tree-widget></pngx-file-tree-widget>
-      </div>
-    </div>
+<!--<div class="row">-->
+<!--  <div class="col col-lg-4 col-xl-3 col-sidebar">-->
+<!--    <pngx-file-tree-widget (goToFolder)="goToFolder($event)"></pngx-file-tree-widget>-->
+<!--  </div>-->
+<!--</div>-->
+<div>
+  <div class="fixed-top mt-5 p-1 d-lg-none"> <!-- Chỉ hiển thị trên màn hình nhỏ -->
+    <pngx-file-tree-widget (goToFolder)="goToFolder($event)"
+                           [ngClass]="{'collapse': !isSidebarVisible}"></pngx-file-tree-widget>
   </div>
+  <div class="fixed-bottom d-lg-none"> <!-- Chỉ hiển thị trên màn hình nhỏ -->
+    <button (click)="toggleSidebar()" class="toggle-button">
+      <i-bs class="me-1" name="chevronUp" width="0.8rem" height="0.8rem"></i-bs>
+    </button>
+  </div>
+</div>
 
+<div class="row row-cols-1 g-4 mb-4 sticky-lg-top z-0">
+  <div class="col-md-4">
+  <div class="d-none d-lg-block mt-5 p-1"> <!-- Chỉ hiển thị trên màn hình lớn -->
+    <pngx-file-tree-widget (goToFolder)="goToFolder($event)"></pngx-file-tree-widget>
+  </div>
+</div>
+  <div class="col-md-8 ">
 
-  <div class="col-12 col-lg-8 col-xl-9 mb-4">
+    <div class="form-inline d-flex align-items-center">
+      <a class="me" (click)="goToFolderRoot(); ">
+        <i-bs class="" name="folder-fill" width="2rem"
+              height="2rem"></i-bs>
+      </a>
+
+      <div *ngFor="let folder of folderPath; let i = index" class="fs-5"
+           style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center;">
+        <ng-container *ngIf="i >= folderPath.length - 3 || i < 3">
+          <i-bs class="" name="chevron-right"></i-bs>&nbsp;<a class="me custom-cursor" (click)="goToFolder(folder)">
+          {{ folder.name }}
+        </a>
+        </ng-container>
+        <ng-container *ngIf="i === 2&&folderPath.length>i+1 ">
+          <i-bs class="" name="chevron-right"></i-bs>&nbsp;<a class="me custom-cursor" (click)="goToFolder(folder)">
+          ...
+        </a>
+        </ng-container>
+      </div>
+
+    </div>
     <div class="row mb-3">
       <div class="col-md mb-2 mb-xl-0">
         <div class="form-inline d-flex align-items-center">
@@ -119,7 +133,6 @@
                       (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
     </div>
     @if (displayMode === 'details') {
-
       <!-- <div class="card border mb-3"> -->
       <table class="table table-sm align-middle border shadow-sm">
         <thead>
@@ -213,7 +226,8 @@
               <td scope="row" class="d-md-table-cell">
                 <div class="btn-group d-block d-sm-none">
                   <div ngbDropdown class="d-inline-block">
-                    <button type="button" class="btn btn-link" id="actionsMenuMobile" (click)="$event.stopPropagation()"
+                    <button type="button" class="btn btn-link" id="actionsMenuMobile"
+                            (click)="$event.stopPropagation()"
                             ngbDropdownToggle>
                       <i-bs name="three-dots-vertical"></i-bs>
                     </button>
@@ -289,7 +303,8 @@
         }
         @if (collectionSize > 20) {
           <ngb-pagination class="ms-auto" [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page"
-                          [maxSize]="5" (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
+                          [maxSize]="5" (pageChange)="reloadData()" size="sm"
+                          aria-label="Pagination"></ngb-pagination>
         }
       </div>
     }
@@ -297,9 +312,7 @@
   </div>
 
 
-
-
+  <!--  </div>-->
 </div>
-
 
 

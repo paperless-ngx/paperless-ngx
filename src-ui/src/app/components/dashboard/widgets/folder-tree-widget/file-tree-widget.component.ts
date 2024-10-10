@@ -1,7 +1,7 @@
 import {
-  Component,
+  Component, EventEmitter,
   OnDestroy,
-  OnInit,
+  OnInit, Output,
   Renderer2,
   ViewChild,
   ViewContainerRef,
@@ -42,11 +42,13 @@ export class FileTreeWidgetComponent extends ComponentWithPermissions
     super()
   }
 
-  data = []
-  dataMap = {}
+  @Output() goToFolder = new EventEmitter<any>()
+  data = [];
+  totalFolder = 0;
+  pageNumber: number = 1
   subscription: Subscription
 
-  goToFolder(object: Folder, event) {
+  getFolderList(object: Folder, event) {
 
     this.folderService.listFolderFiltered(
       1,
@@ -61,10 +63,9 @@ export class FileTreeWidgetComponent extends ComponentWithPermissions
       const tdElement = spanElement.closest('td')
       const svgElement = spanElement?.querySelector('svg')
       const tableElement = tdElement?.querySelector('table')
-      if (svgElement.style.transform!='') {
+      if (svgElement.style.transform != '') {
         this.renderer.removeStyle(svgElement, 'transform')
-      }
-      else {
+      } else {
         this.renderer.setStyle(svgElement, 'transform', 'rotate(90deg)')
         this.renderer.setStyle(svgElement, 'transition', 'transform 0.3s ease')
       }
@@ -77,6 +78,11 @@ export class FileTreeWidgetComponent extends ComponentWithPermissions
         const tdElement = (event.target as HTMLElement).closest('td')
         const node = this.viewContainer.createComponent(NodeFileWidgetComponent)
         node.instance.data = c.results
+        node.instance.folderId = object.id
+        node.instance.totalFolder = c.count
+        node.instance.goToFolder.subscribe((object) => {
+          this.goToFolder.emit(object)
+        })
         const componentElement = node.location.nativeElement
         this.renderer.appendChild(tdElement, componentElement)
         return
@@ -88,23 +94,28 @@ export class FileTreeWidgetComponent extends ComponentWithPermissions
 
   content: string | null = null
 
+
   updateContent(content: string): void {
     this.content = content
   }
 
   ngOnDestroy(): void {
     // this.subscription.unsubscribe()
+    return
   }
 
   ngOnInit(): void {
     this.reload()
 
   }
-
+  viewMore() {
+    this.pageNumber=this.pageNumber+1
+    this.reload()
+  }
   private reload() {
 
     this.folderService.listFolderFiltered(
-      1,
+      this.pageNumber,
       null,
       null,
       true,
@@ -112,12 +123,19 @@ export class FileTreeWidgetComponent extends ComponentWithPermissions
       null,
       true,
     ).subscribe((c) => {
-      console.log(c)
+      if (this.pageNumber > 1) {
+        this.data=this.data.concat(c.results)
+        this.isLoading = false
+        this.loading = false
+        return
+      }
       this.data = c.results
+      this.totalFolder = c.count
       this.isLoading = false
       this.loading = false
+      return
     })
-
-
   }
+
+
 }

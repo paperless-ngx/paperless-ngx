@@ -59,7 +59,8 @@ extends CustomFolderListComponent<Folder> {
 
 
   reloadData() {
-    this.id = this.route.snapshot.params['id']
+    this.id = this.route.snapshot.params['id'] !== 'root' ? this.route.snapshot.params['id'] :  null;
+
     super.reloadData()
   }
 
@@ -71,7 +72,6 @@ extends CustomFolderListComponent<Folder> {
   goToFolder(object: Folder) {
     let folderId = this.route.snapshot.queryParams['folderIds'];
     let getQueryParams: { folderIds?: string };
-
     if (this.isFolderCutClicked) {
       getQueryParams = {
         folderIds: Array.from(this.folderCut).join(',')
@@ -85,11 +85,18 @@ extends CustomFolderListComponent<Folder> {
     }
 
     this.id = object?.id
+
     this.router.navigate(['/folders/', object.id],
       {
         queryParams: getQueryParams
       }
     );
+    // this.preFolder
+    //
+    // console.log('folder cũ ',this.preFolder)
+    // this.preFolder = object.id
+    // console.log('folder mới',this.preFolder)
+
     super.reloadData()
 
   }
@@ -109,13 +116,20 @@ extends CustomFolderListComponent<Folder> {
     } else {
       getQueryParams = {};
     }
-
-    this.router.navigate(['/folders/',], {
+    this.id = null;
+    this.folderPath = [];
+    this.page = 1
+    this.router.navigate(['/folders/root',], {
       queryParams: getQueryParams
     });
 
     super.reloadData()
 
+  }
+  isSidebarVisible: boolean = false; // Biến để theo dõi trạng thái của sidebar
+
+  toggleSidebar() {
+    this.isSidebarVisible = !this.isSidebarVisible; // Đảo ngược trạng thái khi nhấn nút
   }
 
   getDeleteMessage(object: Folder) {

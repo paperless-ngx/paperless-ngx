@@ -1,46 +1,55 @@
 <ng-container content>
 
-    <table class="">
+  <table class="">
 
-      <tbody>
-        @if (isLoading) {
-          <tr>
-            <td colspan="5">
-              <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-              <ng-container i18n>Loading...</ng-container>
-            </td>
-          </tr>
-        }
-        @for (object of data; track object) {
-          <tr>
-            <td class="custom-space"></td>
-            @if (object.type == 'folder') {
-              <td scope="row" class="d-md-table-cell custom-width-content">
-
-                 <span class="text-primary"
-                        (click)="goToFolder(object,$event); $event.stopPropagation()">
-
-                    <i-bs class="me-1" name="chevronRight" width="1rem" height="1rem"></i-bs>
-                    <i-bs class="me-1" name="folder-fill" width="1.2rem" height="1.2rem"></i-bs>
-                    {{ object.name }}
+    <tbody>
+      @if (isLoading) {
+        <tr>
+          <td colspan="5">
+            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+            <ng-container i18n>Loading...</ng-container>
+          </td>
+        </tr>
+      }
+      @for (object of data; track object) {
+        <tr>
+          <td class="custom-space"></td>
+          @if (object.type == 'folder') {
+            <td scope="row" class="d-md-table-cell custom-width-content">
+                 <span class="text-primary">
+                    <i-bs class="me-1" (click)="getFolderList(object,$event);" name="chevronRight" width="1rem"
+                          height="1rem"></i-bs>
+                    <i-bs class="me-1" (click)="this.goToFolder.emit(object); $event.stopPropagation()"
+                          name="folder-fill" width="1.2rem" height="1.2rem"></i-bs>
+                   {{ object.name }}
                   </span>
-              </td>
-            } @else {
-              <td scope="row" class="d-md-table-cell custom-width-content">
+            </td>
+          } @else {
+            <td scope="row" class="d-md-table-cell custom-width-content">
                <span
-                    class="text-primary"
-                    [routerLink]="['/documents', object.document_matching]"
-                    (click)="$event.stopPropagation()">
+                 class="text-primary"
+                 [routerLink]="['/documents', object.document_matching]"
+                 (click)="$event.stopPropagation()">
 
                     <i-bs class="me-1 " name="file-earmark-pdf" width="1.2rem"
                           height="1.2rem"></i-bs>
-                    {{ object.name }}
+                 {{ object.name }}
                   </span>
-              </td>
-            }
+            </td>
+          }
 
-          </tr>
-        }
-      </tbody>
-    </table>
-  </ng-container>
+        </tr>
+      }
+      @if (data.length < totalFolder) {
+        <tr>
+          <td class="custom-space"></td>
+          <td scope="row" class="d-md-table-cell custom-width-content">
+                   <span class="text-primary" (click)="viewMore()">
+                     More...
+                    </span>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</ng-container>

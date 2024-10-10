@@ -127,17 +127,17 @@ export const routes: Routes = [
           },
         },
       },
-      {
-        path: 'folders',
-        component: FoldersComponent,
-        canActivate: [PermissionsGuard],
-        data: {
-          requiredPermission: {
-            action: PermissionAction.View,
-            type: PermissionType.Folder,
-          },
-        },
-      },
+      // {
+      //   path: 'folders/',
+      //   component: FoldersComponent,
+      //   canActivate: [PermissionsGuard],
+      //   data: {
+      //     requiredPermission: {
+      //       action: PermissionAction.View,
+      //       type: PermissionType.Folder,
+      //     },
+      //   },
+      // },
       {
         path: 'folders/:id',
         component: FoldersComponent,
