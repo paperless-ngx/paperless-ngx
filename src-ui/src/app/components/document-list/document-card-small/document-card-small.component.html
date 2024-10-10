@@ -35,7 +35,8 @@
     <div class="card-body bg-light p-2">
       <p class="card-text">
         @if (displayFields.includes(DisplayField.CORRESPONDENT) && document.correspondent) {
-          <a title="Toggle correspondent filter" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="fw-bold btn-link">{{(document.correspondent$ | async)?.name ?? privateName}}</a>:
+          <a title="Toggle correspondent filter" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="fw-bold btn-link">{{(document.correspondent$ | async)?.name ?? privateName}}</a>
+          @if (displayFields.includes(DisplayField.TITLE)) {:}
         }
         @if (displayFields.includes(DisplayField.TITLE)) {
           {{document.title | documentTitle}}
