@@ -21,7 +21,7 @@
               } @else {
                 {{(document.correspondent$ | async)?.name}}
               }
-              :
+              @if (displayFields.includes(DisplayField.TITLE)) {:}
             }
             @if (displayFields.includes(DisplayField.TITLE)) {
               {{document.title | documentTitle}}
