@@ -428,7 +428,7 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 class CorrespondentField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         return Correspondent.objects.all()
-    
+
 class TagsField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         return Tag.objects.all()
