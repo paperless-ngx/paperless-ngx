@@ -13,6 +13,16 @@
     <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editMailAccount()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailAccount }">
       <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add Account</ng-container>
     </button>
+    @if (gmailOAuthUrl) {
+      <a class="btn btn-sm btn-outline-secondary ms-2" [href]="gmailOAuthUrl" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailAccount }">
+        <i-bs name="google"></i-bs>&nbsp;<ng-container i18n>Connect Gmail Account</ng-container>
+      </a>
+    }
+    @if (outlookOAuthUrl) {
+      <a class="btn btn-sm btn-outline-secondary ms-2" [href]="outlookOAuthUrl" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.MailAccount }">
+        <i-bs name="microsoft"></i-bs>&nbsp;<ng-container i18n>Connect Outlook Account</ng-container>
+      </a>
+    }
   </h4>
   <ul class="list-group">
     <li class="list-group-item">
@@ -27,7 +37,15 @@
     @for (account of mailAccounts; track account) {
       <li class="list-group-item">
         <div class="row">
-          <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editMailAccount(account)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailAccount)">{{account.name}}</button></div>
+          <div class="col d-flex align-items-center">
+            <button class="btn btn-link p-0 text-start" type="button" (click)="editMailAccount(account)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailAccount)">
+              {{account.name}}@switch (account.account_type) {
+                @case (MailAccountType.IMAP) {<i-bs name="envelope-at-fill" class="ms-2"></i-bs>}
+                @case (MailAccountType.Gmail_OAuth) {<i-bs name="google" class="ms-2"></i-bs>}
+                @case (MailAccountType.Outlook_OAuth) {<i-bs name="microsoft" class="ms-2"></i-bs>}
+              }
+            </button>
+          </div>
           <div class="col d-flex align-items-center">{{account.imap_server}}</div>
           <div class="col d-flex align-items-center d-none d-sm-block">{{account.username}}</div>
           <div class="col">
