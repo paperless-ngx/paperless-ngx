@@ -55,6 +55,7 @@ from paperless.views import UserViewSet
 from paperless_mail.views import MailAccountTestView
 from paperless_mail.views import MailAccountViewSet
 from paperless_mail.views import MailRuleViewSet
+from paperless_mail.views import OauthCallbackView
 
 api_router = DefaultRouter()
 api_router.register(r"correspondents", CorrespondentViewSet)
@@ -170,6 +171,11 @@ urlpatterns = [
                     "^storage_paths/test/",
                     StoragePathTestView.as_view(),
                     name="storage_paths_test",
+                ),
+                re_path(
+                    r"^oauth/callback/",
+                    OauthCallbackView.as_view(),
+                    name="oauth_callback",
                 ),
                 *api_router.urls,
             ],

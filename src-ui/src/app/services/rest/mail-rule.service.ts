@@ -37,12 +37,6 @@ export class MailRuleService extends AbstractPaperlessService<MailRule> {
     return super.update(o).pipe(tap(() => this.reload()))
   }
 
-  patchMany(objects: MailRule[]): Observable<MailRule[]> {
-    return combineLatest(objects.map((o) => super.patch(o))).pipe(
-      tap(() => this.reload())
-    )
-  }
-
   delete(o: MailRule) {
     return super.delete(o).pipe(tap(() => this.reload()))
   }

@@ -112,7 +112,7 @@ process.
 Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Related-Projects) for a user-maintained list of related projects and
 software (e.g. for mobile devices) that is compatible with Paperless-ngx.
 
-### IMAP (Email) {#usage-email}
+### Email {#usage-email}
 
 You can tell paperless-ngx to consume documents from your email
 accounts. This is a very flexible and powerful feature, if you regularly
@@ -199,6 +199,14 @@ different means. These are as follows:
 
 Paperless is set up to check your mails every 10 minutes. This can be
 configured via [`PAPERLESS_EMAIL_TASK_CRON`](configuration.md#PAPERLESS_EMAIL_TASK_CRON)
+
+#### OAuth Email Setup
+
+Paperless-ngx supports OAuth2 authentication for Gmail and Outlook email accounts. To set up an email account with OAuth2, you will need to create a 'developer' app with the respective provider and obtain the client ID and client secret and set the appropriate [configuration variables](configuration.md#email_oauth). You will also need to set either [`PAPERLESS_OAUTH_CALLBACK_BASE_URL`](configuration.md#PAPERLESS_OAUTH_CALLBACK_BASE_URL) or [`PAPERLESS_URL`](configuration.md#PAPERLESS_URL) to the correct value for the OAuth2 flow to work correctly.
+
+Specific instructions for setting up the required 'developer' app with Google or Microsoft are beyond the scope of this documentation, but you can find user-maintained instructions in [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Email-OAuth-App-Setup) or by searching the web.
+
+Once setup, navigating to the email settings page in Paperless-ngx will allow you to add an email account for Gmail or Outlook using OAuth2. After authenticating, you will be presented with the newly-created account where you will need to enter and save your email address. After this, the account will work as any other email account in Paperless-ngx and refreshing tokens will be handled automatically.
 
 ### REST API
 
