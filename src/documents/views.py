@@ -140,6 +140,7 @@ from documents.serialisers import SavedViewSerializer
 from documents.serialisers import SearchResultSerializer
 from documents.serialisers import ShareLinkSerializer
 from documents.serialisers import StoragePathSerializer
+from documents.serialisers import StoragePathTestSerializer
 from documents.serialisers import TagSerializer
 from documents.serialisers import TagSerializerVersion1
 from documents.serialisers import TasksViewSerializer
@@ -151,6 +152,7 @@ from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_updated
 from documents.tasks import consume_file
 from documents.tasks import empty_trash
+from documents.templating.filepath import validate_filepath_template_and_render
 from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import GeneralConfig
@@ -1548,6 +1550,25 @@ class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             bulk_edit.bulk_update_documents.delay(doc_ids)
 
         return response
+
+
+class StoragePathTestView(GenericAPIView):
+    """
+    Test storage path against a document
+    """
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = StoragePathTestSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        document = serializer.validated_data.get("document")
+        path = serializer.validated_data.get("path")
+
+        result = validate_filepath_template_and_render(path, document)
+        return Response(result)
 
 
 class UiSettingsView(GenericAPIView):

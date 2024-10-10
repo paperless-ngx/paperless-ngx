@@ -2010,3 +2010,18 @@ class TrashSerializer(SerializerWithPerms):
                 "Some documents in the list have not yet been deleted.",
             )
         return documents
+
+
+class StoragePathTestSerializer(SerializerWithPerms):
+    path = serializers.CharField(
+        required=True,
+        label="Path",
+        write_only=True,
+    )
+
+    document = serializers.PrimaryKeyRelatedField(
+        queryset=Document.objects.all(),
+        required=True,
+        label="Document",
+        write_only=True,
+    )
