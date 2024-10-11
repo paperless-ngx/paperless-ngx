@@ -66,8 +66,6 @@ export class MailComponent
       .subscribe({
         next: (r) => {
           this.mailAccounts = r.results
-          console.log(this.mailAccounts, this.oAuthAccountId)
-
           if (this.oAuthAccountId) {
             this.editMailAccount(
               this.mailAccounts.find(

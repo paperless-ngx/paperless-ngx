@@ -117,7 +117,6 @@ export class StoragePathEditDialogComponent
     this.foundDocuments$ = concat(
       of([]), // default items
       this.documentsInput$.pipe(
-        tap(() => console.log('searching')),
         distinctUntilChanged(),
         takeUntil(this.unsubscribeNotifier),
         tap(() => (this.loading = true)),
