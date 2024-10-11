@@ -17,8 +17,8 @@
           @if (object.type == 'folder') {
             <td scope="row" class="d-md-table-cell custom-width-content">
                  <span class="text-primary">
-                    <i-bs class="me-1" (click)="getFolderList(object,$event);" name="chevronRight" width="1.5rem" height="1.5rem"></i-bs>
-                    <i-bs class="me-1" (click)="this.goToFolder.emit(object); $event.stopPropagation()" name="folder-fill" width="2rem" height="2rem"></i-bs>
+                    <i-bs class="me-1" (click)="getNode(object,$event);" name="chevronRight" width="1.5rem" height="1.5rem"></i-bs>
+                    <i-bs class="me-1" (click)="this.goToNode.emit(object); $event.stopPropagation()" name="folder-fill" width="2rem" height="2rem"></i-bs>
                    {{ object.name }}
                   </span>
             </td>
@@ -38,7 +38,7 @@
 
         </tr>
       }
-      @if (data.length < totalFolder) {
+      @if (data.length < totalElement) {
         <tr>
           <td class="custom-space"></td>
           <td scope="row" class="d-md-table-cell custom-width-content">

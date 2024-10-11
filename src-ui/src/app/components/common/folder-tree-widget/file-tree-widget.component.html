@@ -1,7 +1,7 @@
-<pngx-widget-frame title="Folder Tree" [loading]="loading" i18n-title>
-  <ng-container content>
-    <div style="position: relative">
-      <section class="custom-scroll">
+<!--<pngx-widget-frame title="Folder Tree" [loading]="loading" i18n-title>-->
+<!--  <ng-container content>-->
+<!--    <div style="position: relative">-->
+<!--      <section class="custom-scroll">-->
         <table class="">
 
           <tbody>
@@ -15,11 +15,12 @@
             }
             @for (object of data; track object) {
               <tr>
+                <td class="custom-space"></td>
                 @if (object.type == 'folder') {
                   <td scope="row" class="d-md-table-cell custom-width-content">
                  <span class="text-primary">
-                    <i-bs class="me-1" (click)="getFolderList(object,$event);" name="chevronRight" width="1.5rem" height="1.5rem"></i-bs>
-                    <i-bs class="me-1" (click)="this.goToFolder.emit(object); $event.stopPropagation()" name="folder-fill" width="2rem" height="2rem"></i-bs>
+                    <i-bs class="me-1 custom-cursor" (click)="getNode(object,$event);" name="chevronRight" width="1.5rem" height="1.5rem"></i-bs>
+                    <i-bs class="me-1 custom-cursor" (click)="this.goToNode.emit(object); $event.stopPropagation()" name="folder-fill" width="2rem" height="2rem"></i-bs>
                    {{ object.name }}
                   </span>
 
@@ -41,8 +42,9 @@
 
               </tr>
             }
-            @if (data.length < totalFolder) {
+            @if (data.length < totalElement) {
               <tr>
+                <td class="custom-space"></td>
                 <td scope="row" class="d-md-table-cell custom-width-content">
                    <span class="text-primary" (click)="viewMore()">
                      More...
@@ -53,9 +55,9 @@
           </tbody>
         </table>
 
-      </section>
+<!--      </section>-->
 
-    </div>
-  </ng-container>
+<!--    </div>-->
+<!--  </ng-container>-->
 
-</pngx-widget-frame>
+<!--</pngx-widget-frame>-->

@@ -1,0 +1,63 @@
+<!--<pngx-widget-frame title="Folder Tree" [loading]="loading" i18n-title>-->
+<!--  <ng-container content>-->
+<!--    <div style="position: relative">-->
+<!--      <section class="custom-scroll">-->
+        <table class="">
+
+          <tbody>
+            @if (isLoading) {
+              <tr>
+                <td colspan="5">
+                  <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                  <ng-container i18n>Loading...</ng-container>
+                </td>
+              </tr>
+            }
+            @for (object of data; track object) {
+              <tr>
+                <td class="custom-space"></td>
+                @if (object.type == 'folder') {
+                  <td scope="row" class="d-md-table-cell custom-width-content">
+                 <span class="text-primary">
+                    <i-bs class="me-1 custom-cursor" (click)="getNode(object,$event);" name="chevronRight" width="1.5rem" height="1.5rem"></i-bs>
+                    <i-bs class="me-1 custom-cursor" (click)="this.goToNode.emit(object); $event.stopPropagation()" name="folder-fill" width="2rem" height="2rem"></i-bs>
+                   {{ object.name }}
+                  </span>
+
+                  </td>
+                } @else {
+                  <td scope="row" class="d-md-table-cell custom-width-content">
+                  <span
+                    class="text-primary"
+                    [routerLink]="['/documents', object.document_matching]"
+                    (click)="$event.stopPropagation()">
+
+                    <i-bs class="me-1 " name="file-earmark-pdf" width="2rem"
+                          height="2rem"></i-bs>
+                    {{ object.name }}
+                  </span>
+
+                  </td>
+                }
+
+              </tr>
+            }
+            @if (data.length < totalElement) {
+              <tr>
+                <td class="custom-space"></td>
+                <td scope="row" class="d-md-table-cell custom-width-content">
+                   <span class="text-primary" (click)="viewMore()">
+                     More...
+                    </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+<!--      </section>-->
+
+<!--    </div>-->
+<!--  </ng-container>-->
+
+<!--</pngx-widget-frame>-->

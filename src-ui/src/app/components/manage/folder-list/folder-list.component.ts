@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, Renderer2 } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Subject } from 'rxjs'
 import { FolderService } from 'src/app/services/rest/folder.service'
@@ -38,7 +38,8 @@ extends CustomFolderListComponent<Folder> {
     modalService: NgbModal,
     toastService: ToastService,
     documentListViewService: DocumentListViewService,
-    permissionsService: PermissionsService
+    permissionsService: PermissionsService,
+    private renderer: Renderer2,
   ) {
     super(
       folderService,
@@ -126,8 +127,24 @@ extends CustomFolderListComponent<Folder> {
     super.reloadData()
 
   }
-  isSidebarVisible: boolean = false; // Biến để theo dõi trạng thái của sidebar
-  toggleSidebar() {
+  isSidebarVisible: boolean = true; // Biến để theo dõi trạng thái của sidebar
+  buttonLabel: string = 'Show Tree';
+  toggleSidebar(event) {
+    const btnElement = event.target as HTMLElement;
+    const svgElement = btnElement?.querySelector('svg')
+    // const spanElement = btnElement?.querySelector('span')
+    // console.log(btnElement)
+     if (svgElement.style.transform != '') {
+        this.renderer.removeStyle(svgElement, 'transform')
+        // this.renderer.setValue(btnElement,'Show tree')
+
+      } else {
+        this.renderer.setStyle(svgElement, 'transform', 'rotate(180deg)')
+        // this.renderer.setValue(btnElement,'Hidden tree')
+        this.renderer.setStyle(svgElement, 'transition', 'transform 0.3s ease')
+      }
+    // // this.renderer.setStyle(svgElement, 'transition', 'transform 0.3s ease')
+    this.buttonLabel = !this.isSidebarVisible ? 'Hide Tree ' : 'Show Tree';
     this.isSidebarVisible = !this.isSidebarVisible; // Đảo ngược trạng thái khi nhấn nút
   }
 

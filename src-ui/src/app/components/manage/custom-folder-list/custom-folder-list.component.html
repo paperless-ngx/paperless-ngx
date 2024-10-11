@@ -73,33 +73,27 @@
 </pngx-page-header>
 
 
-<br>
-<!--<div class="row">-->
-<!--  <div class="col col-lg-4 col-xl-3 col-sidebar">-->
-<!--    <pngx-file-tree-widget (goToFolder)="goToFolder($event)"></pngx-file-tree-widget>-->
-<!--  </div>-->
-<!--</div>-->
-<div class="fixed-bottom pb-5 d-lg-none"> <!-- Chỉ hiển thị trên màn hình nhỏ -->
-  <button (click)="toggleSidebar()" type="button" class="btn btn-light d-lg-none fixed-bottom"
-        style="border-color:var(--bs-primary); border-style: solid;">
-  <i-bs class="me-1" name="chevronUp" width="1rem" height="1rem"></i-bs>
-</button>
-  <pngx-file-tree-widget (goToFolder)="goToFolder($event)"
-                         [ngClass]="{'collapse': !isSidebarVisible}"></pngx-file-tree-widget>
+<div class="fixed-bottom end-0  d-lg-none " style="z-index:5">
+    <button (click)="toggleSidebar($event)" class="btn btn-sm btn-primary ms-md-5">
+      <i-bs  name="chevronUp" width="1rem" height="1rem"></i-bs> &nbsp;{{buttonLabel }}
+    </button>
+
 </div>
-<button (click)="toggleSidebar()" type="button" class="btn btn-light d-lg-none fixed-bottom"
-        style="border-color:var(--bs-primary); border-style: solid;">
-  <i-bs class="me-1" name="chevronUp" width="1rem" height="1rem"></i-bs>
-</button>
-<div class="row row-cols-1 g-4 mb-4 sticky-lg-top z-0">
-  <div class="col-md-4">
-    <div class="d-none d-lg-block p-1"> <!-- Chỉ hiển thị trên màn hình lớn -->
-      <pngx-file-tree-widget (goToFolder)="goToFolder($event)"></pngx-file-tree-widget>
-    </div>
+
+<div class="row row-cols-1 g-4 mb-4 sticky-lg-top z-0" style="position:relative">
+  <div class="col-md-4 p-1 folder-tree" [ngClass]="{'collapse': !isSidebarVisible}">
+    <pngx-widget-frame title="Folder Tree"  [loading]="isLoading" i18n-title>
+    <!-- Chỉ hiển thị trên màn hình lớn -->
+        <ng-container content>
+          <div class="folder-tree-content" >
+            <pngx-file-tree-widget (goToNode)="goToFolder($event)"></pngx-file-tree-widget>
+          </div>
+        </ng-container>
+    </pngx-widget-frame>
   </div>
   <div class="col-md-8 ">
 
-    <div class="form-inline d-flex align-items-center">
+    <div class="form-inline d-flex align-items-center overflow-auto">
       <a class="me" (click)="goToFolderRoot(); ">
         <i-bs class="" name="folder-fill" width="2rem"
               height="2rem"></i-bs>

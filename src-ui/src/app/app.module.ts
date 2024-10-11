@@ -51,7 +51,8 @@ import { SavedViewWidgetComponent } from './components/dashboard/widgets/saved-v
 import { StatisticsWidgetComponent } from './components/dashboard/widgets/statistics-widget/statistics-widget.component'
 import { UploadFileWidgetComponent } from './components/dashboard/widgets/upload-file-widget/upload-file-widget.component'
 import { WidgetFrameComponent } from './components/dashboard/widgets/widget-frame/widget-frame.component'
-import { FileTreeWidgetComponent } from './components/dashboard/widgets/folder-tree-widget/file-tree-widget.component'
+import { FileTreeWidgetComponent } from './components/common/folder-tree-widget/file-tree-widget.component'
+import { WarehouseTreeWidgetComponent } from './components/common/warehouse-tree-widget/warehouse-tree-widget.component'
 import { WelcomeWidgetComponent } from './components/dashboard/widgets/welcome-widget/welcome-widget.component'
 import { YesNoPipe } from './pipes/yes-no.pipe'
 import { FileSizePipe } from './pipes/file-size.pipe'
@@ -476,6 +477,7 @@ function initializeApp(settings: SettingsService) {
     UploadFileWidgetComponent,
     WidgetFrameComponent,
     FileTreeWidgetComponent,
+    WarehouseTreeWidgetComponent,
     NodeFileWidgetComponent,
     WelcomeWidgetComponent,
     YesNoPipe,

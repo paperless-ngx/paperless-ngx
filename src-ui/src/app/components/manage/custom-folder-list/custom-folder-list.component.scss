@@ -47,3 +47,24 @@ $paperless-card-breakpoints: (
     transition: transform 0.3s ease; /* Hiệu ứng chuyển tiếp cho xoay */
     transform: rotate(180deg); /* Xoay 180 độ */
 }
+@media (max-width: 768px) { /* Màn hình MD */
+  .folder-tree {
+    position: fixed;
+    bottom: 0;
+    left: 0; /* Cố định ở bên trái */
+    right: 0; /* Cố định ở bên phải */
+
+    z-index: 4; /* Đảm bảo nằm trên các phần tử khác */
+    margin-bottom:30px
+  }
+  .folder-tree-content {
+    height: 65vh;
+
+  }
+}
+
+.folder-tree-content {
+    overflow: auto;
+    height: 75vh;
+
+  }

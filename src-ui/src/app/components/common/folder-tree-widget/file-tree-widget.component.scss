@@ -1,0 +1,55 @@
+
+table {
+  width: max-content;
+  //border-collapse: collapse;
+
+}
+
+th,
+td {
+  border: 1px solid black;
+}
+
+
+.rotate-90 {
+  transform: rotate(90deg);
+  transition: transform 0.3s ease; /* Thêm hiệu ứng chuyển động nếu cần */
+}
+
+@media (max-width: 768px) {
+  .custom-scroll {
+  //max-height: 500px;
+
+}
+}
+
+
+//table {
+//    width: 100%;
+//    //border-collapse: collapse;
+//}
+//
+//th,
+//td {
+//    border: 1px solid black;
+//
+//}
+
+.custom-space {
+    border-top: none;
+    border-right: none;
+    border-bottom: none;
+    width: 20px;
+}
+
+.custom-width-content {
+    //width: 80%;
+    border-top: none;
+    border-right: none;
+    border-bottom: none;
+    border-left: none;
+}
+
+.custom-cursor {
+  cursor: pointer;
+}
