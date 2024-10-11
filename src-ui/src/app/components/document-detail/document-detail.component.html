@@ -350,8 +350,9 @@
 </ng-template>
 
 <ng-template #previewContent>
-  @if (!document) {
-    <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+  @if (!metadata) {
+    <img [src]="thumbUrl | safeUrl" class="thumb-preview" width="100%" height="auto" alt="Document loading..." i18n-alt />
+    <div class="position-absolute top-0 left-0 p-2 d-flex align-items-center justify-content-center">
       <div>
         <div class="spinner-border spinner-border-sm me-2" role="status"></div>
         <ng-container i18n>Loading...</ng-container>

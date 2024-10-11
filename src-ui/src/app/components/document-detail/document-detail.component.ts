@@ -132,6 +132,7 @@ export class DocumentDetailComponent
   title: string
   titleSubject: Subject<string> = new Subject()
   previewUrl: string
+  thumbUrl: string
   previewText: string
   downloadUrl: string
   downloadOriginalUrl: string
@@ -338,6 +339,7 @@ export class DocumentDetailComponent
               }`
             },
           })
+          this.thumbUrl = this.documentsService.getThumbUrl(documentId)
           return this.documentsService.get(documentId)
         })
       )
