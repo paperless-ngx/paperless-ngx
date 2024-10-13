@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-08-28 17:12-0700\n"
-"PO-Revision-Date: 2024-08-29 03:11\n"
+"PO-Revision-Date: 2024-10-05 12:10\n"
 "Last-Translator: \n"
 "Language-Team: Slovenian\n"
 "Language: sl_SI\n"
@@ -47,11 +47,11 @@ msgstr "Regularni izraz"
 
 #: documents/models.py:61 documents/models.py:975
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Zamegljena beseda"
 
 #: documents/models.py:62
 msgid "Automatic"
-msgstr ""
+msgstr "Samodejno"
 
 #: documents/models.py:65 documents/models.py:419 documents/models.py:1291
 #: paperless_mail/models.py:18 paperless_mail/models.py:107
@@ -257,59 +257,59 @@ msgstr "dnevniki"
 
 #: documents/models.py:401
 msgid "Table"
-msgstr ""
+msgstr "Tabela"
 
 #: documents/models.py:402
 msgid "Small Cards"
-msgstr ""
+msgstr "Manjše kartice"
 
 #: documents/models.py:403
 msgid "Large Cards"
-msgstr ""
+msgstr "Večje kartice"
 
 #: documents/models.py:406
 msgid "Title"
-msgstr ""
+msgstr "Naslov"
 
 #: documents/models.py:407
 msgid "Created"
-msgstr ""
+msgstr "Ustvarjeno"
 
 #: documents/models.py:408
 msgid "Added"
-msgstr ""
+msgstr "Dodano"
 
 #: documents/models.py:409
 msgid "Tags"
-msgstr ""
+msgstr "Oznake"
 
 #: documents/models.py:410
 msgid "Correspondent"
-msgstr ""
+msgstr "Dopisnik"
 
 #: documents/models.py:411
 msgid "Document Type"
-msgstr ""
+msgstr "Vrsta dokumenta"
 
 #: documents/models.py:412
 msgid "Storage Path"
-msgstr ""
+msgstr "Pot do shrambe"
 
 #: documents/models.py:413
 msgid "Note"
-msgstr ""
+msgstr "Opomba"
 
 #: documents/models.py:414
 msgid "Owner"
-msgstr ""
+msgstr "Lastnik"
 
 #: documents/models.py:415
 msgid "Shared"
-msgstr ""
+msgstr "Deljeno"
 
 #: documents/models.py:416
 msgid "ASN"
-msgstr ""
+msgstr "ASN"
 
 #: documents/models.py:422
 msgid "show on dashboard"
@@ -329,15 +329,15 @@ msgstr "razvrsti obratno"
 
 #: documents/models.py:437
 msgid "View page size"
-msgstr ""
+msgstr "Velikost strani"
 
 #: documents/models.py:445
 msgid "View display mode"
-msgstr ""
+msgstr "Način prikaza"
 
 #: documents/models.py:452
 msgid "Document display fields"
-msgstr ""
+msgstr "Prikaži polja dokumenta"
 
 #: documents/models.py:459 documents/models.py:516
 msgid "saved view"
@@ -433,7 +433,7 @@ msgstr "polnobesedilna poizvedba"
 
 #: documents/models.py:489
 msgid "more like this"
-msgstr ""
+msgstr "več podobnih"
 
 #: documents/models.py:490
 msgid "has tags in"
@@ -493,27 +493,27 @@ msgstr "nima lastnika v"
 
 #: documents/models.py:504
 msgid "has custom field value"
-msgstr ""
+msgstr "vsebuje vrednost po meri"
 
 #: documents/models.py:505
 msgid "is shared by me"
-msgstr ""
+msgstr "delim jaz"
 
 #: documents/models.py:506
 msgid "has custom fields"
-msgstr ""
+msgstr "vsebuje polja po meri"
 
 #: documents/models.py:507
 msgid "has custom field in"
-msgstr ""
+msgstr "vsebuje polje po meri v"
 
 #: documents/models.py:508
 msgid "does not have custom field in"
-msgstr ""
+msgstr "ne vsebuje polja po meri v"
 
 #: documents/models.py:509
 msgid "does not have custom field"
-msgstr ""
+msgstr "ne vsebuje polja po meri"
 
 #: documents/models.py:519
 msgid "rule type"
@@ -673,11 +673,11 @@ msgstr "Denarno"
 
 #: documents/models.py:811
 msgid "Document Link"
-msgstr ""
+msgstr "Povezava do dokumenta"
 
 #: documents/models.py:812
 msgid "Select"
-msgstr ""
+msgstr "Izberi"
 
 #: documents/models.py:824
 msgid "data type"
@@ -685,11 +685,11 @@ msgstr "tip podatka"
 
 #: documents/models.py:831
 msgid "extra data"
-msgstr ""
+msgstr "dodatni podatki"
 
 #: documents/models.py:835
 msgid "Extra data for the custom field, such as select options"
-msgstr ""
+msgstr "Dodatni podatki za polje po meri, npr. opcije izbora"
 
 #: documents/models.py:841
 msgid "custom field"
@@ -709,15 +709,15 @@ msgstr "primeri polja po meri"
 
 #: documents/models.py:978
 msgid "Consumption Started"
-msgstr ""
+msgstr "Obdelava pričeta"
 
 #: documents/models.py:979
 msgid "Document Added"
-msgstr ""
+msgstr "Dokument dodan"
 
 #: documents/models.py:980
 msgid "Document Updated"
-msgstr ""
+msgstr "Dokument posodobljen"
 
 #: documents/models.py:983
 msgid "Consume Folder"
@@ -733,7 +733,7 @@ msgstr "Pridobi e-pošto"
 
 #: documents/models.py:988
 msgid "Workflow Trigger Type"
-msgstr ""
+msgstr "Tip sprožilca procesa"
 
 #: documents/models.py:1000
 msgid "filter path"
@@ -757,35 +757,35 @@ msgstr "filtriraj dokumente iz tega e-poštnega pravila"
 
 #: documents/models.py:1044
 msgid "has these tag(s)"
-msgstr ""
+msgstr "vsebuje te oznake"
 
 #: documents/models.py:1052
 msgid "has this document type"
-msgstr ""
+msgstr "vsebuje tip dokumenta"
 
 #: documents/models.py:1060
 msgid "has this correspondent"
-msgstr ""
+msgstr "vsebuje dopisnika"
 
 #: documents/models.py:1064
 msgid "workflow trigger"
-msgstr ""
+msgstr "sprožilec procesa"
 
 #: documents/models.py:1065
 msgid "workflow triggers"
-msgstr ""
+msgstr "sprožilci procesa"
 
 #: documents/models.py:1075
 msgid "Assignment"
-msgstr ""
+msgstr "Dodelitev"
 
 #: documents/models.py:1079
 msgid "Removal"
-msgstr ""
+msgstr "Odstranitev"
 
 #: documents/models.py:1083
 msgid "Workflow Action Type"
-msgstr ""
+msgstr "Tip dejanja procesa"
 
 #: documents/models.py:1089
 msgid "assign title"
@@ -833,83 +833,83 @@ msgstr "tem skupinam podeli dovoljenje za spreminjanje"
 
 #: documents/models.py:1174
 msgid "assign these custom fields"
-msgstr ""
+msgstr "dodeli ta polja po meri"
 
 #: documents/models.py:1181
 msgid "remove these tag(s)"
-msgstr ""
+msgstr "odstrani te oznake"
 
 #: documents/models.py:1186
 msgid "remove all tags"
-msgstr ""
+msgstr "odstrani vse oznake"
 
 #: documents/models.py:1193
 msgid "remove these document type(s)"
-msgstr ""
+msgstr "odstrani te vrste dokumentov"
 
 #: documents/models.py:1198
 msgid "remove all document types"
-msgstr ""
+msgstr "odstrani vse vrste dokumentov"
 
 #: documents/models.py:1205
 msgid "remove these correspondent(s)"
-msgstr ""
+msgstr "odstrani te dopisnike"
 
 #: documents/models.py:1210
 msgid "remove all correspondents"
-msgstr ""
+msgstr "odstrani vse dopisnike"
 
 #: documents/models.py:1217
 msgid "remove these storage path(s)"
-msgstr ""
+msgstr "odstrani te poti do shrambe"
 
 #: documents/models.py:1222
 msgid "remove all storage paths"
-msgstr ""
+msgstr "odstrani vse poti do shrambe"
 
 #: documents/models.py:1229
 msgid "remove these owner(s)"
-msgstr ""
+msgstr "odstrani te lastnike"
 
 #: documents/models.py:1234
 msgid "remove all owners"
-msgstr ""
+msgstr "odstrani vse lastnike"
 
 #: documents/models.py:1241
 msgid "remove view permissions for these users"
-msgstr ""
+msgstr "odstrani dovoljenja za ogled tem uporabnikom"
 
 #: documents/models.py:1248
 msgid "remove view permissions for these groups"
-msgstr ""
+msgstr "odstrani dovoljenja za ogled tem skupinam"
 
 #: documents/models.py:1255
 msgid "remove change permissions for these users"
-msgstr ""
+msgstr "odstrani dovoljenja za spreminjanje tem uporabnikom"
 
 #: documents/models.py:1262
 msgid "remove change permissions for these groups"
-msgstr ""
+msgstr "odstrani dovoljenja za spreminjanje tem skupinam"
 
 #: documents/models.py:1267
 msgid "remove all permissions"
-msgstr ""
+msgstr "odstrani vsa dovoljenja"
 
 #: documents/models.py:1274
 msgid "remove these custom fields"
-msgstr ""
+msgstr "odstrani ta polja po meri"
 
 #: documents/models.py:1279
 msgid "remove all custom fields"
-msgstr ""
+msgstr "odstrani vsa polja po meri"
 
 #: documents/models.py:1283
 msgid "workflow action"
-msgstr ""
+msgstr "dejanje procesa"
 
 #: documents/models.py:1284
 msgid "workflow actions"
-msgstr ""
+msgstr "dejanja procesa"
 
 #: documents/models.py:1293 paperless_mail/models.py:109
 msgid "order"
@@ -917,11 +917,11 @@ msgstr "vrstni red"
 
 #: documents/models.py:1299
 msgid "triggers"
-msgstr ""
+msgstr "sprožilci"
 
 #: documents/models.py:1306
 msgid "actions"
-msgstr ""
+msgstr "dejanja"
 
 #: documents/models.py:1309
 msgid "enabled"
@@ -948,13 +948,14 @@ msgstr "Zaznani neveljavni znaki."
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
-msgstr ""
+msgstr "Pozdrav iz %(site_name)s!"
 
 #: documents/templates/account/email/base_message.txt:5
 #, python-format
 msgid "Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
-msgstr ""
+msgstr "Hvala, ker uporabljate %(site_name)s!\n"
+"%(site_domain)s"
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
@@ -967,7 +968,7 @@ msgstr "Prosimo, prijavite se."
 #: documents/templates/account/login.html:12
 #, python-format
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
-msgstr ""
+msgstr "Še nimate računa? <a href=\"%(signup_url)s\">Registrirajte se</a>"
 
 #: documents/templates/account/login.html:19
 #: documents/templates/account/signup.html:15
@@ -991,7 +992,7 @@ msgstr "Ste pozabili svoje geslo?"
 #: documents/templates/account/login.html:45
 #: documents/templates/account/signup.html:49
 msgid "or sign in via"
-msgstr ""
+msgstr "ali se prijavite preko"
 
 #: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
@@ -1064,26 +1065,26 @@ msgstr "Vaše novo geslo je bilo nastavljeno. Zdaj se lahko <a href=\"%(login_ur
 
 #: documents/templates/account/signup.html:5
 msgid "Paperless-ngx sign up"
-msgstr ""
+msgstr "Paperless-ngx registracija"
 
 #: documents/templates/account/signup.html:10
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
-msgstr ""
+msgstr "Že imate račun? <a href=\"%(login_url)s\">Prijavite se</a>"
 
 #: documents/templates/account/signup.html:16
 #: documents/templates/socialaccount/signup.html:14
 msgid "Email (optional)"
-msgstr ""
+msgstr "E-pošta (opcijsko)"
 
 #: documents/templates/account/signup.html:18
 msgid "Password (again)"
-msgstr ""
+msgstr "Geslo (ponovno)"
 
 #: documents/templates/account/signup.html:36
 #: documents/templates/socialaccount/signup.html:27
 msgid "Sign up"
-msgstr ""
+msgstr "Registracija"
 
 #: documents/templates/index.html:61
 msgid "Paperless-ngx is loading..."
@@ -1108,49 +1109,49 @@ msgstr "Deljena povezava je potekla."
 #: documents/templates/socialaccount/authentication_error.html:5
 #: documents/templates/socialaccount/login.html:5
 msgid "Paperless-ngx social account sign in"
-msgstr ""
+msgstr "Prijava v Paperless-ngx preko družabnega omrežja"
 
 #: documents/templates/socialaccount/authentication_error.html:10
 #, python-format
 msgid "An error occurred while attempting to login via your social network account. Back to the <a href=\"%(login_url)s\">login page</a>"
-msgstr ""
+msgstr "Pri prijavi preko družabnega omrežja je prišlo do napake. Nazaj na <a href=\"%(login_url)s\">prijavno stran</a>"
 
 #: documents/templates/socialaccount/login.html:10
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
-msgstr ""
+msgstr "S profilom boste povezali račun zunanjega ponudnika %(provider)s."
 
 #: documents/templates/socialaccount/login.html:13
 msgid "Continue"
-msgstr ""
+msgstr "Nadaljuj"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
-msgstr ""
+msgstr "Registracija v Paperless-ngx preko družabnega omrežja"
 
 #: documents/templates/socialaccount/signup.html:10
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
-msgstr ""
+msgstr "Za prijavo boste uporabili račun ponudnika %(provider_name)s."
 
 #: documents/templates/socialaccount/signup.html:11
 msgid "As a final step, please complete the following form:"
-msgstr ""
+msgstr "Kot zadnji korak vas prosimo, da izpolnite naslednji obrazec:"
 
 #: documents/validators.py:17
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "Napaka pri razčlembi URI-ja {value} zaradi manjkajoče sheme"
 
 #: documents/validators.py:22
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
+msgstr "Napaka pri razčlembi URI-ja {value} zaradi manjkajoče omrežne lokacije ali poti"
 
 #: documents/validators.py:27
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "Napaka pri razčlembi URI-ja {value}"
 
 #: paperless/apps.py:10
 msgid "Paperless"
@@ -1162,35 +1163,35 @@ msgstr "pdf"
 
 #: paperless/models.py:27
 msgid "pdfa"
-msgstr ""
+msgstr "PDF/A"
 
 #: paperless/models.py:28
 msgid "pdfa-1"
-msgstr ""
+msgstr "PDF/A-1"
 
 #: paperless/models.py:29
 msgid "pdfa-2"
-msgstr ""
+msgstr "PDF/A-2"
 
 #: paperless/models.py:30
 msgid "pdfa-3"
-msgstr ""
+msgstr "PDF/A-3"
 
 #: paperless/models.py:39
 msgid "skip"
-msgstr ""
+msgstr "skip"
 
 #: paperless/models.py:40
 msgid "redo"
-msgstr ""
+msgstr "redo"
 
 #: paperless/models.py:41
 msgid "force"
-msgstr ""
+msgstr "force"
 
 #: paperless/models.py:42
 msgid "skip_noarchive"
-msgstr ""
+msgstr "skip_noarchive"
 
 #: paperless/models.py:50
 msgid "never"
@@ -1198,7 +1199,7 @@ msgstr "nikoli"
 
 #: paperless/models.py:51
 msgid "with_text"
-msgstr ""
+msgstr "with_text"
 
 #: paperless/models.py:52
 msgid "always"
@@ -1206,27 +1207,27 @@ msgstr "vedno"
 
 #: paperless/models.py:60
 msgid "clean"
-msgstr ""
+msgstr "clean"
 
 #: paperless/models.py:61
 msgid "clean-final"
-msgstr ""
+msgstr "clean-final"
 
 #: paperless/models.py:62
 msgid "none"
-msgstr ""
+msgstr "none"
 
 #: paperless/models.py:70
 msgid "LeaveColorUnchanged"
-msgstr ""
+msgstr "LeaveColorUnchanged"
 
 #: paperless/models.py:71
 msgid "RGB"
-msgstr ""
+msgstr "RGB"
 
 #: paperless/models.py:72
 msgid "UseDeviceIndependentColor"
-msgstr ""
+msgstr "UseDeviceIndependentColor"
 
 #: paperless/models.py:73
 msgid "Gray"
@@ -1234,59 +1235,59 @@ msgstr "Siva"
 
 #: paperless/models.py:74
 msgid "CMYK"
-msgstr ""
+msgstr "CMYK"
 
 #: paperless/models.py:83
 msgid "Sets the output PDF type"
-msgstr ""
+msgstr "Nastavi vrsto izhodnega PDF"
 
 #: paperless/models.py:95
 msgid "Do OCR from page 1 to this value"
-msgstr ""
+msgstr "Naredi OCR od strani 1 do vrednosti"
 
 #: paperless/models.py:101
 msgid "Do OCR using these languages"
-msgstr ""
+msgstr "Naredi OCR z uporabo teh jezikov"
 
 #: paperless/models.py:108
 msgid "Sets the OCR mode"
-msgstr ""
+msgstr "Nastavi način za OCR"
 
 #: paperless/models.py:116
 msgid "Controls the generation of an archive file"
-msgstr ""
+msgstr "Nadzoruje generiranje arhivske datoteke"
 
 #: paperless/models.py:124
 msgid "Sets image DPI fallback value"
-msgstr ""
+msgstr "Nastavi rezervno vrednosti DPI"
 
 #: paperless/models.py:131
 msgid "Controls the unpaper cleaning"
-msgstr ""
+msgstr "Upravlja čiščenje"
 
 #: paperless/models.py:138
 msgid "Enables deskew"
-msgstr ""
+msgstr "Omogoči poravnavo"
 
 #: paperless/models.py:141
 msgid "Enables page rotation"
-msgstr ""
+msgstr "Omogoči vrtenje strani"
 
 #: paperless/models.py:146
 msgid "Sets the threshold for rotation of pages"
-msgstr ""
+msgstr "Nastavi prag za vrtenje strani"
 
 #: paperless/models.py:152
 msgid "Sets the maximum image size for decompression"
-msgstr ""
+msgstr "Nastavi maksimalno velikost slike za dekompresiranje"
 
 #: paperless/models.py:158
 msgid "Sets the Ghostscript color conversion strategy"
-msgstr ""
+msgstr "Nastavi strategijo pretvorbe barv Ghostscript"
 
 #: paperless/models.py:166
 msgid "Adds additional user arguments for OCRMyPDF"
-msgstr ""
+msgstr "Doda argumente uporabnika za OCRMyPDF"
 
 #: paperless/models.py:171
 msgid "Application title"
@@ -1298,7 +1299,7 @@ msgstr "Logotip aplikacije"
 
 #: paperless/models.py:188
 msgid "paperless application settings"
-msgstr ""
+msgstr "aplikacijske nastavitve paperless"
 
 #: paperless/settings.py:682
 msgid "English (US)"
@@ -1370,7 +1371,7 @@ msgstr "japonščina"
 
 #: paperless/settings.py:699
 msgid "Korean"
-msgstr ""
+msgstr "Korejščina"
 
 #: paperless/settings.py:700
 msgid "Luxembourgish"
@@ -1630,15 +1631,15 @@ msgstr "filtriraj vsebino"
 
 #: paperless_mail/models.py:157
 msgid "filter attachment filename inclusive"
-msgstr ""
+msgstr "filtriraj ime datoteke priloge vključno"
 
 #: paperless_mail/models.py:169
 msgid "filter attachment filename exclusive"
-msgstr ""
+msgstr "filtriraj ime datoteke priloge izključno"
 
 #: paperless_mail/models.py:174
 msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "Uporabljajte samo dokumente, ki se v celoti ujemajo s tem imenom datoteke, če je navedeno. Dovoljeni so nadomestni znaki, kot sta *.pdf ali *račun*. Neobčutljiva na velike in male črke."
 
 #: paperless_mail/models.py:181
 msgid "maximum age"

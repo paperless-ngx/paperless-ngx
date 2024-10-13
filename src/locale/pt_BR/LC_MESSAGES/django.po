@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-08-28 17:12-0700\n"
-"PO-Revision-Date: 2024-09-13 00:28\n"
+"PO-Revision-Date: 2024-10-10 22:08\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -309,7 +309,7 @@ msgstr "Compartilhado"
 
 #: documents/models.py:416
 msgid "ASN"
-msgstr ""
+msgstr "ASN"
 
 #: documents/models.py:422
 msgid "show on dashboard"
@@ -997,7 +997,7 @@ msgstr "ou conecte-se com"
 
 #: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
-msgstr ""
+msgstr "Redefinição de senha Paperless-ngx"
 
 #: documents/templates/account/password_reset.html:9
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
