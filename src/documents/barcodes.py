@@ -387,7 +387,12 @@ class BarcodePlugin(ConsumeTaskPlugin):
         """
         # filter all barcodes for the separator string
         # get the page numbers of the separating barcodes
-        separator_pages = {bc.page: False for bc in self.barcodes if bc.is_separator}
+        retain = settings.CONSUMER_BARCODE_RETAIN_SPLIT_PAGES
+        separator_pages = {
+            bc.page: retain
+            for bc in self.barcodes
+            if bc.is_separator and (not retain or (retain and bc.page > 0))
+        }  # as below, dont include the first page if retain is enabled
         if not settings.CONSUMER_ENABLE_ASN_BARCODE:
             return separator_pages
 

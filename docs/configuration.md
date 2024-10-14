@@ -1287,6 +1287,12 @@ change this.
 
     Defaults to "PATCHT"
 
+#### [`PAPERLESS_CONSUMER_BARCODE_RETAIN_SPLIT_PAGES=<bool>`](#PAPERLESS_CONSUMER_BARCODE_RETAIN_SPLIT_PAGES) {#PAPERLESS_CONSUMER_BARCODE_RETAIN_SPLIT_PAGES}
+
+: If set to true, all pages that are split by a barcode (such as PATCHT) will be kept.
+
+    Defaults to false.
+
 #### [`PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE=<bool>`](#PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE) {#PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE}
 
 : Enables the detection of barcodes in the scanned document and
