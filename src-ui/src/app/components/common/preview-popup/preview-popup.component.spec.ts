@@ -9,7 +9,12 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { PdfViewerModule } from 'ng2-pdf-viewer'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import {
+  HttpClient,
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http'
+import { of, throwError } from 'rxjs'
 
 const doc = {
   id: 10,
@@ -23,6 +28,7 @@ describe('PreviewPopupComponent', () => {
   let fixture: ComponentFixture<PreviewPopupComponent>
   let settingsService: SettingsService
   let documentService: DocumentService
+  let http: HttpClient
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -35,6 +41,7 @@ describe('PreviewPopupComponent', () => {
     })
     settingsService = TestBed.inject(SettingsService)
     documentService = TestBed.inject(DocumentService)
+    http = TestBed.inject(HttpClient)
     jest
       .spyOn(documentService, 'getPreviewUrl')
       .mockImplementation((id) => doc.original_file_name)
@@ -94,5 +101,18 @@ describe('PreviewPopupComponent', () => {
     expect(fixture.debugElement.nativeElement.textContent).toContain(
       'Error loading preview'
     )
+  })
+
+  it('should get text content from http if appropriate', () => {
+    const httpSpy = jest.spyOn(http, 'get')
+    httpSpy.mockReturnValueOnce(
+      throwError(() => new Error('Error getting preview'))
+    )
+    component.init()
+    expect(httpSpy).toHaveBeenCalled()
+    expect(component.error).toBeTruthy()
+    httpSpy.mockReturnValueOnce(of('Preview text'))
+    component.init()
+    expect(component.previewText).toEqual('Preview text')
   })
 })
