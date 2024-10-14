@@ -10,6 +10,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AlterField(
+            model_name="mailaccount",
+            name="password",
+            field=models.CharField(max_length=3072, verbose_name="password"),
+        ),
         migrations.AddField(
             model_name="mailaccount",
             name="expiration",
@@ -35,7 +40,7 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 blank=True,
                 help_text="The refresh token to use for token authentication e.g. with oauth2.",
-                max_length=2048,
+                max_length=3072,
                 null=True,
                 verbose_name="refresh token",
             ),
