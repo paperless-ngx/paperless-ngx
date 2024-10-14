@@ -86,7 +86,7 @@ COPY ./docker/rootfs /
 # Purpose: The final image
 # Comments:
 #  - Don't leave anything extra in here
-FROM s6-overlay-base AS main-app
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS main-app
 
 LABEL org.opencontainers.image.authors="paperless-ngx team <hello@paperless-ngx.com>"
 LABEL org.opencontainers.image.documentation="https://docs.paperless-ngx.com/"
