@@ -42,7 +42,7 @@ class MailAccount(document_models.ModelWithOwner):
 
     username = models.CharField(_("username"), max_length=256)
 
-    password = models.CharField(_("password"), max_length=2048)
+    password = models.CharField(_("password"), max_length=3072)
 
     is_token = models.BooleanField(_("Is token authentication"), default=False)
 
