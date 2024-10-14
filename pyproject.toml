@@ -36,6 +36,7 @@ dependencies = [
   "filelock~=3.16.1",
   "flower~=2.0.1",
   "gotenberg-client~=0.6.0",
+  "httpx-oauth~=0.15",
   "imap-tools~=1.7.3",
   "inotifyrecursive~=0.3",
   "jinja2>=3.1.4",
