@@ -10,6 +10,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AlterField(
+            model_name="mailaccount",
+            name="password",
+            field=models.CharField(max_length=3072, verbose_name="password"),
+        ),
         migrations.AddField(
             model_name="mailaccount",
             name="expiration",
