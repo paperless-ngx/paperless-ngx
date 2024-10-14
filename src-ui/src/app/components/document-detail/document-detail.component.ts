@@ -136,6 +136,7 @@ export class DocumentDetailComponent
   previewText: string
   downloadUrl: string
   downloadOriginalUrl: string
+  previewLoaded: boolean = false
 
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
@@ -538,6 +539,9 @@ export class DocumentDetailComponent
       .subscribe({
         next: (result) => {
           this.metadata = result
+          if (this.archiveContentRenderType !== ContentRenderType.PDF) {
+            this.previewLoaded = true
+          }
         },
         error: (error) => {
           this.metadata = {} // allow display to fallback to <object> tag
@@ -904,11 +908,15 @@ export class DocumentDetailComponent
   pdfPreviewLoaded(pdf: PDFDocumentProxy) {
     this.previewNumPages = pdf.numPages
     if (this.password) this.requiresPassword = false
+    setTimeout(() => {
+      this.previewLoaded = true
+    }, 300)
   }
 
   onError(event) {
     if (event.name == 'PasswordException') {
       this.requiresPassword = true
+      this.previewLoaded = true
     }
   }
 

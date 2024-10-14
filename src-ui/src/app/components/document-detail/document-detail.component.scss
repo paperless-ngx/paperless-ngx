@@ -64,5 +64,16 @@ textarea.rtl {
 }
 
 .thumb-preview {
-  border: 8px solid var(--bs-secondary);
+  top: 0;
+  left: calc(.5 * var(--bs-gutter-x));
+  height: calc(100vh - 160px);
+  overflow: hidden;
+  background-color: gray;
+  padding: 10px 8px; // border
+  width: calc(100% - var(--bs-gutter-x));
+  z-index: 1000;
+
+  > div {
+    mix-blend-mode: difference;
+  }
 }
