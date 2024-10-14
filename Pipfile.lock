@@ -24,11 +24,11 @@
         },
         "anyio": {
             "hashes": [
-                "sha256:137b4559cbb034c477165047febb6ff83f390fc3b20bf181c1fc0a728cb8beeb",
-                "sha256:c7d2e9d63e31599eeb636c8c5c03a7e108d73b345f064f1c19fdc87b79036a9a"
+                "sha256:4c8bc31ccdb51c7f7bd251f51c609e038d63e34219b44aa86e47576389880b4c",
+                "sha256:6d170c36fba3bdd840c73d3868c1e777e33676a69c3a72cf0a0d5d6d8009b61d"
             ],
             "markers": "python_version >= '3.9'",
-            "version": "==4.6.0"
+            "version": "==4.6.2.post1"
         },
         "asgiref": {
             "hashes": [
@@ -604,12 +604,12 @@
         },
         "gotenberg-client": {
             "hashes": [
-                "sha256:94e12d1e2ebaaf8552008c95553f5c635c6b8beef401c65cee6ba0d73bbb146b",
-                "sha256:b0829ae666ee75fc2bd61cf055c2dea9877f73d52a3b4e1998eea4cee14923f5"
+                "sha256:3c1ee0aabb9107f0cf9aed84647575b322406ad9eb2c794e1da62bda6a4e74fa",
+                "sha256:8e626307f31bb8e07f2f7153eba57910c6bb15dbad15bc945e15d71aa847bc53"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==0.6.0"
+            "version": "==0.7.0"
         },
         "gunicorn": {
             "hashes": [
@@ -799,7 +799,7 @@
                 "sha256:7bb2708e112d8fdd7829cd4243970f0c223274051cb35ee80c03301ee29a3df0",
                 "sha256:f7c2be1d2f3c3c3160d441802406b206c2b76f5947b11115e6df10c6c65e66c2"
             ],
-            "markers": "python_version >= '3.8'",
+            "markers": "python_version >= '3.9'",
             "version": "==0.27.2"
         },
         "httpx-oauth": {
@@ -1555,11 +1555,12 @@
                 "c"
             ],
             "hashes": [
-                "sha256:8bad2e497ce22d556dac1464738cb948f8d6bab450d965cf1d8a8effd52412e0",
-                "sha256:babf565d459d8f72fb65da5e211dd0b58a52c51e4e1fa9cadecff42d6b7619b2"
+                "sha256:644d3973fe26908c73d4be746074f6e5224b03c1101d302d9a53bf565ad64907",
+                "sha256:a5764f67c27bec8bfac85764d23c534af2c27b893550377e37ce59c12aac47a2"
             ],
+            "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==3.2.2"
+            "version": "==3.2.3"
         },
         "psycopg-c": {
             "hashes": [
@@ -2049,12 +2050,12 @@
         },
         "tika-client": {
             "hashes": [
-                "sha256:647f528860aa639d87516ecff0fb25797b4edaa973fe60b320c56c5bd7cb6a88",
-                "sha256:7fcd12d991fa155b2f94fcadb25ecee472c437e757b6737930f924a81feca60b"
+                "sha256:734fdbdcdca33e65de7fd6aa50870271bc6cd41b5decce5f098469a2b63bff15",
+                "sha256:be6cb0377eb5f03809c6bc059b43a6404b3357819dcff25d83b3d564c25a19aa"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==0.6.0"
+            "version": "==0.7.0"
         },
         "tornado": {
             "hashes": [
@@ -2087,7 +2088,7 @@
                 "sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d",
                 "sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8"
             ],
-            "markers": "python_version < '3.11'",
+            "markers": "python_version < '3.13'",
             "version": "==4.12.2"
         },
         "tzdata": {
