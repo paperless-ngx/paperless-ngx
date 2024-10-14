@@ -64,7 +64,7 @@ class MailAccount(document_models.ModelWithOwner):
 
     refresh_token = models.CharField(
         _("refresh token"),
-        max_length=2048,
+        max_length=3072,
         blank=True,
         null=True,
         help_text=_(
