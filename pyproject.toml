@@ -69,6 +69,10 @@ dependencies = [
   "granian>=1.7.6",
 ]
 
+optional-dependencies.supervisor = [
+  "supervisor==4.2.5",
+]
+
 [tool.uv]
 package = false
 dev-dependencies = [
