@@ -364,9 +364,17 @@ class CannotMoveFilesException(Exception):
     pass
 
 
+@receiver(models.signals.post_save, sender=CustomFieldInstance)
 @receiver(models.signals.m2m_changed, sender=Document.tags.through)
 @receiver(models.signals.post_save, sender=Document)
-def update_filename_and_move_files(sender, instance: Document, **kwargs):
+def update_filename_and_move_files(
+    sender,
+    instance: Document | CustomFieldInstance,
+    **kwargs,
+):
+    if isinstance(instance, CustomFieldInstance):
+        instance = instance.document
+
     def validate_move(instance, old_path, new_path):
         if not os.path.isfile(old_path):
             # Can't do anything if the old file does not exist anymore.

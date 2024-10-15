@@ -82,7 +82,7 @@ def get_cf_value(
     name: str,
     default: str | None = None,
 ) -> str | None:
-    if name in custom_field_data:
+    if name in custom_field_data and custom_field_data[name]["value"] is not None:
         return custom_field_data[name]["value"]
     elif default is not None:
         return default
@@ -235,8 +235,10 @@ def get_custom_fields_context(
             field_instance.field.data_type,
             replacement_text="-",
         )
+        if field_instance.value is None:
+            value = None
         # String types need to be sanitized
-        if field_instance.field.data_type in {
+        elif field_instance.field.data_type in {
             CustomField.FieldDataType.MONETARY,
             CustomField.FieldDataType.STRING,
             CustomField.FieldDataType.URL,
