@@ -232,6 +232,10 @@ export class DocumentDetailComponent
     return this.getRenderType(this.document?.mime_type)
   }
 
+  get showThumbnailOverlay(): boolean {
+    return this.settings.get(SETTINGS_KEYS.DOCUMENT_EDITING_OVERLAY_THUMBNAIL)
+  }
+
   private getRenderType(mimeType: string): ContentRenderType {
     if (!mimeType) return ContentRenderType.Unknown
     if (mimeType === 'application/pdf') {

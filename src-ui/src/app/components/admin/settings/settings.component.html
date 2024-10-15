@@ -120,17 +120,6 @@
 
         <div class="row mb-3">
           <div class="col-md-3 col-form-label pt-0">
-            <span i18n>Document editor</span>
-          </div>
-          <div class="col">
-
-            <pngx-input-check i18n-title title="Use PDF viewer provided by the browser" i18n-hint hint="This is usually faster for displaying large PDF documents, but it might not work on some browsers." formControlName="useNativePdfViewer"></pngx-input-check>
-
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <div class="col-md-3 col-form-label pt-0">
             <span i18n>Sidebar</span>
           </div>
           <div class="col">
@@ -184,7 +173,19 @@
 
         <div class="row mb-3">
           <div class="offset-md-3 col">
+            <pngx-input-check i18n-title title="Use PDF viewer provided by the browser" i18n-hint hint="This is usually faster for displaying large PDF documents, but it might not work on some browsers." formControlName="useNativePdfViewer"></pngx-input-check>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
             <pngx-input-check i18n-title title="Automatically remove inbox tag(s) on save" formControlName="documentEditingRemoveInboxTags"></pngx-input-check>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <pngx-input-check i18n-title title="Show document thumbnail during loading" formControlName="documentEditingOverlayThumbnail"></pngx-input-check>
           </div>
         </div>
 
