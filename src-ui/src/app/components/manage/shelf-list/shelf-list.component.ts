@@ -53,7 +53,7 @@ export interface ManagementListColumn {
 }
 
 @Directive()
-export abstract class CustomListComponent<T extends ObjectWithId>
+export abstract class ShelfListComponent<T extends ObjectWithId>
   extends ComponentWithPermissions
   implements OnInit, OnDestroy {
   documents: any[] = [];

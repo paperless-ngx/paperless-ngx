@@ -29,14 +29,13 @@ import { ConfigComponent } from './components/admin/config/config.component'
 import { ApprovalsComponent } from './components/admin/approval/approvals.component'
 
 import { WarehouseListComponent } from './components/manage/warehouse-list/warehouse-list.component'
-import { BoxFieldsComponent } from './components/manage/box-fields/box-fields.component'
+import { BoxCaseComponent } from './components/manage/boxcase/boxcase.component'
 
 
 //import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
-import { CustomShelfComponent } from './components/manage/custom-shelf/custom-shelf.component'
+import { ShelfComponent } from './components/manage/shelf/shelf.component'
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
 import { FoldersComponent } from './components/manage/folder-list/folder-list.component'
-import { SubFoldersComponent } from './components/manage/subfolder-list/subfolder-list.component'
 import { DossiersComponent } from './components/manage/dossier-list/dossier-list.component'
 import { DossiersFormComponent } from './components/manage/dossier-form-list/dossier-form-list.component'
 
@@ -173,7 +172,7 @@ export const routes: Routes = [
       },
       {
         path: 'box/:id',
-        component: BoxFieldsComponent,
+        component: BoxCaseComponent,
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
@@ -184,7 +183,7 @@ export const routes: Routes = [
       },
       {
         path: 'shelf/:id',
-        component: CustomShelfComponent,
+        component: ShelfComponent,
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
@@ -216,53 +215,6 @@ export const routes: Routes = [
         },
       },
       {
-        //   path: 'warehouses/:id',
-        //   component: WarehouseListComponent,
-        //   canActivate: [PermissionsGuard],
-        //   data: {
-        //     requiredPermission: {
-        //       action: PermissionAction.View,
-        //       type: PermissionType.Warehouse,
-        //     },
-        //   },
-        // },
-        // {
-        //   path: 'khovatly',
-        //   component: KhoVatLyComponent,
-        //   canActivate: [PermissionsGuard],
-        //   data: {
-        //     requiredPermission: {
-        //       action: PermissionAction.View,
-        //       type: PermissionType.KhoVatLy,
-        //     },
-        //   },
-        // },
-        // {
-        //   path: 'khovatly',
-        //   component: KhoVatLyComponent,
-        //   canActivate: [PermissionsGuard],
-        //   data: {
-        //     requiredPermission: {
-        //       action: PermissionAction.View,
-        //       type: PermissionType.KhoVatLy,
-        //     },
-        //   },
-        //   children: [
-        //     {
-        //       path: 'warehouses',
-        //       component: WarehouseListComponent,
-        //       canActivate: [PermissionsGuard],
-        //       data: {
-        //         requiredPermission: {
-        //           action: PermissionAction.View,
-        //           type: PermissionType.Warehouse,
-        //         },
-        //       },
-        //     },
-        //   ],
-        // },
-
-
         path: 'documenttypes',
         component: DocumentTypeListComponent,
         canActivate: [PermissionsGuard],

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { BoxListComponent } from '../box-list/box-list.component';
+import { BoxCaseListComponent } from '../boxcase-list/boxcase-list.component';
 import { BoxService } from 'src/app/services/rest/box.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
@@ -12,11 +12,11 @@ import { BoxsServices } from 'src/app/services/common-service/service-box';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'pngx-box-fields',
-  templateUrl: './../box-list/box-list.component.html',
-  styleUrls: ['./../box-list/box-list.component.scss'],
+  selector: 'pngx-boxcase',
+  templateUrl: '../boxcase-list/boxcase-list.component.html',
+  styleUrls: ['./../boxcase-list/boxcase-list.component.scss'],
 })
-export class BoxFieldsComponent extends BoxListComponent<Box> {
+export class BoxCaseComponent extends BoxCaseListComponent<Box> {
   constructor(
     boxService: BoxService,
     modalService: NgbModal,

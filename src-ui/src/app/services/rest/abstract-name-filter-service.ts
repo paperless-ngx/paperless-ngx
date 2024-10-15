@@ -31,6 +31,25 @@ export abstract class AbstractNameFilterService<T extends ObjectWithId,> extends
     return this.list(page, pageSize, sortField, sortReverse, params)
   }
 
+  listFilteredCustom(
+    page?: number,
+    pageSize?: number,
+    sortField?: string,
+    params?:{},
+    sortReverse?: boolean,
+    nameFilter?: string,
+    fullPerms?: boolean
+  ) {
+    if (nameFilter) {
+      params['name__icontains'] = nameFilter
+    }
+    if (fullPerms) {
+      params['full_perms'] = true
+    }
+
+    return this.list(page, pageSize, sortField, sortReverse, params)
+  }
+
   listFolderFiltered(page?: number,
     pageSize?: number,
     sortField?: string,
@@ -51,7 +70,7 @@ export abstract class AbstractNameFilterService<T extends ObjectWithId,> extends
     if (fullPerms) {
       params['full_perms'] = true
     }
- 
+
     return this.list(page, pageSize, sortField, sortReverse, params)
   }
 
@@ -79,10 +98,10 @@ export abstract class AbstractNameFilterService<T extends ObjectWithId,> extends
     if (type.length){
       params['type'] = type
     }
- 
+
     return this.list(page, pageSize, sortField, sortReverse, params)
   }
-  
+
   listDossierFormFiltered(page?: number,
     pageSize?: number,
     sortField?: string,
@@ -104,7 +123,7 @@ export abstract class AbstractNameFilterService<T extends ObjectWithId,> extends
     if (type.length){
       params['type'] = type
     }
- 
+
     return this.list(page, pageSize, sortField, sortReverse, params)
   }
 
@@ -140,6 +159,24 @@ export abstract class AbstractNameFilterService<T extends ObjectWithId,> extends
       params['full_perms'] = true
     }
     params['type__iexact'] = 'Boxcase'
+
+    return this.list(page, pageSize, sortField, sortReverse, params)
+  }
+
+  listWarehouse(page?: number,
+    pageSize?: number,
+    sortField?: string,
+    sortReverse?: boolean,
+    nameFilter?: string,
+    fullPerms?: boolean) {
+    let params = {}
+    if (nameFilter) {
+      params['name__icontains'] = nameFilter
+    }
+    if (fullPerms) {
+      params['full_perms'] = true
+    }
+    params['type__iexact'] = 'Warehouse'
 
     return this.list(page, pageSize, sortField, sortReverse, params)
   }

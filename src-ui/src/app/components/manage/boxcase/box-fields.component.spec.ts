@@ -12,19 +12,19 @@ import { PageHeaderComponent } from '../../common/page-header/page-header.compon
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { BoxFieldsComponent } from './box-fields.component'
+import { BoxCaseComponent } from './boxcase.component'
 import { BoxService } from 'src/app/services/rest/box.service'
 
 
 describe('BoxFieldsComponent', () => {
-  let component: BoxFieldsComponent
-  let fixture: ComponentFixture<BoxFieldsComponent>
+  let component: BoxCaseComponent
+  let fixture: ComponentFixture<BoxCaseComponent>
   let boxService: BoxService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
       declarations: [
-        BoxFieldsComponent,
+        BoxCaseComponent,
         SortableDirective,
         PageHeaderComponent,
         IfPermissionsDirective,
@@ -61,7 +61,7 @@ describe('BoxFieldsComponent', () => {
         ],
       })
     )
-    fixture = TestBed.createComponent(BoxFieldsComponent)
+    fixture = TestBed.createComponent(BoxCaseComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
   })

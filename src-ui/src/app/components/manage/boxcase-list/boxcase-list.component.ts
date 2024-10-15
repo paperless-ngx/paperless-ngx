@@ -51,7 +51,7 @@ export interface ManagementListColumn {
 }
 
 @Directive()
-export abstract class BoxListComponent<T extends ObjectWithId>
+export abstract class BoxCaseListComponent<T extends ObjectWithId>
   extends ComponentWithPermissions
   implements OnInit, OnDestroy {
   documents: any[] = [];

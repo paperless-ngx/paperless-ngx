@@ -112,13 +112,12 @@ import { FolderCardSmallComponent } from './components/manage/folder-card-small/
 import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
 import { FoldersComponent } from './components/manage/folder-list/folder-list.component'
-import { SubFoldersComponent } from './components/manage/subfolder-list/subfolder-list.component'
-import { BoxFieldsComponent } from './components/manage/box-fields/box-fields.component'
+import { BoxCaseComponent } from './components/manage/boxcase/boxcase.component'
 import { WarehouseEditDialogComponent } from './components/common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
 import { WarehouseListComponent } from './components/manage/warehouse-list/warehouse-list.component'
 import { BoxEditDialogComponent } from './components/common/edit-dialog/box-edit-dialog/box-edit-dialog.component'
 import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
-import { CustomShelfComponent } from './components/manage/custom-shelf/custom-shelf.component'
+import { ShelfComponent } from './components/manage/shelf/shelf.component'
 import { CustomShelfEditDialogComponent } from './components/common/edit-dialog/custom-shelf-edit-dialog/custom-shelf-edit-dialog.component'
 import { CustomFieldsDropdownComponent } from './components/common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { ApprovalEditDialogComponent } from './components/common/edit-dialog/approval-edit-dialog/approval-edit-dialog.component'
@@ -234,6 +233,8 @@ import {
   upcScan,
   x,
   xLg,
+  bookshelf,
+  inboxes,
   fileEarmarkPdf
 } from 'ngx-bootstrap-icons'
 
@@ -333,6 +334,8 @@ const icons = {
   trash,
   uiRadios,
   upcScan,
+  bookshelf,
+  inboxes,
   x,
   xLg,
 }
@@ -419,7 +422,7 @@ function initializeApp(settings: SettingsService) {
   declarations: [
     //BoxListComponent,
     FolderCardSmallComponent,
-    CustomShelfComponent,
+    ShelfComponent,
     BoxEditDialogComponent,
     AppComponent,
     DocumentListComponent,
@@ -432,7 +435,6 @@ function initializeApp(settings: SettingsService) {
     DossierFormEditDialogComponent,
     DossierCustomFieldFormEditDialogComponent,
     FoldersComponent,
-    SubFoldersComponent,
     FolderEditDialogComponent,
     TagListComponent,
     DocumentTypeListComponent,
@@ -519,7 +521,7 @@ function initializeApp(settings: SettingsService) {
     UsersAndGroupsComponent,
     FileDropComponent,
     CustomFieldsComponent,
-    BoxFieldsComponent,
+    BoxCaseComponent,
     CustomShelfEditDialogComponent,
     CustomFieldEditDialogComponent,
     CustomFieldsDropdownComponent,

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CustomListComponent } from '../custom-list/custom-list.component';
+import { ShelfListComponent } from '../shelf-list/shelf-list.component'
 import { Shelf } from 'src/app/data/custom-shelf';
 import { CustomShelfService } from 'src/app/services/rest/custom-shelf.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -7,18 +7,17 @@ import { ToastService } from 'src/app/services/toast.service';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { PermissionType, PermissionsService } from 'src/app/services/permissions.service';
 import { ActivatedRoute } from '@angular/router';
-import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component';
 import { FILTER_HAS_CUSTOM_SHELF_ANY } from 'src/app/data/filter-rule-type';
 import { CustomShelfEditDialogComponent } from '../../common/edit-dialog/custom-shelf-edit-dialog/custom-shelf-edit-dialog.component';
 import { CustomService } from 'src/app/services/common-service/service-shelf';
 
 
 @Component({
-  selector: 'pngx-custom-shelf',
-  templateUrl: './../custom-list/custom-list.component.html',
-  styleUrls: ['./../custom-list/custom-list.component.scss'],
+  selector: 'pngx-shelf',
+  templateUrl: './../shelf-list/shelf-list.component.html',
+  styleUrls: ['./../shelf-list/shelf-list.component.scss'],
 })
-export class CustomShelfComponent extends CustomListComponent<Shelf> {
+export class ShelfComponent extends ShelfListComponent<Shelf> {
   constructor(
     customshelfService: CustomShelfService,
     modalService: NgbModal,

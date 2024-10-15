@@ -7,13 +7,14 @@ import {
   ViewContainerRef,
 } from '@angular/core'
 import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service';
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { Folder } from 'src/app/data/folder'
 import { FolderService } from 'src/app/services/rest/folder.service'
 
 import { HttpClient } from '@angular/common/http'
 
 import { Subscription } from 'rxjs'
+import { WarehouseService } from '../../../services/rest/warehouse.service'
 
 
 const MAX_ALERTS = 5
@@ -33,7 +34,7 @@ export class WarehouseTreeWidgetComponent extends ComponentWithPermissions
 
   constructor(
     private http: HttpClient,
-    private folderService: FolderService,
+    private warehouseService: WarehouseService,
     private documentListViewService: DocumentListViewService,
     private viewContainer: ViewContainerRef,
     private renderer: Renderer2,
@@ -81,18 +82,39 @@ export class WarehouseTreeWidgetComponent extends ComponentWithPermissions
   }
 
   getNode(object: Folder, event) {
+    if (object.type === 'Warehouse') {
+      let params = {}
+      params['type__iexact'] = 'Shelf';
+      params['parent_warehouse__iexact'] = object.id;
 
-    this.folderService.listFolderFiltered(
-      1,
-      null,
-      null,
-      true,
-      object.id,
-      null,
-      true,
-    ).subscribe((c) => {
-      this.renderNode(c, object, event)
-    })
+      this.warehouseService.listFilteredCustom(
+        1,
+        null,
+        null,
+        params,
+        true,
+        null,
+        true,
+      ).subscribe((c) => {
+        this.renderNode(c, object, event)
+      })
+    }
+    else if (object.type === 'Shelf') {
+      let params = {}
+      params['type__iexact'] = 'Boxcase'
+      this.warehouseService.listFilteredCustom(
+        1,
+        null,
+        null,
+        params,
+        true,
+        null,
+        true,
+      ).subscribe((c) => {
+        this.renderNode(c, object, event)
+      })
+    }
+
 
   }
 
@@ -108,8 +130,8 @@ export class WarehouseTreeWidgetComponent extends ComponentWithPermissions
   }
 
   viewMore() {
-    this.pageNumber=this.pageNumber+1
-    this.folderService.listFolderFiltered(
+    this.pageNumber = this.pageNumber + 1
+    this.warehouseService.listFolderFiltered(
       this.pageNumber,
       null,
       null,
@@ -127,11 +149,10 @@ export class WarehouseTreeWidgetComponent extends ComponentWithPermissions
   reload() {
     console.log(this.nodeId)
     if (this.nodeId == 0) {
-      this.folderService.listFolderFiltered(
-        this.pageNumber,
+      this.warehouseService.listFiltered(
+        1,
         null,
         null,
-        true,
         null,
         null,
         true,
