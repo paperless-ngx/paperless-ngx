@@ -1322,7 +1322,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             extra_data={"select_options": ["ChoiceOne", "ChoiceTwo"]},
         )
 
-        CustomFieldInstance.objects.create(
+        cfi1 = CustomFieldInstance.objects.create(
             document=doc_a,
             field=cf2,
             value_select=0,
@@ -1351,7 +1351,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         with override_settings(
             FILENAME_FORMAT="""
                  {% if "Select Field" in custom_fields %}
-                   {{ title }}_{{ custom_fields | get_cf_value('Select Field') }}
+                   {{ title }}_{{ custom_fields | get_cf_value('Select Field', 'Default Value') }}
                  {% else %}
                    {{ title }}
                  {% endif %}
@@ -1360,6 +1360,15 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             self.assertEqual(
                 generate_filename(doc_a),
                 "Some Title_ChoiceOne.pdf",
+            )
+
+            # Check for handling Nones well
+            cfi1.value_select = None
+            cfi1.save()
+
+            self.assertEqual(
+                generate_filename(doc_a),
+                "Some Title_Default Value.pdf",
             )
 
         cf.name = "Invoice Number"
