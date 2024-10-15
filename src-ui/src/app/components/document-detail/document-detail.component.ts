@@ -72,6 +72,7 @@ import { DeletePagesConfirmDialogComponent } from '../common/confirm-dialog/dele
 import { HotKeyService } from 'src/app/services/hot-key.service'
 import { PDFDocumentProxy } from 'ng2-pdf-viewer'
 import { DataType } from 'src/app/data/datatype'
+import { log } from '@angular-devkit/build-angular/src/builders/ssr-dev-server'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -221,15 +222,13 @@ export class DocumentDetailComponent
   }
 
   get archiveContentRenderType(): ContentRenderType {
-    return this.getRenderType(
-      this.metadata?.has_archive_version
-        ? 'application/pdf'
-        : this.metadata?.original_mime_type
-    )
+    return this.document?.archived_file_name
+      ? this.getRenderType('application/pdf')
+      : this.getRenderType(this.document?.mime_type)
   }
 
   get originalContentRenderType(): ContentRenderType {
-    return this.getRenderType(this.metadata?.original_mime_type)
+    return this.getRenderType(this.document?.mime_type)
   }
 
   private getRenderType(mimeType: string): ContentRenderType {

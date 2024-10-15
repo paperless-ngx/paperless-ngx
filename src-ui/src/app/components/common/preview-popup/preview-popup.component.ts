@@ -46,8 +46,8 @@ export class PreviewPopupComponent implements OnDestroy {
   get isPdf(): boolean {
     // We dont have time to retrieve metadata, make a best guess by file name
     return (
-      this.document?.original_file_name?.endsWith('.pdf') ||
-      this.document?.archived_file_name?.endsWith('.pdf')
+      this.document?.archived_file_name?.length > 0 ||
+      this.document?.mime_type?.includes('pdf')
     )
   }
 
@@ -62,17 +62,19 @@ export class PreviewPopupComponent implements OnDestroy {
   }
 
   init() {
-    this.http
-      .get(this.previewURL, { responseType: 'text' })
-      .pipe(first(), takeUntil(this.unsubscribeNotifier))
-      .subscribe({
-        next: (res) => {
-          this.previewText = res.toString()
-        },
-        error: (err) => {
-          this.error = err
-        },
-      })
+    if (this.document.mime_type?.includes('text')) {
+      this.http
+        .get(this.previewURL, { responseType: 'text' })
+        .pipe(first(), takeUntil(this.unsubscribeNotifier))
+        .subscribe({
+          next: (res) => {
+            this.previewText = res.toString()
+          },
+          error: (err) => {
+            this.error = err
+          },
+        })
+    }
   }
 
   onError(event: any) {

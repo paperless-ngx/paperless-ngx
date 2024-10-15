@@ -104,6 +104,11 @@ describe('PreviewPopupComponent', () => {
   })
 
   it('should get text content from http if appropriate', () => {
+    component.document = {
+      ...doc,
+      original_file_name: 'sample.txt',
+      mime_type: 'text/plain',
+    }
     const httpSpy = jest.spyOn(http, 'get')
     httpSpy.mockReturnValueOnce(
       throwError(() => new Error('Error getting preview'))
