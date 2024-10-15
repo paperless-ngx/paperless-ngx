@@ -235,8 +235,10 @@ def get_custom_fields_context(
             field_instance.field.data_type,
             replacement_text="-",
         )
+        if field_instance.value is None:
+            value = None
         # String types need to be sanitized
-        if field_instance.field.data_type in {
+        elif field_instance.field.data_type in {
             CustomField.FieldDataType.MONETARY,
             CustomField.FieldDataType.STRING,
             CustomField.FieldDataType.URL,
