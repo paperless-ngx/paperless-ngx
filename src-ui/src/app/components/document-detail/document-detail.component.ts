@@ -72,7 +72,6 @@ import { DeletePagesConfirmDialogComponent } from '../common/confirm-dialog/dele
 import { HotKeyService } from 'src/app/services/hot-key.service'
 import { PDFDocumentProxy } from 'ng2-pdf-viewer'
 import { DataType } from 'src/app/data/datatype'
-import { log } from '@angular-devkit/build-angular/src/builders/ssr-dev-server'
 
 enum DocumentDetailNavIDs {
   Details = 1,

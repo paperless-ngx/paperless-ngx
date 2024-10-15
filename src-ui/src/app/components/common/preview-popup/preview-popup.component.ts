@@ -44,7 +44,6 @@ export class PreviewPopupComponent implements OnDestroy {
   }
 
   get isPdf(): boolean {
-    // We dont have time to retrieve metadata, make a best guess by file name
     return (
       this.document?.archived_file_name?.length > 0 ||
       this.document?.mime_type?.includes('pdf')
