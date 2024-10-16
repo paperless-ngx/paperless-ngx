@@ -76,4 +76,8 @@ textarea.rtl {
   > div {
     mix-blend-mode: difference;
   }
+
+  > img {
+    filter: blur(1px);
+  }
 }
