@@ -7,3 +7,32 @@
 ::ng-deep .popover.popover-preview {
     max-width: 32rem;
 }
+
+// https://github.com/paperless-ngx/paperless-ngx/issues/7920
+// TODO: remove me
+@mixin ff_txt {
+  .preview-popup-container {
+    width: 30rem !important;
+    height: 22rem !important;
+    background-color: #e7e7e7;
+  }
+
+  object {
+    mix-blend-mode: difference;
+    &.p-2 {
+      padding: 0 !important;
+    }
+  }
+}
+
+@-moz-document url-prefix() {
+  html[data-bs-theme='dark'] {
+    @include ff_txt;
+  }
+  html[data-bs-theme='auto'] {
+    @media screen and (prefers-color-scheme: dark) {
+      @include ff_txt;
+    }
+  }
+
+}
