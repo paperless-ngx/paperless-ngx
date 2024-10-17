@@ -31,6 +31,7 @@ const doc = {
   correspondent: 8,
   document_type: 10,
   storage_path: null,
+  page_count: 8,
   notes: [
     {
       id: 11,
@@ -80,6 +81,7 @@ describe('DocumentCardLargeComponent', () => {
   it('should display a document', () => {
     expect(fixture.nativeElement.textContent).toContain('Document 10')
     expect(fixture.nativeElement.textContent).toContain('Cupcake ipsum')
+    expect(fixture.nativeElement.textContent).toContain('8 pages')
   })
 
   it('should show preview on mouseover after delay to preload content', fakeAsync(() => {

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-08-28 17:12-0700\n"
-"PO-Revision-Date: 2024-09-11 16:49\n"
+"PO-Revision-Date: 2024-09-24 12:11\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -925,7 +925,7 @@ msgstr ""
 
 #: documents/models.py:1309
 msgid "enabled"
-msgstr ""
+msgstr "engedélyezve"
 
 #: documents/serialisers.py:120
 #, python-format

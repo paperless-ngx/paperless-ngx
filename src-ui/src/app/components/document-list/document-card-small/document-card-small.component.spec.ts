@@ -34,6 +34,7 @@ const doc = {
   correspondent: 8,
   document_type: 10,
   storage_path: null,
+  page_count: 12,
   notes: [
     {
       id: 11,
@@ -89,6 +90,10 @@ describe('DocumentCardSmallComponent', () => {
     component = fixture.componentInstance
     component.document = Object.assign({}, doc)
     fixture.detectChanges()
+  })
+
+  it('should display page count', () => {
+    expect(fixture.nativeElement.textContent).toContain('12 pages')
   })
 
   it('should display a document, limit tags to 5', () => {

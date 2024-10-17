@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-08-28 17:12-0700\n"
-"PO-Revision-Date: 2024-08-29 03:10\n"
+"PO-Revision-Date: 2024-10-08 00:29\n"
 "Last-Translator: \n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -257,59 +257,59 @@ msgstr "záznamy"
 
 #: documents/models.py:401
 msgid "Table"
-msgstr ""
+msgstr "Tabulka"
 
 #: documents/models.py:402
 msgid "Small Cards"
-msgstr ""
+msgstr "Malé karty"
 
 #: documents/models.py:403
 msgid "Large Cards"
-msgstr ""
+msgstr "Velké karty"
 
 #: documents/models.py:406
 msgid "Title"
-msgstr ""
+msgstr "Název"
 
 #: documents/models.py:407
 msgid "Created"
-msgstr ""
+msgstr "Vytvořeno"
 
 #: documents/models.py:408
 msgid "Added"
-msgstr ""
+msgstr "Přidáno"
 
 #: documents/models.py:409
 msgid "Tags"
-msgstr ""
+msgstr "Štítky"
 
 #: documents/models.py:410
 msgid "Correspondent"
-msgstr ""
+msgstr "Korespondent"
 
 #: documents/models.py:411
 msgid "Document Type"
-msgstr ""
+msgstr "Typ dokumentu"
 
 #: documents/models.py:412
 msgid "Storage Path"
-msgstr ""
+msgstr "Cesta úložiště"
 
 #: documents/models.py:413
 msgid "Note"
-msgstr ""
+msgstr "Poznámka"
 
 #: documents/models.py:414
 msgid "Owner"
-msgstr ""
+msgstr "Majitel"
 
 #: documents/models.py:415
 msgid "Shared"
-msgstr ""
+msgstr "Sdílené"
 
 #: documents/models.py:416
 msgid "ASN"
-msgstr ""
+msgstr "ASN"
 
 #: documents/models.py:422
 msgid "show on dashboard"
@@ -329,11 +329,11 @@ msgstr "třídit opačně"
 
 #: documents/models.py:437
 msgid "View page size"
-msgstr ""
+msgstr "Zobrazit velikost stránky"
 
 #: documents/models.py:445
 msgid "View display mode"
-msgstr ""
+msgstr "Zobrazit režim zobrazení"
 
 #: documents/models.py:452
 msgid "Document display fields"

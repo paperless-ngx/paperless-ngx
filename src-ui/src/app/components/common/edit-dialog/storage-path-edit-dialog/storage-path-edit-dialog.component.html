@@ -10,7 +10,57 @@
   <div class="modal-body">
 
     <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
-    <pngx-input-text i18n-title title="Path" formControlName="path" [error]="error?.path" [hint]="pathHint"></pngx-input-text>
+    <pngx-input-textarea i18n-title title="Path" formControlName="path" [error]="error?.path" hint="See <a target='_blank' href='https://docs.paperless-ngx.com/advanced_usage/#file-name-handling'>the documentation</a>." i18n-hint [monospace]="true"></pngx-input-textarea>
+
+    <div ngbAccordion>
+      <div ngbAccordionItem>
+        <h2 ngbAccordionHeader>
+          <button ngbAccordionButton i18n>Preview</button>
+        </h2>
+        <div ngbAccordionCollapse>
+          <div ngbAccordionBody>
+            <ng-template>
+              <div class="card mb-2">
+                <div class="card-body p-2">
+                  @if (testLoading) {
+                    <ng-container [ngTemplateOutlet]="loadingTemplate"></ng-container>
+                  } @else if (testResult) {
+                    <code>{{testResult}}</code>
+                  } @else if (testFailed) {
+                    <div class="text-danger" i18n>Path test failed</div>
+                  } @else {
+                    <div class="text-muted small" i18n>No document selected</div>
+                  }
+                </div>
+              </div>
+              <ng-select name="testDocument"
+                [items]="foundDocuments$ | async"
+                placeholder="Search for a document" i18n-placeholder
+                notFoundText="No documents found" i18n-notFoundText
+                bindValue="id"
+                bindLabel="title"
+                [compareWith]="compareDocuments"
+                [trackByFn]="trackByFn"
+                [minTermLength]="2"
+                [loading]="loading"
+                [typeahead]="documentsInput$"
+                (change)="testPath($event)">
+                <ng-template #loadingTemplate ng-loadingspinner-tmp>
+                  <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
+                  <div class="visually-hidden" i18n>Loading...</div>
+                </ng-template>
+                <ng-template ng-option-tmp let-document="item" let-index="index" let-search="searchTerm">
+                  <div>{{document.title}} <small class="text-muted">({{document.created | customDate:'shortDate'}})</small></div>
+                </ng-template>
+              </ng-select>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr/>
+
     <pngx-input-select i18n-title title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></pngx-input-select>
     @if (patternRequired) {
       <pngx-input-text i18n-title title="Matching pattern" formControlName="match" [error]="error?.match"></pngx-input-text>

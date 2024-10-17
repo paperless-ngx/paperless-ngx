@@ -16,6 +16,7 @@ import { Subject, filter, take, takeUntil } from 'rxjs'
 import { SelectionDataItem } from 'src/app/services/rest/document.service'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import { HotKeyService } from 'src/app/services/hot-key.service'
+import { popperOptionsReenablePreventOverflow } from 'src/app/utils/popper-options'
 
 export interface ChangedItems {
   itemsToAdd: MatchingModel[]
@@ -330,6 +331,8 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
   @ViewChild('dropdown') dropdown: NgbDropdown
   @ViewChild('buttonItems') buttonItems: ElementRef
 
+  public popperOptions = popperOptionsReenablePreventOverflow
+
   filterText: string
 
   @Input()
@@ -483,7 +486,7 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
   dropdownOpenChange(open: boolean): void {
     if (open) {
       setTimeout(() => {
-        this.listFilterTextInput.nativeElement.focus()
+        this.listFilterTextInput?.nativeElement.focus()
       }, 0)
       if (this.editing) {
         this.selectionModel.reset()
@@ -492,7 +495,7 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
       this.opened.next(this)
     } else {
       if (this.creating) {
-        this.dropdown.open()
+        this.dropdown?.open()
         this.creating = false
       } else {
         this.filterText = ''

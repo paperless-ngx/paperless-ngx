@@ -153,6 +153,7 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
     return new FormGroup({
       name: new FormControl(null),
       account: new FormControl(null),
+      enabled: new FormControl(true),
       folder: new FormControl('INBOX'),
       filter_from: new FormControl(null),
       filter_to: new FormControl(null),

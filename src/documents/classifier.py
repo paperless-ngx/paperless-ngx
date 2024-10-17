@@ -78,9 +78,9 @@ class DocumentClassifier:
 
     def __init__(self):
         # last time a document changed and therefore training might be required
-        self.last_doc_change_time: Optional[datetime] = None
+        self.last_doc_change_time: datetime | None = None
         # Hash of primary keys of AUTO matching values last used in training
-        self.last_auto_type_hash: Optional[bytes] = None
+        self.last_auto_type_hash: bytes | None = None
 
         self.data_vectorizer = None
         self.tags_binarizer = None
@@ -408,7 +408,7 @@ class DocumentClassifier:
 
         return content
 
-    def predict_correspondent(self, content: str) -> Optional[int]:
+    def predict_correspondent(self, content: str) -> int | None:
         if self.correspondent_classifier:
             X = self.data_vectorizer.transform([self.preprocess_content(content)])
             correspondent_id = self.correspondent_classifier.predict(X)
@@ -419,7 +419,7 @@ class DocumentClassifier:
         else:
             return None
 
-    def predict_document_type(self, content: str) -> Optional[int]:
+    def predict_document_type(self, content: str) -> int | None:
         if self.document_type_classifier:
             X = self.data_vectorizer.transform([self.preprocess_content(content)])
             document_type_id = self.document_type_classifier.predict(X)
@@ -451,7 +451,7 @@ class DocumentClassifier:
         else:
             return []
 
-    def predict_storage_path(self, content: str) -> Optional[int]:
+    def predict_storage_path(self, content: str) -> int | None:
         if self.storage_path_classifier:
             X = self.data_vectorizer.transform([self.preprocess_content(content)])
             storage_path_id = self.storage_path_classifier.predict(X)

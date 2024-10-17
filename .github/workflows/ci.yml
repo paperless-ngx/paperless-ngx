@@ -16,9 +16,9 @@ on:
 env:
   # This is the version of pipenv all the steps will use
   # If changing this, change Dockerfile
-  DEFAULT_PIP_ENV_VERSION: "2024.0.1"
+  DEFAULT_PIP_ENV_VERSION: "2024.0.3"
   # This is the default version of Python to use in most steps which aren't specific
-  DEFAULT_PYTHON_VERSION: "3.10"
+  DEFAULT_PYTHON_VERSION: "3.11"
 
 jobs:
   pre-commit:
@@ -100,7 +100,7 @@ jobs:
       - pre-commit
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11']
+        python-version: ['3.10', '3.11', '3.12']
       fail-fast: false
     steps:
       -
@@ -486,7 +486,7 @@ jobs:
         name: Patch whitenoise
         run: |
           curl --fail --silent --show-error --location --output 484.patch https://github.com/evansd/whitenoise/pull/484.patch
-          patch -d $(pipenv --venv)/lib/python3.10/site-packages --verbose -p2 < 484.patch
+          patch -d $(pipenv --venv)/lib/python3.11/site-packages --verbose -p2 < 484.patch
           rm 484.patch
       -
         name: Install system dependencies

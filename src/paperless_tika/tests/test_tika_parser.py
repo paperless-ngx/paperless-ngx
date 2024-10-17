@@ -5,7 +5,6 @@ from pathlib import Path
 
 import pytest
 from httpx import codes
-from httpx._multipart import DataField
 from pytest_django.fixtures import SettingsWrapper
 from pytest_httpx import HTTPXMock
 
@@ -128,11 +127,22 @@ class TestTikaParser:
         tika_parser.convert_to_pdf(sample_odt_file, None)
 
         request = httpx_mock.get_request()
-        found = False
-        for field in request.stream.fields:
-            if isinstance(field, DataField) and field.name == "pdfa":
-                assert field.value == expected_form_value
-                found = True
-        assert found, "pdfFormat was not found"
 
-        httpx_mock.reset(assert_all_responses_were_requested=False)
+        expected_field_name = "pdfa"
+
+        content_type = request.headers["Content-Type"]
+        assert "multipart/form-data" in content_type
+
+        boundary = content_type.split("boundary=")[1]
+
+        parts = request.content.split(f"--{boundary}".encode())
+
+        form_field_found = any(
+            f'name="{expected_field_name}"'.encode() in part
+            and expected_form_value.encode() in part
+            for part in parts
+        )
+
+        assert form_field_found
+
+        httpx_mock.reset()

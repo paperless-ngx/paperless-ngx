@@ -2,7 +2,6 @@ import datetime as dt
 import os
 import shutil
 from pathlib import Path
-from typing import Union
 from unittest import mock
 
 from django.test import TestCase
@@ -34,7 +33,7 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.dirs.double_sided_dir.mkdir()
         self.staging_file = self.dirs.scratch_dir / STAGING_FILE_NAME
 
-    def consume_file(self, srcname, dstname: Union[str, Path] = "foo.pdf"):
+    def consume_file(self, srcname, dstname: str | Path = "foo.pdf"):
         """
         Starts the consume process and also ensures the
         destination file does not exist afterwards

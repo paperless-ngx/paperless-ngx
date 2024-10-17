@@ -511,6 +511,42 @@ class TestBarcode(
             document_list = reader.separate_pages(separator_page_numbers)
             self.assertEqual(len(document_list), 5)
 
+    @override_settings(
+        CONSUMER_ENABLE_BARCODES=True,
+        CONSUMER_ENABLE_ASN_BARCODE=True,
+        CONSUMER_BARCODE_RETAIN_SPLIT_PAGES=True,
+    )
+    def test_separate_pages_by_asn_barcodes_and_patcht_retain_pages(self):
+        """
+        GIVEN:
+            - Input PDF with a patch code on page 3 and ASN barcodes on pages 1,5,6,9,11
+            - Retain split pages is enabled
+        WHEN:
+            - Input file is split on barcodes
+        THEN:
+            - Correct number of files produced, split correctly by correct pages, and the split pages are retained
+        """
+        test_file = self.BARCODE_SAMPLE_DIR / "split-by-asn-2.pdf"
+
+        with self.get_reader(test_file) as reader:
+            reader.detect()
+            separator_page_numbers = reader.get_separation_pages()
+
+            self.assertEqual(
+                reader.pdf_file,
+                test_file,
+            )
+            self.assertDictEqual(
+                separator_page_numbers,
+                {
+                    2: True,
+                    4: True,
+                    5: True,
+                    8: True,
+                    10: True,
+                },
+            )
+
 
 @override_settings(CONSUMER_BARCODE_SCANNER="PYZBAR")
 class TestBarcodeNewConsume(

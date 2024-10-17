@@ -44,6 +44,8 @@ export interface ManagementListColumn {
   valueFn: any
 
   rendersHtml?: boolean
+
+  hideOnMobile?: boolean
 }
 
 @Directive()

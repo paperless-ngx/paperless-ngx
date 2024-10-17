@@ -2,7 +2,7 @@ fix = true
 line-length = 88
 respect-gitignore = true
 src = ["src"]
-target-version = "py39"
+target-version = "py310"
 output-format = "grouped"
 show-fixes = true
 

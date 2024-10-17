@@ -327,13 +327,8 @@ export class DocumentDetailComponent
         switchMap((paramMap) => {
           const documentId = +paramMap.get('id')
           this.docChangeNotifier.next(documentId)
-          return this.documentsService.get(documentId)
-        })
-      )
-      .pipe(
-        switchMap((doc) => {
-          this.documentId = doc.id
-          this.previewUrl = this.documentsService.getPreviewUrl(this.documentId)
+          // Dont wait to get the preview
+          this.previewUrl = this.documentsService.getPreviewUrl(documentId)
           this.http.get(this.previewUrl, { responseType: 'text' }).subscribe({
             next: (res) => {
               this.previewText = res.toString()
@@ -344,6 +339,12 @@ export class DocumentDetailComponent
               }`
             },
           })
+          return this.documentsService.get(documentId)
+        })
+      )
+      .pipe(
+        switchMap((doc) => {
+          this.documentId = doc.id
           this.downloadUrl = this.documentsService.getDownloadUrl(
             this.documentId
           )
@@ -1019,10 +1020,14 @@ export class DocumentDetailComponent
     }
     return (
       !this.document ||
-      this.permissionsService.currentUserHasObjectPermissions(
+      (this.permissionsService.currentUserCan(
         PermissionAction.Change,
-        doc
-      )
+        PermissionType.Document
+      ) &&
+        this.permissionsService.currentUserHasObjectPermissions(
+          PermissionAction.Change,
+          doc
+        ))
     )
   }
 

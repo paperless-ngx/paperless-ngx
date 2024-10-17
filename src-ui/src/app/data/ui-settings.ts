@@ -64,6 +64,8 @@ export const SETTINGS_KEYS = {
   SEARCH_DB_ONLY: 'general-settings:search:db-only',
   SEARCH_FULL_TYPE: 'general-settings:search:more-link',
   EMPTY_TRASH_DELAY: 'trash_delay',
+  GMAIL_OAUTH_URL: 'gmail_oauth_url',
+  OUTLOOK_OAUTH_URL: 'outlook_oauth_url',
 }
 
 export const SETTINGS: UiSetting[] = [
@@ -241,5 +243,15 @@ export const SETTINGS: UiSetting[] = [
     key: SETTINGS_KEYS.EMPTY_TRASH_DELAY,
     type: 'number',
     default: 30,
+  },
+  {
+    key: SETTINGS_KEYS.GMAIL_OAUTH_URL,
+    type: 'string',
+    default: null,
+  },
+  {
+    key: SETTINGS_KEYS.OUTLOOK_OAUTH_URL,
+    type: 'string',
+    default: null,
   },
 ]

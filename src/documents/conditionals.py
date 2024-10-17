@@ -1,6 +1,5 @@
 from datetime import datetime
 from datetime import timezone
-from typing import Optional
 
 from django.conf import settings
 from django.core.cache import cache
@@ -15,7 +14,7 @@ from documents.classifier import DocumentClassifier
 from documents.models import Document
 
 
-def suggestions_etag(request, pk: int) -> Optional[str]:
+def suggestions_etag(request, pk: int) -> str | None:
     """
     Returns an optional string for the ETag, allowing browser caching of
     suggestions if the classifier has not been changed and the suggested dates
@@ -42,7 +41,7 @@ def suggestions_etag(request, pk: int) -> Optional[str]:
     return None
 
 
-def suggestions_last_modified(request, pk: int) -> Optional[datetime]:
+def suggestions_last_modified(request, pk: int) -> datetime | None:
     """
     Returns the datetime of classifier last modification.  This is slightly off,
     as there is not way to track the suggested date setting modification, but it seems
@@ -67,7 +66,7 @@ def suggestions_last_modified(request, pk: int) -> Optional[datetime]:
     return None
 
 
-def metadata_etag(request, pk: int) -> Optional[str]:
+def metadata_etag(request, pk: int) -> str | None:
     """
     Metadata is extracted from the original file, so use its checksum as the
     ETag
@@ -80,7 +79,7 @@ def metadata_etag(request, pk: int) -> Optional[str]:
     return None
 
 
-def metadata_last_modified(request, pk: int) -> Optional[datetime]:
+def metadata_last_modified(request, pk: int) -> datetime | None:
     """
     Metadata is extracted from the original file, so use its modified.  Strictly speaking, this is
     not the modification of the original file, but of the database object, but might as well
@@ -94,7 +93,7 @@ def metadata_last_modified(request, pk: int) -> Optional[datetime]:
     return None
 
 
-def preview_etag(request, pk: int) -> Optional[str]:
+def preview_etag(request, pk: int) -> str | None:
     """
     ETag for the document preview, using the original or archive checksum, depending on the request
     """
@@ -110,7 +109,7 @@ def preview_etag(request, pk: int) -> Optional[str]:
     return None
 
 
-def preview_last_modified(request, pk: int) -> Optional[datetime]:
+def preview_last_modified(request, pk: int) -> datetime | None:
     """
     Uses the documents modified time to set the Last-Modified header.  Not strictly
     speaking correct, but close enough and quick
@@ -123,7 +122,7 @@ def preview_last_modified(request, pk: int) -> Optional[datetime]:
     return None
 
 
-def thumbnail_last_modified(request, pk: int) -> Optional[datetime]:
+def thumbnail_last_modified(request, pk: int) -> datetime | None:
     """
     Returns the filesystem last modified either from cache or from filesystem.
     Cache should be (slightly?) faster than filesystem

@@ -239,7 +239,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
                     "/{created_year_short}/{created_month}/{created_month_name}"
                     "/{created_month_name_short}/{created_day}/{added}/{added_year}"
                     "/{added_year_short}/{added_month}/{added_month_name}"
-                    "/{added_month_name_short}/{added_day}/{asn}/{tags}"
+                    "/{added_month_name_short}/{added_day}/{asn}"
                     "/{tag_list}/{owner_username}/{original_name}/{doc_pk}/",
                 },
             ),
@@ -305,6 +305,35 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
 
         # only called once
         bulk_update_mock.assert_called_once_with([document.pk])
+
+    def test_test_storage_path(self):
+        """
+        GIVEN:
+            - API request to test a storage path
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP response
+            - Correct response data
+        """
+        document = Document.objects.create(
+            mime_type="application/pdf",
+            storage_path=self.sp1,
+            title="Something",
+            checksum="123",
+        )
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "document": document.id,
+                    "path": "path/{{ title }}",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, "path/Something")
 
 
 class TestBulkEditObjects(APITestCase):

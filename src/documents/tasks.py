@@ -5,7 +5,6 @@ import uuid
 from datetime import timedelta
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Optional
 
 import tqdm
 from celery import Task
@@ -106,7 +105,7 @@ def train_classifier():
 def consume_file(
     self: Task,
     input_doc: ConsumableDocument,
-    overrides: Optional[DocumentMetadataOverrides] = None,
+    overrides: DocumentMetadataOverrides | None = None,
 ):
     # Default no overrides
     if overrides is None:

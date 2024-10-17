@@ -235,6 +235,8 @@ class FaultyGenericExceptionParser(_BaseTestParser):
 
 def fake_magic_from_file(file, mime=False):
     if mime:
+        if file.name.startswith("invalid_pdf"):
+            return "application/octet-stream"
         if os.path.splitext(file)[1] == ".pdf":
             return "application/pdf"
         elif os.path.splitext(file)[1] == ".png":
@@ -951,6 +953,27 @@ class TestConsumer(
         self.assertEqual(doc3.archive_filename, "simple.png.pdf")
 
         sanity_check()
+
+    @mock.patch("documents.consumer.run_subprocess")
+    def test_try_to_clean_invalid_pdf(self, m):
+        shutil.copy(
+            Path(__file__).parent / "samples" / "invalid_pdf.pdf",
+            settings.CONSUMPTION_DIR / "invalid_pdf.pdf",
+        )
+        with self.get_consumer(
+            settings.CONSUMPTION_DIR / "invalid_pdf.pdf",
+        ) as consumer:
+            # fails because no qpdf
+            self.assertRaises(ConsumerError, consumer.run)
+
+            m.assert_called_once()
+
+            args, _ = m.call_args
+
+            command = args[0]
+
+            self.assertEqual(command[0], "qpdf")
+            self.assertEqual(command[1], "--replace-input")
 
 
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)

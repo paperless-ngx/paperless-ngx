@@ -140,7 +140,7 @@
   } @else {
     @if (list.displayMode === DisplayMode.LARGE_CARDS) {
       <div>
-        @for (d of list.documents; track trackByDocumentId($index, d)) {
+        @for (d of list.documents; track d.id) {
           <pngx-document-card-large
             [selected]="list.isSelected(d)"
             (toggleSelected)="toggleSelected(d, $event)"
@@ -160,105 +160,116 @@
       <div class="table-responsive">
         <table class="table table-sm align-middle border shadow-sm">
           <thead>
-            <th></th>
-            @if (activeDisplayFields.includes(DisplayField.ASN)) {
-              <th class="cursor-pointer"
-                pngxSortable="archive_serial_number"
-                title="Sort by ASN" i18n-title
-                [currentSortField]="list.sortField"
-                [currentSortReverse]="list.sortReverse"
-                (sort)="onSort($event)"
-                i18n>ASN</th>
-            }
-            @if (activeDisplayFields.includes(DisplayField.CORRESPONDENT) && permissionService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
-              <th class="cursor-pointer"
-                pngxSortable="correspondent__name"
-                title="Sort by correspondent" i18n-title
-                [currentSortField]="list.sortField"
-                [currentSortReverse]="list.sortReverse"
-                (sort)="onSort($event)"
-                i18n>Correspondent</th>
-            }
-            @if (activeDisplayFields.includes(DisplayField.TITLE)) {
-              <th class="cursor-pointer"
-                pngxSortable="title"
-                title="Sort by title" i18n-title
-                [currentSortField]="list.sortField"
-                [currentSortReverse]="list.sortReverse"
-                (sort)="onSort($event)"
-                style="min-width: 150px;"
-                i18n>Title</th>
-            }
-            @if (activeDisplayFields.includes(DisplayField.TAGS) && !activeDisplayFields.includes(DisplayField.TITLE)) {
-              <th i18n>Tags</th>
-            }
-            @if (activeDisplayFields.includes(DisplayField.OWNER) && permissionService.currentUserCan(PermissionAction.View, PermissionType.User)) {
-              <th class="cursor-pointer"
-                pngxSortable="owner"
-                title="Sort by owner" i18n-title
-                [currentSortField]="list.sortField"
-                [currentSortReverse]="list.sortReverse"
-                (sort)="onSort($event)"
-                i18n>Owner</th>
-            }
-            @if (activeDisplayFields.includes(DisplayField.NOTES) && notesEnabled) {
-              <th class="cursor-pointer"
-                pngxSortable="num_notes"
-                title="Sort by notes" i18n-title
-                [currentSortField]="list.sortField"
-                [currentSortReverse]="list.sortReverse"
-                (sort)="onSort($event)"
-                i18n>Notes</th>
-            }
-            @if (activeDisplayFields.includes(DisplayField.DOCUMENT_TYPE) && permissionService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
-              <th class="cursor-pointer"
-                pngxSortable="document_type__name"
-                title="Sort by document type" i18n-title
-                [currentSortField]="list.sortField"
-                [currentSortReverse]="list.sortReverse"
-                (sort)="onSort($event)"
-                i18n>Document type</th>
-            }
-            @if (activeDisplayFields.includes(DisplayField.STORAGE_PATH) && permissionService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
-              <th class="cursor-pointer"
-                pngxSortable="storage_path__name"
-                title="Sort by storage path" i18n-title
-                [currentSortField]="list.sortField"
-                [currentSortReverse]="list.sortReverse"
-                (sort)="onSort($event)"
-                i18n>Storage path</th>
-            }
-            @if (activeDisplayFields.includes(DisplayField.CREATED)) {
-              <th class="cursor-pointer"
-                pngxSortable="created"
-                title="Sort by created date" i18n-title
-                [currentSortField]="list.sortField"
-                [currentSortReverse]="list.sortReverse"
-                (sort)="onSort($event)"
-                i18n>Created</th>
-            }
-            @if (activeDisplayFields.includes(DisplayField.ADDED)) {
-              <th class="cursor-pointer"
-                pngxSortable="added"
-                title="Sort by added date" i18n-title
-                [currentSortField]="list.sortField"
-                [currentSortReverse]="list.sortReverse"
-                (sort)="onSort($event)"
-                i18n>Added</th>
-            }
-            @if (activeDisplayFields.includes(DisplayField.SHARED)) {
-              <th i18n>
-                Shared
-              </th>
-            }
-            @for (field of activeDisplayCustomFields; track field) {
-              <th>
-                {{getDisplayCustomFieldTitle(field)}}
-              </th>
-            }
+            <tr>
+              <th></th>
+              @if (activeDisplayFields.includes(DisplayField.ASN)) {
+                <th class="cursor-pointer"
+                  pngxSortable="archive_serial_number"
+                  title="Sort by ASN" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)"
+                  i18n>ASN</th>
+              }
+              @if (activeDisplayFields.includes(DisplayField.CORRESPONDENT) && permissionService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
+                <th class="cursor-pointer"
+                  pngxSortable="correspondent__name"
+                  title="Sort by correspondent" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)"
+                  i18n>Correspondent</th>
+              }
+              @if (activeDisplayFields.includes(DisplayField.TITLE)) {
+                <th class="cursor-pointer"
+                  pngxSortable="title"
+                  title="Sort by title" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)"
+                  style="min-width: 150px;"
+                  i18n>Title</th>
+              }
+              @if (activeDisplayFields.includes(DisplayField.TAGS) && !activeDisplayFields.includes(DisplayField.TITLE)) {
+                <th i18n>Tags</th>
+              }
+              @if (activeDisplayFields.includes(DisplayField.OWNER) && permissionService.currentUserCan(PermissionAction.View, PermissionType.User)) {
+                <th class="cursor-pointer"
+                  pngxSortable="owner"
+                  title="Sort by owner" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)"
+                  i18n>Owner</th>
+              }
+              @if (activeDisplayFields.includes(DisplayField.NOTES) && notesEnabled) {
+                <th class="cursor-pointer"
+                  pngxSortable="num_notes"
+                  title="Sort by notes" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)"
+                  i18n>Notes</th>
+              }
+              @if (activeDisplayFields.includes(DisplayField.DOCUMENT_TYPE) && permissionService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
+                <th class="cursor-pointer"
+                  pngxSortable="document_type__name"
+                  title="Sort by document type" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)"
+                  i18n>Document type</th>
+              }
+              @if (activeDisplayFields.includes(DisplayField.STORAGE_PATH) && permissionService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
+                <th class="cursor-pointer"
+                  pngxSortable="storage_path__name"
+                  title="Sort by storage path" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)"
+                  i18n>Storage path</th>
+              }
+              @if (activeDisplayFields.includes(DisplayField.CREATED)) {
+                <th class="cursor-pointer"
+                  pngxSortable="created"
+                  title="Sort by created date" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)"
+                  i18n>Created</th>
+              }
+              @if (activeDisplayFields.includes(DisplayField.ADDED)) {
+                <th class="cursor-pointer"
+                  pngxSortable="added"
+                  title="Sort by added date" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)"
+                  i18n>Added</th>
+              }
+              @if (activeDisplayFields.includes(DisplayField.PAGE_COUNT)) {
+                  <th class="cursor-pointer"
+                    pngxSortable="page_count"
+                    title="Sort by number of pages" i18n-title
+                    [currentSortField]="list.sortField"
+                    [currentSortReverse]="list.sortReverse"
+                    (sort)="onSort($event)"
+                    i18n>Pages</th>
+                }
+              @if (activeDisplayFields.includes(DisplayField.SHARED)) {
+                <th i18n>
+                  Shared
+                </th>
+              }
+              @for (field of activeDisplayCustomFields; track field) {
+                <th>
+                  {{getDisplayCustomFieldTitle(field)}}
+                </th>
+              }
+            </tr>
           </thead>
           <tbody>
-            @for (d of list.documents; track trackByDocumentId($index, d)) {
+            @for (d of list.documents; track d.id) {
               <tr (click)="toggleSelected(d, $event); $event.stopPropagation();" (dblclick)="openDocumentDetail(d)" [ngClass]="list.isSelected(d) ? 'table-row-selected' : ''">
                 <td>
                   <div class="form-check">
@@ -330,6 +341,11 @@
                     {{d.added | customDate}}
                   </td>
                 }
+                @if (activeDisplayFields.includes(DisplayField.PAGE_COUNT)) {
+                    <td>
+                        {{ d.page_count }}
+                    </td>
+                  }
                 @if (activeDisplayFields.includes(DisplayField.SHARED)) {
                   <td>
                     @if (d.is_shared_by_requester) { <ng-container i18n>Yes</ng-container> } @else { <ng-container i18n>No</ng-container> }
@@ -348,7 +364,7 @@
     }
     @if (list.displayMode === DisplayMode.SMALL_CARDS) {
       <div class="row row-cols-paperless-cards">
-        @for (d of list.documents; track trackByDocumentId($index, d)) {
+        @for (d of list.documents; track d.id) {
           <pngx-document-card-small class="p-0"
             [selected]="list.isSelected(d)"
             (toggleSelected)="toggleSelected(d, $event)"

@@ -19,8 +19,8 @@ logger = logging.getLogger("paperless.caching")
 class MetadataCacheData:
     original_checksum: str
     original_metadata: list
-    archive_checksum: Optional[str]
-    archive_metadata: Optional[list]
+    archive_checksum: str | None
+    archive_metadata: list | None
 
 
 @dataclass(frozen=True)
@@ -46,7 +46,7 @@ def get_suggestion_cache_key(document_id: int) -> str:
     return f"doc_{document_id}_suggest"
 
 
-def get_suggestion_cache(document_id: int) -> Optional[SuggestionCacheData]:
+def get_suggestion_cache(document_id: int) -> SuggestionCacheData | None:
     """
     If possible, return the cached suggestions for the given document ID.
     The classifier needs to be matching in format and hash and the suggestions need to
@@ -121,13 +121,13 @@ def get_metadata_cache_key(document_id: int) -> str:
     return f"doc_{document_id}_metadata"
 
 
-def get_metadata_cache(document_id: int) -> Optional[MetadataCacheData]:
+def get_metadata_cache(document_id: int) -> MetadataCacheData | None:
     """
     Returns the cached document metadata for the given document ID, as long as the metadata
     was cached once and the checksums have not changed
     """
     doc_key = get_metadata_cache_key(document_id)
-    doc_metadata: Optional[MetadataCacheData] = cache.get(doc_key)
+    doc_metadata: MetadataCacheData | None = cache.get(doc_key)
     # The metadata exists in the cache
     if doc_metadata is not None:
         try:
@@ -161,7 +161,7 @@ def get_metadata_cache(document_id: int) -> Optional[MetadataCacheData]:
 def set_metadata_cache(
     document: Document,
     original_metadata: list,
-    archive_metadata: Optional[list],
+    archive_metadata: list | None,
     *,
     timeout=CACHE_50_MINUTES,
 ) -> None:

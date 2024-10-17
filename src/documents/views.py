@@ -140,6 +140,7 @@ from documents.serialisers import SavedViewSerializer
 from documents.serialisers import SearchResultSerializer
 from documents.serialisers import ShareLinkSerializer
 from documents.serialisers import StoragePathSerializer
+from documents.serialisers import StoragePathTestSerializer
 from documents.serialisers import TagSerializer
 from documents.serialisers import TagSerializerVersion1
 from documents.serialisers import TasksViewSerializer
@@ -151,6 +152,7 @@ from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_updated
 from documents.tasks import consume_file
 from documents.tasks import empty_trash
+from documents.templating.filepath import validate_filepath_template_and_render
 from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import GeneralConfig
@@ -160,6 +162,7 @@ from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+from paperless_mail.oauth import PaperlessMailOAuth2Manager
 from paperless_mail.serialisers import MailAccountSerializer
 from paperless_mail.serialisers import MailRuleSerializer
 
@@ -361,6 +364,7 @@ class DocumentViewSet(
         "archive_serial_number",
         "num_notes",
         "owner",
+        "page_count",
     )
 
     def get_queryset(self):
@@ -1548,6 +1552,25 @@ class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         return response
 
 
+class StoragePathTestView(GenericAPIView):
+    """
+    Test storage path against a document
+    """
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = StoragePathTestSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        document = serializer.validated_data.get("document")
+        path = serializer.validated_data.get("path")
+
+        result = validate_filepath_template_and_render(path, document)
+        return Response(result)
+
+
 class UiSettingsView(GenericAPIView):
     queryset = UiSettings.objects.all()
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
@@ -1582,6 +1605,15 @@ class UiSettingsView(GenericAPIView):
             ui_settings["app_logo"] = general_config.app_logo
 
         ui_settings["auditlog_enabled"] = settings.AUDIT_LOG_ENABLED
+
+        if settings.GMAIL_OAUTH_ENABLED or settings.OUTLOOK_OAUTH_ENABLED:
+            manager = PaperlessMailOAuth2Manager()
+            if settings.GMAIL_OAUTH_ENABLED:
+                ui_settings["gmail_oauth_url"] = manager.get_gmail_authorization_url()
+            if settings.OUTLOOK_OAUTH_ENABLED:
+                ui_settings["outlook_oauth_url"] = (
+                    manager.get_outlook_authorization_url()
+                )
 
         user_resp = {
             "id": user.id,
@@ -1637,9 +1669,8 @@ class RemoteVersionView(GenericAPIView):
             try:
                 remote_json = json.loads(remote)
                 remote_version = remote_json["tag_name"]
-                # Basically PEP 616 but that only went in 3.9
-                if remote_version.startswith("ngx-"):
-                    remote_version = remote_version[len("ngx-") :]
+                # Some early tags used ngx-x.y.z
+                remote_version = remote_version.removeprefix("ngx-")
             except ValueError:
                 logger.debug("An error occurred parsing remote version json")
         except urllib.error.URLError:
@@ -1896,6 +1927,32 @@ class CustomFieldViewSet(ModelViewSet):
     model = CustomField
 
     queryset = CustomField.objects.all().order_by("-created")
+
+    def get_queryset(self):
+        filter = (
+            Q(fields__document__deleted_at__isnull=True)
+            if self.request.user is None or self.request.user.is_superuser
+            else (
+                Q(
+                    fields__document__deleted_at__isnull=True,
+                    fields__document__id__in=get_objects_for_user_owner_aware(
+                        self.request.user,
+                        "documents.view_document",
+                        Document,
+                    ).values_list("id", flat=True),
+                )
+            )
+        )
+        return (
+            super()
+            .get_queryset()
+            .annotate(
+                document_count=Count(
+                    "fields",
+                    filter=filter,
+                ),
+            )
+        )
 
 
 class SystemStatusView(PassUserMixin):
