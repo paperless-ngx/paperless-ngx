@@ -1020,10 +1020,14 @@ export class DocumentDetailComponent
     }
     return (
       !this.document ||
-      this.permissionsService.currentUserHasObjectPermissions(
+      (this.permissionsService.currentUserCan(
         PermissionAction.Change,
-        doc
-      )
+        PermissionType.Document
+      ) &&
+        this.permissionsService.currentUserHasObjectPermissions(
+          PermissionAction.Change,
+          doc
+        ))
     )
   }
 
