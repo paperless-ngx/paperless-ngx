@@ -35,11 +35,11 @@ export class DossierCustomFieldSelectComponent
 
   @Input()
   title: string = ''
-  
+
   @Input()
   error: string
 
-  
+
   private arrayCustomFields: CustomField[]=[]
   private unsubscribeNotifier: Subject<any> = new Subject()
   public unusedFields: CustomField[]
@@ -76,9 +76,9 @@ export class DossierCustomFieldSelectComponent
   @Input()
   set inheritedCustomFields(inherited: CustomFieldInstance[]) {
     this.loading =false
-    
+
     this.dictCustomFields={}
-    
+
     this.dictCustomFieldsEnable={}
     const newInheritedCustomFields = inherited?.length? inherited: []
     this.getFields(newInheritedCustomFields);
@@ -86,8 +86,8 @@ export class DossierCustomFieldSelectComponent
 
   }
 
-  @Input() inputDossier: Dossier 
-  @Input() inputDossierForm: DossierForm 
+  @Input() inputDossier: Dossier
+  @Input() inputDossierForm: DossierForm
   @Output() dataChange = new EventEmitter<any[]>();
 
   inheritedWarning: string = $localize`Inherited from dossier`
@@ -107,25 +107,25 @@ export class DossierCustomFieldSelectComponent
     //   this.dataDossier()
     // }
     // if(this.inputDossierForm!=undefined){
-  
+
     // }
 
     this.customFields.valueChanges.subscribe(data => {
-      const filteredData = data.filter(item => this.dictCustomFieldsEnable[item.field]);      
+      const filteredData = data.filter(item => this.dictCustomFieldsEnable[item.field]);
         this.dataChange.emit(filteredData);
     });
-    
+
   }
-  
+
 
   get customFields(): FormArray {
     return this.form.get('customFields') as FormArray;
   }
-  
+
 
   private getFields(newInheritedCustomFields) {
-    
-    
+
+
     this.customFieldsService.clearCache();
     this.customFieldsService
     .listAll()
@@ -136,8 +136,8 @@ export class DossierCustomFieldSelectComponent
       this.writeValue(newInheritedCustomFields)
       // console.log('gia tri',this.arrayCustomFields)
     })
-    
-    
+
+
   }
 
   dataDossier(id){
@@ -154,7 +154,7 @@ export class DossierCustomFieldSelectComponent
         this.dossier = c.results
       })
   }
-  
+
   writeValue(newInheritedCustomFields): void {
     console.log("call",newInheritedCustomFields,)
     this.dictCustomFields = {};
@@ -163,8 +163,8 @@ export class DossierCustomFieldSelectComponent
       this.dictCustomFields[obj.field] = obj;
       this.dictCustomFieldsEnable[obj.field] = true;
     });
-    
-   
+
+
     for (let c of this.arrayCustomFields) {
       if (!(c.id in this.dictCustomFields)) {
         this.dictCustomFields[c.id] = {
@@ -177,7 +177,7 @@ export class DossierCustomFieldSelectComponent
           "value_reference": null,
           "value_origin": null,
           "apply": false,
-          
+
         };
         this.dictCustomFieldsEnable[c.id] = false
       }else{
@@ -191,9 +191,9 @@ export class DossierCustomFieldSelectComponent
           "value_reference": null,
           "value_origin": this.dictCustomFields[c.id].value,
           "apply": false,
-          
+
         };
-        
+
         this.dictCustomFieldsEnable[c.id] = true
       }
     }
@@ -210,14 +210,14 @@ export class DossierCustomFieldSelectComponent
           value_origin: new FormControl(value?.value_origin),
           apply: new FormControl(value?.apply),
         }));
-        
+
       }
       this.dossierReference.push([])
-    }   
-    
+    }
+
   }
 
-  
+
   onChange = (newValue: string[]) => {}
 
   onTouched = () => {}
@@ -237,7 +237,7 @@ export class DossierCustomFieldSelectComponent
   ngOnInit(): void {
     if(this.inputDossier!=undefined){
       this.dataDossier(this.inputDossier.id)
-    } 
+    }
   }
 
   enableClick(event, field) {
@@ -256,33 +256,33 @@ export class DossierCustomFieldSelectComponent
     }
     this.dataChange.emit(result);
   }
-  
+
   applyClick(event,field,index) {
     if (this.customFields.at(index).get('apply').value==false){
       let fieldId = this.customFields.at(index).get('field').value
       this.dictCustomFields[fieldId]?.apply==true
       this.customFields.at(index).patchValue({value: this.customFields.at(index).get('value_reference').value})
       this.customFields.at(index).patchValue({apply: true})
-  
+
     }else if(this.customFields.at(index).get('apply').value==true){
       let fieldId = this.customFields.at(index).get('field').value
       this.dictCustomFields[fieldId]?.apply==false
       this.customFields.at(index).patchValue({value: this.customFields.at(index).get('value_origin').value})
       // this.customFields.at(index).patchValue({value: this.customFields.at(index).get('value_reference').value})
       this.customFields.at(index).patchValue({apply: false})
-  
+
     }
   }
- 
+
   onMatchValueChange(event, field: any) {
     field.value.match_value=event.target.value
-   
+
   }
 
   modelChangeDossier(event,i) {
     if (event!=null){
       const d = this.dossier.find(obj => obj.id === event);
-      console.log(this.dossier)
+      // console.log(this.dossier)
       this.dossierReference[i]=d?.custom_fields
     }
   }
@@ -291,7 +291,7 @@ export class DossierCustomFieldSelectComponent
     if (event!=null){
       const d = this.dossierReference[index].find(obj => obj.id === event);
       this.customFields.at(index).patchValue({value_reference: d?.value})
-      
+
       this.dictCustomFields[this.customFields.at(index).get('field').value].value_reference = d?.value
     }
   }

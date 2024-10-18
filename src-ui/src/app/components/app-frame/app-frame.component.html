@@ -221,13 +221,12 @@
             </li>
 
             <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Warehouse }">
-                <a class="nav-link" (click)="toggleKho()" routerLink="warehouses" ngbPopover="Warehouses" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
-                    container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                    <i-bs class="me-1" name="house"></i-bs>
-                    <span>&nbsp;<ng-container i18n>Warehouse</ng-container></span>
-                </a>
+              <a class="nav-link" routerLink="warehouses/root" routerLinkActive="active" (click)="closeMenu()"
+                ngbPopover="Warehouses" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
+                container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+                <i-bs class="me-1" name="house"></i-bs><span>&nbsp;<ng-container i18n>Warehouses</ng-container></span>
+              </a>
             </li>
-
 
             <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }">
                   <a class="nav-link" routerLink="customfields" routerLinkActive="active" (click)="closeMenu()"

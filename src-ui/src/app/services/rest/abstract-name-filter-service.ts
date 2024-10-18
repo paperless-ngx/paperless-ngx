@@ -127,59 +127,6 @@ export abstract class AbstractNameFilterService<T extends ObjectWithId,> extends
     return this.list(page, pageSize, sortField, sortReverse, params)
   }
 
-  listGia(page?: number,
-    pageSize?: number,
-    sortField?: string,
-    sortReverse?: boolean,
-    nameFilter?: string,
-    fullPerms?: boolean) {
-    let params = {}
-    if (nameFilter) {
-      params['name__icontains'] = nameFilter
-    }
-    if (fullPerms) {
-      params['full_perms'] = true
-    }
-    params['type__iexact'] = 'Shelf'
-
-    return this.list(page, pageSize, sortField, sortReverse, params)
-  }
-
-  listBox(page?: number,
-    pageSize?: number,
-    sortField?: string,
-    sortReverse?: boolean,
-    nameFilter?: string,
-    fullPerms?: boolean) {
-    let params = {}
-    if (nameFilter) {
-      params['name__icontains'] = nameFilter
-    }
-    if (fullPerms) {
-      params['full_perms'] = true
-    }
-    params['type__iexact'] = 'Boxcase'
-
-    return this.list(page, pageSize, sortField, sortReverse, params)
-  }
-
-  listWarehouse(page?: number,
-    pageSize?: number,
-    sortField?: string,
-    sortReverse?: boolean,
-    nameFilter?: string,
-    fullPerms?: boolean) {
-    let params = {}
-    if (nameFilter) {
-      params['name__icontains'] = nameFilter
-    }
-    if (fullPerms) {
-      params['full_perms'] = true
-    }
-    params['type__iexact'] = 'Warehouse'
-
-    return this.list(page, pageSize, sortField, sortReverse, params)
-  }
 
 
   bulk_edit_objects(

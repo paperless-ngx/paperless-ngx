@@ -92,12 +92,6 @@ extends CustomFolderListComponent<Folder> {
         queryParams: getQueryParams
       }
     );
-    // this.preFolder
-    //
-    // console.log('folder cũ ',this.preFolder)
-    // this.preFolder = object.id
-    // console.log('folder mới',this.preFolder)
-
     super.reloadData()
 
   }

@@ -15,7 +15,7 @@
             </button>
           </div>
         </div>
-        <div class="d-flex align-items-center gap-2" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
+        <div class="d-flex flex-wrap align-items-center gap-2 w" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
           <label class="me-2" i18n>Edit:</label>
           @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.Tag)) {
             <pngx-filterable-dropdown title="Tags" icon="tag-fill" i18n-title
@@ -75,7 +75,7 @@
             </pngx-filterable-dropdown>
           }
           @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.Warehouse)) {
-            <pngx-filterable-dropdown title="Warehouse" icon="folder-fill" i18n-title
+            <pngx-filterable-dropdown title="Warehouse" icon="house-door-fill" i18n-title
               filterPlaceholder="Filter warehouses" i18n-filterPlaceholder
               [items]="warehouses"
               [disabled]="!userCanEditAll"
@@ -84,7 +84,7 @@
               [(selectionModel)]="warehouseSelectionModel"
               (apply)="setWarehouses($event)">
             </pngx-filterable-dropdown>
-            <pngx-filterable-dropdown title="Shelf" icon="folder-fill" i18n-title
+            <pngx-filterable-dropdown title="Shelf" icon="bookshelf" i18n-title
               filterPlaceholder="Filter shelfs" i18n-filterPlaceholder
               [items]="shelfs"
               [disabled]="!userCanEditAll"
@@ -93,7 +93,7 @@
               [(selectionModel)]="shelfSelectionModel"
               (apply)="setShelfs($event)">
             </pngx-filterable-dropdown>
-            <pngx-filterable-dropdown title="Boxcase" icon="folder-fill" i18n-title
+            <pngx-filterable-dropdown title="Boxcase" icon="inboxes-fill" i18n-title
               filterPlaceholder="Filter boxcases" i18n-filterPlaceholder
               [items]="boxcases"
               [disabled]="!userCanEditAll"

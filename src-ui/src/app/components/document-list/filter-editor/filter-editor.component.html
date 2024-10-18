@@ -71,7 +71,7 @@
           [allowSelectNone]="true"></pngx-filterable-dropdown>
         }
         @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Warehouse)) {
-          <pngx-filterable-dropdown class="flex-fill" title="Warehouse" icon="house-fill" i18n-title
+          <pngx-filterable-dropdown class="flex-fill" title="Warehouse" icon="house-door-fill" i18n-title
           filterPlaceholder="Filter warehouses" i18n-filterPlaceholder
           [items]="warehouses"
           [(selectionModel)]="warehouseSelectionModel"
@@ -79,16 +79,16 @@
           (opened)="onWarehouseDropdownOpen()"
           [allowSelectNone]="true"></pngx-filterable-dropdown>
 
-          <pngx-filterable-dropdown class="flex-fill" title="Shelf" icon="house-fill" i18n-title
+          <pngx-filterable-dropdown class="flex-fill" title="Shelf" icon="bookshelf" i18n-title
           filterPlaceholder="Filter shelf" i18n-filterPlaceholder
           [items]="shelfs"
           [(selectionModel)]="shelfSelectionModel"
           (selectionModelChange)="updateRules()"
           (opened)="onShelfDropdownOpen()"
-          
+
           [allowSelectNone]="true"></pngx-filterable-dropdown>
-          
-          <pngx-filterable-dropdown class="flex-fill" title="Boxcase" icon="house-fill" i18n-title
+
+          <pngx-filterable-dropdown class="flex-fill" title="Boxcase" icon="inboxes-fill" i18n-title
           filterPlaceholder="Filter boxcase" i18n-filterPlaceholder
           [items]="boxcases"
           [(selectionModel)]="boxcaseSelectionModel"

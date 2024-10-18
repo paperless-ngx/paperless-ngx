@@ -20,7 +20,7 @@
                   <td scope="row" class="d-md-table-cell custom-width-content">
                  <span class="text-primary">
                     <i-bs class="me-1 custom-cursor" (click)="getNode(object,$event);" name="chevronRight" width="1.5rem" height="1.5rem"></i-bs>
-                    <i-bs class="me-1 custom-cursor" (click)="this.goToNode.emit(object); $event.stopPropagation()" name="house" width="2rem" height="2rem"></i-bs>
+                    <i-bs class="me-1 custom-cursor" (click)="this.goToNode.emit(object); $event.stopPropagation()" name="house-door-fill" width="2rem" height="2rem"></i-bs>
                    {{ object.name }}
                   </span>
 
@@ -37,8 +37,8 @@
                 } @else if  (object.type == 'Boxcase') {
                   <td scope="row" class="d-md-table-cell custom-width-content p-1">
                  <span class="text-primary">
-                    <i-bs class="me-1 custom-cursor" (click)="getNode(object,$event);" name="chevronRight" width="1.5rem" height="1.5rem"></i-bs>
-                    <i-bs class="me-1 custom-cursor" (click)="this.goToNode.emit(object); $event.stopPropagation()" name="inboxes" width="1.5rem" height="1.5rem"></i-bs>
+<!--                    <i-bs class="me-1 custom-cursor" (click)="getNode(object,$event);" name="chevronRight" width="1.5rem" height="1.5rem"></i-bs>-->
+                    <i-bs class="me-1 custom-cursor" (click)="this.goToNode.emit(object); $event.stopPropagation()" name="inboxes-fill" width="1.5rem" height="1.5rem"></i-bs>
                    {{ object.name }}
                   </span>
 

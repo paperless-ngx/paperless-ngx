@@ -125,7 +125,6 @@ export class FileTreeWidgetComponent extends ComponentWithPermissions
   }
 
   reload() {
-    console.log(this.nodeId)
     if (this.nodeId == 0) {
       this.folderService.listFolderFiltered(
         this.pageNumber,

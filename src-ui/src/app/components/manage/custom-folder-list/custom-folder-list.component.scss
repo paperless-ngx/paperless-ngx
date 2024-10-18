@@ -51,10 +51,10 @@ $paperless-card-breakpoints: (
   .folder-tree {
     position: fixed;
     bottom: 0;
-    left: 0; /* Cố định ở bên trái */
-    right: 0; /* Cố định ở bên phải */
+    //left: 0; /* Cố định ở bên trái */
+    //right: 0; /* Cố định ở bên phải */
 
-    z-index: 4; /* Đảm bảo nằm trên các phần tử khác */
+    z-index: 6; /* Đảm bảo nằm trên các phần tử khác */
     margin-bottom:30px
   }
   .folder-tree-content {
@@ -62,9 +62,15 @@ $paperless-card-breakpoints: (
 
   }
 }
+@media (min-width: 768px) {
+
+  .folder-tree {
+    display: block;
+  }
+}
 
 .folder-tree-content {
     overflow: auto;
-    height: 75vh;
+    height: 65vh;
 
   }

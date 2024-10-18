@@ -6,22 +6,22 @@ import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
 import { of } from 'rxjs'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SortableDirective } from 'src/app/directives/sortable.directive'
-import { WarehouseService } from 'src/app/services/rest/warehouse.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
-
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { WarehouseListComponent } from './warehouse-list.component'
+import { BoxCaseComponent } from './boxcase.component'
+import { BoxService } from 'src/app/services/rest/box.service'
 
-describe('WarehouseListComponent', () => {
-  let component: WarehouseListComponent
-  let fixture: ComponentFixture<WarehouseListComponent>
-  let warehouseService: WarehouseService
+
+describe('BoxFieldsComponent', () => {
+  let component: BoxCaseComponent
+  let fixture: ComponentFixture<BoxCaseComponent>
+  let boxService: BoxService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
       declarations: [
-        WarehouseListComponent,
+        BoxCaseComponent,
         SortableDirective,
         PageHeaderComponent,
         IfPermissionsDirective,
@@ -37,8 +37,8 @@ describe('WarehouseListComponent', () => {
       ],
     }).compileComponents()
 
-    warehouseService = TestBed.inject(WarehouseService)
-    jest.spyOn(warehouseService, 'listFiltered').mockReturnValue(
+    boxService = TestBed.inject(BoxService)
+    jest.spyOn(boxService, 'listFiltered').mockReturnValue(
       of({
         count: 3,
         all: [1, 2, 3],
@@ -58,7 +58,7 @@ describe('WarehouseListComponent', () => {
         ],
       })
     )
-    fixture = TestBed.createComponent(WarehouseListComponent)
+    fixture = TestBed.createComponent(BoxCaseComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
   })

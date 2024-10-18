@@ -2426,7 +2426,7 @@
          </trans-unit>
          <trans-unit id="9187755754633397589" datatype="html">
             <source>
-                
+
                <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;" />
                Appears on
                <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
@@ -4770,7 +4770,7 @@
                <context context-type="linenumber">45</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/warehouse-list/warehouse-list.component.ts</context>
+               <context context-type="sourcefile">src/app/components/manage/warehouse-list/warehouse.component.ts</context>
                <context context-type="linenumber">44</context>
             </context-group>
             <target state="translated">Kiểu</target>
@@ -9117,7 +9117,7 @@
             <target state="translated">
                {VAR_PLURAL, plural, =1 {Đã chọn
                <x id="INTERPOLATION" />
-               của 1 tài liệu} 
+               của 1 tài liệu}
                other {Đã chọn
                <x id="INTERPOLATION" />
                trong
@@ -10991,7 +10991,7 @@
          <trans-unit id="7311260203118047667" datatype="html">
             <source>warehouse</source>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/warehouse-list/warehouse-list.component.ts</context>
+               <context context-type="sourcefile">src/app/components/manage/warehouse-list/warehouse.component.ts</context>
                <context context-type="linenumber">38</context>
             </context-group>
             <target state="translated">kho</target>
@@ -10999,7 +10999,7 @@
          <trans-unit id="3780468104925816143" datatype="html">
             <source>warehouses</source>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/warehouse-list/warehouse-list.component.ts</context>
+               <context context-type="sourcefile">src/app/components/manage/warehouse-list/warehouse.component.ts</context>
                <context context-type="linenumber">39</context>
             </context-group>
             <target state="translated">kho</target>
@@ -11011,7 +11011,7 @@
                "?
             </source>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/warehouse-list/warehouse-list.component.ts</context>
+               <context context-type="sourcefile">src/app/components/manage/warehouse-list/warehouse.component.ts</context>
                <context context-type="linenumber">55</context>
             </context-group>
             <target state="translated">

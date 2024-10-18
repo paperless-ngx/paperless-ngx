@@ -1,6 +1,6 @@
 <pngx-page-header title="{{ typeNamePlural | titlecase }}">
 
-  <div class="btn-group flex-fill" role="group">
+  <div class="btn-group flex-fill z-0" role="group" >
     <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="details" (ngModelChange)="saveDisplayMode()"
            id="displayModeDetails" name="displayModeDetails">
     <label for="displayModeDetails" class="btn btn-outline-primary btn-sm">
@@ -74,58 +74,58 @@
 
 
 <div class="fixed-bottom end-0  d-lg-none " style="z-index:5">
-    <button (click)="toggleSidebar($event)" class="btn btn-sm btn-primary ms-md-5">
-      <i-bs  name="chevronUp" width="1rem" height="1rem"></i-bs> &nbsp;{{buttonLabel }}
-    </button>
+  <button (click)="toggleSidebar($event)" class="btn btn-sm btn-primary ms-md-5">
+    <i-bs name="chevron-down" width="1rem" height="1rem"></i-bs> &nbsp;{{ buttonLabel }}
+  </button>
 
 </div>
+<div class="form-inline d-flex align-items-center overflow-auto mb-1">
+  <a class="me" (click)="goToFolderRoot(); ">
+    <i-bs class="" name="house" width="2rem"
+          height="2rem"></i-bs>
+  </a>
 
+  <div *ngFor="let folder of folderPath; let i = index" class="fs-5"
+       style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center;">
+    <ng-container *ngIf="i >= folderPath.length - 3 || i < 3">
+      <i-bs class="" name="chevron-right"></i-bs>&nbsp;<a class="me custom-cursor" (click)="goToFolder(folder)">
+      {{ folder.name }}
+    </a>
+    </ng-container>
+    <ng-container *ngIf="i === 2&&folderPath.length>i+1 ">
+      <i-bs class="" name="chevron-right"></i-bs>&nbsp;<a class="me custom-cursor" >
+      ...
+    </a>
+    </ng-container>
+  </div>
+
+</div>
+<div class="row mb-3 ">
+  <div class="col-md mb-2 mb-xl-0">
+    <div class="form-inline d-flex align-items-center">
+      <label class="text-muted me-2 mb-0" i18n>Filter by:</label>
+      <input class="form-control form-control-sm flex-fill w-auto" type="text" autofocus [(ngModel)]="nameFilter"
+             (keyup)="onNameFilterKeyUp($event)" placeholder="Name" i18n-placeholder>
+    </div>
+  </div>
+
+  <ngb-pagination class="col-auto z-0" [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page" [maxSize]="5"
+                  (pageChange)="reloadData()" size="sm" aria-label="Pagination" ></ngb-pagination>
+</div>
 <div class="row row-cols-1 g-4 mb-4 sticky-lg-top z-0" style="position:relative">
-  <div class="col-md-4 p-1 folder-tree" [ngClass]="{'collapse': !isSidebarVisible}">
-    <pngx-widget-frame title="Folder Tree"  [loading]="isLoading" i18n-title>
-    <!-- Chỉ hiển thị trên màn hình lớn -->
-        <ng-container content>
-          <div class="folder-tree-content" >
-            <pngx-file-tree-widget (goToNode)="goToFolder($event)"></pngx-file-tree-widget>
-          </div>
-        </ng-container>
+  <div class="col-md-4 folder-tree" [ngClass]="{'collapse': !isSidebarVisible}">
+    <pngx-widget-frame title="Folder Tree" [loading]="isLoading" i18n-title>
+      <!-- Chỉ hiển thị trên màn hình lớn -->
+      <ng-container content>
+        <div class="folder-tree-content">
+          <pngx-file-tree-widget (goToNode)="goToFolder($event)"></pngx-file-tree-widget>
+        </div>
+      </ng-container>
     </pngx-widget-frame>
   </div>
   <div class="col-md-8 ">
 
-    <div class="form-inline d-flex align-items-center overflow-auto">
-      <a class="me" (click)="goToFolderRoot(); ">
-        <i-bs class="" name="folder-fill" width="2rem"
-              height="2rem"></i-bs>
-      </a>
 
-      <div *ngFor="let folder of folderPath; let i = index" class="fs-5"
-           style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center;">
-        <ng-container *ngIf="i >= folderPath.length - 3 || i < 3">
-          <i-bs class="" name="chevron-right"></i-bs>&nbsp;<a class="me custom-cursor" (click)="goToFolder(folder)">
-          {{ folder.name }}
-        </a>
-        </ng-container>
-        <ng-container *ngIf="i === 2&&folderPath.length>i+1 ">
-          <i-bs class="" name="chevron-right"></i-bs>&nbsp;<a class="me custom-cursor" (click)="goToFolder(folder)">
-          ...
-        </a>
-        </ng-container>
-      </div>
-
-    </div>
-    <div class="row mb-3">
-      <div class="col-md mb-2 mb-xl-0">
-        <div class="form-inline d-flex align-items-center">
-          <label class="text-muted me-2 mb-0" i18n>Filter by:</label>
-          <input class="form-control form-control-sm flex-fill w-auto" type="text" autofocus [(ngModel)]="nameFilter"
-                 (keyup)="onNameFilterKeyUp($event)" placeholder="Name" i18n-placeholder>
-        </div>
-      </div>
-
-      <ngb-pagination class="col-auto" [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page" [maxSize]="5"
-                      (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
-    </div>
     @if (displayMode === 'details') {
       <!-- <div class="card border mb-3"> -->
       <table class="table table-sm align-middle border shadow-sm">

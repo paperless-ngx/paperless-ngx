@@ -329,12 +329,6 @@ export class AppFrameComponent
     }
   }
 
-  toggleKho() {
-    this.isKhoExpanded = !this.isKhoExpanded;
-  }
-  toggleGia() {
-    this.isGiaExpanded = !this.isGiaExpanded;
-  }
   closeMenus() {
     this.isKhoVatLyExpanded = false;
     this.isKhoExpanded = false;

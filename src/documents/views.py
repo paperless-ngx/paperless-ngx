@@ -2255,7 +2255,30 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     ordering_fields = ("name", "type", "parent_warehouse", "document_count")
 
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
 
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            ordering = request.query_params.get('ordering', None)
+            print('ordering',ordering)
+            if ordering == 'document_count':
+                print('-document_count')
+                sorted_data = sorted(serializer.data,
+                                     key=lambda x: x['document_count'])
+
+            elif ordering == '-document_count':
+                print('+document_count')
+                sorted_data = sorted(serializer.data,
+                                     key=lambda x: x['document_count'],
+                                     reverse=True)
+            else:
+                sorted_data = serializer.data
+            print(sorted_data)
+            return self.get_paginated_response(sorted_data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         # try:
@@ -2264,8 +2287,8 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         if serializer.is_valid(raise_exception=True):
             parent_warehouse = serializer.validated_data.get('parent_warehouse',None)
 
-        parent_warehouse = Warehouse.objects.filter(id=parent_warehouse.id if parent_warehouse else 0).first()
-
+        parent_warehouse = Warehouse.objects.filter(id=parent_warehouse.id if parent_warehouse else None).first()
+        print(parent_warehouse, serializer.validated_data.get("type"))
         if serializer.validated_data.get("type") == Warehouse.WAREHOUSE and not parent_warehouse:
             warehouse = serializer.save(owner=request.user)
             warehouse.path = str(warehouse.id)
@@ -2354,6 +2377,31 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @action(methods=["get"], detail=True)
+    def warehouse_path(self, request, pk=None):
+        if request.method == "GET":
+            try:
+                warehouse = Warehouse.objects.get(pk=pk)
+                warehouse_path_ids= warehouse.path.split('/')
+                warehouses = Warehouse.objects.filter(id__in=warehouse_path_ids)
+                warehouse_dict = {}
+                for f in warehouses:
+                    warehouse_dict[f.id] = f
+                warehouse_path_list = []
+                for p in warehouse_path_ids:
+                    value = warehouse_dict.get(int(p))
+                    warehouse_path_list.append(value)
+                warehouse_serializers = WarehouseSerializer(warehouse_path_list,
+                                                       many=True)
+                return Response({"results": warehouse_serializers.data},
+                                status=status.HTTP_200_OK)
+            except Exception as e:
+                logger.error(f"An error occurred retrieving warehouse: {e!s}")
+                return Response(
+                    {
+                        "error": "Error retrieving warehouses, check logs for more detail."},
+                )
+
 
 
 class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
@@ -2378,6 +2426,28 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     filterset_class = FolderFilterSet
     ordering_fields = ("name", "path", "parent_folder", "document_count")
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            ordering = request.query_params.get('ordering', None)
+            print('ordering',ordering)
+            if ordering == 'document_count':
+                sorted_data = sorted(serializer.data,
+                                     key=lambda x: x['document_count'])
+            elif ordering == '-document_count':
+
+                sorted_data = sorted(serializer.data,
+                                     key=lambda x: x['document_count'],
+                                     reverse=True)
+            else:
+                sorted_data = serializer.data
+            print(sorted_data)
+            return self.get_paginated_response(sorted_data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def getFolderDoc(self, request):
         currentUser = request.user

@@ -28,7 +28,7 @@ import { UsersAndGroupsComponent } from './components/admin/users-groups/users-g
 import { ConfigComponent } from './components/admin/config/config.component'
 import { ApprovalsComponent } from './components/admin/approval/approvals.component'
 
-import { WarehouseListComponent } from './components/manage/warehouse-list/warehouse-list.component'
+import { WarehouseComponent } from './components/manage/warehouse/warehouse.component'
 import { BoxCaseComponent } from './components/manage/boxcase/boxcase.component'
 
 
@@ -38,13 +38,6 @@ import { CustomFieldsComponent } from './components/manage/custom-fields/custom-
 import { FoldersComponent } from './components/manage/folder-list/folder-list.component'
 import { DossiersComponent } from './components/manage/dossier-list/dossier-list.component'
 import { DossiersFormComponent } from './components/manage/dossier-form-list/dossier-form-list.component'
-
-
-
-
-
-
-
 
 
 
@@ -171,7 +164,7 @@ export const routes: Routes = [
         },
       },
       {
-        path: 'box/:id',
+        path: 'boxcase/:id',
         component: BoxCaseComponent,
         canActivate: [PermissionsGuard],
         data: {
@@ -193,8 +186,8 @@ export const routes: Routes = [
         },
       },
       {
-        path: 'warehouses',
-        component: WarehouseListComponent,
+        path: 'warehouses/:id',
+        component: WarehouseComponent,
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {

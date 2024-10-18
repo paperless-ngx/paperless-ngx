@@ -85,7 +85,7 @@ export class WarehouseTreeWidgetComponent extends ComponentWithPermissions
     if (object.type === 'Warehouse') {
       let params = {}
       params['type__iexact'] = 'Shelf';
-      params['parent_warehouse__iexact'] = object.id;
+      params['parent_warehouse'] = object.id;
 
       this.warehouseService.listFilteredCustom(
         1,
@@ -102,6 +102,7 @@ export class WarehouseTreeWidgetComponent extends ComponentWithPermissions
     else if (object.type === 'Shelf') {
       let params = {}
       params['type__iexact'] = 'Boxcase'
+      params['parent_warehouse'] = object.id;
       this.warehouseService.listFilteredCustom(
         1,
         null,
@@ -147,7 +148,6 @@ export class WarehouseTreeWidgetComponent extends ComponentWithPermissions
   }
 
   reload() {
-    console.log(this.nodeId)
     if (this.nodeId == 0) {
       this.warehouseService.listFiltered(
         1,

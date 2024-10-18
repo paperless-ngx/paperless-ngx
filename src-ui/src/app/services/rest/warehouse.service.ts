@@ -13,4 +13,7 @@ export class WarehouseService extends AbstractNameFilterService<Warehouse> {
   constructor(http: HttpClient) {
     super(http, 'warehouses')
   }
+  getWarehousePath(id: number): Observable<Warehouse> {
+    return this.http.get<Warehouse>(this.getResourceUrl(id, 'warehouse_path'))
+  }
 }

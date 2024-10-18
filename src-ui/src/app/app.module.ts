@@ -114,7 +114,7 @@ import { CustomFieldsComponent } from './components/manage/custom-fields/custom-
 import { FoldersComponent } from './components/manage/folder-list/folder-list.component'
 import { BoxCaseComponent } from './components/manage/boxcase/boxcase.component'
 import { WarehouseEditDialogComponent } from './components/common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
-import { WarehouseListComponent } from './components/manage/warehouse-list/warehouse-list.component'
+import { WarehouseComponent } from './components/manage/warehouse/warehouse.component'
 import { BoxEditDialogComponent } from './components/common/edit-dialog/box-edit-dialog/box-edit-dialog.component'
 import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { ShelfComponent } from './components/manage/shelf/shelf.component'
@@ -200,6 +200,7 @@ import {
   hash,
   hddStack,
   house,
+  houseDoorFill,
   infoCircle,
   journals,
   link,
@@ -235,6 +236,7 @@ import {
   xLg,
   bookshelf,
   inboxes,
+  inboxesFill,
   fileEarmarkPdf
 } from 'ngx-bootstrap-icons'
 
@@ -303,6 +305,7 @@ const icons = {
   hash,
   hddStack,
   house,
+  houseDoorFill,
   infoCircle,
   journals,
   link,
@@ -336,6 +339,7 @@ const icons = {
   upcScan,
   bookshelf,
   inboxes,
+  inboxesFill,
   x,
   xLg,
 }
@@ -440,7 +444,7 @@ function initializeApp(settings: SettingsService) {
     DocumentTypeListComponent,
     CorrespondentListComponent,
     StoragePathListComponent,
-    WarehouseListComponent,
+    WarehouseComponent,
     LogsComponent,
     SettingsComponent,
     NotFoundComponent,

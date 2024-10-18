@@ -1,156 +1,130 @@
-
-
-import {
-  Directive,
-  OnDestroy,
-  OnInit,
-  QueryList,
-  ViewChildren,
-} from '@angular/core'
+import { Component, Renderer2, ViewChild, ViewContainerRef } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { Subject } from 'rxjs'
-import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators'
-import {
-  MatchingModel,
-  MATCHING_ALGORITHMS,
-  MATCH_AUTO,
-  MATCH_NONE,
-} from 'src/app/data/matching-model'
-import { ObjectWithId } from 'src/app/data/object-with-id'
-import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
-import {
-  SortableDirective,
-  SortEvent,
-} from 'src/app/directives/sortable.directive'
+import { Router } from '@angular/router'
+import { FILTER_HAS_WAREHOUSE_ANY } from 'src/app/data/filter-rule-type'
+import { Warehouse } from 'src/app/data/warehouse'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
-  PermissionAction,
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
-import {
-  AbstractNameFilterService,
-  BulkEditObjectOperation,
-} from 'src/app/services/rest/abstract-name-filter-service'
+import { WarehouseService } from 'src/app/services/rest/warehouse.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
+import { WarehouseEditDialogComponent } from '../../common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
+import { ManagementListComponent } from '../management-list/management-list.component'
+import { ActivatedRoute } from '@angular/router'
+import { EditCustomShelfdMode } from '../../common/edit-dialog/edit-customshelf/edit-customshelf.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
-import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
-import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
-import { ShareLink } from 'src/app/data/share-link'
-import { environment } from 'src/environments/environment'
-import { ActivatedRoute, Router } from '@angular/router'
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators'
+import { Subject } from 'rxjs'
+import { ShelfComponent } from '../shelf/shelf.component'
+import { BoxCaseComponent } from '../boxcase/boxcase.component'
 
-export interface ManagementListColumn {
-  key: string
-
-  name: string
-
-  valueFn: any
-
-  rendersHtml?: boolean
-}
-
-@Directive()
-export abstract class WarehouseComponent<T extends ObjectWithId>
-  extends ComponentWithPermissions
-  implements OnInit, OnDestroy {
-  documents: any[] = [];
-  id: any;
+@Component({
+  selector: 'pngx-warehouse',
+  templateUrl: './warehouse.component.html',
+  styleUrls: ['./warehouse.component.scss']
+})
+export class WarehouseComponent extends ManagementListComponent<Warehouse> {
+  @ViewChild('warehouseTree', { read: ViewContainerRef }) container!: ViewContainerRef
+  public warehousePath: Warehouse[] = []
   constructor(
-    private service: AbstractNameFilterService<T>,
-    private modalService: NgbModal,
-    private editDialogComponent: any,
-    private toastService: ToastService,
-    private documentListViewService: DocumentListViewService,
-    private permissionsService: PermissionsService,
-    protected filterRuleType: number,
-    public typeName: string,
-    public typeNamePlural: string,
-    public permissionType: PermissionType,
-    public extraColumns: ManagementListColumn[]
+    warehouseService: WarehouseService,
+    modalService: NgbModal,
+    toastService: ToastService,
+    documentListViewService: DocumentListViewService,
+    permissionsService: PermissionsService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private viewContainer: ViewContainerRef,
+    private renderer: Renderer2,
   ) {
-    super()
+    super(
+      warehouseService,
+      modalService,
+      WarehouseEditDialogComponent,
+      toastService,
+      documentListViewService,
+      permissionsService,
+      FILTER_HAS_WAREHOUSE_ANY,
+      $localize`warehouse`,
+      $localize`warehouses`,
+      PermissionType.Warehouse,
+      [
+        {
+          key: 'type',
+          name: $localize`Type`,
+          rendersHtml: true,
+          valueFn: (w: Warehouse) => {
+            return w.type
+          },
+        },
+      ]
+    )
   }
 
-  @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>
+  openCreateDialog() {
+    var activeModal = this.getModalService().open(this.getEditDialogComponent(), {
+      backdrop: 'static',
+    })
+    activeModal.componentInstance.object = { parent_warehouse: this.id,type: 'Warehouse' }
+    activeModal.componentInstance.dialogMode = EditDialogMode.CREATE
 
-  public data: T[] = []
-
-  public page = 1
-
-  public collectionSize = 0
-
-  public sortField: string
-  public sortReverse: boolean
-
-  public isLoading: boolean = false
-
-  private nameFilterDebounce: Subject<string>
-  private unsubscribeNotifier: Subject<any> = new Subject()
-  private _nameFilter: string
-
-  public selectedObjects: Set<number> = new Set()
-  public togggleAll: boolean = false
-
-
-
-  ngOnInit(): void {
-    this.reloadData()
-
-    this.nameFilterDebounce = new Subject<string>()
-
-    this.nameFilterDebounce
-      .pipe(
-        takeUntil(this.unsubscribeNotifier),
-        debounceTime(400),
-        distinctUntilChanged()
+    activeModal.componentInstance.succeeded.subscribe(() => {
+      this.reloadData()
+      // this.getDocuments(this.id);
+      this.getToastService().showInfo(
+        $localize`Successfully created ${this.typeName}.`
       )
-      .subscribe((title) => {
-        this._nameFilter = title
-        this.page = 1
-        this.reloadData()
-      })
+    })
+    activeModal.componentInstance.failed.subscribe((e) => {
+      this.getToastService().showError(
+        $localize`Error occurred while creating ${this.typeName}.`,
+        e
+      )
+    })
   }
-
-
-
-  ngOnDestroy() {
-    this.unsubscribeNotifier.next(true)
-    this.unsubscribeNotifier.complete()
-  }
-
-  getMatching(o: MatchingModel) {
-    if (o.matching_algorithm == MATCH_AUTO) {
-      return $localize`Automatic`
-    } else if (o.matching_algorithm == MATCH_NONE) {
-      return $localize`None`
-    } else if (o.match && o.match.length > 0) {
-      return `${MATCHING_ALGORITHMS.find((a) => a.id == o.matching_algorithm).shortName
-        }: ${o.match}`
-    } else {
-      return '-'
-    }
-  }
-
-  onSort(event: SortEvent) {
-    this.sortField = event.column
-    this.sortReverse = event.reverse
-    this.reloadData()
-  }
-
   reloadData() {
+    let type = ''
+    this.route.params.subscribe(params => {
+      this.id = +params['id'];
+    });
+    this.route.queryParams.subscribe(params => {
+      type = params['type'];
+    });
+    if (this.id! && type =='Shelf'){
+       this.router.navigate(['/warehouses',this.id], { queryParams: {type:'Shelf'} });
+       this.renderShelf()
+        return;
+    }else if (this.id! && type =='Boxcase'){
+       this.router.navigate(['/warehouses',this.id], { queryParams: {type:'Boxcase'} });
+       this.renderBoxcase()
+       return;
+    }
+    let warehousePathList
+    if (this.id){
+        this.warehouseService.getWarehousePath(this.id).subscribe(
+        (warehouse) => {
+          warehousePathList = warehouse;
+          // console.log(listFolderPath)
+          this.warehousePath = warehousePathList.results
+        },)
+    }
+
+    let params = {}
+    params['type__iexact'] = 'Warehouse'
     this.isLoading = true
-    this.service
-      .listFiltered(
+    this.getService()
+      .listFilteredCustom(
         this.page,
         null,
         this.sortField,
+        params,
         this.sortReverse,
-        this._nameFilter,
-        true
+        this.nameFilter,
+        true,
       )
-      .pipe(takeUntil(this.unsubscribeNotifier))
+      .pipe(takeUntil(this.getUnsubscribeNotifier()))
       .subscribe((c) => {
         this.data = c.results
         this.collectionSize = c.count
@@ -158,200 +132,70 @@ export abstract class WarehouseComponent<T extends ObjectWithId>
       })
   }
 
-  openCreateDialog() {
-    var activeModal = this.modalService.open(this.editDialogComponent, {
-      backdrop: 'static',
-    })
-    activeModal.componentInstance.dialogMode = EditDialogMode.CREATE
-    activeModal.componentInstance.succeeded.subscribe(() => {
-      this.reloadData()
-      this.toastService.showInfo(
-        $localize`Successfully created ${this.typeName}.`
-      )
-    })
-    activeModal.componentInstance.failed.subscribe((e) => {
-      this.toastService.showError(
-        $localize`Error occurred while creating ${this.typeName}.`,
-        e
-      )
-    })
+  getDeleteMessage(object: Warehouse) {
+    return $localize`Do you really want to delete the warehouse "${object.name}"?`
   }
 
-  openEditDialog(object: T) {
-    var activeModal = this.modalService.open(this.editDialogComponent, {
-      backdrop: 'static',
-    })
-    activeModal.componentInstance.object = object
-    activeModal.componentInstance.dialogMode = EditDialogMode.EDIT
-    activeModal.componentInstance.succeeded.subscribe(() => {
-      this.reloadData()
-      this.toastService.showInfo(
-        $localize`Successfully updated ${this.typeName}.`
-      )
-    })
-    activeModal.componentInstance.failed.subscribe((e) => {
-      this.toastService.showError(
-        $localize`Error occurred while saving ${this.typeName}.`,
-        e
-      )
-    })
+  renderWarehouse(){
+
+    const tableFilterContent = document.querySelector('.warehouse-tree');
+    const warehouseElement = document.querySelector('.warehouse');
+    warehouseElement.innerHTML = ''
+    const shelfElement = this.viewContainer.createComponent(WarehouseComponent);
+
+    const componentElement = shelfElement.location.nativeElement
+    const tabelShelf= componentElement.querySelector('.warehouse-tree');
+
+    this.renderer.appendChild(tabelShelf, tableFilterContent)
+    this.renderer.appendChild(warehouseElement, componentElement)
+
+  }
+  renderBoxcase(){
+
+    const tableFilterContent = document.querySelector('.warehouse-tree');
+    const warehouseElement = document.querySelector('.warehouse');
+    warehouseElement.innerHTML = ''
+    const shelfElement = this.viewContainer.createComponent(BoxCaseComponent);
+
+    const componentElement = shelfElement.location.nativeElement
+    const tabelShelf= componentElement.querySelector('.warehouse-tree');
+
+    this.renderer.appendChild(tabelShelf, tableFilterContent)
+    this.renderer.appendChild(warehouseElement, componentElement)
+
   }
 
-  abstract getDeleteMessage(object: T)
+  renderShelf(){
 
-  filterDocuments(object: ObjectWithId) {
-    this.documentListViewService.quickFilter([
-      { rule_type: this.filterRuleType, value: object.id.toString() },
-    ])
+    const tableFilterContent = document.querySelector('.warehouse-tree');
+    const warehouseElement = document.querySelector('.warehouse');
+    warehouseElement.innerHTML = ''
+    const shelfElement = this.viewContainer.createComponent(ShelfComponent);
+
+    const componentElement = shelfElement.location.nativeElement
+    const tabelShelf= componentElement.querySelector('.warehouse-tree');
+
+    this.renderer.appendChild(tabelShelf, tableFilterContent)
+    this.renderer.appendChild(warehouseElement, componentElement)
+
   }
-
-  openDeleteDialog(object: T) {
-    var activeModal = this.modalService.open(ConfirmDialogComponent, {
-      backdrop: 'static',
-    })
-    activeModal.componentInstance.title = $localize`Confirm delete`
-    activeModal.componentInstance.messageBold = this.getDeleteMessage(object)
-    activeModal.componentInstance.message = $localize`Associated documents will not be deleted.`
-    activeModal.componentInstance.btnClass = 'btn-danger'
-    activeModal.componentInstance.btnCaption = $localize`Delete`
-    activeModal.componentInstance.confirmClicked.subscribe(() => {
-      activeModal.componentInstance.buttonsEnabled = false
-      this.service
-        .delete(object)
-        .pipe(takeUntil(this.unsubscribeNotifier))
-        .subscribe({
-          next: () => {
-            activeModal.close()
-            this.reloadData()
-          },
-          error: (error) => {
-            activeModal.componentInstance.buttonsEnabled = true
-            this.toastService.showError(
-              $localize`Error while deleting element`,
-              error
-            )
-          },
-        })
-    })
-  }
-
-  get nameFilter() {
-    return this._nameFilter
-  }
-
-  set nameFilter(nameFilter: string) {
-    this.nameFilterDebounce.next(nameFilter)
-  }
-
-  onNameFilterKeyUp(event: KeyboardEvent) {
-    if (event.code == 'Escape') this.nameFilterDebounce.next(null)
-  }
-
-  userCanDelete(object: ObjectWithPermissions): boolean {
-    return this.permissionsService.currentUserOwnsObject(object)
-  }
-
-  userCanEdit(object: ObjectWithPermissions): boolean {
-    return this.permissionsService.currentUserHasObjectPermissions(
-      this.PermissionAction.Change,
-      object
-    )
-  }
-
-  userCanBulkEdit(action: PermissionAction): boolean {
-    if (!this.permissionsService.currentUserCan(action, this.permissionType))
-      return false
-    let ownsAll: boolean = true
-    const objects = this.data.filter((o) => this.selectedObjects.has(o.id))
-    ownsAll = objects.every((o) =>
-      this.permissionsService.currentUserOwnsObject(o)
-    )
-    return ownsAll
-  }
-
-  toggleAll(event: PointerEvent) {
-    if ((event.target as HTMLInputElement).checked) {
-      this.selectedObjects = new Set(this.data.map((o) => o.id))
-    } else {
-      this.clearSelection()
+  goToShelfBoxcase(object){
+    if (object.type === 'Warehouse'){
+      this.goToShelf(object)
+    }if (object.type === 'Shelf'){
+      this.goToBoxcase(object)
     }
+
   }
 
-  clearSelection() {
-    this.togggleAll = false
-    this.selectedObjects.clear()
+  goToShelf(object){
+    this.router.navigate(['/warehouses',object.id], { queryParams: {type:'Shelf'} });
+    this.renderShelf()
+  }
+  goToBoxcase(object){
+    this.router.navigate(['/warehouses',object.id], { queryParams: {type:'Boxcase'} });
+    this.renderBoxcase()
   }
 
-  toggleSelected(object) {
-    this.selectedObjects.has(object.id)
-      ? this.selectedObjects.delete(object.id)
-      : this.selectedObjects.add(object.id)
-  }
 
-  setPermissions() {
-    let modal = this.modalService.open(PermissionsDialogComponent, {
-      backdrop: 'static',
-    })
-    modal.componentInstance.confirmClicked.subscribe(
-      ({ permissions, merge }) => {
-        modal.componentInstance.buttonsEnabled = false
-        this.service
-          .bulk_edit_objects(
-            Array.from(this.selectedObjects),
-            BulkEditObjectOperation.SetPermissions,
-            permissions,
-            merge
-          )
-          .subscribe({
-            next: () => {
-              modal.close()
-              this.toastService.showInfo(
-                $localize`Permissions updated successfully`
-              )
-              this.reloadData()
-            },
-            error: (error) => {
-              modal.componentInstance.buttonsEnabled = true
-              this.toastService.showError(
-                $localize`Error updating permissions`,
-                error
-              )
-            },
-          })
-      }
-    )
-  }
-
-  delete() {
-    let modal = this.modalService.open(ConfirmDialogComponent, {
-      backdrop: 'static',
-    })
-    modal.componentInstance.title = $localize`Confirm delete`
-    modal.componentInstance.messageBold = $localize`This operation will permanently delete all objects.`
-    modal.componentInstance.message = $localize`This operation cannot be undone.`
-    modal.componentInstance.btnClass = 'btn-danger'
-    modal.componentInstance.btnCaption = $localize`Proceed`
-    modal.componentInstance.confirmClicked.subscribe(() => {
-      modal.componentInstance.buttonsEnabled = false
-      this.service
-        .bulk_edit_objects(
-          Array.from(this.selectedObjects),
-          BulkEditObjectOperation.Delete
-        )
-        .subscribe({
-          next: () => {
-            modal.close()
-            this.toastService.showInfo($localize`Objects deleted successfully`)
-            this.reloadData()
-          },
-          error: (error) => {
-            modal.componentInstance.buttonsEnabled = true
-            this.toastService.showError(
-              $localize`Error deleting objects`,
-              error
-            )
-          },
-        })
-    })
-  }
 }
