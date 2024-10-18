@@ -48,8 +48,10 @@ export class WarehouseTreeWidgetComponent extends ComponentWithPermissions
   pageNumber: number = 1
   nodeId: number = 0
   subscription: Subscription
+  type_warehouse: string
 
   renderNode(c, object, event) {
+    this.type_warehouse = object.type
     const spanElement = (event.target as HTMLElement).closest('span')
     const tdElement = spanElement.closest('td')
     const svgElement = spanElement?.querySelector('svg')
@@ -132,12 +134,17 @@ export class WarehouseTreeWidgetComponent extends ComponentWithPermissions
 
   viewMore() {
     this.pageNumber = this.pageNumber + 1
-    this.warehouseService.listFolderFiltered(
+    let params = {}
+
+    params['parent_warehouse'] = this.nodeId!==0 ? this.nodeId : null;
+    params['type__iexact'] = this.nodeId==0 ? 'Warehouse': this.type_warehouse
+    console.log(params)
+    this.warehouseService.listFilteredCustom(
       this.pageNumber,
       null,
       null,
+      params,
       true,
-      this.nodeId,
       null,
       true,
     ).subscribe((c) => {
