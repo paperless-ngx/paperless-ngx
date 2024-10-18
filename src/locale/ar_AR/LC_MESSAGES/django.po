@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-08-28 17:12-0700\n"
-"PO-Revision-Date: 2024-08-29 03:10\n"
+"PO-Revision-Date: 2024-10-15 12:11\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -185,11 +185,11 @@ msgstr "اسم المِلَفّ الحالي في التخزين"
 
 #: documents/models.py:243
 msgid "archive filename"
-msgstr "اسم المِلَفّ ‏الأرشيف"
+msgstr "اسم ‏الأرشيف"
 
 #: documents/models.py:249
 msgid "Current archive filename in storage"
-msgstr "اسم مِلَفّ ‏الأرشيف الحالي في التخزين"
+msgstr "اسم ملف ‏الأرشيف الحالي في التخزين"
 
 #: documents/models.py:253
 msgid "original filename"
