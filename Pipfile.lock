@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "dccf58aea1ba4c0aa4aa93c1cc13881229889db25bc6e5b2384413a7e7e85182"
+            "sha256": "5a7cb70103e8f3931682c73432290f2f4ec2ba06395c8ec076d2d5449c4ff0dd"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -522,6 +522,7 @@
         },
         "django-allauth": {
             "extras": [
+                "mfa",
                 "socialaccount"
             ],
             "hashes": [
@@ -640,6 +641,13 @@
             ],
             "markers": "python_version >= '3.7'",
             "version": "==1.2.2"
+        },
+        "fido2": {
+            "hashes": [
+                "sha256:26100f226d12ced621ca6198528ce17edf67b78df4287aee1285fee3cd5aa9fc",
+                "sha256:6be34c0b9fe85e4911fd2d103cce7ae8ce2f064384a7a2a3bd970b3ef7702931"
+            ],
+            "version": "==1.1.3"
         },
         "filelock": {
             "hashes": [
@@ -1775,6 +1783,13 @@
             ],
             "index": "pypi",
             "version": "==0.1.9"
+        },
+        "qrcode": {
+            "hashes": [
+                "sha256:025ce2b150f7fe4296d116ee9bad455a6643ab4f6e7dce541613a4758cbce347",
+                "sha256:9fc05f03305ad27a709eb742cf3097fa19e6f6f93bb9e2f039c0979190f6f1b1"
+            ],
+            "version": "==8.0"
         },
         "rapidfuzz": {
             "hashes": [
