@@ -1,4 +1,9 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing'
 import {
   CustomFieldQueriesModel,
   CustomFieldsQueryDropdownComponent,
@@ -20,6 +25,8 @@ import {
   CustomFieldQueryAtom,
   CustomFieldQueryElement,
 } from 'src/app/utils/custom-field-query-element'
+import { NgSelectModule } from '@ng-select/ng-select'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 
 const customFields = [
   {
@@ -44,7 +51,13 @@ describe('CustomFieldsQueryDropdownComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [CustomFieldsQueryDropdownComponent],
-      imports: [NgbDropdownModule, NgxBootstrapIconsModule.pick(allIcons)],
+      imports: [
+        NgbDropdownModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+        NgSelectModule,
+        FormsModule,
+        ReactiveFormsModule,
+      ],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
@@ -180,6 +193,15 @@ describe('CustomFieldsQueryDropdownComponent', () => {
     component.title = 'Test Title'
     expect(component.name).toBe('test_title')
   })
+
+  it('should add a default atom on open and focus the select field', fakeAsync(() => {
+    expect(component.selectionModel.queries.length).toBe(0)
+    component.onOpenChange(true)
+    fixture.detectChanges()
+    tick()
+    expect(component.selectionModel.queries.length).toBe(1)
+    expect(window.document.activeElement.tagName).toBe('INPUT')
+  }))
 
   describe('CustomFieldQueriesModel', () => {
     let model: CustomFieldQueriesModel

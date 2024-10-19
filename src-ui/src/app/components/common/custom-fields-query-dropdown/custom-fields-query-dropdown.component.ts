@@ -4,9 +4,12 @@ import {
   Input,
   OnDestroy,
   Output,
+  QueryList,
   ViewChild,
+  ViewChildren,
 } from '@angular/core'
 import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
+import { NgSelectComponent } from '@ng-select/ng-select'
 import { Subject, first, takeUntil } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
@@ -184,6 +187,8 @@ export class CustomFieldsQueryDropdownComponent implements OnDestroy {
 
   @ViewChild('dropdown') dropdown: NgbDropdown
 
+  @ViewChildren(NgSelectComponent) fieldSelects!: QueryList<NgSelectComponent>
+
   private _selectionModel: CustomFieldQueriesModel
 
   @Input()
@@ -227,16 +232,32 @@ export class CustomFieldsQueryDropdownComponent implements OnDestroy {
   }
 
   public onOpenChange(open: boolean) {
-    if (open && this.selectionModel.queries.length === 0) {
-      this.selectionModel.addExpression()
+    if (open) {
+      if (this.selectionModel.queries.length === 0) {
+        this.selectionModel.addAtom(
+          new CustomFieldQueryAtom([
+            null,
+            CustomFieldQueryOperator.Exists,
+            'true',
+          ])
+        )
+      }
+      if (
+        this.selectionModel.queries.length === 1 &&
+        (
+          (this.selectionModel.queries[0] as CustomFieldQueryExpression)
+            ?.value[0] as CustomFieldQueryAtom
+        )?.field === null
+      ) {
+        setTimeout(() => {
+          this.fieldSelects.first?.focus()
+        }, 0)
+      }
     }
   }
 
   public get isActive(): boolean {
-    return (
-      (this.selectionModel.queries[0] as CustomFieldQueryExpression)?.value
-        ?.length > 0
-    )
+    return this.selectionModel.isValid()
   }
 
   private getFields() {
