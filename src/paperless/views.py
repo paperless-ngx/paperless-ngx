@@ -1,6 +1,12 @@
 import os
 from collections import OrderedDict
 
+from allauth.mfa import signals
+from allauth.mfa.adapter import get_adapter as get_mfa_adapter
+from allauth.mfa.base.internal.flows import delete_and_cleanup
+from allauth.mfa.models import Authenticator
+from allauth.mfa.recovery_codes.internal.flows import auto_generate_recovery_codes
+from allauth.mfa.totp.internal import auth as totp_auth
 from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth.models import Group
@@ -143,6 +149,75 @@ class ProfileView(GenericAPIView):
         user.save()
 
         return Response(serializer.to_representation(user))
+
+
+class TOTPActivateView(GenericAPIView):
+    """
+    TOTP views
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user = self.request.user
+        mfa_adapter = get_mfa_adapter()
+        secret = totp_auth.get_totp_secret(regenerate=True)
+        url = mfa_adapter.build_totp_url(user, secret)
+        svg = mfa_adapter.build_totp_svg(url)
+        return Response(
+            {
+                "url": url,
+                "qr_svg": svg,
+                "secret": secret,
+            },
+        )
+
+    def post(self, request, *args, **kwargs):
+        valid = totp_auth.validate_totp_code(
+            request.data["secret"],
+            request.data["code"],
+        )
+        recovery_codes = None
+        if valid:
+            # from allauth.mfa.totp.internal.flows activate_totp
+            auth = totp_auth.TOTP.activate(
+                request.user,
+                request.data["secret"],
+            ).instance
+            signals.authenticator_added.send(
+                sender=Authenticator,
+                request=request,
+                user=request.user,
+                authenticator=auth,
+            )
+            # adapter = get_adapter()
+            # adapter.add_message(request, messages.SUCCESS, "mfa/messages/totp_activated.txt")
+            # adapter.send_notification_mail("mfa/email/totp_activated", request.user)
+            rc_auth: Authenticator = auto_generate_recovery_codes(request)
+            if rc_auth:
+                recovery_codes = rc_auth.wrap().get_unused_codes()
+        return Response(
+            {
+                "success": valid,
+                "recovery_codes": recovery_codes,
+            },
+        )
+
+    def delete(self, request, *args, **kwargs):
+        user = self.request.user
+        try:
+            # from allauth.mfa.totp.internal.flows deactivate_totp
+            authenticator = Authenticator.objects.filter(
+                user=user,
+                type=Authenticator.Type.TOTP,
+            ).first()
+            delete_and_cleanup(request, authenticator)
+            # adapter = get_account_adapter(request)
+            # adapter.add_message(request, messages.SUCCESS, "mfa/messages/totp_deactivated.txt")
+            # adapter.send_notification_mail("mfa/email/totp_deactivated", request.user)
+            return Response(True)
+        except Authenticator.DoesNotExist:
+            return HttpResponseBadRequest("TOTP not found")
 
 
 class GenerateAuthTokenView(GenericAPIView):
