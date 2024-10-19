@@ -101,7 +101,10 @@ import {
   CustomFieldQueryLogicalOperator,
   CustomFieldQueryOperator,
 } from 'src/app/data/custom-field-query'
-import { CustomFieldQueryAtom } from 'src/app/utils/custom-field-query-element'
+import {
+  CustomFieldQueryAtom,
+  CustomFieldQueryExpression,
+} from 'src/app/utils/custom-field-query-element'
 
 const tags: Tag[] = [
   {
@@ -1441,15 +1444,12 @@ describe('FilterEditorComponent', () => {
       By.css('button')
     )
     customFieldToggleButton.triggerEventHandler('click')
+    tick()
     fixture.detectChanges()
-    const customFieldButtons = customFieldsQueryDropdown.queryAll(
-      By.css('button')
-    )
-    customFieldButtons[1].triggerEventHandler('click')
-    fixture.detectChanges()
-    const query = component.customFieldQueriesModel
-      .queries[0] as CustomFieldQueryAtom
-    query.field = custom_fields[0].id
+    const expression = component.customFieldQueriesModel
+      .queries[0] as CustomFieldQueryExpression
+    const atom = expression.value[0] as CustomFieldQueryAtom
+    atom.field = custom_fields[0].id
     const fieldSelect: NgSelectComponent = customFieldsQueryDropdown.queryAll(
       By.directive(NgSelectComponent)
     )[0].componentInstance
