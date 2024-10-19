@@ -41,7 +41,7 @@
       <option value="false" i18n>False</option>
     </select>
   } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Select) {
-    <ng-select
+    <ng-select #fieldSelects
       class="paperless-input-select rounded-end"
       [items]="getSelectOptionsForField(atom.field)"
       [(ngModel)]="atom.value"
