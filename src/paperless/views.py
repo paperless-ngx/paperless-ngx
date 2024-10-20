@@ -17,6 +17,7 @@ from django.http import HttpResponseBadRequest
 from django.views.generic import View
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.authtoken.models import Token
+from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import GenericAPIView
 from rest_framework.pagination import PageNumberPagination
@@ -105,6 +106,24 @@ class UserViewSet(ModelViewSet):
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_class = UserFilterSet
     ordering_fields = ("username",)
+
+    @action(detail=True, methods=["post"])
+    def deactivate_totp(self, request, pk=None):
+        request_user = request.user
+        user = User.objects.get(pk=pk)
+        if not request_user.is_superuser and request_user != user:
+            return HttpResponseBadRequest(
+                "You do not have permission to deactivate TOTP for this user",
+            )
+        try:
+            authenticator = Authenticator.objects.filter(
+                user=user,
+                type=Authenticator.Type.TOTP,
+            ).first()
+            delete_and_cleanup(request, authenticator)
+            return Response(True)
+        except Authenticator.DoesNotExist:
+            return HttpResponseBadRequest("TOTP not found")
 
 
 class GroupViewSet(ModelViewSet):

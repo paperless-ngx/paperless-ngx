@@ -33,6 +33,11 @@ class UserSerializer(serializers.ModelSerializer):
         required=False,
     )
     inherited_permissions = serializers.SerializerMethodField()
+    is_mfa_enabled = serializers.SerializerMethodField()
+
+    def get_is_mfa_enabled(self, user: User):
+        mfa_adapter = get_mfa_adapter()
+        return mfa_adapter.is_mfa_enabled(user)
 
     class Meta:
         model = User
@@ -50,6 +55,7 @@ class UserSerializer(serializers.ModelSerializer):
             "groups",
             "user_permissions",
             "inherited_permissions",
+            "is_mfa_enabled",
         )
 
     def get_inherited_permissions(self, obj):
