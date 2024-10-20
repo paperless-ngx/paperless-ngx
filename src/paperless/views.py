@@ -14,6 +14,7 @@ from django.contrib.auth.models import User
 from django.db.models.functions import Lower
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
+from django.http import HttpResponseForbidden
 from django.views.generic import View
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.authtoken.models import Token
@@ -112,7 +113,7 @@ class UserViewSet(ModelViewSet):
         request_user = request.user
         user = User.objects.get(pk=pk)
         if not request_user.is_superuser and request_user != user:
-            return HttpResponseBadRequest(
+            return HttpResponseForbidden(
                 "You do not have permission to deactivate TOTP for this user",
             )
         try:
