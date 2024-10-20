@@ -1,5 +1,9 @@
 import os
 
+from allauth.account import views as allauth_account_views
+from allauth.mfa.base import views as allauth_mfa_views
+from allauth.socialaccount import views as allauth_social_account_views
+from allauth.urls import build_provider_urlpatterns
 from django.conf import settings
 from django.conf.urls import include
 from django.contrib import admin
@@ -144,19 +148,22 @@ urlpatterns = [
                     BulkEditObjectsView.as_view(),
                     name="bulk_edit_objects",
                 ),
-                path("profile/generate_auth_token/", GenerateAuthTokenView.as_view()),
-                path(
-                    "profile/disconnect_social_account/",
-                    DisconnectSocialAccountView.as_view(),
-                ),
-                path(
-                    "profile/social_account_providers/",
-                    SocialAccountProvidersView.as_view(),
-                ),
                 re_path(
                     "^profile/",
                     include(
                         [
+                            path(
+                                "generate_auth_token/",
+                                GenerateAuthTokenView.as_view(),
+                            ),
+                            path(
+                                "disconnect_social_account/",
+                                DisconnectSocialAccountView.as_view(),
+                            ),
+                            path(
+                                "social_account_providers/",
+                                SocialAccountProvidersView.as_view(),
+                            ),
                             re_path(
                                 "^$",
                                 ProfileView.as_view(),
@@ -245,8 +252,63 @@ urlpatterns = [
         serve,
         kwargs={"document_root": os.path.join(settings.MEDIA_ROOT, "logo")},
     ),
-    # login, logout
-    path("accounts/", include("allauth.urls")),
+    # allauth
+    path(
+        "accounts/",
+        include(
+            [
+                # login, logout, signup
+                path("login/", allauth_account_views.login, name="account_login"),
+                path("logout/", allauth_account_views.logout, name="account_logout"),
+                path("signup/", allauth_account_views.signup, name="account_signup"),
+                # password reset
+                path(
+                    "password/reset/",
+                    allauth_account_views.password_reset,
+                    name="account_reset_password",
+                ),
+                path(
+                    "password/reset/done/",
+                    allauth_account_views.password_reset_done,
+                    name="account_reset_password_done",
+                ),
+                re_path(
+                    r"^password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",
+                    allauth_account_views.password_reset_from_key,
+                    name="account_reset_password_from_key",
+                ),
+                path(
+                    "password/reset/key/done/",
+                    allauth_account_views.password_reset_from_key_done,
+                    name="account_reset_password_from_key_done",
+                ),
+                # social account base urls
+                path(
+                    "3rdparty/login/cancelled/",
+                    allauth_social_account_views.login_cancelled,
+                    name="socialaccount_login_cancelled",
+                ),
+                path(
+                    "3rdparty/login/error/",
+                    allauth_social_account_views.login_error,
+                    name="socialaccount_login_error",
+                ),
+                path(
+                    "3rdparty/signup/",
+                    allauth_social_account_views.signup,
+                    name="socialaccount_signup",
+                ),
+                # social account provider urls
+                *build_provider_urlpatterns(),
+                # mfa
+                path(
+                    "2fa/authenticate/",
+                    allauth_mfa_views.authenticate,
+                    name="mfa_authenticate",
+                ),
+            ],
+        ),
+    ),
     # Root of the Frontend
     re_path(
         r".*",
@@ -254,7 +316,6 @@ urlpatterns = [
         name="base",
     ),
 ]
-
 
 websocket_urlpatterns = [
     path(settings.BASE_URL.lstrip("/") + "ws/status/", StatusConsumer.as_asgi()),
