@@ -259,6 +259,7 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
           this.totpLoading = false
           this.isTotpEnabled = activationResponse.success
           this.recoveryCodes = activationResponse.recovery_codes
+          this.form.get('totp_code').enable()
           if (activationResponse.success) {
             this.toastService.showInfo($localize`TOTP activated successfully`)
           } else {
