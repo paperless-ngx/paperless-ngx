@@ -294,4 +294,85 @@ describe('ProfileEditDialogComponent', () => {
     expect(disconnectSpy).toHaveBeenCalled()
     expect(component.socialAccounts).not.toContainEqual(socialAccount)
   })
+
+  it('should get totp settings', () => {
+    const settings = {
+      url: 'http://localhost/',
+      qr_svg: 'svg',
+      secret: 'secret',
+    }
+    const getSpy = jest.spyOn(profileService, 'getTotpSettings')
+    const toastSpy = jest.spyOn(toastService, 'showError')
+    getSpy.mockReturnValueOnce(
+      throwError(() => new Error('failed to get settings'))
+    )
+    component.gettotpSettings()
+    expect(getSpy).toHaveBeenCalled()
+    expect(toastSpy).toHaveBeenCalled()
+
+    getSpy.mockReturnValue(of(settings))
+    component.gettotpSettings()
+    expect(getSpy).toHaveBeenCalled()
+    expect(component.totpSettings).toEqual(settings)
+  })
+
+  it('should activate totp', () => {
+    const activateSpy = jest.spyOn(profileService, 'activateTotp')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const error = new Error('failed to activate totp')
+    activateSpy.mockReturnValueOnce(throwError(() => error))
+    component.totpSettings = {
+      url: 'http://localhost/',
+      qr_svg: 'svg',
+      secret: 'secret',
+    }
+    component.form.get('totp_code').patchValue('123456')
+    component.activateTotp()
+    expect(activateSpy).toHaveBeenCalledWith(
+      component.totpSettings.secret,
+      component.form.get('totp_code').value
+    )
+    expect(toastErrorSpy).toHaveBeenCalled()
+
+    activateSpy.mockReturnValueOnce(of({ success: false, recovery_codes: [] }))
+    component.activateTotp()
+    expect(toastErrorSpy).toHaveBeenCalledWith('Error activating TOTP', error)
+
+    activateSpy.mockReturnValueOnce(
+      of({ success: true, recovery_codes: ['1', '2', '3'] })
+    )
+    component.activateTotp()
+    expect(toastInfoSpy).toHaveBeenCalled()
+    expect(component.isTotpEnabled).toBeTruthy()
+    expect(component.recoveryCodes).toEqual(['1', '2', '3'])
+  })
+
+  it('should deactivate totp', () => {
+    const deactivateSpy = jest.spyOn(profileService, 'deactivateTotp')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const error = new Error('failed to deactivate totp')
+    deactivateSpy.mockReturnValueOnce(throwError(() => error))
+    component.deactivateTotp()
+    expect(deactivateSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
+
+    deactivateSpy.mockReturnValueOnce(of(false))
+    component.deactivateTotp()
+    expect(toastErrorSpy).toHaveBeenCalledWith('Error deactivating TOTP', error)
+
+    deactivateSpy.mockReturnValueOnce(of(true))
+    component.deactivateTotp()
+    expect(toastInfoSpy).toHaveBeenCalled()
+    expect(component.isTotpEnabled).toBeFalsy()
+  })
+
+  it('should copy recovery codes', fakeAsync(() => {
+    const copySpy = jest.spyOn(clipboard, 'copy')
+    component.recoveryCodes = ['1', '2', '3']
+    component.copyRecoveryCodes()
+    expect(copySpy).toHaveBeenCalledWith('1\n2\n3')
+    tick(3000)
+  }))
 })

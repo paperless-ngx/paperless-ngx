@@ -256,8 +256,6 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (activationResponse) => {
-          console.log(activationResponse)
-
           this.totpLoading = false
           this.isTotpEnabled = activationResponse.success
           this.recoveryCodes = activationResponse.recovery_codes
