@@ -54,7 +54,7 @@ from paperless.views import GenerateAuthTokenView
 from paperless.views import GroupViewSet
 from paperless.views import ProfileView
 from paperless.views import SocialAccountProvidersView
-from paperless.views import TOTPActivateView
+from paperless.views import TOTPView
 from paperless.views import UserViewSet
 from paperless_mail.views import MailAccountTestView
 from paperless_mail.views import MailAccountViewSet
@@ -166,9 +166,9 @@ urlpatterns = [
                                 name="profile_view",
                             ),
                             path(
-                                "totp_activate/",
-                                TOTPActivateView.as_view(),
-                                name="activate",
+                                "totp/",
+                                TOTPView.as_view(),
+                                name="totp_view",
                             ),
                             # TODO: remove allauth urls?
                         ],

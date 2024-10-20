@@ -51,7 +51,7 @@ export class ProfileService {
 
   getTotpSettings(): Observable<TotpSettings> {
     return this.http.get<TotpSettings>(
-      `${environment.apiBaseUrl}${this.endpoint}/totp_activate/`
+      `${environment.apiBaseUrl}${this.endpoint}/totp/`
     )
   }
 
@@ -60,7 +60,7 @@ export class ProfileService {
     totpCode: string
   ): Observable<{ success: boolean; recovery_codes: string[] }> {
     return this.http.post<{ success: boolean; recovery_codes: string[] }>(
-      `${environment.apiBaseUrl}${this.endpoint}/totp_activate/`,
+      `${environment.apiBaseUrl}${this.endpoint}/totp/`,
       {
         secret: totpSecret,
         code: totpCode,
@@ -70,7 +70,7 @@ export class ProfileService {
 
   deactivateTotp(): Observable<boolean> {
     return this.http.delete<boolean>(
-      `${environment.apiBaseUrl}${this.endpoint}/totp_activate/`,
+      `${environment.apiBaseUrl}${this.endpoint}/totp/`,
       {}
     )
   }

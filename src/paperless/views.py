@@ -151,7 +151,7 @@ class ProfileView(GenericAPIView):
         return Response(serializer.to_representation(user))
 
 
-class TOTPActivateView(GenericAPIView):
+class TOTPView(GenericAPIView):
     """
     TOTP views
     """
@@ -159,6 +159,9 @@ class TOTPActivateView(GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
+        """
+        Generates a new TOTP secret and returns the URL and SVG
+        """
         user = self.request.user
         mfa_adapter = get_mfa_adapter()
         secret = totp_auth.get_totp_secret(regenerate=True)
@@ -173,13 +176,15 @@ class TOTPActivateView(GenericAPIView):
         )
 
     def post(self, request, *args, **kwargs):
+        """
+        Validates a TOTP code and activates the TOTP authenticator
+        """
         valid = totp_auth.validate_totp_code(
             request.data["secret"],
             request.data["code"],
         )
         recovery_codes = None
         if valid:
-            # from allauth.mfa.totp.internal.flows activate_totp
             auth = totp_auth.TOTP.activate(
                 request.user,
                 request.data["secret"],
@@ -190,9 +195,6 @@ class TOTPActivateView(GenericAPIView):
                 user=request.user,
                 authenticator=auth,
             )
-            # adapter = get_adapter()
-            # adapter.add_message(request, messages.SUCCESS, "mfa/messages/totp_activated.txt")
-            # adapter.send_notification_mail("mfa/email/totp_activated", request.user)
             rc_auth: Authenticator = auto_generate_recovery_codes(request)
             if rc_auth:
                 recovery_codes = rc_auth.wrap().get_unused_codes()
@@ -204,17 +206,16 @@ class TOTPActivateView(GenericAPIView):
         )
 
     def delete(self, request, *args, **kwargs):
+        """
+        Deactivates the TOTP authenticator
+        """
         user = self.request.user
         try:
-            # from allauth.mfa.totp.internal.flows deactivate_totp
             authenticator = Authenticator.objects.filter(
                 user=user,
                 type=Authenticator.Type.TOTP,
             ).first()
             delete_and_cleanup(request, authenticator)
-            # adapter = get_account_adapter(request)
-            # adapter.add_message(request, messages.SUCCESS, "mfa/messages/totp_deactivated.txt")
-            # adapter.send_notification_mail("mfa/email/totp_deactivated", request.user)
             return Response(True)
         except Authenticator.DoesNotExist:
             return HttpResponseBadRequest("TOTP not found")
