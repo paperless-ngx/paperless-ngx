@@ -125,9 +125,8 @@ class DocumentType(MatchingModel):
 
 
 class StoragePath(MatchingModel):
-    path = models.CharField(
+    path = models.TextField(
         _("path"),
-        max_length=2048,
     )
 
     class Meta(MatchingModel.Meta):
