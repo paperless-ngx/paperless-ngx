@@ -1,9 +1,7 @@
 import base64
 import os
 from argparse import ArgumentParser
-from typing import Optional
 from typing import TypedDict
-from typing import Union
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
@@ -103,7 +101,7 @@ class CryptMixin:
         },
     ]
 
-    def get_crypt_params(self) -> dict[str, dict[str, Union[str, int]]]:
+    def get_crypt_params(self) -> dict[str, dict[str, str | int]]:
         return {
             EXPORTER_CRYPTO_SETTINGS_NAME: {
                 EXPORTER_CRYPTO_ALGO_NAME: self.kdf_algorithm,
@@ -128,7 +126,7 @@ class CryptMixin:
             EXPORTER_CRYPTO_SALT_NAME
         ]
 
-    def setup_crypto(self, *, passphrase: str, salt: Optional[str] = None):
+    def setup_crypto(self, *, passphrase: str, salt: str | None = None):
         """
         Constructs a class for encryption or decryption using the specified passphrase and salt
 

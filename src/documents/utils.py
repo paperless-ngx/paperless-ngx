@@ -4,21 +4,19 @@ from os import utime
 from pathlib import Path
 from subprocess import CompletedProcess
 from subprocess import run
-from typing import Optional
-from typing import Union
 
 from django.conf import settings
 from PIL import Image
 
 
 def _coerce_to_path(
-    source: Union[Path, str],
-    dest: Union[Path, str],
+    source: Path | str,
+    dest: Path | str,
 ) -> tuple[Path, Path]:
     return Path(source).resolve(), Path(dest).resolve()
 
 
-def copy_basic_file_stats(source: Union[Path, str], dest: Union[Path, str]) -> None:
+def copy_basic_file_stats(source: Path | str, dest: Path | str) -> None:
     """
     Copies only the m_time and a_time attributes from source to destination.
     Both are expected to exist.
@@ -33,8 +31,8 @@ def copy_basic_file_stats(source: Union[Path, str], dest: Union[Path, str]) -> N
 
 
 def copy_file_with_basic_stats(
-    source: Union[Path, str],
-    dest: Union[Path, str],
+    source: Path | str,
+    dest: Path | str,
 ) -> None:
     """
     A sort of simpler copy2 that doesn't copy extended file attributes,
@@ -53,7 +51,7 @@ def maybe_override_pixel_limit() -> None:
     """
     Maybe overrides the PIL limit on pixel count, if configured to allow it
     """
-    limit: Optional[Union[float, int]] = settings.MAX_IMAGE_PIXELS
+    limit: float | int | None = settings.MAX_IMAGE_PIXELS
     if limit is not None and limit >= 0:
         pixel_count = limit
         if pixel_count == 0:
@@ -63,8 +61,8 @@ def maybe_override_pixel_limit() -> None:
 
 def run_subprocess(
     arguments: list[str],
-    env: Optional[dict[str, str]] = None,
-    logger: Optional[logging.Logger] = None,
+    env: dict[str, str] | None = None,
+    logger: logging.Logger | None = None,
     *,
     check_exit_code: bool = True,
     log_stdout: bool = True,

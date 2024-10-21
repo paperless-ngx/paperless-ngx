@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-08-28 17:12-0700\n"
-"PO-Revision-Date: 2024-09-13 00:28\n"
+"PO-Revision-Date: 2024-10-13 00:32\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -100,11 +100,11 @@ msgstr "etiquetes"
 
 #: documents/models.py:121 documents/models.py:170
 msgid "document type"
-msgstr "tipus document"
+msgstr "tipus de document"
 
 #: documents/models.py:122
 msgid "document types"
-msgstr "tipus documents"
+msgstr "tipus de documents"
 
 #: documents/models.py:127
 msgid "path"
@@ -749,7 +749,7 @@ msgstr "filtra nom arxiu"
 
 #: documents/models.py:1017 paperless_mail/models.py:162
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr "Consumiu només documents que coincideixin completament amb aquest nom de fitxer si s'especifica. Es permeten els comodins com ara *.pdf o *factura*. Cas insensitiu."
+msgstr "Consumiu només documents que coincideixin completament amb aquest nom de fitxer si s'especifica. Es permeten els comodins com ara *.pdf o *factura*. Cas insensible."
 
 #: documents/models.py:1028
 msgid "filter documents from this mail rule"
@@ -809,7 +809,7 @@ msgstr "assigna aquest corresponsal"
 
 #: documents/models.py:1130
 msgid "assign this storage path"
-msgstr "assigna aquesta ruta emmagatzematge"
+msgstr "assigna aquesta ruta d'emmagatzematge"
 
 #: documents/models.py:1139
 msgid "assign this owner"
@@ -817,19 +817,19 @@ msgstr "assigna aquest propietari"
 
 #: documents/models.py:1146
 msgid "grant view permissions to these users"
-msgstr "dona permisos visualització a aquests usuaris"
+msgstr "dona permisos de visualització a aquests usuaris"
 
 #: documents/models.py:1153
 msgid "grant view permissions to these groups"
-msgstr "dóna permisos de visionat a aquests grups"
+msgstr "dona permisos de visionat a aquests grups"
 
 #: documents/models.py:1160
 msgid "grant change permissions to these users"
-msgstr "dóna permisos d'edició a aquests usuaris"
+msgstr "dona permisos d'edició a aquests usuaris"
 
 #: documents/models.py:1167
 msgid "grant change permissions to these groups"
-msgstr "dóna permisos d'edició a aquests grups"
+msgstr "dona permisos d'edició a aquests grups"
 
 #: documents/models.py:1174
 msgid "assign these custom fields"
@@ -861,7 +861,7 @@ msgstr "elimina tots els corresponsals"
 
 #: documents/models.py:1217
 msgid "remove these storage path(s)"
-msgstr "elimina aquesta(es) ruta d'emmagatzemament"
+msgstr "elimina aquesta(es) ruta(es) d'emmagatzematge"
 
 #: documents/models.py:1222
 msgid "remove all storage paths"
@@ -869,7 +869,7 @@ msgstr "elimina totes les rutes d'emmagatzemament"
 
 #: documents/models.py:1229
 msgid "remove these owner(s)"
-msgstr "elimina aquest(s) propietari(s)"
+msgstr "elimina aquesta(es) ruta(es) d'emmagatzematge"
 
 #: documents/models.py:1234
 msgid "remove all owners"
@@ -877,7 +877,7 @@ msgstr "elimina tots els propietaris"
 
 #: documents/models.py:1241
 msgid "remove view permissions for these users"
-msgstr "treu permisos visualització a aquests usuaris"
+msgstr "treu permisos de visualització a aquests usuaris"
 
 #: documents/models.py:1248
 msgid "remove view permissions for these groups"
@@ -1012,7 +1012,7 @@ msgstr "Email"
 
 #: documents/templates/account/password_reset.html:21
 msgid "Send me instructions!"
-msgstr "Enviar instruccions"
+msgstr "Enviar instruccions!"
 
 #: documents/templates/account/password_reset_done.html:5
 msgid "Paperless-ngx reset password sent"
@@ -1024,7 +1024,7 @@ msgstr "Reviseu el correu."
 
 #: documents/templates/account/password_reset_done.html:13
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
-msgstr "Enviat per correu electrònic instruccions per configurar la vostra contrasenya. Hauríeu de rebre el correu electrònic en breu!"
+msgstr "Us hem enviat per correu electrònic les instruccions per configurar la vostra contrasenya. Rebreu el correu electrònic en breu!"
 
 #: documents/templates/account/password_reset_from_key.html:5
 msgid "Paperless-ngx reset password confirmation"
@@ -1032,7 +1032,7 @@ msgstr "Paperless-ngx confirmació de restabliment de contrasenya"
 
 #: documents/templates/account/password_reset_from_key.html:9
 msgid "Set a new password."
-msgstr "Entra una contrasenya nova"
+msgstr "Introdueix una nova contrasenya."
 
 #: documents/templates/account/password_reset_from_key.html:15
 msgid "request a new password reset"
@@ -1092,11 +1092,11 @@ msgstr "Paperless-ngx carregant..."
 
 #: documents/templates/index.html:62
 msgid "Still here?! Hmm, something might be wrong."
-msgstr "Encara Aquí?! Hmm, alguna cosa pot estar malament."
+msgstr "Encara aquí?! Hmm, alguna cosa pot estar malament."
 
 #: documents/templates/index.html:62
 msgid "Here's a link to the docs."
-msgstr "Link als documents."
+msgstr "Aquí teniu un enllaç a la documentació."
 
 #: documents/templates/paperless-ngx/base.html:58
 msgid "Share link was not found."
@@ -1119,7 +1119,7 @@ msgstr "Error al autenticar amb xarxa social. Torna a <a href=\"%(login_url)s\">
 #: documents/templates/socialaccount/login.html:10
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
-msgstr "Estàs a punt de connectar un nou proveïdor extern des de %(provider)s."
+msgstr "Estàs a punt de connectar a un nou proveïdor extern des de %(provider)s."
 
 #: documents/templates/socialaccount/login.html:13
 msgid "Continue"
@@ -1127,7 +1127,7 @@ msgstr "Continuar"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
-msgstr "Paperless-ngx alta de xarxa social"
+msgstr "Inscripció amb comptes socials a Paperless-ngx"
 
 #: documents/templates/socialaccount/signup.html:10
 #, python-format
@@ -1179,11 +1179,11 @@ msgstr "pdfa-3"
 
 #: paperless/models.py:39
 msgid "skip"
-msgstr "skip"
+msgstr "surt"
 
 #: paperless/models.py:40
 msgid "redo"
-msgstr "redo"
+msgstr "refer"
 
 #: paperless/models.py:41
 msgid "force"
@@ -1191,7 +1191,7 @@ msgstr "forçar"
 
 #: paperless/models.py:42
 msgid "skip_noarchive"
-msgstr "skip_noarchive"
+msgstr "omet_sense_arxivar"
 
 #: paperless/models.py:50
 msgid "never"
@@ -1211,7 +1211,7 @@ msgstr "neteja"
 
 #: paperless/models.py:61
 msgid "clean-final"
-msgstr "clean-final"
+msgstr "neteja-final"
 
 #: paperless/models.py:62
 msgid "none"
@@ -1227,7 +1227,7 @@ msgstr "RGB"
 
 #: paperless/models.py:72
 msgid "UseDeviceIndependentColor"
-msgstr "EmprarColordispositiuIndependent"
+msgstr "EmprarColorDispositiuIndependent"
 
 #: paperless/models.py:73
 msgid "Gray"
@@ -1247,7 +1247,7 @@ msgstr "OCR des de pàgina 1 fins aquest valor"
 
 #: paperless/models.py:101
 msgid "Do OCR using these languages"
-msgstr "Feu OCR utilitzant aquests idiomes"
+msgstr "Executa OCR utilitzant aquests idiomes"
 
 #: paperless/models.py:108
 msgid "Sets the OCR mode"
@@ -1267,7 +1267,7 @@ msgstr "Controla la neteja sense paper"
 
 #: paperless/models.py:138
 msgid "Enables deskew"
-msgstr "Habilita deskew"
+msgstr "Permet l'alineació"
 
 #: paperless/models.py:141
 msgid "Enables page rotation"
@@ -1303,7 +1303,7 @@ msgstr "configuració de l'aplicació paperless"
 
 #: paperless/settings.py:682
 msgid "English (US)"
-msgstr "English (US)"
+msgstr "Anglès (US)"
 
 #: paperless/settings.py:683
 msgid "Arabic"
@@ -1387,11 +1387,11 @@ msgstr "Holandès"
 
 #: paperless/settings.py:703
 msgid "Polish"
-msgstr "Polac"
+msgstr "Polonès"
 
 #: paperless/settings.py:704
 msgid "Portuguese (Brazil)"
-msgstr "Portuguès (BZ)"
+msgstr "Portuguès (Brasil)"
 
 #: paperless/settings.py:705
 msgid "Portuguese"
@@ -1583,7 +1583,7 @@ msgstr "Utilitzeu el nom del fitxer adjunt com a títol"
 
 #: paperless_mail/models.py:99
 msgid "Do not assign title from rule"
-msgstr "No assignis títol desde regla"
+msgstr "No assignis el títol segons la regla"
 
 #: paperless_mail/models.py:102
 msgid "Do not assign a correspondent"
@@ -1591,7 +1591,7 @@ msgstr "No assignar corresponsal"
 
 #: paperless_mail/models.py:103
 msgid "Use mail address"
-msgstr "Utilitza adreça correu"
+msgstr "Utilitza l'adreça de correu"
 
 #: paperless_mail/models.py:104
 msgid "Use name (or mail address if not available)"
@@ -1611,7 +1611,7 @@ msgstr "carpeta"
 
 #: paperless_mail/models.py:123
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr "Subcarpetes han d'estar separades per un delimitador, sovint un punt ('.') o una barra inclinada ('/'), però varia segons el servidor de correu."
+msgstr "Les subcarpetes han d'estar separades per un delimitador, sovint un punt ('.') o una barra inclinada ('/'), però varia segons el servidor de correu."
 
 #: paperless_mail/models.py:129
 msgid "filter from"
@@ -1639,7 +1639,7 @@ msgstr "filtra nom del fitxer adjunt excloent"
 
 #: paperless_mail/models.py:174
 msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr "No consumeixis documents que coincideixin aquest nom d'arxiu especificat. Comodins com *.pdf o *factura* permessos. Cas insensitiu."
+msgstr "No consumeixis documents que coincideixin completament amb aquest nom de fitxer, si s'especifica. Es permeten comodins com *.pdf* o *invoice*. No distingeix entre majúscules i minúscules."
 
 #: paperless_mail/models.py:181
 msgid "maximum age"
@@ -1655,7 +1655,7 @@ msgstr "tipus de fitxer adjunt"
 
 #: paperless_mail/models.py:191
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
-msgstr "Els fitxers adjunts inline inclouen imatges incrustades, per la qual cosa és millor combinar aquesta opció amb un filtre de nom de fitxer."
+msgstr "Els fitxers adjunts en línia inclouen imatges incrustades, per la qual cosa és millor combinar aquesta opció amb un filtre de nom de fitxer."
 
 #: paperless_mail/models.py:197
 msgid "consumption scope"
@@ -1667,7 +1667,7 @@ msgstr "acció"
 
 #: paperless_mail/models.py:209
 msgid "action parameter"
-msgstr "paràmetre d'accío"
+msgstr "paràmetre d'acció"
 
 #: paperless_mail/models.py:214
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
@@ -1675,7 +1675,7 @@ msgstr "Paràmetre addicional per a l'acció seleccionada anteriorment, la carpe
 
 #: paperless_mail/models.py:222
 msgid "assign title from"
-msgstr "assignar títol desde"
+msgstr "assigna el títol des de"
 
 #: paperless_mail/models.py:242
 msgid "assign correspondent from"

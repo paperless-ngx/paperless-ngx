@@ -4,7 +4,6 @@ import os
 import shutil
 from pathlib import Path
 from typing import Final
-from typing import Optional
 
 from django.conf import settings
 from pikepdf import Pdf
@@ -37,7 +36,7 @@ class CollatePlugin(NoCleanupPluginMixin, NoSetupPluginMixin, ConsumeTaskPlugin)
             in self.input_doc.original_file.parts
         )
 
-    def run(self) -> Optional[str]:
+    def run(self) -> str | None:
         """
         Tries to collate pages from 2 single sided scans of a double sided
         document.

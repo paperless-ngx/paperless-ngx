@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-08-28 17:12-0700\n"
-"PO-Revision-Date: 2024-08-30 12:10\n"
+"PO-Revision-Date: 2024-09-29 00:33\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -273,11 +273,11 @@ msgstr "Titolo"
 
 #: documents/models.py:407
 msgid "Created"
-msgstr ""
+msgstr "Creato"
 
 #: documents/models.py:408
 msgid "Added"
-msgstr ""
+msgstr "Aggiunto"
 
 #: documents/models.py:409
 msgid "Tags"
@@ -505,15 +505,15 @@ msgstr ""
 
 #: documents/models.py:507
 msgid "has custom field in"
-msgstr ""
+msgstr "ha un campo personalizzato in"
 
 #: documents/models.py:508
 msgid "does not have custom field in"
-msgstr ""
+msgstr "non ha un campo personalizzato in"
 
 #: documents/models.py:509
 msgid "does not have custom field"
-msgstr ""
+msgstr "non ha un campo personalizzato"
 
 #: documents/models.py:519
 msgid "rule type"
@@ -677,7 +677,7 @@ msgstr "Link Documento"
 
 #: documents/models.py:812
 msgid "Select"
-msgstr ""
+msgstr "Selezione"
 
 #: documents/models.py:824
 msgid "data type"
@@ -685,7 +685,7 @@ msgstr "tipo di dato"
 
 #: documents/models.py:831
 msgid "extra data"
-msgstr ""
+msgstr "dati aggiuntivi"
 
 #: documents/models.py:835
 msgid "Extra data for the custom field, such as select options"
@@ -837,7 +837,7 @@ msgstr "assegna questi campi personalizzati"
 
 #: documents/models.py:1181
 msgid "remove these tag(s)"
-msgstr ""
+msgstr "rimuovi queste etichette"
 
 #: documents/models.py:1186
 msgid "remove all tags"
@@ -853,11 +853,11 @@ msgstr "rimuovi tutti i tipi di documento"
 
 #: documents/models.py:1205
 msgid "remove these correspondent(s)"
-msgstr ""
+msgstr "rimuovi questi corrispondenti"
 
 #: documents/models.py:1210
 msgid "remove all correspondents"
-msgstr ""
+msgstr "rimuovi tutti i corrispondenti"
 
 #: documents/models.py:1217
 msgid "remove these storage path(s)"
@@ -865,15 +865,15 @@ msgstr ""
 
 #: documents/models.py:1222
 msgid "remove all storage paths"
-msgstr ""
+msgstr "rimuovi tutti i percorsi di archiviazione"
 
 #: documents/models.py:1229
 msgid "remove these owner(s)"
-msgstr ""
+msgstr "rimuovi questo proprietario(i)"
 
 #: documents/models.py:1234
 msgid "remove all owners"
-msgstr ""
+msgstr "rimuovi tutti i proprietari"
 
 #: documents/models.py:1241
 msgid "remove view permissions for these users"
@@ -893,7 +893,7 @@ msgstr ""
 
 #: documents/models.py:1267
 msgid "remove all permissions"
-msgstr ""
+msgstr "rimuovi tutte le autorizzazioni"
 
 #: documents/models.py:1274
 msgid "remove these custom fields"
@@ -1371,7 +1371,7 @@ msgstr "Giapponese"
 
 #: paperless/settings.py:699
 msgid "Korean"
-msgstr ""
+msgstr "Coreano"
 
 #: paperless/settings.py:700
 msgid "Luxembourgish"

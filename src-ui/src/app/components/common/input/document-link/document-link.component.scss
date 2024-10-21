@@ -3,7 +3,19 @@
 
     .ng-value {
         background-color: transparent !important;
-        border-color: transparent;
+        border-color: transparent !important;
+    }
+}
+
+.paperless-input-select.disabled {
+    --bs-btn-disabled-border-color: transparent;
+    ::ng-deep ng-select {
+        .ng-select-container {
+            div, .ng-arrow-wrapper, input {
+                cursor: not-allowed;
+            }
+            background-color: var(--pngx-bg-alt) !important;
+        }
     }
 }
 

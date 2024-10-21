@@ -344,8 +344,8 @@
       @if (!hasNext()) {
         <button type="button" class="order-2 btn btn-sm btn-outline-primary" (click)="save(true)" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save &amp; close</button>
       }
+      <button type="button" class="order-0 btn btn-sm btn-outline-secondary" (click)="discard()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Discard</button>
     </ng-container>
-    <button type="button" class="order-0 btn btn-sm btn-outline-secondary" (click)="discard()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Discard</button>
   </div>
 </ng-template>
 
@@ -379,7 +379,7 @@
         }
       }
       @case (ContentRenderType.Text) {
-        <div class="preview-sticky bg-light p-3 overflow-auto" width="100%">{{previewText}}</div>
+        <div class="preview-sticky bg-light p-3 overflow-auto whitespace-preserve" width="100%">{{previewText}}</div>
       }
       @case (ContentRenderType.Image) {
         <div class="preview-sticky">

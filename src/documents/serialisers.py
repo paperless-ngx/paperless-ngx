@@ -1,4 +1,5 @@
 import datetime
+import logging
 import math
 import re
 import zoneinfo
@@ -52,7 +53,11 @@ from documents.models import WorkflowTrigger
 from documents.parsers import is_mime_type_supported
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import set_permissions_for_object
+from documents.templating.filepath import validate_filepath_template_and_render
+from documents.templating.utils import convert_format_str_to_template_format
 from documents.validators import uri_validator
+
+logger = logging.getLogger("paperless.serializers")
 
 
 # https://www.django-rest-framework.org/api-guide/serializers/#example
@@ -494,6 +499,8 @@ class CustomFieldSerializer(serializers.ModelSerializer):
         read_only=False,
     )
 
+    document_count = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = CustomField
         fields = [
@@ -501,6 +508,7 @@ class CustomFieldSerializer(serializers.ModelSerializer):
             "name",
             "data_type",
             "extra_data",
+            "document_count",
         ]
 
     def validate(self, attrs):
@@ -578,23 +586,14 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
     value = ReadWriteSerializerMethodField(allow_null=True)
 
     def create(self, validated_data):
-        type_to_data_store_name_map = {
-            CustomField.FieldDataType.STRING: "value_text",
-            CustomField.FieldDataType.URL: "value_url",
-            CustomField.FieldDataType.DATE: "value_date",
-            CustomField.FieldDataType.BOOL: "value_bool",
-            CustomField.FieldDataType.INT: "value_int",
-            CustomField.FieldDataType.FLOAT: "value_float",
-            CustomField.FieldDataType.MONETARY: "value_monetary",
-            CustomField.FieldDataType.DOCUMENTLINK: "value_document_ids",
-            CustomField.FieldDataType.SELECT: "value_select",
-        }
         # An instance is attached to a document
         document: Document = validated_data["document"]
         # And to a CustomField
         custom_field: CustomField = validated_data["field"]
         # This key must exist, as it is validated
-        data_store_name = type_to_data_store_name_map[custom_field.data_type]
+        data_store_name = CustomFieldInstance.get_value_field_name(
+            custom_field.data_type,
+        )
 
         if custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
             # prior to update so we can look for any docs that are going to be removed
@@ -759,6 +758,7 @@ class DocumentSerializer(
     original_file_name = SerializerMethodField()
     archived_file_name = SerializerMethodField()
     created_date = serializers.DateField(required=False)
+    page_count = SerializerMethodField()
 
     custom_fields = CustomFieldInstanceSerializer(
         many=True,
@@ -778,6 +778,9 @@ class DocumentSerializer(
         allow_null=True,
         required=False,
     )
+
+    def get_page_count(self, obj):
+        return obj.page_count
 
     def get_original_file_name(self, obj):
         return obj.original_filename
@@ -894,6 +897,7 @@ class DocumentSerializer(
             "notes",
             "custom_fields",
             "remove_inbox_tags",
+            "page_count",
         )
         list_serializer_class = OwnedObjectListSerializer
 
@@ -1393,9 +1397,18 @@ class PostDocumentSerializer(serializers.Serializer):
         mime_type = magic.from_buffer(document_data, mime=True)
 
         if not is_mime_type_supported(mime_type):
-            raise serializers.ValidationError(
-                _("File type %(type)s not supported") % {"type": mime_type},
-            )
+            if (
+                mime_type in settings.CONSUMER_PDF_RECOVERABLE_MIME_TYPES
+                and document.name.endswith(
+                    ".pdf",
+                )
+            ):
+                # If the file is an invalid PDF, we can try to recover it later in the consumer
+                mime_type = "application/pdf"
+            else:
+                raise serializers.ValidationError(
+                    _("File type %(type)s not supported") % {"type": mime_type},
+                )
 
         return document.name, document_data
 
@@ -1474,38 +1487,18 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "set_permissions",
         )
 
-    def validate_path(self, path):
-        try:
-            path.format(
-                title="title",
-                correspondent="correspondent",
-                document_type="document_type",
-                created="created",
-                created_year="created_year",
-                created_year_short="created_year_short",
-                created_month="created_month",
-                created_month_name="created_month_name",
-                created_month_name_short="created_month_name_short",
-                created_day="created_day",
-                added="added",
-                added_year="added_year",
-                added_year_short="added_year_short",
-                added_month="added_month",
-                added_month_name="added_month_name",
-                added_month_name_short="added_month_name_short",
-                added_day="added_day",
-                asn="asn",
-                tags="tags",
-                tag_list="tag_list",
-                owner_username="someone",
-                original_name="testfile",
-                doc_pk="doc_pk",
+    def validate_path(self, path: str):
+        converted_path = convert_format_str_to_template_format(path)
+        if converted_path != path:
+            logger.warning(
+                f"Storage path {path} is not using the new style format, consider updating",
             )
+        result = validate_filepath_template_and_render(converted_path)
 
-        except KeyError as err:
-            raise serializers.ValidationError(_("Invalid variable detected.")) from err
+        if result is None:
+            raise serializers.ValidationError(_("Invalid variable detected."))
 
-        return path
+        return converted_path
 
     def update(self, instance, validated_data):
         """
@@ -2017,3 +2010,18 @@ class TrashSerializer(SerializerWithPerms):
                 "Some documents in the list have not yet been deleted.",
             )
         return documents
+
+
+class StoragePathTestSerializer(SerializerWithPerms):
+    path = serializers.CharField(
+        required=True,
+        label="Path",
+        write_only=True,
+    )
+
+    document = serializers.PrimaryKeyRelatedField(
+        queryset=Document.objects.all(),
+        required=True,
+        label="Document",
+        write_only=True,
+    )

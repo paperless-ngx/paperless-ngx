@@ -9,8 +9,6 @@ from os import PathLike
 from pathlib import Path
 from platform import machine
 from typing import Final
-from typing import Optional
-from typing import Union
 from urllib.parse import urlparse
 
 from celery.schedules import crontab
@@ -57,7 +55,7 @@ def __get_int(key: str, default: int) -> int:
     return int(os.getenv(key, default))
 
 
-def __get_optional_int(key: str) -> Optional[int]:
+def __get_optional_int(key: str) -> int | None:
     """
     Returns None if the environment key is not present, otherwise an integer
     """
@@ -75,7 +73,7 @@ def __get_float(key: str, default: float) -> float:
 
 def __get_path(
     key: str,
-    default: Union[PathLike, str],
+    default: PathLike | str,
 ) -> Path:
     """
     Return a normalized, absolute path based on the environment variable or a default,
@@ -86,7 +84,7 @@ def __get_path(
     return Path(default).resolve()
 
 
-def __get_optional_path(key: str) -> Optional[Path]:
+def __get_optional_path(key: str) -> Path | None:
     """
     Returns None if the environment key is not present, otherwise a fully resolved Path
     """
@@ -97,7 +95,7 @@ def __get_optional_path(key: str) -> Optional[Path]:
 
 def __get_list(
     key: str,
-    default: Optional[list[str]] = None,
+    default: list[str] | None = None,
     sep: str = ",",
 ) -> list[str]:
     """
@@ -112,7 +110,7 @@ def __get_list(
         return []
 
 
-def _parse_redis_url(env_redis: Optional[str]) -> tuple[str, str]:
+def _parse_redis_url(env_redis: str | None) -> tuple[str, str]:
     """
     Gets the Redis information from the environment or a default and handles
     converting from incompatible django_channels and celery formats.
@@ -472,7 +470,11 @@ ACCOUNT_EMAIL_VERIFICATION = os.getenv(
     "optional",
 )
 
-ACCOUNT_SESSION_REMEMBER = __get_boolean("PAPERLESS_ACCOUNT_SESSION_REMEMBER")
+ACCOUNT_SESSION_REMEMBER = __get_boolean("PAPERLESS_ACCOUNT_SESSION_REMEMBER", "True")
+SESSION_EXPIRE_AT_BROWSER_CLOSE = not ACCOUNT_SESSION_REMEMBER
+SESSION_COOKIE_AGE = int(
+    os.getenv("PAPERLESS_SESSION_COOKIE_AGE", 60 * 60 * 24 * 7 * 3),
+)
 
 if AUTO_LOGIN_USERNAME:
     _index = MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware")
@@ -930,6 +932,10 @@ CONSUMER_BARCODE_MAX_PAGES: Final[int] = __get_int(
     0,
 )
 
+CONSUMER_BARCODE_RETAIN_SPLIT_PAGES = __get_boolean(
+    "PAPERLESS_CONSUMER_BARCODE_RETAIN_SPLIT_PAGES",
+)
+
 CONSUMER_ENABLE_TAG_BARCODE: Final[bool] = __get_boolean(
     "PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE",
 )
@@ -955,6 +961,8 @@ CONSUMER_COLLATE_DOUBLE_SIDED_SUBDIR_NAME: Final[str] = os.getenv(
 CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT: Final[bool] = __get_boolean(
     "PAPERLESS_CONSUMER_COLLATE_DOUBLE_SIDED_TIFF_SUPPORT",
 )
+
+CONSUMER_PDF_RECOVERABLE_MIME_TYPES = ("application/octet-stream",)
 
 OCR_PAGES = __get_optional_int("PAPERLESS_OCR_PAGES")
 
@@ -983,7 +991,7 @@ OCR_ROTATE_PAGES_THRESHOLD: Final[float] = __get_float(
     12.0,
 )
 
-OCR_MAX_IMAGE_PIXELS: Final[Optional[int]] = __get_optional_int(
+OCR_MAX_IMAGE_PIXELS: Final[int | None] = __get_optional_int(
     "PAPERLESS_OCR_MAX_IMAGE_PIXELS",
 )
 
@@ -994,7 +1002,7 @@ OCR_COLOR_CONVERSION_STRATEGY = os.getenv(
 
 OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS")
 
-MAX_IMAGE_PIXELS: Final[Optional[int]] = __get_optional_int(
+MAX_IMAGE_PIXELS: Final[int | None] = __get_optional_int(
     "PAPERLESS_MAX_IMAGE_PIXELS",
 )
 
@@ -1122,7 +1130,7 @@ APP_LOGO = os.getenv("PAPERLESS_APP_LOGO", None)
 ###############################################################################
 
 
-def _get_nltk_language_setting(ocr_lang: str) -> Optional[str]:
+def _get_nltk_language_setting(ocr_lang: str) -> str | None:
     """
     Maps an ISO-639-1 language code supported by Tesseract into
     an optional NLTK language name.  This is the set of common supported
@@ -1159,7 +1167,7 @@ def _get_nltk_language_setting(ocr_lang: str) -> Optional[str]:
 
 NLTK_ENABLED: Final[bool] = __get_boolean("PAPERLESS_ENABLE_NLTK", "yes")
 
-NLTK_LANGUAGE: Optional[str] = _get_nltk_language_setting(OCR_LANGUAGE)
+NLTK_LANGUAGE: str | None = _get_nltk_language_setting(OCR_LANGUAGE)
 
 ###############################################################################
 # Email (SMTP) Backend                                                        #
@@ -1181,13 +1189,29 @@ if DEBUG:  # pragma: no cover
 # Email Preprocessors                                                         #
 ###############################################################################
 
-EMAIL_GNUPG_HOME: Final[Optional[str]] = os.getenv("PAPERLESS_EMAIL_GNUPG_HOME")
+EMAIL_GNUPG_HOME: Final[str | None] = os.getenv("PAPERLESS_EMAIL_GNUPG_HOME")
 EMAIL_ENABLE_GPG_DECRYPTOR: Final[bool] = __get_boolean(
     "PAPERLESS_ENABLE_GPG_DECRYPTOR",
 )
 
 
 ###############################################################################
-# Soft Delete
+# Soft Delete                                                                 #
 ###############################################################################
 EMPTY_TRASH_DELAY = max(__get_int("PAPERLESS_EMPTY_TRASH_DELAY", 30), 1)
+
+
+###############################################################################
+# Oauth Email                                                                 #
+###############################################################################
+OAUTH_CALLBACK_BASE_URL = os.getenv("PAPERLESS_OAUTH_CALLBACK_BASE_URL")
+GMAIL_OAUTH_CLIENT_ID = os.getenv("PAPERLESS_GMAIL_OAUTH_CLIENT_ID")
+GMAIL_OAUTH_CLIENT_SECRET = os.getenv("PAPERLESS_GMAIL_OAUTH_CLIENT_SECRET")
+GMAIL_OAUTH_ENABLED = bool(
+    OAUTH_CALLBACK_BASE_URL and GMAIL_OAUTH_CLIENT_ID and GMAIL_OAUTH_CLIENT_SECRET,
+)
+OUTLOOK_OAUTH_CLIENT_ID = os.getenv("PAPERLESS_OUTLOOK_OAUTH_CLIENT_ID")
+OUTLOOK_OAUTH_CLIENT_SECRET = os.getenv("PAPERLESS_OUTLOOK_OAUTH_CLIENT_SECRET")
+OUTLOOK_OAUTH_ENABLED = bool(
+    OAUTH_CALLBACK_BASE_URL and OUTLOOK_OAUTH_CLIENT_ID and OUTLOOK_OAUTH_CLIENT_SECRET,
+)

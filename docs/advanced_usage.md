@@ -265,7 +265,7 @@ This variable allows you to configure the filename (folders are allowed)
 using placeholders. For example, configuring this to
 
 ```bash
-PAPERLESS_FILENAME_FORMAT={created_year}/{correspondent}/{title}
+PAPERLESS_FILENAME_FORMAT={{ created_year }}/{{ correspondent }}/{{ title }}
 ```
 
 will create a directory structure as follows:
@@ -298,45 +298,50 @@ will create a directory structure as follows:
     when changing `PAPERLESS_FILENAME_FORMAT` you will need to manually run the
     [`document renamer`](administration.md#renamer) to move any existing documents.
 
-#### Placeholders
+### Placeholders {#filename-format-variables}
 
-Paperless provides the following placeholders within filenames:
+Paperless provides the following variables for use within filenames:
 
-- `{asn}`: The archive serial number of the document, or "none".
-- `{correspondent}`: The name of the correspondent, or "none".
-- `{document_type}`: The name of the document type, or "none".
-- `{tag_list}`: A comma separated list of all tags assigned to the
+- `{{ asn }}`: The archive serial number of the document, or "none".
+- `{{ correspondent }}`: The name of the correspondent, or "none".
+- `{{ document_type }}`: The name of the document type, or "none".
+- `{{ tag_list }}`: A comma separated list of all tags assigned to the
   document.
-- `{title}`: The title of the document.
-- `{created}`: The full date (ISO format) the document was created.
-- `{created_year}`: Year created only, formatted as the year with
+- `{{ title }}`: The title of the document.
+- `{{ created }}`: The full date (ISO format) the document was created.
+- `{{ created_year }}`: Year created only, formatted as the year with
   century.
-- `{created_year_short}`: Year created only, formatted as the year
+- `{{ created_year_short }}`: Year created only, formatted as the year
   without century, zero padded.
-- `{created_month}`: Month created only (number 01-12).
-- `{created_month_name}`: Month created name, as per locale
-- `{created_month_name_short}`: Month created abbreviated name, as per
+- `{{ created_month }}`: Month created only (number 01-12).
+- `{{ created_month_name }}`: Month created name, as per locale
+- `{{ created_month_name_short }}`: Month created abbreviated name, as per
   locale
-- `{created_day}`: Day created only (number 01-31).
-- `{added}`: The full date (ISO format) the document was added to
+- `{{ created_day }}`: Day created only (number 01-31).
+- `{{ added }}`: The full date (ISO format) the document was added to
   paperless.
-- `{added_year}`: Year added only.
-- `{added_year_short}`: Year added only, formatted as the year without
+- `{{ added_year }}`: Year added only.
+- `{{ added_year_short }}`: Year added only, formatted as the year without
   century, zero padded.
-- `{added_month}`: Month added only (number 01-12).
-- `{added_month_name}`: Month added name, as per locale
-- `{added_month_name_short}`: Month added abbreviated name, as per
+- `{{ added_month }}`: Month added only (number 01-12).
+- `{{ added_month_name }}`: Month added name, as per locale
+- `{{ added_month_name_short }}`: Month added abbreviated name, as per
   locale
-- `{added_day}`: Day added only (number 01-31).
-- `{owner_username}`: Username of document owner, if any, or "none"
-- `{original_name}`: Document original filename, minus the extension, if any, or "none"
-- `{doc_pk}`: The paperless identifier (primary key) for the document.
+- `{{ added_day }}`: Day added only (number 01-31).
+- `{{ owner_username }}`: Username of document owner, if any, or "none"
+- `{{ original_name }}`: Document original filename, minus the extension, if any, or "none"
+- `{{ doc_pk }}`: The paperless identifier (primary key) for the document.
 
 !!! warning
 
     When using file name placeholders, in particular when using `{tag_list}`,
     you may run into the limits of your operating system's maximum path lengths.
     In that case, files will retain the previous path instead and the issue logged.
+
+!!! tip
+
+    These variables are all simple strings, but the format can be a full template.
+    See [Filename Templates](#filename-templates) for even more advanced formatting.
 
 Paperless will try to conserve the information from your database as
 much as possible. However, some characters that you can use in document
@@ -363,7 +368,7 @@ paperless will fall back to using the default naming scheme instead.
     However, keep in mind that inside docker, if files get stored outside of
     the predefined volumes, they will be lost after a restart.
 
-##### Empty placeholders
+#### Empty placeholders
 
 You can affect how empty placeholders are treated by changing the
 [`PAPERLESS_FILENAME_FORMAT_REMOVE_NONE`](configuration.md#PAPERLESS_FILENAME_FORMAT_REMOVE_NONE) setting.
@@ -390,8 +395,8 @@ For example, you could define the following two storage paths:
     the correspondence.
 
 ```
-By Year = {created_year}/{correspondent}/{title}
-Insurances = Insurances/{correspondent}/{created_year}-{created_month}-{created_day} {title}
+By Year = {{ created_year }}/{{ correspondent }}/{{ title }}
+Insurances = Insurances/{{ correspondent }}/{{ created_year }}-{{ created_month }}-{{ created_day }} {{ title }}
 ```
 
 If you then map these storage paths to the documents, you might get the
@@ -417,6 +422,97 @@ Insurances/                             # Insurances
 
     Defining a storage path is optional. If no storage path is defined for a
     document, the global [`PAPERLESS_FILENAME_FORMAT`](configuration.md#PAPERLESS_FILENAME_FORMAT) is applied.
+
+### Filename Templates {#filename-templates}
+
+The filename formatting uses [Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/templates/) to build the filename.
+This allows for complex logic to be included in the format, including [logical structures](https://jinja.palletsprojects.com/en/3.1.x/templates/#list-of-control-structures)
+and [filters](https://jinja.palletsprojects.com/en/3.1.x/templates/#id11) to manipulate the [variables](#filename-format-variables)
+provided. The template is provided as a string, potentially multiline, and rendered into a single line.
+
+In addition, the entire Document instance is available to be utilized in a more advanced way, as well as some variables which only make sense to be accessed
+with more complex logic.
+
+#### Additional Variables
+
+- `{{ tag_name_list }}`: A list of tag names applied to the document, ordered by the tag name. Note this is a list, not a single string
+- `{{ custom_fields }}`: A mapping of custom field names to their type and value. A user can access the mapping by field name or check if a field is applied by checking its existence in the variable.
+
+!!! tip
+
+    To access a custom field which has a space in the name, use the `get_cf_value` filter.  See the examples below.
+    This helps get fields by name and handle a default value if the named field is not attached to a Document.
+
+#### Examples
+
+This example will construct a path based on the archive serial number range:
+
+```jinja
+somepath/
+{% if document.archive_serial_number >= 0 and document.archive_serial_number <= 200 %}
+  asn-000-200/{{title}}
+{% elif document.archive_serial_number >= 201 and document.archive_serial_number <= 400 %}
+  asn-201-400
+  {% if document.archive_serial_number >= 201 and document.archive_serial_number < 300 %}
+    /asn-2xx
+  {% elif document.archive_serial_number >= 300 and document.archive_serial_number < 400 %}
+    /asn-3xx
+  {% endif %}
+{% endif %}
+/{{ title }}
+```
+
+For a document with an ASN of 205, it would result in `somepath/asn-201-400/asn-2xx/Title.pdf`, but
+a document with an ASN of 355 would be placed in `somepath/asn-201-400/asn-3xx/Title.pdf`.
+
+```jinja
+{% if document.mime_type == "application/pdf" %}
+  pdfs
+{% elif document.mime_type == "image/png" %}
+  pngs
+{% else %}
+  others
+{% endif %}
+/{{ title }}
+```
+
+For a PDF document, it would result in `pdfs/Title.pdf`, but for a PNG document, the path would be `pngs/Title.pdf`.
+
+To use custom fields:
+
+```jinja
+{% if "Invoice" in custom_fields %}
+  invoices/{{ custom_fields.Invoice.value }}
+{% else %}
+  not-invoices/{{ title }}
+{% endif %}
+```
+
+If the document has a custom field named "Invoice" with a value of 123, it would be filed into the `invoices/123.pdf`, but a document without the custom field
+would be filed to `not-invoices/Title.pdf`
+
+If the custom field is named "Invoice Number", you would access the value of it via the `get_cf_value` filter due to quirks of the Django Template Language:
+
+```jinja
+"invoices/{{ custom_fields|get_cf_value('Invoice Number') }}"
+```
+
+You can also use a custom `datetime` filter to format dates:
+
+```jinja
+invoices/
+{{ custom_fields|get_cf_value("Date Field","2024-01-01")|datetime('%Y') }}/
+{{ custom_fields|get_cf_value("Date Field","2024-01-01")|datetime('%m') }}/
+{{ custom_fields|get_cf_value("Date Field","2024-01-01")|datetime('%d') }}/
+Invoice_{{ custom_fields|get_cf_value("Select Field") }}_{{ custom_fields|get_cf_value("Date Field","2024-01-01")|replace("-", "") }}.pdf
+```
+
+This will create a path like `invoices/2022/01/01/Invoice_OptionTwo_20220101.pdf` if the custom field "Date Field" is set to January 1, 2022 and "Select Field" is set to `OptionTwo`.
+
+## Automatic recovery of invalid PDFs {#pdf-recovery}
+
+Paperless will attempt to "clean" certain invalid PDFs with `qpdf` before processing if, for example, the mime_type
+detection is incorrect. This can happen if the PDF is not properly formatted or contains errors.
 
 ## Celery Monitoring {#celery-monitoring}
 

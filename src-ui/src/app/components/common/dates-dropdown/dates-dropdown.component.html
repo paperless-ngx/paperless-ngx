@@ -1,4 +1,4 @@
-<div class="btn-group w-100" ngbDropdown role="group">
+<div class="btn-group w-100" ngbDropdown role="group" [popperOptions]="popperOptions">
   <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="createdDateBefore || createdDateAfter ? 'btn-primary' : 'btn-outline-primary'" [disabled]="disabled">
     <i-bs width="1em" height="1em" name="calendar-event-fill"></i-bs>
     <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
@@ -17,7 +17,7 @@
                 }
               </div>
               <div class="d-flex justify-content-between w-100 align-items-center ps-2">
-                <div class="pe-2 pe-lg-4">
+                <div class="pe-4">
                   {{rd.name}}
                 </div>
                 <div class="text-muted small pe-2">
@@ -28,20 +28,19 @@
               </div>
             </button>
           }
-          <div class="list-group-item d-flex flex-column align-items-start" role="menuitem">
+          <div class="list-group-item d-flex p-2" role="menuitem">
 
-            <div class="mb-2 d-flex flex-row w-100 justify-content-between small">
-              <div i18n>After</div>
+            <div class="selected-icon">
               @if (createdDateAfter) {
-                <a class="btn btn-link p-0 m-0" (click)="clearCreatedAfter()">
-                  <i-bs width="1em" height="1em" name="x"></i-bs>
-                  <small i18n>Clear</small>
+                <a class="text-light focus-variants" href="javascript:void(0)" (click)="clearCreatedAfter()">
+                  <i-bs width="1em" height="1em" name="check" class="variant-unfocused"></i-bs>
+                  <i-bs width="1em" height="1em" name="x" class="variant-focused text-primary"></i-bs>
                 </a>
               }
             </div>
-
-            <div class="input-group input-group-sm">
-              <input class="form-control" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
+            <div class="input-group input-group-sm small ps-1 pe-2">
+              <span class="input-group-text w-25 small text-muted" i18n>After</span>
+              <input class="form-control small" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
                 maxlength="10" [(ngModel)]="createdDateAfter" ngbDatepicker #createdDateAfterPicker="ngbDatepicker">
               <button class="btn btn-outline-secondary" (click)="createdDateAfterPicker.toggle()" type="button">
                 <i-bs width="1em" height="1em" name="calendar"></i-bs>
@@ -49,20 +48,19 @@
             </div>
 
           </div>
-          <div class="list-group-item d-flex flex-column align-items-start" role="menuitem">
+          <div class="list-group-item d-flex p-2" role="menuitem">
 
-            <div class="mb-2 d-flex flex-row w-100 justify-content-between small">
-              <div i18n>Before</div>
+            <div class="selected-icon">
               @if (createdDateBefore) {
-                <a class="btn btn-link p-0 m-0" (click)="clearCreatedBefore()">
-                  <i-bs width="1em" height="1em" name="x"></i-bs>
-                  <small i18n>Clear</small>
+                <a class="text-light focus-variants" href="javascript:void(0)" (click)="clearCreatedBefore()">
+                  <i-bs width="1em" height="1em" name="check" class="variant-unfocused"></i-bs>
+                  <i-bs width="1em" height="1em" name="x" class="variant-focused text-primary"></i-bs>
                 </a>
               }
             </div>
-
-            <div class="input-group input-group-sm">
-              <input class="form-control" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
+            <div class="input-group input-group-sm small ps-1 pe-2">
+              <span class="input-group-text w-25 small text-muted" i18n>Before</span>
+              <input class="form-control small" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
                 maxlength="10" [(ngModel)]="createdDateBefore" ngbDatepicker #createdDateBeforePicker="ngbDatepicker">
               <button class="btn btn-outline-secondary" (click)="createdDateBeforePicker.toggle()" type="button">
                 <i-bs width="1em" height="1em" name="calendar"></i-bs>
@@ -83,7 +81,7 @@
                 }
               </div>
               <div class="d-flex justify-content-between w-100 align-items-center ps-2">
-                <div class="pe-2 pe-lg-4">
+                <div class="pe-4">
                   {{rd.name}}
                 </div>
                 <div class="text-muted small pe-2">
@@ -94,20 +92,19 @@
               </div>
             </button>
           }
-          <div class="list-group-item d-flex flex-column align-items-start" role="menuitem">
+          <div class="list-group-item d-flex p-2" role="menuitem">
 
-            <div class="mb-2 d-flex flex-row w-100 justify-content-between small">
-              <div i18n>After</div>
+            <div class="selected-icon">
               @if (addedDateAfter) {
-                <a class="btn btn-link p-0 m-0" (click)="clearAddedAfter()">
-                  <i-bs width="1em" height="1em" name="x"></i-bs>
-                  <small i18n>Clear</small>
+                <a class="text-light focus-variants" href="javascript:void(0)" (click)="clearAddedAfter()">
+                  <i-bs width="1em" height="1em" name="check" class="variant-unfocused"></i-bs>
+                  <i-bs width="1em" height="1em" name="x" class="variant-focused text-primary"></i-bs>
                 </a>
               }
             </div>
-
-            <div class="input-group input-group-sm">
-              <input class="form-control" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
+            <div class="input-group input-group-sm small ps-1 pe-2">
+              <span class="input-group-text w-25 small text-muted" i18n>After</span>
+              <input class="form-control small" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
                 maxlength="10" [(ngModel)]="addedDateAfter" ngbDatepicker #addedDateAfterPicker="ngbDatepicker">
               <button class="btn btn-outline-secondary" (click)="addedDateAfterPicker.toggle()" type="button">
                 <i-bs width="1em" height="1em" name="calendar"></i-bs>
@@ -115,20 +112,19 @@
             </div>
 
           </div>
-          <div class="list-group-item d-flex flex-column align-items-start" role="menuitem">
+          <div class="list-group-item d-flex p-2" role="menuitem">
 
-            <div class="mb-2 d-flex flex-row w-100 justify-content-between small">
-              <div i18n>Before</div>
+            <div class="selected-icon">
               @if (addedDateBefore) {
-                <a class="btn btn-link p-0 m-0" (click)="clearAddedBefore()">
-                  <i-bs width="1em" height="1em" name="x"></i-bs>
-                  <small i18n>Clear</small>
+                <a class="text-light focus-variants" href="javascript:void(0)" (click)="clearAddedBefore()">
+                  <i-bs width="1em" height="1em" name="check" class="variant-unfocused"></i-bs>
+                  <i-bs width="1em" height="1em" name="x" class="variant-focused text-primary"></i-bs>
                 </a>
               }
             </div>
-
-            <div class="input-group input-group-sm">
-              <input class="form-control" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
+            <div class="input-group input-group-sm small ps-1 pe-2">
+              <span class="input-group-text w-25 small text-muted" i18n>Before</span>
+              <input class="form-control small" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
                 maxlength="10" [(ngModel)]="addedDateBefore" ngbDatepicker #addedDateBeforePicker="ngbDatepicker">
               <button class="btn btn-outline-secondary" (click)="addedDateBeforePicker.toggle()" type="button">
                 <i-bs width="1em" height="1em" name="calendar"></i-bs>

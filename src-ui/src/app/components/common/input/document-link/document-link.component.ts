@@ -46,6 +46,12 @@ export class DocumentLinkComponent
   @Input()
   parentDocumentID: number
 
+  @Input()
+  minimal: boolean = false
+
+  @Input()
+  placeholder: string = $localize`Search for documents`
+
   constructor(private documentsService: DocumentService) {
     super()
   }

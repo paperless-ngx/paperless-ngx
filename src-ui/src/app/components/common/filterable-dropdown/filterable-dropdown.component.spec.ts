@@ -539,15 +539,10 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     fixture.nativeElement
       .querySelector('button')
       .dispatchEvent(new MouseEvent('click')) // open
-    fixture.detectChanges()
     tick(100)
     component.filterText = 'FooBar'
-    fixture.detectChanges()
-    component.listFilterTextInput.nativeElement.dispatchEvent(
-      new KeyboardEvent('keyup', { key: 'Enter' })
-    )
+    component.listFilterEnter()
     expect(component.selectionModel.getSelectedItems()).toEqual([])
-    tick(300)
     expect(createSpy).toHaveBeenCalled()
   }))
 

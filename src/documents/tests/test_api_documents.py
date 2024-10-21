@@ -1402,6 +1402,27 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(overrides.filename, "simple.pdf")
         self.assertEqual(overrides.custom_field_ids, [custom_field.id])
 
+    def test_upload_invalid_pdf(self):
+        """
+        GIVEN: Invalid PDF named "*.pdf" that mime_type is in settings.CONSUMER_PDF_RECOVERABLE_MIME_TYPES
+        WHEN: Upload the file
+        THEN: The file is not rejected
+        """
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
+
+        with open(
+            os.path.join(os.path.dirname(__file__), "samples", "invalid_pdf.pdf"),
+            "rb",
+        ) as f:
+            response = self.client.post(
+                "/api/documents/post_document/",
+                {"document": f},
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     def test_get_metadata(self):
         doc = Document.objects.create(
             title="test",

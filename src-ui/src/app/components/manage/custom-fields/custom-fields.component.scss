@@ -1,0 +1,4 @@
+// hide caret on mobile dropdown
+.d-block.d-sm-none .dropdown-toggle::after {
+    display: none;
+}

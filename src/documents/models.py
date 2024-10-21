@@ -5,7 +5,6 @@ import re
 from collections import OrderedDict
 from pathlib import Path
 from typing import Final
-from typing import Optional
 
 import dateutil.parser
 import pathvalidate
@@ -23,6 +22,9 @@ from multiselectfield import MultiSelectField
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
 
+from django.db.models import Case
+from django.db.models.functions import Cast
+from django.db.models.functions import Substr
 from django_softdelete.models import SoftDeleteModel
 
 from documents.data_models import DocumentSource
@@ -123,9 +125,8 @@ class DocumentType(MatchingModel):
 
 
 class StoragePath(MatchingModel):
-    path = models.CharField(
+    path = models.TextField(
         _("path"),
-        max_length=512,
     )
 
     class Meta(MatchingModel.Meta):
@@ -203,6 +204,18 @@ class Document(SoftDeleteModel, ModelWithOwner):
         blank=True,
         null=True,
         help_text=_("The checksum of the archived document."),
+    )
+
+    page_count = models.PositiveIntegerField(
+        _("page count"),
+        blank=False,
+        null=True,
+        unique=False,
+        db_index=False,
+        validators=[MinValueValidator(1)],
+        help_text=_(
+            "The number of pages of the document.",
+        ),
     )
 
     created = models.DateTimeField(_("created"), default=timezone.now, db_index=True)
@@ -314,7 +327,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
         return self.archive_filename is not None
 
     @property
-    def archive_path(self) -> Optional[Path]:
+    def archive_path(self) -> Path | None:
         if self.has_archive_version:
             return (settings.ARCHIVE_DIR / Path(str(self.archive_filename))).resolve()
         else:
@@ -414,6 +427,7 @@ class SavedView(ModelWithOwner):
         OWNER = ("owner", _("Owner"))
         SHARED = ("shared", _("Shared"))
         ASN = ("asn", _("ASN"))
+        PAGE_COUNT = ("pagecount", _("Pages"))
         CUSTOM_FIELD = ("custom_field_%d", ("Custom Field"))
 
     name = models.CharField(_("name"), max_length=128)
@@ -507,6 +521,7 @@ class SavedViewFilterRule(models.Model):
         (39, _("has custom field in")),
         (40, _("does not have custom field in")),
         (41, _("does not have custom field")),
+        (42, _("custom fields query")),
     ]
 
     saved_view = models.ForeignKey(
@@ -857,6 +872,18 @@ class CustomFieldInstance(models.Model):
     and attached to a single Document to be metadata for it
     """
 
+    TYPE_TO_DATA_STORE_NAME_MAP = {
+        CustomField.FieldDataType.STRING: "value_text",
+        CustomField.FieldDataType.URL: "value_url",
+        CustomField.FieldDataType.DATE: "value_date",
+        CustomField.FieldDataType.BOOL: "value_bool",
+        CustomField.FieldDataType.INT: "value_int",
+        CustomField.FieldDataType.FLOAT: "value_float",
+        CustomField.FieldDataType.MONETARY: "value_monetary",
+        CustomField.FieldDataType.DOCUMENTLINK: "value_document_ids",
+        CustomField.FieldDataType.SELECT: "value_select",
+    }
+
     created = models.DateTimeField(
         _("created"),
         default=timezone.now,
@@ -897,6 +924,27 @@ class CustomFieldInstance(models.Model):
 
     value_monetary = models.CharField(null=True, max_length=128)
 
+    value_monetary_amount = models.GeneratedField(
+        expression=Case(
+            # If the value starts with a number and no currency symbol, use the whole string
+            models.When(
+                value_monetary__regex=r"^\d+",
+                then=Cast(
+                    Substr("value_monetary", 1),
+                    output_field=models.DecimalField(decimal_places=2, max_digits=65),
+                ),
+            ),
+            # If the value starts with a 3-char currency symbol, use the rest of the string
+            default=Cast(
+                Substr("value_monetary", 4),
+                output_field=models.DecimalField(decimal_places=2, max_digits=65),
+            ),
+            output_field=models.DecimalField(decimal_places=2, max_digits=65),
+        ),
+        output_field=models.DecimalField(decimal_places=2, max_digits=65),
+        db_persist=True,
+    )
+
     value_document_ids = models.JSONField(null=True)
 
     value_select = models.PositiveSmallIntegerField(null=True)
@@ -923,31 +971,21 @@ class CustomFieldInstance(models.Model):
         )
         return str(self.field.name) + f" : {value}"
 
+    @classmethod
+    def get_value_field_name(cls, data_type: CustomField.FieldDataType):
+        try:
+            return cls.TYPE_TO_DATA_STORE_NAME_MAP[data_type]
+        except KeyError:  # pragma: no cover
+            raise NotImplementedError(data_type)
+
     @property
     def value(self):
         """
         Based on the data type, access the actual value the instance stores
         A little shorthand/quick way to get what is actually here
         """
-        if self.field.data_type == CustomField.FieldDataType.STRING:
-            return self.value_text
-        elif self.field.data_type == CustomField.FieldDataType.URL:
-            return self.value_url
-        elif self.field.data_type == CustomField.FieldDataType.DATE:
-            return self.value_date
-        elif self.field.data_type == CustomField.FieldDataType.BOOL:
-            return self.value_bool
-        elif self.field.data_type == CustomField.FieldDataType.INT:
-            return self.value_int
-        elif self.field.data_type == CustomField.FieldDataType.FLOAT:
-            return self.value_float
-        elif self.field.data_type == CustomField.FieldDataType.MONETARY:
-            return self.value_monetary
-        elif self.field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
-            return self.value_document_ids
-        elif self.field.data_type == CustomField.FieldDataType.SELECT:
-            return self.value_select
-        raise NotImplementedError(self.field.data_type)
+        value_field_name = self.get_value_field_name(self.field.data_type)
+        return getattr(self, value_field_name)
 
 
 if settings.AUDIT_LOG_ENABLED:

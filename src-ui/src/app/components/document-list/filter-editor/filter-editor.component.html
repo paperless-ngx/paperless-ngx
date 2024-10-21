@@ -86,15 +86,10 @@
         }
 
         @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.CustomField) && customFields.length > 0) {
-          <pngx-filterable-dropdown class="flex-fill" title="Custom fields" icon="ui-radios" i18n-title
-          filterPlaceholder="Filter custom fields" i18n-filterPlaceholder
-          [items]="customFields"
-          [manyToOne]="true"
-          [(selectionModel)]="customFieldSelectionModel"
+          <pngx-custom-fields-query-dropdown class="flex-fill" title="Custom fields" icon="ui-radios" i18n-title
+          [(selectionModel)]="customFieldQueriesModel"
           (selectionModelChange)="updateRules()"
-          (opened)="onCustomFieldsDropdownOpen()"
-          [documentCounts]="customFieldDocumentCounts"
-          [allowSelectNone]="true"></pngx-filterable-dropdown>
+          ></pngx-custom-fields-query-dropdown>
         }
         <pngx-dates-dropdown
           title="Dates" i18n-title

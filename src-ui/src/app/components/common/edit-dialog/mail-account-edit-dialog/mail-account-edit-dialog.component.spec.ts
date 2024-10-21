@@ -11,7 +11,7 @@ import {
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { IMAPSecurity } from 'src/app/data/mail-account'
+import { IMAPSecurity, MailAccountType } from 'src/app/data/mail-account'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -82,6 +82,7 @@ describe('MailAccountEditDialogComponent', () => {
       imap_port: 443,
       imap_security: IMAPSecurity.SSL,
       is_token: false,
+      account_type: MailAccountType.IMAP,
     }
 
     // success

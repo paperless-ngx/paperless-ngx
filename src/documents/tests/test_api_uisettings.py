@@ -2,6 +2,7 @@ import json
 
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.test import override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -113,3 +114,22 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    @override_settings(
+        OAUTH_CALLBACK_BASE_URL="http://localhost:8000",
+        GMAIL_OAUTH_CLIENT_ID="abc123",
+        GMAIL_OAUTH_CLIENT_SECRET="def456",
+        GMAIL_OAUTH_ENABLED=True,
+        OUTLOOK_OAUTH_CLIENT_ID="ghi789",
+        OUTLOOK_OAUTH_CLIENT_SECRET="jkl012",
+        OUTLOOK_OAUTH_ENABLED=True,
+    )
+    def test_settings_includes_oauth_urls_if_enabled(self):
+        response = self.client.get(self.ENDPOINT, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNotNone(
+            response.data["settings"]["gmail_oauth_url"],
+        )
+        self.assertIsNotNone(
+            response.data["settings"]["outlook_oauth_url"],
+        )

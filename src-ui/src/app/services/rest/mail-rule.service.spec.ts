@@ -18,6 +18,7 @@ const mail_rules = [
     id: 1,
     account: 1,
     order: 1,
+    enabled: true,
     folder: 'INBOX',
     filter_from: null,
     filter_to: null,
@@ -36,6 +37,7 @@ const mail_rules = [
     id: 2,
     account: 1,
     order: 1,
+    enabled: true,
     folder: 'INBOX',
     filter_from: null,
     filter_to: null,
@@ -54,6 +56,7 @@ const mail_rules = [
     id: 3,
     account: 1,
     order: 1,
+    enabled: true,
     folder: 'INBOX',
     filter_from: null,
     filter_to: null,
@@ -73,21 +76,6 @@ const mail_rules = [
 commonAbstractPaperlessServiceTests(endpoint, MailRuleService)
 
 describe(`Additional service tests for MailRuleService`, () => {
-  it('should support patchMany', () => {
-    subscription = service.patchMany(mail_rules).subscribe()
-    mail_rules.forEach((mail_rule) => {
-      const req = httpTestingController.expectOne(
-        `${environment.apiBaseUrl}${endpoint}/${mail_rule.id}/`
-      )
-      expect(req.request.method).toEqual('PATCH')
-      req.flush(mail_rule)
-    })
-    const reloadReq = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
-    )
-    reloadReq.flush({ results: mail_rules })
-  })
-
   it('should support reload', () => {
     service['reload']()
     const req = httpTestingController.expectOne(

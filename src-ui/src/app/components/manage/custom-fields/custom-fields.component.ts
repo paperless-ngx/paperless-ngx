@@ -9,6 +9,12 @@ import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dial
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { FILTER_CUSTOM_FIELDS_QUERY } from 'src/app/data/filter-rule-type'
+import {
+  CustomFieldQueryLogicalOperator,
+  CustomFieldQueryOperator,
+} from 'src/app/data/custom-field-query'
 
 @Component({
   selector: 'pngx-custom-fields',
@@ -26,7 +32,8 @@ export class CustomFieldsComponent
     private customFieldsService: CustomFieldsService,
     public permissionsService: PermissionsService,
     private modalService: NgbModal,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private documentListViewService: DocumentListViewService
   ) {
     super()
   }
@@ -91,5 +98,17 @@ export class CustomFieldsComponent
 
   getDataType(field: CustomField): string {
     return DATA_TYPE_LABELS.find((l) => l.id === field.data_type).name
+  }
+
+  filterDocuments(field: CustomField) {
+    this.documentListViewService.quickFilter([
+      {
+        rule_type: FILTER_CUSTOM_FIELDS_QUERY,
+        value: JSON.stringify([
+          CustomFieldQueryLogicalOperator.Or,
+          [[field.id, CustomFieldQueryOperator.Exists, true]],
+        ]),
+      },
+    ])
   }
 }

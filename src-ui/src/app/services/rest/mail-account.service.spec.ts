@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing'
 import { environment } from 'src/environments/environment'
 import { commonAbstractPaperlessServiceTests } from './abstract-paperless-service.spec'
 import { MailAccountService } from './mail-account.service'
-import { IMAPSecurity } from 'src/app/data/mail-account'
+import { IMAPSecurity, MailAccountType } from 'src/app/data/mail-account'
 
 let httpTestingController: HttpTestingController
 let service: MailAccountService
@@ -20,6 +20,7 @@ const mail_accounts = [
     username: 'user',
     password: 'pass',
     is_token: false,
+    account_type: MailAccountType.IMAP,
   },
   {
     name: 'Mail Account 2',
@@ -30,6 +31,7 @@ const mail_accounts = [
     username: 'user',
     password: 'pass',
     is_token: false,
+    account_type: MailAccountType.IMAP,
   },
   {
     name: 'Mail Account 3',
@@ -40,6 +42,7 @@ const mail_accounts = [
     username: 'user',
     password: 'pass',
     is_token: false,
+    account_type: MailAccountType.IMAP,
   },
 ]
 
@@ -53,20 +56,6 @@ describe(`Additional service tests for MailAccountService`, () => {
       `${environment.apiBaseUrl}${endpoint}/test/`
     )
     expect(req.request.method).toEqual('POST')
-  })
-
-  it('should support patchMany', () => {
-    subscription = service.patchMany(mail_accounts).subscribe()
-    mail_accounts.forEach((mail_account) => {
-      const req = httpTestingController.expectOne(
-        `${environment.apiBaseUrl}${endpoint}/${mail_account.id}/`
-      )
-      expect(req.request.method).toEqual('PATCH')
-      req.flush(mail_account)
-    })
-    httpTestingController.expectOne(
-      `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
-    )
   })
 
   it('should support reload', () => {

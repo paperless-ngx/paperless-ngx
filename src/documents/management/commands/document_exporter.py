@@ -6,7 +6,6 @@ import tempfile
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING
-from typing import Optional
 
 import tqdm
 from django.conf import settings
@@ -183,7 +182,7 @@ class Command(CryptMixin, BaseCommand):
         self.zip_export: bool = options["zip"]
         self.data_only: bool = options["data_only"]
         self.no_progress_bar: bool = options["no_progress_bar"]
-        self.passphrase: Optional[str] = options.get("passphrase")
+        self.passphrase: str | None = options.get("passphrase")
 
         self.files_in_export_dir: set[Path] = set()
         self.exported_files: set[str] = set()
@@ -427,7 +426,7 @@ class Command(CryptMixin, BaseCommand):
         document: Document,
         base_name: str,
         document_dict: dict,
-    ) -> tuple[Path, Optional[Path], Optional[Path]]:
+    ) -> tuple[Path, Path | None, Path | None]:
         """
         Generates the targets for a given document, including the original file, archive file and thumbnail (depending on settings).
         """
@@ -461,8 +460,8 @@ class Command(CryptMixin, BaseCommand):
         self,
         document: Document,
         original_target: Path,
-        thumbnail_target: Optional[Path],
-        archive_target: Optional[Path],
+        thumbnail_target: Path | None,
+        archive_target: Path | None,
     ) -> None:
         """
         Copies files from the document storage location to the specified target location.
@@ -512,7 +511,7 @@ class Command(CryptMixin, BaseCommand):
     def check_and_copy(
         self,
         source: Path,
-        source_checksum: Optional[str],
+        source_checksum: str | None,
         target: Path,
     ):
         """
