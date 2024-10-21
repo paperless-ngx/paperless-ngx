@@ -62,7 +62,7 @@ repos:
     rev: v6.2.1
     hooks:
       - id: beautysh
-        language_version: '3.10'
+        language_version: '3.11'
         additional_dependencies:
           - setuptools
         args:
