@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="storagepath",
             name="path",
-            field=models.CharField(max_length=2048, verbose_name="path"),
+            field=models.TextField(verbose_name="path"),
         ),
         migrations.RunPython(
             convert_from_format_to_template,
