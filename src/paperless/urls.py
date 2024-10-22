@@ -1,6 +1,7 @@
 import os
 
 from allauth.account import views as allauth_account_views
+from allauth.mfa.base import views as allauth_mfa_views
 from allauth.socialaccount import views as allauth_social_account_views
 from allauth.urls import build_provider_urlpatterns
 from django.conf import settings
@@ -147,19 +148,22 @@ urlpatterns = [
                     BulkEditObjectsView.as_view(),
                     name="bulk_edit_objects",
                 ),
-                path("profile/generate_auth_token/", GenerateAuthTokenView.as_view()),
-                path(
-                    "profile/disconnect_social_account/",
-                    DisconnectSocialAccountView.as_view(),
-                ),
-                path(
-                    "profile/social_account_providers/",
-                    SocialAccountProvidersView.as_view(),
-                ),
                 re_path(
                     "^profile/",
                     include(
                         [
+                            path(
+                                "generate_auth_token/",
+                                GenerateAuthTokenView.as_view(),
+                            ),
+                            path(
+                                "disconnect_social_account/",
+                                DisconnectSocialAccountView.as_view(),
+                            ),
+                            path(
+                                "social_account_providers/",
+                                SocialAccountProvidersView.as_view(),
+                            ),
                             re_path(
                                 "^$",
                                 ProfileView.as_view(),
@@ -170,7 +174,6 @@ urlpatterns = [
                                 TOTPView.as_view(),
                                 name="totp_view",
                             ),
-                            # TODO: remove allauth urls?
                         ],
                     ),
                 ),
@@ -310,6 +313,12 @@ urlpatterns = [
                     ),
                 ),
                 *build_provider_urlpatterns(),
+                # mfa, see allauth/mfa/base/urls.py
+                path(
+                    "2fa/authenticate/",
+                    allauth_mfa_views.authenticate,
+                    name="mfa_authenticate",
+                ),
             ],
         ),
     ),
