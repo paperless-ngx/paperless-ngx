@@ -119,6 +119,22 @@
   <div [formGroup]="formGroup">
     <input type="hidden" formControlName="id" />
     <pngx-input-select i18n-title title="Trigger type" [horizontal]="true" [items]="triggerTypeOptions" formControlName="type"></pngx-input-select>
+    @if (formGroup.get('type').value === WorkflowTriggerType.Scheduled) {
+      <p class="small" i18n>Set scheduled trigger delay and which field to use.</p>
+      <div class="row">
+        <div class="col-4">
+          <pngx-input-text i18n-title title="Delay" formControlName="schedule_delay" i18n-hint hint="Delay time string such as '3months', '1y'." [error]="error?.schedule_delay"></pngx-input-text>
+        </div>
+        <div class="col-4">
+          <pngx-input-select i18n-title title="Delay field" formControlName="schedule_delay_field" [items]="scheduleDelayFieldOptions" [error]="error?.schedule_delay_field"></pngx-input-select>
+        </div>
+        @if (formGroup.get('schedule_delay_field').value === 'custom_field') {
+          <div class="col-4">
+            <pngx-input-select i18n-title title="Custom delay field" formControlName="schedule_delay_custom_field" [items]="dateCustomFields" i18n-hint hint="Custom field to use for delay." [error]="error?.schedule_delay_custom_field"></pngx-input-select>
+          </div>
+        }
+      </div>
+    }
     <p class="small" i18n>Trigger for documents that match <em>all</em> filters specified below.</p>
     <div class="row">
       <div class="col">
@@ -128,7 +144,7 @@
           <pngx-input-text i18n-title title="Filter path" formControlName="filter_path" i18n-hint hint="Apply to documents that match this path. Wildcards specified as * are allowed. Case-normalized.</a>" [error]="error?.filter_path"></pngx-input-text>
           <pngx-input-select i18n-title title="Filter mail rule" [items]="mailRules" [allowNull]="true" formControlName="filter_mailrule" i18n-hint hint="Apply to documents consumed via this mail rule." [error]="error?.filter_mailrule"></pngx-input-select>
         }
-        @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated) {
+        @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated || formGroup.get('type').value === WorkflowTriggerType.Scheduled) {
           <pngx-input-select i18n-title title="Content matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></pngx-input-select>
           @if (patternRequired) {
             <pngx-input-text i18n-title title="Content matching pattern" formControlName="match" [error]="error?.match"></pngx-input-text>
@@ -138,7 +154,7 @@
           }
         }
       </div>
-      @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated) {
+      @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated || formGroup.get('type').value === WorkflowTriggerType.Scheduled) {
         <div class="col-md-6">
           <pngx-input-tags [allowCreate]="false" i18n-title title="Has any of tags" formControlName="filter_has_tags"></pngx-input-tags>
           <pngx-input-select i18n-title title="Has correspondent" [items]="correspondents" [allowNull]="true" formControlName="filter_has_correspondent"></pngx-input-select>

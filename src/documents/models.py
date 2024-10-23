@@ -1016,11 +1016,18 @@ class WorkflowTrigger(models.Model):
         CONSUMPTION = 1, _("Consumption Started")
         DOCUMENT_ADDED = 2, _("Document Added")
         DOCUMENT_UPDATED = 3, _("Document Updated")
+        SCHEDULED = 4, _("Scheduled")
 
     class DocumentSourceChoices(models.IntegerChoices):
         CONSUME_FOLDER = DocumentSource.ConsumeFolder.value, _("Consume Folder")
         API_UPLOAD = DocumentSource.ApiUpload.value, _("Api Upload")
         MAIL_FETCH = DocumentSource.MailFetch.value, _("Mail Fetch")
+
+    class ScheduleDelayField(models.TextChoices):
+        ADDED = "added", _("Added")
+        CREATED = "created", _("Created")
+        MODIFIED = "modified", _("Modified")
+        CUSTOM_FIELD = "custom_field", _("Custom Field")
 
     type = models.PositiveIntegerField(
         _("Workflow Trigger Type"),
@@ -1096,6 +1103,34 @@ class WorkflowTrigger(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
         verbose_name=_("has this correspondent"),
+    )
+
+    schedule_delay = models.CharField(
+        _("schedule delay"),
+        max_length=256,
+        null=True,
+        blank=True,
+        help_text=_(
+            "The delay before the scheduled trigger is activated.",
+        ),
+    )
+
+    schedule_delay_field = models.CharField(
+        _("schedule delay field"),
+        max_length=20,
+        choices=ScheduleDelayField.choices,
+        default=ScheduleDelayField.ADDED,
+        help_text=_(
+            "The field to use for the delay.",
+        ),
+    )
+
+    schedule_delay_custom_field = models.ForeignKey(
+        CustomField,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("schedule delay custom field"),
     )
 
     class Meta:

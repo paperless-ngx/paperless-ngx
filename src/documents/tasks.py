@@ -14,6 +14,7 @@ from django.db import models
 from django.db import transaction
 from django.db.models.signals import post_save
 from django.utils import timezone
+from duration_parser import parse_timedelta
 from filelock import FileLock
 from whoosh.writing import AsyncWriter
 
@@ -31,10 +32,13 @@ from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.models import Correspondent
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import Workflow
+from documents.models import WorkflowTrigger
 from documents.parsers import DocumentParser
 from documents.parsers import get_parser_class_for_mime_type
 from documents.plugins.base import ConsumeTaskPlugin
@@ -44,6 +48,7 @@ from documents.plugins.helpers import ProgressStatusOptions
 from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
+from documents.signals.handlers import run_workflows
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
@@ -319,3 +324,65 @@ def empty_trash(doc_ids=None):
             cleanup_document_deletion,
             sender=Document,
         )
+
+
+@shared_task
+def check_scheduled_workflows():
+    scheduled_workflows: list[Workflow] = Workflow.objects.filter(
+        triggers__type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+        enabled=True,
+    ).prefetch_related("triggers")
+    if scheduled_workflows.count() > 0:
+        logger.debug(f"Checking {len(scheduled_workflows)} scheduled workflows")
+        for workflow in scheduled_workflows:
+            schedule_triggers = workflow.triggers.filter(
+                type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            )
+            trigger: WorkflowTrigger
+            for trigger in schedule_triggers:
+                documents = Document.objects.none()
+                delay_td = parse_timedelta(trigger.schedule_delay)
+                logger.debug(
+                    f"Checking trigger {trigger} with delay {delay_td} against field: {trigger.schedule_delay_field}",
+                )
+                if (
+                    trigger.schedule_delay_field
+                    == WorkflowTrigger.ScheduleDelayField.ADDED
+                ):
+                    documents = Document.objects.filter(
+                        added__lt=timezone.now() - delay_td,
+                    )
+                elif (
+                    trigger.schedule_delay_field
+                    == WorkflowTrigger.ScheduleDelayField.CREATED
+                ):
+                    documents = Document.objects.filter(
+                        created__lt=timezone.now() - delay_td,
+                    )
+                elif (
+                    trigger.schedule_delay_field
+                    == WorkflowTrigger.ScheduleDelayField.MODIFIED
+                ):
+                    documents = Document.objects.filter(
+                        modified__lt=timezone.now() - delay_td,
+                    )
+                elif (
+                    trigger.schedule_delay_field
+                    == WorkflowTrigger.ScheduleDelayField.CUSTOM_FIELD
+                ):
+                    cf_instances = CustomFieldInstance.objects.filter(
+                        field=trigger.schedule_delay_custom_field,
+                        value_date__lt=timezone.now() - delay_td,
+                    )
+                    documents = Document.objects.filter(
+                        id__in=cf_instances.values_list("document", flat=True),
+                    )
+                if documents.count() > 0:
+                    logger.debug(
+                        f"Found {documents.count()} documents for trigger {trigger}",
+                    )
+                    for document in documents:
+                        run_workflows(
+                            WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+                            document,
+                        )

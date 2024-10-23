@@ -1370,7 +1370,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         doc = Document.objects.create(
             title="test",
         )
-        self.assertRaises(Exception, document_matches_workflow, doc, w, 4)
+        self.assertRaises(Exception, document_matches_workflow, doc, w, 99)
 
     def test_removal_action_document_updated_workflow(self):
         """

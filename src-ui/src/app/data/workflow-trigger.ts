@@ -10,6 +10,14 @@ export enum WorkflowTriggerType {
   Consumption = 1,
   DocumentAdded = 2,
   DocumentUpdated = 3,
+  Scheduled = 4,
+}
+
+export enum ScheduleDelayField {
+  Added = 'added',
+  Created = 'created',
+  Modified = 'modified',
+  CustomField = 'custom_field',
 }
 
 export interface WorkflowTrigger extends ObjectWithId {
@@ -34,4 +42,10 @@ export interface WorkflowTrigger extends ObjectWithId {
   filter_has_correspondent?: number // Correspondent.id
 
   filter_has_document_type?: number // DocumentType.id
+
+  schedule_delay?: string
+
+  schedule_delay_field?: ScheduleDelayField
+
+  schedule_delay_custom_field?: number // CustomField.id
 }

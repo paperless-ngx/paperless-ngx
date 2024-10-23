@@ -16,9 +16,10 @@ import { EditDialogComponent } from '../edit-dialog.component'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { MailRule } from 'src/app/data/mail-rule'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { CustomField } from 'src/app/data/custom-field'
+import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
   DocumentSource,
+  ScheduleDelayField,
   WorkflowTrigger,
   WorkflowTriggerType,
 } from 'src/app/data/workflow-trigger'
@@ -48,6 +49,25 @@ export const DOCUMENT_SOURCE_OPTIONS = [
   },
 ]
 
+export const SCHEDULE_DELAY_FIELD_OPTIONS = [
+  {
+    id: ScheduleDelayField.Added,
+    name: $localize`Added`,
+  },
+  {
+    id: ScheduleDelayField.Created,
+    name: $localize`Created`,
+  },
+  {
+    id: ScheduleDelayField.Modified,
+    name: $localize`Modified`,
+  },
+  {
+    id: ScheduleDelayField.CustomField,
+    name: $localize`Custom Field`,
+  },
+]
+
 export const WORKFLOW_TYPE_OPTIONS = [
   {
     id: WorkflowTriggerType.Consumption,
@@ -60,6 +80,10 @@ export const WORKFLOW_TYPE_OPTIONS = [
   {
     id: WorkflowTriggerType.DocumentUpdated,
     name: $localize`Document Updated`,
+  },
+  {
+    id: WorkflowTriggerType.Scheduled,
+    name: $localize`Scheduled`,
   },
 ]
 
@@ -314,6 +338,11 @@ export class WorkflowEditDialogComponent
         filter_has_document_type: new FormControl(
           trigger.filter_has_document_type
         ),
+        schedule_delay: new FormControl(trigger.schedule_delay),
+        schedule_delay_field: new FormControl(trigger.schedule_delay_field),
+        schedule_delay_custom_field: new FormControl(
+          trigger.schedule_delay_custom_field
+        ),
       }),
       { emitEvent }
     )
@@ -388,6 +417,16 @@ export class WorkflowEditDialogComponent
     return WORKFLOW_TYPE_OPTIONS
   }
 
+  get scheduleDelayFieldOptions() {
+    return SCHEDULE_DELAY_FIELD_OPTIONS
+  }
+
+  get dateCustomFields() {
+    return this.customFields?.filter(
+      (f) => f.data_type === CustomFieldDataType.Date
+    )
+  }
+
   getTriggerTypeOptionName(type: WorkflowTriggerType): string {
     return this.triggerTypeOptions.find((t) => t.id === type)?.name ?? ''
   }
@@ -408,6 +447,9 @@ export class WorkflowEditDialogComponent
       matching_algorithm: MATCH_NONE,
       match: '',
       is_insensitive: true,
+      schedule_delay: null,
+      schedule_delay_field: ScheduleDelayField.Added,
+      schedule_delay_custom_field: null,
     }
     this.object.triggers.push(trigger)
     this.createTriggerField(trigger)
