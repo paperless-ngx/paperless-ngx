@@ -1166,6 +1166,10 @@ class WorkflowAction(models.Model):
             2,
             _("Removal"),
         )
+        NOTIFICATION = (
+            3,
+            _("Notification"),
+        )
 
     type = models.PositiveIntegerField(
         _("Workflow Action Type"),
@@ -1365,6 +1369,48 @@ class WorkflowAction(models.Model):
     remove_all_custom_fields = models.BooleanField(
         default=False,
         verbose_name=_("remove all custom fields"),
+    )
+
+    notification_subject = models.CharField(
+        _("notification subject"),
+        max_length=256,
+        null=True,
+        blank=True,
+        help_text=_(
+            "The subject of the notification, can include some placeholders, "
+            "see documentation.",
+        ),
+    )
+
+    notification_body = models.TextField(
+        _("notification body"),
+        null=True,
+        blank=True,
+        help_text=_(
+            "The body (message) of the notification, can include some placeholders, "
+            "see documentation.",
+        ),
+    )
+
+    notification_destination_emails = models.TextField(
+        _("notification destination emails"),
+        null=True,
+        blank=True,
+        help_text=_(
+            "The destination email addresses for the notification, comma separated.",
+        ),
+    )
+
+    notification_destination_url = models.URLField(
+        _("notification destination url"),
+        null=True,
+        blank=True,
+        help_text=_("The destination URL for the notification."),
+    )
+
+    notification_include_document = models.BooleanField(
+        default=False,
+        verbose_name=_("include document in notification"),
     )
 
     class Meta:

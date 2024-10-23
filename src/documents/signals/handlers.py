@@ -2,6 +2,7 @@ import logging
 import os
 import shutil
 
+import httpx
 from celery import states
 from celery.signals import before_task_publish
 from celery.signals import task_failure
@@ -12,6 +13,7 @@ from django.contrib.admin.models import ADDITION
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.core.mail import EmailMessage
 from django.db import DatabaseError
 from django.db import close_old_connections
 from django.db import models
@@ -866,6 +868,68 @@ def run_workflows(
                 ):
                     overrides.custom_field_ids.remove(field.pk)
 
+    def notification_action():
+        subject = parse_doc_title_w_placeholders(
+            action.notification_subject,
+            document.correspondent.name if document.correspondent else "",
+            document.document_type.name if document.document_type else "",
+            document.owner.username if document.owner else "",
+            timezone.localtime(document.added),
+            document.original_filename or "",
+            timezone.localtime(document.created),
+        )
+        body = action.notification_body.format(
+            title=subject,
+            document=document,
+        )
+        # TODO: if doc exists, construct URL
+        if action.notification_destination_emails:
+            if not settings.EMAIL_ENABLED:
+                logger.error(
+                    "Email backend has not been configured, cannot send email notifications",
+                    extra={"group": logging_group},
+                )
+            else:
+                try:
+                    email = EmailMessage(
+                        subject=subject,
+                        body=body,
+                        to=action.notification_destination_emails.split(","),
+                    )
+                    if action.notification_include_document:
+                        email.attach_file(document.source_path)
+                    email.send()
+                except Exception as e:
+                    logger.exception(
+                        f"Error occurred sending notification email: {e}",
+                        extra={"group": logging_group},
+                    )
+        if action.notification_destination_url:
+            try:
+                data = {
+                    "title": subject,
+                    "message": body,
+                }
+                files = None
+                if action.notification_include_document:
+                    with open(document.source_path, "rb") as f:
+                        files = {"document": f}
+                        httpx.post(
+                            action.notification_destination_url,
+                            data=data,
+                            files=files,
+                        )
+                else:
+                    httpx.post(
+                        action.notification_destination_url,
+                        data=data,
+                    )
+            except Exception as e:
+                logger.exception(
+                    f"Error occurred sending notification to destination URL: {e}",
+                    extra={"group": logging_group},
+                )
+
     use_overrides = overrides is not None
     messages = []
 
@@ -911,6 +975,8 @@ def run_workflows(
                     assignment_action()
                 elif action.type == WorkflowAction.WorkflowActionType.REMOVAL:
                     removal_action()
+                elif action.type == WorkflowAction.WorkflowActionType.NOTIFICATION:
+                    notification_action()
 
             if not use_overrides:
                 # save first before setting tags

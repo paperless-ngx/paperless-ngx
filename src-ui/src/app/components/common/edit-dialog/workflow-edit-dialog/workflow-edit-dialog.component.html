@@ -322,6 +322,17 @@
           </div>
         </div>
       }
+      @case (WorkflowActionType.Notification) {
+        <div class="row">
+          <div class="col">
+            <pngx-input-text i18n-title title="Notification subject" formControlName="notification_subject" [error]="error?.actions?.[i]?.notification_subject"></pngx-input-text>
+            <pngx-input-text i18n-title title="Notification body" formControlName="notification_body" [error]="error?.actions?.[i]?.notification_body"></pngx-input-text>
+            <pngx-input-text i18n-title title="Notification emails" formControlName="notification_destination_emails" [error]="error?.actions?.[i]?.notification_destination_emails"></pngx-input-text>
+            <pngx-input-text i18n-title title="Notification url" formControlName="notification_destination_url" [error]="error?.actions?.[i]?.notification_destination_url"></pngx-input-text>
+            <pngx-input-switch i18n-title title="Notification include document" formControlName="notification_include_document"></pngx-input-switch>
+          </div>
+        </div>
+      }
     }
   </div>
 </ng-template>

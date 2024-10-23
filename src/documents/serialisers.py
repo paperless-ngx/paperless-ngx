@@ -1847,6 +1847,11 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
             "remove_view_groups",
             "remove_change_users",
             "remove_change_groups",
+            "notification_subject",
+            "notification_body",
+            "notification_destination_emails",
+            "notification_destination_url",
+            "notification_include_document",
         ]
 
     def validate(self, attrs):
@@ -1884,6 +1889,38 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
                         {"assign_title": f'Invalid f-string detected: "{e.args[0]}"'},
                     )
 
+        if (
+            "notification_subject" in attrs
+            and attrs["notification_subject"] is not None
+            and len(attrs["notification_subject"]) > 0
+            and not (
+                attrs["notification_destination_emails"]
+                or attrs["notification_destination_url"]
+            )
+        ):
+            raise serializers.ValidationError(
+                "Notification subject requires destination emails or URL",
+            )
+
+        if (
+            (
+                (
+                    "notification_destination_emails" in attrs
+                    and attrs["notification_destination_emails"] is not None
+                    and len(attrs["notification_destination_emails"]) > 0
+                )
+                or (
+                    "notification_destination_url" in attrs
+                    and attrs["notification_destination_url"] is not None
+                    and len(attrs["notification_destination_url"]) > 0
+                )
+            )
+            and not attrs["notification_subject"]
+            and not attrs["notification_body"]
+        ):
+            raise serializers.ValidationError(
+                "Notification subject and body required",
+            )
         return attrs
 
 

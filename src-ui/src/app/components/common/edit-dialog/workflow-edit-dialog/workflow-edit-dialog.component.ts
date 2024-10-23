@@ -96,6 +96,10 @@ export const WORKFLOW_ACTION_OPTIONS = [
     id: WorkflowActionType.Removal,
     name: $localize`Removal`,
   },
+  {
+    id: WorkflowActionType.Notification,
+    name: $localize`Notification`,
+  },
 ]
 
 const TRIGGER_MATCHING_ALGORITHMS = MATCHING_ALGORITHMS.filter(
@@ -402,6 +406,17 @@ export class WorkflowEditDialogComponent
         remove_all_custom_fields: new FormControl(
           action.remove_all_custom_fields
         ),
+        notification_subject: new FormControl(action.notification_subject),
+        notification_body: new FormControl(action.notification_body),
+        notification_destination_emails: new FormControl(
+          action.notification_destination_emails
+        ),
+        notification_destination_url: new FormControl(
+          action.notification_destination_url
+        ),
+        notification_include_document: new FormControl(
+          action.notification_include_document
+        ),
       }),
       { emitEvent }
     )
@@ -503,6 +518,11 @@ export class WorkflowEditDialogComponent
       remove_all_permissions: false,
       remove_custom_fields: [],
       remove_all_custom_fields: false,
+      notification_subject: null,
+      notification_body: null,
+      notification_destination_emails: null,
+      notification_destination_url: null,
+      notification_include_document: null,
     }
     this.object.actions.push(action)
     this.createActionField(action)
