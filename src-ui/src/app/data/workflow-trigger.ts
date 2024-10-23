@@ -45,6 +45,8 @@ export interface WorkflowTrigger extends ObjectWithId {
 
   schedule_delay?: string
 
+  schedule_is_recurring?: boolean
+
   schedule_delay_field?: ScheduleDelayField
 
   schedule_delay_custom_field?: number // CustomField.id

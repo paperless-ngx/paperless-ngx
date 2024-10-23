@@ -38,6 +38,7 @@ from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import Workflow
+from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
 from documents.parsers import DocumentParser
 from documents.parsers import get_parser_class_for_mime_type
@@ -382,6 +383,26 @@ def check_scheduled_workflows():
                         f"Found {documents.count()} documents for trigger {trigger}",
                     )
                     for document in documents:
+                        workflow_runs = WorkflowRun.objects.filter(
+                            document=document,
+                            workflow=workflow,
+                        )
+                        if not trigger.schedule_is_recurring and workflow_runs.exists():
+                            # schedule is non-recurring and the workflow has already been run
+                            logger.debug(
+                                f"Skipping document {document} for non-recurring workflow {workflow} as it has already been run",
+                            )
+                            continue
+                        elif (
+                            trigger.schedule_is_recurring
+                            and workflow_runs.exists()
+                            and workflow_runs.last().run_at > timezone.now() - delay_td
+                        ):
+                            # schedule is recurring but the last run was within the delay
+                            logger.debug(
+                                f"Skipping document {document} for recurring workflow {workflow} as the last run was within the delay",
+                            )
+                            continue
                         run_workflows(
                             WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
                             document,

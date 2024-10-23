@@ -37,6 +37,7 @@ from documents.models import PaperlessTask
 from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowAction
+from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import set_permissions_for_object
@@ -914,6 +915,11 @@ def run_workflows(
                 # save first before setting tags
                 document.save()
                 document.tags.set(doc_tag_ids)
+
+            WorkflowRun.objects.create(
+                workflow=workflow,
+                document=document if not use_overrides else None,
+            )
 
     if use_overrides:
         return overrides, "\n".join(messages)

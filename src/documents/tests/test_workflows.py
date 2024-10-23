@@ -1354,7 +1354,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
 
     def test_new_trigger_type_raises_exception(self):
         trigger = WorkflowTrigger.objects.create(
-            type=4,
+            type=99,
         )
         action = WorkflowAction.objects.create(
             assign_title="Doc assign owner",

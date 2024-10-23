@@ -1738,10 +1738,6 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
         label="Trigger Type",
     )
 
-    schedule_delay = serializers.CharField(
-        required=False,
-    )
-
     class Meta:
         model = WorkflowTrigger
         fields = [
@@ -1758,6 +1754,7 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             "filter_has_correspondent",
             "filter_has_document_type",
             "schedule_delay",
+            "schedule_is_recurring",
             "schedule_delay_field",
             "schedule_delay_custom_field",
         ]

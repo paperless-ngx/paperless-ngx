@@ -339,6 +339,7 @@ export class WorkflowEditDialogComponent
           trigger.filter_has_document_type
         ),
         schedule_delay: new FormControl(trigger.schedule_delay),
+        schedule_is_recurring: new FormControl(trigger.schedule_is_recurring),
         schedule_delay_field: new FormControl(trigger.schedule_delay_field),
         schedule_delay_custom_field: new FormControl(
           trigger.schedule_delay_custom_field
@@ -448,6 +449,7 @@ export class WorkflowEditDialogComponent
       match: '',
       is_insensitive: true,
       schedule_delay: null,
+      schedule_is_recurring: false,
       schedule_delay_field: ScheduleDelayField.Added,
       schedule_delay_custom_field: null,
     }

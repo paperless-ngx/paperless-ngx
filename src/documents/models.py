@@ -1115,6 +1115,14 @@ class WorkflowTrigger(models.Model):
         ),
     )
 
+    schedule_is_recurring = models.BooleanField(
+        _("schedule is recurring"),
+        default=False,
+        help_text=_(
+            "If the schedule should be recurring.",
+        ),
+    )
+
     schedule_delay_field = models.CharField(
         _("schedule delay field"),
         max_length=20,
@@ -1383,3 +1391,33 @@ class Workflow(models.Model):
 
     def __str__(self):
         return f"Workflow: {self.name}"
+
+
+class WorkflowRun(models.Model):
+    workflow = models.ForeignKey(
+        Workflow,
+        on_delete=models.CASCADE,
+        related_name="runs",
+        verbose_name=_("workflow"),
+    )
+
+    document = models.ForeignKey(
+        Document,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="workflow_runs",
+        verbose_name=_("document"),
+    )
+
+    run_at = models.DateTimeField(
+        _("date run"),
+        default=timezone.now,
+        db_index=True,
+    )
+
+    class Meta:
+        verbose_name = _("workflow run")
+        verbose_name_plural = _("workflow runs")
+
+    def __str__(self):
+        return f"WorkflowRun {self.pk}"
