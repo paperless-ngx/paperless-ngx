@@ -1318,8 +1318,8 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         """
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
-            schedule_delay="1 day",
-            schedule_delay_field="created",
+            schedule_offset_days=1,
+            schedule_date_field="created",
         )
         action = WorkflowAction.objects.create(
             assign_title="Doc assign owner",
@@ -1359,8 +1359,8 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         """
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
-            schedule_delay="1 day",
-            schedule_delay_field=WorkflowTrigger.ScheduleDelayField.ADDED,
+            schedule_offset_days=1,
+            schedule_date_field=WorkflowTrigger.ScheduleDateField.ADDED,
         )
         action = WorkflowAction.objects.create(
             assign_title="Doc assign owner",
@@ -1402,8 +1402,8 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         mock_filter.return_value = Document.objects.all()
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
-            schedule_delay="1 day",
-            schedule_delay_field=WorkflowTrigger.ScheduleDelayField.MODIFIED,
+            schedule_offset_days=1,
+            schedule_date_field=WorkflowTrigger.ScheduleDateField.MODIFIED,
         )
         action = WorkflowAction.objects.create(
             assign_title="Doc assign owner",

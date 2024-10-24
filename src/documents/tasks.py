@@ -14,7 +14,6 @@ from django.db import models
 from django.db import transaction
 from django.db.models.signals import post_save
 from django.utils import timezone
-from duration_parser import parse_timedelta
 from filelock import FileLock
 from whoosh.writing import AsyncWriter
 
@@ -342,38 +341,38 @@ def check_scheduled_workflows():
             trigger: WorkflowTrigger
             for trigger in schedule_triggers:
                 documents = Document.objects.none()
-                delay_td = parse_timedelta(trigger.schedule_delay)
+                offset_td = timedelta(days=trigger.schedule_offset_days)
                 logger.debug(
-                    f"Checking trigger {trigger} with delay {delay_td} against field: {trigger.schedule_delay_field}",
+                    f"Checking trigger {trigger} with offset {offset_td} against field: {trigger.schedule_date_field}",
                 )
                 if (
-                    trigger.schedule_delay_field
-                    == WorkflowTrigger.ScheduleDelayField.ADDED
+                    trigger.schedule_date_field
+                    == WorkflowTrigger.ScheduleDateField.ADDED
                 ):
                     documents = Document.objects.filter(
-                        added__lt=timezone.now() - delay_td,
+                        added__lt=timezone.now() - offset_td,
                     )
                 elif (
-                    trigger.schedule_delay_field
-                    == WorkflowTrigger.ScheduleDelayField.CREATED
+                    trigger.schedule_date_field
+                    == WorkflowTrigger.ScheduleDateField.CREATED
                 ):
                     documents = Document.objects.filter(
-                        created__lt=timezone.now() - delay_td,
+                        created__lt=timezone.now() - offset_td,
                     )
                 elif (
-                    trigger.schedule_delay_field
-                    == WorkflowTrigger.ScheduleDelayField.MODIFIED
+                    trigger.schedule_date_field
+                    == WorkflowTrigger.ScheduleDateField.MODIFIED
                 ):
                     documents = Document.objects.filter(
-                        modified__lt=timezone.now() - delay_td,
+                        modified__lt=timezone.now() - offset_td,
                     )
                 elif (
-                    trigger.schedule_delay_field
-                    == WorkflowTrigger.ScheduleDelayField.CUSTOM_FIELD
+                    trigger.schedule_date_field
+                    == WorkflowTrigger.ScheduleDateField.CUSTOM_FIELD
                 ):
                     cf_instances = CustomFieldInstance.objects.filter(
-                        field=trigger.schedule_delay_custom_field,
-                        value_date__lt=timezone.now() - delay_td,
+                        field=trigger.schedule_date_custom_field,
+                        value_date__lt=timezone.now() - offset_td,
                     )
                     documents = Document.objects.filter(
                         id__in=cf_instances.values_list("document", flat=True),
@@ -385,6 +384,7 @@ def check_scheduled_workflows():
                     for document in documents:
                         workflow_runs = WorkflowRun.objects.filter(
                             document=document,
+                            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
                             workflow=workflow,
                         )
                         if not trigger.schedule_is_recurring and workflow_runs.exists():
@@ -396,7 +396,7 @@ def check_scheduled_workflows():
                         elif (
                             trigger.schedule_is_recurring
                             and workflow_runs.exists()
-                            and workflow_runs.last().run_at > timezone.now() - delay_td
+                            and workflow_runs.last().run_at > timezone.now() - offset_td
                         ):
                             # schedule is recurring but the last run was within the delay
                             logger.debug(

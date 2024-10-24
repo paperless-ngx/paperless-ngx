@@ -1023,7 +1023,7 @@ class WorkflowTrigger(models.Model):
         API_UPLOAD = DocumentSource.ApiUpload.value, _("Api Upload")
         MAIL_FETCH = DocumentSource.MailFetch.value, _("Mail Fetch")
 
-    class ScheduleDelayField(models.TextChoices):
+    class ScheduleDateField(models.TextChoices):
         ADDED = "added", _("Added")
         CREATED = "created", _("Created")
         MODIFIED = "modified", _("Modified")
@@ -1105,13 +1105,11 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("has this correspondent"),
     )
 
-    schedule_delay = models.CharField(
-        _("schedule delay"),
-        max_length=256,
-        null=True,
-        blank=True,
+    schedule_offset_days = models.PositiveIntegerField(
+        _("schedule offset days"),
+        default=0,
         help_text=_(
-            "The delay before the scheduled trigger is activated.",
+            "The number of days to offset the schedule trigger by.",
         ),
     )
 
@@ -1123,22 +1121,22 @@ class WorkflowTrigger(models.Model):
         ),
     )
 
-    schedule_delay_field = models.CharField(
-        _("schedule delay field"),
+    schedule_date_field = models.CharField(
+        _("schedule date field"),
         max_length=20,
-        choices=ScheduleDelayField.choices,
-        default=ScheduleDelayField.ADDED,
+        choices=ScheduleDateField.choices,
+        default=ScheduleDateField.ADDED,
         help_text=_(
-            "The field to use for the delay.",
+            "The field to check for a schedule trigger.",
         ),
     )
 
-    schedule_delay_custom_field = models.ForeignKey(
+    schedule_date_custom_field = models.ForeignKey(
         CustomField,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        verbose_name=_("schedule delay custom field"),
+        verbose_name=_("schedule date custom field"),
     )
 
     class Meta:
@@ -1399,6 +1397,12 @@ class WorkflowRun(models.Model):
         on_delete=models.CASCADE,
         related_name="runs",
         verbose_name=_("workflow"),
+    )
+
+    type = models.PositiveIntegerField(
+        _("workflow trigger type"),
+        choices=WorkflowTrigger.WorkflowTriggerType.choices,
+        null=True,
     )
 
     document = models.ForeignKey(

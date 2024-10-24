@@ -19,7 +19,7 @@ import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
   DocumentSource,
-  ScheduleDelayField,
+  ScheduleDateField,
   WorkflowTrigger,
   WorkflowTriggerType,
 } from 'src/app/data/workflow-trigger'
@@ -49,21 +49,21 @@ export const DOCUMENT_SOURCE_OPTIONS = [
   },
 ]
 
-export const SCHEDULE_DELAY_FIELD_OPTIONS = [
+export const SCHEDULE_DATE_FIELD_OPTIONS = [
   {
-    id: ScheduleDelayField.Added,
+    id: ScheduleDateField.Added,
     name: $localize`Added`,
   },
   {
-    id: ScheduleDelayField.Created,
+    id: ScheduleDateField.Created,
     name: $localize`Created`,
   },
   {
-    id: ScheduleDelayField.Modified,
+    id: ScheduleDateField.Modified,
     name: $localize`Modified`,
   },
   {
-    id: ScheduleDelayField.CustomField,
+    id: ScheduleDateField.CustomField,
     name: $localize`Custom Field`,
   },
 ]
@@ -338,11 +338,11 @@ export class WorkflowEditDialogComponent
         filter_has_document_type: new FormControl(
           trigger.filter_has_document_type
         ),
-        schedule_delay: new FormControl(trigger.schedule_delay),
+        schedule_offset_days: new FormControl(trigger.schedule_offset_days),
         schedule_is_recurring: new FormControl(trigger.schedule_is_recurring),
-        schedule_delay_field: new FormControl(trigger.schedule_delay_field),
-        schedule_delay_custom_field: new FormControl(
-          trigger.schedule_delay_custom_field
+        schedule_date_field: new FormControl(trigger.schedule_date_field),
+        schedule_date_custom_field: new FormControl(
+          trigger.schedule_date_custom_field
         ),
       }),
       { emitEvent }
@@ -418,8 +418,8 @@ export class WorkflowEditDialogComponent
     return WORKFLOW_TYPE_OPTIONS
   }
 
-  get scheduleDelayFieldOptions() {
-    return SCHEDULE_DELAY_FIELD_OPTIONS
+  get scheduleDateFieldOptions() {
+    return SCHEDULE_DATE_FIELD_OPTIONS
   }
 
   get dateCustomFields() {
@@ -448,10 +448,10 @@ export class WorkflowEditDialogComponent
       matching_algorithm: MATCH_NONE,
       match: '',
       is_insensitive: true,
-      schedule_delay: null,
+      schedule_offset_days: null,
       schedule_is_recurring: false,
-      schedule_delay_field: ScheduleDelayField.Added,
-      schedule_delay_custom_field: null,
+      schedule_date_field: ScheduleDateField.Added,
+      schedule_date_custom_field: null,
     }
     this.object.triggers.push(trigger)
     this.createTriggerField(trigger)

@@ -918,6 +918,7 @@ def run_workflows(
 
             WorkflowRun.objects.create(
                 workflow=workflow,
+                type=trigger_type,
                 document=document if not use_overrides else None,
             )
 

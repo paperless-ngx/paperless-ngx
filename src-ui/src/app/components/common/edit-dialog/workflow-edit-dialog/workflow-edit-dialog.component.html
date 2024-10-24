@@ -120,18 +120,18 @@
     <input type="hidden" formControlName="id" />
     <pngx-input-select i18n-title title="Trigger type" [horizontal]="true" [items]="triggerTypeOptions" formControlName="type"></pngx-input-select>
     @if (formGroup.get('type').value === WorkflowTriggerType.Scheduled) {
-      <p class="small" i18n>Set scheduled trigger delay and which field to use.</p>
+      <p class="small" i18n>Set scheduled trigger offset and which field to use.</p>
       <div class="row">
         <div class="col-4">
-          <pngx-input-text i18n-title title="Delay" formControlName="schedule_delay" i18n-hint hint="Delay time string such as '3months', '1y'." [error]="error?.schedule_delay"></pngx-input-text>
+          <pngx-input-number i18n-title title="Offset" formControlName="schedule_offset_days" i18n-hint hint="Offset in days. Use 0 for immediate." [error]="error?.schedule_offset_days"></pngx-input-number>
           <pngx-input-check i18n-title title="Repeat" formControlName="schedule_is_recurring" i18n-hint hint="Repeat the trigger after the delay." [error]="error?.schedule_is_recurring"></pngx-input-check>
         </div>
         <div class="col-4">
-          <pngx-input-select i18n-title title="Relative to" formControlName="schedule_delay_field" [items]="scheduleDelayFieldOptions" [error]="error?.schedule_delay_field"></pngx-input-select>
+          <pngx-input-select i18n-title title="Relative to" formControlName="schedule_date_field" [items]="scheduleDateFieldOptions" [error]="error?.schedule_date_field"></pngx-input-select>
         </div>
-        @if (formGroup.get('schedule_delay_field').value === 'custom_field') {
+        @if (formGroup.get('schedule_date_field').value === 'custom_field') {
           <div class="col-4">
-            <pngx-input-select i18n-title title="Delay custom field" formControlName="schedule_delay_custom_field" [items]="dateCustomFields" i18n-hint hint="Custom field to use for delay." [error]="error?.schedule_delay_custom_field"></pngx-input-select>
+            <pngx-input-select i18n-title title="Delay custom field" formControlName="schedule_date_custom_field" [items]="dateCustomFields" i18n-hint hint="Custom field to use for date." [error]="error?.schedule_date_custom_field"></pngx-input-select>
           </div>
         }
       </div>

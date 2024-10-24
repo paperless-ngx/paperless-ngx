@@ -26,7 +26,6 @@ celery = {extras = ["redis"], version = "*"}
 channels = "~=4.1"
 channels-redis = "*"
 concurrent-log-handler = "*"
-duration-parser = "*"
 filelock = "*"
 flower = "*"
 gotenberg-client = "*"
