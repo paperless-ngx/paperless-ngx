@@ -398,9 +398,9 @@ def check_scheduled_workflows():
                             and workflow_runs.exists()
                             and workflow_runs.last().run_at > timezone.now() - offset_td
                         ):
-                            # schedule is recurring but the last run was within the delay
+                            # schedule is recurring but the last run was within the offset
                             logger.debug(
-                                f"Skipping document {document} for recurring workflow {workflow} as the last run was within the delay",
+                                f"Skipping document {document} for recurring workflow {workflow} as the last run was within the offset",
                             )
                             continue
                         run_workflows(

@@ -4387,29 +4387,29 @@
           <context context-type="linenumber">123</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="3676850495488145564" datatype="html">
-        <source>Offset</source>
+      <trans-unit id="4779176004576564638" datatype="html">
+        <source>Offset days</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">126</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="1053165610360608412" datatype="html">
-        <source>Offset in days. Use 0 for immediate.</source>
+      <trans-unit id="8816141193078203810" datatype="html">
+        <source>Use 0 for immediate.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">126</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="3571391964903695725" datatype="html">
-        <source>Repeat</source>
+      <trans-unit id="1011433830042635014" datatype="html">
+        <source>Recurring</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">127</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="59662776949594121" datatype="html">
-        <source>Repeat the trigger after the delay.</source>
+      <trans-unit id="4951638563945393327" datatype="html">
+        <source>Repeat the trigger after the offset.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">127</context>
