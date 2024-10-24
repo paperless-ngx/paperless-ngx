@@ -120,6 +120,7 @@ export class WorkflowEditDialogComponent
   storagePaths: StoragePath[]
   mailRules: MailRule[]
   customFields: CustomField[]
+  dateCustomFields: CustomField[]
 
   expandedItem: number = null
 
@@ -159,7 +160,12 @@ export class WorkflowEditDialogComponent
     customFieldsService
       .listAll()
       .pipe(first())
-      .subscribe((result) => (this.customFields = result.results))
+      .subscribe((result) => {
+        this.customFields = result.results
+        this.dateCustomFields = this.customFields?.filter(
+          (f) => f.data_type === CustomFieldDataType.Date
+        )
+      })
   }
 
   getCreateTitle() {
@@ -422,12 +428,6 @@ export class WorkflowEditDialogComponent
     return SCHEDULE_DATE_FIELD_OPTIONS
   }
 
-  get dateCustomFields() {
-    return this.customFields?.filter(
-      (f) => f.data_type === CustomFieldDataType.Date
-    )
-  }
-
   getTriggerTypeOptionName(type: WorkflowTriggerType): string {
     return this.triggerTypeOptions.find((t) => t.id === type)?.name ?? ''
   }
@@ -448,7 +448,7 @@ export class WorkflowEditDialogComponent
       matching_algorithm: MATCH_NONE,
       match: '',
       is_insensitive: true,
-      schedule_offset_days: null,
+      schedule_offset_days: 0,
       schedule_is_recurring: false,
       schedule_date_field: ScheduleDateField.Added,
       schedule_date_custom_field: null,

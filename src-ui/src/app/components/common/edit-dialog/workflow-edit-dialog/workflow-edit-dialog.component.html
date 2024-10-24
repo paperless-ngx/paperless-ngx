@@ -123,7 +123,7 @@
       <p class="small" i18n>Set scheduled trigger offset and which field to use.</p>
       <div class="row">
         <div class="col-4">
-          <pngx-input-number i18n-title title="Offset" formControlName="schedule_offset_days" i18n-hint hint="Offset in days. Use 0 for immediate." [error]="error?.schedule_offset_days"></pngx-input-number>
+          <pngx-input-number i18n-title title="Offset" formControlName="schedule_offset_days" i18n-hint hint="Offset in days. Use 0 for immediate." [showAdd]="false" [error]="error?.schedule_offset_days"></pngx-input-number>
           <pngx-input-check i18n-title title="Repeat" formControlName="schedule_is_recurring" i18n-hint hint="Repeat the trigger after the delay." [error]="error?.schedule_is_recurring"></pngx-input-check>
         </div>
         <div class="col-4">
