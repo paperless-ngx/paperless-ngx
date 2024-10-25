@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import tqdm
+from allauth.mfa.models import Authenticator
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.models import SocialApp
 from allauth.socialaccount.models import SocialToken
@@ -270,6 +271,7 @@ class Command(CryptMixin, BaseCommand):
             "social_accounts": SocialAccount.objects.all(),
             "social_apps": SocialApp.objects.all(),
             "social_tokens": SocialToken.objects.all(),
+            "authenticators": Authenticator.objects.all(),
         }
 
         if settings.AUDIT_LOG_ENABLED:
