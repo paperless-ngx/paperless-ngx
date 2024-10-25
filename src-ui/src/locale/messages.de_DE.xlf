@@ -589,7 +589,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">348</context>
+          <context context-type="linenumber">347</context>
         </context-group>
         <target state="final">Verwerfen</target>
       </trans-unit>
@@ -2425,11 +2425,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">160</context>
+          <context context-type="linenumber">158</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">240</context>
+          <context context-type="linenumber">238</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
@@ -2457,7 +2457,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">824</context>
+          <context context-type="linenumber">825</context>
         </context-group>
         <target state="final">Fehler beim Löschen des Dokuments</target>
       </trans-unit>
@@ -2616,24 +2616,8 @@
           <context context-type="linenumber">73</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
-          <context context-type="linenumber">59</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
-          <context context-type="linenumber">76</context>
-        </context-group>
-        <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
           <context context-type="linenumber">53</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">57</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">129</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.html</context>
@@ -2773,19 +2757,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">848</context>
+          <context context-type="linenumber">849</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1139</context>
+          <context context-type="linenumber">1144</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1177</context>
+          <context context-type="linenumber">1182</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1218</context>
+          <context context-type="linenumber">1223</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -2805,11 +2789,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">162</context>
+          <context context-type="linenumber">160</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">242</context>
+          <context context-type="linenumber">240</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
@@ -3207,6 +3191,22 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">56</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
+          <context context-type="linenumber">76</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
+          <context context-type="linenumber">129</context>
+        </context-group>
         <target state="final">Öffnen</target>
       </trans-unit>
       <trans-unit id="6329940072345709724" datatype="html" approved="yes">
@@ -3409,7 +3409,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">801</context>
+          <context context-type="linenumber">802</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -6514,7 +6514,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1195</context>
+          <context context-type="linenumber">1200</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
@@ -6810,7 +6810,7 @@
         <source>An error occurred loading content: <x id="PH" equiv-text="err.message ?? err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">342,344</context>
+          <context context-type="linenumber">337,339</context>
         </context-group>
         <target state="final">Fehler beim Laden des Inhalts: <x id="PH" equiv-text="err.message ?? err.toString()"/></target>
       </trans-unit>
@@ -6818,7 +6818,7 @@
         <source>Document changes detected</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">365</context>
+          <context context-type="linenumber">366</context>
         </context-group>
         <target state="final">Dokumentänderungen erkannt</target>
       </trans-unit>
@@ -6826,7 +6826,7 @@
         <source>The version of this document in your browser session appears older than the existing version.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">366</context>
+          <context context-type="linenumber">367</context>
         </context-group>
         <target state="final">Die Dokumentenversion in der Browsersession erschein älter als die existierende Version.</target>
       </trans-unit>
@@ -6834,7 +6834,7 @@
         <source>Saving the document here may overwrite other changes that were made. To restore the existing version, discard your changes or close the document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">367</context>
+          <context context-type="linenumber">368</context>
         </context-group>
         <target state="final">Beim Speichern des Dokuments könnten andere Änderungen überschrieben werden. Um die existierende Version wiederherzustellen, verwerfen Sie Ihre Änderungen oder schließen Sie das Dokument.</target>
       </trans-unit>
@@ -6842,7 +6842,7 @@
         <source>Ok</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">369</context>
+          <context context-type="linenumber">370</context>
         </context-group>
         <target state="final">OK</target>
       </trans-unit>
@@ -6850,7 +6850,7 @@
         <source>Next document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">476</context>
+          <context context-type="linenumber">477</context>
         </context-group>
         <target state="final">Nächstes Dokument</target>
       </trans-unit>
@@ -6858,7 +6858,7 @@
         <source>Previous document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">486</context>
+          <context context-type="linenumber">487</context>
         </context-group>
         <target state="final">Vorheriges Dokument</target>
       </trans-unit>
@@ -6866,7 +6866,7 @@
         <source>Close document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">494</context>
+          <context context-type="linenumber">495</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
@@ -6878,7 +6878,7 @@
         <source>Save document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">501</context>
+          <context context-type="linenumber">502</context>
         </context-group>
         <target state="final">Dokument speichern</target>
       </trans-unit>
@@ -6886,7 +6886,7 @@
         <source>Error retrieving metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">543</context>
+          <context context-type="linenumber">544</context>
         </context-group>
         <target state="final">Fehler beim Abrufen der Metadaten</target>
       </trans-unit>
@@ -6894,7 +6894,7 @@
         <source>Error retrieving suggestions.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">568</context>
+          <context context-type="linenumber">569</context>
         </context-group>
         <target state="final">Fehler beim Abrufen der Vorschläge.</target>
       </trans-unit>
@@ -6902,11 +6902,11 @@
         <source>Document saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">715</context>
+          <context context-type="linenumber">716</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">729</context>
+          <context context-type="linenumber">730</context>
         </context-group>
         <target state="final">Dokument erfolgreich gespeichert.</target>
       </trans-unit>
@@ -6914,11 +6914,11 @@
         <source>Error saving document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">733</context>
+          <context context-type="linenumber">734</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">774</context>
+          <context context-type="linenumber">775</context>
         </context-group>
         <target state="final">Fehler beim Speichern des Dokuments</target>
       </trans-unit>
@@ -6926,7 +6926,7 @@
         <source>Do you really want to move the document &quot;<x id="PH" equiv-text="this.document.title"/>&quot; to the trash?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">802</context>
+          <context context-type="linenumber">803</context>
         </context-group>
         <target state="final">Möchten Sie das Dokument „<x id="PH" equiv-text="this.document.title"/>“ wirklich in den Papierkorb verschieben?</target>
       </trans-unit>
@@ -6934,7 +6934,7 @@
         <source>Documents can be restored prior to permanent deletion.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">803</context>
+          <context context-type="linenumber">804</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -6946,7 +6946,7 @@
         <source>Move to trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">805</context>
+          <context context-type="linenumber">806</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -6958,7 +6958,7 @@
         <source>Reprocess confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">844</context>
+          <context context-type="linenumber">845</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -6970,7 +6970,7 @@
         <source>This operation will permanently recreate the archive file for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">845</context>
+          <context context-type="linenumber">846</context>
         </context-group>
         <target state="final">Dieser Vorgang wird die Archivdatei dieses Dokuments unwiderruflich neu erstellen.</target>
       </trans-unit>
@@ -6978,7 +6978,7 @@
         <source>The archive file will be re-generated with the current settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">846</context>
+          <context context-type="linenumber">847</context>
         </context-group>
         <target state="final">Die Archivdatei wird mit den aktuellen Einstellungen neu generiert.</target>
       </trans-unit>
@@ -6986,7 +6986,7 @@
         <source>Reprocess operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">856</context>
+          <context context-type="linenumber">857</context>
         </context-group>
         <target state="final">Die erneute Verarbeitung wird im Hintergrund gestartet. Schließen und öffnen Sie dieses Dokument nach Abschluss des Vorgangs erneut oder laden Sie es neu, um neue Inhalte anzuzeigen.</target>
       </trans-unit>
@@ -6994,7 +6994,7 @@
         <source>Error executing operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">867</context>
+          <context context-type="linenumber">868</context>
         </context-group>
         <target state="final">Fehler beim Ausführen der Aktion</target>
       </trans-unit>
@@ -7002,7 +7002,7 @@
         <source>Page Fit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">936</context>
+          <context context-type="linenumber">937</context>
         </context-group>
         <target state="final">Seite einpassen</target>
       </trans-unit>
@@ -7010,7 +7010,7 @@
         <source>Split confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1137</context>
+          <context context-type="linenumber">1142</context>
         </context-group>
         <target state="final">Teilung bestätigen</target>
       </trans-unit>
@@ -7018,7 +7018,7 @@
         <source>This operation will split the selected document(s) into new documents.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1138</context>
+          <context context-type="linenumber">1143</context>
         </context-group>
         <target state="final">Dieser Vorgang wird ausgewählte Dokumente in neue Dokumente aufteilen.</target>
       </trans-unit>
@@ -7026,7 +7026,7 @@
         <source>Split operation will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1154</context>
+          <context context-type="linenumber">1159</context>
         </context-group>
         <target state="final">Teilungsvorgang wird im Hintergrund gestartet.</target>
       </trans-unit>
@@ -7034,7 +7034,7 @@
         <source>Error executing split operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1163</context>
+          <context context-type="linenumber">1168</context>
         </context-group>
         <target state="final">Fehler beim Ausführen des Teilungsvorgangs</target>
       </trans-unit>
@@ -7042,7 +7042,7 @@
         <source>Rotate confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1175</context>
+          <context context-type="linenumber">1180</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7054,7 +7054,7 @@
         <source>This operation will permanently rotate the original version of the current document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1176</context>
+          <context context-type="linenumber">1181</context>
         </context-group>
         <target state="final">Dieser Vorgang wird die Originalversion des aktuellen Dokuments unwiderruflich rotieren.</target>
       </trans-unit>
@@ -7062,7 +7062,7 @@
         <source>Rotation will begin in the background. Close and re-open the document after the operation has completed to see the changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1192</context>
+          <context context-type="linenumber">1197</context>
         </context-group>
         <target state="final">Der Rotationsvorgang wird im Hintergrund gestartet. Schließen und öffnen Sie das Dokument nach Abschluss des Vorgangs erneut, um die Änderungen zu sehen.</target>
       </trans-unit>
@@ -7070,7 +7070,7 @@
         <source>Error executing rotate operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1204</context>
+          <context context-type="linenumber">1209</context>
         </context-group>
         <target state="final">Fehler beim Ausführen des Rotationsvorgangs</target>
       </trans-unit>
@@ -7078,7 +7078,7 @@
         <source>Delete pages confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1216</context>
+          <context context-type="linenumber">1221</context>
         </context-group>
         <target state="final">Seiten löschen bestätigen</target>
       </trans-unit>
@@ -7086,7 +7086,7 @@
         <source>This operation will permanently delete the selected pages from the original document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1217</context>
+          <context context-type="linenumber">1222</context>
         </context-group>
         <target state="final">Dieser Vorgang wird die ausgewählten Seiten unwiderruflich aus dem Originaldokument löschen.</target>
       </trans-unit>
@@ -7094,7 +7094,7 @@
         <source>Delete pages operation will begin in the background. Close and re-open or reload this document after the operation has completed to see the changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1232</context>
+          <context context-type="linenumber">1237</context>
         </context-group>
         <target state="final">Der Vorgang „Seiten löschen“ wird im Hintergrund ausgeführt. Schließen und öffnen Sie dieses Dokument nach Abschluss der Operation erneut oder laden Sie es neu, um neue Inhalte anzuzeigen.</target>
       </trans-unit>
@@ -7102,7 +7102,7 @@
         <source>Error executing delete pages operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1241</context>
+          <context context-type="linenumber">1246</context>
         </context-group>
         <target state="final">Fehler beim Ausführen des Vorgangs „Seiten löschen“</target>
       </trans-unit>
@@ -8476,7 +8476,7 @@
         <source>Error retrieving mail accounts</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">81</context>
+          <context context-type="linenumber">79</context>
         </context-group>
         <target state="final">Fehler beim Abrufen der E-Mail-Konten</target>
       </trans-unit>
@@ -8484,7 +8484,7 @@
         <source>Error retrieving mail rules</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">95</context>
+          <context context-type="linenumber">93</context>
         </context-group>
         <target state="final">Fehler beim Abrufen der E-Mail-Regeln</target>
       </trans-unit>
@@ -8492,7 +8492,7 @@
         <source>OAuth2 authentication success</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">103</context>
+          <context context-type="linenumber">101</context>
         </context-group>
         <target state="translated">OAuth2-Authentifizierung erfolgreich</target>
       </trans-unit>
@@ -8500,7 +8500,7 @@
         <source>OAuth2 authentication failed, see logs for details</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">114</context>
+          <context context-type="linenumber">112</context>
         </context-group>
         <target state="translated">OAuth2-Authentifizierung fehlgeschlagen, siehe Protokolle für Details</target>
       </trans-unit>
@@ -8508,7 +8508,7 @@
         <source>Saved account &quot;<x id="PH" equiv-text="newMailAccount.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">138</context>
+          <context context-type="linenumber">136</context>
         </context-group>
         <target state="final">Benutzerkonto „<x id="PH" equiv-text="newMailAccount.name"/>“ gespeichert.</target>
       </trans-unit>
@@ -8516,7 +8516,7 @@
         <source>Error saving account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">150</context>
+          <context context-type="linenumber">148</context>
         </context-group>
         <target state="final">Fehler beim Speichern des Kontos.</target>
       </trans-unit>
@@ -8524,7 +8524,7 @@
         <source>Confirm delete mail account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">158</context>
+          <context context-type="linenumber">156</context>
         </context-group>
         <target state="final">Löschen des E-Mail-Kontos bestätigen</target>
       </trans-unit>
@@ -8532,7 +8532,7 @@
         <source>This operation will permanently delete this mail account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">159</context>
+          <context context-type="linenumber">157</context>
         </context-group>
         <target state="final">Dieser Vorgang wird dieses E-Mail-Konto unwiderruflich löschen.</target>
       </trans-unit>
@@ -8540,7 +8540,7 @@
         <source>Deleted mail account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">168</context>
+          <context context-type="linenumber">166</context>
         </context-group>
         <target state="final">E-Mail-Konto gelöscht</target>
       </trans-unit>
@@ -8548,7 +8548,7 @@
         <source>Error deleting mail account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">178</context>
+          <context context-type="linenumber">176</context>
         </context-group>
         <target state="final">Fehler beim Löschen des E-Mail-Kontos.</target>
       </trans-unit>
@@ -8556,7 +8556,7 @@
         <source>Saved rule &quot;<x id="PH" equiv-text="newMailRule.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">197</context>
+          <context context-type="linenumber">195</context>
         </context-group>
         <target state="final">Regel „<x id="PH" equiv-text="newMailRule.name"/>“ gespeichert.</target>
       </trans-unit>
@@ -8564,7 +8564,7 @@
         <source>Error saving rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">208</context>
+          <context context-type="linenumber">206</context>
         </context-group>
         <target state="final">Fehler beim Speichern der Regel.</target>
       </trans-unit>
@@ -8572,7 +8572,7 @@
         <source>Rule &quot;<x id="PH" equiv-text="rule.name"/>&quot; enabled.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">224</context>
+          <context context-type="linenumber">222</context>
         </context-group>
         <target state="final">Regel „<x id="PH" equiv-text="rule.name"/>“ aktiviert.</target>
       </trans-unit>
@@ -8580,7 +8580,7 @@
         <source>Rule &quot;<x id="PH" equiv-text="rule.name"/>&quot; disabled.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">225</context>
+          <context context-type="linenumber">223</context>
         </context-group>
         <target state="final">Regel „<x id="PH" equiv-text="rule.name"/>“ deaktiviert.</target>
       </trans-unit>
@@ -8588,7 +8588,7 @@
         <source>Error toggling rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">229</context>
+          <context context-type="linenumber">227</context>
         </context-group>
         <target state="final">Fehler beim Umschalten der Regel.</target>
       </trans-unit>
@@ -8596,7 +8596,7 @@
         <source>Confirm delete mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">238</context>
+          <context context-type="linenumber">236</context>
         </context-group>
         <target state="final">Löschen der E-Mail-Regel bestätigen</target>
       </trans-unit>
@@ -8604,7 +8604,7 @@
         <source>This operation will permanently delete this mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">239</context>
+          <context context-type="linenumber">237</context>
         </context-group>
         <target state="final">Dieser Vorgang wird diese E-Mail-Regel unwiderruflich löschen.</target>
       </trans-unit>
@@ -8612,7 +8612,7 @@
         <source>Deleted mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">248</context>
+          <context context-type="linenumber">246</context>
         </context-group>
         <target state="final">E-Mail-Regel gelöscht</target>
       </trans-unit>
@@ -8620,7 +8620,7 @@
         <source>Error deleting mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">257</context>
+          <context context-type="linenumber">255</context>
         </context-group>
         <target state="final">Fehler beim Löschen der E-Mail-Regel.</target>
       </trans-unit>
@@ -8628,7 +8628,7 @@
         <source>Permissions updated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">279</context>
+          <context context-type="linenumber">277</context>
         </context-group>
         <target state="final">Berechtigungen aktualisiert</target>
       </trans-unit>
@@ -8636,7 +8636,7 @@
         <source>Error updating permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-          <context context-type="linenumber">284</context>
+          <context context-type="linenumber">282</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
