@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-19 22:56-0700\n"
-"PO-Revision-Date: 2024-10-20 05:58\n"
+"PO-Revision-Date: 2024-10-25 16:32\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -996,7 +996,7 @@ msgstr "Εντοπίστηκε μη έγκυρη μεταβλητή."
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
-msgstr "Γεια σας από %(site_name)!"
+msgstr "Γεια σας από %(site_name)s!"
 
 #: documents/templates/account/email/base_message.txt:5
 #, python-format
