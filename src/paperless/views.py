@@ -116,14 +116,14 @@ class UserViewSet(ModelViewSet):
             return HttpResponseForbidden(
                 "You do not have permission to deactivate TOTP for this user",
             )
-        try:
-            authenticator = Authenticator.objects.filter(
-                user=user,
-                type=Authenticator.Type.TOTP,
-            ).first()
+        authenticator = Authenticator.objects.filter(
+            user=user,
+            type=Authenticator.Type.TOTP,
+        ).first()
+        if authenticator is not None:
             delete_and_cleanup(request, authenticator)
             return Response(True)
-        except Authenticator.DoesNotExist:
+        else:
             return HttpResponseBadRequest("TOTP not found")
 
 
@@ -230,14 +230,14 @@ class TOTPView(GenericAPIView):
         Deactivates the TOTP authenticator
         """
         user = self.request.user
-        try:
-            authenticator = Authenticator.objects.filter(
-                user=user,
-                type=Authenticator.Type.TOTP,
-            ).first()
+        authenticator = Authenticator.objects.filter(
+            user=user,
+            type=Authenticator.Type.TOTP,
+        ).first()
+        if authenticator is not None:
             delete_and_cleanup(request, authenticator)
             return Response(True)
-        except Authenticator.DoesNotExist:
+        else:
             return HttpResponseBadRequest("TOTP not found")
 
 
