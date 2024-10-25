@@ -787,6 +787,10 @@ More details about configuration option for various providers can be found in th
 Once external auth is set up, 'regular' login can be disabled with the [PAPERLESS_DISABLE_REGULAR_LOGIN](configuration.md#PAPERLESS_DISABLE_REGULAR_LOGIN) setting and / or users can be automatically
 redirected with the [PAPERLESS_REDIRECT_LOGIN_TO_SSO](configuration.md#PAPERLESS_REDIRECT_LOGIN_TO_SSO) setting.
 
+!!! warning
+
+    When exporting and then re-importing your installation with the Paperless exporter, you will need to re-associate your social accounts with your Paperless-ngx account, in which case this setting should be disabled.
+
 ## Decryption of encrypted emails before consumption {#gpg-decryptor}
 
 Paperless-ngx can be configured to decrypt gpg encrypted emails before consumption.
