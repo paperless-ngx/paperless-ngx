@@ -23,10 +23,12 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { ToastService } from 'src/app/services/toast.service'
 import { UserService } from 'src/app/services/rest/user.service'
+import { PermissionsService } from 'src/app/services/permissions.service'
 
 describe('UserEditDialogComponent', () => {
   let component: UserEditDialogComponent
   let settingsService: SettingsService
+  let permissionsService: PermissionsService
   let toastService: ToastService
   let fixture: ComponentFixture<UserEditDialogComponent>
 
@@ -74,6 +76,7 @@ describe('UserEditDialogComponent', () => {
     fixture = TestBed.createComponent(UserEditDialogComponent)
     settingsService = TestBed.inject(SettingsService)
     settingsService.currentUser = { id: 99, username: 'user99' }
+    permissionsService = TestBed.inject(PermissionsService)
     toastService = TestBed.inject(ToastService)
     component = fixture.componentInstance
 
@@ -148,5 +151,15 @@ describe('UserEditDialogComponent', () => {
     component.deactivateTotp()
     expect(deactivateSpy).toHaveBeenCalled()
     expect(toastInfoSpy).toHaveBeenCalled()
+  })
+
+  it('should check superuser status of current user', () => {
+    expect(component.currentUserIsSuperUser).toBeFalsy()
+    permissionsService.initialize([], {
+      id: 99,
+      username: 'user99',
+      is_superuser: true,
+    })
+    expect(component.currentUserIsSuperUser).toBeTruthy()
   })
 })
