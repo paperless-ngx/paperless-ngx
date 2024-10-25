@@ -48,7 +48,7 @@ repos:
         exclude: "(^Pipfile\\.lock$)"
   # Python hooks
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.6.4'
+    rev: 'v0.6.8'
     hooks:
       - id: ruff
       - id: ruff-format
@@ -62,6 +62,8 @@ repos:
     rev: v6.2.1
     hooks:
       - id: beautysh
+        additional_dependencies:
+          - setuptools
         args:
           - "--tab"
   - repo: https://github.com/shellcheck-py/shellcheck-py

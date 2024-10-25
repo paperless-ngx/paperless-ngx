@@ -1,7 +1,17 @@
 import { ParamMap, Params } from '@angular/router'
 import { FilterRule } from '../data/filter-rule'
-import { FilterRuleType, FILTER_RULE_TYPES } from '../data/filter-rule-type'
+import {
+  FilterRuleType,
+  FILTER_RULE_TYPES,
+  FILTER_HAS_CUSTOM_FIELDS_ANY,
+  FILTER_CUSTOM_FIELDS_QUERY,
+  FILTER_HAS_CUSTOM_FIELDS_ALL,
+} from '../data/filter-rule-type'
 import { ListViewState } from '../services/document-list-view.service'
+import {
+  CustomFieldQueryLogicalOperator,
+  CustomFieldQueryOperator,
+} from '../data/custom-field-query'
 
 const SORT_FIELD_PARAMETER = 'sort'
 const SORT_REVERSE_PARAMETER = 'reverse'
@@ -38,6 +48,49 @@ export function paramsToViewState(queryParams: ParamMap): ListViewState {
     sortField: sortField,
     sortReverse: sortReverse,
   }
+}
+
+export function transformLegacyFilterRules(
+  filterRules: FilterRule[]
+): FilterRule[] {
+  const LEGACY_CUSTOM_FIELD_FILTER_RULE_TYPES = [
+    FILTER_HAS_CUSTOM_FIELDS_ANY,
+    FILTER_HAS_CUSTOM_FIELDS_ALL,
+  ]
+  if (
+    filterRules.filter((rule) =>
+      LEGACY_CUSTOM_FIELD_FILTER_RULE_TYPES.includes(rule.rule_type)
+    ).length
+  ) {
+    const anyRules = filterRules.filter(
+      (rule) => rule.rule_type === FILTER_HAS_CUSTOM_FIELDS_ANY
+    )
+    const allRules = filterRules.filter(
+      (rule) => rule.rule_type === FILTER_HAS_CUSTOM_FIELDS_ALL
+    )
+    const customFieldQueryLogicalOperator = allRules.length
+      ? CustomFieldQueryLogicalOperator.And
+      : CustomFieldQueryLogicalOperator.Or
+    const valueRules = allRules.length ? allRules : anyRules
+    const customFieldQueryExpression = [
+      customFieldQueryLogicalOperator,
+      [
+        ...valueRules.map((rule) => [
+          parseInt(rule.value),
+          CustomFieldQueryOperator.Exists,
+          true,
+        ]),
+      ],
+    ]
+    filterRules.push({
+      rule_type: FILTER_CUSTOM_FIELDS_QUERY,
+      value: JSON.stringify(customFieldQueryExpression),
+    })
+  }
+  // TODO: can we support FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS or FILTER_HAS_ANY_CUSTOM_FIELDS?
+  return filterRules.filter(
+    (rule) => !LEGACY_CUSTOM_FIELD_FILTER_RULE_TYPES.includes(rule.rule_type)
+  )
 }
 
 export function filterRulesFromQueryParams(
@@ -77,7 +130,9 @@ export function filterRulesFromQueryParams(
         })
       )
     })
-
+  filterRulesFromQueryParams = transformLegacyFilterRules(
+    filterRulesFromQueryParams
+  )
   return filterRulesFromQueryParams
 }
 

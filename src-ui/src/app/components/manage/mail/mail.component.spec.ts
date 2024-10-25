@@ -13,7 +13,7 @@ import {
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
-import { MailAccount } from 'src/app/data/mail-account'
+import { MailAccount, MailAccountType } from 'src/app/data/mail-account'
 import { MailRule } from 'src/app/data/mail-rule'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
@@ -43,14 +43,18 @@ import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { SwitchComponent } from '../../common/input/switch/switch.component'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { By } from '@angular/platform-browser'
+import { ActivatedRoute, convertToParamMap } from '@angular/router'
+import { SettingsService } from 'src/app/services/settings.service'
 
 const mailAccounts = [
-  { id: 1, name: 'account1' },
-  { id: 2, name: 'account2' },
+  { id: 1, name: 'account1', account_type: MailAccountType.IMAP },
+  { id: 2, name: 'account2', account_type: MailAccountType.IMAP },
+  { id: 3, name: 'account3', accout_type: MailAccountType.Gmail_OAuth },
 ]
 const mailRules = [
-  { id: 1, name: 'rule1', owner: 1, account: 1 },
-  { id: 2, name: 'rule2', owner: 2, account: 2 },
+  { id: 1, name: 'rule1', owner: 1, account: 1, enabled: true },
+  { id: 2, name: 'rule2', owner: 2, account: 2, enabled: true },
 ]
 
 describe('MailComponent', () => {
@@ -61,6 +65,8 @@ describe('MailComponent', () => {
   let modalService: NgbModal
   let toastService: ToastService
   let permissionsService: PermissionsService
+  let activatedRoute: ActivatedRoute
+  let settingsService: SettingsService
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -109,6 +115,9 @@ describe('MailComponent', () => {
     modalService = TestBed.inject(NgbModal)
     toastService = TestBed.inject(ToastService)
     permissionsService = TestBed.inject(PermissionsService)
+    activatedRoute = TestBed.inject(ActivatedRoute)
+    settingsService = TestBed.inject(SettingsService)
+    settingsService.currentUser = { id: 1 }
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     jest
       .spyOn(permissionsService, 'currentUserHasObjectPermissions')
@@ -226,6 +235,17 @@ describe('MailComponent', () => {
     component.editMailRule()
   })
 
+  it('should support copy mail rule', () => {
+    completeSetup()
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
+    component.copyMailRule(mailRules[0] as MailRule)
+    const editDialog = modal.componentInstance as MailRuleEditDialogComponent
+    expect(editDialog.object.id).toBeNull()
+    expect(editDialog.object.name).toEqual(`${mailRules[0].name} (copy)`)
+    expect(editDialog.dialogMode).toEqual(EditDialogMode.CREATE)
+  })
+
   it('should support delete mail rule, show error if needed', () => {
     completeSetup()
     let modal: NgbModalRef
@@ -309,5 +329,63 @@ describe('MailComponent', () => {
     expect(dialog.object).toEqual(mailAccounts[0])
     dialog.confirmClicked.emit({ permissions: perms, merge: true })
     expect(accountPatchSpy).toHaveBeenCalled()
+  })
+
+  it('should update mail rule when enable is toggled', () => {
+    completeSetup()
+    const patchSpy = jest.spyOn(mailRuleService, 'patch')
+    const toggleInput = fixture.debugElement.query(
+      By.css('input[type="checkbox"]')
+    )
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    // fail first
+    patchSpy.mockReturnValueOnce(
+      throwError(() => new Error('Error getting config'))
+    )
+    toggleInput.nativeElement.click()
+    expect(patchSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
+    // succeed second
+    patchSpy.mockReturnValueOnce(of(mailRules[0] as MailRule))
+    toggleInput.nativeElement.click()
+    patchSpy.mockReturnValueOnce(
+      of({ ...mailRules[0], enabled: false } as MailRule)
+    )
+    toggleInput.nativeElement.click()
+    expect(patchSpy).toHaveBeenCalled()
+    expect(toastInfoSpy).toHaveBeenCalled()
+  })
+
+  it('should show success message when oauth account is connected', () => {
+    const queryParams = { oauth_success: '1' }
+    jest
+      .spyOn(activatedRoute, 'queryParamMap', 'get')
+      .mockReturnValue(of(convertToParamMap(queryParams)))
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    completeSetup()
+    expect(toastInfoSpy).toHaveBeenCalled()
+  })
+
+  it('should show error message when oauth account connect fails', () => {
+    const queryParams = { oauth_success: '0' }
+    jest
+      .spyOn(activatedRoute, 'queryParamMap', 'get')
+      .mockReturnValue(of(convertToParamMap(queryParams)))
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    completeSetup()
+    expect(toastErrorSpy).toHaveBeenCalled()
+  })
+
+  it('should open account edit dialog if oauth account is connected', () => {
+    const queryParams = { oauth_success: '1', oauth_account: '3' }
+    jest
+      .spyOn(activatedRoute, 'queryParamMap', 'get')
+      .mockReturnValue(of(convertToParamMap(queryParams)))
+    completeSetup()
+    component.oAuthAccountId = 3
+    const editSpy = jest.spyOn(component, 'editMailAccount')
+    component.ngOnInit()
+    expect(editSpy).toHaveBeenCalled()
   })
 })

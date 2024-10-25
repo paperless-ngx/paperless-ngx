@@ -15,7 +15,12 @@ import {
   isFullTextFilterRule,
 } from 'src/app/utils/filter-rules'
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
-import { DisplayField, DisplayMode, Document } from 'src/app/data/document'
+import {
+  DEFAULT_DISPLAY_FIELDS,
+  DisplayField,
+  DisplayMode,
+  Document,
+} from 'src/app/data/document'
 import { SavedView } from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import {
@@ -108,6 +113,11 @@ export class DocumentListComponent
         (this.unmodifiedSavedView.display_fields &&
           this.unmodifiedSavedView.display_fields.join(',') !==
             this.activeDisplayFields.join(',')) ||
+        (!this.unmodifiedSavedView.display_fields &&
+          this.activeDisplayFields.join(',') !==
+            DEFAULT_DISPLAY_FIELDS.filter((f) => f.id !== DisplayField.ADDED)
+              .map((f) => f.id)
+              .join(',')) ||
         filterRulesDiffer(
           this.unmodifiedSavedView.filter_rules,
           this.list.filterRules
@@ -381,10 +391,6 @@ export class DocumentListComponent
     this.list.quickFilter([
       { rule_type: FILTER_FULLTEXT_MORELIKE, value: documentID.toString() },
     ])
-  }
-
-  trackByDocumentId(index, item: Document) {
-    return item.id
   }
 
   get notesEnabled(): boolean {

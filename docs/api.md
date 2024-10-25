@@ -54,6 +54,7 @@ fields:
 - `archived_file_name`: Verbose filename of the archived document.
   Read-only. Null if no archived document is available.
 - `notes`: Array of notes associated with the document.
+- `page_count`: Number of pages.
 - `set_permissions`: Allows setting document permissions. Optional,
   write-only. See [below](#permissions).
 - `custom_fields`: Array of custom fields & values, specified as
@@ -235,12 +236,6 @@ results:
 Pagination works exactly the same as it does for normal requests on this
 endpoint.
 
-Certain limitations apply to full text queries:
-
-- Results are always sorted by search score. The results matching the
-  query best will show up first.
-- Only a small subset of filtering parameters are supported.
-
 Furthermore, each returned document has an additional `__search_hit__`
 attribute with various information about the search results:
 
@@ -279,6 +274,51 @@ attribute with various information about the search results:
   the search terms with `<span>` tags as shown above.
 - `rank` is the index of the search results. The first result will
   have rank 0.
+
+### Filtering by custom fields
+
+You can filter documents by their custom field values by specifying the
+`custom_field_query` query parameter. Here are some recipes for common
+use cases:
+
+1. Documents with a custom field "due" (date) between Aug 1, 2024 and
+   Sept 1, 2024 (inclusive):
+
+   `?custom_field_query=["due", "range", ["2024-08-01", "2024-09-01"]]`
+
+2. Documents with a custom field "customer" (text) that equals "bob"
+   (case sensitive):
+
+   `?custom_field_query=["customer", "exact", "bob"]`
+
+3. Documents with a custom field "answered" (boolean) set to `true`:
+
+   `?custom_field_query=["answered", "exact", true]`
+
+4. Documents with a custom field "favorite animal" (select) set to either
+   "cat" or "dog":
+
+   `?custom_field_query=["favorite animal", "in", ["cat", "dog"]]`
+
+5. Documents with a custom field "address" (text) that is empty:
+
+   `?custom_field_query=["OR", ["address", "isnull", true], ["address", "exact", ""]]`
+
+6. Documents that don't have a field called "foo":
+
+   `?custom_field_query=["foo", "exists", false]`
+
+7. Documents that have document links "references" to both document 3 and 7:
+
+   `?custom_field_query=["references", "contains", [3, 7]]`
+
+All field types support basic operations including `exact`, `in`, `isnull`,
+and `exists`. String, URL, and monetary fields support case-insensitive
+substring matching operations including `icontains`, `istartswith`, and
+`iendswith`. Integer, float, and date fields support arithmetic comparisons
+including `gt` (>), `gte` (>=), `lt` (<), `lte` (<=), and `range`.
+Lastly, document link fields support a `contains` operator that behaves
+like a "is superset of" check.
 
 ### `/api/search/autocomplete/`
 

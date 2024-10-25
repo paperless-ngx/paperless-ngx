@@ -32,6 +32,7 @@ from documents.views import SelectionDataView
 from documents.views import SharedLinkView
 from documents.views import ShareLinkViewSet
 from documents.views import StatisticsView
+from documents.views import StoragePathTestView
 from documents.views import StoragePathViewSet
 from documents.views import SystemStatusView
 from documents.views import TagViewSet
@@ -54,6 +55,7 @@ from paperless.views import UserViewSet
 from paperless_mail.views import MailAccountTestView
 from paperless_mail.views import MailAccountViewSet
 from paperless_mail.views import MailRuleViewSet
+from paperless_mail.views import OauthCallbackView
 
 api_router = DefaultRouter()
 api_router.register(r"correspondents", CorrespondentViewSet)
@@ -164,6 +166,16 @@ urlpatterns = [
                     "^trash/",
                     TrashView.as_view(),
                     name="trash",
+                ),
+                re_path(
+                    "^storage_paths/test/",
+                    StoragePathTestView.as_view(),
+                    name="storage_paths_test",
+                ),
+                re_path(
+                    r"^oauth/callback/",
+                    OauthCallbackView.as_view(),
+                    name="oauth_callback",
                 ),
                 *api_router.urls,
             ],

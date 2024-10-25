@@ -15,9 +15,9 @@
   <li class="list-group-item">
     <div class="row">
       <div class="col" i18n>Name</div>
-      <div class="col" i18n>Sort order</div>
+      <div class="col d-none d-sm-flex" i18n>Sort order</div>
       <div class="col" i18n>Status</div>
-      <div class="col" i18n>Triggers</div>
+      <div class="col d-none d-sm-flex" i18n>Triggers</div>
       <div class="col" i18n>Actions</div>
     </div>
   </li>
@@ -26,17 +26,44 @@
     <li class="list-group-item">
       <div class="row">
         <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editWorkflow(workflow)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.Workflow)">{{workflow.name}}</button></div>
-        <div class="col d-flex align-items-center"><code>{{workflow.order}}</code></div>
-        <div class="col d-flex align-items-center"><code> @if(workflow.enabled) { <ng-container i18n>Enabled</ng-container> } @else { <span i18n class="text-muted">Disabled</span> }</code></div>
-        <div class="col d-flex align-items-center">{{getTypesList(workflow)}}</div>
+        <div class="col d-flex align-items-center d-none d-sm-flex"><code>{{workflow.order}}</code></div>
+        <div class="col d-flex align-items-center">
+          <div class="form-check form-switch mb-0">
+            <input #inputField type="checkbox" class="form-check-input cursor-pointer" [id]="workflow.id+'_enable'" [(ngModel)]="workflow.enabled" (change)="onWorkflowEnableToggled(workflow)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Workflow }">
+            <label class="form-check-label cursor-pointer" [for]="workflow.id+'_enable'">
+              <code> @if(workflow.enabled) { <ng-container i18n>Enabled</ng-container> } @else { <span i18n class="text-muted">Disabled</span> }</code>
+            </label>
+          </div>
+        </div>
+        <div class="col d-flex align-items-center d-none d-sm-flex">{{getTypesList(workflow)}}</div>
         <div class="col">
-          <div class="btn-group">
-            <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Workflow }" class="btn btn-sm btn-outline-secondary" type="button" (click)="editWorkflow(workflow)">
-              <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
-            </button>
-            <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Workflow }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteWorkflow(workflow)">
-              <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
-            </button>
+
+          <div class="btn-group d-block d-sm-none">
+            <div ngbDropdown container="body" class="d-inline-block">
+              <button type="button" class="btn btn-link" id="actionsMenuMobile" (click)="$event.stopPropagation()" ngbDropdownToggle>
+                <i-bs name="three-dots-vertical"></i-bs>
+              </button>
+              <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">
+                <button (click)="editWorkflow(workflow)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Workflow }" ngbDropdownItem i18n>Edit</button>
+                <button (click)="deleteWorkflow(workflow)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Workflow }" ngbDropdownItem i18n>Delete</button>
+                <button (click)="copyWorkflow(workflow)" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Workflow }" ngbDropdownItem i18n>Copy</button>
+              </div>
+            </div>
+          </div>
+          <div class="btn-toolbar d-none d-sm-flex gap-2" role="toolbar">
+            <div class="btn-group">
+              <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Workflow }" class="btn btn-sm btn-outline-secondary" type="button" (click)="editWorkflow(workflow)">
+                <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
+              </button>
+              <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Workflow }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteWorkflow(workflow)">
+                <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+              </button>
+            </div>
+            <div class="btn-group">
+              <button *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Workflow }" class="btn btn-sm btn-outline-secondary" type="button" (click)="copyWorkflow(workflow)">
+                <i-bs width="1em" height="1em" name="files"></i-bs>&nbsp;<ng-container i18n>Copy</ng-container>
+              </button>
+            </div>
           </div>
         </div>
       </div>

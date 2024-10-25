@@ -67,7 +67,7 @@ export class TasksService {
       .post(`${this.baseUrl}acknowledge_tasks/`, {
         tasks: [...task_ids],
       })
-      .pipe(takeUntil(this.unsubscribeNotifer), first())
+      .pipe(first())
       .subscribe((r) => {
         this.reload()
       })

@@ -1,0 +1,163 @@
+<div class="btn-group w-100" role="group" ngbDropdown #dropdown="ngbDropdown" (openChange)="onOpenChange($event)" [popperOptions]="popperOptions">
+  <button class="btn btn-sm btn-outline-primary" id="dropdown_toggle" ngbDropdownToggle [disabled]="disabled">
+    <i-bs name="{{icon}}"></i-bs>
+    <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
+    @if (isActive) {
+      <pngx-clearable-badge [selected]="isActive" (cleared)="reset()"></pngx-clearable-badge>
+    }
+  </button>
+  <div class="px-3 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown_{{name}}">
+    <div class="list-group list-group-flush">
+      @for (element of selectionModel.queries; track element.id; let i = $index) {
+        <div class="list-group-item px-0 d-flex flex-nowrap">
+          @switch (element.type) {
+            @case (CustomFieldQueryComponentType.Atom) {
+              <ng-container *ngTemplateOutlet="queryAtom; context: { atom: element }"></ng-container>
+            }
+            @case (CustomFieldQueryComponentType.Expression) {
+              <ng-container *ngTemplateOutlet="queryExpression; context: { expression: element }"></ng-container>
+            }
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<ng-template #comparisonValueTemplate let-atom="atom">
+  @if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Date) {
+    <input class="form-control" placeholder="yyyy-mm-dd"
+      [(ngModel)]="atom.value"
+      ngbDatepicker
+      #d="ngbDatepicker" />
+    <button class="btn btn-sm btn-outline-secondary rounded-end" (click)="d.toggle()" type="button">
+      <i-bs name="calendar-event"></i-bs>
+    </button>
+  } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Float || getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Integer) {
+    <input class="w-25 form-control rounded-end" type="number" [(ngModel)]="atom.value" [disabled]="disabled">
+  } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Boolean) {
+    <select class="w-25 form-select rounded-end" [(ngModel)]="atom.value" [disabled]="disabled">
+      <option value="true" i18n>True</option>
+      <option value="false" i18n>False</option>
+    </select>
+  } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Select) {
+    <ng-select #fieldSelects
+      class="paperless-input-select rounded-end"
+      [items]="getSelectOptionsForField(atom.field)"
+      [(ngModel)]="atom.value"
+      [disabled]="disabled"
+      (mousedown)="$event.stopImmediatePropagation()"
+    ></ng-select>
+  } @else {
+    <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="atom.value" [disabled]="disabled">
+  }
+</ng-template>
+
+<ng-template #queryAtom let-atom="atom">
+  <div class="input-group input-group-sm">
+    <ng-select
+      class="paperless-input-select"
+      [items]="customFields"
+      [(ngModel)]="atom.field"
+      [disabled]="disabled"
+      bindLabel="name"
+      bindValue="id"
+      (mousedown)="$event.stopImmediatePropagation()"
+    ></ng-select>
+    <select class="w-25 form-select" [(ngModel)]="atom.operator" [disabled]="disabled">
+      <option *ngFor="let operator of getOperatorsForField(atom.field)" [ngValue]="operator.value">{{operator.label}}</option>
+    </select>
+    @switch (atom.operator) {
+      @case (CustomFieldQueryOperator.Exists) {
+        <select class="w-25 form-select rounded-end" [(ngModel)]="atom.value" [disabled]="disabled">
+          <option value="true" i18n>True</option>
+          <option value="false" i18n>False</option>
+        </select>
+      }
+      @case (CustomFieldQueryOperator.IsNull) {
+        <select class="w-25 form-select rounded-end" [(ngModel)]="atom.value" [disabled]="disabled">
+          <option value="true" i18n>True</option>
+          <option value="false" i18n>False</option>
+        </select>
+      }
+      @case (CustomFieldQueryOperator.GreaterThanOrEqual) {
+        <ng-container *ngTemplateOutlet="comparisonValueTemplate; context: { atom: atom }"></ng-container>
+      }
+      @case (CustomFieldQueryOperator.LessThanOrEqual) {
+        <ng-container *ngTemplateOutlet="comparisonValueTemplate; context: { atom: atom }"></ng-container>
+      }
+      @case (CustomFieldQueryOperator.GreaterThan) {
+        <ng-container *ngTemplateOutlet="comparisonValueTemplate; context: { atom: atom }"></ng-container>
+      }
+      @case (CustomFieldQueryOperator.LessThan) {
+        <ng-container *ngTemplateOutlet="comparisonValueTemplate; context: { atom: atom }"></ng-container>
+      }
+      @case (CustomFieldQueryOperator.Contains) {
+        <pngx-input-document-link [(ngModel)]="atom.value" class="w-25 form-select doc-link-select p-0" placeholder="Search docs..." i18n-placeholder [minimal]="true"></pngx-input-document-link>
+      }
+      @case (CustomFieldQueryOperator.In) {
+        <ng-select
+          class="paperless-input-select rounded-end"
+          [items]="getSelectOptionsForField(atom.field)"
+          [(ngModel)]="atom.value"
+          [disabled]="disabled"
+          [multiple]="true"
+          (mousedown)="$event.stopImmediatePropagation()"
+        ></ng-select>
+      }
+      @case (CustomFieldQueryOperator.Exact) {
+        <ng-container *ngTemplateOutlet="comparisonValueTemplate; context: { atom: atom }"></ng-container>
+      }
+      @default {
+        <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="atom.value" [disabled]="disabled">
+      }
+    }
+    <button class="btn btn-link btn-sm text-danger pe-0" type="button" (click)="removeElement(atom)" [disabled]="disabled">
+      <i-bs name="x-circle"></i-bs>
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #queryExpression let-expression="expression">
+  <div class="d-flex w-100">
+    <div class="d-flex flex-grow-1 flex-column">
+      <div class="btn-group btn-group-xs" role="group">
+        <input [(ngModel)]="expression.operator" type="radio" class="btn-check" id="logicalOperatorOr_{{expression.id}}" name="logicalOperatorOr_{{expression.id}}" value="OR" [disabled]="expression.depth > 0 && expression.value.length < 2">
+        <label class="btn btn-outline-primary" for="logicalOperatorOr_{{expression.id}}" i18n>Any</label>
+        <input [(ngModel)]="expression.operator" type="radio" class="btn-check" id="logicalOperatorAnd_{{expression.id}}" name="logicalOperatorAnd_{{expression.id}}" value="AND" [disabled]="expression.depth > 0 && expression.value.length < 2">
+        <label class="btn btn-outline-primary" for="logicalOperatorAnd_{{expression.id}}" i18n>All</label>
+        @if (expression.negatable)  {
+          <input [(ngModel)]="expression.operator" type="radio" class="btn-check" id="logicalOperatorNot_{{expression.id}}" name="logicalOperatorNot_{{expression.id}}" value="NOT">
+          <label class="btn btn-outline-secondary" for="logicalOperatorNot_{{expression.id}}" i18n>Not</label>
+        }
+      </div>
+      <div class="list-group list-group-flush mb-n2">
+        @for (element of expression.value; track element.id; let i = $index) {
+          <div class="list-group-item px-0 d-flex flex-nowrap">
+            @switch (element.type) {
+              @case (CustomFieldQueryComponentType.Atom) {
+                <ng-container *ngTemplateOutlet="queryAtom; context: { atom: element }"></ng-container>
+              }
+              @case (CustomFieldQueryComponentType.Expression) {
+                <ng-container *ngTemplateOutlet="queryExpression; context: { expression: element }"></ng-container>
+              }
+            }
+          </div>
+        }
+      </div>
+    </div>
+    <div class="btn-group-vertical ms-2 ps-2 border-start" role="group" aria-label="Vertical button group">
+      <button type="button" class="btn btn-sm btn-outline-secondary text-primary" title="Add query" i18n-title (click)="addAtom(expression)" [disabled]="disabled || expression.value.length === CUSTOM_FIELD_QUERY_MAX_ATOMS">
+        <i-bs name="node-plus"></i-bs>
+      </button>
+      <button type="button" class="btn btn-sm btn-outline-secondary text-primary" title="Add expression" i18n-title (click)="addExpression(expression)" [disabled]="disabled || expression.depth === CUSTOM_FIELD_QUERY_MAX_DEPTH">
+        <i-bs name="braces"></i-bs>
+      </button>
+      @if (expression.depth > 0) {
+        <button type="button" class="btn btn-sm btn-outline-secondary text-danger" (click)="removeElement(expression)" [disabled]="disabled">
+          <i-bs name="x-circle"></i-bs>
+        </button>
+      }
+    </div>
+  </div>
+</ng-template>

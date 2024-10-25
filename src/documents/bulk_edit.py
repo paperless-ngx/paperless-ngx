@@ -3,7 +3,6 @@ import itertools
 import logging
 import os
 import tempfile
-from typing import Optional
 
 from celery import chain
 from celery import chord
@@ -242,7 +241,7 @@ def rotate(doc_ids: list[int], degrees: int):
 
 def merge(
     doc_ids: list[int],
-    metadata_document_id: Optional[int] = None,
+    metadata_document_id: int | None = None,
     delete_originals: bool = False,
     user: User = None,
 ):
@@ -387,6 +386,8 @@ def delete_pages(doc_ids: list[int], pages: list[int]):
             pdf.remove_unreferenced_resources()
             pdf.save()
             doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
+            if doc.page_count is not None:
+                doc.page_count = doc.page_count - len(pages)
             doc.save()
             update_document_archive_file.delay(document_id=doc.id)
             logger.info(f"Deleted pages {pages} from document {doc.id}")

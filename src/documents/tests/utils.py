@@ -3,15 +3,13 @@ import tempfile
 import time
 import warnings
 from collections import namedtuple
+from collections.abc import Callable
 from collections.abc import Generator
 from collections.abc import Iterator
 from contextlib import contextmanager
 from os import PathLike
 from pathlib import Path
 from typing import Any
-from typing import Callable
-from typing import Optional
-from typing import Union
 from unittest import mock
 
 import httpx
@@ -91,7 +89,7 @@ def paperless_environment():
 
 def util_call_with_backoff(
     method_or_callable: Callable,
-    args: Union[list, tuple],
+    args: list | tuple,
     *,
     skip_on_50x_err=True,
 ) -> tuple[bool, Any]:
@@ -170,22 +168,22 @@ class FileSystemAssertsMixin:
     Utilities for checks various state information of the file system
     """
 
-    def assertIsFile(self, path: Union[PathLike, str]):
+    def assertIsFile(self, path: PathLike | str):
         self.assertTrue(Path(path).resolve().is_file(), f"File does not exist: {path}")
 
-    def assertIsNotFile(self, path: Union[PathLike, str]):
+    def assertIsNotFile(self, path: PathLike | str):
         self.assertFalse(Path(path).resolve().is_file(), f"File does exist: {path}")
 
-    def assertIsDir(self, path: Union[PathLike, str]):
+    def assertIsDir(self, path: PathLike | str):
         self.assertTrue(Path(path).resolve().is_dir(), f"Dir does not exist: {path}")
 
-    def assertIsNotDir(self, path: Union[PathLike, str]):
+    def assertIsNotDir(self, path: PathLike | str):
         self.assertFalse(Path(path).resolve().is_dir(), f"Dir does exist: {path}")
 
     def assertFilesEqual(
         self,
-        path1: Union[PathLike, str],
-        path2: Union[PathLike, str],
+        path1: PathLike | str,
+        path2: PathLike | str,
     ):
         path1 = Path(path1)
         path2 = Path(path2)
@@ -196,7 +194,7 @@ class FileSystemAssertsMixin:
 
         self.assertEqual(hash1, hash2, "File SHA256 mismatch")
 
-    def assertFileCountInDir(self, path: Union[PathLike, str], count: int):
+    def assertFileCountInDir(self, path: PathLike | str, count: int):
         path = Path(path).resolve()
         self.assertTrue(path.is_dir(), f"Path {path} is not a directory")
         files = [x for x in path.iterdir() if x.is_file()]
@@ -340,7 +338,7 @@ class GetConsumerMixin:
     def get_consumer(
         self,
         filepath: Path,
-        overrides: Union[DocumentMetadataOverrides, None] = None,
+        overrides: DocumentMetadataOverrides | None = None,
         source: DocumentSource = DocumentSource.ConsumeFolder,
     ) -> Generator[ConsumerPlugin, None, None]:
         # Store this for verification
@@ -368,7 +366,7 @@ class DummyProgressManager:
       mock.patch("documents.tasks.ProgressManager", DummyProgressManager)
     """
 
-    def __init__(self, filename: str, task_id: Optional[str] = None) -> None:
+    def __init__(self, filename: str, task_id: str | None = None) -> None:
         self.filename = filename
         self.task_id = task_id
         self.payloads = []
@@ -392,7 +390,7 @@ class DummyProgressManager:
         message: str,
         current_progress: int,
         max_progress: int,
-        extra_args: Optional[dict[str, Union[str, int]]] = None,
+        extra_args: dict[str, str | int] | None = None,
     ) -> None:
         # Ensure the layer is open
         self.open()

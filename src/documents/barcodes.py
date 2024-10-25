@@ -3,7 +3,6 @@ import re
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 from django.conf import settings
 from pdf2image import convert_from_path
@@ -81,7 +80,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
         self._tiff_conversion_done = False
         self.barcodes: list[Barcode] = []
 
-    def run(self) -> Optional[str]:
+    def run(self) -> str | None:
         # Some operations may use PIL, override pixel setting if needed
         maybe_override_pixel_limit()
 
@@ -299,7 +298,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
             )
 
     @property
-    def asn(self) -> Optional[int]:
+    def asn(self) -> int | None:
         """
         Search the parsed barcodes for any ASNs.
         The first barcode that starts with CONSUMER_ASN_BARCODE_PREFIX
@@ -334,7 +333,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
         return asn
 
     @property
-    def tags(self) -> Optional[list[int]]:
+    def tags(self) -> list[int] | None:
         """
         Search the parsed barcodes for any tags.
         Returns the detected tag ids (or empty list)
@@ -388,7 +387,12 @@ class BarcodePlugin(ConsumeTaskPlugin):
         """
         # filter all barcodes for the separator string
         # get the page numbers of the separating barcodes
-        separator_pages = {bc.page: False for bc in self.barcodes if bc.is_separator}
+        retain = settings.CONSUMER_BARCODE_RETAIN_SPLIT_PAGES
+        separator_pages = {
+            bc.page: retain
+            for bc in self.barcodes
+            if bc.is_separator and (not retain or (retain and bc.page > 0))
+        }  # as below, dont include the first page if retain is enabled
         if not settings.CONSUMER_ENABLE_ASN_BARCODE:
             return separator_pages
 

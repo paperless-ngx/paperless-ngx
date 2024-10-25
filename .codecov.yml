@@ -14,8 +14,9 @@ flag_management:
 # codecov will only comment if coverage changes
 comment:
   require_changes: true
+  # https://docs.codecov.com/docs/javascript-bundle-analysis
   require_bundle_changes: true
-  bundle_change_threshold: "1Kb"
+  bundle_change_threshold: "50Kb"
 coverage:
   status:
     project:
@@ -24,7 +25,12 @@ coverage:
         threshold: 1%
     patch:
       default:
-        # For the changed lines only, target 75% covered, but
-        # allow as low as 50%
-        target: 75%
+        # For the changed lines only, target 100% covered, but
+        # allow as low as 75%
+        target: 100%
         threshold: 25%
+# https://docs.codecov.com/docs/javascript-bundle-analysis
+bundle_analysis:
+  # Fail if the bundle size increases by more than 1MB
+  warning_threshold: "1MB"
+  status: true
