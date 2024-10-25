@@ -774,6 +774,15 @@ describe('DocumentDetailComponent', () => {
     expect(component.previewNumPages).toEqual(1000)
   })
 
+  it('should include delay of 300ms after previewloaded before showing pdf', fakeAsync(() => {
+    initNormally()
+    expect(component.previewLoaded).toBeFalsy()
+    component.pdfPreviewLoaded({ numPages: 1000 } as any)
+    expect(component.previewNumPages).toEqual(1000)
+    tick(300)
+    expect(component.previewLoaded).toBeTruthy()
+  }))
+
   it('should support zoom controls', () => {
     initNormally()
     component.onZoomSelect({ target: { value: '1' } } as any) // from select
