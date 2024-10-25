@@ -8,6 +8,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import tqdm
+from allauth.socialaccount.models import SocialAccount
+from allauth.socialaccount.models import SocialApp
+from allauth.socialaccount.models import SocialToken
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
@@ -21,6 +24,7 @@ from django.utils import timezone
 from filelock import FileLock
 from guardian.models import GroupObjectPermission
 from guardian.models import UserObjectPermission
+from rest_framework.authtoken.models import Token
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -264,6 +268,10 @@ class Command(CryptMixin, BaseCommand):
             "app_configs": ApplicationConfiguration.objects.all(),
             "notes": Note.objects.all(),
             "documents": Document.objects.order_by("id").all(),
+            "social_accounts": SocialAccount.objects.all(),
+            "social_apps": SocialApp.objects.all(),
+            "social_tokens": SocialToken.objects.all(),
+            "auth_tokens": Token.objects.all(),
         }
 
         if settings.AUDIT_LOG_ENABLED:
