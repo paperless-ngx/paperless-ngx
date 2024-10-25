@@ -43,10 +43,6 @@
 - Fix: handle overflowing dropdowns on mobile [@shamoon](https://github.com/shamoon) ([#7758](https://github.com/paperless-ngx/paperless-ngx/pull/7758))
 - Fix: chrome scrolling in >= 129 [@shamoon](https://github.com/shamoon) ([#7738](https://github.com/paperless-ngx/paperless-ngx/pull/7738))
 
-### Documentation
-
-- Enhancement: support retain barcode split pages [@shamoon](https://github.com/shamoon) ([#7912](https://github.com/paperless-ngx/paperless-ngx/pull/7912))
-
 ### Maintenance
 
 - Enhancement: use apt only when needed docker-entrypoint.sh [@gawa971](https://github.com/gawa971) ([#7756](https://github.com/paperless-ngx/paperless-ngx/pull/7756))
