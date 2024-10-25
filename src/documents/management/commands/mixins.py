@@ -97,6 +97,22 @@ class CryptMixin:
             "model_name": "paperless_mail.mailaccount",
             "fields": [
                 "password",
+                "refresh_token",
+            ],
+        },
+        {
+            "exporter_key": "social_tokens",
+            "model_name": "socialaccount.socialtoken",
+            "fields": [
+                "token",
+                "token_secret",
+            ],
+        },
+        {
+            "exporter_key": "auth_tokens",
+            "model_name": "authtoken.token",
+            "fields": [
+                "key",
             ],
         },
     ]

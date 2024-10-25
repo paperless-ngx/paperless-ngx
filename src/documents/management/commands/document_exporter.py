@@ -569,11 +569,13 @@ class Command(CryptMixin, BaseCommand):
                             value=manifest_record["fields"][field],
                         )
 
-        elif MailAccount.objects.count() > 0:
+        elif (
+            MailAccount.objects.count() > 0
+            or SocialToken.objects.count() > 0
+            or Token.objects.count() > 0
+        ):
             self.stdout.write(
                 self.style.NOTICE(
-                    "You have configured mail accounts, "
-                    "but no passphrase was given. "
-                    "Passwords will be in plaintext",
+                    "No passphrase was given, sensitive fields will be in plaintext",
                 ),
             )
