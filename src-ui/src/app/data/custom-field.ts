@@ -59,4 +59,5 @@ export interface CustomField extends ObjectWithId {
     select_options?: string[]
     default_currency?: string
   }
+  document_count?: number
 }

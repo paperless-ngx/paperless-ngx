@@ -21,7 +21,8 @@ $form-file-button-hover-bg: var(--pngx-bg-alt);
 
 // Paperless-ngx styles
 body {
-  font-size: 0.875rem;
+  --pngx-body-font-size: 0.875rem;
+  font-size: var(--pngx-body-font-size);
   height: 100vh;
 }
 
@@ -369,6 +370,10 @@ textarea,
   cursor: not-allowed;
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
+
 ul.pagination {
   margin-bottom: 0;
 }
@@ -649,6 +654,10 @@ code {
   filter: invert(0.5) saturate(0);
 }
 
+.accordion-button {
+  font-size: var(--pngx-body-font-size);
+}
+
 .me-1px {
   margin-right: 1px !important;
 }
@@ -679,4 +688,23 @@ code {
       pointer-events: initial;
     }
   }
+}
+
+// pdfjs
+canvas.hiddenCanvasElement {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: -1;
+  height: 0;
+  width: 0;
+}
+
+// bs icons
+i-bs svg {
+  vertical-align: text-bottom;
+}
+
+.document-card .card-footer i-bs svg {
+  vertical-align: middle;
 }

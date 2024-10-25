@@ -3,7 +3,6 @@ import re
 import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING
-from typing import Optional
 
 from django.conf import settings
 from PIL import Image
@@ -40,6 +39,15 @@ class RasterisedDocumentParser(DocumentParser):
         This parser uses the OCR configuration settings to parse documents
         """
         return OcrConfig()
+
+    def get_page_count(self, document_path, mime_type):
+        page_count = None
+        if mime_type == "application/pdf":
+            import pikepdf
+
+            with pikepdf.Pdf.open(document_path) as pdf:
+                page_count = len(pdf.pages)
+        return page_count
 
     def extract_metadata(self, document_path, mime_type):
         result = []
@@ -115,7 +123,7 @@ class RasterisedDocumentParser(DocumentParser):
         )
         return no_alpha_image
 
-    def get_dpi(self, image) -> Optional[int]:
+    def get_dpi(self, image) -> int | None:
         try:
             with Image.open(image) as im:
                 x, y = im.info["dpi"]
@@ -124,7 +132,7 @@ class RasterisedDocumentParser(DocumentParser):
             self.log.warning(f"Error while getting DPI from image {image}: {e}")
             return None
 
-    def calculate_a4_dpi(self, image) -> Optional[int]:
+    def calculate_a4_dpi(self, image) -> int | None:
         try:
             with Image.open(image) as im:
                 width, height = im.size
@@ -139,9 +147,9 @@ class RasterisedDocumentParser(DocumentParser):
 
     def extract_text(
         self,
-        sidecar_file: Optional[Path],
+        sidecar_file: Path | None,
         pdf_file: Path,
-    ) -> Optional[str]:
+    ) -> str | None:
         # When re-doing OCR, the sidecar contains ONLY the new text, not
         # the whole text, so do not utilize it in that case
         if (

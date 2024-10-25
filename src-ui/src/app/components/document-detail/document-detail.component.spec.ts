@@ -85,6 +85,7 @@ import { PdfViewerModule } from 'ng2-pdf-viewer'
 import { DataType } from 'src/app/data/datatype'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { TagService } from 'src/app/services/rest/tag.service'
+import { TextAreaComponent } from '../common/input/textarea/textarea.component'
 
 const doc: Document = {
   id: 3,
@@ -183,6 +184,7 @@ describe('DocumentDetailComponent', () => {
         SplitConfirmDialogComponent,
         RotateConfirmDialogComponent,
         DeletePagesConfirmDialogComponent,
+        TextAreaComponent,
       ],
       imports: [
         RouterModule.forRoot(routes),

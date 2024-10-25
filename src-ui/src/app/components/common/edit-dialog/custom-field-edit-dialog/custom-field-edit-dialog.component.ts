@@ -67,7 +67,7 @@ export class CustomFieldEditDialogComponent
     this.selectOptionInputs.changes
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        this.selectOptionInputs.last.nativeElement.focus()
+        this.selectOptionInputs.last?.nativeElement.focus()
       })
   }
 

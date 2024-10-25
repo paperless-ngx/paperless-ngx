@@ -57,14 +57,13 @@ export class WorkflowsComponent
       .join(', ')
   }
 
-  editWorkflow(workflow: Workflow) {
+  editWorkflow(workflow: Workflow, forceCreate: boolean = false) {
     const modal = this.modalService.open(WorkflowEditDialogComponent, {
       backdrop: 'static',
       size: 'xl',
     })
-    modal.componentInstance.dialogMode = workflow
-      ? EditDialogMode.EDIT
-      : EditDialogMode.CREATE
+    modal.componentInstance.dialogMode =
+      workflow && !forceCreate ? EditDialogMode.EDIT : EditDialogMode.CREATE
     if (workflow) {
       // quick "deep" clone so original doesn't get modified
       const clone = Object.assign({}, workflow)
@@ -86,6 +85,25 @@ export class WorkflowsComponent
       .subscribe((e) => {
         this.toastService.showError($localize`Error saving workflow.`, e)
       })
+  }
+
+  copyWorkflow(workflow: Workflow) {
+    const clone = Object.assign({}, workflow)
+    clone.id = null
+    clone.name = `${workflow.name} (copy)`
+    clone.actions = [
+      ...workflow.actions.map((a) => {
+        a.id = null
+        return a
+      }),
+    ]
+    clone.triggers = [
+      ...workflow.triggers.map((t) => {
+        t.id = null
+        return t
+      }),
+    ]
+    this.editWorkflow(clone, true)
   }
 
   deleteWorkflow(workflow: Workflow) {
@@ -110,6 +128,23 @@ export class WorkflowsComponent
           this.toastService.showError($localize`Error deleting workflow.`, e)
         },
       })
+    })
+  }
+
+  onWorkflowEnableToggled(workflow: Workflow) {
+    this.workflowService.patch(workflow).subscribe({
+      next: () => {
+        this.toastService.showInfo(
+          workflow.enabled
+            ? $localize`Enabled workflow`
+            : $localize`Disabled workflow`
+        )
+        this.workflowService.clearCache()
+        this.reload()
+      },
+      error: (e) => {
+        this.toastService.showError($localize`Error toggling workflow.`, e)
+      },
     })
   }
 }
