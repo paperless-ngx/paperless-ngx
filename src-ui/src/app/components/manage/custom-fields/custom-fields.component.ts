@@ -15,6 +15,7 @@ import {
   CustomFieldQueryLogicalOperator,
   CustomFieldQueryOperator,
 } from 'src/app/data/custom-field-query'
+import { SettingsService } from 'src/app/services/settings.service'
 
 @Component({
   selector: 'pngx-custom-fields',
@@ -33,7 +34,8 @@ export class CustomFieldsComponent
     public permissionsService: PermissionsService,
     private modalService: NgbModal,
     private toastService: ToastService,
-    private documentListViewService: DocumentListViewService
+    private documentListViewService: DocumentListViewService,
+    private settingsService: SettingsService
   ) {
     super()
   }
@@ -62,6 +64,7 @@ export class CustomFieldsComponent
       .subscribe((newField) => {
         this.toastService.showInfo($localize`Saved field "${newField.name}".`)
         this.customFieldsService.clearCache()
+        this.settingsService.initializeDisplayFields()
         this.reload()
       })
     modal.componentInstance.failed
@@ -87,6 +90,7 @@ export class CustomFieldsComponent
           modal.close()
           this.toastService.showInfo($localize`Deleted field`)
           this.customFieldsService.clearCache()
+          this.settingsService.initializeDisplayFields()
           this.reload()
         },
         error: (e) => {
