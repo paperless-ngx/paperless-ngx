@@ -65,12 +65,18 @@ textarea.rtl {
 
 .thumb-preview {
   top: 0;
-  left: calc(.5 * var(--bs-gutter-x));
+  left: 0;
+  width: 100%;
   height: calc(100vh - 160px);
+
+  @media screen and (min-width: 768px) {
+    left: calc(.5 * var(--bs-gutter-x));
+    width: calc(100% - var(--bs-gutter-x));
+  }
+
   overflow: hidden;
   background-color: gray;
   padding: 10px 8px; // border
-  width: calc(100% - var(--bs-gutter-x));
   z-index: 1000;
 
   > div {
