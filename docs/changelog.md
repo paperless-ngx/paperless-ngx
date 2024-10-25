@@ -3666,68 +3666,68 @@ Versions 1.11.1 and 1.11.2 contain bug fixes from v1.11.0 that prevented use of 
 
 ### Features
 
-- (chore) Runs pyupgrade to Python 3.8+ [@stumpylog](https://github.com/stumpylog) ([\#890](https://github.com/paperless-ngx/paperless-ngx/pull/890))
-- Dockerfile Organization \& Enhancements [@stumpylog](https://github.com/stumpylog) ([\#888](https://github.com/paperless-ngx/paperless-ngx/pull/888))
-- mobile friendlier manage pages [@shamoon](https://github.com/shamoon) ([\#873](https://github.com/paperless-ngx/paperless-ngx/pull/873))
-- Use semver for release process [@stumpylog](https://github.com/stumpylog) ([\#851](https://github.com/paperless-ngx/paperless-ngx/pull/851))
-- Enable Docker Hub push [@stumpylog](https://github.com/stumpylog) ([\#828](https://github.com/paperless-ngx/paperless-ngx/pull/828))
-- Feature barcode tiff support [@gador](https://github.com/gador) ([\#766](https://github.com/paperless-ngx/paperless-ngx/pull/766))
-- Updates GHA workflow to rebuild intermediate images on changes [@stumpylog](https://github.com/stumpylog) ([\#820](https://github.com/paperless-ngx/paperless-ngx/pull/820))
-- Adds simple Python to wait for Redis broker to be ready [@stumpylog](https://github.com/stumpylog) ([\#788](https://github.com/paperless-ngx/paperless-ngx/pull/788))
-- Update GHA workflow to build all Docker images [@stumpylog](https://github.com/stumpylog) ([\#761](https://github.com/paperless-ngx/paperless-ngx/pull/761))
+- (chore) Runs pyupgrade to Python 3.8+ [@stumpylog](https://github.com/stumpylog) ([#890](https://github.com/paperless-ngx/paperless-ngx/pull/890))
+- Dockerfile Organization \& Enhancements [@stumpylog](https://github.com/stumpylog) ([#888](https://github.com/paperless-ngx/paperless-ngx/pull/888))
+- mobile friendlier manage pages [@shamoon](https://github.com/shamoon) ([#873](https://github.com/paperless-ngx/paperless-ngx/pull/873))
+- Use semver for release process [@stumpylog](https://github.com/stumpylog) ([#851](https://github.com/paperless-ngx/paperless-ngx/pull/851))
+- Enable Docker Hub push [@stumpylog](https://github.com/stumpylog) ([#828](https://github.com/paperless-ngx/paperless-ngx/pull/828))
+- Feature barcode tiff support [@gador](https://github.com/gador) ([#766](https://github.com/paperless-ngx/paperless-ngx/pull/766))
+- Updates GHA workflow to rebuild intermediate images on changes [@stumpylog](https://github.com/stumpylog) ([#820](https://github.com/paperless-ngx/paperless-ngx/pull/820))
+- Adds simple Python to wait for Redis broker to be ready [@stumpylog](https://github.com/stumpylog) ([#788](https://github.com/paperless-ngx/paperless-ngx/pull/788))
+- Update GHA workflow to build all Docker images [@stumpylog](https://github.com/stumpylog) ([#761](https://github.com/paperless-ngx/paperless-ngx/pull/761))
 
 ### Bug Fixes
 
-- Feature / fix saved view \& sort field query params [@shamoon](https://github.com/shamoon) ([\#881](https://github.com/paperless-ngx/paperless-ngx/pull/881))
-- Mobile friendlier manage pages [@shamoon](https://github.com/shamoon) ([\#873](https://github.com/paperless-ngx/paperless-ngx/pull/873))
-- Add timeout to healthcheck [@shamoon](https://github.com/shamoon) ([\#880](https://github.com/paperless-ngx/paperless-ngx/pull/880))
-- Always accept yyyy-mm-dd date inputs [@shamoon](https://github.com/shamoon) ([\#864](https://github.com/paperless-ngx/paperless-ngx/pull/864))
-- Fix local Docker image building [@stumpylog](https://github.com/stumpylog) ([\#849](https://github.com/paperless-ngx/paperless-ngx/pull/849))
-- Fix: show errors on invalid date input [@shamoon](https://github.com/shamoon) ([\#862](https://github.com/paperless-ngx/paperless-ngx/pull/862))
-- Fix: Older dates do not display on frontend [@shamoon](https://github.com/shamoon) ([\#852](https://github.com/paperless-ngx/paperless-ngx/pull/852))
-- Fixes IMAP UTF8 Authentication [@stumpylog](https://github.com/stumpylog) ([\#725](https://github.com/paperless-ngx/paperless-ngx/pull/725))
-- Fix password field remains visible [@shamoon](https://github.com/shamoon) ([\#840](https://github.com/paperless-ngx/paperless-ngx/pull/840))
-- Fixes Pillow build for armv7 [@stumpylog](https://github.com/stumpylog) ([\#815](https://github.com/paperless-ngx/paperless-ngx/pull/815))
-- Update frontend localization source file [@shamoon](https://github.com/shamoon) ([\#814](https://github.com/paperless-ngx/paperless-ngx/pull/814))
-- Fix install script extra OCR languages format [@stumpylog](https://github.com/stumpylog) ([\#777](https://github.com/paperless-ngx/paperless-ngx/pull/777))
+- Feature / fix saved view \& sort field query params [@shamoon](https://github.com/shamoon) ([#881](https://github.com/paperless-ngx/paperless-ngx/pull/881))
+- Mobile friendlier manage pages [@shamoon](https://github.com/shamoon) ([#873](https://github.com/paperless-ngx/paperless-ngx/pull/873))
+- Add timeout to healthcheck [@shamoon](https://github.com/shamoon) ([#880](https://github.com/paperless-ngx/paperless-ngx/pull/880))
+- Always accept yyyy-mm-dd date inputs [@shamoon](https://github.com/shamoon) ([#864](https://github.com/paperless-ngx/paperless-ngx/pull/864))
+- Fix local Docker image building [@stumpylog](https://github.com/stumpylog) ([#849](https://github.com/paperless-ngx/paperless-ngx/pull/849))
+- Fix: show errors on invalid date input [@shamoon](https://github.com/shamoon) ([#862](https://github.com/paperless-ngx/paperless-ngx/pull/862))
+- Fix: Older dates do not display on frontend [@shamoon](https://github.com/shamoon) ([#852](https://github.com/paperless-ngx/paperless-ngx/pull/852))
+- Fixes IMAP UTF8 Authentication [@stumpylog](https://github.com/stumpylog) ([#725](https://github.com/paperless-ngx/paperless-ngx/pull/725))
+- Fix password field remains visible [@shamoon](https://github.com/shamoon) ([#840](https://github.com/paperless-ngx/paperless-ngx/pull/840))
+- Fixes Pillow build for armv7 [@stumpylog](https://github.com/stumpylog) ([#815](https://github.com/paperless-ngx/paperless-ngx/pull/815))
+- Update frontend localization source file [@shamoon](https://github.com/shamoon) ([#814](https://github.com/paperless-ngx/paperless-ngx/pull/814))
+- Fix install script extra OCR languages format [@stumpylog](https://github.com/stumpylog) ([#777](https://github.com/paperless-ngx/paperless-ngx/pull/777))
 
 ### Documentation
 
-- Use semver for release process [@stumpylog](https://github.com/stumpylog) ([\#851](https://github.com/paperless-ngx/paperless-ngx/pull/851))
-- Deployment: Consolidate tika compose files [@qcasey](https://github.com/qcasey) ([\#866](https://github.com/paperless-ngx/paperless-ngx/pull/866))
-- Fix local Docker image building [@stumpylog](https://github.com/stumpylog) ([\#849](https://github.com/paperless-ngx/paperless-ngx/pull/849))
+- Use semver for release process [@stumpylog](https://github.com/stumpylog) ([#851](https://github.com/paperless-ngx/paperless-ngx/pull/851))
+- Deployment: Consolidate tika compose files [@qcasey](https://github.com/qcasey) ([#866](https://github.com/paperless-ngx/paperless-ngx/pull/866))
+- Fix local Docker image building [@stumpylog](https://github.com/stumpylog) ([#849](https://github.com/paperless-ngx/paperless-ngx/pull/849))
 
 ### Maintenance
 
-- Dockerfile Organization \& Enhancements [@stumpylog](https://github.com/stumpylog) ([\#888](https://github.com/paperless-ngx/paperless-ngx/pull/888))
-- Add timeout to healthcheck [@shamoon](https://github.com/shamoon) ([\#880](https://github.com/paperless-ngx/paperless-ngx/pull/880))
-- Use semver for release process [@stumpylog](https://github.com/stumpylog) ([\#851](https://github.com/paperless-ngx/paperless-ngx/pull/851))
-- Deployment: Consolidate tika compose files [@qcasey](https://github.com/qcasey) ([\#866](https://github.com/paperless-ngx/paperless-ngx/pull/866))
-- Fixes Pillow build for armv7 [@stumpylog](https://github.com/stumpylog) ([\#815](https://github.com/paperless-ngx/paperless-ngx/pull/815))
-- Update frontend localization source file [@shamoon](https://github.com/shamoon) ([\#814](https://github.com/paperless-ngx/paperless-ngx/pull/814))
-- Fix install script extra OCR languages format [@stumpylog](https://github.com/stumpylog) ([\#777](https://github.com/paperless-ngx/paperless-ngx/pull/777))
-- Adds simple Python to wait for Redis broker to be ready [@stumpylog](https://github.com/stumpylog) ([\#788](https://github.com/paperless-ngx/paperless-ngx/pull/788))
+- Dockerfile Organization \& Enhancements [@stumpylog](https://github.com/stumpylog) ([#888](https://github.com/paperless-ngx/paperless-ngx/pull/888))
+- Add timeout to healthcheck [@shamoon](https://github.com/shamoon) ([#880](https://github.com/paperless-ngx/paperless-ngx/pull/880))
+- Use semver for release process [@stumpylog](https://github.com/stumpylog) ([#851](https://github.com/paperless-ngx/paperless-ngx/pull/851))
+- Deployment: Consolidate tika compose files [@qcasey](https://github.com/qcasey) ([#866](https://github.com/paperless-ngx/paperless-ngx/pull/866))
+- Fixes Pillow build for armv7 [@stumpylog](https://github.com/stumpylog) ([#815](https://github.com/paperless-ngx/paperless-ngx/pull/815))
+- Update frontend localization source file [@shamoon](https://github.com/shamoon) ([#814](https://github.com/paperless-ngx/paperless-ngx/pull/814))
+- Fix install script extra OCR languages format [@stumpylog](https://github.com/stumpylog) ([#777](https://github.com/paperless-ngx/paperless-ngx/pull/777))
+- Adds simple Python to wait for Redis broker to be ready [@stumpylog](https://github.com/stumpylog) ([#788](https://github.com/paperless-ngx/paperless-ngx/pull/788))
 
 ### Dependencies
 
 <details>
 <summary>15 changes</summary>
 
-- Bump tj-actions/changed-files from 18.7 to 19 @dependabot ([\#830](https://github.com/paperless-ngx/paperless-ngx/pull/830))
-- Bump asgiref from 3.5.0 to 3.5.1 @dependabot ([\#867](https://github.com/paperless-ngx/paperless-ngx/pull/867))
-- Bump jest from 27.5.1 to 28.0.3 in /src-ui @dependabot ([\#860](https://github.com/paperless-ngx/paperless-ngx/pull/860))
-- Bump @<!---->ng-bootstrap/ng-bootstrap from 12.1.0 to 12.1.1 in /src-ui @dependabot ([\#861](https://github.com/paperless-ngx/paperless-ngx/pull/861))
-- Bump @<!---->types/node from 17.0.27 to 17.0.29 in /src-ui @dependabot ([\#833](https://github.com/paperless-ngx/paperless-ngx/pull/833))
-- Bump @<!---->ng-bootstrap/ng-bootstrap from 12.0.2 to 12.1.0 in /src-ui @dependabot ([\#834](https://github.com/paperless-ngx/paperless-ngx/pull/834))
-- Bump pytest from 7.1.1 to 7.1.2 @dependabot ([\#806](https://github.com/paperless-ngx/paperless-ngx/pull/806))
-- Bump github/codeql-action from 1 to 2 @dependabot ([\#792](https://github.com/paperless-ngx/paperless-ngx/pull/792))
-- Bump imap-tools from 0.53.0 to 0.54.0 @dependabot ([\#758](https://github.com/paperless-ngx/paperless-ngx/pull/758))
-- Bump ocrmypdf from 13.4.2 to 13.4.3 @dependabot ([\#757](https://github.com/paperless-ngx/paperless-ngx/pull/757))
-- Bump importlib-resources from 5.6.0 to 5.7.1 @dependabot ([\#756](https://github.com/paperless-ngx/paperless-ngx/pull/756))
-- Bump tox from 3.24.5 to 3.25.0 @dependabot ([\#692](https://github.com/paperless-ngx/paperless-ngx/pull/692))
-- Bump cypress from 9.5.3 to 9.6.0 in /src-ui @dependabot ([\#800](https://github.com/paperless-ngx/paperless-ngx/pull/800))
-- Bump angular \& tools to 13.3.4 or 13.3.3 [@shamoon](https://github.com/shamoon) ([\#799](https://github.com/paperless-ngx/paperless-ngx/pull/799))
-- Bump concurrently from 7.0.0 to 7.1.0 in /src-ui @dependabot ([\#797](https://github.com/paperless-ngx/paperless-ngx/pull/797))
+- Bump tj-actions/changed-files from 18.7 to 19 @dependabot ([#830](https://github.com/paperless-ngx/paperless-ngx/pull/830))
+- Bump asgiref from 3.5.0 to 3.5.1 @dependabot ([#867](https://github.com/paperless-ngx/paperless-ngx/pull/867))
+- Bump jest from 27.5.1 to 28.0.3 in /src-ui @dependabot ([#860](https://github.com/paperless-ngx/paperless-ngx/pull/860))
+- Bump @<!---->ng-bootstrap/ng-bootstrap from 12.1.0 to 12.1.1 in /src-ui @dependabot ([#861](https://github.com/paperless-ngx/paperless-ngx/pull/861))
+- Bump @<!---->types/node from 17.0.27 to 17.0.29 in /src-ui @dependabot ([#833](https://github.com/paperless-ngx/paperless-ngx/pull/833))
+- Bump @<!---->ng-bootstrap/ng-bootstrap from 12.0.2 to 12.1.0 in /src-ui @dependabot ([#834](https://github.com/paperless-ngx/paperless-ngx/pull/834))
+- Bump pytest from 7.1.1 to 7.1.2 @dependabot ([#806](https://github.com/paperless-ngx/paperless-ngx/pull/806))
+- Bump github/codeql-action from 1 to 2 @dependabot ([#792](https://github.com/paperless-ngx/paperless-ngx/pull/792))
+- Bump imap-tools from 0.53.0 to 0.54.0 @dependabot ([#758](https://github.com/paperless-ngx/paperless-ngx/pull/758))
+- Bump ocrmypdf from 13.4.2 to 13.4.3 @dependabot ([#757](https://github.com/paperless-ngx/paperless-ngx/pull/757))
+- Bump importlib-resources from 5.6.0 to 5.7.1 @dependabot ([#756](https://github.com/paperless-ngx/paperless-ngx/pull/756))
+- Bump tox from 3.24.5 to 3.25.0 @dependabot ([#692](https://github.com/paperless-ngx/paperless-ngx/pull/692))
+- Bump cypress from 9.5.3 to 9.6.0 in /src-ui @dependabot ([#800](https://github.com/paperless-ngx/paperless-ngx/pull/800))
+- Bump angular \& tools to 13.3.4 or 13.3.3 [@shamoon](https://github.com/shamoon) ([#799](https://github.com/paperless-ngx/paperless-ngx/pull/799))
+- Bump concurrently from 7.0.0 to 7.1.0 in /src-ui @dependabot ([#797](https://github.com/paperless-ngx/paperless-ngx/pull/797))
 </details>
 
 ## paperless-ngx 1.7.0
@@ -3735,87 +3735,87 @@ Versions 1.11.1 and 1.11.2 contain bug fixes from v1.11.0 that prevented use of 
 ### Breaking Changes
 
 - `PAPERLESS_URL` is now required when using a reverse proxy. See
-  [\#674](https://github.com/paperless-ngx/paperless-ngx/pull/674).
+  [#674](https://github.com/paperless-ngx/paperless-ngx/pull/674).
 
 ### Features
 
 - Allow setting more than one tag in mail rules
-  [@jonasc](https://github.com/jonasc) ([\#270](https://github.com/paperless-ngx/paperless-ngx/pull/270))
+  [@jonasc](https://github.com/jonasc) ([#270](https://github.com/paperless-ngx/paperless-ngx/pull/270))
 - Global drag'n'drop [@shamoon](https://github.com/shamoon)
-  ([\#283](https://github.com/paperless-ngx/paperless-ngx/pull/283))
+  ([#283](https://github.com/paperless-ngx/paperless-ngx/pull/283))
 - Fix: download buttons should disable while waiting
-  [@shamoon](https://github.com/shamoon) ([\#630](https://github.com/paperless-ngx/paperless-ngx/pull/630))
-- Update checker [@shamoon](https://github.com/shamoon) ([\#591](https://github.com/paperless-ngx/paperless-ngx/pull/591))
+  [@shamoon](https://github.com/shamoon) ([#630](https://github.com/paperless-ngx/paperless-ngx/pull/630))
+- Update checker [@shamoon](https://github.com/shamoon) ([#591](https://github.com/paperless-ngx/paperless-ngx/pull/591))
 - Show prompt on password-protected pdfs
-  [@shamoon](https://github.com/shamoon) ([\#564](https://github.com/paperless-ngx/paperless-ngx/pull/564))
+  [@shamoon](https://github.com/shamoon) ([#564](https://github.com/paperless-ngx/paperless-ngx/pull/564))
 - Filtering query params aka browser navigation for filtering
-  [@shamoon](https://github.com/shamoon) ([\#540](https://github.com/paperless-ngx/paperless-ngx/pull/540))
+  [@shamoon](https://github.com/shamoon) ([#540](https://github.com/paperless-ngx/paperless-ngx/pull/540))
 - Clickable tags in dashboard widgets
-  [@shamoon](https://github.com/shamoon) ([\#515](https://github.com/paperless-ngx/paperless-ngx/pull/515))
+  [@shamoon](https://github.com/shamoon) ([#515](https://github.com/paperless-ngx/paperless-ngx/pull/515))
 - Add bottom pagination [@shamoon](https://github.com/shamoon)
-  ([\#372](https://github.com/paperless-ngx/paperless-ngx/pull/372))
+  ([#372](https://github.com/paperless-ngx/paperless-ngx/pull/372))
 - Feature barcode splitter [@gador](https://github.com/gador)
-  ([\#532](https://github.com/paperless-ngx/paperless-ngx/pull/532))
-- App loading screen [@shamoon](https://github.com/shamoon) ([\#298](https://github.com/paperless-ngx/paperless-ngx/pull/298))
+  ([#532](https://github.com/paperless-ngx/paperless-ngx/pull/532))
+- App loading screen [@shamoon](https://github.com/shamoon) ([#298](https://github.com/paperless-ngx/paperless-ngx/pull/298))
 - Use progress bar for delayed buttons
-  [@shamoon](https://github.com/shamoon) ([\#415](https://github.com/paperless-ngx/paperless-ngx/pull/415))
+  [@shamoon](https://github.com/shamoon) ([#415](https://github.com/paperless-ngx/paperless-ngx/pull/415))
 - Add minimum length for documents text filter
-  [@shamoon](https://github.com/shamoon) ([\#401](https://github.com/paperless-ngx/paperless-ngx/pull/401))
+  [@shamoon](https://github.com/shamoon) ([#401](https://github.com/paperless-ngx/paperless-ngx/pull/401))
 - Added nav buttons in the document detail view
-  [@GruberViktor](https://github.com/gruberviktor) ([\#273](https://github.com/paperless-ngx/paperless-ngx/pull/273))
+  [@GruberViktor](https://github.com/gruberviktor) ([#273](https://github.com/paperless-ngx/paperless-ngx/pull/273))
 - Improve date keyboard input [@shamoon](https://github.com/shamoon)
-  ([\#253](https://github.com/paperless-ngx/paperless-ngx/pull/253))
-- Color theming [@shamoon](https://github.com/shamoon) ([\#243](https://github.com/paperless-ngx/paperless-ngx/pull/243))
+  ([#253](https://github.com/paperless-ngx/paperless-ngx/pull/253))
+- Color theming [@shamoon](https://github.com/shamoon) ([#243](https://github.com/paperless-ngx/paperless-ngx/pull/243))
 - Parse dates when entered without separators
-  [@GruberViktor](https://github.com/gruberviktor) ([\#250](https://github.com/paperless-ngx/paperless-ngx/pull/250))
+  [@GruberViktor](https://github.com/gruberviktor) ([#250](https://github.com/paperless-ngx/paperless-ngx/pull/250))
 
 ### Bug Fixes
 
 - Add "localhost" to ALLOWED_HOSTS
-  [@gador](https://github.com/gador) ([\#700](https://github.com/paperless-ngx/paperless-ngx/pull/700))
-- Fix: scanners table [@qcasey](https://github.com/qcasey) ([\#690](https://github.com/paperless-ngx/paperless-ngx/pull/690))
+  [@gador](https://github.com/gador) ([#700](https://github.com/paperless-ngx/paperless-ngx/pull/700))
+- Fix: scanners table [@qcasey](https://github.com/qcasey) ([#690](https://github.com/paperless-ngx/paperless-ngx/pull/690))
 - Adds wait for file before consuming
-  [@stumpylog](https://github.com/stumpylog) ([\#483](https://github.com/paperless-ngx/paperless-ngx/pull/483))
+  [@stumpylog](https://github.com/stumpylog) ([#483](https://github.com/paperless-ngx/paperless-ngx/pull/483))
 - Fix: frontend document editing erases time data
-  [@shamoon](https://github.com/shamoon) ([\#654](https://github.com/paperless-ngx/paperless-ngx/pull/654))
+  [@shamoon](https://github.com/shamoon) ([#654](https://github.com/paperless-ngx/paperless-ngx/pull/654))
 - Increase length of SavedViewFilterRule
-  [@stumpylog](https://github.com/stumpylog) ([\#612](https://github.com/paperless-ngx/paperless-ngx/pull/612))
+  [@stumpylog](https://github.com/stumpylog) ([#612](https://github.com/paperless-ngx/paperless-ngx/pull/612))
 - Fixes attachment filename matching during mail fetching
-  [@stumpylog](https://github.com/stumpylog) ([\#680](https://github.com/paperless-ngx/paperless-ngx/pull/680))
+  [@stumpylog](https://github.com/stumpylog) ([#680](https://github.com/paperless-ngx/paperless-ngx/pull/680))
 - Add `PAPERLESS_URL` env variable & CSRF var
-  [@shamoon](https://github.com/shamoon) ([\#674](https://github.com/paperless-ngx/paperless-ngx/discussions/674))
+  [@shamoon](https://github.com/shamoon) ([#674](https://github.com/paperless-ngx/paperless-ngx/discussions/674))
 - Fix: download buttons should disable while waiting
-  [@shamoon](https://github.com/shamoon) ([\#630](https://github.com/paperless-ngx/paperless-ngx/pull/630))
+  [@shamoon](https://github.com/shamoon) ([#630](https://github.com/paperless-ngx/paperless-ngx/pull/630))
 - Fixes downloaded filename, add more consumer ignore settings
-  [@stumpylog](https://github.com/stumpylog) ([\#599](https://github.com/paperless-ngx/paperless-ngx/pull/599))
+  [@stumpylog](https://github.com/stumpylog) ([#599](https://github.com/paperless-ngx/paperless-ngx/pull/599))
 - FIX BUG: case-sensitive matching was not possible
-  [@danielBreitlauch](https://github.com/danielbreitlauch) ([\#594](https://github.com/paperless-ngx/paperless-ngx/pull/594))
+  [@danielBreitlauch](https://github.com/danielbreitlauch) ([#594](https://github.com/paperless-ngx/paperless-ngx/pull/594))
 - Uses shutil.move instead of rename
-  [@gador](https://github.com/gador) ([\#617](https://github.com/paperless-ngx/paperless-ngx/pull/617))
+  [@gador](https://github.com/gador) ([#617](https://github.com/paperless-ngx/paperless-ngx/pull/617))
 - Fix npm deps 01.02.22 2 [@shamoon](https://github.com/shamoon)
-  ([\#610](https://github.com/paperless-ngx/paperless-ngx/discussions/610))
+  ([#610](https://github.com/paperless-ngx/paperless-ngx/discussions/610))
 - Fix npm dependencies 01.02.22
-  [@shamoon](https://github.com/shamoon) ([\#600](https://github.com/paperless-ngx/paperless-ngx/pull/600))
+  [@shamoon](https://github.com/shamoon) ([#600](https://github.com/paperless-ngx/paperless-ngx/pull/600))
 - Fix issue 416: implement `PAPERLESS_OCR_MAX_IMAGE_PIXELS`
-  [@hacker-h](https://github.com/hacker-h) ([\#441](https://github.com/paperless-ngx/paperless-ngx/pull/441))
+  [@hacker-h](https://github.com/hacker-h) ([#441](https://github.com/paperless-ngx/paperless-ngx/pull/441))
 - Fix: exclude cypress from build in Dockerfile
-  [@FrankStrieter](https://github.com/FrankStrieter) ([\#526](https://github.com/paperless-ngx/paperless-ngx/pull/526))
+  [@FrankStrieter](https://github.com/FrankStrieter) ([#526](https://github.com/paperless-ngx/paperless-ngx/pull/526))
 - Corrections to pass pre-commit hooks
-  [@schnuffle](https://github.com/schnuffle) ([\#454](https://github.com/paperless-ngx/paperless-ngx/pull/454))
+  [@schnuffle](https://github.com/schnuffle) ([#454](https://github.com/paperless-ngx/paperless-ngx/pull/454))
 - Fix 311 unable to click checkboxes in document list
-  [@shamoon](https://github.com/shamoon) ([\#313](https://github.com/paperless-ngx/paperless-ngx/pull/313))
+  [@shamoon](https://github.com/shamoon) ([#313](https://github.com/paperless-ngx/paperless-ngx/pull/313))
 - Fix imap tools bug [@stumpylog](https://github.com/stumpylog)
-  ([\#393](https://github.com/paperless-ngx/paperless-ngx/pull/393))
+  ([#393](https://github.com/paperless-ngx/paperless-ngx/pull/393))
 - Fix filterable dropdown buttons aren't translated
-  [@shamoon](https://github.com/shamoon) ([\#366](https://github.com/paperless-ngx/paperless-ngx/pull/366))
+  [@shamoon](https://github.com/shamoon) ([#366](https://github.com/paperless-ngx/paperless-ngx/pull/366))
 - Fix 224: "Auto-detected date is day before receipt date"
-  [@a17t](https://github.com/a17t) ([\#246](https://github.com/paperless-ngx/paperless-ngx/pull/246))
+  [@a17t](https://github.com/a17t) ([#246](https://github.com/paperless-ngx/paperless-ngx/pull/246))
 - Fix minor sphinx errors [@shamoon](https://github.com/shamoon)
-  ([\#322](https://github.com/paperless-ngx/paperless-ngx/pull/322))
+  ([#322](https://github.com/paperless-ngx/paperless-ngx/pull/322))
 - Fix page links hidden [@shamoon](https://github.com/shamoon)
-  ([\#314](https://github.com/paperless-ngx/paperless-ngx/pull/314))
+  ([#314](https://github.com/paperless-ngx/paperless-ngx/pull/314))
 - Fix: Include excluded items in dropdown count
-  [@shamoon](https://github.com/shamoon) ([\#263](https://github.com/paperless-ngx/paperless-ngx/pull/263))
+  [@shamoon](https://github.com/shamoon) ([#263](https://github.com/paperless-ngx/paperless-ngx/pull/263))
 
 ### Translation
 
@@ -3832,37 +3832,37 @@ Versions 1.11.1 and 1.11.2 contain bug fixes from v1.11.0 that prevented use of 
 
 ### Documentation
 
-- Fix: scanners table [@qcasey](https://github.com/qcasey) ([\#690](https://github.com/paperless-ngx/paperless-ngx/pull/690))
+- Fix: scanners table [@qcasey](https://github.com/qcasey) ([#690](https://github.com/paperless-ngx/paperless-ngx/pull/690))
 - Add `PAPERLESS_URL` env variable & CSRF var
-  [@shamoon](https://github.com/shamoon) ([\#674](https://github.com/paperless-ngx/paperless-ngx/pull/674))
+  [@shamoon](https://github.com/shamoon) ([#674](https://github.com/paperless-ngx/paperless-ngx/pull/674))
 - Fixes downloaded filename, add more consumer ignore settings
-  [@stumpylog](https://github.com/stumpylog) ([\#599](https://github.com/paperless-ngx/paperless-ngx/pull/599))
+  [@stumpylog](https://github.com/stumpylog) ([#599](https://github.com/paperless-ngx/paperless-ngx/pull/599))
 - Fix issue 416: implement `PAPERLESS_OCR_MAX_IMAGE_PIXELS`
-  [@hacker-h](https://github.com/hacker-h) ([\#441](https://github.com/paperless-ngx/paperless-ngx/pull/441))
+  [@hacker-h](https://github.com/hacker-h) ([#441](https://github.com/paperless-ngx/paperless-ngx/pull/441))
 - Fix minor sphinx errors [@shamoon](https://github.com/shamoon)
-  ([\#322](https://github.com/paperless-ngx/paperless-ngx/pull/322))
+  ([#322](https://github.com/paperless-ngx/paperless-ngx/pull/322))
 
 ### Maintenance
 
 - Add `PAPERLESS_URL` env variable & CSRF var
-  [@shamoon](https://github.com/shamoon) ([\#674](https://github.com/paperless-ngx/paperless-ngx/pull/674))
+  [@shamoon](https://github.com/shamoon) ([#674](https://github.com/paperless-ngx/paperless-ngx/pull/674))
 - Chore: Implement release-drafter action for Changelogs
-  [@qcasey](https://github.com/qcasey) ([\#669](https://github.com/paperless-ngx/paperless-ngx/pull/669))
-- Chore: Add CODEOWNERS [@qcasey](https://github.com/qcasey) ([\#667](https://github.com/paperless-ngx/paperless-ngx/pull/667))
+  [@qcasey](https://github.com/qcasey) ([#669](https://github.com/paperless-ngx/paperless-ngx/pull/669))
+- Chore: Add CODEOWNERS [@qcasey](https://github.com/qcasey) ([#667](https://github.com/paperless-ngx/paperless-ngx/pull/667))
 - Support docker-compose v2 in install
-  [@stumpylog](https://github.com/stumpylog) ([\#611](https://github.com/paperless-ngx/paperless-ngx/pull/611))
+  [@stumpylog](https://github.com/stumpylog) ([#611](https://github.com/paperless-ngx/paperless-ngx/pull/611))
 - Add Belarusian localization [@shamoon](https://github.com/shamoon)
-  ([\#588](https://github.com/paperless-ngx/paperless-ngx/pull/588))
+  ([#588](https://github.com/paperless-ngx/paperless-ngx/pull/588))
 - Add Turkish localization [@shamoon](https://github.com/shamoon)
-  ([\#536](https://github.com/paperless-ngx/paperless-ngx/pull/536))
+  ([#536](https://github.com/paperless-ngx/paperless-ngx/pull/536))
 - Add Serbian localization [@shamoon](https://github.com/shamoon)
-  ([\#504](https://github.com/paperless-ngx/paperless-ngx/pull/504))
+  ([#504](https://github.com/paperless-ngx/paperless-ngx/pull/504))
 - Create PULL_REQUEST_TEMPLATE.md
-  [@shamoon](https://github.com/shamoon) ([\#304](https://github.com/paperless-ngx/paperless-ngx/pull/304))
+  [@shamoon](https://github.com/shamoon) ([#304](https://github.com/paperless-ngx/paperless-ngx/pull/304))
 - Add Chinese localization [@shamoon](https://github.com/shamoon)
-  ([\#247](https://github.com/paperless-ngx/paperless-ngx/pull/247))
+  ([#247](https://github.com/paperless-ngx/paperless-ngx/pull/247))
 - Add Slovenian language for frontend
-  [@shamoon](https://github.com/shamoon) ([\#315](https://github.com/paperless-ngx/paperless-ngx/pull/315))
+  [@shamoon](https://github.com/shamoon) ([#315](https://github.com/paperless-ngx/paperless-ngx/pull/315))
 
 ## paperless-ngx 1.6.0
 
@@ -3878,46 +3878,46 @@ include:
 - Updated Python and Angular dependencies.
 - Dropped support for Python 3.7.
 - Dropped support for Ansible playbooks (thanks
-  [@slankes](https://github.com/slankes) [\#109](https://github.com/paperless-ngx/paperless-ngx/pull/109)). If someone would
+  [@slankes](https://github.com/slankes) [#109](https://github.com/paperless-ngx/paperless-ngx/pull/109)). If someone would
   like to continue supporting them, please see our [ansible
   repo](https://github.com/paperless-ngx/paperless-ngx-ansible).
 - Python code is now required to use Black formatting (thanks
-  [@kpj](https://github.com/kpj) [\#168](https://github.com/paperless-ngx/paperless-ngx/pull/168)).
+  [@kpj](https://github.com/kpj) [#168](https://github.com/paperless-ngx/paperless-ngx/pull/168)).
 - [@tribut](https://github.com/tribut) added support for a custom SSO
-  logout redirect ([jonaswinkler\#1258](https://github.com/jonaswinkler/paperless-ng/pull/1258)). See
+  logout redirect ([jonaswinkler#1258](https://github.com/jonaswinkler/paperless-ng/pull/1258)). See
   `PAPERLESS_LOGOUT_REDIRECT_URL`.
 - [@shamoon](https://github.com/shamoon) added a loading indicator
-  when document list is reloading ([jonaswinkler\#1297](https://github.com/jonaswinkler/paperless-ng/pull/1297)).
+  when document list is reloading ([jonaswinkler#1297](https://github.com/jonaswinkler/paperless-ng/pull/1297)).
 - [@shamoon](https://github.com/shamoon) improved the PDF viewer on
-  mobile ([\#2](https://github.com/paperless-ngx/paperless-ngx/pull/2)).
+  mobile ([#2](https://github.com/paperless-ngx/paperless-ngx/pull/2)).
 - [@shamoon](https://github.com/shamoon) added 'any' / 'all' and
-  'not' filtering with tags ([\#10](https://github.com/paperless-ngx/paperless-ngx/pull/10)).
+  'not' filtering with tags ([#10](https://github.com/paperless-ngx/paperless-ngx/pull/10)).
 - [@shamoon](https://github.com/shamoon) added warnings for unsaved
-  changes, with smart edit buttons ([\#13](https://github.com/paperless-ngx/paperless-ngx/pull/13)).
+  changes, with smart edit buttons ([#13](https://github.com/paperless-ngx/paperless-ngx/pull/13)).
 - [@benjaminfrank](https://github.com/benjaminfrank) enabled a
-  non-root access to port 80 via systemd ([\#18](https://github.com/paperless-ngx/paperless-ngx/pull/18)).
+  non-root access to port 80 via systemd ([#18](https://github.com/paperless-ngx/paperless-ngx/pull/18)).
 - [@tribut](https://github.com/tribut) added simple "delete to
-  trash" functionality ([\#24](https://github.com/paperless-ngx/paperless-ngx/pull/24)). See `PAPERLESS_TRASH_DIR`.
+  trash" functionality ([#24](https://github.com/paperless-ngx/paperless-ngx/pull/24)). See `PAPERLESS_TRASH_DIR`.
 - [@amenk](https://github.com/amenk) fixed the search box overlay
-  menu on mobile ([\#32](https://github.com/paperless-ngx/paperless-ngx/pull/32)).
+  menu on mobile ([#32](https://github.com/paperless-ngx/paperless-ngx/pull/32)).
 - [@dblitt](https://github.com/dblitt) updated the login form to not
-  auto-capitalize usernames ([\#36](https://github.com/paperless-ngx/paperless-ngx/pull/36)).
+  auto-capitalize usernames ([#36](https://github.com/paperless-ngx/paperless-ngx/pull/36)).
 - [@evilsidekick293](https://github.com/evilsidekick293) made the
-  worker timeout configurable ([\#37](https://github.com/paperless-ngx/paperless-ngx/pull/37)). See `PAPERLESS_WORKER_TIMEOUT`.
+  worker timeout configurable ([#37](https://github.com/paperless-ngx/paperless-ngx/pull/37)). See `PAPERLESS_WORKER_TIMEOUT`.
 - [@Nicarim](https://github.com/Nicarim) fixed downloads of UTF-8
-  formatted documents in Firefox ([\#56](https://github.com/paperless-ngx/paperless-ngx/pull/56)).
+  formatted documents in Firefox ([#56](https://github.com/paperless-ngx/paperless-ngx/pull/56)).
 - [@mweimerskirch](https://github.com/mweimerskirch) sorted the
-  language dropdown by locale ([\#78](https://github.com/paperless-ngx/paperless-ngx/issues/78)).
+  language dropdown by locale ([#78](https://github.com/paperless-ngx/paperless-ngx/issues/78)).
 - [@mweimerskirch](https://github.com/mweimerskirch) enabled the
-  Czech ([\#83](https://github.com/paperless-ngx/paperless-ngx/pull/83)) and Danish ([\#84](https://github.com/paperless-ngx/paperless-ngx/pull/84)) translations.
+  Czech ([#83](https://github.com/paperless-ngx/paperless-ngx/pull/83)) and Danish ([#84](https://github.com/paperless-ngx/paperless-ngx/pull/84)) translations.
 - [@cschmatzler](https://github.com/cschmatzler) enabled specifying
-  the webserver port ([\#124](https://github.com/paperless-ngx/paperless-ngx/pull/124)). See `PAPERLESS_PORT`.
+  the webserver port ([#124](https://github.com/paperless-ngx/paperless-ngx/pull/124)). See `PAPERLESS_PORT`.
 - [@muellermartin](https://github.com/muellermartin) fixed an error
-  when uploading transparent PNGs ([\#133](https://github.com/paperless-ngx/paperless-ngx/pull/133)).
+  when uploading transparent PNGs ([#133](https://github.com/paperless-ngx/paperless-ngx/pull/133)).
 - [@shamoon](https://github.com/shamoon) created a slick new logo
-  ([\#165](https://github.com/paperless-ngx/paperless-ngx/pull/165)).
+  ([#165](https://github.com/paperless-ngx/paperless-ngx/pull/165)).
 - [@tim-vogel](https://github.com/tim-vogel) fixed exports missing
-  groups ([\#193](https://github.com/paperless-ngx/paperless-ngx/pull/193)).
+  groups ([#193](https://github.com/paperless-ngx/paperless-ngx/pull/193)).
 
 Known issues:
 
@@ -4871,26 +4871,26 @@ primarily.
 
 - [syntonym](https://github.com/syntonym) submitted a pull request to
   catch IMAP connection errors
-  [\#475](https://github.com/the-paperless-project/paperless/pull/475).
+  [#475](https://github.com/the-paperless-project/paperless/pull/475).
 - [Stéphane Brunner](https://github.com/sbrunner) added `psycopg2` to
   the Pipfile
-  [\#489](https://github.com/the-paperless-project/paperless/pull/489).
+  [#489](https://github.com/the-paperless-project/paperless/pull/489).
   He also fixed a syntax error in `docker-compose.yml.example`
-  [\#488](https://github.com/the-paperless-project/paperless/pull/488)
+  [#488](https://github.com/the-paperless-project/paperless/pull/488)
   and added [DjangoQL](https://github.com/ivelum/djangoql), which
   allows a litany of handy search functionality
-  [\#492](https://github.com/the-paperless-project/paperless/pull/492).
+  [#492](https://github.com/the-paperless-project/paperless/pull/492).
 - [CkuT](https://github.com/CkuT) and
   [JOKer](https://github.com/MasterofJOKers) hacked out a simple, but
   super-helpful optimisation to how the thumbnails are served up,
   improving performance considerably
-  [\#481](https://github.com/the-paperless-project/paperless/pull/481).
+  [#481](https://github.com/the-paperless-project/paperless/pull/481).
 - [tsia](https://github.com/tsia) added a few fields to the tags REST
   API.
-  [\#483](https://github.com/the-paperless-project/paperless/pull/483).
+  [#483](https://github.com/the-paperless-project/paperless/pull/483).
 - [Brian Cribbs](https://github.com/cribbstechnolog) improved the
   documentation to help people using Paperless over NFS
-  [\#484](https://github.com/the-paperless-project/paperless/pull/484).
+  [#484](https://github.com/the-paperless-project/paperless/pull/484).
 - [Brendan M. Sleight](https://github.com/bmsleight) updated the
   documentation to include a note for setting the `DEBUG` value. The
   `paperless.conf.example` file was also updated to mirror the project
@@ -4904,21 +4904,21 @@ primarily.
   volume so that using the push API will work for users of the Docker
   install. Thanks to [Colin Frei](https://github.com/colinfrei) for
   fixing this in
-  [\#466](https://github.com/the-paperless-project/paperless/pull/466).
+  [#466](https://github.com/the-paperless-project/paperless/pull/466).
 - [khrise](https://github.com/khrise) submitted a pull request to
   include the `added` property to the REST API
-  [\#471](https://github.com/the-paperless-project/paperless/pull/471).
+  [#471](https://github.com/the-paperless-project/paperless/pull/471).
 
 ### 2.6.0
 
 - Allow an infinite number of logs to be deleted. Thanks to
   [Ulli](https://github.com/Ulli2k) for noting the problem in
-  [\#433](https://github.com/the-paperless-project/paperless/issues/433).
+  [#433](https://github.com/the-paperless-project/paperless/issues/433).
 - Fix the `RecentCorrespondentsFilter` correspondents filter that was
   added in 2.4 to play nice with the defaults. Thanks to
   [tsia](https://github.com/tsia) and
   [Sblop](https://github.com/Sblop) who pointed this out.
-  [\#423](https://github.com/the-paperless-project/paperless/issues/423).
+  [#423](https://github.com/the-paperless-project/paperless/issues/423).
 - Updated dependencies to include (among other things) a security
   patch to requests.
 - Fix text in sample data for tests so that the language guesser stops
@@ -4926,16 +4926,16 @@ primarily.
   in there.
 - Tweaked the gunicorn sample command to use filesystem paths instead
   of Python paths.
-  [\#441](https://github.com/the-paperless-project/paperless/pull/441)
+  [#441](https://github.com/the-paperless-project/paperless/pull/441)
 - Added pretty colour boxes next to the hex values in the Tags
   section, thanks to a pull request from [Joshua
   Taillon](https://github.com/jat255)
-  [\#442](https://github.com/the-paperless-project/paperless/pull/442).
+  [#442](https://github.com/the-paperless-project/paperless/pull/442).
 - Added a `.editorconfig` file to better specify coding style.
 - [Joshua Taillon](https://github.com/jat255) also added some logic to
   tie Paperless' date guessing logic into how it parses file names on
   import.
-  [\#440](https://github.com/the-paperless-project/paperless/pull/440)
+  [#440](https://github.com/the-paperless-project/paperless/pull/440)
 
 ### 2.5.0
 
@@ -4951,10 +4951,10 @@ primarily.
   hack" we were applying to sessions that weren't using a login, as
   that hack user didn't have a valid id. The fix was to attribute the
   first user id in the system to this hack user.
-  [\#394](https://github.com/the-paperless-project/paperless/issues/394)
+  [#394](https://github.com/the-paperless-project/paperless/issues/394)
 - A problem in how we handle slug values on Tags and Correspondents
   required a few changes to how we handle this field
-  [\#393](https://github.com/the-paperless-project/paperless/issues/393):
+  [#393](https://github.com/the-paperless-project/paperless/issues/393):
   1.  Slugs are no longer editable. They're derived from the name of
       the tag or correspondent at save time, so if you wanna change
       the slug, you have to change the name, and even then you're
@@ -4970,15 +4970,15 @@ primarily.
   dates to be attached to documents, which in turn busted the UI.
   Thanks to [Andrew Peng](https://github.com/pengc99) for reporting
   this.
-  [\#414](https://github.com/the-paperless-project/paperless/issues/414).
+  [#414](https://github.com/the-paperless-project/paperless/issues/414).
 - A bug in the Dockerfile meant that Tesseract language files weren't
   being installed correctly. [euri10](https://github.com/euri10) was
   quick to provide a fix:
-  [\#406](https://github.com/the-paperless-project/paperless/issues/406),
-  [\#413](https://github.com/the-paperless-project/paperless/pull/413).
+  [#406](https://github.com/the-paperless-project/paperless/issues/406),
+  [#413](https://github.com/the-paperless-project/paperless/pull/413).
 - Document consumption is now wrapped in a transaction as per an old
   ticket
-  [\#262](https://github.com/the-paperless-project/paperless/issues/262).
+  [#262](https://github.com/the-paperless-project/paperless/issues/262).
 - The `get_date()` functionality of the parsers has been consolidated
   onto the `DocumentParser` class since much of that code was
   redundant anyway.
@@ -4989,7 +4989,7 @@ primarily.
   [jonaswinkler](https://github.com/jonaswinkler)'s very first pull
   request! You can now do nifty things like tag documents in bulk, or
   set correspondents in bulk.
-  [\#405](https://github.com/the-paperless-project/paperless/pull/405)
+  [#405](https://github.com/the-paperless-project/paperless/pull/405)
 - The import/export system is now a little smarter. By default,
   documents are tagged as `unencrypted`, since exports are by their
   nature unencrypted. It's now in the import step that we decide the
@@ -5003,7 +5003,7 @@ primarily.
 - A bug was found in the REST API filter system that was the result of
   an update of django-filter some time ago. This has now been patched
   in
-  [\#412](https://github.com/the-paperless-project/paperless/issues/412).
+  [#412](https://github.com/the-paperless-project/paperless/issues/412).
   Thanks to [thepill](https://github.com/thepill) for spotting it!
 
 ### 2.3.0
@@ -5012,29 +5012,29 @@ primarily.
   [Joshua Taillon](https://github.com/jat255)! This was a
   long-requested feature, and it's addition is likely to be greatly
   appreciated by the community:
-  [\#395](https://github.com/the-paperless-project/paperless/pull/395)
+  [#395](https://github.com/the-paperless-project/paperless/pull/395)
   Thanks also to [David Martin](https://github.com/ddddavidmartin) for
   his assistance on the issue.
 - [dubit0](https://github.com/dubit0) found & fixed a bug that
   prevented management commands from running before we had an
   operational database:
-  [\#396](https://github.com/the-paperless-project/paperless/pull/396)
+  [#396](https://github.com/the-paperless-project/paperless/pull/396)
 - Joshua also added a simple update to the thumbnail generation
   process to improve performance:
-  [\#399](https://github.com/the-paperless-project/paperless/pull/399)
+  [#399](https://github.com/the-paperless-project/paperless/pull/399)
 - As his last bit of effort on this release, Joshua also added some
   code to allow you to view the documents inline rather than download
   them as an attachment.
-  [\#400](https://github.com/the-paperless-project/paperless/pull/400)
+  [#400](https://github.com/the-paperless-project/paperless/pull/400)
 - Finally, [ahyear](https://github.com/ahyear) found a slip in the
   Docker documentation and patched it.
-  [\#401](https://github.com/the-paperless-project/paperless/pull/401)
+  [#401](https://github.com/the-paperless-project/paperless/pull/401)
 
 ### 2.2.1
 
 - [Kyle Lucy](https://github.com/kmlucy) reported a bug quickly after
   the release of 2.2.0 where we broke the `DISABLE_LOGIN` feature:
-  [\#392](https://github.com/the-paperless-project/paperless/issues/392).
+  [#392](https://github.com/the-paperless-project/paperless/issues/392).
 
 ### 2.2.0
 
@@ -5043,24 +5043,24 @@ primarily.
   Brooks](https://github.com/brookst) this is the first version of
   Paperless that supports Django 2.0! As a result of their hard work,
   you can now also run Paperless on Python 3.7 as well:
-  [\#386](https://github.com/the-paperless-project/paperless/issues/386)
+  [#386](https://github.com/the-paperless-project/paperless/issues/386)
   &
-  [\#390](https://github.com/the-paperless-project/paperless/pull/390).
+  [#390](https://github.com/the-paperless-project/paperless/pull/390).
 - [Stéphane Brunner](https://github.com/sbrunner) added a few lines of
   code that made tagging interface a lot easier on those of us with
   lots of different tags:
-  [\#391](https://github.com/the-paperless-project/paperless/pull/391).
+  [#391](https://github.com/the-paperless-project/paperless/pull/391).
 - [Kilian Koeltzsch](https://github.com/kiliankoe) noticed a bug in
   how we capture & automatically create tags, so that's fixed now
   too:
-  [\#384](https://github.com/the-paperless-project/paperless/issues/384).
+  [#384](https://github.com/the-paperless-project/paperless/issues/384).
 - [erikarvstedt](https://github.com/erikarvstedt) tweaked the
   behaviour of the test suite to be better behaved for packaging
   environments:
-  [\#383](https://github.com/the-paperless-project/paperless/pull/383).
+  [#383](https://github.com/the-paperless-project/paperless/pull/383).
 - [Lukasz Soluch](https://github.com/LukaszSolo) added CORS support to
   make building a new Javascript-based front-end cleaner & easier:
-  [\#387](https://github.com/the-paperless-project/paperless/pull/387).
+  [#387](https://github.com/the-paperless-project/paperless/pull/387).
 
 ### 2.1.0
 
@@ -5068,19 +5068,19 @@ primarily.
   features that make Paperless a lot more user (and developer)
   friendly:
   1.  There's a new search box on the front page:
-      [\#374](https://github.com/the-paperless-project/paperless/pull/374).
+      [#374](https://github.com/the-paperless-project/paperless/pull/374).
   2.  The correspondents & tags pages now have a column showing the
       number of relevant documents:
-      [\#375](https://github.com/the-paperless-project/paperless/pull/375).
+      [#375](https://github.com/the-paperless-project/paperless/pull/375).
   3.  The Dockerfile has been tweaked to build faster for those of us
       who are doing active development on Paperless using the Docker
       environment:
-      [\#376](https://github.com/the-paperless-project/paperless/pull/376).
+      [#376](https://github.com/the-paperless-project/paperless/pull/376).
 - You now also have the ability to customise the interface to your
   heart's content by creating a file called `overrides.css` and/or
   `overrides.js` in the root of your media directory. Thanks to [Mark
   McFate](https://github.com/SummittDweller) for this idea:
-  [\#371](https://github.com/the-paperless-project/paperless/issues/371)
+  [#371](https://github.com/the-paperless-project/paperless/issues/371)
 
 ### 2.0.0
 
@@ -5124,9 +5124,9 @@ this big change.
   now direct it to consume from a particular `--directory`, limit the
   `--loop-time`, set the time between mail server checks with
   `--mail-delta` or just run it as a one-off with `--one-shot`. See
-  [\#305](https://github.com/the-paperless-project/paperless/issues/305)
+  [#305](https://github.com/the-paperless-project/paperless/issues/305)
   &
-  [\#313](https://github.com/the-paperless-project/paperless/pull/313)
+  [#313](https://github.com/the-paperless-project/paperless/pull/313)
   for more information.
 - Refactor the use of travis/tox/pytest/coverage into two files:
   `.travis.yml` and `setup.cfg`.
@@ -5135,7 +5135,7 @@ this big change.
 - All for a alternative FreeBSD-friendly location for
   `paperless.conf`. Thanks to [Martin
   Arendtsen](https://github.com/Arendtsen) who provided this
-  ([\#322](https://github.com/the-paperless-project/paperless/pull/322)).
+  ([#322](https://github.com/the-paperless-project/paperless/pull/322)).
 - Document consumption events are now logged in the Django admin
   events log. Thanks to [CkuT](https://github.com/CkuT) for doing the
   legwork on this one and to [Quentin Dawans](https://github.com/ovv)
@@ -5143,13 +5143,13 @@ this big change.
   coordinate & work out how the feature would be developed.
 - [erikarvstedt](https://github.com/erikarvstedt) contributed a pull
   request
-  ([\#328](https://github.com/the-paperless-project/paperless/pull/328))
+  ([#328](https://github.com/the-paperless-project/paperless/pull/328))
   to add `--noreload` to the default server start process. This helps
   reduce the load imposed by the running webservice.
 - Through some discussion on
-  [\#253](https://github.com/the-paperless-project/paperless/issues/253)
+  [#253](https://github.com/the-paperless-project/paperless/issues/253)
   and
-  [\#323](https://github.com/the-paperless-project/paperless/issues/323),
+  [#323](https://github.com/the-paperless-project/paperless/issues/323),
   we've removed a few of the hardcoded URL values to make it easier
   for people to host Paperless on a subdirectory. Thanks to [Quentin
   Dawans](https://github.com/ovv) and [Kyle
@@ -5157,30 +5157,30 @@ this big change.
 - The clickable area for documents on the listing page has been
   increased to a more predictable space thanks to a glorious hack from
   [erikarvstedt](https://github.com/erikarvstedt) in
-  [\#344](https://github.com/the-paperless-project/paperless/pull/344).
+  [#344](https://github.com/the-paperless-project/paperless/pull/344).
 - [Strubbl](https://github.com/strubbl) noticed an annoying bug in the
   bash script wrapping the Docker entrypoint and fixed it with some
   very creating Bash skills:
-  [\#352](https://github.com/the-paperless-project/paperless/pull/352).
+  [#352](https://github.com/the-paperless-project/paperless/pull/352).
 - You can now use the search field to find documents by tag thanks to
   [thinkjk](https://github.com/thinkjk)'s _first ever issue_:
-  [\#354](https://github.com/the-paperless-project/paperless/issues/354).
+  [#354](https://github.com/the-paperless-project/paperless/issues/354).
 - Inotify is now being used to detect additions to the consume
   directory thanks to some excellent work from
   [erikarvstedt](https://github.com/erikarvstedt) on
-  [\#351](https://github.com/the-paperless-project/paperless/pull/351)
+  [#351](https://github.com/the-paperless-project/paperless/pull/351)
 
 ### 1.3.0
 
 - You can now run Paperless without a login, though you'll still have
   to create at least one user. This is thanks to a pull-request from
   [matthewmoto](https://github.com/matthewmoto):
-  [\#295](https://github.com/the-paperless-project/paperless/pull/295).
+  [#295](https://github.com/the-paperless-project/paperless/pull/295).
   Note that logins are still required by default, and that you need to
   disable them by setting `PAPERLESS_DISABLE_LOGIN="true"` in your
   environment or in `/etc/paperless.conf`.
 - Fix for
-  [\#303](https://github.com/the-paperless-project/paperless/issues/303)
+  [#303](https://github.com/the-paperless-project/paperless/issues/303)
   where sketchily-formatted documents could cause the consumer to
   break and insert half-records into the database breaking all sorts
   of things. We now capture the return codes of both `convert` and
@@ -5188,24 +5188,24 @@ this big change.
 - Fix for additional date types thanks to input from
   [Isaac](https://github.com/isaacsando) and code from
   [BastianPoe](https://github.com/BastianPoe)
-  ([\#301](https://github.com/the-paperless-project/paperless/issues/301)).
+  ([#301](https://github.com/the-paperless-project/paperless/issues/301)).
 - Fix for running migrations in the Docker container
-  ([\#299](https://github.com/the-paperless-project/paperless/issues/299)).
+  ([#299](https://github.com/the-paperless-project/paperless/issues/299)).
   Thanks to [Georgi Todorov](https://github.com/TeraHz) for the fix
-  ([\#300](https://github.com/the-paperless-project/paperless/pull/300))
+  ([#300](https://github.com/the-paperless-project/paperless/pull/300))
   and to [Pit](https://github.com/pitkley) for the review.
 - Fix for Docker cases where the issuing user is not UID 1000. This
   was a collaborative fix between [Jeffrey
   Portman](https://github.com/ChromoX) and
   [Pit](https://github.com/pitkley) in
-  [\#311](https://github.com/the-paperless-project/paperless/pull/311)
+  [#311](https://github.com/the-paperless-project/paperless/pull/311)
   and
-  [\#312](https://github.com/the-paperless-project/paperless/pull/312)
+  [#312](https://github.com/the-paperless-project/paperless/pull/312)
   to fix
-  [\#306](https://github.com/the-paperless-project/paperless/issues/306).
+  [#306](https://github.com/the-paperless-project/paperless/issues/306).
 - Patch the historical migrations to support MySQL's um,
   _interesting_ way of handing indexes
-  ([\#308](https://github.com/the-paperless-project/paperless/issues/308)).
+  ([#308](https://github.com/the-paperless-project/paperless/issues/308)).
   Thanks to [Simon Taddiken](https://github.com/skuzzle) for reporting
   the problem and helping me find where to fix it.
 
@@ -5230,24 +5230,24 @@ this big change.
   properly update.
 - [BastianPoe](https://github.com/BastianPoe) has also contributed a
   monumental amount of work
-  ([\#291](https://github.com/the-paperless-project/paperless/pull/291))
+  ([#291](https://github.com/the-paperless-project/paperless/pull/291))
   to solving
-  [\#158](https://github.com/the-paperless-project/paperless/issues/158):
+  [#158](https://github.com/the-paperless-project/paperless/issues/158):
   setting the document creation date based on finding a date in the
   document text.
 
 ### 1.1.0
 
 - Fix for
-  [\#283](https://github.com/the-paperless-project/paperless/issues/283),
+  [#283](https://github.com/the-paperless-project/paperless/issues/283),
   a redirect bug which broke interactions with paperless-desktop.
   Thanks to [chris-aeviator](https://github.com/chris-aeviator) for
   reporting it.
 - Addition of an optional new financial year filter, courtesy of
   [David Martin](https://github.com/ddddavidmartin)
-  [\#256](https://github.com/the-paperless-project/paperless/pull/256)
+  [#256](https://github.com/the-paperless-project/paperless/pull/256)
 - Fixed a typo in how thumbnails were named in exports
-  [\#285](https://github.com/the-paperless-project/paperless/pull/285),
+  [#285](https://github.com/the-paperless-project/paperless/pull/285),
   courtesy of [Dan Panzarella](https://github.com/pzl)
 
 ### 1.0.0
@@ -5260,33 +5260,33 @@ this big change.
   template tag with less copypasta.
 - Support for multi-word-matches for auto-tagging thanks to an
   excellent patch from [ishirav](https://github.com/ishirav)
-  [\#277](https://github.com/the-paperless-project/paperless/pull/277).
+  [#277](https://github.com/the-paperless-project/paperless/pull/277).
 - Fixed a CSS bug reported by [Stefan Hagen](https://github.com/xkpd3)
   that caused an overlapping of the text and checkboxes under some
   resolutions
-  [\#272](https://github.com/the-paperless-project/paperless/issues/272).
+  [#272](https://github.com/the-paperless-project/paperless/issues/272).
 - Patched the Docker config to force the serving of static files.
   Credit for this one goes to [dev-rke](https://github.com/dev-rke)
   via
-  [\#248](https://github.com/the-paperless-project/paperless/issues/248).
+  [#248](https://github.com/the-paperless-project/paperless/issues/248).
 - Fix file permissions during Docker start up thanks to
   [Pit](https://github.com/pitkley) on
-  [\#268](https://github.com/the-paperless-project/paperless/pull/268).
+  [#268](https://github.com/the-paperless-project/paperless/pull/268).
 - Date fields in the admin are now expressed as HTML5 date fields
   thanks to [Lukas Winkler](https://github.com/Findus23)'s issue
-  [\#278](https://github.com/the-paperless-project/paperless/issues/248)
+  [#278](https://github.com/the-paperless-project/paperless/issues/248)
 
 ### 0.8.0
 
 - Paperless can now run in a subdirectory on a host (`/paperless`),
   rather than always running in the root (`/`) thanks to
   [maphy-psd](https://github.com/maphy-psd)'s work on
-  [\#255](https://github.com/the-paperless-project/paperless/pull/255).
+  [#255](https://github.com/the-paperless-project/paperless/pull/255).
 
 ### 0.7.0
 
 - **Potentially breaking change**: As per
-  [\#235](https://github.com/the-paperless-project/paperless/issues/235),
+  [#235](https://github.com/the-paperless-project/paperless/issues/235),
   Paperless will no longer automatically delete documents attached to
   correspondents when those correspondents are themselves deleted.
   This was Django's default behaviour, but didn't make much sense in
@@ -5295,7 +5295,7 @@ this big change.
   Martin](https://github.com/ddddavidmartin) for their input on this
   one.
 - Fix for
-  [\#232](https://github.com/the-paperless-project/paperless/issues/232)
+  [#232](https://github.com/the-paperless-project/paperless/issues/232)
   wherein Paperless wasn't recognising `.tif` files properly. Thanks
   to [ayounggun](https://github.com/ayounggun) for reporting this one
   and to [Kusti Skytén](https://github.com/kskyten) for posting the
@@ -5306,7 +5306,7 @@ this big change.
 - Abandon the shared-secret trick we were using for the POST API in
   favour of BasicAuth or Django session.
 - Fix the POST API so it actually works.
-  [\#236](https://github.com/the-paperless-project/paperless/issues/236)
+  [#236](https://github.com/the-paperless-project/paperless/issues/236)
 - **Breaking change**: We've dropped the use of
   `PAPERLESS_SHARED_SECRET` as it was being used both for the API (now
   replaced with a normal auth) and form email polling. Now that we're
@@ -5322,40 +5322,40 @@ this big change.
 - Support for fuzzy matching in the auto-tagger & auto-correspondent
   systems thanks to [Jake Gysland](https://github.com/jgysland)'s
   patch
-  [\#220](https://github.com/the-paperless-project/paperless/pull/220).
+  [#220](https://github.com/the-paperless-project/paperless/pull/220).
 - Modified the Dockerfile to prepare an export directory
-  ([\#212](https://github.com/the-paperless-project/paperless/pull/212)).
+  ([#212](https://github.com/the-paperless-project/paperless/pull/212)).
   Thanks to combined efforts from [Pit](https://github.com/pitkley)
   and [Strubbl](https://github.com/strubbl) in working out the kinks
   on this one.
 - Updated the import/export scripts to include support for thumbnails.
   Big thanks to [CkuT](https://github.com/CkuT) for finding this
   shortcoming and doing the work to get it fixed in
-  [\#224](https://github.com/the-paperless-project/paperless/pull/224).
+  [#224](https://github.com/the-paperless-project/paperless/pull/224).
 - All of the following changes are thanks to [David
   Martin](https://github.com/ddddavidmartin): \* Bumped the dependency on pyocr to 0.4.7 so new users can make use
   of Tesseract 4 if they so prefer
-  ([\#226](https://github.com/the-paperless-project/paperless/pull/226)).
+  ([#226](https://github.com/the-paperless-project/paperless/pull/226)).
   - Fixed a number of issues with the automated mail handler
-    ([\#227](https://github.com/the-paperless-project/paperless/pull/227),
-    [\#228](https://github.com/the-paperless-project/paperless/pull/228))
+    ([#227](https://github.com/the-paperless-project/paperless/pull/227),
+    [#228](https://github.com/the-paperless-project/paperless/pull/228))
   - Amended the documentation for better handling of systemd service
     files
-    ([\#229](https://github.com/the-paperless-project/paperless/pull/229))
+    ([#229](https://github.com/the-paperless-project/paperless/pull/229))
   - Amended the Django Admin configuration to have nice headers
-    ([\#230](https://github.com/the-paperless-project/paperless/pull/230))
+    ([#230](https://github.com/the-paperless-project/paperless/pull/230))
 
 ### 0.4.1
 
 - Fix for
-  [\#206](https://github.com/the-paperless-project/paperless/issues/206)
+  [#206](https://github.com/the-paperless-project/paperless/issues/206)
   wherein the pluggable parser didn't recognise files with all-caps
   suffixes like `.PDF`
 
 ### 0.4.0
 
 - Introducing reminders. See
-  [\#199](https://github.com/the-paperless-project/paperless/issues/199)
+  [#199](https://github.com/the-paperless-project/paperless/issues/199)
   for more information, but the short explanation is that you can now
   attach simple notes & times to documents which are made available
   via the API. Currently, the default API (basically just the Django
@@ -5368,7 +5368,7 @@ this big change.
 ### 0.3.6
 
 - Fix for
-  [\#200](https://github.com/the-paperless-project/paperless/issues/200)
+  [#200](https://github.com/the-paperless-project/paperless/issues/200)
   (!!) where the API wasn't configured to allow updating the
   correspondent or the tags for a document.
 - The `content` field is now optional, to allow for the edge case of a
@@ -5387,11 +5387,11 @@ this big change.
   the tabular layout in favour of a tiled interface.
 - Users can now configure the number of items per page.
 - Fix for
-  [\#171](https://github.com/the-paperless-project/paperless/issues/171):
+  [#171](https://github.com/the-paperless-project/paperless/issues/171):
   Allow users to specify their own `SECRET_KEY` value.
 - Moved the dotenv loading to the top of settings.py
 - Fix for
-  [\#112](https://github.com/the-paperless-project/paperless/issues/112):
+  [#112](https://github.com/the-paperless-project/paperless/issues/112):
   Added checks for binaries required for document consumption.
 
 ### 0.3.4
@@ -5406,7 +5406,7 @@ this big change.
   even on my high-DPI monitor.
 - BasicAuth support for document and thumbnail downloads, as well as
   the Push API thanks to @thomasbrueggemann. See
-  [\#179](https://github.com/the-paperless-project/paperless/pull/179).
+  [#179](https://github.com/the-paperless-project/paperless/pull/179).
 
 ### 0.3.3
 
@@ -5418,7 +5418,7 @@ this big change.
 ### 0.3.2
 
 - Fix for
-  [\#172](https://github.com/the-paperless-project/paperless/issues/172):
+  [#172](https://github.com/the-paperless-project/paperless/issues/172):
   defaulting ALLOWED_HOSTS to `["*"]` and allowing the user to set
   her own value via `PAPERLESS_ALLOWED_HOSTS` should the need arise.
 
@@ -5435,7 +5435,7 @@ this big change.
   Just set `PAPERLESS_CONSUMER_LOOP_TIME` to a number of seconds. The
   default is 10.
 - As per
-  [\#44](https://github.com/the-paperless-project/paperless/issues/44),
+  [#44](https://github.com/the-paperless-project/paperless/issues/44),
   we've removed support for `PAPERLESS_CONVERT`, `PAPERLESS_CONSUME`,
   and `PAPERLESS_SECRET`. Please use `PAPERLESS_CONVERT_BINARY`,
   `PAPERLESS_CONSUMPTION_DIR`, and `PAPERLESS_SHARED_SECRET`
@@ -5443,28 +5443,28 @@ this big change.
 
 ### 0.2.0
 
-- [\#150](https://github.com/the-paperless-project/paperless/pull/150):
+- [#150](https://github.com/the-paperless-project/paperless/pull/150):
   The media root is now a variable you can set in `paperless.conf`.
-- [\#148](https://github.com/the-paperless-project/paperless/pull/148):
+- [#148](https://github.com/the-paperless-project/paperless/pull/148):
   The database location (sqlite) is now a variable you can set in
   `paperless.conf`.
-- [\#146](https://github.com/the-paperless-project/paperless/issues/146):
+- [#146](https://github.com/the-paperless-project/paperless/issues/146):
   Fixed a bug that allowed unauthorised access to the `/fetch` URL.
-- [\#131](https://github.com/the-paperless-project/paperless/issues/131):
+- [#131](https://github.com/the-paperless-project/paperless/issues/131):
   Document files are now automatically removed from disk when they're
   deleted in Paperless.
-- [\#121](https://github.com/the-paperless-project/paperless/issues/121):
+- [#121](https://github.com/the-paperless-project/paperless/issues/121):
   Fixed a bug where Paperless wasn't setting document creation time
   based on the file naming scheme.
-- [\#81](https://github.com/the-paperless-project/paperless/issues/81):
+- [#81](https://github.com/the-paperless-project/paperless/issues/81):
   Added a hook to run an arbitrary script after every document is
   consumed.
-- [\#98](https://github.com/the-paperless-project/paperless/issues/98):
+- [#98](https://github.com/the-paperless-project/paperless/issues/98):
   Added optional environment variables for ImageMagick so that it
   doesn't explode when handling Very Large Documents or when it's
   just running on a low-memory system. Thanks to [Florian
   Harr](https://github.com/evils) for his help on this one.
-- [\#89](https://github.com/the-paperless-project/paperless/issues/89)
+- [#89](https://github.com/the-paperless-project/paperless/issues/89)
   Ported the auto-tagging code to correspondents as well. Thanks to
   [Justin Snyman](https://github.com/stringlytyped) for the pointers
   in the issue queue.
@@ -5473,7 +5473,7 @@ this big change.
   Jager](https://github.com/tikitu) for his pull request that I took
   forever to merge and to [Pit](https://github.com/pitkley) for his
   efforts on the regex front.
-- [\#94](https://github.com/the-paperless-project/paperless/issues/94):
+- [#94](https://github.com/the-paperless-project/paperless/issues/94):
   Restored support for changing the created date in the UI. Thanks to
   [Martin Honermeyer](https://github.com/djmaze) and [Tim
   White](https://github.com/timwhite) for working with me on this.
@@ -5484,7 +5484,7 @@ this big change.
   code have been renamed to "correspondent" to better reflect the
   nature of the property (one could quite reasonably scan a document
   before sending it to someone.)
-- [\#67](https://github.com/the-paperless-project/paperless/issues/67):
+- [#67](https://github.com/the-paperless-project/paperless/issues/67):
   Rewrote the document exporter and added a new importer that allows
   for full metadata retention without depending on the file name and
   modification time. A big thanks to [Tikitu de
@@ -5493,22 +5493,22 @@ this big change.
   Jung](https://github.com/the01), and [Christopher
   Luu](https://github.com/nuudles) for their code snippets and
   contributing conversation that lead to this change.
-- [\#20](https://github.com/the-paperless-project/paperless/issues/20):
+- [#20](https://github.com/the-paperless-project/paperless/issues/20):
   Added _unpaper_ support to help in cleaning up the scanned image
   before it's OCR'd. Thanks to [Pit](https://github.com/pitkley) for
   this one.
-- [\#71](https://github.com/the-paperless-project/paperless/issues/71)
+- [#71](https://github.com/the-paperless-project/paperless/issues/71)
   Added (encrypted) thumbnails in anticipation of a proper UI.
-- [\#68](https://github.com/the-paperless-project/paperless/issues/68):
+- [#68](https://github.com/the-paperless-project/paperless/issues/68):
   Added support for using a proper config file at
   `/etc/paperless.conf` and modified the systemd unit files to use it.
 - Refactored the Vagrant installation process to use environment
   variables rather than asking the user to modify `settings.py`.
-- [\#44](https://github.com/the-paperless-project/paperless/issues/44):
+- [#44](https://github.com/the-paperless-project/paperless/issues/44):
   Harmonise environment variable names with constant names.
-- [\#60](https://github.com/the-paperless-project/paperless/issues/60):
+- [#60](https://github.com/the-paperless-project/paperless/issues/60):
   Setup logging to actually use the Python native logging framework.
-- [\#53](https://github.com/the-paperless-project/paperless/issues/53):
+- [#53](https://github.com/the-paperless-project/paperless/issues/53):
   Fixed an annoying bug that caused `.jpeg` and `.JPG` images to be
   imported but made unavailable.
 
@@ -5525,19 +5525,19 @@ this big change.
 - Improved the efficiency of the consumer by parsing pages more
   intelligently and introducing a threaded OCR process (thanks again
   [Pit](https://github.com/pitkley)).
-- [\#45](https://github.com/the-paperless-project/paperless/issues/45):
+- [#45](https://github.com/the-paperless-project/paperless/issues/45):
   Cleaned up the logic for tag matching. Reported by
   [darkmatter](https://github.com/darkmatter).
-- [\#47](https://github.com/the-paperless-project/paperless/issues/47):
+- [#47](https://github.com/the-paperless-project/paperless/issues/47):
   Auto-rotate landscape documents. Reported by
   [Paul](https://github.com/polo2ro) and fixed by
   [Pit](https://github.com/pitkley).
-- [\#48](https://github.com/the-paperless-project/paperless/issues/48):
+- [#48](https://github.com/the-paperless-project/paperless/issues/48):
   Matching algorithms should do so on a word boundary
   ([darkmatter](https://github.com/darkmatter))
-- [\#54](https://github.com/the-paperless-project/paperless/issues/54):
+- [#54](https://github.com/the-paperless-project/paperless/issues/54):
   Documented the re-tagger ([zedster](https://github.com/zedster))
-- [\#57](https://github.com/the-paperless-project/paperless/issues/57):
+- [#57](https://github.com/the-paperless-project/paperless/issues/57):
   Make sure file is preserved on import failure
   ([darkmatter](https://github.com/darkmatter))
 - Added tox with pep8 checking
