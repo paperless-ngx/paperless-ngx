@@ -4,9 +4,6 @@ import os
 import tempfile
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING
-from typing import Optional
-from typing import Union
 
 import magic
 from django.conf import settings
@@ -23,7 +20,6 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.loggers import LoggingMixin
-from documents.matching import document_matches_workflow
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -32,8 +28,6 @@ from documents.models import DocumentType
 from documents.models import FileInfo
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.models import Workflow
-from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
@@ -48,6 +42,8 @@ from documents.plugins.helpers import ProgressManager
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.signals import document_consumption_finished
 from documents.signals import document_consumption_started
+from documents.signals.handlers import run_workflows
+from documents.templating.title import parse_doc_title_w_placeholders
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
@@ -61,167 +57,18 @@ class WorkflowTriggerPlugin(
 ):
     NAME: str = "WorkflowTriggerPlugin"
 
-    def run(self) -> Optional[str]:
+    def run(self) -> str | None:
         """
         Get overrides from matching workflows
         """
-        msg = ""
-        overrides = DocumentMetadataOverrides()
-        for workflow in (
-            Workflow.objects.filter(enabled=True)
-            .prefetch_related("actions")
-            .prefetch_related("actions__assign_view_users")
-            .prefetch_related("actions__assign_view_groups")
-            .prefetch_related("actions__assign_change_users")
-            .prefetch_related("actions__assign_change_groups")
-            .prefetch_related("actions__assign_custom_fields")
-            .prefetch_related("actions__remove_tags")
-            .prefetch_related("actions__remove_correspondents")
-            .prefetch_related("actions__remove_document_types")
-            .prefetch_related("actions__remove_storage_paths")
-            .prefetch_related("actions__remove_custom_fields")
-            .prefetch_related("actions__remove_owners")
-            .prefetch_related("triggers")
-            .order_by("order")
-        ):
-            action_overrides = DocumentMetadataOverrides()
-
-            if document_matches_workflow(
-                self.input_doc,
-                workflow,
-                WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
-            ):
-                for action in workflow.actions.all():
-                    if TYPE_CHECKING:
-                        assert isinstance(action, WorkflowAction)
-                    msg += f"Applying {action} from {workflow}\n"
-                    if action.type == WorkflowAction.WorkflowActionType.ASSIGNMENT:
-                        if action.assign_title is not None:
-                            action_overrides.title = action.assign_title
-                        if action.assign_tags is not None:
-                            action_overrides.tag_ids = list(
-                                action.assign_tags.values_list("pk", flat=True),
-                            )
-
-                        if action.assign_correspondent is not None:
-                            action_overrides.correspondent_id = (
-                                action.assign_correspondent.pk
-                            )
-                        if action.assign_document_type is not None:
-                            action_overrides.document_type_id = (
-                                action.assign_document_type.pk
-                            )
-                        if action.assign_storage_path is not None:
-                            action_overrides.storage_path_id = (
-                                action.assign_storage_path.pk
-                            )
-                        if action.assign_owner is not None:
-                            action_overrides.owner_id = action.assign_owner.pk
-                        if action.assign_view_users is not None:
-                            action_overrides.view_users = list(
-                                action.assign_view_users.values_list("pk", flat=True),
-                            )
-                        if action.assign_view_groups is not None:
-                            action_overrides.view_groups = list(
-                                action.assign_view_groups.values_list("pk", flat=True),
-                            )
-                        if action.assign_change_users is not None:
-                            action_overrides.change_users = list(
-                                action.assign_change_users.values_list("pk", flat=True),
-                            )
-                        if action.assign_change_groups is not None:
-                            action_overrides.change_groups = list(
-                                action.assign_change_groups.values_list(
-                                    "pk",
-                                    flat=True,
-                                ),
-                            )
-                        if action.assign_custom_fields is not None:
-                            action_overrides.custom_field_ids = list(
-                                action.assign_custom_fields.values_list(
-                                    "pk",
-                                    flat=True,
-                                ),
-                            )
-                        overrides.update(action_overrides)
-                    elif action.type == WorkflowAction.WorkflowActionType.REMOVAL:
-                        # Removal actions overwrite the current overrides
-                        if action.remove_all_tags:
-                            overrides.tag_ids = []
-                        elif overrides.tag_ids:
-                            for tag in action.remove_custom_fields.filter(
-                                pk__in=overrides.tag_ids,
-                            ):
-                                overrides.tag_ids.remove(tag.pk)
-
-                        if action.remove_all_correspondents or (
-                            overrides.correspondent_id is not None
-                            and action.remove_correspondents.filter(
-                                pk=overrides.correspondent_id,
-                            ).exists()
-                        ):
-                            overrides.correspondent_id = None
-
-                        if action.remove_all_document_types or (
-                            overrides.document_type_id is not None
-                            and action.remove_document_types.filter(
-                                pk=overrides.document_type_id,
-                            ).exists()
-                        ):
-                            overrides.document_type_id = None
-
-                        if action.remove_all_storage_paths or (
-                            overrides.storage_path_id is not None
-                            and action.remove_storage_paths.filter(
-                                pk=overrides.storage_path_id,
-                            ).exists()
-                        ):
-                            overrides.storage_path_id = None
-
-                        if action.remove_all_custom_fields:
-                            overrides.custom_field_ids = []
-                        elif overrides.custom_field_ids:
-                            for field in action.remove_custom_fields.filter(
-                                pk__in=overrides.custom_field_ids,
-                            ):
-                                overrides.custom_field_ids.remove(field.pk)
-
-                        if action.remove_all_owners or (
-                            overrides.owner_id is not None
-                            and action.remove_owners.filter(
-                                pk=overrides.owner_id,
-                            ).exists()
-                        ):
-                            overrides.owner_id = None
-
-                        if action.remove_all_permissions:
-                            overrides.view_users = []
-                            overrides.view_groups = []
-                            overrides.change_users = []
-                            overrides.change_groups = []
-                        else:
-                            if overrides.view_users:
-                                for user in action.remove_view_users.filter(
-                                    pk__in=overrides.view_users,
-                                ):
-                                    overrides.view_users.remove(user.pk)
-                            if overrides.change_users:
-                                for user in action.remove_change_users.filter(
-                                    pk__in=overrides.change_users,
-                                ):
-                                    overrides.change_users.remove(user.pk)
-                            if overrides.view_groups:
-                                for user in action.remove_view_groups.filter(
-                                    pk__in=overrides.view_groups,
-                                ):
-                                    overrides.view_groups.remove(user.pk)
-                            if overrides.change_groups:
-                                for user in action.remove_change_groups.filter(
-                                    pk__in=overrides.change_groups,
-                                ):
-                                    overrides.change_groups.remove(user.pk)
-
-        self.metadata.update(overrides)
+        overrides, msg = run_workflows(
+            WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            self.input_doc,
+            None,
+            DocumentMetadataOverrides(),
+        )
+        if overrides:
+            self.metadata.update(overrides)
         return msg
 
 
@@ -278,7 +125,7 @@ class ConsumerPlugin(
         current_progress: int,
         max_progress: int,
         status: ProgressStatusOptions,
-        message: Optional[Union[ConsumerStatusShortMessage, str]] = None,
+        message: ConsumerStatusShortMessage | str | None = None,
         document_id=None,
     ):  # pragma: no cover
         self.status_mgr.send_progress(
@@ -294,10 +141,10 @@ class ConsumerPlugin(
 
     def _fail(
         self,
-        message: Union[ConsumerStatusShortMessage, str],
-        log_message: Optional[str] = None,
+        message: ConsumerStatusShortMessage | str,
+        log_message: str | None = None,
         exc_info=None,
-        exception: Optional[Exception] = None,
+        exception: Exception | None = None,
     ):
         self._send_progress(100, 100, ProgressStatusOptions.FAILED, message)
         self.log.error(log_message or message, exc_info=exc_info)
@@ -350,7 +197,7 @@ class ConsumerPlugin(
         """
         Check that if override_asn is given, it is unique and within a valid range
         """
-        if not self.metadata.asn:
+        if self.metadata.asn is None:
             # check not necessary in case no ASN gets set
             return
         # Validate the range is above zero and less than uint32_t max
@@ -532,6 +379,7 @@ class ConsumerPlugin(
             )
             self.working_copy = Path(tempdir.name) / Path(self.filename)
             copy_file_with_basic_stats(self.input_doc.original_file, self.working_copy)
+            self.unmodified_original = None
 
             # Determine the parser class.
 
@@ -539,11 +387,40 @@ class ConsumerPlugin(
 
             self.log.debug(f"Detected mime type: {mime_type}")
 
+            if (
+                Path(self.filename).suffix.lower() == ".pdf"
+                and mime_type in settings.CONSUMER_PDF_RECOVERABLE_MIME_TYPES
+            ):
+                try:
+                    # The file might be a pdf, but the mime type is wrong.
+                    # Try to clean with qpdf
+                    self.log.debug(
+                        "Detected possible PDF with wrong mime type, trying to clean with qpdf",
+                    )
+                    run_subprocess(
+                        [
+                            "qpdf",
+                            "--replace-input",
+                            self.working_copy,
+                        ],
+                        logger=self.log,
+                    )
+                    mime_type = magic.from_file(self.working_copy, mime=True)
+                    self.log.debug(f"Detected mime type after qpdf: {mime_type}")
+                    # Save the original file for later
+                    self.unmodified_original = (
+                        Path(tempdir.name) / Path("uo") / Path(self.filename)
+                    )
+                    copy_file_with_basic_stats(
+                        self.input_doc.original_file,
+                        self.unmodified_original,
+                    )
+                except Exception as e:
+                    self.log.error(f"Error attempting to clean PDF: {e}")
+
             # Based on the mime type, get the parser for that type
-            parser_class: Optional[type[DocumentParser]] = (
-                get_parser_class_for_mime_type(
-                    mime_type,
-                )
+            parser_class: type[DocumentParser] | None = get_parser_class_for_mime_type(
+                mime_type,
             )
             if not parser_class:
                 tempdir.cleanup()
@@ -586,6 +463,7 @@ class ConsumerPlugin(
         date = None
         thumbnail = None
         archive_path = None
+        page_count = None
 
         try:
             self._send_progress(
@@ -621,6 +499,7 @@ class ConsumerPlugin(
                 )
                 date = parse_date(self.filename, text)
             archive_path = document_parser.get_archive_path()
+            page_count = document_parser.get_page_count(self.working_copy, mime_type)
 
         except ParseError as e:
             document_parser.cleanup()
@@ -662,7 +541,12 @@ class ConsumerPlugin(
         try:
             with transaction.atomic():
                 # store the document.
-                document = self._store(text=text, date=date, mime_type=mime_type)
+                document = self._store(
+                    text=text,
+                    date=date,
+                    page_count=page_count,
+                    mime_type=mime_type,
+                )
 
                 # If we get here, it was successful. Proceed with post-consume
                 # hooks. If they fail, nothing will get changed.
@@ -682,7 +566,9 @@ class ConsumerPlugin(
 
                     self._write(
                         document.storage_type,
-                        self.working_copy,
+                        self.unmodified_original
+                        if self.unmodified_original is not None
+                        else self.working_copy,
                         document.source_path,
                     )
 
@@ -718,6 +604,8 @@ class ConsumerPlugin(
                 self.log.debug(f"Deleting file {self.working_copy}")
                 self.input_doc.original_file.unlink()
                 self.working_copy.unlink()
+                if self.unmodified_original is not None:  # pragma: no cover
+                    self.unmodified_original.unlink()
 
                 # https://github.com/jonaswinkler/paperless-ng/discussions/1037
                 shadow_file = os.path.join(
@@ -789,7 +677,8 @@ class ConsumerPlugin(
     def _store(
         self,
         text: str,
-        date: Optional[datetime.datetime],
+        date: datetime.datetime | None,
+        page_count: int | None,
         mime_type: str,
     ) -> Document:
         # If someone gave us the original filename, use it instead of doc.
@@ -835,6 +724,7 @@ class ConsumerPlugin(
             created=create_date,
             modified=create_date,
             storage_type=storage_type,
+            page_count=page_count,
             original_filename=self.filename,
         )
 
@@ -864,7 +754,7 @@ class ConsumerPlugin(
                 pk=self.metadata.storage_path_id,
             )
 
-        if self.metadata.asn:
+        if self.metadata.asn is not None:
             document.archive_serial_number = self.metadata.asn
 
         if self.metadata.owner_id:
@@ -907,47 +797,3 @@ class ConsumerPlugin(
             copy_basic_file_stats(source, target)
         except Exception:  # pragma: no cover
             pass
-
-
-def parse_doc_title_w_placeholders(
-    title: str,
-    correspondent_name: str,
-    doc_type_name: str,
-    owner_username: str,
-    local_added: datetime.datetime,
-    original_filename: str,
-    created: Optional[datetime.datetime] = None,
-) -> str:
-    """
-    Available title placeholders for Workflows depend on what has already been assigned,
-    e.g. for pre-consumption triggers created will not have been parsed yet, but it will
-    for added / updated triggers
-    """
-    formatting = {
-        "correspondent": correspondent_name,
-        "document_type": doc_type_name,
-        "added": local_added.isoformat(),
-        "added_year": local_added.strftime("%Y"),
-        "added_year_short": local_added.strftime("%y"),
-        "added_month": local_added.strftime("%m"),
-        "added_month_name": local_added.strftime("%B"),
-        "added_month_name_short": local_added.strftime("%b"),
-        "added_day": local_added.strftime("%d"),
-        "added_time": local_added.strftime("%H:%M"),
-        "owner_username": owner_username,
-        "original_filename": Path(original_filename).stem,
-    }
-    if created is not None:
-        formatting.update(
-            {
-                "created": created.isoformat(),
-                "created_year": created.strftime("%Y"),
-                "created_year_short": created.strftime("%y"),
-                "created_month": created.strftime("%m"),
-                "created_month_name": created.strftime("%B"),
-                "created_month_name_short": created.strftime("%b"),
-                "created_day": created.strftime("%d"),
-                "created_time": created.strftime("%H:%M"),
-            },
-        )
-    return title.format(**formatting).strip()

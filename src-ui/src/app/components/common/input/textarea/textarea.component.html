@@ -1,0 +1,33 @@
+<div class="mb-3" [class.pb-3]="error">
+  <div class="row">
+    <div class="d-flex align-items-center position-relative hidden-button-container" [class.col-md-3]="horizontal">
+      @if (title) {
+        <label class="form-label" [class.mb-md-0]="horizontal" [for]="inputId">{{title}}</label>
+      }
+      @if (removable) {
+        <button type="button" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
+          <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Remove</ng-container>
+          </button>
+        }
+      </div>
+      <div class="position-relative" [class.col-md-9]="horizontal">
+        <textarea #inputField
+          [id]="inputId"
+          class="form-control"
+          [class.is-invalid]="error"
+          [class.font-monospace]="monospace"
+          [(ngModel)]="value"
+          (change)="onChange(value)"
+          [disabled]="disabled"
+          [placeholder]="placeholder"
+          rows="4">
+        </textarea>
+        @if (hint) {
+          <small class="form-text text-muted" [innerHTML]="hint | safeHtml"></small>
+        }
+        <div class="invalid-feedback position-absolute top-100">
+          {{error}}
+        </div>
+      </div>
+    </div>
+  </div>

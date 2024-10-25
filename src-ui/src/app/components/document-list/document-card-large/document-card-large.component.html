@@ -21,7 +21,7 @@
               } @else {
                 {{(document.correspondent$ | async)?.name}}
               }
-              :
+              @if (displayFields.includes(DisplayField.TITLE)) {:}
             }
             @if (displayFields.includes(DisplayField.TITLE)) {
               {{document.title | documentTitle}}
@@ -54,7 +54,7 @@
               <i-bs name="diagram-3"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>More like this</span>
             </a>
             <a routerLink="/documents/{{document.id}}" class="btn btn-sm btn-outline-secondary" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-              <i-bs name="pencil"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Edit</span>
+              <i-bs name="box-arrow-in-right"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Open</span>
             </a>
             <a class="btn btn-sm btn-outline-secondary" target="_blank" [href]="previewUrl"
               [ngbPopover]="previewContent" [popoverTitle]="document.title | documentTitle"
@@ -110,6 +110,12 @@
                     <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="calendar-event"></i-bs><small>{{document.added | customDate:'mediumDate'}}</small>
                   </div>
                 }
+              }
+              @if (displayFields.includes(DisplayField.PAGE_COUNT) && document.page_count) {
+                <div class="list-group-item bg-light text-dark p-1 border-0 d-flex align-items-center">
+                  <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="files"></i-bs>
+                  <small i18n>{document.page_count, plural, =1 {1 page} other {{{document.page_count}} pages}}</small>
+                </div>
               }
               @if (displayFields.includes(DisplayField.OWNER) && document.owner && document.owner !== settingsService.currentUser.id) {
                 <div class="list-group-item bg-light text-dark p-1 border-0 d-flex align-items-center">

@@ -122,27 +122,38 @@ install_languages() {
 	if [ ${#langs[@]} -eq 0 ]; then
 		return
 	fi
-	apt-get update
 
+	# Build list of packages to install
+	to_install=()
 	for lang in "${langs[@]}"; do
 		pkg="tesseract-ocr-$lang"
 
 		if dpkg --status "$pkg" &>/dev/null; then
 			echo "Package $pkg already installed!"
 			continue
-		fi
-
-		if ! apt-cache show "$pkg" &>/dev/null; then
-			echo "Package $pkg not found! :("
-			continue
-		fi
-
-		echo "Installing package $pkg..."
-		if ! apt-get --assume-yes install "$pkg" &>/dev/null; then
-			echo "Could not install $pkg"
-			exit 1
+		else
+			to_install+=("$pkg")
 		fi
 	done
+
+	# Use apt only when we install packages
+	if [ ${#to_install[@]} -gt 0 ]; then
+		apt-get update
+
+		for pkg in "${to_install[@]}"; do
+
+			if ! apt-cache show "$pkg" &>/dev/null; then
+				echo "Skipped $pkg: Package not found! :("
+				continue
+			fi
+
+			echo "Installing package $pkg..."
+			if ! apt-get --assume-yes install "$pkg" &>/dev/null; then
+				echo "Could not install $pkg"
+				exit 1
+			fi
+		done
+	fi
 }
 
 echo "Paperless-ngx docker container starting..."

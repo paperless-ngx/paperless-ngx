@@ -17,7 +17,7 @@ import {
   NgbDropdownItem,
   NgbTypeaheadModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgSelectComponent } from '@ng-select/ng-select'
+import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
 import { of, throwError } from 'rxjs'
 import {
   FILTER_TITLE,
@@ -55,6 +55,7 @@ import {
   FILTER_HAS_ANY_CUSTOM_FIELDS,
   FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
   FILTER_HAS_CUSTOM_FIELDS_ALL,
+  FILTER_CUSTOM_FIELDS_QUERY,
 } from 'src/app/data/filter-rule-type'
 import { Correspondent } from 'src/app/data/correspondent'
 import { DocumentType } from 'src/app/data/document-type'
@@ -95,6 +96,15 @@ import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service
 import { RouterModule } from '@angular/router'
 import { SearchService } from 'src/app/services/rest/search.service'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { CustomFieldsQueryDropdownComponent } from '../../common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
+import {
+  CustomFieldQueryLogicalOperator,
+  CustomFieldQueryOperator,
+} from 'src/app/data/custom-field-query'
+import {
+  CustomFieldQueryAtom,
+  CustomFieldQueryExpression,
+} from 'src/app/utils/custom-field-query-element'
 
 const tags: Tag[] = [
   {
@@ -181,6 +191,7 @@ describe('FilterEditorComponent', () => {
         ToggleableDropdownButtonComponent,
         DatesDropdownComponent,
         CustomDatePipe,
+        CustomFieldsQueryDropdownComponent,
       ],
       imports: [
         RouterModule,
@@ -190,6 +201,7 @@ describe('FilterEditorComponent', () => {
         NgbDatepickerModule,
         NgxBootstrapIconsModule.pick(allIcons),
         NgbTypeaheadModule,
+        NgSelectModule,
       ],
       providers: [
         FilterPipe,
@@ -838,108 +850,79 @@ describe('FilterEditorComponent', () => {
     ]
   }))
 
-  it('should ingest filter rules for has all custom fields', fakeAsync(() => {
-    expect(component.customFieldSelectionModel.getSelectedItems()).toHaveLength(
-      0
-    )
+  it('should ingest filter rules for custom fields all', fakeAsync(() => {
+    expect(component.customFieldQueriesModel.isEmpty()).toBeTruthy()
     component.filterRules = [
       {
         rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
-        value: '42',
-      },
-      {
-        rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
-        value: '43',
+        value: '42,43',
       },
     ]
-    expect(component.customFieldSelectionModel.logicalOperator).toEqual(
-      LogicalOperator.And
+    expect(component.customFieldQueriesModel.queries[0].operator).toEqual(
+      CustomFieldQueryLogicalOperator.And
     )
-    expect(component.customFieldSelectionModel.getSelectedItems()).toEqual(
-      custom_fields
-    )
-    // coverage
-    component.filterRules = [
-      {
-        rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
-        value: null,
-      },
-    ]
-    component.toggleTag(2) // coverage
+    expect(component.customFieldQueriesModel.queries[0].value.length).toEqual(2)
+    expect(
+      (
+        component.customFieldQueriesModel.queries[0]
+          .value[0] as CustomFieldQueryAtom
+      ).serialize()
+    ).toEqual(['42', CustomFieldQueryOperator.Exists, 'true'])
   }))
 
   it('should ingest filter rules for has any custom fields', fakeAsync(() => {
-    expect(component.customFieldSelectionModel.getSelectedItems()).toHaveLength(
-      0
-    )
+    expect(component.customFieldQueriesModel.isEmpty()).toBeTruthy()
     component.filterRules = [
       {
         rule_type: FILTER_HAS_CUSTOM_FIELDS_ANY,
-        value: '42',
-      },
-      {
-        rule_type: FILTER_HAS_CUSTOM_FIELDS_ANY,
-        value: '43',
+        value: '42,43',
       },
     ]
-    expect(component.customFieldSelectionModel.logicalOperator).toEqual(
-      LogicalOperator.Or
+    expect(component.customFieldQueriesModel.queries[0].operator).toEqual(
+      CustomFieldQueryLogicalOperator.Or
     )
-    expect(component.customFieldSelectionModel.getSelectedItems()).toEqual(
-      custom_fields
-    )
-    // coverage
-    component.filterRules = [
-      {
-        rule_type: FILTER_HAS_CUSTOM_FIELDS_ANY,
-        value: null,
-      },
-    ]
+    expect(component.customFieldQueriesModel.queries[0].value.length).toEqual(2)
+    expect(
+      (
+        component.customFieldQueriesModel.queries[0]
+          .value[0] as CustomFieldQueryAtom
+      ).serialize()
+    ).toEqual(['42', CustomFieldQueryOperator.Exists, 'true'])
   }))
 
-  it('should ingest filter rules for has any custom field', fakeAsync(() => {
-    expect(component.customFieldSelectionModel.getSelectedItems()).toHaveLength(
-      0
-    )
+  it('should ingest filter rules for custom field queries', fakeAsync(() => {
+    expect(component.customFieldQueriesModel.isEmpty()).toBeTruthy()
     component.filterRules = [
       {
-        rule_type: FILTER_HAS_ANY_CUSTOM_FIELDS,
-        value: '1',
+        rule_type: FILTER_CUSTOM_FIELDS_QUERY,
+        value: '["AND", [[42, "exists", "true"],[43, "exists", "true"]]]',
       },
     ]
-    expect(component.customFieldSelectionModel.getSelectedItems()).toHaveLength(
-      1
+    expect(component.customFieldQueriesModel.queries[0].operator).toEqual(
+      CustomFieldQueryLogicalOperator.And
     )
-    expect(component.customFieldSelectionModel.get(null)).toBeTruthy()
-  }))
+    expect(component.customFieldQueriesModel.queries[0].value.length).toEqual(2)
+    expect(
+      (
+        component.customFieldQueriesModel.queries[0]
+          .value[0] as CustomFieldQueryAtom
+      ).serialize()
+    ).toEqual([42, CustomFieldQueryOperator.Exists, 'true'])
 
-  it('should ingest filter rules for exclude tag(s)', fakeAsync(() => {
-    expect(component.customFieldSelectionModel.getExcludedItems()).toHaveLength(
-      0
-    )
+    // atom
     component.filterRules = [
       {
-        rule_type: FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
-        value: '42',
-      },
-      {
-        rule_type: FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
-        value: '43',
+        rule_type: FILTER_CUSTOM_FIELDS_QUERY,
+        value: '[42, "exists", "true"]',
       },
     ]
-    expect(component.customFieldSelectionModel.logicalOperator).toEqual(
-      LogicalOperator.And
-    )
-    expect(component.customFieldSelectionModel.getExcludedItems()).toEqual(
-      custom_fields
-    )
-    // coverage
-    component.filterRules = [
-      {
-        rule_type: FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
-        value: null,
-      },
-    ]
+    expect(component.customFieldQueriesModel.queries[0].value.length).toEqual(1)
+    expect(
+      (
+        component.customFieldQueriesModel.queries[0]
+          .value[0] as CustomFieldQueryAtom
+      ).serialize()
+    ).toEqual([42, CustomFieldQueryOperator.Exists, 'true'])
   }))
 
   it('should ingest filter rules for owner', fakeAsync(() => {
@@ -1453,71 +1436,34 @@ describe('FilterEditorComponent', () => {
     ])
   }))
 
-  it('should convert user input to correct filter rules on custom field select not assigned', fakeAsync(() => {
-    const customFieldsFilterableDropdown = fixture.debugElement.queryAll(
-      By.directive(FilterableDropdownComponent)
-    )[4]
-    customFieldsFilterableDropdown.triggerEventHandler('opened')
-    const customFieldButton = customFieldsFilterableDropdown.queryAll(
-      By.directive(ToggleableDropdownButtonComponent)
-    )[0]
-    customFieldButton.triggerEventHandler('toggle')
-    fixture.detectChanges()
-    expect(component.filterRules).toEqual([
-      {
-        rule_type: FILTER_HAS_ANY_CUSTOM_FIELDS,
-        value: 'false',
-      },
-    ])
-  }))
-
   it('should convert user input to correct filter rules on custom field selections', fakeAsync(() => {
-    const customFieldsFilterableDropdown = fixture.debugElement.queryAll(
-      By.directive(FilterableDropdownComponent)
-    )[4] // CF dropdown
-    customFieldsFilterableDropdown.triggerEventHandler('opened')
-    const customFieldButtons = customFieldsFilterableDropdown.queryAll(
-      By.directive(ToggleableDropdownButtonComponent)
+    const customFieldsQueryDropdown = fixture.debugElement.queryAll(
+      By.directive(CustomFieldsQueryDropdownComponent)
+    )[0]
+    const customFieldToggleButton = customFieldsQueryDropdown.query(
+      By.css('button')
     )
-    customFieldButtons[1].triggerEventHandler('toggle')
-    customFieldButtons[2].triggerEventHandler('toggle')
+    customFieldToggleButton.triggerEventHandler('click')
+    tick()
     fixture.detectChanges()
+    const expression = component.customFieldQueriesModel
+      .queries[0] as CustomFieldQueryExpression
+    const atom = expression.value[0] as CustomFieldQueryAtom
+    atom.field = custom_fields[0].id
+    const fieldSelect: NgSelectComponent = customFieldsQueryDropdown.queryAll(
+      By.directive(NgSelectComponent)
+    )[0].componentInstance
+    fieldSelect.open()
+    const options = customFieldsQueryDropdown.queryAll(By.css('.ng-option'))
+    options[0].nativeElement.click()
+    expect(component.customFieldQueriesModel.queries[0].value.length).toEqual(1)
     expect(component.filterRules).toEqual([
       {
-        rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
-        value: custom_fields[0].id.toString(),
-      },
-      {
-        rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
-        value: custom_fields[1].id.toString(),
-      },
-    ])
-    const toggleOperatorButtons = customFieldsFilterableDropdown.queryAll(
-      By.css('input[type=radio]')
-    )
-    toggleOperatorButtons[1].nativeElement.checked = true
-    toggleOperatorButtons[1].triggerEventHandler('change')
-    fixture.detectChanges()
-    expect(component.filterRules).toEqual([
-      {
-        rule_type: FILTER_HAS_CUSTOM_FIELDS_ANY,
-        value: custom_fields[0].id.toString(),
-      },
-      {
-        rule_type: FILTER_HAS_CUSTOM_FIELDS_ANY,
-        value: custom_fields[1].id.toString(),
-      },
-    ])
-    customFieldButtons[2].triggerEventHandler('exclude')
-    fixture.detectChanges()
-    expect(component.filterRules).toEqual([
-      {
-        rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
-        value: custom_fields[0].id.toString(),
-      },
-      {
-        rule_type: FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
-        value: custom_fields[1].id.toString(),
+        rule_type: FILTER_CUSTOM_FIELDS_QUERY,
+        value: JSON.stringify([
+          CustomFieldQueryLogicalOperator.Or,
+          [[custom_fields[0].id, 'exists', 'true']],
+        ]),
       },
     ])
   }))
@@ -1930,21 +1876,11 @@ describe('FilterEditorComponent', () => {
 
     component.filterRules = [
       {
-        rule_type: FILTER_HAS_CUSTOM_FIELDS_ALL,
-        value: '42',
+        rule_type: FILTER_CUSTOM_FIELDS_QUERY,
+        value: '["AND",[["42","exists","true"],["43","exists","true"]]]',
       },
     ]
-    expect(component.generateFilterName()).toEqual(
-      `Custom fields: ${custom_fields[0].name}`
-    )
-
-    component.filterRules = [
-      {
-        rule_type: FILTER_HAS_ANY_CUSTOM_FIELDS,
-        value: 'false',
-      },
-    ]
-    expect(component.generateFilterName()).toEqual('Without any custom field')
+    expect(component.generateFilterName()).toEqual(`Custom fields query`)
 
     component.filterRules = [
       {

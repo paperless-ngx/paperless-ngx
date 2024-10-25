@@ -12,6 +12,9 @@
   z-index: 995; /* Behind the navbar */
   padding: 50px 0 0; /* Height of navbar */
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+  overflow-y: auto;
+  --pngx-sidebar-width: 100%;
+  max-width: var(--pngx-sidebar-width);
 
   .sidebar-heading .spinner-border {
     width: 0.8em;
@@ -24,15 +27,15 @@
 
   // These come from the col-* classes for non-slim sidebar, needed for animation
   @media (min-width: 768px) {
-    max-width: 25%;
+    --pngx-sidebar-width: 25%;
   }
 
   @media (min-width: 992px) {
-    max-width: 16.66666667%;
+    --pngx-sidebar-width: 16.66666667%;
   }
 
   @media (min-width: 2400px) {
-    max-width: 8.33333333%;
+    --pngx-sidebar-width: 8.33333333%;
   }
 
   transition: all .2s ease;
@@ -109,12 +112,17 @@ main {
 
   .sidebar-slim-toggler {
     display: block;
-    position: absolute;
-    right: -12px;
+    position: fixed;
+    left: calc(var(--pngx-sidebar-width) - 12px);
     top: 60px;
     z-index: 996;
     --bs-btn-padding-x: 0.35rem;
     --bs-btn-padding-y: 0.125rem;
+    transition: all .2s ease;
+  }
+
+  .sidebar.slim .sidebar-slim-toggler {
+    --pngx-sidebar-width: 50px !important;
   }
 }
 

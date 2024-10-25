@@ -608,8 +608,17 @@ You can optionally also automatically redirect users to the SSO login with [PAPE
 
 #### [`PAPERLESS_ACCOUNT_SESSION_REMEMBER=<bool>`](#PAPERLESS_ACCOUNT_SESSION_REMEMBER) {#PAPERLESS_ACCOUNT_SESSION_REMEMBER}
 
-: Only applies to regular (non-SSO) accounts. See the corresponding
+: If false, sessions will expire at browser close, if true will use `PAPERLESS_SESSION_COOKIE_AGE` for expiration. See the corresponding
 [django-allauth documentation](https://docs.allauth.org/en/latest/account/configuration.html)
+
+    Defaults to True
+
+#### [`PAPERLESS_SESSION_COOKIE_AGE=<int>`](#PAPERLESS_SESSION_COOKIE_AGE) {#PAPERLESS_SESSION_COOKIE_AGE}
+
+: Login session cookie expiration. Applies if `PAPERLESS_ACCOUNT_SESSION_REMEMBER` is enabled. See the corresponding
+[django documentation](https://docs.djangoproject.com/en/5.1/ref/settings/#std-setting-SESSION_COOKIE_AGE)
+
+    Defaults to 1209600 (2 weeks)
 
 ## OCR settings {#ocr}
 
@@ -1155,12 +1164,6 @@ within your documents.
 
     Defaults to false.
 
-#### [`PAPERLESS_EMAIL_GNUPG_HOME=<str>`](#PAPERLESS_EMAIL_GNUPG_HOME) {#PAPERLESS_EMAIL_GNUPG_HOME}
-
-: Optional, sets the `GNUPG_HOME` path to use with GPG decryptor for encrypted emails. See [GPG Decryptor](advanced_usage.md#gpg-decryptor) for more information. If not set, defaults to the default `GNUPG_HOME` path.
-
-    Defaults to <not set>.
-
 ### Polling {#polling}
 
 #### [`PAPERLESS_CONSUMER_POLLING=<num>`](#PAPERLESS_CONSUMER_POLLING) {#PAPERLESS_CONSUMER_POLLING}
@@ -1204,6 +1207,48 @@ consumers working on the same file. Configure this to prevent that.
 
     Defaults to 0.5 seconds.
 
+## Incoming Mail {#incoming_mail}
+
+### Email OAuth {#email_oauth}
+
+#### [`PAPERLESS_OAUTH_CALLBACK_BASE_URL=<str>`](#PAPERLESS_OAUTH_CALLBACK_BASE_URL) {#PAPERLESS_OAUTH_CALLBACK_BASE_URL}
+
+: The base URL for the OAuth callback. This is used to construct the full URL for the OAuth callback. This should be the URL that the Paperless instance is accessible at. If not set, defaults to the `PAPERLESS_URL` setting. At least one of these settings must be set to enable OAuth Email setup.
+
+    Defaults to none (thus will use [PAPERLESS_URL](#PAPERLESS_URL)).
+
+#### [`PAPERLESS_GMAIL_OAUTH_CLIENT_ID=<str>`](#PAPERLESS_GMAIL_OAUTH_CLIENT_ID) {#PAPERLESS_GMAIL_OAUTH_CLIENT_ID}
+
+: The OAuth client ID for Gmail. This is required for Gmail OAuth Email setup. See [OAuth Email Setup](usage.md#oauth-email-setup) for more information.
+
+    Defaults to none.
+
+#### [`PAPERLESS_GMAIL_OAUTH_CLIENT_SECRET=<str>`](#PAPERLESS_GMAIL_OAUTH_CLIENT_SECRET) {#PAPERLESS_GMAIL_OAUTH_CLIENT_SECRET}
+
+: The OAuth client secret for Gmail. This is required for Gmail OAuth Email setup. See [OAuth Email Setup](usage.md#oauth-email-setup) for more information.
+
+    Defaults to none.
+
+#### [`PAPERLESS_OUTLOOK_OAUTH_CLIENT_ID=<str>`](#PAPERLESS_OUTLOOK_OAUTH_CLIENT_ID) {#PAPERLESS_OUTLOOK_OAUTH_CLIENT_ID}
+
+: The OAuth client ID for Outlook. This is required for Outlook OAuth Email setup. See [OAuth Email Setup](usage.md#oauth-email-setup) for more information.
+
+    Defaults to none.
+
+#### [`PAPERLESS_OUTLOOK_OAUTH_CLIENT_SECRET=<str>`](#PAPERLESS_OUTLOOK_OAUTH_CLIENT_SECRET) {#PAPERLESS_OUTLOOK_OAUTH_CLIENT_SECRET}
+
+: The OAuth client secret for Outlook. This is required for Outlook OAuth Email setup. See [OAuth Email Setup](usage.md#oauth-email-setup) for more information.
+
+    Defaults to none.
+
+### Encrypted Emails {#encrypted_emails}
+
+#### [`PAPERLESS_EMAIL_GNUPG_HOME=<str>`](#PAPERLESS_EMAIL_GNUPG_HOME) {#PAPERLESS_EMAIL_GNUPG_HOME}
+
+: Optional, sets the `GNUPG_HOME` path to use with GPG decryptor for encrypted emails. See [GPG Decryptor](advanced_usage.md#gpg-decryptor) for more information. If not set, defaults to the default `GNUPG_HOME` path.
+
+    Defaults to <not set>.
+
 ## Barcodes {#barcodes}
 
 #### [`PAPERLESS_CONSUMER_ENABLE_BARCODES=<bool>`](#PAPERLESS_CONSUMER_ENABLE_BARCODES) {#PAPERLESS_CONSUMER_ENABLE_BARCODES}
@@ -1241,6 +1286,12 @@ paperless is used with the PATCH-T separator pages, users shouldn't
 change this.
 
     Defaults to "PATCHT"
+
+#### [`PAPERLESS_CONSUMER_BARCODE_RETAIN_SPLIT_PAGES=<bool>`](#PAPERLESS_CONSUMER_BARCODE_RETAIN_SPLIT_PAGES) {#PAPERLESS_CONSUMER_BARCODE_RETAIN_SPLIT_PAGES}
+
+: If set to true, all pages that are split by a barcode (such as PATCHT) will be kept.
+
+    Defaults to false.
 
 #### [`PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE=<bool>`](#PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE) {#PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE}
 

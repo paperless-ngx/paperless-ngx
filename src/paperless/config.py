@@ -1,6 +1,5 @@
 import dataclasses
 import json
-from typing import Optional
 
 from django.conf import settings
 
@@ -44,18 +43,18 @@ class OcrConfig(OutputTypeConfig):
     correspond almost directly to the OCRMyPDF options
     """
 
-    pages: Optional[int] = dataclasses.field(init=False)
+    pages: int | None = dataclasses.field(init=False)
     language: str = dataclasses.field(init=False)
     mode: str = dataclasses.field(init=False)
     skip_archive_file: str = dataclasses.field(init=False)
-    image_dpi: Optional[int] = dataclasses.field(init=False)
+    image_dpi: int | None = dataclasses.field(init=False)
     clean: str = dataclasses.field(init=False)
     deskew: bool = dataclasses.field(init=False)
     rotate: bool = dataclasses.field(init=False)
     rotate_threshold: float = dataclasses.field(init=False)
-    max_image_pixel: Optional[float] = dataclasses.field(init=False)
+    max_image_pixel: float | None = dataclasses.field(init=False)
     color_conversion_strategy: str = dataclasses.field(init=False)
-    user_args: Optional[dict[str, str]] = dataclasses.field(init=False)
+    user_args: dict[str, str] | None = dataclasses.field(init=False)
 
     def __post_init__(self) -> None:
         super().__post_init__()

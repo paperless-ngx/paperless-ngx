@@ -302,7 +302,7 @@ describe('DocumentListComponent', () => {
     displayModeButtons[0].triggerEventHandler('change')
     fixture.detectChanges()
     expect(component.list.displayMode).toEqual('table')
-    expect(fixture.debugElement.queryAll(By.css('tr'))).toHaveLength(3)
+    expect(fixture.debugElement.queryAll(By.css('tr'))).toHaveLength(4)
 
     displayModeButtons[1].nativeElement.checked = true
     displayModeButtons[1].triggerEventHandler('change')
@@ -602,7 +602,7 @@ describe('DocumentListComponent', () => {
 
     expect(
       fixture.debugElement.queryAll(By.directive(SortableDirective))
-    ).toHaveLength(9)
+    ).toHaveLength(10)
 
     expect(component.notesEnabled).toBeTruthy()
     settingsService.set(SETTINGS_KEYS.NOTES_ENABLED, false)
@@ -610,14 +610,14 @@ describe('DocumentListComponent', () => {
     expect(component.notesEnabled).toBeFalsy()
     expect(
       fixture.debugElement.queryAll(By.directive(SortableDirective))
-    ).toHaveLength(8)
+    ).toHaveLength(9)
 
     // insufficient perms
     jest.spyOn(permissionService, 'currentUserCan').mockReturnValue(false)
     fixture.detectChanges()
     expect(
       fixture.debugElement.queryAll(By.directive(SortableDirective))
-    ).toHaveLength(4)
+    ).toHaveLength(5)
   })
 
   it('should support toggle on document objects', () => {
