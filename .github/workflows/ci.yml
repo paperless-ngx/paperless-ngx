@@ -655,7 +655,9 @@ jobs:
           git checkout ${{ needs.publish-release.outputs.version }}-changelog
           echo -e "# Changelog\n\n${{ needs.publish-release.outputs.changelog }}\n" > changelog-new.md
           echo "Manually linking usernames"
-          sed -i -r 's|@(.+?) \(\[#|[@\1](https://github.com/\1) ([#|ig' changelog-new.md
+          sed -i -r 's|@([a-zA-Z0-9_]+) \(\[#|[@\1](https://github.com/\1) ([#|g' changelog-new.md
+          echo "Removing unneeded comment tags"
+          sed -i -r 's|@<!---->|@|g' changelog-new.md
           CURRENT_CHANGELOG=`tail --lines +2 changelog.md`
           echo -e "$CURRENT_CHANGELOG" >> changelog-new.md
           mv changelog-new.md changelog.md
