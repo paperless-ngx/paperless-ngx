@@ -5406,15 +5406,15 @@ this big change.
 - I shrunk the thumbnails a little 'cause they were too big for me,
   even on my high-DPI monitor.
 - BasicAuth support for document and thumbnail downloads, as well as
-  the Push API thanks to @thomasbrueggemann. See
+  the Push API thanks to [Thomas Brueggemann](https://github.com/thomasbrueggemann). See
   [#179](https://github.com/the-paperless-project/paperless/pull/179).
 
 ### 0.3.3
 
 - Thumbnails in the UI and a Django-suit -based face-lift courtesy of
-  @ekw!
+  [Eric Wong](https://github.com/ekw)!
 - Timezone, items per page, and default language are now all
-  configurable, also thanks to @ekw.
+  configurable, also thanks to [Eric Wong](https://github.com/ekw).
 
 ### 0.3.2
 
