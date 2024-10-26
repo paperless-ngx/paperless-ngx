@@ -1,5 +1,8 @@
 import os
 
+from allauth.account import views as allauth_account_views
+from allauth.socialaccount import views as allauth_social_account_views
+from allauth.urls import build_provider_urlpatterns
 from django.conf import settings
 from django.conf.urls import include
 from django.contrib import admin
@@ -231,8 +234,71 @@ urlpatterns = [
         serve,
         kwargs={"document_root": os.path.join(settings.MEDIA_ROOT, "logo")},
     ),
-    # login, logout
-    path("accounts/", include("allauth.urls")),
+    # allauth
+    path(
+        "accounts/",
+        include(
+            [
+                # see allauth/account/urls.py
+                # login, logout, signup
+                path("login/", allauth_account_views.login, name="account_login"),
+                path("logout/", allauth_account_views.logout, name="account_logout"),
+                path("signup/", allauth_account_views.signup, name="account_signup"),
+                # password reset
+                path(
+                    "password/",
+                    include(
+                        [
+                            path(
+                                "reset/",
+                                allauth_account_views.password_reset,
+                                name="account_reset_password",
+                            ),
+                            path(
+                                "reset/done/",
+                                allauth_account_views.password_reset_done,
+                                name="account_reset_password_done",
+                            ),
+                            path(
+                                "reset/key/done/",
+                                allauth_account_views.password_reset_from_key_done,
+                                name="account_reset_password_from_key_done",
+                            ),
+                        ],
+                    ),
+                ),
+                re_path(
+                    r"^password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",
+                    allauth_account_views.password_reset_from_key,
+                    name="account_reset_password_from_key",
+                ),
+                # social account base urls, see allauth/socialaccount/urls.py
+                path(
+                    "3rdparty/",
+                    include(
+                        [
+                            path(
+                                "login/cancelled/",
+                                allauth_social_account_views.login_cancelled,
+                                name="socialaccount_login_cancelled",
+                            ),
+                            path(
+                                "login/error/",
+                                allauth_social_account_views.login_error,
+                                name="socialaccount_login_error",
+                            ),
+                            path(
+                                "signup/",
+                                allauth_social_account_views.signup,
+                                name="socialaccount_signup",
+                            ),
+                        ],
+                    ),
+                ),
+                *build_provider_urlpatterns(),
+            ],
+        ),
+    ),
     # Root of the Frontend
     re_path(
         r".*",
