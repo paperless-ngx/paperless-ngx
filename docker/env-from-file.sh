@@ -16,7 +16,7 @@ do
 	# Check if it starts with "PAPERLESS_" and ends in "_FILE"
 	if [[ ${env_name} == PAPERLESS_*_FILE ]]; then
 		# This should have been named different..
-		if [[ ${env_name} == "PAPERLESS_OCR_SKIP_ARCHIVE_FILE" ]]; then
+		if [[ ${env_name} == "PAPERLESS_OCR_SKIP_ARCHIVE_FILE" || ${env_name} == "PAPERLESS_MODEL_FILE" ]]; then
 			continue
 		fi
 		# Extract the value of the environment
