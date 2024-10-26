@@ -52,11 +52,11 @@
 <details>
 <summary>10 changes</summary>
 
-- Chore(deps-dev): Bump [@<!---->codecov/webpack-plugin from 1.0.1 to 1.2.0 in /src-ui @dependabot](https://github.com/<!---->codecov/webpack-plugin from 1.0.1 to 1.2.0 in /src-ui @dependabot) ([#7830](https://github.com/paperless-ngx/paperless-ngx/pull/7830))
-- Chore(deps-dev): Bump [@<!---->types/node from 22.5.2 to 22.7.4 in /src-ui @dependabot](https://github.com/<!---->types/node from 22.5.2 to 22.7.4 in /src-ui @dependabot) ([#7829](https://github.com/paperless-ngx/paperless-ngx/pull/7829))
+- Chore(deps-dev): Bump @codecov/webpack-plugin from 1.0.1 to 1.2.0 in /src-ui [@dependabot](https://github.com/dependabot) ([#7830](https://github.com/paperless-ngx/paperless-ngx/pull/7830))
+- Chore(deps-dev): Bump @types/node from 22.5.2 to 22.7.4 in /src-ui [@dependabot](https://github.com/dependabot) ([#7829](https://github.com/paperless-ngx/paperless-ngx/pull/7829))
 - Chore(deps-dev): Bump the frontend-eslint-dependencies group in /src-ui with 4 updates [@dependabot](https://github.com/dependabot) ([#7827](https://github.com/paperless-ngx/paperless-ngx/pull/7827))
 - Chore(deps-dev): Bump the frontend-jest-dependencies group in /src-ui with 2 updates [@dependabot](https://github.com/dependabot) ([#7826](https://github.com/paperless-ngx/paperless-ngx/pull/7826))
-- Chore(deps-dev): Bump [@<!---->playwright/test from 1.46.1 to 1.47.2 in /src-ui @dependabot](https://github.com/<!---->playwright/test from 1.46.1 to 1.47.2 in /src-ui @dependabot) ([#7828](https://github.com/paperless-ngx/paperless-ngx/pull/7828))
+- Chore(deps-dev): Bump @playwright/test from 1.46.1 to 1.47.2 in /src-ui [@dependabot](https://github.com/dependabot) ([#7828](https://github.com/paperless-ngx/paperless-ngx/pull/7828))
 - Chore(deps): Bump the frontend-angular-dependencies group in /src-ui with 21 updates [@dependabot](https://github.com/dependabot) ([#7825](https://github.com/paperless-ngx/paperless-ngx/pull/7825))
 - Chore: Upgrades OCRMyPDF to v16 [@stumpylog](https://github.com/stumpylog) ([#7815](https://github.com/paperless-ngx/paperless-ngx/pull/7815))
 - Chore: Upgrades the Docker image to use Python 3.12 [@stumpylog](https://github.com/stumpylog) ([#7796](https://github.com/paperless-ngx/paperless-ngx/pull/7796))
