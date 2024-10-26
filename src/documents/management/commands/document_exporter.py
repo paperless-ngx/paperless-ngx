@@ -565,9 +565,10 @@ class Command(CryptMixin, BaseCommand):
                 crypt_fields = crypt_config["fields"]
                 for manifest_record in manifest[exporter_key]:
                     for field in crypt_fields:
-                        manifest_record["fields"][field] = self.encrypt_string(
-                            value=manifest_record["fields"][field],
-                        )
+                        if manifest_record["fields"][field]:
+                            manifest_record["fields"][field] = self.encrypt_string(
+                                value=manifest_record["fields"][field],
+                            )
 
         elif (
             MailAccount.objects.count() > 0
