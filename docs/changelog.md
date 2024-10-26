@@ -3590,7 +3590,7 @@ Versions 1.11.1 and 1.11.2 contain bug fixes from v1.11.0 that prevented use of 
 - Fix: warn when closing a document with unsaved changes due to max open docs [@shamoon](https://github.com/shamoon) ([#956](https://github.com/paperless-ngx/paperless-ngx/pull/956))
 - Bugfix: Adds configurable intoify debounce time [@stumpylog](https://github.com/stumpylog) ([#953](https://github.com/paperless-ngx/paperless-ngx/pull/953))
 - Bugfix: Fixes document filename date off by 1 issue [@stumpylog](https://github.com/stumpylog) ([#942](https://github.com/paperless-ngx/paperless-ngx/pull/942))
-- fixes #@gador](https://github.com/gador) ([#962](https://github.com/paperless-ngx/paperless-ngx/pull/962))
+- fixes #949: change to MIME detection for files [@gador](https://github.com/gador) ([#962](https://github.com/paperless-ngx/paperless-ngx/pull/962))
 - docs: fix some typos [@Berjou](https://github.com/Berjou) ([#948](https://github.com/paperless-ngx/paperless-ngx/pull/948))
 - [Docs] Fix 2 small typos [@tooomm](https://github.com/tooomm) ([#946](https://github.com/paperless-ngx/paperless-ngx/pull/946))
 - [Readme] Fix typo [@tooomm](https://github.com/tooomm) ([#941](https://github.com/paperless-ngx/paperless-ngx/pull/941))
