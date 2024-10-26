@@ -414,9 +414,10 @@ class Command(CryptMixin, BaseCommand):
                 ):
                     had_at_least_one_record = True
                     for field in crypt_fields:
-                        record["fields"][field] = self.decrypt_string(
-                            value=record["fields"][field],
-                        )
+                        if record["fields"][field]:
+                            record["fields"][field] = self.decrypt_string(
+                                value=record["fields"][field],
+                            )
 
             if had_at_least_one_record:
                 # It's annoying, but the DB is loaded from the JSON directly
