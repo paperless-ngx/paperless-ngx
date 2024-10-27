@@ -406,7 +406,14 @@ class DocumentViewSet(
         from documents import index
 
         index.remove_document_from_index(self.get_object())
-        return super().destroy(request, *args, **kwargs)
+        try:
+            return super().destroy(request, *args, **kwargs)
+        except Exception as e:
+            if "Data too long for column" in str(e):
+                logger.warning(
+                    "Detected a possible incompatible database column. See https://docs.paperless-ngx.com/troubleshooting/#convert-uuid-field",
+                )
+            return HttpResponseBadRequest(str(e))
 
     @staticmethod
     def original_requested(request):
