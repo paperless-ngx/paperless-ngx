@@ -134,19 +134,6 @@ class StoragePath(MatchingModel):
         verbose_name_plural = _("storage paths")
 
 
-# see https://docs.djangoproject.com/en/5.1/releases/5.0/#migrating-existing-uuidfield-on-mariadb-10-7 and
-# https://github.com/san4ezy/django_softdelete/issues/45
-class Char32UUIDField(models.UUIDField):
-    def db_type(self, connection):
-        return "char(32)"
-
-    def get_db_prep_value(self, value, connection, prepared=False):
-        value = super().get_db_prep_value(value, connection, prepared)
-        if value is not None and not isinstance(value, str):  # pragma: no cover
-            value = value.hex
-        return value
-
-
 class Document(SoftDeleteModel, ModelWithOwner):
     STORAGE_TYPE_UNENCRYPTED = "unencrypted"
     STORAGE_TYPE_GPG = "gpg"
@@ -301,11 +288,6 @@ class Document(SoftDeleteModel, ModelWithOwner):
         help_text=_(
             "The position of this document in your physical document archive.",
         ),
-    )
-
-    transaction_id = Char32UUIDField(
-        blank=True,
-        null=True,
     )
 
     class Meta:
