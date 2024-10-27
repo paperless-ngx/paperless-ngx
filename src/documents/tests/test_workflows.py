@@ -29,6 +29,7 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowAction
+from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
 from documents.signals import document_consumption_finished
 from documents.tests.utils import DirectoriesMixin
@@ -1427,6 +1428,55 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
 
         doc.refresh_from_db()
         self.assertEqual(doc.owner, self.user2)
+
+    def test_workflow_scheduled_trigger_too_early(self):
+        """
+        GIVEN:
+            - Existing workflow with SCHEDULED trigger and offset of 30 days
+            - Workflow run date is 20 days ago
+        WHEN:
+            - Scheduled workflows are checked
+        THEN:
+            - Workflow does not run as the offset is not met
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            schedule_offset_days=30,
+            schedule_date_field=WorkflowTrigger.ScheduleDateField.CREATED,
+            schedule_is_recurring=True,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+            created=timezone.now() - timedelta(days=40),
+        )
+
+        WorkflowRun.objects.create(
+            workflow=w,
+            document=doc,
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            run_at=timezone.now() - timedelta(days=20),
+        )
+
+        with self.assertLogs(level="DEBUG") as cm:
+            tasks.check_scheduled_workflows()
+            self.assertIn("last run was within the offset", " ".join(cm.output))
+
+            doc.refresh_from_db()
+            self.assertIsNone(doc.owner)
 
     def test_workflow_enabled_disabled(self):
         trigger = WorkflowTrigger.objects.create(
