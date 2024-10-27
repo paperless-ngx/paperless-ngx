@@ -353,10 +353,6 @@ ways from the original. As the logs indicate, if you encounter this error you ca
 `PAPERLESS_OCR_USER_ARGS: '{"continue_on_soft_render_error": true}'` to try to 'force'
 processing documents with this issue.
 
-## Platform-Specific Deployment Troubleshooting
-
-A user-maintained wiki page is available to help troubleshoot issues that may arise when trying to deploy Paperless-ngx on specific platforms, for example SELinux. Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Platform%E2%80%90Specific-Troubleshooting).
-
 ## Logs show "possible incompatible database column" when deleting documents {#convert-uuid-field}
 
 You may see errors when deleting documents like:
@@ -370,3 +366,7 @@ This error can occur in installations which have upgraded from a version of Pape
 ```shell-session
 $ python3 manage.py convert_mariadb_uuid
 ```
+
+## Platform-Specific Deployment Troubleshooting
+
+A user-maintained wiki page is available to help troubleshoot issues that may arise when trying to deploy Paperless-ngx on specific platforms, for example SELinux. Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Platform%E2%80%90Specific-Troubleshooting).
