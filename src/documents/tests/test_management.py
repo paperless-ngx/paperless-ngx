@@ -3,6 +3,7 @@ import hashlib
 import os
 import shutil
 import tempfile
+from io import StringIO
 from pathlib import Path
 from unittest import mock
 
@@ -238,3 +239,16 @@ class TestSanityChecker(DirectoriesMixin, TestCase):
 
         self.assertEqual(len(capture.output), 2)
         self.assertIn("Checksum mismatch. Stored: abc, actual:", capture.output[1])
+
+
+class TestConvertMariaDBUUID(TestCase):
+    @mock.patch("django.db.connection.schema_editor")
+    def test_convert(self, m):
+        m.alter_field.return_value = None
+
+        stdout = StringIO()
+        call_command("convert_mariadb_uuid", stdout=stdout)
+
+        m.assert_called_once()
+
+        self.assertIn("Successfully converted", stdout.getvalue())
