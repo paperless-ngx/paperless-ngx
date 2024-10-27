@@ -7,9 +7,10 @@
     "trailingComma": "es5",
     "overrides": [
         {
-            "files": ["index.md", "administration.md"],
+            "files": ["*.md"],
             "options": {
-                "tabWidth": 4
+                "tabWidth": 4,
+                "embeddedLanguageFormatting": "off"
             }
         }
     ]
