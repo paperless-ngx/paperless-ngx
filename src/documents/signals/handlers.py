@@ -29,6 +29,7 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_unique_filename
+from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import MatchingModel
@@ -362,6 +363,20 @@ def cleanup_document_deletion(sender, instance, **kwargs):
 
 class CannotMoveFilesException(Exception):
     pass
+
+
+@receiver(models.signals.post_save, sender=CustomField)
+def update_cf_instance_documents(sender, instance: CustomField, **kwargs):
+    """
+    'Select' custom field instances get their end-user value (e.g. in file names) from the select_options in extra_data,
+    which is contained in the custom field itself. So when the field is changed, we (may) need to update the file names
+    of all documents that have this custom field.
+    """
+    if (
+        instance.data_type == CustomField.FieldDataType.SELECT
+    ):  # Only select fields, for now
+        for cf_instance in instance.fields.all():
+            update_filename_and_move_files(sender, cf_instance)
 
 
 @receiver(models.signals.post_save, sender=CustomFieldInstance)
