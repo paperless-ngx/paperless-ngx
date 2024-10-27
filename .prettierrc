@@ -7,7 +7,7 @@
     "trailingComma": "es5",
     "overrides": [
         {
-            "files": ["*.md"],
+            "files": ["docs/*.md"],
             "options": {
                 "tabWidth": 4,
                 "embeddedLanguageFormatting": "off"
