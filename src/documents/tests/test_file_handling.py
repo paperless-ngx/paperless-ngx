@@ -527,6 +527,48 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             self.assertNotEqual(original_modified, doc.modified)
             mock_move.assert_not_called()
 
+    @override_settings(
+        FILENAME_FORMAT="{{title}}_{{custom_fields|get_cf_value('test')}}",
+    )
+    @mock.patch("documents.signals.handlers.update_filename_and_move_files")
+    def test_select_cf_updated(self, m):
+        """
+        GIVEN:
+            - A document with a select type custom field
+        WHEN:
+            - The custom field select options are updated
+        THEN:
+            - The update_filename_and_move_files handler is called and the document filename is updated
+        """
+        cf = CustomField.objects.create(
+            name="test",
+            data_type=CustomField.FieldDataType.SELECT,
+            extra_data={
+                "select_options": ["apple", "banana", "cherry"],
+            },
+        )
+        doc = Document.objects.create(
+            title="document",
+            filename="document.pdf",
+            archive_filename="document.pdf",
+            checksum="A",
+            archive_checksum="B",
+            mime_type="application/pdf",
+        )
+        CustomFieldInstance.objects.create(field=cf, document=doc, value_select=0)
+
+        self.assertEqual(generate_filename(doc), "document_apple.pdf")
+
+        # handler should not have been called
+        self.assertEqual(m.call_count, 0)
+        cf.extra_data = {
+            "select_options": ["aubergine", "banana", "cherry"],
+        }
+        cf.save()
+        self.assertEqual(generate_filename(doc), "document_aubergine.pdf")
+        # handler should have been called
+        self.assertEqual(m.call_count, 1)
+
 
 class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     @override_settings(FILENAME_FORMAT=None)
