@@ -413,7 +413,10 @@ class DocumentViewSet(
                 logger.warning(
                     "Detected a possible incompatible database column. See https://docs.paperless-ngx.com/troubleshooting/#convert-uuid-field",
                 )
-            return HttpResponseBadRequest(str(e))
+            logger.error(f"Error deleting document: {e!s}")
+            return HttpResponseBadRequest(
+                "Error deleting document, check logs for more detail.",
+            )
 
     @staticmethod
     def original_requested(request):
