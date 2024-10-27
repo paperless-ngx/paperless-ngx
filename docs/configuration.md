@@ -8,17 +8,17 @@ common [OCR](#ocr) related settings and some frontend settings. If set, these wi
 preference over the settings via environment variables. If not set, the environment setting
 or applicable default will be utilized instead.
 
-- If you run paperless on docker, `paperless.conf` is not used.
-  Rather, configure paperless by copying necessary options to
-  `docker-compose.env`.
+-   If you run paperless on docker, `paperless.conf` is not used.
+    Rather, configure paperless by copying necessary options to
+    `docker-compose.env`.
 
-- If you are running paperless on anything else, paperless will search
-  for the configuration file in these locations and use the first one
-  it finds:
-  - The environment variable `PAPERLESS_CONFIGURATION_PATH`
-  - `/path/to/paperless/paperless.conf`
-  - `/etc/paperless.conf`
-  - `/usr/local/etc/paperless.conf`
+-   If you are running paperless on anything else, paperless will search
+    for the configuration file in these locations and use the first one
+    it finds:
+    -   The environment variable `PAPERLESS_CONFIGURATION_PATH`
+    -   `/path/to/paperless/paperless.conf`
+    -   `/etc/paperless.conf`
+    -   `/usr/local/etc/paperless.conf`
 
 ## Required services
 

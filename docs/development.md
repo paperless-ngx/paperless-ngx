@@ -6,23 +6,23 @@ on Paperless-ngx.
 Check out the source from GitHub. The repository is organized in the
 following way:
 
-- `main` always represents the latest release and will only see
-  changes when a new release is made.
-- `dev` contains the code that will be in the next release.
-- `feature-X` contains bigger changes that will be in some release, but
-  not necessarily the next one.
+-   `main` always represents the latest release and will only see
+    changes when a new release is made.
+-   `dev` contains the code that will be in the next release.
+-   `feature-X` contains bigger changes that will be in some release, but
+    not necessarily the next one.
 
 When making functional changes to Paperless-ngx, _always_ make your changes
 on the `dev` branch.
 
 Apart from that, the folder structure is as follows:
 
-- `docs/` - Documentation.
-- `src-ui/` - Code of the front end.
-- `src/` - Code of the back end.
-- `scripts/` - Various scripts that help with different parts of
-  development.
-- `docker/` - Files required to build the docker image.
+-   `docs/` - Documentation.
+-   `src-ui/` - Code of the front end.
+-   `src/` - Code of the back end.
+-   `scripts/` - Various scripts that help with different parts of
+    development.
+-   `docker/` - Files required to build the docker image.
 
 ## Contributing to Paperless-ngx
 
@@ -99,17 +99,17 @@ first-time setup.
 
 7.  You can now either ...
 
-    - install redis or
+    -   install redis or
 
-    - use the included `scripts/start_services.sh` to use docker to fire
-      up a redis instance (and some other services such as tika,
-      gotenberg and a database server) or
+    -   use the included `scripts/start_services.sh` to use docker to fire
+        up a redis instance (and some other services such as tika,
+        gotenberg and a database server) or
 
-    - spin up a bare redis container
+    -   spin up a bare redis container
 
-      ```
-      $ docker run -d -p 6379:6379 --restart unless-stopped redis:latest
-      ```
+        ```
+        $ docker run -d -p 6379:6379 --restart unless-stopped redis:latest
+        ```
 
 8.  Continue with either back-end or front-end development – or both :-).
 
@@ -122,9 +122,9 @@ work well for development, but you can use whatever you want.
 Configure the IDE to use the `src/`-folder as the base source folder.
 Configure the following launch configurations in your IDE:
 
-- `python3 manage.py runserver`
-- `python3 manage.py document_consumer`
-- `celery --app paperless worker -l DEBUG` (or any other log level)
+-   `python3 manage.py runserver`
+-   `python3 manage.py document_consumer`
+-   `celery --app paperless worker -l DEBUG` (or any other log level)
 
 To start them all:
 
@@ -150,11 +150,11 @@ $ ng build --configuration production
 
 ### Testing
 
-- Run `pytest` in the `src/` directory to execute all tests. This also
-  generates a HTML coverage report. When runnings test, `paperless.conf`
-  is loaded as well. However, the tests rely on the default
-  configuration. This is not ideal. But for now, make sure no settings
-  except for DEBUG are overridden when testing.
+-   Run `pytest` in the `src/` directory to execute all tests. This also
+    generates a HTML coverage report. When runnings test, `paperless.conf`
+    is loaded as well. However, the tests rely on the default
+    configuration. This is not ideal. But for now, make sure no settings
+    except for DEBUG are overridden when testing.
 
 !!! note
 
@@ -245,14 +245,14 @@ these parts have to be translated separately.
 
 ### Front end localization
 
-- The AngularJS front end does localization according to the [Angular
-  documentation](https://angular.io/guide/i18n).
-- The source language of the project is "en_US".
-- The source strings end up in the file `src-ui/messages.xlf`.
-- The translated strings need to be placed in the
-  `src-ui/src/locale/` folder.
-- In order to extract added or changed strings from the source files,
-  call `ng extract-i18n`.
+-   The AngularJS front end does localization according to the [Angular
+    documentation](https://angular.io/guide/i18n).
+-   The source language of the project is "en_US".
+-   The source strings end up in the file `src-ui/messages.xlf`.
+-   The translated strings need to be placed in the
+    `src-ui/src/locale/` folder.
+-   In order to extract added or changed strings from the source files,
+    call `ng extract-i18n`.
 
 Adding new languages requires adding the translated files in the
 `src-ui/src/locale/` folder and adjusting a couple files.
@@ -298,18 +298,18 @@ A majority of the strings that appear in the back end appear only when
 the admin is used. However, some of these are still shown on the front
 end (such as error messages).
 
-- The django application does localization according to the [Django
-  documentation](https://docs.djangoproject.com/en/3.1/topics/i18n/translation/).
-- The source language of the project is "en_US".
-- Localization files end up in the folder `src/locale/`.
-- In order to extract strings from the application, call
-  `python3 manage.py makemessages -l en_US`. This is important after
-  making changes to translatable strings.
-- The message files need to be compiled for them to show up in the
-  application. Call `python3 manage.py compilemessages` to do this.
-  The generated files don't get committed into git, since these are
-  derived artifacts. The build pipeline takes care of executing this
-  command.
+-   The django application does localization according to the [Django
+    documentation](https://docs.djangoproject.com/en/3.1/topics/i18n/translation/).
+-   The source language of the project is "en_US".
+-   Localization files end up in the folder `src/locale/`.
+-   In order to extract strings from the application, call
+    `python3 manage.py makemessages -l en_US`. This is important after
+    making changes to translatable strings.
+-   The message files need to be compiled for them to show up in the
+    application. Call `python3 manage.py compilemessages` to do this.
+    The generated files don't get committed into git, since these are
+    derived artifacts. The build pipeline takes care of executing this
+    command.
 
 Adding new languages requires adding the translated files in the
 `src/locale/`-folder and adjusting the file
@@ -378,10 +378,10 @@ base code.
 Paperless-ngx uses parsers to add documents. A parser is
 responsible for:
 
-- Retrieving the content from the original
-- Creating a thumbnail
-- _optional:_ Retrieving a created date from the original
-- _optional:_ Creating an archived document from the original
+-   Retrieving the content from the original
+-   Creating a thumbnail
+-   _optional:_ Retrieving a created date from the original
+-   _optional:_ Creating an archived document from the original
 
 Custom parsers can be added to Paperless-ngx to support more file types. In
 order to do that, you need to write the parser itself and announce its
@@ -439,14 +439,14 @@ def myparser_consumer_declaration(sender, **kwargs):
     }
 ```
 
-- `parser` is a reference to a class that extends `DocumentParser`.
-- `weight` is used whenever two or more parsers are able to parse a
-  file: The parser with the higher weight wins. This can be used to
-  override the parsers provided by Paperless-ngx.
-- `mime_types` is a dictionary. The keys are the mime types your
-  parser supports and the value is the default file extension that
-  Paperless-ngx should use when storing files and serving them for
-  download. We could guess that from the file extensions, but some
-  mime types have many extensions associated with them and the Python
-  methods responsible for guessing the extension do not always return
-  the same value.
+-   `parser` is a reference to a class that extends `DocumentParser`.
+-   `weight` is used whenever two or more parsers are able to parse a
+    file: The parser with the higher weight wins. This can be used to
+    override the parsers provided by Paperless-ngx.
+-   `mime_types` is a dictionary. The keys are the mime types your
+    parser supports and the value is the default file extension that
+    Paperless-ngx should use when storing files and serving them for
+    download. We could guess that from the file extensions, but some
+    mime types have many extensions associated with them and the Python
+    methods responsible for guessing the extension do not always return
+    the same value.

@@ -4,27 +4,27 @@
 
 Check for the following issues:
 
-- Ensure that the directory you're putting your documents in is the
-  folder paperless is watching. With docker, this setting is performed
-  in the `docker-compose.yml` file. Without Docker, look at the
-  `CONSUMPTION_DIR` setting. Don't adjust this setting if you're
-  using docker.
+-   Ensure that the directory you're putting your documents in is the
+    folder paperless is watching. With docker, this setting is performed
+    in the `docker-compose.yml` file. Without Docker, look at the
+    `CONSUMPTION_DIR` setting. Don't adjust this setting if you're
+    using docker.
 
-- Ensure that redis is up and running. Paperless does its task
-  processing asynchronously, and for documents to arrive at the task
-  processor, it needs redis to run.
+-   Ensure that redis is up and running. Paperless does its task
+    processing asynchronously, and for documents to arrive at the task
+    processor, it needs redis to run.
 
-- Ensure that the task processor is running. Docker does this
-  automatically. Manually invoke the task processor by executing
+-   Ensure that the task processor is running. Docker does this
+    automatically. Manually invoke the task processor by executing
 
-  ```shell-session
-  $ celery --app paperless worker
-  ```
+    ```shell-session
+    $ celery --app paperless worker
+    ```
 
-- Look at the output of paperless and inspect it for any errors.
+-   Look at the output of paperless and inspect it for any errors.
 
-- Go to the admin interface, and check if there are failed tasks. If
-  so, the tasks will contain an error message.
+-   Go to the admin interface, and check if there are failed tasks. If
+    so, the tasks will contain an error message.
 
 ## Consumer warns `OCR for XX failed`
 
@@ -78,12 +78,12 @@ Ensure that `chown` is possible on these directories.
 This indicates that the Auto matching algorithm found no documents to
 learn from. This may have two reasons:
 
-- You don't use the Auto matching algorithm: The error can be safely
-  ignored in this case.
-- You are using the Auto matching algorithm: The classifier explicitly
-  excludes documents with Inbox tags. Verify that there are documents
-  in your archive without inbox tags. The algorithm will only learn
-  from documents not in your inbox.
+-   You don't use the Auto matching algorithm: The error can be safely
+    ignored in this case.
+-   You are using the Auto matching algorithm: The classifier explicitly
+    excludes documents with Inbox tags. Verify that there are documents
+    in your archive without inbox tags. The algorithm will only learn
+    from documents not in your inbox.
 
 ## UserWarning in sklearn on every single document
 
