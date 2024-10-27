@@ -156,7 +156,7 @@ different means. These are as follows:
   will not consume mails already tagged. Not all mail servers support
   this feature!
 
-  - **Apple Mail support:** Apple Mail clients allow differently colored tags. For this to work use `apple:<color>` (e.g. _apple:green_) as a custom tag. Available colors are _red_, _orange_, _yellow_, _blue_, _green_, _violet_ and _grey_.
+    - **Apple Mail support:** Apple Mail clients allow differently colored tags. For this to work use `apple:<color>` (e.g. _apple:green_) as a   custom tag. Available colors are _red_, _orange_, _yellow_, _blue_, _green_, _violet_ and _grey_.
 
 !!! warning
 
@@ -780,16 +780,16 @@ Paperless-ngx consists of the following components:
 
   This task processor is responsible for:
 
-  - Consuming documents. When the consumer finds new documents, it
-    notifies the task processor to start a consumption task.
-  - The task processor also performs the consumption of any
-    documents you upload through the web interface.
-  - Consuming emails. It periodically checks your configured
-    accounts for new emails and notifies the task processor to
-    consume the attachment of an email.
-  - Maintaining the search index and the automatic matching
-    algorithm. These are things that paperless needs to do from time
-    to time in order to operate properly.
+    - Consuming documents. When the consumer finds new documents, it
+      notifies the task processor to start a consumption task.
+    - The task processor also performs the consumption of any
+      documents you upload through the web interface.
+    - Consuming emails. It periodically checks your configured
+      accounts for new emails and notifies the task processor to
+      consume the attachment of an email.
+    - Maintaining the search index and the automatic matching
+      algorithm. These are things that paperless needs to do from time
+      to time in order to operate properly.
 
   This allows paperless to process multiple documents from your
   consumption folder in parallel! On a modern multi core system, this

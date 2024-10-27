@@ -430,49 +430,49 @@ a json payload of the format:
 The following methods are supported:
 
 - `set_correspondent`
-  - Requires `parameters`: `{ "correspondent": CORRESPONDENT_ID }`
+    - Requires `parameters`: `{ "correspondent": CORRESPONDENT_ID }`
 - `set_document_type`
-  - Requires `parameters`: `{ "document_type": DOCUMENT_TYPE_ID }`
+    - Requires `parameters`: `{ "document_type": DOCUMENT_TYPE_ID }`
 - `set_storage_path`
-  - Requires `parameters`: `{ "storage_path": STORAGE_PATH_ID }`
+    - Requires `parameters`: `{ "storage_path": STORAGE_PATH_ID }`
 - `add_tag`
-  - Requires `parameters`: `{ "tag": TAG_ID }`
+    - Requires `parameters`: `{ "tag": TAG_ID }`
 - `remove_tag`
-  - Requires `parameters`: `{ "tag": TAG_ID }`
+    - Requires `parameters`: `{ "tag": TAG_ID }`
 - `modify_tags`
-  - Requires `parameters`: `{ "add_tags": [LIST_OF_TAG_IDS] }` and / or `{ "remove_tags": [LIST_OF_TAG_IDS] }`
+    - Requires `parameters`: `{ "add_tags": [LIST_OF_TAG_IDS] }` and / or `{ "remove_tags": [LIST_OF_TAG_IDS] }`
 - `delete`
-  - No `parameters` required
+    - No `parameters` required
 - `reprocess`
-  - No `parameters` required
+    - No `parameters` required
 - `set_permissions`
-  - Requires `parameters`:
-    - `"set_permissions": PERMISSIONS_OBJ` (see format [above](#permissions)) and / or
-    - `"owner": OWNER_ID or null`
-    - `"merge": true or false` (defaults to false)
-  - The `merge` flag determines if the supplied permissions will overwrite all existing permissions (including
-    removing them) or be merged with existing permissions.
+    - Requires `parameters`:
+        - `"set_permissions": PERMISSIONS_OBJ` (see format [above](#permissions)) and / or
+        - `"owner": OWNER_ID or null`
+        - `"merge": true or false` (defaults to false)
+    - The `merge` flag determines if the supplied permissions will overwrite all existing permissions (including
+      removing them) or be merged with existing permissions.
 - `merge`
-  - No additional `parameters` required.
-  - The ordering of the merged document is determined by the list of IDs.
-  - Optional `parameters`:
-    - `"metadata_document_id": DOC_ID` apply metadata (tags, correspondent, etc.) from this document to the merged document.
-    - `"delete_originals": true` to delete the original documents. This requires the calling user being the owner of
-      all documents that are merged.
+    - No additional `parameters` required.
+    - The ordering of the merged document is determined by the list of IDs.
+    - Optional `parameters`:
+        - `"metadata_document_id": DOC_ID` apply metadata (tags, correspondent, etc.) from this document to the merged document.
+        - `"delete_originals": true` to delete the original documents. This requires the calling user being the owner of
+          all documents that are merged.
 - `split`
-  - Requires `parameters`:
-    - `"pages": [..]` The list should be a list of pages and/or a ranges, separated by commas e.g. `"[1,2-3,4,5-7]"`
-  - Optional `parameters`:
-    - `"delete_originals": true` to delete the original document after consumption. This requires the calling user being the owner of
+    - Requires `parameters`:
+        - `"pages": [..]` The list should be a list of pages and/or a ranges, separated by commas e.g. `"[1,2-3,4,5-7]"`
+    - Optional `parameters`:
+        - `"delete_originals": true` to delete the original document after consumption. This requires the calling user being the owner of
       the document.
-  - The split operation only accepts a single document.
+    - The split operation only accepts a single document.
 - `rotate`
-  - Requires `parameters`:
-    - `"degrees": DEGREES`. Must be an integer i.e. 90, 180, 270
+    - Requires `parameters`:
+        - `"degrees": DEGREES`. Must be an integer i.e. 90, 180, 270
 - `delete_pages`
-  - Requires `parameters`:
-    - `"pages": [..]` The list should be a list of integers e.g. `"[2,3,4]"`
-  - The delete_pages operation only accepts a single document.
+    - Requires `parameters`:
+        - `"pages": [..]` The list should be a list of integers e.g. `"[2,3,4]"`
+    - The delete_pages operation only accepts a single document.
 
 ### Objects
 
