@@ -1408,6 +1408,13 @@ class WorkflowAction(models.Model):
         help_text=_("The destination URL for the notification."),
     )
 
+    notification_destination_url_headers = models.JSONField(
+        _("notification destination url headers"),
+        null=True,
+        blank=True,
+        help_text=_("The headers to send with the notification destination URL."),
+    )
+
     notification_include_document = models.BooleanField(
         default=False,
         verbose_name=_("include document in notification"),

@@ -1851,6 +1851,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
             "notification_body",
             "notification_destination_emails",
             "notification_destination_url",
+            "notification_destination_url_headers",
             "notification_include_document",
         ]
 

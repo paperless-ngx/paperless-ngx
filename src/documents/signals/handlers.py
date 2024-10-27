@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import shutil
@@ -898,7 +899,11 @@ def run_workflows(
                     )
                     if action.notification_include_document:
                         email.attach_file(document.source_path)
-                    email.send()
+                    n_messages = email.send()
+                    logger.debug(
+                        f"Sent {n_messages} notification email(s) to {action.notification_destination_emails}",
+                        extra={"group": logging_group},
+                    )
                 except Exception as e:
                     logger.exception(
                         f"Error occurred sending notification email: {e}",
@@ -911,18 +916,37 @@ def run_workflows(
                     "message": body,
                 }
                 files = None
+                headers = None
+                if action.notification_destination_url_headers:
+                    try:
+                        # headers are a JSON object with key-value pairs, needs to be converted to a Mapping[str, str]
+                        header_mapping = json.loads(
+                            action.notification_destination_url_headers,
+                        )
+                        headers = {str(k): str(v) for k, v in header_mapping.items()}
+                    except Exception as e:
+                        logger.error(
+                            f"Error occurred parsing notification destination URL headers: {e}",
+                            extra={"group": logging_group},
+                        )
                 if action.notification_include_document:
                     with open(document.source_path, "rb") as f:
                         files = {"document": f}
-                        httpx.post(
+                        response = httpx.post(
                             action.notification_destination_url,
                             data=data,
+                            headers=headers,
                             files=files,
+                        )
+                        logger.debug(
+                            f"Response from notification destination URL: {response}",
+                            extra={"group": logging_group},
                         )
                 else:
                     httpx.post(
                         action.notification_destination_url,
                         data=data,
+                        headers=headers,
                     )
             except Exception as e:
                 logger.exception(

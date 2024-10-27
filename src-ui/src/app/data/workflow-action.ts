@@ -72,5 +72,7 @@ export interface WorkflowAction extends ObjectWithId {
 
   notification_destination_url?: string
 
+  notification_destination_url_headers?: string
+
   notification_include_document?: boolean
 }

@@ -414,6 +414,9 @@ export class WorkflowEditDialogComponent
         notification_destination_url: new FormControl(
           action.notification_destination_url
         ),
+        notification_destination_url_headers: new FormControl(
+          action.notification_destination_url_headers
+        ),
         notification_include_document: new FormControl(
           action.notification_include_document
         ),
@@ -522,6 +525,7 @@ export class WorkflowEditDialogComponent
       notification_body: null,
       notification_destination_emails: null,
       notification_destination_url: null,
+      notification_destination_url_headers: null,
       notification_include_document: null,
     }
     this.object.actions.push(action)
