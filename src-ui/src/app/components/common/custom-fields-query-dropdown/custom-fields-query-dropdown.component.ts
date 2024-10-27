@@ -114,16 +114,21 @@ export class CustomFieldQueriesModel {
     queryElement: CustomFieldQueryElement,
     elements: any[]
   ): CustomFieldQueryElement {
+    let foundElement
     for (let i = 0; i < elements.length; i++) {
       if (elements[i] === queryElement) {
-        return elements.splice(i, 1)[0]
+        foundElement = elements.splice(i, 1)[0]
       } else if (elements[i].type === CustomFieldQueryElementType.Expression) {
-        return this.findElement(
+        foundElement = this.findElement(
           queryElement,
           elements[i].value as CustomFieldQueryElement[]
         )
       }
+      if (foundElement) {
+        break
+      }
     }
+    return foundElement
   }
 
   public removeElement(queryElement: CustomFieldQueryElement) {
