@@ -532,15 +532,15 @@ installation, you can use volumes to accomplish this:
 
 ```yaml
 services:
-  # ...
-  webserver:
-    environment:
-      - PAPERLESS_ENABLE_FLOWER
-    ports:
-      - 5555:5555 # (2)!
     # ...
-    volumes:
-      - /path/to/my/flowerconfig.py:/usr/src/paperless/src/paperless/flowerconfig.py:ro # (1)!
+    webserver:
+        environment:
+            - PAPERLESS_ENABLE_FLOWER
+        ports:
+            - 5555:5555 # (2)!
+        # ...
+        volumes:
+            - /path/to/my/flowerconfig.py:/usr/src/paperless/src/paperless/flowerconfig.py:ro # (1)!
 ```
 
 1. Note the `:ro` tag means the file will be mounted as read only.
@@ -571,11 +571,11 @@ For example, using Docker Compose:
 
 ```yaml
 services:
-  # ...
-  webserver:
     # ...
-    volumes:
-      - /path/to/my/scripts:/custom-cont-init.d:ro # (1)!
+    webserver:
+        # ...
+        volumes:
+            - /path/to/my/scripts:/custom-cont-init.d:ro # (1)!
 ```
 
 1. Note the `:ro` tag means the folder will be mounted as read only. This is for extra security against changes
@@ -819,9 +819,9 @@ If using docker, you'll need to add the following volume mounts to your `docker-
 
 ```yaml
 webserver:
-  volumes:
-    - /home/user/.gnupg/pubring.gpg:/usr/src/paperless/.gnupg/pubring.gpg
-    - <path to gpg-agent.extra socket>:/usr/src/paperless/.gnupg/S.gpg-agent
+    volumes:
+        - /home/user/.gnupg/pubring.gpg:/usr/src/paperless/.gnupg/pubring.gpg
+        - <path to gpg-agent.extra socket>:/usr/src/paperless/.gnupg/S.gpg-agent
 ```
 
 For a 'bare-metal' installation no further configuration is necessary. If you

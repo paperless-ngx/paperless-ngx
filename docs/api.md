@@ -125,12 +125,12 @@ File metadata is reported as a list of objects in the following form:
 
 ```json
 [
-  {
-    "namespace": "http://ns.adobe.com/pdf/1.3/",
-    "prefix": "pdf",
-    "key": "Producer",
-    "value": "SparklePDF, Fancy edition"
-  }
+    {
+        "namespace": "http://ns.adobe.com/pdf/1.3/",
+        "prefix": "pdf",
+        "key": "Producer",
+        "value": "SparklePDF, Fancy edition"
+    }
 ]
 ```
 

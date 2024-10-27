@@ -10,7 +10,6 @@
             "files": ["docs/*.md"],
             "options": {
                 "tabWidth": 4,
-                "embeddedLanguageFormatting": "off"
             }
         }
     ]

@@ -105,14 +105,14 @@ steps described in [Docker setup](#docker_hub) automatically.
 
     ```yaml
     ports:
-      - 8000:8000
+        - 8000:8000
     ```
 
     Replace the part BEFORE the colon with a port of your choice:
 
     ```yaml
     ports:
-      - 8010:8000
+        - 8010:8000
     ```
 
     Don't change the part after the colon or edit other lines that
@@ -222,7 +222,7 @@ steps described in [Docker setup](#docker_hub) automatically.
 
     ```yaml
     webserver:
-      image: ghcr.io/paperless-ngx/paperless-ngx:latest
+        image: ghcr.io/paperless-ngx/paperless-ngx:latest
     ```
 
     and replace it with a line that instructs Docker Compose to build
@@ -230,8 +230,8 @@ steps described in [Docker setup](#docker_hub) automatically.
 
     ```yaml
     webserver:
-      build:
-        context: .
+        build:
+            context: .
     ```
 
 4.  Follow steps 3 to 8 of [Docker Setup](#docker_hub). When asked to run
