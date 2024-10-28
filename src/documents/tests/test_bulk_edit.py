@@ -327,6 +327,15 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         )
         self.assertEqual(groups_with_perms.count(), 2)
 
+    @mock.patch("documents.models.Document.delete")
+    def test_delete_documents_old_uuid_field(self, m):
+        m.side_effect = Exception("Data too long for column 'transaction_id' at row 1")
+        doc_ids = [self.doc1.id, self.doc2.id, self.doc3.id]
+        bulk_edit.delete(doc_ids)
+        with self.assertLogs(level="WARNING") as cm:
+            bulk_edit.delete(doc_ids)
+            self.assertIn("possible incompatible database column", cm.output[0])
+
 
 class TestPDFActions(DirectoriesMixin, TestCase):
     def setUp(self):
