@@ -159,13 +159,20 @@ def modify_custom_fields(doc_ids: list[int], add_custom_fields, remove_custom_fi
 
 @shared_task
 def delete(doc_ids: list[int]):
-    Document.objects.filter(id__in=doc_ids).delete()
+    try:
+        Document.objects.filter(id__in=doc_ids).delete()
 
-    from documents import index
+        from documents import index
 
-    with index.open_index_writer() as writer:
-        for id in doc_ids:
-            index.remove_document_by_id(writer, id)
+        with index.open_index_writer() as writer:
+            for id in doc_ids:
+                index.remove_document_by_id(writer, id)
+    except Exception as e:
+        if "Data too long for column" in str(e):
+            logger.warning(
+                "Detected a possible incompatible database column. See https://docs.paperless-ngx.com/troubleshooting/#convert-uuid-field",
+            )
+        logger.error(f"Error deleting documents: {e!s}")
 
     return "OK"
 

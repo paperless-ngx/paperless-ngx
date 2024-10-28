@@ -15,6 +15,7 @@ from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.db import DataError
 from django.test import override_settings
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
@@ -2604,6 +2605,35 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         doc1.refresh_from_db()
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(doc1.tags.count(), 2)
+
+    @mock.patch("django_softdelete.models.SoftDeleteModel.delete")
+    def test_warn_on_delete_with_old_uuid_field(self, mocked_delete):
+        """
+        GIVEN:
+            - Existing document in a (mocked) MariaDB database with an old UUID field
+        WHEN:
+            - API request to delete document is made which raises "Data too long for column" error
+        THEN:
+            - Warning is logged alerting the user of the issue (and link to the fix)
+        """
+
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document 1",
+            checksum="1",
+        )
+
+        mocked_delete.side_effect = DataError(
+            "Data too long for column 'transaction_id' at row 1",
+        )
+
+        with self.assertLogs(level="WARNING") as cm:
+            self.client.delete(f"/api/documents/{doc.pk}/")
+            self.assertIn(
+                "Detected a possible incompatible database column",
+                cm.output[0],
+            )
 
 
 class TestDocumentApiV2(DirectoriesMixin, APITestCase):
