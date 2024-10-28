@@ -483,12 +483,6 @@ jobs:
         run: |
           pipenv --python ${{ steps.setup-python.outputs.python-version }} sync --dev
       -
-        name: Patch whitenoise
-        run: |
-          curl --fail --silent --show-error --location --output 484.patch https://github.com/evansd/whitenoise/pull/484.patch
-          patch -d $(pipenv --venv)/lib/python3.11/site-packages --verbose -p2 < 484.patch
-          rm 484.patch
-      -
         name: Install system dependencies
         run: |
           sudo apt-get update -qq
