@@ -150,7 +150,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         with (
             mock.patch(
-                "documents.signals.handlers.Document.objects.filter",
+                "documents.signals.handlers.Document.global_objects.filter",
             ) as m,
             disable_auditlog(),
         ):
@@ -865,7 +865,9 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
             archive_filename="0000001.pdf",
             archive_checksum="B",
         )
-        with mock.patch("documents.signals.handlers.Document.objects.filter") as m:
+        with mock.patch(
+            "documents.signals.handlers.Document.global_objects.filter",
+        ) as m:
             m.side_effect = DatabaseError()
             doc.save()
 
