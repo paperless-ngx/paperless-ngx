@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-19 22:56-0700\n"
-"PO-Revision-Date: 2024-10-20 05:58\n"
+"PO-Revision-Date: 2024-10-28 12:12\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -23,35 +23,35 @@ msgstr "ドキュメント"
 
 #: documents/filters.py:334
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "値は有効なJSONである必要があります。"
 
 #: documents/filters.py:353
 msgid "Invalid custom field query expression"
-msgstr ""
+msgstr "無効なカスタムフィールドクエリ式"
 
 #: documents/filters.py:363
 msgid "Invalid expression list. Must be nonempty."
-msgstr ""
+msgstr "無効な式リストです。空であってはなりません。"
 
 #: documents/filters.py:384
 msgid "Invalid logical operator {op!r}"
-msgstr ""
+msgstr "無効な論理演算子 {op!r}"
 
 #: documents/filters.py:398
 msgid "Maximum number of query conditions exceeded."
-msgstr ""
+msgstr "クエリ条件の最大数を超えました。"
 
 #: documents/filters.py:455
 msgid "{name!r} is not a valid custom field."
-msgstr ""
+msgstr "{name!r} は有効なカスタムフィールドではありません。"
 
 #: documents/filters.py:492
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr ""
+msgstr "{data_type} はクエリ expr {expr!r} をサポートしていません。"
 
 #: documents/filters.py:600
 msgid "Maximum nesting depth exceeded."
-msgstr ""
+msgstr "最大ネストの深さを超えました。"
 
 #: documents/models.py:41 documents/models.py:802
 msgid "owner"
@@ -192,11 +192,11 @@ msgstr "アーカイブされたドキュメントのチェックサム"
 
 #: documents/models.py:211
 msgid "page count"
-msgstr ""
+msgstr "ページ数"
 
 #: documents/models.py:218
 msgid "The number of pages of the document."
-msgstr ""
+msgstr "ドキュメントのページ数。"
 
 #: documents/models.py:222 documents/models.py:402 documents/models.py:722
 #: documents/models.py:760 documents/models.py:831 documents/models.py:889
@@ -353,7 +353,7 @@ msgstr "ASN"
 
 #: documents/models.py:431
 msgid "Pages"
-msgstr ""
+msgstr "ページ"
 
 #: documents/models.py:437
 msgid "show on dashboard"
@@ -561,7 +561,7 @@ msgstr "カスタムフィールドがありません"
 
 #: documents/models.py:525
 msgid "custom fields query"
-msgstr ""
+msgstr "カスタムフィールドのクエリ"
 
 #: documents/models.py:535
 msgid "rule type"
@@ -1543,15 +1543,15 @@ msgstr "STARTTLS を使用"
 
 #: paperless_mail/models.py:19
 msgid "IMAP"
-msgstr ""
+msgstr "IMAP"
 
 #: paperless_mail/models.py:20
 msgid "Gmail OAuth"
-msgstr ""
+msgstr "Gmail OAuth"
 
 #: paperless_mail/models.py:21
 msgid "Outlook OAuth"
-msgstr ""
+msgstr "Outlook OAuth"
 
 #: paperless_mail/models.py:25
 msgid "IMAP server"
@@ -1591,19 +1591,19 @@ msgstr "'UTF-8' や 'US-ASCII' など、メールサーバーとの通信に使�
 
 #: paperless_mail/models.py:60
 msgid "account type"
-msgstr ""
+msgstr "アカウントタイプ"
 
 #: paperless_mail/models.py:66
 msgid "refresh token"
-msgstr ""
+msgstr "トークンの更新"
 
 #: paperless_mail/models.py:71
 msgid "The refresh token to use for token authentication e.g. with oauth2."
-msgstr ""
+msgstr "oauth2などのトークン認証に使用するリフレッシュトークン。"
 
 #: paperless_mail/models.py:80
 msgid "The expiration date of the refresh token. "
-msgstr ""
+msgstr "更新トークンの有効期限。 "
 
 #: paperless_mail/models.py:90
 msgid "mail rule"
