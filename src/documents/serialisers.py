@@ -651,6 +651,14 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
                     raise serializers.ValidationError(
                         f"Value must be index of an element in {select_options}",
                     )
+            elif field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
+                doc_ids = data["value"]
+                if Document.objects.filter(id__in=doc_ids).count() != len(
+                    data["value"],
+                ):
+                    raise serializers.ValidationError(
+                        "Some documents in value don't exist or were specified twice.",
+                    )
 
         return data
 

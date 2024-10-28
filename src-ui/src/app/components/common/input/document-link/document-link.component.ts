@@ -71,9 +71,9 @@ export class DocumentLinkComponent
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe((documentResults) => {
           this.loading = false
-          this.selectedDocuments = documentIDs
-            .map((id) => documentResults.results.find((d) => d.id === id))
-            .filter((d) => d)
+          this.selectedDocuments = documentIDs.map((id) =>
+            documentResults.results.find((d) => d.id === id)
+          )
           super.writeValue(documentIDs)
         })
     }
@@ -114,7 +114,7 @@ export class DocumentLinkComponent
 
   unselect(document: Document): void {
     this.selectedDocuments = this.selectedDocuments.filter(
-      (d) => d.id !== document.id
+      (d) => d && d.id !== document.id
     )
     this.onChange(this.selectedDocuments.map((d) => d.id))
   }
