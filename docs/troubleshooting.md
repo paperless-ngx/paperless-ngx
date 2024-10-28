@@ -353,6 +353,20 @@ ways from the original. As the logs indicate, if you encounter this error you ca
 `PAPERLESS_OCR_USER_ARGS: '{"continue_on_soft_render_error": true}'` to try to 'force'
 processing documents with this issue.
 
+## Logs show "possible incompatible database column" when deleting documents {#convert-uuid-field}
+
+You may see errors when deleting documents like:
+
+```
+Data too long for column 'transaction_id' at row 1
+```
+
+This error can occur in installations which have upgraded from a version of Paperless-ngx that used Django 4 (Paperless-ngx versions prior to v2.13.0) with a MariaDB/MySQL database. Due to the backawards-incompatible change in Django 5, the column "documents_document.transaction_id" will need to be re-created, which can be done with a one-time run of the following management command:
+
+```shell-session
+$ python3 manage.py convert_mariadb_uuid
+```
+
 ## Platform-Specific Deployment Troubleshooting
 
 A user-maintained wiki page is available to help troubleshoot issues that may arise when trying to deploy Paperless-ngx on specific platforms, for example SELinux. Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Platform%E2%80%90Specific-Troubleshooting).
