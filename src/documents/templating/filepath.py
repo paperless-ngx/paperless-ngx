@@ -296,7 +296,7 @@ def validate_filepath_template_and_render(
     else:
         # or use the real document information
         tags_list = document.tags.order_by("name").all()
-        custom_fields = document.custom_fields.all()
+        custom_fields = CustomFieldInstance.global_objects.filter(document=document)
 
     # Build the context dictionary
     context = (
