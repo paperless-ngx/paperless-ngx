@@ -348,6 +348,8 @@ def cleanup_document_deletion(sender, instance, **kwargs):
                         f"While deleting document {instance!s}, the file "
                         f"{filename} could not be deleted: {e}",
                     )
+            elif filename and not os.path.isfile(filename):
+                logger.warn(f"Expected {filename} tp exist, but it did not")
 
         delete_empty_directories(
             os.path.dirname(instance.source_path),
@@ -461,7 +463,7 @@ def update_filename_and_move_files(
                 shutil.move(old_archive_path, instance.archive_path)
 
             # Don't save() here to prevent infinite recursion.
-            Document.objects.filter(pk=instance.pk).update(
+            Document.global_objects.filter(pk=instance.pk).update(
                 filename=instance.filename,
                 archive_filename=instance.archive_filename,
                 modified=timezone.now(),
