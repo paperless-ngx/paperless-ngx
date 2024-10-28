@@ -2,11 +2,11 @@
 
 You can go multiple routes to setup and run Paperless:
 
-- [Use the easy install docker script](#docker_script)
-- [Pull the image from Docker Hub](#docker_hub)
-- [Build the Docker image yourself](#docker_build)
-- [Install Paperless directly on your system manually (bare metal)](#bare_metal)
-- A user-maintained list of commercial hosting providers can be found [in the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Related-Projects)
+-   [Use the easy install docker script](#docker_script)
+-   [Pull the image from Docker Hub](#docker_hub)
+-   [Build the Docker image yourself](#docker_build)
+-   [Install Paperless directly on your system manually (bare metal)](#bare_metal)
+-   A user-maintained list of commercial hosting providers can be found [in the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Related-Projects)
 
 The Docker routes are quick & easy. These are the recommended routes.
 This configures all the stuff from the above automatically so that it
@@ -105,14 +105,14 @@ steps described in [Docker setup](#docker_hub) automatically.
 
     ```yaml
     ports:
-      - 8000:8000
+        - 8000:8000
     ```
 
     Replace the part BEFORE the colon with a port of your choice:
 
     ```yaml
     ports:
-      - 8010:8000
+        - 8010:8000
     ```
 
     Don't change the part after the colon or edit other lines that
@@ -129,11 +129,11 @@ steps described in [Docker setup](#docker_hub) automatically.
     If you want to run Paperless as a rootless container, you will need
     to do the following in your `docker-compose.yml`:
 
-    - set the `user` running the container to map to the `paperless`
-      user in the container. This value (`user_id` below), should be
-      the same id that `USERMAP_UID` and `USERMAP_GID` are set to in
-      the next step. See `USERMAP_UID` and `USERMAP_GID`
-      [here](configuration.md#docker).
+    -   set the `user` running the container to map to the `paperless`
+        user in the container. This value (`user_id` below), should be
+        the same id that `USERMAP_UID` and `USERMAP_GID` are set to in
+        the next step. See `USERMAP_UID` and `USERMAP_GID`
+        [here](configuration.md#docker).
 
     Your entry for Paperless should contain something like:
 
@@ -222,7 +222,7 @@ steps described in [Docker setup](#docker_hub) automatically.
 
     ```yaml
     webserver:
-      image: ghcr.io/paperless-ngx/paperless-ngx:latest
+        image: ghcr.io/paperless-ngx/paperless-ngx:latest
     ```
 
     and replace it with a line that instructs Docker Compose to build
@@ -230,8 +230,8 @@ steps described in [Docker setup](#docker_hub) automatically.
 
     ```yaml
     webserver:
-      build:
-        context: .
+        build:
+            context: .
     ```
 
 4.  Follow steps 3 to 8 of [Docker Setup](#docker_hub). When asked to run
@@ -257,20 +257,20 @@ are released, dependency support is confirmed, etc.
 
 1.  Install dependencies. Paperless requires the following packages.
 
-    - `python3`
-    - `python3-pip`
-    - `python3-dev`
-    - `default-libmysqlclient-dev` for MariaDB
-    - `pkg-config` for mysqlclient (python dependency)
-    - `fonts-liberation` for generating thumbnails for plain text
-      files
-    - `imagemagick` >= 6 for PDF conversion
-    - `gnupg` for handling encrypted documents
-    - `libpq-dev` for PostgreSQL
-    - `libmagic-dev` for mime type detection
-    - `mariadb-client` for MariaDB compile time
-    - `libzbar0` for barcode detection
-    - `poppler-utils` for barcode detection
+    -   `python3`
+    -   `python3-pip`
+    -   `python3-dev`
+    -   `default-libmysqlclient-dev` for MariaDB
+    -   `pkg-config` for mysqlclient (python dependency)
+    -   `fonts-liberation` for generating thumbnails for plain text
+        files
+    -   `imagemagick` >= 6 for PDF conversion
+    -   `gnupg` for handling encrypted documents
+    -   `libpq-dev` for PostgreSQL
+    -   `libmagic-dev` for mime type detection
+    -   `mariadb-client` for MariaDB compile time
+    -   `libzbar0` for barcode detection
+    -   `poppler-utils` for barcode detection
 
     Use this list for your preferred package management:
 
@@ -281,17 +281,17 @@ are released, dependency support is confirmed, etc.
     These dependencies are required for OCRmyPDF, which is used for text
     recognition.
 
-    - `unpaper`
-    - `ghostscript`
-    - `icc-profiles-free`
-    - `qpdf`
-    - `liblept5`
-    - `libxml2`
-    - `pngquant` (suggested for certain PDF image optimizations)
-    - `zlib1g`
-    - `tesseract-ocr` >= 4.0.0 for OCR
-    - `tesseract-ocr` language packs (`tesseract-ocr-eng`,
-      `tesseract-ocr-deu`, etc)
+    -   `unpaper`
+    -   `ghostscript`
+    -   `icc-profiles-free`
+    -   `qpdf`
+    -   `liblept5`
+    -   `libxml2`
+    -   `pngquant` (suggested for certain PDF image optimizations)
+    -   `zlib1g`
+    -   `tesseract-ocr` >= 4.0.0 for OCR
+    -   `tesseract-ocr` language packs (`tesseract-ocr-eng`,
+        `tesseract-ocr-deu`, etc)
 
     Use this list for your preferred package management:
 
@@ -301,15 +301,15 @@ are released, dependency support is confirmed, etc.
 
     On Raspberry Pi, these libraries are required as well:
 
-    - `libatlas-base-dev`
-    - `libxslt1-dev`
-    - `mime-support`
+    -   `libatlas-base-dev`
+    -   `libxslt1-dev`
+    -   `mime-support`
 
     You will also need these for installing some of the python dependencies:
 
-    - `build-essential`
-    - `python3-setuptools`
-    - `python3-wheel`
+    -   `build-essential`
+    -   `python3-setuptools`
+    -   `python3-wheel`
 
     Use this list for your preferred package management:
 
@@ -361,33 +361,33 @@ are released, dependency support is confirmed, etc.
     needs. Required settings for getting
     paperless running are:
 
-    - [`PAPERLESS_REDIS`](configuration.md#PAPERLESS_REDIS) should point to your redis server, such as
-      <redis://localhost:6379>.
-    - [`PAPERLESS_DBENGINE`](configuration.md#PAPERLESS_DBENGINE) optional, and should be one of `postgres`,
-      `mariadb`, or `sqlite`
-    - [`PAPERLESS_DBHOST`](configuration.md#PAPERLESS_DBHOST) should be the hostname on which your
-      PostgreSQL server is running. Do not configure this to use
-      SQLite instead. Also configure port, database name, user and
-      password as necessary.
-    - [`PAPERLESS_CONSUMPTION_DIR`](configuration.md#PAPERLESS_CONSUMPTION_DIR) should point to a folder which
-      paperless should watch for documents. You might want to have
-      this somewhere else. Likewise, [`PAPERLESS_DATA_DIR`](configuration.md#PAPERLESS_DATA_DIR) and
-      [`PAPERLESS_MEDIA_ROOT`](configuration.md#PAPERLESS_MEDIA_ROOT) define where paperless stores its data.
-      If you like, you can point both to the same directory.
-    - [`PAPERLESS_SECRET_KEY`](configuration.md#PAPERLESS_SECRET_KEY) should be a random sequence of
-      characters. It's used for authentication. Failure to do so
-      allows third parties to forge authentication credentials.
-    - [`PAPERLESS_URL`](configuration.md#PAPERLESS_URL) if you are behind a reverse proxy. This should
-      point to your domain. Please see
-      [configuration](configuration.md) for more
-      information.
+    -   [`PAPERLESS_REDIS`](configuration.md#PAPERLESS_REDIS) should point to your redis server, such as
+        <redis://localhost:6379>.
+    -   [`PAPERLESS_DBENGINE`](configuration.md#PAPERLESS_DBENGINE) optional, and should be one of `postgres`,
+        `mariadb`, or `sqlite`
+    -   [`PAPERLESS_DBHOST`](configuration.md#PAPERLESS_DBHOST) should be the hostname on which your
+        PostgreSQL server is running. Do not configure this to use
+        SQLite instead. Also configure port, database name, user and
+        password as necessary.
+    -   [`PAPERLESS_CONSUMPTION_DIR`](configuration.md#PAPERLESS_CONSUMPTION_DIR) should point to a folder which
+        paperless should watch for documents. You might want to have
+        this somewhere else. Likewise, [`PAPERLESS_DATA_DIR`](configuration.md#PAPERLESS_DATA_DIR) and
+        [`PAPERLESS_MEDIA_ROOT`](configuration.md#PAPERLESS_MEDIA_ROOT) define where paperless stores its data.
+        If you like, you can point both to the same directory.
+    -   [`PAPERLESS_SECRET_KEY`](configuration.md#PAPERLESS_SECRET_KEY) should be a random sequence of
+        characters. It's used for authentication. Failure to do so
+        allows third parties to forge authentication credentials.
+    -   [`PAPERLESS_URL`](configuration.md#PAPERLESS_URL) if you are behind a reverse proxy. This should
+        point to your domain. Please see
+        [configuration](configuration.md) for more
+        information.
 
     Many more adjustments can be made to paperless, especially the OCR
     part. The following options are recommended for everyone:
 
-    - Set [`PAPERLESS_OCR_LANGUAGE`](configuration.md#PAPERLESS_OCR_LANGUAGE) to the language most of your
-      documents are written in.
-    - Set [`PAPERLESS_TIME_ZONE`](configuration.md#PAPERLESS_TIME_ZONE) to your local time zone.
+    -   Set [`PAPERLESS_OCR_LANGUAGE`](configuration.md#PAPERLESS_OCR_LANGUAGE) to the language most of your
+        documents are written in.
+    -   Set [`PAPERLESS_TIME_ZONE`](configuration.md#PAPERLESS_TIME_ZONE) to your local time zone.
 
     !!! warning
 
@@ -395,9 +395,9 @@ are released, dependency support is confirmed, etc.
 
 7.  Create the following directories if they are missing:
 
-    - `/opt/paperless/media`
-    - `/opt/paperless/data`
-    - `/opt/paperless/consume`
+    -   `/opt/paperless/media`
+    -   `/opt/paperless/data`
+    -   `/opt/paperless/consume`
 
     Adjust as necessary if you configured different folders.
     Ensure that the paperless user has write permissions for every one
@@ -586,21 +586,21 @@ your setup depending on how you installed paperless.
 This setup describes how to update an existing paperless Docker
 installation. The important things to keep in mind are as follows:
 
-- Read the [changelog](changelog.md) and
-  take note of breaking changes.
-- You should decide if you want to stick with SQLite or want to
-  migrate your database to PostgreSQL. See [documentation](#sqlite_to_psql)
-  for details on
-  how to move your data from SQLite to PostgreSQL. Both work fine with
-  paperless. However, if you already have a database server running
-  for other services, you might as well use it for paperless as well.
-- The task scheduler of paperless, which is used to execute periodic
-  tasks such as email checking and maintenance, requires a
-  [redis](https://redis.io/) message broker instance. The
-  Docker Compose route takes care of that.
-- The layout of the folder structure for your documents and data
-  remains the same, so you can just plug your old docker volumes into
-  paperless-ngx and expect it to find everything where it should be.
+-   Read the [changelog](changelog.md) and
+    take note of breaking changes.
+-   You should decide if you want to stick with SQLite or want to
+    migrate your database to PostgreSQL. See [documentation](#sqlite_to_psql)
+    for details on
+    how to move your data from SQLite to PostgreSQL. Both work fine with
+    paperless. However, if you already have a database server running
+    for other services, you might as well use it for paperless as well.
+-   The task scheduler of paperless, which is used to execute periodic
+    tasks such as email checking and maintenance, requires a
+    [redis](https://redis.io/) message broker instance. The
+    Docker Compose route takes care of that.
+-   The layout of the folder structure for your documents and data
+    remains the same, so you can just plug your old docker volumes into
+    paperless-ngx and expect it to find everything where it should be.
 
 Migration to paperless-ngx is then performed in a few simple steps:
 
@@ -763,30 +763,30 @@ Paperless runs on Raspberry Pi. However, some things are rather slow on
 the Pi and configuring some options in paperless can help improve
 performance immensely:
 
-- Stick with SQLite to save some resources.
-- Consider setting [`PAPERLESS_OCR_PAGES`](configuration.md#PAPERLESS_OCR_PAGES) to 1, so that paperless will
-  only OCR the first page of your documents. In most cases, this page
-  contains enough information to be able to find it.
-- [`PAPERLESS_TASK_WORKERS`](configuration.md#PAPERLESS_TASK_WORKERS) and [`PAPERLESS_THREADS_PER_WORKER`](configuration.md#PAPERLESS_THREADS_PER_WORKER) are
-  configured to use all cores. The Raspberry Pi models 3 and up have 4
-  cores, meaning that paperless will use 2 workers and 2 threads per
-  worker. This may result in sluggish response times during
-  consumption, so you might want to lower these settings (example: 2
-  workers and 1 thread to always have some computing power left for
-  other tasks).
-- Keep [`PAPERLESS_OCR_MODE`](configuration.md#PAPERLESS_OCR_MODE) at its default value `skip` and consider
-  OCR'ing your documents before feeding them into paperless. Some
-  scanners are able to do this!
-- Set [`PAPERLESS_OCR_SKIP_ARCHIVE_FILE`](configuration.md#PAPERLESS_OCR_SKIP_ARCHIVE_FILE) to `with_text` to skip archive
-  file generation for already ocr'ed documents, or `always` to skip it
-  for all documents.
-- If you want to perform OCR on the device, consider using
-  `PAPERLESS_OCR_CLEAN=none`. This will speed up OCR times and use
-  less memory at the expense of slightly worse OCR results.
-- If using docker, consider setting [`PAPERLESS_WEBSERVER_WORKERS`](configuration.md#PAPERLESS_WEBSERVER_WORKERS) to 1. This will save some memory.
-- Consider setting [`PAPERLESS_ENABLE_NLTK`](configuration.md#PAPERLESS_ENABLE_NLTK) to false, to disable the
-  more advanced language processing, which can take more memory and
-  processing time.
+-   Stick with SQLite to save some resources.
+-   Consider setting [`PAPERLESS_OCR_PAGES`](configuration.md#PAPERLESS_OCR_PAGES) to 1, so that paperless will
+    only OCR the first page of your documents. In most cases, this page
+    contains enough information to be able to find it.
+-   [`PAPERLESS_TASK_WORKERS`](configuration.md#PAPERLESS_TASK_WORKERS) and [`PAPERLESS_THREADS_PER_WORKER`](configuration.md#PAPERLESS_THREADS_PER_WORKER) are
+    configured to use all cores. The Raspberry Pi models 3 and up have 4
+    cores, meaning that paperless will use 2 workers and 2 threads per
+    worker. This may result in sluggish response times during
+    consumption, so you might want to lower these settings (example: 2
+    workers and 1 thread to always have some computing power left for
+    other tasks).
+-   Keep [`PAPERLESS_OCR_MODE`](configuration.md#PAPERLESS_OCR_MODE) at its default value `skip` and consider
+    OCR'ing your documents before feeding them into paperless. Some
+    scanners are able to do this!
+-   Set [`PAPERLESS_OCR_SKIP_ARCHIVE_FILE`](configuration.md#PAPERLESS_OCR_SKIP_ARCHIVE_FILE) to `with_text` to skip archive
+    file generation for already ocr'ed documents, or `always` to skip it
+    for all documents.
+-   If you want to perform OCR on the device, consider using
+    `PAPERLESS_OCR_CLEAN=none`. This will speed up OCR times and use
+    less memory at the expense of slightly worse OCR results.
+-   If using docker, consider setting [`PAPERLESS_WEBSERVER_WORKERS`](configuration.md#PAPERLESS_WEBSERVER_WORKERS) to 1. This will save some memory.
+-   Consider setting [`PAPERLESS_ENABLE_NLTK`](configuration.md#PAPERLESS_ENABLE_NLTK) to false, to disable the
+    more advanced language processing, which can take more memory and
+    processing time.
 
 For details, refer to [configuration](configuration.md).
 
