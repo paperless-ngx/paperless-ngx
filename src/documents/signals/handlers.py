@@ -365,6 +365,7 @@ class CannotMoveFilesException(Exception):
     pass
 
 
+# should be disabled in /src/documents/management/commands/document_importer.py handle
 @receiver(models.signals.post_save, sender=CustomField)
 def update_cf_instance_documents(sender, instance: CustomField, **kwargs):
     """
@@ -379,6 +380,7 @@ def update_cf_instance_documents(sender, instance: CustomField, **kwargs):
             update_filename_and_move_files(sender, cf_instance)
 
 
+# should be disabled in /src/documents/management/commands/document_importer.py handle
 @receiver(models.signals.post_save, sender=CustomFieldInstance)
 @receiver(models.signals.m2m_changed, sender=Document.tags.through)
 @receiver(models.signals.post_save, sender=Document)

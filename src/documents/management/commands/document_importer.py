@@ -34,6 +34,7 @@ from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_CRYPTO_SETTINGS_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
+from documents.signals.handlers import update_cf_instance_documents
 from documents.signals.handlers import update_filename_and_move_files
 from documents.utils import copy_file_with_basic_stats
 from paperless import version
@@ -242,6 +243,7 @@ class Command(CryptMixin, BaseCommand):
 
         self.decrypt_secret_fields()
 
+        # see /src/documents/signals/handlers.py
         with (
             disable_signal(
                 post_save,
@@ -252,6 +254,16 @@ class Command(CryptMixin, BaseCommand):
                 m2m_changed,
                 receiver=update_filename_and_move_files,
                 sender=Document.tags.through,
+            ),
+            disable_signal(
+                post_save,
+                receiver=update_filename_and_move_files,
+                sender=CustomFieldInstance,
+            ),
+            disable_signal(
+                post_save,
+                receiver=update_cf_instance_documents,
+                sender=CustomField,
             ),
         ):
             if settings.AUDIT_LOG_ENABLED:
