@@ -1262,4 +1262,43 @@ describe('DocumentDetailComponent', () => {
     expect(component.createDisabled(DataType.StoragePath)).toBeFalsy()
     expect(component.createDisabled(DataType.Tag)).toBeFalsy()
   })
+
+  it('should call tryRenderTiff when no archive and file is tiff', () => {
+    initNormally()
+    const tiffRenderSpy = jest.spyOn(
+      DocumentDetailComponent.prototype as any,
+      'tryRenderTiff'
+    )
+    jest
+      .spyOn(documentService, 'getMetadata')
+      .mockReturnValue(
+        of({ has_archive_version: false, original_mime_type: 'image/tiff' })
+      )
+    component.updateComponent(doc)
+    fixture.detectChanges()
+    expect(component.archiveContentRenderType).toEqual(
+      component.ContentRenderType.TIFF
+    )
+    expect(tiffRenderSpy).toHaveBeenCalled()
+  })
+
+  it('should try to render tiff and show error if failed', () => {
+    initNormally()
+    // just the text request
+    httpTestingController.expectOne(component.previewUrl)
+
+    // invalid tiff
+    component['tryRenderTiff']()
+    httpTestingController
+      .expectOne(component.previewUrl)
+      .flush(new ArrayBuffer(100)) // arraybuffer
+    expect(component.tiffError).not.toBeUndefined()
+
+    // http error
+    component['tryRenderTiff']()
+    httpTestingController
+      .expectOne(component.previewUrl)
+      .error(new ErrorEvent('failed'))
+    expect(component.tiffError).not.toBeUndefined()
+  })
 })

@@ -72,6 +72,7 @@ import { DeletePagesConfirmDialogComponent } from '../common/confirm-dialog/dele
 import { HotKeyService } from 'src/app/services/hot-key.service'
 import { PDFDocumentProxy } from 'ng2-pdf-viewer'
 import { DataType } from 'src/app/data/datatype'
+import * as UTIF from 'utif'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -89,6 +90,7 @@ enum ContentRenderType {
   Text = 'text',
   Other = 'other',
   Unknown = 'unknown',
+  TIFF = 'tiff',
 }
 
 enum ZoomSetting {
@@ -134,6 +136,8 @@ export class DocumentDetailComponent
   previewText: string
   downloadUrl: string
   downloadOriginalUrl: string
+  tiffURL: string
+  tiffError: string
 
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
@@ -240,6 +244,8 @@ export class DocumentDetailComponent
       ['text/plain', 'application/csv', 'text/csv'].includes(mimeType)
     ) {
       return ContentRenderType.Text
+    } else if (mimeType.indexOf('tiff') >= 0) {
+      return ContentRenderType.TIFF
     } else if (mimeType?.indexOf('image/') === 0) {
       return ContentRenderType.Image
     }
@@ -537,6 +543,9 @@ export class DocumentDetailComponent
       .subscribe({
         next: (result) => {
           this.metadata = result
+          if (this.archiveContentRenderType === ContentRenderType.TIFF) {
+            this.tryRenderTiff()
+          }
         },
         error: (error) => {
           this.metadata = {} // allow display to fallback to <object> tag
@@ -1249,5 +1258,46 @@ export class DocumentDetailComponent
             },
           })
       })
+  }
+
+  private tryRenderTiff() {
+    this.http.get(this.previewUrl, { responseType: 'arraybuffer' }).subscribe({
+      next: (res) => {
+        /* istanbul ignore next */
+        try {
+          // See UTIF.js > _imgLoaded
+          const tiffIfds: any[] = UTIF.decode(res)
+          var vsns = tiffIfds,
+            ma = 0,
+            page = vsns[0]
+          if (tiffIfds[0].subIFD) vsns = vsns.concat(tiffIfds[0].subIFD)
+          for (var i = 0; i < vsns.length; i++) {
+            var img = vsns[i]
+            if (img['t258'] == null || img['t258'].length < 3) continue
+            var ar = img['t256'] * img['t257']
+            if (ar > ma) {
+              ma = ar
+              page = img
+            }
+          }
+          UTIF.decodeImage(res, page, tiffIfds)
+          const rgba = UTIF.toRGBA8(page)
+          const { width: w, height: h } = page
+          var cnv = document.createElement('canvas')
+          cnv.width = w
+          cnv.height = h
+          var ctx = cnv.getContext('2d'),
+            imgd = ctx.createImageData(w, h)
+          for (var i = 0; i < rgba.length; i++) imgd.data[i] = rgba[i]
+          ctx.putImageData(imgd, 0, 0)
+          this.tiffURL = cnv.toDataURL()
+        } catch (err) {
+          this.tiffError = $localize`An error occurred loading tiff: ${err.toString()}`
+        }
+      },
+      error: (err) => {
+        this.tiffError = $localize`An error occurred loading tiff: ${err.toString()}`
+      },
+    })
   }
 }

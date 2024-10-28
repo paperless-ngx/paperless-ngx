@@ -35,6 +35,7 @@
     "ngx-ui-tour-ng-bootstrap": "^15.0.0",
     "rxjs": "^7.8.1",
     "tslib": "^2.7.0",
+    "utif": "^3.1.0",
     "uuid": "^10.0.0",
     "zone.js": "^0.14.8"
   },
