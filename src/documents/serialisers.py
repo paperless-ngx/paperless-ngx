@@ -855,6 +855,8 @@ class DocumentSerializer(
                 super().update(instance, validated_data)
         else:
             super().update(instance, validated_data)
+        # hard delete custom field instances that were soft deleted
+        CustomFieldInstance.deleted_objects.filter(document=instance).delete()
         return instance
 
     def __init__(self, *args, **kwargs):
