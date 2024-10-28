@@ -56,16 +56,17 @@ tqdm = "*"
 # See https://github.com/paperless-ngx/paperless-ngx/issues/5494
 uvicorn = {extras = ["standard"], version = "==0.25.0"}
 watchdog = "~=4.0"
-whitenoise = "~=6.7"
+whitenoise = "~=6.8"
 whoosh = "~=2.7"
 zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
+
 
 [dev-packages]
 # Linting
 pre-commit = "*"
 ruff = "*"
-# Testing
 factory-boy = "*"
+# Testing
 pytest = "*"
 pytest-cov = "*"
 pytest-django = "*"
