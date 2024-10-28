@@ -2,7 +2,6 @@
 
 ## paperless-ngx 2.13.1
 
-
 ### Bug Fixes
 
 -   Fix: allow removing dead document links from UI, validate via API [@shamoon](https://github.com/shamoon) ([#8081](https://github.com/paperless-ngx/paperless-ngx/pull/8081))
