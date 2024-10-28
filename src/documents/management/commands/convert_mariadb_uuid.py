@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.db import models
-from django.db import transaction
 
 from documents.models import Document
 
@@ -34,5 +33,4 @@ class Command(BaseCommand):
             )
 
     def handle(self, **options):
-        with transaction.atomic():
-            self.convert_field(Document, "transaction_id", null=True)
+        self.convert_field(Document, "transaction_id", null=True)
