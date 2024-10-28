@@ -2,10 +2,6 @@
 
 ## paperless-ngx 2.13.1
 
-### Features
-
--   Enhancement: auto-rename document files when select type custom fields are changed [@shamoon](https://github.com/shamoon) ([#8045](https://github.com/paperless-ngx/paperless-ngx/pull/8045))
--   Enhancement / fix: include social accounts and api tokens in export [@shamoon](https://github.com/shamoon) ([#8016](https://github.com/paperless-ngx/paperless-ngx/pull/8016))
 
 ### Bug Fixes
 
@@ -18,9 +14,11 @@
 -   Fix: disable custom field signals during import in 2.13.0 [@shamoon](https://github.com/shamoon) ([#8065](https://github.com/paperless-ngx/paperless-ngx/pull/8065))
 -   Fix: doc link documents search should exclude null [@shamoon](https://github.com/shamoon) ([#8064](https://github.com/paperless-ngx/paperless-ngx/pull/8064))
 -   Fix: fix custom field query empty element removal [@shamoon](https://github.com/shamoon) ([#8056](https://github.com/paperless-ngx/paperless-ngx/pull/8056))
+-   Fix / Enhancement: auto-rename document files when select type custom fields are changed [@shamoon](https://github.com/shamoon) ([#8045](https://github.com/paperless-ngx/paperless-ngx/pull/8045))
 -   Fix: dont try to load PAPERLESS_MODEL_FILE as env from file [@shamoon](https://github.com/shamoon) ([#8040](https://github.com/paperless-ngx/paperless-ngx/pull/8040))
 -   Fix: dont include all allauth urls [@shamoon](https://github.com/shamoon) ([#8010](https://github.com/paperless-ngx/paperless-ngx/pull/8010))
 -   Fix: oauth settings without base url [@shamoon](https://github.com/shamoon) ([#8020](https://github.com/paperless-ngx/paperless-ngx/pull/8020))
+-   Fix / Enhancement: include social accounts and api tokens in export [@shamoon](https://github.com/shamoon) ([#8016](https://github.com/paperless-ngx/paperless-ngx/pull/8016))
 
 ### Maintenance
 
