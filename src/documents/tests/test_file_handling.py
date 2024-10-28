@@ -960,17 +960,27 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             - the generated filename uses the defined storage path for the document
             - the generated filename does not include "none" in the place undefined field
         """
+        sp = StoragePath.objects.create(
+            path="TestFolder/{{asn}}/{{created}}",
+        )
         doc = Document.objects.create(
             title="does not matter",
             created=timezone.make_aware(datetime.datetime(2020, 6, 25, 7, 36, 51, 153)),
             mime_type="application/pdf",
             pk=2,
             checksum="2",
-            storage_path=StoragePath.objects.create(
-                path="TestFolder/{{asn}}/{{created}}",
-            ),
+            storage_path=sp,
         )
         self.assertEqual(generate_filename(doc), "TestFolder/2020-06-25.pdf")
+
+        # Special case, undefined variable, then defined at the start of the template
+        # This could lead to an absolute path after we remove the leading -none-, but leave the leading /
+        # -none-/2020/ -> /2020/
+        sp.path = (
+            "{{ owner_username }}/{{ created_year }}/{{ correspondent }}/{{ title }}"
+        )
+        sp.save()
+        self.assertEqual(generate_filename(doc), "2020/does not matter.pdf")
 
     def test_multiple_doc_paths(self):
         """

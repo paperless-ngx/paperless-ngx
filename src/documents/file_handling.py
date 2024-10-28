@@ -111,6 +111,7 @@ def generate_filename(
             rendered_filename = rendered_filename.replace("/-none-/", "/")
             rendered_filename = rendered_filename.replace(" -none-", "")
             rendered_filename = rendered_filename.replace("-none-", "")
+            rendered_filename = rendered_filename.strip(os.sep)
 
         rendered_filename = rendered_filename.replace(
             "-none-",
