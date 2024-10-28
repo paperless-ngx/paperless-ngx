@@ -710,7 +710,7 @@ class PaperlessTask(models.Model):
         return f"Task {self.task_id}"
 
 
-class Note(models.Model):
+class Note(SoftDeleteModel):
     note = models.TextField(
         _("content"),
         blank=True,
@@ -750,7 +750,7 @@ class Note(models.Model):
         return self.note
 
 
-class ShareLink(models.Model):
+class ShareLink(SoftDeleteModel):
     class FileVersion(models.TextChoices):
         ARCHIVE = ("archive", _("Archive"))
         ORIGINAL = ("original", _("Original"))
