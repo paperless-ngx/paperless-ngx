@@ -1,5 +1,47 @@
 # Changelog
 
+## paperless-ngx 2.13.1
+
+### Bug Fixes
+
+-   Fix: allow removing dead document links from UI, validate via API [@shamoon](https://github.com/shamoon) ([#8081](https://github.com/paperless-ngx/paperless-ngx/pull/8081))
+-   Fix: Removes whitenoise patches and upgrades it to 6.8.1 [@stumpylog](https://github.com/stumpylog) ([#8079](https://github.com/paperless-ngx/paperless-ngx/pull/8079))
+-   Fix: Make all document related objects soft delete, fix filepath when deleted [@shamoon](https://github.com/shamoon) ([#8067](https://github.com/paperless-ngx/paperless-ngx/pull/8067))
+-   Fix: handle uuid fields created under mariadb and Django 4 [@shamoon](https://github.com/shamoon) ([#8034](https://github.com/paperless-ngx/paperless-ngx/pull/8034))
+-   Fix: Update filename correctly if the document is in the trash [@stumpylog](https://github.com/stumpylog) ([#8066](https://github.com/paperless-ngx/paperless-ngx/pull/8066))
+-   Fix: Handle a special case where removing none marker could result in an absolute path [@stumpylog](https://github.com/stumpylog) ([#8060](https://github.com/paperless-ngx/paperless-ngx/pull/8060))
+-   Fix: disable custom field signals during import in 2.13.0 [@shamoon](https://github.com/shamoon) ([#8065](https://github.com/paperless-ngx/paperless-ngx/pull/8065))
+-   Fix: doc link documents search should exclude null [@shamoon](https://github.com/shamoon) ([#8064](https://github.com/paperless-ngx/paperless-ngx/pull/8064))
+-   Fix: fix custom field query empty element removal [@shamoon](https://github.com/shamoon) ([#8056](https://github.com/paperless-ngx/paperless-ngx/pull/8056))
+-   Fix / Enhancement: auto-rename document files when select type custom fields are changed [@shamoon](https://github.com/shamoon) ([#8045](https://github.com/paperless-ngx/paperless-ngx/pull/8045))
+-   Fix: dont try to load PAPERLESS_MODEL_FILE as env from file [@shamoon](https://github.com/shamoon) ([#8040](https://github.com/paperless-ngx/paperless-ngx/pull/8040))
+-   Fix: dont include all allauth urls [@shamoon](https://github.com/shamoon) ([#8010](https://github.com/paperless-ngx/paperless-ngx/pull/8010))
+-   Fix: oauth settings without base url [@shamoon](https://github.com/shamoon) ([#8020](https://github.com/paperless-ngx/paperless-ngx/pull/8020))
+-   Fix / Enhancement: include social accounts and api tokens in export [@shamoon](https://github.com/shamoon) ([#8016](https://github.com/paperless-ngx/paperless-ngx/pull/8016))
+
+### Maintenance
+
+-   Fix: Removes whitenoise patches and upgrades it to 6.8.1 [@stumpylog](https://github.com/stumpylog) ([#8079](https://github.com/paperless-ngx/paperless-ngx/pull/8079))
+
+### All App Changes
+
+<details>
+<summary>12 changes</summary>
+
+-   Fix: allow removing dead document links from UI, validate via API [@shamoon](https://github.com/shamoon) ([#8081](https://github.com/paperless-ngx/paperless-ngx/pull/8081))
+-   Fix: Make all document related objects soft delete, fix filepath when deleted [@shamoon](https://github.com/shamoon) ([#8067](https://github.com/paperless-ngx/paperless-ngx/pull/8067))
+-   Fix: handle uuid fields created under mariadb and Django 4 [@shamoon](https://github.com/shamoon) ([#8034](https://github.com/paperless-ngx/paperless-ngx/pull/8034))
+-   Fix: Update filename correctly if the document is in the trash [@stumpylog](https://github.com/stumpylog) ([#8066](https://github.com/paperless-ngx/paperless-ngx/pull/8066))
+-   Fix: Handle a special case where removing none marker could result in an absolute path [@stumpylog](https://github.com/stumpylog) ([#8060](https://github.com/paperless-ngx/paperless-ngx/pull/8060))
+-   Fix: disable custom field signals during import in 2.13.0 [@shamoon](https://github.com/shamoon) ([#8065](https://github.com/paperless-ngx/paperless-ngx/pull/8065))
+-   Fix: doc link documents search should exclude null [@shamoon](https://github.com/shamoon) ([#8064](https://github.com/paperless-ngx/paperless-ngx/pull/8064))
+-   Enhancement: auto-rename document files when select type custom fields are changed [@shamoon](https://github.com/shamoon) ([#8045](https://github.com/paperless-ngx/paperless-ngx/pull/8045))
+-   Fix: fix custom field query empty element removal [@shamoon](https://github.com/shamoon) ([#8056](https://github.com/paperless-ngx/paperless-ngx/pull/8056))
+-   Fix: dont include all allauth urls [@shamoon](https://github.com/shamoon) ([#8010](https://github.com/paperless-ngx/paperless-ngx/pull/8010))
+-   Enhancement / fix: include social accounts and api tokens in export [@shamoon](https://github.com/shamoon) ([#8016](https://github.com/paperless-ngx/paperless-ngx/pull/8016))
+-   Fix: oauth settings without base url [@shamoon](https://github.com/shamoon) ([#8020](https://github.com/paperless-ngx/paperless-ngx/pull/8020))
+</details>
+
 ## paperless-ngx 2.12.1
 
 ### Bug Fixes
