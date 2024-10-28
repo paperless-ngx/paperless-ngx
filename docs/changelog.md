@@ -23,7 +23,6 @@
 ### Maintenance
 
 -   Fix: Removes whitenoise patches and upgrades it to 6.8.1 [@stumpylog](https://github.com/stumpylog) ([#8079](https://github.com/paperless-ngx/paperless-ngx/pull/8079))
--   Chore: fix changelog script [@shamoon](https://github.com/shamoon) ([#8022](https://github.com/paperless-ngx/paperless-ngx/pull/8022))
 
 ### All App Changes
 
