@@ -883,7 +883,11 @@ def run_workflows(
             title=subject,
             document=document,
         )
-        # TODO: if doc exists, construct URL
+        doc_url = None
+        if isinstance(document, Document):
+            doc_url = f"{settings.PAPERLESS_URL}/documents/{document.pk}/"
+        if doc_url:
+            body += f"\n\n{doc_url}"
         if action.notification_destination_emails:
             if not settings.EMAIL_ENABLED:
                 logger.error(
