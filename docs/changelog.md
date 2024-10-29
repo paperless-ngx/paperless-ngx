@@ -1,5 +1,21 @@
 # Changelog
 
+## paperless-ngx 2.13.2
+
+### Bug Fixes
+
+-   Fix: remove auth tokens from export [@shamoon](https://github.com/shamoon) ([#8100](https://github.com/paperless-ngx/paperless-ngx/pull/8100))
+-   Fix: cf query dropdown styling affecting other components [@shamoon](https://github.com/shamoon) ([#8095](https://github.com/paperless-ngx/paperless-ngx/pull/8095))
+
+### All App Changes
+
+<details>
+<summary>2 changes</summary>
+
+-   Fix: remove auth tokens from export [@shamoon](https://github.com/shamoon) ([#8100](https://github.com/paperless-ngx/paperless-ngx/pull/8100))
+-   Fix: cf query dropdown styling affecting other components [@shamoon](https://github.com/shamoon) ([#8095](https://github.com/paperless-ngx/paperless-ngx/pull/8095))
+</details>
+
 ## paperless-ngx 2.13.1
 
 ### Bug Fixes
