@@ -108,13 +108,6 @@ class CryptMixin:
                 "token_secret",
             ],
         },
-        {
-            "exporter_key": "auth_tokens",
-            "model_name": "authtoken.token",
-            "fields": [
-                "key",
-            ],
-        },
     ]
 
     def get_crypt_params(self) -> dict[str, dict[str, str | int]]:

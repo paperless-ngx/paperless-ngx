@@ -24,7 +24,6 @@ from django.utils import timezone
 from filelock import FileLock
 from guardian.models import GroupObjectPermission
 from guardian.models import UserObjectPermission
-from rest_framework.authtoken.models import Token
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -271,7 +270,6 @@ class Command(CryptMixin, BaseCommand):
             "social_accounts": SocialAccount.objects.all(),
             "social_apps": SocialApp.objects.all(),
             "social_tokens": SocialToken.objects.all(),
-            "auth_tokens": Token.objects.all(),
         }
 
         if settings.AUDIT_LOG_ENABLED:
@@ -570,11 +568,7 @@ class Command(CryptMixin, BaseCommand):
                                 value=manifest_record["fields"][field],
                             )
 
-        elif (
-            MailAccount.objects.count() > 0
-            or SocialToken.objects.count() > 0
-            or Token.objects.count() > 0
-        ):
+        elif MailAccount.objects.count() > 0 or SocialToken.objects.count() > 0:
             self.stdout.write(
                 self.style.NOTICE(
                     "No passphrase was given, sensitive fields will be in plaintext",
