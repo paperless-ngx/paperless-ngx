@@ -5473,7 +5473,7 @@
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Filter documents with these Tags</target>
+        <target state="translated">按标签过滤</target>
       </trans-unit>
       <trans-unit id="5752465522295465624" datatype="html">
         <source>What&apos;s this?</source>
@@ -5537,7 +5537,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">75</context>
         </context-group>
-        <target state="needs-translation">Any and all existing owner, user and group permissions will be replaced.</target>
+        <target state="translated"/>
       </trans-unit>
       <trans-unit id="5947558132119506443" datatype="html">
         <source>My documents</source>
