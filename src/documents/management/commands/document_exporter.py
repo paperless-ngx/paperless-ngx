@@ -271,7 +271,6 @@ class Command(CryptMixin, BaseCommand):
             "social_accounts": SocialAccount.objects.all(),
             "social_apps": SocialApp.objects.all(),
             "social_tokens": SocialToken.objects.all(),
-            "auth_tokens": Token.objects.all(),
         }
 
         if settings.AUDIT_LOG_ENABLED:
@@ -285,6 +284,20 @@ class Command(CryptMixin, BaseCommand):
                 manifest_dict[key] = json.loads(
                     serializers.serialize("json", manifest_key_to_object_query[key]),
                 )
+
+            # Add the auth tokens to the manifest, serialized manually
+            manifest_dict["auth_tokens"] = [
+                {
+                    "model": "authtoken.token",
+                    "pk": t.pk,
+                    "fields": {
+                        "key": t.key,
+                        "user": t.user_id,
+                        "created": t.created.isoformat(),
+                    },
+                }
+                for t in Token.objects.all()
+            ]
 
             self.encrypt_secret_fields(manifest_dict)
 

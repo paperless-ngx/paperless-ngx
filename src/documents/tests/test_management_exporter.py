@@ -20,6 +20,7 @@ from django.utils import timezone
 from guardian.models import GroupObjectPermission
 from guardian.models import UserObjectPermission
 from guardian.shortcuts import assign_perm
+from rest_framework.authtoken.models import Token
 
 from documents.management.commands import document_exporter
 from documents.models import Correspondent
@@ -874,6 +875,8 @@ class TestCryptExportImport(
             password="mypassword",
         )
 
+        Token.objects.create(user=User.objects.first())
+
         call_command(
             "document_exporter",
             "--no-progress-bar",
@@ -911,6 +914,10 @@ class TestCryptExportImport(
 
         self.assertIsNotNone(account)
         self.assertEqual(account.password, "mypassword")
+
+        token = Token.objects.first()
+
+        self.assertIsNotNone(token)
 
     def test_import_crypt_no_passphrase(self):
         """
