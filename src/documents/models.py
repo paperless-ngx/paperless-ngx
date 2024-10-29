@@ -1424,4 +1424,4 @@ class WorkflowRun(models.Model):
         verbose_name_plural = _("workflow runs")
 
     def __str__(self):
-        return f"WorkflowRun {self.pk}"
+        return f"WorkflowRun of {self.workflow} at {self.run_at} on {self.document}"
