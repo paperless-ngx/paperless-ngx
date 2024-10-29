@@ -5,26 +5,26 @@
   }
 }
 
-::ng-deep .ng-select-container {
+:host ::ng-deep .ng-select-container {
   border-top-right-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
   height: 100% !important;
 }
 
-::ng-deep .rounded-end .ng-select-container {
+:host ::ng-deep .rounded-end .ng-select-container {
   border-top-right-radius: var(--bs-border-radius) !important;
   border-bottom-right-radius: var(--bs-border-radius) !important;
   border-top-left-radius: 0 !important;
   border-bottom-left-radius: 0 !important;
 }
 
-::ng-deep .ng-select {
+:host ::ng-deep .ng-select {
   max-width: 100px;
   min-width: 35%;
   font-size: 14px;
 }
 
-::ng-deep .doc-link-select {
+:host ::ng-deep .doc-link-select {
   padding-top: 0 !important;
   border-top-right-radius: var(--bs-border-radius) !important;
   border-bottom-right-radius: var(--bs-border-radius) !important;
