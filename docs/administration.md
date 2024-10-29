@@ -19,6 +19,8 @@ Options available to any installation of paperless:
     export. Therefore, incremental backups with `rsync` are entirely
     possible.
 
+    The exporter does not include API tokens and they will need to be re-generated after importing.
+
 !!! caution
 
     You cannot import the export generated with one version of paperless in
