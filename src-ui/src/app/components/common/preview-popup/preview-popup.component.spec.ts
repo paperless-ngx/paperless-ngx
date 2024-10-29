@@ -7,7 +7,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { DocumentService } from 'src/app/services/rest/document.service'
-import { NgxBootstrapIconsModule, allIcons, archive } from 'ngx-bootstrap-icons'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { PdfViewerModule } from 'ng2-pdf-viewer'
 import {
   HttpClient,
