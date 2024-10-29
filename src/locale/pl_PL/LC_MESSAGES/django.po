@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-19 22:56-0700\n"
-"PO-Revision-Date: 2024-10-26 12:11\n"
+"PO-Revision-Date: 2024-10-29 12:12\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -23,7 +23,7 @@ msgstr "Dokumenty"
 
 #: documents/filters.py:334
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "Wartość musi być prawidłowym JSON."
 
 #: documents/filters.py:353
 msgid "Invalid custom field query expression"
