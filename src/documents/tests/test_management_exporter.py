@@ -8,6 +8,9 @@ from pathlib import Path
 from unittest import mock
 from zipfile import ZipFile
 
+from allauth.socialaccount.models import SocialAccount
+from allauth.socialaccount.models import SocialApp
+from allauth.socialaccount.models import SocialToken
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
@@ -877,6 +880,23 @@ class TestCryptExportImport(
 
         Token.objects.create(user=User.objects.first())
 
+        app = SocialApp.objects.create(
+            provider="test",
+            name="test",
+            client_id="test",
+        )
+        account = SocialAccount.objects.create(
+            user=User.objects.first(),
+            provider="test",
+            uid="test",
+        )
+        SocialToken.objects.create(
+            app=app,
+            account=account,
+            token="test",
+            token_secret="test",
+        )
+
         call_command(
             "document_exporter",
             "--no-progress-bar",
@@ -916,8 +936,10 @@ class TestCryptExportImport(
         self.assertEqual(account.password, "mypassword")
 
         token = Token.objects.first()
-
         self.assertIsNotNone(token)
+
+        social_token = SocialToken.objects.first()
+        self.assertIsNotNone(social_token)
 
     def test_import_crypt_no_passphrase(self):
         """
