@@ -281,6 +281,11 @@ CONSUMPTION_DIR = __get_path(
     BASE_DIR.parent / "consume",
 )
 
+CONSUMPTION_FAILED_DIR = __get_path(
+    "PAPERLESS_CONSUMPTION_FAILED_DIR",
+    CONSUMPTION_DIR / "failed",
+)
+
 # This will be created if it doesn't exist
 SCRATCH_DIR = __get_path(
     "PAPERLESS_SCRATCH_DIR",
@@ -890,6 +895,8 @@ CONSUMER_IGNORE_PATTERNS = list(
         ),
     ),
 )
+if CONSUMPTION_DIR in CONSUMPTION_FAILED_DIR.parents:
+    CONSUMER_IGNORE_PATTERNS.append(CONSUMPTION_FAILED_DIR.name)
 
 CONSUMER_SUBDIRS_AS_TAGS = __get_boolean("PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS")
 

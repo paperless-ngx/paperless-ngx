@@ -148,6 +148,11 @@ class ConsumerPlugin(
     ):
         self._send_progress(100, 100, ProgressStatusOptions.FAILED, message)
         self.log.error(log_message or message, exc_info=exc_info)
+        # Move the file to the failed directory
+        if self.input_doc.original_file.exists():
+            self.input_doc.original_file.rename(
+                settings.CONSUMPTION_FAILED_DIR / self.input_doc.original_file.name,
+            )
         raise ConsumerError(f"{self.filename}: {log_message or message}") from exception
 
     def pre_check_file_exists(self):
@@ -797,3 +802,32 @@ class ConsumerPlugin(
             copy_basic_file_stats(source, target)
         except Exception:  # pragma: no cover
             pass
+
+
+class CleanPDFPlugin(
+    NoCleanupPluginMixin,
+    NoSetupPluginMixin,
+    AlwaysRunPluginMixin,
+    ConsumeTaskPlugin,
+):
+    NAME: str = "CleanPDFPlugin"
+
+    def run(self) -> str | None:
+        """
+        Tries to clean a PDF file with qpdf
+        """
+        msg = None
+        try:
+            run_subprocess(
+                [
+                    "qpdf",
+                    "--replace-input",
+                    self.working_copy,
+                ],
+                logger=self.log,
+            )
+            msg = "PDF successfully cleaned"
+        except Exception as e:
+            msg = "Error while cleaning PDF"
+            self.log.error(e)
+        return msg

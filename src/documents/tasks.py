@@ -9,6 +9,7 @@ from tempfile import TemporaryDirectory
 import tqdm
 from celery import Task
 from celery import shared_task
+from celery import states
 from django.conf import settings
 from django.db import models
 from django.db import transaction
@@ -23,16 +24,19 @@ from documents.barcodes import BarcodePlugin
 from documents.caching import clear_document_caches
 from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
+from documents.consumer import CleanPDFPlugin
 from documents.consumer import ConsumerPlugin
 from documents.consumer import WorkflowTriggerPlugin
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
+from documents.data_models import DocumentSource
 from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import PaperlessTask
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.parsers import DocumentParser
@@ -106,6 +110,7 @@ def consume_file(
     self: Task,
     input_doc: ConsumableDocument,
     overrides: DocumentMetadataOverrides | None = None,
+    clean: bool = False,
 ):
     # Default no overrides
     if overrides is None:
@@ -117,6 +122,9 @@ def consume_file(
         WorkflowTriggerPlugin,
         ConsumerPlugin,
     ]
+
+    if clean:
+        plugins.insert(0, CleanPDFPlugin)
 
     with (
         ProgressManager(
@@ -167,6 +175,24 @@ def consume_file(
                 plugin.cleanup()
 
     return msg
+
+
+@shared_task
+def retry_failed_file(task_id: str, clean: bool = False, skip_ocr: bool = False):
+    task = PaperlessTask.objects.get(task_id=task_id, status=states.FAILURE)
+    if task:
+        failed_file = settings.CONSUMPTION_FAILED_DIR / task.task_file_name
+        if not failed_file.exists():
+            logger.error(f"Failed file {failed_file} not found")
+            return
+        consume_file(
+            ConsumableDocument(
+                source=DocumentSource.ConsumeFolder,
+                original_file=failed_file,
+            ),
+            clean=clean,
+            # skip_ocr=skip_ocr,
+        )
 
 
 @shared_task

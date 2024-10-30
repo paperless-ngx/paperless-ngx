@@ -679,24 +679,28 @@ class PaperlessTask(models.Model):
         verbose_name=_("Task State"),
         help_text=_("Current state of the task being run"),
     )
+
     date_created = models.DateTimeField(
         null=True,
         default=timezone.now,
         verbose_name=_("Created DateTime"),
         help_text=_("Datetime field when the task result was created in UTC"),
     )
+
     date_started = models.DateTimeField(
         null=True,
         default=None,
         verbose_name=_("Started DateTime"),
         help_text=_("Datetime field when the task was started in UTC"),
     )
+
     date_done = models.DateTimeField(
         null=True,
         default=None,
         verbose_name=_("Completed DateTime"),
         help_text=_("Datetime field when the task was completed in UTC"),
     )
+
     result = models.TextField(
         null=True,
         default=None,

@@ -65,6 +65,10 @@ def paths_check(app_configs, **kwargs):
         + path_check("PAPERLESS_EMPTY_TRASH_DIR", settings.EMPTY_TRASH_DIR)
         + path_check("PAPERLESS_MEDIA_ROOT", settings.MEDIA_ROOT)
         + path_check("PAPERLESS_CONSUMPTION_DIR", settings.CONSUMPTION_DIR)
+        + path_check(
+            "PAPERLESS_CONSUMPTION_FAILED_DIR",
+            settings.CONSUMPTION_FAILED_DIR,
+        )
     )
 
 

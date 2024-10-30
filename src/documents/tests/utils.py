@@ -35,6 +35,7 @@ def setup_directories():
     dirs.scratch_dir = Path(tempfile.mkdtemp())
     dirs.media_dir = Path(tempfile.mkdtemp())
     dirs.consumption_dir = Path(tempfile.mkdtemp())
+    dirs.consumption_failed_dir = dirs.consumption_dir / "failed"
     dirs.static_dir = Path(tempfile.mkdtemp())
     dirs.index_dir = dirs.data_dir / "index"
     dirs.originals_dir = dirs.media_dir / "documents" / "originals"
@@ -56,6 +57,7 @@ def setup_directories():
         THUMBNAIL_DIR=dirs.thumbnail_dir,
         ARCHIVE_DIR=dirs.archive_dir,
         CONSUMPTION_DIR=dirs.consumption_dir,
+        CONSUMPTION_FAILED_DIR=dirs.consumption_failed_dir,
         LOGGING_DIR=dirs.logging_dir,
         INDEX_DIR=dirs.index_dir,
         STATIC_ROOT=dirs.static_dir,
@@ -72,6 +74,7 @@ def remove_dirs(dirs):
     shutil.rmtree(dirs.data_dir, ignore_errors=True)
     shutil.rmtree(dirs.scratch_dir, ignore_errors=True)
     shutil.rmtree(dirs.consumption_dir, ignore_errors=True)
+    shutil.rmtree(dirs.consumption_failed_dir, ignore_errors=True)
     shutil.rmtree(dirs.static_dir, ignore_errors=True)
     dirs.settings_override.disable()
 
