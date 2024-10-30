@@ -241,6 +241,7 @@ document_exporter target [-c] [-d] [-f] [-na] [-nt] [-p] [-sm] [-z]
 
 optional arguments:
 -c,  --compare-checksums
+-cj, --compare-json
 -d,  --delete
 -f,  --use-filename-format
 -na, --no-archive
@@ -269,7 +270,8 @@ only export changed and added files. Paperless determines whether a file
 has changed by inspecting the file attributes "date/time modified" and
 "size". If that does not work out for you, specify `-c` or
 `--compare-checksums` and paperless will attempt to compare file
-checksums instead. This is slower.
+checksums instead. This is slower. The manifest and metadata json files
+are always updated, unless `cj` or `--compare-json` is specified.
 
 Paperless will not remove any existing files in the export directory. If
 you want paperless to also remove files that do not belong to the
