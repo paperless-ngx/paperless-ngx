@@ -948,7 +948,7 @@ def run_workflows(
                             extra={"group": logging_group},
                         )
                 if action.notification_include_document:
-                    with open(document.source_path, "rb") as f:
+                    with document.source_file as f:
                         files = {"document": f}
                         response = httpx.post(
                             action.notification_destination_url,
