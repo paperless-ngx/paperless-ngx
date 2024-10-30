@@ -6,7 +6,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "1055_alter_storagepath_path"),
+        ("documents", "1056_customfieldinstance_deleted_at_and_more"),
     ]
 
     operations = [
