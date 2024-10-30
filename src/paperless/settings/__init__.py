@@ -98,6 +98,11 @@ CONSUMPTION_DIR = get_path_from_env(
     BASE_DIR.parent / "consume",
 )
 
+CONSUMPTION_FAILED_DIR = __get_path(
+    "PAPERLESS_CONSUMPTION_FAILED_DIR",
+    CONSUMPTION_DIR / "failed",
+)
+
 # This will be created if it doesn't exist
 SCRATCH_DIR = get_path_from_env(
     "PAPERLESS_SCRATCH_DIR",
@@ -782,6 +787,8 @@ CONSUMER_IGNORE_PATTERNS = list(
         ),
     ),
 )
+if CONSUMPTION_DIR in CONSUMPTION_FAILED_DIR.parents:
+    CONSUMER_IGNORE_PATTERNS.append(CONSUMPTION_FAILED_DIR.name)
 
 # Directories to always ignore.  These are matched by directory name, not full path
 CONSUMER_IGNORE_DIRS = list(

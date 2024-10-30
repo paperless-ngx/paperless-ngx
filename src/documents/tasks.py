@@ -37,6 +37,7 @@ from documents.consumer import ConsumerPreflightPlugin
 from documents.consumer import WorkflowTriggerPlugin
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
+from documents.data_models import DocumentSource
 from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
@@ -237,6 +238,23 @@ def consume_file(
                 plugin.cleanup()
 
     return msg
+
+
+@shared_task
+def retry_failed_file(task_id: str, clean: bool = False, skip_ocr: bool = False):
+    task = PaperlessTask.objects.get(task_id=task_id, status=states.FAILURE)
+    if task:
+        failed_file = settings.CONSUMPTION_FAILED_DIR / task.task_file_name
+        if not failed_file.exists():
+            logger.error(f"Failed file {failed_file} not found")
+            return
+
+        consume_file(
+            ConsumableDocument(
+                source=DocumentSource.ConsumeFolder,
+                original_file=failed_file,
+            ),
+        )
 
 
 @shared_task
