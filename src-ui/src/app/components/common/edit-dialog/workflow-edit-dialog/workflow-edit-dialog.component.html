@@ -326,7 +326,7 @@
         <div class="row">
           <div class="col">
             <pngx-input-text i18n-title title="Notification subject" formControlName="notification_subject" [error]="error?.actions?.[i]?.notification_subject"></pngx-input-text>
-            <pngx-input-text i18n-title title="Notification body" formControlName="notification_body" [error]="error?.actions?.[i]?.notification_body"></pngx-input-text>
+            <pngx-input-textarea i18n-title title="Notification body" formControlName="notification_body" [error]="error?.actions?.[i]?.notification_body"></pngx-input-textarea>
             <pngx-input-text i18n-title title="Notification emails" formControlName="notification_destination_emails" [error]="error?.actions?.[i]?.notification_destination_emails"></pngx-input-text>
             <pngx-input-text i18n-title title="Notification url" formControlName="notification_destination_url" [error]="error?.actions?.[i]?.notification_destination_url"></pngx-input-text>
             <pngx-input-text i18n-title title="Notification headers" formControlName="notification_destination_url_headers" [error]="error?.actions?.[i]?.notification_destination_url_headers"></pngx-input-text>
