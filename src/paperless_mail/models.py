@@ -42,7 +42,7 @@ class MailAccount(document_models.ModelWithOwner):
 
     username = models.CharField(_("username"), max_length=256)
 
-    password = models.CharField(_("password"), max_length=3072)
+    password = models.TextField(_("password"))
 
     is_token = models.BooleanField(_("Is token authentication"), default=False)
 
@@ -62,9 +62,8 @@ class MailAccount(document_models.ModelWithOwner):
         default=MailAccountType.IMAP,
     )
 
-    refresh_token = models.CharField(
+    refresh_token = models.TextField(
         _("refresh token"),
-        max_length=3072,
         blank=True,
         null=True,
         help_text=_(
