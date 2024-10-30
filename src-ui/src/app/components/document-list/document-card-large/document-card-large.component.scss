@@ -2,7 +2,7 @@
   overflow-wrap: anywhere;
 }
 
-.doc-img-background {
+.doc-img-container {
   position: relative;
 }
 
@@ -47,18 +47,6 @@
 
 .document-card:hover .document-card-check {
   display: block;
-}
-
-.card-selected {
-  border-color: var(--bs-primary);
-
-  .document-card-check {
-    display: block;
-  }
-}
-
-.doc-img-background-selected {
-  background-color: var(--pngx-primary-faded);
 }
 
 .card-info {

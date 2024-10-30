@@ -490,9 +490,23 @@ ul.pagination {
 
 .doc-img-container {
   border: none !important;
-  border-top-left-radius: .25rem;
-  border-top-right-radius: .25rem;
   overflow: hidden;
+
+  .doc-img {
+    overflow: visible;
+  }
+}
+
+.card-selected {
+  border-color:var(--bs-primary);
+
+  .document-card-check {
+    display: block;
+  }
+
+  .doc-img-container {
+    background-color: var(--pngx-primary-faded);
+  }
 }
 
 table.table {
@@ -705,6 +719,10 @@ i-bs svg {
   vertical-align: text-bottom;
 }
 
-.document-card .card-footer i-bs svg {
-  vertical-align: middle;
+.document-card {
+  overflow: hidden;
+
+  .card-footer i-bs svg {
+    vertical-align: middle;
+  }
 }
