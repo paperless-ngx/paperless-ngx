@@ -1,7 +1,9 @@
 import json
 from unittest import mock
 
+from auditlog.models import LogEntry
 from django.contrib.auth.models import User
+from django.test import override_settings
 from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -51,8 +53,8 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.doc3.tags.add(self.t2)
         self.doc4.tags.add(self.t1, self.t2)
         self.sp1 = StoragePath.objects.create(name="sp1", path="Something/{checksum}")
-        self.cf1 = CustomField.objects.create(name="cf1", data_type="text")
-        self.cf2 = CustomField.objects.create(name="cf2", data_type="text")
+        self.cf1 = CustomField.objects.create(name="cf1", data_type="string")
+        self.cf2 = CustomField.objects.create(name="cf2", data_type="string")
 
     @mock.patch("documents.bulk_edit.bulk_update_documents.delay")
     def test_api_set_correspondent(self, bulk_update_task_mock):
@@ -1254,3 +1256,87 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(b"pages must be a list of integers", response.content)
+
+    @override_settings(AUDIT_LOG_ENABLED=True)
+    def test_bulk_edit_audit_log_enabled_simple_field(self):
+        """
+        GIVEN:
+            - Audit log is enabled
+        WHEN:
+            - API to bulk edit documents is called
+        THEN:
+            - Audit log is created
+        """
+        LogEntry.objects.all().delete()
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "set_correspondent",
+                    "parameters": {"correspondent": self.c2.id},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(LogEntry.objects.filter(object_pk=self.doc1.id).count(), 1)
+
+    @override_settings(AUDIT_LOG_ENABLED=True)
+    def test_bulk_edit_audit_log_enabled_tags(self):
+        """
+        GIVEN:
+            - Audit log is enabled
+        WHEN:
+            - API to bulk edit tags is called
+        THEN:
+            - Audit log is created
+        """
+        LogEntry.objects.all().delete()
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "modify_tags",
+                    "parameters": {
+                        "add_tags": [self.t1.id],
+                        "remove_tags": [self.t2.id],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(LogEntry.objects.filter(object_pk=self.doc1.id).count(), 1)
+
+    @override_settings(AUDIT_LOG_ENABLED=True)
+    def test_bulk_edit_audit_log_enabled_custom_fields(self):
+        """
+        GIVEN:
+            - Audit log is enabled
+        WHEN:
+            - API to bulk edit custom fields is called
+        THEN:
+            - Audit log is created
+        """
+        LogEntry.objects.all().delete()
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "modify_custom_fields",
+                    "parameters": {
+                        "add_custom_fields": [self.cf1.id],
+                        "remove_custom_fields": [],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(LogEntry.objects.filter(object_pk=self.doc1.id).count(), 2)

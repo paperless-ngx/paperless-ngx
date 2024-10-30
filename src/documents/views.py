@@ -26,11 +26,13 @@ from django.db.models import Case
 from django.db.models import Count
 from django.db.models import IntegerField
 from django.db.models import Max
+from django.db.models import Model
 from django.db.models import Q
 from django.db.models import Sum
 from django.db.models import When
 from django.db.models.functions import Length
 from django.db.models.functions import Lower
+from django.db.models.manager import Manager
 from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
@@ -106,6 +108,7 @@ from documents.matching import match_storage_paths
 from documents.matching import match_tags
 from documents.models import Correspondent
 from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
@@ -961,6 +964,22 @@ class SavedViewViewSet(ModelViewSet, PassUserMixin):
 
 
 class BulkEditView(PassUserMixin):
+    MODIFIED_FIELD_BY_METHOD = {
+        bulk_edit.set_correspondent: "correspondent",
+        bulk_edit.set_document_type: "document_type",
+        bulk_edit.set_storage_path: "storage_path",
+        bulk_edit.add_tag: "tags",
+        bulk_edit.remove_tag: "tags",
+        bulk_edit.modify_tags: "tags",
+        bulk_edit.modify_custom_fields: "custom_fields",
+        bulk_edit.set_permissions: None,
+        bulk_edit.delete: "deleted_at",
+        bulk_edit.rotate: "checksum",
+        bulk_edit.delete_pages: "checksum",
+        bulk_edit.split: None,
+        bulk_edit.merge: None,
+    }
+
     permission_classes = (IsAuthenticated,)
     serializer_class = BulkEditSerializer
     parser_classes = (parsers.JSONParser,)
@@ -1013,8 +1032,59 @@ class BulkEditView(PassUserMixin):
                 return HttpResponseForbidden("Insufficient permissions")
 
         try:
+            modified_field = self.MODIFIED_FIELD_BY_METHOD[method]
+            if settings.AUDIT_LOG_ENABLED and modified_field:
+                old_documents = list(
+                    Document.objects.filter(pk__in=documents).values(
+                        "pk",
+                        "correspondent",
+                        "document_type",
+                        "storage_path",
+                        "tags",
+                        "custom_fields",
+                        "deleted_at",
+                        "checksum",
+                    ),
+                )
+
             # TODO: parameter validation
             result = method(documents, **parameters)
+
+            if settings.AUDIT_LOG_ENABLED and modified_field:
+                new_documents = Document.objects.filter(pk__in=documents)
+                for doc in new_documents:
+                    old_value = next(
+                        item for item in old_documents if item["pk"] == doc.pk
+                    )[modified_field]
+                    new_value = getattr(doc, modified_field)
+
+                    if isinstance(new_value, Model):
+                        old_value = old_value.pk if old_value else None
+                        new_value = new_value.pk if new_value else None
+                    elif isinstance(new_value, Manager):
+                        # old value is a list of pks already
+                        new_value = list(new_value.values_list("pk", flat=True))
+                    elif modified_field == "custom_fields":
+                        new_value = list(
+                            CustomFieldInstance.objects.filter(
+                                document=doc,
+                            ).values_list("pk", flat=True),
+                        )
+
+                    LogEntry.objects.log_create(
+                        instance=doc,
+                        changes={
+                            modified_field: [
+                                old_value,
+                                new_value,
+                            ],
+                        },
+                        action=LogEntry.Action.UPDATE,
+                        additional_data={
+                            "reason": f"Bulk edit: {method.__name__}",
+                        },
+                    )
+
             return Response({"result": result})
         except Exception as e:
             logger.warning(f"An error occurred performing bulk edit: {e!s}")
