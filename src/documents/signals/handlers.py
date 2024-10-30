@@ -44,7 +44,7 @@ from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import set_permissions_for_object
-from documents.templating.title import parse_doc_title_w_placeholders
+from documents.templating.workflows import parse_w_workflow_placeholders
 
 logger = logging.getLogger("paperless.handlers")
 
@@ -612,7 +612,7 @@ def run_workflows(
         if action.assign_title:
             if not use_overrides:
                 try:
-                    document.title = parse_doc_title_w_placeholders(
+                    document.title = parse_w_workflow_placeholders(
                         action.assign_title,
                         document.correspondent.name if document.correspondent else "",
                         document.document_type.name if document.document_type else "",
@@ -870,7 +870,16 @@ def run_workflows(
                     overrides.custom_field_ids.remove(field.pk)
 
     def notification_action():
-        subject = parse_doc_title_w_placeholders(
+        title = (
+            document.title
+            if isinstance(document, Document)
+            else str(document.original_file)
+        )
+        doc_url = None
+        if isinstance(document, Document):
+            doc_url = f"{settings.PAPERLESS_URL}/documents/{document.pk}/"
+
+        subject = parse_w_workflow_placeholders(
             action.notification_subject,
             document.correspondent.name if document.correspondent else "",
             document.document_type.name if document.document_type else "",
@@ -878,16 +887,21 @@ def run_workflows(
             timezone.localtime(document.added),
             document.original_filename or "",
             timezone.localtime(document.created),
+            title,
+            doc_url,
         )
-        body = action.notification_body.format(
-            title=subject,
-            document=document,
+        body = parse_w_workflow_placeholders(
+            action.notification_body,
+            document.correspondent.name if document.correspondent else "",
+            document.document_type.name if document.document_type else "",
+            document.owner.username if document.owner else "",
+            timezone.localtime(document.added),
+            document.original_filename or "",
+            timezone.localtime(document.created),
+            title,
+            doc_url,
         )
-        doc_url = None
-        if isinstance(document, Document):
-            doc_url = f"{settings.PAPERLESS_URL}/documents/{document.pk}/"
-        if doc_url:
-            body += f"\n\n{doc_url}"
+
         if action.notification_destination_emails:
             if not settings.EMAIL_ENABLED:
                 logger.error(

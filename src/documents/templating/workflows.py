@@ -2,14 +2,16 @@ from datetime import datetime
 from pathlib import Path
 
 
-def parse_doc_title_w_placeholders(
-    title: str,
+def parse_w_workflow_placeholders(
+    text: str,
     correspondent_name: str,
     doc_type_name: str,
     owner_username: str,
     local_added: datetime,
     original_filename: str,
     created: datetime | None = None,
+    doc_title: str | None = None,
+    doc_url: str | None = None,
 ) -> str:
     """
     Available title placeholders for Workflows depend on what has already been assigned,
@@ -43,4 +45,8 @@ def parse_doc_title_w_placeholders(
                 "created_time": created.strftime("%H:%M"),
             },
         )
-    return title.format(**formatting).strip()
+    if doc_title is not None:
+        formatting.update({"doc_title": doc_title})
+    if doc_url is not None:
+        formatting.update({"doc_url": doc_url})
+    return text.format(**formatting).strip()
