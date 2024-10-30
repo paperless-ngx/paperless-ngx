@@ -1,3 +1,4 @@
+import json
 import shutil
 from datetime import timedelta
 from pathlib import Path
@@ -6,11 +7,14 @@ from unittest import mock
 
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.test import override_settings
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
 from rest_framework.test import APITestCase
+
+from documents.signals.handlers import run_workflows
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -2077,3 +2081,112 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         self.assertEqual(doc.owner, self.user2)
         self.assertEqual(doc.tags.all().count(), 1)
         self.assertIn(self.t2, doc.tags.all())
+
+    @override_settings(
+        PAPERLESS_EMAIL_HOST="localhost",
+        EMAIL_ENABLED=True,
+        PAPERLESS_URL="http://localhost:8000",
+    )
+    @mock.patch("httpx.post")
+    @mock.patch("django.core.mail.message.EmailMessage.send")
+    def test_workflow_notifcation_action(self, mock_email_send, mock_post):
+        """
+        GIVEN:
+            - Document updated workflow with notification action
+        WHEN:
+            - Document that matches is updated
+        THEN:
+            - Notification is sent
+        """
+        mock_post.return_value = mock.Mock(
+            status_code=200,
+            json=mock.Mock(return_value={"status": "ok"}),
+        )
+        mock_email_send.return_value = 1
+
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.NOTIFICATION,
+            notification_subject="Test Notification: {doc_title}",
+            notification_body="Test message: {doc_url}",
+            notification_destination_emails="user@example.com",
+            notification_destination_url="http://paperless-ngx.com",
+            notification_destination_url_headers=json.dumps({"x-api-key": "test"}),
+            notification_include_document=False,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        mock_email_send.assert_called_once()
+        mock_post.assert_called_once_with(
+            "http://paperless-ngx.com",
+            data={
+                "title": "Test Notification: sample test",
+                "message": "Test message: http://localhost:8000/documents/1/",
+            },
+            headers={"x-api-key": "test"},
+        )
+
+    @override_settings(
+        PAPERLESS_EMAIL_HOST="localhost",
+        EMAIL_ENABLED=True,
+        PAPERLESS_URL="http://localhost:8000",
+    )
+    def test_workflow_notification_action_fail(self):
+        """
+        GIVEN:
+            - Document updated workflow with notification action
+        WHEN:
+            - Document that matches is updated
+            - An error occurs during notification
+        THEN:
+            - Error is logged
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.NOTIFICATION,
+            notification_subject="Test Notification: {doc_title}",
+            notification_body="Test message: {doc_url}",
+            notification_destination_emails="me@example.com",
+            notification_destination_url="http://paperless-ngx.com",
+            notification_include_document=True,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        # fails because no file
+        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
+            run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+            expected_str = "Error occurred sending notification email"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = "Error occurred sending notification to destination URL"
+            self.assertIn(expected_str, cm.output[1])

@@ -1891,37 +1891,33 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
                     )
 
         if (
-            "notification_subject" in attrs
-            and attrs["notification_subject"] is not None
-            and len(attrs["notification_subject"]) > 0
-            and not (
-                attrs["notification_destination_emails"]
-                or attrs["notification_destination_url"]
-            )
+            "type" in attrs
+            and attrs["type"] == WorkflowAction.WorkflowActionType.NOTIFICATION
         ):
-            raise serializers.ValidationError(
-                "Notification subject requires destination emails or URL",
-            )
+            if (
+                "notification_subject" not in attrs
+                or attrs["notification_subject"] is None
+                or len(attrs["notification_subject"]) == 0
+                or "notification_body" not in attrs
+                or attrs["notification_body"] is None
+                or len(attrs["notification_body"]) == 0
+            ):
+                raise serializers.ValidationError(
+                    "Notification subject and body required",
+                )
+            elif (
+                "notification_destination_emails" not in attrs
+                or attrs["notification_destination_emails"] is None
+                or len(attrs["notification_destination_emails"]) == 0
+            ) and (
+                "notification_destination_url" not in attrs
+                or attrs["notification_destination_url"] is None
+                or len(attrs["notification_destination_url"]) == 0
+            ):
+                raise serializers.ValidationError(
+                    "Notification destination emails or URL required",
+                )
 
-        if (
-            (
-                (
-                    "notification_destination_emails" in attrs
-                    and attrs["notification_destination_emails"] is not None
-                    and len(attrs["notification_destination_emails"]) > 0
-                )
-                or (
-                    "notification_destination_url" in attrs
-                    and attrs["notification_destination_url"] is not None
-                    and len(attrs["notification_destination_url"]) > 0
-                )
-            )
-            and not attrs["notification_subject"]
-            and not attrs["notification_body"]
-        ):
-            raise serializers.ValidationError(
-                "Notification subject and body required",
-            )
         return attrs
 
 

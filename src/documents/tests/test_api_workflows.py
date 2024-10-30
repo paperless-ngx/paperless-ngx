@@ -433,3 +433,91 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertNotEqual(workflow.triggers.first().id, self.trigger.id)
         self.assertEqual(WorkflowAction.objects.all().count(), 1)
         self.assertNotEqual(workflow.actions.first().id, self.action.id)
+
+    def test_notification_action_validation(self):
+        """
+        GIVEN:
+            - API request to create a workflow with a notification action
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP response
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow 2",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.NOTIFICATION,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        # Notification action requires subject and body
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow 2",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.NOTIFICATION,
+                            "notification_subject": "Subject",
+                            "notification_body": "Body",
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        # Notification action requires destination emails or url
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow 2",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.NOTIFICATION,
+                            "notification_subject": "Subject",
+                            "notification_body": "Body",
+                            "notification_destination_emails": "me@example.com",
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
