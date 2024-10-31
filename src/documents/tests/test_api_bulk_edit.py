@@ -56,6 +56,10 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.cf1 = CustomField.objects.create(name="cf1", data_type="string")
         self.cf2 = CustomField.objects.create(name="cf2", data_type="string")
 
+    def setup_mock(self, m, method_name, return_value="OK"):
+        m.return_value = return_value
+        m.__name__ = method_name
+
     @mock.patch("documents.bulk_edit.bulk_update_documents.delay")
     def test_api_set_correspondent(self, bulk_update_task_mock):
         self.assertNotEqual(self.doc1.correspondent, self.c1)
@@ -180,7 +184,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.serialisers.bulk_edit.modify_tags")
     def test_api_modify_tags(self, m):
-        m.return_value = "OK"
+        self.setup_mock(m, "modify_tags")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -213,7 +217,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             - API returns HTTP 400
             - modify_tags is not called
         """
-        m.return_value = "OK"
+        self.setup_mock(m, "modify_tags")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -232,7 +236,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.serialisers.bulk_edit.modify_custom_fields")
     def test_api_modify_custom_fields(self, m):
-        m.return_value = "OK"
+        self.setup_mock(m, "modify_custom_fields")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -265,8 +269,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             - API returns HTTP 400
             - modify_custom_fields is not called
         """
-        m.return_value = "OK"
-
+        self.setup_mock(m, "modify_custom_fields")
         # Missing add_custom_fields
         response = self.client.post(
             "/api/documents/bulk_edit/",
@@ -361,7 +364,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.serialisers.bulk_edit.delete")
     def test_api_delete(self, m):
-        m.return_value = "OK"
+        self.setup_mock(m, "delete")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -385,8 +388,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         THEN:
             - set_storage_path is called with correct document IDs and storage_path ID
         """
-        m.return_value = "OK"
-
+        self.setup_mock(m, "set_storage_path")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -416,8 +418,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         THEN:
             - set_storage_path is called with correct document IDs and None storage_path
         """
-        m.return_value = "OK"
-
+        self.setup_mock(m, "set_storage_path")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -730,7 +731,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.serialisers.bulk_edit.set_permissions")
     def test_set_permissions(self, m):
-        m.return_value = "OK"
+        self.setup_mock(m, "set_permissions")
         user1 = User.objects.create(username="user1")
         user2 = User.objects.create(username="user2")
         permissions = {
@@ -765,7 +766,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.serialisers.bulk_edit.set_permissions")
     def test_set_permissions_merge(self, m):
-        m.return_value = "OK"
+        self.setup_mock(m, "set_permissions")
         user1 = User.objects.create(username="user1")
         user2 = User.objects.create(username="user2")
         permissions = {
@@ -825,7 +826,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         THEN:
             - User is not able to change permissions
         """
-        m.return_value = "OK"
+        self.setup_mock(m, "set_permissions")
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
         user1 = User.objects.create(username="user1")
@@ -877,7 +878,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         THEN:
             - set_storage_path only called if user can edit all docs
         """
-        m.return_value = "OK"
+        self.setup_mock(m, "set_storage_path")
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
         user1 = User.objects.create(username="user1")
@@ -921,8 +922,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.serialisers.bulk_edit.rotate")
     def test_rotate(self, m):
-        m.return_value = "OK"
-
+        self.setup_mock(m, "rotate")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -976,8 +976,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.serialisers.bulk_edit.merge")
     def test_merge(self, m):
-        m.return_value = "OK"
-
+        self.setup_mock(m, "merge")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -1005,8 +1004,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         user1 = User.objects.create(username="user1")
         self.client.force_authenticate(user=user1)
 
-        m.return_value = "OK"
-
+        self.setup_mock(m, "merge")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -1055,8 +1053,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         THEN:
             - The API fails with a correct error code
         """
-        m.return_value = "OK"
-
+        self.setup_mock(m, "merge")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -1076,8 +1073,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.serialisers.bulk_edit.split")
     def test_split(self, m):
-        m.return_value = "OK"
-
+        self.setup_mock(m, "split")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -1167,8 +1163,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.serialisers.bulk_edit.delete_pages")
     def test_delete_pages(self, m):
-        m.return_value = "OK"
-
+        self.setup_mock(m, "delete_pages")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(

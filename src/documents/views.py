@@ -965,19 +965,19 @@ class SavedViewViewSet(ModelViewSet, PassUserMixin):
 
 class BulkEditView(PassUserMixin):
     MODIFIED_FIELD_BY_METHOD = {
-        bulk_edit.set_correspondent: "correspondent",
-        bulk_edit.set_document_type: "document_type",
-        bulk_edit.set_storage_path: "storage_path",
-        bulk_edit.add_tag: "tags",
-        bulk_edit.remove_tag: "tags",
-        bulk_edit.modify_tags: "tags",
-        bulk_edit.modify_custom_fields: "custom_fields",
-        bulk_edit.set_permissions: None,
-        bulk_edit.delete: "deleted_at",
-        bulk_edit.rotate: "checksum",
-        bulk_edit.delete_pages: "checksum",
-        bulk_edit.split: None,
-        bulk_edit.merge: None,
+        "set_correspondent": "correspondent",
+        "set_document_type": "document_type",
+        "set_storage_path": "storage_path",
+        "add_tag": "tags",
+        "remove_tag": "tags",
+        "modify_tags": "tags",
+        "modify_custom_fields": "custom_fields",
+        "set_permissions": None,
+        "delete": "deleted_at",
+        "rotate": "checksum",
+        "delete_pages": "checksum",
+        "split": None,
+        "merge": None,
     }
 
     permission_classes = (IsAuthenticated,)
@@ -1032,7 +1032,7 @@ class BulkEditView(PassUserMixin):
                 return HttpResponseForbidden("Insufficient permissions")
 
         try:
-            modified_field = self.MODIFIED_FIELD_BY_METHOD[method]
+            modified_field = self.MODIFIED_FIELD_BY_METHOD[method.__name__]
             if settings.AUDIT_LOG_ENABLED and modified_field:
                 old_documents = list(
                     Document.objects.filter(pk__in=documents).values(
