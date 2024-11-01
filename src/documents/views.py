@@ -108,7 +108,6 @@ from documents.matching import match_storage_paths
 from documents.matching import match_tags
 from documents.models import Correspondent
 from documents.models import CustomField
-from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
@@ -1059,17 +1058,11 @@ class BulkEditView(PassUserMixin):
                     new_value = getattr(doc, modified_field)
 
                     if isinstance(new_value, Model):
-                        old_value = old_value.pk if old_value else None
-                        new_value = new_value.pk if new_value else None
+                        # correspondent, document type, etc.
+                        new_value = new_value.pk
                     elif isinstance(new_value, Manager):
-                        # old value is a list of pks already
+                        # tags, custom fields
                         new_value = list(new_value.values_list("pk", flat=True))
-                    elif modified_field == "custom_fields":
-                        new_value = list(
-                            CustomFieldInstance.objects.filter(
-                                document=doc,
-                            ).values_list("pk", flat=True),
-                        )
 
                     LogEntry.objects.log_create(
                         instance=doc,
@@ -1080,6 +1073,7 @@ class BulkEditView(PassUserMixin):
                             ],
                         },
                         action=LogEntry.Action.UPDATE,
+                        actor=user,
                         additional_data={
                             "reason": f"Bulk edit: {method.__name__}",
                         },
