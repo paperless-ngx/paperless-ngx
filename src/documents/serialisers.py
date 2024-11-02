@@ -1847,12 +1847,13 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
             "remove_view_groups",
             "remove_change_users",
             "remove_change_groups",
-            "notification_subject",
-            "notification_body",
-            "notification_destination_emails",
-            "notification_destination_url",
-            "notification_destination_url_headers",
-            "notification_include_document",
+            "email_to",
+            "email_subject",
+            "email_body",
+            "email_include_document",
+            "webhook_url",
+            "webhook_params",
+            "webhook_headers",
         ]
 
     def validate(self, attrs):
@@ -1890,33 +1891,38 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
                         {"assign_title": f'Invalid f-string detected: "{e.args[0]}"'},
                     )
 
-        if (
-            "type" in attrs
-            and attrs["type"] == WorkflowAction.WorkflowActionType.NOTIFICATION
-        ):
+        if "type" in attrs and attrs["type"] == WorkflowAction.WorkflowActionType.EMAIL:
             if (
-                "notification_subject" not in attrs
-                or attrs["notification_subject"] is None
-                or len(attrs["notification_subject"]) == 0
-                or "notification_body" not in attrs
-                or attrs["notification_body"] is None
-                or len(attrs["notification_body"]) == 0
+                "email_subject" not in attrs
+                or attrs["email_subject"] is None
+                or len(attrs["email_subject"]) == 0
+                or "email_body" not in attrs
+                or attrs["email_body"] is None
+                or len(attrs["email_body"]) == 0
             ):
                 raise serializers.ValidationError(
-                    "Notification subject and body required",
+                    "Email subject and body required",
                 )
             elif (
-                "notification_destination_emails" not in attrs
-                or attrs["notification_destination_emails"] is None
-                or len(attrs["notification_destination_emails"]) == 0
-            ) and (
-                "notification_destination_url" not in attrs
-                or attrs["notification_destination_url"] is None
-                or len(attrs["notification_destination_url"]) == 0
+                "email_to" not in attrs
+                or attrs["email_to"] is None
+                or len(attrs["email_to"]) == 0
             ):
                 raise serializers.ValidationError(
-                    "Notification destination emails or URL required",
+                    "Email recipient required",
                 )
+
+        if (
+            "type" in attrs
+            and attrs["type"] == WorkflowAction.WorkflowActionType.WEBHOOK
+        ) and (
+            "webhook_url" not in attrs
+            or attrs["webhook_url"] is None
+            or len(attrs["webhook_url"]) == 0
+        ):
+            raise serializers.ValidationError(
+                "Webhook URL required",
+            )
 
         return attrs
 

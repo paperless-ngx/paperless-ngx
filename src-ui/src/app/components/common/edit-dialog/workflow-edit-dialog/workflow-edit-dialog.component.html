@@ -322,15 +322,23 @@
           </div>
         </div>
       }
-      @case (WorkflowActionType.Notification) {
+      @case (WorkflowActionType.Email) {
         <div class="row">
           <div class="col">
-            <pngx-input-text i18n-title title="Notification subject" formControlName="notification_subject" [error]="error?.actions?.[i]?.notification_subject"></pngx-input-text>
-            <pngx-input-textarea i18n-title title="Notification body" formControlName="notification_body" [error]="error?.actions?.[i]?.notification_body"></pngx-input-textarea>
-            <pngx-input-text i18n-title title="Notification emails" formControlName="notification_destination_emails" [error]="error?.actions?.[i]?.notification_destination_emails"></pngx-input-text>
-            <pngx-input-text i18n-title title="Notification url" formControlName="notification_destination_url" [error]="error?.actions?.[i]?.notification_destination_url"></pngx-input-text>
-            <pngx-input-text i18n-title title="Notification headers" formControlName="notification_destination_url_headers" [error]="error?.actions?.[i]?.notification_destination_url_headers"></pngx-input-text>
-            <pngx-input-switch i18n-title title="Notification include document" formControlName="notification_include_document"></pngx-input-switch>
+            <pngx-input-text i18n-title title="Email subject" formControlName="email_subject" [error]="error?.actions?.[i]?.email_subject"></pngx-input-text>
+            <pngx-input-textarea i18n-title title="Email body" formControlName="email_body" [error]="error?.actions?.[i]?.email_body"></pngx-input-textarea>
+            <pngx-input-text i18n-title title="Email recipients" formControlName="email_to" [error]="error?.actions?.[i]?.email_to"></pngx-input-text>
+            <pngx-input-switch i18n-title title="Attach document" formControlName="email_include_document"></pngx-input-switch>
+          </div>
+        </div>
+      }
+      @case (WorkflowActionType.Webhook) {
+        <div class="row">
+          <div class="col">
+            <pngx-input-text i18n-title title="Webhook url" formControlName="webhook_url" [error]="error?.actions?.[i]?.webhook_url"></pngx-input-text>
+            <pngx-input-text i18n-title title="Webhook params" formControlName="webhook_params" [error]="error?.actions?.[i]?.webhook_params"></pngx-input-text>
+            <pngx-input-text i18n-title title="Webhook headers" formControlName="webhook_headers" [error]="error?.actions?.[i]?.webhook_headers"></pngx-input-text>
+            <pngx-input-switch i18n-title title="Include document" formControlName="webhook_include_document"></pngx-input-switch>
           </div>
         </div>
       }

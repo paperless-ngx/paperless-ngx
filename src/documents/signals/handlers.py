@@ -869,7 +869,14 @@ def run_workflows(
                 ):
                     overrides.custom_field_ids.remove(field.pk)
 
-    def notification_action():
+    def email_action():
+        if not settings.EMAIL_ENABLED:
+            logger.error(
+                "Email backend has not been configured, cannot send email notifications",
+                extra={"group": logging_group},
+            )
+            return
+
         title = (
             document.title
             if isinstance(document, Document)
@@ -878,9 +885,8 @@ def run_workflows(
         doc_url = None
         if isinstance(document, Document):
             doc_url = f"{settings.PAPERLESS_URL}/documents/{document.pk}/"
-
         subject = parse_w_workflow_placeholders(
-            action.notification_subject,
+            action.email_subject,
             document.correspondent.name if document.correspondent else "",
             document.document_type.name if document.document_type else "",
             document.owner.username if document.owner else "",
@@ -891,7 +897,7 @@ def run_workflows(
             doc_url,
         )
         body = parse_w_workflow_placeholders(
-            action.notification_body,
+            action.email_body,
             document.correspondent.name if document.correspondent else "",
             document.document_type.name if document.document_type else "",
             document.owner.username if document.owner else "",
@@ -901,76 +907,83 @@ def run_workflows(
             title,
             doc_url,
         )
+        try:
+            email = EmailMessage(
+                subject=subject,
+                body=body,
+                to=action.email_to.split(","),
+            )
+            if action.email_include_document:
+                email.attach_file(document.source_path)
+            n_messages = email.send()
+            logger.debug(
+                f"Sent {n_messages} notification email(s) to {action.email_to}",
+                extra={"group": logging_group},
+            )
+        except Exception as e:
+            logger.exception(
+                f"Error occurred sending notification email: {e}",
+                extra={"group": logging_group},
+            )
 
-        if action.notification_destination_emails:
-            if not settings.EMAIL_ENABLED:
-                logger.error(
-                    "Email backend has not been configured, cannot send email notifications",
-                    extra={"group": logging_group},
+    def webhook_action():
+        title = (
+            document.title
+            if isinstance(document, Document)
+            else str(document.original_file)
+        )
+        doc_url = None
+        if isinstance(document, Document):
+            doc_url = f"{settings.PAPERLESS_URL}/documents/{document.pk}/"
+
+        try:
+            params = {}
+            params_json = json.loads(action.webhook_params)
+            for key, value in params_json.items():
+                params[key] = parse_w_workflow_placeholders(
+                    value,
+                    document.correspondent.name if document.correspondent else "",
+                    document.document_type.name if document.document_type else "",
+                    document.owner.username if document.owner else "",
+                    timezone.localtime(document.added),
+                    document.original_filename or "",
+                    timezone.localtime(document.created),
+                    title,
+                    doc_url,
                 )
-            else:
+            headers = None
+            if action.webhook_headers:
                 try:
-                    email = EmailMessage(
-                        subject=subject,
-                        body=body,
-                        to=action.notification_destination_emails.split(","),
+                    # headers are a JSON object with key-value pairs, needs to be converted to a Mapping[str, str]
+                    header_mapping = json.loads(
+                        action.webhook_headers,
                     )
-                    if action.notification_include_document:
-                        email.attach_file(document.source_path)
-                    n_messages = email.send()
-                    logger.debug(
-                        f"Sent {n_messages} notification email(s) to {action.notification_destination_emails}",
-                        extra={"group": logging_group},
-                    )
+                    headers = {str(k): str(v) for k, v in header_mapping.items()}
                 except Exception as e:
-                    logger.exception(
-                        f"Error occurred sending notification email: {e}",
+                    logger.error(
+                        f"Error occurred parsing webhook headers: {e}",
                         extra={"group": logging_group},
                     )
-        if action.notification_destination_url:
-            try:
-                data = {
-                    "title": subject,
-                    "message": body,
-                }
-                files = None
-                headers = None
-                if action.notification_destination_url_headers:
-                    try:
-                        # headers are a JSON object with key-value pairs, needs to be converted to a Mapping[str, str]
-                        header_mapping = json.loads(
-                            action.notification_destination_url_headers,
-                        )
-                        headers = {str(k): str(v) for k, v in header_mapping.items()}
-                    except Exception as e:
-                        logger.error(
-                            f"Error occurred parsing notification destination URL headers: {e}",
-                            extra={"group": logging_group},
-                        )
-                if action.notification_include_document:
-                    with document.source_file as f:
-                        files = {"document": f}
-                        response = httpx.post(
-                            action.notification_destination_url,
-                            data=data,
-                            headers=headers,
-                            files=files,
-                        )
-                        logger.debug(
-                            f"Response from notification destination URL: {response}",
-                            extra={"group": logging_group},
-                        )
-                else:
+            if action.webhook_include_document:
+                with open(document.source_path, "rb") as f:
+                    files = {"file": (document.original_filename, f)}
                     httpx.post(
-                        action.notification_destination_url,
-                        data=data,
+                        action.webhook_url,
+                        data=params,
+                        files=files,
                         headers=headers,
                     )
-            except Exception as e:
-                logger.exception(
-                    f"Error occurred sending notification to destination URL: {e}",
-                    extra={"group": logging_group},
+            else:
+                httpx.post(
+                    action.webhook_url,
+                    data=params,
+                    headers=headers,
                 )
+        except Exception as e:
+            logger.exception(
+                f"Error occurred sending webhook: {e}",
+                extra={"group": logging_group},
+            )
 
     use_overrides = overrides is not None
     messages = []
@@ -1017,8 +1030,10 @@ def run_workflows(
                     assignment_action()
                 elif action.type == WorkflowAction.WorkflowActionType.REMOVAL:
                     removal_action()
-                elif action.type == WorkflowAction.WorkflowActionType.NOTIFICATION:
-                    notification_action()
+                elif action.type == WorkflowAction.WorkflowActionType.EMAIL:
+                    email_action()
+                elif action.type == WorkflowAction.WorkflowActionType.WEBHOOK:
+                    webhook_action()
 
             if not use_overrides:
                 # save first before setting tags

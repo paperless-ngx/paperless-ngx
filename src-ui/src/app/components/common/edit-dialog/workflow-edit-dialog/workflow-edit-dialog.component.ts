@@ -97,8 +97,12 @@ export const WORKFLOW_ACTION_OPTIONS = [
     name: $localize`Removal`,
   },
   {
-    id: WorkflowActionType.Notification,
-    name: $localize`Notification`,
+    id: WorkflowActionType.Email,
+    name: $localize`Email`,
+  },
+  {
+    id: WorkflowActionType.Webhook,
+    name: $localize`Webhook`,
   },
 ]
 
@@ -406,19 +410,15 @@ export class WorkflowEditDialogComponent
         remove_all_custom_fields: new FormControl(
           action.remove_all_custom_fields
         ),
-        notification_subject: new FormControl(action.notification_subject),
-        notification_body: new FormControl(action.notification_body),
-        notification_destination_emails: new FormControl(
-          action.notification_destination_emails
-        ),
-        notification_destination_url: new FormControl(
-          action.notification_destination_url
-        ),
-        notification_destination_url_headers: new FormControl(
-          action.notification_destination_url_headers
-        ),
-        notification_include_document: new FormControl(
-          action.notification_include_document
+        email_subject: new FormControl(action.email_subject),
+        email_body: new FormControl(action.email_body),
+        email_to: new FormControl(action.email_to),
+        email_include_document: new FormControl(action.email_include_document),
+        webhook_url: new FormControl(action.webhook_url),
+        webhook_params: new FormControl(action.webhook_params),
+        webhook_headers: new FormControl(action.webhook_headers),
+        webhook_include_document: new FormControl(
+          action.webhook_include_document
         ),
       }),
       { emitEvent }
@@ -521,12 +521,14 @@ export class WorkflowEditDialogComponent
       remove_all_permissions: false,
       remove_custom_fields: [],
       remove_all_custom_fields: false,
-      notification_subject: null,
-      notification_body: null,
-      notification_destination_emails: null,
-      notification_destination_url: null,
-      notification_destination_url_headers: null,
-      notification_include_document: null,
+      email_subject: null,
+      email_body: null,
+      email_to: null,
+      email_include_document: false,
+      webhook_url: null,
+      webhook_params: null,
+      webhook_headers: null,
+      webhook_include_document: false,
     }
     this.object.actions.push(action)
     this.createActionField(action)

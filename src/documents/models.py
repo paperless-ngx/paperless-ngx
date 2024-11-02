@@ -1166,9 +1166,13 @@ class WorkflowAction(models.Model):
             2,
             _("Removal"),
         )
-        NOTIFICATION = (
+        EMAIL = (
             3,
-            _("Notification"),
+            _("Email"),
+        )
+        WEBHOOK = (
+            4,
+            _("Webhook"),
         )
 
     type = models.PositiveIntegerField(
@@ -1371,53 +1375,65 @@ class WorkflowAction(models.Model):
         verbose_name=_("remove all custom fields"),
     )
 
-    notification_subject = models.CharField(
-        _("notification subject"),
+    email_subject = models.CharField(
+        _("email subject"),
         max_length=256,
         null=True,
         blank=True,
         help_text=_(
-            "The subject of the notification, can include some placeholders, "
+            "The subject of the email, can include some placeholders, "
             "see documentation.",
         ),
     )
 
-    notification_body = models.TextField(
-        _("notification body"),
+    email_body = models.TextField(
+        _("email body"),
         null=True,
         blank=True,
         help_text=_(
-            "The body (message) of the notification, can include some placeholders, "
+            "The body (message) of the email, can include some placeholders, "
             "see documentation.",
         ),
     )
 
-    notification_destination_emails = models.TextField(
-        _("notification destination emails"),
+    email_to = models.TextField(
+        _("emails to"),
         null=True,
         blank=True,
         help_text=_(
-            "The destination email addresses for the notification, comma separated.",
+            "The destination email addresses, comma separated.",
         ),
     )
 
-    notification_destination_url = models.URLField(
-        _("notification destination url"),
+    email_include_document = models.BooleanField(
+        default=False,
+        verbose_name=_("include document in email"),
+    )
+
+    webhook_url = models.URLField(
+        _("webhook url"),
         null=True,
         blank=True,
         help_text=_("The destination URL for the notification."),
     )
 
-    notification_destination_url_headers = models.JSONField(
-        _("notification destination url headers"),
+    webhook_params = models.JSONField(
+        _("webhook parameters"),
         null=True,
         blank=True,
-        help_text=_("The headers to send with the notification destination URL."),
+        help_text=_("The parameters to send with the webhook URL."),
     )
 
-    notification_include_document = models.BooleanField(
+    webhook_headers = models.JSONField(
+        _("webhook headers"),
+        null=True,
+        blank=True,
+        help_text=_("The headers to send with the webhook URL."),
+    )
+
+    webhook_include_document = models.BooleanField(
         default=False,
-        verbose_name=_("include document in notification"),
+        verbose_name=_("include document in webhook"),
     )
 
     class Meta:

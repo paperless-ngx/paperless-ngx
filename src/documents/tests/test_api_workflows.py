@@ -434,10 +434,10 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(WorkflowAction.objects.all().count(), 1)
         self.assertNotEqual(workflow.actions.first().id, self.action.id)
 
-    def test_notification_action_validation(self):
+    def test_email_action_validation(self):
         """
         GIVEN:
-            - API request to create a workflow with a notification action
+            - API request to create a workflow with an email action
         WHEN:
             - API is called
         THEN:
@@ -458,14 +458,14 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                     ],
                     "actions": [
                         {
-                            "type": WorkflowAction.WorkflowActionType.NOTIFICATION,
+                            "type": WorkflowAction.WorkflowActionType.EMAIL,
                         },
                     ],
                 },
             ),
             content_type="application/json",
         )
-        # Notification action requires subject and body
+        # Notification action requires to, subject and body
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         response = self.client.post(
@@ -483,9 +483,9 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                     ],
                     "actions": [
                         {
-                            "type": WorkflowAction.WorkflowActionType.NOTIFICATION,
-                            "notification_subject": "Subject",
-                            "notification_body": "Body",
+                            "type": WorkflowAction.WorkflowActionType.EMAIL,
+                            "email_subject": "Subject",
+                            "email_body": "Body",
                         },
                     ],
                 },
@@ -510,10 +510,69 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                     ],
                     "actions": [
                         {
-                            "type": WorkflowAction.WorkflowActionType.NOTIFICATION,
-                            "notification_subject": "Subject",
-                            "notification_body": "Body",
-                            "notification_destination_emails": "me@example.com",
+                            "type": WorkflowAction.WorkflowActionType.EMAIL,
+                            "email_subject": "Subject",
+                            "email_body": "Body",
+                            "email_to": "me@example.com",
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_webhook_action_validation(self):
+        """
+        GIVEN:
+            - API request to create a workflow with a notification action
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP response
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow 2",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.WEBHOOK,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        # Notification action requires url
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow 2",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.WEBHOOK,
+                            "webhook_url": "https://example.com",
                         },
                     ],
                 },

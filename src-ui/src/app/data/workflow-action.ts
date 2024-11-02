@@ -3,7 +3,8 @@ import { ObjectWithId } from './object-with-id'
 export enum WorkflowActionType {
   Assignment = 1,
   Removal = 2,
-  Notification = 3,
+  Email = 3,
+  Webhook = 4,
 }
 export interface WorkflowAction extends ObjectWithId {
   type: WorkflowActionType
@@ -64,15 +65,19 @@ export interface WorkflowAction extends ObjectWithId {
 
   remove_all_custom_fields?: boolean
 
-  notification_subject?: string
+  email_subject?: string
 
-  notification_body?: string
+  email_body?: string
 
-  notification_destination_emails?: string
+  email_to?: string
 
-  notification_destination_url?: string
+  email_include_document?: boolean
 
-  notification_destination_url_headers?: string
+  webhook_url?: string
 
-  notification_include_document?: boolean
+  webhook_params?: string
+
+  webhook_headers?: string
+
+  webhook_include_document?: boolean
 }
