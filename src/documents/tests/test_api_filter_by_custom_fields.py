@@ -289,6 +289,12 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
             lambda document: "string_field" in document,
         )
 
+    def test_exists_false(self):
+        self._assert_query_match_predicate(
+            ["string_field", "exists", False],
+            lambda document: "string_field" not in document,
+        )
+
     def test_select(self):
         # For select fields, you can either specify the index
         # or the name of the option. They function exactly the same.
