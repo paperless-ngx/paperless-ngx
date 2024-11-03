@@ -5,7 +5,7 @@
     </div>
   } @else {
     @if (renderAsObject) {
-      <object [data]="previewURL | safeUrl" width="100%" class="bg-light" [class.p-2]="!isPdf"></object>
+      <object [data]="previewURL | safeUrl" width="100%" class="bg-light" [class.p-2]="!isPdf" [class.pdf]="isPdf"></object>
     } @else {
       @if (requiresPassword) {
         <div class="w-100 h-100 position-relative">
