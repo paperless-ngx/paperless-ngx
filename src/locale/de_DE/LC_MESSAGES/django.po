@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-19 22:56-0700\n"
-"PO-Revision-Date: 2024-10-20 12:11\n"
+"PO-Revision-Date: 2024-11-02 00:29\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -47,7 +47,7 @@ msgstr "{name!r} ist kein gültiges benutzerdefiniertes Feld."
 
 #: documents/filters.py:492
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr "{data_type} unterstützt Abfrage expr {expr!r} nicht."
+msgstr "{data_type} unterstützt den Abfrageausdruck {expr!r} nicht."
 
 #: documents/filters.py:600
 msgid "Maximum nesting depth exceeded."
@@ -1547,11 +1547,11 @@ msgstr "IMAP"
 
 #: paperless_mail/models.py:20
 msgid "Gmail OAuth"
-msgstr "Gmail OAuth"
+msgstr "Gmail-OAuth"
 
 #: paperless_mail/models.py:21
 msgid "Outlook OAuth"
-msgstr "Outlook OAuh"
+msgstr "Outlook-OAuth"
 
 #: paperless_mail/models.py:25
 msgid "IMAP server"
@@ -1599,7 +1599,7 @@ msgstr "Aktualisierungstoken"
 
 #: paperless_mail/models.py:71
 msgid "The refresh token to use for token authentication e.g. with oauth2."
-msgstr "Das Aktualisierungstoken für die Tokenauthentifizierung z.B. mit OAuth2."
+msgstr "Das Aktualisierungstoken, das für die Tokenauthentifizierung (z.B. mit OAuth2) verwendet werden soll."
 
 #: paperless_mail/models.py:80
 msgid "The expiration date of the refresh token. "

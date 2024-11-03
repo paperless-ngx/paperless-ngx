@@ -20,6 +20,10 @@ import { paramsFromViewState, paramsToViewState } from '../utils/query-params'
 import { DocumentService, SelectionData } from './rest/document.service'
 import { SettingsService } from './settings.service'
 
+const LIST_DEFAULT_DISPLAY_FIELDS: DisplayField[] = DEFAULT_DISPLAY_FIELDS.map(
+  (f) => f.id
+).filter((f) => f !== DisplayField.ADDED)
+
 /**
  * Captures the current state of the list view.
  */
@@ -102,6 +106,8 @@ export class DocumentListViewService {
 
   private _activeSavedViewId: number = null
 
+  private displayFieldsInitialized: boolean = false
+
   get activeSavedViewId() {
     return this._activeSavedViewId
   }
@@ -134,6 +140,19 @@ export class DocumentListViewService {
         localStorage.removeItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
       }
     }
+
+    this.settings.displayFieldsInit.subscribe(() => {
+      this.displayFieldsInitialized = true
+      if (this.activeListViewState.displayFields) {
+        this.activeListViewState.displayFields =
+          this.activeListViewState.displayFields.filter(
+            (field) =>
+              this.settings.allDisplayFields.find((f) => f.id === field) !==
+              undefined
+          )
+        this.saveDocumentListView()
+      }
+    })
   }
 
   private defaultListViewState(): ListViewState {
@@ -415,23 +434,17 @@ export class DocumentListViewService {
   }
 
   get displayFields(): DisplayField[] {
-    let fields =
-      this.activeListViewState.displayFields ??
-      DEFAULT_DISPLAY_FIELDS.map((f) => f.id)
-    if (!this.activeListViewState.displayFields) {
-      fields = fields.filter((f) => f !== DisplayField.ADDED)
-    }
-    return this.settings.displayFieldsInitialized
-      ? fields.filter(
+    return this.activeListViewState.displayFields ?? LIST_DEFAULT_DISPLAY_FIELDS
+  }
+
+  set displayFields(fields: DisplayField[]) {
+    this.activeListViewState.displayFields = this.displayFieldsInitialized
+      ? fields?.filter(
           (field) =>
             this.settings.allDisplayFields.find((f) => f.id === field) !==
             undefined
         )
       : fields
-  }
-
-  set displayFields(fields: DisplayField[]) {
-    this.activeListViewState.displayFields = fields
     this.saveDocumentListView()
   }
 

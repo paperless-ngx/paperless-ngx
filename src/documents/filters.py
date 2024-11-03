@@ -424,20 +424,28 @@ class CustomFieldQueryParser:
             value_field_name = "value_monetary_amount"
         has_field = Q(custom_fields__field=custom_field)
 
-        # Our special exists operator.
-        if op == "exists":
-            field_filter = has_field if value else ~has_field
-        else:
-            field_filter = has_field & Q(
-                **{f"custom_fields__{value_field_name}__{op}": value},
-            )
-
         # We need to use an annotation here because different atoms
         # might be referring to different instances of custom fields.
         annotation_name = f"_custom_field_filter_{len(self._annotations)}"
-        self._annotations[annotation_name] = Count("custom_fields", filter=field_filter)
 
-        return Q(**{f"{annotation_name}__gt": 0})
+        # Our special exists operator.
+        if op == "exists":
+            annotation = Count("custom_fields", filter=has_field)
+            # A Document should have > 0 match if it has this field, or 0 if doesn't.
+            query_op = "gt" if value else "exact"
+            query = Q(**{f"{annotation_name}__{query_op}": 0})
+        else:
+            # Check if 1) custom field name matches, and 2) value satisfies condition
+            field_filter = has_field & Q(
+                **{f"custom_fields__{value_field_name}__{op}": value},
+            )
+            # Annotate how many matching custom fields each document has
+            annotation = Count("custom_fields", filter=field_filter)
+            # Filter document by count
+            query = Q(**{f"{annotation_name}__gt": 0})
+
+        self._annotations[annotation_name] = annotation
+        return query
 
     @handle_validation_prefix
     def _get_custom_field(self, id_or_name):
