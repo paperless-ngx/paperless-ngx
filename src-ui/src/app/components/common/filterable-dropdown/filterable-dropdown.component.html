@@ -38,7 +38,7 @@
           @for (item of selectionModel.itemsSorted | filter: filterText:'name'; track item; let i = $index) {
             @if (allowSelectNone || item.id) {
               <pngx-toggleable-dropdown-button
-                [item]="item" [hideCount]="hideCount(item)" [state]="selectionModel.get(item.id)" [count]="getUpdatedDocumentCount(item.id)" (toggle)="selectionModel.toggle(item.id)" (exclude)="excludeClicked(item.id)" (click)="setButtonItemIndex(i - 1)" [disabled]="disabled">
+                [item]="item" [hideCount]="hideCount(item)" [state]="selectionModel.get(item.id)" [count]="getUpdatedDocumentCount(item.id)" (toggled)="selectionModel.toggle(item.id)" (exclude)="excludeClicked(item.id)" (click)="setButtonItemIndex(i - 1)" [disabled]="disabled">
               </pngx-toggleable-dropdown-button>
             }
           }

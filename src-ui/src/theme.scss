@@ -183,7 +183,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   }
 
   .doc-img {
-    mix-blend-mode: normal !important;
+    mix-blend-mode: normal;
     border-radius: 0;
     border-color: var(--bs-border-color);
     filter: invert(10%);
@@ -199,6 +199,24 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 
   .card-selected .doc-img {
     mix-blend-mode: luminosity;
+  }
+
+  @supports (hanging-punctuation: first) and (font: -apple-system-body) and (-webkit-appearance: none) {
+    // Safari does not like the filters on the image, see https://github.com/paperless-ngx/paperless-ngx/pull/8121
+    .doc-img-container {
+      background-color: #ffffff;
+    }
+
+    .doc-img {
+      filter: none !important;
+      box-shadow: inset 0px 0px 0px 10px rgba(0,0,0,1);
+    }
+
+    .doc-img.inverted {
+      filter: none !important;
+      mix-blend-mode: difference;
+      opacity: 0.95;
+    }
   }
 
   .paperless-input-select .ng-select .ng-dropdown-panel .ng-dropdown-panel-items .ng-option:not(.ng-option-selected):hover,

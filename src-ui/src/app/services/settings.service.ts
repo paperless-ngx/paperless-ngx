@@ -274,7 +274,7 @@ export class SettingsService {
   public get allDisplayFields(): Array<{ id: DisplayField; name: string }> {
     return this._allDisplayFields
   }
-  public displayFieldsInitialized: boolean = false
+  public displayFieldsInit: EventEmitter<boolean> = new EventEmitter()
 
   constructor(
     rendererFactory: RendererFactory2,
@@ -382,10 +382,10 @@ export class SettingsService {
             }
           })
         )
-        this.displayFieldsInitialized = true
+        this.displayFieldsInit.emit(true)
       })
     } else {
-      this.displayFieldsInitialized = true
+      this.displayFieldsInit.emit(true)
     }
   }
 

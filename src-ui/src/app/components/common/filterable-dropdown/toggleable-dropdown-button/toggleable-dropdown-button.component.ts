@@ -30,7 +30,7 @@ export class ToggleableDropdownButtonComponent {
   hideCount: boolean = false
 
   @Output()
-  toggle = new EventEmitter()
+  toggled = new EventEmitter()
 
   @Output()
   exclude = new EventEmitter()
@@ -43,7 +43,7 @@ export class ToggleableDropdownButtonComponent {
     if (this.state == ToggleableItemState.Selected) {
       this.exclude.emit()
     } else {
-      this.toggle.emit()
+      this.toggled.emit()
     }
   }
 
