@@ -75,9 +75,9 @@ export interface WorkflowAction extends ObjectWithId {
 
   webhook_url?: string
 
-  webhook_params?: string
+  webhook_params?: object
 
-  webhook_headers?: string
+  webhook_headers?: object
 
   webhook_include_document?: boolean
 }

@@ -336,8 +336,8 @@
         <div class="row">
           <div class="col">
             <pngx-input-text i18n-title title="Webhook url" formControlName="webhook_url" [error]="error?.actions?.[i]?.webhook_url"></pngx-input-text>
-            <pngx-input-text i18n-title title="Webhook params" formControlName="webhook_params" [error]="error?.actions?.[i]?.webhook_params"></pngx-input-text>
-            <pngx-input-text i18n-title title="Webhook headers" formControlName="webhook_headers" [error]="error?.actions?.[i]?.webhook_headers"></pngx-input-text>
+            <pngx-input-entries i18n-title title="Webhook params" formControlName="webhook_params" [error]="error?.actions?.[i]?.webhook_params"></pngx-input-entries>
+            <pngx-input-entries i18n-title title="Webhook headers" formControlName="webhook_headers" [error]="error?.actions?.[i]?.webhook_headers"></pngx-input-entries>
             <pngx-input-switch i18n-title title="Include document" formControlName="webhook_include_document"></pngx-input-switch>
           </div>
         </div>
