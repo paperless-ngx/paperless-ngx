@@ -1,5 +1,52 @@
 # Changelog
 
+## paperless-ngx 2.13.3
+
+### Bug Fixes
+
+-   Fix: fix auto-clean PDFs, create parent dir for storing unmodified original [@shamoon](https://github.com/shamoon) ([#8157](https://github.com/paperless-ngx/paperless-ngx/pull/8157))
+-   Fix: correctly handle exists, false in custom field query filter @yichi-yang ([#8158](https://github.com/paperless-ngx/paperless-ngx/pull/8158))
+-   Fix: dont use filters for inverted thumbnails in Safari [@shamoon](https://github.com/shamoon) ([#8121](https://github.com/paperless-ngx/paperless-ngx/pull/8121))
+-   Fix: use static object for activedisplayfields to prevent changes [@shamoon](https://github.com/shamoon) ([#8120](https://github.com/paperless-ngx/paperless-ngx/pull/8120))
+-   Fix: dont invert pdf colors in FF [@shamoon](https://github.com/shamoon) ([#8110](https://github.com/paperless-ngx/paperless-ngx/pull/8110))
+-   Fix: make mail account password and refresh token text fields [@shamoon](https://github.com/shamoon) ([#8107](https://github.com/paperless-ngx/paperless-ngx/pull/8107))
+
+### Dependencies
+
+<details>
+<summary>8 changes</summary>
+
+-   Chore(deps-dev): Bump the frontend-eslint-dependencies group in /src-ui with 4 updates [@dependabot](https://github.com/dependabot) ([#8145](https://github.com/paperless-ngx/paperless-ngx/pull/8145))
+-   Chore(deps-dev): Bump @types/node from 22.7.4 to 22.8.6 in /src-ui [@dependabot](https://github.com/dependabot) ([#8148](https://github.com/paperless-ngx/paperless-ngx/pull/8148))
+-   Chore(deps-dev): Bump @playwright/test from 1.47.2 to 1.48.2 in /src-ui [@dependabot](https://github.com/dependabot) ([#8147](https://github.com/paperless-ngx/paperless-ngx/pull/8147))
+-   Chore(deps): Bump uuid from 10.0.0 to 11.0.2 in /src-ui [@dependabot](https://github.com/dependabot) ([#8146](https://github.com/paperless-ngx/paperless-ngx/pull/8146))
+-   Chore(deps): Bump tslib from 2.7.0 to 2.8.1 in /src-ui [@dependabot](https://github.com/dependabot) ([#8149](https://github.com/paperless-ngx/paperless-ngx/pull/8149))
+-   Chore(deps-dev): Bump @codecov/webpack-plugin from 1.2.0 to 1.2.1 in /src-ui [@dependabot](https://github.com/dependabot) ([#8150](https://github.com/paperless-ngx/paperless-ngx/pull/8150))
+-   Chore(deps-dev): Bump @types/jest from 29.5.13 to 29.5.14 in /src-ui in the frontend-jest-dependencies group [@dependabot](https://github.com/dependabot) ([#8144](https://github.com/paperless-ngx/paperless-ngx/pull/8144))
+-   Chore(deps): Bump the frontend-angular-dependencies group in /src-ui with 21 updates [@dependabot](https://github.com/dependabot) ([#8143](https://github.com/paperless-ngx/paperless-ngx/pull/8143))
+</details>
+
+### All App Changes
+
+<details>
+<summary>14 changes</summary>
+
+-   Fix: fix auto-clean PDFs, create parent dir for storing unmodified original [@shamoon](https://github.com/shamoon) ([#8157](https://github.com/paperless-ngx/paperless-ngx/pull/8157))
+-   Fix: correctly handle exists, false in custom field query filter @yichi-yang ([#8158](https://github.com/paperless-ngx/paperless-ngx/pull/8158))
+-   Chore(deps-dev): Bump the frontend-eslint-dependencies group in /src-ui with 4 updates [@dependabot](https://github.com/dependabot) ([#8145](https://github.com/paperless-ngx/paperless-ngx/pull/8145))
+-   Chore(deps-dev): Bump @types/node from 22.7.4 to 22.8.6 in /src-ui [@dependabot](https://github.com/dependabot) ([#8148](https://github.com/paperless-ngx/paperless-ngx/pull/8148))
+-   Chore(deps-dev): Bump @playwright/test from 1.47.2 to 1.48.2 in /src-ui [@dependabot](https://github.com/dependabot) ([#8147](https://github.com/paperless-ngx/paperless-ngx/pull/8147))
+-   Chore(deps): Bump uuid from 10.0.0 to 11.0.2 in /src-ui [@dependabot](https://github.com/dependabot) ([#8146](https://github.com/paperless-ngx/paperless-ngx/pull/8146))
+-   Chore(deps): Bump tslib from 2.7.0 to 2.8.1 in /src-ui [@dependabot](https://github.com/dependabot) ([#8149](https://github.com/paperless-ngx/paperless-ngx/pull/8149))
+-   Chore(deps-dev): Bump @codecov/webpack-plugin from 1.2.0 to 1.2.1 in /src-ui [@dependabot](https://github.com/dependabot) ([#8150](https://github.com/paperless-ngx/paperless-ngx/pull/8150))
+-   Chore(deps-dev): Bump @types/jest from 29.5.13 to 29.5.14 in /src-ui in the frontend-jest-dependencies group [@dependabot](https://github.com/dependabot) ([#8144](https://github.com/paperless-ngx/paperless-ngx/pull/8144))
+-   Chore(deps): Bump the frontend-angular-dependencies group in /src-ui with 21 updates [@dependabot](https://github.com/dependabot) ([#8143](https://github.com/paperless-ngx/paperless-ngx/pull/8143))
+-   Fix: dont use filters for inverted thumbnails in Safari [@shamoon](https://github.com/shamoon) ([#8121](https://github.com/paperless-ngx/paperless-ngx/pull/8121))
+-   Fix: use static object for activedisplayfields to prevent changes [@shamoon](https://github.com/shamoon) ([#8120](https://github.com/paperless-ngx/paperless-ngx/pull/8120))
+-   Fix: dont invert pdf colors in FF [@shamoon](https://github.com/shamoon) ([#8110](https://github.com/paperless-ngx/paperless-ngx/pull/8110))
+-   Fix: make mail account password and refresh token text fields [@shamoon](https://github.com/shamoon) ([#8107](https://github.com/paperless-ngx/paperless-ngx/pull/8107))
+</details>
+
 ## paperless-ngx 2.13.2
 
 ### Bug Fixes
