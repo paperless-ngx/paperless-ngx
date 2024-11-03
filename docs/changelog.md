@@ -1,5 +1,21 @@
 # Changelog
 
+## paperless-ngx 2.13.4
+
+### Bug Fixes
+
+-   Fix: fix dark mode icon blend mode in 2.13.3 [@shamoon](https://github.com/shamoon) ([#8166](https://github.com/paperless-ngx/paperless-ngx/pull/8166))
+-   Fix: fix clipped popup preview in 2.13.3 [@shamoon](https://github.com/shamoon) ([#8165](https://github.com/paperless-ngx/paperless-ngx/pull/8165))
+
+### All App Changes
+
+<details>
+<summary>2 changes</summary>
+
+-   Fix: fix dark mode icon blend mode in 2.13.3 [@shamoon](https://github.com/shamoon) ([#8166](https://github.com/paperless-ngx/paperless-ngx/pull/8166))
+-   Fix: fix clipped popup preview in 2.13.3 [@shamoon](https://github.com/shamoon) ([#8165](https://github.com/paperless-ngx/paperless-ngx/pull/8165))
+</details>
+
 ## paperless-ngx 2.13.3
 
 ### Bug Fixes
