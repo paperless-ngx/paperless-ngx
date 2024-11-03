@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-19 22:56-0700\n"
-"PO-Revision-Date: 2024-10-29 12:12\n"
+"PO-Revision-Date: 2024-11-03 04:57\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -1603,7 +1603,7 @@ msgstr ""
 
 #: paperless_mail/models.py:80
 msgid "The expiration date of the refresh token. "
-msgstr ""
+msgstr "刷新令牌的到期日期。 "
 
 #: paperless_mail/models.py:90
 msgid "mail rule"
