@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-19 22:56-0700\n"
-"PO-Revision-Date: 2024-10-25 12:12\n"
+"PO-Revision-Date: 2024-11-02 00:29\n"
 "Last-Translator: \n"
 "Language-Team: Swedish\n"
 "Language: sv_SE\n"
@@ -1015,7 +1015,7 @@ msgstr "Vänligen logga in."
 #: documents/templates/account/login.html:12
 #, python-format
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
-msgstr ""
+msgstr "Har du inget konto än? <a href=\"%(signup_url)s\">Registrera dig</a>"
 
 #: documents/templates/account/login.html:19
 #: documents/templates/account/signup.html:15
@@ -1117,7 +1117,7 @@ msgstr ""
 #: documents/templates/account/signup.html:10
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
-msgstr ""
+msgstr "Har du redan ett konto? <a href=\"%(login_url)s\">Logga in</a>"
 
 #: documents/templates/account/signup.html:16
 #: documents/templates/socialaccount/signup.html:14
@@ -1131,7 +1131,7 @@ msgstr ""
 #: documents/templates/account/signup.html:36
 #: documents/templates/socialaccount/signup.html:27
 msgid "Sign up"
-msgstr ""
+msgstr "Registrera dig"
 
 #: documents/templates/index.html:61
 msgid "Paperless-ngx is loading..."
@@ -1170,7 +1170,7 @@ msgstr ""
 
 #: documents/templates/socialaccount/login.html:13
 msgid "Continue"
-msgstr ""
+msgstr "Fortsätt"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
@@ -1366,7 +1366,7 @@ msgstr "Belarusiska"
 
 #: paperless/settings.py:688
 msgid "Bulgarian"
-msgstr ""
+msgstr "Bulgariska"
 
 #: paperless/settings.py:689
 msgid "Catalan"
@@ -1386,7 +1386,7 @@ msgstr "Tyska"
 
 #: paperless/settings.py:693
 msgid "Greek"
-msgstr ""
+msgstr "Grekiska"
 
 #: paperless/settings.py:694
 msgid "English (GB)"
@@ -1414,7 +1414,7 @@ msgstr "Italienska"
 
 #: paperless/settings.py:700
 msgid "Japanese"
-msgstr ""
+msgstr "Japanska"
 
 #: paperless/settings.py:701
 msgid "Korean"
@@ -1426,7 +1426,7 @@ msgstr "Luxemburgiska"
 
 #: paperless/settings.py:703
 msgid "Norwegian"
-msgstr ""
+msgstr "Norska"
 
 #: paperless/settings.py:704
 msgid "Dutch"
@@ -1542,7 +1542,7 @@ msgstr "Använd STARTTLS"
 
 #: paperless_mail/models.py:19
 msgid "IMAP"
-msgstr ""
+msgstr "IMAP"
 
 #: paperless_mail/models.py:20
 msgid "Gmail OAuth"
