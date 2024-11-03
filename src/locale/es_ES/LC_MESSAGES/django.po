@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-19 22:56-0700\n"
-"PO-Revision-Date: 2024-10-20 05:58\n"
+"PO-Revision-Date: 2024-11-03 04:57\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -23,35 +23,35 @@ msgstr "Documentos"
 
 #: documents/filters.py:334
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "El valor debe ser JSON válido."
 
 #: documents/filters.py:353
 msgid "Invalid custom field query expression"
-msgstr ""
+msgstr "Expresión de consulta de campo personalizado no válida"
 
 #: documents/filters.py:363
 msgid "Invalid expression list. Must be nonempty."
-msgstr ""
+msgstr "Lista de expresiones no válida. Debe ser no vacía."
 
 #: documents/filters.py:384
 msgid "Invalid logical operator {op!r}"
-msgstr ""
+msgstr "Operador lógico inválido {op!r}"
 
 #: documents/filters.py:398
 msgid "Maximum number of query conditions exceeded."
-msgstr ""
+msgstr "Se ha superado el número máximo de condiciones de consulta."
 
 #: documents/filters.py:455
 msgid "{name!r} is not a valid custom field."
-msgstr ""
+msgstr "{nombre!r} no es un campo personalizado válido."
 
 #: documents/filters.py:492
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr ""
+msgstr "{data_type} no admite la consulta expr {expr!r}."
 
 #: documents/filters.py:600
 msgid "Maximum nesting depth exceeded."
-msgstr ""
+msgstr "Profundidad máxima de nidificación superada."
 
 #: documents/models.py:41 documents/models.py:802
 msgid "owner"
@@ -192,11 +192,11 @@ msgstr "La cadena de verificación del documento archivado."
 
 #: documents/models.py:211
 msgid "page count"
-msgstr ""
+msgstr "número de páginas"
 
 #: documents/models.py:218
 msgid "The number of pages of the document."
-msgstr ""
+msgstr "El número de páginas del documento."
 
 #: documents/models.py:222 documents/models.py:402 documents/models.py:722
 #: documents/models.py:760 documents/models.py:831 documents/models.py:889
@@ -353,7 +353,7 @@ msgstr "ASN"
 
 #: documents/models.py:431
 msgid "Pages"
-msgstr ""
+msgstr "Páginas"
 
 #: documents/models.py:437
 msgid "show on dashboard"
@@ -561,7 +561,7 @@ msgstr "no tiene campo personalizado"
 
 #: documents/models.py:525
 msgid "custom fields query"
-msgstr ""
+msgstr "consulta de campos personalizados"
 
 #: documents/models.py:535
 msgid "rule type"
@@ -1543,7 +1543,7 @@ msgstr "Usar STARTTLS"
 
 #: paperless_mail/models.py:19
 msgid "IMAP"
-msgstr ""
+msgstr "IMAP"
 
 #: paperless_mail/models.py:20
 msgid "Gmail OAuth"
