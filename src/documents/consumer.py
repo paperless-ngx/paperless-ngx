@@ -411,6 +411,7 @@ class ConsumerPlugin(
                     self.unmodified_original = (
                         Path(tempdir.name) / Path("uo") / Path(self.filename)
                     )
+                    self.unmodified_original.parent.mkdir(exist_ok=True)
                     copy_file_with_basic_stats(
                         self.input_doc.original_file,
                         self.unmodified_original,
