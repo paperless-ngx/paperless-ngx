@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 import shutil
@@ -938,27 +937,30 @@ def run_workflows(
 
         try:
             params = {}
-            params_json = json.loads(action.webhook_params)
-            for key, value in params_json.items():
-                params[key] = parse_w_workflow_placeholders(
-                    value,
-                    document.correspondent.name if document.correspondent else "",
-                    document.document_type.name if document.document_type else "",
-                    document.owner.username if document.owner else "",
-                    timezone.localtime(document.added),
-                    document.original_filename or "",
-                    timezone.localtime(document.created),
-                    title,
-                    doc_url,
+            try:
+                for key, value in action.webhook_params.items():
+                    params[key] = parse_w_workflow_placeholders(
+                        value,
+                        document.correspondent.name if document.correspondent else "",
+                        document.document_type.name if document.document_type else "",
+                        document.owner.username if document.owner else "",
+                        timezone.localtime(document.added),
+                        document.original_filename or "",
+                        timezone.localtime(document.created),
+                        title,
+                        doc_url,
+                    )
+            except Exception as e:
+                logger.error(
+                    f"Error occurred parsing webhook params: {e}",
+                    extra={"group": logging_group},
                 )
-            headers = None
+            headers = {}
             if action.webhook_headers:
                 try:
-                    # headers are a JSON object with key-value pairs, needs to be converted to a Mapping[str, str]
-                    header_mapping = json.loads(
-                        action.webhook_headers,
-                    )
-                    headers = {str(k): str(v) for k, v in header_mapping.items()}
+                    headers = {
+                        str(k): str(v) for k, v in action.webhook_headers.items()
+                    }
                 except Exception as e:
                     logger.error(
                         f"Error occurred parsing webhook headers: {e}",
