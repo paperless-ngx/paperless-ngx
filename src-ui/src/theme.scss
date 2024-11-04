@@ -204,7 +204,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   @supports (hanging-punctuation: first) and (font: -apple-system-body) and (-webkit-appearance: none) {
     // Safari does not like the filters on the image, see https://github.com/paperless-ngx/paperless-ngx/pull/8121
     .doc-img-container {
-      background-color: #ffffff;
+      background-color: #ffffff !important;
     }
 
     .doc-img {
