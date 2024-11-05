@@ -346,6 +346,9 @@ export class WorkflowEditDialogComponent
         ),
         schedule_offset_days: new FormControl(trigger.schedule_offset_days),
         schedule_is_recurring: new FormControl(trigger.schedule_is_recurring),
+        schedule_recurring_interval_days: new FormControl(
+          trigger.schedule_recurring_interval_days
+        ),
         schedule_date_field: new FormControl(trigger.schedule_date_field),
         schedule_date_custom_field: new FormControl(
           trigger.schedule_date_custom_field
@@ -450,6 +453,7 @@ export class WorkflowEditDialogComponent
       is_insensitive: true,
       schedule_offset_days: 0,
       schedule_is_recurring: false,
+      schedule_recurring_interval_days: 1,
       schedule_date_field: ScheduleDateField.Added,
       schedule_date_custom_field: null,
     }

@@ -124,7 +124,6 @@
       <div class="row">
         <div class="col-4">
           <pngx-input-number i18n-title title="Offset days" formControlName="schedule_offset_days" i18n-hint hint="Use 0 for immediate." [showAdd]="false" [error]="error?.schedule_offset_days"></pngx-input-number>
-          <pngx-input-check i18n-title title="Recurring" formControlName="schedule_is_recurring" i18n-hint hint="Repeat the trigger after the offset." [error]="error?.schedule_is_recurring"></pngx-input-check>
         </div>
         <div class="col-4">
           <pngx-input-select i18n-title title="Relative to" formControlName="schedule_date_field" [items]="scheduleDateFieldOptions" [error]="error?.schedule_date_field"></pngx-input-select>
@@ -134,6 +133,16 @@
             <pngx-input-select i18n-title title="Delay custom field" formControlName="schedule_date_custom_field" [items]="dateCustomFields" i18n-hint hint="Custom field to use for date." [error]="error?.schedule_date_custom_field"></pngx-input-select>
           </div>
         }
+      </div>
+      <div class="row">
+        <div class="col-4">
+          <pngx-input-check i18n-title title="Recurring" formControlName="schedule_is_recurring" i18n-hint hint="Trigger is recurring." [error]="error?.schedule_is_recurring"></pngx-input-check>
+        </div>
+        <div class="col-4">
+          @if (formGroup.get('schedule_is_recurring').value === true) {
+            <pngx-input-number i18n-title title="Recurring interval days" formControlName="schedule_recurring_interval_days" i18n-hint hint="Repeat the trigger every n days." [showAdd]="false" [error]="error?.schedule_recurring_interval_days"></pngx-input-number>
+          }
+        </div>
       </div>
     }
     <p class="small" i18n>Trigger for documents that match <em>all</em> filters specified below.</p>

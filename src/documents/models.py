@@ -1121,6 +1121,15 @@ class WorkflowTrigger(models.Model):
         ),
     )
 
+    schedule_recurring_interval_days = models.PositiveIntegerField(
+        _("schedule recurring delay in days"),
+        default=1,
+        validators=[MinValueValidator(1)],
+        help_text=_(
+            "The number of days between recurring schedule triggers.",
+        ),
+    )
+
     schedule_date_field = models.CharField(
         _("schedule date field"),
         max_length=20,

@@ -47,6 +47,8 @@ export interface WorkflowTrigger extends ObjectWithId {
 
   schedule_is_recurring?: boolean
 
+  schedule_recurring_interval_days?: number
+
   schedule_date_field?: ScheduleDateField
 
   schedule_date_custom_field?: number // CustomField.id

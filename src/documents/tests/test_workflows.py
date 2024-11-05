@@ -1526,8 +1526,8 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
     def test_workflow_scheduled_trigger_too_early(self):
         """
         GIVEN:
-            - Existing workflow with SCHEDULED trigger and offset of 30 days
-            - Workflow run date is 20 days ago
+            - Existing workflow with SCHEDULED trigger and recurring interval of 7 days
+            - Workflow run date is 6 days ago
         WHEN:
             - Scheduled workflows are checked
         THEN:
@@ -1538,6 +1538,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
             schedule_offset_days=30,
             schedule_date_field=WorkflowTrigger.ScheduleDateField.CREATED,
             schedule_is_recurring=True,
+            schedule_recurring_interval_days=7,
         )
         action = WorkflowAction.objects.create(
             assign_title="Doc assign owner",
@@ -1562,12 +1563,15 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
             workflow=w,
             document=doc,
             type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
-            run_at=timezone.now() - timedelta(days=20),
+            run_at=timezone.now() - timedelta(days=6),
         )
 
         with self.assertLogs(level="DEBUG") as cm:
             tasks.check_scheduled_workflows()
-            self.assertIn("last run was within the offset", " ".join(cm.output))
+            self.assertIn(
+                "last run was within the recurring interval",
+                " ".join(cm.output),
+            )
 
             doc.refresh_from_db()
             self.assertIsNone(doc.owner)
