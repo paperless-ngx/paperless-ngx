@@ -157,7 +157,7 @@ class TestCeleryScheduleParsing(TestCase):
     INDEX_EXPIRE_TIME = 23.0 * 60.0 * 60.0
     SANITY_EXPIRE_TIME = ((7.0 * 24.0) - 1.0) * 60.0 * 60.0
     EMPTY_TRASH_EXPIRE_TIME = 23.0 * 60.0 * 60.0
-    RUN_SCHEDULED_WORKFLOWS_EXPIRE_TIME = 4.0 * 60.0
+    RUN_SCHEDULED_WORKFLOWS_EXPIRE_TIME = 59.0 * 60.0
 
     def test_schedule_configuration_default(self):
         """
@@ -199,7 +199,7 @@ class TestCeleryScheduleParsing(TestCase):
                 },
                 "Check and run scheduled workflows": {
                     "task": "documents.tasks.check_scheduled_workflows",
-                    "schedule": crontab(minute="*/5"),
+                    "schedule": crontab(minute="5", hour="*/1"),
                     "options": {"expires": self.RUN_SCHEDULED_WORKFLOWS_EXPIRE_TIME},
                 },
             },
@@ -251,7 +251,7 @@ class TestCeleryScheduleParsing(TestCase):
                 },
                 "Check and run scheduled workflows": {
                     "task": "documents.tasks.check_scheduled_workflows",
-                    "schedule": crontab(minute="*/5"),
+                    "schedule": crontab(minute="5", hour="*/1"),
                     "options": {"expires": self.RUN_SCHEDULED_WORKFLOWS_EXPIRE_TIME},
                 },
             },
@@ -295,7 +295,7 @@ class TestCeleryScheduleParsing(TestCase):
                 },
                 "Check and run scheduled workflows": {
                     "task": "documents.tasks.check_scheduled_workflows",
-                    "schedule": crontab(minute="*/5"),
+                    "schedule": crontab(minute="5", hour="*/1"),
                     "options": {"expires": self.RUN_SCHEDULED_WORKFLOWS_EXPIRE_TIME},
                 },
             },

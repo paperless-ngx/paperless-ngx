@@ -219,12 +219,12 @@ def _parse_beat_schedule() -> dict:
         {
             "name": "Check and run scheduled workflows",
             "env_key": "PAPERLESS_WORKFLOW_SCHEDULED_TASK_CRON",
-            # Default every 5 minutes
-            "env_default": "*/5 * * * *",
+            # Default hourly at 5 minutes past the hour
+            "env_default": "5 */1 * * *",
             "task": "documents.tasks.check_scheduled_workflows",
             "options": {
                 # 1 minute before default schedule sends again
-                "expires": 4.0 * 60.0,
+                "expires": 59.0 * 60.0,
             },
         },
     ]
