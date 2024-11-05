@@ -396,9 +396,13 @@ def check_scheduled_workflows():
                         elif (
                             trigger.schedule_is_recurring
                             and workflow_runs.exists()
-                            and workflow_runs.last().run_at > timezone.now() - offset_td
+                            and (
+                                workflow_runs.last().run_at > timezone.now() - offset_td
+                                or workflow_runs.last().run_at
+                                > timezone.now() - timedelta(days=1)
+                            )
                         ):
-                            # schedule is recurring but the last run was within the offset
+                            # schedule is recurring but the last run was within the offset or within 24 hours of the last run
                             logger.debug(
                                 f"Skipping document {document} for recurring workflow {workflow} as the last run was within the offset",
                             )
