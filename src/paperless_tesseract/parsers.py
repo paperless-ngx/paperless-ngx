@@ -232,6 +232,7 @@ class RasterisedDocumentParser(DocumentParser):
 
         if self.settings.mode == ModeChoices.FORCE or safe_fallback:
             ocrmypdf_args["force_ocr"] = True
+            ocrmypdf_args["invalidate_digital_signatures"] = True
         elif self.settings.mode in {
             ModeChoices.SKIP,
             ModeChoices.SKIP_NO_ARCHIVE,
