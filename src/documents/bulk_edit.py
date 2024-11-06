@@ -212,30 +212,45 @@ def rotate(doc_ids: list[int], degrees: int):
     qs = Document.objects.filter(id__in=doc_ids)
     affected_docs = []
     import pikepdf
+    from PIL import Image
 
     rotate_tasks = []
+    image_mime_types = [
+        "image/png",
+        "image/jpeg",
+        "image/tiff",
+        "image/bmp",
+        "image/gif",
+        "image/webp",
+    ]
     for doc in qs:
-        if doc.mime_type != "application/pdf":
+        is_image = doc.mime_type in image_mime_types
+        if doc.mime_type != "application/pdf" and not is_image:
             logger.warning(
-                f"Document {doc.id} is not a PDF, skipping rotation.",
+                f"Document {doc.id} is not a PDF or image, skipping rotation.",
             )
             continue
         try:
-            with pikepdf.open(doc.source_path, allow_overwriting_input=True) as pdf:
-                for page in pdf.pages:
-                    page.rotate(degrees, relative=True)
-                pdf.save()
-                doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
-                doc.save()
-                rotate_tasks.append(
-                    update_document_archive_file.s(
-                        document_id=doc.id,
-                    ),
-                )
-                logger.info(
-                    f"Rotated document {doc.id} by {degrees} degrees",
-                )
-                affected_docs.append(doc.id)
+            if is_image:
+                im = Image.open(doc.source_path)
+                rotated = im.rotate(-degrees, expand=True)
+                format_from_mime = doc.mime_type.split("/")[1]
+                dpi = im.info.get("dpi", None)
+                save_kwargs = {"format": format_from_mime.upper()}
+                if dpi is not None:
+                    save_kwargs["dpi"] = dpi
+                rotated.save(doc.source_path, **save_kwargs)
+            else:
+                with pikepdf.open(doc.source_path, allow_overwriting_input=True) as pdf:
+                    for page in pdf.pages:
+                        page.rotate(degrees, relative=True)
+                    pdf.save()
+
+            doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
+            doc.save()
+            rotate_tasks.append(update_document_archive_file.s(document_id=doc.id))
+            logger.info(f"Rotated document {doc.id} by {degrees} degrees")
+            affected_docs.append(doc.id)
         except Exception as e:
             logger.exception(f"Error rotating document {doc.id}: {e}")
 
