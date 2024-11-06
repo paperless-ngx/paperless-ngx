@@ -408,16 +408,82 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             filename=sample3,
             mime_type="application/pdf",
         )
-        img_doc = self.dirs.scratch_dir / "sample_image.jpg"
+        jpg_doc = self.dirs.scratch_dir / "sample_image.jpg"
         shutil.copy(
             Path(__file__).parent / "samples" / "simple.jpg",
-            img_doc,
+            jpg_doc,
         )
-        self.img_doc = Document.objects.create(
+        self.jpg_doc = Document.objects.create(
             checksum="D",
             title="D",
-            filename=img_doc,
+            filename=jpg_doc,
             mime_type="image/jpeg",
+        )
+        png_doc = self.dirs.scratch_dir / "sample_text.png"
+        shutil.copy(
+            Path(__file__).parent / "samples" / "simple.png",
+            png_doc,
+        )
+        self.png_doc = Document.objects.create(
+            checksum="E",
+            title="E",
+            filename=png_doc,
+            mime_type="image/png",
+        )
+        tiff_doc = self.dirs.scratch_dir / "sample_text.tiff"
+        shutil.copy(
+            Path(__file__).parent / "samples" / "simple.tiff",
+            tiff_doc,
+        )
+        self.tiff_doc = Document.objects.create(
+            checksum="F",
+            title="F",
+            filename=tiff_doc,
+            mime_type="image/tiff",
+        )
+        webp_doc = self.dirs.scratch_dir / "sample_text.webp"
+        shutil.copy(
+            Path(__file__).parent / "samples" / "simple.webp",
+            webp_doc,
+        )
+        self.webp_doc = Document.objects.create(
+            checksum="G",
+            title="G",
+            filename=webp_doc,
+            mime_type="image/webp",
+        )
+        gif_doc = self.dirs.scratch_dir / "sample_text.gif"
+        shutil.copy(
+            Path(__file__).parent / "samples" / "simple.gif",
+            gif_doc,
+        )
+        self.gif_doc = Document.objects.create(
+            checksum="H",
+            title="H",
+            filename=gif_doc,
+            mime_type="image/gif",
+        )
+        bmp_doc = self.dirs.scratch_dir / "sample_text.bmp"
+        shutil.copy(
+            Path(__file__).parent / "samples" / "simple.bmp",
+            bmp_doc,
+        )
+        self.bmp_doc = Document.objects.create(
+            checksum="I",
+            title="I",
+            filename=bmp_doc,
+            mime_type="image/bmp",
+        )
+        text_doc = self.dirs.scratch_dir / "sample_text.txt"
+        shutil.copy(
+            Path(__file__).parent / "samples" / "simple.txt",
+            text_doc,
+        )
+        self.text_doc = Document.objects.create(
+            checksum="J",
+            title="J",
+            filename=text_doc,
+            mime_type="text/plain",
         )
 
     @mock.patch("documents.tasks.consume_file.s")
@@ -609,7 +675,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
     @mock.patch("documents.tasks.bulk_update_documents.si")
     @mock.patch("documents.tasks.update_document_archive_file.s")
     @mock.patch("celery.chord.delay")
-    def test_rotate(self, mock_chord, mock_update_document, mock_update_documents):
+    def test_rotate_pdf(self, mock_chord, mock_update_document, mock_update_documents):
         """
         GIVEN:
             - Existing documents
@@ -621,6 +687,38 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         doc_ids = [self.doc1.id, self.doc2.id]
         result = bulk_edit.rotate(doc_ids, 90)
         self.assertEqual(mock_update_document.call_count, 2)
+        mock_update_documents.assert_called_once()
+        mock_chord.assert_called_once()
+        self.assertEqual(result, "OK")
+
+    @mock.patch("documents.tasks.bulk_update_documents.si")
+    @mock.patch("documents.tasks.update_document_archive_file.s")
+    @mock.patch("celery.chord.delay")
+    def test_rotate_image(
+        self,
+        mock_chord,
+        mock_update_document,
+        mock_update_documents,
+    ):
+        """
+        GIVEN:
+            - Existing documents
+        WHEN:
+            - Rotate action is called with 6 images
+        THEN:
+            - Rotate action should be called 6 times
+        """
+
+        doc_ids = [
+            self.jpg_doc.id,
+            self.png_doc.id,
+            self.tiff_doc.id,
+            self.webp_doc.id,
+            self.gif_doc.id,
+            self.bmp_doc.id,
+        ]
+        result = bulk_edit.rotate(doc_ids, 90)
+        self.assertEqual(mock_update_document.call_count, 6)
         mock_update_documents.assert_called_once()
         mock_chord.assert_called_once()
         self.assertEqual(result, "OK")
@@ -656,7 +754,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
     @mock.patch("documents.tasks.bulk_update_documents.si")
     @mock.patch("documents.tasks.update_document_archive_file.s")
     @mock.patch("celery.chord.delay")
-    def test_rotate_non_pdf(
+    def test_rotate_non_pdf_or_image(
         self,
         mock_chord,
         mock_update_document,
@@ -666,14 +764,16 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         GIVEN:
             - Existing documents
         WHEN:
-            - Rotate action is called with 2 documents, one of which is not a PDF
+            - Rotate action is called with 2 documents, one of which is not a PDF or image
         THEN:
-            - Rotate action should be performed 1 time, with the non-PDF document skipped
+            - Rotate action should be performed 1 time, with the non-PDF or image document skipped
         """
         with self.assertLogs("paperless.bulk_edit", level="INFO") as cm:
-            result = bulk_edit.rotate([self.doc2.id, self.img_doc.id], 90)
+            result = bulk_edit.rotate([self.doc2.id, self.text_doc.id], 90)
             output_str = cm.output[1]
-            expected_str = "Document 4 is not a PDF, skipping rotation"
+            expected_str = (
+                f"Document {self.text_doc.id} is not a PDF or image, skipping rotation"
+            )
             self.assertIn(expected_str, output_str)
             self.assertEqual(mock_update_document.call_count, 1)
             mock_update_documents.assert_called_once()
