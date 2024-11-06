@@ -19,6 +19,7 @@
 
   object:not(.pdf) {
     mix-blend-mode: difference;
+    background: white !important;
     &.p-2 {
       padding: 0 !important;
     }
