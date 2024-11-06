@@ -29,6 +29,9 @@ export class EntriesComponent extends AbstractInputComponent<object> {
   }
 
   writeValue(newValue: any): void {
+    if (!newValue) {
+      newValue = {}
+    }
     this.entries = Object.entries(newValue)
     this.value = newValue
   }
