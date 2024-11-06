@@ -808,6 +808,8 @@ class DocumentSerializer(
     def validate(self, attrs):
         if (
             "archive_serial_number" in attrs
+            and attrs["archive_serial_number"] is not None
+            and len(attrs["archive_serial_number"]) > 0
             and Document.deleted_objects.filter(
                 archive_serial_number=attrs["archive_serial_number"],
             ).exists()
