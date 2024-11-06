@@ -1417,11 +1417,23 @@ class WorkflowAction(models.Model):
         help_text=_("The destination URL for the notification."),
     )
 
+    webhook_use_params = models.BooleanField(
+        default=True,
+        verbose_name=_("use parameters"),
+    )
+
     webhook_params = models.JSONField(
         _("webhook parameters"),
         null=True,
         blank=True,
-        help_text=_("The parameters to send with the webhook URL."),
+        help_text=_("The parameters to send with the webhook URL if body not used."),
+    )
+
+    webhook_body = models.TextField(
+        _("webhook body"),
+        null=True,
+        blank=True,
+        help_text=_("The body to send with the webhook URL if parameters not used."),
     )
 
     webhook_headers = models.JSONField(

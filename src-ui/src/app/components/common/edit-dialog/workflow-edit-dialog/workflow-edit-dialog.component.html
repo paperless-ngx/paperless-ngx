@@ -336,7 +336,12 @@
         <div class="row">
           <div class="col">
             <pngx-input-text i18n-title title="Webhook url" formControlName="webhook_url" [error]="error?.actions?.[i]?.webhook_url"></pngx-input-text>
-            <pngx-input-entries i18n-title title="Webhook params" formControlName="webhook_params" [error]="error?.actions?.[i]?.webhook_params"></pngx-input-entries>
+            <pngx-input-switch i18n-title title="Use parameters for webhook body" formControlName="webhook_use_params"></pngx-input-switch>
+            @if (formGroup.get('webhook_use_params').value) {
+              <pngx-input-entries i18n-title title="Webhook params" formControlName="webhook_params" [error]="error?.actions?.[i]?.webhook_params"></pngx-input-entries>
+            } @else {
+              <pngx-input-textarea i18n-title title="Webhook body" formControlName="webhook_body" [error]="error?.actions?.[i]?.webhook_body"></pngx-input-textarea>
+            }
             <pngx-input-entries i18n-title title="Webhook headers" formControlName="webhook_headers" [error]="error?.actions?.[i]?.webhook_headers"></pngx-input-entries>
             <pngx-input-switch i18n-title title="Include document" formControlName="webhook_include_document"></pngx-input-switch>
           </div>

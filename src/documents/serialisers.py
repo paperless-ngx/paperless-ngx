@@ -1852,7 +1852,9 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
             "email_body",
             "email_include_document",
             "webhook_url",
+            "webhook_use_params",
             "webhook_params",
+            "webhook_body",
             "webhook_headers",
         ]
 

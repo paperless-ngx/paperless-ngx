@@ -415,7 +415,9 @@ export class WorkflowEditDialogComponent
         email_to: new FormControl(action.email_to),
         email_include_document: new FormControl(action.email_include_document),
         webhook_url: new FormControl(action.webhook_url),
+        webhook_use_params: new FormControl(action.webhook_use_params),
         webhook_params: new FormControl(action.webhook_params),
+        webhook_body: new FormControl(action.webhook_body),
         webhook_headers: new FormControl(action.webhook_headers),
         webhook_include_document: new FormControl(
           action.webhook_include_document
@@ -526,7 +528,9 @@ export class WorkflowEditDialogComponent
       email_to: null,
       email_include_document: false,
       webhook_url: null,
+      webhook_use_params: true,
       webhook_params: null,
+      webhook_body: null,
       webhook_headers: null,
       webhook_include_document: false,
     }

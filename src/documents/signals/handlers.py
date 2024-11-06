@@ -936,24 +936,41 @@ def run_workflows(
             doc_url = f"{settings.PAPERLESS_URL}/documents/{document.pk}/"
 
         try:
-            params = {}
-            try:
-                for key, value in action.webhook_params.items():
-                    params[key] = parse_w_workflow_placeholders(
-                        value,
-                        document.correspondent.name if document.correspondent else "",
-                        document.document_type.name if document.document_type else "",
-                        document.owner.username if document.owner else "",
-                        timezone.localtime(document.added),
-                        document.original_filename or "",
-                        timezone.localtime(document.created),
-                        title,
-                        doc_url,
+            data = {}
+            if action.webhook_use_params:
+                try:
+                    for key, value in action.webhook_params.items():
+                        data[key] = parse_w_workflow_placeholders(
+                            value,
+                            document.correspondent.name
+                            if document.correspondent
+                            else "",
+                            document.document_type.name
+                            if document.document_type
+                            else "",
+                            document.owner.username if document.owner else "",
+                            timezone.localtime(document.added),
+                            document.original_filename or "",
+                            timezone.localtime(document.created),
+                            title,
+                            doc_url,
+                        )
+                except Exception as e:
+                    logger.error(
+                        f"Error occurred parsing webhook params: {e}",
+                        extra={"group": logging_group},
                     )
-            except Exception as e:
-                logger.error(
-                    f"Error occurred parsing webhook params: {e}",
-                    extra={"group": logging_group},
+            else:
+                data = parse_w_workflow_placeholders(
+                    action.webhook_body,
+                    document.correspondent.name if document.correspondent else "",
+                    document.document_type.name if document.document_type else "",
+                    document.owner.username if document.owner else "",
+                    timezone.localtime(document.added),
+                    document.original_filename or "",
+                    timezone.localtime(document.created),
+                    title,
+                    doc_url,
                 )
             headers = {}
             if action.webhook_headers:
@@ -971,14 +988,14 @@ def run_workflows(
                     files = {"file": (document.original_filename, f)}
                     httpx.post(
                         action.webhook_url,
-                        data=params,
+                        data=data,
                         files=files,
                         headers=headers,
                     )
             else:
                 httpx.post(
                     action.webhook_url,
-                    data=params,
+                    data=data,
                     headers=headers,
                 )
         except Exception as e:

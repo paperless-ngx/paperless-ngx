@@ -2233,6 +2233,58 @@ class TestWorkflows(
         EMAIL_ENABLED=True,
         PAPERLESS_URL="http://localhost:8000",
     )
+    @mock.patch("httpx.post")
+    def test_workflow_webhook_action_body(self, mock_post):
+        """
+        GIVEN:
+            - Document updated workflow with webhook action which uses body
+        WHEN:
+            - Document that matches is updated
+        THEN:
+            - Webhook is sent with body
+        """
+        mock_post.return_value = mock.Mock(
+            status_code=200,
+            json=mock.Mock(return_value={"status": "ok"}),
+        )
+
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.WEBHOOK,
+            webhook_use_params=False,
+            webhook_body="Test message: {doc_url}",
+            webhook_url="http://paperless-ngx.com",
+            webhook_include_document=False,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        mock_post.assert_called_once_with(
+            "http://paperless-ngx.com",
+            data=f"Test message: http://localhost:8000/documents/{doc.id}/",
+            headers={},
+        )
+
+    @override_settings(
+        PAPERLESS_EMAIL_HOST="localhost",
+        EMAIL_ENABLED=True,
+        PAPERLESS_URL="http://localhost:8000",
+    )
     def test_workflow_webhook_action_fail(self):
         """
         GIVEN:
@@ -2248,6 +2300,7 @@ class TestWorkflows(
         )
         action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.WEBHOOK,
+            webhook_use_params=True,
             webhook_params={
                 "title": "Test webhook: {doc_title}",
                 "body": "Test message: {doc_url}",
@@ -2277,7 +2330,7 @@ class TestWorkflows(
             self.assertIn(expected_str, cm.output[0])
 
     @mock.patch("httpx.post")
-    def test_workflow_notification_action_url_invalid_params_headers(self, mock_post):
+    def test_workflow_webhook_action_url_invalid_params_headers(self, mock_post):
         """
         GIVEN:
             - Document updated workflow with webhook action
@@ -2293,6 +2346,7 @@ class TestWorkflows(
         action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.WEBHOOK,
             webhook_url="http://paperless-ngx.com",
+            webhook_use_params=True,
             webhook_params="invalid",
             webhook_headers="invalid",
         )
