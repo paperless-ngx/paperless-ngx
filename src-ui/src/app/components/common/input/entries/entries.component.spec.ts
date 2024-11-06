@@ -47,6 +47,8 @@ describe('EntriesComponent', () => {
     const newValue = { key1: 'value1', key2: 'value2' }
     component.writeValue(newValue)
     expect(component.entries).toEqual(Object.entries(newValue))
+    component.writeValue(null)
+    expect(component.entries).toEqual([])
   })
 
   it('should correctly generate the value on input change', () => {
