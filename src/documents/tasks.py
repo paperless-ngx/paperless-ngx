@@ -24,7 +24,6 @@ from documents.barcodes import BarcodePlugin
 from documents.caching import clear_document_caches
 from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
-from documents.consumer import CleanPDFPlugin
 from documents.consumer import ConsumerPlugin
 from documents.consumer import WorkflowTriggerPlugin
 from documents.data_models import ConsumableDocument
@@ -49,6 +48,7 @@ from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
 from documents.utils import copy_file_with_basic_stats
+from documents.utils import run_subprocess
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
@@ -111,7 +111,6 @@ def consume_file(
     self: Task,
     input_doc: ConsumableDocument,
     overrides: DocumentMetadataOverrides | None = None,
-    clean: bool = False,
 ):
     # Default no overrides
     if overrides is None:
@@ -123,9 +122,6 @@ def consume_file(
         WorkflowTriggerPlugin,
         ConsumerPlugin,
     ]
-
-    if clean:
-        plugins.insert(0, CleanPDFPlugin)
 
     with (
         ProgressManager(
@@ -189,13 +185,32 @@ def retry_failed_file(task_id: str, clean: bool = False, skip_ocr: bool = False)
         working_copy = settings.SCRATCH_DIR / failed_file.name
         copy_file_with_basic_stats(failed_file, working_copy)
 
+        if clean:
+            try:
+                result = run_subprocess(
+                    [
+                        "qpdf",
+                        "--replace-input",
+                        "--warning-exit-0",
+                        working_copy,
+                    ],
+                    logger=logger,
+                )
+                if result.returncode != 0:
+                    raise Exception(
+                        f"qpdf failed with exit code {result.returncode}, error: {result.stderr}",
+                    )
+                else:
+                    logger.debug("PDF cleaned successfully")
+            except Exception as e:
+                logger.error(f"Error while cleaning PDF: {e}")
+                return
+
         consume_file(
             ConsumableDocument(
                 source=DocumentSource.ConsumeFolder,
                 original_file=working_copy,
             ),
-            clean=clean,
-            # skip_ocr=skip_ocr,
         )
 
 

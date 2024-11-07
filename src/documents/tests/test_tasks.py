@@ -248,6 +248,6 @@ class TestRetryConsumeTask(
         self.assertIsFile(settings.CONSUMPTION_FAILED_DIR / task.task_file_name)
 
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("documents.tasks", level="INFO") as cm:
+            with self.assertLogs() as cm:
                 tasks.retry_failed_file(task_id=task.task_id, clean=True)
-                self.assertIn("PDF cleaned successfully", cm.output[0])
+                self.assertIn("New document id 1 created", cm.output[-1])
