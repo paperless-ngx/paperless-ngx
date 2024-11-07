@@ -65,6 +65,7 @@ from documents.signals.handlers import cleanup_document_deletion
 from documents.signals.handlers import run_workflows
 from documents.signals.handlers import send_websocket_document_updated
 from documents.utils import copy_file_with_basic_stats
+from documents.utils import run_subprocess
 from documents.workflows.utils import get_workflows_for_trigger
 from paperless.config import AIConfig
 from paperless_ai.indexing import llm_index_add_or_update_document
@@ -250,6 +251,27 @@ def retry_failed_file(task_id: str, clean: bool = False, skip_ocr: bool = False)
             return
         working_copy = settings.SCRATCH_DIR / failed_file.name
         copy_file_with_basic_stats(failed_file, working_copy)
+
+        if clean:
+            try:
+                result = run_subprocess(
+                    [
+                        "qpdf",
+                        "--replace-input",
+                        "--warning-exit-0",
+                        working_copy,
+                    ],
+                    logger=logger,
+                )
+                if result.returncode != 0:
+                    raise Exception(
+                        f"qpdf failed with exit code {result.returncode}, error: {result.stderr}",
+                    )
+                else:
+                    logger.debug("PDF cleaned successfully")
+            except Exception as e:
+                logger.error(f"Error while cleaning PDF: {e}")
+                return
 
         consume_file(
             ConsumableDocument(
