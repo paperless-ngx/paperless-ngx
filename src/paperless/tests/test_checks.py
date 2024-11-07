@@ -29,10 +29,11 @@ class TestChecks(DirectoriesMixin, TestCase):
         MEDIA_ROOT="uuh",
         DATA_DIR="whatever",
         CONSUMPTION_DIR="idontcare",
+        CONSUMPTION_FAILED_DIR="nope",
     )
     def test_paths_check_dont_exist(self):
         msgs = paths_check(None)
-        self.assertEqual(len(msgs), 3, str(msgs))
+        self.assertEqual(len(msgs), 4, str(msgs))
 
         for msg in msgs:
             self.assertTrue(msg.msg.endswith("is set but doesn't exist."))
@@ -41,13 +42,15 @@ class TestChecks(DirectoriesMixin, TestCase):
         os.chmod(self.dirs.data_dir, 0o000)
         os.chmod(self.dirs.media_dir, 0o000)
         os.chmod(self.dirs.consumption_dir, 0o000)
+        os.chmod(self.dirs.consumption_failed_dir, 0o000)
 
         self.addCleanup(os.chmod, self.dirs.data_dir, 0o777)
         self.addCleanup(os.chmod, self.dirs.media_dir, 0o777)
         self.addCleanup(os.chmod, self.dirs.consumption_dir, 0o777)
+        self.addCleanup(os.chmod, self.dirs.consumption_failed_dir, 0o777)
 
         msgs = paths_check(None)
-        self.assertEqual(len(msgs), 3)
+        self.assertEqual(len(msgs), 4)
 
         for msg in msgs:
             self.assertTrue(msg.msg.endswith("is not writeable"))

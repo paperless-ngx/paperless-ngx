@@ -35,7 +35,7 @@ def setup_directories():
     dirs.scratch_dir = Path(tempfile.mkdtemp())
     dirs.media_dir = Path(tempfile.mkdtemp())
     dirs.consumption_dir = Path(tempfile.mkdtemp())
-    dirs.consumption_failed_dir = dirs.consumption_dir / "failed"
+    dirs.consumption_failed_dir = Path(tempfile.mkdtemp("failed"))
     dirs.static_dir = Path(tempfile.mkdtemp())
     dirs.index_dir = dirs.data_dir / "index"
     dirs.originals_dir = dirs.media_dir / "documents" / "originals"
