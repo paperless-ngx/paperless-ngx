@@ -175,7 +175,12 @@ class ConsumerPluginMixin:
         self._send_progress(100, 100, ProgressStatusOptions.FAILED, message)
         self.log.error(log_message or message, exc_info=exc_info)
         # Move the file to the failed directory
-        if self.input_doc.original_file.exists():
+        if (
+            self.input_doc.original_file.exists()
+            and not Path(
+                settings.CONSUMPTION_FAILED_DIR / self.input_doc.original_file.name,
+            ).exists()
+        ):
             copy_file_with_basic_stats(
                 self.input_doc.original_file,
                 settings.CONSUMPTION_FAILED_DIR / self.input_doc.original_file.name,

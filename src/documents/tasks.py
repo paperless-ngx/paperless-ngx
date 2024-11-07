@@ -64,6 +64,7 @@ from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
 from documents.signals.handlers import run_workflows
 from documents.signals.handlers import send_websocket_document_updated
+from documents.utils import copy_file_with_basic_stats
 from documents.workflows.utils import get_workflows_for_trigger
 from paperless.config import AIConfig
 from paperless_ai.indexing import llm_index_add_or_update_document
@@ -72,7 +73,6 @@ from paperless_ai.indexing import update_llm_index
 
 _T = TypeVar("_T")
 IterWrapper = Callable[[Iterable[_T]], Iterable[_T]]
-
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
@@ -248,11 +248,13 @@ def retry_failed_file(task_id: str, clean: bool = False, skip_ocr: bool = False)
         if not failed_file.exists():
             logger.error(f"Failed file {failed_file} not found")
             return
+        working_copy = settings.SCRATCH_DIR / failed_file.name
+        copy_file_with_basic_stats(failed_file, working_copy)
 
         consume_file(
             ConsumableDocument(
                 source=DocumentSource.ConsumeFolder,
-                original_file=failed_file,
+                original_file=working_copy,
             ),
         )
 
