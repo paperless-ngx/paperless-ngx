@@ -24,6 +24,7 @@ class PaperlessTestDirs:
     data_dir: Path
     media_dir: Path
     consumption_dir: Path
+    consumption_failed_dir: Path
 
 
 # TODO: consolidate with documents/tests/conftest.py PaperlessDirs/paperless_dirs
@@ -33,18 +34,21 @@ def directories(tmp_path: Path, settings: SettingsWrapper) -> PaperlessTestDirs:
     data_dir = tmp_path / "data"
     media_dir = tmp_path / "media"
     consumption_dir = tmp_path / "consumption"
+    consumption_failed_dir = tmp_path / "consumption_failed"
 
-    for d in (data_dir, media_dir, consumption_dir):
+    for d in (data_dir, media_dir, consumption_dir, consumption_failed_dir):
         d.mkdir()
 
     settings.DATA_DIR = data_dir
     settings.MEDIA_ROOT = media_dir
     settings.CONSUMPTION_DIR = consumption_dir
+    settings.CONSUMPTION_FAILED_DIR = consumption_failed_dir
 
     return PaperlessTestDirs(
         data_dir=data_dir,
         media_dir=media_dir,
         consumption_dir=consumption_dir,
+        consumption_failed_dir=consumption_failed_dir,
     )
 
 
@@ -64,10 +68,11 @@ class TestChecks:
         settings.MEDIA_ROOT = Path("uuh")
         settings.DATA_DIR = Path("whatever")
         settings.CONSUMPTION_DIR = Path("idontcare")
+        settings.CONSUMPTION_FAILED_DIR = Path("nope")
 
         msgs = paths_check(None)
 
-        assert len(msgs) == 3, str(msgs)
+        assert len(msgs) == 4, str(msgs)
         for msg in msgs:
             assert msg.msg.endswith("is set but doesn't exist.")
 
@@ -75,6 +80,7 @@ class TestChecks:
         directories.data_dir.chmod(0o000)
         directories.media_dir.chmod(0o000)
         directories.consumption_dir.chmod(0o000)
+        directories.consumption_failed_dir.chmod(0o000)
 
         try:
             msgs = paths_check(None)
@@ -82,8 +88,9 @@ class TestChecks:
             directories.data_dir.chmod(0o777)
             directories.media_dir.chmod(0o777)
             directories.consumption_dir.chmod(0o777)
+            directories.consumption_failed_dir.chmod(0o777)
 
-        assert len(msgs) == 3
+        assert len(msgs) == 4
         for msg in msgs:
             assert msg.msg.endswith("is not writeable")
 
