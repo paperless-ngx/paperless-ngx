@@ -204,8 +204,7 @@ class TestRetryConsumeTask(
     TestCase,
 ):
     @override_settings(CONSUMPTION_FAILED_DIR=Path(__file__).parent / "samples")
-    @mock.patch("documents.consumer.run_subprocess")
-    def test_retry_consume(self, m):
+    def test_retry_consume(self):
         test_file = self.SAMPLE_DIR / "corrupted.pdf"
         temp_copy = self.dirs.scratch_dir / test_file.name
         shutil.copy(test_file, temp_copy)
@@ -248,13 +247,7 @@ class TestRetryConsumeTask(
         # Ensure the file is moved to the failed dir
         self.assertIsFile(settings.CONSUMPTION_FAILED_DIR / task.task_file_name)
 
-        tasks.retry_failed_file(task_id=task.task_id)
-
-        m.assert_called_once()
-
-        args, _ = m.call_args
-
-        command = args[0]
-
-        self.assertEqual(command[0], "qpdf")
-        self.assertEqual(command[1], "--replace-input")
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
+            with self.assertLogs("documents.tasks", level="INFO") as cm:
+                tasks.retry_failed_file(task_id=task.task_id, clean=True)
+                self.assertIn("PDF cleaned successfully", cm.output[0])

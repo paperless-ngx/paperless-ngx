@@ -48,6 +48,7 @@ from documents.plugins.helpers import ProgressStatusOptions
 from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
+from documents.utils import copy_file_with_basic_stats
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
@@ -185,10 +186,13 @@ def retry_failed_file(task_id: str, clean: bool = False, skip_ocr: bool = False)
         if not failed_file.exists():
             logger.error(f"Failed file {failed_file} not found")
             return
+        working_copy = settings.SCRATCH_DIR / failed_file.name
+        copy_file_with_basic_stats(failed_file, working_copy)
+
         consume_file(
             ConsumableDocument(
                 source=DocumentSource.ConsumeFolder,
-                original_file=failed_file,
+                original_file=working_copy,
             ),
             clean=clean,
             # skip_ocr=skip_ocr,

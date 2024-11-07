@@ -149,7 +149,12 @@ class ConsumerPlugin(
         self._send_progress(100, 100, ProgressStatusOptions.FAILED, message)
         self.log.error(log_message or message, exc_info=exc_info)
         # Move the file to the failed directory
-        if self.input_doc.original_file.exists():
+        if (
+            self.input_doc.original_file.exists()
+            and not Path(
+                settings.CONSUMPTION_FAILED_DIR / self.input_doc.original_file.name,
+            ).exists()
+        ):
             copy_file_with_basic_stats(
                 self.input_doc.original_file,
                 settings.CONSUMPTION_FAILED_DIR / self.input_doc.original_file.name,
@@ -809,9 +814,23 @@ class CleanPDFPlugin(
     NoCleanupPluginMixin,
     NoSetupPluginMixin,
     AlwaysRunPluginMixin,
+    LoggingMixin,
     ConsumeTaskPlugin,
 ):
     NAME: str = "CleanPDFPlugin"
+    logging_name = "paperless.consumer"
+
+    def __init__(
+        self,
+        input_doc: ConsumableDocument,
+        metadata: DocumentMetadataOverrides,
+        status_mgr: ProgressManager,
+        base_tmp_dir: Path,
+        task_id: str,
+    ) -> None:
+        super().__init__(input_doc, metadata, status_mgr, base_tmp_dir, task_id)
+
+        self.renew_logging_group()
 
     def run(self) -> str | None:
         """
@@ -819,15 +838,19 @@ class CleanPDFPlugin(
         """
         msg = None
         try:
-            run_subprocess(
+            result = run_subprocess(
                 [
                     "qpdf",
                     "--replace-input",
-                    self.working_copy,
+                    self.input_doc.original_file,
                 ],
                 logger=self.log,
             )
-            msg = "PDF successfully cleaned"
+            msg = (
+                f"Error while cleaning PDF: {result.stderr}"
+                if result.returncode != 0
+                else "PDF cleaned successfully"
+            )
         except Exception as e:
             msg = "Error while cleaning PDF"
             self.log.error(e)
