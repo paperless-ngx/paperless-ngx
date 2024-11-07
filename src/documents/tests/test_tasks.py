@@ -204,7 +204,7 @@ class TestRetryConsumeTask(
     TestCase,
 ):
     @override_settings(CONSUMPTION_FAILED_DIR=Path(__file__).parent / "samples")
-    def test_retry_consume(self):
+    def test_retry_consume_clean(self):
         test_file = self.SAMPLE_DIR / "corrupted.pdf"
         temp_copy = self.dirs.scratch_dir / test_file.name
         shutil.copy(test_file, temp_copy)
@@ -250,4 +250,10 @@ class TestRetryConsumeTask(
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
             with self.assertLogs() as cm:
                 tasks.retry_failed_file(task_id=task.task_id, clean=True)
-                self.assertIn("New document id 1 created", cm.output[-1])
+                # on ci, the message is different because qpdf is not installed
+                msg = (
+                    "No such file or directory: 'qpdf'"
+                    if "PAPERLESS_CI_TEST" in os.environ
+                    else "New document id 1 created"
+                )
+                self.assertIn(msg, cm.output[-1])
