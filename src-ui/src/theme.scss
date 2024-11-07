@@ -252,7 +252,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   }
 
   .table-row-selected {
-    td, a {
+    td, a:not(.badge) {
       color: var(--pngx-primary-text-contrast) !important;
     }
   }
