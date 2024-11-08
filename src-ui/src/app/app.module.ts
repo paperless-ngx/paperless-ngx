@@ -67,6 +67,7 @@ import { SafeUrlPipe } from './pipes/safeurl.pipe'
 import { SafeHtmlPipe } from './pipes/safehtml.pipe'
 import { CustomDatePipe } from './pipes/custom-date.pipe'
 import { DateComponent } from './components/common/input/date/date.component'
+import { DatepickerRangeComponent } from './components/common/input/datepicker-range/datepicker-range.component'
 import { ISODateAdapter } from './utils/ngb-iso-date-adapter'
 import { LocalizedDateParserFormatter } from './utils/ngb-date-parser-formatter'
 import { ApiVersionInterceptor } from './interceptors/api-version.interceptor'
@@ -155,6 +156,7 @@ import {
   boxArrowUpRight,
   boxes,
   calendar,
+  calendar3,
   calendarEvent,
   cardChecklist,
   caretDown,
@@ -259,6 +261,7 @@ const icons = {
   boxArrowUpRight,
   boxes,
   calendar,
+  calendar3,
   calendarEvent,
   cardChecklist,
   caretDown,
@@ -499,6 +502,7 @@ function initializeApp(settings: SettingsService) {
     SafeHtmlPipe,
     CustomDatePipe,
     DateComponent,
+    DatepickerRangeComponent,
     ColorComponent,
     DocumentAsnComponent,
     DocumentNotesComponent,

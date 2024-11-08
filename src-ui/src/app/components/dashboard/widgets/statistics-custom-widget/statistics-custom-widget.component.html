@@ -1,6 +1,7 @@
 <pngx-widget-frame title="Statistics" [loading]="loading" i18n-title>
   <ng-container content>
     <div class="list-group border-light">
+      <pngx-input-datepicker-range></pngx-input-datepicker-range>
       <div class="chart-container">
         <canvas id="MyChart">{{ chart }}</canvas>
       </div>
