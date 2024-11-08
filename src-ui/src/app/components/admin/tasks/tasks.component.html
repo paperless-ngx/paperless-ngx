@@ -43,7 +43,7 @@
       </tr>
     </thead>
     <tbody>
-      @for (task of tasks | slice: (page-1) * pageSize : page * pageSize; track task) {
+      @for (task of tasks | slice: (page-1) * pageSize : page * pageSize; track task.id) {
         <tr (click)="toggleSelected(task, $event); $event.stopPropagation();">
           <td>
             <div class="form-check">
