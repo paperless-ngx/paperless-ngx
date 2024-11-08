@@ -26,6 +26,7 @@ import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
+import { CheckComponent } from '../../common/input/check/check.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
@@ -54,6 +55,7 @@ const FILTER_TARGETS = [
     PageHeaderComponent,
     IfPermissionsDirective,
     CustomDatePipe,
+    CheckComponent,
     SlicePipe,
     FormsModule,
     ReactiveFormsModule,
@@ -105,6 +107,8 @@ export class TasksComponent
       ? FILTER_TARGETS
       : FILTER_TARGETS.slice(0, 1)
   }
+
+  public retryClean: boolean = false
 
   get dismissButtonText(): string {
     return this.selectedTasks.size > 0
@@ -180,7 +184,7 @@ export class TasksComponent
   }
 
   retryTask(task: PaperlessTask) {
-    this.tasksService.retryTask(task).subscribe({
+    this.tasksService.retryTask(task, this.retryClean).subscribe({
       next: () => {
         this.toastService.showInfo($localize`Retrying task...`)
       },

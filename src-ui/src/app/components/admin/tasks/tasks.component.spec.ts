@@ -32,6 +32,7 @@ import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
+import { CheckComponent } from '../../common/input/check/check.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { TasksComponent, TaskTab } from './tasks.component'
 
@@ -138,6 +139,7 @@ describe('TasksComponent', () => {
         PageHeaderComponent,
         IfPermissionsDirective,
         CustomDatePipe,
+        CheckComponent,
         ConfirmDialogComponent,
       ],
       providers: [
@@ -184,8 +186,10 @@ describe('TasksComponent', () => {
       `Failed${currentTasksLength}`
     )
     expect(
-      fixture.debugElement.queryAll(By.css('table input[type="checkbox"]'))
-    ).toHaveLength(currentTasksLength + 1)
+      fixture.debugElement.queryAll(
+        By.css('table td > .form-check input[type="checkbox"]')
+      )
+    ).toHaveLength(currentTasksLength)
 
     currentTasksLength = tasks.filter(
       (t) => t.status === PaperlessTaskStatus.Complete
@@ -396,7 +400,7 @@ describe('TasksComponent', () => {
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     retrySpy.mockReturnValueOnce(of({ task_id: '123' }))
     component.retryTask(tasks[0])
-    expect(retrySpy).toHaveBeenCalledWith(tasks[0])
+    expect(retrySpy).toHaveBeenCalledWith(tasks[0], false)
     expect(toastInfoSpy).toHaveBeenCalledWith('Retrying task...')
     retrySpy.mockReturnValueOnce(throwError(() => new Error('test')))
     component.retryTask(tasks[0])

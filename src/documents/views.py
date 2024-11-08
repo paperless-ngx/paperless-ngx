@@ -189,6 +189,7 @@ from documents.serialisers import NotesSerializer
 from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import RemovePasswordDocumentsSerializer
 from documents.serialisers import ReprocessDocumentsSerializer
+from documents.serialisers import RetryTaskSerializer
 from documents.serialisers import RotateDocumentsSerializer
 from documents.serialisers import RunTaskViewSerializer
 from documents.serialisers import SavedViewSerializer
@@ -3471,9 +3472,16 @@ class TasksViewSet(ReadOnlyModelViewSet):
     @action(methods=["post"], detail=True)
     def retry(self, request, pk=None):
         task = self.get_object()
+
+        serializer = RetryTaskSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        clean = serializer.validated_data.get("clean")
+
         try:
-            new_task_id = retry_failed_file(task.task_id, True)
+            new_task_id = retry_failed_file(task.task_id, clean)
             return Response({"task_id": new_task_id})
+        except FileNotFoundError:
+            return HttpResponseBadRequest("Original file not found")
         except Exception as e:
             logger.warning(f"An error occurred retrying task: {e!s}")
             return HttpResponseBadRequest(
