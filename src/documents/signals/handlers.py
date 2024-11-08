@@ -631,6 +631,19 @@ def update_filename_and_move_files(
             )
 
 
+@receiver(models.signals.post_save, sender=PaperlessTask)
+def cleanup_failed_documents(sender, instance: PaperlessTask, **kwargs):
+    if instance.status != states.FAILURE or not instance.acknowledged:
+        return
+
+    if instance.task_file_name:
+        try:
+            Path(settings.CONSUMPTION_FAILED_DIR / instance.task_file_name).unlink()
+            logger.debug(f"Cleaned up failed file {instance.task_file_name}")
+        except FileNotFoundError:
+            logger.warning(f"Failed to clean up failed file {instance.task_file_name}")
+
+
 @shared_task
 def process_cf_select_update(custom_field: CustomField) -> None:
     """

@@ -1,4 +1,5 @@
 import shutil
+import uuid
 from datetime import timedelta
 from pathlib import Path
 from unittest import mock
@@ -11,6 +12,8 @@ from django.test import override_settings
 from django.utils import timezone
 
 from documents import tasks
+from documents.data_models import ConsumableDocument
+from documents.data_models import DocumentSource
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
@@ -18,9 +21,13 @@ from documents.models import PaperlessTask
 from documents.models import Tag
 from documents.sanity_checker import SanityCheckFailedException
 from documents.sanity_checker import SanityCheckMessages
+from documents.signals.handlers import before_task_publish_handler
+from documents.signals.handlers import task_failure_handler
 from documents.tests.test_classifier import dummy_preprocess
 from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
+from documents.tests.utils import SampleDirMixin
 
 
 class TestIndexReindex(DirectoriesMixin, TestCase):
@@ -230,6 +237,70 @@ class TestEmptyTrashTask(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         tasks.empty_trash()
         self.assertEqual(Document.global_objects.count(), 0)
+
+
+class TestRetryConsumeTask(
+    DirectoriesMixin,
+    SampleDirMixin,
+    FileSystemAssertsMixin,
+    TestCase,
+):
+    def do_failed_task(self, test_file: Path) -> PaperlessTask:
+        temp_copy = self.dirs.scratch_dir / test_file.name
+        shutil.copy(test_file, temp_copy)
+
+        headers = {
+            "id": str(uuid.uuid4()),
+            "task": "documents.tasks.consume_file",
+        }
+        body = (
+            # args
+            (
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=str(temp_copy),
+                ),
+                None,
+            ),
+            # kwargs
+            {},
+            # celery metadata
+            {"callbacks": None, "errbacks": None, "chain": None, "chord": None},
+        )
+        before_task_publish_handler(headers=headers, body=body)
+
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
+            with self.assertRaises(Exception):
+                tasks.consume_file(
+                    ConsumableDocument(
+                        source=DocumentSource.ConsumeFolder,
+                        original_file=temp_copy,
+                    ),
+                )
+
+        task_failure_handler(
+            task_id=headers["id"],
+            exception="Example failure",
+        )
+
+        task = PaperlessTask.objects.first()
+        self.assertIsFile(settings.CONSUMPTION_FAILED_DIR / task.task_file_name)
+        return task
+
+    @mock.patch("documents.tasks.consume_file.delay")
+    @mock.patch("documents.tasks.run_subprocess")
+    def test_retry_consume_clean(self, m_subprocess, m_consume_file) -> None:
+        task = self.do_failed_task(self.SAMPLE_DIR / "corrupted.pdf")
+        m_subprocess.return_value.returncode = 0
+        task_id = tasks.retry_failed_file(task_id=task.task_id, clean=True)
+        self.assertIsNotNone(task_id)
+        m_consume_file.assert_called_once()
+
+    def test_cleanup(self) -> None:
+        task = self.do_failed_task(self.SAMPLE_DIR / "corrupted.pdf")
+        task.acknowledged = True
+        task.save()
+        self.assertIsNotFile(settings.CONSUMPTION_FAILED_DIR / task.task_file_name)
 
 
 class TestUpdateContent(DirectoriesMixin, TestCase):

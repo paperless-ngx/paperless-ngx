@@ -20,7 +20,7 @@ import {
   takeUntil,
   timer,
 } from 'rxjs'
-import { PaperlessTask } from 'src/app/data/paperless-task'
+import { PaperlessTask, PaperlessTaskStatus } from 'src/app/data/paperless-task'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { TasksService } from 'src/app/services/tasks.service'
@@ -75,6 +75,7 @@ export class TasksComponent
   private readonly router = inject(Router)
   private readonly toastService = inject(ToastService)
 
+  public PaperlessTaskStatus = PaperlessTaskStatus
   public activeTab: TaskTab
   public selectedTasks: Set<number> = new Set()
   public togggleAll: boolean = false
@@ -176,6 +177,17 @@ export class TasksComponent
   dismissAndGo(task: PaperlessTask) {
     this.dismissTask(task)
     this.router.navigate(['documents', task.related_document])
+  }
+
+  retryTask(task: PaperlessTask) {
+    this.tasksService.retryTask(task).subscribe({
+      next: () => {
+        this.toastService.showInfo($localize`Retrying task...`)
+      },
+      error: (e) => {
+        this.toastService.showError($localize`Failed to retry task`, e)
+      },
+    })
   }
 
   expandTask(task: PaperlessTask) {

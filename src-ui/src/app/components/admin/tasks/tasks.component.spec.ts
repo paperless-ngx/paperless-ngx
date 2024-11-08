@@ -16,7 +16,7 @@ import {
   NgbNavItem,
 } from '@ng-bootstrap/ng-bootstrap'
 import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { throwError } from 'rxjs'
+import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import {
   PaperlessTask,
@@ -388,5 +388,21 @@ describe('TasksComponent', () => {
     component.beforeTabChange()
     expect(component.filterText).toEqual('')
     expect(component.filterTargetID).toEqual(0)
+  })
+
+  it('should retry a task, show toast on error or success', () => {
+    const retrySpy = jest.spyOn(tasksService, 'retryTask')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    retrySpy.mockReturnValueOnce(of({ task_id: '123' }))
+    component.retryTask(tasks[0])
+    expect(retrySpy).toHaveBeenCalledWith(tasks[0])
+    expect(toastInfoSpy).toHaveBeenCalledWith('Retrying task...')
+    retrySpy.mockReturnValueOnce(throwError(() => new Error('test')))
+    component.retryTask(tasks[0])
+    expect(toastErrorSpy).toHaveBeenCalledWith(
+      'Failed to retry task',
+      new Error('test')
+    )
   })
 })
